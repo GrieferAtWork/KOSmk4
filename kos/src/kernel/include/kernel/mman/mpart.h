@@ -945,7 +945,7 @@ NOTHROW(FCALL mpart_nodma_or_unlock_nx)(struct mpart *__restrict self,
 /* Ensure that `self->mp_meta != NULL' */
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_hasmeta_or_unlock(struct mpart *__restrict self,
-                        struct unlockinfo *unlock)
+                        struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
@@ -985,6 +985,13 @@ FUNDEF BLOCKING WUNUSED NONNULL((1, 3)) __BOOL FCALL
 mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct unlockinfo *unlock,
                         struct mpart_setcore_data *__restrict data)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
+/* Same  as `mpart_setcore_or_unlock()', but  keep even after a
+ * lock was lost, keep working to force the part into the core. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_setcore_or_unlock2(struct mpart *__restrict self,
+                         struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Based on `mfault_autosplit_threshold', possibly split `self',
@@ -1085,6 +1092,33 @@ FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_denywrite_or_unlock(struct mpart *__restrict self,
                           struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mpart_denywrite_r_or_unlock(struct mpart *__restrict self,
+                            struct unlockinfo *unlock,
+                            mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+
+/* Ensure that:
+ * >> LIST_FOREACH (node, &self->mp_copy, mn_link) {
+ * >>     mpart_getblockstate(self, <ANY_BLOCK_BELONGING_TO(node)>)
+ * >>         in [MPART_BLOCK_ST_LOAD, MPART_BLOCK_ST_CHNG];
+ * >> } */
+#define mpart_loadprivate_or_unlock(self, unlock) \
+	mpart_loadprivate_r_or_unlock(self, unlock, 0, mpart_getsize(self))
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+_mpart_loadprivate_r_or_unlock(struct mpart *__restrict self,
+                               struct unlockinfo *unlock,
+                               mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY)
+		ASMNAME("mpart_loadprivate_r_or_unlock");
+#ifndef __OPTIMIZE_SIZE__
+#define mpart_loadprivate_r_or_unlock(self, unlock, partrel_offset, num_bytes) \
+	(likely(LIST_EMPTY(&(self)->mp_copy)) ? 1 : _mpart_loadprivate_r_or_unlock(self, unlock, partrel_offset, num_bytes))
+#else /* !__OPTIMIZE_SIZE__ */
+#define mpart_loadprivate_r_or_unlock(self, unlock, partrel_offset, num_bytes) \
+	_mpart_loadprivate_r_or_unlock(self, unlock, partrel_offset, num_bytes)
+#endif /* __OPTIMIZE_SIZE__ */
 /************************************************************************/
 
 
@@ -1212,6 +1246,25 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 #define mpart_hasblockstate(self) \
 	((self)->mp_blkst_ptr != __NULLPTR || ((self)->mp_flags & MPART_F_BLKST_INL))
 
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setblockstate_r)(struct mpart *__restrict self,
+                                     size_t partrel_block_index_start,
+                                     size_t partrel_block_index_end,
+                                     unsigned int st);
+#ifdef NDEBUG
+#define mpart_setblockstate_r_from(self, partrel_block_index_start, partrel_block_index_end, old_st, st) \
+	mpart_setblockstate_r(self, partrel_block_index_start, partrel_block_index_end, st)
+#else /* NDEBUG */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setblockstate_r_from)(struct mpart *__restrict self,
+                                          size_t partrel_block_index_start,
+                                          size_t partrel_block_index_end,
+                                          unsigned int old_st,
+                                          unsigned int st)
+		ASMNAME("mpart_setblockstate_r_from_dbg");
+#endif /* !NDEBUG */
+
+
 /* Perform extra actions after clearing `MPART_BLOCK_ST_INIT' states in `self'. */
 #define mpart_setblockstate_initdone_extrahooks(self)                                          \
 	(__hybrid_atomic_load(&(self)->mp_xflags, __ATOMIC_ACQUIRE) & (MPART_XF_MERGE_AFTER_INIT | \
@@ -1331,8 +1384,10 @@ NOTHROW(FCALL mpart_memaddr_for_write_commit)(struct mpart *__restrict self,
  * The given `loc->mppl_size' is a hint as to how many consecutive blocks
  * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
- * block containing `partrel_offset' */
-FUNDEF BLOCKING NONNULL((1, 3)) void FCALL
+ * block containing `partrel_offset'
+ * @return: true:  Success
+ * @return: false: The underlying file has been deleted */
+FUNDEF BLOCKING NONNULL((1, 3)) __BOOL FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
                          struct mpart_physloc const *__restrict loc,

@@ -275,9 +275,9 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL fsuper_add2changed)(struct fsup
  * @assume(addr + num_bytes <= self->fs_dev->mf_filesize);
  * @assume(num_bytes != 0); */
 #define fsuper_dev_rdsectors_async(self, addr, buf, num_bytes, aio) \
-	((*(self)->fs_loadblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+	mfile_doasyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes, aio)
 #define fsuper_dev_wrsectors_async(self, addr, buf, num_bytes, aio) \
-	((*(self)->fs_saveblocks)((self)->fs_dev, addr, buf, num_bytes, aio))
+	mfile_doasyncio((self)->fs_dev, (self)->fs_saveblocks, addr, buf, num_bytes, aio)
 #define fsuper_dev_rdsectors(self, addr, buf, num_bytes) \
 	mfile_dosyncio((self)->fs_dev, (self)->fs_loadblocks, addr, buf, num_bytes)
 #define fsuper_dev_wrsectors(self, addr, buf, num_bytes) \

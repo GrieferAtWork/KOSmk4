@@ -340,7 +340,8 @@ again_memaddr:
 		 * become the leading block! */
 		physloc.mppl_size = 1;
 #endif /* LOCAL_WRITING */
-		mpart_memload_and_unlock(self, part_offs, &physloc, NULL);
+		if unlikely(!mpart_memload_and_unlock(self, part_offs, &physloc, NULL))
+			goto done; /* File got deleted */
 		goto again;
 	}
 	assert(physloc.mppl_size != 0);

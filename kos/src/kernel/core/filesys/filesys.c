@@ -413,9 +413,8 @@ err_cannot_open_file:
 			 * This can simply be done by holding a trunc-lock,
 			 * which  will be inherited  by the superblock upon
 			 * success. */
-			mfile_lock_write(dev);
-			mfile_trunclock_inc(dev);
-			mfile_lock_endwrite(dev);
+			if (!mfile_trunclock_inc(dev))
+				THROW(E_FSERROR_DELETED);
 			TRY {
 				result = (*self->ffs_open)(self, dev, args);
 			} EXCEPT {

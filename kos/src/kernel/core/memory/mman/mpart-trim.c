@@ -35,6 +35,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/mcoreheap.h>
+#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
@@ -215,7 +216,7 @@ NOTHROW(FCALL mnode_list_sort_item_by_partoff)(struct mnode_list *__restrict lis
 /* Sort the given mem-node list by each node's `mn_partoff'.  This
  * isn't the most efficient function, mainly because it's meant to
  * sort a linked list, so it runs in O(n+(n-1)+(n-2)+...+2+1) */
-INTERN NOBLOCK NONNULL((1)) void /* INTERN because also used in "./mfile-trunc.c" */
+INTERN NOBLOCK NONNULL((1)) void /* INTERN because also used in "./mpart-lock.c" */
 NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self) {
 	struct mnode *iter, *next;
 	for (iter = LIST_FIRST(self); iter; iter = next) {
@@ -2242,7 +2243,7 @@ mpart_unlock_and_writeback_range(struct mpart *__restrict self,
                                  struct mpart_trim_data *__restrict data,
                                  mpart_reladdr_t start,
                                  mpart_reladdr_t end) {
-	size_t i, minblock, endblock;
+	size_t minblock, endblock;
 	struct mfile *file = self->mp_file;
 	struct aio_multihandle_generic aio;
 	aio_multihandle_generic_init(&aio);
@@ -2259,14 +2260,13 @@ mpart_unlock_and_writeback_range(struct mpart *__restrict self,
 		return;
 
 	/* Mark all blocks which we intend to write to as INIT */
-	for (i = minblock; i < endblock; ++i) {
-		assert(mpart_getblockstate(self, i) == MPART_BLOCK_ST_CHNG);
-		mpart_setblockstate(self, i, MPART_BLOCK_ST_INIT);
-	}
+	mpart_setblockstate_r_from(self, minblock, endblock,
+	                           MPART_BLOCK_ST_CHNG,
+	                           MPART_BLOCK_ST_INIT);
 
 	/* Release locks now that the part is prepared for syncing. */
 	incref(file);
-	mfile_trunclock_inc(file);
+	mfile_trunclock_inc_locked(file);
 	atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 	LOCAL_unlock_all();
 
@@ -2291,28 +2291,27 @@ mpart_unlock_and_writeback_range(struct mpart *__restrict self,
 		aio_multihandle_generic_waitfor(&aio);
 		aio_multihandle_generic_checkerror(&aio);
 	} EXCEPT {
-		for (i = minblock; i < endblock; ++i) {
-			assert(mpart_getblockstate(self, i) == MPART_BLOCK_ST_INIT);
-			mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
-		}
+		mpart_setblockstate_r_from(self, minblock, endblock,
+		                           MPART_BLOCK_ST_INIT,
+		                           MPART_BLOCK_ST_CHNG);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		mpart_setblockstate_initdone_extrahooks(self);
 		decref_unlikely(file);
 		RETHROW();
 	}
-	for (i = minblock; i < endblock; ++i) {
-		assert(mpart_getblockstate(self, i) == MPART_BLOCK_ST_INIT);
-		mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
-	}
+	mpart_setblockstate_r_from(self, minblock, endblock,
+	                           MPART_BLOCK_ST_INIT,
+	                           MPART_BLOCK_ST_LOAD);
 	mfile_trunclock_dec_nosignal(file);
 	sig_broadcast(&file->mf_initdone);
 	mpart_setblockstate_initdone_extrahooks(self);
 	decref_unlikely(file);
 }
 
-/* @return: MPART_NXOP_ST_RETRY: Success (but locks were lost)
- * @return: MPART_NXOP_ST_ERROR: Error (and locks were lost) */
+/* @return: MPART_NXOP_ST_SUCCESS: Skip this chunk (syncing isn't possible)
+ * @return: MPART_NXOP_ST_RETRY:   Success (but locks were lost)
+ * @return: MPART_NXOP_ST_ERROR:   Error (and locks were lost) */
 PRIVATE WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mpart_unlock_and_writeback_range_nx)(struct mpart *__restrict self,
                                                    struct mpart_trim_data *__restrict data,
@@ -2322,10 +2321,34 @@ NOTHROW(FCALL mpart_unlock_and_writeback_range_nx)(struct mpart *__restrict self
 	pos_t part_minaddr = mpart_getminaddr(self);
 	pos_t part_maxaddr = mpart_getmaxaddr(self);
 	FINALLY_DECREF_UNLIKELY(file);
-	printk(KERN_TRACE "[cc.trim] Sync part: %p: %#" PRIx64 "-%#" PRIx64 ", %p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
-	       file, part_minaddr + start, part_minaddr +  end - 1,
-	       self, start, end - 1, part_minaddr, part_maxaddr);
+
 	TRY {
+		/* Verify that the file hasn't been/is-being deleted.
+		 *
+		 * Note that we don't have to worry about the read-only flag, since the presence of
+		 * changes means that those changes must have happened *before* the read-only  flag
+		 * got set. */
+		{
+			uintptr_t file_flags = atomic_read(&file->mf_flags);
+			if unlikely(file_flags & (MFILE_F_DELETED | MFILE_F_DELETING)) {
+				if (file_flags & MFILE_F_DELETED) {
+					/* Special case: file got deleted (syncing is impossible)
+					 * In this case, an async  job (may be) in progress  that
+					 * will anonymize all of the file's old parts. */
+					return MPART_NXOP_ST_SUCCESS;
+				}
+
+				/* File is currently marked for deletion (wait for the flag to go away) */
+				LOCAL_unlock_all();
+				mfile_deleting_waitfor(file);
+				return MPART_NXOP_ST_RETRY;
+			}
+		}
+
+		printk(KERN_TRACE "[cc.trim] Sync part: %p: %#" PRIx64 "-%#" PRIx64 ", "
+		                  "%p: %#" PRIxSIZ "-%#" PRIxSIZ "@%#" PRIx64 "-%#" PRIx64 "\n",
+		       file, part_minaddr + start, part_minaddr +  end - 1,
+		       self, start, end - 1, part_minaddr, part_maxaddr);
 		mpart_unlock_and_writeback_range(self, data, start, end);
 	} EXCEPT {
 		/* Invoke a user-defined exception handler (if given) */
@@ -2462,7 +2485,12 @@ again_find_unmapped:
 					error = mpart_unlock_and_writeback_range_nx(self, data,
 					                                            result->mptr_start,
 					                                            result->mptr_end);
-					assert(error == MPART_NXOP_ST_RETRY ||
+					if (error == MPART_NXOP_ST_SUCCESS) {
+						minaddr = result->mptr_end;
+						goto again_find_unmapped;
+					}
+					assert(error == MPART_NXOP_ST_SUCCESS ||
+					       error == MPART_NXOP_ST_RETRY ||
 					       error == MPART_NXOP_ST_ERROR);
 					return error;
 				}
@@ -2489,7 +2517,6 @@ again_find_uninitialized:
 			 * it whose contents are uninitialized, then we can void that range. */
 			if (mpart_find_blockstatus_range(self, result, minaddr, endaddr,
 			                                 MBLOCK_ST_BITSET(MPART_BLOCK_ST_NDEF))) {
-
 				return MPART_FIND_TRIMABLE_RANGE_ST_VOID;
 			}
 			/* No uninitialized ranges. */
@@ -2565,6 +2592,10 @@ again_find_unchanged:
 								error = mpart_unlock_and_writeback_range_nx(self, data,
 								                                            changed_range.mptr_start,
 								                                            changed_range.mptr_end);
+								if (error == MPART_NXOP_ST_SUCCESS) {
+									minaddr = result->mptr_end;
+									goto again_find_unchanged;
+								}
 								assert(error == MPART_NXOP_ST_RETRY ||
 								       error == MPART_NXOP_ST_ERROR);
 								return error;
@@ -2643,6 +2674,10 @@ again_find_unchanged:
 						error = mpart_unlock_and_writeback_range_nx(self, data,
 						                                            result->mptr_start,
 						                                            result->mptr_end);
+						if (error == MPART_NXOP_ST_SUCCESS) {
+							minaddr = result->mptr_end;
+							goto again_find_unchanged;
+						}
 						assert(error == MPART_NXOP_ST_RETRY ||
 						       error == MPART_NXOP_ST_ERROR);
 						return error;
@@ -2712,9 +2747,18 @@ again_find_unchanged:
 
 		result->mptr_end = minblock << blockshift;
 		assert(result->mptr_start < result->mptr_end);
-		/*mpart_unmap_for_void(self,
-		                     result->mptr_start,
-		                     result->mptr_end);*/
+
+		/* Check for special case: if the file is being deleted, then we're
+		 * not allowed to void-out mem-parts that are actually still mapped */
+		if (first_block_status == MPART_BLOCK_ST_LOAD &&
+		    ((atomic_read(&self->mp_file->mf_flags) & MFILE_F_DELETING) ||
+		     (mfile_ismisaligned(self->mp_file) &&
+		      (atomic_read(&mfile_asmisaligned(self->mp_file)->mam_base->mf_flags) & MFILE_F_DELETING)))) {
+			/* XXX: Technically, we didn't need to call `mpart_unmap_for_void()' above in this case! */
+			minaddr = result->mptr_end;
+			goto again_find_unchanged;
+		}
+
 		return MPART_FIND_TRIMABLE_RANGE_ST_VOID;
 	}
 

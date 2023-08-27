@@ -932,6 +932,30 @@ nope:
 	return false;
 }
 
+/* Same  as `mpart_setcore_or_unlock()', but  keep even after a
+ * lock was lost, keep working to force the part into the core. */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) bool FCALL
+mpart_setcore_or_unlock2(struct mpart *__restrict self,
+                         struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	bool result = true;
+	struct mpart_setcore_data sc_data;
+	mpart_setcore_data_init(&sc_data);
+	TRY {
+		for (;;) {
+			if (mpart_setcore_or_unlock(self, unlock, &sc_data))
+				break;
+			result = false;
+			unlock = NULL;
+			mpart_lock_acquire(self);
+		}
+	} EXCEPT {
+		mpart_setcore_data_fini(&sc_data);
+		RETHROW();
+	}
+	return result;
+}
+
 
 /* Based on `mfault_autosplit_threshold', possibly split `self',
  * in  which case  locks are  released and  `false' is returned.
@@ -1019,6 +1043,23 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 	if unlikely(!mpart_hasblockstate(self))
 		return true;
 
+	/* Check if `file' has been deleted. */
+	{
+		uintptr_t file_flags = atomic_read(&file->mf_flags);
+		if unlikely(file_flags & (MFILE_F_DELETED | MFILE_F_DELETING)) {
+			if (file_flags & MFILE_F_DELETED) {
+				/* TODO: What should we do now? (maybe some exception?) */
+			}
+
+			/* Wait for `MFILE_F_DELETING' to go away. */
+			incref(file);
+			UNLOCK(self, unlock);
+			FINALLY_DECREF_UNLIKELY(file);
+			mfile_deleting_waitfor(file);
+			return true;
+		}
+	}
+
 	/* Check for parts that have yet to be loaded. */
 	for (i = blocks_start; i < blocks_end; ++i) {
 		unsigned int st;
@@ -1056,7 +1097,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 		atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		incref(self);
 		incref(file);
-		mfile_trunclock_inc(file);
+		mfile_trunclock_inc_locked(file);
 
 		/* Release the lock from the part, so we can load
 		 * blocks without holding that non-recursive, and
@@ -1119,8 +1160,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 				mfile_dosyncio(file, mo_loadblocks, addr, loc.mppl_addr, num_bytes);
 		} EXCEPT {
 			/* Set block states back to NDEF */
-			for (i = start; i < end; ++i)
-				mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
+			mpart_setblockstate_r(self, start, end, MPART_BLOCK_ST_NDEF);
 			mfile_trunclock_dec_nosignal(file);
 			sig_broadcast(&file->mf_initdone);
 			decref_unlikely(file);
@@ -1130,8 +1170,7 @@ mpart_load_or_unlock(struct mpart *__restrict self,
 initdone:
 
 		/* Set loaded states back to LOAD */
-		for (i = start; i < end; ++i)
-			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
+		mpart_setblockstate_r(self, start, end, MPART_BLOCK_ST_LOAD);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
@@ -2034,6 +2073,143 @@ again_try_clear_write:
 		unlockinfo_xunlock(unlock);
 		mpart_lockops_reap(self);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+	}
+	return true;
+}
+
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+mpart_denywrite_r_or_unlock(struct mpart *__restrict self,
+                            struct unlockinfo *unlock,
+                            mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
+	struct mnode *node;
+	mpart_reladdr_t endaddr = partrel_offset + num_bytes;
+
+	/* Enumerate all shared nodes in order to delete write-access from them. */
+	LIST_FOREACH (node, &self->mp_share, mn_link) {
+		unsigned int error;
+		mpart_reladdr_t mnode_part_minaddr;
+		mpart_reladdr_t mnode_part_endaddr;
+		size_t noderel_offset;
+again_try_clear_write:
+		mnode_part_minaddr = mnode_getpartminaddr(node);
+		mnode_part_endaddr = mnode_getpartendaddr(node);
+		if (mnode_part_minaddr < partrel_offset)
+			mnode_part_minaddr = partrel_offset;
+		if (mnode_part_endaddr > endaddr)
+			mnode_part_endaddr = endaddr;
+		if (mnode_part_minaddr > mnode_part_endaddr)
+			continue; /* Node doesn't overlap with caller-given range. */
+		noderel_offset = mnode_part_minaddr - mnode_getpartminaddr(node);
+
+		/* Only clear the relevant area. */
+		error = mnode_clear_write_r(node, noderel_offset,
+		                            mnode_part_endaddr -
+		                            mnode_part_minaddr);
+		if likely(error == MNODE_CLEAR_WRITE_SUCCESS)
+			continue;
+		if (error == MNODE_CLEAR_WRITE_WOULDBLOCK) {
+			REF struct mman *mm;
+
+			/* Must wait for the node's mman to become available */
+			mm = node->mn_mman;
+			if unlikely(!tryincref(mm))
+				goto again_try_clear_write;
+			_mpart_lock_release(self);
+			unlockinfo_xunlock(unlock);
+			mpart_lockops_reap(self);
+			FINALLY_DECREF_UNLIKELY(mm);
+			mman_lock_waitfor(mm);
+			return false;
+		}
+
+		/* Hard error: bad allocation :( */
+		assert(error == MNODE_CLEAR_WRITE_BADALLOC);
+		_mpart_lock_release(self);
+		unlockinfo_xunlock(unlock);
+		mpart_lockops_reap(self);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+	}
+	return true;
+}
+
+
+
+INTDEF NOBLOCK NONNULL((1)) void /* From "./mpart-trim.c" */
+NOTHROW(FCALL mnode_list_sort_by_partoff)(struct mnode_list *__restrict self);
+
+
+/* Ensure that:
+ * >> LIST_FOREACH (node, &self->mp_copy, mn_link) {
+ * >>     mpart_getblockstate(self, <ANY_BLOCK_BELONGING_TO(node)>)
+ * >>         in [MPART_BLOCK_ST_LOAD, MPART_BLOCK_ST_CHNG];
+ * >> } */
+PUBLIC WUNUSED NONNULL((1)) bool
+(FCALL mpart_loadprivate_r_or_unlock)(struct mpart *__restrict self,
+                                      struct unlockinfo *unlock,
+                                      mpart_reladdr_t partrel_offset, size_t num_bytes)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
+	struct mnode *node;
+	mpart_reladdr_t endaddr = partrel_offset + num_bytes;
+
+	/* Sort the list of copy-on-write nodes so we can easily detect continuous ranges. */
+	mnode_list_sort_by_partoff(&self->mp_copy);
+
+	/* Enumerate copy-on-write (iow: MAP_PRIVATE) nodes of `self' */
+	mnode_list_sort_by_partoff(&self->mp_copy);
+	node = LIST_FIRST(&self->mp_copy);
+	while (node) {
+		mpart_reladdr_t node_minaddr, node_endaddr;
+		size_t node_size;
+		assert(node->mn_part == self);
+		node_minaddr = mnode_getpartminaddr(node);
+		node_endaddr = mnode_getpartendaddr(node);
+		if (node_minaddr < partrel_offset) {
+			node_minaddr = partrel_offset;
+			if (node_minaddr >= node_endaddr) {
+				node = LIST_NEXT(node, mn_link);
+				continue;
+			}
+		}
+		assert(node_minaddr < node_endaddr);
+		if (node_minaddr >= endaddr)
+			break;
+		if (node_endaddr > endaddr)
+			node_endaddr = endaddr;
+
+		/* Check for adjacent nodes. */
+		while ((node = LIST_NEXT(node, mn_link)) != NULL) {
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_minaddr;
+			PAGEDIR_PAGEALIGNED mpart_reladdr_t nextnode_endaddr;
+			assert(node->mn_part == self);
+			nextnode_minaddr = mnode_getpartminaddr(node);
+			nextnode_endaddr = mnode_getpartendaddr(node);
+			if (nextnode_minaddr > node_endaddr)
+				break; /* There's a gap after the end of the relevant range. */
+			if (node_endaddr < nextnode_endaddr) {
+				/* Extend  load-range  to  include  this  node,
+				 * since it overlaps/extends our current range. */
+				node_endaddr = nextnode_endaddr;
+				if (node_endaddr > endaddr)
+					node_endaddr = endaddr;
+			}
+		}
+
+		/* Figure out the effective area that should be loaded. */
+		assert(node_endaddr > node_minaddr);
+		node_size = node_endaddr - node_minaddr;
+
+		/* Ensure that the part is allocated in-core. */
+		if (!MPART_ST_INCORE(self->mp_state)) {
+			if (!mpart_maybesplit_or_unlock(self, unlock, node_minaddr, node_size))
+				return false;
+			if (!mpart_setcore_or_unlock2(self, unlock))
+				return false;
+		}
+
+		/* Ensure that this sub-range is loaded. */
+		if (!mpart_load_or_unlock(self, unlock, node_minaddr, node_size))
+			return false;
 	}
 	return true;
 }

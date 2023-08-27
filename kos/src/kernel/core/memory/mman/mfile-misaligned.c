@@ -121,6 +121,7 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 	/* Apply addend */
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr)) {
 		/* Out-of-bounds --> always read zero-bytes. */
+do_bzero:
 		bzerophyscc(buf, num_bytes);
 		return;
 	}
@@ -134,9 +135,8 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 		pos_t filesize, io_bytes;
 
 		/* Prevent the base file from being truncated. */
-		mfile_lock_read(base);
-		mfile_trunclock_inc(base);
-		mfile_lock_endread(base);
+		if unlikely(!mfile_trunclock_inc(base))
+			goto do_bzero;
 		RAII_FINALLY { mfile_trunclock_dec(base); };
 
 		/* Figure out how much data we can load from the base file. */
@@ -383,9 +383,7 @@ mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
 
 	/* Re-acquire a lock to the base file (and make it a write-lock this time) */
 	TRY {
-#if 0
 again_lock_write_inner:
-#endif
 		mfile_lock_write(inner);
 
 		/* We can't wait for `mf_trunclock' to become 0 because that would pose
@@ -440,6 +438,18 @@ again_lock_write_inner:
 			goto again_lock_write_inner;
 		}
 #endif
+
+		/* Ensure that the `MFILE_F_DELETING'-flag isn't set on `inner'
+		 *
+		 * This is needed to sync  with `unlink(2)', which assumes  that
+		 * the set of existing misaligned files doesn't change while the
+		 * deleting-flag is set. */
+		if unlikely(atomic_read(&inner->mf_flags) & MFILE_F_DELETING) {
+			mfile_lock_endwrite(inner);
+			if unlikely(!mfile_deleting_waitfor(inner))
+				goto free_result_and_xdecref_predecessor_and_return_inner; /* File get *fully* deleted. */
+			goto again_lock_write_inner;
+		}
 	} EXCEPT {
 		kfree(result);
 		xdecref_unlikely(predecessor);
@@ -453,9 +463,7 @@ again_lock_write_inner:
 		/* Deleted file --> don't create a misalignment wrapper! */
 		mfile_tslock_release_br(inner);
 		mfile_lock_endwrite(inner);
-		kfree(result);
-		xdecref_unlikely(predecessor);
-		goto return_inner;
+		goto free_result_and_xdecref_predecessor_and_return_inner;
 	}
 	result->mf_atime = inner->mf_atime;
 	result->mf_mtime = inner->mf_mtime;
@@ -515,6 +523,9 @@ did_insert:
 	xdecref_unlikely(predecessor);
 
 	return result;
+free_result_and_xdecref_predecessor_and_return_inner:
+	kfree(result);
+	xdecref_unlikely(predecessor);
 return_inner:
 	return incref(inner);
 }

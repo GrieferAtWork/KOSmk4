@@ -593,13 +593,18 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	                           MFILE_F_DELETED |
 	                           MFILE_F_NOATIME |
 	                           MFILE_F_NOMTIME);
-	if (old_flags & MFILE_F_PERSISTENT)
-		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT); /* Also clear the PERSISTENT flag */
 	mfile_tslock_release(self);
+
+	/* Also clear the PERSISTENT flag */
+	if (old_flags & MFILE_F_PERSISTENT)
+		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 
 	/* Check if the file has already been marked as deleted. */
 	if (old_flags & MFILE_F_DELETED)
 		return;
+
+	/* Broadcast that the file was marked as deleted. */
+	sig_broadcast(&self->mf_initdone);
 
 	/* Looks  like the burden of deleting the file falls on us...
 	 * Note  that by we've got quite a  bit of space to work with
@@ -626,15 +631,103 @@ NOTHROW(FCALL mfile_delete_and_decref)(REF struct mfile *__restrict self) {
 	                           MFILE_F_DELETED |
 	                           MFILE_F_NOATIME |
 	                           MFILE_F_NOMTIME);
+	mfile_tslock_release(self);
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
-	mfile_tslock_release(self);
 	if (old_flags & MFILE_F_DELETED) {
 		decref(self);
 		return;
 	}
+	sig_broadcast(&self->mf_initdone);
 	mfile_delete_impl(self);
 }
+
+
+
+/* Blocking wait until `MFILE_F_DELETING' isn't set, or `MFILE_F_DELETED' is set
+ * @return: true:  `MFILE_F_DELETING' is no longer set
+ * @return: false: `MFILE_F_DELETED' became set */
+PUBLIC BLOCKING NONNULL((1)) bool FCALL
+mfile_deleting_waitfor(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+	uintptr_t flags;
+again:
+	assert(!task_wasconnected());
+	task_connect(&self->mf_initdone);
+	flags = atomic_read(&self->mf_flags);
+	if unlikely(flags & MFILE_F_DELETED) {
+		task_disconnectall();
+		return false;
+	}
+	if unlikely(!(flags & MFILE_F_DELETING)) {
+		task_disconnectall();
+		return true;
+	}
+	task_waitfor();
+	flags = atomic_read(&self->mf_flags);
+	if (flags & MFILE_F_DELETED)
+		return false;
+	if (!(flags & MFILE_F_DELETING))
+		return true;
+	goto again;
+}
+
+
+/* Do various things necessary to set `MFILE_F_DELETING' in `self->mf_flags'.
+ *
+ * NOTES:
+ * - The caller must have already asserted that there are no trunc-lock (`self->mf_trunclock == 0')
+ * - The caller must have already asserted that `MFILE_F_DELETING' isn't already set.
+ * - The caller must be holding a write-lock to `self'
+ * - This function will *NEVER* set `MFILE_F_DELETED' itself (it only checks if it is/gets set)
+ * - The given in-file address range is used to determine which MAP_PRIVATE parts to load
+ * - The caller of this function still has to decide how to deal with misaligned sub-files of `self'
+ *
+ * @param: delete_minaddr: The lowest in-file address where you intend to delete data
+ * @param: delete_maxaddr: The greatest in-file address where you intend to delete data
+ * @return: true:  Success (`MFILE_F_DELETING' is now set)
+ * @return: false: Locks were released -> try again */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+mfile_deleting_begin_locked_or_unlock(struct mfile *__restrict self,
+                                      pos_t delete_minaddr,
+                                      pos_t delete_maxaddr,
+                                      struct unlockinfo *unlock)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+#define LOCAL_unlock_all()        \
+	(mfile_lock_endwrite_f(self), \
+	 unlockinfo_xunlock(unlock),  \
+	 mfile_lockops_reap(self))
+	assert(mfile_lock_writing(self));
+	assert(self->mf_trunclock == 0);
+	assert(!(self->mf_flags & MFILE_F_DELETING));
+
+	if likely(self->mf_parts != MFILE_PARTS_ANONYMOUS) {
+		/* Acquire references and locks to all parts of `self' */
+		if (!mfile_incref_and_lock_parts_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+			return false;
+
+		/* Deny write access to memory mappings. */
+		if (!mfile_parts_denywrite_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+			return false;
+
+		/* Load parts linked to MAP_PRIVATE nodes. */
+		if (!mfile_parts_loadprivate_r_or_unlock(self, delete_minaddr, delete_maxaddr, unlock))
+			return false;
+
+		/* Actually set the DELETING flag. */
+		atomic_or(&self->mf_flags, MFILE_F_DELETING);
+
+		/* Release locks to parts of `self' */
+		mfile_unlock_and_decref_parts(self);
+	} else {
+		/* Without any parts, we can set the DELETING flag without any extra work. */
+		atomic_or(&self->mf_flags, MFILE_F_DELETING);
+	}
+	return true;
+#undef LOCAL_unlock_all
+}
+
+
 
 DECL_END
 

@@ -1916,6 +1916,7 @@ NOTHROW(FCALL device_delete)(struct device *__restrict self) {
 
 	if (old_flags & MFILE_F_DELETED)
 		return; /* Already deleted, or deletion already in progress. */
+	sig_broadcast(&self->mf_initdone);
 
 	incref(self);
 

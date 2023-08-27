@@ -31,6 +31,8 @@
 #include <misc/unlockinfo.h>
 #include <sched/cred.h>
 
+#include <hybrid/overflow.h>
+
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 
@@ -75,7 +77,7 @@ again:
  * pointer to it. Otherwise, return  `NULL' (references+locks are only  acquired
  * when this function returns `NULL', making that the success-return-value) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mpart *
-NOTHROW(FCALL mpart_incref_and_tree_trylock_whole_tree)(struct mpart *__restrict self) {
+NOTHROW(FCALL mpart_incref_and_trylock_whole_tree)(struct mpart *__restrict self) {
 	struct mpart *result;
 	struct mpart *lhs, *rhs;
 	lhs = self->mp_filent.rb_lhs;
@@ -89,12 +91,12 @@ NOTHROW(FCALL mpart_incref_and_tree_trylock_whole_tree)(struct mpart *__restrict
 
 	/* Recursion... */
 	if (lhs) {
-		result = mpart_incref_and_tree_trylock_whole_tree(lhs);
+		result = mpart_incref_and_trylock_whole_tree(lhs);
 		if unlikely(result != NULL)
 			goto err;
 	}
 	if (rhs) {
-		result = mpart_incref_and_tree_trylock_whole_tree(rhs);
+		result = mpart_incref_and_trylock_whole_tree(rhs);
 		if unlikely(result != NULL)
 			goto err;
 	}
@@ -121,7 +123,7 @@ NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self) {
 again:
 	result = self->mf_parts;
 	if (result) {
-		result = mpart_incref_and_tree_trylock_whole_tree(result);
+		result = mpart_incref_and_trylock_whole_tree(result);
 		if (result) {
 			/* Either remove a  dead mem-part,  or return  a
 			 * reference to one which is currently blocking. */
@@ -187,7 +189,6 @@ NOTHROW(FCALL mfile_unlock_and_decref_parts_except)(struct mfile *__restrict sel
 }
 
 
-
 /* Acquire locks to all of the mem-parts associated with a given mfile.
  * - The caller must be holding a write-lock to `self' and must ensure
  *   that `self' isn't anonymous.
@@ -218,25 +219,98 @@ mfile_incref_and_lock_parts_or_unlock(struct mfile *__restrict self,
 	return true;
 }
 
-
-
-/* Same as `mfile_incref_and_lock_parts_or_unlock()', but
- * assert `mpart_denywrite_or_unlock()'  for  all  parts.
- *
- * Should be used if the caller intends to set `MFILE_F_READONLY' */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
-mfile_incref_and_lock_parts_and_denywrite_or_unlock(struct mfile *__restrict self,
-                                                    struct unlockinfo *unlock)
-		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
-
-	/* Acquire locks. */
-	if (!mfile_incref_and_lock_parts_or_unlock(self, unlock))
+mfile_incref_and_lock_parts_r_or_unlock(struct mfile *__restrict self,
+                                        pos_t minaddr, pos_t maxaddr,
+                                        struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK) {
+	REF struct mpart *blocking_part;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	blocking_part = mfile_tryincref_and_lock_parts_r(self, minaddr, maxaddr);
+	if unlikely(blocking_part) {
+		mfile_lock_endwrite(self);
+		unlockinfo_xunlock(unlock);
+		FINALLY_DECREF_UNLIKELY(blocking_part);
+		mpart_lock_waitfor(blocking_part);
 		return false;
-
-	/* Deny write access to memory mappings. */
-	if (!mfile_parts_denywrite_or_unlock(self, unlock))
-		return false;
+	}
 	return true;
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mfile_tryincref_and_lock_parts_r)(struct mfile *__restrict self,
+                                                pos_t minaddr, pos_t maxaddr) {
+	struct mpart_tree_minmax mima;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
+		/* Either remove a  dead mem-part,  or return  a
+		 * reference to one which is currently blocking. */
+		struct mpart *iter, *next;
+		for (iter = mima.mm_min;; iter = next) {
+			next = mpart_tree_nextnode(mima.mm_min);
+			if unlikely(!tryincref(iter)) {
+				/* Dead mem-part. (remove from tree) */
+				mpart_tree_removenode(&self->mf_parts, iter);
+				DBG_memset(&iter->mp_filent.rb_lhs, 0xcc, sizeof(iter->mp_filent.rb_lhs));
+				iter->mp_filent.rb_rhs = NULL; /* Indicator for `mpart_trim()' */
+				atomic_write(&iter->mp_filent.rb_par, (struct mpart *)-1);
+				continue;
+			}
+			assert(iter->mp_file == self);
+			if (!mpart_lock_tryacquire(iter)) {
+				next = iter;
+				while (next != mima.mm_min) {
+					next = mpart_tree_nextnode(next);
+					mpart_lock_release(next);
+					decref_unlikely(next);
+				}
+				return iter; /* Blocking mem-part. */
+			}
+			if (iter == mima.mm_max)
+				break;
+		}
+	}
+	return NULL;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_r_impl)(struct mfile *__restrict self,
+                                                    struct mpart *not_this_part,
+                                                    pos_t minaddr, pos_t maxaddr) {
+	struct mpart_tree_minmax mima;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min) {
+		for (;;) {
+			struct mpart *next;
+			next = mpart_tree_nextnode(mima.mm_min);
+			if (mima.mm_min != not_this_part) {
+				assert(!wasdestroyed(mima.mm_min));
+				assert(mpart_lock_acquired(mima.mm_min));
+				mpart_lock_release(mima.mm_min);
+				decref_unlikely(mima.mm_min);
+			}
+			if (mima.mm_min == mima.mm_max)
+				break;
+			mima.mm_min = next;
+		}
+	}
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_r)(struct mfile *__restrict self,
+                                               pos_t minaddr, pos_t maxaddr) {
+	mfile_unlock_and_decref_parts_r_impl(self, NULL, minaddr, maxaddr);
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_r_except)(struct mfile *__restrict self,
+                                                      struct mpart *__restrict part,
+                                                      pos_t minaddr, pos_t maxaddr) {
+	mfile_unlock_and_decref_parts_r_impl(self, part, minaddr, maxaddr);
 }
 
 
@@ -329,6 +403,158 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
 	if (self->mf_parts == NULL)
 		return true; /* Nothing to do here :) */
 	return mfile_parts_denywrite_or_unlock_impl(self, self->mf_parts, unlock);
+}
+
+
+
+struct unlock_whole_tree_r_except: unlockinfo {
+	struct mfile      *uwtre_file;    /* [1..1] File to unlock */
+	struct mpart      *uwtre_except;  /* [1..1] Don't unlock this part */
+	struct unlockinfo *uwtre_inner;   /* [0..1] Inner unlock info */
+	pos_t              uwtre_minaddr; /* Min address of locked parts */
+	pos_t              uwtre_maxaddr; /* Max address of locked parts */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unlock_whole_tree_r_except_cb)(struct unlockinfo *__restrict self) {
+	struct unlock_whole_tree_r_except *me;
+	me = (struct unlock_whole_tree_r_except *)self;
+	mfile_unlock_and_decref_parts_r_except(me->uwtre_file, me->uwtre_except,
+	                                       me->uwtre_minaddr, me->uwtre_maxaddr);
+	mfile_lock_endwrite(me->uwtre_file);
+	unlockinfo_xunlock(me->uwtre_inner);
+}
+
+
+PUBLIC WUNUSED NONNULL((1)) bool FCALL
+mfile_parts_denywrite_r_or_unlock(struct mfile *__restrict self,
+                                  pos_t minaddr, pos_t maxaddr,
+                                  struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
+	struct mpart_tree_minmax mima;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min != NULL) {
+		struct unlock_whole_tree_r_except ul;
+		/* Setup a custom unlock controller. */
+		ul.ui_unlock   = &unlock_whole_tree_r_except_cb;
+		ul.uwtre_file  = self;
+		ul.uwtre_inner = unlock;
+		for (;;) {
+			mpart_reladdr_t partrel_minaddr;
+			mpart_reladdr_t partrel_endaddr;
+			size_t part_size;
+			ul.uwtre_except = mima.mm_min;
+
+			if (OVERFLOW_USUB(minaddr, mpart_getminaddr(mima.mm_min), &partrel_minaddr))
+				partrel_minaddr = 0;
+			partrel_endaddr = (size_t)(maxaddr - mpart_getminaddr(mima.mm_min)) + 1;
+			part_size       = mpart_getsize(mima.mm_min);
+			if (partrel_endaddr > part_size || partrel_endaddr == 0)
+				partrel_endaddr = part_size;
+			assert(partrel_endaddr > partrel_minaddr);
+			TRY {
+				/* Deny write access to mappings of this part. */
+				if (!mpart_denywrite_r_or_unlock(mima.mm_min, &ul, partrel_minaddr,
+				                                 partrel_endaddr - partrel_minaddr)) {
+					/* Locks were lost :( */
+					assert(ul.uwtre_except == mima.mm_min);
+					decref_unlikely(ul.uwtre_except); /* This ref was skipped by `mfile_unlock_and_decref_parts_r_except' */
+					return false;
+				}
+			} EXCEPT {
+				/* Locks were also lost in this case! */
+				assert(ul.uwtre_except == mima.mm_min);
+				decref_unlikely(ul.uwtre_except); /* This ref was skipped by `mfile_unlock_and_decref_parts_r_except' */
+				RETHROW();
+			}
+			if (mima.mm_min == mima.mm_max)
+				break;
+			mima.mm_min = mpart_tree_nextnode(mima.mm_min);
+		}
+	}
+	return true;
+}
+
+
+
+
+
+/* Load MAP_PRIVATE (copy-on-write) nodes of `self' into memory.
+ *
+ * The caller must be holding a write-lock to `self', as well as individual
+ * locks to every part associated with it, as well as be holding references
+ * to all of the parts of `self' (`mfile_incref_and_lock_parts_or_unlock').
+ *
+ * @return: true:  Success: all blocks linked to copy-on-write nodes are loaded.
+ * @return: false: Locks were lost and you must try again.
+ *
+ * Locking logic:
+ *   - return == true:  No locks are lost, and no locks are gained
+ *   - return == false: - mfile_unlock_and_decref_parts(self);
+ *                      - mfile_lock_endwrite(unlock);
+ *                      - unlockinfo_xunlock(unlock);
+ *   - THROW:           like `return == false' */
+PUBLIC WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_loadprivate_or_unlock(struct mfile *__restrict self,
+                                  struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
+	return mfile_parts_loadprivate_r_or_unlock(self, 0, (pos_t)-1, unlock);
+}
+
+PUBLIC WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_loadprivate_r_or_unlock(struct mfile *__restrict self,
+                                    pos_t minaddr, pos_t maxaddr,
+                                    struct unlockinfo *unlock)
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY) {
+	/* TODO: In  a low-memory situation,  this function might loop  forever in case it
+	 *       causes OOM and then unloads parts which it already loaded before, causing
+	 *       it to keep looping forever. */
+	struct mpart_tree_minmax mima;
+	assert(self->mf_parts != MFILE_PARTS_ANONYMOUS);
+	mpart_tree_minmaxlocate(self->mf_parts, minaddr, maxaddr, &mima);
+	assert((mima.mm_min != NULL) == (mima.mm_max != NULL));
+	if (mima.mm_min != NULL) {
+		struct unlock_whole_tree_r_except ul;
+		/* Setup a custom unlock controller. */
+		ul.ui_unlock   = &unlock_whole_tree_r_except_cb;
+		ul.uwtre_file  = self;
+		ul.uwtre_inner = unlock;
+		for (;;) {
+			mpart_reladdr_t partrel_minaddr;
+			mpart_reladdr_t partrel_endaddr;
+			size_t part_size;
+			ul.uwtre_except = mima.mm_min;
+
+			if (OVERFLOW_USUB(minaddr, mpart_getminaddr(mima.mm_min), &partrel_minaddr))
+				partrel_minaddr = 0;
+			partrel_endaddr = (size_t)(maxaddr - mpart_getminaddr(mima.mm_min)) + 1;
+			part_size       = mpart_getsize(mima.mm_min);
+			if (partrel_endaddr > part_size || partrel_endaddr == 0)
+				partrel_endaddr = part_size;
+			assert(partrel_endaddr > partrel_minaddr);
+			TRY {
+				/* Make sure that private mappings of this part have been loaded. */
+				if (!mpart_loadprivate_r_or_unlock(mima.mm_min, &ul, partrel_minaddr,
+				                                   partrel_endaddr - partrel_minaddr)) {
+					/* Locks were lost :( */
+					assert(ul.uwtre_except == mima.mm_min);
+					decref_unlikely(ul.uwtre_except); /* This ref was skipped by `mfile_unlock_and_decref_parts_r_except' */
+					return false;
+				}
+			} EXCEPT {
+				/* Locks were also lost in this case! */
+				assert(ul.uwtre_except == mima.mm_min);
+				decref_unlikely(ul.uwtre_except); /* This ref was skipped by `mfile_unlock_and_decref_parts_r_except' */
+				RETHROW();
+			}
+			if (mima.mm_min == mima.mm_max)
+				break;
+			mima.mm_min = mpart_tree_nextnode(mima.mm_min);
+		}
+	}
+	return true;
 }
 
 

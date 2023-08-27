@@ -371,6 +371,45 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self) {
 	return result;
 }
 
+PUBLIC NOBLOCK NONNULL((1)) unsigned int
+NOTHROW(FCALL mnode_clear_write_r)(struct mnode *__restrict self,
+                                   size_t noderel_offset,
+                                   size_t num_bytes) {
+	unsigned int result;
+	struct mman *mm = self->mn_mman;
+	if (!LIST_ISBOUND(self, mn_writable)) {
+		/* Simple case: this node isn't writable.
+		 * This is thread-safe,  since our caller  is currently holding  a
+		 * lock to the associated mem-part, and for this node to (re-)gain
+		 * write access, it would first have to acquire that same lock.
+		 *
+		 * As  such, if it's  not writable now, then  it can't become so
+		 * before our caller releases their lock to the associated part. */
+		return MNODE_CLEAR_WRITE_SUCCESS;
+	}
+
+	if (!tryincref(mm))
+		return MNODE_CLEAR_WRITE_SUCCESS; /* Special case: deleted node. */
+
+	/* Try to acquire a lock to the associated mman */
+	if (!mman_lock_tryacquire(mm)) {
+		result = MNODE_CLEAR_WRITE_WOULDBLOCK;
+	} else {
+		/* Do the thing! */
+		result = mnode_clear_write_locked_p_r(self, mm, noderel_offset, num_bytes);
+		if likely(result == MNODE_CLEAR_WRITE_SUCCESS) {
+			/* Sync the memory mamanger. */
+			mman_sync_p(mm,
+			            mnode_getaddr(self),
+			            mnode_getsize(self));
+		}
+		mman_lock_release(mm);
+	}
+	decref_unlikely(mm);
+	return result;
+}
+
+
 
 
 /* Same as `mnode_clear_write', but the caller is already holding a lock to `mm',
@@ -419,6 +458,62 @@ NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
 
 	/* Unlink from the list of writable nodes. */
 	LIST_UNBIND(self, mn_writable);
+	return MNODE_CLEAR_WRITE_SUCCESS;
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mnode_clear_write_locked_p_r)(struct mnode *__restrict self,
+                                            struct mman *__restrict mm,
+                                            size_t noderel_offset,
+                                            size_t num_bytes) {
+	pagedir_phys_t pdir;
+	void *addr;
+	assert(!wasdestroyed(mm));
+	assert(mman_lock_acquired(mm));
+	assert(self->mn_part != NULL);
+	assert(LIST_ISBOUND(self, mn_writable));
+	assertf(self->mn_flags & MNODE_F_PWRITE,
+	        "How could we have been added to the list of writable nodes "
+	        "when we're not actually supposed to be writable at all?");
+	assertf(!(self->mn_flags & MNODE_F_MPREPARED),
+	        "This function should only be called for user-space nodes, "
+	        "and user-space nodes should never have the MPREPARED bit set");
+	assert((noderel_offset + num_bytes) >= noderel_offset);
+	assert((noderel_offset + num_bytes) <= mnode_getsize(self));
+
+	pdir = mm->mm_pagedir_p;
+	addr = (byte_t *)mnode_getaddr(self) + noderel_offset;
+
+	/* Force page-alignment. */
+	if unlikely((uintptr_t)addr & PAGEMASK) {
+		num_bytes += (uintptr_t)addr & PAGEMASK;
+		addr = (void *)((uintptr_t)addr & ~PAGEMASK);
+	}
+	if unlikely(num_bytes & PAGEMASK) {
+		num_bytes += PAGEMASK;
+		num_bytes &= ~PAGEMASK;
+	}
+
+	/* Check for special case: it's the entire node. */
+	if (addr == mnode_getaddr(self) && num_bytes == mnode_getsize(self))
+		return mnode_clear_write_locked_p(self, mm);
+
+	/* Prepare the page directory */
+	if unlikely(!pagedir_prepare_p(pdir, addr, num_bytes))
+		return MNODE_CLEAR_WRITE_BADALLOC;
+
+	/* Delete write permissions. */
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
+	pagedir_denywrite_p(pdir, addr, num_bytes);
+#else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
+	pagedir_unmap_p(pdir, addr, num_bytes); /* Mapping will be re-created lazily! */
+#endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
+
+	/* Unprepare the page directory. */
+	pagedir_unprepare_p(pdir, addr, num_bytes);
+
+	/* Don't unlink from the list of writable nodes (since part of the node is still writable). */
+	/*LIST_UNBIND(self, mn_writable);*/
 	return MNODE_CLEAR_WRITE_SUCCESS;
 }
 

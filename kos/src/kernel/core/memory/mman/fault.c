@@ -669,6 +669,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 	/* Set-up our extended unlock controller. */
 	self->mfl_unlck.ui_unlock = &unlock_mman_cb;
+#define LOCAL_unlock_all() (mpart_lock_release(part), unlockinfo_unlock(&self->mfl_unlck))
 
 	/* Calculate the part-relative accessed address range. */
 	noderel_offset = (size_t)((uintptr_t)self->mfl_addr -
@@ -714,7 +715,8 @@ mfault_or_unlock(struct mfault *__restrict self)
 			if (!mpart_load_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
 				goto nope_reinit_scmem;
 
-			/* Make  sure  that   unshare-cow  data   was  never   allocated.
+			/* Make sure that unshare-cow data was never allocated.
+			 *
 			 * Because the  `mfl_flags'  field  is [const],  we  should  have
 			 * never reached any of the paths that would have allocated this! */
 			assert(self->mfl_ucdat.ucd_copy == NULL);
@@ -726,26 +728,35 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 		/* Deal with writes to shared memory mappings. */
 		if (node->mn_flags & MNODE_F_SHARED) {
-
-			/* Ensure that the backing file isn't marked as READONLY
-			 *
-			 * This can happen if the memory mapping was created before the READONLY
-			 * flag  was set (but note that setting  the flag causes denywrite to be
-			 * called for all parts, meaning that we may very well have gotten  here
-			 * because somebody revoked write access)
-			 *
-			 * This check is synonymous to the IS_WRITESHARE_MAPPING_OF_READONLY_FILE
-			 * check done when trying to create  file mappings, only that this  check
-			 * is necessary to deal with the case  where a thread already has a  pre-
-			 * existing MAP_SHARED+PROT_WRITE mapping of a file that has later become
-			 * READONLY, at which point pagedir-level  write access was revoked,  but
-			 * the mapping itself wasn't deleted. */
-			if unlikely((part->mp_file->mf_flags & (MFILE_F_DELETED |
-			                                        MFILE_F_READONLY)) ==
-			            MFILE_F_READONLY) {
-				mpart_lock_release(part);
-				unlockinfo_unlock(&self->mfl_unlck);
-				THROW(E_FSERROR_READONLY);
+			uintptr_t file_flags;
+			file_flags = atomic_read(&part->mp_file->mf_flags);
+			if unlikely(file_flags & (MFILE_F_DELETED | MFILE_F_DELETING | MFILE_F_READONLY)) {
+				/* Ensure that the backing file isn't marked as READONLY
+				 *
+				 * This can happen if the memory mapping was created before the READONLY
+				 * flag  was set (but note that setting  the flag causes denywrite to be
+				 * called for all parts, meaning that we may very well have gotten  here
+				 * because somebody revoked write access)
+				 *
+				 * This check is synonymous to the IS_WRITESHARE_MAPPING_OF_READONLY_FILE
+				 * check done when trying to create  file mappings, only that this  check
+				 * is necessary to deal with the case  where a thread already has a  pre-
+				 * existing MAP_SHARED+PROT_WRITE mapping of a file that has later become
+				 * READONLY, at which point pagedir-level  write access was revoked,  but
+				 * the mapping itself wasn't deleted. */
+				if ((file_flags & (MFILE_F_DELETED | MFILE_F_READONLY)) == MFILE_F_READONLY) {
+					LOCAL_unlock_all();
+					THROW(E_FSERROR_READONLY);
+				}
+				if (file_flags & MFILE_F_DELETING) {
+					/* Now allowed to write-fault a SHARED memory mapping while the file is being deleted.
+					 * -> Instead, have to wait for this flag to go away. */
+					REF struct mfile *file = incref(part->mp_file);
+					LOCAL_unlock_all();
+					FINALLY_DECREF_UNLIKELY(file);
+					mfile_deleting_waitfor(file);
+					goto nope;
+				}
 			}
 
 			if (!mpart_msalign_makeanon_or_unlock(part, &self->mfl_unlck, acc_offs, acc_size))
@@ -1109,6 +1120,7 @@ nope_reinit_scmem:
 	mpart_setcore_data_init(&self->mfl_scdat);
 nope:
 	return false;
+#undef LOCAL_unlock_all
 }
 
 

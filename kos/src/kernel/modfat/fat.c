@@ -593,18 +593,6 @@ NOTHROW(KCALL fat_v_cc)(struct mfile *__restrict self,
 }
 
 
-PRIVATE WUNUSED NONNULL((1, 2)) bool KCALL
-fat_v_freeblocks_or_unlock(struct mfile *__restrict self,
-                           struct mfile_freeblocks_token *__restrict token,
-                           pos_t aligned_new_size) {
-	/* TODO: Free unused clusters. (s.a. `fatdir_v_deleteent()') */
-	COMPILER_IMPURE();
-	(void)self;
-	(void)token;
-	(void)aligned_new_size;
-	return true;
-}
-
 PRIVATE NONNULL((1, 5)) void KCALL
 fat_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                  physaddr_t buf, size_t num_bytes,
@@ -735,6 +723,15 @@ again:
 waitfor_write_lock:
 	FatNodeData_WaitWrite(dat);
 	goto again;
+}
+
+PRIVATE NONNULL((1)) void KCALL
+fat_v_freeblocks(struct mfile *__restrict self, pos_t addr, pos_t num_bytes) {
+	/* TODO: Free clusters */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)addr;
+	(void)num_bytes;
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -2437,10 +2434,9 @@ fat_v_printlink(struct mfile *__restrict self, __pformatprinter printer, void *a
 /* FAT operator tables.                                                 */
 /************************************************************************/
 PRIVATE struct mfile_stream_ops const fatreg_v_stream_ops = {
-	.mso_ioctl                = &fat_v_ioctl,
-	.mso_printlink            = &fat_v_printlink,
-	.mso_cc                   = &fat_v_cc,
-	.mso_freeblocks_or_unlock = &fat_v_freeblocks_or_unlock,
+	.mso_ioctl     = &fat_v_ioctl,
+	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 
 PRIVATE struct fregnode_ops const Fat_RegOps = {
@@ -2449,6 +2445,7 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 			.mo_destroy    = &fatreg_v_destroy,
 			.mo_loadblocks = &fat_v_loadblocks,
 			.mo_saveblocks = &fat_v_saveblocks,
+			.mo_freeblocks = &fat_v_freeblocks,
 			.mo_changed    = &fregnode_v_changed,
 			.mo_stream     = &fatreg_v_stream_ops,
 		},
@@ -2457,12 +2454,11 @@ PRIVATE struct fregnode_ops const Fat_RegOps = {
 };
 
 PRIVATE struct mfile_stream_ops const fatdir_v_stream_ops = {
-	.mso_open                 = &flatdirnode_v_open,
-	.mso_stat                 = &flatdirnode_v_stat,
-	.mso_ioctl                = &fat_v_ioctl,
-	.mso_printlink            = &fat_v_printlink,
-	.mso_cc                   = &fat_v_cc,
-	.mso_freeblocks_or_unlock = &fat_v_freeblocks_or_unlock,
+	.mso_open      = &flatdirnode_v_open,
+	.mso_stat      = &flatdirnode_v_stat,
+	.mso_ioctl     = &fat_v_ioctl,
+	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 	.fdno_dir = {
@@ -2471,6 +2467,7 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 				.mo_destroy    = &fatdir_v_destroy,
 				.mo_loadblocks = &fat_v_loadblocks,
 				.mo_saveblocks = &fat_v_saveblocks,
+				.mo_freeblocks = &fat_v_freeblocks,
 				.mo_changed    = &flatdirnode_v_changed,
 				.mo_stream     = &fatdir_v_stream_ops,
 			},
@@ -2499,11 +2496,10 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 };
 #ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 PRIVATE struct mfile_stream_ops const fatlnk_v_stream_ops = {
-	.mso_stat                 = &fatlnk_v_stat,
-	.mso_ioctl                = &fat_v_ioctl,
-	.mso_printlink            = &fat_v_printlink,
-	.mso_cc                   = &fat_v_cc,
-	.mso_freeblocks_or_unlock = &fat_v_freeblocks_or_unlock,
+	.mso_stat      = &fatlnk_v_stat,
+	.mso_ioctl     = &fat_v_ioctl,
+	.mso_printlink = &fat_v_printlink,
+	.mso_cc        = &fat_v_cc,
 };
 PRIVATE struct flnknode_ops const Fat_LnkOps = {
 	.lno_node = {
@@ -2511,6 +2507,7 @@ PRIVATE struct flnknode_ops const Fat_LnkOps = {
 			.mo_destroy    = &fatlnk_v_destroy,
 			.mo_loadblocks = &fat_v_loadblocks,
 			.mo_saveblocks = &fat_v_saveblocks,
+			.mo_freeblocks = &fat_v_freeblocks,
 			.mo_changed    = &flnknode_v_changed,
 			.mo_stream     = &fatlnk_v_stream_ops,
 		},
@@ -3060,6 +3057,7 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 					.mo_destroy    = &fatsuper_v_destroy,
 					.mo_loadblocks = &fat_v_loadblocks,
 					.mo_saveblocks = &fat_v_saveblocks,
+					.mo_freeblocks = &fat_v_freeblocks,
 					.mo_changed    = &flatsuper_v_changed,
 					.mo_stream     = &fatdir_v_stream_ops,
 				},

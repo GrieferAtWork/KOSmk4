@@ -424,6 +424,112 @@ DEFINE_SYSCALL3(errno_t, msync,
 /* mincore()                                                            */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MINCORE
+/* Return the mincore-state that should be used for `addr' in `self' */
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) uint8_t
+NOTHROW(FCALL mpart_get_mincore_state)(struct mpart *__restrict self,
+                                       PAGEDIR_PAGEALIGNED mpart_reladdr_t addr) {
+	uint8_t result = 0x01;
+	struct mfile *file = self->mp_file;
+	size_t i, block_index, block_count;
+	block_index = addr >> file->mf_blockshift;
+	block_count = PAGESIZE >> file->mf_blockshift;
+	if unlikely(!block_count)
+		block_count = 1; /* In case `file->mf_blockshift > PAGESHIFT' */
+	for (i = 0; i < block_count; ++i) {
+		unsigned int block_st;
+		block_st = mpart_getblockstate(self, block_index + i);
+		if (block_st != MPART_BLOCK_ST_LOAD &&
+		    block_st != MPART_BLOCK_ST_CHNG) {
+			/* Found a block that's not marked as changed or loaded. */
+			result = 0x00;
+			break;
+		}
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1)) void KCALL
+do_mincore(struct mman *__restrict mm,
+           VIRT PAGEDIR_PAGEALIGNED byte_t *addr,
+           PAGEDIR_PAGEALIGNED size_t num_bytes,
+           NCX uint8_t *vec) {
+	uint8_t status;
+	struct mnode *node;
+	struct mpart *part;
+	PAGEDIR_PAGEALIGNED size_t noderel_addr;
+	PAGEDIR_PAGEALIGNED size_t noderel_minaddr;
+	PAGEDIR_PAGEALIGNED size_t noderel_endaddr;
+	PAGEDIR_PAGEALIGNED size_t part_size;
+	PAGEDIR_PAGEALIGNED mpart_reladdr_t partrel_minaddr;
+	PAGEDIR_PAGEALIGNED mpart_reladdr_t partrel_endaddr;
+again:
+	mman_lock_read(mm);
+	node = mman_mappings_locate(mm, addr);
+	if unlikely(!node) {
+		mman_lock_endread(mm);
+		THROW(E_SEGFAULT_UNMAPPED, addr,
+		      E_SEGFAULT_CONTEXT_FAULT);
+	}
+	noderel_minaddr = (size_t)(addr - (byte_t *)mnode_getminaddr(node));
+	part_size = mnode_getsize(node) - noderel_minaddr;
+	if (part_size > num_bytes)
+		part_size = num_bytes;
+	noderel_endaddr = noderel_minaddr + part_size;
+	assert(noderel_endaddr > noderel_minaddr);
+
+	/* Load the node's part and do special handling for reserved mappings. */
+	part = node->mn_part;
+	if unlikely(!part) {
+		mman_lock_endread(mm);
+		status = 0x00;
+		goto do_continue;
+	}
+
+	partrel_minaddr = noderel_minaddr + node->mn_partoff;
+	partrel_endaddr = noderel_endaddr + node->mn_partoff;
+	assert(partrel_minaddr < partrel_endaddr);
+	assert(partrel_endaddr <= mpart_getsize(part));
+	if (!mpart_lock_tryacquire(part)) {
+		incref(part);
+		mman_lock_endread(mm);
+		FINALLY_DECREF_UNLIKELY(part);
+		mpart_lock_waitfor(part);
+		goto again;
+	}
+	mman_lock_endread(mm);
+
+	/* Lookup the part-status for the initial page. */
+	if (!MPART_ST_INCORE(part->mp_state)) {
+		/* Special case: part isn't in-core */
+		status = 0x00;
+	} else if (!mpart_hasblockstate(part)) {
+		/* Special case: all blocks are marked as changed */
+		status = 0x01;
+	} else {
+		status       = mpart_get_mincore_state(part, partrel_minaddr);
+		noderel_addr = partrel_minaddr + PAGESIZE;
+		while (noderel_addr < partrel_endaddr) {
+			uint8_t next_status;
+			next_status = mpart_get_mincore_state(part, noderel_addr);
+			if (next_status != status)
+				break;
+			noderel_addr += PAGESIZE;
+		}
+		part_size = noderel_addr - partrel_minaddr;
+	}
+	mpart_lock_release(part);
+
+	/* Write results to user-space and keep going. */
+do_continue:
+	assert(part_size <= num_bytes);
+	vec = (uint8_t *)mempset(vec, status, part_size >> PAGESHIFT);
+	addr += part_size;
+	num_bytes -= part_size;
+	if (num_bytes != 0)
+		goto again;
+}
+
+
 DEFINE_SYSCALL3(errno_t, mincore,
                 NCX UNCHECKED void *, addr, size_t, len,
                 NCX UNCHECKED uint8_t *, vec) {
@@ -433,7 +539,6 @@ DEFINE_SYSCALL3(errno_t, mincore,
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_LOAD));
 	static_assert(MPART_BLOCK_ST_MINCORE(MPART_BLOCK_ST_CHNG));
 	NCX UNCHECKED byte_t *maxaddr;
-	NCX PAGEDIR_PAGEALIGNED byte_t *iter;
 	struct mman *mm = THIS_MMAN;
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
 		THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
@@ -479,96 +584,7 @@ err_badlen:
 		addr = (NCX UNCHECKED void *)USERSPACE_START;
 	}
 #endif /* USERSPACE_START != 0 */
-	for (iter = (NCX PAGEDIR_PAGEALIGNED byte_t *)addr;
-	     iter < maxaddr;) {
-		struct mnode *node;
-		struct mpart *part;
-		struct mfile *file;
-		byte_t *node_minaddr, *node_maxaddr;
-		mpart_reladdr_t partrel_addr;
-		size_t partrel_size, partrel_maxsize;
-		size_t blocksize;
-		uint8_t incore_status;
-		size_t partrel_block_index;
-		size_t partrel_block_count;
-again_lock_mman:
-		mman_lock_read(mm);
-		node = mman_mappings_locate(mm, iter);
-		if unlikely(!node) {
-			mman_lock_endread(mm);
-			THROW(E_SEGFAULT_UNMAPPED, iter, E_SEGFAULT_CONTEXT_FAULT);
-		}
-
-		/* For each page, check if it's been loaded from-disk.
-		 * iow: Has a block-state `MPART_BLOCK_ST_LOAD' or `MPART_BLOCK_ST_CHNG' */
-		node_minaddr = (byte_t *)mnode_getminaddr(node);
-		node_maxaddr = (byte_t *)mnode_getmaxaddr(node);
-		if (node_minaddr < iter)
-			node_minaddr = iter;
-		if (node_maxaddr > maxaddr)
-			node_maxaddr = maxaddr;
-		partrel_addr = node->mn_partoff + (size_t)(iter - node_minaddr);
-		partrel_size = (size_t)(node_maxaddr - node_minaddr) + 1;
-		if ((part = node->mn_part) == NULL) {
-			mman_lock_endread(mm);
-			assert(partrel_size >= PAGESIZE);
-			/* Special case: reserved node */
-			incore_status = 0x00;
-			goto copyinfo_and_continue;
-		}
-
-		/* Acquire a lock to the part while we're still  holding
-		 * a lock to the mman, thus ensuring that `partrel_addr'
-		 * continues  to be correct, and `partrel_size' is still
-		 * going to be in-bounds of the part. */
-		incref(part);
-		if unlikely(!mpart_lock_tryacquire(part)) {
-			mman_lock_endread(mm);
-			FINALLY_DECREF_UNLIKELY(part);
-			mpart_lock_waitfor(part);
-			goto again_lock_mman;
-		}
-		mman_lock_endread(mm);
-		assert(partrel_size >= PAGESIZE);
-
-		/* Calculate the block-status address range that's in control here. */
-		file                = part->mp_file;
-		partrel_block_index = partrel_addr >> file->mf_blockshift;
-		partrel_block_count = (partrel_addr + partrel_size - 1) >> file->mf_blockshift;
-		partrel_block_count -= partrel_block_index;
-		partrel_block_count += 1;
-		blocksize = mfile_getblocksize(file);
-		assert(partrel_block_count != 0);
-#define mpart_isblockincore(self, partrel_block_index) \
-	(MPART_BLOCK_ST_MINCORE(mpart_getblockstate(self, partrel_block_index)) ? 0x01 : 0x00)
-		incore_status   = mpart_isblockincore(part, partrel_block_index);
-		partrel_maxsize = partrel_size;
-		partrel_size    = blocksize;
-		++partrel_block_index;
-		--partrel_block_count;
-
-		/* Scan ahead until we reach the end of the affected block-range, or
-		 * until we encounter a block  with a different in-core status  than
-		 * what we've seen thus far. */
-		for (; partrel_block_count; ++partrel_block_index, --partrel_block_count) {
-			uint8_t new_status;
-			new_status = mpart_isblockincore(part, partrel_block_index);
-			if (new_status != incore_status)
-				break;
-			partrel_size += blocksize;
-		}
-#undef mpart_isblockincore
-		mpart_lock_release(part);
-		decref_unlikely(part);
-		if (partrel_size > partrel_maxsize)
-			partrel_size = partrel_maxsize;
-
-		/* Copy block status information into the given user-space vector. */
-copyinfo_and_continue:
-		memset(vec, incore_status, partrel_size / PAGESIZE, sizeof(uint8_t));
-		iter += partrel_size;
-		vec += partrel_size / PAGESIZE;
-	}
+	do_mincore(mm, (byte_t *)addr, (size_t)((maxaddr + 1) - (byte_t *)addr), vec);
 	return EOK;
 #undef MPART_BLOCK_ST_MINCORE
 }

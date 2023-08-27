@@ -72,7 +72,7 @@ mfile_dosyncio(struct mfile *__restrict self,
 	struct aio_multihandle_generic hand;
 	aio_multihandle_generic_init(&hand);
 	TRY {
-		(*io)(self, addr, buf, num_bytes, &hand);
+		mfile_doasyncio(self, io, addr, buf, num_bytes, &hand);
 		aio_multihandle_done(&hand);
 	} EXCEPT {
 		aio_multihandle_fail(&hand);
@@ -82,6 +82,51 @@ mfile_dosyncio(struct mfile *__restrict self,
 	aio_multihandle_generic_checkerror(&hand);
 }
 
+PUBLIC BLOCKING NONNULL((1, 2)) void
+(KCALL mfile_doasyncio_dbg)(struct mfile *__restrict self,
+                            NONNULL_T((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                               physaddr_t buf, size_t num_bytes,
+                                                               struct aio_multihandle *__restrict aio),
+                            pos_t addr, physaddr_t buf, size_t num_bytes,
+                            struct aio_multihandle *__restrict aio) {
+
+	/* Validate all of the invariants that must be met when invoking I/O operators */
+#ifndef NDEBUG
+	assertf(IS_ALIGNED(buf, (size_t)1 << self->mf_iobashift),
+	        "Physical address %#" PRIxN(__SIZEOF_PHYSADDR_T__) " is not aligned by %#" PRIxSIZ,
+	        buf, (size_t)1 << self->mf_iobashift);
+	assertf(IS_ALIGNED(addr, mfile_getblocksize(self)),
+	        "File address %#" PRIxN(__SIZEOF_POS_T__) " is not aligned by %#" PRIxSIZ,
+	        addr, mfile_getblocksize(self));
+	assertf(IS_ALIGNED(num_bytes, mfile_getblocksize(self)),
+	        "Buffer size %#" PRIxSIZ " is not aligned by %#" PRIxSIZ,
+	        num_bytes, mfile_getblocksize(self));
+	{
+		pos_t filesize = mfile_getsize_nonatomic(self);
+		bool filesize_overflows = false;
+		if (OVERFLOW_UADD(filesize, self->mf_part_amask, &filesize)) {
+			filesize = (pos_t)-1;
+			filesize_overflows = true;
+		}
+
+		assertf((((addr + num_bytes) >= addr || (num_bytes && (addr + num_bytes) == 0 && filesize_overflows)) &&
+		         ((addr + num_bytes) <= filesize || filesize_overflows)) ||
+		        mfile_isanon(self),
+		        "I/O end address %#" PRIxN(__SIZEOF_POS_T__) " extends "
+		        "past part-aligned end-of-file %#" PRIxN(__SIZEOF_POS_T__),
+		        addr + num_bytes, filesize);
+	}
+	assertf(num_bytes != 0, "Caller-given buffer is empty");
+	assertf((self->mf_trunclock != 0) ||
+	        (self->mf_flags & MFILE_F_FIXEDFILESIZE) ||
+	        (mfile_isanon(self)),
+	        "No trunc-lock is held (no guaranty that the file won't change its size)");
+	assertf(!(self->mf_flags & MFILE_F_DELETING), "I/O invoked while file is being deleted");
+#endif /* !NDEBUG */
+
+	/* Invoke the I/O-function */
+	((*io)(self, addr, buf, num_bytes, aio));
+}
 
 
 
@@ -597,15 +642,17 @@ after_intermediate_blocks:
  * The given `loc->mppl_size' is a hint as to how many consecutive blocks
  * this function should attempt to load, though it will only ever load  a
  * single cluster of consecutive blocks that starts with an uninitialized
- * block containing `partrel_offset' */
-PUBLIC BLOCKING NONNULL((1, 3)) void FCALL
+ * block containing `partrel_offset'
+ * @return: true:  Success
+ * @return: false: The underlying file has been deleted */
+PUBLIC BLOCKING NONNULL((1, 3)) bool FCALL
 mpart_memload_and_unlock(struct mpart *__restrict self,
                          mpart_reladdr_t partrel_offset,
                          struct mpart_physloc const *__restrict loc,
                          struct unlockinfo *unlock)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct mfile *file;
-	size_t i, min, max, limit, block_size;
+	size_t min, max, limit, block_size;
 	unsigned int st;
 	physaddr_t min_addr;
 
@@ -619,7 +666,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	if unlikely(st != MPART_BLOCK_ST_INIT && st != MPART_BLOCK_ST_NDEF) {
 		/* Data _is_ available! (this can happen if the caller read
 		 * INIT  before, but the block was loaded in the mean time) */
-		return;
+		return true;
 	}
 	if (st == MPART_BLOCK_ST_INIT) {
 		bool hasinit;
@@ -648,7 +695,23 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		}
 
 		/* Return to the caller, since we've lost the lock to `self' */
-		return;
+		return true;
+	}
+
+	/* In order to acquire a trunc-lock below, we need
+	 * to ensure that  the file  isn't being  deleted. */
+	{
+		uintptr_t file_flags = atomic_read(&file->mf_flags);
+		if unlikely(file_flags & (MFILE_F_DELETING | MFILE_F_DELETED)) {
+			if (file_flags & MFILE_F_DELETING) {
+				incref(file);
+				mpart_lock_release(self);
+				FINALLY_DECREF_UNLIKELY(file);
+				return mfile_deleting_waitfor(file);
+			}
+			mpart_lock_release(self);
+			return false;
+		}
 	}
 
 	/* Set the initial part's state to INIT */
@@ -677,7 +740,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	incref(file);
 
 	/* Prevent the file's size from being lowered. */
-	mfile_trunclock_inc(file);
+	mfile_trunclock_inc_locked(file);
 
 	/* Release locks. */
 	_mpart_lock_release(self);
@@ -751,8 +814,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 			mfile_dosyncio(file, mo_loadblocks, addr, min_addr, num_bytes);
 	} EXCEPT {
 		/* Change back all INIT-parts to UNDEF */
-		for (i = min; i <= max; ++i)
-			mpart_setblockstate(self, i, MPART_BLOCK_ST_NDEF);
+		mpart_setblockstate_r(self, min, max + 1, MPART_BLOCK_ST_NDEF);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		mpart_setblockstate_initdone_extrahooks(self);
@@ -762,8 +824,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 initdone:
 
 	/* Mark all INIT-pages as loaded. */
-	for (i = min; i <= max; ++i)
-		mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
+	mpart_setblockstate_r(self, min, max + 1, MPART_BLOCK_ST_LOAD);
 
 	/* Broadcast that init has finished. */
 	mfile_trunclock_dec_nosignal(file);
@@ -771,6 +832,7 @@ initdone:
 	mpart_setblockstate_initdone_extrahooks(self);
 
 	decref_unlikely(file);
+	return true;
 }
 
 
@@ -989,9 +1051,9 @@ again_read_st:
 		if (st == MPART_BLOCK_ST_NDEF) {
 			auto mo_loadblocks = self->mp_file->mf_ops->mo_loadblocks;
 			if likely(mo_loadblocks != NULL) {
-				/* NOTE: We're allowed to assume that this call is NOBLOCK+NOTHROW!
-				 *       We  also don't have to call `mfile_trunclock_inc()', since
-				 *       doing so wouldn't make any sense for any of the valid use-
+				/* NOTE: We're allowed  to  assume  that this  call  is  NOBLOCK+NOTHROW!
+				 *       We also don't have to call `mfile_trunclock_inc_locked()', since
+				 *       doing  so  wouldn't make  any sense  for any  of the  valid use-
 				 *       cases of hinted memory mappings. */
 				(*mo_loadblocks)(self->mp_file,
 				                 mpart_getminaddr(self) + (block_index << PAGESHIFT),

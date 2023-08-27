@@ -611,6 +611,48 @@ NOTHROW(FCALL mpart_setblockstate)(struct mpart *__restrict self,
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setblockstate_r)(struct mpart *__restrict self,
+                                     size_t partrel_block_index_start,
+                                     size_t partrel_block_index_end,
+                                     unsigned int st) {
+	size_t i;
+	assert(partrel_block_index_start <= partrel_block_index_end);
+	/* TODO: This can probably be done more efficiently. */
+	for (i = partrel_block_index_start; i < partrel_block_index_end; ++i)
+		mpart_setblockstate(self, i, st);
+}
+
+
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setblockstate_r_from_dbg)(struct mpart *__restrict self,
+                                              size_t partrel_block_index_start,
+                                              size_t partrel_block_index_end,
+                                              unsigned int old_st,
+                                              unsigned int st);
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_setblockstate_r_from_dbg)(struct mpart *__restrict self,
+                                              size_t partrel_block_index_start,
+                                              size_t partrel_block_index_end,
+                                              unsigned int old_st,
+                                              unsigned int st) {
+#ifndef NDEBUG
+	size_t i;
+	for (i = partrel_block_index_start; i < partrel_block_index_end; ++i) {
+		unsigned int real_old_st;
+		real_old_st = mpart_getblockstate(self, i);
+		assertf(real_old_st == old_st,
+		        "Wrong old status from block %" PRIuSIZ " of range "
+		        "%" PRIuSIZ "-%" PRIuSIZ " (expected: %u, actual: %u)",
+		        i, partrel_block_index_start, partrel_block_index_end - 1,
+		        old_st, real_old_st);
+	}
+#endif /* !NDEBUG */
+	(void)old_st;
+	mpart_setblockstate_r(self, partrel_block_index_start, partrel_block_index_end, st);
+}
+
+
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mpart_setblockstate_initdone_extrahooks)(REF struct mpart *__restrict self)
 		ASMNAME("mpart_setblockstate_initdone_extrahooks");
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -719,6 +761,23 @@ again:
 	if unlikely(file->mf_ops->mo_saveblocks == NULL)
 		goto done_noop;
 
+	/* Verify that the file hasn't been/is-being deleted.
+	 * NOTE: The DELETING-flag won't change status since we're holding the lock to a pre-existing part. */
+	{
+		uintptr_t file_flags = atomic_read(&file->mf_flags);
+		if unlikely(file_flags & (MFILE_F_DELETING | MFILE_F_DELETED)) {
+			if (file_flags & MFILE_F_DELETING) {
+				incref(file);
+				mpart_lock_release(self);
+				FINALLY_DECREF_UNLIKELY(file);
+				mfile_deleting_waitfor(file);
+				goto again;
+			}
+			/* If the file was deleted, we have no way of writing changes to disk. */
+			goto done_noop;
+		}
+	}
+
 	/* Figure out how many individual blocks are contained by this part. */
 	block_count = mpart_getblockcount(self, file);
 
@@ -788,7 +847,7 @@ again:
 	has_initializing_parts = false;
 	for (start = 0; start < block_count; ++start) {
 		unsigned int st;
-		size_t i, end;
+		size_t end;
 		struct mpart_physloc loc;
 		st = mpart_getblockstate(self, start);
 		if (st != MPART_BLOCK_ST_CHNG) {
@@ -824,7 +883,7 @@ again:
 
 		/* Now to do the actual work: */
 		incref(file);
-		mfile_trunclock_inc(file);
+		mfile_trunclock_inc_locked(file);
 		atomic_or(&self->mp_flags, MPART_F_MAYBE_BLK_INIT);
 		_mpart_lock_release(self);
 		TRY {
@@ -856,8 +915,7 @@ again:
 			/* The write-back failed. - As such we must restore the ST_CHNG status
 			 * of all of the pages we've altered to INIT, as well as broadcast the
 			 * init-done signal of the associated file. */
-			for (i = start; i < end; ++i)
-				mpart_setblockstate(self, i, MPART_BLOCK_ST_CHNG);
+			mpart_setblockstate_r(self, start, end, MPART_BLOCK_ST_CHNG);
 			mfile_trunclock_dec_nosignal(file);
 			sig_broadcast(&file->mf_initdone);
 			mpart_setblockstate_initdone_extrahooks(self);
@@ -868,8 +926,7 @@ again:
 done_writeback:
 
 		/* Change the states of all saved pages back to ST_LOAD */
-		for (i = start; i < end; ++i)
-			mpart_setblockstate(self, i, MPART_BLOCK_ST_LOAD);
+		mpart_setblockstate_r(self, start, end, MPART_BLOCK_ST_LOAD);
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		mpart_setblockstate_initdone_extrahooks(self);

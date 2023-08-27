@@ -1177,14 +1177,15 @@ INTERN_CONST struct device_ops const dev_tty_ops = {{{
 #else /* LIBVIO_CONFIG_ENABLED */
 #define IF_VIO_ENABLED(...) /* nothing */
 #endif /* !LIBVIO_CONFIG_ENABLED */
-#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio)      \
-	{{{{                                                                   \
-		{                                                                  \
-			(typeoffield(struct mfile_ops, mo_destroy))(void *)-1,         \
-			mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream, \
-			IF_VIO_ENABLED(mo_vio)                                         \
-		},                                                                 \
-		&device_v_wrattr                                                   \
+#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio) \
+	{{{{                                                              \
+		{                                                             \
+			(typeoffield(struct mfile_ops, mo_destroy))(void *)-1,    \
+			mo_newpart, mo_loadblocks, NULL, NULL,                    \
+			&device_v_changed, mo_stream,                             \
+			IF_VIO_ENABLED(mo_vio)                                    \
+		},                                                            \
+		&device_v_wrattr                                              \
 	}}}}
 INTERN_CONST struct chrdev_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);

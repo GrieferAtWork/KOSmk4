@@ -43,11 +43,11 @@
 //#define  DEFINE_mfile_tailread_p
 //#define   DEFINE_mfile_tailreadv
 //#define DEFINE_mfile_tailreadv_p
-//#define       DEFINE_mfile_write
-//#define     DEFINE_mfile_write_p
-//#define      DEFINE_mfile_writev
-//#define    DEFINE_mfile_writev_p
-#define    DEFINE_mfile_tailwrite
+#define       DEFINE_mfile_write
+//#define      DEFINE_mfile_write_p
+//#define       DEFINE_mfile_writev
+//#define     DEFINE_mfile_writev_p
+//#define    DEFINE_mfile_tailwrite
 //#define  DEFINE_mfile_tailwrite_p
 //#define   DEFINE_mfile_tailwritev
 //#define DEFINE_mfile_tailwritev_p
@@ -613,12 +613,17 @@ again_direct_io_lockfile:
 
 		/* Check if the file has been deleted (or is read-only). */
 #ifdef LOCAL_WRITING
-		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY))
+		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING | MFILE_F_READONLY))
 #else /* LOCAL_WRITING */
-		if unlikely(self->mf_flags & (MFILE_F_DELETED))
+		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING))
 #endif /* !LOCAL_WRITING */
 		{
+			uintptr_t flags = self->mf_flags;
 			mfile_lock_endread(self);
+			if (flags & MFILE_F_DELETING) {
+				if (mfile_deleting_waitfor(self))
+					goto again_direct_io_lockfile;
+			}
 #ifdef LOCAL_WRITING
 			THROW(E_FSERROR_READONLY);
 #else /* LOCAL_WRITING */
@@ -679,7 +684,7 @@ again_read_old_filesize:
 					goto again_read_old_filesize;
 				changes |= MFILE_F_ATTRCHANGED;
 			}
-			mfile_trunclock_inc(self);
+			mfile_trunclock_inc_locked(self);
 			mfile_lock_endread(self);
 
 			/* Update the last-modified timestamp (if necessary) */
@@ -727,7 +732,7 @@ again_read_old_filesize:
 			assertf(io_bytes <= num_bytes, "Must be the case because `num_bytes' is block-aligned");
 
 			/* Prevent the file's size from being lowered. */
-			mfile_trunclock_inc(self);
+			mfile_trunclock_inc_locked(self);
 			mfile_lock_endread(self);
 		}
 	} EXCEPT {
@@ -831,8 +836,14 @@ again:
 				}
 			}
 
+			if unlikely(self->mf_flags & MFILE_F_DELETING) {
+				mfile_lock_endread(self);
+				mfile_deleting_waitfor(self);
+				goto again;
+			}
+
 			/* Acquire a trunc-lock so the file's size can't be decreased. */
-			mfile_trunclock_inc(self);
+			mfile_trunclock_inc_locked(self);
 			mfile_lock_endread(self);
 			RAII_FINALLY { mfile_trunclock_dec(self); };
 
@@ -861,14 +872,33 @@ dont_handle_vio:
 		goto done;
 	}
 
+	/* Assert that the file is in an acceptable state. */
+	{
+		uintptr_t flags = read_once(&self->mf_flags);
 #ifdef LOCAL_WRITING
-	if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
-		mfile_lock_endread(self);
-		if unlikely(result)
-			goto done;
-		THROW(E_FSERROR_READONLY);
-	}
+		if unlikely(flags & (MFILE_F_DELETED | MFILE_F_DELETING | MFILE_F_READONLY))
+#else /* LOCAL_WRITING */
+		if unlikely(flags & (MFILE_F_DELETED | MFILE_F_DELETING))
+#endif /* !LOCAL_WRITING */
+		{
+			mfile_lock_endread(self);
+			if unlikely(result)
+				goto done;
+#ifdef LOCAL_WRITING
+			if (flags & (MFILE_F_READONLY | MFILE_F_DELETED))
+				THROW(E_FSERROR_READONLY);
 #endif /* LOCAL_WRITING */
+			if (flags & MFILE_F_DELETING) {
+				if (mfile_deleting_waitfor(self))
+					goto again;
+			}
+#ifdef LOCAL_WRITING
+			THROW(E_FSERROR_READONLY);
+#else /* LOCAL_WRITING */
+			goto done;
+#endif /* !LOCAL_WRITING */
+		}
+	}
 
 	/* Load the current file size. */
 	filesize = mfile_getsize(self);
@@ -895,7 +925,7 @@ dont_handle_vio:
 			if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
 				goto again;
 #endif /* LOCAL_WRITING */
-			mfile_trunclock_inc(self);
+			mfile_trunclock_inc_locked(self);
 			mfile_lock_endread(self);
 do_io_with_part_and_trunclock:
 			{
@@ -959,13 +989,35 @@ again_extend_part:
 					mfile_extendpart_data_fini(&extdat);
 					goto again;
 				}
+
+				/* Assert that the file is in an acceptable state. */
+				{
+					uintptr_t flags = read_once(&self->mf_flags);
 #ifdef LOCAL_WRITING
-				if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED)) {
-					mfile_lock_endwrite(self);
-					mfile_extendpart_data_fini(&extdat);
-					THROW(E_FSERROR_READONLY);
-				}
+					if unlikely(flags & (MFILE_F_DELETED | MFILE_F_DELETING | MFILE_F_READONLY))
+#else /* LOCAL_WRITING */
+					if unlikely(flags & (MFILE_F_DELETED | MFILE_F_DELETING))
+#endif /* !LOCAL_WRITING */
+					{
+						mfile_lock_endwrite(self);
+						mfile_extendpart_data_fini(&extdat);
+						if unlikely(result)
+							goto done;
+#ifdef LOCAL_WRITING
+						if (flags & (MFILE_F_READONLY | MFILE_F_DELETED))
+							THROW(E_FSERROR_READONLY);
 #endif /* LOCAL_WRITING */
+						if (flags & MFILE_F_DELETING) {
+							if (mfile_deleting_waitfor(self))
+								goto again;
+						}
+#ifdef LOCAL_WRITING
+						THROW(E_FSERROR_READONLY);
+#else /* LOCAL_WRITING */
+						goto done;
+#endif /* !LOCAL_WRITING */
+					}
+				}
 
 				/* Make sure that there's still nothing within the accessed range. */
 				part = mpart_tree_rlocate(self->mf_parts,
@@ -993,7 +1045,7 @@ restart_after_extendpart:
 				if (!mfile_msalign_makeanon_locked_or_unlock(self, offset, offset + io_bytes - 1))
 					goto again;
 #endif /* LOCAL_WRITING */
-				mfile_trunclock_inc(self); /* Prevent `ftruncate(2)' until we're done */
+				mfile_trunclock_inc_locked(self); /* Prevent `ftruncate(2)' until we're done */
 				mfile_lock_endwrite(self);
 				goto do_io_with_part_and_trunclock;
 			}
@@ -1033,12 +1085,15 @@ destroy_new_part_and_try_again:
 			goto again;
 		}
 #ifdef LOCAL_WRITING
-		if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED))
+		if unlikely(self->mf_flags & (MFILE_F_READONLY | MFILE_F_DELETED | MFILE_F_DELETING))
 			goto destroy_new_part_and_try_again;
-#endif /* LOCAL_WRITING */
+#else /* LOCAL_WRITING */
+		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING))
+			goto destroy_new_part_and_try_again;
+#endif /* !LOCAL_WRITING */
 
 		/* Do I/O with the newly created part. */
-		mfile_trunclock_inc(self);
+		mfile_trunclock_inc_locked(self);
 		if unlikely(mfile_getsize(self) < filesize) {
 			mfile_trunclock_dec(self);
 			goto destroy_new_part_and_try_again;
@@ -1144,17 +1199,14 @@ handle_write_impossible_too_big:
 	part = mpart_tree_locate(self->mf_parts, newpart_minaddr);
 	if (part != NULL && tryincref(part)) {
 		io_bytes = (size_t)(mpart_getendaddr(part) - offset);
-		assertf(io_bytes <= self->mf_part_amask,
-		        "There should never be more than 1 byte less than "
-		        "a single (block-aligned) page of trailing memory "
-		        "allocated in a any file, based on that file's size");
+
 		/* Still limit the max I/O by what has actually been requested. */
 		if (io_bytes > num_bytes)
 			io_bytes = num_bytes;
 
 		/* In order to later increase the file's size, we must firstly
 		 * acquire  a write-lock to the file, and be holding this lock
-		 * when calling `mfile_trunclock_inc()'
+		 * when calling `mfile_trunclock_inc_locked()'
 		 * This way, another thread can also acquire a write-lock, and
 		 * wait for `mf_trunclock' to become  zero in order to  ensure
 		 * that  a file's size doesn't change for some period of time.
@@ -1218,7 +1270,8 @@ part_setcore:
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
 						if (filesize != mfile_getsize(self) || mfile_isanon(self) ||
-						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
+						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING |
+						                       MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mpart_setcore_data_fini(&sc_data);
@@ -1246,7 +1299,8 @@ part_setcore:
 						/* Re-acquire locks and make sure that nothing's changed. */
 						mfile_lock_write(self);
 						if (filesize != mfile_getsize(self) || mfile_isanon(self) ||
-						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
+						    (self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING |
+						                       MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) ||
 						    part != mpart_tree_locate(self->mf_parts, newpart_minaddr)) {
 							mfile_lock_endwrite_f(self);
 							mfile_lockops_reap(self);
@@ -1314,7 +1368,7 @@ again_decref_part_and_fini_uc_data:
 		/* Seeing how we're still holding  a write-lock to `self', we  know
 		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
-		mfile_trunclock_inc(self);
+		mfile_trunclock_inc_locked(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
 		mfile_changed(self, MFILE_F_ATTRCHANGED); /* Set the attributes-changed flag. */
 		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
@@ -1322,7 +1376,7 @@ again_decref_part_and_fini_uc_data:
 		decref_unlikely(part);
 
 #else /* LOCAL_TAILIO */
-		mfile_trunclock_inc(self);
+		mfile_trunclock_inc_locked(self);
 		mfile_lock_endwrite(self);
 		TRY {
 #ifdef LOCAL_BUFFER_IS_IOVEC
@@ -1415,7 +1469,8 @@ restart_after_extendpart_tail:
 				mfile_extendpart_data_fini(&extdat);
 				goto again;
 			}
-			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
+			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING |
+			                              MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
 				goto restart_after_extendpart_tail;
 			if unlikely(mfile_getsize(self) != filesize)
 				goto restart_after_extendpart_tail;
@@ -1522,7 +1577,7 @@ restart_after_extendpart_tail:
 		/* Seeing how we're still holding  a write-lock to `self', we  know
 		 * that  no-one else (should)  have altered the  file's size in the
 		 * mean time, meaning that the append-write above truly was atomic! */
-		mfile_trunclock_inc(self);
+		mfile_trunclock_inc_locked(self);
 		atomic64_write(&self->mf_filesize, (u64)(offset + io_bytes));
 		mfile_changed(self, MFILE_F_ATTRCHANGED); /* Set the attributes-changed flag. */
 		mfile_trunclock_dec_nosignal(self); /* *_nosignal, because we broadcast unconditionally below. */
@@ -1641,7 +1696,7 @@ extend_failed:
 		 * file's size from being lowered beyond the area of the parts
 		 * which we need to load from disk. */
 		if (parthead_disk || parttail_disk)
-			mfile_trunclock_inc(self);
+			mfile_trunclock_inc_locked(self);
 		mfile_lock_end(self);
 		TRY {
 
@@ -1772,11 +1827,7 @@ extend_failed:
 				}
 
 				/* Mark all blocks that we've wrote data to as changed. */
-				{
-					size_t blki;
-					for (blki = changed_minblk; blki <= changed_maxblk; ++blki)
-						mpart_setblockstate(part, blki, MPART_BLOCK_ST_CHNG);
-				}
+				mpart_setblockstate_r(part, changed_minblk, changed_maxblk + 1, MPART_BLOCK_ST_CHNG);
 
 				/* Re-acquire a lock to the file, so we can insert the new mem-part. */
 				mfile_lock_write(self);
@@ -1792,16 +1843,27 @@ extend_failed:
 		}
 
 		/* If we haven't already done so above, acquire a trunc-lock. */
-		if (!parthead_disk && !parttail_disk)
-			mfile_trunclock_inc(self);
+		if (!parthead_disk && !parttail_disk) {
+			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING |
+			                              MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE)) {
+				mfile_lock_endwrite(self);
+				goto handle_part_insert_failure_without_lock_and_trunclock;
+			}
+			mfile_trunclock_inc_locked(self);
 
-		/* Make sure that the file hasn't become anonymous. */
-		if unlikely(mfile_isanon(self))
-			goto handle_part_insert_failure;
+			/* Make sure that the file hasn't become anonymous. */
+			if unlikely(mfile_isanon(self))
+				goto handle_part_insert_failure;
+		} else {
+			/* Make sure that the file hasn't become anonymous. */
+			if unlikely(mfile_isanon(self))
+				goto handle_part_insert_failure;
 
-		/* Make sure that the file's size can still be altered. */
-		if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
-			goto handle_part_insert_failure;
+			/* Make sure that the file's size can still be altered. */
+			if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING |
+			                              MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE))
+				goto handle_part_insert_failure;
+		}
 
 		/* When  any portion of the new part  had to be zero-initialized, then we
 		 * have to ensure that in the mean time the file's size hasn't increased.
@@ -1868,6 +1930,7 @@ handle_part_insert_failure:
 			mfile_lock_endwrite(self);
 handle_part_insert_failure_without_lock:
 			mfile_trunclock_dec(self);
+handle_part_insert_failure_without_lock_and_trunclock:
 			RAII_FINALLY {
 				TAILQ_ENTRY_UNBOUND_INIT(&part->mp_allparts);
 				mpart_destroy(part);

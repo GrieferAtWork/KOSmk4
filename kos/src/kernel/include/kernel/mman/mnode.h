@@ -508,6 +508,10 @@ NOTHROW(FCALL mnode_assert_integrity)(struct mnode *__restrict self);
  * @return: * : One of `MNODE_CLEAR_WRITE_*' */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) unsigned int
+NOTHROW(FCALL mnode_clear_write_r)(struct mnode *__restrict self,
+                                   size_t noderel_offset,
+                                   size_t num_bytes);
 #define MNODE_CLEAR_WRITE_SUCCESS    0 /* Success (or no-op when `self' wasn't mapped with write-access, or the associated mman was destroyed) */
 #define MNODE_CLEAR_WRITE_WOULDBLOCK 1 /* ERROR: The operation would have blocked (The caller must blocking-wait for `mman_lock_canwrite(self->mmn_mman)') */
 #define MNODE_CLEAR_WRITE_BADALLOC   2 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
@@ -524,6 +528,11 @@ NOTHROW(FCALL mnode_clear_write)(struct mnode *__restrict self);
 FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
                                           struct mman *__restrict mm);
+FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL mnode_clear_write_locked_p_r)(struct mnode *__restrict self,
+                                            struct mman *__restrict mm,
+                                            size_t noderel_offset,
+                                            size_t num_bytes);
 
 /* Same as  `mnode_clear_write_locked_p()',  but  directly
  * operate on the current page directory / memory manager. */

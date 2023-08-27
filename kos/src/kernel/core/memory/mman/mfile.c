@@ -47,6 +47,7 @@
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -129,6 +130,31 @@ NOTHROW(FCALL mfile_alloc_physmem_nocc)(struct mfile *__restrict self,
 }
 
 
+/* Acquire a lock to `self', wait for `MFILE_F_DELETING' to go away
+ * and check if `MFILE_F_DELETED' is set, then increment the trunc-
+ * lock. If `MFILE_F_DELETED' was set, return `false'.
+ * @return: true:  Success
+ * @return: false: Failed to increment the trunc-lock (`MFILE_F_DELETED' was set) */
+PUBLIC BLOCKING WUNUSED NONNULL((1)) bool FCALL
+mfile_trunclock_inc(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+again:
+	mfile_lock_read(self);
+	/* Check for deletion-flags. */
+	if unlikely(self->mf_flags & (MFILE_F_DELETED | MFILE_F_DELETING)) {
+		uintptr_t flags = self->mf_flags;
+		mfile_lock_endread(self);
+		if (flags & MFILE_F_DELETED)
+			return false;
+		if (!mfile_deleting_waitfor(self))
+			return false;
+		goto again;
+	}
+	mfile_trunclock_inc_locked(self);
+	mfile_lock_endread(self);
+	return true;
+}
+
 /* Blocking wait until `self->mf_trunclock == 0' */
 PUBLIC BLOCKING NONNULL((1)) void FCALL
 mfile_trunclock_waitfor(struct mfile *__restrict self)
@@ -143,7 +169,6 @@ mfile_trunclock_waitfor(struct mfile *__restrict self)
 		task_waitfor();
 	} while (atomic_read(&self->mf_trunclock) != 0);
 }
-
 
 
 PUBLIC NOBLOCK NONNULL((1)) void

@@ -441,9 +441,11 @@ NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
-
-	/* Already deleted, or deletion already in progress. */
-	return (old_flags & MFILE_F_DELETED) == 0;
+	if (old_flags & MFILE_F_DELETED)
+		return false;
+	/* Broadcast that the file was marked as deleted. */
+	sig_broadcast(&self->mf_initdone);
+	return true;
 }
 
 

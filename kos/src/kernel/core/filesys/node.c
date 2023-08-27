@@ -1238,8 +1238,11 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
-
-	return !(old_flags & MFILE_F_DELETED);
+	if (old_flags & MFILE_F_DELETED)
+		return false;
+	/* Broadcast that the file was marked as deleted. */
+	sig_broadcast(&self->mf_initdone);
+	return true;
 }
 
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) __BOOL
@@ -1261,8 +1264,11 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 	/* Also clear the PERSISTENT flag */
 	if (old_flags & MFILE_F_PERSISTENT)
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
-
-	return !(old_flags & MFILE_F_DELETED);
+	if (old_flags & MFILE_F_DELETED)
+		return false;
+	/* Broadcast that the file was marked as deleted. */
+	sig_broadcast(&self->mf_initdone);
+	return true;
 }
 
 

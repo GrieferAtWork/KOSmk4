@@ -154,34 +154,6 @@ struct ccinfo;
 typedef unsigned int fallocate_mode_t; /* TODO */
 #endif /* !__fallocate_mode_t_defined */
 
-struct mfile_freeblocks_token;
-struct mfile_freeblocks_token {
-	/* [0..1] When defined, a callback that can be used to finalize `self'
-	 *
-	 * Even if set, this callback will NOT be called if `mso_freeblocks_or_unlock()'
-	 * returns  `true' (in which case it is assumed that everything went OK and that
-	 * any other memory pointed-to be below fields has been used/invalidated)
-	 *
-	 * NOTE: When non-NULL, this callback IS invoked when `mso_freeblocks_or_unlock'
-	 *       throws an exception, and MAY be invoked when `mso_freeblocks_or_unlock'
-	 *       returns `false' */
-	NONNULL_T((1)) void (FCALL *mfbt_fini)(struct mfile_freeblocks_token *__restrict self);
-
-	/* [0..1] General purpose data fields.
-	 *
-	 * Initially, all of these are initialized to all NULLs. The intended usage  for
-	 * these is for `mso_freeblocks_or_unlock()' to populate these points with heap-
-	 * allocated data structures that may be needed during future iterations */
-	void *mfbt_data[7];
-};
-
-/* Callback that may ONLY be invoked from `mso_freeblocks_or_unlock', where it MUST
- * be called if the function  wants to do something that  might block, prior to  it
- * returning `false' or by throwing an exception. */
-FUNDEF NONNULL((1)) void
-NOTHROW(FCALL mfile_freeblocks_unlock)(struct mfile *__restrict self,
-                                       pos_t aligned_new_size);
-
 /* Extended operators used for implementing stream interface
  * functions and/or overriding the behavior of certain user-
  * exposed functions. */
@@ -375,40 +347,6 @@ struct mfile_stream_ops {
 	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
 	                         struct ccinfo *__restrict info);
 
-	/* [0..1] Hook for internal, fs-specific handling for `ftruncate()'.
-	 * This operator behaves kind-of similar to `mso_truncate()', except
-	 * that it gets called *from* `mfile_truncate()' in a context  where
-	 * `aligned_new_size' is  less than  `self->mf_filesize', and  while
-	 * already holding locks and having checked for special cases:
-	 * - mpart_lock_acquired(self->mf_parts[->...]); // Every part of `self' is locked
-	 * - mfile_lock_writing(self);                   // A write-lock to `self' is held
-	 * - self->mf_parts != MFILE_PARTS_ANONYMOUS;    // The file isn't anonymous
-	 * - mfile_partaddr_ceilalign(self, self->mf_filesize) > aligned_new_size;
-	 *                                               // New aligned size is less than old aligned size
-	 *                                               // iow: total number of blocks has been reduced
-	 * - self->mf_trunclock == 0;                    // No "trunc-lock" is currently being held
-	 * - !mpart_hasblocksstate_init(mpart_tree_rlocate(self->mf_parts, aligned_new_size, (pos_t)-1)->[*any*];
-	 *                                               // No part above `aligned_new_size' is currently being initialized
-	 *                                               // The same also goes for `MPART_F_CHANGED'
-	 * - mpart_tree_locate(self->mf_parts, aligned_new_size - 1) !=
-	 *   mpart_tree_locate(self->mf_parts,       aligned_new_size);
-	 *                                               // No part overlaps with the file's new aligned size
-	 *
-	 * When implemented, this operator is required to behave as follows:
-	 * @return: true:  Success (the contents of `token' are undefined, and `token->mfbt_fini' will *NOT* be called)
-	 * @return: false: Try  again (`mfile_freeblocks_unlock()' was  called, and the contents  of `token' will be
-	 *                 preserved until the next time this operator gets invoked. Or if something else goes wrong
-	 *                 before then, `token->mfbt_fini' (if non-NULL), will be invoked in order to free data that
-	 *                 may be stored in `token->mfbt_data')
-	 * @throws:        Error (`mfile_freeblocks_unlock()' was called, and `token->mfbt_fini' (if non-NULL), will
-	 *                 be invoked immediately before the thrown exception is propagated)
-	 */
-	BLOCKING WUNUSED_T NONNULL_T((1, 2)) __BOOL
-	(KCALL *mso_freeblocks_or_unlock)(struct mfile *__restrict self,
-	                                  struct mfile_freeblocks_token *__restrict token,
-	                                  pos_t aligned_new_size)
-			THROWS(E_IOERROR, ...);
-
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* [0..1] Operator pair used for creating/destroying additional cookie objects
 	 *        that remain alive for as long as `mf_notify != NULL' (iow: for as long
@@ -529,12 +467,26 @@ mfile_dosyncio(struct mfile *__restrict self,
  *                                       to be less than `mf_blockshift', but in many cases
  *                                       (including  those of ramfs-based files), it simply
  *                                       is equal to `mf_blockshift'. */
-#define mfile_rdblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_loadblocks)(self, addr, buf, num_bytes, aio))
-#define mfile_wrblocks_async(self, addr, buf, num_bytes, aio) ((*(self)->mf_ops->mo_saveblocks)(self, addr, buf, num_bytes, aio))
+#define mfile_rdblocks_async(self, addr, buf, num_bytes, aio) mfile_doasyncio(self, (self)->mf_ops->mo_loadblocks, addr, buf, num_bytes, aio)
+#define mfile_wrblocks_async(self, addr, buf, num_bytes, aio) mfile_doasyncio(self, (self)->mf_ops->mo_saveblocks, addr, buf, num_bytes, aio)
 #define mfile_rdblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_loadblocks, addr, buf, num_bytes)
 #define mfile_wrblocks(self, addr, buf, num_bytes)            mfile_dosyncio(self, (self)->mf_ops->mo_saveblocks, addr, buf, num_bytes)
-#define mfile_haverdblocks(self) ((self)->mf_ops->mo_loadblocks != __NULLPTR)
-#define mfile_havewrblocks(self) ((self)->mf_ops->mo_saveblocks != __NULLPTR)
+#define mfile_haverdblocks(self)                              ((self)->mf_ops->mo_loadblocks != __NULLPTR)
+#define mfile_havewrblocks(self)                              ((self)->mf_ops->mo_saveblocks != __NULLPTR)
+
+#ifdef NDEBUG
+#define mfile_doasyncio(self, io, addr, buf, num_bytes, aio) \
+	((*io)(self, addr, buf, num_bytes, aio))
+#else /* NDEBUG */
+FUNDEF BLOCKING NONNULL((1, 2)) void
+(KCALL mfile_doasyncio)(struct mfile *__restrict self,
+                        NONNULL_T((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                           physaddr_t buf, size_t num_bytes,
+                                                           struct aio_multihandle *__restrict aio),
+                        pos_t addr, physaddr_t buf, size_t num_bytes,
+                        struct aio_multihandle *__restrict aio)
+		ASMNAME("mfile_doasyncio_dbg");
+#endif /* !NDEBUG */
 
 /* Helper macros for low-level block sizes */
 #define mfile_getblockshift(self) (self)->mf_blockshift
@@ -608,7 +560,8 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
 	 * @assume(addr + num_bytes <= mfile_partaddr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
-	 * @assume(self->mf_trunclock != 0);
+	 * @assume(self->mf_trunclock != 0 || (self->mf_flags & MFILE_F_FIXEDFILESIZE));
+	 * @assume(!(self->mf_flags & MFILE_F_DELETING));
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)
 	 * NOTE: This function is allowed to be BLOCKING, but must still guaranty not to do so
 	 *       indefinitely,  as it may be called in the context of async workers, which may
@@ -617,7 +570,8 @@ struct mfile_ops {
 	BLOCKING NONNULL_T((1, 5)) void
 	(KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
-	                       struct aio_multihandle *__restrict aio);
+	                       struct aio_multihandle *__restrict aio)
+			THROWS(E_IOERROR, ...);
 
 	/* [0..1]
 	 * Save/write-back the given physical memory buffer (this is the write-to-disk callback)
@@ -626,7 +580,8 @@ struct mfile_ops {
 	 * @assume(IS_ALIGNED(num_bytes, mfile_getblocksize(self)));
 	 * @assume(addr + num_bytes <= mfile_partaddr_ceilalign(self, self->mf_filesize));
 	 * @assume(num_bytes != 0);
-	 * @assume(self->mf_trunclock != 0);
+	 * @assume(self->mf_trunclock != 0 || (self->mf_flags & MFILE_F_FIXEDFILESIZE));
+	 * @assume(!(self->mf_flags & MFILE_F_DELETING));
 	 * NOTE: This callback must _NOT_ invoke `aio_multihandle_done(aio)' (that's the caller's job)
 	 * NOTE: This function is allowed to be BLOCKING, but must still guaranty not to do so
 	 *       indefinitely,  as it may be called in the context of async workers, which may
@@ -635,7 +590,22 @@ struct mfile_ops {
 	BLOCKING NONNULL_T((1, 5)) void
 	(KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
-	                       struct aio_multihandle *__restrict aio);
+	                       struct aio_multihandle *__restrict aio)
+			THROWS(E_IOERROR, ...);
+
+	/* [0..1]
+	 * Deallocate file blocks from disk (blocks are lazily allocated by `mo_saveblocks')
+	 * @assume(IS_ALIGNED(minaddr, mfile_getblocksize(self)));
+	 * @assume(IS_ALIGNED(maxaddr + 1, mfile_getblocksize(self)));
+	 * @assume(maxaddr + 1 <= mfile_partaddr_ceilalign(self, self->mf_filesize)); // Assuming no overflows
+	 * @assume(minaddr <= maxaddr);
+	 * @assume(self->mf_trunclock == 0);
+	 * @assume(self->mf_flags & MFILE_F_DELETING); // Caller is thread that set `MFILE_F_DELETING'
+	 * @assume(!(self->mf_flags & MFILE_F_FIXEDFILESIZE)); */
+	BLOCKING NONNULL_T((1)) void
+	(KCALL *mo_freeblocks)(struct mfile *__restrict self,
+	                       pos_t minaddr, pos_t maxaddr)
+			THROWS(E_IOERROR, ...);
 
 	/* [0..1] Called after `MFILE_F_CHANGED' and/or `MFILE_F_ATTRCHANGED' becomes set.
 	 * @param: oldflags: Old file flags. (set of `MFILE_F_*')
@@ -708,7 +678,8 @@ struct mfile_ops {
                                             * delete-operation itself will eventually be allowed to set the file's size to  `0'.
                                             * Once async deletion is complete, the file's part-tree and changed-list will be set
                                             * to  MFILE_PARTS_ANONYMOUS, the file will have a zero  of `0', and all of its used-
-                                            * to-be parts will be anon, too. */
+                                            * to-be parts will be anon, too.
+                                            * TODO: After setting this flag, `mf_initdone' is broadcast */
 /*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
 /*      MFILE_F_                0x00000080  * ... Reserved: MS_DIRSYNC */
 #define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))][const_SET_if(MFILE_F_DELETED)]
@@ -723,7 +694,34 @@ struct mfile_ops {
 #define MFILE_F_NOUSRIO         0x00002000 /* [lock(ATOMIC)] Disallow  user-space  from  pread(2)-ing or  pwrite(2)-ing  this file.
                                             * Doesn't affect `mso_pread' and `mso_pwrite'; only `mfile_read()' and `mfile_write()'. */
 #define MFILE_F_NOMTIME         0x00004000 /* [lock(ATOMIC)][const_if(MFILE_F_DELETED)] Don't modify the value of `mf_mtime' */
-/*efine MFILE_F_                0x00008000  * ... */
+#define MFILE_F_DELETING        0x00008000 /* [lock(ATOMIC)] Special flag  to indicate  that the  file
+                                            * (may be) about to be deleted. In order to set this flag:
+                                            * - self->mf_trunclock == 0
+                                            * - mfile_lock_writing(self)
+                                            * - mpart_lock_acquired(self->mf_parts->*)
+                                            * - For all parts that overlap with the address range that should get deleted:
+                                            *   - Address ranges belonging to MAP_PRIVATE mappings have been loaded (block status LOAD or CHNG)
+                                            *   - Address ranges belonging to MAP_SHARED mappings had their write-access revoked
+                                            * After setting the flag (NOT done by `mfile_deleting_begin_locked_or_unlock()'):
+                                            * - Either call `mfile_msalign_makeanon_locked_or_unlock()' for the range you wish to delete
+                                            * - Or recursively  call `mfile_deleting_begin_locked_or_unlock()'  to set  `MFILE_F_DELETING'
+                                            *   for all misaligned sub-files. In this variant, caches of misaligned sub-files are not lost
+                                            *   when  the delete-operation needs to be rolled back (e.g. `unlink(2)' notices that the file
+                                            *   still has additional  hard-links), however  also requires that  misaligned sub-files  that
+                                            *   were marked as DELETING are kept track dynamically.
+                                            * When the flag is set:
+                                            * - Not allowed to increment `self->mf_trunclock'
+                                            * - Not allowed to fault a `MAP_SHARED' file mappings
+                                            * - Not allowed to raise `self->mf_filesize'
+                                            * - Not allowed to lower `self->mf_filesize' (except in thread that set `MFILE_F_DELETING')
+                                            * - Not  allowed to trim any part of the file that is used by a MAP_PRIVATE mapping
+                                            *   If the file is a misaligned sub-file, then this restriction also applies if the
+                                            *   underlying file has this flag set.
+                                            * - Not allowed to create new misaligned sub-files  (`mf_msalign'), though existing ones can be  used.
+                                            *   This is important to ensure that the set of misaligned sub-files doesn't change (since `unlink(2)'
+                                            *   sets the `MFILE_F_DELETING' flag  for all misaligned  sub-files so-as not  to necessarily have  to
+                                            *   unload *everything* in case the file being deleted has extra hard-links)
+                                            * After clearing this flag, `mf_initdone' is broadcast */
 /*      MFILE_F_                0x00010000  * ... Reserved: MS_POSIXACL */
 /*      MFILE_F_                0x00020000  * ... Reserved: MS_UNBINDABLE */
 #define MFILE_F_PERSISTENT      0x00040000 /* [lock(CLEAR_ONCE)] Parts of this file should not be unloaded to free up
@@ -879,7 +877,7 @@ struct mfile {
 	struct inotify_controller    *mf_notify;     /* [0..1][owned][lock(!PREEMPTION && :notify_lock)] Notify controller. */
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
-	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
+	WEAK size_t                   mf_trunclock;  /* [lock(INC((RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))) && !(mf_flags & MFILE_F_DELETING)),
 	                                              *       DEC(ATOMIC))]
 	                                              * Non-zero if `mf_filesize' must not be lowered. Incrementing this
 	                                              * counter requires one  to be holding  a lock to  one of the  mem-
@@ -915,14 +913,17 @@ struct mfile {
 #endif /* __SIZEOF_POINTER__ >= 8 */
 #else /* __WANT_FS_INIT */
 	atomic64_t                    mf_filesize;   /* [lock(READ:      ATOMIC,
-	                                              *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock'   was    incremented    while    holding    `mf_lock'!
-	                                              *                                                // By acquiring a write-lock to `mf_lock' and waiting for `mf_trunclock == 0',
-	                                              *                                                // one  must  be  able  to   prevent  `mf_filesize'  from  changing  at   all!
-	                                              *       DECREMENT: WRLOCK(mf_lock) && mf_trunclock == 0 &&
-	                                              *                  (mfile_partaddr_ceilalign(OLDVALUE) == mfile_partaddr_ceilalign(NEWVALUE) ||
-	                                              *                   mpart_lock_acquired(ALL(mf_parts))))]
-	                                              * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)] // Also cannot be lowered when `mf_trunclock != 0'
-	                                              * [valid_if(!mfile_isanon(self))] File size field.
+	                                              *       INCREMENT: mf_trunclock != 0 && ATOMIC,  // NOTE: `mf_trunclock'  was  incremented while  holding `mf_lock'!  By first
+	                                              *                                                // acquiring a write-lock to  `mf_lock' and waiting for  `mf_trunclock == 0',
+	                                              *                                                // as well as one must be able to prevent `mf_filesize' from changing at all!
+	                                              *       DECREMENT: mf_trunclock == 0 && ATOMIC &&
+	                                              *                  (!(mf_flags & MFILE_F_DELETING) && mfile_partaddr_ceilalign(OLDVALUE) == mfile_partaddr_ceilalign(NEWVALUE) ||
+	                                              *                   // Allowed to lower after setting `MFILE_F_DELETING' (but not if other thread set)
+	                                              *                   (mf_flags & MFILE_F_DELETING) ||
+	                                              *                   // Allowed to set  to 0 while  holding a lock  after `MFILE_F_DELETED' was  set
+	                                              *                   (mfile_lock_writing(self) && (mf_flags & MFILE_F_DELETED) && NEW_VALUE == 0)))]
+	                                              * [const_if(MFILE_F_FIXEDFILESIZE || MFILE_F_DELETED)]
+	                                              * [valid_if(!mfile_isanon(self))] File       size       field.
 	                                              * Attempting  to  construct new  mem-parts above  this address
 	                                              * will  fail  and/or clamp  the  max accessible  file  size to
 	                                              * the given address. Note however that  in the case of a  file
@@ -1069,14 +1070,16 @@ struct mfile {
 
 
 
-/* Increment or decrement the size-lock counter. In order to  use
- * `mfile_trunclock_inc',  the caller must currently be holding a
- * lock to `self->mf_lock', or at least one of the parts found in
- * the tree of `self->mf_parts'.
+/* Increment  or  decrement the  size-lock  counter. In  order  to use
+ * `mfile_trunclock_inc_locked',  the caller must currently be holding
+ * a lock to `self->mf_lock',  or at least one  of the parts found  in
+ * the tree of `self->mf_parts', and made sure that `MFILE_F_DELETING'
+ * isn't set (and `MFILE_F_DELETED' *shouldn't* be set).
+ *
  * Alternatively, when `mfile_isanon(self)' is true, then no such
- * requirements are imposed, and  use of these functions  becomes
+ * requirements are imposed,  and use of  these functions  become
  * optional. */
-#define mfile_trunclock_inc(self) \
+#define mfile_trunclock_inc_locked(self) \
 	__hybrid_atomic_inc(&(self)->mf_trunclock, __ATOMIC_ACQUIRE)
 #define mfile_trunclock_dec(self)                                         \
 	(__hybrid_assert((self)->mf_trunclock != 0),                          \
@@ -1086,10 +1089,57 @@ struct mfile {
 	(__hybrid_assert((self)->mf_trunclock != 0), \
 	 __hybrid_atomic_dec(&(self)->mf_trunclock, __ATOMIC_RELEASE))
 
+/* Acquire a lock to `self', wait for `MFILE_F_DELETING' to go away
+ * and check if `MFILE_F_DELETED' is set, then increment the trunc-
+ * lock. If `MFILE_F_DELETED' was set, return `false'.
+ * @return: true:  Success
+ * @return: false: Failed to increment the trunc-lock (`MFILE_F_DELETED' was set) */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_trunclock_inc(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
 /* Blocking wait until `self->mf_trunclock == 0' */
 FUNDEF BLOCKING NONNULL((1)) void FCALL
 mfile_trunclock_waitfor(struct mfile *__restrict self)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+
+/* Blocking wait until `MFILE_F_DELETING' isn't set, or `MFILE_F_DELETED' is set
+ * @return: true:  `MFILE_F_DELETING' is no longer set
+ * @return: false: `MFILE_F_DELETED' became set */
+FUNDEF BLOCKING NONNULL((1)) __BOOL FCALL
+mfile_deleting_waitfor(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+/* Do various things necessary to set `MFILE_F_DELETING' in `self->mf_flags'.
+ *
+ * NOTES:
+ * - The caller must have already asserted that there are no trunc-lock (`self->mf_trunclock == 0')
+ * - The caller must have already asserted that `MFILE_F_DELETING' isn't already set.
+ * - The caller must be holding a write-lock to `self'
+ * - This function will *NEVER* set `MFILE_F_DELETED' itself (it only checks if it is/gets set)
+ * - The given in-file address range is used to determine which MAP_PRIVATE parts to load
+ * - The caller of this function still has to decide how to deal with misaligned sub-files of `self'
+ *
+ * @param: delete_minaddr: The lowest in-file address where you intend to delete data
+ * @param: delete_maxaddr: The greatest in-file address where you intend to delete data
+ * @return: true:  Success (`MFILE_F_DELETING' is now set)
+ * @return: false: Locks were released -> try again */
+FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_deleting_begin_locked_or_unlock(struct mfile *__restrict self,
+                                      pos_t delete_minaddr DFL((pos_t)0),
+                                      pos_t delete_maxaddr DFL((pos_t)-1),
+                                      struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
+
+/* Roll-back a delete-operation previously started with `mfile_deleting_begin()' */
+#define mfile_deleting_rollback(self)                                             \
+	(__hybrid_atomic_and(&(self)->mf_flags, ~MFILE_F_DELETING, __ATOMIC_SEQ_CST), \
+	 sig_broadcast(&(self)->mf_initdone))
+
+/* Commit a delete-operation previously started with `mfile_deleting_begin()'
+ * NOTE: This is only a convenience wrapper to document the connection with `mfile_delete()' */
+#define mfile_deleting_commit(self) mfile_delete(self)
 
 
 #ifdef CONFIG_NO_SMP
@@ -1284,6 +1334,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 /* Make the given file anonymous+deleted. What this means is that (in order):
  *  - The `MFILE_F_DELETED' flag is set for the file.
  *  - The `MFILE_F_PERSISTENT' flag is cleared for the file.
+ *  - The `MFILE_F_DELETING' flag is cleared for the file.
  *  - The file-fields of all mem-parts are altered to point
  *    at  anonymous  memory   files.  (s.a.   `mfile_anon')
  *  - The `MPART_F_GLOBAL_REF' flag is cleared for all parts
@@ -1495,6 +1546,11 @@ FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_incref_and_lock_parts_or_unlock(struct mfile *__restrict self,
                                       struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_incref_and_lock_parts_r_or_unlock(struct mfile *__restrict self,
+                                        pos_t minaddr, pos_t maxaddr,
+                                        struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK);
 
 /* Same  as  `mfile_incref_and_lock_parts_or_unlock()', but  return a
  * reference to the blocking part (if any), and not release any locks
@@ -1506,26 +1562,27 @@ mfile_incref_and_lock_parts_or_unlock(struct mfile *__restrict self,
  * - When this function returns `NULL', locks+references have been acquired. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mfile_tryincref_and_lock_parts)(struct mfile *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct mpart *
+NOTHROW(FCALL mfile_tryincref_and_lock_parts_r)(struct mfile *__restrict self,
+                                                pos_t minaddr, pos_t maxaddr);
 
 /* Do the inverse of `mfile_incref_and_lock_parts_or_unlock()' and
  * release locks+references to parts of `self'. NOTE: The lock  to
  * `self' is _NOT_ released during this! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_unlock_and_decref_parts)(struct mfile *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_r)(struct mfile *__restrict self,
+                                               pos_t minaddr, pos_t maxaddr);
 
 /* Same as `mfile_unlock_and_decref_parts()', but keep a lock & reference to `part' */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfile_unlock_and_decref_parts_except)(struct mfile *__restrict self,
                                                     struct mpart *__restrict part);
-
-/* Same as `mfile_incref_and_lock_parts_or_unlock()', but
- * assert `mpart_denywrite_or_unlock()'  for  all  parts.
- *
- * Should be used if the caller intends to set `MFILE_F_READONLY' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
-mfile_incref_and_lock_parts_and_denywrite_or_unlock(struct mfile *__restrict self,
-                                                    struct unlockinfo *unlock DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL mfile_unlock_and_decref_parts_r_except)(struct mfile *__restrict self,
+                                                      struct mpart *__restrict part,
+                                                      pos_t minaddr, pos_t maxaddr);
 
 /* Deny  write  access  to anyone  currently  mapping any  part  of `self'.
  * The caller must be holding a write-lock to `self', as well as individual
@@ -1545,6 +1602,51 @@ FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
                                 struct unlockinfo *unlock DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_denywrite_r_or_unlock(struct mfile *__restrict self,
+                                  pos_t minaddr, pos_t maxaddr,
+                                  struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+
+/* Load MAP_PRIVATE (copy-on-write) nodes of `self' into memory.
+ *
+ * The caller must be holding a write-lock to `self', as well as individual
+ * locks to every part associated with it, as well as be holding references
+ * to all of the parts of `self' (`mfile_incref_and_lock_parts_or_unlock').
+ *
+ * @return: true:  Success: all blocks linked to copy-on-write nodes are loaded.
+ * @return: false: Locks were lost and you must try again.
+ *
+ * Locking logic:
+ *   - return == true:  No locks are lost, and no locks are gained
+ *   - return == false: - mfile_unlock_and_decref_parts(self);
+ *                      - mfile_lock_endwrite(unlock);
+ *                      - unlockinfo_xunlock(unlock);
+ *   - THROW:           like `return == false' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_loadprivate_or_unlock(struct mfile *__restrict self,
+                                  struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+mfile_parts_loadprivate_r_or_unlock(struct mfile *__restrict self,
+                                    pos_t minaddr, pos_t maxaddr,
+                                    struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY);
+
+
+/* Ensure  that the `MFILE_F_DELETING' flag isn't set. The
+ * caller must be holding a read- or write-lock to `self'. */
+FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
+_mfile_notdeleting_or_unlock(struct mfile *__restrict self,
+                             struct unlockinfo *unlock DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+		ASMNAME("mfile_notdeleting_or_unlock");
+#define mfile_notdeleting_or_unlock(self, ...)                                              \
+	(unlikely(__hybrid_atomic_load(&(self)->mf_flags, __ATOMIC_ACQUIRE) & MFILE_F_DELETING) \
+	 ? _mfile_notdeleting_or_unlock(self, ##__VA_ARGS__)                                    \
+	 : 1)
+
 
 /* Go through all `mf_msalign' sub-files of `self' and initialize+anonymize
  * all mem-parts that (at least partially) overlap with  [minaddr,maxaddr].
