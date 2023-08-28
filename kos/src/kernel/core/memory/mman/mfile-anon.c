@@ -21,6 +21,8 @@
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C 1
 #define __WANT_MPART__mp_anXplop
 #define __WANT_MPART__mp_dead
+#define __WANT_MFILE__mf_lop
+#define __WANT_MFILE__mf_plop
 #define __WANT_MFILE__mf_lopX
 #define __WANT_MFILE__mf_mplop
 #define __WANT_MFILE__mf_mflop
@@ -31,12 +33,18 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/allnodes.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
+#include <kernel/fs/super.h>
 #include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <sched/sig-completion.h>
 #include <sched/task.h>
+
+#include <hybrid/minmax.h>
 
 #include <kos/lockop.h>
 
@@ -54,6 +62,124 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_decref_after_delete_extusage)(REF struct mfile *__restrict self);
+
+
+/* Called after referencing elements from `fallsuper_list'
+ * were removed for `MFILE_F_EXTUSAGE'-marked file  `self' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_decref_after_delete_extusage_mounts)(REF struct mfile *__restrict self) {
+	/* More file-usages that set `MFILE_F_EXTUSAGE' can be handled here... */
+	decref(self);
+}
+
+
+
+/************************************************************************/
+/* ASYNC FILE MOUNT DELETION                                            */
+/************************************************************************/
+
+#define _MFILE_EXTUSAGE_FSUPER_OFFSET      MAX_C(sizeof(struct postlockop), sizeof(struct lockop))
+#define _mfile_extusage_getfsuper(self)    (*(struct fsuper *const *)((self)->_mf_lopX + _MFILE_EXTUSAGE_FSUPER_OFFSET))
+#define _mfile_extusage_setfsuper(self, v) (void)(*(struct fsuper **)((self)->_mf_lopX + _MFILE_EXTUSAGE_FSUPER_OFFSET) = (v))
+static_assert(sizeof(((struct mfile *)0)->_mf_lopX) >= (_MFILE_EXTUSAGE_FSUPER_OFFSET + sizeof(struct fsuper *)));
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct fsuper *
+NOTHROW(FCALL fallsuper_try_remove_by_device_locked)(struct mfile *__restrict self) {
+	struct fsuper *fs;
+	LIST_FOREACH (fs, &fallsuper_list, fs_root.fn_allsuper) {
+		if (fs->fs_dev == self && likely(tryincref(fs))) {
+			/* Remove from the list of all superblocks. */
+			fallsuper_remove(fs);
+			LIST_ENTRY_UNBOUND_INIT(&fs->fs_root.fn_allsuper);
+
+			/* Clear  the global flag  (if set) since we
+			 * removed the superblock from the all-list. */
+			if (atomic_fetchand(&fs->fs_root.mf_flags, ~MFILE_FN_GLOBAL_REF))
+				decref_nokill(fs);
+			return fs;
+		}
+	}
+	return NULL;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(LOCKOP_CC mfile_decref_after_delete_extusage_allsuper_plop)(struct postlockop *__restrict self) {
+	REF struct fsuper *fs;
+	REF struct mfile *me;
+	me = container_of(self, struct mfile, _mf_plop);
+	fs = _mfile_extusage_getfsuper(me);
+	if (fs) {
+		/* Delete  the  superblock and  drop the  reference we
+		 * got from `fallsuper_try_remove_by_device_locked()'. */
+		fsuper_delete_and_decref(fs);
+
+		/* Repeat the search for more filesystems (unlikely, but *technically* you're allowed to mount
+		 * a file multiple times, so-long as you (somehow) skip the `fsuper') */
+		mfile_decref_after_delete_extusage(me);
+	} else {
+		mfile_decref_after_delete_extusage_mounts(me);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(LOCKOP_CC mfile_decref_after_delete_extusage_allsuper_lop)(struct lockop *__restrict self) {
+	REF struct fsuper *fs;
+	REF struct mfile *me;
+	me = container_of(self, struct mfile, _mf_lop);
+	fs = fallsuper_try_remove_by_device_locked(me);
+	_mfile_extusage_setfsuper(me, fs);
+	me->_mf_plop.plo_func = &mfile_decref_after_delete_extusage_allsuper_plop;
+	return &me->_mf_plop;
+}
+
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_decref_after_delete_extusage)(REF struct mfile *__restrict self) {
+again:
+	if (fallsuper_tryacquire()) {
+		REF struct fsuper *super;
+		super = fallsuper_try_remove_by_device_locked(self);
+		fallsuper_release();
+		if (super) {
+			fsuper_delete_and_decref(super);
+			goto again;
+		}
+		mfile_decref_after_delete_extusage_mounts(self);
+	} else {
+		/* Must use a lock-op. */
+		self->_mf_lop.lo_func = &mfile_decref_after_delete_extusage_allsuper_lop; /* inherit reference */
+		lockop_enqueue(&fallsuper_lockops, &self->_mf_lop);
+		_fallsuper_reap();
+	}
+}
+
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_decref_after_delete)(REF struct mfile *__restrict self) {
+	/* Generate `IN_IGNORED' */
+	mfile_inotify_ignored(self);
+
+	/* If `self' is being used to mount a super-block, force-delete
+	 * that superblock (case: you pull out a thumb-drive while it's
+	 * mounted,  and we want  those mounts to  disappear as soon as
+	 * possible) */
+	if unlikely(self->mf_flags & MFILE_F_EXTUSAGE) {
+		mfile_decref_after_delete_extusage(self);
+		return;
+	}
+
+	/* Drop the inherited reference to the original file. */
+	decref_unlikely(self);
+}
+
+
+
+
+
+/************************************************************************/
+/* ASYNC FILE DELETION                                                  */
+/************************************************************************/
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC mpart_delete_postop_cb)(Tobpostlockop(mfile) *__restrict self,
@@ -256,19 +382,19 @@ PRIVATE NOBLOCK NONNULL((1)) Tobpostlockop(mfile) *
 NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
                                             struct mpart *already_locked_part);
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
-NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
-                                         REF struct mfile *__restrict file);
+NOTHROW(LOCKOP_CC mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
+                                             REF struct mfile *__restrict file);
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
-                                                         struct mfile *__restrict file);
+NOTHROW(LOCKOP_CC mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
+                                                             struct mfile *__restrict file);
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
-                                   struct mfile *__restrict file);
+NOTHROW(LOCKOP_CC mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
+                                       struct mfile *__restrict file);
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
-NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
-                                         struct mpart *__restrict part) {
+NOTHROW(LOCKOP_CC mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
+                                             struct mpart *__restrict part) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mplop);
 
@@ -299,26 +425,9 @@ NOTHROW(FCALL mfile_delete_withpartlock)(Toblockop(mpart) *__restrict self,
 	return NULL;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_decref_after_delete)(struct mfile *__restrict self) {
-	/* Generate `IN_IGNORED' */
-	mfile_inotify_ignored(self);
-
-	/* TODO: If `self' is being used to mount a super-block, force-delete
-	 *       that superblock (case: you pull out a thumb-drive while it's
-	 *       mounted,  and we want  those mounts to  disappear as soon as
-	 *       possible)
-	 * CAUTION: Considering how often we  get here, optimize this  check
-	 *          for the case where `self' *isn't* used to mount a super-
-	 *          block. Don't make this check be O(fallsuper_getsize()) */
-
-	/* Drop the inherited reference to the original file. */
-	decref_unlikely(self);
-}
-
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
-                                                         struct mfile *__restrict UNUSED(_file)) {
+NOTHROW(LOCKOP_CC mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *__restrict self,
+                                                             struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	struct mpart_slist deadparts;
 	me        = container_of(self, struct mfile, _mf_mfplop);
@@ -337,8 +446,8 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *_
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
-                                   struct mfile *__restrict UNUSED(_file)) {
+NOTHROW(LOCKOP_CC mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
+                                       struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mfplop);
 	mfile_decref_after_delete(me);
@@ -519,8 +628,8 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mfile) *
-NOTHROW(FCALL mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
-                                         struct mfile *__restrict UNUSED(_file)) {
+NOTHROW(LOCKOP_CC mfile_delete_withfilelock)(Toblockop(mfile) *__restrict self,
+                                             struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mflop);
 	return mfile_delete_withfilelock_ex(me, NULL);
@@ -652,35 +761,6 @@ NOTHROW(FCALL mfile_delete_and_decref)(REF struct mfile *__restrict self) {
 	mfile_delete_impl(self);
 }
 
-
-
-/* Blocking wait until `MFILE_F_DELETING' isn't set, or `MFILE_F_DELETED' is set
- * @return: true:  `MFILE_F_DELETING' is no longer set
- * @return: false: `MFILE_F_DELETED' became set */
-PUBLIC BLOCKING NONNULL((1)) bool FCALL
-mfile_deleting_waitfor(struct mfile *__restrict self)
-		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
-	uintptr_t flags;
-again:
-	assert(!task_wasconnected());
-	task_connect(&self->mf_initdone);
-	flags = atomic_read(&self->mf_flags);
-	if unlikely(flags & MFILE_F_DELETED) {
-		task_disconnectall();
-		return false;
-	}
-	if unlikely(!(flags & MFILE_F_DELETING)) {
-		task_disconnectall();
-		return true;
-	}
-	task_waitfor();
-	flags = atomic_read(&self->mf_flags);
-	if (flags & MFILE_F_DELETED)
-		return false;
-	if (!(flags & MFILE_F_DELETING))
-		return true;
-	goto again;
-}
 
 
 /* Do various things necessary to set `MFILE_F_DELETING' in `self->mf_flags'.
@@ -902,7 +982,8 @@ NOTHROW(FCALL _mfile_unlink_commit_prehook)(struct mfile *__restrict self,
 	LIST_FOREACH_SAFE (ms, &self->mf_msalign, mam_link) {
 		assert(!wasdestroyed(ms));
 		assert(ms->mf_flags & MFILE_F_DELETING);
-#if 0 /* Don't need to delete right now; once the base file gets deleted, the misaligned sub-files will, too. */
+#if 0 /* Don't  need to delete right now; once  the base file gets deleted, the
+       * misaligned sub-files will, too. s.a. `mfile_do_delete_msalign_files()' */
 		mfile_delete_and_decref(ms);
 #else
 		decref_unlikely(ms);

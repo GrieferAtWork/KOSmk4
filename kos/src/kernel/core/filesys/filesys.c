@@ -274,7 +274,7 @@ waitfor_dev_inprogress_end:
  * being opened, allowing future/concurrent attempts  at opening this device as  a
  * superblock from no longer blocking. */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev) {
+NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev, bool success) {
 	mount_in_progress_lock_acquire();
 	assertf(mount_in_progress_count != 0, "No mounts in progress for _any_ files");
 	if likely(mount_in_progress_count == 1) {
@@ -299,6 +299,7 @@ NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev) {
 			if (mount_in_progress_list[i] == dev)
 				break;
 		}
+
 		/* Shift the list to get rid of `dev' */
 		--mount_in_progress_count;
 		memmovedown(&mount_in_progress_list[i],
@@ -311,6 +312,11 @@ NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev) {
 done:
 	/* Wake up anything who might be waiting for opening to be done. */
 	sig_broadcast(&mount_in_progress_rmsig);
+
+	/* Upon success, remember that `dev' has extended uses
+	 * now  (needed so deletes  cascade to the superblock) */
+	if (success)
+		atomic_or(&dev->mf_flags, MFILE_F_EXTUSAGE);
 
 	/* Reference from `mount_in_progress_list' (*_nokill because caller still has another ref) */
 	decref_nokill(dev);
@@ -423,11 +429,11 @@ err_cannot_open_file:
 				RETHROW();
 			}
 		} EXCEPT {
-			ffilesys_open_done(dev);
+			ffilesys_open_done(dev, false);
 			RETHROW();
 		}
 		if (result == NULL) {
-			ffilesys_open_done(dev);
+			ffilesys_open_done(dev, false);
 
 			/* Release the trunc-lock if the device couldn't be opened. */
 			mfile_trunclock_dec(dev);
@@ -465,6 +471,9 @@ err_cannot_open_file:
 				if unlikely(result->fs_saveblocks == NULL)
 					result->fs_saveblocks = &throw_readonly_v_saveblocks;
 			}
+
+			/* Remember that `dev' has extended uses now (needed so deletes cascade to the superblock) */
+			atomic_or(&dev->mf_flags, MFILE_F_EXTUSAGE);
 		} else {
 			printk(KERN_INFO "[fs] Created %s-superblock\n",
 			       self->ffs_name);

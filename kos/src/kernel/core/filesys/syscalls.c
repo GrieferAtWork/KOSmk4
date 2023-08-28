@@ -1006,7 +1006,7 @@ again_open_superblock:
 				fallsuper_acquire();
 			} EXCEPT {
 				if (dev != NULL)
-					ffilesys_open_done(dev);
+					ffilesys_open_done(dev, false);
 				assert(super->fs_root.mf_refcnt == 1);
 				super->fs_root.mf_refcnt = 0;
 				COMPILER_WRITE_BARRIER();

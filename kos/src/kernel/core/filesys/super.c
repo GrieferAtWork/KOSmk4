@@ -416,39 +416,6 @@ again_locked:
 /* Async helpers for `fsuper_delete()'                                  */
 /************************************************************************/
 
-/* Begin deletion of `self' */
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
-	uintptr_t old_flags;
-
-	/* Mark the device as deleted (and make available use of the file fields) */
-	mfile_tslock_acquire(self);
-	old_flags = atomic_fetchor(&self->mf_flags,
-	                           MFILE_F_DELETED | MFILE_F_NOATIME |
-	                           MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
-	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
-	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
-	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
-	                           MFILE_F_READONLY);
-	mfile_tslock_release(self);
-
-	/* Delete global reference to the superblock. */
-	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
-	    (atomic_fetchand(&self->mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
-		decref_nokill(self);
-
-	/* Also clear the PERSISTENT flag */
-	if (old_flags & MFILE_F_PERSISTENT)
-		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
-	if (old_flags & MFILE_F_DELETED)
-		return false;
-	/* Broadcast that the file was marked as deleted. */
-	sig_broadcast(&self->mf_initdone);
-	return true;
-}
-
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_postlop)(struct postlockop *__restrict self) {
 	REF struct fnode *me;
@@ -547,7 +514,7 @@ again:
 	/* Try to get a reference to this tree-node. */
 	if (tryincref(tree)) {
 		/* Try to begin deletion of this file (unless it's already marked as deleted) */
-		if (mfile_begin_delete(tree)) {
+		if (fnode_delete_strt(tree)) {
 			/* Do the rest of the deletion later. */
 			tree->_mf_delfnodes = self->fs_root._mf_delfnodes; /* Inherit reference */
 			self->fs_root._mf_delfnodes = tree;                /* Inherit reference */
@@ -627,7 +594,7 @@ NOTHROW(LOCKOP_CC fsuper_clear_changed_lop)(Toblockop(fsuper) *__restrict self,
 			node = LIST_FIRST(&me->fs_changednodes);
 			LIST_UNBIND(node, fn_changed); /* With this, we inherit the reference from `fs_changednodes' */
 			assert(!wasdestroyed(node));
-			if (!mfile_begin_delete(node)) {
+			if (!fnode_delete_strt(node)) {
 				/* Special case: the node is already being deleted for some other reason,
 				 *               meaning  that we are unable to gain ownership of its LOP
 				 *               fields (which we'd need for doing the decref later)
@@ -710,10 +677,38 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self) {
  * conditions that can result in data corruption) */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL fsuper_delete_strt)(struct fsuper *__restrict self) {
+	uintptr_t old_flags;
+
 	/* Check for special case: singleton filesystems mustn't be marked as DELETED */
 	if (self->fs_sys->ffs_flags & FFILESYS_F_SINGLE)
 		return false;
-	return mfile_begin_delete(&self->fs_root);
+
+	/* Mark the device as deleted (and make available use of the file fields) */
+	mfile_tslock_acquire(&self->fs_root);
+	old_flags = atomic_fetchor(&self->fs_root.mf_flags,
+	                           MFILE_F_DELETED | MFILE_F_NOATIME |
+	                           MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
+	                           MFILE_F_CHANGED | MFILE_F_ATTRCHANGED |
+	                           MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY |
+	                           MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
+	                           MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
+	                           MFILE_F_READONLY);
+	mfile_tslock_release(&self->fs_root);
+
+	/* Delete global reference to the superblock. */
+	if ((old_flags & MFILE_FN_GLOBAL_REF) &&
+	    (atomic_fetchand(&self->fs_root.mf_flags, ~(MFILE_FN_GLOBAL_REF)) & MFILE_FN_GLOBAL_REF))
+		decref_nokill(self);
+
+	/* Also clear the PERSISTENT flag */
+	if (old_flags & MFILE_F_PERSISTENT)
+		atomic_and(&self->fs_root.mf_flags, ~MFILE_F_PERSISTENT);
+	if (old_flags & MFILE_F_DELETED)
+		return false;
+
+	/* Broadcast that the file was marked as deleted. */
+	sig_broadcast(&self->fs_root.mf_initdone);
+	return true;
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void

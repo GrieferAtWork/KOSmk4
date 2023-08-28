@@ -750,7 +750,8 @@ struct mfile_ops {
 /*efine MFILE_F_                0x00800000  * ... */
 #define MFILE_F_STRICTATIME     0x01000000 /* [lock(ATOMIC)] Strict last-accessed timestamps ??? */
 #define MFILE_F_LAZYTIME        0x02000000 /* [lock(ATOMIC)] Lazy timestamps ??? */
-/*efine MFILE_F_                0x04000000  * ... */
+#define MFILE_F_EXTUSAGE        0x04000000 /* [lock(WRITE_ONCE)] This file *might* be used as the device of a super-block
+                                            * (or in the future: some other rarely used, global wrapper around an mfile). */
 #define MFILE_F_ROFLAGS         0x08000000 /* [lock(WRITE_ONCE)]
                                             * The following flags may not be changed by user-space:
                                             *  - MFILE_F_READONLY, MFILE_FN_ATTRREADONLY

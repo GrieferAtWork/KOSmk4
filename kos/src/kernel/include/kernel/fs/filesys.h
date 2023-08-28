@@ -243,7 +243,7 @@ ffilesys_opendev(__BOOL *__restrict pnewly_created,
  * being opened, allowing future/concurrent attempts  at opening this device as  a
  * superblock from no longer blocking. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev);
+NOTHROW(FCALL ffilesys_open_done)(struct mfile *__restrict dev, __BOOL success DFL(1));
 
 
 /* Lookup a filesystem type, given its name.

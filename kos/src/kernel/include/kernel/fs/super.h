@@ -598,6 +598,8 @@ fsuper_setlabel(struct fsuper *__restrict self,
  * required locks become available... */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
+#define fsuper_delete_and_decref(self) \
+	(void)(fsuper_delete_strt(self) ? fsuper_delete_impl(self) : decref(self))
 
 /* Internal implementation of `fsuper_delete()' (don't call this one
  * unless  you know that you're doing; otherwise, you may cause race
@@ -605,7 +607,7 @@ NOTHROW(FCALL fsuper_delete)(struct fsuper *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL fsuper_delete_strt)(struct fsuper *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL fsuper_delete_impl)(struct fsuper *__restrict self);
+NOTHROW(FCALL fsuper_delete_impl)(REF struct fsuper *__restrict self);
 
 
 /* Gather information about the filesystem and store that information in `*result' */

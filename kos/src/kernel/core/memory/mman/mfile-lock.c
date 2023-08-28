@@ -49,6 +49,38 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+
+
+
+/* Blocking wait until `MFILE_F_DELETING' isn't set, or `MFILE_F_DELETED' is set
+ * @return: true:  `MFILE_F_DELETING' is no longer set
+ * @return: false: `MFILE_F_DELETED' became set */
+PUBLIC BLOCKING NONNULL((1)) bool FCALL
+mfile_deleting_waitfor(struct mfile *__restrict self)
+		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...) {
+	uintptr_t flags;
+again:
+	assert(!task_wasconnected());
+	task_connect(&self->mf_initdone);
+	flags = atomic_read(&self->mf_flags);
+	if unlikely(flags & MFILE_F_DELETED) {
+		task_disconnectall();
+		return false;
+	}
+	if unlikely(!(flags & MFILE_F_DELETING)) {
+		task_disconnectall();
+		return true;
+	}
+	task_waitfor();
+	flags = atomic_read(&self->mf_flags);
+	if (flags & MFILE_F_DELETED)
+		return false;
+	if (!(flags & MFILE_F_DELETING))
+		return true;
+	goto again;
+}
+
+
 /* release locks and decref() an entire mem-part tree. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_unlock_and_decref_whole_tree)(REF struct mpart *__restrict self) {

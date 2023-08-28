@@ -1240,6 +1240,7 @@ NOTHROW(FCALL fnode_delete_strt)(struct fnode *__restrict self) {
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 	if (old_flags & MFILE_F_DELETED)
 		return false;
+
 	/* Broadcast that the file was marked as deleted. */
 	sig_broadcast(&self->mf_initdone);
 	return true;
@@ -1266,6 +1267,7 @@ NOTHROW(FCALL fnode_delete_strt_with_tslock)(struct fnode *__restrict self) {
 		atomic_and(&self->mf_flags, ~MFILE_F_PERSISTENT);
 	if (old_flags & MFILE_F_DELETED)
 		return false;
+
 	/* Broadcast that the file was marked as deleted. */
 	sig_broadcast(&self->mf_initdone);
 	return true;
