@@ -55,75 +55,75 @@
  *  │ │ │ │ │ │ │                Also can't be made to support the bound-elem API, either...))
  *  │ │ │ │ │ │ │ ┌─ XSIMPLEQ_*: XOR-key'd Simple queue
  *  │ │ │ │ │ │ │ │
- * ╒╧═╧═╧═╧═╧═╧═╧═╧╕
+ * ╒╧═╧═╧═╧═╧═╧═╧═╧╕  ..
  * │1 1 2 2 2   1 3│  -- Pointers per *_HEAD([name], type) aka. *_HEAD_P(T)
  * │2 1 1 2 2 2 2 1│  -- Pointers per *_ENTRY(type)        aka. *_ENTRY_P(T)
- * ╞═══════════════╡
+ * ╞═══════════════╡  ..
  * │1 1 1 1 1   1 1│  CODE [*]_HEAD_INITIALIZER(self)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  void [*]_INIT(self)
  * │          1    │  void [*]_INIT(elem, key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │  1 1       1 1│  void [*]_MOVE(dst, src)                                 (C++-style move-constructor)
  * │1     1 1      │  void [*]_MOVE(dst, src, key)                            (C++-style move-constructor)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │  1 1       1 1│  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * │1     1 1      │  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │  1 1       1 1│  void [*]_TRANSFER(dst, src)                             (C++-style move-constructor, but leaves `src' undefined)
  * │1     1 1      │  void [*]_TRANSFER(dst, src, key)                        (C++-style move-constructor, but leaves `src' undefined)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  void [*]_CLEAR(self)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │    1         1│  void [*]_CONCAT(dst, src)
  * │      1 1      │  void [*]_CONCAT(dst, src, key)
  * │N N         N  │  void [*]_CONCAT(dst, src, [type], key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  PTR  [*]_END(self)                                      (Pointer to 1 past the last elem; NULL-pointer, since all of these are linked lists)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  bool [*]_EMPTY(self)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  T*   [*]_FIRST(self)
  * │1 1 1         1│  T**  [*]_PFIRST(self)                                   (Return pointer to the pointer to the first item; use with *_P_* functions)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │      1 1      │  T*   [*]_LAST(self)
  * │    1         1│  T*   [*]_LAST(self, [type], key)
  * │N N         N  │  T*   [*]_LAST(self, key)
  * │N N         N  │  void [*]_LAST(self, p_result, key)
  * │      1        │  T*   [*]_LAST_FAST(self, [type], key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1 1 1  │  T*   [*]_NEXT(elem, key)                                (Return successor (NULL if no prev-elem exists))
  * │              1│  T*   [*]_NEXT(self, elem, key)                          (Return successor (NULL if no prev-elem exists))
  * │1 1 1         1│  T**  [*]_PNEXT(elem, key)                               (Return pointer to the pointer to the next item; use with *_P_* functions)
  * │        1      │  T*   [*]_LOOP_NEXT(self, elem, key)                     (NOTE: *_NEXT(elem, key) for RINGQ)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │        1 1 1  │  T*   [*]_PREV(elem, key)                                (Return predecessor (NULL if no prev-elem exists))
  * │1              │  T*   [*]_PREV(elem, self, [type], key)                  (Return predecessor (NULL if no prev-elem exists))
  * │      1        │  T*   [*]_PREV(elem, [headname], key)                    (Return predecessor (NULL if no prev-elem exists))
  * │      1        │  T*   [*]_PREV_FAST(elem, self, [type], key)             (Return predecessor (NULL if no prev-elem exists))
  * │1              │  T*   [*]_PREV_UNSAFE(elem, [type], key)                 (Return predecessor (undef if no prev-elem exists))
  * │        1      │  T*   [*]_LOOP_PREV(self, elem, key)                     (NOTE: *_PREV(elem, key) for RINGQ)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │N N N N N   N N│ size_t[*]_COUNT(self, key)                   # Requires: !__NO_XBLOCK + __COMPILER_HAVE_TYPEOF
  * │N N N N N   N N│  void [*]_COUNT(self, p_result, [type], key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1     1 1 1│  void [*]_INSERT_AFTER(predecessor, elem, key)
  * │      1 1      │  void [*]_INSERT_AFTER(self, predecessor, elem, key)
  * │1 1 1     1 1 1│  void [*]_INSERT_AFTER_R(predecessor, lo_elem, hi_elem, key)      { ..., predecessor, lo_elem...hi_elem, predecessor.next, ... }
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1     1   1    │  void [*]_INSERT_BEFORE(successor, elem, key)
  * │        1   1  │  void [*]_INSERT_BEFORE(self, successor, elem, key)
  * │1     1   1    │  void [*]_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)       { ..., successor.prev, lo_elem...hi_elem, successor, ... }
  * │        1   1  │  void [*]_INSERT_BEFORE_R(self, successor, lo_elem, hi_elem, key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  void [*]_INSERT[_HEAD](self, elem, key)
  * │1 1 1 1 1   1 1│  void [*]_INSERT[_HEAD]_R(self, lo_elem, hi_elem, key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │    1 1 1     1│  void [*]_INSERT_TAIL(self, elem, key)
  * │N N         N  │  void [*]_INSERT_TAIL(self, elem, [type], key)
  * │    1 1 1     1│  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, key)
  * │N N         N  │  void [*]_INSERT_TAIL_R(self, lo_elem, hi_elem, [type], key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1 1 1 1   1 1│  void [*]_REMOVE_HEAD(self, key)
  * │N N N 1     N N│  void [*]_REMOVE_TAIL(self, [type], key)
  * │        1      │  void [*]_REMOVE_TAIL(self, key)
@@ -135,7 +135,7 @@
  * │1 1         1  │  void [*]_REMOVE_AFTER(elem, key)                        (Remove successor of `elem'; undef if no successor)
  * │    1 1 1     1│  void [*]_REMOVE_AFTER(self, elem, key)
  * │  1            │  void [*]_REMOVE_PREVPTR(p_elem, elem, key)              (libbsd-specific; for use with `SLIST_FOREACH_PREVPTR()')
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │N N N N N   N N│  void [*]_REMOVE_IF(self, out_pelem, [type], key, condition)
  * │░░░░░░░░░░░░░░░│             NOTE: `*out_pelem' is written to before `condition' is
  * │░░░░░░░░░░░░░░░│                   evaluated to test if `*out_pelem' should be removed
@@ -147,9 +147,9 @@
  * │N N N N N   N N│  void [*]_REMOVEALL(self, out_pelem, [type], key, condition, on_match)
  * │░░░░░░░░░░░░░░░│             Remove all elements for which `condition' is true, and evaluate `on_match'
  * │░░░░░░░░░░░░░░░│             every time such a match is confirmed. The associated element is `*out_pelem'
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │  N N         N│  void [*]_CONTAINS(self, elem, [type], key, on_success)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1         1    │  void [*]_REPLACE(old_elem, new_elem, key)
  * │            1  │  void [*]_REPLACE(self, old_elem, new_elem, key)
  * │  N N 1 1     N│  void [*]_REPLACE(self, old_elem, new_elem, [type], key)
@@ -158,7 +158,7 @@
  * │  N N 1 1     N│  void [*]_REPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key)
  * │  N N         N│  void [*]_TRYREPLACE(self, old_elem, new_elem, [type], key, on_failure)
  * │  N N         N│  void [*]_TRYREPLACE_R(self, old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, [type], key, on_failure)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │N N N N N   N N│  CODE [*]_FOREACH(elem, self, key)
  * │N N N N N   N N│  CODE [*]_FOREACH_FROM(elem, self, key)                  (If non-NULL, start enumeration with `IN(elem)'; else start w/ `[*]_FIRST(self)')
  * │N N N N N   N N│  CODE [*]_FOREACH_SAFE(elem, self, key, [tvar])          (Same as [*]_FOREACH, but the loop body may safely remove `elem')
@@ -170,31 +170,31 @@
  * │      N        │  CODE [*]_FOREACH_REVERSE_SAFE(elem, self, [headname], key, [tvar])
  * │      N        │  CODE [*]_FOREACH_REVERSE_FROM_SAFE(elem, self, [headname], key, [tvar])
  * │  N            │  CODE [*]_FOREACH_PREVPTR(elem, p_elem, self, key)
- * ╘╤═╤═╤═╤═╤═╤═╤═╤╛
+ * ╘╤═╤═╤═╤═╤═╤═╤═╤╛  ..
  * ╒╧═╧═╧═╧═╧═╧═╧═╧╕  -- Sub-API: Atomic operations
  * │  1            │  void [*]_ATOMIC_INSERT(self, elem, key)
  * │  1            │  void [*]_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)
  * │  1            │  T*   [*]_ATOMIC_CLEAR(self)
- * ╘╤═╤═╤═╤═╤═╤═╤═╤╛
+ * ╘╤═╤═╤═╤═╤═╤═╤═╤╛  ..
  * ╒╧═╧═╧═╧═╧═╧═╧═╧╕  -- Sub-API: Pointer-to-element (allows for a number of otherwise impossible O(1) operations)
  * │1 1 1         1│  T*   [*]_P_PREV(p_elem, self, [type], key)              (Return predecessor (NULL if no prev-elem exists))
  * │1 1 1         1│  T*   [*]_P_PREV_UNSAFE(p_elem, [type], key)             (Return predecessor (undef if no prev-elem exists))
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1            │  void [*]_P_INSERT_BEFORE(p_successor, elem, key)
  * │1 1            │  void [*]_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, key)   { ..., (*p_successor).prev, lo_elem...hi_elem, (*p_successor), ... }
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1            │  void [*]_P_REMOVE(p_elem, key)
  * │    1         1│  void [*]_P_REMOVE(self, p_elem, key)
  * │1 1            │  void [*]_P_REMOVE_R(p_lo_elem, hi_elem, key)
  * │    1         1│  void [*]_P_REMOVE_R(self, p_lo_elem, hi_elem, key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │1 1            │  void [*]_P_REPLACE(p_old_elem, new_elem, key)
  * │    1         1│  void [*]_P_REPLACE(self, p_old_elem, new_elem, key)
  * │1 1            │  void [*]_P_REPLACE_R(p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
  * │    1         1│  void [*]_P_REPLACE_R(self, p_old_lo_elem, old_hi_elem, new_lo_elem, new_hi_elem, key)
- * ├───────────────┤
+ * ├───────────────┤  ..
  * │N N N         N│  CODE [*]_P_FOREACH(p_elem, self, key)
- * ╘╤═╤═╤═╤═╤═╤═╤═╤╛
+ * ╘╤═╤═╤═╤═╤═╤═╤═╤╛  ..
  * ╒╧═╧═╧═╧═╧═╧═╧═╧╕  -- Sub-API: Check if an element is contained within a list, but removal requires *_UNBIND instead of *_REMOVE
  * │1     1 1 1    │  CODE [*]_ENTRY_UNBOUND_INITIALIZER         -- Static initializer for unbound elements
  * │1     1 1 1    │  void [*]_ENTRY_UNBOUND_INIT(entry)         -- Runtime initializer for unbound elements
@@ -204,10 +204,10 @@
  * │N     N N      │  void [*]_UNBIND_IF(self, out_pelem, [type], key, condition)
  * │N     N N      │  void [*]_TRYUNBIND_IF(self, out_pelem, [type], key, condition, on_failure)
  * │N     N N      │  void [*]_UNBINDALL(self, out_pelem, [type], key, condition, on_match)
- * ╘═╤═══════════╤═╛
- *   │  Runtime  │
- *   │ (in O(x)) │
- *   ╘═══════════╛
+ * ╘═╤═══════════╤═╛  ..
+ *   │  Runtime  │    ..
+ *   │ (in O(x)) │    ..
+ *   ╘═══════════╛    ..
  *
  * NOTE: [foo]-arguments are optional and may be omitted when `__HYBRID_LIST_RESTRICT_API'
  *       is   disabled,   and  sufficient   compiler/preprocessor-support   is  available. */
