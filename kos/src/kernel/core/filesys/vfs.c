@@ -151,7 +151,8 @@ NOTHROW(FCALL vfs_recent)(struct vfs *__restrict path_vfs,
 			/* Must remove the least recently used path from the the cache. */
 			REF struct path *oldpath;
 			oldpath = TAILQ_LAST(&path_vfs->vf_recent);
-			TAILQ_UNBIND(&path_vfs->vf_recent, oldpath, p_recent);
+			TAILQ_REMOVE_TAIL(&path_vfs->vf_recent, p_recent);
+			TAILQ_ENTRY_UNBOUND_INIT(&oldpath->p_recent);
 			vfs_recentlock_release(path_vfs);
 			/* Drop old reference */
 			decref(oldpath);

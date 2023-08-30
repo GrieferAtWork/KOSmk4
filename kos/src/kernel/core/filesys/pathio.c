@@ -225,7 +225,7 @@ NOTHROW(FCALL path_tryincref_and_trylock_whole_tree)(struct path *__restrict sel
 /* Release a lock as previously acquired by `path_tryincref_and_trylock_whole_tree()'.
  * At the same  time, mark all  paths which had  been locked as  having been  deleted. */
 PRIVATE NONNULL((1)) void
-NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(struct path *__restrict self) {
+NOTHROW(FCALL path_decref_and_delete_and_unlock_whole_tree)(REF struct path *__restrict self) {
 	size_t old_mask;
 	struct path_bucket *old_buckets;
 
@@ -1607,7 +1607,8 @@ again_acquire_locks:
 			vfs_rootlock_waitwrite(pathvfs);
 			goto again_acquire_locks;
 		}
-		/* If we're still the root path, replace said path with . */
+
+		/* If we're still the root path, replace said path with `fdirnode_unmounted'. */
 		if likely(pathvfs->vf_root == self) {
 			if (!replacement_mount) {
 #ifdef _pathmount_alloc_atomic_nx
@@ -1712,16 +1713,16 @@ again_load_parent:
 	vfs_mountslock_release(pathvfs);
 
 	/* And this is the second part of the magic:
-	 *  - Mark all paths reachable from `self' as deleted, and remove
-	 *    each of  them  from  the  VFS  controller's  recent  cache.
-	 *  - Afterwards, decref() the path, at which point all VFS-related
-	 *    references to said path will have gone away, meaning that the
-	 *    only which which may still  keep the path alive are  external
-	 *    references.
-	 *    In case there are no  more references, path_destroy() is  called
-	 *    which in  turn removes  used-to-be  mounting points  from  super
-	 *    mounting point lists, and finally: if such a list becomes empty,
-	 *    `fsuper_delete()' is called,  which does  the fs-level  unmount! */
+	 * - Mark all paths reachable from `self' as deleted, and remove
+	 *   each of  them  from  the  VFS  controller's  recent  cache.
+	 * - Afterwards, decref() the path, at which point all VFS-related
+	 *   references  to said  path will  have gone  away, meaning that
+	 *   the only thing could keep  the path alive still are  external
+	 *   references.
+	 *   In case there are no  more references, path_destroy() is  called
+	 *   which in  turn removes  used-to-be  mounting points  from  super
+	 *   mounting point lists, and finally: if such a list becomes empty,
+	 *   `fsuper_delete()' is called,  which does  the fs-level  unmount! */
 	incref(self); /* Inherited by `path_decref_and_delete_and_unlock_whole_tree()' */
 	path_decref_and_delete_and_unlock_whole_tree(self);
 
@@ -1792,12 +1793,12 @@ path_mount(struct path *__restrict self,
 
 	TRY {
 		/* Acquire necessary locks:
-		 *  - path_tryincref_and_trylock_whole_tree(self);
-		 *  - vfs_mountslock_tryacquire(pathvfs);
-		 *  - vfs_driveslock_trywrite(pathvfs); // In case a DOS drive gets deleted
-		 *  - fsuper_mounts_trywrite(super)
-		 *  - path_isroot(self) ?        vfs_rootlock_trywrite(pathvfs)
-		 *                      : path_cldlock_trywrite(self->p_parent)
+		 * - path_tryincref_and_trylock_whole_tree(self);
+		 * - vfs_mountslock_tryacquire(pathvfs);
+		 * - vfs_driveslock_trywrite(pathvfs); // In case a DOS drive gets deleted
+		 * - fsuper_mounts_trywrite(super)
+		 * - path_isroot(self) ?        vfs_rootlock_trywrite(pathvfs)
+		 *                     : path_cldlock_trywrite(self->p_parent)
 		 */
 		REF struct path *blocking_path;
 

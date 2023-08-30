@@ -687,7 +687,7 @@ path_makechild(struct path *__restrict self, atflag_t atflags,
 			RETHROW();
 		}
 		if unlikely(existing != NULL) {
-			if (!tryincref(existing)) {
+			if (tryincref(existing)) {
 				/* Race condition: another thread must have created it in the mean time... */
 				path_cldlock_endwrite(self);
 				_path_free(result);
@@ -695,6 +695,7 @@ path_makechild(struct path *__restrict self, atflag_t atflags,
 				decref_unlikely(dent);
 				return existing;
 			}
+
 			/* The existing path is  dead; remove it ourselves  even
 			 * though it should also have been able to it by itself. */
 			path_cldlist_remove_force(self, existing);
