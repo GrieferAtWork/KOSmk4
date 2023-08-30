@@ -153,7 +153,7 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 		.fd_ops     = &devdiskrule_ops,                                                  \
 		.fd_ino     = ino,                                                               \
 		.fd_hash    = hash,                                                              \
-		.fd_namelen = lengthof(name),                                                    \
+		.fd_namelen = COMPILER_STRLEN(name),                                             \
 		.fd_type    = DT_DIR,                                                            \
 		/* .fd_name = */ name                                                            \
 	}
