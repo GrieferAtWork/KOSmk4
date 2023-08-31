@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL abort_tls_globals_alloc_failed)(void) {
 		(*handler)();
 
 	/* Fallback: abort with an error message. */
-	abortf("[libc][tls-globals] Failed to allocate tls-globals for thread %2$" PRIdN(__SIZEOF_PID_T__) "\n"
+	abortf("[libc][tls-globals] Failed to allocate tls-globals for thread %" PRIdN(__SIZEOF_PID_T__) "\n"
 	       "[libc][tls-globals] To suppress this error, re-run with `LIBC_TLS_GLOBALS_ALLOW_UNSAFE=1'\n",
 	       gettid());
 }
