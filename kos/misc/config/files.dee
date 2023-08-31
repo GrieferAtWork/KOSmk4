@@ -183,7 +183,7 @@ function generateAllProjectFiles() {
 	generateCppPropertiesJson("kos/CppProperties.json", isRoot: true, haveLibstdcxxIncludes: true);
 	generateCppPropertiesJson("kos/src/kernel/CppProperties.json", haveKernelIncludes: true);
 	generateCppPropertiesJson("kos/src/kernel/core/CppProperties.json", haveKernelIncludes: true, defineBuildingKernelCore: true);
-	generateCppPropertiesJson("kos/.vscode/c_cpp_properties.json", isRoot: true, forVsCode: true, haveLibstdcxxIncludes: true);
+	generateCppPropertiesJson("kos/.vscode/c_cpp_properties.json", isRoot: true, forVsCode: true, haveKernelIncludes: true, haveLibstdcxxIncludes: true);
 }
 
 

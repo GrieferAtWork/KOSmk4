@@ -85,8 +85,8 @@
  * >> size_t foo;
  * This is wrong, since `size_t' might not appear in the global namespace,
  * but only within the  std:: namespace. I tried  to fix this by  patching
- * its source, but  after realizing how  often it does  this, I just  gave
- * up and made this
+ * its  source, but after realizing how often it does this, I just gave up
+ * and made this.
  *
  * When  this feature is enabled, <cstddef> will just behave the same
  * as <stddef.h>, meaning all symbols are declared in `std' AND `::'! */
@@ -95,7 +95,7 @@
 #define __USE_BROKEN_CCOMPAT 1
 #endif /* _BROKEN_CCOMPAT_SOURCE || _GLIBCXX_SHARED */
 
-/* When  exposed  in  headers,  the  behavior  of  memmem()  and memrmem()
+/* When  exposed in  headers, the  behavior of  `memmem()' and `memrmem()'
  * differs from the behavior found in Glibc's implementation (of memmem())
  * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE (kos-specific)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return `NULL'
