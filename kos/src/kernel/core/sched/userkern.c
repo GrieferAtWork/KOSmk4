@@ -219,7 +219,6 @@ PUBLIC struct mfile userkern_segment_file = {
 	MFILE_INIT_mf_lock,
 	MFILE_INIT_mf_parts(&userkern_segment_part),
 	MFILE_INIT_mf_initdone,
-	MFILE_INIT_mf_lockops,
 	MFILE_INIT_mf_changed(NULL),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -349,7 +348,6 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	MFILE_INIT_mf_lock,
 	MFILE_INIT_mf_parts(&userkern_segment_part),
 	MFILE_INIT_mf_initdone,
-	MFILE_INIT_mf_lockops,
 	MFILE_INIT_mf_changed(NULL),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY

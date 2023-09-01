@@ -81,22 +81,23 @@ __SYSDECL_BEGIN
  * that will be performed asynchronously once some kind of lock becomes
  * available:
  *
- * >> void _service(void);
- * >> #define must_service() ...
- * >> #define service() (void)(!must_service() || (_service(), 0))
- * >> #define acquire() acquire_lock(&lock)
- * >> #define release() (release_lock(&lock), service())
+ * >> void _reap(void);
+ * >> #define must_reap()   ...
+ * >> #define reap()        (void)(!must_reap() || (_reap(), 0))
+ * >> #define try_acquire() try_acquire_lock(&lock)
+ * >> #define acquire()     acquire_lock(&lock)
+ * >> #define release()     (release_lock(&lock), reap())
  * >>
  * >> ...
  * >>
- * >> void _service(void) {
+ * >> void _reap(void) {
  * >>     do {
  * >>         if (!try_acquire())
  * >>             break;
- * >>         SERVICE_LOCK_OPS();
+ * >>         REAP_LOCK_OPS();
  * >>         release_lock(&lock);
- * >>         SERVICE_POST_LOCK_OPS();
- * >>     } while (must_service());
+ * >>         REAP_POST_LOCK_OPS();
+ * >>     } while (must_reap());
  * >> }
  *
  * This kind of implementation is  sequentially consistent in that it  can
@@ -133,12 +134,12 @@ __SYSDECL_BEGIN
  * >> PRIVATE struct myobj_list   list    = LIST_HEAD_INITIALIZER(list);
  * >> PRIVATE struct atomic_lock  lock    = ATOMIC_LOCK_INIT;
  * >> PRIVATE struct lockop_slist lockops = SLIST_HEAD_INITIALIZER(lockops);
- * >> #define _service()   _lockop_reap(&lockops, &lock)
- * >> #define service()    lockop_reap(&lockops, &lock)
+ * >> #define _reap()      _lockop_reap(&lockops, &lock)
+ * >> #define reap()       lockop_reap(&lockops, &lock)
  * >> #define tryacquire() atomic_lock_tryacquire(&lock)
  * >> #define acquire()    atomic_lock_acquire(&lock)
  * >> #define _release()   atomic_lock_release(&lock)
- * >> #define release()    (_release(), service())
+ * >> #define release()    (_release(), reap())
  * >>
  * >> PRIVATE NOBLOCK NONNULL((1)) void
  * >> NOTHROW(LOCKOP_CC myobj_destroy_postlop)(struct postlockop *__restrict self) {
@@ -160,13 +161,12 @@ __SYSDECL_BEGIN
  * >> NOTHROW(myobj_destroy)(struct myobj *self) {
  * >>     if (tryacquire()) {
  * >>         LIST_REMOVE(self, ent);
- * >>         _release();
+ * >>         release();
  * >>         free(self);
- * >>         service();
  * >>     } else {
  * >>         self->lop.lo_func = &myobj_destroy_lop;
  * >>         lockop_enqueue(&lockops, &self->lop); // or `SLIST_ATOMIC_INSERT(&lockops, &self->lop, lo_link)'
- * >>         _service();
+ * >>         _reap();
  * >>     }
  * >> }
  */
@@ -292,9 +292,9 @@ struct shared_rwlock;
 	_oblockop_reap_ex(self, trylock, unlock, cookie, obj)
 #else /* __OPTIMIZE_SIZE__ */
 #define lockop_reap_ex(self, trylock, unlock, cookie) \
-	(void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_ex(self, trylock, unlock, cookie), 0))
+	(void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap_ex(self, trylock, unlock, cookie), 0))
 #define oblockop_reap_ex(self, trylock, unlock, cookie, obj) \
-	(void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_ex(self, trylock, unlock, cookie, obj), 0))
+	(void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_ex(self, trylock, unlock, cookie, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -362,14 +362,14 @@ void _oblockop_reap_ex([[inout]] struct oblockop_slist *__restrict self,
 #define oblockop_reap_shared_lock(self, lock, obj)   _oblockop_reap_shared_lock(self, lock, obj)
 #define oblockop_reap_shared_rwlock(self, lock, obj) _oblockop_reap_shared_rwlock(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
-#define lockop_reap_atomic_lock(self, lock)          (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_lock(self, lock), 0))
-#define lockop_reap_atomic_rwlock(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_atomic_rwlock(self, lock), 0))
-#define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
-#define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
-#define lockop_reap_shared_lock(self, lock)          (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_lock(self, lock), 0))
-#define lockop_reap_shared_rwlock(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap_shared_rwlock(self, lock), 0))
-#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_lock(self, lock, obj), 0))
-#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
+#define lockop_reap_atomic_lock(self, lock)          (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap_atomic_lock(self, lock), 0))
+#define lockop_reap_atomic_rwlock(self, lock)        (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap_atomic_rwlock(self, lock), 0))
+#define oblockop_reap_atomic_lock(self, lock, obj)   (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_lock(self, lock, obj), 0))
+#define oblockop_reap_atomic_rwlock(self, lock, obj) (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_rwlock(self, lock, obj), 0))
+#define lockop_reap_shared_lock(self, lock)          (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap_shared_lock(self, lock), 0))
+#define lockop_reap_shared_rwlock(self, lock)        (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap_shared_rwlock(self, lock), 0))
+#define oblockop_reap_shared_lock(self, lock, obj)   (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_lock(self, lock, obj), 0))
+#define oblockop_reap_shared_rwlock(self, lock, obj) (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_rwlock(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -545,8 +545,8 @@ void _oblockop_reap_shared_rwlock([[inout]] struct oblockop_slist *__restrict se
 #define lockop_reap(self, lock)        _lockop_reap(self, lock)
 #define oblockop_reap(self, lock, obj) _oblockop_reap(self, lock, obj)
 #else /* __OPTIMIZE_SIZE__ */
-#define lockop_reap(self, lock)        (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_lockop_reap(self, lock), 0))
-#define oblockop_reap(self, lock, obj) (void)(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR || (_oblockop_reap(self, lock, obj), 0))
+#define lockop_reap(self, lock)        (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_lockop_reap(self, lock), 0))
+#define oblockop_reap(self, lock, obj) (void)(__likely(__hybrid_atomic_load(&(self)->slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap(self, lock, obj), 0))
 #endif /* !__OPTIMIZE_SIZE__ */
 
 }
@@ -629,6 +629,178 @@ __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
 %} /* extern "C++" */
 %#endif /* __cplusplus */
 
+
+
+%{
+
+
+/* Reap helpers that are optimized  for- and operate under the  assumption
+ * of specific memory layouts. You shouldn't use these functions directly.
+ *
+ * Instead, you should use:
+ * >> struct my_struct {
+ * >>     struct atomic_lock         ms_lock;
+ * >>     Toblockop_slist(my_struct) ms_lops;
+ * >> };
+ * >> #define my_struct_reap(self)  oblockop_reap_atomic_lockT2(self, struct my_struct, ms_lops, ms_lock)
+ * >> #define _my_struct_reap(self) _oblockop_reap_atomic_lockT2(self, struct my_struct, ms_lops, ms_lock)
+ *
+ * Or if you know that all compilers you intend to target support `typeof()', you can also use:
+ * >> #define my_struct_reap(self)  oblockop_reap_atomic_lockT(self, ms_lops, ms_lock)
+ * >> #define _my_struct_reap(self) _oblockop_reap_atomic_lockT(self, ms_lops, ms_lock)
+ *
+ * The relevant macros will then take a look at the offsets of  `ms_lock'
+ * and `ms_lops' in relation to each other, and if it is found that there
+ * exists a dedicated optimization for  their relation, then that is  the
+ * call  that will be used (thus reducing the size of the call that needs
+ * to be made in order to perform the reap operation).
+ */
+
+}
+
+[[decl_include("<kos/anno.h>", "<hybrid/typecore.h>")]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_atomic_lock_OL")]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[requires_function(_oblockop_reap_atomic_lock)]]
+[[impl_include("<kos/bits/lockop.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/sched/atomic-lock.h>")]]
+void _oblockop_reap_atomic_lock_OL([[nonnull]] void *__restrict obj,
+                                   $ptrdiff_t offsetof_lockop_slist) {
+	struct __LOCAL_tobj {
+		@struct oblockop_slist@ lto_self;
+		@struct atomic_lock@    lto_lock;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_lockop_slist);
+	_oblockop_reap_atomic_lock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+
+[[decl_include("<kos/anno.h>", "<hybrid/typecore.h>")]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_atomic_lock_LO")]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[requires_function(_oblockop_reap_atomic_lock)]]
+[[impl_include("<kos/bits/lockop.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/sched/atomic-lock.h>")]]
+void _oblockop_reap_atomic_lock_LO([[nonnull]] void *__restrict obj,
+                                   $ptrdiff_t offsetof_atomic_lock) {
+	struct __LOCAL_tobj {
+		@struct atomic_lock@    lto_lock;
+@@pp_if __SIZEOF_ATOMIC_LOCK < __SIZEOF_POINTER__@@
+		__BYTE_TYPE__         __lto_pad[__SIZEOF_POINTER__ - __SIZEOF_ATOMIC_LOCK];
+@@pp_endif@@
+		@struct oblockop_slist@ lto_self;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_atomic_lock);
+	_oblockop_reap_atomic_lock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+
+
+[[decl_include("<kos/anno.h>", "<hybrid/typecore.h>")]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_atomic_rwlock_OL")]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[requires_function(_oblockop_reap_atomic_rwlock)]]
+[[impl_include("<kos/bits/lockop.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/sched/atomic-rwlock.h>")]]
+void _oblockop_reap_atomic_rwlock_OL([[nonnull]] void *__restrict obj,
+                                     $ptrdiff_t offsetof_lockop_slist) {
+	struct __LOCAL_tobj {
+		@struct oblockop_slist@ lto_self;
+		@struct atomic_rwlock@  lto_lock;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_lockop_slist);
+	_oblockop_reap_atomic_rwlock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+
+[[decl_include("<kos/anno.h>", "<hybrid/typecore.h>")]]
+[[nothrow, attribute(__NOBLOCK), crt_name("oblockop_reap_atomic_rwlock_LO")]]
+[[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
+[[requires_function(_oblockop_reap_atomic_rwlock)]]
+[[impl_include("<kos/bits/lockop.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/sched/atomic-rwlock.h>")]]
+void _oblockop_reap_atomic_rwlock_LO([[nonnull]] void *__restrict obj,
+                                     $ptrdiff_t offsetof_atomic_rwlock) {
+	struct __LOCAL_tobj {
+		@struct atomic_rwlock@  lto_lock;
+@@pp_if __SIZEOF_ATOMIC_RWLOCK < __SIZEOF_POINTER__@@
+		__BYTE_TYPE__         __lto_pad[__SIZEOF_POINTER__ - __SIZEOF_ATOMIC_RWLOCK];
+@@pp_endif@@
+		@struct oblockop_slist@ lto_self;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_atomic_rwlock);
+	_oblockop_reap_atomic_rwlock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+
+
+
+%{
+
+#ifdef __INTELLISENSE__ /* To improve syntax highlighting */
+#define _oblockop_reapT2(obj, Tobj, lockops_field, lock_field)               _oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field)   _oblockop_reap_atomic_lock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field) _oblockop_reap_atomic_rwlock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field)   _oblockop_reap_shared_lock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field) _oblockop_reap_shared_rwlock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#else /* __INTELLISENSE__ */
+#if defined(__COMPILER_HAVE_TYPEOF) && defined(__NO_builtin_types_compatible_p)
+#define _oblockop_reapT2(obj, Tobj, lockops_field, lock_field)                                               \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((obj)->lock_field), struct atomic_lock),   \
+	                      _oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field),                \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((obj)->lock_field), struct atomic_rwlock), \
+	                      _oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field),              \
+	                      _oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)))
+#else /* __COMPILER_HAVE_TYPEOF && !__NO_builtin_types_compatible_p */
+#define _oblockop_reapT2(obj, Tobj, lockops_field, lock_field) \
+	_oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#endif /* !__COMPILER_HAVE_TYPEOF || __NO_builtin_types_compatible_p */
+#define __oblockop_reapT2_select(_oblockop_reap, obj, Tobj, lockops_field, lock_field)                                           \
+	__builtin_choose_expr(__builtin_offsetof(Tobj, lockops_field) + __SIZEOF_POINTER__ == __builtin_offsetof(Tobj, lock_field), \
+	                      _oblockop_reap##_OL(obj, __builtin_offsetof(Tobj, lockops_field)),                                    \
+	__builtin_choose_expr(__builtin_offsetof(Tobj, lock_field) + __SIZEOF_POINTER__ == __builtin_offsetof(Tobj, lockops_field), \
+	                      _oblockop_reap##_LO(obj, __builtin_offsetof(Tobj, lock_field)),                                       \
+	                      _oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)))
+#define __oblockop_reapT2_select_unsup(_oblockop_reap, obj, Tobj, lockops_field, lock_field) \
+	_oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field)   __oblockop_reapT2_select(_oblockop_reap_atomic_lock, obj, Tobj, lockops_field, lock_field)
+#define _oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field) __oblockop_reapT2_select(_oblockop_reap_atomic_rwlock, obj, Tobj, lockops_field, lock_field)
+#define _oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field)   __oblockop_reapT2_select_unsup(_oblockop_reap_shared_lock, obj, Tobj, lockops_field, lock_field)
+#define _oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field) __oblockop_reapT2_select_unsup(_oblockop_reap_shared_rwlock, obj, Tobj, lockops_field, lock_field)
+#endif /* !__INTELLISENSE__ */
+
+
+#ifdef __COMPILER_HAVE_TYPEOF
+#define _oblockop_reapT(obj, lockops_field, lock_field)               _oblockop_reapT2(obj, __typeof__(*(obj)), lockops_field, lock_field)
+#define _oblockop_reap_atomic_lockT(obj, lockops_field, lock_field)   _oblockop_reap_atomic_lockT2(obj, __typeof__(*(obj)), lockops_field, lock_field)
+#define _oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field) _oblockop_reap_atomic_rwlockT2(obj, __typeof__(*(obj)), lockops_field, lock_field)
+#define _oblockop_reap_shared_lockT(obj, lockops_field, lock_field)   _oblockop_reap_shared_lockT2(obj, __typeof__(*(obj)), lockops_field, lock_field)
+#define _oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field) _oblockop_reap_shared_rwlockT2(obj, __typeof__(*(obj)), lockops_field, lock_field)
+#else /* __COMPILER_HAVE_TYPEOF */
+#define _oblockop_reapT(obj, lockops_field, lock_field)               _oblockop_reap(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_atomic_lockT(obj, lockops_field, lock_field)   _oblockop_reap_atomic_lock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field) _oblockop_reap_atomic_rwlock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_shared_lockT(obj, lockops_field, lock_field)   _oblockop_reap_shared_lock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#define _oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field) _oblockop_reap_shared_rwlock(&(obj)->lockops_field, &(obj)->lock_field, obj)
+#endif /* !__COMPILER_HAVE_TYPEOF */
+
+#ifdef __OPTIMIZE_SIZE__
+#define oblockop_reapT2(obj, Tobj, lockops_field, lock_field)               _oblockop_reapT2(obj, Tobj, lockops_field, lock_field)
+#define oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field)   _oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field)
+#define oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field) _oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field)
+#define oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field)   _oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field)
+#define oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field) _oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field)
+#define oblockop_reapT(obj, lockops_field, lock_field)                      _oblockop_reapT(obj, lockops_field, lock_field)
+#define oblockop_reap_atomic_lockT(obj, lockops_field, lock_field)          _oblockop_reap_atomic_lockT(obj, lockops_field, lock_field)
+#define oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field)        _oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field)
+#define oblockop_reap_shared_lockT(obj, lockops_field, lock_field)          _oblockop_reap_shared_lockT(obj, lockops_field, lock_field)
+#define oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field)        _oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field)
+#else /* __OPTIMIZE_SIZE__ */
+#define oblockop_reapT2(obj, Tobj, lockops_field, lock_field)               (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reapT2(obj, Tobj, lockops_field, lock_field), 0))
+#define oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field)   (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_lockT2(obj, Tobj, lockops_field, lock_field), 0))
+#define oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field) (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_rwlockT2(obj, Tobj, lockops_field, lock_field), 0))
+#define oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field)   (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_lockT2(obj, Tobj, lockops_field, lock_field), 0))
+#define oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field) (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_rwlockT2(obj, Tobj, lockops_field, lock_field), 0))
+#define oblockop_reapT(obj, lockops_field, lock_field)                      (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reapT(obj, lockops_field, lock_field), 0))
+#define oblockop_reap_atomic_lockT(obj, lockops_field, lock_field)          (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_lockT(obj, lockops_field, lock_field), 0))
+#define oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field)        (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_atomic_rwlockT(obj, lockops_field, lock_field), 0))
+#define oblockop_reap_shared_lockT(obj, lockops_field, lock_field)          (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_lockT(obj, lockops_field, lock_field), 0))
+#define oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field)        (void)(__likely(__hybrid_atomic_load(&(obj)->lockops_field.slh_first, __ATOMIC_ACQUIRE) == __NULLPTR) || (_oblockop_reap_shared_rwlockT(obj, lockops_field, lock_field), 0))
+#endif /* !__OPTIMIZE_SIZE__ */
+
+}
 
 
 %{

@@ -809,13 +809,13 @@ struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
 	struct mfile_ops const       *mf_ops;        /* [1..1][const] File operators. */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
+	Toblockop_slist(mfile)        mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
 #ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 	void const                  *_mf_wrlockpc;   /* [lock(mf_lock)] Write-lock program counter. */
 #endif /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 	RBTREE_ROOT(mpart)            mf_parts;      /* [0..n][lock(mf_lock)] File parts. (or `MFILE_PARTS_ANONYMOUS') */
 	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of
 	                                              * the contained parts changes state from INIT to  LOAD. */
-	Toblockop_slist(mfile)        mf_lockops;    /* [0..n][lock(ATOMIC)] Chain of lock operations. */
 	struct REF mpart_slist        mf_changed;    /* [0..n][lock(APPEND: ATOMIC,
 	                                              *             CLEAR:  ATOMIC && mf_lock)]
 	                                              * Chain of references to parts that contain unsaved changes.
@@ -850,17 +850,16 @@ struct mfile {
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0 */
 
 #ifdef __WANT_FS_INIT
-#define MFILE_INIT_mf_refcnt(mf_refcnt) mf_refcnt
-#define MFILE_INIT_mf_ops(mf_ops)       mf_ops
+#define MFILE_INIT_mf_refcnt(mf_refcnt)   mf_refcnt
+#define MFILE_INIT_mf_ops(mf_ops)         mf_ops
 #ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
-#define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT, __NULLPTR
+#define MFILE_INIT_mf_lock                ATOMIC_RWLOCK_INIT, SLIST_HEAD_INITIALIZER(~), __NULLPTR
 #else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
-#define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT
+#define MFILE_INIT_mf_lock                ATOMIC_RWLOCK_INIT, SLIST_HEAD_INITIALIZER(~)
 #endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
-#define MFILE_INIT_mf_parts(mf_parts)           mf_parts
-#define MFILE_INIT_mf_initdone                  SIG_INIT
-#define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
-#define MFILE_INIT_mf_changed(mf_changed)       { mf_changed }
+#define MFILE_INIT_mf_parts(mf_parts)     mf_parts
+#define MFILE_INIT_mf_initdone            SIG_INIT
+#define MFILE_INIT_mf_changed(mf_changed) { mf_changed }
 #if ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) != 0
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift, { }
@@ -869,10 +868,10 @@ struct mfile {
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#define MFILE_INIT_mf_notify                    __NULLPTR
+#define MFILE_INIT_mf_notify              __NULLPTR
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-#define MFILE_INIT_mf_flags(mf_flags)           mf_flags
-#define MFILE_INIT_mf_trunclock                 0
+#define MFILE_INIT_mf_flags(mf_flags)     mf_flags
+#define MFILE_INIT_mf_trunclock           0
 #endif /* __WANT_FS_INIT */
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	struct inotify_controller    *mf_notify;     /* [0..1][owned][lock(!PREEMPTION && :notify_lock)] Notify controller. */
@@ -1269,16 +1268,16 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	(_mfile_init_wrlockpc_(self)           \
 	 _mfile_init_notify_(self)             \
 	 atomic_rwlock_init(&(self)->mf_lock), \
-	 sig_init(&(self)->mf_initdone),       \
 	 SLIST_INIT(&(self)->mf_lockops),      \
+	 sig_init(&(self)->mf_initdone),       \
 	 LIST_INIT(&(self)->mf_msalign),       \
 	 (self)->mf_trunclock = 0)
 #define __mfile_cinit_common_norefcnt(self)             \
 	(_mfile_cinit_wrlockpc_(self)                       \
 	 _mfile_cinit_notify_(self)                         \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
-	 sig_cinit(&(self)->mf_initdone),                   \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
+	 sig_cinit(&(self)->mf_initdone),                   \
 	 __hybrid_assert(LIST_EMPTY(&(self)->mf_msalign)),  \
 	 __hybrid_assert((self)->mf_trunclock == 0))
 
@@ -1333,8 +1332,8 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_blocksize_aligned(self, size)    (((size) & (((size_t)1 << (self)->mf_blockshift) - 1)) == 0)
 
 /* Reap lock operations of `self' */
-#define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
-#define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlock(&(self)->mf_lockops, &(self)->mf_lock, (struct mfile *)(self))
+#define _mfile_lockops_reap(self)    _oblockop_reap_atomic_rwlockT((struct mfile *)(self), mf_lockops, mf_lock)
+#define mfile_lockops_reap(self)     oblockop_reap_atomic_rwlockT((struct mfile *)(self), mf_lockops, mf_lock)
 #define mfile_lockops_mustreap(self) (__hybrid_atomic_load(&(self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */

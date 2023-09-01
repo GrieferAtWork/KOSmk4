@@ -444,8 +444,8 @@ NOTHROW(FCALL handman_destroy)(struct handman *__restrict self);
 DEFINE_REFCNT_FUNCTIONS(struct handman, hm_refcnt, handman_destroy)
 
 /* Helpers for accessing `hm_lock' */
-#define _handman_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->hm_lops, &(self)->hm_lock, self)
-#define handman_reap(self)         oblockop_reap_atomic_rwlock(&(self)->hm_lops, &(self)->hm_lock, self)
+#define _handman_reap(self)        _oblockop_reap_atomic_rwlockT(self, hm_lops, hm_lock)
+#define handman_reap(self)         oblockop_reap_atomic_rwlockT(self, hm_lops, hm_lock)
 #define handman_mustreap(self)     oblockop_mustreap(&(self)->hm_lops)
 #define handman_write(self)        atomic_rwlock_write(&(self)->hm_lock)
 #define handman_write_nx(self)     atomic_rwlock_write_nx(&(self)->hm_lock)

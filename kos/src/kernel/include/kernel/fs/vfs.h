@@ -129,8 +129,8 @@ DEFINE_REFCNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 #define vfs_mountslock_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->vf_mountslock)
 
 /* Helper macros for working with `struct vfs::vf_recentlock' */
-#define _vfs_recentlock_reap(self)      _oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
-#define vfs_recentlock_reap(self)       oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
+#define _vfs_recentlock_reap(self)      _oblockop_reap_atomic_lockT(self, vf_recentlops, vf_recentlock)
+#define vfs_recentlock_reap(self)       oblockop_reap_atomic_lockT(self, vf_recentlops, vf_recentlock)
 #define vfs_recentlock_mustreap(self)   oblockop_mustreap(&(self)->vf_recentlops)
 #define vfs_recentlock_tryacquire(self) atomic_lock_tryacquire(&(self)->vf_recentlock)
 #define vfs_recentlock_acquire(self)    atomic_lock_acquire(&(self)->vf_recentlock)

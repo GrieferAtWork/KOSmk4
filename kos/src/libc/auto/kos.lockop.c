@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90be262b */
+/* HASH CRC-32:0xaa22671b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,6 +179,49 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__r
 #include <libc/template/lockop.h>
 #endif /* !__INTELLISENSE__ */
 }
+#include <hybrid/typecore.h>
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK NONNULL((1)) void
+NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock_OL)(void *__restrict obj,
+                                                       ptrdiff_t offsetof_lockop_slist) {
+	struct __LOCAL_tobj {
+		struct oblockop_slist lto_self;
+		struct atomic_lock    lto_lock;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_lockop_slist);
+	libc_oblockop_reap_atomic_lock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK NONNULL((1)) void
+NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock_LO)(void *__restrict obj,
+                                                       ptrdiff_t offsetof_atomic_lock) {
+	struct __LOCAL_tobj {
+		struct atomic_lock    lto_lock;
+#if __SIZEOF_ATOMIC_LOCK < __SIZEOF_POINTER__
+		__BYTE_TYPE__         __lto_pad[__SIZEOF_POINTER__ - __SIZEOF_ATOMIC_LOCK];
+#endif /* __SIZEOF_ATOMIC_LOCK < __SIZEOF_POINTER__ */
+		struct oblockop_slist lto_self;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_atomic_lock);
+	libc_oblockop_reap_atomic_lock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK NONNULL((1)) void
+NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock_OL)(void *__restrict obj,
+                                                         ptrdiff_t offsetof_lockop_slist) {
+	struct __LOCAL_tobj {
+		struct oblockop_slist lto_self;
+		struct atomic_rwlock  lto_lock;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_lockop_slist);
+	libc_oblockop_reap_atomic_rwlock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK NONNULL((1)) void
+NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock_LO)(void *__restrict obj,
+                                                         ptrdiff_t offsetof_atomic_rwlock) {
+	struct __LOCAL_tobj {
+		struct atomic_rwlock  lto_lock;
+#if __SIZEOF_ATOMIC_RWLOCK < __SIZEOF_POINTER__
+		__BYTE_TYPE__         __lto_pad[__SIZEOF_POINTER__ - __SIZEOF_ATOMIC_RWLOCK];
+#endif /* __SIZEOF_ATOMIC_RWLOCK < __SIZEOF_POINTER__ */
+		struct oblockop_slist lto_self;
+	} *tobj = (struct __LOCAL_tobj *)((byte_t *)obj + offsetof_atomic_rwlock);
+	libc_oblockop_reap_atomic_rwlock(&tobj->lto_self, &tobj->lto_lock, obj);
+}
 
 DECL_END
 
@@ -192,5 +235,9 @@ DEFINE_PUBLIC_ALIAS(lockop_reap_shared_lock, libc_lockop_reap_shared_lock);
 DEFINE_PUBLIC_ALIAS(oblockop_reap_shared_lock, libc_oblockop_reap_shared_lock);
 DEFINE_PUBLIC_ALIAS(lockop_reap_shared_rwlock, libc_lockop_reap_shared_rwlock);
 DEFINE_PUBLIC_ALIAS(oblockop_reap_shared_rwlock, libc_oblockop_reap_shared_rwlock);
+DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_lock_OL, libc_oblockop_reap_atomic_lock_OL);
+DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_lock_LO, libc_oblockop_reap_atomic_lock_LO);
+DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_rwlock_OL, libc_oblockop_reap_atomic_rwlock_OL);
+DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_rwlock_LO, libc_oblockop_reap_atomic_rwlock_LO);
 
 #endif /* !GUARD_LIBC_AUTO_KOS_LOCKOP_C */

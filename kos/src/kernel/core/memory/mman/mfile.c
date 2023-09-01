@@ -364,7 +364,6 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_lock,
 	MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_initdone,
-	MFILE_INIT_mf_lockops,
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -403,7 +402,6 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_lock,                                         \
 		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                 \
 		MFILE_INIT_mf_initdone,                                     \
-		MFILE_INIT_mf_lockops,                                      \
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),               \
 		MFILE_INIT_mf_blockshift(i, i),                             \
 		MFILE_INIT_mf_notify_                                       \

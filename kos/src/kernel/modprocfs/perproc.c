@@ -171,7 +171,6 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_initdone,
-		MFILE_INIT_mf_lockops,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -205,7 +204,6 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_initdone,
-		MFILE_INIT_mf_lockops,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -244,7 +242,6 @@ INTERN_CONST struct flnknode const procfs_pp_fdlnk_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -284,7 +281,6 @@ INTERN_CONST struct printnode const procfs_pp_fdinfo_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -323,7 +319,6 @@ INTERN_CONST struct flnknode const procfs_perproc_dcwdlink_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -363,7 +358,6 @@ INTERN_CONST struct flnknode const procfs_perproc_drivelink_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -404,7 +398,6 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY

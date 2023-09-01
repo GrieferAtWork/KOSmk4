@@ -3972,7 +3972,11 @@
 #define __CRT_HAVE_objalloc_free
 #define __CRT_HAVE_objalloc_free_block
 #define __CRT_HAVE_oblockop_reap_atomic_lock
+#define __CRT_HAVE_oblockop_reap_atomic_lock_LO
+#define __CRT_HAVE_oblockop_reap_atomic_lock_OL
 #define __CRT_HAVE_oblockop_reap_atomic_rwlock
+#define __CRT_HAVE_oblockop_reap_atomic_rwlock_LO
+#define __CRT_HAVE_oblockop_reap_atomic_rwlock_OL
 #define __CRT_HAVE_oblockop_reap_ex
 #define __CRT_HAVE_oblockop_reap_shared_lock
 #define __CRT_HAVE_oblockop_reap_shared_rwlock

@@ -46,7 +46,6 @@ PUBLIC struct mramfile execabi_system_rtld_file = {
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(&execabi_system_rtld_file.mrf_part),
 		MFILE_INIT_mf_initdone,
-		MFILE_INIT_mf_lockops,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -80,7 +79,6 @@ PUBLIC struct mramfile compat_execabi_system_rtld_file = {
 		MFILE_INIT_mf_lock,
 		MFILE_INIT_mf_parts(&compat_execabi_system_rtld_file.mrf_part),
 		MFILE_INIT_mf_initdone,
-		MFILE_INIT_mf_lockops,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY

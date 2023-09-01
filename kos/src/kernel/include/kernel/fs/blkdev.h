@@ -164,8 +164,8 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
 
 /* Helper macros for `struct blkdev::bd_rootinfo::br_partslock' */
-#define _blkdev_root_partslock_reap(self)      _oblockop_reap_atomic_lock(&(self)->bd_rootinfo.br_partslops, &(self)->bd_rootinfo.br_partslock, self)
-#define blkdev_root_partslock_reap(self)       oblockop_reap_atomic_lock(&(self)->bd_rootinfo.br_partslops, &(self)->bd_rootinfo.br_partslock, self)
+#define _blkdev_root_partslock_reap(self)      _oblockop_reap_atomic_lockT(self, bd_rootinfo.br_partslops, bd_rootinfo.br_partslock)
+#define blkdev_root_partslock_reap(self)       oblockop_reap_atomic_lockT(self, bd_rootinfo.br_partslops, bd_rootinfo.br_partslock)
 #define blkdev_root_partslock_mustreap(self)   oblockop_mustreap(&(self)->bd_rootinfo.br_partslops)
 #define blkdev_root_partslock_tryacquire(self) atomic_lock_tryacquire(&(self)->bd_rootinfo.br_partslock)
 #define blkdev_root_partslock_acquire(self)    atomic_lock_acquire(&(self)->bd_rootinfo.br_partslock)

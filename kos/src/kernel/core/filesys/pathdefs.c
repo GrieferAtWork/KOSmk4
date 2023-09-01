@@ -113,7 +113,6 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_lock,
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_initdone,
-					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY

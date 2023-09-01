@@ -60,7 +60,6 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 				MFILE_INIT_mf_lock,                                                 \
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                         \
 				MFILE_INIT_mf_initdone,                                             \
-				MFILE_INIT_mf_lockops,                                              \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                       \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                     \
 				MFILE_INIT_mf_notify_                                               \
@@ -115,7 +114,6 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 					MFILE_INIT_mf_lock,                                                  \
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                          \
 					MFILE_INIT_mf_initdone,                                              \
-					MFILE_INIT_mf_lockops,                                               \
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                        \
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                      \
 					MFILE_INIT_mf_notify_                                                \
@@ -183,7 +181,6 @@ INTERN_CONST struct flnknode const devicelink_template = {
 			MFILE_INIT_mf_lock,
 			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_initdone,
-			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 			MFILE_INIT_mf_notify_
@@ -255,7 +252,6 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_lock,
 					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_initdone,
-					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 					MFILE_INIT_mf_notify_

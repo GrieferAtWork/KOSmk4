@@ -231,7 +231,6 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_lock,");
 	print("				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_initdone,");
-	print("				MFILE_INIT_mf_lockops,");
 	print("				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),");
 	print("#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY");
@@ -445,7 +444,6 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -498,7 +496,6 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -551,7 +548,6 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -604,7 +600,6 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -657,7 +652,6 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -709,7 +703,6 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -763,7 +756,6 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -816,7 +808,6 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -870,7 +861,6 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
@@ -924,7 +914,6 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_lock,
 				MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_initdone,
-				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY

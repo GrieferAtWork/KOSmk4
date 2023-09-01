@@ -440,9 +440,9 @@ DATDEF __BOOL fsuper_allow_fs_oob;
 
 
 /* Helper macros for `struct fsuper::fs_changednodes_lock' */
-#define _fsuper_changednodes_reap(self)      _oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, (struct fsuper *)(self))
-#define fsuper_changednodes_reap(self)       oblockop_reap_atomic_lock(&(self)->fs_changednodes_lops, &(self)->fs_changednodes_lock, (struct fsuper *)(self))
 #define fsuper_changednodes_mustreap(self)   oblockop_mustreap(&(self)->fs_changednodes_lops)
+#define _fsuper_changednodes_reap(self)      _oblockop_reap_atomic_lockT((struct fsuper *)(self), fs_changednodes_lops, fs_changednodes_lock)
+#define fsuper_changednodes_reap(self)       oblockop_reap_atomic_lockT((struct fsuper *)(self), fs_changednodes_lops, fs_changednodes_lock)
 #define fsuper_changednodes_tryacquire(self) atomic_lock_tryacquire(&(self)->fs_changednodes_lock)
 #define fsuper_changednodes_acquire(self)    atomic_lock_acquire(&(self)->fs_changednodes_lock)
 #define fsuper_changednodes_acquire_nx(self) atomic_lock_acquire_nx(&(self)->fs_changednodes_lock)
@@ -455,8 +455,8 @@ DATDEF __BOOL fsuper_allow_fs_oob;
 
 /* Helper macros for `struct fsuper::fs_nodeslock' */
 #define fsuper_nodes_mustreap(self)     oblockop_mustreap(&(self)->fs_nodeslockops)
-#define fsuper_nodes_reap(self)         oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, (struct fsuper *)(self))
-#define _fsuper_nodes_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->fs_nodeslockops, &(self)->fs_nodeslock, (struct fsuper *)(self))
+#define fsuper_nodes_reap(self)         oblockop_reap_atomic_rwlockT((struct fsuper *)(self), fs_nodeslockops, fs_nodeslock)
+#define _fsuper_nodes_reap(self)        _oblockop_reap_atomic_rwlockT((struct fsuper *)(self), fs_nodeslockops, fs_nodeslock)
 #define fsuper_nodes_write(self)        atomic_rwlock_write(&(self)->fs_nodeslock)
 #define fsuper_nodes_write_nx(self)     atomic_rwlock_write_nx(&(self)->fs_nodeslock)
 #define fsuper_nodes_trywrite(self)     atomic_rwlock_trywrite(&(self)->fs_nodeslock)
@@ -484,8 +484,8 @@ DATDEF __BOOL fsuper_allow_fs_oob;
 
 /* Helper macros for `struct fsuper::fs_mountslock' */
 #define fsuper_mounts_mustreap(self)     oblockop_mustreap(&(self)->fs_mountslockops)
-#define fsuper_mounts_reap(self)         oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, (struct fsuper *)(self))
-#define _fsuper_mounts_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->fs_mountslockops, &(self)->fs_mountslock, (struct fsuper *)(self))
+#define fsuper_mounts_reap(self)         oblockop_reap_atomic_rwlockT((struct fsuper *)(self), fs_mountslockops, fs_mountslock)
+#define _fsuper_mounts_reap(self)        _oblockop_reap_atomic_rwlockT((struct fsuper *)(self), fs_mountslockops, fs_mountslock)
 #define fsuper_mounts_write(self)        atomic_rwlock_write(&(self)->fs_mountslock)
 #define fsuper_mounts_write_nx(self)     atomic_rwlock_write_nx(&(self)->fs_mountslock)
 #define fsuper_mounts_trywrite(self)     atomic_rwlock_trywrite(&(self)->fs_mountslock)

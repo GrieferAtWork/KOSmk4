@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48cef615 */
+/* HASH CRC-32:0x8f08c3c2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,10 @@ INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_locko
 INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *__restrict obj);
 INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
 INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock_OL)(void *__restrict obj, ptrdiff_t offsetof_lockop_slist);
+INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock_LO)(void *__restrict obj, ptrdiff_t offsetof_atomic_lock);
+INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock_OL)(void *__restrict obj, ptrdiff_t offsetof_lockop_slist);
+INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock_LO)(void *__restrict obj, ptrdiff_t offsetof_atomic_rwlock);
 
 DECL_END
 

@@ -413,11 +413,13 @@ NOTHROW(FCALL is_pc_nothrow)(NCX void const *pc) {
 
 	/* Check for special case: standard gcc exception-handling information. */
 	if (fde.f_persofun == __gxx_personality_v0) {
-		byte_t const *reader = (byte_t const *)fde.f_lsdaaddr;
+		byte_t const *reader;
 		byte_t const *landingpad;
 		byte_t const *callsite_end;
 		u8 temp, callsite_encoding;
 		size_t callsite_size;
+		reader     = (byte_t const *)fde.f_lsdaaddr;
+		landingpad = (byte_t const *)fde.f_pcstart;
 		if unlikely(!reader)
 			goto no_decref_drv;
 		temp = *reader++; /* gl_landing_enc */
