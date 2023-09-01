@@ -66,7 +66,7 @@ local CONFIGS = {
 	"CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE",
 	"CONFIG_HAVE_KERNEL_TRACE_MALLOC",
 	"CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS",
-}.sorted([](x) -> x.lstrip("?"));
+}.sorted(x -> x.lstrip("?"));
 
 local longestNameLen = CONFIGS.each.lstrip("?").length > ...;
 for (local config: CONFIGS) {

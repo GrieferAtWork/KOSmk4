@@ -71,7 +71,7 @@ BEGIN
 		SOURCE({ "arch/" + XARCH_ASMFILES })
 	END
 
-	BEGIN GROUP("libs.libdl") { COMPILE_WITH_ASM_FILTER([](infp, outfp) {
+	BEGIN GROUP("libs.libdl") { COMPILE_WITH_ASM_FILTER((infp, outfp) -> {
 		local indat = infp.read();
 		local flushStart = 0, i = 0, len = #indat;
 		while (i < len) {

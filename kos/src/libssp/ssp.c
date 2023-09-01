@@ -2,7 +2,7 @@
 // Libssp is the one responsible for stack-smash-protection, so prevent
 // a dependency loop by getting rid  of SSP within the library  itself.
 local opt = options.setdefault("GCC.options", []);
-opt.removeif([](e) -> e.startswith("-fstack-protector"));
+opt.removeif(e -> e.startswith("-fstack-protector"));
 ]]]*/
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *

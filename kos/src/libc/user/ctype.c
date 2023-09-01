@@ -81,18 +81,18 @@ uint16_t const libc___ctype_b_loc_matrix[384] = {
 /*[[[deemon
 
 local final known_flags = {
-	("CTB_LOC_ISUPPER",  [](ch) -> ASCII_ISUPPER(ch)),
-	("CTB_LOC_ISLOWER",  [](ch) -> ASCII_ISLOWER(ch)),
-	("CTB_LOC_ISALPHA",  [](ch) -> ASCII_ISALPHA(ch)),
-	("CTB_LOC_ISDIGIT",  [](ch) -> ASCII_ISDIGIT(ch)),
-	("CTB_LOC_ISXDIGIT", [](ch) -> ASCII_ISXDIGIT(ch)),
-	("CTB_LOC_ISSPACE",  [](ch) -> ASCII_ISSPACE(ch)),
-	("CTB_LOC_ISPRINT",  [](ch) -> ASCII_ISPRINT(ch)),
-	("CTB_LOC_ISGRAPH",  [](ch) -> ASCII_ISGRAPH(ch)),
-	("CTB_LOC_ISBLANK",  [](ch) -> ASCII_ISBLANK(ch)),
-	("CTB_LOC_ISCNTRL",  [](ch) -> ASCII_ISCNTRL(ch)),
-	("CTB_LOC_ISPUNCT",  [](ch) -> ASCII_ISPUNCT(ch)),
-	("CTB_LOC_ISALNUM",  [](ch) -> ASCII_ISALNUM(ch))
+	("CTB_LOC_ISUPPER",  ch -> ASCII_ISUPPER(ch)),
+	("CTB_LOC_ISLOWER",  ch -> ASCII_ISLOWER(ch)),
+	("CTB_LOC_ISALPHA",  ch -> ASCII_ISALPHA(ch)),
+	("CTB_LOC_ISDIGIT",  ch -> ASCII_ISDIGIT(ch)),
+	("CTB_LOC_ISXDIGIT", ch -> ASCII_ISXDIGIT(ch)),
+	("CTB_LOC_ISSPACE",  ch -> ASCII_ISSPACE(ch)),
+	("CTB_LOC_ISPRINT",  ch -> ASCII_ISPRINT(ch)),
+	("CTB_LOC_ISGRAPH",  ch -> ASCII_ISGRAPH(ch)),
+	("CTB_LOC_ISBLANK",  ch -> ASCII_ISBLANK(ch)),
+	("CTB_LOC_ISCNTRL",  ch -> ASCII_ISCNTRL(ch)),
+	("CTB_LOC_ISPUNCT",  ch -> ASCII_ISPUNCT(ch)),
+	("CTB_LOC_ISALNUM",  ch -> ASCII_ISALNUM(ch))
 };
 
 for (local x: [-128: 255+1]) {
@@ -498,18 +498,18 @@ uint32_t const libc___ctype32_b_loc_matrix[256] = {
 /*[[[deemon
 
 local final known_flags = {
-	("CTB_LOC_ISUPPER",  [](ch) -> ASCII_ISUPPER(ch)),
-	("CTB_LOC_ISLOWER",  [](ch) -> ASCII_ISLOWER(ch)),
-	("CTB_LOC_ISALPHA",  [](ch) -> ASCII_ISALPHA(ch)),
-	("CTB_LOC_ISDIGIT",  [](ch) -> ASCII_ISDIGIT(ch)),
-	("CTB_LOC_ISXDIGIT", [](ch) -> ASCII_ISXDIGIT(ch)),
-	("CTB_LOC_ISSPACE",  [](ch) -> ASCII_ISSPACE(ch)),
-	("CTB_LOC_ISPRINT",  [](ch) -> ASCII_ISPRINT(ch)),
-	("CTB_LOC_ISGRAPH",  [](ch) -> ASCII_ISGRAPH(ch)),
-	("CTB_LOC_ISBLANK",  [](ch) -> ASCII_ISBLANK(ch)),
-	("CTB_LOC_ISCNTRL",  [](ch) -> ASCII_ISCNTRL(ch)),
-	("CTB_LOC_ISPUNCT",  [](ch) -> ASCII_ISPUNCT(ch)),
-	("CTB_LOC_ISALNUM",  [](ch) -> ASCII_ISALNUM(ch))
+	("CTB_LOC_ISUPPER",  ch -> ASCII_ISUPPER(ch)),
+	("CTB_LOC_ISLOWER",  ch -> ASCII_ISLOWER(ch)),
+	("CTB_LOC_ISALPHA",  ch -> ASCII_ISALPHA(ch)),
+	("CTB_LOC_ISDIGIT",  ch -> ASCII_ISDIGIT(ch)),
+	("CTB_LOC_ISXDIGIT", ch -> ASCII_ISXDIGIT(ch)),
+	("CTB_LOC_ISSPACE",  ch -> ASCII_ISSPACE(ch)),
+	("CTB_LOC_ISPRINT",  ch -> ASCII_ISPRINT(ch)),
+	("CTB_LOC_ISGRAPH",  ch -> ASCII_ISGRAPH(ch)),
+	("CTB_LOC_ISBLANK",  ch -> ASCII_ISBLANK(ch)),
+	("CTB_LOC_ISCNTRL",  ch -> ASCII_ISCNTRL(ch)),
+	("CTB_LOC_ISPUNCT",  ch -> ASCII_ISPUNCT(ch)),
+	("CTB_LOC_ISALNUM",  ch -> ASCII_ISALNUM(ch))
 };
 
 for (local x: [:255+1]) {

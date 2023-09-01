@@ -25,7 +25,7 @@
  * compiler options. */
 /*[[[magic
 local opt = options.setdefault("GCC.options", []);
-opt.removeif([](e) -> e.startswith("-O"));
+opt.removeif(e -> e.startswith("-O"));
 opt.append("-O2");
 ]]]*/
 
@@ -51,11 +51,11 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 #define PP_FLAGS(...)            options.setdefault(OPT_COMPILE_PPFLAGS, []).extend(__VA_ARGS__);
 #define AS_FLAGS(...)            options.setdefault(OPT_COMPILE_ASFLAGS, []).extend(__VA_ARGS__);
 #define LD_FLAGS(...)            options.setdefault(OPT_LINK_LDFLAGS, []).extend(__VA_ARGS__);
-#define REMOVE_GCC_FLAGS(...)    options.get(OPT_GCC_OPTIONS).removeif([](x) -> x in __VA_ARGS__);
-#define REMOVE_CC_FLAGS(...)     options.get(OPT_COMPILE_CCFLAGS).removeif([](x) -> x in __VA_ARGS__);
-#define REMOVE_PP_FLAGS(...)     options.get(OPT_COMPILE_PPFLAGS).removeif([](x) -> x in __VA_ARGS__);
-#define REMOVE_AS_FLAGS(...)     options.get(OPT_COMPILE_ASFLAGS).removeif([](x) -> x in __VA_ARGS__);
-#define REMOVE_LD_FLAGS(...)     options.get(OPT_LINK_LDFLAGS).removeif([](x) -> x in __VA_ARGS__);
+#define REMOVE_GCC_FLAGS(...)    options.get(OPT_GCC_OPTIONS).removeif(x -> x in __VA_ARGS__);
+#define REMOVE_CC_FLAGS(...)     options.get(OPT_COMPILE_CCFLAGS).removeif(x -> x in __VA_ARGS__);
+#define REMOVE_PP_FLAGS(...)     options.get(OPT_COMPILE_PPFLAGS).removeif(x -> x in __VA_ARGS__);
+#define REMOVE_AS_FLAGS(...)     options.get(OPT_COMPILE_ASFLAGS).removeif(x -> x in __VA_ARGS__);
+#define REMOVE_LD_FLAGS(...)     options.get(OPT_LINK_LDFLAGS).removeif(x -> x in __VA_ARGS__);
 #define OBJECT(...)              options.setdefault(OPT_LINK_OBJECTS,[]).extend(__VA_ARGS__);
 #define LINKER_SCRIPT(name)      options[OPT_LINK_SCRIPT] = name;
 #define SET_DISKFILE(name)       options[OPT_MCOPY_OUTPUT] = name;

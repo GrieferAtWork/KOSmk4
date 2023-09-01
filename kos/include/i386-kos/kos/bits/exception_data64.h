@@ -75,8 +75,8 @@ local tempfp = File.Writer();
 local usedStructNames = [];
 (printExceptionDataStructs from .....misc.libgen.exceptinfo)(
 	fp: tempfp,
-	escapeTypename: [](x) -> "__UINT64_TYPE__ /" "*{}*" "/".format({ x }),
-	keyStructName:  [](x) {
+	escapeTypename: x -> "__UINT64_TYPE__ /" "*{}*" "/".format({ x }),
+	keyStructName:  x {
 		if (x !in usedStructNames)
 			usedStructNames.append(x);
 		return f"__{x}64";

@@ -310,7 +310,7 @@ function isCustomErrnoExpr(s) -> s !is none && s != "DEFAULT_ERRNO";
 @@Returns (formattedExpr, listOfMacrosThatMustBeDefined)
 function formatErrnoExpr(cls: ExceptClass): (string, {string...}) {
 	local expr = File.Writer();
-	cls.printErrnoExpr(expr, cbField: [](name) ->
+	cls.printErrnoExpr(expr, cbField: name ->
 		expr << "self->e_args." << cls.findFieldByName(name)[0]);
 	expr = expr.string;
 	local reqMacros = [];

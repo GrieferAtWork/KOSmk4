@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8137d2 */
+/* HASH CRC-32:0x8948d068 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ function isCustomErrnoExpr(s) -> s !is none && s != "DEFAULT_ERRNO";
 @@Returns (formattedExpr, listOfMacrosThatMustBeDefined)
 function formatErrnoExpr(cls: ExceptClass): (string, {string...}) {
 	local expr = File.Writer();
-	cls.printErrnoExpr(expr, cbField: [](name) ->
+	cls.printErrnoExpr(expr, cbField: name ->
 		expr << "self->e_args." << cls.findFieldByName(name)[0]);
 	expr = expr.string;
 	local reqMacros = [];

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x178d875a */
+/* HASH CRC-32:0xecbda72c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,7 +118,7 @@ for (local tab: nl_cat.values) {
 // Sorted referenced byte-blobs by length (descendingly)
 function sortByLength(x) {
 	x = x.sorted();
-	x.sort([](x) -> -#x);
+	x.sort(x -> -#x);
 	return x;
 }
 knownBytesLe = sortByLength(knownBytesLe);
