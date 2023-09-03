@@ -184,7 +184,7 @@ libc_cxa_end_catch(void) {
 	if (!(info->ei_flags & EXCEPT_FRETHROW)) {
 		/* TODO: If  `this_exception_code'  is  an RT-level  exception,  then we
 		 *       must set some kind of thread-local flag to have it be re-thrown
-		 *       the next time the a call to `task_serve()' is made! */
+		 *       the next time a call to `task_serve()' is made! */
 		info->ei_code = EXCEPT_CODEOF(E_OK);
 	}
 	info->ei_flags &= ~(EXCEPT_FRETHROW);

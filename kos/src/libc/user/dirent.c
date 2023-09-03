@@ -49,7 +49,7 @@ DECL_BEGIN
 #endif /* !_DIRENT_MATCHES_DIRENT64 */
 
 struct __dirstream {
-	int            ds_fd;      /* [const][owned] The handle for the underlying file stream object. */
+	fd_t           ds_fd;      /* [const][owned] The handle for the underlying file stream object. */
 	size_t         ds_lodsize; /* Amount of bytes returned by the `kreaddir()' system call during its last invocation. */
 	size_t         ds_bufsize; /* Size of the directory stream buffer (`ds_buf') in bytes. */
 	struct dirent *ds_next;    /* [1..1][in(ds_buf)] Pointer to the next directory entry yet to-be read. */

@@ -74,8 +74,8 @@ DECL_BEGIN
  * via  an  atomic handle  operation `h_readdir'  that does  all of  the usual
  * read+advance all on its own. (this callback also supports a PEEK operation)
  *
- * As such, it is up to the operator to decide when to actually advance the
- * read/write   pointer,   which  is   controlled  via   the  readdir-mode:
+ * As such, it is up to the operator to decide when to actually advance
+ * the read/write pointer,  which is controlled  via the  readdir-mode:
  *   - READDIR_DEFAULT:  Yield to next entry when `buf' was of sufficient size
  *   - READDIR_CONTINUE: Always yield to next entry
  *   - READDIR_PEEK:     Never yield to next entry
@@ -114,6 +114,7 @@ DECL_BEGIN
  * allocated locks exists that is used alongside the internal address of the  associated
  * file-handle in order to acquire a (waitable) lock during every linux-emulated readdir
  * operation.
+ *
  * But note that this only guards against parallel calls to linux's readdir API. When
  * this  is also mixed with KOS's kreaddir API, you will once again run into the data
  * race described above.
@@ -185,8 +186,8 @@ readdir_lock_acquire(void *h_data) {
 	 *    is by sending an RPC to itself, and using `syscall_emulate()'
 	 *    alongside the register state given to the RPC handler. And in
 	 *    this scenario, the RPC  delivery mechanism will have  already
-	 *    unwound our stack,  at which we'd  have already released  the
-	 *    readdir lock, so no dead-lock is possible. */
+	 *    unwound our stack, at which point we'd have already  released
+	 *    the readdir lock, so no dead-lock is possible. */
 	for (;;) {
 		if ((atomic_fetchor(&readdir_lockbits[word], mask) & mask) == 0)
 			break;
@@ -257,7 +258,7 @@ private:
 	struct readdir_buffer *m_self;
 public:
 	ATTR_FORCEINLINE _readdir_buffer_finally_fini(struct readdir_buffer *__restrict self) noexcept
-	    : m_self(self) { }
+	    : m_self(self) {}
 	ATTR_FORCEINLINE ~_readdir_buffer_finally_fini() noexcept {
 		readdir_buffer_fini(m_self);
 	}
@@ -285,9 +286,11 @@ again:
 		self->rb_buflen = reqlen;
 		goto again;
 	}
+
 	/* Check for special case: end-of-directory */
 	if (!reqlen)
 		return NULL;
+
 	/* Return a pointer to the directory entry we've just read. */
 	return self->rb_buf;
 }
@@ -329,6 +332,7 @@ DEFINE_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 			THROW(E_OVERFLOW);
 	}
 	buf->d_namlen = ent->d_namlen;
+
 	/* Copy the name to user-space.
 	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
@@ -369,6 +373,7 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 			THROW(E_OVERFLOW);
 	}
 	buf->d_namlen = ent->d_namlen;
+
 	/* Copy the name to user-space.
 	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
@@ -408,6 +413,7 @@ DEFINE_SYSCALL3(ssize_t, getdents, fd_t, fd,
 				THROW(E_INVALID_ARGUMENT); /* return -EINVAL; */
 			goto done;
 		}
+
 		/* Translate the entry. */
 		COMPILER_BARRIER();
 		buf->d_ino = (linux_dirent_ino_t)ent->d_ino;
@@ -460,6 +466,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, getdents, fd_t, fd,
 				THROW(E_INVALID_ARGUMENT); /* return -EINVAL; */
 			goto done;
 		}
+
 		/* Translate the entry. */
 		COMPILER_BARRIER();
 		buf->d_ino = (compat_linux_dirent_ino_t)ent->d_ino;
@@ -512,6 +519,7 @@ DEFINE_SYSCALL3(ssize_t, getdents64, fd_t, fd,
 				THROW(E_INVALID_ARGUMENT); /* return -EINVAL; */
 			goto done;
 		}
+
 		/* Translate the entry. */
 		COMPILER_BARRIER();
 		buf->d_ino = (linux_dirent64_ino_t)ent->d_ino;
