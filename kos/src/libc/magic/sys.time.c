@@ -213,7 +213,7 @@ int futimes32([[fdarg]] $fd_t fd, [[in_opt]] struct $timeval32 const tvp[2]);
 [[decl_include("<bits/os/timeval.h>")]]
 [[no_crt_self_import, export_as("__gettimeofday", "__libc_gettimeofday")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gettimeofday", "__gettimeofday", "__libc_gettimeofday")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gettimeofday64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gettimeofday64", "__gettimeofday64")]]
 [[requires($has_function(gettimeofday32) || $has_function(gettimeofday64))]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
 int gettimeofday([[out_opt]] struct timeval *__restrict tv,
@@ -248,7 +248,7 @@ int gettimeofday([[out_opt]] struct timeval *__restrict tv,
 [[decl_include("<bits/os/itimerval.h>")]]
 [[no_crt_self_import, export_as("__getitimer", "__libc_getitimer")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getitimer", "__getitimer", "__libc_getitimer")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getitimer64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getitimer64", "__getitimer64")]]
 [[requires($has_function(getitimer32) || $has_function(getitimer64))]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
 int getitimer(__itimer_which_t which,
@@ -282,7 +282,7 @@ int getitimer(__itimer_which_t which,
 [[decl_include("<bits/os/itimerval.h>")]]
 [[no_crt_self_import, export_as("__setitimer", "__libc_setitimer")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("setitimer", "__setitimer", "__libc_setitimer")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("setitimer64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("setitimer64", "__setitimer64")]]
 [[requires($has_function(setitimer32) || $has_function(setitimer64))]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
 int setitimer(__itimer_which_t which,
@@ -336,7 +336,7 @@ int setitimer(__itimer_which_t which,
 [[decl_include("<bits/os/timeval.h>")]]
 [[no_crt_self_import, export_as("__utimes")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes", "__utimes")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimes64", "__utimes64")]]
 [[requires($has_function(utimes32) || $has_function(utimes64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int utimes([[in]] char const *file,
@@ -368,7 +368,7 @@ int utimes([[in]] char const *file,
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 [[no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimesat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimesat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimesat64", "__futimesat64")]]
 [[requires($has_function(futimesat32) || $has_function(futimesat64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int futimesat([[fdarg]] $fd_t fd, [[in]] char const *file,
@@ -401,7 +401,7 @@ int futimesat([[fdarg]] $fd_t fd, [[in]] char const *file,
 [[decl_include("<bits/os/timeval.h>"), decl_prefix(struct timezone;)]]
 [[no_crt_self_import, export_as("__settimeofday", "__libc_settimeofday")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("settimeofday", "__settimeofday", "__libc_settimeofday")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("settimeofday64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("settimeofday64", "__settimeofday64")]]
 [[requires($has_function(settimeofday32) || $has_function(settimeofday64))]]
 [[userimpl, section(".text.crt{|.dos}.system.adjtime")]]
 int settimeofday([[in_opt]] struct timeval const *tv,
@@ -427,7 +427,7 @@ int settimeofday([[in_opt]] struct timeval const *tv,
 [[decl_include("<bits/os/timeval.h>")]]
 [[no_crt_self_import, export_as("__adjtime")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtime", "__adjtime")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtime64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtime64", "__adjtime64")]]
 [[requires($has_function(adjtime32) || $has_function(adjtime64))]]
 [[userimpl, section(".text.crt{|.dos}.system.adjtime")]]
 int adjtime([[in_opt]] struct timeval const *delta,
@@ -465,7 +465,7 @@ int adjtime([[in_opt]] struct timeval const *delta,
 [[decl_include("<bits/os/timeval.h>")]]
 [[no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("lutimes")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("lutimes64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("lutimes64", "__lutimes64")]]
 [[requires($has_function(lutimes32) || $has_function(lutimes64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int lutimes([[in]] char const *file,
@@ -496,7 +496,7 @@ int lutimes([[in]] char const *file,
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 [[no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimes")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimes64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimes64", "__futimes64")]]
 [[requires($has_function(futimes32) || $has_function(futimes64))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int futimes([[fdarg]] $fd_t fd, [[in_opt]] struct timeval const tvp[2]) {
@@ -527,6 +527,7 @@ int futimes([[fdarg]] $fd_t fd, [[in_opt]] struct timeval const tvp[2]) {
 %#ifdef __USE_TIME64
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(gettimeofday), doc_alias("gettimeofday")]]
+[[time64_export_alias("__gettimeofday64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("__gettimeofday", "__libc_gettimeofday")]]
 [[requires_function(gettimeofday32)]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
@@ -546,6 +547,7 @@ int gettimeofday64([[out_opt]] struct timeval64 *__restrict tv,
 
 [[decl_include("<bits/os/itimerval.h>")]]
 [[preferred_time64_variant_of(getitimer), doc_alias("getitimer")]]
+[[time64_export_alias("__getitimer64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__getitimer", "__libc_getitimer")]]
 [[requires_function(getitimer32)]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
@@ -565,6 +567,7 @@ int getitimer64(__itimer_which_t which,
 
 [[decl_include("<bits/os/itimerval.h>")]]
 [[preferred_time64_variant_of(setitimer), doc_alias("setitimer")]]
+[[time64_export_alias("__setitimer64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__setitimer", "__libc_setitimer")]]
 [[requires_function(setitimer32)]]
 [[userimpl, section(".text.crt{|.dos}.time")]]
@@ -595,6 +598,7 @@ int setitimer64(__itimer_which_t which,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(utimes), doc_alias("utimes")]]
+[[time64_export_alias("__utimes64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__utimes")]]
 [[requires_function(utimes32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
@@ -614,6 +618,7 @@ int utimes64([[in]] char const *file,
 %#ifdef __USE_MISC
 [[decl_include("<bits/os/timeval.h>"), decl_prefix(struct timezone;)]]
 [[preferred_time64_variant_of(settimeofday), doc_alias("settimeofday")]]
+[[time64_export_alias("__settimeofday64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__settimeofday", "__libc_settimeofday")]]
 [[requires_function(settimeofday32)]]
 [[userimpl, section(".text.crt{|.dos}.system.adjtime")]]
@@ -629,6 +634,7 @@ int settimeofday64([[in_opt]] struct timeval64 const *tv,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(adjtime), doc_alias("adjtime")]]
+[[time64_export_alias("__adjtime64")]]
 [[requires_function(adjtime32)]]
 [[userimpl, section(".text.crt{|.dos}.system.adjtime")]]
 int adjtime64([[in_opt]] struct timeval64 const *delta,
@@ -649,6 +655,7 @@ int adjtime64([[in_opt]] struct timeval64 const *delta,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(lutimes), doc_alias("lutimes")]]
+[[time64_export_alias("__lutimes64")]]
 [[requires_function(lutimes32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int lutimes64([[in]] char const *file,
@@ -666,6 +673,7 @@ int lutimes64([[in]] char const *file,
 
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 [[preferred_time64_variant_of(lutimes), doc_alias("lutimes")]]
+[[time64_export_alias("__lutimes64")]]
 [[requires_function(futimes32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int futimes64([[fdarg]] $fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
@@ -685,6 +693,7 @@ int futimes64([[fdarg]] $fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
 %#ifdef __USE_GNU
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 [[preferred_time64_variant_of(futimesat), doc_alias("futimesat")]]
+[[time64_export_alias("__futimesat64")]]
 [[requires_function(futimesat32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int futimesat64([[fdarg]] $fd_t fd, [[in]] char const *file,

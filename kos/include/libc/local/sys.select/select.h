@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb48b00d1 */
+/* HASH CRC-32:0xf02837a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_select_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
+#if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE___select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <features.h>
 #include <bits/os/timeval.h>
 #include <bits/os/fd_set.h>
@@ -43,6 +43,8 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64)
 __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+#elif defined(__CRT_HAVE___select64)
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),__select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.select/select64.h>
@@ -75,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_select_defined
 #define __localdep_select __LIBC_LOCAL_NAME(select)
 #endif /* !__local___localdep_select_defined */
-#else /* __CRT_HAVE_select64 || __CRT_HAVE_select || __CRT_HAVE___select */
+#else /* __CRT_HAVE_select64 || __CRT_HAVE___select64 || __CRT_HAVE_select || __CRT_HAVE___select */
 #undef __local_select_defined
-#endif /* !__CRT_HAVE_select64 && !__CRT_HAVE_select && !__CRT_HAVE___select */
+#endif /* !__CRT_HAVE_select64 && !__CRT_HAVE___select64 && !__CRT_HAVE_select && !__CRT_HAVE___select */
 #endif /* !__local_select_defined */

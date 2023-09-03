@@ -230,7 +230,7 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
 @@@return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections
 [[cp, decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select", "__select")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select64", "__select64")]]
 [[userimpl, requires($has_function(select32) || $has_function(select64))]]
 [[export_as("__select")]]
 __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
@@ -259,7 +259,7 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 [[cp, doc_alias("select"), no_crt_self_import]]
 [[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect64", "__pselect64")]]
 [[userimpl, requires($has_function(pselect32) || $has_function(pselect64))]]
 __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
                               [[inout_opt]] fd_set *__restrict readfds,
@@ -290,6 +290,7 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 [[cp, doc_alias("select")]]
 [[decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>")]]
 [[preferred_time64_variant_of(select)]]
+[[time64_export_alias("__select64")]]
 [[userimpl, requires_function(select32)]]
 __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
                                [[inout_opt]] fd_set *__restrict readfds,
@@ -308,6 +309,7 @@ __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
 [[cp, doc_alias("select")]]
 [[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>")]]
 [[preferred_time64_variant_of(pselect)]]
+[[time64_export_alias("__pselect64")]]
 [[userimpl, requires_function(pselect32)]]
 __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
                                 [[inout_opt]] fd_set *__restrict readfds,

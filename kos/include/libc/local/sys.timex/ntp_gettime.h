@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb06b7bfd */
+/* HASH CRC-32:0x232c22c2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_ntp_gettime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE_ntp_gettimex)
+#if defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE___ntp_gettime64) || defined(__CRT_HAVE_ntp_gettimex)
 #include <bits/crt/ntptimeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ntp_gettime32_defined) && defined(__CRT_HAVE_ntp_gettimex)
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __n
 __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex64)
 __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
+#elif defined(__CRT_HAVE___ntp_gettime64)
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),__ntp_gettime64,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timex/ntp_gettime64.h>
@@ -83,7 +85,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ntp_gettime_defined
 #define __localdep_ntp_gettime __LIBC_LOCAL_NAME(ntp_gettime)
 #endif /* !__local___localdep_ntp_gettime_defined */
-#else /* __CRT_HAVE_ntp_gettimex64 || __CRT_HAVE_ntp_gettimex */
+#else /* __CRT_HAVE_ntp_gettimex64 || __CRT_HAVE___ntp_gettime64 || __CRT_HAVE_ntp_gettimex */
 #undef __local_ntp_gettime_defined
-#endif /* !__CRT_HAVE_ntp_gettimex64 && !__CRT_HAVE_ntp_gettimex */
+#endif /* !__CRT_HAVE_ntp_gettimex64 && !__CRT_HAVE___ntp_gettime64 && !__CRT_HAVE_ntp_gettimex */
 #endif /* !__local_ntp_gettime_defined */

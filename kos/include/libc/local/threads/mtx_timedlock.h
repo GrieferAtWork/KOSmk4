@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87ea4aa0 */
+/* HASH CRC-32:0x306852f4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE___pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/crt/threads.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -39,6 +39,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__self,__abstime))
+#elif defined(__CRT_HAVE___pthread_mutex_timedlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),__pthread_mutex_timedlock64,(__self,__abstime))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_mutex_timedlock.h>
@@ -68,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mtx_timedlock_defined
 #define __localdep_mtx_timedlock __LIBC_LOCAL_NAME(mtx_timedlock)
 #endif /* !__local___localdep_mtx_timedlock_defined */
-#else /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */
+#else /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE___pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */
 #undef __local_mtx_timedlock_defined
-#endif /* !__CRT_HAVE_pthread_mutex_timedlock64 && !__CRT_HAVE_pthread_mutex_timedlock */
+#endif /* !__CRT_HAVE_pthread_mutex_timedlock64 && !__CRT_HAVE___pthread_mutex_timedlock64 && !__CRT_HAVE_pthread_mutex_timedlock */
 #endif /* !__local_mtx_timedlock_defined */

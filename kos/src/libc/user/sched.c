@@ -307,7 +307,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x64991962]]]*/
+/*[[[start:exports,hash:CRC-32=0x10d6aa57]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
 DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
@@ -347,7 +347,11 @@ DEFINE_PUBLIC_ALIAS(sched_getaffinity, libc_sched_getaffinity);
 DEFINE_PUBLIC_ALIAS(__sched_rr_get_interval, libc_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(__libc_sched_rr_get_interval, libc_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(sched_rr_get_interval, libc_sched_rr_get_interval);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__sched_rr_get_interval64, libc_sched_rr_get_interval64);
 DEFINE_PUBLIC_ALIAS(sched_rr_get_interval64, libc_sched_rr_get_interval64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

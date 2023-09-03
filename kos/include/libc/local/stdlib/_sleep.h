@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe016d04c */
+/* HASH CRC-32:0x50077ffa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep_defined
@@ -48,6 +48,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),nanosleep64,(__requested_time,__remaining))
+#elif defined(__CRT_HAVE___nanosleep64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/os/timespec.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__nanosleep64,(__requested_time,__remaining))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/nanosleep.h>
@@ -87,7 +92,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__sleep_defined
 #define __localdep__sleep __LIBC_LOCAL_NAME(_sleep)
 #endif /* !__local___localdep__sleep_defined */
-#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE___nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
 #undef __local__sleep_defined
-#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE___nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 #endif /* !__local__sleep_defined */

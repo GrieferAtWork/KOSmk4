@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6695904c */
+/* HASH CRC-32:0x76955030 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -332,10 +332,22 @@ DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread, libc_shared_recursive_rwlo
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite, libc_shared_recursive_rwlock_waitwrite);
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread_with_timeout, libc_shared_recursive_rwlock_waitread_with_timeout);
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite_with_timeout, libc_shared_recursive_rwlock_waitwrite_with_timeout);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_read_with_timeout64, libc_shared_recursive_rwlock_read_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_write_with_timeout64, libc_shared_recursive_rwlock_write_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread_with_timeout64, libc_shared_recursive_rwlock_waitread_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite_with_timeout64, libc_shared_recursive_rwlock_waitwrite_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SCHED_SHARED_RECURSIVE_RWLOCK_C */

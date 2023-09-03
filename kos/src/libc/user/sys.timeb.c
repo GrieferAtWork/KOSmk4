@@ -156,14 +156,21 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc93952b6]]]*/
+/*[[[start:exports,hash:CRC-32=0xeb1992c0]]]*/
 DEFINE_PUBLIC_ALIAS(_ftime, libc__ftime32);
 DEFINE_PUBLIC_ALIAS(_ftime32, libc__ftime32);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(_ftime64, libc__ftime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(_ftime32_s, libc__ftime32_s);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(_ftime64_s, libc__ftime64_s);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(ftime, libc_ftime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(ftime64, libc_ftime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

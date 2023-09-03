@@ -126,13 +126,16 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify") ATTR_IN(1) void
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4774b393]]]*/
+/*[[[start:exports,hash:CRC-32=0x6cec8221]]]*/
 DEFINE_PUBLIC_ALIAS(LChMod, libc_LChMod);
 DEFINE_PUBLIC_ALIAS(MkFiFo, libc_MkFiFo);
 DEFINE_PUBLIC_ALIAS(MkFiFoAt, libc_MkFiFoAt);
 DEFINE_PUBLIC_ALIAS(MkNod, libc_MkNod);
 DEFINE_PUBLIC_ALIAS(FUTimens, libc_FUTimens);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(FUTimens64, libc_FUTimens64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

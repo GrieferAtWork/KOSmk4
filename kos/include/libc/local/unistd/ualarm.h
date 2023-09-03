@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5857fdd9 */
+/* HASH CRC-32:0xd1738fdd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <asm/os/itimer.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
+#if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE___setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setitimer_defined
 #define __local___localdep_setitimer_defined
@@ -48,6 +48,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer,(int __which, struct itimerval const *__newval, struct itimerval *__oldval),setitimer64,(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE___setitimer64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/os/itimerval.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer,(int __which, struct itimerval const *__newval, struct itimerval *__oldval),__setitimer64,(__which,__newval,__oldval))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/setitimer.h>
@@ -77,7 +82,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ualarm_defined
 #define __localdep_ualarm __LIBC_LOCAL_NAME(ualarm)
 #endif /* !__local___localdep_ualarm_defined */
-#else /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
+#else /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE___setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
 #undef __local_ualarm_defined
-#endif /* !__ITIMER_REAL || (!__CRT_HAVE_setitimer64 && !__CRT_HAVE_setitimer && !__CRT_HAVE___setitimer && !__CRT_HAVE___libc_setitimer) */
+#endif /* !__ITIMER_REAL || (!__CRT_HAVE_setitimer64 && !__CRT_HAVE___setitimer64 && !__CRT_HAVE_setitimer && !__CRT_HAVE___setitimer && !__CRT_HAVE___libc_setitimer) */
 #endif /* !__local_ualarm_defined */

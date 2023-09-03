@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6d71590 */
+/* HASH CRC-32:0xae775d65 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -464,6 +464,8 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, str
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),__libc_getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),getrusage64,(__who,__usage))
+#elif defined(__CRT_HAVE___getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),__getrusage64,(__who,__usage))
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -474,6 +476,8 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, s
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),__libc_getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE_getrusage64)
 __CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),(__who,__usage))
+#elif defined(__CRT_HAVE___getrusage64)
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),__getrusage64,(__who,__usage))
 #endif /* ... */
 #endif /* __USE_TIME64 */
 /* >> getpriority(2), setpriority(2)

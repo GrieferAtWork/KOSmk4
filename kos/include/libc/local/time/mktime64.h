@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b6b6bd2 */
+/* HASH CRC-32:0x1f95627a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(struct __NAMESPACE_STD_SYM tm *__tp),timegm,(__tp))
 #elif defined(__CRT_HAVE_timegm64)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(struct __NAMESPACE_STD_SYM tm *__tp),timegm64,(__tp))
+#elif defined(__CRT_HAVE___timegm64)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(struct __NAMESPACE_STD_SYM tm *__tp),__timegm64,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime64)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime64,(__tp))
 #else /* ... */

@@ -136,9 +136,12 @@ libc_LFutexExpr(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 
-/*[[[start:exports,hash:CRC-32=0xa856d1a4]]]*/
+/*[[[start:exports,hash:CRC-32=0x7134ca14]]]*/
 DEFINE_PUBLIC_ALIAS(lfutexexpr, libc_lfutexexpr);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(lfutexexpr64, libc_lfutexexpr64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe991260f */
+/* HASH CRC-32:0x7f33c983 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_ppoll_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_ppoll64) || defined(__CRT_HAVE_ppoll)
+#if defined(__CRT_HAVE_ppoll64) || defined(__CRT_HAVE___ppoll64) || defined(__CRT_HAVE_ppoll)
 #include <bits/os/pollfd.h>
 #include <bits/os/timespec.h>
 #include <bits/os/sigset.h>
@@ -37,6 +37,8 @@ __CREDIRECT(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4),int,__NOTHROW_
 __CREDIRECT(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll64)
 __CREDIRECT(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
+#elif defined(__CRT_HAVE___ppoll64)
+__CREDIRECT(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),__ppoll64,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.poll/ppoll64.h>
@@ -69,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ppoll_defined
 #define __localdep_ppoll __LIBC_LOCAL_NAME(ppoll)
 #endif /* !__local___localdep_ppoll_defined */
-#else /* __CRT_HAVE_ppoll64 || __CRT_HAVE_ppoll */
+#else /* __CRT_HAVE_ppoll64 || __CRT_HAVE___ppoll64 || __CRT_HAVE_ppoll */
 #undef __local_ppoll_defined
-#endif /* !__CRT_HAVE_ppoll64 && !__CRT_HAVE_ppoll */
+#endif /* !__CRT_HAVE_ppoll64 && !__CRT_HAVE___ppoll64 && !__CRT_HAVE_ppoll */
 #endif /* !__local_ppoll_defined */

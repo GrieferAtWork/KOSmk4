@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ecaadb5 */
+/* HASH CRC-32:0x2906f2c8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,8 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),struct __NAMESPACE_STD
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime,(__time_t const *__timer),localtime64,(__timer))
 #elif defined(__CRT_HAVE__localtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime,(__time_t const *__timer),_localtime64,(__timer))
+#elif defined(__CRT_HAVE___localtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime,(__time_t const *__timer),__localtime64,(__timer))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime.h>

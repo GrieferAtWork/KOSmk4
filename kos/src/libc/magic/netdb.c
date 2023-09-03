@@ -632,7 +632,7 @@ int gai_cancel(struct gaicb *gaicbp);
 
 [[cp, no_crt_self_import, decl_include("<bits/crt/gaicb.h>", "<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend64", "__gai_suspend_time64")]]
 [[userimpl, requires($has_function(gai_suspend64) || $has_function(gai_suspend32))]]
 int gai_suspend(struct gaicb const *const list[],
                 int ent, struct timespec const *timeout) {
@@ -661,6 +661,7 @@ int gai_suspend32(struct gaicb const *const list[],
                   int ent, struct $timespec32 const *timeout);
 
 [[cp, preferred_time64_variant_of(gai_suspend), doc_alias("gai_suspend")]]
+[[time64_export_alias("__gai_suspend_time64")]]
 [[userimpl, requires_function(gai_suspend32), decl_include("<bits/crt/gaicb.h>", "<bits/os/timespec.h>")]]
 int gai_suspend64(struct gaicb const *const list[],
                   int ent, struct timespec64 const *timeout) {

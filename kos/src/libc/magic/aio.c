@@ -345,8 +345,8 @@ int aio_suspendt32([[in(nent)]] struct aiocb const *const list[],
 [[cp, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspend64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspendt64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspend64t64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspendt64", "__aio_suspend_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspend64t64", "__aio_suspend64_time64")]]
 [[userimpl, requires($has_function(aio_suspendt32) || $has_function(aio_suspendt64))]]
 int aio_suspend([[in(nent)]] struct aiocb const *const list[],
                 __STDC_INT_AS_SIZE_T nent,
@@ -414,8 +414,8 @@ int aio_suspend64t32([[in(nent)]] struct aiocb64 const *const list[],
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias("libc_aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                             !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("aio_suspend64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspendt64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                              defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("aio_suspend64t64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("aio_suspendt64", "__aio_suspend_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                              defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("aio_suspend64t64", "__aio_suspend64_time64")]]
 [[userimpl, requires($has_function(aio_suspend64t32) || $has_function(aio_suspend64t64))]]
 int aio_suspend64([[in(nent)]] struct aiocb64 const *const list[],
                   __STDC_INT_AS_SIZE_T nent,
@@ -447,8 +447,10 @@ int aio_suspend64([[in(nent)]] struct aiocb64 const *const list[],
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_kos_alias("libc_aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && ( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("aio_suspend64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                               !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__),  alias("aio_suspendt64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                                defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__),  alias("aio_suspend64t64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                               !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__),  alias("aio_suspendt64", "__aio_suspend_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                                defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__),  alias("aio_suspend64t64", "__aio_suspend64_time64")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__), crt_self_export]]
+[[time64_export_as("__aio_suspend_time64")]]
 [[userimpl, requires_function(aio_suspendt32)]]
 int aio_suspendt64([[in(nent)]] struct aiocb const *const list[],
                    __STDC_INT_AS_SIZE_T nent,
@@ -468,7 +470,10 @@ int aio_suspendt64([[in(nent)]] struct aiocb const *const list[],
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alt_variant_of(aio_suspend)]]
 [[if($extended_include_prefix("<bits/types.h>")                                            __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alt_variant_of(aio_suspend64)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__                                              ), preferred_alt_variant_of(aio_suspendt64)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__                                              ), alias("__aio_suspend_time64")]]
+[[time64_export_alias("__aio_suspend64_time64")]]
 [[userimpl, requires_function(aio_suspend64t32)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__), crt_self_export]]
 int aio_suspend64t64([[in(nent)]] struct aiocb64 const *const list[],
                      __STDC_INT_AS_SIZE_T nent,
                      struct timespec64 const *__restrict rel_timeout) {

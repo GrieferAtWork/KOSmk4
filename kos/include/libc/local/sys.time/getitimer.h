@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x577a28fd */
+/* HASH CRC-32:0xfbf1be9a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_getitimer_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
+#if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE___getitimer64) || defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getitimer32_defined
@@ -47,6 +47,8 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which,
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),__libc_getitimer,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer64)
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
+#elif defined(__CRT_HAVE___getitimer64)
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),__getitimer64,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/getitimer64.h>
@@ -87,7 +89,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getitimer_defined
 #define __localdep_getitimer __LIBC_LOCAL_NAME(getitimer)
 #endif /* !__local___localdep_getitimer_defined */
-#else /* __CRT_HAVE_getitimer64 || __CRT_HAVE_getitimer || __CRT_HAVE___getitimer || __CRT_HAVE___libc_getitimer */
+#else /* __CRT_HAVE_getitimer64 || __CRT_HAVE___getitimer64 || __CRT_HAVE_getitimer || __CRT_HAVE___getitimer || __CRT_HAVE___libc_getitimer */
 #undef __local_getitimer_defined
-#endif /* !__CRT_HAVE_getitimer64 && !__CRT_HAVE_getitimer && !__CRT_HAVE___getitimer && !__CRT_HAVE___libc_getitimer */
+#endif /* !__CRT_HAVE_getitimer64 && !__CRT_HAVE___getitimer64 && !__CRT_HAVE_getitimer && !__CRT_HAVE___getitimer && !__CRT_HAVE___libc_getitimer */
 #endif /* !__local_getitimer_defined */

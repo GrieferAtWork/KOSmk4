@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed8752ba */
+/* HASH CRC-32:0x1e0331db */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,8 +96,14 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(timeval_add, libc_timeval_add);
 DEFINE_PUBLIC_ALIAS(timeval_sub, libc_timeval_sub);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(timeval_add64, libc_timeval_add64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(timeval_sub64, libc_timeval_sub64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_TIMEVAL_UTILS_C */

@@ -484,7 +484,7 @@ int ntp_adjtime([[inout]] struct timex *__restrict tntx) {
 [[decl_include("<bits/os/timex.h>")]]
 [[preferred_time64_variant_of(adjtimex), doc_alias("adjtimex")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__adjtimex", "__libc_adjtimex")]]
-[[export_alias("__adjtimex64"), userimpl, requires_function(adjtimex32)]]
+[[time64_export_alias("__adjtimex64"), userimpl, requires_function(adjtimex32)]]
 int adjtimex64([[inout]] struct timex64 *__restrict ntx) {
 	int result;
 	struct timex32 nxtalt;
@@ -593,6 +593,7 @@ int ntp_adjtime64([[inout]] struct timex64 *__restrict tntx) {
 
 [[crt_name("ntp_gettimex64"), decl_include("<bits/crt/ntptimeval.h>")]]
 [[preferred_time64_variant_of(ntp_gettimex), doc_alias("ntp_gettime")]]
+[[time64_export_alias("__ntp_gettime64")]]
 [[userimpl, requires_function(ntp_gettime32)]]
 int ntp_gettime64([[out]] struct ntptimeval64 *__restrict ntv) {
 	struct ntptimeval32 ntv32;

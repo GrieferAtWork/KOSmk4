@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5df08b05 */
+/* HASH CRC-32:0x208eff53 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,16 @@ __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait,(sem_t *
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __self, struct timespec const *__restrict __abstime),sem_timedwait64,(__self,__abstime))
-#elif defined(__CRT_HAVE_sem_timedwait64) || defined(__CRT_HAVE_sem_timedwait)
+#elif defined(__CRT_HAVE___sem_timedwait64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> sem_timedwait(3), sem_timedwait64(3)
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __self, struct timespec const *__restrict __abstime),__sem_timedwait64,(__self,__abstime))
+#elif defined(__CRT_HAVE_sem_timedwait64) || defined(__CRT_HAVE___sem_timedwait64) || defined(__CRT_HAVE_sem_timedwait)
 #include <libc/local/semaphore/sem_timedwait.h>
 /* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait  for a  ticket to become  available to the  given semaphore `self'
@@ -174,6 +183,15 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait64,(sem_
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
+#elif defined(__CRT_HAVE___sem_timedwait64)
+/* >> sem_timedwait(3), sem_timedwait64(3)
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __self, struct timespec64 const *__restrict __abstime),__sem_timedwait64,(__self,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 #include <libc/local/semaphore/sem_timedwait64.h>
 /* >> sem_timedwait(3), sem_timedwait64(3)

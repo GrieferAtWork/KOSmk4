@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b09266a */
+/* HASH CRC-32:0x1a996af3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -193,8 +193,14 @@ DEFINE_PUBLIC_ALIAS(DOS$_wutime32, libd_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$wutime, libd_wutime);
 DEFINE_PUBLIC_ALIAS(wutime, libc_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$_wutime64, libd_wutime64);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$wutime64, libd_wutime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(wutime64, libc_wutime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_UTIME_C */

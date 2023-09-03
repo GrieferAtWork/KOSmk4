@@ -1216,8 +1216,8 @@ class FunctionFeatures {
 	/* CRT Features */
 	public member crt_name: UserString | string | none = none;       /* [[default_]crt_name(...)]    Symbol name override for the default CRT function binding */
 	public member crt_noImpl: bool = false;                          /* [[no_]crt_impl]              Don't implement function within the CRT */
-	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import]       Prevent importing from ASMNAME(crt_name || current.name) */
-	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export]       Prevent exporting as ASMNAME(crt_name || current.name) */
+	public member crt_noSelfImport: bool | UserString | string = false; /* [[no_]crt_self_import]    Prevent importing from ASMNAME(crt_name || current.name) */
+	public member crt_noSelfExport: bool | UserString | string = false; /* [[no_]crt_self_export]    Prevent exporting as ASMNAME(crt_name || current.name) */
 	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]              Prevent implementation in libc/auto and always use libc/user */
 	public member crt_dosVariant: bool | FunctionImplementation | Callable = false;
 	                                                                 /* [[no_]crt_dos_variant]       The function has a dedicated DOS-implementation (may also be set to the actual impl, or a callable to generate said impl) */
@@ -1756,10 +1756,12 @@ err_unexpected_if:
 			return "[default_]crt_name";
 		if (crt_noImpl != defaultFeatures.crt_noImpl)
 			return "[no_]crt_impl";
-		if (crt_noSelfImport != defaultFeatures.crt_noSelfImport)
+#define IDENTICAL(a, b) (type(a) === type(b) && (a) == (b))
+		if (!IDENTICAL(crt_noSelfImport, defaultFeatures.crt_noSelfImport))
 			return "[no_]crt_self_import";
-		if (crt_noSelfExport != defaultFeatures.crt_noSelfExport)
+		if (!IDENTICAL(crt_noSelfExport, defaultFeatures.crt_noSelfExport))
 			return "[no_]crt_self_export";
+#undef IDENTICAL
 		if (crt_dosSection !== defaultFeatures.crt_dosSection)
 			return "[no_]dos_section";
 		if (crt_kosSection !== defaultFeatures.crt_kosSection)
@@ -4347,6 +4349,52 @@ again_parse_annotations:
 					self.skip(")");
 				}	break;
 
+				case "time64_export_as":
+				case "time64_export_alias":
+				case "time64_export_raw_alias":
+				case "time64_preferred_export_alias":
+				case "time64_preferred_export_raw_alias": {
+					/* Helpers to define export aliases that are only used
+					 * when   `__SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__' */
+					local mode = tok;
+					self.next();
+					tok = self.skip("(");
+					while (tok !in ["", ")"]) {
+						for (local name: context.parseAliasNameOrList()) {
+							if (mode.endswith("alias")) {
+								local ppCond = currentConditions;
+								if (!mode.endswith("raw_alias"))
+									ppCond = constructAliasConditions(ppCond, name);
+								if (ppCond is none)
+									ppCond = "1";
+								local binding = FunctionBinding(
+									ppCond:     ppCond,
+									prototypes: currentPrototypes,
+									binding:    name);
+								if (mode.startswith("time64_preferred_")) {
+									current.bindings.insert(numPreferredBindings, binding);
+									++numPreferredBindings;
+								} else {
+									current.bindings.append(binding);
+								}
+							}
+							if (currentKosLibraryFunction is none)
+								currentKosLibraryFunction = LibraryFunction();
+							local exportCondition = "$extended_include_prefix(\"<bits/types.h>\")__SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__";
+							if (currentConditions !is none)
+								exportCondition = f"({exportCondition})&&({currentConditions})";
+							currentKosLibraryFunction.exportSymbolNames.append((exportCondition, name));
+							if (currentDosLibraryFunction is none)
+								currentDosLibraryFunction = LibraryFunction();
+							currentDosLibraryFunction.exportSymbolNames.append((exportCondition, "DOS$" + name));
+						}
+						if (self.tok != ",")
+							break;
+						tok = self.next();
+					}
+					self.skip(")");
+				}	break;
+
 				case "alias":
 				case "raw_alias":
 				case "preferred_alias":
@@ -5057,6 +5105,18 @@ again_parse_annotations:
 						"stat64_variant_of"      : "$extended_include_prefix(\"<bits/os/stat.h>\")defined(__STAT32_MATCHES_STAT64)",
 						"glob64_variant_of"      : "$extended_include_prefix(\"<bits/crt/glob.h>\")defined(__GLOB32_MATCHES_GLOB64)",
 					}[tok.lsstrip("preferred_")];
+
+					/* Special case: time64 alt variants are only exported if they are needed. */
+					if ("time64" in tok) {
+						final local exportIf = "$extended_include_prefix(\"<bits/types.h>\")__SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__";
+						if (currentFeatures.crt_noSelfExport !is bool) {
+							currentFeatures.crt_noSelfExport =
+								f"({currentFeatures.crt_noSelfExport})||({exportIf})";
+						} else if (!currentFeatures.crt_noSelfExport) {
+							currentFeatures.crt_noSelfExport = exportIf;
+						}
+					}
+
 					self.next();
 					self.skip("(");
 					assemblyName = self.parseCStringOrAllUntilRParen();
@@ -5196,6 +5256,28 @@ do_handle_alt_variant_of:
 					self.next();
 					break;
 
+				case "crt_self_import":
+				case "no_crt_self_import":
+				case "crt_self_export":
+				case "no_crt_self_export": {
+					local field, value = {
+						"crt_self_import"    : ("crt_noSelfImport", false),
+						"no_crt_self_import" : ("crt_noSelfImport", true),
+						"crt_self_export"    : ("crt_noSelfExport", false),
+						"no_crt_self_export" : ("crt_noSelfExport", true),
+					}[tok]...;
+					self.next();
+					if (currentConditions is none) {
+						currentFeatures.operator . (field) = value;
+					} else {
+						/* Conditional enable/disable of self-import/export */
+						local usedCond = currentConditions;
+						if (value)
+							usedCond = f"!({usedCond})";
+						currentFeatures.operator . (field) = usedCond;
+					}
+				}	break;
+
 				default:
 					if (currentConditions is none) {
 						if (defaultAttributes is none)
@@ -5281,13 +5363,15 @@ again_skip_annotation_rbracket:
 //		print("Function: ", headerName, "::", currentName);
 
 		/* Bind the function against its own symbol */
-		if (!currentFeatures.crt_noSelfImport) {
+		if (currentFeatures.crt_noSelfImport !is bool || !currentFeatures.crt_noSelfImport) {
 			local usedCrtName = currentFeatures.crt_name;
 			if (usedCrtName is none)
 				usedCrtName = currentName;
 			current.bindings.insert(
 				numPreferredBindings, FunctionBinding(
-					ppCond:     keyCrtHave(usedCrtName),
+					ppCond:     currentFeatures.crt_noSelfImport is bool
+						? keyCrtHave(usedCrtName)
+						: f"({currentFeatures.crt_noSelfImport})&&({keyCrtHave(usedCrtName)})",
 					prototypes: currentPrototypes,
 					binding:    usedCrtName));
 		}
@@ -6000,7 +6084,7 @@ got_chkExpr:
 							f"used with %\{uchar\} function {repr currentName}"
 						);
 					}
-					if (#current.bindings > (currentFeatures.crt_noSelfImport ? 0 : 1)) {
+					if (#current.bindings > ((currentFeatures.crt_noSelfImport !is bool || currentFeatures.crt_noSelfImport) ? 0 : 1)) {
 						self.errAt(currentNameTokStart,
 							f"%\{uchar\} function {repr currentName} has custom bindings");
 					}
@@ -6711,8 +6795,11 @@ again_lookup_wcsCurrent:
 					currentKosLibraryFunction.name = libc_kosName;
 				}
 				current.internalName = libc_kosName;
-				if (!currentFeatures.crt_noSelfExport)
+				if (currentFeatures.crt_noSelfExport !is bool) {
+					currentKosLibraryFunction.exportSymbolNames.append((currentFeatures.crt_noSelfExport, crtName));
+				} else if (!currentFeatures.crt_noSelfExport) {
 					currentKosLibraryFunction.exportSymbolNames.append(("1", crtName));
+				}
 				if (!allLibraryFunctionsByName.setnew(libc_kosName, currentKosLibraryFunction)) {
 					self.errAt(currentNameTokStart,
 						f"Duplicate library function: {repr libc_kosName}");
@@ -6737,8 +6824,11 @@ again_lookup_wcsCurrent:
 						libc_dosName = "libd_" + crtName;
 						currentDosLibraryFunction.name = libc_dosName;
 					}
-					if (!currentFeatures.crt_noSelfExport)
+					if (currentFeatures.crt_noSelfExport !is bool) {
+						currentDosLibraryFunction.exportSymbolNames.append((currentFeatures.crt_noSelfExport, "DOS$" + crtName));
+					} else if (!currentFeatures.crt_noSelfExport) {
 						currentDosLibraryFunction.exportSymbolNames.append(("1", "DOS$" + crtName));
+					}
 					if (!allLibraryFunctionsByName.setnew(libc_dosName, currentDosLibraryFunction)) {
 						self.errAt(currentNameTokStart,
 							f"Duplicate library function: {repr libc_dosName}");
@@ -6916,8 +7006,11 @@ again_lookup_wcsCurrent:
 							libc_dosName = "libd_" + crtName;
 							currentDosLibraryFunction.name = libc_dosName;
 						}
-						if (!currentFeatures.crt_noSelfExport)
+						if (currentFeatures.crt_noSelfExport !is bool) {
+							currentDosLibraryFunction.exportSymbolNames.append((currentFeatures.crt_noSelfExport, "DOS$" + crtName));
+						} else if (!currentFeatures.crt_noSelfExport) {
 							currentDosLibraryFunction.exportSymbolNames.append(("1", "DOS$" + crtName));
+						}
 						if (!allLibraryFunctionsByName.setnew(libc_dosName, currentDosLibraryFunction)) {
 							self.errAt(currentNameTokStart,
 								f"Duplicate library function: {repr libc_dosName}");
@@ -6995,7 +7088,7 @@ handle_eq_after_prototype:
 				self, context.defaultFeatures, currentName);
 			currentFeatures.assertAllSymbolicAliasOnly(
 				self, context.defaultFeatures, currentName);
-			if (#current.bindings > (currentFeatures.crt_noSelfImport ? 0 : 1)) {
+			if (#current.bindings > ((currentFeatures.crt_noSelfImport !is bool || currentFeatures.crt_noSelfImport) ? 0 : 1)) {
 				self.errAt(currentNameTokStart,
 					f"Aliasing function {repr currentName} has "
 					f"custom bindings {repr current.bindings}");

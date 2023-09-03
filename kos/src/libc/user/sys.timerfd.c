@@ -110,12 +110,17 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb329c30d]]]*/
+/*[[[start:exports,hash:CRC-32=0xcd802ea5]]]*/
 DEFINE_PUBLIC_ALIAS(timerfd_create, libc_timerfd_create);
 DEFINE_PUBLIC_ALIAS(timerfd_settime, libc_timerfd_settime);
 DEFINE_PUBLIC_ALIAS(timerfd_gettime, libc_timerfd_gettime);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__timerfd_settime64, libc_timerfd_settime64);
 DEFINE_PUBLIC_ALIAS(timerfd_settime64, libc_timerfd_settime64);
+DEFINE_PUBLIC_ALIAS(__timerfd_gettime64, libc_timerfd_gettime64);
 DEFINE_PUBLIC_ALIAS(timerfd_gettime64, libc_timerfd_gettime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

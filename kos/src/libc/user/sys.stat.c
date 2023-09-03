@@ -1482,7 +1482,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf8baa88e]]]*/
+/*[[[start:exports,hash:CRC-32=0x973b927c]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$mkdir, libd_mkdir);
@@ -1528,13 +1528,18 @@ DEFINE_PUBLIC_ALIAS(DOS$mknodat, libd_mknodat);
 DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);
 DEFINE_PUBLIC_ALIAS(DOS$utimensat, libd_utimensat);
 DEFINE_PUBLIC_ALIAS(utimensat, libc_utimensat);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__utimensat64, libd_utimensat64);
 DEFINE_PUBLIC_ALIAS(DOS$utimensat64, libd_utimensat64);
 DEFINE_PUBLIC_ALIAS(__utimensat64, libc_utimensat64);
 DEFINE_PUBLIC_ALIAS(utimensat64, libc_utimensat64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(futimens, libc_futimens);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(__futimens64, libc_futimens64);
 DEFINE_PUBLIC_ALIAS(futimens64, libc_futimens64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_wstat, libd__wstat32);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat32, libd__wstat32);
 DEFINE_PUBLIC_ALIAS(_wstat, libc__wstat32);

@@ -441,7 +441,7 @@ int sched_rr_get_interval32($pid_t pid, [[out_opt]] struct $timespec32 *tms);
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import, export_as("__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sched_rr_get_interval", "__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sched_rr_get_interval64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sched_rr_get_interval64", "__sched_rr_get_interval64")]]
 [[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
 int sched_rr_get_interval($pid_t pid, [[out_opt]] struct timespec *tms) {
 @@pp_if $has_function(sched_rr_get_interval32)@@
@@ -464,6 +464,7 @@ int sched_rr_get_interval($pid_t pid, [[out_opt]] struct timespec *tms) {
 %#ifdef __USE_TIME64
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sched_rr_get_interval), doc_alias("sched_rr_get_interval")]]
+[[time64_export_alias("__sched_rr_get_interval64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[userimpl, requires_function(sched_rr_get_interval32)]]
 int sched_rr_get_interval64($pid_t pid, [[out_opt]] struct timespec64 *tms) {

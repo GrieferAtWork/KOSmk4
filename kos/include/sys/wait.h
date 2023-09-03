@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdef0cc07 */
+/* HASH CRC-32:0x52d0ee */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,7 +147,12 @@ __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_
  * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),wait3_64,(__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
+#elif defined(__CRT_HAVE___wait3_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> wait3(2), wait3_64(2)
+ * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),__wait3_time64,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE___wait3_time64) || defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 #include <libc/local/sys.wait/wait3.h>
 /* >> wait3(2), wait3_64(2)
  * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -171,6 +176,11 @@ __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __st
  * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE___wait3_time64)
+/* >> wait3(2), wait3_64(2)
+ * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),__wait3_time64,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 #include <libc/local/sys.wait/wait3_64.h>
 /* >> wait3(2), wait3_64(2)
@@ -202,7 +212,12 @@ __CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4_64) || defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE___wait4) || defined(__CRT_HAVE___libc_wait4)
+#elif defined(__CRT_HAVE___wait4_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> wait4(2), wait4_64(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),__wait4_time64,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4_64) || defined(__CRT_HAVE___wait4_time64) || defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE___wait4) || defined(__CRT_HAVE___libc_wait4)
 #include <libc/local/sys.wait/wait4.h>
 /* >> wait4(2), wait4_64(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -231,6 +246,11 @@ __CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __W
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE___wait4_time64)
+/* >> wait4(2), wait4_64(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),__wait4_time64,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE___wait4) || defined(__CRT_HAVE___libc_wait4)
 #include <libc/local/sys.wait/wait4_64.h>
 /* >> wait4(2), wait4_64(2)

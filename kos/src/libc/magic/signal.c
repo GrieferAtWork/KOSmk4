@@ -2098,7 +2098,7 @@ int sigtimedwait32([[in]] $sigset_t const *__restrict set,
 @@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
 [[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait", "__sigtimedwait")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64", "__sigtimedwait64")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[in]] $sigset_t const *__restrict set,
                  [[out_opt]] siginfo_t *__restrict info,
@@ -2142,6 +2142,7 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 [[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
+[[time64_export_alias("__sigtimedwait64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
 int sigtimedwait64([[in]] $sigset_t const *__restrict set,

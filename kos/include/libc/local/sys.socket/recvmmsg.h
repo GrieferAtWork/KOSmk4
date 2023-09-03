@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcd1b042 */
+/* HASH CRC-32:0x912ad93e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_recvmmsg_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
+#if defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE___recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
 #include <features.h>
 #include <bits/os/mmsghdr.h>
 #include <bits/os/timespec.h>
@@ -37,6 +37,8 @@ __CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_
 __CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg64)
 __CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#elif defined(__CRT_HAVE___recvmmsg64)
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),__recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.socket/recvmmsg64.h>
@@ -69,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_recvmmsg_defined
 #define __localdep_recvmmsg __LIBC_LOCAL_NAME(recvmmsg)
 #endif /* !__local___localdep_recvmmsg_defined */
-#else /* __CRT_HAVE_recvmmsg64 || __CRT_HAVE_recvmmsg */
+#else /* __CRT_HAVE_recvmmsg64 || __CRT_HAVE___recvmmsg64 || __CRT_HAVE_recvmmsg */
 #undef __local_recvmmsg_defined
-#endif /* !__CRT_HAVE_recvmmsg64 && !__CRT_HAVE_recvmmsg */
+#endif /* !__CRT_HAVE_recvmmsg64 && !__CRT_HAVE___recvmmsg64 && !__CRT_HAVE_recvmmsg */
 #endif /* !__local_recvmmsg_defined */

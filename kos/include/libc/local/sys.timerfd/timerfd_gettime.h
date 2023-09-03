@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbe2086b */
+/* HASH CRC-32:0xd4f72424 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_timerfd_gettime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
+#if defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE___timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_g
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime64)
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
+#elif defined(__CRT_HAVE___timerfd_gettime64)
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),__timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_gettime64.h>
@@ -75,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timerfd_gettime_defined
 #define __localdep_timerfd_gettime __LIBC_LOCAL_NAME(timerfd_gettime)
 #endif /* !__local___localdep_timerfd_gettime_defined */
-#else /* __CRT_HAVE_timerfd_gettime64 || __CRT_HAVE_timerfd_gettime */
+#else /* __CRT_HAVE_timerfd_gettime64 || __CRT_HAVE___timerfd_gettime64 || __CRT_HAVE_timerfd_gettime */
 #undef __local_timerfd_gettime_defined
-#endif /* !__CRT_HAVE_timerfd_gettime64 && !__CRT_HAVE_timerfd_gettime */
+#endif /* !__CRT_HAVE_timerfd_gettime64 && !__CRT_HAVE___timerfd_gettime64 && !__CRT_HAVE_timerfd_gettime */
 #endif /* !__local_timerfd_gettime_defined */

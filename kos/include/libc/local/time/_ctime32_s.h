@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9d5796 */
+/* HASH CRC-32:0xe6c25d4d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__time_t const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
+#elif defined(__CRT_HAVE___ctime64_r) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/tm.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__time_t const *__restrict __timer, char __buf[26]),__ctime64_r,(__timer,__buf))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/ctime_r.h>

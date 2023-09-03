@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4991ba2 */
+/* HASH CRC-32:0xc3040732 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,10 @@ __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday,(
 #elif defined(__CRT_HAVE_gettimeofday64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> gettimeofday(2), gettimeofday64(2) */
 __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
+#elif defined(__CRT_HAVE___gettimeofday64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> gettimeofday(2), gettimeofday64(2) */
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),__gettimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE___gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 #include <libc/local/sys.time/gettimeofday.h>
 /* >> gettimeofday(2), gettimeofday64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) int __NOTHROW_NCX(__LIBCCALL gettimeofday)(struct timeval *__restrict __tv, __timezone_ptr_t __tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gettimeofday))(__tv, __tz); })
@@ -173,7 +176,10 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which,
 #elif defined(__CRT_HAVE_getitimer64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> getitimer(2), getitimer64(2) */
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),getitimer64,(__which,__curr_value))
-#elif defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
+#elif defined(__CRT_HAVE___getitimer64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> getitimer(2), getitimer64(2) */
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),__getitimer64,(__which,__curr_value))
+#elif defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE___getitimer64) || defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 #include <libc/local/sys.time/getitimer.h>
 /* >> getitimer(2), getitimer64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL getitimer)(__itimer_which_t __which, struct itimerval *__curr_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer))(__which, __curr_value); })
@@ -190,7 +196,10 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer,(__it
 #elif defined(__CRT_HAVE_setitimer64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> setitimer(2), setitimer64(2) */
 __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),setitimer64,(__which,__newval,__oldval))
-#elif defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
+#elif defined(__CRT_HAVE___setitimer64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> setitimer(2), setitimer64(2) */
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),__setitimer64,(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE___setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 #include <libc/local/sys.time/setitimer.h>
 /* >> setitimer(2), setitimer64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(2) __ATTR_OUT_OPT(3) int __NOTHROW_NCX(__LIBCCALL setitimer)(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setitimer))(__which, __newval, __oldval); })
@@ -204,7 +213,10 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes,(char const *
 #elif defined(__CRT_HAVE_utimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> utimes(2), utimes64(2) */
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
+#elif defined(__CRT_HAVE___utimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> utimes(2), utimes64(2) */
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),__utimes64,(__file,__tvp))
+#elif defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE___utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <libc/local/sys.time/utimes.h>
 /* >> utimes(2), utimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_NCX(__LIBCCALL utimes)(char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes))(__file, __tvp); })
@@ -217,7 +229,10 @@ __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futim
 #elif defined(__CRT_HAVE_futimesat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimesat(2), futimesat64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char const *__file, struct timeval const __tvp[2]),futimesat64,(__fd,__file,__tvp))
-#elif defined(__CRT_HAVE_futimesat64) || defined(__CRT_HAVE_futimesat)
+#elif defined(__CRT_HAVE___futimesat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> futimesat(2), futimesat64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char const *__file, struct timeval const __tvp[2]),__futimesat64,(__fd,__file,__tvp))
+#elif defined(__CRT_HAVE_futimesat64) || defined(__CRT_HAVE___futimesat64) || defined(__CRT_HAVE_futimesat)
 #include <libc/local/sys.time/futimesat.h>
 /* >> futimesat(2), futimesat64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimesat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3) int __NOTHROW_NCX(__LIBCCALL futimesat)(__fd_t __fd, char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat))(__fd, __file, __tvp); })
@@ -237,7 +252,10 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday,(st
 #elif defined(__CRT_HAVE_settimeofday64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> settimeofday(2), settimeofday64(2) */
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
+#elif defined(__CRT_HAVE___settimeofday64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> settimeofday(2), settimeofday64(2) */
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),__settimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE___settimeofday64) || defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 #include <libc/local/sys.time/settimeofday.h>
 /* >> settimeofday(2), settimeofday64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) int __NOTHROW_NCX(__LIBCCALL settimeofday)(struct timeval const *__tv, struct timezone const *__tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday))(__tv, __tz); })
@@ -251,7 +269,10 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime,(struct
 #elif defined(__CRT_HAVE_adjtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtime(3), adjtime64(3) */
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct timeval *__olddelta),adjtime64,(__delta,__olddelta))
-#elif defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
+#elif defined(__CRT_HAVE___adjtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> adjtime(3), adjtime64(3) */
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct timeval *__olddelta),__adjtime64,(__delta,__olddelta))
+#elif defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE___adjtime64) || defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 #include <libc/local/sys.time/adjtime.h>
 /* >> adjtime(3), adjtime64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(adjtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) __ATTR_OUT_OPT(2) int __NOTHROW_NCX(__LIBCCALL adjtime)(struct timeval const *__delta, struct timeval *__olddelta) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtime))(__delta, __olddelta); })
@@ -262,7 +283,10 @@ __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes,(char const *
 #elif defined(__CRT_HAVE_lutimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lutimes(2), lutimes64(2) */
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),lutimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_lutimes64) || defined(__CRT_HAVE_lutimes)
+#elif defined(__CRT_HAVE___lutimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> lutimes(2), lutimes64(2) */
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),__lutimes64,(__file,__tvp))
+#elif defined(__CRT_HAVE_lutimes64) || defined(__CRT_HAVE___lutimes64) || defined(__CRT_HAVE_lutimes)
 #include <libc/local/sys.time/lutimes.h>
 /* >> lutimes(2), lutimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lutimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_NCX(__LIBCCALL lutimes)(char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes))(__file, __tvp); })
@@ -273,7 +297,10 @@ __CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes,(__fd_t __
 #elif defined(__CRT_HAVE_futimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimes(2), futimes64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),futimes64,(__fd,__tvp))
-#elif (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE_futimes)
+#elif defined(__CRT_HAVE___futimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> futimes(2), futimes64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),__futimes64,(__fd,__tvp))
+#elif (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE___lutimes64) || defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes.h>
 /* >> futimes(2), futimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_NCX(__LIBCCALL futimes)(__fd_t __fd, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes))(__fd, __tvp); })
@@ -287,6 +314,9 @@ __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday64
 #elif defined(__CRT_HAVE_gettimeofday64)
 /* >> gettimeofday(2), gettimeofday64(2) */
 __CDECLARE(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday64,(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz),(__tv,__tz))
+#elif defined(__CRT_HAVE___gettimeofday64)
+/* >> gettimeofday(2), gettimeofday64(2) */
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday64,(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz),__gettimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> gettimeofday(2), gettimeofday64(2) */
 __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday64,(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz),__gettimeofday,(__tv,__tz))
@@ -310,6 +340,9 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t __whic
 #elif defined(__CRT_HAVE_getitimer64)
 /* >> getitimer(2), getitimer64(2) */
 __CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),(__which,__curr_value))
+#elif defined(__CRT_HAVE___getitimer64)
+/* >> getitimer(2), getitimer64(2) */
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),__getitimer64,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE___getitimer) || defined(__CRT_HAVE___libc_getitimer)
 #include <libc/local/sys.time/getitimer64.h>
 /* >> getitimer(2), getitimer64(2) */
@@ -327,6 +360,9 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer64,(__
 #elif defined(__CRT_HAVE_setitimer64)
 /* >> setitimer(2), setitimer64(2) */
 __CDECLARE(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer64,(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval),(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE___setitimer64)
+/* >> setitimer(2), setitimer64(2) */
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,setitimer64,(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval),__setitimer64,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 #include <libc/local/sys.time/setitimer64.h>
 /* >> setitimer(2), setitimer64(2) */
@@ -341,6 +377,9 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes64,(char const
 #elif defined(__CRT_HAVE_utimes64)
 /* >> utimes(2), utimes64(2) */
 __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),(__file,__tvp))
+#elif defined(__CRT_HAVE___utimes64)
+/* >> utimes(2), utimes64(2) */
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),__utimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <libc/local/sys.time/utimes64.h>
 /* >> utimes(2), utimes64(2) */
@@ -360,6 +399,9 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday64,(
 #elif defined(__CRT_HAVE_settimeofday64)
 /* >> settimeofday(2), settimeofday64(2) */
 __CDECLARE(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday64,(struct timeval64 const *__tv, struct timezone const *__tz),(__tv,__tz))
+#elif defined(__CRT_HAVE___settimeofday64)
+/* >> settimeofday(2), settimeofday64(2) */
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,settimeofday64,(struct timeval64 const *__tv, struct timezone const *__tz),__settimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 #include <libc/local/sys.time/settimeofday64.h>
 /* >> settimeofday(2), settimeofday64(2) */
@@ -371,6 +413,9 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime64,(stru
 #elif defined(__CRT_HAVE_adjtime64)
 /* >> adjtime(3), adjtime64(3) */
 __CDECLARE(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime64,(struct timeval64 const *__delta, struct timeval64 *__olddelta),(__delta,__olddelta))
+#elif defined(__CRT_HAVE___adjtime64)
+/* >> adjtime(3), adjtime64(3) */
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,adjtime64,(struct timeval64 const *__delta, struct timeval64 *__olddelta),__adjtime64,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 #include <libc/local/sys.time/adjtime64.h>
 /* >> adjtime(3), adjtime64(3) */
@@ -382,6 +427,9 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes64,(char cons
 #elif defined(__CRT_HAVE_lutimes64)
 /* >> lutimes(2), lutimes64(2) */
 __CDECLARE(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes64,(char const *__file, struct timeval64 const __tvp[2]),(__file,__tvp))
+#elif defined(__CRT_HAVE___lutimes64)
+/* >> lutimes(2), lutimes64(2) */
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,lutimes64,(char const *__file, struct timeval64 const __tvp[2]),__lutimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes)
 #include <libc/local/sys.time/lutimes64.h>
 /* >> lutimes(2), lutimes64(2) */
@@ -393,6 +441,9 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t
 #elif defined(__CRT_HAVE_futimes64)
 /* >> lutimes(2), lutimes64(2) */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),(__fd,__tvp))
+#elif defined(__CRT_HAVE___lutimes64)
+/* >> lutimes(2), lutimes64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),__lutimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes64.h>
 /* >> lutimes(2), lutimes64(2) */
@@ -407,6 +458,9 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futi
 #elif defined(__CRT_HAVE_futimesat64)
 /* >> futimesat(2), futimesat64(2) */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futimesat64,(__fd_t __fd, char const *__file, struct timeval64 const __tvp[2]),(__fd,__file,__tvp))
+#elif defined(__CRT_HAVE___futimesat64)
+/* >> futimesat(2), futimesat64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,futimesat64,(__fd_t __fd, char const *__file, struct timeval64 const __tvp[2]),__futimesat64,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat)
 #include <libc/local/sys.time/futimesat64.h>
 /* >> futimesat(2), futimesat64(2) */

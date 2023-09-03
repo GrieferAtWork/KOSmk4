@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea8ce856 */
+/* HASH CRC-32:0x59af0045 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,25 +124,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wctime64_s, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__wctime64_s */
 #ifdef __CRT_HAVE__wstrtime
 __CDECLARE(__ATTR_OUT(1),wchar_t *,__NOTHROW_NCX,_wstrtime,(wchar_t __buf[9]),(__buf))
-#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/corecrt_wtime/_wstrtime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wstrtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) wchar_t *__NOTHROW_NCX(__LIBCCALL _wstrtime)(wchar_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE__wstrdate
 __CDECLARE(__ATTR_OUT(1),wchar_t *,__NOTHROW_NCX,_wstrdate,(wchar_t __buf[9]),(__buf))
-#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/corecrt_wtime/_wstrdate.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wstrdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) wchar_t *__NOTHROW_NCX(__LIBCCALL _wstrdate)(wchar_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE__wstrtime_s
 __CDECLARE(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_wstrtime_s,(wchar_t *__buf, size_t __buflen),(__buf,__buflen))
-#elif defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/corecrt_wtime/_wstrtime_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wstrtime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBCCALL _wstrtime_s)(wchar_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime_s))(__buf, __buflen); })
 #endif /* ... */
 #ifdef __CRT_HAVE__wstrdate_s
 __CDECLARE(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_wstrdate_s,(wchar_t *__buf, size_t __buflen),(__buf,__buflen))
-#elif defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/corecrt_wtime/_wstrdate_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wstrdate_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBCCALL _wstrdate_s)(wchar_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate_s))(__buf, __buflen); })
 #endif /* ... */

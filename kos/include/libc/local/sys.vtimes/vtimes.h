@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb30736c */
+/* HASH CRC-32:0x2e7d4eb8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <asm/os/resource.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && ((defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))
+#if defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && ((defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))
 #include <bits/crt/vtimes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getrusage_defined
@@ -49,6 +49,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),getrusage64,(__who,__usage))
+#elif defined(__CRT_HAVE___getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/os/rusage.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),__getrusage64,(__who,__usage))
 #else /* ... */
 #undef __local___localdep_getrusage_defined
 #endif /* !... */
@@ -86,7 +91,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_vtimes_defined
 #define __localdep_vtimes __LIBC_LOCAL_NAME(vtimes)
 #endif /* !__local___localdep_vtimes_defined */
-#else /* __RUSAGE_SELF && __RUSAGE_CHILDREN && ((__CRT_HAVE_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___libc_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_getrusage64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__))) */
+#else /* __RUSAGE_SELF && __RUSAGE_CHILDREN && ((__CRT_HAVE_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___libc_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_getrusage64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___getrusage64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__))) */
 #undef __local_vtimes_defined
-#endif /* !__RUSAGE_SELF || !__RUSAGE_CHILDREN || ((!__CRT_HAVE_getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE___getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE___libc_getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE_getrusage64 || (!__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__))) */
+#endif /* !__RUSAGE_SELF || !__RUSAGE_CHILDREN || ((!__CRT_HAVE_getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE___getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE___libc_getrusage || (__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE_getrusage64 || (!__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)) && (!__CRT_HAVE___getrusage64 || (!__USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__))) */
 #endif /* !__local_vtimes_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26bdc676 */
+/* HASH CRC-32:0x33816092 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__strtime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_localtime64_r_defined
 #define __local___localdep_localtime64_r_defined
@@ -36,6 +36,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
+#elif defined(__CRT_HAVE___localtime64_r)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/tm.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),__localtime64_r,(__timer,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime64_r.h>
@@ -55,6 +60,8 @@ __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time
 __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),time64,(__timer))
 #elif defined(__CRT_HAVE__time64)
 __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),_time64,(__timer))
+#elif defined(__CRT_HAVE___time64)
+__CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),__time64,(__timer))
 #elif defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/time64.h>
@@ -89,7 +96,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__strtime_defined
 #define __localdep__strtime __LIBC_LOCAL_NAME(_strtime)
 #endif /* !__local___localdep__strtime_defined */
-#else /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
+#else /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE___time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
 #undef __local__strtime_defined
-#endif /* !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
+#endif /* !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE___time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
 #endif /* !__local__strtime_defined */

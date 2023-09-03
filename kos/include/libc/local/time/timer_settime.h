@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5c572ec */
+/* HASH CRC-32:0xc156bbe8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_timer_settime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_timer_settime64) || defined(__CRT_HAVE_timer_settime)
+#if defined(__CRT_HAVE_timer_settime64) || defined(__CRT_HAVE___timer_settime64) || defined(__CRT_HAVE_timer_settime)
 #include <features.h>
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,6 +36,8 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timer_se
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict ___value, struct __itimerspec64 *__restrict __ovalue),timer_settime,(__timerid,__flags,___value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime64)
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict ___value, struct __itimerspec64 *__restrict __ovalue),timer_settime64,(__timerid,__flags,___value,__ovalue))
+#elif defined(__CRT_HAVE___timer_settime64)
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict ___value, struct __itimerspec64 *__restrict __ovalue),__timer_settime64,(__timerid,__flags,___value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timer_settime64.h>
@@ -84,7 +86,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timer_settime_defined
 #define __localdep_timer_settime __LIBC_LOCAL_NAME(timer_settime)
 #endif /* !__local___localdep_timer_settime_defined */
-#else /* __CRT_HAVE_timer_settime64 || __CRT_HAVE_timer_settime */
+#else /* __CRT_HAVE_timer_settime64 || __CRT_HAVE___timer_settime64 || __CRT_HAVE_timer_settime */
 #undef __local_timer_settime_defined
-#endif /* !__CRT_HAVE_timer_settime64 && !__CRT_HAVE_timer_settime */
+#endif /* !__CRT_HAVE_timer_settime64 && !__CRT_HAVE___timer_settime64 && !__CRT_HAVE_timer_settime */
 #endif /* !__local_timer_settime_defined */

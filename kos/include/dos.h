@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36483298 */
+/* HASH CRC-32:0xad4fd45f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,14 +86,14 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(__UINT32_TYPE__ __milli),__crtSleep,(__mi
 #else /* ... */
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/stdlib/_sleep.h>
 /* >> _sleep(3)
  * Sleep for `milli' milliseconds (1/1.000 seconds) */
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL delay)(__UINT32_TYPE__ __milli) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sleep))(__milli); }
-#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE___nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
 #undef __delay_defined
-#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE___nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 #endif /* !... */
 #endif /* !__delay_defined */
 #ifdef __CRT_HAVE__getdiskfree
@@ -109,15 +109,15 @@ __CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),(__duration))
 #else /* __CRT_HAVE_sleep */
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#if defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/unistd/sleep.h>
 /* >> sleep(3)
  * Dos-specific prototype for `sleep(3)'
  * This one simply returns void, thus being unable to handle the EINTR-case. */
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL sleep)(unsigned int __duration) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sleep))(__duration); }
-#else /* __CRT_HAVE__sleep || __CRT_HAVE___crtSleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+#else /* __CRT_HAVE__sleep || __CRT_HAVE___crtSleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE___nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
 #undef __sleep_defined
-#endif /* !__CRT_HAVE__sleep && !__CRT_HAVE___crtSleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
+#endif /* !__CRT_HAVE__sleep && !__CRT_HAVE___crtSleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE___nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 #endif /* !__CRT_HAVE_sleep */
 #endif /* !__sleep_defined */
 #ifndef __unlink_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95e92a */
+/* HASH CRC-32:0x3f679817 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_clock_nanosleep_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
+#if defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE___clock_nanosleep_time64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <features.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -42,6 +42,8 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,__localdep_cl
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64)
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
+#elif defined(__CRT_HAVE___clock_nanosleep_time64)
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),__clock_nanosleep_time64,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_nanosleep64.h>
@@ -82,7 +84,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_clock_nanosleep_defined
 #define __localdep_clock_nanosleep __LIBC_LOCAL_NAME(clock_nanosleep)
 #endif /* !__local___localdep_clock_nanosleep_defined */
-#else /* __CRT_HAVE_clock_nanosleep64 || __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep */
+#else /* __CRT_HAVE_clock_nanosleep64 || __CRT_HAVE___clock_nanosleep_time64 || __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep */
 #undef __local_clock_nanosleep_defined
-#endif /* !__CRT_HAVE_clock_nanosleep64 && !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep */
+#endif /* !__CRT_HAVE_clock_nanosleep64 && !__CRT_HAVE___clock_nanosleep_time64 && !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep */
 #endif /* !__local_clock_nanosleep_defined */

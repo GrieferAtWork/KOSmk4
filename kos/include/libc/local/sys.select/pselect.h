@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbefca0fe */
+/* HASH CRC-32:0xa75983b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_pselect_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE_pselect)
+#if defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE___pselect64) || defined(__CRT_HAVE_pselect)
 #include <features.h>
 #include <bits/os/timespec.h>
 #include <bits/os/sigset.h>
@@ -38,6 +38,8 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64)
 __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+#elif defined(__CRT_HAVE___pselect64)
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),__pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.select/pselect64.h>
@@ -70,7 +72,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pselect_defined
 #define __localdep_pselect __LIBC_LOCAL_NAME(pselect)
 #endif /* !__local___localdep_pselect_defined */
-#else /* __CRT_HAVE_pselect64 || __CRT_HAVE_pselect */
+#else /* __CRT_HAVE_pselect64 || __CRT_HAVE___pselect64 || __CRT_HAVE_pselect */
 #undef __local_pselect_defined
-#endif /* !__CRT_HAVE_pselect64 && !__CRT_HAVE_pselect */
+#endif /* !__CRT_HAVE_pselect64 && !__CRT_HAVE___pselect64 && !__CRT_HAVE_pselect */
 #endif /* !__local_pselect_defined */

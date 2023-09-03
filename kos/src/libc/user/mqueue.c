@@ -266,7 +266,7 @@ NOTHROW_RPC(LIBCCALL libc_mq_timedsend64)(mqd_t mqdes,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mq_timedsend64]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xdabc74e1]]]*/
+/*[[[start:exports,hash:CRC-32=0x835b7aef]]]*/
 DEFINE_PUBLIC_ALIAS(mq_open, libc_mq_open);
 DEFINE_PUBLIC_ALIAS(mq_close, libc_mq_close);
 DEFINE_PUBLIC_ALIAS(mq_getattr, libc_mq_getattr);
@@ -277,8 +277,13 @@ DEFINE_PUBLIC_ALIAS(mq_receive, libc_mq_receive);
 DEFINE_PUBLIC_ALIAS(mq_send, libc_mq_send);
 DEFINE_PUBLIC_ALIAS(mq_timedreceive, libc_mq_timedreceive);
 DEFINE_PUBLIC_ALIAS(mq_timedsend, libc_mq_timedsend);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__mq_timedreceive_time64, libc_mq_timedreceive64);
 DEFINE_PUBLIC_ALIAS(mq_timedreceive64, libc_mq_timedreceive64);
+DEFINE_PUBLIC_ALIAS(__mq_timedsend_time64, libc_mq_timedsend64);
 DEFINE_PUBLIC_ALIAS(mq_timedsend64, libc_mq_timedsend64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

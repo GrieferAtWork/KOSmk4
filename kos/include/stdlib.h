@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad916285 */
+/* HASH CRC-32:0x36cfdd4c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6038,7 +6038,7 @@ __CDECLARE_VOID(,__NOTHROW_RPC,_sleep,(__UINT32_TYPE__ __milli),(__milli))
 /* >> _sleep(3)
  * Sleep for `milli' milliseconds (1/1.000 seconds) */
 __CREDIRECT_VOID(,__NOTHROW_RPC,_sleep,(__UINT32_TYPE__ __milli),__crtSleep,(__milli))
-#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/stdlib/_sleep.h>
 /* >> _sleep(3)
  * Sleep for `milli' milliseconds (1/1.000 seconds) */

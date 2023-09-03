@@ -1027,9 +1027,12 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x579a238]]]*/
+/*[[[start:exports,hash:CRC-32=0x71ad0d5a]]]*/
 DEFINE_PUBLIC_ALIAS(lfutex, libc_lfutex);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(lfutex64, libc_lfutex64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(futex_wake, libc_futex_wake);
 DEFINE_PUBLIC_ALIAS(futex_wakeall, libc_futex_wakeall);
 DEFINE_PUBLIC_ALIAS(futex_wakemask, libc_futex_wakemask);
@@ -1053,6 +1056,7 @@ DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits, libc_futex_timedwaitwhile_ex
 DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits, libc_futex_timedwaituntil_exactbits);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit, libc_futex_timedwaitwhile_anybit);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits, libc_futex_timedwaitwhile_allbits);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile64, libc_futex_timedwaitwhile64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaituntil64, libc_futex_timedwaituntil64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above64);
@@ -1063,6 +1067,7 @@ DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_
 DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(futex_getspin, libc_futex_getspin);
 DEFINE_PUBLIC_ALIAS(futex_setspin, libc_futex_setspin);
 /*[[[end:exports]]]*/

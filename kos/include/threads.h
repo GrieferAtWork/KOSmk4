@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ad7e8a */
+/* HASH CRC-32:0xa0d6ec8a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,7 +243,14 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep,(struct t
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),thrd_sleep64,(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#elif defined(__CRT_HAVE___thrd_sleep64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
+ * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
+ * @return: <= -2: Some other error occurred */
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),__thrd_sleep64,(__time_point,__remaining))
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE___thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/threads/thrd_sleep.h>
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
@@ -267,7 +274,14 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep64,(struc
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#elif defined(__CRT_HAVE___thrd_sleep64)
+/* >> thrd_sleep(3), thrd_sleep64(3)
+ * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
+ * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
+ * @return: <= -2: Some other error occurred */
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),__thrd_sleep64,(__time_point,__remaining))
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/threads/thrd_sleep64.h>
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
@@ -394,7 +408,14 @@ __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),mtx_timedlock64,(__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
+#elif defined(__CRT_HAVE___mtx_timedlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),__mtx_timedlock64,(__mutex,__time_point))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE___pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/threads/mtx_timedlock.h>
 /* >> mtx_timedlock(3), mtx_timedlock64(3)
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
@@ -418,7 +439,14 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
+#elif defined(__CRT_HAVE___mtx_timedlock64)
+/* >> mtx_timedlock(3), mtx_timedlock64(3)
+ * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),__mtx_timedlock64,(__mutex,__time_point))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE___pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/threads/mtx_timedlock64.h>
 /* >> mtx_timedlock(3), mtx_timedlock64(3)
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
@@ -559,7 +587,14 @@ __CDECLARE(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_ti
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CREDIRECT(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),cnd_timedwait64,(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#elif defined(__CRT_HAVE___cnd_timedwait64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
+__CREDIRECT(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),__cnd_timedwait64,(__cond,__mutex,__time_point))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE___pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/threads/cnd_timedwait.h>
 /* >> cnd_timedwait(3), cnd_timedwait64(3)
  * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
@@ -583,7 +618,14 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_t
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#elif defined(__CRT_HAVE___cnd_timedwait64)
+/* >> cnd_timedwait(3), cnd_timedwait64(3)
+ * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
+ * @return: thrd_success:  Success
+ * @return: thrd_timedout: Timeout
+ * @return: thrd_error:    Error */
+__CREDIRECT(__ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),__cnd_timedwait64,(__cond,__mutex,__time_point))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE___pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/threads/cnd_timedwait64.h>
 /* >> cnd_timedwait(3), cnd_timedwait64(3)
  * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')

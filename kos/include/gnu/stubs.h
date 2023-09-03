@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a8da099 */
+/* HASH CRC-32:0x78e35735 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,8 +103,11 @@
 #define __stub___adjtimex
 #define __stub___libc_adjtimex
 #define __stub_adjtimex
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 #define __stub___adjtimex64
 #define __stub_adjtimex64
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub___argp_parse
 #define __stub_argp_help
 #define __stub___argp_parse
@@ -131,7 +134,10 @@
 #define __stub_catgets
 #define __stub_catopen
 #define __stub_clock_adjtime
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#define __stub___clock_adjtime64
 #define __stub_clock_adjtime64
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub___clock_getcpuclockid
 #define __stub_clock_getcpuclockid
 #define __stub_closelog
@@ -195,7 +201,10 @@
 #define __stub_gai_error
 #define __stub_gai_strerror
 #define __stub_gai_suspend
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#define __stub___gai_suspend_time64
 #define __stub_gai_suspend64
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub_get_nprocs
 #define __stub_get_nprocs_conf
 #define __stub_getaddrinfo
@@ -364,9 +373,14 @@
 #define __stub_ns_verify_tcp
 #define __stub_ns_verify_tcp_init
 #define __stub_ntp_adjtime
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 #define __stub_ntp_adjtime64
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub_ntp_gettimex
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#define __stub___ntp_gettime64
 #define __stub_ntp_gettimex64
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub_open_wmemstream
 #define __stub_opendev
 #define __stub_openlog

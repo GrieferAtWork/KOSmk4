@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa477522 */
+/* HASH CRC-32:0x44b100b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_timerfd_settime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
+#if defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE___timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
 #include <features.h>
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,6 +36,8 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__l
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64)
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
+#elif defined(__CRT_HAVE___timerfd_settime64)
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),__timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_settime64.h>
@@ -84,7 +86,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timerfd_settime_defined
 #define __localdep_timerfd_settime __LIBC_LOCAL_NAME(timerfd_settime)
 #endif /* !__local___localdep_timerfd_settime_defined */
-#else /* __CRT_HAVE_timerfd_settime64 || __CRT_HAVE_timerfd_settime */
+#else /* __CRT_HAVE_timerfd_settime64 || __CRT_HAVE___timerfd_settime64 || __CRT_HAVE_timerfd_settime */
 #undef __local_timerfd_settime_defined
-#endif /* !__CRT_HAVE_timerfd_settime64 && !__CRT_HAVE_timerfd_settime */
+#endif /* !__CRT_HAVE_timerfd_settime64 && !__CRT_HAVE___timerfd_settime64 && !__CRT_HAVE_timerfd_settime */
 #endif /* !__local_timerfd_settime_defined */

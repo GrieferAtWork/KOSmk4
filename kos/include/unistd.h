@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92808726 */
+/* HASH CRC-32:0xf8716843 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -702,7 +702,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(
  * @return: 0 : Timeout expired
  * @return: * : You were interrupted, and this many seconds were still left on the timeout */
 __CDECLARE(,unsigned int,__NOTHROW_RPC,sleep,(unsigned int __seconds),(__seconds))
-#elif defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#elif defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/unistd/sleep.h>
 /* >> sleep(3)
  * Sleep for up to `seconds' seconds
@@ -2261,7 +2261,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setresgid,(__gid_t __rgid, __gid_t __egid, __g
 /* >> usleep(3)
  * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CDECLARE(,int,__NOTHROW_RPC,usleep,(__useconds_t __useconds),(__useconds))
-#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
+#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE___nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #include <libc/local/unistd/usleep.h>
 /* >> usleep(3)
  * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
@@ -2287,10 +2287,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEP
 __CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t ___value, __useconds_t __interval),(___value,__interval))
 #else /* __CRT_HAVE_ualarm */
 #include <asm/os/itimer.h>
-#if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
+#if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE___setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
 #include <libc/local/unistd/ualarm.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ualarm, __FORCELOCAL __ATTR_ARTIFICIAL __useconds_t __NOTHROW_NCX(__LIBCCALL ualarm)(__useconds_t ___value, __useconds_t __interval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ualarm))(___value, __interval); })
-#endif /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
+#endif /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE___setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
 #endif /* !__CRT_HAVE_ualarm */
 #ifndef __vfork_defined
 #define __vfork_defined

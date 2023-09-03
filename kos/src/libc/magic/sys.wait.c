@@ -155,7 +155,7 @@ $pid_t wait3_32(/*[[out_opt]]*/ __WAIT_STATUS stat_loc,
 @@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, no_crt_self_import, export_as("__wait3")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait3", "__wait3")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait3_64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait3_64", "__wait3_time64")]]
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/os/rusage.h>", "<parts/waitmacros.h>")]]
@@ -183,6 +183,7 @@ $pid_t wait3(/*[[out_opt]]*/ __WAIT_STATUS stat_loc,
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/rusage.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/os/rusage.h>", "<bits/os/rusage-convert.h>", "<parts/waitmacros.h>")]]
 [[preferred_time64_variant_of(wait3), doc_alias("wait3")]]
+[[time64_export_alias("__wait3_time64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__wait3")]]
 [[userimpl, requires_function(wait3_32)]]
 $pid_t wait3_64(/*[[out_opt]]*/ __WAIT_STATUS stat_loc,
@@ -213,7 +214,7 @@ $pid_t wait4_32($pid_t pid, /*[[out_opt]]*/ __WAIT_STATUS stat_loc,
 @@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, decl_prefix(struct rusage;), no_crt_self_import, export_as("__wait4", "__libc_wait4")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait4", "__wait4", "__libc_wait4")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait4_64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wait4_64", "__wait4_time64")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/os/rusage.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/os/rusage-convert.h>")]]
@@ -239,6 +240,7 @@ $pid_t wait4($pid_t pid, /*[[out_opt]]*/ __WAIT_STATUS stat_loc,
 %#ifdef __USE_TIME64
 %struct rusage64;
 [[preferred_time64_variant_of(wait4), doc_alias("wait4")]]
+[[time64_export_alias("__wait4_time64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__wait4", "__libc_wait4")]]
 [[decl_prefix(struct rusage64;)]]
 [[decl_include("<bits/types.h>", "<features.h>")]]

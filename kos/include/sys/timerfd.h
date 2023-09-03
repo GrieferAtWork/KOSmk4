@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9cf9441 */
+/* HASH CRC-32:0xaf65a149 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,11 @@ __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,time
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
-#elif defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
+#elif defined(__CRT_HAVE___timerfd_settime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timerfd_settime(2), timerfd_settime64(2)
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),__timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
+#elif defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE___timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
 #include <libc/local/sys.timerfd/timerfd_settime.h>
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
@@ -129,7 +133,10 @@ __CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd
 #elif defined(__CRT_HAVE_timerfd_gettime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
-#elif defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
+#elif defined(__CRT_HAVE___timerfd_gettime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timerfd_gettime(2), timerfd_gettime64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),__timerfd_gettime64,(__ufd,__otmr))
+#elif defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE___timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 #include <libc/local/sys.timerfd/timerfd_gettime.h>
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
@@ -144,6 +151,10 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,tim
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),(__ufd,__flags,__utmr,__otmr))
+#elif defined(__CRT_HAVE___timerfd_settime64)
+/* >> timerfd_settime(2), timerfd_settime64(2)
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),__timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime)
 #include <libc/local/sys.timerfd/timerfd_settime64.h>
 /* >> timerfd_settime(2), timerfd_settime64(2)
@@ -156,6 +167,9 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime64,(_
 #elif defined(__CRT_HAVE_timerfd_gettime64)
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),(__ufd,__otmr))
+#elif defined(__CRT_HAVE___timerfd_gettime64)
+/* >> timerfd_gettime(2), timerfd_gettime64(2) */
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),__timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
 #include <libc/local/sys.timerfd/timerfd_gettime64.h>
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */

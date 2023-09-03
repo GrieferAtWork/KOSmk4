@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbe87ccd */
+/* HASH CRC-32:0xa0493366 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -370,8 +370,14 @@ DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout, libc_shared_lock_acquire_w
 DEFINE_PUBLIC_ALIAS(shared_lock_waitfor, libc_shared_lock_waitfor);
 DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_with_timeout, libc_shared_lock_waitfor_with_timeout);
 #ifndef __KERNEL__
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout64, libc_shared_lock_acquire_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_with_timeout64, libc_shared_lock_waitfor_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire_nx, libc_shared_lock_acquire_nx);

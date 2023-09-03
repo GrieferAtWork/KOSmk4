@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2fb3e1f */
+/* HASH CRC-32:0x6f467cef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_adjtime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
+#if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE___adjtime64) || defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_adjtime32_defined
@@ -41,6 +41,8 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_adjt
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime64)
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
+#elif defined(__CRT_HAVE___adjtime64)
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),__adjtime64,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE___adjtime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/adjtime64.h>
@@ -85,7 +87,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_adjtime_defined
 #define __localdep_adjtime __LIBC_LOCAL_NAME(adjtime)
 #endif /* !__local___localdep_adjtime_defined */
-#else /* __CRT_HAVE_adjtime64 || __CRT_HAVE_adjtime || __CRT_HAVE___adjtime */
+#else /* __CRT_HAVE_adjtime64 || __CRT_HAVE___adjtime64 || __CRT_HAVE_adjtime || __CRT_HAVE___adjtime */
 #undef __local_adjtime_defined
-#endif /* !__CRT_HAVE_adjtime64 && !__CRT_HAVE_adjtime && !__CRT_HAVE___adjtime */
+#endif /* !__CRT_HAVE_adjtime64 && !__CRT_HAVE___adjtime64 && !__CRT_HAVE_adjtime && !__CRT_HAVE___adjtime */
 #endif /* !__local_adjtime_defined */

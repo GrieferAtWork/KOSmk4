@@ -570,7 +570,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xef9a0177]]]*/
+/*[[[start:exports,hash:CRC-32=0x3bb109e6]]]*/
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -580,13 +580,19 @@ DEFINE_PUBLIC_ALIAS(time, libc_time);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_time64, libc_time64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__time64, libc_time64);
 DEFINE_PUBLIC_ALIAS(time64, libc_time64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(_tzset, libc_tzset);
 DEFINE_PUBLIC_ALIAS(tzset, libc_tzset);
 DEFINE_PUBLIC_ALIAS(__stime, libc_stime);
 DEFINE_PUBLIC_ALIAS(__libc_stime, libc_stime);
 DEFINE_PUBLIC_ALIAS(stime, libc_stime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(stime64, libc_stime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(__nanosleep, libc_nanosleep);
 DEFINE_PUBLIC_ALIAS(__libc_nanosleep, libc_nanosleep);
 DEFINE_PUBLIC_ALIAS(__libc_nanosleep, libc_nanosleep);
@@ -606,15 +612,27 @@ DEFINE_PUBLIC_ALIAS(__clock_nanosleep, libc_clock_nanosleep);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep, libc_clock_nanosleep);
 DEFINE_PUBLIC_ALIAS(__clock_getcpuclockid, libc_clock_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(clock_getcpuclockid, libc_clock_getcpuclockid);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__nanosleep64, libc_nanosleep64);
 DEFINE_PUBLIC_ALIAS(nanosleep64, libc_nanosleep64);
+DEFINE_PUBLIC_ALIAS(__clock_getres64, libc_clock_getres64);
 DEFINE_PUBLIC_ALIAS(clock_getres64, libc_clock_getres64);
+DEFINE_PUBLIC_ALIAS(__clock_gettime64, libc_clock_gettime64);
 DEFINE_PUBLIC_ALIAS(clock_gettime64, libc_clock_gettime64);
+DEFINE_PUBLIC_ALIAS(__clock_settime64, libc_clock_settime64);
 DEFINE_PUBLIC_ALIAS(clock_settime64, libc_clock_settime64);
+DEFINE_PUBLIC_ALIAS(__timer_settime64, libc_timer_settime64);
 DEFINE_PUBLIC_ALIAS(timer_settime64, libc_timer_settime64);
+DEFINE_PUBLIC_ALIAS(__timer_gettime64, libc_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
+DEFINE_PUBLIC_ALIAS(__clock_nanosleep_time64, libc_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__clock_adjtime64, libc_clock_adjtime64);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

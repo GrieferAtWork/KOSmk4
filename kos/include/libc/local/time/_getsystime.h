@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea8268fa */
+/* HASH CRC-32:0x70e7d91a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__getsystime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
+#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE___gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday64_defined
@@ -37,6 +37,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE___gettimeofday64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/timeval.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),__gettimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
@@ -62,6 +67,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime64_r)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
+#elif defined(__CRT_HAVE___localtime64_r)
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),__localtime64_r,(__timer,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime64_r.h>
@@ -87,7 +94,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__getsystime_defined
 #define __localdep__getsystime __LIBC_LOCAL_NAME(_getsystime)
 #endif /* !__local___localdep__getsystime_defined */
-#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
+#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE___gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE___libc_gettimeofday */
 #undef __local__getsystime_defined
-#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE___libc_gettimeofday */
+#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE___gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE___libc_gettimeofday */
 #endif /* !__local__getsystime_defined */

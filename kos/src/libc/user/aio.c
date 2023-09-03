@@ -1465,7 +1465,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init)
 }
 /*[[[end:libc_aio_init]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x91b3c220]]]*/
+/*[[[start:exports,hash:CRC-32=0xeaac856e]]]*/
 DEFINE_PUBLIC_ALIAS(aio_read, libc_aio_read);
 DEFINE_PUBLIC_ALIAS(aio_write, libc_aio_write);
 DEFINE_PUBLIC_ALIAS(aio_fsync, libc_aio_fsync);
@@ -1482,8 +1482,13 @@ DEFINE_PUBLIC_ALIAS(aio_error64, libc_aio_error64);
 DEFINE_PUBLIC_ALIAS(aio_return64, libc_aio_return64);
 DEFINE_PUBLIC_ALIAS(aio_cancel64, libc_aio_cancel64);
 DEFINE_PUBLIC_ALIAS(aio_suspend64, libc_aio_suspend64);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__aio_suspend_time64, libc_aio_suspendt64);
 DEFINE_PUBLIC_ALIAS(aio_suspendt64, libc_aio_suspendt64);
+DEFINE_PUBLIC_ALIAS(__aio_suspend64_time64, libc_aio_suspend64t64);
 DEFINE_PUBLIC_ALIAS(aio_suspend64t64, libc_aio_suspend64t64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(aio_init, libc_aio_init);
 /*[[[end:exports]]]*/
 

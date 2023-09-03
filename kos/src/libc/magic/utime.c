@@ -98,7 +98,7 @@ typedef __time_t time_t;
 int crt_utime32([[in]] char const *filename, [[in_opt]] struct $utimbuf32 const *file_times);
 
 [[decl_include("<bits/os/utimbuf.h>")]]
-[[cp, ignore, nocrt, alias("utime64", "_utime64")]]
+[[cp, ignore, nocrt, alias("utime64", "_utime64", "__utime64")]]
 int crt_utime64([[in]] char const *filename, [[in_opt]] struct $utimbuf64 const *file_times);
 
 [[decl_include("<bits/os/utimbuf.h>", "<bits/types.h>")]]
@@ -113,7 +113,7 @@ int crt_futime64([[fdarg]] $fd_t fd, [[in_opt]] struct $utimbuf64 const *file_ti
 @@>> utime(2), utime64(2)
 [[cp, decl_include("<bits/os/utimbuf.h>"), no_crt_self_import, export_as("__utime", "__libc_utime")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime", "__utime", "__libc_utime", "_utime", "_utime32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime64", "_utime64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utime64", "_utime64", "__utime64")]]
 [[userimpl, requires($has_function(crt_utime32) || $has_function(crt_utime64))]]
 [[crt_dos_variant, dos_only_export_as("_utime", "_utime32")]]
 int utime([[in]] char const *filename, [[in_opt]] struct utimbuf const *file_times) {
@@ -148,6 +148,7 @@ int utime([[in]] char const *filename, [[in_opt]] struct utimbuf const *file_tim
 %#ifdef __USE_TIME64
 [[cp, crt_dos_variant, decl_include("<bits/os/utimbuf.h>")]]
 [[preferred_time64_variant_of(utime)], doc_alias("utime")]
+[[time64_export_alias("__utime64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__utime", "__libc_utime", "_utime", "_utime32")]]
 [[userimpl, requires_function(crt_utime32)]]
 [[dos_only_export_alias("_utime64")]]

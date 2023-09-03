@@ -377,7 +377,7 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc32cd66f]]]*/
+/*[[[start:exports,hash:CRC-32=0x7269960b]]]*/
 DEFINE_PUBLIC_ALIAS(__gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_ALIAS(__libc_gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_ALIAS(gettimeofday, libc_gettimeofday);
@@ -397,15 +397,27 @@ DEFINE_PUBLIC_ALIAS(__adjtime, libc_adjtime);
 DEFINE_PUBLIC_ALIAS(adjtime, libc_adjtime);
 DEFINE_PUBLIC_ALIAS(lutimes, libc_lutimes);
 DEFINE_PUBLIC_ALIAS(futimes, libc_futimes);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__gettimeofday64, libc_gettimeofday64);
 DEFINE_PUBLIC_ALIAS(gettimeofday64, libc_gettimeofday64);
+DEFINE_PUBLIC_ALIAS(__getitimer64, libc_getitimer64);
 DEFINE_PUBLIC_ALIAS(getitimer64, libc_getitimer64);
+DEFINE_PUBLIC_ALIAS(__setitimer64, libc_setitimer64);
 DEFINE_PUBLIC_ALIAS(setitimer64, libc_setitimer64);
+DEFINE_PUBLIC_ALIAS(__utimes64, libc_utimes64);
 DEFINE_PUBLIC_ALIAS(utimes64, libc_utimes64);
+DEFINE_PUBLIC_ALIAS(__settimeofday64, libc_settimeofday64);
 DEFINE_PUBLIC_ALIAS(settimeofday64, libc_settimeofday64);
+DEFINE_PUBLIC_ALIAS(__adjtime64, libc_adjtime64);
 DEFINE_PUBLIC_ALIAS(adjtime64, libc_adjtime64);
+DEFINE_PUBLIC_ALIAS(__lutimes64, libc_lutimes64);
 DEFINE_PUBLIC_ALIAS(lutimes64, libc_lutimes64);
+DEFINE_PUBLIC_ALIAS(__lutimes64, libc_futimes64);
 DEFINE_PUBLIC_ALIAS(futimes64, libc_futimes64);
+DEFINE_PUBLIC_ALIAS(__futimesat64, libc_futimesat64);
 DEFINE_PUBLIC_ALIAS(futimesat64, libc_futimesat64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

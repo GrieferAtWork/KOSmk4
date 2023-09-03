@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bea8a02 */
+/* HASH CRC-32:0x8d8cfee8 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,7 +135,10 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(LFutexExprI, libc_LFutexExprI);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(LFutexExprI64, libc_LFutexExprI64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_FUTEXEXPR_C */

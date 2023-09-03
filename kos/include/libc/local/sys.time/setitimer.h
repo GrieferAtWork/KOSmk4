@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf22ce5b7 */
+/* HASH CRC-32:0x62c6a559 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_setitimer_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
+#if defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE___setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setitimer32_defined
@@ -47,6 +47,8 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_seti
 __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__libc_setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer64)
 __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))
+#elif defined(__CRT_HAVE___setitimer64)
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__setitimer64,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/setitimer64.h>
@@ -105,7 +107,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setitimer_defined
 #define __localdep_setitimer __LIBC_LOCAL_NAME(setitimer)
 #endif /* !__local___localdep_setitimer_defined */
-#else /* __CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer */
+#else /* __CRT_HAVE_setitimer64 || __CRT_HAVE___setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer */
 #undef __local_setitimer_defined
-#endif /* !__CRT_HAVE_setitimer64 && !__CRT_HAVE_setitimer && !__CRT_HAVE___setitimer && !__CRT_HAVE___libc_setitimer */
+#endif /* !__CRT_HAVE_setitimer64 && !__CRT_HAVE___setitimer64 && !__CRT_HAVE_setitimer && !__CRT_HAVE___setitimer && !__CRT_HAVE___libc_setitimer */
 #endif /* !__local_setitimer_defined */

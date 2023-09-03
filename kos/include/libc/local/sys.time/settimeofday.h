@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9668212c */
+/* HASH CRC-32:0xab26d7fb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_settimeofday_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
+#if defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE___settimeofday64) || defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 #include <bits/os/timeval.h>
 struct timezone;
 __NAMESPACE_LOCAL_BEGIN
@@ -48,6 +48,8 @@ __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_setti
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday64)
 __CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE___settimeofday64)
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__settimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/settimeofday64.h>
@@ -80,7 +82,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_settimeofday_defined
 #define __localdep_settimeofday __LIBC_LOCAL_NAME(settimeofday)
 #endif /* !__local___localdep_settimeofday_defined */
-#else /* __CRT_HAVE_settimeofday64 || __CRT_HAVE_settimeofday || __CRT_HAVE___settimeofday || __CRT_HAVE___libc_settimeofday */
+#else /* __CRT_HAVE_settimeofday64 || __CRT_HAVE___settimeofday64 || __CRT_HAVE_settimeofday || __CRT_HAVE___settimeofday || __CRT_HAVE___libc_settimeofday */
 #undef __local_settimeofday_defined
-#endif /* !__CRT_HAVE_settimeofday64 && !__CRT_HAVE_settimeofday && !__CRT_HAVE___settimeofday && !__CRT_HAVE___libc_settimeofday */
+#endif /* !__CRT_HAVE_settimeofday64 && !__CRT_HAVE___settimeofday64 && !__CRT_HAVE_settimeofday && !__CRT_HAVE___settimeofday && !__CRT_HAVE___libc_settimeofday */
 #endif /* !__local_settimeofday_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42350cc1 */
+/* HASH CRC-32:0x531db388 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_gai_suspend_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
+#if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE___gai_suspend_time64) || defined(__CRT_HAVE_gai_suspend)
 #include <bits/crt/gaicb.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,6 +36,8 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend32,(struct gaicb const *con
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend64)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),gai_suspend64,(__list,__ent,__timeout))
+#elif defined(__CRT_HAVE___gai_suspend_time64)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),__gai_suspend_time64,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend)
 __NAMESPACE_LOCAL_END
 #include <libc/local/netdb/gai_suspend64.h>
@@ -68,7 +70,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_gai_suspend_defined
 #define __localdep_gai_suspend __LIBC_LOCAL_NAME(gai_suspend)
 #endif /* !__local___localdep_gai_suspend_defined */
-#else /* __CRT_HAVE_gai_suspend64 || __CRT_HAVE_gai_suspend */
+#else /* __CRT_HAVE_gai_suspend64 || __CRT_HAVE___gai_suspend_time64 || __CRT_HAVE_gai_suspend */
 #undef __local_gai_suspend_defined
-#endif /* !__CRT_HAVE_gai_suspend64 && !__CRT_HAVE_gai_suspend */
+#endif /* !__CRT_HAVE_gai_suspend64 && !__CRT_HAVE___gai_suspend_time64 && !__CRT_HAVE_gai_suspend */
 #endif /* !__local_gai_suspend_defined */

@@ -159,7 +159,7 @@ int sem_timedwait32([[inout]] sem_t *__restrict self,
 @@@return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available.
 [[cp, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait64", "__sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
 int sem_timedwait([[inout]] sem_t *__restrict self,
                   [[in]] struct timespec const *__restrict abstime) {
@@ -180,6 +180,7 @@ int sem_timedwait([[inout]] sem_t *__restrict self,
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sem_timedwait), doc_alias("sem_timedwait")]]
+[[time64_export_alias("__sem_timedwait64")]]
 [[userimpl, requires_function(sem_timedwait32)]]
 int sem_timedwait64([[inout]] sem_t *__restrict self,
                     [[in]] struct timespec64 const *__restrict abstime) {

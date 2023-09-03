@@ -4739,7 +4739,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdca325be]]]*/
+/*[[[start:exports,hash:CRC-32=0xc4314657]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -4751,7 +4751,11 @@ DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
 DEFINE_PUBLIC_ALIAS(pthread_getresult_np, libc_pthread_getresult_np);
 DEFINE_PUBLIC_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__pthread_timedjoin_np64, libc_pthread_timedjoin64_np);
 DEFINE_PUBLIC_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(cthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_ALIAS(pthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_ALIAS(thrd_current, libc_pthread_self);
@@ -4815,9 +4819,14 @@ DEFINE_PUBLIC_ALIAS(pthread_mutex_destroy, libc_pthread_mutex_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_lock, libc_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock, libc_pthread_mutex_timedlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_mutex_reltimedlock_np, libc_pthread_mutex_reltimedlock_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(pthread_mutex_reltimedlock64_np, libc_pthread_mutex_reltimedlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_mutex_unlock, libc_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling);
@@ -4847,12 +4856,18 @@ DEFINE_PUBLIC_ALIAS(pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
+DEFINE_PUBLIC_ALIAS(__pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedrdlock_np, libc_pthread_rwlock_reltimedrdlock_np);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedwrlock_np, libc_pthread_rwlock_reltimedwrlock_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock64_np);
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_rwlock_unlock, libc_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_init, libc_pthread_rwlockattr_init);
 DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy);
@@ -4867,9 +4882,14 @@ DEFINE_PUBLIC_ALIAS(pthread_cond_signal, libc_pthread_cond_signal);
 DEFINE_PUBLIC_ALIAS(pthread_cond_broadcast, libc_pthread_cond_broadcast);
 DEFINE_PUBLIC_ALIAS(pthread_cond_wait, libc_pthread_cond_wait);
 DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait, libc_pthread_cond_timedwait);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
 DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_cond_reltimedwait_np, libc_pthread_cond_reltimedwait_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(pthread_cond_reltimedwait64_np, libc_pthread_cond_reltimedwait64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(pthread_condattr_init, libc_pthread_condattr_init);
 DEFINE_PUBLIC_ALIAS(pthread_condattr_destroy, libc_pthread_condattr_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getpshared);

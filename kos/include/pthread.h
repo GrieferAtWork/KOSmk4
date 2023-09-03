@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe660864 */
+/* HASH CRC-32:0x3b48b88e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -723,7 +723,16 @@ __CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_ti
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__self,__thread_return,__abstime))
-#elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE_pthread_timedjoin_np)
+#elif defined(__CRT_HAVE___pthread_timedjoin_np64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),__pthread_timedjoin_np64,(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE___pthread_timedjoin_np64) || defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread  wait for termination  of the thread  `self',
@@ -753,6 +762,15 @@ __CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_t
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE___pthread_timedjoin_np64)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),__pthread_timedjoin_np64,(__self,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin64_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
@@ -1520,7 +1538,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__self,__abstime))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
+#elif defined(__CRT_HAVE___pthread_mutex_timedlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
+ * Wait until lock becomes available, or specified time passes
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),__pthread_mutex_timedlock64,(__self,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE___pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/pthread/pthread_mutex_timedlock.h>
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
  * Wait until lock becomes available, or specified time passes
@@ -1544,6 +1569,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
+#elif defined(__CRT_HAVE___pthread_mutex_timedlock64)
+/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
+ * Wait until lock becomes available, or specified time passes
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __abstime),__pthread_mutex_timedlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/pthread/pthread_mutex_timedlock64.h>
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1844,7 +1876,18 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__self,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#elif defined(__CRT_HAVE___pthread_rwlock_timedrdlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `self' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),__pthread_rwlock_timedrdlock64,(__self,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE___pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
  * Try to acquire read lock for `self' or return after the specified time
@@ -1877,7 +1920,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__self,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
+#elif defined(__CRT_HAVE___pthread_rwlock_timedwrlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
+ * Try to acquire write lock for `self' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),__pthread_rwlock_timedwrlock64,(__self,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE___pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
  * Try to acquire write lock for `self' or return after the specified time
@@ -1912,6 +1965,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_timedrdlock64)
+/* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
+ * Try to acquire read lock for `self' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),__pthread_rwlock_timedrdlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
@@ -1945,6 +2009,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
+#elif defined(__CRT_HAVE___pthread_rwlock_timedwrlock64)
+/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
+ * Try to acquire write lock for `self' or return after the specified time
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),__pthread_rwlock_timedwrlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
@@ -2190,7 +2264,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__self,__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#elif defined(__CRT_HAVE___pthread_cond_timedwait64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
+ * Wait for condition variable `self' to be signaled or broadcast
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),__pthread_cond_timedwait64,(__self,__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE___pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `self' to be signaled or broadcast
@@ -2223,6 +2307,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__self,__mutex,__abstime))
+#elif defined(__CRT_HAVE___pthread_cond_timedwait64)
+/* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
+ * Wait for condition variable `self' to be signaled or broadcast
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
+ * beginning of the epoch (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),__pthread_cond_timedwait64,(__self,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait64.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)

@@ -474,13 +474,14 @@ int setrlimit(__rlimit_resource_t resource,
 
 [[decl_include("<bits/os/rusage.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage", "__getrusage", "__libc_getrusage")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("getrusage64", "__getrusage64")]]
 [[export_as("__getrusage", "__libc_getrusage")]]
 int getrusage(__rusage_who_t who,
               [[out]] struct rusage *usage);
 
 %#ifdef __USE_TIME64
 [[preferred_time64_variant_of(getrusage), doc_alias("getrusage")]]
+[[time64_export_alias("__getrusage64")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__getrusage", "__libc_getrusage")]]
 [[decl_include("<bits/os/rusage.h>")]]
 int getrusage64(__rusage_who_t who,

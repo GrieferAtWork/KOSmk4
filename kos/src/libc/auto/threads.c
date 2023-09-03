@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x395639e2 */
+/* HASH CRC-32:0x731d251f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -421,7 +421,11 @@ DEFINE_PUBLIC_ALIAS(thrd_join, libc_thrd_join);
 DEFINE_PUBLIC_ALIAS(mtx_init, libc_mtx_init);
 DEFINE_PUBLIC_ALIAS(mtx_lock, libc_mtx_lock);
 DEFINE_PUBLIC_ALIAS(mtx_timedlock, libc_mtx_timedlock);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__mtx_timedlock64, libc_mtx_timedlock64);
 DEFINE_PUBLIC_ALIAS(mtx_timedlock64, libc_mtx_timedlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(mtx_trylock, libc_mtx_trylock);
 DEFINE_PUBLIC_ALIAS(mtx_unlock, libc_mtx_unlock);
 DEFINE_PUBLIC_ALIAS(cnd_init, libc_cnd_init);
@@ -429,7 +433,11 @@ DEFINE_PUBLIC_ALIAS(cnd_signal, libc_cnd_signal);
 DEFINE_PUBLIC_ALIAS(cnd_broadcast, libc_cnd_broadcast);
 DEFINE_PUBLIC_ALIAS(cnd_wait, libc_cnd_wait);
 DEFINE_PUBLIC_ALIAS(cnd_timedwait, libc_cnd_timedwait);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__cnd_timedwait64, libc_cnd_timedwait64);
 DEFINE_PUBLIC_ALIAS(cnd_timedwait64, libc_cnd_timedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(tss_create, libc_tss_create);
 DEFINE_PUBLIC_ALIAS(tss_set, libc_tss_set);
 DEFINE_PUBLIC_ALIAS(thr_min_stack, libc_thr_min_stack);

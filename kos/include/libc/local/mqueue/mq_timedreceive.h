@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7396e02 */
+/* HASH CRC-32:0xbde1a188 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_mq_timedreceive_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_mq_timedreceive64) || defined(__CRT_HAVE_mq_timedreceive)
+#if defined(__CRT_HAVE_mq_timedreceive64) || defined(__CRT_HAVE___mq_timedreceive_time64) || defined(__CRT_HAVE_mq_timedreceive)
 #include <bits/os/timespec.h>
 #include <bits/os/mqueue.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,6 +36,8 @@ __CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__locald
 __CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive64)
 __CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#elif defined(__CRT_HAVE___mq_timedreceive_time64)
+__CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),__mq_timedreceive_time64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mqueue/mq_timedreceive64.h>
@@ -64,7 +66,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mq_timedreceive_defined
 #define __localdep_mq_timedreceive __LIBC_LOCAL_NAME(mq_timedreceive)
 #endif /* !__local___localdep_mq_timedreceive_defined */
-#else /* __CRT_HAVE_mq_timedreceive64 || __CRT_HAVE_mq_timedreceive */
+#else /* __CRT_HAVE_mq_timedreceive64 || __CRT_HAVE___mq_timedreceive_time64 || __CRT_HAVE_mq_timedreceive */
 #undef __local_mq_timedreceive_defined
-#endif /* !__CRT_HAVE_mq_timedreceive64 && !__CRT_HAVE_mq_timedreceive */
+#endif /* !__CRT_HAVE_mq_timedreceive64 && !__CRT_HAVE___mq_timedreceive_time64 && !__CRT_HAVE_mq_timedreceive */
 #endif /* !__local_mq_timedreceive_defined */

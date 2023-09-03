@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f117eb */
+/* HASH CRC-32:0x7836f26b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_time_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_time32_defined
 #define __local___localdep_crt_time32_defined
@@ -50,6 +50,8 @@ __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time
 __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),time64,(__timer))
 #elif defined(__CRT_HAVE__time64)
 __CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),_time64,(__timer))
+#elif defined(__CRT_HAVE___time64)
+__CREDIRECT(__ATTR_OUT_OPT(1),__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),__time64,(__timer))
 #elif defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/time64.h>
@@ -78,7 +80,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_time_defined
 #define __localdep_time __LIBC_LOCAL_NAME(time)
 #endif /* !__local___localdep_time_defined */
-#else /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
+#else /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE___time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
 #undef __local_time_defined
-#endif /* !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
+#endif /* !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE___time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
 #endif /* !__local_time_defined */

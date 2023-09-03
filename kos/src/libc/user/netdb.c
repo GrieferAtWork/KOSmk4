@@ -975,7 +975,7 @@ NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const list[],
 
 
 
-/*[[[start:exports,hash:CRC-32=0x17e37c1b]]]*/
+/*[[[start:exports,hash:CRC-32=0xd54b97ce]]]*/
 DEFINE_PUBLIC_ALIAS(sethostent, libc_sethostent);
 DEFINE_PUBLIC_ALIAS(endhostent, libc_endhostent);
 DEFINE_PUBLIC_ALIAS(gethostent, libc_gethostent);
@@ -1036,7 +1036,11 @@ DEFINE_PUBLIC_ALIAS(getaddrinfo_a, libc_getaddrinfo_a);
 DEFINE_PUBLIC_ALIAS(gai_error, libc_gai_error);
 DEFINE_PUBLIC_ALIAS(gai_cancel, libc_gai_cancel);
 DEFINE_PUBLIC_ALIAS(gai_suspend, libc_gai_suspend);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__gai_suspend_time64, libc_gai_suspend64);
 DEFINE_PUBLIC_ALIAS(gai_suspend64, libc_gai_suspend64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

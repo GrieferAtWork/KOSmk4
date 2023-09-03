@@ -1450,7 +1450,7 @@ __STDC_INT_AS_SSIZE_T recvmmsg32([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct
 @@@return: -1: Error (s.a. `recvmsg(2)')
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg64", "__recvmmsg64")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
 __STDC_INT_AS_SSIZE_T recvmmsg([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
@@ -1474,6 +1474,7 @@ __STDC_INT_AS_SSIZE_T recvmmsg([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct m
 
 %#ifdef __USE_TIME64
 [[cp, preferred_time64_variant_of(recvmmsg), doc_alias("recvmmsg")]]
+[[time64_export_alias("__recvmmsg64")]]
 [[userimpl, requires_function(recvmmsg32)]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
 __STDC_INT_AS_SSIZE_T recvmmsg64([[fdread]] $fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,

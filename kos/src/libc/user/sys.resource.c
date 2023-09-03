@@ -204,7 +204,7 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xda0b99f9]]]*/
+/*[[[start:exports,hash:CRC-32=0xc00fb06e]]]*/
 DEFINE_PUBLIC_ALIAS(prlimit, libc_prlimit);
 DEFINE_PUBLIC_ALIAS(prlimit64, libc_prlimit64);
 DEFINE_PUBLIC_ALIAS(__getrlimit, libc_getrlimit);
@@ -216,7 +216,11 @@ DEFINE_PUBLIC_ALIAS(setrlimit, libc_setrlimit);
 DEFINE_PUBLIC_ALIAS(__getrusage, libc_getrusage);
 DEFINE_PUBLIC_ALIAS(__libc_getrusage, libc_getrusage);
 DEFINE_PUBLIC_ALIAS(getrusage, libc_getrusage);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__getrusage64, libc_getrusage64);
 DEFINE_PUBLIC_ALIAS(getrusage64, libc_getrusage64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(getpriority, libc_getpriority);
 DEFINE_PUBLIC_ALIAS(__setpriority, libc_setpriority);
 DEFINE_PUBLIC_ALIAS(__libc_setpriority, libc_setpriority);

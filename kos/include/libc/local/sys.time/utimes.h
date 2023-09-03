@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47dabe1d */
+/* HASH CRC-32:0xf882a11f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_utimes_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
+#if defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE___utimes64) || defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_utimes32_defined
@@ -43,6 +43,8 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_utimes64,
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),__utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes64)
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes64,(__file,__tvp))
+#elif defined(__CRT_HAVE___utimes64)
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),__utimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE___utimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/utimes64.h>
@@ -79,7 +81,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_utimes_defined
 #define __localdep_utimes __LIBC_LOCAL_NAME(utimes)
 #endif /* !__local___localdep_utimes_defined */
-#else /* __CRT_HAVE_utimes64 || __CRT_HAVE_utimes || __CRT_HAVE___utimes */
+#else /* __CRT_HAVE_utimes64 || __CRT_HAVE___utimes64 || __CRT_HAVE_utimes || __CRT_HAVE___utimes */
 #undef __local_utimes_defined
-#endif /* !__CRT_HAVE_utimes64 && !__CRT_HAVE_utimes && !__CRT_HAVE___utimes */
+#endif /* !__CRT_HAVE_utimes64 && !__CRT_HAVE___utimes64 && !__CRT_HAVE_utimes && !__CRT_HAVE___utimes */
 #endif /* !__local_utimes_defined */

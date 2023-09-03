@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbacc7717 */
+/* HASH CRC-32:0x858a4235 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wait3_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
+#if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE___wait3_time64) || defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 #include <features.h>
 #include <bits/os/rusage.h>
 #include <parts/waitmacros.h>
@@ -45,6 +45,8 @@ __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_
 __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),__wait3,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3_64)
 __CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3_64,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE___wait3_time64)
+__CREDIRECT(__ATTR_OUT_OPT(3),__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),__wait3_time64,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE___wait3)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.wait/wait3_64.h>
@@ -78,7 +80,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wait3_defined
 #define __localdep_wait3 __LIBC_LOCAL_NAME(wait3)
 #endif /* !__local___localdep_wait3_defined */
-#else /* __CRT_HAVE_wait3_64 || __CRT_HAVE_wait3 || __CRT_HAVE___wait3 */
+#else /* __CRT_HAVE_wait3_64 || __CRT_HAVE___wait3_time64 || __CRT_HAVE_wait3 || __CRT_HAVE___wait3 */
 #undef __local_wait3_defined
-#endif /* !__CRT_HAVE_wait3_64 && !__CRT_HAVE_wait3 && !__CRT_HAVE___wait3 */
+#endif /* !__CRT_HAVE_wait3_64 && !__CRT_HAVE___wait3_time64 && !__CRT_HAVE_wait3 && !__CRT_HAVE___wait3 */
 #endif /* !__local_wait3_defined */

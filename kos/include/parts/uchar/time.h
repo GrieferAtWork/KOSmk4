@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d89d9a3 */
+/* HASH CRC-32:0x6b11b9d3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,10 +274,10 @@ __CREDIRECT(__ATTR_OUT(1),char16_t *,__NOTHROW_NCX,_c16strtime,(char16_t __buf[9
 __CREDIRECT_DOS(__ATTR_OUT(1),char16_t *,__NOTHROW_NCX,_c16strtime,(char16_t __buf[9]),_wstrtime,(__buf))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
+#if (defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wstrtime.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBDCALL _c16strtime)(char16_t __buf[9]) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime))((__WCHAR_TYPE__ *)__buf); }
-#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c16strtime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c16strtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBDCALL _c16strtime)(char16_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16strtime))(__buf); })
 #endif /* ... */
@@ -288,10 +288,10 @@ __CREDIRECT(__ATTR_OUT(1),char32_t *,__NOTHROW_NCX,_c32strtime,(char32_t __buf[9
 __CREDIRECT_KOS(__ATTR_OUT(1),char32_t *,__NOTHROW_NCX,_c32strtime,(char32_t __buf[9]),_wstrtime,(__buf))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
+#if (defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wstrtime.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBKCALL _c32strtime)(char32_t __buf[9]) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime))((__WCHAR_TYPE__ *)__buf); }
-#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c32strtime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c32strtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBKCALL _c32strtime)(char32_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32strtime))(__buf); })
 #endif /* ... */
@@ -302,10 +302,10 @@ __CREDIRECT(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c16strtime_s,(char16_t *__b
 __CREDIRECT_DOS(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c16strtime_s,(char16_t *__buf, size_t __buflen),_wstrtime_s,(__buf,__buflen))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
+#if (defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wstrtime_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBDCALL _c16strtime_s)(char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime_s))((__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif (defined(__CRT_HAVE__wstrtime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif (defined(__CRT_HAVE__wstrtime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c16strtime_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c16strtime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBDCALL _c16strtime_s)(char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16strtime_s))(__buf, __buflen); })
 #endif /* ... */
@@ -316,10 +316,10 @@ __CREDIRECT(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c32strtime_s,(char32_t *__b
 __CREDIRECT_KOS(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c32strtime_s,(char32_t *__buf, size_t __buflen),_wstrtime_s,(__buf,__buflen))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
+#if (defined(__CRT_HAVE__wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wstrtime_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBKCALL _c32strtime_s)(char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrtime_s))((__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif (defined(__CRT_HAVE__wstrtime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif (defined(__CRT_HAVE__wstrtime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wstrtime) || defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c32strtime_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c32strtime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBKCALL _c32strtime_s)(char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32strtime_s))(__buf, __buflen); })
 #endif /* ... */
@@ -330,10 +330,10 @@ __CREDIRECT(__ATTR_OUT(1),char16_t *,__NOTHROW_NCX,_c16strdate,(char16_t __buf[9
 __CREDIRECT_DOS(__ATTR_OUT(1),char16_t *,__NOTHROW_NCX,_c16strdate,(char16_t __buf[9]),_wstrdate,(__buf))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
+#if (defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wstrdate.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBDCALL _c16strdate)(char16_t __buf[9]) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate))((__WCHAR_TYPE__ *)__buf); }
-#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c16strdate.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c16strdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBDCALL _c16strdate)(char16_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16strdate))(__buf); })
 #endif /* ... */
@@ -344,10 +344,10 @@ __CREDIRECT(__ATTR_OUT(1),char32_t *,__NOTHROW_NCX,_c32strdate,(char32_t __buf[9
 __CREDIRECT_KOS(__ATTR_OUT(1),char32_t *,__NOTHROW_NCX,_c32strdate,(char32_t __buf[9]),_wstrdate,(__buf))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
+#if (defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wstrdate.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBKCALL _c32strdate)(char32_t __buf[9]) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate))((__WCHAR_TYPE__ *)__buf); }
-#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c32strdate.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c32strdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBKCALL _c32strdate)(char32_t __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32strdate))(__buf); })
 #endif /* ... */
@@ -358,10 +358,10 @@ __CREDIRECT(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c16strdate_s,(char16_t *__b
 __CREDIRECT_DOS(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c16strdate_s,(char16_t *__buf, size_t __buflen),_wstrdate_s,(__buf,__buflen))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
+#if (defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wstrdate_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBDCALL _c16strdate_s)(char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate_s))((__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif (defined(__CRT_HAVE__wstrdate) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif (defined(__CRT_HAVE__wstrdate) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c16strdate_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c16strdate_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBDCALL _c16strdate_s)(char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16strdate_s))(__buf, __buflen); })
 #endif /* ... */
@@ -372,10 +372,10 @@ __CREDIRECT(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c32strdate_s,(char32_t *__b
 __CREDIRECT_KOS(__ATTR_OUTS(1, 2),errno_t,__NOTHROW_NCX,_c32strdate_s,(char32_t *__buf, size_t __buflen),_wstrdate_s,(__buf,__buflen))
 #else /* ... */
 #include <bits/types.h>
-#if (defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
+#if (defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wstrdate_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBKCALL _c32strdate_s)(char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wstrdate_s))((__WCHAR_TYPE__ *)__buf, __buflen); }
-#elif (defined(__CRT_HAVE__wstrdate) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif (defined(__CRT_HAVE__wstrdate) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/parts.uchar.time/_c32strdate_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c32strdate_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) errno_t __NOTHROW_NCX(__LIBKCALL _c32strdate_s)(char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32strdate_s))(__buf, __buflen); })
 #endif /* ... */

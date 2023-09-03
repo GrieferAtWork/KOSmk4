@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x558cbafb */
+/* HASH CRC-32:0x50e0ba28 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_clock_settime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_clock_settime64) || defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
+#if defined(__CRT_HAVE_clock_settime64) || defined(__CRT_HAVE___clock_settime64) || defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_settime32_defined
@@ -43,6 +43,8 @@ __CREDIRECT(__ATTR_IN(2),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid
 __CREDIRECT(__ATTR_IN(2),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),__clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime64)
 __CREDIRECT(__ATTR_IN(2),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),clock_settime64,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_settime64)
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),__clock_settime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_settime64.h>
@@ -71,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_clock_settime_defined
 #define __localdep_clock_settime __LIBC_LOCAL_NAME(clock_settime)
 #endif /* !__local___localdep_clock_settime_defined */
-#else /* __CRT_HAVE_clock_settime64 || __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime */
+#else /* __CRT_HAVE_clock_settime64 || __CRT_HAVE___clock_settime64 || __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime */
 #undef __local_clock_settime_defined
-#endif /* !__CRT_HAVE_clock_settime64 && !__CRT_HAVE_clock_settime && !__CRT_HAVE___clock_settime */
+#endif /* !__CRT_HAVE_clock_settime64 && !__CRT_HAVE___clock_settime64 && !__CRT_HAVE_clock_settime && !__CRT_HAVE___clock_settime */
 #endif /* !__local_clock_settime_defined */

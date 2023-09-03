@@ -92,9 +92,13 @@ NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point,
 /*[[[end:libc_thrd_sleep64]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x6da5b87c]]]*/
+/*[[[start:exports,hash:CRC-32=0xe0da9a4f]]]*/
 DEFINE_PUBLIC_ALIAS(thrd_sleep, libc_thrd_sleep);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__thrd_sleep64, libc_thrd_sleep64);
 DEFINE_PUBLIC_ALIAS(thrd_sleep64, libc_thrd_sleep64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

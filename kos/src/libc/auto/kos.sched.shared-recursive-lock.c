@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a6c06c */
+/* HASH CRC-32:0xdd23dd7e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,8 +189,14 @@ DEFINE_PUBLIC_ALIAS(shared_recursive_lock_acquire, libc_shared_recursive_lock_ac
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_acquire_with_timeout, libc_shared_recursive_lock_acquire_with_timeout);
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_waitfor, libc_shared_recursive_lock_waitfor);
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_waitfor_with_timeout, libc_shared_recursive_lock_waitfor_with_timeout);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_acquire_with_timeout64, libc_shared_recursive_lock_acquire_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(shared_recursive_lock_waitfor_with_timeout64, libc_shared_recursive_lock_waitfor_with_timeout64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SCHED_SHARED_RECURSIVE_LOCK_C */

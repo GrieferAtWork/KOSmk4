@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b0bf205 */
+/* HASH CRC-32:0x3a8e3f03 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time_t,__NOTHROW_NCX,__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time_t,__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm64,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time_t,__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime64,(__tp))
+#elif defined(__CRT_HAVE___timegm64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__time_t,__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),__timegm64,(__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timegm.h>

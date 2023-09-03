@@ -624,7 +624,7 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3c5b5886]]]*/
+/*[[[start:exports,hash:CRC-32=0x6a872600]]]*/
 DEFINE_PUBLIC_ALIAS(__socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socketpair, libc_socketpair);
@@ -658,7 +658,11 @@ DEFINE_PUBLIC_ALIAS(accept4, libc_accept4);
 DEFINE_PUBLIC_ALIAS(__sendmmsg, libc_sendmmsg);
 DEFINE_PUBLIC_ALIAS(sendmmsg, libc_sendmmsg);
 DEFINE_PUBLIC_ALIAS(recvmmsg, libc_recvmmsg);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__recvmmsg64, libc_recvmmsg64);
 DEFINE_PUBLIC_ALIAS(recvmmsg64, libc_recvmmsg64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(sockatmark, libc_sockatmark);
 DEFINE_PUBLIC_ALIAS(isfdtype, libc_isfdtype);
 /*[[[end:exports]]]*/

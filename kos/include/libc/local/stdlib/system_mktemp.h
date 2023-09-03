@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7a6423b */
+/* HASH CRC-32:0x3a4bf163 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday,(struct timeval *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
+#elif defined(__CRT_HAVE___gettimeofday64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/os/timeval.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday,(struct timeval *__restrict __tv, void * __tz),__gettimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE___gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/gettimeofday.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -126,6 +131,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
+#elif defined(__CRT_HAVE___gettimeofday64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/timeval.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),__gettimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
@@ -338,7 +348,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, 
 	__attempt = 0;
 __again:
 	{
-#if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE___gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 		struct __timeval64 __tv;
 		if ((__NAMESPACE_LOCAL_SYM __localdep_gettimeofday64)(&__tv, __NULLPTR) == 0) {
 			__seed = (__UINT32_TYPE__)(__tv.tv_sec) ^
@@ -347,7 +357,7 @@ __again:
 			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
 		} else
-#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
+#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE___gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE___libc_gettimeofday)
 		struct timeval __tv;
 		if ((__NAMESPACE_LOCAL_SYM __localdep_gettimeofday)(&__tv, __NULLPTR) == 0) {
 			__seed = (__UINT32_TYPE__)(__tv.tv_sec) ^

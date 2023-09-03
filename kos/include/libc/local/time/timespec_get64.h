@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6da1ab0 */
+/* HASH CRC-32:0x1c332cdd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <asm/os/clock.h>
 #include <asm/crt/time.h>
 #include <bits/types.h>
-#if defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#if defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE___clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime64_defined
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clocki
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),__clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime64)
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),clock_gettime64,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_gettime64)
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),__clock_gettime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_gettime64.h>
@@ -58,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timespec_get64_defined
 #define __localdep_timespec_get64 __LIBC_LOCAL_NAME(timespec_get64)
 #endif /* !__local___localdep_timespec_get64_defined */
-#else /* __CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime) */
+#else /* __CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE___clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime) */
 #undef __local_timespec_get64_defined
-#endif /* !__CLOCK_REALTIME || !__TIME_UTC || (!__CRT_HAVE_clock_gettime64 && !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime) */
+#endif /* !__CLOCK_REALTIME || !__TIME_UTC || (!__CRT_HAVE_clock_gettime64 && !__CRT_HAVE___clock_gettime64 && !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime) */
 #endif /* !__local_timespec_get64_defined */

@@ -1471,7 +1471,7 @@ int utimensat([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-[[export_alias("__utimensat64")]]
+[[time64_export_alias("__utimensat64")]]
 [[crt_dos_variant, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
 [[userimpl, requires_function(utimensat32), impl_include("<asm/os/fcntl.h>")]]
 int utimensat64([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
@@ -1512,8 +1512,8 @@ int futimens32([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or
 %#ifdef __USE_XOPEN2K8
 @@>> futimens(2), futimens64(2)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64", "__futimens64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64", "__futimens64")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
 int futimens([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]) {
 @@pp_if $has_function(futimens64)@@
@@ -1539,7 +1539,7 @@ int futimens([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3
 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-[[export_alias("__futimens64")]]
+[[time64_export_alias("__futimens64")]]
 [[preferred_time64_variant_of(futimens), doc_alias("futimens")]]
 [[userimpl, requires_function(futimens32)]]
 int futimens64([[fdarg]] $fd_t fd, [[in_opt]] struct timespec64 const times[2 /*or:3*/]) {

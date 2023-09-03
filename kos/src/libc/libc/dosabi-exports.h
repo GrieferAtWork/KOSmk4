@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d5f1b47 */
+/* HASH CRC-32:0x70fcad9e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,8 +39,13 @@ DEFINE_PUBLIC_ALIAS(DOS$aio_error64, libd_aio_error64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_return64, libd_aio_return64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_cancel64, libd_aio_cancel64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64, libd_aio_suspend64);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__aio_suspend_time64, libd_aio_suspendt64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspendt64, libd_aio_suspendt64);
+DEFINE_PUBLIC_ALIAS(DOS$__aio_suspend64_time64, libd_aio_suspend64t64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64t64, libd_aio_suspend64t64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$aio_init, libd_aio_init);
 
 /* aliases */
@@ -1513,8 +1518,12 @@ DEFINE_PUBLIC_ALIAS(DOS$mq_receive, libd_mq_receive);
 DEFINE_PUBLIC_ALIAS(DOS$mq_send, libd_mq_send);
 DEFINE_PUBLIC_ALIAS(DOS$mq_timedreceive, libd_mq_timedreceive);
 DEFINE_PUBLIC_ALIAS(DOS$mq_timedsend, libd_mq_timedsend);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__mq_timedreceive_time64, libd_mq_timedreceive64);
 DEFINE_PUBLIC_ALIAS(DOS$mq_timedreceive64, libd_mq_timedreceive64);
+DEFINE_PUBLIC_ALIAS(DOS$__mq_timedsend_time64, libd_mq_timedsend64);
 DEFINE_PUBLIC_ALIAS(DOS$mq_timedsend64, libd_mq_timedsend64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* net.if */
 DEFINE_PUBLIC_ALIAS(DOS$if_nametoindex, libd_if_nametoindex);
@@ -1572,7 +1581,10 @@ DEFINE_PUBLIC_ALIAS(DOS$getaddrinfo_a, libd_getaddrinfo_a);
 DEFINE_PUBLIC_ALIAS(DOS$gai_error, libd_gai_error);
 DEFINE_PUBLIC_ALIAS(DOS$gai_cancel, libd_gai_cancel);
 DEFINE_PUBLIC_ALIAS(DOS$gai_suspend, libd_gai_suspend);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__gai_suspend_time64, libd_gai_suspend64);
 DEFINE_PUBLIC_ALIAS(DOS$gai_suspend64, libd_gai_suspend64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* netinet.ether */
 DEFINE_PUBLIC_ALIAS(DOS$ether_ntoa, libd_ether_ntoa);
@@ -1665,7 +1677,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_join, libd_pthread_join);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getresult_np, libd_pthread_getresult_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_tryjoin_np, libd_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_timedjoin_np, libd_pthread_timedjoin_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_timedjoin_np64, libd_pthread_timedjoin64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_timedjoin64_np, libd_pthread_timedjoin64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$cthread_detach, libd_pthread_detach);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_detach, libd_pthread_detach);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_equal, libd_pthread_equal);
@@ -1725,9 +1740,14 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_destroy, libd_pthread_mutex_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_trylock, libd_pthread_mutex_trylock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_lock, libd_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock, libd_pthread_mutex_timedlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_timedlock64, libd_pthread_mutex_timedlock64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock64, libd_pthread_mutex_timedlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock_np, libd_pthread_mutex_reltimedlock_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock64_np, libd_pthread_mutex_reltimedlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_getprioceiling, libd_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_setprioceiling, libd_pthread_mutex_setprioceiling);
@@ -1757,12 +1777,18 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_wrlock, libd_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_trywrlock, libd_pthread_rwlock_trywrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock, libd_pthread_rwlock_timedrdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedwrlock, libd_pthread_rwlock_timedwrlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_timedrdlock64, libd_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock64, libd_pthread_rwlock_timedrdlock64);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_timedwrlock64, libd_pthread_rwlock_timedwrlock64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedwrlock64, libd_pthread_rwlock_timedwrlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock_np, libd_pthread_rwlock_reltimedrdlock_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock_np, libd_pthread_rwlock_reltimedwrlock_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock64_np, libd_pthread_rwlock_reltimedrdlock64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock64_np, libd_pthread_rwlock_reltimedwrlock64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_unlock, libd_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_init, libd_pthread_rwlockattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_destroy, libd_pthread_rwlockattr_destroy);
@@ -1777,9 +1803,14 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_signal, libd_pthread_cond_signal);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_broadcast, libd_pthread_cond_broadcast);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_wait, libd_pthread_cond_wait);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait, libd_pthread_cond_timedwait);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_cond_timedwait64, libd_pthread_cond_timedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait64, libd_pthread_cond_timedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait_np, libd_pthread_cond_reltimedwait_np);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait64_np, libd_pthread_cond_reltimedwait64_np);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_init, libd_pthread_condattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_destroy, libd_pthread_condattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_condattr_getpshared, libd_pthread_condattr_getpshared);
@@ -1999,7 +2030,10 @@ DEFINE_PUBLIC_ALIAS(DOS$sched_getaffinity, libd_sched_getaffinity);
 DEFINE_PUBLIC_ALIAS(DOS$__sched_rr_get_interval, libd_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_sched_rr_get_interval, libd_sched_rr_get_interval);
 DEFINE_PUBLIC_ALIAS(DOS$sched_rr_get_interval, libd_sched_rr_get_interval);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__sched_rr_get_interval64, libd_sched_rr_get_interval64);
 DEFINE_PUBLIC_ALIAS(DOS$sched_rr_get_interval64, libd_sched_rr_get_interval64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* search */
 DEFINE_PUBLIC_ALIAS(DOS$insque, libd_insque);
@@ -2018,7 +2052,10 @@ DEFINE_PUBLIC_ALIAS(DOS$sem_close, libd_sem_close);
 DEFINE_PUBLIC_ALIAS(DOS$sem_unlink, libd_sem_unlink);
 DEFINE_PUBLIC_ALIAS(DOS$sem_wait, libd_sem_wait);
 DEFINE_PUBLIC_ALIAS(DOS$sem_timedwait, libd_sem_timedwait);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__sem_timedwait64, libd_sem_timedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$sem_timedwait64, libd_sem_timedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$sem_trywait, libd_sem_trywait);
 DEFINE_PUBLIC_ALIAS(DOS$sem_post, libd_sem_post);
 DEFINE_PUBLIC_ALIAS(DOS$sem_post_multiple, libd_sem_post_multiple);
@@ -2083,7 +2120,10 @@ DEFINE_PUBLIC_ALIAS(DOS$signandset, libd_signandset);
 DEFINE_PUBLIC_ALIAS(DOS$sigwaitinfo, libd_sigwaitinfo);
 DEFINE_PUBLIC_ALIAS(DOS$sigtimedwait, libd_sigtimedwait);
 DEFINE_PUBLIC_ALIAS(DOS$sigqueue, libd_sigqueue);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__sigtimedwait64, libd_sigtimedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$sigtimedwait64, libd_sigtimedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$sigqueueinfo, libd_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(DOS$tgsigqueueinfo, libd_tgsigqueueinfo);
 DEFINE_PUBLIC_ALIAS(DOS$killpg, libd_killpg);
@@ -3382,7 +3422,10 @@ DEFINE_PUBLIC_ALIAS(DOS$iopl, libd_iopl);
 DEFINE_PUBLIC_ALIAS(DOS$__poll, libd_poll);
 DEFINE_PUBLIC_ALIAS(DOS$poll, libd_poll);
 DEFINE_PUBLIC_ALIAS(DOS$ppoll, libd_ppoll);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__ppoll64, libd_ppoll64);
 DEFINE_PUBLIC_ALIAS(DOS$ppoll64, libd_ppoll64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.prctl */
 DEFINE_PUBLIC_ALIAS(DOS$prctl, libd_prctl);
@@ -3414,7 +3457,10 @@ DEFINE_PUBLIC_ALIAS(DOS$setrlimit, libd_setrlimit);
 DEFINE_PUBLIC_ALIAS(DOS$__getrusage, libd_getrusage);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_getrusage, libd_getrusage);
 DEFINE_PUBLIC_ALIAS(DOS$getrusage, libd_getrusage);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__getrusage64, libd_getrusage64);
 DEFINE_PUBLIC_ALIAS(DOS$getrusage64, libd_getrusage64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$getpriority, libd_getpriority);
 DEFINE_PUBLIC_ALIAS(DOS$__setpriority, libd_setpriority);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_setpriority, libd_setpriority);
@@ -3428,8 +3474,12 @@ DEFINE_PUBLIC_ALIAS(DOS$__fdelt_chk, libd___fdelt_chk);
 DEFINE_PUBLIC_ALIAS(DOS$__select, libd_select);
 DEFINE_PUBLIC_ALIAS(DOS$select, libd_select);
 DEFINE_PUBLIC_ALIAS(DOS$pselect, libd_pselect);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__select64, libd_select64);
 DEFINE_PUBLIC_ALIAS(DOS$select64, libd_select64);
+DEFINE_PUBLIC_ALIAS(DOS$__pselect64, libd_pselect64);
 DEFINE_PUBLIC_ALIAS(DOS$pselect64, libd_pselect64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.sem */
 DEFINE_PUBLIC_ALIAS(DOS$semget, libd_semget);
@@ -3484,7 +3534,10 @@ DEFINE_PUBLIC_ALIAS(DOS$accept4, libd_accept4);
 DEFINE_PUBLIC_ALIAS(DOS$__sendmmsg, libd_sendmmsg);
 DEFINE_PUBLIC_ALIAS(DOS$sendmmsg, libd_sendmmsg);
 DEFINE_PUBLIC_ALIAS(DOS$recvmmsg, libd_recvmmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__recvmmsg64, libd_recvmmsg64);
 DEFINE_PUBLIC_ALIAS(DOS$recvmmsg64, libd_recvmmsg64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$sockatmark, libd_sockatmark);
 DEFINE_PUBLIC_ALIAS(DOS$isfdtype, libd_isfdtype);
 
@@ -3497,8 +3550,10 @@ DEFINE_PUBLIC_ALIAS(DOS$__fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$futimens, libd_futimens);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__futimens64, libd_futimens64);
 DEFINE_PUBLIC_ALIAS(DOS$futimens64, libd_futimens64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.statfs */
 DEFINE_PUBLIC_ALIAS(DOS$__statfs, libd_statfs);
@@ -3559,31 +3614,52 @@ DEFINE_PUBLIC_ALIAS(DOS$__adjtime, libd_adjtime);
 DEFINE_PUBLIC_ALIAS(DOS$adjtime, libd_adjtime);
 DEFINE_PUBLIC_ALIAS(DOS$lutimes, libd_lutimes);
 DEFINE_PUBLIC_ALIAS(DOS$futimes, libd_futimes);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__gettimeofday64, libd_gettimeofday64);
 DEFINE_PUBLIC_ALIAS(DOS$gettimeofday64, libd_gettimeofday64);
+DEFINE_PUBLIC_ALIAS(DOS$__getitimer64, libd_getitimer64);
 DEFINE_PUBLIC_ALIAS(DOS$getitimer64, libd_getitimer64);
+DEFINE_PUBLIC_ALIAS(DOS$__setitimer64, libd_setitimer64);
 DEFINE_PUBLIC_ALIAS(DOS$setitimer64, libd_setitimer64);
+DEFINE_PUBLIC_ALIAS(DOS$__utimes64, libd_utimes64);
 DEFINE_PUBLIC_ALIAS(DOS$utimes64, libd_utimes64);
+DEFINE_PUBLIC_ALIAS(DOS$__settimeofday64, libd_settimeofday64);
 DEFINE_PUBLIC_ALIAS(DOS$settimeofday64, libd_settimeofday64);
+DEFINE_PUBLIC_ALIAS(DOS$__adjtime64, libd_adjtime64);
 DEFINE_PUBLIC_ALIAS(DOS$adjtime64, libd_adjtime64);
+DEFINE_PUBLIC_ALIAS(DOS$__lutimes64, libd_lutimes64);
 DEFINE_PUBLIC_ALIAS(DOS$lutimes64, libd_lutimes64);
+DEFINE_PUBLIC_ALIAS(DOS$__lutimes64, libd_futimes64);
 DEFINE_PUBLIC_ALIAS(DOS$futimes64, libd_futimes64);
+DEFINE_PUBLIC_ALIAS(DOS$__futimesat64, libd_futimesat64);
 DEFINE_PUBLIC_ALIAS(DOS$futimesat64, libd_futimesat64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.timeb */
 DEFINE_PUBLIC_ALIAS(DOS$_ftime, libd__ftime32);
 DEFINE_PUBLIC_ALIAS(DOS$_ftime32, libd__ftime32);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$_ftime64, libd__ftime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_ftime32_s, libd__ftime32_s);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$_ftime64_s, libd__ftime64_s);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$ftime, libd_ftime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$ftime64, libd_ftime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.timerfd */
 DEFINE_PUBLIC_ALIAS(DOS$timerfd_create, libd_timerfd_create);
 DEFINE_PUBLIC_ALIAS(DOS$timerfd_settime, libd_timerfd_settime);
 DEFINE_PUBLIC_ALIAS(DOS$timerfd_gettime, libd_timerfd_gettime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__timerfd_settime64, libd_timerfd_settime64);
 DEFINE_PUBLIC_ALIAS(DOS$timerfd_settime64, libd_timerfd_settime64);
+DEFINE_PUBLIC_ALIAS(DOS$__timerfd_gettime64, libd_timerfd_gettime64);
 DEFINE_PUBLIC_ALIAS(DOS$timerfd_gettime64, libd_timerfd_gettime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.times */
 DEFINE_PUBLIC_ALIAS(DOS$__times, libd_times);
@@ -3596,10 +3672,13 @@ DEFINE_PUBLIC_ALIAS(DOS$__libc_adjtimex, libd_adjtimex);
 DEFINE_PUBLIC_ALIAS(DOS$adjtimex, libd_adjtimex);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_gettimex, libd_ntp_gettimex);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_adjtime, libd_ntp_adjtime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__adjtimex64, libd_adjtimex64);
 DEFINE_PUBLIC_ALIAS(DOS$adjtimex64, libd_adjtimex64);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_adjtime64, libd_ntp_adjtime64);
+DEFINE_PUBLIC_ALIAS(DOS$__ntp_gettime64, libd_ntp_gettimex64);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_gettimex64, libd_ntp_gettimex64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* sys.uio */
 DEFINE_PUBLIC_ALIAS(DOS$process_vm_readv, libd_process_vm_readv);
@@ -3648,11 +3727,17 @@ DEFINE_PUBLIC_ALIAS(DOS$waitpid, libd_waitpid);
 DEFINE_PUBLIC_ALIAS(DOS$waitid, libd_waitid);
 DEFINE_PUBLIC_ALIAS(DOS$__wait3, libd_wait3);
 DEFINE_PUBLIC_ALIAS(DOS$wait3, libd_wait3);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__wait3_time64, libd_wait3_64);
 DEFINE_PUBLIC_ALIAS(DOS$wait3_64, libd_wait3_64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__wait4, libd_wait4);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_wait4, libd_wait4);
 DEFINE_PUBLIC_ALIAS(DOS$wait4, libd_wait4);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__wait4_time64, libd_wait4_64);
 DEFINE_PUBLIC_ALIAS(DOS$wait4_64, libd_wait4_64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$detach, libd_detach);
 
 /* sys.xattr */
@@ -3700,14 +3785,20 @@ DEFINE_PUBLIC_ALIAS(DOS$thr_stksegment, libd_thr_stksegment);
 
 /* threads */
 DEFINE_PUBLIC_ALIAS(DOS$thrd_sleep, libd_thrd_sleep);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__thrd_sleep64, libd_thrd_sleep64);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_sleep64, libd_thrd_sleep64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$thrd_exit, libd_thrd_exit);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_detach, libd_thrd_detach);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_join, libd_thrd_join);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_init, libd_mtx_init);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_lock, libd_mtx_lock);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_timedlock, libd_mtx_timedlock);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__mtx_timedlock64, libd_mtx_timedlock64);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_timedlock64, libd_mtx_timedlock64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$mtx_trylock, libd_mtx_trylock);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_unlock, libd_mtx_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_init, libd_cnd_init);
@@ -3715,7 +3806,10 @@ DEFINE_PUBLIC_ALIAS(DOS$cnd_signal, libd_cnd_signal);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_broadcast, libd_cnd_broadcast);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_wait, libd_cnd_wait);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_timedwait, libd_cnd_timedwait);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__cnd_timedwait64, libd_cnd_timedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_timedwait64, libd_cnd_timedwait64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$tss_create, libd_tss_create);
 DEFINE_PUBLIC_ALIAS(DOS$tss_set, libd_tss_set);
 
@@ -3739,19 +3833,36 @@ DEFINE_PUBLIC_ALIAS(DOS$strftime, libd_strftime);
 DEFINE_PUBLIC_ALIAS(DOS$asctime, libd_asctime);
 DEFINE_PUBLIC_ALIAS(DOS$asctime_s, libd_asctime_s);
 DEFINE_PUBLIC_ALIAS(DOS$_time64, libd_time64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__time64, libd_time64);
 DEFINE_PUBLIC_ALIAS(DOS$time64, libd_time64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_difftime64, libd_difftime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__difftime64, libd_difftime64);
 DEFINE_PUBLIC_ALIAS(DOS$difftime64, libd_difftime64);
-DEFINE_PUBLIC_ALIAS(DOS$_mktime64, libd_mktime64);
 DEFINE_PUBLIC_ALIAS(DOS$timelocal64, libd_mktime64);
+DEFINE_PUBLIC_ALIAS(DOS$__mktime64, libd_mktime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$_mktime64, libd_mktime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$mktime64, libd_mktime64);
+DEFINE_PUBLIC_ALIAS(DOS$__ctime64, libd_ctime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_ctime64, libd_ctime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$ctime64, libd_ctime64);
+DEFINE_PUBLIC_ALIAS(DOS$__gmtime64, libd_gmtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_gmtime64, libd_gmtime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$gmtime64, libd_gmtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_localtime64, libd_localtime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__localtime64, libd_localtime64);
 DEFINE_PUBLIC_ALIAS(DOS$localtime64, libd_localtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__stime, libd_stime);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_stime, libd_stime);
 DEFINE_PUBLIC_ALIAS(DOS$stime, libd_stime);
@@ -3759,9 +3870,14 @@ DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime, libd_timegm);
 DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime32, libd_timegm);
 DEFINE_PUBLIC_ALIAS(DOS$timegm, libd_timegm);
 DEFINE_PUBLIC_ALIAS(DOS$dysize, libd_dysize);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$stime64, libd_stime64);
+DEFINE_PUBLIC_ALIAS(DOS$__timegm64, libd_timegm64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime64, libd_timegm64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$timegm64, libd_timegm64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__nanosleep, libd_nanosleep);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_nanosleep, libd_nanosleep);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_nanosleep, libd_nanosleep);
@@ -3781,21 +3897,36 @@ DEFINE_PUBLIC_ALIAS(DOS$__clock_nanosleep, libd_clock_nanosleep);
 DEFINE_PUBLIC_ALIAS(DOS$clock_nanosleep, libd_clock_nanosleep);
 DEFINE_PUBLIC_ALIAS(DOS$__clock_getcpuclockid, libd_clock_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(DOS$clock_getcpuclockid, libd_clock_getcpuclockid);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__nanosleep64, libd_nanosleep64);
 DEFINE_PUBLIC_ALIAS(DOS$nanosleep64, libd_nanosleep64);
+DEFINE_PUBLIC_ALIAS(DOS$__clock_getres64, libd_clock_getres64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_getres64, libd_clock_getres64);
+DEFINE_PUBLIC_ALIAS(DOS$__clock_gettime64, libd_clock_gettime64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_gettime64, libd_clock_gettime64);
+DEFINE_PUBLIC_ALIAS(DOS$__clock_settime64, libd_clock_settime64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_settime64, libd_clock_settime64);
+DEFINE_PUBLIC_ALIAS(DOS$__timer_settime64, libd_timer_settime64);
 DEFINE_PUBLIC_ALIAS(DOS$timer_settime64, libd_timer_settime64);
+DEFINE_PUBLIC_ALIAS(DOS$__timer_gettime64, libd_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(DOS$timer_gettime64, libd_timer_gettime64);
+DEFINE_PUBLIC_ALIAS(DOS$__clock_nanosleep_time64, libd_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_nanosleep64, libd_clock_nanosleep64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_timespec32_get, libd_timespec_get);
 DEFINE_PUBLIC_ALIAS(DOS$timespec_get, libd_timespec_get);
 DEFINE_PUBLIC_ALIAS(DOS$_timespec64_get, libd_timespec_get64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__timespec_get64, libd_timespec_get64);
 DEFINE_PUBLIC_ALIAS(DOS$timespec_get64, libd_timespec_get64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$_timespec32_get, libd_timespec_getres);
 DEFINE_PUBLIC_ALIAS(DOS$timespec_getres, libd_timespec_getres);
 DEFINE_PUBLIC_ALIAS(DOS$_timespec64_get, libd_timespec_getres64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__timespec_getres64, libd_timespec_getres64);
 DEFINE_PUBLIC_ALIAS(DOS$timespec_getres64, libd_timespec_getres64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$getdate, libd_getdate);
 DEFINE_PUBLIC_ALIAS(DOS$_strftime_l, libd_strftime_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strftime_l, libd_strftime_l);
@@ -3804,14 +3935,22 @@ DEFINE_PUBLIC_ALIAS(DOS$strptime, libd_strptime);
 DEFINE_PUBLIC_ALIAS(DOS$strptime_l, libd_strptime_l);
 DEFINE_PUBLIC_ALIAS(DOS$getdate_r, libd_getdate_r);
 DEFINE_PUBLIC_ALIAS(DOS$clock_adjtime, libd_clock_adjtime);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__clock_adjtime64, libd_clock_adjtime64);
 DEFINE_PUBLIC_ALIAS(DOS$clock_adjtime64, libd_clock_adjtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$__gmtime_r, libd_gmtime_r);
 DEFINE_PUBLIC_ALIAS(DOS$gmtime_r, libd_gmtime_r);
 DEFINE_PUBLIC_ALIAS(DOS$localtime_r, libd_localtime_r);
 DEFINE_PUBLIC_ALIAS(DOS$ctime_r, libd_ctime_r);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__gmtime64_r, libd_gmtime64_r);
 DEFINE_PUBLIC_ALIAS(DOS$gmtime64_r, libd_gmtime64_r);
+DEFINE_PUBLIC_ALIAS(DOS$__localtime64_r, libd_localtime64_r);
 DEFINE_PUBLIC_ALIAS(DOS$localtime64_r, libd_localtime64_r);
+DEFINE_PUBLIC_ALIAS(DOS$__ctime64_r, libd_ctime64_r);
 DEFINE_PUBLIC_ALIAS(DOS$ctime64_r, libd_ctime64_r);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$asctime_r, libd_asctime_r);
 DEFINE_PUBLIC_ALIAS(DOS$_get_daylight, libd__get_daylight);
 DEFINE_PUBLIC_ALIAS(DOS$_get_timezone, libd__get_timezone);
@@ -3830,8 +3969,10 @@ DEFINE_PUBLIC_ALIAS(DOS$_setsystime, libd__setsystime);
 /* timeval-utils */
 DEFINE_PUBLIC_ALIAS(DOS$timeval_add, libd_timeval_add);
 DEFINE_PUBLIC_ALIAS(DOS$timeval_sub, libd_timeval_sub);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$timeval_add64, libd_timeval_add64);
 DEFINE_PUBLIC_ALIAS(DOS$timeval_sub64, libd_timeval_sub64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* ttyent */
 DEFINE_PUBLIC_ALIAS(DOS$getttynam, libd_getttynam);
@@ -4065,7 +4206,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_futime, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$_futime32, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$futime, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$_futime64, libd_futime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$futime64, libd_futime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* utmp */
 DEFINE_PUBLIC_ALIAS(DOS$login_tty, libd_login_tty);

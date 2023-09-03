@@ -131,7 +131,7 @@ $fd_t timerfd_create(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 @@@param: flags: Set of `0 | TFD_TIMER_ABSTIME'
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/itimerspec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_settime")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_settime64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_settime64", "__timerfd_settime64")]]
 [[userimpl, requires($has_function(timerfd_settime32) || $has_function(timerfd_settime64))]]
 int timerfd_settime([[fdarg]] $fd_t ufd, __STDC_INT_AS_UINT_T flags,
                     [[in]] struct itimerspec const *utmr,
@@ -172,7 +172,7 @@ int timerfd_settime([[fdarg]] $fd_t ufd, __STDC_INT_AS_UINT_T flags,
 @@>> timerfd_gettime(2), timerfd_gettime64(2)
 [[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_gettime")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_gettime64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timerfd_gettime64", "__timerfd_gettime64")]]
 [[userimpl, requires($has_function(timerfd_gettime32) || $has_function(timerfd_gettime64))]]
 int timerfd_gettime([[fdarg]] $fd_t ufd, [[out]] struct itimerspec *__restrict otmr) {
 @@pp_if $has_function(timerfd_gettime32)@@
@@ -205,6 +205,7 @@ int timerfd_gettime([[fdarg]] $fd_t ufd, [[out]] struct itimerspec *__restrict o
 
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[preferred_time64_variant_of(timerfd_settime), doc_alias("timerfd_settime")]]
+[[time64_export_alias("__timerfd_settime64")]]
 [[userimpl, requires_function(timerfd_settime32)]]
 int timerfd_settime64([[fdarg]] $fd_t ufd, __STDC_INT_AS_UINT_T flags,
                       [[in]] struct itimerspec64 const *utmr,
@@ -227,6 +228,7 @@ int timerfd_settime64([[fdarg]] $fd_t ufd, __STDC_INT_AS_UINT_T flags,
 
 [[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[preferred_time64_variant_of(timerfd_gettime), doc_alias("timerfd_gettime")]]
+[[time64_export_alias("__timerfd_gettime64")]]
 [[userimpl, requires_function(timerfd_gettime32)]]
 int timerfd_gettime64([[fdarg]] $fd_t ufd, [[out]] struct itimerspec64 *__restrict otmr) {
 	int result;

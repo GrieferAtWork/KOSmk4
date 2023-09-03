@@ -172,7 +172,7 @@ int ppoll32([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
 
 [[cp, decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ppoll")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ppoll64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ppoll64", "__ppoll64")]]
 [[userimpl, requires($has_function(ppoll32) || $has_function(ppoll64))]]
 int ppoll([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
           [[in_opt]] struct timespec const *timeout,
@@ -197,6 +197,7 @@ int ppoll([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
 %
 %#ifdef __USE_TIME64
 [[preferred_time64_variant_of(ppoll), doc_alias("ppoll")]]
+[[time64_export_alias("__ppoll64")]]
 [[cp, userimpl, requires_function(ppoll32)]]
 [[decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
 int ppoll64([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,

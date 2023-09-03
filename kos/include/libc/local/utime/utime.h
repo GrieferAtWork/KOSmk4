@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6166ec35 */
+/* HASH CRC-32:0x1710ad52 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_utime_defined
 #define __local_utime_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE___utime) || defined(__CRT_HAVE___libc_utime) || defined(__CRT_HAVE__utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
+#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE___utime) || defined(__CRT_HAVE___libc_utime) || defined(__CRT_HAVE__utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64) || defined(__CRT_HAVE___utime64)
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_utime32_defined
@@ -46,6 +46,8 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64)
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
+#elif defined(__CRT_HAVE___utime64)
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),__utime64,(__filename,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_utime64_defined
 #endif /* !... */
@@ -83,7 +85,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_utime_defined
 #define __localdep_utime __LIBC_LOCAL_NAME(utime)
 #endif /* !__local___localdep_utime_defined */
-#else /* __CRT_HAVE_utime || __CRT_HAVE___utime || __CRT_HAVE___libc_utime || __CRT_HAVE__utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
+#else /* __CRT_HAVE_utime || __CRT_HAVE___utime || __CRT_HAVE___libc_utime || __CRT_HAVE__utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 || __CRT_HAVE___utime64 */
 #undef __local_utime_defined
-#endif /* !__CRT_HAVE_utime && !__CRT_HAVE___utime && !__CRT_HAVE___libc_utime && !__CRT_HAVE__utime && !__CRT_HAVE__utime32 && !__CRT_HAVE_utime64 && !__CRT_HAVE__utime64 */
+#endif /* !__CRT_HAVE_utime && !__CRT_HAVE___utime && !__CRT_HAVE___libc_utime && !__CRT_HAVE__utime && !__CRT_HAVE__utime32 && !__CRT_HAVE_utime64 && !__CRT_HAVE__utime64 && !__CRT_HAVE___utime64 */
 #endif /* !__local_utime_defined */

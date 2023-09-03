@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670a4401 */
+/* HASH CRC-32:0xf025314c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -391,7 +391,9 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,gai_cancel,(struct gaicb *__gaicbp),(__gaicbp)
 __CDECLARE(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),gai_suspend64,(__list,__ent,__timeout))
-#elif defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
+#elif defined(__CRT_HAVE___gai_suspend_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),__gai_suspend_time64,(__list,__ent,__timeout))
+#elif defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE___gai_suspend_time64) || defined(__CRT_HAVE_gai_suspend)
 #include <libc/local/netdb/gai_suspend.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend)(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend))(__list, __ent, __timeout); })
 #endif /* ... */
@@ -401,6 +403,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend, __FORCELOCAL __ATTR_ARTIFICIAL int 
 __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend64)
 __CDECLARE(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout),(__list,__ent,__timeout))
+#elif defined(__CRT_HAVE___gai_suspend_time64)
+__CREDIRECT(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout),__gai_suspend_time64,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend)
 #include <libc/local/netdb/gai_suspend64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend64)(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend64))(__list, __ent, __timeout); })

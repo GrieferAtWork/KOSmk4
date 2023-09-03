@@ -764,7 +764,7 @@ $errno_t pthread_tryjoin_np(pthread_t self, [[out_opt]] void **thread_return);
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin_np")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin64_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin64_np", "__pthread_timedjoin_np64")]]
 [[userimpl, requires($has_function(crt_pthread_timedjoin32_np) ||
                      $has_function(pthread_timedjoin64_np))]]
 $errno_t pthread_timedjoin_np(pthread_t self,
@@ -793,8 +793,8 @@ $errno_t pthread_timedjoin_np(pthread_t self,
 $errno_t crt_pthread_timedjoin32_np(pthread_t self, [[out_opt]] void **thread_return,
                                     [[in_opt]] struct timespec32 const *abstime);
 
-
 [[cp, preferred_time64_variant_of(pthread_timedjoin_np), doc_alias("pthread_timedjoin_np")]]
+[[time64_export_alias("__pthread_timedjoin_np64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(crt_pthread_timedjoin32_np)]]
 $errno_t pthread_timedjoin64_np(pthread_t self, [[out_opt]] void **thread_return,
@@ -1733,7 +1733,7 @@ $errno_t pthread_mutex_lock([[inout]] pthread_mutex_t *self);
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_mutex_timedlock")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_mutex_timedlock64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_mutex_timedlock64", "__pthread_mutex_timedlock64")]]
 [[userimpl, requires($has_function(crt_pthread_mutex_timedlock32) ||
                      $has_function(pthread_mutex_timedlock64))]]
 $errno_t pthread_mutex_timedlock([[inout]] pthread_mutex_t *__restrict self,
@@ -1762,6 +1762,7 @@ $errno_t crt_pthread_mutex_timedlock32([[inout]] pthread_mutex_t *__restrict sel
                                        [[in]] struct timespec const *__restrict abstime);
 
 [[cp, preferred_time64_variant_of(pthread_mutex_timedlock), doc_alias("pthread_mutex_timedlock")]]
+[[time64_export_alias("__pthread_mutex_timedlock64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(crt_pthread_mutex_timedlock32)]]
 $errno_t pthread_mutex_timedlock64([[inout]] pthread_mutex_t *__restrict self,
@@ -2047,7 +2048,7 @@ $errno_t pthread_rwlock_trywrlock([[inout]] pthread_rwlock_t *self);
 @@                    You're already holding a read-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock64", "__pthread_rwlock_timedrdlock64")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_timedrdlock32) ||
                      $has_function(pthread_rwlock_timedrdlock64))]]
 $errno_t pthread_rwlock_timedrdlock([[inout]] pthread_rwlock_t *__restrict self,
@@ -2079,7 +2080,7 @@ $errno_t pthread_rwlock_timedrdlock([[inout]] pthread_rwlock_t *__restrict self,
 @@                    You're already holding a write-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock64", "__pthread_rwlock_timedwrlock64")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_timedwrlock32) ||
                      $has_function(pthread_rwlock_timedwrlock64))]]
 $errno_t pthread_rwlock_timedwrlock([[inout]] pthread_rwlock_t *__restrict self,
@@ -2113,6 +2114,7 @@ $errno_t crt_pthread_rwlock_timedwrlock32([[inout]] pthread_rwlock_t *__restrict
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_timedrdlock), doc_alias("pthread_rwlock_timedrdlock")]]
+[[time64_export_alias("__pthread_rwlock_timedrdlock64")]]
 [[userimpl, requires_function(crt_pthread_rwlock_timedrdlock32)]]
 $errno_t pthread_rwlock_timedrdlock64([[inout]] pthread_rwlock_t *__restrict self,
                                       [[in]] struct timespec64 const *__restrict abstime) {
@@ -2126,6 +2128,7 @@ $errno_t pthread_rwlock_timedrdlock64([[inout]] pthread_rwlock_t *__restrict sel
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_timedwrlock), doc_alias("pthread_rwlock_timedwrlock")]]
+[[time64_export_alias("__pthread_rwlock_timedwrlock64")]]
 [[userimpl, requires_function(crt_pthread_rwlock_timedwrlock32)]]
 $errno_t pthread_rwlock_timedwrlock64([[inout]] pthread_rwlock_t *__restrict self,
                                       [[in]] struct timespec64 const *__restrict abstime) {
@@ -2350,7 +2353,7 @@ $errno_t pthread_cond_wait([[inout]] pthread_cond_t *__restrict self,
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_timedwait")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_timedwait64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_timedwait64", "__pthread_cond_timedwait64")]]
 [[userimpl, requires($has_function(crt_pthread_cond_timedwait32) ||
                      $has_function(pthread_cond_timedwait64))]]
 $errno_t pthread_cond_timedwait([[inout]] pthread_cond_t *__restrict self,
@@ -2383,6 +2386,7 @@ $errno_t crt_pthread_cond_timedwait32([[inout]] pthread_cond_t *__restrict self,
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_cond_timedwait), doc_alias("pthread_cond_timedwait")]]
+[[time64_export_alias("__pthread_cond_timedwait64")]]
 [[userimpl, requires_function(crt_pthread_cond_timedwait32)]]
 $errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict self,
                                   [[inout]] pthread_mutex_t *__restrict mutex,

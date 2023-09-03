@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x736daa7b */
+/* HASH CRC-32:0x4bdab736 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__wstrdate_s_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE__wstrdate) || defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__wstrdate_defined
 #define __local___localdep__wstrdate_defined
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wstrdate,(__WCHAR_TYPE__ __buf[9]),_wstrdate,(__buf))
-#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE___time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wstrdate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__wstrdate_s_defined
 #define __localdep__wstrdate_s __LIBC_LOCAL_NAME(_wstrdate_s)
 #endif /* !__local___localdep__wstrdate_s_defined */
-#else /* __CRT_HAVE__wstrdate || __CRT_HAVE__strdate || __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
+#else /* __CRT_HAVE__wstrdate || __CRT_HAVE__strdate || __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE___time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
 #undef __local__wstrdate_s_defined
-#endif /* !__CRT_HAVE__wstrdate && !__CRT_HAVE__strdate && !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
+#endif /* !__CRT_HAVE__wstrdate && !__CRT_HAVE__strdate && !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE___time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
 #endif /* !__local__wstrdate_s_defined */

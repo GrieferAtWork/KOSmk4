@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ea38f7f */
+/* HASH CRC-32:0x2a95a0b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1254,7 +1254,18 @@ __CDECLARE(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_S
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
 __CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
-#elif defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
+#elif defined(__CRT_HAVE___recvmmsg64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> recvmmsg(2)
+ * Same as `recvmsg(2)', but may be used to receive many
+ * messages  (datagrams)  with  a  single  system  call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
+ *                            MSG_WAITFORONE'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),__recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#elif defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE___recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/sys.socket/recvmmsg.h>
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
@@ -1290,6 +1301,17 @@ __CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
 __CDECLARE(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#elif defined(__CRT_HAVE___recvmmsg64)
+/* >> recvmmsg(2)
+ * Same as `recvmsg(2)', but may be used to receive many
+ * messages  (datagrams)  with  a  single  system  call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
+ *                            MSG_WAITFORONE'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
+__CREDIRECT(__ATTR_FDREAD(1) __ATTR_INOUTS(2, 3) __ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),__recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/sys.socket/recvmmsg64.h>
 /* >> recvmmsg(2)

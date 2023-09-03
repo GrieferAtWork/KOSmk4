@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6619cbc9 */
+/* HASH CRC-32:0x37297972 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_sigtimedwait_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE___sigtimedwait)
+#if defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE___sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE___sigtimedwait)
 #include <bits/os/siginfo.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,6 +50,8 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout),__sigtimedwait,(__set,__info,__rel_timeout))
 #elif defined(__CRT_HAVE_sigtimedwait64)
 __CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout),sigtimedwait64,(__set,__info,__rel_timeout))
+#elif defined(__CRT_HAVE___sigtimedwait64)
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout),__sigtimedwait64,(__set,__info,__rel_timeout))
 #elif defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE___sigtimedwait)
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigtimedwait64.h>
@@ -82,7 +84,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sigtimedwait_defined
 #define __localdep_sigtimedwait __LIBC_LOCAL_NAME(sigtimedwait)
 #endif /* !__local___localdep_sigtimedwait_defined */
-#else /* __CRT_HAVE_sigtimedwait64 || __CRT_HAVE_sigtimedwait || __CRT_HAVE___sigtimedwait */
+#else /* __CRT_HAVE_sigtimedwait64 || __CRT_HAVE___sigtimedwait64 || __CRT_HAVE_sigtimedwait || __CRT_HAVE___sigtimedwait */
 #undef __local_sigtimedwait_defined
-#endif /* !__CRT_HAVE_sigtimedwait64 && !__CRT_HAVE_sigtimedwait && !__CRT_HAVE___sigtimedwait */
+#endif /* !__CRT_HAVE_sigtimedwait64 && !__CRT_HAVE___sigtimedwait64 && !__CRT_HAVE_sigtimedwait && !__CRT_HAVE___sigtimedwait */
 #endif /* !__local_sigtimedwait_defined */

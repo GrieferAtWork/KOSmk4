@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa757d301 */
+/* HASH CRC-32:0xd168ed84 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_timer_gettime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_timer_gettime64) || defined(__CRT_HAVE_timer_gettime)
+#if defined(__CRT_HAVE_timer_gettime64) || defined(__CRT_HAVE___timer_gettime64) || defined(__CRT_HAVE_timer_gettime)
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__ti
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime,(__timerid,___value))
 #elif defined(__CRT_HAVE_timer_gettime64)
 __CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime64,(__timerid,___value))
+#elif defined(__CRT_HAVE___timer_gettime64)
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),__timer_gettime64,(__timerid,___value))
 #elif defined(__CRT_HAVE_timer_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timer_gettime64.h>
@@ -75,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timer_gettime_defined
 #define __localdep_timer_gettime __LIBC_LOCAL_NAME(timer_gettime)
 #endif /* !__local___localdep_timer_gettime_defined */
-#else /* __CRT_HAVE_timer_gettime64 || __CRT_HAVE_timer_gettime */
+#else /* __CRT_HAVE_timer_gettime64 || __CRT_HAVE___timer_gettime64 || __CRT_HAVE_timer_gettime */
 #undef __local_timer_gettime_defined
-#endif /* !__CRT_HAVE_timer_gettime64 && !__CRT_HAVE_timer_gettime */
+#endif /* !__CRT_HAVE_timer_gettime64 && !__CRT_HAVE___timer_gettime64 && !__CRT_HAVE_timer_gettime */
 #endif /* !__local_timer_gettime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28fee2ec */
+/* HASH CRC-32:0xcc8cb683 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -864,15 +864,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K8
-#if defined(__CRT_HAVE_futimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#if defined(__CRT_HAVE_futimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> futimens(2), futimens64(2) */
+__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
+#elif defined(__CRT_HAVE_futimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE___futimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),__futimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_futimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> futimens(2), futimens64(2) */
-__CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE___futimens64) || defined(__CRT_HAVE_futimens)
 #include <libc/local/sys.stat/futimens.h>
 /* >> futimens(2), futimens64(2) */

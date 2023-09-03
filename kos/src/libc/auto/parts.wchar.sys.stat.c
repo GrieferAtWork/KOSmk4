@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1805f00 */
+/* HASH CRC-32:0x80dfc2a3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -701,8 +701,14 @@ DEFINE_PUBLIC_ALIAS(DOS$wmknodat, libd_wmknodat);
 DEFINE_PUBLIC_ALIAS(wmknodat, libc_wmknodat);
 DEFINE_PUBLIC_ALIAS(DOS$wutimensat, libd_wutimensat);
 DEFINE_PUBLIC_ALIAS(wutimensat, libc_wutimensat);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$wutimensat64, libd_wutimensat64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(wutimensat64, libc_wutimensat64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_SYS_STAT_C */

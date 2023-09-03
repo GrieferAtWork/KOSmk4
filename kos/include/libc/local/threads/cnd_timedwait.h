@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec379bda */
+/* HASH CRC-32:0x90d49edf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE___pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <bits/crt/threads.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -39,6 +39,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__self,__mutex,__abstime))
+#elif defined(__CRT_HAVE___pthread_cond_timedwait64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),__pthread_cond_timedwait64,(__self,__mutex,__abstime))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_cond_timedwait.h>
@@ -70,7 +75,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_cnd_timedwait_defined
 #define __localdep_cnd_timedwait __LIBC_LOCAL_NAME(cnd_timedwait)
 #endif /* !__local___localdep_cnd_timedwait_defined */
-#else /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */
+#else /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE___pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */
 #undef __local_cnd_timedwait_defined
-#endif /* !__CRT_HAVE_pthread_cond_timedwait64 && !__CRT_HAVE_pthread_cond_timedwait */
+#endif /* !__CRT_HAVE_pthread_cond_timedwait64 && !__CRT_HAVE___pthread_cond_timedwait64 && !__CRT_HAVE_pthread_cond_timedwait */
 #endif /* !__local_cnd_timedwait_defined */

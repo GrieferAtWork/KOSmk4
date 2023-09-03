@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb978fbe8 */
+/* HASH CRC-32:0xef074946 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1264,35 +1264,66 @@ DEFINE_PUBLIC_ALIAS(asctime_s, libc_asctime_s);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_difftime64, libc_difftime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(__difftime64, libc_difftime64);
 DEFINE_PUBLIC_ALIAS(difftime64, libc_difftime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(timelocal64, libc_mktime64);
+DEFINE_PUBLIC_ALIAS(__mktime64, libc_mktime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mktime64, libc_mktime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(timelocal64, libc_mktime64);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(mktime64, libc_mktime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__ctime64, libc_ctime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_ctime64, libc_ctime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(ctime64, libc_ctime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__gmtime64, libc_gmtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_gmtime64, libc_gmtime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(gmtime64, libc_gmtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_localtime64, libc_localtime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__localtime64, libc_localtime64);
 DEFINE_PUBLIC_ALIAS(localtime64, libc_localtime64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mkgmtime, libc_timegm);
 DEFINE_PUBLIC_ALIAS(_mkgmtime32, libc_timegm);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(timegm, libc_timegm);
 DEFINE_PUBLIC_ALIAS(dysize, libc_dysize);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__timegm64, libc_timegm64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mkgmtime64, libc_timegm64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(timegm64, libc_timegm64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_timespec32_get, libc_timespec_get);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -1300,7 +1331,11 @@ DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_get64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__timespec_get64, libc_timespec_get64);
 DEFINE_PUBLIC_ALIAS(timespec_get64, libc_timespec_get64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_timespec32_get, libc_timespec_getres);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -1308,7 +1343,11 @@ DEFINE_PUBLIC_ALIAS(timespec_getres, libc_timespec_getres);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_getres64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__timespec_getres64, libc_timespec_getres64);
 DEFINE_PUBLIC_ALIAS(timespec_getres64, libc_timespec_getres64);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strftime_l, libc_strftime_l);
@@ -1322,9 +1361,21 @@ DEFINE_PUBLIC_ALIAS(__gmtime_r, libc_gmtime_r);
 DEFINE_PUBLIC_ALIAS(gmtime_r, libc_gmtime_r);
 DEFINE_PUBLIC_ALIAS(localtime_r, libc_localtime_r);
 DEFINE_PUBLIC_ALIAS(ctime_r, libc_ctime_r);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__gmtime64_r, libc_gmtime64_r);
 DEFINE_PUBLIC_ALIAS(gmtime64_r, libc_gmtime64_r);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__localtime64_r, libc_localtime64_r);
 DEFINE_PUBLIC_ALIAS(localtime64_r, libc_localtime64_r);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__ctime64_r, libc_ctime64_r);
 DEFINE_PUBLIC_ALIAS(ctime64_r, libc_ctime64_r);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(asctime_r, libc_asctime_r);
 DEFINE_PUBLIC_ALIAS(DOS$__daylight, libc___daylight);
 DEFINE_PUBLIC_ALIAS(__p__daylight, libc___daylight);
