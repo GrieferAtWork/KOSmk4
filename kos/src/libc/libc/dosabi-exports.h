@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70fcad9e */
+/* HASH CRC-32:0x56b39855 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3326,6 +3326,9 @@ DEFINE_PUBLIC_ALIAS(DOS$inotify_rm_watch, libd_inotify_rm_watch);
 /* sys.ioctl */
 DEFINE_PUBLIC_ALIAS(DOS$__ioctl, libd_ioctl);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_ioctl, libd_ioctl);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__ioctl_time64, libd_ioctl);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$ioctl, libd_ioctl);
 
 /* sys.ipc */

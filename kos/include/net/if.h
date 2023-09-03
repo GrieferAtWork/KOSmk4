@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe634b354 */
+/* HASH CRC-32:0x1ecad958 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,7 +145,8 @@ __CDECLARE(__ATTR_IN(1),__STDC_UINT_AS_SIZE_T,__NOTHROW_RPC_KOS,if_nametoindex,(
 #else /* __CRT_HAVE_if_nametoindex */
 #include <asm/os/socket-ioctls.h>
 #include <asm/os/socket.h>
-#if ((defined(__CRT_HAVE_socket) || defined(__CRT_HAVE___socket)) && defined(__SOCK_DGRAM) && (defined(__AF_LOCAL) || defined(__AF_INET) || defined(__AF_INET6)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__SIOCGIFINDEX)) || defined(__CRT_HAVE_if_nameindex)
+#include <bits/types.h>
+#if ((defined(__CRT_HAVE_socket) || defined(__CRT_HAVE___socket)) && defined(__SOCK_DGRAM) && (defined(__AF_LOCAL) || defined(__AF_INET) || defined(__AF_INET6)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__SIOCGIFINDEX)) || defined(__CRT_HAVE_if_nameindex)
 #include <libc/local/net.if/if_nametoindex.h>
 /* >> if_nametoindex(3)
  * Lookup the index of the interface with the given `ifname'
@@ -153,7 +154,7 @@ __CDECLARE(__ATTR_IN(1),__STDC_UINT_AS_SIZE_T,__NOTHROW_RPC_KOS,if_nametoindex,(
  * @return: 0 : [errno=ENODEV] No interface matching `ifname'
  * @return: 0 : [errno=*] Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(if_nametoindex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __STDC_UINT_AS_SIZE_T __NOTHROW_RPC_KOS(__LIBCCALL if_nametoindex)(char const *__ifname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(if_nametoindex))(__ifname); })
-#endif /* ((__CRT_HAVE_socket || __CRT_HAVE___socket) && __SOCK_DGRAM && (__AF_LOCAL || __AF_INET || __AF_INET6) && (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __SIOCGIFINDEX) || __CRT_HAVE_if_nameindex */
+#endif /* ((__CRT_HAVE_socket || __CRT_HAVE___socket) && __SOCK_DGRAM && (__AF_LOCAL || __AF_INET || __AF_INET6) && (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __SIOCGIFINDEX) || __CRT_HAVE_if_nameindex */
 #endif /* !__CRT_HAVE_if_nametoindex */
 #ifdef __CRT_HAVE_if_indextoname
 /* >> if_indextoname(3)
@@ -165,7 +166,8 @@ __CDECLARE(__ATTR_OUT(2),char *,__NOTHROW_RPC_KOS,if_indextoname,(__STDC_UINT_AS
 #else /* __CRT_HAVE_if_indextoname */
 #include <asm/os/socket-ioctls.h>
 #include <asm/os/socket.h>
-#if ((defined(__CRT_HAVE_socket) || defined(__CRT_HAVE___socket)) && defined(__SOCK_DGRAM) && (defined(__AF_LOCAL) || defined(__AF_INET) || defined(__AF_INET6)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__SIOCGIFNAME)) || defined(__CRT_HAVE_if_nameindex)
+#include <bits/types.h>
+#if ((defined(__CRT_HAVE_socket) || defined(__CRT_HAVE___socket)) && defined(__SOCK_DGRAM) && (defined(__AF_LOCAL) || defined(__AF_INET) || defined(__AF_INET6)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__SIOCGIFNAME)) || defined(__CRT_HAVE_if_nameindex)
 #include <libc/local/net.if/if_indextoname.h>
 /* >> if_indextoname(3)
  * Lookup the name of the interface with the given `ifindex'
@@ -173,7 +175,7 @@ __CDECLARE(__ATTR_OUT(2),char *,__NOTHROW_RPC_KOS,if_indextoname,(__STDC_UINT_AS
  * @return: NULL   : [errno=ENXIO] No interface with index `ifindex'
  * @return: NULL   : [errno=*] Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(if_indextoname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) char *__NOTHROW_RPC_KOS(__LIBCCALL if_indextoname)(__STDC_UINT_AS_SIZE_T __ifindex, char *__ifname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(if_indextoname))(__ifindex, __ifname); })
-#endif /* ((__CRT_HAVE_socket || __CRT_HAVE___socket) && __SOCK_DGRAM && (__AF_LOCAL || __AF_INET || __AF_INET6) && (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __SIOCGIFNAME) || __CRT_HAVE_if_nameindex */
+#endif /* ((__CRT_HAVE_socket || __CRT_HAVE___socket) && __SOCK_DGRAM && (__AF_LOCAL || __AF_INET || __AF_INET6) && (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __SIOCGIFNAME) || __CRT_HAVE_if_nameindex */
 #endif /* !__CRT_HAVE_if_indextoname */
 /* >> if_indextoname(3)
  * Allocate and return a listing of all interface names. The list is

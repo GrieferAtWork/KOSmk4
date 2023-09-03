@@ -58,9 +58,13 @@ NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb2e72ef0]]]*/
+/*[[[start:exports,hash:CRC-32=0xb0591502]]]*/
 DEFINE_PUBLIC_ALIAS(__ioctl, libc_ioctl);
 DEFINE_PUBLIC_ALIAS(__libc_ioctl, libc_ioctl);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__ioctl_time64, libc_ioctl);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(ioctl, libc_ioctl);
 /*[[[end:exports]]]*/
 

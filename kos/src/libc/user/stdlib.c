@@ -1774,7 +1774,7 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg),
 {
 	struct atexit_callback *new_vector;
 	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
-		if (atomic_rwlock_reading(&atexit_vector.av_lock)) {
+		if (atomic_rwlock_reading(&atexit_vector.av_lock)) { /* TODO: FIXME: This also triggers if another thread is holding a write-lock! */
 			/* atexit functions have already been invoked. -> Do so ourself as well. */
 			(*func)(atexit_vector.av_stat, arg);
 			return 0;
@@ -1891,7 +1891,7 @@ NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(void (LIBCCALL *func)(void))
 {
 	struct at_quick_exit_callback *new_vector;
 	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
-		if (atomic_rwlock_reading(&atexit_vector.av_lock)) {
+		if (atomic_rwlock_reading(&atexit_vector.av_lock)) { /* TODO: FIXME: This also triggers if another thread is holding a write-lock! */
 			/* atexit functions have already been invoked. -> Do so ourself as well. */
 			(*func)();
 			return 0;

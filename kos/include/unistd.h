@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8716843 */
+/* HASH CRC-32:0x8ea7ec75 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1171,12 +1171,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 __CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(1),__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_tcgetpgrp */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCGPGRP)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCGPGRP)
 #include <libc/local/unistd/tcgetpgrp.h>
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetpgrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) __pid_t __NOTHROW_NCX(__LIBCCALL tcgetpgrp)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetpgrp))(__fd); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCGPGRP */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCGPGRP */
 #endif /* !__CRT_HAVE_tcgetpgrp */
 #ifdef __CRT_HAVE_tcsetpgrp
 /* >> tcsetpgrp(2)
@@ -1184,12 +1184,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetpgrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
 #else /* __CRT_HAVE_tcsetpgrp */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSPGRP)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCSPGRP)
 #include <libc/local/unistd/tcsetpgrp.h>
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetpgrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL tcsetpgrp)(__fd_t __fd, __pid_t __pgrp_id) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetpgrp))(__fd, __pgrp_id); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPGRP */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCSPGRP */
 #endif /* !__CRT_HAVE_tcsetpgrp */
 #ifndef __getlogin_defined
 #define __getlogin_defined
@@ -1533,16 +1533,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,isatty,(__fd_t __fd
 __CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,isatty,(__fd_t __fd),__isatty,(__fd))
 #else /* ... */
 #include <asm/os/tty.h>
-#if defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
+#if defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCGETA))
 #include <libc/local/unistd/isatty.h>
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); })
-#else /* __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
+#else /* __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCGETA) */
 #undef __isatty_defined
-#endif /* !__CRT_HAVE_tcgetattr && !__CRT_HAVE___tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA) */
+#endif /* !__CRT_HAVE_tcgetattr && !__CRT_HAVE___tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl && !__CRT_HAVE___ioctl_time64) || !__TCGETA) */
 #endif /* !... */
 #endif /* !__isatty_defined */
 #ifndef __dup2_defined
@@ -4300,7 +4300,51 @@ __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #ifndef __ioctl_defined
 #define __ioctl_defined
-#ifdef __CRT_HAVE_ioctl
+#if defined(__CRT_HAVE_ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__LIBC __ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ioctl_t __request, ...) __CASMNAME_SAME("ioctl");
+#elif defined(__CRT_HAVE___ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl_time64,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE_ioctl)
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though
@@ -4333,6 +4377,17 @@ __CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t _
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl_time64)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl_time64,(__fd,__request),__request,1,(void *))
 #else /* ... */
 #undef __ioctl_defined
 #endif /* !... */

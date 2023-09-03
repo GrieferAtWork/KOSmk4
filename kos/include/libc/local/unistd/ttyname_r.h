@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x714c4070 */
+/* HASH CRC-32:0xb6b76a70 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,14 +124,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_isatty,(
 __NAMESPACE_LOCAL_END
 #include <asm/os/tty.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
+#if defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCGETA))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/isatty.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isatty __LIBC_LOCAL_NAME(isatty)
-#else /* __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
+#else /* __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCGETA) */
 #undef __local___localdep_isatty_defined
-#endif /* !__CRT_HAVE_tcgetattr && !__CRT_HAVE___tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA) */
+#endif /* !__CRT_HAVE_tcgetattr && !__CRT_HAVE___tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl && !__CRT_HAVE___ioctl_time64) || !__TCGETA) */
 #endif /* !... */
 #endif /* !__local___localdep_isatty_defined */
 #ifndef __local___localdep_lstat64_defined
@@ -270,7 +270,7 @@ __LOCAL_LIBC(ttyname_r) __ATTR_FDARG(1) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname_r))(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen) {
 
 	/* Ensure that it's actually a TTY */
-#if defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE___isatty) || defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))
+#if defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE___isatty) || defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCGETA))
 	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_isatty)(__fd)) {
 #ifdef __ENOTTY
 		__libc_seterrno(__ENOTTY);
@@ -280,7 +280,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname_r))(__fd_t __fd, char *__buf,
 		return 1;
 #endif /* !__ENOTTY */
 	}
-#endif /* __CRT_HAVE_isatty || __CRT_HAVE__isatty || __CRT_HAVE___isatty || __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
+#endif /* __CRT_HAVE_isatty || __CRT_HAVE__isatty || __CRT_HAVE___isatty || __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCGETA) */
 
 	/* Simply try to realpath() the given `fd' */
 #ifdef __CRT_HAVE_frealpath4

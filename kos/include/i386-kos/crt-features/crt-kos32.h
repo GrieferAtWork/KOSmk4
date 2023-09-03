@@ -699,6 +699,7 @@
 #define __CRT_HAVE___initstate
 #define __CRT_HAVE___iob_func
 #define __CRT_HAVE___ioctl
+#define __CRT_HAVE___ioctl_time64
 #define __CRT_HAVE___ioperm
 #define __CRT_HAVE___iopl
 #define __CRT_HAVE___isalnum_l

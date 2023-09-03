@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53adb101 */
+/* HASH CRC-32:0x838a8205 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -558,14 +558,14 @@ __CREDIRECT(__ATTR_FDARG(1),int,__NOTHROW_NCX,__localdep_tcsetpgrp,(__fd_t __fd,
 __NAMESPACE_LOCAL_END
 #include <asm/os/tty.h>
 __NAMESPACE_LOCAL_BEGIN
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSPGRP)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCSPGRP)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/tcsetpgrp.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tcsetpgrp __LIBC_LOCAL_NAME(tcsetpgrp)
-#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPGRP */
+#else /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCSPGRP */
 #undef __local___localdep_tcsetpgrp_defined
-#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TIOCSPGRP */
+#endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl && !__CRT_HAVE___ioctl_time64) || !__TIOCSPGRP */
 #endif /* !__CRT_HAVE_tcsetpgrp */
 #endif /* !__local___localdep_tcsetpgrp_defined */
 #ifndef __local___localdep_vfork_defined
@@ -782,15 +782,15 @@ __do_exec:
 
 
 #ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
-#if !defined(__CRT_HAVE_tcsetpgrp) && ((!defined(__CRT_HAVE_ioctl) && !defined(__CRT_HAVE___ioctl) && !defined(__CRT_HAVE___libc_ioctl)) || !defined(__TIOCSPGRP))
+#if !defined(__CRT_HAVE_tcsetpgrp) && ((!defined(__CRT_HAVE_ioctl) && !defined(__CRT_HAVE___ioctl) && !defined(__CRT_HAVE___libc_ioctl) && !defined(__CRT_HAVE___ioctl_time64)) || !defined(__TIOCSPGRP))
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_tcsetpgrp && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TIOCSPGRP) */
+#else /* !__CRT_HAVE_tcsetpgrp && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl && !__CRT_HAVE___ioctl_time64) || !__TIOCSPGRP) */
 			case __POSIX_SPAWN_ACTION_TCSETPGRP:
 				/* NOTE: Passing `0' as second argument to `tcsetpgrp()' is the same as `getpid()' */
 				if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_tcsetpgrp)(__act->__sa_action.__sa_tcsetpgrp_action.__sa_fd, 0))
 					goto __child_error;
 				break;
-#endif /* __CRT_HAVE_tcsetpgrp || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPGRP) */
+#endif /* __CRT_HAVE_tcsetpgrp || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCSPGRP) */
 #endif /* __POSIX_SPAWN_ACTION_TCSETPGRP */
 
 

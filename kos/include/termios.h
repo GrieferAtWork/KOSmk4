@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a73a232 */
+/* HASH CRC-32:0x3c6397ec */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -681,46 +681,52 @@ __CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,tcgetattr,(__fd_t __f
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),__tcgetattr,(__fd,__termios_p))
 #else /* ... */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCGETA)
 #include <libc/local/termios/tcgetattr.h>
 /* >> tcgetattr(3)
  * Get terminal attributes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetattr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL tcgetattr)(__fd_t __fd, struct termios *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetattr))(__fd, __termios_p); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCGETA */
 #endif /* !... */
 #ifdef __CRT_HAVE_tcsetattr
 /* >> tcsetattr(3)
  * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(3),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
-#elif defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)
+#else /* __CRT_HAVE_tcsetattr */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)
 #include <libc/local/termios/tcsetattr.h>
 /* >> tcsetattr(3)
  * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetattr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN(3) int __NOTHROW_NCX(__LIBCCALL tcsetattr)(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetattr))(__fd, __optional_actions, __termios_p); })
-#endif /* ... */
+#endif /* __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64 */
+#endif /* !__CRT_HAVE_tcsetattr */
 #ifdef __CRT_HAVE_tcsendbreak
 /* >> tcsendbreak(3) */
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,tcsendbreak,(__fd_t __fd, int __duration),(__fd,__duration))
 #else /* __CRT_HAVE_tcsendbreak */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCSBRKP)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCSBRKP)
 #include <libc/local/termios/tcsendbreak.h>
 /* >> tcsendbreak(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsendbreak, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL tcsendbreak)(__fd_t __fd, int __duration) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsendbreak))(__fd, __duration); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCSBRKP */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCSBRKP */
 #endif /* !__CRT_HAVE_tcsendbreak */
 #ifdef __CRT_HAVE_tcdrain
 /* >> tcdrain(3) */
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_RPC,tcdrain,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_tcdrain */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCSBRK)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCSBRK)
 #include <libc/local/termios/tcdrain.h>
 /* >> tcdrain(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcdrain, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_RPC(__LIBCCALL tcdrain)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcdrain))(__fd); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCSBRK */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCSBRK */
 #endif /* !__CRT_HAVE_tcdrain */
 #ifdef __CRT_HAVE_tcflush
 /* >> tcflush(3)
@@ -728,12 +734,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcdrain, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_F
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,tcflush,(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector),(__fd,__queue_selector))
 #else /* __CRT_HAVE_tcflush */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCFLSH)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCFLSH)
 #include <libc/local/termios/tcflush.h>
 /* >> tcflush(3)
  * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcflush, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL tcflush)(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcflush))(__fd, __queue_selector); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCFLSH */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCFLSH */
 #endif /* !__CRT_HAVE_tcflush */
 #ifdef __CRT_HAVE_tcflow
 /* >> tcflow(3)
@@ -741,12 +748,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcflush, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_F
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,tcflow,(__fd_t __fd, __STDC_INT_AS_UINT_T __action),(__fd,__action))
 #else /* __CRT_HAVE_tcflow */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCXONC)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCXONC)
 #include <libc/local/termios/tcflow.h>
 /* >> tcflow(3)
  * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcflow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL tcflow)(__fd_t __fd, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcflow))(__fd, __action); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCXONC */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCXONC */
 #endif /* !__CRT_HAVE_tcflow */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
@@ -755,11 +763,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcflow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FD
 __CDECLARE(__ATTR_FDARG(1),__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_tcgetsid */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCGSID)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCGSID)
 #include <libc/local/termios/tcgetsid.h>
 /* >> tcgetsid(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetsid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __pid_t __NOTHROW_NCX(__LIBCCALL tcgetsid)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetsid))(__fd); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCGSID */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCGSID */
 #endif /* !__CRT_HAVE_tcgetsid */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
@@ -769,11 +778,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetsid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
 #else /* __CRT_HAVE_tcsetsid */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSCTTY)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCSCTTY)
 #include <libc/local/termios/tcsetsid.h>
 /* >> tcsetsid(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetsid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL tcsetsid)(__fd_t __fd, __pid_t __pid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetsid))(__fd, __pid); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSCTTY */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCSCTTY */
 #endif /* !__CRT_HAVE_tcsetsid */
 #endif /* __USE_BSD */
 
@@ -824,22 +834,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CDECLARE(__ATTR_FDARG(1) __ATTR_OUT(2),int,__NOTHROW_NCX,tcgetwinsize,(__fd_t __fd, struct winsize *__winsize_p),(__fd,__winsize_p))
 #else /* __CRT_HAVE_tcgetwinsize */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCGWINSZ)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCGWINSZ)
 #include <libc/local/termios/tcgetwinsize.h>
 /* >> tcgetwinsize(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetwinsize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL tcgetwinsize)(__fd_t __fd, struct winsize *__winsize_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetwinsize))(__fd, __winsize_p); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCGWINSZ */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCGWINSZ */
 #endif /* !__CRT_HAVE_tcgetwinsize */
 #ifdef __CRT_HAVE_tcsetwinsize
 /* >> tcsetwinsize(3) */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN(2),int,__NOTHROW_NCX,tcsetwinsize,(__fd_t __fd, struct winsize const *__winsize_p),(__fd,__winsize_p))
 #else /* __CRT_HAVE_tcsetwinsize */
 #include <asm/os/tty.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSWINSZ)
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TIOCSWINSZ)
 #include <libc/local/termios/tcsetwinsize.h>
 /* >> tcsetwinsize(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetwinsize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL tcsetwinsize)(__fd_t __fd, struct winsize const *__winsize_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetwinsize))(__fd, __winsize_p); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSWINSZ */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TIOCSWINSZ */
 #endif /* !__CRT_HAVE_tcsetwinsize */
 #endif /* __USE_NETBSD */
 

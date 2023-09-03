@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f259af9 */
+/* HASH CRC-32:0x1e355c2f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2006,7 +2006,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_F
 __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,directio,(__fd_t __fd, int __mode),(__fd,__mode))
 #else /* __CRT_HAVE_directio */
 #include <asm/os/file-ioctls.h>
-#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__FIODIRECTIO)
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__FIODIRECTIO)
 #include <libc/local/fcntl/directio.h>
 /* >> directio(3)
  * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
@@ -2028,7 +2028,7 @@ __CDECLARE(__ATTR_FDARG(1),int,__NOTHROW_NCX,directio,(__fd_t __fd, int __mode),
  * @return:  0: Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(directio, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) int __NOTHROW_NCX(__LIBCCALL directio)(__fd_t __fd, int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(directio))(__fd, __mode); })
-#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __FIODIRECTIO */
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __FIODIRECTIO */
 #endif /* !__CRT_HAVE_directio */
 #endif /* __USE_SOLARIS */
 

@@ -670,7 +670,12 @@ __SYSDECL_BEGIN
 @@@return: 0 : A zero return-value usually indicates success.
 @@@return: -1: All ioctl operations use this to indicate error (s.a. `errno')
 [[cp, guard, vartypes(void *), decl_include("<features.h>", "<bits/types.h>")]]
-[[export_alias("__ioctl", "__libc_ioctl")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("ioctl", "__ioctl", "__libc_ioctl")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__ioctl_time64")]]
+[[alias("ioctl", "__ioctl", "__libc_ioctl", "__ioctl_time64")]]
+[[no_crt_self_import]]
+[[export_as("__ioctl", "__libc_ioctl")]]
+[[time64_export_as("__ioctl_time64")]]
 __STDC_INT_AS_SSIZE_T ioctl([[fdarg]] $fd_t fd, $ioctl_t request, ...);
 
 %{

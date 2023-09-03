@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6c23842 */
+/* HASH CRC-32:0x1cb027af */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,7 +296,53 @@ __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #ifndef __ioctl_defined
 #define __ioctl_defined
-#ifdef __CRT_HAVE_ioctl
+#include <features.h>
+#include <bits/types.h>
+#if defined(__CRT_HAVE_ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__LIBC __ATTR_FDARG(1) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ioctl_t __request, ...) __CASMNAME_SAME("ioctl");
+#elif defined(__CRT_HAVE___ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___libc_ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl_time64,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE_ioctl)
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.
  * Many I/O  control operations  except  an additional  argument,  though
@@ -329,6 +375,17 @@ __CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t _
  * @return: 0 : A zero return-value usually indicates success.
  * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__libc_ioctl,(__fd,__request),__request,1,(void *))
+#elif defined(__CRT_HAVE___ioctl_time64)
+/* >> ioctl(2)
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
+ * usually either a pointer to a larger argument structure, or an integer
+ * that fits into a single register.
+ * @return: * : The return value depends on the given `request'.
+ * @return: 0 : A zero return-value usually indicates success.
+ * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
+__CVREDIRECT(__ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,ioctl,(__fd_t __fd, __ioctl_t __request),__ioctl_time64,(__fd,__request),__request,1,(void *))
 #else /* ... */
 #undef __ioctl_defined
 #endif /* !... */
