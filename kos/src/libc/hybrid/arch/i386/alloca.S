@@ -38,8 +38,8 @@
 .section .text.crt.utility
 INTERN_FUNCTION(libc_alloca)
 	.cfi_startproc
-	popP_cfi %Pdx              /* return address */
-	.cfi_register %Pip, %Pdx
+	popP_cfi %Pcx              /* return address */
+	.cfi_register %Pip, %Pcx
 #ifdef __x86_64__
 	subP   %R_sysvabi0P, %Psp  /* Allocate stack memory */
 #else /* __x86_64__ */
@@ -48,8 +48,13 @@ INTERN_FUNCTION(libc_alloca)
 .Lalloca_dos_join:
 	andP   $(~(SIZEOF_POINTER - 1)), %Psp /* Re-align stack */
 	.cfi_same_value %Psp
-	movP   %Psp, %Pax          /* Also re-return the new stack pointer in `%Pax' */
-	jmpP   *%Pdx               /* Return to caller */
+#ifdef __x86_64__
+	movP   %Psp, %Pax          /* Return the new stack pointer in `%Pax' */
+#else /* __x86_64__ */
+	leaP   4(%Psp), %Pax       /* Must add 4 to return pointer because CDECL means
+	                            * caller  still has to  free arguments from stack. */
+#endif /* !__x86_64__ */
+	jmpP   *%Pcx               /* Return to caller */
 	.cfi_endproc
 END(libc_alloca)
 
