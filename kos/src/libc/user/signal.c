@@ -1272,7 +1272,7 @@ NOTHROW(LIBCCALL libc___libc_current_sigrtmax)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x92d16028]]]*/
+/*[[[start:exports,hash:CRC-32=0x6ab97bb]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1311,6 +1311,7 @@ DEFINE_PUBLIC_ALIAS(chkuserprocmask, libc_chkuserprocmask);
 DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(__sigaction, libc_sigaction);
+DEFINE_PUBLIC_ALIAS(__libc_sigaction, libc_sigaction);
 DEFINE_PUBLIC_ALIAS(sigaction, libc_sigaction);
 DEFINE_PUBLIC_ALIAS(__sigpending, libc_sigpending);
 DEFINE_PUBLIC_ALIAS(__libc_sigpending, libc_sigpending);

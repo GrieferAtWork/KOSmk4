@@ -815,6 +815,7 @@ int tcsendbreak([[fdarg]] $fd_t fd, int duration) {
 
 @@>> tcdrain(3)
 [[cp, decl_include("<bits/types.h>")]]
+[[export_as("__libc_tcdrain")]] /* From Glibc 2.3.2 */
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRK))]]
 int tcdrain([[fdarg]] $fd_t fd) {

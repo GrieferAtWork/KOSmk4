@@ -1212,6 +1212,7 @@ int getsockname([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*
 @@@return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect)
 [[cp, export_alias("__connect"), decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__libc_connect")]] /* From Glibc 2.3.2 */
 int connect([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
             socklen_t addr_len);
 
@@ -1239,6 +1240,7 @@ int getpeername([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*
 @@@return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 [[cp, export_alias("__send"), decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__libc_send")]] /* From Glibc 2.3.2 */
 ssize_t send([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1250,6 +1252,7 @@ ssize_t send([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf
 @@@return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 [[cp, wunused, export_alias("__recv"), decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__libc_recv")]] /* From Glibc 2.3.2 */
 ssize_t recv([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1270,6 +1273,7 @@ ssize_t recv([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *buf,
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 @@@return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__libc_sendto")]] /* From Glibc 2.3.2 */
 ssize_t sendto([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
@@ -1292,6 +1296,7 @@ ssize_t sendto([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *b
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__libc_recvfrom")]] /* From Glibc 2.3.2 */
 ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                  /*[[out_opt/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
@@ -1305,6 +1310,7 @@ ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__res
 @@@return: * : [<= bufsize] The actual # of send payload bytes
 @@@return: -1: ... Same as for `send(2)' and `sendto(2)'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
+[[export_as("__libc_sendmsg")]] /* From Glibc 2.3.2 */
 ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1317,6 +1323,7 @@ ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
 @@@return: * : [<= bufsize] The actual # of received payload bytes
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
+[[export_as("__libc_recvmsg")]] /* From Glibc 2.3.2 */
 ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1375,6 +1382,7 @@ int listen([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__libc_accept")]] /* From Glibc 2.3.2 */
 $fd_t accept([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
              [[inout_opt]] socklen_t *__restrict addr_len);
 

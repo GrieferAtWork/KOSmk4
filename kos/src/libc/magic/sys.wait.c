@@ -104,6 +104,7 @@ typedef struct __siginfo_struct siginfo_t;
 @@>> wait(2)
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
 [[cp, export_alias("__wait"), decl_include("<bits/types.h>", "<parts/waitmacros.h>")]]
+[[export_as("__libc_wait")]] /* From Glibc 2.3.2 */
 $pid_t wait(/*[[out_opt]]*/ __WAIT_STATUS stat_loc);
 
 @@>> waitpid(2)
@@ -115,6 +116,7 @@ $pid_t wait(/*[[out_opt]]*/ __WAIT_STATUS stat_loc);
 @@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[decl_include("<bits/types.h>", "<features.h>", "<parts/waitmacros.h>")]]
 [[cp, export_alias("__waitpid")]]
+[[export_as("__libc_waitpid")]] /* From Glibc 2.3.2 */
 $pid_t waitpid($pid_t pid, /*[[out_opt]]*/ __WAIT_STATUS stat_loc,
                __STDC_INT_AS_UINT_T options);
 

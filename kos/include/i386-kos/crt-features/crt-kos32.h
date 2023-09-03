@@ -742,6 +742,7 @@
 #define __CRT_HAVE___lgammaf_r
 #define __CRT_HAVE___lgammal
 #define __CRT_HAVE___lgammal_r
+#define __CRT_HAVE___libc_accept
 #define __CRT_HAVE___libc_access
 #define __CRT_HAVE___libc_acct
 #define __CRT_HAVE___libc_adjtimex
@@ -755,6 +756,7 @@
 #define __CRT_HAVE___libc_chroot
 #define __CRT_HAVE___libc_close
 #define __CRT_HAVE___libc_closedir
+#define __CRT_HAVE___libc_connect
 #define __CRT_HAVE___libc_creat
 #define __CRT_HAVE___libc_current_sigrtmax
 #define __CRT_HAVE___libc_current_sigrtmax_private
@@ -801,6 +803,7 @@
 #define __CRT_HAVE___libc_link
 #define __CRT_HAVE___libc_longjmp
 #define __CRT_HAVE___libc_lseek
+#define __CRT_HAVE___libc_lseek64
 #define __CRT_HAVE___libc_mallinfo
 #define __CRT_HAVE___libc_malloc
 #define __CRT_HAVE___libc_mallopt
@@ -820,10 +823,12 @@
 #define __CRT_HAVE___libc_nanosleep
 #define __CRT_HAVE___libc_nice
 #define __CRT_HAVE___libc_open
+#define __CRT_HAVE___libc_open64
 #define __CRT_HAVE___libc_opendir
 #define __CRT_HAVE___libc_pause
 #define __CRT_HAVE___libc_pipe
 #define __CRT_HAVE___libc_pread
+#define __CRT_HAVE___libc_pread64
 #define __CRT_HAVE___libc_prev_fstat
 #define __CRT_HAVE___libc_prev_lstat
 #define __CRT_HAVE___libc_prev_mknod
@@ -831,13 +836,18 @@
 #define __CRT_HAVE___libc_prev_ustat
 #define __CRT_HAVE___libc_pvalloc
 #define __CRT_HAVE___libc_pwrite
+#define __CRT_HAVE___libc_pwrite64
 #define __CRT_HAVE___libc_read
 #define __CRT_HAVE___libc_readdir
 #define __CRT_HAVE___libc_readdir_r
 #define __CRT_HAVE___libc_readlink
+#define __CRT_HAVE___libc_readv
 #define __CRT_HAVE___libc_realloc
 #define __CRT_HAVE___libc_reallocarray
 #define __CRT_HAVE___libc_reboot
+#define __CRT_HAVE___libc_recv
+#define __CRT_HAVE___libc_recvfrom
+#define __CRT_HAVE___libc_recvmsg
 #define __CRT_HAVE___libc_rename
 #define __CRT_HAVE___libc_rewinddir
 #define __CRT_HAVE___libc_rmdir
@@ -851,6 +861,9 @@
 #define __CRT_HAVE___libc_sched_yield
 #define __CRT_HAVE___libc_secure_getenv
 #define __CRT_HAVE___libc_seekdir
+#define __CRT_HAVE___libc_send
+#define __CRT_HAVE___libc_sendmsg
+#define __CRT_HAVE___libc_sendto
 #define __CRT_HAVE___libc_setdomainname
 #define __CRT_HAVE___libc_setfsgid
 #define __CRT_HAVE___libc_setfsuid
@@ -866,6 +879,7 @@
 #define __CRT_HAVE___libc_setsid
 #define __CRT_HAVE___libc_settimeofday
 #define __CRT_HAVE___libc_setuid
+#define __CRT_HAVE___libc_sigaction
 #define __CRT_HAVE___libc_siglongjmp
 #define __CRT_HAVE___libc_sigpending
 #define __CRT_HAVE___libc_sigprocmask
@@ -884,6 +898,7 @@
 #define __CRT_HAVE___libc_syscall_writev
 #define __CRT_HAVE___libc_sysinfo
 #define __CRT_HAVE___libc_system
+#define __CRT_HAVE___libc_tcdrain
 #define __CRT_HAVE___libc_telldir
 #define __CRT_HAVE___libc_time
 #define __CRT_HAVE___libc_times
@@ -896,8 +911,11 @@
 #define __CRT_HAVE___libc_valloc
 #define __CRT_HAVE___libc_vfork
 #define __CRT_HAVE___libc_vhangup
+#define __CRT_HAVE___libc_wait
 #define __CRT_HAVE___libc_wait4
+#define __CRT_HAVE___libc_waitpid
 #define __CRT_HAVE___libc_write
+#define __CRT_HAVE___libc_writev
 #define __CRT_HAVE___link
 #define __CRT_HAVE___linux_C_lib_version
 #define __CRT_HAVE___llrint
@@ -7011,6 +7029,7 @@
 #define __CRT_HAVE_KOS$__libc_link
 #define __CRT_HAVE_KOS$__libc_mkdir
 #define __CRT_HAVE_KOS$__libc_open
+#define __CRT_HAVE_KOS$__libc_open64
 #define __CRT_HAVE_KOS$__libc_opendir
 #define __CRT_HAVE_KOS$__libc_prev_mknod
 #define __CRT_HAVE_KOS$__libc_readlink
@@ -7910,6 +7929,7 @@
 #define __CRT_HAVE_DOS$__libc_link
 #define __CRT_HAVE_DOS$__libc_mkdir
 #define __CRT_HAVE_DOS$__libc_open
+#define __CRT_HAVE_DOS$__libc_open64
 #define __CRT_HAVE_DOS$__libc_opendir
 #define __CRT_HAVE_DOS$__libc_prev_mknod
 #define __CRT_HAVE_DOS$__libc_readlink

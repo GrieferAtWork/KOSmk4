@@ -1285,6 +1285,7 @@ int nanosleep32([[in]] struct $timespec32 const *requested_time,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep64")]]
 [[userimpl, requires($has_function(nanosleep32) || $has_function(nanosleep64))]]
+[[export_as("__libc_nanosleep")]] /* From Glibc 2.3.2 */
 [[impl_include("<bits/os/timespec.h>")]]
 int nanosleep([[in]] struct timespec const *requested_time,
               [[out_opt]] struct timespec *remaining) {

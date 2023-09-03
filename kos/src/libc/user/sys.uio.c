@@ -207,15 +207,17 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5cb7f222]]]*/
+/*[[[start:exports,hash:CRC-32=0x1732eb3f]]]*/
 DEFINE_PUBLIC_ALIAS(process_vm_readv, libc_process_vm_readv);
 DEFINE_PUBLIC_ALIAS(process_vm_writev, libc_process_vm_writev);
 DEFINE_PUBLIC_ALIAS(__readv, libc_readv);
 DEFINE_PUBLIC_ALIAS(syscall_readv, libc_readv);
 DEFINE_PUBLIC_ALIAS(__syscall_readv, libc_readv);
 DEFINE_PUBLIC_ALIAS(__libc_syscall_readv, libc_readv);
+DEFINE_PUBLIC_ALIAS(__libc_readv, libc_readv);
 DEFINE_PUBLIC_ALIAS(readv, libc_readv);
 DEFINE_PUBLIC_ALIAS(__writev, libc_writev);
+DEFINE_PUBLIC_ALIAS(__libc_writev, libc_writev);
 DEFINE_PUBLIC_ALIAS(syscall_writev, libc_writev);
 DEFINE_PUBLIC_ALIAS(__syscall_writev, libc_writev);
 DEFINE_PUBLIC_ALIAS(__libc_syscall_writev, libc_writev);

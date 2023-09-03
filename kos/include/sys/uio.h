@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc02a738a */
+/* HASH CRC-32:0x87997c3f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,6 +126,17 @@ __CDECLARE(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
 __CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__writev,(__fd,__iov,__count))
+#elif defined(__CRT_HAVE___libc_writev)
+/* >> writev(2)
+ * Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write  data from `count'  separate buffers, though  still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
+__CREDIRECT(__ATTR_FDWRITE(1) __ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),__libc_writev,(__fd,__iov,__count))
 #endif /* ... */
 
 #ifdef __USE_MISC

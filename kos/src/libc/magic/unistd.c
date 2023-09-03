@@ -1578,6 +1578,7 @@ ssize_t freadlinkat([[dirfd]] $fd_t dfd, [[in]] char const *path,
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("_lseek", "__lseek", "__libc_lseek")]]
 [[dos_only_export_alias("_lseeki64")]]
 [[export_alias("llseek", "__llseek")]]
+[[export_as("__libc_lseek64")]] /* From Glibc 2.3.2 */
 [[userimpl, requires_function(crt_lseek32)]]
 [[section(".text.crt{|.dos}.io.large.seek")]]
 $off64_t lseek64([[fdarg]] $fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
@@ -1746,6 +1747,7 @@ ssize_t crt_pwrite32([[fdwrite]] $fd_t fd, [[in(return <= bufsize)]] void const 
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[preferred_off64_variant_of(pread), doc_alias("pread")]]
 [[export_alias("__pread64")]]
+[[export_as("__libc_pread64")]] /* From Glibc 2.3.2 */
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(crt_pread32) ||
            ($has_function(lseek, read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
@@ -1784,6 +1786,7 @@ ssize_t pread64([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf,
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[preferred_off64_variant_of(pwrite), doc_alias("pwrite")]]
 [[export_alias("__pwrite64")]]
+[[export_as("__libc_pwrite64")]] /* From Glibc 2.3.2 */
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(crt_pwrite32) ||
            ($has_function(lseek, write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
@@ -3096,6 +3099,7 @@ void *sbrk(intptr_t delta);
 [[cp, decl_include("<bits/types.h>")]]
 [[export_alias("__fdatasync", "__libc_fdatasync")]]
 [[alias("fsync", "__fsync", "_commit")]]
+[[export_as("__libc_fsync")]] /* From Glibc 2.3.2 */
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 int fdatasync([[fdwrite]] $fd_t fd) {
 	COMPILER_IMPURE();

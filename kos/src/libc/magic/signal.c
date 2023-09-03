@@ -1991,6 +1991,7 @@ int sigsuspend([[in]] sigset_t const *set);
 @@@return: -1: [errno=EINVAL] The given `signo' is invalid
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
+[[export_as("__libc_sigaction")]] /* From Glibc 2.3.2 */
 int sigaction($signo_t signo,
               [[in_opt]] struct sigaction const *act,
               [[out_opt]] struct sigaction *oact);

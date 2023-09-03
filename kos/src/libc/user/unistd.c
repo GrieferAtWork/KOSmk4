@@ -3487,7 +3487,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa37c1089]]]*/
+/*[[[start:exports,hash:CRC-32=0x255ed01a]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3675,14 +3675,17 @@ DEFINE_PUBLIC_ALIAS(_lseeki64, libc_lseek64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__llseek, libc_lseek64);
+DEFINE_PUBLIC_ALIAS(__libc_lseek64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(lseek64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__libc_pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(__libc_pwrite, libc_pwrite);
 DEFINE_PUBLIC_ALIAS(pwrite, libc_pwrite);
 DEFINE_PUBLIC_ALIAS(__pread64, libc_pread64);
+DEFINE_PUBLIC_ALIAS(__libc_pread64, libc_pread64);
 DEFINE_PUBLIC_ALIAS(pread64, libc_pread64);
 DEFINE_PUBLIC_ALIAS(__pwrite64, libc_pwrite64);
+DEFINE_PUBLIC_ALIAS(__libc_pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_ALIAS(pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_ALIAS(DOS$dup3, libd_dup3);
 DEFINE_PUBLIC_ALIAS(dup3, libc_dup3);
@@ -3779,6 +3782,7 @@ DEFINE_PUBLIC_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(sbrk, libc_sbrk);
 DEFINE_PUBLIC_ALIAS(__fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(__libc_fdatasync, libc_fdatasync);
+DEFINE_PUBLIC_ALIAS(__libc_fsync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);

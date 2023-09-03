@@ -624,26 +624,34 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7bd3d037]]]*/
+/*[[[start:exports,hash:CRC-32=0x3c5b5886]]]*/
 DEFINE_PUBLIC_ALIAS(__socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socketpair, libc_socketpair);
 DEFINE_PUBLIC_ALIAS(bind, libc_bind);
 DEFINE_PUBLIC_ALIAS(getsockname, libc_getsockname);
 DEFINE_PUBLIC_ALIAS(__connect, libc_connect);
+DEFINE_PUBLIC_ALIAS(__libc_connect, libc_connect);
 DEFINE_PUBLIC_ALIAS(connect, libc_connect);
 DEFINE_PUBLIC_ALIAS(getpeername, libc_getpeername);
 DEFINE_PUBLIC_ALIAS(__send, libc_send);
+DEFINE_PUBLIC_ALIAS(__libc_send, libc_send);
 DEFINE_PUBLIC_ALIAS(send, libc_send);
 DEFINE_PUBLIC_ALIAS(__recv, libc_recv);
+DEFINE_PUBLIC_ALIAS(__libc_recv, libc_recv);
 DEFINE_PUBLIC_ALIAS(recv, libc_recv);
+DEFINE_PUBLIC_ALIAS(__libc_sendto, libc_sendto);
 DEFINE_PUBLIC_ALIAS(sendto, libc_sendto);
+DEFINE_PUBLIC_ALIAS(__libc_recvfrom, libc_recvfrom);
 DEFINE_PUBLIC_ALIAS(recvfrom, libc_recvfrom);
+DEFINE_PUBLIC_ALIAS(__libc_sendmsg, libc_sendmsg);
 DEFINE_PUBLIC_ALIAS(sendmsg, libc_sendmsg);
+DEFINE_PUBLIC_ALIAS(__libc_recvmsg, libc_recvmsg);
 DEFINE_PUBLIC_ALIAS(recvmsg, libc_recvmsg);
 DEFINE_PUBLIC_ALIAS(getsockopt, libc_getsockopt);
 DEFINE_PUBLIC_ALIAS(setsockopt, libc_setsockopt);
 DEFINE_PUBLIC_ALIAS(listen, libc_listen);
+DEFINE_PUBLIC_ALIAS(__libc_accept, libc_accept);
 DEFINE_PUBLIC_ALIAS(accept, libc_accept);
 DEFINE_PUBLIC_ALIAS(shutdown, libc_shutdown);
 DEFINE_PUBLIC_ALIAS(accept4, libc_accept4);

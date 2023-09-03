@@ -120,6 +120,7 @@ ssize_t process_vm_writev($pid_t pid,
  * don't import this function under  these aliases. The same also  goes
  * for `writev()' below! */
 [[export_as("syscall_readv", "__syscall_readv", "__libc_syscall_readv")]]
+[[export_as("__libc_readv")]] /* From Glibc 2.3.2 */
 ssize_t readv([[fdread]] $fd_t fd, [[in(? <= count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 @@>> writev(2)
@@ -132,7 +133,7 @@ ssize_t readv([[fdread]] $fd_t fd, [[in(? <= count)]] struct iovec const *iov, _
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 @@@return: 0                     : No more data can be written
 [[cp, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
-[[export_alias("__writev")]]
+[[export_alias("__writev", "__libc_writev")]]
 [[export_as("syscall_writev", "__syscall_writev", "__libc_syscall_writev")]]
 ssize_t writev([[fdwrite]] $fd_t fd, [[in(? <= count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 

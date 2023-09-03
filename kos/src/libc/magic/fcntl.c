@@ -1708,6 +1708,7 @@ $fd_t open32([[in]] char const *filename, $oflag_t oflags, ...);
 [[                                                                                                                                                     alias("open64", "__open64")]]
 [[decl_include("<bits/types.h>"), export_as("__open", "__libc_open", "__open_2")]]
 [[crt_dos_variant, dos_export_as("DOS$_open", /*"DOS$"*/ "?_open@@YAHPBDHH@Z")]]
+[[export_as("__libc_open")]] /* From Glibc 2.3.2 */
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
 $fd_t open([[in]] char const *filename, $oflag_t oflags, ...) {
@@ -1741,6 +1742,7 @@ $fd_t creat([[in]] char const *filename, $mode_t mode) {
 [[vartypes($mode_t), crt_dos_variant, preferred_largefile64_variant_of(open), doc_alias("open")]]
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_open", "__open", "__libc_open")]]
 [[export_alias("__open64"), export_as("__open64_2")]]
+[[export_as("__libc_open64")]] /* From Glibc 2.3.2 */
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
 [[cp, wunused, userimpl, requires_function(open32)]]
 $fd_t open64([[in]] char const *filename, $oflag_t oflags, ...) {
