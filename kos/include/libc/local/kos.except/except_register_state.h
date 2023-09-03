@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b1b6284 */
+/* HASH CRC-32:0x2969fd09 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,7 @@
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
 #ifdef __arch_except_register_state
-#include <kos/bits/except.h>
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/except-register-state.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(except_register_state) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __EXCEPT_REGISTER_STATE_TYPE *
 __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_register_state))(void) {

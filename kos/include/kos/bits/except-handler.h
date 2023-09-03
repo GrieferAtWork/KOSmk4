@@ -21,14 +21,8 @@
 #define _KOS_BITS_EXCEPT_HANDLER_H 1
 
 #include <__stdinc.h>
-#ifndef __except_register_state_t_defined
-#include <kos/bits/except.h> /* __EXCEPT_REGISTER_STATE_TYPE */
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
-#endif /* !__except_register_state_t_defined */
+
+#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

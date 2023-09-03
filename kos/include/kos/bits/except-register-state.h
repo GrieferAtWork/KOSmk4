@@ -17,41 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_EXCEPTION_NEST_H
-#define _KOS_BITS_EXCEPTION_NEST_H 1
+#ifndef _KOS_BITS_EXCEPT_REGISTER_STATE_H
+#define _KOS_BITS_EXCEPT_REGISTER_STATE_H 1
 
-#include <__stdinc.h>
-#include <features.h>
+#include <kos/bits/except.h> /* __EXCEPT_REGISTER_STATE_TYPE */
 
-#include <hybrid/byteorder.h>
-#include <hybrid/typecore.h>
+#ifndef __EXCEPT_REGISTER_STATE_TYPE
+#include <bits/os/mcontext.h>
+#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
+#define __EXCEPT_REGISTER_STATE_TYPE_IS_MCONTEXT
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
-#include <bits/types.h>
-#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
-#include <kos/bits/exception_data.h>        /* struct exception_data */
-
-#ifndef __EXCEPT_BACKTRACE_SIZE
-#if defined(NDEBUG) || defined(NDEBUG_EXCEPT_TRACE)
-#define __EXCEPT_BACKTRACE_SIZE 0
-#else /* NDEBUG || NDEBUG_EXCEPT_TRACE */
-#define __EXCEPT_BACKTRACE_SIZE 16
-#endif /* !NDEBUG && !NDEBUG_EXCEPT_TRACE */
-#endif /* !__EXCEPT_BACKTRACE_SIZE */
-
-#ifdef __CC__
-__DECL_BEGIN
-
-#define _EXCEPTION_NESTING_DATA_SIZE (sizeof(struct _exception_nesting_data) - sizeof(__size_t))
-struct _exception_nesting_data {
-	__size_t                     en_size;  /* == _EXCEPTION_NESTING_DATA_SIZE */
-	__EXCEPT_REGISTER_STATE_TYPE en_state; /* Saved exception state. */
-	struct exception_data        en_data;  /* Saved exception data. */
-#if __EXCEPT_BACKTRACE_SIZE != 0
-	void                        *en_trace[__EXCEPT_BACKTRACE_SIZE]; /* Saved traceback. */
-#endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
-};
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_KOS_BITS_EXCEPTION_NEST_H */
+#endif /* !_KOS_BITS_EXCEPT_REGISTER_STATE_H */

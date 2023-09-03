@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf71eaf1 */
+/* HASH CRC-32:0xf22edf43 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,11 +35,11 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <hybrid/host.h>
-#include <kos/bits/except.h>          /* __EXCEPT_REGISTER_STATE_TYPE */
-#include <kos/bits/except-compiler.h> /* __TRY, __EXCEPT */
-#include <kos/bits/exception_data.h>  /* struct exception_data */
-#include <kos/bits/exception_nest.h>  /* struct _exception_nesting_data */
-#include <kos/except/codes.h>         /* E_OK, ... */
+#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/except-compiler.h>       /* __TRY, __EXCEPT */
+#include <kos/bits/exception_data.h>        /* struct exception_data */
+#include <kos/bits/exception_nest.h>        /* struct _exception_nesting_data */
+#include <kos/except/codes.h>               /* E_OK, ... */
 #include <kos/bits/fastexcept.h>
 #include <bits/crt/format-printer.h>
 
@@ -50,12 +50,6 @@
 #ifndef EXCEPTION_DATA_POINTERS
 #define EXCEPTION_DATA_POINTERS  8
 #endif /* !EXCEPTION_DATA_POINTERS */
-
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

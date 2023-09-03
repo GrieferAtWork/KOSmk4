@@ -25,16 +25,11 @@
 #if (defined(__CC__) && defined(__KOS__) && \
      defined(__KERNEL__) && !defined(__INTELLISENSE__))
 #include <__crt.h>
+
 #include <sched/pertask.h>
 
-#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
-#include <kos/bits/exception_data.h> /* struct exception_data, __except_code_t, ... */
-
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/exception_data.h>        /* struct exception_data, __except_code_t, ... */
 
 __DECL_BEGIN
 

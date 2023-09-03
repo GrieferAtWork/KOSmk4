@@ -27,9 +27,9 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/bits/except.h>         /* __EXCEPT_REGISTER_STATE_TYPE */
-#include <kos/bits/exception_data.h> /* struct exception_data */
-#include <kos/bits/exception_nest.h> /* __EXCEPT_BACKTRACE_SIZE */
+#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/exception_data.h>        /* struct exception_data */
+#include <kos/bits/exception_nest.h>        /* __EXCEPT_BACKTRACE_SIZE */
 
 #undef EXCEPT_BACKTRACE_SIZE
 #define EXCEPT_BACKTRACE_SIZE __EXCEPT_BACKTRACE_SIZE
@@ -58,12 +58,6 @@
 #define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_EXCEPT_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_ARGS)
 #define OFFSET_EXCEPTION_INFO_TRACE    (__SIZEOF_EXCEPT_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA)
 #define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_EXCEPT_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA + (__EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__))
-
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 #ifdef __CC__
 __DECL_BEGIN

@@ -88,15 +88,15 @@
 )]%[insert:prefix(
 #include <hybrid/host.h>
 )]%[insert:prefix(
-#include <kos/bits/except.h>          /* __EXCEPT_REGISTER_STATE_TYPE */
+#include <kos/bits/except-register-state.h> /* __EXCEPT_REGISTER_STATE_TYPE */
 )]%[insert:prefix(
-#include <kos/bits/except-compiler.h> /* __TRY, __EXCEPT */
+#include <kos/bits/except-compiler.h>       /* __TRY, __EXCEPT */
 )]%[insert:prefix(
-#include <kos/bits/exception_data.h>  /* struct exception_data */
+#include <kos/bits/exception_data.h>        /* struct exception_data */
 )]%[insert:prefix(
-#include <kos/bits/exception_nest.h>  /* struct _exception_nesting_data */
+#include <kos/bits/exception_nest.h>        /* struct _exception_nesting_data */
 )]%[insert:prefix(
-#include <kos/except/codes.h>         /* E_OK, ... */
+#include <kos/except/codes.h>               /* E_OK, ... */
 )]%[insert:prefix(
 #include <kos/bits/fastexcept.h>
 )]%[insert:prefix(
@@ -110,12 +110,6 @@
 #ifndef EXCEPTION_DATA_POINTERS
 #define EXCEPTION_DATA_POINTERS  8
 #endif /* !EXCEPTION_DATA_POINTERS */
-
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 
 }
 
@@ -263,14 +257,8 @@ except_subclass_t except_subclass(void) {
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_register_state)),
   preferred_fast_extern_inline("except_register_state", { return __arch_except_register_state(); })]]
-[[const, wunused, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
-[[decl_prefix(
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
-)]]
+[[const, wunused, nothrow, nonnull]]
+[[decl_include("<kos/bits/except-register-state.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_except_register_state))]]
 except_register_state_t *except_register_state(void) {
@@ -1803,18 +1791,12 @@ struct exception_info *except_info(void) {
 @@Unwind the given register state to propagate the currently set error.
 @@Following this, the  returned register state  should then be  loaded.
 [[kernel, cc(__EXCEPT_UNWIND_CC)]]
-[[wunused, nonnull, decl_include("<kos/bits/except.h>")]]
+[[wunused, nonnull]]
+[[decl_include("<kos/bits/except-register-state.h>")]]
 [[decl_prefix(
 #ifndef __EXCEPT_UNWIND_CC
 #define __EXCEPT_UNWIND_CC __LIBKCALL
 #endif /* !__EXCEPT_UNWIND_CC */
-)]]
-[[decl_prefix(
-#ifndef __EXCEPT_REGISTER_STATE_TYPE
-#include <bits/os/mcontext.h>
-#define __EXCEPT_REGISTER_STATE_TYPE   struct mcontext
-#define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
-#endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 )]]
 except_register_state_t *except_unwind([[inout]] except_register_state_t *__restrict state);
 
