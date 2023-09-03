@@ -39,127 +39,178 @@
 
 #if defined(__CRT_HAVE_x86_nopf_rep_movsb) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_memcpy_nopf __arch_memcpy_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_movsb */
+#endif /* __CRT_HAVE_x86_nopf_rep_movsb || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_repe_cmpsb) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_nopf_memeq __arch_nopf_memeq
-#endif /* __CRT_HAVE_x86_nopf_repe_cmpsb */
+#endif /* __CRT_HAVE_x86_nopf_repe_cmpsb || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_insb) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_insb_nopf __arch_insb_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_insb */
+#endif /* __CRT_HAVE_x86_nopf_rep_insb || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_insw) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_insw_nopf __arch_insw_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_insw */
+#endif /* __CRT_HAVE_x86_nopf_rep_insw || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_insl) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_insl_nopf __arch_insl_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_insl */
+#endif /* __CRT_HAVE_x86_nopf_rep_insl || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_outsb) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_outsb_nopf __arch_outsb_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_outsb */
+#endif /* __CRT_HAVE_x86_nopf_rep_outsb || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_outsw) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_outsw_nopf __arch_outsw_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_outsw */
+#endif /* __CRT_HAVE_x86_nopf_rep_outsw || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_rep_outsl) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_outsl_nopf __arch_outsl_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_outsl */
+#endif /* __CRT_HAVE_x86_nopf_rep_outsl || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_movb_Pax_al) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_readb_nopf __arch_readb_nopf
-#endif /* __CRT_HAVE_x86_nopf_movb_Pax_al */
+#endif /* __CRT_HAVE_x86_nopf_movb_Pax_al || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_movw_Pax_ax) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_readw_nopf __arch_readw_nopf
-#endif /* __CRT_HAVE_x86_nopf_movw_Pax_ax */
+#endif /* __CRT_HAVE_x86_nopf_movw_Pax_ax || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_movl_Pax_eax) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_readl_nopf __arch_readl_nopf
-#endif /* __CRT_HAVE_x86_nopf_movl_Pax_eax */
+#endif /* __CRT_HAVE_x86_nopf_movl_Pax_eax || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_Pax_rax) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_readq_nopf __arch_readq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_Pax_rax || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_movb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_writeb_nopf __arch_writeb_nopf
-#endif /* __CRT_HAVE_x86_nopf_movb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_movb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_movw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_writew_nopf __arch_writew_nopf
-#endif /* __CRT_HAVE_x86_nopf_movw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_movw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_movl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_writel_nopf __arch_writel_nopf
-#endif /* __CRT_HAVE_x86_nopf_movl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_movl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_writeq_nopf __arch_writeq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_rep_stosb) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_memset_nopf __arch_memset_nopf
-#endif /* __CRT_HAVE_x86_nopf_rep_stosb */
+#endif /* __CRT_HAVE_x86_nopf_rep_stosb || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xchgb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xchb_nopf __arch_atomic_xchb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xchgb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xchgb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xchgw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xchw_nopf __arch_atomic_xchw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xchgw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xchgw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xchgl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xchl_nopf __arch_atomic_xchl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xchgl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xchgl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_xchgq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_xchq_nopf __arch_atomic_xchq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_xchgq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_lock_xaddb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_fetchaddb_nopf __arch_atomic_fetchaddb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xaddb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xaddb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xaddw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_fetchaddw_nopf __arch_atomic_fetchaddw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xaddw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xaddw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xaddl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_fetchaddl_nopf __arch_atomic_fetchaddl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xaddl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xaddl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_xaddq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_fetchaddq_nopf __arch_atomic_fetchaddq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_xaddq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_lock_orb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_orb_nopf __arch_atomic_orb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_orb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_orb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_orw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_orw_nopf __arch_atomic_orw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_orw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_orw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_orl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_orl_nopf __arch_atomic_orl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_orl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_orl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_orq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_orq_nopf __arch_atomic_orq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_orq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_lock_andb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_andb_nopf __arch_atomic_andb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_andb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_andb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_andw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_andw_nopf __arch_atomic_andw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_andw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_andw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_andl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_andl_nopf __arch_atomic_andl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_andl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_andl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_andq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_andq_nopf __arch_atomic_andq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_andq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_lock_xorb_al_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xorb_nopf __arch_atomic_xorb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xorb_al_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xorb_al_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xorw_ax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xorw_nopf __arch_atomic_xorw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xorw_ax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xorw_ax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_xorl_eax_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_xorl_nopf __arch_atomic_xorl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_xorl_eax_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_xorl_eax_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_xorq_rax_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_xorq_nopf __arch_atomic_xorq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_xorq_rax_Pcx || __X86_NOPF_AVAILABLE) */
 #if defined(__CRT_HAVE_x86_nopf_lock_cmpxchgb_dl_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_cmpxchb_nopf __arch_atomic_cmpxchb_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgb_dl_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgb_dl_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_cmpxchgw_dx_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_cmpxchw_nopf __arch_atomic_cmpxchw_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgw_dx_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgw_dx_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__CRT_HAVE_x86_nopf_lock_cmpxchgl_edx_Pcx) || defined(__X86_NOPF_AVAILABLE)
 #define __arch_atomic_cmpxchl_nopf __arch_atomic_cmpxchl_nopf
-#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgl_edx_Pcx */
+#endif /* __CRT_HAVE_x86_nopf_lock_cmpxchgl_edx_Pcx || __X86_NOPF_AVAILABLE */
 #if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_lock_cmpxchgq_rdx_Pcx) || defined(__X86_NOPF_AVAILABLE))
 #define __arch_atomic_cmpxchq_nopf __arch_atomic_cmpxchq_nopf
 #endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_lock_cmpxchgq_rdx_Pcx || __X86_NOPF_AVAILABLE) */
+
+/* X86-specific nopf read/write with fs/gs segment */
+#if defined(__CRT_HAVE_x86_nopf_movb_al_fsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writefsb_nopf __x86_writefsb_nopf
+#endif /* __CRT_HAVE_x86_nopf_movb_al_fsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movb_fsPax_al) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readfsb_nopf __x86_readfsb_nopf
+#endif /* __CRT_HAVE_x86_nopf_movb_fsPax_al || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movw_fsPax_ax) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readfsw_nopf __x86_readfsw_nopf
+#endif /* __CRT_HAVE_x86_nopf_movw_fsPax_ax || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movw_ax_fsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writefsw_nopf __x86_writefsw_nopf
+#endif /* __CRT_HAVE_x86_nopf_movw_ax_fsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movl_fsPax_eax) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readfsl_nopf __x86_readfsl_nopf
+#endif /* __CRT_HAVE_x86_nopf_movl_fsPax_eax || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movl_eax_fsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writefsl_nopf __x86_writefsl_nopf
+#endif /* __CRT_HAVE_x86_nopf_movl_eax_fsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_fsPax_rax) || defined(__X86_NOPF_AVAILABLE))
+#define __x86_readfsq_nopf __x86_readfsq_nopf
+#endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_fsPax_rax || __X86_NOPF_AVAILABLE) */
+#if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_rax_fsPcx) || defined(__X86_NOPF_AVAILABLE))
+#define __x86_writefsq_nopf __x86_writefsq_nopf
+#endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_rax_fsPcx || __X86_NOPF_AVAILABLE) */
+
+#if defined(__CRT_HAVE_x86_nopf_movb_al_gsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writegsb_nopf __x86_writegsb_nopf
+#endif /* __CRT_HAVE_x86_nopf_movb_al_gsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movb_gsPax_al) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readgsb_nopf __x86_readgsb_nopf
+#endif /* __CRT_HAVE_x86_nopf_movb_gsPax_al || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movw_gsPax_ax) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readgsw_nopf __x86_readgsw_nopf
+#endif /* __CRT_HAVE_x86_nopf_movw_gsPax_ax || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movw_ax_gsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writegsw_nopf __x86_writegsw_nopf
+#endif /* __CRT_HAVE_x86_nopf_movw_ax_gsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movl_gsPax_eax) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_readgsl_nopf __x86_readgsl_nopf
+#endif /* __CRT_HAVE_x86_nopf_movl_gsPax_eax || __X86_NOPF_AVAILABLE */
+#if defined(__CRT_HAVE_x86_nopf_movl_eax_gsPcx) || defined(__X86_NOPF_AVAILABLE)
+#define __x86_writegsl_nopf __x86_writegsl_nopf
+#endif /* __CRT_HAVE_x86_nopf_movl_eax_gsPcx || __X86_NOPF_AVAILABLE */
+#if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_gsPax_rax) || defined(__X86_NOPF_AVAILABLE))
+#define __x86_readgsq_nopf __x86_readgsq_nopf
+#endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_gsPax_rax || __X86_NOPF_AVAILABLE) */
+#if defined(__x86_64__) && (defined(__CRT_HAVE_x86_nopf_movq_rax_gsPcx) || defined(__X86_NOPF_AVAILABLE))
+#define __x86_writegsq_nopf __x86_writegsq_nopf
+#endif /* __x86_64__ && (__CRT_HAVE_x86_nopf_movq_rax_gsPcx || __X86_NOPF_AVAILABLE) */
 
 
 #ifdef __CC__
@@ -502,7 +553,6 @@ __NOTHROW(__arch_readl_nopf)(__NCX void const *__addr, __uint32_t *__presult) {
 	return !__error;
 }
 #endif /* __arch_readl_nopf */
-
 
 #ifdef __arch_readq_nopf
 __X86_NOPF_DEFFUN(x86_nopf_movq_Pax_rax) /* movq (%Pax), %rax  (read qword) */
@@ -1062,6 +1112,248 @@ __NOTHROW(__arch_atomic_cmpxchq_nopf)(__NCX void *__addr,
 	return !__error;
 }
 #endif /* __arch_atomic_cmpxchq_nopf */
+
+
+/* X86-specific nopf read/write with fs/gs segment */
+#ifdef __x86_readfsb_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movb_fsPax_al) /* movb %fs:(%Pax), %al  (read byte) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readfsb_nopf)(__NCX void const *__addr, __uint8_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_fsPax_al, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movb_fsPax_al)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readfsb_nopf */
+
+#ifdef __x86_readfsw_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movw_fsPax_ax) /* movw %fs:(%Pax), %ax  (read word) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readfsw_nopf)(__NCX void const *__addr, __uint16_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_fsPax_ax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movw_fsPax_ax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readfsw_nopf */
+
+#ifdef __x86_readfsl_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movl_fsPax_eax) /* movl %fs:(%Pax), %eax  (read dword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readfsl_nopf)(__NCX void const *__addr, __uint32_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_fsPax_eax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movl_fsPax_eax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readfsl_nopf */
+
+#ifdef __x86_readfsq_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movq_fsPax_rax) /* movq %fs:(%Pax), %rax  (read qword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readfsq_nopf)(__NCX void const *__addr, __uint64_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_fsPax_rax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movq_fsPax_rax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readfsq_nopf */
+
+#ifdef __x86_writefsb_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movb_al_fsPcx)  /* movb %al, %fs:(%Pcx)  (write byte) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writefsb_nopf)(__NCX void *__addr, __uint8_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_al_fsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movb_al_fsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writefsb_nopf */
+
+#ifdef __x86_writefsw_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movw_ax_fsPcx)  /* movw %ax, %fs:(%Pcx)  (write word) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writefsw_nopf)(__NCX void *__addr, __uint16_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_ax_fsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movw_ax_fsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writefsw_nopf */
+
+#ifdef __x86_writefsl_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movl_eax_fsPcx) /* movl %eax, %fs:(%Pcx)  (write dword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writefsl_nopf)(__NCX void *__addr, __uint32_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_eax_fsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movl_eax_fsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writefsl_nopf */
+
+#ifdef __x86_writefsq_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movq_rax_fsPcx) /* movq %rax, %fs:(%Pcx)  (write qword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writefsq_nopf)(__NCX void *__addr, __uint64_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_rax_fsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movq_rax_fsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writefsq_nopf */
+
+#ifdef __x86_readgsb_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movb_gsPax_al) /* movb %gs:(%Pax), %al  (read byte) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readgsb_nopf)(__NCX void const *__addr, __uint8_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_gsPax_al, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movb_gsPax_al)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readgsb_nopf */
+
+#ifdef __x86_readgsw_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movw_gsPax_ax) /* movw %gs:(%Pax), %ax  (read word) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readgsw_nopf)(__NCX void const *__addr, __uint16_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_gsPax_ax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movw_gsPax_ax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readgsw_nopf */
+
+#ifdef __x86_readgsl_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movl_gsPax_eax) /* movl %gs:(%Pax), %eax  (read dword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readgsl_nopf)(__NCX void const *__addr, __uint32_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_gsPax_eax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movl_gsPax_eax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readgsl_nopf */
+
+#ifdef __x86_readgsq_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movq_gsPax_rax) /* movq %gs:(%Pax), %rax  (read qword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __BOOL
+__NOTHROW(__x86_readgsq_nopf)(__NCX void const *__addr, __uint64_t *__presult) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_gsPax_rax, 3)
+	                     : "=a" (*__presult)
+	                     , "=@ccc" (__error)
+	                     : "a" (__addr)
+	                     __X86_NOPF_CALLARG(x86_nopf_movq_gsPax_rax)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_readgsq_nopf */
+
+#ifdef __x86_writegsb_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movb_al_gsPcx)  /* movb %al, %gs:(%Pcx)  (write byte) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writegsb_nopf)(__NCX void *__addr, __uint8_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movb_al_gsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movb_al_gsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writegsb_nopf */
+
+#ifdef __x86_writegsw_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movw_ax_gsPcx)  /* movw %ax, %gs:(%Pcx)  (write word) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writegsw_nopf)(__NCX void *__addr, __uint16_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movw_ax_gsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movw_ax_gsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writegsw_nopf */
+
+#ifdef __x86_writegsl_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movl_eax_gsPcx) /* movl %eax, %gs:(%Pcx)  (write dword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writegsl_nopf)(__NCX void *__addr, __uint32_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movl_eax_gsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movl_eax_gsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writegsl_nopf */
+
+#ifdef __x86_writegsq_nopf
+__X86_NOPF_DEFFUN(x86_nopf_movq_rax_gsPcx) /* movq %rax, %gs:(%Pcx)  (write qword) */
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__NOTHROW(__x86_writegsq_nopf)(__NCX void *__addr, __uint64_t __val) {
+	__BOOL __error;
+	__asm__ __volatile__(__X86_NOPF_CALLASM(x86_nopf_movq_rax_gsPcx, 3)
+	                     : "=@ccc" (__error)
+	                     : "c" (__addr)
+	                     , "a" (__val)
+	                     __X86_NOPF_CALLARG(x86_nopf_movq_rax_gsPcx)
+	                     __X86_NOPF_CALLCLB_ "cc");
+	return !__error;
+}
+#endif /* __x86_writegsq_nopf */
 
 #undef __X86_NOPF_CALLASM
 #undef __X86_NOPF_CALLARG

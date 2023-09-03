@@ -26,7 +26,7 @@
 
 #include <asm/intrin.h>
 
-/* In i386 user-space, try to use `arch_prctl(2)' to get/set  %fs/&gs.base
+/* In i386 user-space, try to use `arch_prctl(2)' to get/set  %fs/%gs.base
  * Note that we could still use `wr(fs|gs)base' in this case (because it's
  * emulated  by the kernel), but that method  is still a little bit slower
  * since it involves the kernel having to decode a faulting instruction.

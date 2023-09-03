@@ -1071,7 +1071,6 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 		}                                                            \
 		COMPILER_BARRIER();                                          \
 	}	__WHILE0
-
 #endif /* libc_nopf_checkpc && libc_nopf_retof */
 
 
@@ -1087,23 +1086,18 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 PRIVATE SECTION_EXCEPT_TEXT NONNULL((1, 2)) void CC
 x86_verify_tls(except_register_state_t *__restrict state,
                struct exception_data *__restrict error) {
-	bool readerror;
+	bool readok;
 	void *tlsbase, *tlsptr0;
 
 	/* In *_nopf-mode, read a pointer from `%segtls:0'.
 	 * - If a #PF (or some other exception) is generated, fail.
 	 * - Ensure that the read pointer equals `RD_TLS_BASE_REGISTER_S()' */
-	__asm__ __volatile__(""
 #ifdef __x86_64__
-	                     "call libc_x86_nopf_movq_fsPax_rax"
+	readok = __x86_readfsq_nopf((void const *)0, (uint64_t *)&tlsptr0);
 #else /* __x86_64__ */
-	                     "call libc_x86_nopf_movl_gsPax_eax"
+	readok = __x86_readgsl_nopf((void const *)0, (uint32_t *)&tlsptr0);
 #endif /* !__x86_64__ */
-	                     : "=a" (tlsptr0)
-	                     , "=@ccc" (readerror)
-	                     : "a" (0)
-	                     : "cc");
-	if likely(!readerror) {
+	if likely(readok) {
 		RD_TLS_BASE_REGISTER_S(tlsbase);
 		if likely(tlsbase == tlsptr0)
 			return;
