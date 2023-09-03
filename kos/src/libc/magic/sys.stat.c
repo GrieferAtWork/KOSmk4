@@ -457,145 +457,653 @@ typedef __blksize_t blksize_t;
 
 /* When running as `__CRT_DOS_PRIMARY':
  *   `struct stat' is:
- *       [                                       ] = struct __dos_stat32
- *       [__USE_TIME_BITS64                      ] = struct __dos_stat64i32 == struct __dos_stat64
- *       [__USE_FILE_OFFSET64                    ] = struct __dos_stat32i64
- *       [__USE_TIME_BITS64 + __USE_FILE_OFFSET64] = struct __dos_stat64
+ *       [                                       ]          = struct __dos_stat32
+ *       [__USE_TIME_BITS64                      ]          = struct __dos_stat64i32 == struct __dos_stat64
+ *       [__USE_FILE_OFFSET64                    ]          = struct __dos_stat32i64
+ *       [__USE_TIME_BITS64 + __USE_FILE_OFFSET64]          = struct __dos_stat64
  *   `struct stat64' is:
- *       [                 ]                       = struct __dos_stat32i64
- *       [__USE_TIME_BITS64]                       = struct __dos_stat64
+ *       [                 ]                                = struct __dos_stat32i64
+ *       [__USE_TIME_BITS64]                                = struct __dos_stat64
  * When running as `__CRT_KOS_PRIMARY':
- *   `struct stat' is:                             = struct __kos_stat
- *   `struct stat64' is:                           = struct __kos_stat
+ *   `struct stat' is:                                      = struct __kos_stat
+ *   `struct stat64' is:                                    = struct __kos_stat
  * When running as `__CRT_GLC_PRIMARY':
  *   `struct stat' is:
- *       [                   ]                     = struct __cyg_stat
- *       [__USE_FILE_OFFSET64]                     = struct __glc_stat64
- *   `struct stat64' is:                           = struct __glc_stat64
+ *       [                   ]                              = struct __glc_stat
+ *       [__USE_TIME_BITS64 + defined(__glc_stat64_time64)] = struct __glc_stat64_time64
+ *       [__USE_FILE_OFFSET64]                              = struct __glc_stat64
+ *   `struct stat64' is:                                    = struct __glc_stat64
  * When running as `__CRT_CYG_PRIMARY':
- *   `struct stat' is:                             = struct __cyg_stat
- *   `struct stat64' is:                           = struct __cyg_stat
+ *   `struct stat' is:                                      = struct __cyg_stat
+ *   `struct stat64' is:                                    = struct __cyg_stat
  * Otherwise, `struct stat' uses a totally generic layout.
  */
 
 %[default:section(".text.crt{|.dos}.fs.stat")];
 
 /* Name format: `<N_TIME_BITS>i<N_FILE_BITS>' */
-[[ignore, nocrt, alias("_stat", "_stat32")]]
-[[decl_prefix(struct __dos_stat32;)]]
-int dos_stat32i32([[in]] char const *__restrict filename,
-                  [[out]] struct __dos_stat32 *__restrict buf);
-
-[[ignore, nocrt, alias("_stati64", "_stat32i64")]]
-[[decl_prefix(struct __dos_stat32i64;)]]
-int dos_stat32i64([[in]] char const *__restrict filename,
-                  [[out]] struct __dos_stat32i64 *__restrict buf);
-
-[[ignore, nocrt, alias("_stat64", "_stat64i32")]]
-[[decl_prefix(struct __dos_stat64i32;)]]
-int dos_stat64i32([[in]] char const *__restrict filename,
-                  [[out]] struct __dos_stat64i32 *__restrict buf);
-
-[[ignore, nocrt, alias("_stat64", "_stat64i32")]]
-[[decl_prefix(struct __dos_stat64;)]]
-int dos_stat64i64([[in]] char const *__restrict filename,
-                  [[out]] struct __dos_stat64 *__restrict buf);
-
-[[ignore, nocrt, alias("_fstat", "_fstat32")]]
-[[decl_prefix(struct __dos_stat32;), decl_include("<bits/types.h>")]]
-int dos_fstat32i32([[fdarg]] $fd_t fd, [[out]] struct __dos_stat32 *__restrict buf);
-
-[[ignore, nocrt, alias("_fstati64", "_fstat32i64")]]
-[[decl_prefix(struct __dos_stat32i64;), decl_include("<bits/types.h>")]]
-int dos_fstat32i64([[fdarg]] $fd_t fd, [[out]] struct __dos_stat32i64 *__restrict buf);
-
-[[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]
-[[decl_prefix(struct __dos_stat64i32;), decl_include("<bits/types.h>")]]
-int dos_fstat64i32([[fdarg]] $fd_t fd, [[out]] struct __dos_stat64i32 *__restrict buf);
-
-[[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]
-[[decl_prefix(struct __dos_stat64;), decl_include("<bits/types.h>")]]
-int dos_fstat64i64([[fdarg]] $fd_t fd, [[out]] struct __dos_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>"),                   alias("_stat", "_stat32")]]         int dos_stat32i32([[in]] char const *__restrict filename, [[out]] struct __dos_stat32 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>"),                   alias("_stati64", "_stat32i64")]]   int dos_stat32i64([[in]] char const *__restrict filename, [[out]] struct __dos_stat32i64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>"),                   alias("_stat64", "_stat64i32")]]    int dos_stat64i32([[in]] char const *__restrict filename, [[out]] struct __dos_stat64i32 *__restrict buf);
+//[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>"),                   alias("_stat64", "_stat64i32")]]    int dos_stat64i64([[in]] char const *__restrict filename, [[out]] struct __dos_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>", "<bits/types.h>"), alias("_fstat", "_fstat32")]]       int dos_fstat32i32([[fdarg]] $fd_t fd, [[out]] struct __dos_stat32 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>", "<bits/types.h>"), alias("_fstati64", "_fstat32i64")]] int dos_fstat32i64([[fdarg]] $fd_t fd, [[out]] struct __dos_stat32i64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>", "<bits/types.h>"), alias("_fstat64", "_fstat64i32")]]  int dos_fstat64i32([[fdarg]] $fd_t fd, [[out]] struct __dos_stat64i32 *__restrict buf);
+//[[ignore, nocrt, decl_include("<bits/os/dos/stat.h>", "<bits/types.h>"), alias("_fstat64", "_fstat64i32")]]  int dos_fstat64i64([[fdarg]] $fd_t fd, [[out]] struct __dos_stat64 *__restrict buf);
 
 
-//[[ignore, nocrt, alias("stat")]]    int glibc_stat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("stat64")]]  int glibc_stat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
-//[[ignore, nocrt, alias("lstat")]]   int glibc_lstat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("lstat64")]] int glibc_lstat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
-//[[ignore, nocrt, alias("fstat")]]   int glibc_fstat([[fdarg]] $fd_t fd, [[out]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64([[fdarg]] $fd_t fd, [[out]] struct __glc_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("stat")]]               int glibc_stat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("lstat")]]              int glibc_lstat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("fstat")]]              int glibc_fstat([[fdarg]] $fd_t fd, [[out]] struct __glc_stat *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("fstatat")]]            int glibc_fstatat([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf, $atflag_t flags);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("stat64")]]             int glibc_stat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("lstat64")]]            int glibc_lstat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("fstat64")]]            int glibc_fstat64([[fdarg]] $fd_t fd, [[out]] struct __glc_stat64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("fstatat64")]]          int glibc_fstatat64([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf, $atflag_t flags);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("__stat64_time64")]]    int glibc_stat64_time64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64_time64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>"),                   alias("__lstat64_time64")]]   int glibc_lstat64_time64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64_time64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("__fstat64_time64")]]   int glibc_fstat64_time64([[fdarg]] $fd_t fd, [[out]] struct __glc_stat64_time64 *__restrict buf);
+[[ignore, nocrt, decl_include("<bits/os/linux/stat.h>", "<bits/types.h>"), alias("__fstatat64_time64")]] int glibc_fstatat64_time64([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict filename, [[out]] struct __glc_stat64_time64 *__restrict buf, $atflag_t flags);
 
 
 /* TODO: Don't assume that kstat() and kstat64() are the same. -- Only do so when `defined(__STAT32_MATCHES_STAT64)'! */
 
 @@>> stat(2), stat64(2)
 [[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("kstat", "kstat64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat64")]]
+[[if(                                                              defined(__CRT_KOS_PRIMARY)                                                                                                         ), alias("kstat", "kstat64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                                                          ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)                                          ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)                                         ), alias("_stat", "_stat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")  defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64)                                                                         ), alias("__stat64_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("stat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && ( defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("stat64")]]
+[[userimpl, impl_include("<bits/types.h>"), requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(fstatat)) || $has_function(stat64) ||
+           $has_function(glibc_stat) || $has_function(glibc_stat64) || $has_function(glibc_stat64_time64) ||
+           $has_function(dos_stat32i32) || $has_function(dos_stat32i64) || $has_function(dos_stat64i32)
+)]]
 int stat([[in]] char const *__restrict filename,
-         [[out]] struct stat *__restrict buf);
-/* TODO: Emulate stat() for __USE_TIME_BITS64 compatibility! */
+         [[out]] struct stat *__restrict buf) {
+@@pp_if defined(__AT_FDCWD) && $has_function(fstatat)@@
+	return fstatat(__AT_FDCWD, filename, buf, 0);
+@@pp_elif $has_function(stat64) || $has_function(glibc_stat) || $has_function(glibc_stat64) || $has_function(glibc_stat64_time64)@@
+@@pp_if $has_function(stat64)@@
+	@struct stat64@ st;
+	int result = stat64(filename, &st);
+@@pp_elif $has_function(glibc_stat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_stat64_time64(filename, &st);
+@@pp_elif $has_function(glibc_stat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_stat64(filename, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_stat(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_stat64i32) || $has_function(dos_stat32i64) || $has_function(dos_stat32i32) */
+@@pp_if $has_function(dos_stat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_stat64i32(filename, &st);
+@@pp_elif $has_function(dos_stat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_stat32i64(filename, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_stat32i32(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 
 
 @@>> fstat(2), fstat64(2)
 [[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("kfstat", "kfstat64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_fstat64", "_fstat64i32")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_fstati64", "_fstat32i64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_fstat", "_fstat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat64")]]
-int fstat([[fdarg]] $fd_t fd, [[out]] struct stat *__restrict buf);
+[[if(                                                              defined(__CRT_KOS_PRIMARY)                                                                                                         ), alias("kfstat", "kfstat64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                                                          ), alias("_fstat64", "_fstat64i32")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)                                          ), alias("_fstati64", "_fstat32i64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)                                         ), alias("_fstat", "_fstat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")  defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64)                                                                         ), alias("__fstat64_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("fstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && ( defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("fstat64")]]
+[[userimpl, impl_include("<bits/types.h>")]]
+[[requires($has_function(fstat64) ||
+           $has_function(glibc_fstat) || $has_function(glibc_fstat64) || $has_function(glibc_fstat64_time64) ||
+           $has_function(dos_fstat32i32) || $has_function(dos_fstat32i64) || $has_function(dos_fstat64i32)
+)]]
+int fstat([[fdarg]] $fd_t fd, [[out]] struct stat *__restrict buf) {
+@@pp_if $has_function(fstat64) || $has_function(glibc_fstat) || $has_function(glibc_fstat64) || $has_function(glibc_fstat64_time64)@@
+@@pp_if $has_function(fstat64)@@
+	@struct stat64@ st;
+	int result = fstat64(fd, &st);
+@@pp_elif $has_function(glibc_fstat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_fstat64_time64(fd, &st);
+@@pp_elif $has_function(glibc_fstat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_fstat64(fd, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_fstat(fd, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_fstat64i32) || $has_function(dos_fstat32i64) || $has_function(dos_fstat32i32) */
+@@pp_if $has_function(dos_fstat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_fstat64i32(fd, &st);
+@@pp_elif $has_function(dos_fstat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_fstat32i64(fd, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_fstat32i32(fd, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 @@>> lstat(2), lstat64(2)
 [[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("klstat", "klstat64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat64")]]
+[[if(                                                              defined(__CRT_KOS_PRIMARY)                                                                                                         ), alias("klstat", "klstat64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                                                          ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)                                          ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>")                      defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)                                         ), alias("_stat", "_stat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")  defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64)                                                                         ), alias("__lstat64_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("lstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && ( defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("lstat64")]]
+[[userimpl, impl_include("<bits/types.h>"), requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fstatat)) || $has_function(lstat64) ||
+           $has_function(glibc_lstat) || $has_function(glibc_lstat64) || $has_function(glibc_lstat64_time64) ||
+           $has_function(dos_stat32i32) || $has_function(dos_stat32i64) || $has_function(dos_stat64i32) /* DOS versions don't actually deref symlinks! */
+)]]
 int lstat([[in]] char const *__restrict filename,
-          [[out]] struct stat *__restrict buf);
+          [[out]] struct stat *__restrict buf) {
+@@pp_if defined(__AT_FDCWD) && $has_function(fstatat)@@
+	return fstatat(__AT_FDCWD, filename, buf, __AT_SYMLINK_NOFOLLOW);
+@@pp_elif $has_function(lstat64) || $has_function(glibc_lstat) || $has_function(glibc_lstat64) || $has_function(glibc_lstat64_time64)@@
+@@pp_if $has_function(lstat64)@@
+	@struct stat64@ st;
+	int result = lstat64(filename, &st);
+@@pp_elif $has_function(glibc_lstat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_lstat64_time64(filename, &st);
+@@pp_elif $has_function(glibc_lstat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_lstat64(filename, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_lstat(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_stat64i32) || $has_function(dos_stat32i64) || $has_function(dos_stat32i32) */
+@@pp_if $has_function(dos_stat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_stat64i32(filename, &st);
+@@pp_elif $has_function(dos_stat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_stat32i64(filename, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_stat32i32(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %
 %#ifdef __USE_LARGEFILE64
 
 [[no_crt_impl, doc_alias("stat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("kstat", "kstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("stat")]]
-[[                                                                                                       alias("stat64")]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                                                      ), alias("kstat", "kstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                       ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)                       ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64) ), alias("__stat64_time64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                                            ), alias("stat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)), alias("stat64")]]
+[[userimpl, impl_include("<bits/types.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(fstatat64)) ||
+           $has_function(glibc_stat) || $has_function(glibc_stat64) || $has_function(glibc_stat64_time64) ||
+           $has_function(dos_stat32i32) || $has_function(dos_stat32i64) || $has_function(dos_stat64i32)
+)]]
 int stat64([[in]] char const *__restrict filename,
-           [[out]] struct stat64 *__restrict buf);
+           [[out]] struct stat64 *__restrict buf) {
+@@pp_if defined(__AT_FDCWD) && $has_function(fstatat64)@@
+	return fstatat64(__AT_FDCWD, filename, buf, 0);
+@@pp_elif $has_function(glibc_stat) || $has_function(glibc_stat64) || $has_function(glibc_stat64_time64)@@
+@@pp_if $has_function(glibc_stat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_stat64_time64(filename, &st);
+@@pp_elif $has_function(glibc_stat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_stat64(filename, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_stat(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_stat64i32) || $has_function(dos_stat32i64) || $has_function(dos_stat32i32) */
+@@pp_if $has_function(dos_stat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_stat64i32(filename, &st);
+@@pp_elif $has_function(dos_stat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_stat32i64(filename, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_stat32i32(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 
 [[no_crt_impl, doc_alias("fstat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("kfstat", "kfstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_fstat64", "_fstat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_fstati64", "_fstat32i64")]]
-[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("fstat")]]
-[[                                                                                                       alias("fstat64")]]
-int fstat64([[fdarg]] $fd_t fd, [[out]] struct stat64 *__restrict buf);
+[[if(                                        defined(__CRT_KOS_PRIMARY)                                                      ), alias("kfstat", "kfstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                       ), alias("_fstat64", "_fstat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)                       ), alias("_fstati64", "_fstat32i64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64) ), alias("__fstat64_time64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                                            ), alias("fstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)), alias("fstat64")]]
+[[userimpl, impl_include("<bits/types.h>")]]
+[[requires($has_function(glibc_fstat) || $has_function(glibc_fstat64) || $has_function(glibc_fstat64_time64) ||
+           $has_function(dos_fstat32i32) || $has_function(dos_fstat32i64) || $has_function(dos_fstat64i32)
+)]]
+int fstat64([[fdarg]] $fd_t fd, [[out]] struct stat64 *__restrict buf) {
+@@pp_if $has_function(glibc_fstat) || $has_function(glibc_fstat64) || $has_function(glibc_fstat64_time64)@@
+@@pp_if $has_function(glibc_fstat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_fstat64_time64(fd, &st);
+@@pp_elif $has_function(glibc_fstat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_fstat64(fd, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_fstat(fd, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_fstat64i32) || $has_function(dos_fstat32i64) || $has_function(dos_fstat32i32) */
+@@pp_if $has_function(dos_fstat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_fstat64i32(fd, &st);
+@@pp_elif $has_function(dos_fstat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_fstat32i64(fd, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_fstat32i32(fd, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [[no_crt_impl, doc_alias("lstat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
-[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("klstat", "klstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("lstat")]]
-[[                                                                                                       alias("lstat64")]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                                                      ), alias("klstat", "klstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                       ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)                       ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64) ), alias("__lstat64_time64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                                            ), alias("lstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)), alias("lstat64")]]
+[[userimpl, impl_include("<bits/types.h>"), requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fstatat64)) ||
+           $has_function(glibc_lstat) || $has_function(glibc_lstat64) || $has_function(glibc_lstat64_time64) ||
+           $has_function(dos_stat32i32) || $has_function(dos_stat32i64) || $has_function(dos_stat64i32) /* DOS versions don't actually deref symlinks! */
+)]]
 int lstat64([[in]] char const *__restrict filename,
-            [[out]] struct stat64 *__restrict buf);
+            [[out]] struct stat64 *__restrict buf) {
+@@pp_if defined(__AT_FDCWD) && $has_function(fstatat64)@@
+	return fstatat64(__AT_FDCWD, filename, buf, __AT_SYMLINK_NOFOLLOW);
+@@pp_elif $has_function(lstat64) || $has_function(glibc_lstat) || $has_function(glibc_lstat64) || $has_function(glibc_lstat64_time64)@@
+@@pp_if $has_function(lstat64)@@
+	@struct stat64@ st;
+	int result = lstat64(filename, &st);
+@@pp_elif $has_function(glibc_lstat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_lstat64_time64(filename, &st);
+@@pp_elif $has_function(glibc_lstat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_lstat64(filename, &st);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_lstat(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+@@pp_else@@
+	/* $has_function(dos_stat64i32) || $has_function(dos_stat32i64) || $has_function(dos_stat32i32) */
+@@pp_if $has_function(dos_stat64i32)@@
+	@struct __dos_stat64i32@ st;
+	int result = dos_stat64i32(filename, &st);
+@@pp_elif $has_function(dos_stat32i64)@@
+	@struct __dos_stat32i64@ st;
+	int result = dos_stat32i64(filename, &st);
+@@pp_else@@
+	@struct __dos_stat32@ st;
+	int result = dos_stat32i32(filename, &st);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)0;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)0;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)0;
+		buf->@st_mtimespec@ = (syscall_ulong_t)0;
+		buf->@st_ctimespec@ = (syscall_ulong_t)0;
+@@pp_endif@@
+	}
+	return result;
+@@pp_endif@@
+}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 %#endif /* __USE_LARGEFILE64 */
 
@@ -623,6 +1131,12 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat)(char const *__re
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat64)(char const *__restrict filename, struct __glc_stat64 *__restrict buf);
 INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat)(fd_t dirfd, char const *__restrict filename, struct __glc_stat *__restrict buf, atflag_t flags);
 INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat64)(fd_t dirfd, char const *__restrict filename, struct __glc_stat64 *__restrict buf, atflag_t flags);
+#ifdef __glc_stat64_time64
+INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_glc_fstat64_time64)(fd_t fd, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_stat64_time64)(char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat64_time64)(char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat64_time64)(fd_t dirfd, char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf, atflag_t flags);
+#endif /* __glc_stat64_time64 */
 
 INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dos_fstat32)(fd_t fd, struct __dos_stat32 *__restrict buf); /* _fstat, _fstat32 */
 INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dos_fstat32i64)(fd_t fd, struct __dos_stat32i64 *__restrict buf); /* _fstati64, _fstat32i64 */
@@ -641,25 +1155,100 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__r
 @@>> fstatat(2), fstatat64(2)
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [[no_crt_impl, decl_include("<bits/os/stat.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if(                                                             defined(__CRT_KOS_PRIMARY)                                      ), alias("kfstatat", "kfstatat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat64")]]
+[[if(                                                              defined(__CRT_KOS_PRIMARY)                                                                                                         ), alias("kfstatat", "kfstatat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")  defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64)                                                                         ), alias("__fstatat64_time64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("fstatat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")(!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)) && ( defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))), alias("fstatat64")]]
+[[userimpl, impl_include("<bits/types.h>")]]
+[[requires($has_function(fstatat64))]]
 int fstatat([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict filename,
-            [[out]] struct stat *__restrict buf, $atflag_t flags);
+            [[out]] struct stat *__restrict buf, $atflag_t flags) {
+	@struct stat64@ st;
+	int result = fstatat64(dirfd, filename, &st, flags);
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+}
 
 %#ifdef __USE_LARGEFILE64
 [[no_crt_impl, doc_alias("fstatat"), decl_include("<bits/os/stat.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if(                                            defined(__CRT_KOS_PRIMARY)      ), alias("kfstatat", "kfstatat64")]]
-[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
-[[                                                                                  alias("fstatat64")]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                                                      ), alias("kfstatat", "kfstatat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_TIME_BITS64) && defined(__glc_stat64_time64) ), alias("__fstatat64_time64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                                            ), alias("fstatat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_TIME_BITS64) || !defined(__glc_stat64_time64)), alias("fstatat64")]]
+[[userimpl, impl_include("<bits/types.h>")]]
+[[requires($has_function(glibc_fstatat) || $has_function(glibc_fstatat64) || $has_function(glibc_fstatat64_time64))]]
 int fstatat64([[dirfd]] $fd_t dirfd, [[in]] char const *__restrict filename,
-              [[out]] struct stat64 *__restrict buf, $atflag_t flags);
+              [[out]] struct stat64 *__restrict buf, $atflag_t flags) {
+@@pp_if $has_function(glibc_fstatat64_time64)@@
+	@struct __glc_stat64_time64@ st;
+	int result = glibc_fstatat64_time64(dirfd, filename, &st, flags);
+@@pp_elif $has_function(glibc_fstatat64)@@
+	@struct __glc_stat64@ st;
+	int result = glibc_fstatat64(dirfd, filename, &st, flags);
+@@pp_else@@
+	@struct __glc_stat@ st;
+	int result = glibc_fstatat(dirfd, filename, &st, flags);
+@@pp_endif@@
+	if (result == 0) {
+		buf->@st_dev@       = (dev_t)st.@st_dev@;
+		buf->@st_ino@       = (ino_t)st.@st_ino@;
+		buf->@st_mode@      = (mode_t)st.@st_mode@;
+		buf->@st_nlink@     = (nlink_t)st.@st_nlink@;
+		buf->@st_uid@       = (uid_t)st.@st_uid@;
+		buf->@st_gid@       = (gid_t)st.@st_gid@;
+@@pp_ifdef _STATBUF_ST_RDEV@@
+		buf->@st_rdev@      = (dev_t)st.@st_rdev@;
+@@pp_endif@@
+		buf->@st_size@      = (off64_t)st.@st_size@;
+@@pp_ifdef _STATBUF_ST_BLKSIZE@@
+		buf->@st_blksize@   = (blksize_t)st.@st_blksize@;
+@@pp_endif@@
+@@pp_ifdef _STATBUF_ST_BLOCKS@@
+		buf->@st_blocks@    = (blkcnt64_t)st.@st_blocks@;
+@@pp_endif@@
+		buf->@st_atime@     = (time_t)st.@st_atime@;
+		buf->@st_mtime@     = (time_t)st.@st_mtime@;
+		buf->@st_ctime@     = (time_t)st.@st_ctime@;
+@@pp_ifdef _STATBUF_ST_NSEC@@
+		buf->@st_atimespec@ = (syscall_ulong_t)st.@st_atimespec@;
+		buf->@st_mtimespec@ = (syscall_ulong_t)st.@st_mtimespec@;
+		buf->@st_ctimespec@ = (syscall_ulong_t)st.@st_ctimespec@;
+@@pp_endif@@
+	}
+	return result;
+}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
-[[cp, ignore, nocrt, alias("_mkdir")]]
+[[cp, ignore, nocrt]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)), raw_alias("_mkdir")]]
 int dos_mkdir([[in]] char const *pathname);
 
 
@@ -667,10 +1256,9 @@ int dos_mkdir([[in]] char const *pathname);
 [[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
 [[userimpl, export_alias("__mkdir", "__libc_mkdir")]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
-[[requires((defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)) ||
-           (defined(__AT_FDCWD) && $has_function(mkdirat)))]]
+[[requires($has_function(dos_mkdir) || (defined(__AT_FDCWD) && $has_function(mkdirat)))]]
 int mkdir([[in]] char const *pathname, $mode_t mode) {
-@@pp_if defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)@@
+@@pp_if $has_function(dos_mkdir)@@
 	(void)mode;
 	return dos_mkdir(pathname);
 @@pp_else@@
@@ -824,7 +1412,7 @@ int utimensat32([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH'
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64", "__utimensat64")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
 [[crt_dos_variant, impl_include("<asm/os/fcntl.h>")]]
 int utimensat([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
@@ -883,6 +1471,7 @@ int utimensat([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+[[export_alias("__utimensat64")]]
 [[crt_dos_variant, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
 [[userimpl, requires_function(utimensat32), impl_include("<asm/os/fcntl.h>")]]
 int utimensat64([[dirfd]] $fd_t dirfd, [[in]] char const *filename,
@@ -923,7 +1512,7 @@ int futimens32([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or
 %#ifdef __USE_XOPEN2K8
 @@>> futimens(2), futimens64(2)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64", "__futimens64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
 int futimens([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]) {
@@ -950,6 +1539,7 @@ int futimens([[fdarg]] $fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3
 
 %#ifdef __USE_TIME64
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+[[export_alias("__futimens64")]]
 [[preferred_time64_variant_of(futimens), doc_alias("futimens")]]
 [[userimpl, requires_function(futimens32)]]
 int futimens64([[fdarg]] $fd_t fd, [[in_opt]] struct timespec64 const times[2 /*or:3*/]) {

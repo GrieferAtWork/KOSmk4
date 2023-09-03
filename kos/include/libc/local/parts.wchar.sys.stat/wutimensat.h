@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x656cfb8f */
+/* HASH CRC-32:0x5b95b893 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_wutimensat64) || defined(__CRT_HAVE_wutimensat) || ((defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#if defined(__CRT_HAVE_wutimensat64) || defined(__CRT_HAVE_wutimensat) || ((defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE___utimensat64) || defined(__CRT_HAVE_utimensat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
@@ -66,7 +66,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
+#elif defined(__CRT_HAVE___utimensat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),__utimensat64,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE___utimensat64) || defined(__CRT_HAVE_utimensat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/utimensat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -81,7 +83,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_wutimensat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_wutimensat64)
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_wutimensat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat64,(__dirfd,__filename,__times,__flags))
-#elif ((defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || defined(__CRT_HAVE_wutimensat)
+#elif ((defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE___utimensat64) || defined(__CRT_HAVE_utimensat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || defined(__CRT_HAVE_wutimensat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.sys.stat/wutimensat64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -161,7 +163,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wutimensat_defined
 #define __localdep_wutimensat __LIBC_LOCAL_NAME(wutimensat)
 #endif /* !__local___localdep_wutimensat_defined */
-#else /* __CRT_HAVE_wutimensat64 || __CRT_HAVE_wutimensat || ((__CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
+#else /* __CRT_HAVE_wutimensat64 || __CRT_HAVE_wutimensat || ((__CRT_HAVE_utimensat64 || __CRT_HAVE___utimensat64 || __CRT_HAVE_utimensat) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
 #undef __local_wutimensat_defined
-#endif /* !__CRT_HAVE_wutimensat64 && !__CRT_HAVE_wutimensat && ((!__CRT_HAVE_utimensat64 && !__CRT_HAVE_utimensat) || (!__CRT_HAVE_convert_wcstombs && !__CRT_HAVE_convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc)) */
+#endif /* !__CRT_HAVE_wutimensat64 && !__CRT_HAVE_wutimensat && ((!__CRT_HAVE_utimensat64 && !__CRT_HAVE___utimensat64 && !__CRT_HAVE_utimensat) || (!__CRT_HAVE_convert_wcstombs && !__CRT_HAVE_convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc)) */
 #endif /* !__local_wutimensat_defined */

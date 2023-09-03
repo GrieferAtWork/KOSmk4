@@ -233,6 +233,7 @@ DEFINE_PUBLIC_ALIAS(fstat, libc_glc_fstat);
 DEFINE_PUBLIC_ALIAS(prev_fstat, libc_glc_fstat);        /* libc4/5 alias */
 DEFINE_PUBLIC_ALIAS(__prev_fstat, libc_glc_fstat);      /* libc4/5 alias */
 DEFINE_PUBLIC_ALIAS(__libc_prev_fstat, libc_glc_fstat); /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__fstat64, libc_glc_fstat64);
 DEFINE_PUBLIC_ALIAS(fstat64, libc_glc_fstat64);
 DEFINE_PUBLIC_ALIAS(fstatat, libc_glc_fstatat);
 DEFINE_PUBLIC_ALIAS(fstatat64, libc_glc_fstatat64);
@@ -244,6 +245,17 @@ DEFINE_INTERN_ALIAS(libc_fstat, libc_glc_fstat);
 DEFINE_INTERN_ALIAS(libc_fstat64, libc_glc_fstat64);
 DEFINE_INTERN_ALIAS(libc_fstatat, libc_glc_fstatat);
 DEFINE_INTERN_ALIAS(libc_fstatat64, libc_glc_fstatat64);
+#ifdef __glc_stat64_time64
+DEFINE_PUBLIC_ALIAS(__stat64_time64, libc_glc_stat64_time64);
+DEFINE_PUBLIC_ALIAS(__lstat64_time64, libc_glc_lstat64_time64);
+DEFINE_PUBLIC_ALIAS(__fstat64_time64, libc_glc_fstat64_time64);
+DEFINE_PUBLIC_ALIAS(__fstatat64_time64, libc_glc_fstatat64_time64);
+DEFINE_INTERN_ALIAS(libc_stat64_time64, libc_glc_stat64_time64);
+DEFINE_INTERN_ALIAS(libc_lstat64_time64, libc_glc_lstat64_time64);
+DEFINE_INTERN_ALIAS(libc_fstat64_time64, libc_glc_fstat64_time64);
+DEFINE_INTERN_ALIAS(libc_fstatat64_time64, libc_glc_fstatat64_time64);
+#endif /* __glc_stat64_time64 */
+
 LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL convstat_kos2glc)(struct __glc_stat *__restrict dst,
                                        struct __kos_stat const *__restrict src) {
@@ -286,6 +298,29 @@ NOTHROW_NCX(LIBCCALL convstat_kos2glc64)(struct __glc_stat64 *__restrict dst,
 	dst->st_ctimensec = (typeof(dst->st_ctimensec))src->st_ctimensec;
 	dst->st_ino64     = (typeof(dst->st_ino64))src->st_ino64;
 }
+
+#ifdef __glc_stat64_time64
+LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL convstat_kos2glc64_time64)(struct __glc_stat64_time64 *__restrict dst,
+                                                struct __kos_stat const *__restrict src) {
+	dst->st_dev       = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino       = (typeof(dst->st_ino))src->st_ino;
+	dst->st_mode      = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink     = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid       = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid       = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev      = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size      = (typeof(dst->st_size))src->st_size;
+	dst->st_blksize   = (typeof(dst->st_blksize))src->st_blksize;
+	dst->st_blocks    = (typeof(dst->st_blocks))src->st_blocks;
+	dst->st_atime     = (typeof(dst->st_atime))src->st_atime;
+	dst->st_atimensec = (typeof(dst->st_atimensec))src->st_atimensec;
+	dst->st_mtime     = (typeof(dst->st_mtime))src->st_mtime;
+	dst->st_mtimensec = (typeof(dst->st_mtimensec))src->st_mtimensec;
+	dst->st_ctime     = (typeof(dst->st_ctime))src->st_ctime;
+	dst->st_ctimensec = (typeof(dst->st_ctimensec))src->st_ctimensec;
+}
+#endif /* __glc_stat64_time64 */
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_glc_fstat)(fd_t fd,
@@ -376,6 +411,53 @@ NOTHROW_NCX(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
 		convstat_kos2glc64(buf, &st);
 	return result;
 }
+
+#ifdef __glc_stat64_time64
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
+NOTHROW_NCX(LIBCCALL libc_glc_fstat64_time64)(fd_t fd,
+                                              struct __glc_stat64_time64 *__restrict buf) {
+	struct __kos_stat st;
+	int result = libc_kos_fstat(fd, &st);
+	if likely(!result)
+		convstat_kos2glc64_time64(buf, &st);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_glc_stat64_time64)(char const *__restrict filename,
+                                             struct __glc_stat64_time64 *__restrict buf) {
+	struct __kos_stat st;
+	int result = libc_kos_stat(filename, &st);
+	if likely(!result)
+		convstat_kos2glc64_time64(buf, &st);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_glc_lstat64_time64)(char const *__restrict filename,
+                                              struct __glc_stat64_time64 *__restrict buf) {
+	struct __kos_stat st;
+	int result = libc_kos_lstat(filename, &st);
+	if likely(!result)
+		convstat_kos2glc64_time64(buf, &st);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
+NOTHROW_NCX(LIBCCALL libc_glc_fstatat64_time64)(fd_t dirfd,
+                                                char const *__restrict filename,
+                                                struct __glc_stat64_time64 *__restrict buf,
+                                                atflag_t flags) {
+	struct __kos_stat st;
+	int result = libc_kos_fstatat(dirfd,
+	                              filename,
+	                              &st,
+	                              flags);
+	if likely(!result)
+		convstat_kos2glc64_time64(buf, &st);
+	return result;
+}
+#endif /* __glc_stat64_time64 */
 
 
 /************************************************************************/
@@ -1400,7 +1482,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4e17e21f]]]*/
+/*[[[start:exports,hash:CRC-32=0xf8baa88e]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$mkdir, libd_mkdir);
@@ -1446,9 +1528,12 @@ DEFINE_PUBLIC_ALIAS(DOS$mknodat, libd_mknodat);
 DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);
 DEFINE_PUBLIC_ALIAS(DOS$utimensat, libd_utimensat);
 DEFINE_PUBLIC_ALIAS(utimensat, libc_utimensat);
+DEFINE_PUBLIC_ALIAS(DOS$__utimensat64, libd_utimensat64);
 DEFINE_PUBLIC_ALIAS(DOS$utimensat64, libd_utimensat64);
+DEFINE_PUBLIC_ALIAS(__utimensat64, libc_utimensat64);
 DEFINE_PUBLIC_ALIAS(utimensat64, libc_utimensat64);
 DEFINE_PUBLIC_ALIAS(futimens, libc_futimens);
+DEFINE_PUBLIC_ALIAS(__futimens64, libc_futimens64);
 DEFINE_PUBLIC_ALIAS(futimens64, libc_futimens64);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat, libd__wstat32);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat32, libd__wstat32);

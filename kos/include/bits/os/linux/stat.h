@@ -25,6 +25,7 @@
 #include <__crt.h> /* __CRT_GLC_PRIMARY */
 #include <features.h>
 
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 #include <bits/os/timespec.h>
@@ -44,7 +45,13 @@
 #define _STATBUF_ST_RDEV     1
 #define _STATBUF_ST_BLOCKS   1
 
+#if __SIZEOF_TIME32_T__ < __SIZEOF_TIME64_T__ && defined(__USE_TIME_BITS64)
+#define __glc_stat64_time64 stat
+#define __stat64            stat
 #ifdef __USE_LARGEFILE64
+#define __glc_stat64_time64_alias stat64 /* Need an alias for `struct stat64' */
+#endif /* __USE_LARGEFILE64 */
+#elif defined(__USE_LARGEFILE64)
 #define __glc_stat64 stat64
 #define __stat64     stat64
 #else /* __USE_LARGEFILE64 */
@@ -273,9 +280,9 @@ struct __glc_stat64 /*[PREFIX(st_)]*/ {
 	/* +8  */ __UINT32_TYPE__ __st_pad0;
 #ifdef __USE_KOS
 	/* +12 */ __UINT32_TYPE__   st_ino32;
-#else
+#else /* __USE_KOS */
 	/* +12 */ __UINT32_TYPE__ __st_ino32;
-#endif /* !... */
+#endif /* !__USE_KOS */
 	/* +16 */ __UINT32_TYPE__   st_mode;
 	/* +20 */ __UINT32_TYPE__   st_nlink;
 	/* +24 */ __UINT32_TYPE__   st_uid;
@@ -380,6 +387,136 @@ struct __glc_stat64 /*[PREFIX(st_)]*/ {
 	/* +88 */ __UINT64_TYPE__ st_ino;
 #endif /* !__USE_KOS */
 };
+
+
+#if __SIZEOF_TIME32_T__ < __SIZEOF_TIME64_T__
+#ifndef __glc_stat64_time64
+#define __glc_stat64_time64 __glc_stat64_time64 /* To indicate that this special struct exists */
+#endif /* !__glc_stat64_time64 */
+struct __glc_stat64_time64 /*[PREFIX(st_)]*/ {
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT64_TYPE__   st_ino;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT64_TYPE__   st_size;
+	/* +48 */ __INT32_TYPE__    st_blksize;
+	/* +52 */ __UINT32_TYPE__ __st_pad1;
+	/* +56 */ __INT64_TYPE__    st_blocks;
+
+	/* struct __timespec64 st_atimespec; */
+	/* +64 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_atim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_atimespec;
+		struct {
+			__time64_t        st_atime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_apad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_atimensec;
+		};
+	};
+
+	/* struct __timespec64 st_mtimespec; */
+	/* +80 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_mtim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_mtimespec;
+		struct {
+			__time64_t        st_mtime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_mpad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_mtimensec;
+		};
+	};
+
+	/* struct __timespec64 st_ctimespec; */
+	/* +96 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_ctim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_ctimespec;
+		struct {
+			__time64_t        st_ctime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_cpad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_ctimensec;
+		};
+	};
+	/* +112 */ __ULONGPTR_TYPE__ __glibc_reserved4;
+	/* +120 */ __ULONGPTR_TYPE__ __glibc_reserved5;
+};
+
+#ifdef __glc_stat64_time64_alias /* Same as `__glc_stat64_time64' */
+struct __glc_stat64_time64_alias /*[PREFIX(st_)]*/ {
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT64_TYPE__   st_ino;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT64_TYPE__   st_size;
+	/* +48 */ __INT32_TYPE__    st_blksize;
+	/* +52 */ __UINT32_TYPE__ __st_pad1;
+	/* +56 */ __INT64_TYPE__    st_blocks;
+
+	/* struct __timespec64 st_atimespec; */
+	/* +64 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_atim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_atimespec;
+		struct {
+			__time64_t        st_atime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_apad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_atimensec;
+		};
+	};
+
+	/* struct __timespec64 st_mtimespec; */
+	/* +80 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_mtim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_mtimespec;
+		struct {
+			__time64_t        st_mtime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_mpad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_mtimensec;
+		};
+	};
+
+	/* struct __timespec64 st_ctimespec; */
+	/* +96 */ union {
+#ifdef __USE_XOPEN2K8
+		struct __timespec64   st_ctim;
+#endif /* __USE_XOPEN2K8 */
+		struct __timespec64   st_ctimespec;
+		struct {
+			__time64_t        st_ctime;
+#if __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			__syscall_ulong_t __st_cpad;
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < __SIZEOF_TIME64_T__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			__syscall_ulong_t st_ctimensec;
+		};
+	};
+	/* +112 */ __ULONGPTR_TYPE__ __glibc_reserved4;
+	/* +120 */ __ULONGPTR_TYPE__ __glibc_reserved5;
+};
+#endif /* __glc_stat64_time64_alias */
+#endif /* __SIZEOF_TIME32_T__ < __SIZEOF_TIME64_T__ */
 
 __DECL_END
 #endif /* __CC__ */

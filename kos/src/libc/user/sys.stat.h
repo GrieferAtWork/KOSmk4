@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6f1f02a */
+/* HASH CRC-32:0x94ed4479 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,12 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat)(char const *__re
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat64)(char const *__restrict filename, struct __glc_stat64 *__restrict buf);
 INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat)(fd_t dirfd, char const *__restrict filename, struct __glc_stat *__restrict buf, atflag_t flags);
 INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat64)(fd_t dirfd, char const *__restrict filename, struct __glc_stat64 *__restrict buf, atflag_t flags);
+#ifdef __glc_stat64_time64
+INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_glc_fstat64_time64)(fd_t fd, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_stat64_time64)(char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_glc_lstat64_time64)(char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf);
+INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_glc_fstatat64_time64)(fd_t dirfd, char const *__restrict filename, struct __glc_stat64_time64 *__restrict buf, atflag_t flags);
+#endif /* __glc_stat64_time64 */
 
 INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dos_fstat32)(fd_t fd, struct __dos_stat32 *__restrict buf); /* _fstat, _fstat32 */
 INTDEF ATTR_FDARG(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dos_fstat32i64)(fd_t fd, struct __dos_stat32i64 *__restrict buf); /* _fstati64, _fstat32i64 */

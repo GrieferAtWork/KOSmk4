@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf1d556a */
+/* HASH CRC-32:0xc17d0019 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_utimensat_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
+#if defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE___utimensat64) || defined(__CRT_HAVE_utimensat)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_utimensat32_defined) && defined(__CRT_HAVE_utimensat)
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64)
 __CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE___utimensat64)
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),__utimensat64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/utimensat64.h>
@@ -104,7 +106,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_utimensat_defined
 #define __localdep_utimensat __LIBC_LOCAL_NAME(utimensat)
 #endif /* !__local___localdep_utimensat_defined */
-#else /* __CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat */
+#else /* __CRT_HAVE_utimensat64 || __CRT_HAVE___utimensat64 || __CRT_HAVE_utimensat */
 #undef __local_utimensat_defined
-#endif /* !__CRT_HAVE_utimensat64 && !__CRT_HAVE_utimensat */
+#endif /* !__CRT_HAVE_utimensat64 && !__CRT_HAVE___utimensat64 && !__CRT_HAVE_utimensat */
 #endif /* !__local_utimensat_defined */

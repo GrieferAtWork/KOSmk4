@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe761e306 */
+/* HASH CRC-32:0x4d5f1b47 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3497,6 +3497,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$fchmod, libd_fchmod);
 DEFINE_PUBLIC_ALIAS(DOS$futimens, libd_futimens);
+DEFINE_PUBLIC_ALIAS(DOS$__futimens64, libd_futimens64);
 DEFINE_PUBLIC_ALIAS(DOS$futimens64, libd_futimens64);
 
 /* sys.statfs */

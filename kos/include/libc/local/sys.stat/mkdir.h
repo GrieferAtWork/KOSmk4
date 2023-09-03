@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdca42358 */
+/* HASH CRC-32:0xb3c4beaa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #if (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_dos_mkdir_defined) && defined(__CRT_HAVE__mkdir)
+#if !defined(__local___localdep_dos_mkdir_defined) && defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #define __local___localdep_dos_mkdir_defined
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
-#endif /* !__local___localdep_dos_mkdir_defined && __CRT_HAVE__mkdir */
+#endif /* !__local___localdep_dos_mkdir_defined && __CRT_DOS_PRIMARY && __CRT_HAVE__mkdir */
 #ifndef __local___localdep_mkdirat_defined
 #define __local___localdep_mkdirat_defined
 #ifdef __CRT_HAVE_mkdirat

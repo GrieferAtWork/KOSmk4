@@ -609,10 +609,14 @@
 #define __CRT_HAVE___fseeko64
 #define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
+#define __CRT_HAVE___fstat64
+#define __CRT_HAVE___fstat64_time64
+#define __CRT_HAVE___fstatat64_time64
 #define __CRT_HAVE___fstatfs
 #define __CRT_HAVE___fsync
 #define __CRT_HAVE___ftello64
 #define __CRT_HAVE___ftruncate
+#define __CRT_HAVE___futimens64
 #define __CRT_HAVE___fwritable
 #define __CRT_HAVE___fwriting
 #define __CRT_HAVE___fxstat
@@ -953,6 +957,7 @@
 #define __CRT_HAVE___lroundf
 #define __CRT_HAVE___lroundl
 #define __CRT_HAVE___lseek
+#define __CRT_HAVE___lstat64_time64
 #define __CRT_HAVE___lxstat
 #define __CRT_HAVE___lxstat64
 #define __CRT_HAVE___madvise
@@ -1303,6 +1308,7 @@
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_fail_local
 #define __CRT_HAVE___stack_chk_guard
+#define __CRT_HAVE___stat64_time64
 #define __CRT_HAVE___statfs
 #define __CRT_HAVE___stdio_common_vfprintf
 #define __CRT_HAVE___stdio_common_vfprintf_p
@@ -1463,6 +1469,7 @@
 #define __CRT_HAVE___unlink
 #define __CRT_HAVE___uselocale
 #define __CRT_HAVE___utime
+#define __CRT_HAVE___utimensat64
 #define __CRT_HAVE___utimes
 #define __CRT_HAVE___vfork
 #define __CRT_HAVE___vfscanf
@@ -7088,6 +7095,7 @@
 #define __CRT_HAVE_KOS$__tzname
 #define __CRT_HAVE_KOS$__unlink
 #define __CRT_HAVE_KOS$__utime
+#define __CRT_HAVE_KOS$__utimensat64
 #define __CRT_HAVE_KOS$__vswprintf_l
 #define __CRT_HAVE_KOS$__wargv
 #define __CRT_HAVE_KOS$__wcscasecmp_l
@@ -7991,6 +7999,7 @@
 #define __CRT_HAVE_DOS$__tzname
 #define __CRT_HAVE_DOS$__unlink
 #define __CRT_HAVE_DOS$__utime
+#define __CRT_HAVE_DOS$__utimensat64
 #define __CRT_HAVE_DOS$__vcrt_GetModuleFileNameW
 #define __CRT_HAVE_DOS$__vcrt_GetModuleHandleW
 #define __CRT_HAVE_DOS$__vcrt_InitializeCriticalSectionEx

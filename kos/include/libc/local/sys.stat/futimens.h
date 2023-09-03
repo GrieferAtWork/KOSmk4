@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bed438a */
+/* HASH CRC-32:0x9e449330 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_futimens_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
+#if defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE___futimens64) || defined(__CRT_HAVE_futimens)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimens32_defined) && defined(__CRT_HAVE_futimens)
@@ -35,6 +35,8 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_futime
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64)
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
+#elif defined(__CRT_HAVE___futimens64)
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),__futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/futimens64.h>
@@ -71,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futimens_defined
 #define __localdep_futimens __LIBC_LOCAL_NAME(futimens)
 #endif /* !__local___localdep_futimens_defined */
-#else /* __CRT_HAVE_futimens64 || __CRT_HAVE_futimens */
+#else /* __CRT_HAVE_futimens64 || __CRT_HAVE___futimens64 || __CRT_HAVE_futimens */
 #undef __local_futimens_defined
-#endif /* !__CRT_HAVE_futimens64 && !__CRT_HAVE_futimens */
+#endif /* !__CRT_HAVE_futimens64 && !__CRT_HAVE___futimens64 && !__CRT_HAVE_futimens */
 #endif /* !__local_futimens_defined */
