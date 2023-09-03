@@ -116,6 +116,12 @@ function createPPAssume(macros: {string: (int | bool)} = none): PPAssume {
 	return PPAssume(macros: macros, assumptions: Dict());
 }
 
+@@Hex mode:
+@@ -1: Always use hex
+@@  0: Use hex if appropriate
+@@  1: Always use decimal
+global PP_HEX_MODE: int = 0;
+
 class PPAssume {
 	this = default;
 
@@ -409,7 +415,7 @@ class PPBranch {
 				fp << "-";
 				data = -data;
 			}
-			fp << (data > 256 ? data.hex() : data);
+			fp << ((PP_HEX_MODE < 0 || (PP_HEX_MODE == 0 && data > 256)) ? data.hex() : data);
 			if (data > 0x7fffffffffffffff) {
 				fp << "ULL";
 			} else if (data > 0xffffffff) {

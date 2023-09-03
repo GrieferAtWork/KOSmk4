@@ -1,0 +1,334 @@
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from posix;
+import ipc;
+import optimizeForIfdef, optimizeForEndif, PP_HEX_MODE from ....misc.libgen.c.ppexpr;
+
+function nm(filename: string): {string...} {
+	if (!stat.exists(filename))
+		return;
+	local r, w = ipc.Pipe.new()...;
+	local proc = ipc.Process("nm", ["nm", "-D", filename]);
+	proc.stdout = w;
+	proc.start();
+	w.close();
+	r = File.Buffer(r, "ro,c,none"); /* line-buffered */
+	for (local line: r) {
+		line = line.strip().replace("\t", " ");
+		local symbolName = line
+			.rpartition(" ")
+			.last
+			.partition("@")
+			.first
+			.decode("utf-8");
+		if ("." !in symbolName && symbolName !in ["GLIBC_PRIVATE", "GLIBC_ABI_DT_RELR"])
+			yield symbolName;
+	}
+	r.close();
+	local e = proc.join();
+	if (e != 0)
+		throw Error(f"nm {repr filename} exited with {e}");
+}
+
+global final VERSIONS: {string...} = {
+	"2.3.2",
+	"2.3.5",
+	"2.3.6",
+	"2.4",
+	"2.5",
+	"2.6.1",
+	"2.7",
+	"2.8.90",
+	"2.9",
+	"2.19",
+	"2.21",
+	"2.23",
+	"2.24",
+	"2.26",
+	"2.27",
+	"2.28",
+	"2.29",
+	"2.30",
+	"2.31",
+	"2.32",
+	"2.33",
+	"2.34",
+	"2.35",
+	"2.36",
+	"2.37",
+	"2.38",
+};
+
+function getVersionCodeFromName(versionName: string): int {
+	local parts = List(versionName.split("."));
+	while (#parts < 3)
+		parts.append("0");
+	local result = 0;
+	for (local part: parts) {
+		result *= 100;
+		result += int(part);
+	}
+	return result;
+}
+
+#define VERSION_FLAG_X32 0x00000000
+#define VERSION_FLAG_X64 0x80000000
+#define VERSION_CONF_ST  0x00000000 // Single-threaded
+#define VERSION_CONF_MT  0x10000000 // Multi-threaded
+#define VERSION_MASK     0xf0000000
+global final KNOWN_VERSION: {int...} = (for (local v: VERSIONS) getVersionCodeFromName(v)).sorted();
+global final KNOWN_VERSION_MIN: int = KNOWN_VERSION < ...;
+global final KNOWN_VERSION_MAX: int = KNOWN_VERSION > ...;
+
+local symbolsByVersion: {int: HashSet with string} = Dict(() -> {
+	for (local v: VERSIONS) {
+		local vcode = getVersionCodeFromName(v);
+		local libc32_so = f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libc-{v}.so";
+		local libc64_so = f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libc-{v}.so";
+		local st32 = HashSet(nm(libc32_so));
+		local st64 = HashSet(nm(libc64_so));
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libdl-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libdl-{v}.so"));
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libm-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libm-{v}.so"));
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\librt-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\librt-{v}.so"));
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libutil-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libutil-{v}.so"));
+		local mt32 = copy st32;
+		local mt64 = copy st64;
+		mt32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libpthread-{v}.so"));
+		mt64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libpthread-{v}.so"));
+		yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X32, st32);
+		yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X64, st64);
+		yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X32, mt32);
+		yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X64, mt64);
+	}
+}());
+
+function fixMissingX64Version(missingVersion: string, versionAfter: string) {
+	for (local mode: { VERSION_CONF_ST, VERSION_CONF_MT }) {
+		local x32_232 = symbolsByVersion[getVersionCodeFromName(missingVersion) | VERSION_FLAG_X32 | mode];
+		local x32_235 = symbolsByVersion[getVersionCodeFromName(versionAfter) | VERSION_FLAG_X32 | mode];
+		local x64_232 = HashSet();
+		local x64_235 = symbolsByVersion[getVersionCodeFromName(versionAfter) | VERSION_FLAG_X64 | mode];
+		for (local sym: x32_232 | x32_235 | x64_235) {
+			if (sym in x64_235) {
+				if (sym in x32_235 && sym !in x32_232) {
+					/* Symbol in 32/64-bit <versionAfter>, but not in 32-bit <missingVersion>
+					 * -> Assume that it also isn't in the 64-bit <missingVersion>. */
+					continue;
+				}
+			} else {
+				if (sym !in x32_235 && sym in x32_232) {
+					/* Symbol only in 32-bit <missingVersion> (but not 32-bit <versionAfter>)
+					 * -> Assume that it also appears in the 64-bit <missingVersion>. */
+				} else {
+					continue;
+				}
+			}
+			x64_232.insert(sym);
+		}
+		symbolsByVersion[getVersionCodeFromName(missingVersion) | VERSION_FLAG_X64 | mode] = x64_232;
+	}
+}
+
+/* Special handling because I couldn't find certain 64-bit versions of Glibc- */
+fixMissingX64Version("2.3.2", "2.3.5"); /* I don't think this one even has a 64-bit version */
+
+local symbolsAndVersions: {string: {int...}} = Dict();
+for (local ver, symbols: symbolsByVersion) {
+	for (local sym: symbols) {
+		local vers = symbolsAndVersions.get(sym);
+		if (vers is none)
+			symbolsAndVersions[sym] = vers = HashSet();
+		vers.insert(ver);
+	}
+}
+
+function getPpCondForArchVersions(vers: {int...}): string {
+	if (!vers)
+		return "0"; /* Available in no versions */
+	if (#vers == #KNOWN_VERSION)
+		return "1"; /* Available in all versions */
+	if (#vers == 1)
+		return f"__GLIBC_VERSION__=={vers.first}"; /* Available in single version */
+	local result = "";
+	for (local versionIndex = 0; versionIndex < #KNOWN_VERSION;) {
+		local minVersion = KNOWN_VERSION[versionIndex];
+		if (minVersion !in vers) {
+			++versionIndex;
+			continue;
+		}
+		local maxVersion = minVersion;
+		++versionIndex;
+		while (versionIndex < #KNOWN_VERSION) {
+			local nextVersion = KNOWN_VERSION[versionIndex];
+			if (nextVersion !in vers)
+				break;
+			maxVersion = nextVersion;
+			++versionIndex;
+		}
+		if (result)
+			result += "||";
+		if (minVersion == maxVersion) {
+			result += f"__GLIBC_VERSION__=={minVersion}";
+		} else if (minVersion == KNOWN_VERSION_MIN) {
+			result += f"__GLIBC_VERSION__<={maxVersion}";
+		} else if (maxVersion == KNOWN_VERSION_MAX) {
+			result += f"__GLIBC_VERSION__>={minVersion}";
+		} else {
+			result += f"(__GLIBC_VERSION__>={minVersion}&&__GLIBC_VERSION__<={maxVersion})";
+		}
+	}
+	return result;
+}
+
+function mergeConditions(bIf: string, aCond: string, bCond: string): string {
+	if (aCond == bCond)
+		return aCond;
+	if (aCond == "0") {
+		if (bCond == "1")
+			return bIf;
+		return f"({bIf}) && ({bCond})";
+	}
+	if (bCond == "0") {
+		if (aCond == "1")
+			return f"!({bIf})";
+		return f"!({bIf}) && ({aCond})";
+	}
+	if (aCond == "1")
+		return f"!({bIf}) || ({bCond})";
+	if (bCond == "1")
+		return f"({bIf}) || ({aCond})";
+	return f"(({bIf}) ? ({bCond}) : ({aCond}))";
+}
+
+function getPpCondForVersions(vers: {int...}): string {
+	local st32_versions = List(for (local v: vers) if ((v & VERSION_MASK) == (VERSION_FLAG_X32 | VERSION_CONF_ST)) v & ~VERSION_MASK);
+	local mt32_versions = List(for (local v: vers) if ((v & VERSION_MASK) == (VERSION_FLAG_X32 | VERSION_CONF_MT)) v & ~VERSION_MASK);
+	local st64_versions = List(for (local v: vers) if ((v & VERSION_MASK) == (VERSION_FLAG_X64 | VERSION_CONF_ST)) v & ~VERSION_MASK);
+	local mt64_versions = List(for (local v: vers) if ((v & VERSION_MASK) == (VERSION_FLAG_X64 | VERSION_CONF_MT)) v & ~VERSION_MASK);
+	st32_versions.sort();
+	mt32_versions.sort();
+	st64_versions.sort();
+	mt64_versions.sort();
+	local st32_cond = getPpCondForArchVersions(st32_versions);
+	local mt32_cond = getPpCondForArchVersions(mt32_versions);
+	local st64_cond = getPpCondForArchVersions(st64_versions);
+	local mt64_cond = getPpCondForArchVersions(mt64_versions);
+	local x32_cond = mergeConditions("defined(_REENTRANT)", st32_cond, mt32_cond);
+	local x64_cond = mergeConditions("defined(_REENTRANT)", st64_cond, mt64_cond);
+	return mergeConditions("defined(__x86_64__)", x32_cond, x64_cond);
+}
+
+function escapeSymbolName(name: string): string {
+	return name;
+}
+
+
+@@Mapping from symbol names to preprocessor conditions
+local symbolsByPpCond: {string: {string...}} = Dict();
+for (local sym, vers: symbolsAndVersions) {
+	local cond = getPpCondForVersions(vers);
+	local set = symbolsByPpCond.get(cond);
+	if (set is none)
+		symbolsByPpCond[cond] = set = HashSet();
+	set.insert(escapeSymbolName(sym));
+}
+
+function printSymbolSet(symbols: {string...}) {
+	symbols = symbols.sorted();
+	for (local sym: symbols) {
+		print("#define __CRT_HAVE_", sym);
+	}
+}
+
+print("\
+/* Copyright (c) 2019-2023 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include <hybrid/host.h> /* For `__x86_64__' */
+
+/*
+ * Select Glibc version.
+ *
+ * Glibc version:");
+for (local v: VERSIONS) {
+	local vcode = getVersionCodeFromName(v);
+	print(" *    ", str(vcode).rjust(6), ": /lib/libc-", v, ".so");
+}
+print("\
+ */
+#ifndef __GNU_LIBRARY__
+#define __GNU_LIBRARY__ 6
+#endif /* !__GNU_LIBRARY__ */
+#if __GNU_LIBRARY__ < 6
+#error \"Pre-ELF versions of Glibc aren't supported\"
+#endif /* __GNU_LIBRARY__ < 6 */
+#ifndef __GLIBC__
+#define __GLIBC__       ", (KNOWN_VERSION_MAX / 10000) % 100, "
+#define __GLIBC_MINOR__ ", (KNOWN_VERSION_MAX / 100) % 100, "
+#define __GLIBC_PATCH__ ", (KNOWN_VERSION_MAX) % 100, "
+#else /* !__GLIBC__ */
+#ifndef __GLIBC_MINOR__
+#define __GLIBC_MINOR__ 0
+#endif /* !__GLIBC_MINOR__ */
+#ifndef __GLIBC_PATCH__
+#define __GLIBC_PATCH__ 0
+#endif /* !__GLIBC_PATCH__ */
+#endif /* __GLIBC__ */
+#ifndef __GLIBC_VERSION__
+#define __GLIBC_VERSION__ (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100 + __GLIBC_PATCH__)
+#endif /* !__GLIBC_VERSION__ */
+
+/************************************************************************/");
+
+/* Print condition tables based on version */
+printSymbolSet(symbolsByPpCond.get("1", {}));
+
+/* Print All of the other tables */
+PP_HEX_MODE = 1; /* Always use decimal in PP expressions */
+for (local ppCond: symbolsByPpCond.keys.sorted()) {
+	if (ppCond == "1")
+		continue; /* Already printed. */
+	print(optimizeForIfdef(ppCond)),;
+	printSymbolSet(symbolsByPpCond[ppCond]);
+	print(optimizeForEndif(ppCond)),;
+}
