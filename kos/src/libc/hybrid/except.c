@@ -23,7 +23,11 @@
 #include "../api.h"
 /**/
 
+#include <kos/bits/except-register-state-helpers.h>
+#include <kos/bits/except-register-state.h>
 #include <kos/except.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -195,8 +199,7 @@ libc_cxa_end_catch(void) {
 INTERN SECTION_EXCEPT_TEXT ATTR_COLD ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL libc_except_badusage_no_nesting)(except_register_state_t const *state) {
 	struct assert_args args;
-	/* FIXME: This assumes that except_register_state_t is kcpustate! */
-	memcpy(&args.aa_state, state, sizeof(struct kcpustate));
+	except_register_state_to_kcpustate(state, &args.aa_state);
 	args.aa_file   = NULL;
 	args.aa_line   = 0;
 	args.aa_func   = NULL;
@@ -213,8 +216,7 @@ assert_failf_at(except_register_state_t const *state,
                 char const *__restrict format, ...) {
 	struct assert_args args;
 	va_start(args.aa_args, format);
-	/* FIXME: This assumes that except_register_state_t is kcpustate! */
-	memcpy(&args.aa_state, state, sizeof(struct kcpustate));
+	except_register_state_to_kcpustate(state, &args.aa_state);
 	args.aa_expr   = expr;
 	args.aa_file   = NULL;
 	args.aa_line   = 0;

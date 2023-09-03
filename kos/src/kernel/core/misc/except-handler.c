@@ -50,9 +50,10 @@
 #include <hybrid/sched/preemption.h>
 
 #include <asm/intrin.h>
+#include <kos/bits/except-register-state-helpers.h>
+#include <kos/bits/except-register-state.h>
 #include <kos/bits/except.h>
 #include <kos/except.h>
-#include <kos/kernel/cpu-state-helpers.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -69,9 +70,6 @@
 #include <libunwind/errno.h>
 #include <libunwind/register.h>
 #include <libunwind/unwind.h>
-
-#define kcpustate_get_unwind_exception(state)        __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(*(state))
-#define kcpustate_set_unwind_exception(state, value) __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*(state), value)
 
 DECL_BEGIN
 
@@ -1155,30 +1153,32 @@ NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct taskpid *
 
 PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW(FCALL unwind_landingpad)(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
-                                 struct kcpustate *__restrict state,
+                                 except_register_state_t *__restrict state,
                                  void const *except_pc) {
 	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
-	struct kcpustate new_state;
+	except_register_state_t new_state;
 	unwind_errno_t unwind_error;
-	landing_pad_pc = kcpustate_getpc(state);
+	landing_pad_pc = except_register_state_getpc(state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
+
 	/* Apply landing-pad transformations. */
 	memcpy(&new_state, state, sizeof(new_state));
 	unwind_error = unwind_cfa_landing_apply(&cfa, fde, except_pc,
-	                                        &unwind_getreg_kcpustate, state,
-	                                        &unwind_setreg_kcpustate, &new_state);
+	                                        &unwind_getreg_except_register_state, state,
+	                                        &unwind_setreg_except_register_state, &new_state);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto done;
+
 	/* Write-back the new register state. */
 	memcpy(state, &new_state, sizeof(new_state));
 	return UNWIND_SUCCESS;
 done:
 	if (unwind_error == UNWIND_NO_FRAME) {
 		/* Directly jump to the landing pad. */
-		kcpustate_setpc(state, landing_pad_pc);
+		except_register_state_setpc(state, landing_pad_pc);
 		unwind_error = UNWIND_SUCCESS;
 	}
 	return unwind_error;
@@ -1187,14 +1187,14 @@ done:
 
 INTDEF ATTR_COLD NONNULL((2)) void FCALL /* TODO: Standardize this function! (currently arch-specific) */
 halt_unhandled_exception(unwind_errno_t unwind_error,
-                         struct kcpustate *__restrict unwind_state);
+                         except_register_state_t *__restrict unwind_state);
 
 DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
-NOTHROW(FCALL libc_except_unwind)(struct kcpustate *__restrict state) {
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *
+NOTHROW(FCALL libc_except_unwind)(except_register_state_t *__restrict state) {
 	unwind_errno_t error;
 	unwind_fde_t fde;
-	struct kcpustate old_state;
+	except_register_state_t old_state;
 	void const *pc;
 	assertf(PERTASK_NE(this_exception_info.ei_code, EXCEPT_CODEOF(E_OK)) ||
 	        PERTASK_NE(this_exception_info.ei_nesting, 0),
@@ -1206,7 +1206,7 @@ search_fde:
 	 * NOTE: -1 because the state we're being given has its PC pointer
 	 *       set  to  be  directed  after  the  faulting  instruction. */
 	memcpy(&old_state, state, sizeof(old_state));
-	pc    = kcpustate_getpc(&old_state) - 1;
+	pc    = except_register_state_getpc(&old_state) - 1;
 	error = unwind_fde_find(pc, &fde);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
@@ -1245,8 +1245,8 @@ search_fde:
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
 		error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &fde, pc,
-		                                              &unwind_getreg_kcpustate, &old_state,
-		                                              &unwind_setreg_kcpustate, state);
+		                                              &unwind_getreg_except_register_state, &old_state,
+		                                              &unwind_setreg_except_register_state, state);
 	} else
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 	{
@@ -1255,26 +1255,22 @@ search_fde:
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
 		error = unwind_cfa_apply_sysret_safe(&cfa, &fde, pc,
-		                                     &unwind_getreg_kcpustate, &old_state,
-		                                     &unwind_setreg_kcpustate, state);
+		                                     &unwind_getreg_except_register_state, &old_state,
+		                                     &unwind_setreg_except_register_state, state);
 	}
 
 	/* When unwinding to user-space, we'll get an error `UNWIND_INVALID_REGISTER' */
 	if (error == UNWIND_INVALID_REGISTER) {
 		struct ucpustate ustate;
 		unwind_cfa_sigframe_state_t sigframe_cfa;
-#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
-		ustate = old_state;
-#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
-		kcpustate_to_ucpustate(&old_state, &ustate);
-#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
+		except_register_state_to_ucpustate(&old_state, &ustate);
 
 		/* Assume that we're unwinding a signal frame when returning to user-space. */
 		error = unwind_fde_sigframe_exec(&fde, &sigframe_cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
 		error = unwind_cfa_sigframe_apply_sysret_safe(&sigframe_cfa, &fde, pc,
-		                                              &unwind_getreg_kcpustate, &old_state,
+		                                              &unwind_getreg_except_register_state, &old_state,
 		                                              &unwind_setreg_ucpustate, &ustate);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
@@ -1352,9 +1348,9 @@ search_fde:
 				 * using a 16-bit move.  For the last case,  all recent Core and  Atom
 				 * processors  perform a 16-bit move, leaving the upper portion of the
 				 * stack location unmodified. ...
-				 * -> In  other words: Bochs  is entirely correct  in its emulation, and
-				 *    I'm a fault here, in which case. Honestly: Thank you Bochs. That's
-				 *    one less Problem for  me to figure out  the hard way once  testing
+				 * -> In other words:  Bochs is  entirely correct in  its emulation,  and
+				 *    I'm at fault here, in which case. Honestly: Thank you Bochs. That's
+				 *    one less Problem  for me to  figure out the  hard way once  testing
 				 *    on real Hardware is going to start...
 				 */
 				LOG_SEGMENT_INCONSISTENCY_CHK('c', ustate.ucs_cs, SEGMENT_IS_VALID_KERNCODE);
@@ -1370,12 +1366,7 @@ search_fde:
 			}
 		}
 #endif /* __i386__ || __x86_64__ */
-
-#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
-		*state = ustate;
-#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
-		ucpustate_to_kcpustate(&ustate, state);
-#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
+		except_register_state_from_ucpustate(state, &ustate);
 	} else {
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
@@ -1390,9 +1381,9 @@ search_fde:
 			if (!PERTASK_TEST(this_exception_trace[i]))
 				break;
 		}
-		PERTASK_SET(this_exception_trace[i], kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[i], except_register_state_getpc(state));
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		PERTASK_SET(this_exception_trace[0], kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[0], except_register_state_getpc(state));
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -1426,11 +1417,7 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 	/* Fill in the exception register state. */
-#ifdef ICPUSTATE_IS_TRANSITIVE_KCPUSTATE
-	info->ei_state = *state;
-#else /* ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
-	icpustate_to_kcpustate(state, &info->ei_state);
-#endif /* !ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
+	except_register_state_from_icpustate(&info->ei_state, state);
 
 	/* Figure out how we want to unwind this exception. */
 	if (icpustate_isuser(state)) {
@@ -1441,12 +1428,12 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
 		/* We _really_ shouldn't get here, but just in case: simply load `state' */
 		cpu_apply_icpustate(state);
 	} else {
-		struct kcpustate st, *pst;
+		except_register_state_t st, *pst;
 
 		/* Do normal unwinding. */
-		memcpy(&st, &info->ei_state, sizeof(struct kcpustate));
+		memcpy(&st, &info->ei_state, sizeof(except_register_state_t));
 		pst = libc_except_unwind(&st);
-		cpu_apply_kcpustate(pst);
+		except_register_state_cpu_apply(pst);
 	}
 }
 
@@ -1461,7 +1448,7 @@ DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
 INTERN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
-                                                       struct kcpustate *__restrict state) {
+                                                       except_register_state_t *__restrict state) {
 	u8 temp, callsite_encoding;
 	byte_t const *reader;
 	byte_t const *landingpad;
@@ -1497,15 +1484,15 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct 
 
 #if 1 /* Compare pointers like this, as `kcs_eip' is the _RETURN_ address \
        * (i.e. the address after the piece of code that caused the exception) */
-		if (kcpustate_getpc(state) > startpc && kcpustate_getpc(state) <= endpc)
+		if (except_register_state_getpc(state) > startpc && except_register_state_getpc(state) <= endpc)
 #else
-		if (kcpustate_getpc(state) >= startpc && kcpustate_getpc(state) < endpc)
+		if (except_register_state_getpc(state) >= startpc && except_register_state_getpc(state) < endpc)
 #endif
 		{
 			if (handler == 0)
 				return EXCEPT_PERSONALITY_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 			/* Just to the associated handler */
-			kcpustate_setpc(state, landingpad + handler);
+			except_register_state_setpc(state, landingpad + handler);
 			if (action != 0) {
 				/* The ABI wants  us to fill  %eax with  a pointer to  the exception  (`_Unwind_Exception').
 				 * However,  since  KOS exception  is kept  a bit  simpler  (so-as to  allow it  to function
@@ -1513,7 +1500,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct 
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
 				 * So while what we  write here really doesn't  matter at all, let's  just put in  something
 				 * that at the very least makes a bit of sense. */
-				kcpustate_set_unwind_exception(state, except_code());
+				except_register_state_set_unwind_exception(state, except_code());
 			}
 			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 		}

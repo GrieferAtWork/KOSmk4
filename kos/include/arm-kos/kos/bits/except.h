@@ -35,12 +35,12 @@
 #include <kos/kernel/cpu-state.h>
 #define __EXCEPT_REGISTER_STATE_TYPE                               struct ucpustate
 #define __SIZEOF_EXCEPT_REGISTER_STATE                             SIZEOF_UCPUSTATE
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).ucs_pc)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).ucs_pc = (__UINT32_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).ucs_sp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).ucs_sp = (__UINT32_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).ucs_r0) /* TODO: Check if this is correct! */
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).ucs_r0 = (__UINT32_TYPE__)(value))
+#define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->ucs_pc)
+#define __except_register_state_setpc(x, value)                (void)((x)->ucs_pc = (__UINT32_TYPE__)(value))
+#define __except_register_state_getsp(x)                       ((__BYTE_TYPE__ const *)(x)->ucs_sp)
+#define __except_register_state_setsp(x, value)                (void)((x)->ucs_sp = (__UINT32_TYPE__)(value))
+#define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->ucs_r0) /* TODO: Check if this is correct! */
+#define __except_register_state_set_unwind_exception(x, value) (void)((x)->ucs_r0 = (__UINT32_TYPE__)(value))
 #else /* __USE_KOS_KERNEL */
 #include <hybrid/typecore.h>
 
@@ -69,12 +69,12 @@ struct __except_register_state_type_struct {
 	__UINT32_TYPE__ __ers_cpsr; /* CurrentProgramStatusRegister */
 };
 __DECL_END
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).__ers_pc)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).__ers_pc = (__UINT32_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).__ers_sp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).__ers_sp = (__UINT32_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).__ers_r0) /* TODO: Check if this is correct! */
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).__ers_r0 = (__UINT32_TYPE__)(value))
+#define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->__ers_pc)
+#define __except_register_state_setpc(x, value)                (void)((x)->__ers_pc = (__UINT32_TYPE__)(value))
+#define __except_register_state_getsp(x)                       ((__BYTE_TYPE__ const *)(x)->__ers_sp)
+#define __except_register_state_setsp(x, value)                (void)((x)->__ers_sp = (__UINT32_TYPE__)(value))
+#define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->__ers_r0) /* TODO: Check if this is correct! */
+#define __except_register_state_set_unwind_exception(x, value) (void)((x)->__ers_r0 = (__UINT32_TYPE__)(value))
 #endif /* __CC__ */
 #endif /* !__USE_KOS_KERNEL */
 

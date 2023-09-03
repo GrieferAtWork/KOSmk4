@@ -63,8 +63,11 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <hybrid/sched/preemption.h>
 
 #include <asm/intrin.h>
+#include <kos/bits/except-register-state-helpers.h>
+#include <kos/bits/except-register-state.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <atomic.h>
 #include <format-printer.h>
@@ -361,16 +364,16 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 	} EXCEPT {
 		handle_except_during_panic_info();
 	}
-#ifdef KCPUSTATE_IS_UCPUSTATE
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
 	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW,
 	                           &args->aa_state);
-#else /* KCPUSTATE_IS_UCPUSTATE */
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	{
 		struct ucpustate temp;
 		kcpustate_to_ucpustate(&args->aa_state, &temp);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &temp);
 	}
-#endif /* !KCPUSTATE_IS_UCPUSTATE */
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
@@ -530,14 +533,14 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 		handle_except_during_panic_info();
 	}
 	TRY {
-#ifdef KCPUSTATE_IS_UCPUSTATE
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW,
 		                           &args->aa_state);
-#else /* KCPUSTATE_IS_UCPUSTATE */
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 		struct ucpustate temp;
 		kcpustate_to_ucpustate(&args->aa_state, &temp);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &temp);
-#endif /* !KCPUSTATE_IS_UCPUSTATE */
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	} EXCEPT {
 	}
 	/* Try to trigger a debugger trap (if enabled) */
@@ -590,15 +593,15 @@ NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Stack check failure [pc=%p]\n", kcpustate_getpc(state));
-#ifdef KCPUSTATE_IS_UCPUSTATE
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
 	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, state);
-#else /* KCPUSTATE_IS_UCPUSTATE */
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	{
 		struct ucpustate ustate;
 		kcpustate_to_ucpustate(state, &ustate);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	}
-#endif /* !KCPUSTATE_IS_UCPUSTATE */
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGSEGV);
@@ -618,15 +621,15 @@ NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", kcpustate_getpc(state));
-#ifdef KCPUSTATE_IS_UCPUSTATE
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
 	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, state);
-#else /* KCPUSTATE_IS_UCPUSTATE */
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	{
 		struct ucpustate ustate;
 		kcpustate_to_ucpustate(state, &ustate);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	}
-#endif /* !KCPUSTATE_IS_UCPUSTATE */
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);

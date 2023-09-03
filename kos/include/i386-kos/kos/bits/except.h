@@ -31,19 +31,19 @@
 #define __EXCEPT_REGISTER_STATE_TYPE   struct kcpustate
 #define __SIZEOF_EXCEPT_REGISTER_STATE SIZEOF_KCPUSTATE
 #ifdef __x86_64__
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_rip)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip = (__u64)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rsp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp = (__u64)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax = (__u64)(value))
+#define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->kcs_rip)
+#define __except_register_state_setpc(x, value)                (void)((x)->kcs_rip = (__u64)(value))
+#define __except_register_state_getsp(x)                       ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_rsp)
+#define __except_register_state_setsp(x, value)                (void)((x)->kcs_gpregs.gp_rsp = (__u64)(value))
+#define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_rax)
+#define __except_register_state_set_unwind_exception(x, value) (void)((x)->kcs_gpregs.gp_rax = (__u64)(value))
 #else /* __x86_64__ */
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_eip)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip = (__u32)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_esp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_esp = (__u32)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_eax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_eax = (__u32)(value))
+#define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->kcs_eip)
+#define __except_register_state_setpc(x, value)                (void)((x)->kcs_eip = (__u32)(value))
+#define __except_register_state_getsp(x)                       ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_esp)
+#define __except_register_state_setsp(x, value)                (void)((x)->kcs_gpregs.gp_esp = (__u32)(value))
+#define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_eax)
+#define __except_register_state_set_unwind_exception(x, value) (void)((x)->kcs_gpregs.gp_eax = (__u32)(value))
 #endif /* !__x86_64__ */
 #else /* __USE_KOS_KERNEL */
 #include <hybrid/typecore.h>
@@ -80,12 +80,12 @@ struct __except_register_state_type_struct {
 	__REGISTER_TYPE__ __ers_pip;    /* Instruction pointer */
 };
 __DECL_END
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).__ers_pip)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).__ers_pip = (__REGISTER_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).__ers_psp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).__ers_psp = (__REGISTER_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).__ers_pax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).__ers_pax = (__REGISTER_TYPE__)(value))
+#define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->__ers_pip)
+#define __except_register_state_setpc(x, value)                (void)((x)->__ers_pip = (__REGISTER_TYPE__)(value))
+#define __except_register_state_getsp(x)                       ((__BYTE_TYPE__ const *)(x)->__ers_psp)
+#define __except_register_state_setsp(x, value)                (void)((x)->__ers_psp = (__REGISTER_TYPE__)(value))
+#define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->__ers_pax)
+#define __except_register_state_set_unwind_exception(x, value) (void)((x)->__ers_pax = (__REGISTER_TYPE__)(value))
 #endif /* __CC__ */
 #endif /* !__USE_KOS_KERNEL */
 
