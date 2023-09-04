@@ -24,8 +24,10 @@ import ipc;
 import optimizeForIfdef, optimizeForEndif, PP_HEX_MODE from ....misc.libgen.c.ppexpr;
 
 function nm(filename: string): {string...} {
-	if (!stat.exists(filename))
+	if (!stat.exists(filename)) {
+		print File.stderr: "Warning: missing file", repr filename;
 		return;
+	}
 	local r, w = ipc.Pipe.new()...;
 	local proc = ipc.Process("nm", ["nm", "-D", filename]);
 	proc.stdout = w;
@@ -34,6 +36,8 @@ function nm(filename: string): {string...} {
 	r = File.Buffer(r, "ro,c,none"); /* line-buffered */
 	for (local line: r) {
 		line = line.strip().replace("\t", " ");
+		/*if (line.startswith("U"))
+			continue;*/
 		local symbolName = line
 			.rpartition(" ")
 			.last
@@ -102,10 +106,10 @@ global final KNOWN_VERSION_MAX: int = KNOWN_VERSION > ...;
 local symbolsByVersion: {int: HashSet with string} = Dict(() -> {
 	for (local v: VERSIONS) {
 		local vcode = getVersionCodeFromName(v);
-		local libc32_so = f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libc-{v}.so";
-		local libc64_so = f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libc-{v}.so";
-		local st32 = HashSet(nm(libc32_so));
-		local st64 = HashSet(nm(libc64_so));
+		local st32 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libc-{v}.so"));
+		local st64 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libc-{v}.so"));
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\ld-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\ld-{v}.so"));
 		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libdl-{v}.so"));
 		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libdl-{v}.so"));
 		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libm-{v}.so"));
@@ -114,6 +118,10 @@ local symbolsByVersion: {int: HashSet with string} = Dict(() -> {
 		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\librt-{v}.so"));
 		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libutil-{v}.so"));
 		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libutil-{v}.so"));
+		/* NOTE: libcrypt was removed from Glibc at some point, so modern versions don't have this lib.
+		 * ref: https://sourceware.org/legacy-ml/libc-alpha/2017-08/msg01257.html */
+		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libcrypt-{v}.so"));
+		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libcrypt-{v}.so"));
 		local mt32 = copy st32;
 		local mt64 = copy st64;
 		mt32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libpthread-{v}.so"));

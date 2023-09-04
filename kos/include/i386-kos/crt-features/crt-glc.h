@@ -346,6 +346,7 @@
 #define __CRT_HAVE___libc_pwrite
 #define __CRT_HAVE___libc_realloc
 #define __CRT_HAVE___libc_sa_len
+#define __CRT_HAVE___libc_stack_end
 #define __CRT_HAVE___libc_start_main
 #define __CRT_HAVE___libc_system
 #define __CRT_HAVE___libc_valloc
@@ -475,6 +476,7 @@
 #define __CRT_HAVE___sysctl
 #define __CRT_HAVE___sysv_signal
 #define __CRT_HAVE___timezone
+#define __CRT_HAVE___tls_get_addr
 #define __CRT_HAVE___toascii_l
 #define __CRT_HAVE___tolower_l
 #define __CRT_HAVE___toupper_l
@@ -523,7 +525,13 @@
 #define __CRT_HAVE___xstat
 #define __CRT_HAVE___xstat64
 #define __CRT_HAVE__authenticate
+#define __CRT_HAVE__dl_allocate_tls
+#define __CRT_HAVE__dl_allocate_tls_init
 #define __CRT_HAVE__dl_argv
+#define __CRT_HAVE__dl_deallocate_tls
+#define __CRT_HAVE__dl_debug_state
+#define __CRT_HAVE__dl_get_tls_static_info
+#define __CRT_HAVE__dl_mcount
 #define __CRT_HAVE__dl_mcount_wrapper
 #define __CRT_HAVE__dl_mcount_wrapper_check
 #define __CRT_HAVE__dl_rtld_di_serinfo
@@ -549,6 +557,7 @@
 #define __CRT_HAVE__obstack_free
 #define __CRT_HAVE__obstack_memory_used
 #define __CRT_HAVE__obstack_newchunk
+#define __CRT_HAVE__r_debug
 #define __CRT_HAVE__res
 #define __CRT_HAVE__res_hconf
 #define __CRT_HAVE__rpc_dtablesize
@@ -2480,9 +2489,6 @@
 #if !defined(__x86_64__) && __GLIBC_VERSION__ >= 23700
 #define __CRT_HAVE___ppoll64_chk
 #endif /* !__x86_64__ && __GLIBC_VERSION__ >= 23700 */
-#if !defined(__x86_64__) || defined(_REENTRANT) || __GLIBC_VERSION__ >= 23200
-#define __CRT_HAVE___libc_stack_end
-#endif /* !__x86_64__ || _REENTRANT || __GLIBC_VERSION__ >= 23200 */
 #if !defined(__x86_64__) || __GLIBC_VERSION__ >= 22600
 #define __CRT_HAVE___libc_msgrcv
 #define __CRT_HAVE___libc_msgsnd
@@ -2504,9 +2510,7 @@
 #define __CRT_HAVE___pthread_cleanup_routine
 #define __CRT_HAVE___pthread_mutex_destroy
 #define __CRT_HAVE___pthread_mutex_init
-#define __CRT_HAVE___pthread_mutex_lock
 #define __CRT_HAVE___pthread_mutex_trylock
-#define __CRT_HAVE___pthread_mutex_unlock
 #define __CRT_HAVE___pthread_mutexattr_destroy
 #define __CRT_HAVE___pthread_mutexattr_init
 #define __CRT_HAVE___pthread_mutexattr_settype
@@ -2519,9 +2523,6 @@
 #define __CRT_HAVE___pthread_rwlock_unlock
 #define __CRT_HAVE___pthread_rwlock_wrlock
 #define __CRT_HAVE___pthread_unregister_cancel_restore
-#define __CRT_HAVE__dl_allocate_tls
-#define __CRT_HAVE__dl_allocate_tls_init
-#define __CRT_HAVE__dl_deallocate_tls
 #define __CRT_HAVE__pthread_cleanup_pop
 #define __CRT_HAVE__pthread_cleanup_pop_restore
 #define __CRT_HAVE__pthread_cleanup_push
@@ -2674,6 +2675,7 @@
 #define __CRT_HAVE___res_maybe_init
 #endif /* __GLIBC_VERSION__ >= 20305 && __GLIBC_VERSION__ <= 22400 */
 #if __GLIBC_VERSION__ >= 20305 && __GLIBC_VERSION__ <= 23300
+#define __CRT_HAVE__dl_make_stack_executable
 #define __CRT_HAVE__dlfcn_hook
 #endif /* __GLIBC_VERSION__ >= 20305 && __GLIBC_VERSION__ <= 23300 */
 #if __GLIBC_VERSION__ >= 20400 && __GLIBC_VERSION__ <= 20700
@@ -2682,15 +2684,15 @@
 #if __GLIBC_VERSION__ >= 20601 && __GLIBC_VERSION__ <= 20700
 #define __CRT_HAVE___nss_services_lookup
 #endif /* __GLIBC_VERSION__ >= 20601 && __GLIBC_VERSION__ <= 20700 */
-#if __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 22100
-#define __CRT_HAVE___get_cpu_features
-#endif /* __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 22100 */
 #if __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23000
 #define __CRT_HAVE___clock_getcpuclockid
 #define __CRT_HAVE___clock_getres
 #define __CRT_HAVE___clock_nanosleep
 #define __CRT_HAVE___clock_settime
 #endif /* __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23000 */
+#if __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23200
+#define __CRT_HAVE___get_cpu_features
+#endif /* __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23200 */
 #if __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 22900
 #define __CRT_HAVE___libc_vfork
 #endif /* __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 22900 */
@@ -2705,9 +2707,6 @@
 #define __CRT_HAVE___libc_dlvsym
 #define __CRT_HAVE__dl_open_hook2
 #endif /* __GLIBC_VERSION__ >= 22700 && __GLIBC_VERSION__ <= 23300 */
-#if __GLIBC_VERSION__ >= 22700 && __GLIBC_VERSION__ <= 23600
-#define __CRT_HAVE__dl_exception_create
-#endif /* __GLIBC_VERSION__ >= 22700 && __GLIBC_VERSION__ <= 23600 */
 #if __GLIBC_VERSION__ >= 22800 && __GLIBC_VERSION__ <= 23000
 #define __CRT_HAVE___nanosleep_nocancel
 #define __CRT_HAVE___pause_nocancel
@@ -2731,17 +2730,16 @@
 #define __CRT_HAVE___pthread_cond_destroy
 #define __CRT_HAVE___pthread_cond_init
 #endif /* __GLIBC_VERSION__ >= 23200 && __GLIBC_VERSION__ <= 23300 */
-#if __GLIBC_VERSION__ >= 23200 && __GLIBC_VERSION__ <= 23600
-#define __CRT_HAVE__dl_fatal_printf
-#endif /* __GLIBC_VERSION__ >= 23200 && __GLIBC_VERSION__ <= 23600 */
 #if __GLIBC_VERSION__ >= 23300 && __GLIBC_VERSION__ <= 23600
 #define __CRT_HAVE___libc_scratch_buffer_dupfree
 #endif /* __GLIBC_VERSION__ >= 23300 && __GLIBC_VERSION__ <= 23600 */
 #if defined(_REENTRANT) && __GLIBC_VERSION__ >= 20305 && __GLIBC_VERSION__ <= 23300
 #define __CRT_HAVE___pthread_initialize_minimal
-#define __CRT_HAVE__dl_get_tls_static_info
-#define __CRT_HAVE__dl_make_stack_executable
 #endif /* _REENTRANT && __GLIBC_VERSION__ >= 20305 && __GLIBC_VERSION__ <= 23300 */
+#if defined(_REENTRANT) || __GLIBC_VERSION__ <= 23000 || __GLIBC_VERSION__ >= 23400
+#define __CRT_HAVE___pthread_mutex_lock
+#define __CRT_HAVE___pthread_mutex_unlock
+#endif /* _REENTRANT || __GLIBC_VERSION__ <= 23000 || __GLIBC_VERSION__ >= 23400 */
 #if defined(__x86_64__) && __GLIBC_VERSION__ >= 20700 && __GLIBC_VERSION__ <= 22100
 #define __CRT_HAVE___vdso_clock_gettime
 #endif /* __x86_64__ && __GLIBC_VERSION__ >= 20700 && __GLIBC_VERSION__ <= 22100 */
@@ -2752,17 +2750,26 @@
 #define __CRT_HAVE__dl_close
 #define __CRT_HAVE__dl_open
 #define __CRT_HAVE__dl_out_of_memory
-#define __CRT_HAVE__r_debug
 #endif /* __GLIBC_VERSION__ <= 20306 */
 #if __GLIBC_VERSION__ <= 22100
 #define __CRT_HAVE_h_errno
 #endif /* __GLIBC_VERSION__ <= 22100 */
 #if __GLIBC_VERSION__ <= 22400
 #define __CRT_HAVE___libc_dl_error_tsd
+#define __CRT_HAVE__dl_tls_setup
 #endif /* __GLIBC_VERSION__ <= 22400 */
 #if __GLIBC_VERSION__ <= 22600
 #define __CRT_HAVE__Jv_RegisterClasses
 #endif /* __GLIBC_VERSION__ <= 22600 */
+#if __GLIBC_VERSION__ <= 23000
+#define __CRT_HAVE_crypt
+#define __CRT_HAVE_crypt_r
+#define __CRT_HAVE_encrypt
+#define __CRT_HAVE_encrypt_r
+#define __CRT_HAVE_fcrypt
+#define __CRT_HAVE_setkey
+#define __CRT_HAVE_setkey_r
+#endif /* __GLIBC_VERSION__ <= 23000 */
 #if __GLIBC_VERSION__ <= 23200
 #define __CRT_HAVE__dl_starting_up
 #endif /* __GLIBC_VERSION__ <= 23200 */
@@ -2822,7 +2829,6 @@
 #define __CRT_HAVE__argp_unlock_xxx
 #define __CRT_HAVE__dl_check_map_versions
 #define __CRT_HAVE__dl_debug_printf
-#define __CRT_HAVE__dl_debug_state
 #define __CRT_HAVE__dl_dst_count
 #define __CRT_HAVE__dl_dst_substitute
 #define __CRT_HAVE__dl_get_origin
@@ -2833,7 +2839,6 @@
 #define __CRT_HAVE__dl_lookup_versioned_symbol_skip
 #define __CRT_HAVE__dl_map_object
 #define __CRT_HAVE__dl_map_object_deps
-#define __CRT_HAVE__dl_mcount
 #define __CRT_HAVE__dl_relocate_object
 #define __CRT_HAVE__dl_start_profile
 #define __CRT_HAVE__dl_tls_symaddr
@@ -3544,6 +3549,9 @@
 #define __CRT_HAVE___open_nocancel
 #define __CRT_HAVE___read_nocancel
 #define __CRT_HAVE__dl_catch_exception
+#define __CRT_HAVE__dl_exception_create
+#define __CRT_HAVE__dl_exception_create_format
+#define __CRT_HAVE__dl_exception_free
 #define __CRT_HAVE__dl_signal_exception
 #define __CRT_HAVE_acosf32
 #define __CRT_HAVE_acosf32x
@@ -4085,6 +4093,7 @@
 #define __CRT_HAVE___nss_files_fopen
 #define __CRT_HAVE___nss_parse_line_result
 #define __CRT_HAVE___nss_readline
+#define __CRT_HAVE__dl_fatal_printf
 #define __CRT_HAVE_pthread_attr_getsigmask_np
 #define __CRT_HAVE_pthread_attr_setsigmask_np
 #define __CRT_HAVE_sigabbrev_np
@@ -4095,6 +4104,7 @@
 #if __GLIBC_VERSION__ >= 23300
 #define __CRT_HAVE___fstat64
 #define __CRT_HAVE___x86_get_cpuid_feature_leaf
+#define __CRT_HAVE__dl_x86_get_cpu_features
 #define __CRT_HAVE_fstat
 #define __CRT_HAVE_fstat64
 #define __CRT_HAVE_fstatat
@@ -4130,6 +4140,7 @@
 #define __CRT_HAVE___nptl_change_stack_perm
 #define __CRT_HAVE___nptl_create_event
 #define __CRT_HAVE___nptl_death_event
+#define __CRT_HAVE___nptl_initial_report_events
 #define __CRT_HAVE___nptl_last_event
 #define __CRT_HAVE___nptl_nthreads
 #define __CRT_HAVE___nptl_rtld_global
@@ -4330,6 +4341,10 @@
 #endif /* __GLIBC_VERSION__ >= 23400 */
 #if __GLIBC_VERSION__ >= 23500
 #define __CRT_HAVE___memcmpeq
+#define __CRT_HAVE___rseq_flags
+#define __CRT_HAVE___rseq_offset
+#define __CRT_HAVE___rseq_size
+#define __CRT_HAVE___rtld_version_placeholder
 #define __CRT_HAVE__dl_audit_preinit
 #define __CRT_HAVE__dl_audit_symbind_alt
 #define __CRT_HAVE__dl_find_object
@@ -4447,6 +4462,5 @@
 #endif /* __GLIBC_VERSION__ >= 23600 */
 #ifdef __x86_64__
 #define __CRT_HAVE___arch_prctl
-#define __CRT_HAVE___tls_get_addr
 #define __CRT_HAVE_arch_prctl
 #endif /* __x86_64__ */
