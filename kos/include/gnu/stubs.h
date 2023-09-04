@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78e35735 */
+/* HASH CRC-32:0x9770427d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@
 #define __stub_adjtimex
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-#define __stub___adjtimex64
+#define __stub____adjtimex64
 #define __stub_adjtimex64
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub___argp_parse
@@ -378,7 +378,7 @@
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub_ntp_gettimex
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-#define __stub___ntp_gettime64
+#define __stub___ntp_gettimex64
 #define __stub_ntp_gettimex64
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #define __stub_open_wmemstream

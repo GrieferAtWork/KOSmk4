@@ -377,7 +377,7 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7269960b]]]*/
+/*[[[start:exports,hash:CRC-32=0x934b1544]]]*/
 DEFINE_PUBLIC_ALIAS(__gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_ALIAS(__libc_gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_ALIAS(gettimeofday, libc_gettimeofday);
@@ -413,7 +413,7 @@ DEFINE_PUBLIC_ALIAS(__adjtime64, libc_adjtime64);
 DEFINE_PUBLIC_ALIAS(adjtime64, libc_adjtime64);
 DEFINE_PUBLIC_ALIAS(__lutimes64, libc_lutimes64);
 DEFINE_PUBLIC_ALIAS(lutimes64, libc_lutimes64);
-DEFINE_PUBLIC_ALIAS(__lutimes64, libc_futimes64);
+DEFINE_PUBLIC_ALIAS(__futimes64, libc_futimes64);
 DEFINE_PUBLIC_ALIAS(futimes64, libc_futimes64);
 DEFINE_PUBLIC_ALIAS(__futimesat64, libc_futimesat64);
 DEFINE_PUBLIC_ALIAS(futimesat64, libc_futimesat64);

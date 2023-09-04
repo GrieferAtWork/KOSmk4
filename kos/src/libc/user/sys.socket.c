@@ -624,7 +624,7 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6a872600]]]*/
+/*[[[start:exports,hash:CRC-32=0x6e618636]]]*/
 DEFINE_PUBLIC_ALIAS(__socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socket, libc_socket);
 DEFINE_PUBLIC_ALIAS(socketpair, libc_socketpair);
@@ -645,10 +645,23 @@ DEFINE_PUBLIC_ALIAS(sendto, libc_sendto);
 DEFINE_PUBLIC_ALIAS(__libc_recvfrom, libc_recvfrom);
 DEFINE_PUBLIC_ALIAS(recvfrom, libc_recvfrom);
 DEFINE_PUBLIC_ALIAS(__libc_sendmsg, libc_sendmsg);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__sendmsg64, libc_sendmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(sendmsg, libc_sendmsg);
 DEFINE_PUBLIC_ALIAS(__libc_recvmsg, libc_recvmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__recvmsg64, libc_recvmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(recvmsg, libc_recvmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__getsockopt64, libc_getsockopt);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(getsockopt, libc_getsockopt);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__setsockopt64, libc_setsockopt);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(setsockopt, libc_setsockopt);
 DEFINE_PUBLIC_ALIAS(listen, libc_listen);
 DEFINE_PUBLIC_ALIAS(__libc_accept, libc_accept);
@@ -656,9 +669,11 @@ DEFINE_PUBLIC_ALIAS(accept, libc_accept);
 DEFINE_PUBLIC_ALIAS(shutdown, libc_shutdown);
 DEFINE_PUBLIC_ALIAS(accept4, libc_accept4);
 DEFINE_PUBLIC_ALIAS(__sendmmsg, libc_sendmmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__sendmmsg64, libc_sendmmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(sendmmsg, libc_sendmmsg);
 DEFINE_PUBLIC_ALIAS(recvmmsg, libc_recvmmsg);
-#include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(__recvmmsg64, libc_recvmmsg64);
 DEFINE_PUBLIC_ALIAS(recvmmsg64, libc_recvmmsg64);

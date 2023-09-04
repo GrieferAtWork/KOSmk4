@@ -352,6 +352,7 @@
 #define __CRT_HAVE__W_Gettnames
 #define __CRT_HAVE__Wcsftime
 #define __CRT_HAVE__ZSt9terminatev
+#define __CRT_HAVE____adjtimex64
 #define __CRT_HAVE____brk_addr
 #define __CRT_HAVE____lc_codepage_func
 #define __CRT_HAVE____lc_collate_cp_func
@@ -369,7 +370,6 @@
 #define __CRT_HAVE___adjtime
 #define __CRT_HAVE___adjtime64
 #define __CRT_HAVE___adjtimex
-#define __CRT_HAVE___adjtimex64
 #define __CRT_HAVE___afail
 #define __CRT_HAVE___afailf
 #define __CRT_HAVE___after_morecore_hook
@@ -628,6 +628,7 @@
 #define __CRT_HAVE___ftello64
 #define __CRT_HAVE___ftruncate
 #define __CRT_HAVE___futimens64
+#define __CRT_HAVE___futimes64
 #define __CRT_HAVE___futimesat64
 #define __CRT_HAVE___fwritable
 #define __CRT_HAVE___fwriting
@@ -672,6 +673,7 @@
 #define __CRT_HAVE___getrusage
 #define __CRT_HAVE___getrusage64
 #define __CRT_HAVE___getsid
+#define __CRT_HAVE___getsockopt64
 #define __CRT_HAVE___getspent
 #define __CRT_HAVE___getspnam
 #define __CRT_HAVE___gettimeofday
@@ -1106,7 +1108,7 @@
 #define __CRT_HAVE___nterrno_location
 #define __CRT_HAVE___ntohl
 #define __CRT_HAVE___ntohs
-#define __CRT_HAVE___ntp_gettime64
+#define __CRT_HAVE___ntp_gettimex64
 #define __CRT_HAVE___open
 #define __CRT_HAVE___open64
 #define __CRT_HAVE___open64_2
@@ -1200,6 +1202,7 @@
 #define __CRT_HAVE___reboot
 #define __CRT_HAVE___recv
 #define __CRT_HAVE___recvmmsg64
+#define __CRT_HAVE___recvmsg64
 #define __CRT_HAVE___register_frame
 #define __CRT_HAVE___register_frame_info
 #define __CRT_HAVE___register_frame_info_bases
@@ -1271,6 +1274,8 @@
 #define __CRT_HAVE___sem_timedwait64
 #define __CRT_HAVE___send
 #define __CRT_HAVE___sendmmsg
+#define __CRT_HAVE___sendmmsg64
+#define __CRT_HAVE___sendmsg64
 #define __CRT_HAVE___set_app_type
 #define __CRT_HAVE___set_cygerrno
 #define __CRT_HAVE___set_doserrno
@@ -1294,6 +1299,7 @@
 #define __CRT_HAVE___setreuid
 #define __CRT_HAVE___setrlimit
 #define __CRT_HAVE___setsid
+#define __CRT_HAVE___setsockopt64
 #define __CRT_HAVE___setspent
 #define __CRT_HAVE___setstate
 #define __CRT_HAVE___settimeofday

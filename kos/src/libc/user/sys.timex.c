@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x892cf56e]]]*/
+/*[[[start:exports,hash:CRC-32=0x56df6cfc]]]*/
 DEFINE_PUBLIC_ALIAS(__adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_ALIAS(__libc_adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_ALIAS(adjtimex, libc_adjtimex);
@@ -127,10 +127,10 @@ DEFINE_PUBLIC_ALIAS(ntp_gettimex, libc_ntp_gettimex);
 DEFINE_PUBLIC_ALIAS(ntp_adjtime, libc_ntp_adjtime);
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__adjtimex64, libc_adjtimex64);
+DEFINE_PUBLIC_ALIAS(___adjtimex64, libc_adjtimex64);
 DEFINE_PUBLIC_ALIAS(adjtimex64, libc_adjtimex64);
 DEFINE_PUBLIC_ALIAS(ntp_adjtime64, libc_ntp_adjtime64);
-DEFINE_PUBLIC_ALIAS(__ntp_gettime64, libc_ntp_gettimex64);
+DEFINE_PUBLIC_ALIAS(__ntp_gettimex64, libc_ntp_gettimex64);
 DEFINE_PUBLIC_ALIAS(ntp_gettimex64, libc_ntp_gettimex64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/

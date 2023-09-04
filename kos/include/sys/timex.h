@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa94e931d */
+/* HASH CRC-32:0xe39d3e30 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,10 +207,10 @@ __CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restri
 #elif defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE____adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),___adjtimex64,(__ntx))
+#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE____adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <libc/local/sys.timex/adjtimex.h>
 /* >> adjtimex(2), adjtimex64(2) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL __adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); }
@@ -227,10 +227,10 @@ __CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict
 #elif defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
 __CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE____adjtimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> adjtimex(2), adjtimex64(2) */
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),___adjtimex64,(__ntx))
+#elif (defined(__CRT_HAVE___libc_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE____adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <libc/local/sys.timex/adjtimex.h>
 /* >> adjtimex(2), adjtimex64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); })
@@ -241,7 +241,10 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__re
 #elif defined(__CRT_HAVE_ntp_gettimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> ntp_gettime(3), ntp_gettime64(3) */
 __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE___ntp_gettime64) || defined(__CRT_HAVE_ntp_gettimex)
+#elif defined(__CRT_HAVE___ntp_gettimex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> ntp_gettime(3), ntp_gettime64(3) */
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),__ntp_gettimex64,(__ntv))
+#elif defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE___ntp_gettimex64) || defined(__CRT_HAVE_ntp_gettimex)
 #include <libc/local/sys.timex/ntp_gettime.h>
 /* >> ntp_gettime(3), ntp_gettime64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL ntp_gettime)(struct ntptimeval *__restrict __ntv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntp_gettime))(__ntv); })
@@ -271,9 +274,9 @@ __CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__rest
 #elif defined(__CRT_HAVE_adjtimex64)
 /* >> adjtimex(2), adjtimex64(2) */
 __CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64)
+#elif defined(__CRT_HAVE____adjtimex64)
 /* >> adjtimex(2), adjtimex64(2) */
-__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),__adjtimex64,(__ntx))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),___adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <libc/local/sys.timex/adjtimex64.h>
 /* >> adjtimex(2), adjtimex64(2) */
@@ -296,9 +299,9 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *
 #elif defined(__CRT_HAVE_ntp_gettimex64)
 /* >> ntp_gettime(3), ntp_gettime64(3) */
 __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE___ntp_gettime64)
+#elif defined(__CRT_HAVE___ntp_gettimex64)
 /* >> ntp_gettime(3), ntp_gettime64(3) */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),__ntp_gettime64,(__ntv))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),__ntp_gettimex64,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex)
 #include <libc/local/sys.timex/ntp_gettime64.h>
 /* >> ntp_gettime(3), ntp_gettime64(3) */

@@ -1311,6 +1311,7 @@ ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__res
 @@@return: -1: ... Same as for `send(2)' and `sendto(2)'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
 [[export_as("__libc_sendmsg")]] /* From Glibc 2.3.2 */
+[[time64_export_as("__sendmsg64")]] /* No idea why this has a time64-alias, but it does... */
 ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1324,6 +1325,7 @@ ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
 [[export_as("__libc_recvmsg")]] /* From Glibc 2.3.2 */
+[[time64_export_as("__recvmsg64")]] /* No idea why this has a time64-alias, but it does... */
 ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -1339,6 +1341,7 @@ ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[time64_export_as("__getsockopt64")]] /* No idea why this has a time64-alias, but it does... */
 int getsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[out/*(*optlen <= *optlen)*/]] void *__restrict optval, [[inout]] socklen_t *__restrict optlen);
 
@@ -1352,6 +1355,7 @@ int getsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
 @@@return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[time64_export_as("__setsockopt64")]] /* No idea why this has a time64-alias, but it does... */
 int setsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[in(optlen)]] void const *optval, socklen_t optlen);
 
@@ -1430,6 +1434,7 @@ $fd_t accept4([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ 
 @@@return: -1: ... Same as `sendmsg(2)'
 [[cp, export_alias("__sendmmsg")]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>")]]
+[[time64_export_as("__sendmmsg64")]] /* No idea why this has a time64-alias, but it does... */
 __STDC_INT_AS_SSIZE_T sendmmsg([[fdwrite]] $fd_t sockfd, [[inout]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 

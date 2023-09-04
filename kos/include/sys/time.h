@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3040732 */
+/* HASH CRC-32:0x12ec7fe2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -300,7 +300,7 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes,(__fd_t _
 #elif defined(__CRT_HAVE___futimes64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimes(2), futimes64(2) */
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),__futimes64,(__fd,__tvp))
-#elif (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE___lutimes64) || defined(__CRT_HAVE_futimes)
+#elif (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE___futimes64) || defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes.h>
 /* >> futimes(2), futimes64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_FDARG(1) __ATTR_IN_OPT(2) int __NOTHROW_NCX(__LIBCCALL futimes)(__fd_t __fd, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes))(__fd, __tvp); })
@@ -441,9 +441,9 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t
 #elif defined(__CRT_HAVE_futimes64)
 /* >> lutimes(2), lutimes64(2) */
 __CDECLARE(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),(__fd,__tvp))
-#elif defined(__CRT_HAVE___lutimes64)
+#elif defined(__CRT_HAVE___futimes64)
 /* >> lutimes(2), lutimes64(2) */
-__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),__lutimes64,(__fd,__tvp))
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),__futimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes64.h>
 /* >> lutimes(2), lutimes64(2) */

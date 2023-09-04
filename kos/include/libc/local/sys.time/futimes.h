@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x390edca6 */
+/* HASH CRC-32:0x39889953 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_futimes_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE___lutimes64) || defined(__CRT_HAVE_futimes)
+#if (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes64) || defined(__CRT_HAVE___futimes64) || defined(__CRT_HAVE_futimes)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
@@ -35,8 +35,8 @@ __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futime
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes64)
 __CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
-#elif defined(__CRT_HAVE___lutimes64)
-__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),__lutimes64,(__fd,__tvp))
+#elif defined(__CRT_HAVE___futimes64)
+__CREDIRECT(__ATTR_FDARG(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),__futimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/futimes64.h>
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futimes_defined
 #define __localdep_futimes __LIBC_LOCAL_NAME(futimes)
 #endif /* !__local___localdep_futimes_defined */
-#else /* (__CRT_HAVE_lutimes && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_futimes64 || __CRT_HAVE___lutimes64 || __CRT_HAVE_futimes */
+#else /* (__CRT_HAVE_lutimes && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_futimes64 || __CRT_HAVE___futimes64 || __CRT_HAVE_futimes */
 #undef __local_futimes_defined
-#endif /* (!__CRT_HAVE_lutimes || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__) && !__CRT_HAVE_futimes64 && !__CRT_HAVE___lutimes64 && !__CRT_HAVE_futimes */
+#endif /* (!__CRT_HAVE_lutimes || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__) && !__CRT_HAVE_futimes64 && !__CRT_HAVE___futimes64 && !__CRT_HAVE_futimes */
 #endif /* !__local_futimes_defined */

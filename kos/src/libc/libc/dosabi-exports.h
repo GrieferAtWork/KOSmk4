@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56b39855 */
+/* HASH CRC-32:0x6d20eaaf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3524,10 +3524,22 @@ DEFINE_PUBLIC_ALIAS(DOS$sendto, libd_sendto);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_recvfrom, libd_recvfrom);
 DEFINE_PUBLIC_ALIAS(DOS$recvfrom, libd_recvfrom);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_sendmsg, libd_sendmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__sendmsg64, libd_sendmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$sendmsg, libd_sendmsg);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_recvmsg, libd_recvmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__recvmsg64, libd_recvmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$recvmsg, libd_recvmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__getsockopt64, libd_getsockopt);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$getsockopt, libd_getsockopt);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__setsockopt64, libd_setsockopt);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$setsockopt, libd_setsockopt);
 DEFINE_PUBLIC_ALIAS(DOS$listen, libd_listen);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_accept, libd_accept);
@@ -3535,6 +3547,9 @@ DEFINE_PUBLIC_ALIAS(DOS$accept, libd_accept);
 DEFINE_PUBLIC_ALIAS(DOS$shutdown, libd_shutdown);
 DEFINE_PUBLIC_ALIAS(DOS$accept4, libd_accept4);
 DEFINE_PUBLIC_ALIAS(DOS$__sendmmsg, libd_sendmmsg);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__sendmmsg64, libd_sendmmsg);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(DOS$sendmmsg, libd_sendmmsg);
 DEFINE_PUBLIC_ALIAS(DOS$recvmmsg, libd_recvmmsg);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
@@ -3632,7 +3647,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__adjtime64, libd_adjtime64);
 DEFINE_PUBLIC_ALIAS(DOS$adjtime64, libd_adjtime64);
 DEFINE_PUBLIC_ALIAS(DOS$__lutimes64, libd_lutimes64);
 DEFINE_PUBLIC_ALIAS(DOS$lutimes64, libd_lutimes64);
-DEFINE_PUBLIC_ALIAS(DOS$__lutimes64, libd_futimes64);
+DEFINE_PUBLIC_ALIAS(DOS$__futimes64, libd_futimes64);
 DEFINE_PUBLIC_ALIAS(DOS$futimes64, libd_futimes64);
 DEFINE_PUBLIC_ALIAS(DOS$__futimesat64, libd_futimesat64);
 DEFINE_PUBLIC_ALIAS(DOS$futimesat64, libd_futimesat64);
@@ -3676,10 +3691,10 @@ DEFINE_PUBLIC_ALIAS(DOS$adjtimex, libd_adjtimex);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_gettimex, libd_ntp_gettimex);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_adjtime, libd_ntp_adjtime);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$__adjtimex64, libd_adjtimex64);
+DEFINE_PUBLIC_ALIAS(DOS$___adjtimex64, libd_adjtimex64);
 DEFINE_PUBLIC_ALIAS(DOS$adjtimex64, libd_adjtimex64);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_adjtime64, libd_ntp_adjtime64);
-DEFINE_PUBLIC_ALIAS(DOS$__ntp_gettime64, libd_ntp_gettimex64);
+DEFINE_PUBLIC_ALIAS(DOS$__ntp_gettimex64, libd_ntp_gettimex64);
 DEFINE_PUBLIC_ALIAS(DOS$ntp_gettimex64, libd_ntp_gettimex64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 

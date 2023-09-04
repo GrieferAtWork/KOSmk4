@@ -673,7 +673,7 @@ int lutimes64([[in]] char const *file,
 
 [[decl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 [[preferred_time64_variant_of(lutimes), doc_alias("lutimes")]]
-[[time64_export_alias("__lutimes64")]]
+[[time64_export_alias("__futimes64")]]
 [[requires_function(futimes32)]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify_time")]]
 int futimes64([[fdarg]] $fd_t fd, [[in_opt]] struct timeval64 const tvp[2]) {
