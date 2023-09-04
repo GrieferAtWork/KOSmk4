@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b48b88e */
+/* HASH CRC-32:0x3da0f4f0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -842,15 +842,30 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL pthread_equal)(pthr
 
 /* Thread attribute handling. */
 
+#ifdef __CRT_HAVE_pthread_attr_init
 /* >> pthread_attr_init(3)
  * Initialize thread  attribute `*self'  with default  attributes (detachstate  is
  * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__self),(__self))
+__CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_attr_init)
+/* >> pthread_attr_init(3)
+ * Initialize thread  attribute `*self'  with default  attributes (detachstate  is
+ * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__self),__pthread_attr_init,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_attr_destroy
 /* >> pthread_attr_destroy(3)
  * Destroy thread attribute `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_attr_destroy)
+/* >> pthread_attr_destroy(3)
+ * Destroy thread attribute `*self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__self),__pthread_attr_destroy,(__self))
+#endif /* ... */
 /* >> pthread_attr_getdetachstate(3)
  * Get   detach   state    attribute
  * @param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
@@ -1007,12 +1022,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIF
 #define __cpu_set_t_defined
 typedef struct __cpu_set_struct cpu_set_t;
 #endif /* !__cpu_set_t_defined */
+#ifdef __CRT_HAVE_pthread_attr_setaffinity_np
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
-__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
+__CDECLARE(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
+#elif defined(__CRT_HAVE___pthread_attr_setaffinity_np)
+/* >> pthread_attr_setaffinity_np(3)
+ * Set cpuset on which the thread will be allowed to run
+ * @return: EOK:    Success
+ * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: ENOMEM: Insufficient memory */
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),__pthread_attr_setaffinity_np,(__self,__cpusetsize,__cpuset))
+#endif /* ... */
 /* >> pthread_attr_getaffinity_np(3)
  * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
@@ -1240,6 +1264,14 @@ __CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__NOTHROW_CB,pthread_on
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__NOTHROW_CB,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),call_once,(__once_control,__init_routine))
+#elif defined(__CRT_HAVE___pthread_once)
+/* >> pthread_once(3)
+ * Guarantee that the initialization function `init_routine' will be called
+ * only  once,  even if  pthread_once is  executed  several times  with the
+ * same `once_control' argument. `once_control' must  point to a static  or
+ * extern variable initialized to `PTHREAD_ONCE_INIT'.
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__errno_t,__NOTHROW_CB,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),__pthread_once,(__once_control,__init_routine))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> pthread_once(3)
@@ -1497,10 +1529,17 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_tag *_
 /* pthread_mutex_t                                                      */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_mutex_init
 /* >> pthread_mutex_init(3)
  * Initialize the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__self, pthread_mutexattr_t const *__mutexattr),(__self,__mutexattr))
+__CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__self, pthread_mutexattr_t const *__mutexattr),(__self,__mutexattr))
+#elif defined(__CRT_HAVE___pthread_mutex_init)
+/* >> pthread_mutex_init(3)
+ * Initialize the given mutex `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__self, pthread_mutexattr_t const *__mutexattr),__pthread_mutex_init,(__self,__mutexattr))
+#endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutex_destroy
 /* >> pthread_mutex_destroy(3)
  * Destroy the given mutex `self'
@@ -1511,18 +1550,40 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthrea
  * Destroy the given mutex `self'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__self),mtx_destroy,(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_destroy)
+/* >> pthread_mutex_destroy(3)
+ * Destroy the given mutex `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__self),__pthread_mutex_destroy,(__self))
 #endif /* ... */
+#ifdef __CRT_HAVE_pthread_mutex_trylock
 /* >> pthread_mutex_trylock(3)
  * Try locking the given mutex `self'
  * @return: EOK:   Success
  * @return: EBUSY: The  mutex  has  already  been   locked
  *                 In case of  a recursive mutex,  another
  *                 thread was the one to acquire the lock. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__self),(__self))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_trylock)
+/* >> pthread_mutex_trylock(3)
+ * Try locking the given mutex `self'
+ * @return: EOK:   Success
+ * @return: EBUSY: The  mutex  has  already  been   locked
+ *                 In case of  a recursive mutex,  another
+ *                 thread was the one to acquire the lock. */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__self),__pthread_mutex_trylock,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_mutex_lock
 /* >> pthread_mutex_lock(3)
  * Lock the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_lock)
+/* >> pthread_mutex_lock(3)
+ * Lock the given mutex `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__self),__pthread_mutex_lock,(__self))
+#endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1637,10 +1698,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
+#ifdef __CRT_HAVE_pthread_mutex_unlock
 /* >> pthread_mutex_unlock(3)
  * Unlock the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_unlock)
+/* >> pthread_mutex_unlock(3)
+ * Unlock the given mutex `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__self),__pthread_mutex_unlock,(__self))
+#endif /* ... */
 /* >> pthread_mutex_getprioceiling(3)
  * Get the priority ceiling of `self'
  * @return: EOK: Success */
@@ -1691,15 +1759,30 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(
 /* pthread_mutexattr_t                                                  */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_mutexattr_init
 /* >> pthread_mutexattr_init(3)
  * Initialize mutex attribute object `self' with default
  * attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__self),(__self))
+__CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_mutexattr_init)
+/* >> pthread_mutexattr_init(3)
+ * Initialize mutex attribute object `self' with default
+ * attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__self),__pthread_mutexattr_init,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_mutexattr_destroy
 /* >> pthread_mutexattr_destroy(3)
  * Destroy mutex attribute object `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_mutexattr_destroy)
+/* >> pthread_mutexattr_destroy(3)
+ * Destroy mutex attribute object `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__self),__pthread_mutexattr_destroy,(__self))
+#endif /* ... */
 /* >> pthread_mutexattr_getpshared(3)
  * Get the process-shared flag of the mutex attribute `self'
  * @return: EOK: Success */
@@ -1735,6 +1818,13 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pt
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__self, int __kind),pthread_mutexattr_setkind_np,(__self,__kind))
+#elif defined(__CRT_HAVE___pthread_mutexattr_settype)
+/* >> pthread_mutexattr_settype(3)
+ * Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `kind' */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__self, int __kind),__pthread_mutexattr_settype,(__self,__kind))
 #endif /* ... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 /* >> pthread_mutexattr_getprotocol(3)
@@ -1816,15 +1906,31 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_n
 /* pthread_rwlock_t                                                     */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_rwlock_init
 /* >> pthread_rwlock_init(3)
  * Initialize read-write lock `self' using attributes `attr',
  * or  use   the  default   values   if  later   is   `NULL'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __self, pthread_rwlockattr_t const *__restrict __attr),(__self,__attr))
+__CDECLARE(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __self, pthread_rwlockattr_t const *__restrict __attr),(__self,__attr))
+#elif defined(__CRT_HAVE___pthread_rwlock_init)
+/* >> pthread_rwlock_init(3)
+ * Initialize read-write lock `self' using attributes `attr',
+ * or  use   the  default   values   if  later   is   `NULL'.
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __self, pthread_rwlockattr_t const *__restrict __attr),__pthread_rwlock_init,(__self,__attr))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_destroy
 /* >> pthread_rwlock_destroy(3)
  * Destroy read-write lock `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_destroy)
+/* >> pthread_rwlock_destroy(3)
+ * Destroy read-write lock `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__self),__pthread_rwlock_destroy,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_rdlock
 /* >> pthread_rwlock_rdlock(3)
  * Acquire read lock for `self'
  * @return: EOK:     Success
@@ -1832,27 +1938,66 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(p
  * @return: EDEADLK: You're already holding a write-lock
  * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a read-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_rdlock)
+/* >> pthread_rwlock_rdlock(3)
+ * Acquire read lock for `self'
+ * @return: EOK:     Success
+ * @return: EAGAIN:  The maximum # of read-locks has been acquired
+ * @return: EDEADLK: You're already holding a write-lock
+ * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a read-lock */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__self),__pthread_rwlock_rdlock,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_tryrdlock
 /* >> pthread_rwlock_tryrdlock(3)
  * Try to acquire read lock for `self'
  * @return: EOK:    Success
  * @return: EBUSY:  A read-lock cannot be acquired at the moment,
  *                  because a write-lock  is already being  held.
  * @return: EAGAIN: The maximum # of read-locks has been acquired */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_tryrdlock)
+/* >> pthread_rwlock_tryrdlock(3)
+ * Try to acquire read lock for `self'
+ * @return: EOK:    Success
+ * @return: EBUSY:  A read-lock cannot be acquired at the moment,
+ *                  because a write-lock  is already being  held.
+ * @return: EAGAIN: The maximum # of read-locks has been acquired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__self),__pthread_rwlock_tryrdlock,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_wrlock
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for `self'
  * @return: EOK:     Success
  * @return: EDEADLK: You're already holding a read-lock
  * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a write-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_wrlock)
+/* >> pthread_rwlock_wrlock(3)
+ * Acquire write lock for `self'
+ * @return: EOK:     Success
+ * @return: EDEADLK: You're already holding a read-lock
+ * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a write-lock */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__self),__pthread_rwlock_wrlock,(__self))
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_rwlock_trywrlock
 /* >> pthread_rwlock_trywrlock(3)
  * Try to acquire write lock for `self'
  * @return: EOK:   Success
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
  *                 because read-locks  are  already  being  held. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_trywrlock)
+/* >> pthread_rwlock_trywrlock(3)
+ * Try to acquire write lock for `self'
+ * @return: EOK:   Success
+ * @return: EBUSY: A write-lock cannot be acquired at the moment,
+ *                 because read-locks  are  already  being  held. */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__self),__pthread_rwlock_trywrlock,(__self))
+#endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
@@ -2171,11 +2316,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
+#ifdef __CRT_HAVE_pthread_rwlock_unlock
 /* >> pthread_rwlock_unlock(3)
  * Unlock `self'
  * @return: EOK:   Success
  * @return: EPERM: You're not holding a read- or write-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_rwlock_unlock)
+/* >> pthread_rwlock_unlock(3)
+ * Unlock `self'
+ * @return: EOK:   Success
+ * @return: EPERM: You're not holding a read- or write-lock */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__self),__pthread_rwlock_unlock,(__self))
+#endif /* ... */
 
 
 /************************************************************************/
@@ -2215,11 +2368,19 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setkin
 /* pthread_cond_t                                                       */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_cond_init
 /* >> pthread_cond_init(3)
  * Initialize condition variable `self' using attributes
  * `attr', or use the default values if later is `NULL'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __self, pthread_condattr_t const *__restrict __cond_attr),(__self,__cond_attr))
+__CDECLARE(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __self, pthread_condattr_t const *__restrict __cond_attr),(__self,__cond_attr))
+#elif defined(__CRT_HAVE___pthread_cond_init)
+/* >> pthread_cond_init(3)
+ * Initialize condition variable `self' using attributes
+ * `attr', or use the default values if later is `NULL'.
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __self, pthread_condattr_t const *__restrict __cond_attr),__pthread_cond_init,(__self,__cond_attr))
+#endif /* ... */
 #ifdef __CRT_HAVE_pthread_cond_destroy
 /* >> pthread_cond_destroy(3)
  * Destroy condition variable `self'
@@ -2230,6 +2391,11 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread
  * Destroy condition variable `self'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__self),cnd_destroy,(__self))
+#elif defined(__CRT_HAVE___pthread_cond_destroy)
+/* >> pthread_cond_destroy(3)
+ * Destroy condition variable `self'
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__self),__pthread_cond_destroy,(__self))
 #endif /* ... */
 /* >> pthread_cond_signal(3)
  * Wake up one thread waiting for condition variable `self'
@@ -2497,21 +2663,38 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFIC
 /* pthread_barrier_t                                                    */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_barrier_init
 /* >> pthread_barrier_init(3)
  * Initialize `self' with  the attributes in  `attr'.
  * The barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __self, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__self,__attr,__count))
+__CDECLARE(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __self, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__self,__attr,__count))
+#elif defined(__CRT_HAVE___pthread_barrier_init)
+/* >> pthread_barrier_init(3)
+ * Initialize `self' with  the attributes in  `attr'.
+ * The barrier is opened when `count' waiters arrived
+ * @return: EOK:    Success
+ * @return: EINVAL: The given `count' is ZERO(0) */
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __self, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),__pthread_barrier_init,(__self,__attr,__count))
+#endif /* ... */
 /* >> pthread_barrier_destroy(3)
  * Destroy the given (previously dynamically initialized) `self'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_destroy,(pthread_barrier_t *__self),(__self))
+#ifdef __CRT_HAVE_pthread_barrier_wait
 /* >> pthread_barrier_wait(3)
  * Wait on  the given  `self'
  * @return: 0 :                            Success
  * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__self),(__self))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__self),(__self))
+#elif defined(__CRT_HAVE___pthread_barrier_wait)
+/* >> pthread_barrier_wait(3)
+ * Wait on  the given  `self'
+ * @return: 0 :                            Success
+ * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__self),__pthread_barrier_wait,(__self))
+#endif /* ... */
 
 
 /************************************************************************/
@@ -2564,6 +2747,17 @@ __CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),thr_keycreate,(__key,__destr_function))
+#elif defined(__CRT_HAVE___pthread_key_create)
+/* >> pthread_key_create(3)
+ * Create a key value identifying a location in the thread-specific
+ * data area. Each thread maintains a distinct thread-specific data
+ * area. `destr_function', if non-`NULL', is called with the  value
+ * associated to that key when the key is destroyed.
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),__pthread_key_create,(__key,__destr_function))
 #endif /* ... */
 #ifdef __USE_SOLARIS
 #ifndef PTHREAD_ONCE_KEY_NP
@@ -2595,7 +2789,7 @@ __CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pth
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),thr_keycreate_once,(__key,__destr_function))
-#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate) || defined(__CRT_HAVE___pthread_key_create)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
  * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
@@ -2638,6 +2832,14 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_
  * @return: NULL: No value has been bound, yet
  * @return: NULL: Invalid `key' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
+#elif defined(__CRT_HAVE___pthread_getspecific)
+/* >> pthread_getspecific(3)
+ * Return current value of the thread-specific data slot identified by `key'
+ * @return: * :   The value currently associated with `key' in the calling thread
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
+__CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),__pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_pthread_getspecificptr_np)
 #include <libc/local/pthread/pthread_getspecific.h>
 /* >> pthread_getspecific(3)
@@ -2664,6 +2866,14 @@ __CDECLARE(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(pt
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
 __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
+#elif defined(__CRT_HAVE___pthread_setspecific)
+/* >> pthread_setspecific(3)
+ * Store POINTER in the thread-specific data slot identified by `key'
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),__pthread_setspecific,(__key,__pointer))
 #endif /* ... */
 #ifdef __USE_KOS
 /* >> pthread_getspecificptr_np(3)

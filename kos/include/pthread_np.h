@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2392b85f */
+/* HASH CRC-32:0xba29e916 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,6 +73,13 @@ __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setkind_np
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
 __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setkind_np,(pthread_mutexattr_t *__self, int __kind),(__self,__kind))
+#elif defined(__CRT_HAVE___pthread_mutexattr_settype)
+/* >> pthread_mutexattr_settype(3)
+ * Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `kind' */
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setkind_np,(pthread_mutexattr_t *__self, int __kind),__pthread_mutexattr_settype,(__self,__kind))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getname_np
 /* >> pthread_getname_np(3)

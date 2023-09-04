@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0d6ec8a */
+/* HASH CRC-32:0xaec5cc68 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -372,7 +372,7 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),cthread_yield,())
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,mtx_init,(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type),(__mutex,__type))
-#elif defined(__CRT_HAVE_pthread_mutex_init)
+#elif defined(__CRT_HAVE_pthread_mutex_init) || defined(__CRT_HAVE___pthread_mutex_init)
 #include <libc/local/threads/mtx_init.h>
 /* >> mtx_init(3)
  * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
@@ -386,7 +386,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_RPC,mtx_lock,(mtx_t *__restrict __mutex),(__mutex))
-#elif defined(__CRT_HAVE_pthread_mutex_lock)
+#elif defined(__CRT_HAVE_pthread_mutex_lock) || defined(__CRT_HAVE___pthread_mutex_lock)
 #include <libc/local/threads/mtx_lock.h>
 /* >> mtx_lock(3)
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
@@ -463,7 +463,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL 
  * @return: thrd_busy:    Cannot lock without blocking right now
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,mtx_trylock,(mtx_t *__restrict __mutex),(__mutex))
-#elif defined(__CRT_HAVE_pthread_mutex_trylock)
+#elif defined(__CRT_HAVE_pthread_mutex_trylock) || defined(__CRT_HAVE___pthread_mutex_trylock)
 #include <libc/local/threads/mtx_trylock.h>
 /* >> mtx_trylock(3)
  * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
@@ -478,7 +478,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,mtx_unlock,(mtx_t *__restrict __mutex),(__mutex))
-#elif defined(__CRT_HAVE_pthread_mutex_unlock)
+#elif defined(__CRT_HAVE_pthread_mutex_unlock) || defined(__CRT_HAVE___pthread_mutex_unlock)
 #include <libc/local/threads/mtx_unlock.h>
 /* >> mtx_unlock(3)
  * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
@@ -494,6 +494,10 @@ __CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __
 /* >> mtx_destroy(3)
  * Destroy the given mutex (s.a. `pthread_mutex_destroy(3)') */
 __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __mutex),(__mutex))
+#elif defined(__CRT_HAVE___pthread_mutex_destroy)
+/* >> mtx_destroy(3)
+ * Destroy the given mutex (s.a. `pthread_mutex_destroy(3)') */
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict __mutex),__pthread_mutex_destroy,(__mutex))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_once
 /* >> call_once(3)
@@ -503,6 +507,10 @@ __CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_CB,call_once,(onc
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
 __CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_CB,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),(__flag,__func))
+#elif defined(__CRT_HAVE___pthread_once)
+/* >> call_once(3)
+ * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_CB,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),__pthread_once,(__flag,__func))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> call_once(3)
@@ -519,7 +527,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) void __NOTHRO
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,cnd_init,(cnd_t *__restrict __cond),(__cond))
-#elif defined(__CRT_HAVE_pthread_cond_init)
+#elif defined(__CRT_HAVE_pthread_cond_init) || defined(__CRT_HAVE___pthread_cond_init)
 #include <libc/local/threads/cnd_init.h>
 /* >> cnd_init(3)
  * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
@@ -643,6 +651,10 @@ __CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),pthre
 /* Destroy condition variable pointed by cond and free all of its resources
  * s.a. `pthread_cond_destroy()' */
 __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
+#elif defined(__CRT_HAVE___pthread_cond_destroy)
+/* Destroy condition variable pointed by cond and free all of its resources
+ * s.a. `pthread_cond_destroy()' */
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),__pthread_cond_destroy,(__cond))
 #endif /* ... */
 
 
@@ -654,7 +666,7 @@ __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__con
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, void (__LIBKCALL *__destructor)(void *__arg)),(__tss_id,__destructor))
-#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate) || defined(__CRT_HAVE___pthread_key_create)
 #include <libc/local/threads/tss_create.h>
 /* >> tss_create(3)
  * Create a new TLS key (s.a. `pthread_key_create(3)')
@@ -672,6 +684,11 @@ __CREDIRECT(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),pthread_getspecific,(
  * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
  * @return: * : The calling thread's value of the given TLS variable */
 __CDECLARE(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),(__tss_id))
+#elif defined(__CRT_HAVE___pthread_getspecific)
+/* >> tss_get(3)
+ * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
+ * @return: * : The calling thread's value of the given TLS variable */
+__CREDIRECT(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),__pthread_getspecific,(__tss_id))
 #elif defined(__CRT_HAVE_pthread_getspecificptr_np)
 #include <libc/local/pthread/pthread_getspecific.h>
 /* >> tss_get(3)
@@ -685,7 +702,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void *__NOTHROW_NCX(__LIBCCALL tss_get)(tss_t __t
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(__ATTR_ACCESS_NONE(2),int,__NOTHROW_NCX,tss_set,(tss_t __tss_id, void *__val),(__tss_id,__val))
-#elif defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific)
+#elif defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific) || defined(__CRT_HAVE___pthread_setspecific)
 #include <libc/local/threads/tss_set.h>
 /* >> tss_set(3)
  * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')

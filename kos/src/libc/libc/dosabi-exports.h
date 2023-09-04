@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4723b7d5 */
+/* HASH CRC-32:0x5f5e2638 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1685,7 +1685,9 @@ DEFINE_PUBLIC_ALIAS(DOS$cthread_detach, libd_pthread_detach);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_detach, libd_pthread_detach);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_equal, libd_pthread_equal);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_equal, libd_pthread_equal);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_attr_init, libd_pthread_attr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_init, libd_pthread_attr_init);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_attr_destroy, libd_pthread_attr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_destroy, libd_pthread_attr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getdetachstate, libd_pthread_attr_getdetachstate);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setdetachstate, libd_pthread_attr_setdetachstate);
@@ -1705,6 +1707,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getstacksize, libd_pthread_attr_getstacksiz
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setstacksize, libd_pthread_attr_setstacksize);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getstack, libd_pthread_attr_getstack);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setstack, libd_pthread_attr_setstack);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_attr_setaffinity_np, libd_pthread_attr_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setaffinity_np, libd_pthread_attr_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getaffinity_np, libd_pthread_attr_getaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getattr_default_np, libd_pthread_getattr_default_np);
@@ -1724,6 +1727,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_setconcurrency, libd_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setaffinity_np, libd_pthread_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getaffinity_np, libd_pthread_getaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$call_once, libd_pthread_once);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_once, libd_pthread_once);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_once, libd_pthread_once);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setcancelstate, libd_pthread_setcancelstate);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setcanceltype, libd_pthread_setcanceltype);
@@ -1734,10 +1738,14 @@ DEFINE_PUBLIC_ALIAS(DOS$__pthread_unregister_cancel, libd___pthread_unregister_c
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_register_cancel_defer, libd___pthread_register_cancel_defer);
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_unregister_cancel_restore, libd___pthread_unregister_cancel_restore);
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_unwind_next, libd___pthread_unwind_next);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_init, libd_pthread_mutex_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_init, libd_pthread_mutex_init);
 DEFINE_PUBLIC_ALIAS(DOS$mtx_destroy, libd_pthread_mutex_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_destroy, libd_pthread_mutex_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_destroy, libd_pthread_mutex_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_trylock, libd_pthread_mutex_trylock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_trylock, libd_pthread_mutex_trylock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_lock, libd_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_lock, libd_pthread_mutex_lock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock, libd_pthread_mutex_timedlock);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
@@ -1748,18 +1756,22 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock_np, libd_pthread_mutex_reltim
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_reltimedlock64_np, libd_pthread_mutex_reltimedlock64_np);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_getprioceiling, libd_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_setprioceiling, libd_pthread_mutex_setprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_consistent_np, libd_pthread_mutex_consistent);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_consistent, libd_pthread_mutex_consistent);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutexattr_init, libd_pthread_mutexattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_init, libd_pthread_mutexattr_init);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutexattr_destroy, libd_pthread_mutexattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_destroy, libd_pthread_mutexattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getpshared, libd_pthread_mutexattr_getpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setpshared, libd_pthread_mutexattr_setpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getkind_np, libd_pthread_mutexattr_gettype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_gettype, libd_pthread_mutexattr_gettype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setkind_np, libd_pthread_mutexattr_settype);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_mutexattr_settype, libd_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_settype, libd_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getprotocol, libd_pthread_mutexattr_getprotocol);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setprotocol, libd_pthread_mutexattr_setprotocol);
@@ -1769,11 +1781,17 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getrobust_np, libd_pthread_mutexattr_g
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getrobust, libd_pthread_mutexattr_getrobust);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setrobust_np, libd_pthread_mutexattr_setrobust);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setrobust, libd_pthread_mutexattr_setrobust);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_init, libd_pthread_rwlock_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_init, libd_pthread_rwlock_init);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_destroy, libd_pthread_rwlock_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_destroy, libd_pthread_rwlock_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_rdlock, libd_pthread_rwlock_rdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_rdlock, libd_pthread_rwlock_rdlock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_tryrdlock, libd_pthread_rwlock_tryrdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_tryrdlock, libd_pthread_rwlock_tryrdlock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_wrlock, libd_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_wrlock, libd_pthread_rwlock_wrlock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_trywrlock, libd_pthread_rwlock_trywrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_trywrlock, libd_pthread_rwlock_trywrlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedrdlock, libd_pthread_rwlock_timedrdlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_timedwrlock, libd_pthread_rwlock_timedwrlock);
@@ -1789,6 +1807,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock_np, libd_pthread_rwlock_re
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedrdlock64_np, libd_pthread_rwlock_reltimedrdlock64_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_reltimedwrlock64_np, libd_pthread_rwlock_reltimedwrlock64_np);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_rwlock_unlock, libd_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_unlock, libd_pthread_rwlock_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_init, libd_pthread_rwlockattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_destroy, libd_pthread_rwlockattr_destroy);
@@ -1796,8 +1815,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_getpshared, libd_pthread_rwlockattr_g
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_setpshared, libd_pthread_rwlockattr_setpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_getkind_np, libd_pthread_rwlockattr_getkind_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlockattr_setkind_np, libd_pthread_rwlockattr_setkind_np);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_cond_init, libd_pthread_cond_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_init, libd_pthread_cond_init);
 DEFINE_PUBLIC_ALIAS(DOS$cnd_destroy, libd_pthread_cond_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_cond_destroy, libd_pthread_cond_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_destroy, libd_pthread_cond_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_signal, libd_pthread_cond_signal);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_broadcast, libd_pthread_cond_broadcast);
@@ -1822,8 +1843,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_spin_destroy, libd_pthread_spin_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_spin_lock, libd_pthread_spin_lock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_spin_trylock, libd_pthread_spin_trylock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_spin_unlock, libd_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_barrier_init, libd_pthread_barrier_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrier_init, libd_pthread_barrier_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrier_destroy, libd_pthread_barrier_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_barrier_wait, libd_pthread_barrier_wait);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrier_wait, libd_pthread_barrier_wait);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_init, libd_pthread_barrierattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_destroy, libd_pthread_barrierattr_destroy);
@@ -1832,8 +1855,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_setpshared, libd_pthread_barrierattr
 DEFINE_PUBLIC_ALIAS(DOS$tss_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_key_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$tss_get, libd_pthread_getspecific);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_getspecific, libd_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getspecific, libd_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(DOS$thr_setspecific, libd_pthread_setspecific);
+DEFINE_PUBLIC_ALIAS(DOS$__pthread_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getspecificptr_np, libd_pthread_getspecificptr_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getcpuclockid, libd_pthread_getcpuclockid);

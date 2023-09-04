@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1062a4b */
+/* HASH CRC-32:0x91975a19 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,26 @@
 #ifndef __local_mtx_lock_defined
 #define __local_mtx_lock_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_pthread_mutex_lock
+#if defined(__CRT_HAVE_pthread_mutex_lock) || defined(__CRT_HAVE___pthread_mutex_lock)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_lock_defined
 #define __local___localdep_pthread_mutex_lock_defined
+#ifdef __CRT_HAVE_pthread_mutex_lock
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__self),pthread_mutex_lock,(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_lock)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__self),__pthread_mutex_lock,(__self))
+#else /* ... */
+#undef __local___localdep_pthread_mutex_lock_defined
+#endif /* !... */
 #endif /* !__local___localdep_pthread_mutex_lock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -49,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mtx_lock_defined
 #define __localdep_mtx_lock __LIBC_LOCAL_NAME(mtx_lock)
 #endif /* !__local___localdep_mtx_lock_defined */
-#else /* __CRT_HAVE_pthread_mutex_lock */
+#else /* __CRT_HAVE_pthread_mutex_lock || __CRT_HAVE___pthread_mutex_lock */
 #undef __local_mtx_lock_defined
-#endif /* !__CRT_HAVE_pthread_mutex_lock */
+#endif /* !__CRT_HAVE_pthread_mutex_lock && !__CRT_HAVE___pthread_mutex_lock */
 #endif /* !__local_mtx_lock_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f9a12ca */
+/* HASH CRC-32:0x54b3b2a6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_thr_getspecific_defined
 #define __local_thr_getspecific_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
+#if (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE___pthread_getspecific) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific) || defined(__CRT_HAVE___pthread_setspecific))
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -31,6 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_tss_get)
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),tss_get,(__key))
+#elif defined(__CRT_HAVE___pthread_getspecific)
+__CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),__pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_pthread_getspecificptr_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_getspecific.h>
@@ -46,6 +48,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #elif defined(__CRT_HAVE_thr_setspecific)
 __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
+#elif defined(__CRT_HAVE___pthread_setspecific)
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),__pthread_setspecific,(__key,__pointer))
 #else /* ... */
 #undef __local___localdep_pthread_setspecific_defined
 #endif /* !... */
@@ -63,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_thr_getspecific_defined
 #define __localdep_thr_getspecific __LIBC_LOCAL_NAME(thr_getspecific)
 #endif /* !__local___localdep_thr_getspecific_defined */
-#else /* (__CRT_HAVE_pthread_getspecific || __CRT_HAVE_tss_get || __CRT_HAVE_pthread_getspecificptr_np) && (__CRT_HAVE_pthread_setspecific || __CRT_HAVE_thr_setspecific) */
+#else /* (__CRT_HAVE_pthread_getspecific || __CRT_HAVE_tss_get || __CRT_HAVE___pthread_getspecific || __CRT_HAVE_pthread_getspecificptr_np) && (__CRT_HAVE_pthread_setspecific || __CRT_HAVE_thr_setspecific || __CRT_HAVE___pthread_setspecific) */
 #undef __local_thr_getspecific_defined
-#endif /* (!__CRT_HAVE_pthread_getspecific && !__CRT_HAVE_tss_get && !__CRT_HAVE_pthread_getspecificptr_np) || (!__CRT_HAVE_pthread_setspecific && !__CRT_HAVE_thr_setspecific) */
+#endif /* (!__CRT_HAVE_pthread_getspecific && !__CRT_HAVE_tss_get && !__CRT_HAVE___pthread_getspecific && !__CRT_HAVE_pthread_getspecificptr_np) || (!__CRT_HAVE_pthread_setspecific && !__CRT_HAVE_thr_setspecific && !__CRT_HAVE___pthread_setspecific) */
 #endif /* !__local_thr_getspecific_defined */

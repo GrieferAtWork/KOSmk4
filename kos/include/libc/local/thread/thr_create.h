@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7dc1877 */
+/* HASH CRC-32:0xd4bb1c8d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,26 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_pthread_attr_destroy_defined) && defined(__CRT_HAVE_pthread_attr_destroy)
+#ifndef __local___localdep_pthread_attr_destroy_defined
 #define __local___localdep_pthread_attr_destroy_defined
+#ifdef __CRT_HAVE_pthread_attr_destroy
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__self),pthread_attr_destroy,(__self))
-#endif /* !__local___localdep_pthread_attr_destroy_defined && __CRT_HAVE_pthread_attr_destroy */
-#if !defined(__local___localdep_pthread_attr_init_defined) && defined(__CRT_HAVE_pthread_attr_init)
+#elif defined(__CRT_HAVE___pthread_attr_destroy)
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__self),__pthread_attr_destroy,(__self))
+#else /* ... */
+#undef __local___localdep_pthread_attr_destroy_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_attr_destroy_defined */
+#ifndef __local___localdep_pthread_attr_init_defined
 #define __local___localdep_pthread_attr_init_defined
+#ifdef __CRT_HAVE_pthread_attr_init
 __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_init,(__pthread_attr_t *__self),pthread_attr_init,(__self))
-#endif /* !__local___localdep_pthread_attr_init_defined && __CRT_HAVE_pthread_attr_init */
+#elif defined(__CRT_HAVE___pthread_attr_init)
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_init,(__pthread_attr_t *__self),__pthread_attr_init,(__self))
+#else /* ... */
+#undef __local___localdep_pthread_attr_init_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_attr_init_defined */
 #if !defined(__local___localdep_pthread_attr_setdetachstate_defined) && defined(__CRT_HAVE_pthread_attr_setdetachstate)
 #define __local___localdep_pthread_attr_setdetachstate_defined
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setdetachstate,(__pthread_attr_t *__self, int __detachstate),pthread_attr_setdetachstate,(__self,__detachstate))
@@ -79,13 +91,13 @@ __LOCAL_LIBC(thr_create) __ATTR_OUT(6) __ATTR_NONNULL((3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_create))(void *__stack_base, __SIZE_TYPE__ __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, __pthread_t *__newthread) {
 	__errno_t __result;
 	if (__flags || __stack_base || __stack_size) {
-#ifndef __CRT_HAVE_pthread_attr_init
+#if !defined(__CRT_HAVE_pthread_attr_init) && !defined(__CRT_HAVE___pthread_attr_init)
 #ifdef __ENOSYS
 		return __ENOSYS;
 #else /* __ENOSYS */
 		return 1;
 #endif /* !__ENOSYS */
-#else /* !__CRT_HAVE_pthread_attr_init */
+#else /* !__CRT_HAVE_pthread_attr_init && !__CRT_HAVE___pthread_attr_init */
 		__pthread_attr_t __attr;
 		if (__flags & ~(0 |
 #if defined(__CRT_HAVE_pthread_attr_setscope) && defined(__PTHREAD_SCOPE_SYSTEM)
@@ -148,10 +160,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_create))(void *__stack_base, __SI
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_create)(__newthread, &__attr, __start_routine, __arg);
 		goto __done_attr; /* Suppress warnings if not otherwise used. */
 __done_attr:;
-#ifdef __CRT_HAVE_pthread_attr_destroy
+#if defined(__CRT_HAVE_pthread_attr_destroy) || defined(__CRT_HAVE___pthread_attr_destroy)
 		(__NAMESPACE_LOCAL_SYM __localdep_pthread_attr_destroy)(&__attr);
-#endif /* __CRT_HAVE_pthread_attr_destroy */
-#endif /* __CRT_HAVE_pthread_attr_init */
+#endif /* __CRT_HAVE_pthread_attr_destroy || __CRT_HAVE___pthread_attr_destroy */
+#endif /* __CRT_HAVE_pthread_attr_init || __CRT_HAVE___pthread_attr_init */
 	} else {
 		/* Create new thread with default attributes. */
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_create)(__newthread, __NULLPTR, __start_routine, __arg);

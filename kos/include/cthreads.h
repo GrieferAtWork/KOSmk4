@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b04e5a4 */
+/* HASH CRC-32:0x758154a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -515,19 +515,19 @@ typedef __pthread_key_t cthread_key_t;
 
 #ifdef __CRT_HAVE_cthread_keycreate
 __CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,cthread_keycreate,(cthread_key_t *__key),(__key))
-#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate) || defined(__CRT_HAVE___pthread_key_create)
 #include <libc/local/cthreads/cthread_keycreate.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cthread_keycreate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL cthread_keycreate)(cthread_key_t *__key) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cthread_keycreate))(__key); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cthread_getspecific
 __CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,cthread_getspecific,(cthread_key_t __key, void **__p_value),(__key,__p_value))
-#elif defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)
+#elif defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE___pthread_getspecific) || defined(__CRT_HAVE_pthread_getspecificptr_np)
 #include <libc/local/cthreads/cthread_getspecific.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cthread_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL cthread_getspecific)(cthread_key_t __key, void **__p_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cthread_getspecific))(__key, __p_value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cthread_setspecific
 __CDECLARE(__ATTR_ACCESS_NONE(2),int,__NOTHROW_NCX,cthread_setspecific,(cthread_key_t __key, void *___value),(__key,___value))
-#elif defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific)
+#elif defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific) || defined(__CRT_HAVE___pthread_setspecific)
 #include <libc/local/cthreads/cthread_setspecific.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cthread_setspecific, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_NONE(2) int __NOTHROW_NCX(__LIBCCALL cthread_setspecific)(cthread_key_t __key, void *___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cthread_setspecific))(__key, ___value); })
 #endif /* ... */

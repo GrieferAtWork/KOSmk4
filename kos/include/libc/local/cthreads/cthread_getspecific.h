@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b95db24 */
+/* HASH CRC-32:0x2e340a2c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_cthread_getspecific_defined
 #define __local_cthread_getspecific_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)
+#if defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE___pthread_getspecific) || defined(__CRT_HAVE_pthread_getspecificptr_np)
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_getspecific_defined
@@ -30,6 +30,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_tss_get)
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),tss_get,(__key))
+#elif defined(__CRT_HAVE___pthread_getspecific)
+__CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),__pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_pthread_getspecificptr_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_getspecific.h>
@@ -49,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_cthread_getspecific_defined
 #define __localdep_cthread_getspecific __LIBC_LOCAL_NAME(cthread_getspecific)
 #endif /* !__local___localdep_cthread_getspecific_defined */
-#else /* __CRT_HAVE_pthread_getspecific || __CRT_HAVE_tss_get || __CRT_HAVE_pthread_getspecificptr_np */
+#else /* __CRT_HAVE_pthread_getspecific || __CRT_HAVE_tss_get || __CRT_HAVE___pthread_getspecific || __CRT_HAVE_pthread_getspecificptr_np */
 #undef __local_cthread_getspecific_defined
-#endif /* !__CRT_HAVE_pthread_getspecific && !__CRT_HAVE_tss_get && !__CRT_HAVE_pthread_getspecificptr_np */
+#endif /* !__CRT_HAVE_pthread_getspecific && !__CRT_HAVE_tss_get && !__CRT_HAVE___pthread_getspecific && !__CRT_HAVE_pthread_getspecificptr_np */
 #endif /* !__local_cthread_getspecific_defined */

@@ -844,12 +844,14 @@ int pthread_equal(pthread_t thr1, pthread_t thr2) {
 @@`PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_attr_init")]]
 $errno_t pthread_attr_init([[out]] pthread_attr_t *self);
 
 @@>> pthread_attr_destroy(3)
 @@Destroy thread attribute `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_attr_destroy")]]
 $errno_t pthread_attr_destroy([[inout]] pthread_attr_t *self);
 
 @@>> pthread_attr_getdetachstate(3)
@@ -1087,6 +1089,7 @@ $errno_t pthread_attr_setstack([[inout]] pthread_attr_t *self,
 @@@return: EINVAL: The given set contains a non-existant CPU
 @@@return: ENOMEM: Insufficient memory
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_attr_setaffinity_np")]]
 $errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *self, size_t cpusetsize,
                                      [[in_opt]] cpu_set_t const *cpuset);
 
@@ -1268,6 +1271,7 @@ $errno_t pthread_getaffinity_np(pthread_t self, size_t cpusetsize,
 @@extern variable initialized to `PTHREAD_ONCE_INIT'.
 @@@return: EOK: Success
 [[nothrow_cb, export_alias("call_once")]]
+[[export_alias("__pthread_once")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
 [[impl_include("<hybrid/sched/__yield.h>", "<asm/os/errno.h>")]]
@@ -1700,13 +1704,14 @@ int __sigsetjmp([[out]] struct __jmp_buf_tag *env, int savemask);
 @@Initialize the given mutex `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutex_init")]]
 $errno_t pthread_mutex_init([[out]] pthread_mutex_t *self,
                             pthread_mutexattr_t const *mutexattr);
 
 @@>> pthread_mutex_destroy(3)
 @@Destroy the given mutex `self'
 @@@return: EOK: Success
-[[export_alias("mtx_destroy")]]
+[[export_alias("mtx_destroy", "__pthread_mutex_destroy")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutex_destroy([[inout]] pthread_mutex_t *self);
 
@@ -1717,12 +1722,14 @@ $errno_t pthread_mutex_destroy([[inout]] pthread_mutex_t *self);
 @@                In case of  a recursive mutex,  another
 @@                thread was the one to acquire the lock.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutex_trylock")]]
 $errno_t pthread_mutex_trylock([[inout]] pthread_mutex_t *self);
 
 @@>> pthread_mutex_lock(3)
 @@Lock the given mutex `self'
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutex_lock")]]
 $errno_t pthread_mutex_lock([[inout]] pthread_mutex_t *self);
 
 %#ifdef __USE_XOPEN2K
@@ -1835,6 +1842,7 @@ $errno_t pthread_mutex_reltimedlock64_np([[inout]] pthread_mutex_t *__restrict s
 @@Unlock the given mutex `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutex_unlock")]]
 $errno_t pthread_mutex_unlock([[inout]] pthread_mutex_t *self);
 
 @@>> pthread_mutex_getprioceiling(3)
@@ -1880,6 +1888,7 @@ $errno_t pthread_mutex_consistent([[inout]] pthread_mutex_t *self);
 @@attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutexattr_init")]]
 $errno_t pthread_mutexattr_init([[out]] pthread_mutexattr_t *self);
 
 
@@ -1887,6 +1896,7 @@ $errno_t pthread_mutexattr_init([[out]] pthread_mutexattr_t *self);
 @@Destroy mutex attribute object `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_mutexattr_destroy")]]
 $errno_t pthread_mutexattr_destroy([[inout]] pthread_mutexattr_t *self);
 
 @@>> pthread_mutexattr_getpshared(3)
@@ -1918,8 +1928,9 @@ $errno_t pthread_mutexattr_gettype([[in]] pthread_mutexattr_t const *__restrict 
 @@`PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `kind'
-[[export_alias("pthread_mutexattr_setkind_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("pthread_mutexattr_setkind_np")]] /* OpenBSD-specific name */
+[[export_alias("__pthread_mutexattr_settype")]]
 $errno_t pthread_mutexattr_settype([[inout]] pthread_mutexattr_t *self, int kind);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
@@ -1991,6 +2002,7 @@ $errno_t pthread_mutexattr_setrobust([[inout]] pthread_mutexattr_t *self, int ro
 @@or  use   the  default   values   if  later   is   `NULL'.
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_init")]]
 $errno_t pthread_rwlock_init([[out]] pthread_rwlock_t *__restrict self,
                              [[in_opt]] pthread_rwlockattr_t const *__restrict attr);
 
@@ -1998,6 +2010,7 @@ $errno_t pthread_rwlock_init([[out]] pthread_rwlock_t *__restrict self,
 @@Destroy read-write lock `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_destroy")]]
 $errno_t pthread_rwlock_destroy([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_rdlock(3)
@@ -2008,6 +2021,7 @@ $errno_t pthread_rwlock_destroy([[inout]] pthread_rwlock_t *self);
 @@@return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
 @@                  You're already holding a read-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_rdlock")]]
 $errno_t pthread_rwlock_rdlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_tryrdlock(3)
@@ -2017,6 +2031,7 @@ $errno_t pthread_rwlock_rdlock([[inout]] pthread_rwlock_t *self);
 @@                 because a write-lock  is already being  held.
 @@@return: EAGAIN: The maximum # of read-locks has been acquired
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_tryrdlock")]]
 $errno_t pthread_rwlock_tryrdlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_wrlock(3)
@@ -2026,6 +2041,7 @@ $errno_t pthread_rwlock_tryrdlock([[inout]] pthread_rwlock_t *self);
 @@@return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
 @@                  You're already holding a write-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_wrlock")]]
 $errno_t pthread_rwlock_wrlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_trywrlock(3)
@@ -2034,6 +2050,7 @@ $errno_t pthread_rwlock_wrlock([[inout]] pthread_rwlock_t *self);
 @@@return: EBUSY: A write-lock cannot be acquired at the moment,
 @@                because read-locks  are  already  being  held.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_trywrlock")]]
 $errno_t pthread_rwlock_trywrlock([[inout]] pthread_rwlock_t *self);
 
 %#ifdef __USE_XOPEN2K
@@ -2251,6 +2268,7 @@ $errno_t pthread_rwlock_reltimedwrlock64_np([[inout]] pthread_rwlock_t *__restri
 @@@return: EOK:   Success
 @@@return: EPERM: You're not holding a read- or write-lock
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_rwlock_unlock")]]
 $errno_t pthread_rwlock_unlock([[inout]] pthread_rwlock_t *self);
 
 %
@@ -2313,14 +2331,16 @@ $errno_t pthread_rwlockattr_setkind_np([[inout]] pthread_rwlockattr_t *self, int
 @@`attr', or use the default values if later is `NULL'.
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_cond_init")]]
 $errno_t pthread_cond_init([[out]] pthread_cond_t *__restrict self,
                            [[in_opt]] pthread_condattr_t const *__restrict cond_attr);
 
 @@>> pthread_cond_destroy(3)
 @@Destroy condition variable `self'
 @@@return: EOK: Success
-[[export_alias("cnd_destroy")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("cnd_destroy")]]
+[[export_alias("__pthread_cond_destroy")]]
 $errno_t pthread_cond_destroy([[inout]] pthread_cond_t *self);
 
 @@>> pthread_cond_signal(3)
@@ -2598,6 +2618,7 @@ $errno_t pthread_spin_unlock([[inout]] pthread_spinlock_t *self) {
 @@@return: EOK:    Success
 @@@return: EINVAL: The given `count' is ZERO(0)
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_barrier_init")]]
 $errno_t pthread_barrier_init([[out]] pthread_barrier_t *__restrict self,
                               [[in_opt]] pthread_barrierattr_t const *__restrict attr,
                               unsigned int count);
@@ -2613,6 +2634,7 @@ $errno_t pthread_barrier_destroy([[inout]] pthread_barrier_t *self);
 @@@return: 0 :                            Success
 @@@return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread.
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("__pthread_barrier_wait")]]
 $errno_t pthread_barrier_wait([[inout]] pthread_barrier_t *self);
 
 %
@@ -2673,6 +2695,7 @@ $errno_t pthread_barrierattr_setpshared([[inout]] pthread_barrierattr_t *self, i
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("thr_keycreate")]]
 [[nodos]] /* TODO: dos support for `pthread_key_create' (it's in cygwin, so it can exist on DOS!) */
+[[export_alias("__pthread_key_create")]]
 $errno_t pthread_key_create([[out]] pthread_key_t *key,
                             [[nullable]] void (LIBKCALL *destr_function)(void *value));
 
@@ -2761,6 +2784,7 @@ $errno_t pthread_key_delete(pthread_key_t key);
 @@@return: NULL: Invalid `key'
 [[wunused, decl_include("<bits/crt/pthreadtypes.h>")]]
 [[userimpl, export_alias("tss_get")]]
+[[export_alias("__pthread_getspecific")]]
 [[requires_function(pthread_getspecificptr_np)]]
 void *pthread_getspecific(pthread_key_t key) {
 	void **slot = pthread_getspecificptr_np(key);
@@ -2775,6 +2799,7 @@ void *pthread_getspecific(pthread_key_t key) {
 @@                 calling  thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("thr_setspecific")]]
+[[export_alias("__pthread_setspecific")]]
 $errno_t pthread_setspecific(pthread_key_t key,
                              [[access(none)]] void const *pointer);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe7703f1 */
+/* HASH CRC-32:0x8134cf4d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,26 @@
 #ifndef __local_cnd_init_defined
 #define __local_cnd_init_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_pthread_cond_init
+#if defined(__CRT_HAVE_pthread_cond_init) || defined(__CRT_HAVE___pthread_cond_init)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_cond_init_defined
 #define __local___localdep_pthread_cond_init_defined
+#ifdef __CRT_HAVE_pthread_cond_init
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __self, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__self,__cond_attr))
+#elif defined(__CRT_HAVE___pthread_cond_init)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __self, __pthread_condattr_t const *__restrict __cond_attr),__pthread_cond_init,(__self,__cond_attr))
+#else /* ... */
+#undef __local___localdep_pthread_cond_init_defined
+#endif /* !... */
 #endif /* !__local___localdep_pthread_cond_init_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -49,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_cnd_init_defined
 #define __localdep_cnd_init __LIBC_LOCAL_NAME(cnd_init)
 #endif /* !__local___localdep_cnd_init_defined */
-#else /* __CRT_HAVE_pthread_cond_init */
+#else /* __CRT_HAVE_pthread_cond_init || __CRT_HAVE___pthread_cond_init */
 #undef __local_cnd_init_defined
-#endif /* !__CRT_HAVE_pthread_cond_init */
+#endif /* !__CRT_HAVE_pthread_cond_init && !__CRT_HAVE___pthread_cond_init */
 #endif /* !__local_cnd_init_defined */

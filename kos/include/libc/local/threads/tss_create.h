@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dfd65be */
+/* HASH CRC-32:0x1511d767 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_tss_create_defined
 #define __local_tss_create_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
+#if defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate) || defined(__CRT_HAVE___pthread_key_create)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_key_create_defined
@@ -38,6 +38,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),thr_keycreate,(__key,__destr_function))
+#elif defined(__CRT_HAVE___pthread_key_create)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),__pthread_key_create,(__key,__destr_function))
 #else /* ... */
 #undef __local___localdep_pthread_key_create_defined
 #endif /* !... */
@@ -59,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_tss_create_defined
 #define __localdep_tss_create __LIBC_LOCAL_NAME(tss_create)
 #endif /* !__local___localdep_tss_create_defined */
-#else /* __CRT_HAVE_pthread_key_create || __CRT_HAVE_thr_keycreate */
+#else /* __CRT_HAVE_pthread_key_create || __CRT_HAVE_thr_keycreate || __CRT_HAVE___pthread_key_create */
 #undef __local_tss_create_defined
-#endif /* !__CRT_HAVE_pthread_key_create && !__CRT_HAVE_thr_keycreate */
+#endif /* !__CRT_HAVE_pthread_key_create && !__CRT_HAVE_thr_keycreate && !__CRT_HAVE___pthread_key_create */
 #endif /* !__local_tss_create_defined */

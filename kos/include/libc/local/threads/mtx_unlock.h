@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30c7cb59 */
+/* HASH CRC-32:0x4bbec61d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,26 @@
 #ifndef __local_mtx_unlock_defined
 #define __local_mtx_unlock_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_pthread_mutex_unlock
+#if defined(__CRT_HAVE_pthread_mutex_unlock) || defined(__CRT_HAVE___pthread_mutex_unlock)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_mutex_unlock_defined
 #define __local___localdep_pthread_mutex_unlock_defined
+#ifdef __CRT_HAVE_pthread_mutex_unlock
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__self),pthread_mutex_unlock,(__self))
+#elif defined(__CRT_HAVE___pthread_mutex_unlock)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__self),__pthread_mutex_unlock,(__self))
+#else /* ... */
+#undef __local___localdep_pthread_mutex_unlock_defined
+#endif /* !... */
 #endif /* !__local___localdep_pthread_mutex_unlock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -49,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mtx_unlock_defined
 #define __localdep_mtx_unlock __LIBC_LOCAL_NAME(mtx_unlock)
 #endif /* !__local___localdep_mtx_unlock_defined */
-#else /* __CRT_HAVE_pthread_mutex_unlock */
+#else /* __CRT_HAVE_pthread_mutex_unlock || __CRT_HAVE___pthread_mutex_unlock */
 #undef __local_mtx_unlock_defined
-#endif /* !__CRT_HAVE_pthread_mutex_unlock */
+#endif /* !__CRT_HAVE_pthread_mutex_unlock && !__CRT_HAVE___pthread_mutex_unlock */
 #endif /* !__local_mtx_unlock_defined */

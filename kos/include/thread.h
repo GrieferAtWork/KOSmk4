@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x500458c */
+/* HASH CRC-32:0x5e2e5940 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,6 +209,17 @@ __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *_
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
+#elif defined(__CRT_HAVE___pthread_key_create)
+/* >> pthread_key_create(3)
+ * Create a key value identifying a location in the thread-specific
+ * data area. Each thread maintains a distinct thread-specific data
+ * area. `destr_function', if non-`NULL', is called with the  value
+ * associated to that key when the key is destroyed.
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),__pthread_key_create,(__key,__destr_function))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_key_create_once_np
 /* >> pthread_key_create_once_np(3)
@@ -232,7 +243,7 @@ __CREDIRECT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
-#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate) || defined(__CRT_HAVE___pthread_key_create)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
  * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
@@ -261,10 +272,18 @@ __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,thr_setspecific,(threa
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
 __CDECLARE(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),(__key,__val))
+#elif defined(__CRT_HAVE___pthread_setspecific)
+/* >> pthread_setspecific(3)
+ * Store POINTER in the thread-specific data slot identified by `key'
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),__pthread_setspecific,(__key,__val))
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_getspecific
 __CDECLARE(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,thr_getspecific,(thread_key_t __key, void **__p_val),(__key,__p_val))
-#elif (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
+#elif (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE___pthread_getspecific) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific) || defined(__CRT_HAVE___pthread_setspecific))
 #include <libc/local/thread/thr_getspecific.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(thr_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL thr_getspecific)(thread_key_t __key, void **__p_val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getspecific))(__key, __p_val); })
 #endif /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3ed9e6a */
+/* HASH CRC-32:0x22da4b65 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,16 @@
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_pthread_attr_destroy_defined) && defined(__CRT_HAVE_pthread_attr_destroy)
+#ifndef __local___localdep_pthread_attr_destroy_defined
 #define __local___localdep_pthread_attr_destroy_defined
+#ifdef __CRT_HAVE_pthread_attr_destroy
 __CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__self),pthread_attr_destroy,(__self))
-#endif /* !__local___localdep_pthread_attr_destroy_defined && __CRT_HAVE_pthread_attr_destroy */
+#elif defined(__CRT_HAVE___pthread_attr_destroy)
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__self),__pthread_attr_destroy,(__self))
+#else /* ... */
+#undef __local___localdep_pthread_attr_destroy_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_attr_destroy_defined */
 #ifndef __local___localdep_pthread_attr_getstack_defined
 #define __local___localdep_pthread_attr_getstack_defined
 #ifdef __CRT_HAVE_pthread_attr_getstack
@@ -61,9 +67,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_stackseg_np))(__pthread_t __s
 			__sinfo->ss_size  = __stacksize;
 			__sinfo->ss_flags = 0;
 		}
-#ifdef __CRT_HAVE_pthread_attr_destroy
+#if defined(__CRT_HAVE_pthread_attr_destroy) || defined(__CRT_HAVE___pthread_attr_destroy)
 		(__NAMESPACE_LOCAL_SYM __localdep_pthread_attr_destroy)(&__attr);
-#endif /* __CRT_HAVE_pthread_attr_destroy */
+#endif /* __CRT_HAVE_pthread_attr_destroy || __CRT_HAVE___pthread_attr_destroy */
 	}
 	return __result;
 }
