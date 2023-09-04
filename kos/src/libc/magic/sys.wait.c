@@ -134,6 +134,7 @@ typedef __id_t id_t;
 @@@param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
 @@                 optionally     or'd     with     `WNOHANG | WNOWAIT'
 [[cp, decl_include("<features.h>", "<bits/os/siginfo.h>", "<bits/types.h>")]]
+[[export_alias("__waitid")]]
 int waitid(idtype_t idtype, id_t id,
            [[out_opt]] siginfo_t *infop,
            __STDC_INT_AS_UINT_T options);

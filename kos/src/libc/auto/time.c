@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef074946 */
+/* HASH CRC-32:0x9d7ce072 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/time.h"
+#include "../user/signal.h"
 #include "../user/stdio.h"
 #include "string.h"
 #include "../user/sys.time.h"
@@ -1232,6 +1233,47 @@ NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm *tp,
 #undef ctime_s
 #undef gmtime_s
 #undef localtime_s
+#ifndef __KERNEL__
+#include <bits/os/sigset.h>
+#include <bits/os/timespec.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_IN(1) ATTR_OUT_OPT(2) int
+NOTHROW_NCX(LIBCCALL libc___nanosleep_nocancel)(struct timespec const *requested_time,
+                                                struct timespec *remaining) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_nanosleep(requested_time, remaining);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc___nanosleep64_nocancel, libc___nanosleep_nocancel);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#include <bits/os/sigset.h>
+#include <bits/os/timespec.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_IN(1) ATTR_OUT_OPT(2) int
+NOTHROW_NCX(LIBCCALL libc___nanosleep64_nocancel)(struct timespec64 const *requested_time,
+                                                  struct timespec64 *remaining) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_nanosleep64(requested_time, remaining);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__KERNEL__ */
 
 DECL_END
 
@@ -1404,6 +1446,11 @@ DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
 DEFINE_PUBLIC_ALIAS(_strdate_s, libc__strdate_s);
 DEFINE_PUBLIC_ALIAS(_getsystime, libc__getsystime);
 DEFINE_PUBLIC_ALIAS(_setsystime, libc__setsystime);
+DEFINE_PUBLIC_ALIAS(__nanosleep_nocancel, libc___nanosleep_nocancel);
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(__nanosleep64_nocancel, libc___nanosleep64_nocancel);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_TIME_C */

@@ -236,9 +236,10 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6c0b3452]]]*/
+/*[[[start:exports,hash:CRC-32=0xdcc86d0]]]*/
 DEFINE_PUBLIC_ALIAS(__select, libc_select);
 DEFINE_PUBLIC_ALIAS(select, libc_select);
+DEFINE_PUBLIC_ALIAS(__pselect, libc_pselect);
 DEFINE_PUBLIC_ALIAS(pselect, libc_pselect);
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__

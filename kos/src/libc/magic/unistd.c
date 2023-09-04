@@ -1362,6 +1362,10 @@ $fd_t dup([[fdarg]] $fd_t fd);
 [[guard, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_close")]]
 [[export_alias("__close", "__libc_close")]]
+/* Even though we're allowed to have it be one, close(2) isn't a
+ * cancellation  point on KOS, so `__close_nocancel(3)' can just
+ * be an alias for the regular `close(2)' */
+[[export_as("__close_nocancel")]]
 [[section(".text.crt{|.dos}.io.access")]]
 int close([[fdarg]] $fd_t fd);
 
@@ -4335,4 +4339,93 @@ __SYSDECL_END
 #endif /* _UCHAR_H && !_PARTS_UCHAR_UNISTD_H */
 #endif /* __USE_UTF */
 
+}
+
+
+/* *_nocancel functions */
+[[hidden, wunused, decl_include("<bits/types.h>")]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(read, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+ssize_t __read_nocancel([[fdread]] $fd_t fd,
+                        [[out(return <= bufsize)]] void *buf,
+                        size_t bufsize) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = read(fd, buf, bufsize);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+
+[[hidden, wunused, decl_include("<bits/types.h>")]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(write, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+ssize_t __write_nocancel([[fdwrite]] $fd_t fd,
+                         [[in(return <= bufsize)]] void const *buf,
+                         size_t bufsize) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = write(fd, buf, bufsize);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+
+
+[[hidden, decl_include("<features.h>", "<bits/types.h>")]]
+[[decl_prefix(DEFINE_PIO_OFFSET)]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(pread64, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+ssize_t __pread64_nocancel([[fdread]] $fd_t fd, [[out(return <= bufsize)]] void *buf,
+                           size_t bufsize, __PIO_OFFSET64 offset) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = pread64(fd, buf, bufsize, offset);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+
+[[hidden]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(pause, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+int __pause_nocancel() {
+	int result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = pause();
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
 }

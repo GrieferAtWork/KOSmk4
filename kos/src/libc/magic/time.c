@@ -2686,3 +2686,50 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 }
+
+
+/* *_nocancel functions */
+[[hidden, decl_include("<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("__nanosleep_nocancel")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("__nanosleep64_nocancel")]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(nanosleep, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>", "<bits/os/timespec.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+int __nanosleep_nocancel([[in]] struct timespec const *requested_time,
+                         [[out_opt]] struct timespec *remaining) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = nanosleep(requested_time, remaining);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+
+[[hidden, decl_include("<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(__nanosleep_nocancel), doc_alias("__nanosleep_nocancel")]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(nanosleep64, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>", "<bits/os/timespec.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+int __nanosleep64_nocancel([[in]] struct timespec64 const *requested_time,
+                           [[out_opt]] struct timespec64 *remaining) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = nanosleep64(requested_time, remaining);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}

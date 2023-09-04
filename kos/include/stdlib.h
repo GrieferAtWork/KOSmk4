@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a2bf657 */
+/* HASH CRC-32:0x49674fac */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2484,7 +2484,11 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(void (__LIBCCALL *__func)(int __status, void *__arg), void *__arg),(__func,__arg))
+#ifdef __CRT_HAVE_on_exit
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(void (__LIBCCALL *__func)(int __status, void *__arg), void *__arg),(__func,__arg))
+#elif defined(__CRT_HAVE___on_exit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(void (__LIBCCALL *__func)(int __status, void *__arg), void *__arg),__on_exit,(__func,__arg))
+#endif /* ... */
 #ifdef __CRT_HAVE_clearenv
 __CDECLARE(,int,__NOTHROW_NCX,clearenv,(void),())
 #elif defined(__LOCAL_environ)

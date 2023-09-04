@@ -1272,7 +1272,7 @@ NOTHROW(LIBCCALL libc___libc_current_sigrtmax)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa30fe3ff]]]*/
+/*[[[start:exports,hash:CRC-32=0xb94d4f66]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1316,8 +1316,11 @@ DEFINE_PUBLIC_ALIAS(sigaction, libc_sigaction);
 DEFINE_PUBLIC_ALIAS(__sigpending, libc_sigpending);
 DEFINE_PUBLIC_ALIAS(__libc_sigpending, libc_sigpending);
 DEFINE_PUBLIC_ALIAS(sigpending, libc_sigpending);
+DEFINE_PUBLIC_ALIAS(__sigwait, libc_sigwait);
 DEFINE_PUBLIC_ALIAS(sigwait, libc_sigwait);
+DEFINE_PUBLIC_ALIAS(__sigwaitinfo, libc_sigwaitinfo);
 DEFINE_PUBLIC_ALIAS(sigwaitinfo, libc_sigwaitinfo);
+DEFINE_PUBLIC_ALIAS(__sigtimedwait, libc_sigtimedwait);
 DEFINE_PUBLIC_ALIAS(sigtimedwait, libc_sigtimedwait);
 DEFINE_PUBLIC_ALIAS(sigqueue, libc_sigqueue);
 #include <bits/types.h>

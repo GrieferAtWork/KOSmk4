@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa69c9fde */
+/* HASH CRC-32:0x9e675364 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3431,6 +3431,8 @@ DFUN(".text.crt.dos.time", libd__strtime, libc__strtime, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd__strdate, libc__strdate, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd__getsystime, libc__getsystime, TD, 1, TP)
 DFUN(".text.crt.dos.time", libd__setsystime, libc__setsystime, TD, 2, TP, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___nanosleep_nocancel, libc___nanosleep_nocancel, TD, 2, TP, TP)
+DFUN(".text.crt.dos.compat.glibc", libd___nanosleep64_nocancel, libc___nanosleep64_nocancel, TD, 2, TP, TP)
 
 /* timeval-utils */
 DFUN(".text.crt.dos.libiberty", libd_timeval_add, libc_timeval_add, TV, 3, TP, TP, TP)
@@ -3580,6 +3582,9 @@ DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(_
 DFUN(".text.crt.dos.bsd.io.access", libd_close_range, libc_close_range, TD, 3, TD, TD, TD)
 DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell64, libc_tell64, TIn(__SIZEOF_OFF64_T__), 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.compat.glibc", libd___read_nocancel, libc___read_nocancel, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
+DFUN(".text.crt.dos.compat.glibc", libd___write_nocancel, libc___write_nocancel, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
+DFUN(".text.crt.dos.compat.glibc", libd___pread64_nocancel, libc___pread64_nocancel, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TIn(__SIZEOF_OFF64_T__))
 
 /* util */
 DFUN(".text.crt.dos.io.tty", libd_opendev, libc_opendev, TIn(__SIZEOF_FD_T__), 4, TP, TIn(__SIZEOF_OFLAG_T__), TD, TP)

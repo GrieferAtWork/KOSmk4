@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc05858c0 */
+/* HASH CRC-32:0x6b049602 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,6 +88,8 @@ INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBDCALL libd_directio)(fd_t fd, int mode);
  * @return:  0: Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF ATTR_FDARG(1) int NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd, int mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_NCX(VLIBDCALL libd___open_nocancel)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_NCX(VLIBCCALL libc___open_nocancel)(char const *filename, oflag_t oflags, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

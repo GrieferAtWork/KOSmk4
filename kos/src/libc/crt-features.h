@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91705cd2 */
+/* HASH CRC-32:0x69e7fd71 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,6 +155,13 @@
 #define __CRT_HAVE_DOS$__memsetq_chk
 #define __CRT_HAVE_DOS$__memsetw_chk
 #define __CRT_HAVE_DOS$__minor
+#define __CRT_HAVE_DOS$__nanosleep64_nocancel
+#define __CRT_HAVE_DOS$__nanosleep_nocancel
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$__open_nocancel
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__overflow
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -166,12 +173,14 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__posix_getopt
+#define __CRT_HAVE_DOS$__pread64_nocancel
 #define __CRT_HAVE_DOS$__pthread_cleanup_routine
 #define __CRT_HAVE_DOS$__pthread_register_cancel
 #define __CRT_HAVE_DOS$__pthread_register_cancel_defer
 #define __CRT_HAVE_DOS$__pthread_unregister_cancel
 #define __CRT_HAVE_DOS$__pthread_unregister_cancel_restore
 #define __CRT_HAVE_DOS$__pthread_unwind_next
+#define __CRT_HAVE_DOS$__read_nocancel
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__setusermatherr
@@ -248,6 +257,7 @@
 #define __CRT_HAVE_DOS$__wcserror_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$__write_nocancel
 #define __CRT_HAVE_DOS$__xpg_basename
 #define __CRT_HAVE_DOS$__xpg_sigpause
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -4555,6 +4565,9 @@
 #define __CRT_HAVE___memsetw_chk
 #define __CRT_HAVE___minor
 #define __CRT_HAVE___mutex_unlock_solid
+#define __CRT_HAVE___nanosleep64_nocancel
+#define __CRT_HAVE___nanosleep_nocancel
+#define __CRT_HAVE___open_nocancel
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -4574,8 +4587,10 @@
 #define __CRT_HAVE___p__wpgmptr
 #define __CRT_HAVE___p_program_invocation_short_name
 #define __CRT_HAVE___p_sys_siglist
+#define __CRT_HAVE___pause_nocancel
 #define __CRT_HAVE___peb
 #define __CRT_HAVE___posix_getopt
+#define __CRT_HAVE___pread64_nocancel
 #define __CRT_HAVE___progname
 #define __CRT_HAVE___progname_full
 #define __CRT_HAVE___pthread_cleanup_routine
@@ -4584,6 +4599,7 @@
 #define __CRT_HAVE___pthread_unregister_cancel
 #define __CRT_HAVE___pthread_unregister_cancel_restore
 #define __CRT_HAVE___pthread_unwind_next
+#define __CRT_HAVE___read_nocancel
 #define __CRT_HAVE___res_state
 #define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE___signbit
@@ -4652,6 +4668,7 @@
 #define __CRT_HAVE___vswprintf_l
 #define __CRT_HAVE___wcserror
 #define __CRT_HAVE___wcserror_s
+#define __CRT_HAVE___write_nocancel
 #define __CRT_HAVE___xpg_basename
 #define __CRT_HAVE___xpg_sigpause
 #define __CRT_HAVE___xpg_strerror_r

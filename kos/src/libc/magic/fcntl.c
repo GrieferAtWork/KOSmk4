@@ -2011,3 +2011,30 @@ __SYSDECL_END
 #endif /* __USE_KOS */
 
 }
+
+
+/* *_nocancel functions */
+[[hidden, wunused, vartypes($mode_t), crt_dos_variant]]
+[[decl_include("<bits/types.h>")]]
+[[export_alias("__open64_nocancel")]]
+[[requires_include("<bits/os/signal.h>")]]
+[[requires(defined(__SIGRPC) && defined(__SIG_BLOCK) && defined(__SIG_SETMASK) &&
+           $has_function(open, sigprocmask))]]
+[[impl_include("<bits/os/sigset.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+$fd_t __open_nocancel([[in]] char const *filename, $oflag_t oflags, ...) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)sigemptyset(&nss);
+	(void)sigaddset(&nss, __SIGRPC);
+	result = sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		va_list args;
+		va_start(args, oflags);
+		result = open(filename, oflags, va_arg(args, mode_t));
+		va_end(args);
+		(void)sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}

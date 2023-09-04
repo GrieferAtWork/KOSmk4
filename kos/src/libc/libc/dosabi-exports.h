@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d20eaaf */
+/* HASH CRC-32:0x4723b7d5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2112,12 +2112,15 @@ DEFINE_PUBLIC_ALIAS(DOS$sigaction, libd_sigaction);
 DEFINE_PUBLIC_ALIAS(DOS$__sigpending, libd_sigpending);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_sigpending, libd_sigpending);
 DEFINE_PUBLIC_ALIAS(DOS$sigpending, libd_sigpending);
+DEFINE_PUBLIC_ALIAS(DOS$__sigwait, libd_sigwait);
 DEFINE_PUBLIC_ALIAS(DOS$sigwait, libd_sigwait);
 DEFINE_PUBLIC_ALIAS(DOS$sigisemptyset, libd_sigisemptyset);
 DEFINE_PUBLIC_ALIAS(DOS$sigandset, libd_sigandset);
 DEFINE_PUBLIC_ALIAS(DOS$sigorset, libd_sigorset);
 DEFINE_PUBLIC_ALIAS(DOS$signandset, libd_signandset);
+DEFINE_PUBLIC_ALIAS(DOS$__sigwaitinfo, libd_sigwaitinfo);
 DEFINE_PUBLIC_ALIAS(DOS$sigwaitinfo, libd_sigwaitinfo);
+DEFINE_PUBLIC_ALIAS(DOS$__sigtimedwait, libd_sigtimedwait);
 DEFINE_PUBLIC_ALIAS(DOS$sigtimedwait, libd_sigtimedwait);
 DEFINE_PUBLIC_ALIAS(DOS$sigqueue, libd_sigqueue);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
@@ -3476,6 +3479,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__fdelt_warn, libd___fdelt_chk);
 DEFINE_PUBLIC_ALIAS(DOS$__fdelt_chk, libd___fdelt_chk);
 DEFINE_PUBLIC_ALIAS(DOS$__select, libd_select);
 DEFINE_PUBLIC_ALIAS(DOS$select, libd_select);
+DEFINE_PUBLIC_ALIAS(DOS$__pselect, libd_pselect);
 DEFINE_PUBLIC_ALIAS(DOS$pselect, libd_pselect);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$__select64, libd_select64);
@@ -3742,6 +3746,7 @@ DEFINE_PUBLIC_ALIAS(DOS$wait, libd_wait);
 DEFINE_PUBLIC_ALIAS(DOS$__waitpid, libd_waitpid);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_waitpid, libd_waitpid);
 DEFINE_PUBLIC_ALIAS(DOS$waitpid, libd_waitpid);
+DEFINE_PUBLIC_ALIAS(DOS$__waitid, libd_waitid);
 DEFINE_PUBLIC_ALIAS(DOS$waitid, libd_waitid);
 DEFINE_PUBLIC_ALIAS(DOS$__wait3, libd_wait3);
 DEFINE_PUBLIC_ALIAS(DOS$wait3, libd_wait3);
@@ -3983,6 +3988,10 @@ DEFINE_PUBLIC_ALIAS(DOS$_strtime, libd__strtime);
 DEFINE_PUBLIC_ALIAS(DOS$_strdate, libd__strdate);
 DEFINE_PUBLIC_ALIAS(DOS$_getsystime, libd__getsystime);
 DEFINE_PUBLIC_ALIAS(DOS$_setsystime, libd__setsystime);
+DEFINE_PUBLIC_ALIAS(DOS$__nanosleep_nocancel, libd___nanosleep_nocancel);
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS(DOS$__nanosleep64_nocancel, libd___nanosleep64_nocancel);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 /* timeval-utils */
 DEFINE_PUBLIC_ALIAS(DOS$timeval_add, libd_timeval_add);
@@ -4104,6 +4113,7 @@ DEFINE_PUBLIC_ALIAS(DOS$dup, libd_dup);
 DEFINE_PUBLIC_ALIAS(DOS$_close, libd_close);
 DEFINE_PUBLIC_ALIAS(DOS$__close, libd_close);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_close, libd_close);
+DEFINE_PUBLIC_ALIAS(DOS$__close_nocancel, libd_close);
 DEFINE_PUBLIC_ALIAS(DOS$close, libd_close);
 DEFINE_PUBLIC_ALIAS(DOS$_lseeki64, libd_lseek64);
 DEFINE_PUBLIC_ALIAS(DOS$llseek, libd_lseek64);
@@ -4214,6 +4224,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_tell, libd_tell);
 DEFINE_PUBLIC_ALIAS(DOS$tell, libd_tell);
 DEFINE_PUBLIC_ALIAS(DOS$_telli64, libd_tell64);
 DEFINE_PUBLIC_ALIAS(DOS$tell64, libd_tell64);
+DEFINE_PUBLIC_ALIAS(DOS$__read_nocancel, libd___read_nocancel);
+DEFINE_PUBLIC_ALIAS(DOS$__write_nocancel, libd___write_nocancel);
+DEFINE_PUBLIC_ALIAS(DOS$__pread64_nocancel, libd___pread64_nocancel);
 
 /* util */
 DEFINE_PUBLIC_ALIAS(DOS$opendev, libd_opendev);

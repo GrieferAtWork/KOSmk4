@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c79f838 */
+/* HASH CRC-32:0xc10c9bb7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -591,6 +591,18 @@ INTDEF ATTR_INOUT(1) unsigned int NOTHROW_NCX(LIBDCALL libd__setsystime)(struct 
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_INOUT(1) unsigned int NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm *tp, unsigned int milliseconds);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd___nanosleep_nocancel)(struct timespec const *requested_time, struct timespec *remaining);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc___nanosleep_nocancel)(struct timespec const *requested_time, struct timespec *remaining);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd___nanosleep64_nocancel)(struct timespec64 const *requested_time, struct timespec64 *remaining);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc___nanosleep64_nocancel)(struct timespec64 const *requested_time, struct timespec64 *remaining);
 #endif /* !__KERNEL__ */
 
 DECL_END

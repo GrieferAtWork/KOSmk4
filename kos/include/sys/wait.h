@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52d0ee */
+/* HASH CRC-32:0xbb3a9bf2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,11 +123,19 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_
 #define __id_t_defined
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
+#ifdef __CRT_HAVE_waitid
 /* >> waitid(2)
  * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
  *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
-__CDECLARE_OPT(__ATTR_OUT_OPT(3),int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
+__CDECLARE(__ATTR_OUT_OPT(3),int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
+#elif defined(__CRT_HAVE___waitid)
+/* >> waitid(2)
+ * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+__CREDIRECT(__ATTR_OUT_OPT(3),int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),__waitid,(__idtype,__id,__infop,__options))
+#endif /* ... */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)

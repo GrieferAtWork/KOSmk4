@@ -2141,6 +2141,7 @@ int setstate_r([[nonnull]] char *__restrict statebuf,
 
 [[crt_dos_variant]]
 [[crt_dos_impl_if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL))]]
+[[export_alias("__on_exit")]]
 [[section(".text.crt{|.dos}.sched.process")]]
 int on_exit([[nonnull]] void (LIBCCALL *func)(int status, void *arg), void *arg);
 

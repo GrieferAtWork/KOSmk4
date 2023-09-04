@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd23b271a */
+/* HASH CRC-32:0x70684073 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/fcntl.h"
+#include "../user/signal.h"
 #include "../user/sys.ioctl.h"
 
 DECL_BEGIN
@@ -55,12 +56,56 @@ NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd,
                                     int mode) {
 	return libc_ioctl(fd, __FIODIRECTIO, mode);
 }
+#include <bits/os/sigset.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.compat.glibc") WUNUSED ATTR_IN(1) fd_t
+NOTHROW_NCX(VLIBDCALL libd___open_nocancel)(char const *filename,
+                                            oflag_t oflags,
+                                            ...) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		va_list args;
+		va_start(args, oflags);
+		result = libd_open(filename, oflags, va_arg(args, mode_t));
+		va_end(args);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#include <bits/os/sigset.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") WUNUSED ATTR_IN(1) fd_t
+NOTHROW_NCX(VLIBCCALL libc___open_nocancel)(char const *filename,
+                                            oflag_t oflags,
+                                            ...) {
+	fd_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		va_list args;
+		va_start(args, oflags);
+		result = libc_open(filename, oflags, va_arg(args, mode_t));
+		va_end(args);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(directio, libc_directio);
+DEFINE_PUBLIC_ALIAS(DOS$__open64_nocancel, libd___open_nocancel);
+DEFINE_PUBLIC_ALIAS(DOS$__open_nocancel, libd___open_nocancel);
+DEFINE_PUBLIC_ALIAS(__open64_nocancel, libc___open_nocancel);
+DEFINE_PUBLIC_ALIAS(__open_nocancel, libc___open_nocancel);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FCNTL_C */

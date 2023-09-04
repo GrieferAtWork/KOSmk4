@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79f83891 */
+/* HASH CRC-32:0x8fa7e56a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -912,6 +912,25 @@ INTDEF WUNUSED ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBDCALL libd_tell64)(fd_t fd);
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTDEF WUNUSED ATTR_FDARG(1) off64_t NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_NCX(LIBDCALL libd___read_nocancel)(fd_t fd, void *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_NCX(LIBCCALL libc___read_nocancel)(fd_t fd, void *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_NCX(LIBDCALL libd___write_nocancel)(fd_t fd, void const *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t NOTHROW_NCX(LIBCCALL libc___write_nocancel)(fd_t fd, void const *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_NCX(LIBDCALL libd___pread64_nocancel)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_NCX(LIBCCALL libc___pread64_nocancel)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF int NOTHROW_NCX(LIBCCALL libc___pause_nocancel)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

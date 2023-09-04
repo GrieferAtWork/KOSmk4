@@ -3230,7 +3230,7 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5afa8483]]]*/
+/*[[[start:exports,hash:CRC-32=0x274a2c30]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(xexit, libc_exit);
@@ -3268,8 +3268,10 @@ DEFINE_PUBLIC_ALIAS(srandom_r, libc_srandom_r);
 DEFINE_PUBLIC_ALIAS(initstate_r, libc_initstate_r);
 DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
 #ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$__on_exit, libd_on_exit);
 DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
 DEFINE_PUBLIC_ALIAS(DOS$setenv, libd_setenv);

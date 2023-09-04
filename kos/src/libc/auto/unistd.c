@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4859fbe5 */
+/* HASH CRC-32:0xe7b6c1fe */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2167,6 +2167,73 @@ NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
 	return libc_lseek64(fd, 0, __SEEK_CUR);
 }
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+#include <bits/os/sigset.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_NCX(LIBCCALL libc___read_nocancel)(fd_t fd,
+                                           void *buf,
+                                           size_t bufsize) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_read(fd, buf, bufsize);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#include <bits/os/sigset.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") WUNUSED ATTR_FDWRITE(1) ATTR_INS(2, 3) ssize_t
+NOTHROW_NCX(LIBCCALL libc___write_nocancel)(fd_t fd,
+                                            void const *buf,
+                                            size_t bufsize) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_write(fd, buf, bufsize);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#include <bits/os/sigset.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_FDREAD(1) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_NCX(LIBCCALL libc___pread64_nocancel)(fd_t fd,
+                                              void *buf,
+                                              size_t bufsize,
+                                              __PIO_OFFSET64 offset) {
+	ssize_t result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_pread64(fd, buf, bufsize, offset);
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
+#include <bits/os/sigset.h>
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc___pause_nocancel)(void) {
+	int result;
+	struct __sigset_struct oss;
+	struct __sigset_struct nss;
+	(void)libc_sigemptyset(&nss);
+	(void)libc_sigaddset(&nss, __SIGRPC);
+	result = libc_sigprocmask(__SIG_BLOCK, &nss, &oss);
+	if likely(result == 0) {
+		result = libc_pause();
+		(void)libc_sigprocmask(__SIG_SETMASK, &oss, NULL);
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -2268,6 +2335,10 @@ DEFINE_PUBLIC_ALIAS(tell, libc_tell);
 DEFINE_PUBLIC_ALIAS(_telli64, libc_tell64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(tell64, libc_tell64);
+DEFINE_PUBLIC_ALIAS(__read_nocancel, libc___read_nocancel);
+DEFINE_PUBLIC_ALIAS(__write_nocancel, libc___write_nocancel);
+DEFINE_PUBLIC_ALIAS(__pread64_nocancel, libc___pread64_nocancel);
+DEFINE_PUBLIC_ALIAS(__pause_nocancel, libc___pause_nocancel);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

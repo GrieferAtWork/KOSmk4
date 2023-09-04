@@ -1204,6 +1204,21 @@ NOTHROW(LIBCCALL libc__dl_find_dso_for_object)(ElfW(Addr) addr) {
 
 
 
+/* Some old Glibc dl function wrappers */
+DEFINE_PUBLIC_ALIAS(_dl_tls_symaddr, libc__dl_tls_symaddr);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") void * /* From: `Glibc-2.3.2' */
+NOTHROW(LIBCCALL libc__dl_tls_symaddr)(struct link_map *lm, ElfW(Sym) const *sym) {
+	void *base = dltlsaddr((void *)lm);
+	if unlikely(!base)
+		abortf("[_dl_tls_symaddr] failed to allocate tls: %s", dlerror());
+	return (byte_t *)base + sym->st_value;
+}
+
+
+
+
+
+
 /* Glibc "fast" string functions from before Glibc 2.24 */
 #undef GLIBC_MEMCPY_SMALL_USE_UNALIGNED
 #if (defined(__i386__) || defined(__x86_64__) || \

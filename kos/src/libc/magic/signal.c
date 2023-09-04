@@ -2008,6 +2008,7 @@ int sigpending([[out]] sigset_t *__restrict set);
 @@Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/os/sigset.h>", "<bits/types.h>")]]
+[[export_alias("__sigwait")]]
 int sigwait([[in]] sigset_t const *__restrict set,
             [[out]] $signo_t *__restrict signo);
 
@@ -2080,6 +2081,7 @@ int signandset([[out]] $sigset_t *set,
 @@@param: info: Information about the signal on which to wait.
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>")]]
+[[export_alias("__sigwaitinfo")]]
 int sigwaitinfo([[in]] $sigset_t const *__restrict set,
                 [[out_opt]] siginfo_t *__restrict info);
 
@@ -2099,6 +2101,7 @@ int sigtimedwait32([[in]] $sigset_t const *__restrict set,
 [[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait", "__sigtimedwait")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64", "__sigtimedwait64")]]
+[[export_as("__sigtimedwait")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[in]] $sigset_t const *__restrict set,
                  [[out_opt]] siginfo_t *__restrict info,

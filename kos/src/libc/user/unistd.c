@@ -3487,7 +3487,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x255ed01a]]]*/
+/*[[[start:exports,hash:CRC-32=0xe1b61def]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3611,6 +3611,7 @@ DEFINE_PUBLIC_ALIAS(_close, libc_close);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__close, libc_close);
 DEFINE_PUBLIC_ALIAS(__libc_close, libc_close);
+DEFINE_PUBLIC_ALIAS(__close_nocancel, libc_close);
 DEFINE_PUBLIC_ALIAS(close, libc_close);
 DEFINE_PUBLIC_ALIAS(DOS$_access, libd_access);
 DEFINE_PUBLIC_ALIAS(DOS$__access, libd_access);

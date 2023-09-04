@@ -456,6 +456,7 @@
 #define __CRT_HAVE___clock_settime64
 #define __CRT_HAVE___clone
 #define __CRT_HAVE___close
+#define __CRT_HAVE___close_nocancel
 #define __CRT_HAVE___cmsg_nxthdr
 #define __CRT_HAVE___cnd_timedwait64
 #define __CRT_HAVE___conio_common_vcprintf
@@ -1092,6 +1093,8 @@
 #define __CRT_HAVE___nanl
 #define __CRT_HAVE___nanosleep
 #define __CRT_HAVE___nanosleep64
+#define __CRT_HAVE___nanosleep64_nocancel
+#define __CRT_HAVE___nanosleep_nocancel
 #define __CRT_HAVE___nearbyint
 #define __CRT_HAVE___nearbyintf
 #define __CRT_HAVE___nearbyintl
@@ -1109,10 +1112,13 @@
 #define __CRT_HAVE___ntohl
 #define __CRT_HAVE___ntohs
 #define __CRT_HAVE___ntp_gettimex64
+#define __CRT_HAVE___on_exit
 #define __CRT_HAVE___open
 #define __CRT_HAVE___open64
 #define __CRT_HAVE___open64_2
+#define __CRT_HAVE___open64_nocancel
 #define __CRT_HAVE___open_2
+#define __CRT_HAVE___open_nocancel
 #define __CRT_HAVE___openat64_2
 #define __CRT_HAVE___openat_2
 #define __CRT_HAVE___option_is_end
@@ -1157,6 +1163,7 @@
 #define __CRT_HAVE___p_type
 #define __CRT_HAVE___pathconf
 #define __CRT_HAVE___pause
+#define __CRT_HAVE___pause_nocancel
 #define __CRT_HAVE___peb
 #define __CRT_HAVE___pipe
 #define __CRT_HAVE___poll
@@ -1169,6 +1176,7 @@
 #define __CRT_HAVE___powl
 #define __CRT_HAVE___ppoll64
 #define __CRT_HAVE___pread64
+#define __CRT_HAVE___pread64_nocancel
 #define __CRT_HAVE___prev_fstat
 #define __CRT_HAVE___prev_lstat
 #define __CRT_HAVE___prev_mknod
@@ -1178,6 +1186,7 @@
 #define __CRT_HAVE___printf_function_table
 #define __CRT_HAVE___progname
 #define __CRT_HAVE___progname_full
+#define __CRT_HAVE___pselect
 #define __CRT_HAVE___pselect64
 #define __CRT_HAVE___pthread_cleanup_routine
 #define __CRT_HAVE___pthread_cond_timedwait64
@@ -1196,6 +1205,7 @@
 #define __CRT_HAVE___random
 #define __CRT_HAVE___rawmemchr
 #define __CRT_HAVE___read
+#define __CRT_HAVE___read_nocancel
 #define __CRT_HAVE___readlink
 #define __CRT_HAVE___readv
 #define __CRT_HAVE___realloc_hook
@@ -1327,7 +1337,10 @@
 #define __CRT_HAVE___sigsetjmp
 #define __CRT_HAVE___sigsetmask
 #define __CRT_HAVE___sigsuspend
+#define __CRT_HAVE___sigtimedwait
 #define __CRT_HAVE___sigtimedwait64
+#define __CRT_HAVE___sigwait
+#define __CRT_HAVE___sigwaitinfo
 #define __CRT_HAVE___sin
 #define __CRT_HAVE___sincos
 #define __CRT_HAVE___sincosf
@@ -1541,6 +1554,7 @@
 #define __CRT_HAVE___wait3_time64
 #define __CRT_HAVE___wait4
 #define __CRT_HAVE___wait4_time64
+#define __CRT_HAVE___waitid
 #define __CRT_HAVE___waitpid
 #define __CRT_HAVE___wargv
 #define __CRT_HAVE___wcscasecmp_l
@@ -1561,6 +1575,7 @@
 #define __CRT_HAVE___wctype_l
 #define __CRT_HAVE___winitenv
 #define __CRT_HAVE___write
+#define __CRT_HAVE___write_nocancel
 #define __CRT_HAVE___writev
 #define __CRT_HAVE___x86_getcontext_eax
 #define __CRT_HAVE___x86_rtm_xtest
@@ -1685,6 +1700,7 @@
 #define __CRT_HAVE__dl_argv
 #define __CRT_HAVE__dl_find_dso_for_object
 #define __CRT_HAVE__dl_find_object
+#define __CRT_HAVE__dl_tls_symaddr
 #define __CRT_HAVE__doprnt
 #define __CRT_HAVE__doscan
 #define __CRT_HAVE__dosmaperr
@@ -7115,7 +7131,9 @@
 #define __CRT_HAVE_KOS$__open
 #define __CRT_HAVE_KOS$__open64
 #define __CRT_HAVE_KOS$__open64_2
+#define __CRT_HAVE_KOS$__open64_nocancel
 #define __CRT_HAVE_KOS$__open_2
+#define __CRT_HAVE_KOS$__open_nocancel
 #define __CRT_HAVE_KOS$__openat64_2
 #define __CRT_HAVE_KOS$__openat_2
 #define __CRT_HAVE_KOS$__p___initenv
@@ -8017,7 +8035,9 @@
 #define __CRT_HAVE_DOS$__open
 #define __CRT_HAVE_DOS$__open64
 #define __CRT_HAVE_DOS$__open64_2
+#define __CRT_HAVE_DOS$__open64_nocancel
 #define __CRT_HAVE_DOS$__open_2
+#define __CRT_HAVE_DOS$__open_nocancel
 #define __CRT_HAVE_DOS$__openat64_2
 #define __CRT_HAVE_DOS$__openat_2
 #define __CRT_HAVE_DOS$__p___initenv

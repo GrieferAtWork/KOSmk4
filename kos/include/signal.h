@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff13ef9e */
+/* HASH CRC-32:0xf8730ddb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2026,10 +2026,17 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __s
  * @return: 0: Success */
 __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __set),__libc_sigpending,(__set))
 #endif /* ... */
+#ifdef __CRT_HAVE_sigwait
 /* >> sigwait(3)
  * Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, __signo_t *__restrict __signo),(__set,__signo))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, __signo_t *__restrict __signo),(__set,__signo))
+#elif defined(__CRT_HAVE___sigwait)
+/* >> sigwait(3)
+ * Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, __signo_t *__restrict __signo),__sigwait,(__set,__signo))
+#endif /* ... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
 /* >> sigisemptyset(3)
@@ -2085,13 +2092,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(signandset, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE_signandset */
 #endif /* __USE_KOS */
 #ifdef __USE_POSIX199309
+#ifdef __CRT_HAVE_sigwaitinfo
 /* >> sigwaitinfo(2)
  * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,
  * as it would/has also been passed to a signal handler's second (info) argument.
  * @param: set:  The set of signals on which to wait
  * @param: info: Information about the signal on which to wait.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,sigwaitinfo,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info),(__set,__info))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,sigwaitinfo,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info),(__set,__info))
+#elif defined(__CRT_HAVE___sigwaitinfo)
+/* >> sigwaitinfo(2)
+ * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,
+ * as it would/has also been passed to a signal handler's second (info) argument.
+ * @param: set:  The set of signals on which to wait
+ * @param: info: Information about the signal on which to wait.
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,sigwaitinfo,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info),__sigwaitinfo,(__set,__info))
+#endif /* ... */
 #if defined(__CRT_HAVE_sigtimedwait) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
