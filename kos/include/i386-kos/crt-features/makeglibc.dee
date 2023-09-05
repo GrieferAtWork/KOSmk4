@@ -44,8 +44,11 @@ function nm(filename: string): {string...} {
 			.partition("@")
 			.first
 			.decode("utf-8");
-		if ("." !in symbolName && symbolName !in ["GLIBC_PRIVATE", "GLIBC_ABI_DT_RELR"])
-			yield symbolName;
+		if ("." in symbolName)
+			continue;
+		if (symbolName in ["GLIBC_PRIVATE", "GLIBC_ABI_DT_RELR", "_DYNAMIC", "_GLOBAL_OFFSET_TABLE_"])
+			continue;
+		yield symbolName;
 	}
 	r.close();
 	local e = proc.join();
@@ -54,6 +57,10 @@ function nm(filename: string): {string...} {
 }
 
 global final VERSIONS: {string...} = {
+	"2.0",
+	"2.0.4",
+	"2.1.3",
+	"2.2.5",
 	"2.3.2",
 	"2.3.5",
 	"2.3.6",
@@ -63,6 +70,7 @@ global final VERSIONS: {string...} = {
 	"2.7",
 	"2.8.90",
 	"2.9",
+	// TODO: Get more versions between here (2009-2013)
 	"2.19",
 	"2.21",
 	"2.23",
@@ -161,7 +169,11 @@ function fixMissingX64Version(missingVersion: string, versionAfter: string) {
 }
 
 /* Special handling because I couldn't find certain 64-bit versions of Glibc- */
-fixMissingX64Version("2.3.2", "2.3.5"); /* I don't think this one even has a 64-bit version */
+//fixMissingX64Version("2.3.2", "2.3.5"); /* I don't think this one even has a 64-bit version */
+fixMissingX64Version("2.2.5", "2.3.2");
+fixMissingX64Version("2.1.3", "2.2.5");
+fixMissingX64Version("2.0.4", "2.1.3");
+fixMissingX64Version("2.0", "2.0.4");
 
 local symbolsAndVersions: {string: {int...}} = Dict();
 for (local ver, symbols: symbolsByVersion) {
@@ -178,8 +190,6 @@ function getPpCondForArchVersions(vers: {int...}): string {
 		return "0"; /* Available in no versions */
 	if (#vers == #KNOWN_VERSION)
 		return "1"; /* Available in all versions */
-	if (#vers == 1)
-		return f"__GLIBC_VERSION__=={vers.first}"; /* Available in single version */
 	local result = "";
 	for (local versionIndex = 0; versionIndex < #KNOWN_VERSION;) {
 		local minVersion = KNOWN_VERSION[versionIndex];
@@ -198,12 +208,12 @@ function getPpCondForArchVersions(vers: {int...}): string {
 		}
 		if (result)
 			result += "||";
-		if (minVersion == maxVersion) {
-			result += f"__GLIBC_VERSION__=={minVersion}";
-		} else if (minVersion == KNOWN_VERSION_MIN) {
+		if (minVersion == KNOWN_VERSION_MIN) {
 			result += f"__GLIBC_VERSION__<={maxVersion}";
 		} else if (maxVersion == KNOWN_VERSION_MAX) {
 			result += f"__GLIBC_VERSION__>={minVersion}";
+		} else if (minVersion == maxVersion) {
+			result += f"__GLIBC_VERSION__=={minVersion}";
 		} else {
 			result += f"(__GLIBC_VERSION__>={minVersion}&&__GLIBC_VERSION__<={maxVersion})";
 		}
