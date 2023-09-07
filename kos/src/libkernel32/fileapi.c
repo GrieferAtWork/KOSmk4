@@ -931,7 +931,7 @@ libk32_GetFileType(HANDLE hFile) {
 		return FILE_TYPE_CHAR;
 	if (S_ISFIFO(st.st_mode) || S_ISSOCK(st.st_mode))
 		return FILE_TYPE_PIPE;
-	return FILE_TYPE_UNKNOWN;
+	return FILE_TYPE_DISK; /* Also returned for "regular" files. */
 }
 
 INTERN WINBOOL WINAPI
