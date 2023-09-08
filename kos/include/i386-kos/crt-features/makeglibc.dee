@@ -70,9 +70,19 @@ global final VERSIONS: {string...} = {
 	"2.7",
 	"2.8.90",
 	"2.9",
-	// TODO: Get more versions between here (2009-2013)
+	"2.10.1",
+	"2.11",
+	"2.12",
+	"2.12.90",
+	"2.13.90",
+	"2.15",
+	"2.16",
+	"2.17",
+	"2.18",
 	"2.19",
+	"2.20",
 	"2.21",
+	"2.22",
 	"2.23",
 	"2.24",
 	"2.26",
@@ -111,35 +121,46 @@ global final KNOWN_VERSION: {int...} = (for (local v: VERSIONS) getVersionCodeFr
 global final KNOWN_VERSION_MIN: int = KNOWN_VERSION < ...;
 global final KNOWN_VERSION_MAX: int = KNOWN_VERSION > ...;
 
-local symbolsByVersion: {int: HashSet with string} = Dict(() -> {
-	for (local v: VERSIONS) {
-		local vcode = getVersionCodeFromName(v);
-		local st32 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libc-{v}.so"));
-		local st64 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libc-{v}.so"));
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\ld-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\ld-{v}.so"));
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libdl-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libdl-{v}.so"));
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libm-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libm-{v}.so"));
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\librt-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\librt-{v}.so"));
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libutil-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libutil-{v}.so"));
-		/* NOTE: libcrypt was removed from Glibc at some point, so modern versions don't have this lib.
-		 * ref: https://sourceware.org/legacy-ml/libc-alpha/2017-08/msg01257.html */
-		st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libcrypt-{v}.so"));
-		st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libcrypt-{v}.so"));
-		local mt32 = copy st32;
-		local mt64 = copy st64;
-		mt32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libpthread-{v}.so"));
-		mt64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libpthread-{v}.so"));
-		yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X32, st32);
-		yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X64, st64);
-		yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X32, mt32);
-		yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X64, mt64);
-	}
-}());
+function loadForVersion(v: string): {(int, HashSet with string)...} {
+	local vcode = getVersionCodeFromName(v);
+	local st32 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libc-{v}.so"));
+	local st64 = HashSet(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libc-{v}.so"));
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\ld-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\ld-{v}.so"));
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libdl-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libdl-{v}.so"));
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libm-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libm-{v}.so"));
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\librt-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\librt-{v}.so"));
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libutil-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libutil-{v}.so"));
+	/* NOTE: libcrypt was removed from Glibc at some point, so modern versions don't have this lib.
+	 * ref: https://sourceware.org/legacy-ml/libc-alpha/2017-08/msg01257.html */
+	st32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libcrypt-{v}.so"));
+	st64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libcrypt-{v}.so"));
+	local mt32 = copy st32;
+	local mt64 = copy st64;
+	mt32.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib32\\libpthread-{v}.so"));
+	mt64.insertall(nm(f"E:\\home\\libc-binaries\\i386\\bin\\lib64\\libpthread-{v}.so"));
+	yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X32, st32);
+	yield (vcode | VERSION_CONF_ST | VERSION_FLAG_X64, st64);
+	yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X32, mt32);
+	yield (vcode | VERSION_CONF_MT | VERSION_FLAG_X64, mt64);
+}
+
+local symbolsByVersion: {int: HashSet with string} = Dict();
+local symbolLoaderThreads: {Thread...} = [];
+for (local v: VERSIONS) {
+	local t = Thread(() -> {
+		for (local vx, sx: loadForVersion(v))
+			symbolsByVersion[vx] = sx;
+	});
+	t.start();
+	symbolLoaderThreads.append(t);
+}
+for (local x: symbolLoaderThreads)
+	x.join();
 
 function fixMissingX64Version(missingVersion: string, versionAfter: string) {
 	for (local mode: { VERSION_CONF_ST, VERSION_CONF_MT }) {

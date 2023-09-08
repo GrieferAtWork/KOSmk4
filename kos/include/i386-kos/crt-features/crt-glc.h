@@ -37,8 +37,19 @@
  *     20700: /lib/libc-2.7.so
  *     20890: /lib/libc-2.8.90.so
  *     20900: /lib/libc-2.9.so
+ *     21001: /lib/libc-2.10.1.so
+ *     21100: /lib/libc-2.11.so
+ *     21200: /lib/libc-2.12.so
+ *     21290: /lib/libc-2.12.90.so
+ *     21390: /lib/libc-2.13.90.so
+ *     21500: /lib/libc-2.15.so
+ *     21600: /lib/libc-2.16.so
+ *     21700: /lib/libc-2.17.so
+ *     21800: /lib/libc-2.18.so
  *     21900: /lib/libc-2.19.so
+ *     22000: /lib/libc-2.20.so
  *     22100: /lib/libc-2.21.so
+ *     22200: /lib/libc-2.22.so
  *     22300: /lib/libc-2.23.so
  *     22400: /lib/libc-2.24.so
  *     22600: /lib/libc-2.26.so
@@ -1510,13 +1521,16 @@
 #define __CRT_HAVE_res_init
 #define __CRT_HAVE_vm86
 #endif /* !__x86_64__ */
-#if !defined(__x86_64__) && __GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 22600
+#if !defined(__x86_64__) && ((__GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 20900) || __GLIBC_VERSION__ == 21900 || __GLIBC_VERSION__ == 22100 || (__GLIBC_VERSION__ >= 22300 && __GLIBC_VERSION__ <= 22600))
 #define __CRT_HAVE___cmpdi2
 #define __CRT_HAVE___fixunsdfdi
 #define __CRT_HAVE___fixunsxfdi
 #define __CRT_HAVE___floatdidf
 #define __CRT_HAVE___ucmpdi2
-#endif /* !__x86_64__ && __GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 22600 */
+#endif /* !__x86_64__ && ((__GLIBC_VERSION__ >= 20302 && __GLIBC_VERSION__ <= 20900) || __GLIBC_VERSION__ == 21900 || __GLIBC_VERSION__ == 22100 || (__GLIBC_VERSION__ >= 22300 && __GLIBC_VERSION__ <= 22600)) */
+#if !defined(__x86_64__) && ((__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ == 22000 || __GLIBC_VERSION__ == 22200 || __GLIBC_VERSION__ >= 22600)
+#define __CRT_HAVE___uname
+#endif /* !__x86_64__ && ((__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ == 22000 || __GLIBC_VERSION__ == 22200 || __GLIBC_VERSION__ >= 22600) */
 #if !defined(__x86_64__) && __GLIBC_VERSION__ >= 20103
 #define __CRT_HAVE__IO_stdin_used
 #define __CRT_HAVE___deregister_frame
@@ -1576,9 +1590,6 @@
 #define __CRT_HAVE___strstr_cg
 #define __CRT_HAVE___strstr_g
 #endif /* !__x86_64__ && __GLIBC_VERSION__ >= 20302 */
-#if !defined(__x86_64__) && __GLIBC_VERSION__ >= 22600
-#define __CRT_HAVE___uname
-#endif /* !__x86_64__ && __GLIBC_VERSION__ >= 22600 */
 #if !defined(__x86_64__) && __GLIBC_VERSION__ >= 23200
 #define __CRT_HAVE___clock_gettime64
 #endif /* !__x86_64__ && __GLIBC_VERSION__ >= 23200 */
@@ -1790,16 +1801,20 @@
 #define __CRT_HAVE_pthread_mutexattr_setprotocol
 #define __CRT_HAVE_pthread_mutexattr_setrobust_np
 #endif /* _REENTRANT ? __GLIBC_VERSION__ >= 20400 : __GLIBC_VERSION__ >= 23400 */
-#if defined(_REENTRANT) ? __GLIBC_VERSION__ >= 21900 : __GLIBC_VERSION__ >= 23400
-#define __CRT_HAVE_pthread_getattr_default_np
+#if defined(_REENTRANT) ? __GLIBC_VERSION__ >= 21100 : __GLIBC_VERSION__ >= 23400
+#define __CRT_HAVE_pthread_sigqueue
+#endif /* _REENTRANT ? __GLIBC_VERSION__ >= 21100 : __GLIBC_VERSION__ >= 23400 */
+#if defined(_REENTRANT) ? __GLIBC_VERSION__ >= 21200 : __GLIBC_VERSION__ >= 23400
 #define __CRT_HAVE_pthread_getname_np
 #define __CRT_HAVE_pthread_mutex_consistent
 #define __CRT_HAVE_pthread_mutexattr_getrobust
 #define __CRT_HAVE_pthread_mutexattr_setrobust
-#define __CRT_HAVE_pthread_setattr_default_np
 #define __CRT_HAVE_pthread_setname_np
-#define __CRT_HAVE_pthread_sigqueue
-#endif /* _REENTRANT ? __GLIBC_VERSION__ >= 21900 : __GLIBC_VERSION__ >= 23400 */
+#endif /* _REENTRANT ? __GLIBC_VERSION__ >= 21200 : __GLIBC_VERSION__ >= 23400 */
+#if defined(_REENTRANT) ? __GLIBC_VERSION__ >= 21800 : __GLIBC_VERSION__ >= 23400
+#define __CRT_HAVE_pthread_getattr_default_np
+#define __CRT_HAVE_pthread_setattr_default_np
+#endif /* _REENTRANT ? __GLIBC_VERSION__ >= 21800 : __GLIBC_VERSION__ >= 23400 */
 #if defined(_REENTRANT) ? __GLIBC_VERSION__ >= 22800 : __GLIBC_VERSION__ >= 23400
 #define __CRT_HAVE_call_once
 #define __CRT_HAVE_cnd_broadcast
@@ -1841,6 +1856,9 @@
 #if defined(__x86_64__) ? (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) : __GLIBC_VERSION__ >= 20103
 #define __CRT_HAVE___modify_ldt
 #endif /* __x86_64__ ? (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) : __GLIBC_VERSION__ >= 20103 */
+#if defined(__x86_64__) ? (__GLIBC_VERSION__ >= 21100 && __GLIBC_VERSION__ <= 23200) : (__GLIBC_VERSION__ >= 21200 && __GLIBC_VERSION__ <= 23200)
+#define __CRT_HAVE___get_cpu_features
+#endif /* __x86_64__ ? (__GLIBC_VERSION__ >= 21100 && __GLIBC_VERSION__ <= 23200) : (__GLIBC_VERSION__ >= 21200 && __GLIBC_VERSION__ <= 23200) */
 #if defined(__x86_64__) ? (defined(_REENTRANT) && __GLIBC_VERSION__ >= 23100) : (defined(_REENTRANT) && __GLIBC_VERSION__ >= 23000)
 #define __CRT_HAVE___libpthread_version_placeholder
 #endif /* __x86_64__ ? (_REENTRANT && __GLIBC_VERSION__ >= 23100) : (_REENTRANT && __GLIBC_VERSION__ >= 23000) */
@@ -1848,6 +1866,9 @@
 #define __CRT_HAVE___expl
 #define __CRT_HAVE___expm1l
 #endif /* __x86_64__ ? __GLIBC_VERSION__ <= 20004 : (__GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 20205) */
+#if defined(__x86_64__) ? __GLIBC_VERSION__ >= 21001 : __GLIBC_VERSION__ >= 21100
+#define __CRT_HAVE_fallocate64
+#endif /* __x86_64__ ? __GLIBC_VERSION__ >= 21001 : __GLIBC_VERSION__ >= 21100 */
 #if defined(__x86_64__) ? __GLIBC_VERSION__ >= 22600 : __GLIBC_VERSION__ >= 20302
 #define __CRT_HAVE___libc_msgrcv
 #define __CRT_HAVE___libc_msgsnd
@@ -1904,9 +1925,9 @@
 #define __CRT_HAVE__dl_start_profile
 #define __CRT_HAVE__dl_unload_cache
 #endif /* __GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302 */
-#if (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) || __GLIBC_VERSION__ >= 22300
+#if (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) || __GLIBC_VERSION__ >= 22200
 #define __CRT_HAVE___libc_pread
-#endif /* (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) || __GLIBC_VERSION__ >= 22300 */
+#endif /* (__GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 20302) || __GLIBC_VERSION__ >= 22200 */
 #if __GLIBC_VERSION__ >= 20103 && __GLIBC_VERSION__ <= 23000
 #define __CRT_HAVE_encrypt
 #define __CRT_HAVE_encrypt_r
@@ -1964,25 +1985,31 @@
 #if __GLIBC_VERSION__ >= 20400 && __GLIBC_VERSION__ <= 20700
 #define __CRT_HAVE__dl_tls_get_addr_soft
 #endif /* __GLIBC_VERSION__ >= 20400 && __GLIBC_VERSION__ <= 20700 */
-#if __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23000
+#if (__GLIBC_VERSION__ >= 21001 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ == 22000 || __GLIBC_VERSION__ == 22200
+#define __CRT_HAVE_NSSLOWHASH_Begin
+#define __CRT_HAVE_NSSLOWHASH_Destroy
+#define __CRT_HAVE_NSSLOWHASH_End
+#define __CRT_HAVE_NSSLOWHASH_NewContext
+#define __CRT_HAVE_NSSLOWHASH_Update
+#define __CRT_HAVE_NSSLOW_Init
+#define __CRT_HAVE_NSSLOW_Shutdown
+#endif /* (__GLIBC_VERSION__ >= 21001 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ == 22000 || __GLIBC_VERSION__ == 22200 */
+#if __GLIBC_VERSION__ >= 21700 && __GLIBC_VERSION__ <= 23000
 #define __CRT_HAVE___clock_getcpuclockid
 #define __CRT_HAVE___clock_getres
 #define __CRT_HAVE___clock_nanosleep
 #define __CRT_HAVE___clock_settime
-#endif /* __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23000 */
-#if __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23200
-#define __CRT_HAVE___get_cpu_features
-#endif /* __GLIBC_VERSION__ >= 21900 && __GLIBC_VERSION__ <= 23200 */
-#if __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 22900
+#endif /* __GLIBC_VERSION__ >= 21700 && __GLIBC_VERSION__ <= 23000 */
+#if __GLIBC_VERSION__ >= 22000 && __GLIBC_VERSION__ <= 22900
 #define __CRT_HAVE___libc_vfork
-#endif /* __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 22900 */
+#endif /* __GLIBC_VERSION__ >= 22000 && __GLIBC_VERSION__ <= 22900 */
 #if __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 23300
 #define __CRT_HAVE___shm_directory
 #endif /* __GLIBC_VERSION__ >= 22100 && __GLIBC_VERSION__ <= 23300 */
-#if __GLIBC_VERSION__ >= 22300 && __GLIBC_VERSION__ <= 23300
+#if __GLIBC_VERSION__ >= 22200 && __GLIBC_VERSION__ <= 23300
 #define __CRT_HAVE___pthread_barrier_init
 #define __CRT_HAVE___pthread_barrier_wait
-#endif /* __GLIBC_VERSION__ >= 22300 && __GLIBC_VERSION__ <= 23300 */
+#endif /* __GLIBC_VERSION__ >= 22200 && __GLIBC_VERSION__ <= 23300 */
 #if __GLIBC_VERSION__ >= 22700 && __GLIBC_VERSION__ <= 23300
 #define __CRT_HAVE___libc_dlvsym
 #define __CRT_HAVE__dl_open_hook2
@@ -2813,6 +2840,9 @@
 #if __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 20601 && __GLIBC_VERSION__ <= 20700)
 #define __CRT_HAVE___nss_services_lookup
 #endif /* __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 20601 && __GLIBC_VERSION__ <= 20700) */
+#if __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ >= 22000
+#define __CRT_HAVE___getrlimit
+#endif /* __GLIBC_VERSION__ <= 20004 || (__GLIBC_VERSION__ >= 21290 && __GLIBC_VERSION__ <= 21800) || __GLIBC_VERSION__ >= 22000 */
 #if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ == 20205
 #define __CRT_HAVE__dl_pagesize
 #endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ == 20205 */
@@ -2835,20 +2865,17 @@
 #define __CRT_HAVE___libc_fatal
 #define __CRT_HAVE___nanosleep
 #endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 20302 */
-#if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 21900
+#if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 21500
 #define __CRT_HAVE___nss_lookup
-#endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 21900 */
-#if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22100
-#define __CRT_HAVE___getrlimit
-#endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22100 */
-#if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22300
+#endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 21500 */
+#if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22200
 #define __CRT_HAVE___recv
 #define __CRT_HAVE___socket
 #define __CRT_HAVE___tdelete
 #define __CRT_HAVE___tfind
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___twalk
-#endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22300 */
+#endif /* __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22200 */
 #if __GLIBC_VERSION__ <= 20004 || __GLIBC_VERSION__ >= 22600
 #define __CRT_HAVE___mmap
 #define __CRT_HAVE___mprotect
@@ -2969,6 +2996,43 @@
 #if __GLIBC_VERSION__ == 20302 || __GLIBC_VERSION__ >= 22700
 #define __CRT_HAVE___sigtimedwait
 #endif /* __GLIBC_VERSION__ == 20302 || __GLIBC_VERSION__ >= 22700 */
+#if __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22200
+#define __CRT_HAVE___h_errno
+#define __CRT_HAVE___libc_scratch_buffer_grow
+#define __CRT_HAVE___libc_scratch_buffer_grow_preserve
+#define __CRT_HAVE___libc_scratch_buffer_set_array_size
+#endif /* __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22200 */
+#if __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22300
+#define __CRT_HAVE___netlink_assert_response
+#define __CRT_HAVE___strtod_nan
+#define __CRT_HAVE___strtof_nan
+#define __CRT_HAVE___strtold_nan
+#endif /* __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22300 */
+#if __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22400
+#define __CRT_HAVE___copy_grp
+#define __CRT_HAVE___merge_grp
+#endif /* __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22400 */
+#if __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22600
+#define __CRT_HAVE___inet6_scopeid_pton
+#define __CRT_HAVE___inet_pton_length
+#define __CRT_HAVE___libc_alloc_buffer_alloc_array
+#define __CRT_HAVE___libc_alloc_buffer_allocate
+#define __CRT_HAVE___libc_alloc_buffer_copy_bytes
+#define __CRT_HAVE___libc_alloc_buffer_copy_string
+#define __CRT_HAVE___libc_alloc_buffer_create_failure
+#define __CRT_HAVE___libc_dynarray_at_failure
+#define __CRT_HAVE___libc_dynarray_emplace_enlarge
+#define __CRT_HAVE___libc_dynarray_finalize
+#define __CRT_HAVE___libc_dynarray_resize
+#define __CRT_HAVE___libc_dynarray_resize_clear
+#define __CRT_HAVE___resolv_context_get
+#define __CRT_HAVE___resolv_context_get_override
+#define __CRT_HAVE___resolv_context_get_preinit
+#define __CRT_HAVE___resolv_context_put
+#endif /* __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22600 */
+#if __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22900
+#define __CRT_HAVE___inet_aton_exact
+#endif /* __GLIBC_VERSION__ == 21700 || __GLIBC_VERSION__ >= 22900 */
 #if __GLIBC_VERSION__ == 23300
 #define __CRT_HAVE___futex_abstimed_wait64
 #define __CRT_HAVE___futex_abstimed_wait_cancelable64
@@ -3981,10 +4045,65 @@
 #define __CRT_HAVE_inotify_init1
 #define __CRT_HAVE_pipe2
 #endif /* __GLIBC_VERSION__ >= 20900 */
-#if __GLIBC_VERSION__ >= 21900
+#if __GLIBC_VERSION__ >= 21001
+#define __CRT_HAVE___cxa_at_quick_exit
+#define __CRT_HAVE___posix_getopt
+#define __CRT_HAVE__nss_files_parse_sgent
+#define __CRT_HAVE_accept4
+#define __CRT_HAVE_endsgent
+#define __CRT_HAVE_fallocate
+#define __CRT_HAVE_fgetsgent
+#define __CRT_HAVE_fgetsgent_r
+#define __CRT_HAVE_getsgent
+#define __CRT_HAVE_getsgent_r
+#define __CRT_HAVE_getsgnam
+#define __CRT_HAVE_getsgnam_r
+#define __CRT_HAVE_malloc_info
+#define __CRT_HAVE_preadv
+#define __CRT_HAVE_preadv64
+#define __CRT_HAVE_psiginfo
+#define __CRT_HAVE_putsgent
+#define __CRT_HAVE_pwritev
+#define __CRT_HAVE_pwritev64
+#define __CRT_HAVE_quick_exit
+#define __CRT_HAVE_register_printf_modifier
+#define __CRT_HAVE_register_printf_specifier
+#define __CRT_HAVE_register_printf_type
+#define __CRT_HAVE_setsgent
+#define __CRT_HAVE_sgetsgent
+#define __CRT_HAVE_sgetsgent_r
+#endif /* __GLIBC_VERSION__ >= 21001 */
+#if __GLIBC_VERSION__ >= 21100
+#define __CRT_HAVE___abort_msg
+#define __CRT_HAVE___longjmp_chk
+#define __CRT_HAVE_execvpe
+#define __CRT_HAVE_mkostemps
+#define __CRT_HAVE_mkostemps64
+#define __CRT_HAVE_mkstemps
+#define __CRT_HAVE_mkstemps64
+#endif /* __GLIBC_VERSION__ >= 21100 */
+#if __GLIBC_VERSION__ >= 21200
+#define __CRT_HAVE_ntp_gettimex
+#define __CRT_HAVE_recvmmsg
+#endif /* __GLIBC_VERSION__ >= 21200 */
+#if __GLIBC_VERSION__ >= 21290
+#define __CRT_HAVE___fentry__
+#define __CRT_HAVE___libc_rpc_getport
+#define __CRT_HAVE_fanotify_init
+#define __CRT_HAVE_fanotify_mark
+#define __CRT_HAVE_prlimit
+#define __CRT_HAVE_prlimit64
+#endif /* __GLIBC_VERSION__ >= 21290 */
+#if __GLIBC_VERSION__ >= 21390
+#define __CRT_HAVE___libc_alloca_cutoff
+#define __CRT_HAVE_clock_adjtime
+#define __CRT_HAVE_name_to_handle_at
+#define __CRT_HAVE_open_by_handle_at
+#define __CRT_HAVE_syncfs
+#endif /* __GLIBC_VERSION__ >= 21390 */
+#if __GLIBC_VERSION__ >= 21500
 #define __CRT_HAVE__ITM_deregisterTMCloneTable
 #define __CRT_HAVE__ITM_registerTMCloneTable
-#define __CRT_HAVE___abort_msg
 #define __CRT_HAVE___acos_finite
 #define __CRT_HAVE___acosf_finite
 #define __CRT_HAVE___acosh_finite
@@ -4000,14 +4119,10 @@
 #define __CRT_HAVE___atanh_finite
 #define __CRT_HAVE___atanhf_finite
 #define __CRT_HAVE___atanhl_finite
-#define __CRT_HAVE___call_tls_dtors
-#define __CRT_HAVE___clock_gettime
 #define __CRT_HAVE___cosh_finite
 #define __CRT_HAVE___coshf_finite
 #define __CRT_HAVE___coshl_finite
 #define __CRT_HAVE___ctype_init
-#define __CRT_HAVE___cxa_at_quick_exit
-#define __CRT_HAVE___cxa_thread_atexit_impl
 #define __CRT_HAVE___exp10_finite
 #define __CRT_HAVE___exp10f_finite
 #define __CRT_HAVE___exp10l_finite
@@ -4019,20 +4134,15 @@
 #define __CRT_HAVE___expl_finite
 #define __CRT_HAVE___fdelt_chk
 #define __CRT_HAVE___fdelt_warn
-#define __CRT_HAVE___fentry__
 #define __CRT_HAVE___fmod_finite
 #define __CRT_HAVE___fmodf_finite
 #define __CRT_HAVE___fmodl_finite
 #define __CRT_HAVE___gamma_r_finite
 #define __CRT_HAVE___gammaf_r_finite
 #define __CRT_HAVE___gammal_r_finite
-#define __CRT_HAVE___getauxval
 #define __CRT_HAVE___hypot_finite
 #define __CRT_HAVE___hypotf_finite
 #define __CRT_HAVE___hypotl_finite
-#define __CRT_HAVE___issignaling
-#define __CRT_HAVE___issignalingf
-#define __CRT_HAVE___issignalingl
 #define __CRT_HAVE___j0_finite
 #define __CRT_HAVE___j0f_finite
 #define __CRT_HAVE___j0l_finite
@@ -4045,10 +4155,6 @@
 #define __CRT_HAVE___lgamma_r_finite
 #define __CRT_HAVE___lgammaf_r_finite
 #define __CRT_HAVE___lgammal_r_finite
-#define __CRT_HAVE___libc_alloca_cutoff
-#define __CRT_HAVE___libc_ifunc_impl_list
-#define __CRT_HAVE___libc_rpc_getport
-#define __CRT_HAVE___libc_secure_getenv
 #define __CRT_HAVE___log10_finite
 #define __CRT_HAVE___log10f_finite
 #define __CRT_HAVE___log10l_finite
@@ -4058,15 +4164,9 @@
 #define __CRT_HAVE___log_finite
 #define __CRT_HAVE___logf_finite
 #define __CRT_HAVE___logl_finite
-#define __CRT_HAVE___longjmp_chk
-#define __CRT_HAVE___madvise
-#define __CRT_HAVE___mktemp
-#define __CRT_HAVE___poll_chk
-#define __CRT_HAVE___posix_getopt
 #define __CRT_HAVE___pow_finite
 #define __CRT_HAVE___powf_finite
 #define __CRT_HAVE___powl_finite
-#define __CRT_HAVE___ppoll_chk
 #define __CRT_HAVE___pthread_get_minstack
 #define __CRT_HAVE___remainder_finite
 #define __CRT_HAVE___remainderf_finite
@@ -4074,7 +4174,6 @@
 #define __CRT_HAVE___scalb_finite
 #define __CRT_HAVE___scalbf_finite
 #define __CRT_HAVE___scalbl_finite
-#define __CRT_HAVE___sendmmsg
 #define __CRT_HAVE___sinh_finite
 #define __CRT_HAVE___sinhf_finite
 #define __CRT_HAVE___sinhl_finite
@@ -4090,75 +4189,47 @@
 #define __CRT_HAVE___yn_finite
 #define __CRT_HAVE___ynf_finite
 #define __CRT_HAVE___ynl_finite
-#define __CRT_HAVE__dl_find_dso_for_object
-#define __CRT_HAVE__nss_files_parse_sgent
-#define __CRT_HAVE_accept4
+#define __CRT_HAVE_process_vm_readv
+#define __CRT_HAVE_process_vm_writev
+#define __CRT_HAVE_scandirat
+#define __CRT_HAVE_scandirat64
+#define __CRT_HAVE_sendmmsg
+#define __CRT_HAVE_setns
+#endif /* __GLIBC_VERSION__ >= 21500 */
+#if __GLIBC_VERSION__ >= 21600
+#define __CRT_HAVE___getauxval
+#define __CRT_HAVE___poll_chk
+#define __CRT_HAVE___ppoll_chk
 #define __CRT_HAVE_aligned_alloc
 #define __CRT_HAVE_c16rtomb
 #define __CRT_HAVE_c32rtomb
-#define __CRT_HAVE_clock_adjtime
-#define __CRT_HAVE_endsgent
-#define __CRT_HAVE_execvpe
-#define __CRT_HAVE_fallocate
-#define __CRT_HAVE_fallocate64
-#define __CRT_HAVE_fanotify_init
-#define __CRT_HAVE_fanotify_mark
-#define __CRT_HAVE_fgetsgent
-#define __CRT_HAVE_fgetsgent_r
 #define __CRT_HAVE_getauxval
-#define __CRT_HAVE_getsgent
-#define __CRT_HAVE_getsgent_r
-#define __CRT_HAVE_getsgnam
-#define __CRT_HAVE_getsgnam_r
-#define __CRT_HAVE_malloc_info
 #define __CRT_HAVE_mbrtoc16
 #define __CRT_HAVE_mbrtoc32
-#define __CRT_HAVE_mkostemps
-#define __CRT_HAVE_mkostemps64
-#define __CRT_HAVE_mkstemps
-#define __CRT_HAVE_mkstemps64
-#define __CRT_HAVE_name_to_handle_at
-#define __CRT_HAVE_ntp_gettimex
-#define __CRT_HAVE_open_by_handle_at
-#define __CRT_HAVE_preadv
-#define __CRT_HAVE_preadv64
-#define __CRT_HAVE_prlimit
-#define __CRT_HAVE_prlimit64
-#define __CRT_HAVE_process_vm_readv
-#define __CRT_HAVE_process_vm_writev
-#define __CRT_HAVE_psiginfo
-#define __CRT_HAVE_putsgent
-#define __CRT_HAVE_pwritev
-#define __CRT_HAVE_pwritev64
-#define __CRT_HAVE_quick_exit
-#define __CRT_HAVE_recvmmsg
-#define __CRT_HAVE_register_printf_modifier
-#define __CRT_HAVE_register_printf_specifier
-#define __CRT_HAVE_register_printf_type
-#define __CRT_HAVE_scandirat
-#define __CRT_HAVE_scandirat64
-#define __CRT_HAVE_secure_getenv
-#define __CRT_HAVE_sendmmsg
-#define __CRT_HAVE_setns
-#define __CRT_HAVE_setsgent
-#define __CRT_HAVE_sgetsgent
-#define __CRT_HAVE_sgetsgent_r
-#define __CRT_HAVE_syncfs
 #define __CRT_HAVE_timespec_get
-#endif /* __GLIBC_VERSION__ >= 21900 */
+#endif /* __GLIBC_VERSION__ >= 21600 */
+#if __GLIBC_VERSION__ >= 21700
+#define __CRT_HAVE___clock_gettime
+#define __CRT_HAVE___libc_ifunc_impl_list
+#define __CRT_HAVE___libc_secure_getenv
+#define __CRT_HAVE___madvise
+#define __CRT_HAVE___mktemp
+#define __CRT_HAVE___sendmmsg
+#define __CRT_HAVE_secure_getenv
+#endif /* __GLIBC_VERSION__ >= 21700 */
+#if __GLIBC_VERSION__ >= 21800
+#define __CRT_HAVE___call_tls_dtors
+#define __CRT_HAVE___cxa_thread_atexit_impl
+#define __CRT_HAVE___issignaling
+#define __CRT_HAVE___issignalingf
+#define __CRT_HAVE___issignalingl
+#define __CRT_HAVE__dl_find_dso_for_object
+#endif /* __GLIBC_VERSION__ >= 21800 */
 #if __GLIBC_VERSION__ >= 22100
 #define __CRT_HAVE___gconv_transliterate
 #endif /* __GLIBC_VERSION__ >= 22100 */
 #if __GLIBC_VERSION__ >= 22300
-#define __CRT_HAVE___h_errno
-#define __CRT_HAVE___libc_scratch_buffer_grow
-#define __CRT_HAVE___libc_scratch_buffer_grow_preserve
-#define __CRT_HAVE___libc_scratch_buffer_set_array_size
-#define __CRT_HAVE___netlink_assert_response
 #define __CRT_HAVE___signgam
-#define __CRT_HAVE___strtod_nan
-#define __CRT_HAVE___strtof_nan
-#define __CRT_HAVE___strtold_nan
 #define __CRT_HAVE_fts64_children
 #define __CRT_HAVE_fts64_close
 #define __CRT_HAVE_fts64_open
@@ -4166,8 +4237,6 @@
 #define __CRT_HAVE_fts64_set
 #endif /* __GLIBC_VERSION__ >= 22300 */
 #if __GLIBC_VERSION__ >= 22400
-#define __CRT_HAVE___copy_grp
-#define __CRT_HAVE___merge_grp
 #define __CRT_HAVE_nextdown
 #define __CRT_HAVE_nextdownf
 #define __CRT_HAVE_nextdownl
@@ -4192,8 +4261,6 @@
 #define __CRT_HAVE___fpclassifyf128
 #define __CRT_HAVE___gammaf128_r_finite
 #define __CRT_HAVE___hypotf128_finite
-#define __CRT_HAVE___inet6_scopeid_pton
-#define __CRT_HAVE___inet_pton_length
 #define __CRT_HAVE___iscanonicall
 #define __CRT_HAVE___iseqsig
 #define __CRT_HAVE___iseqsigf
@@ -4206,26 +4273,12 @@
 #define __CRT_HAVE___j1f128_finite
 #define __CRT_HAVE___jnf128_finite
 #define __CRT_HAVE___lgammaf128_r_finite
-#define __CRT_HAVE___libc_alloc_buffer_alloc_array
-#define __CRT_HAVE___libc_alloc_buffer_allocate
-#define __CRT_HAVE___libc_alloc_buffer_copy_bytes
-#define __CRT_HAVE___libc_alloc_buffer_copy_string
-#define __CRT_HAVE___libc_alloc_buffer_create_failure
-#define __CRT_HAVE___libc_dynarray_at_failure
-#define __CRT_HAVE___libc_dynarray_emplace_enlarge
-#define __CRT_HAVE___libc_dynarray_finalize
-#define __CRT_HAVE___libc_dynarray_resize
-#define __CRT_HAVE___libc_dynarray_resize_clear
 #define __CRT_HAVE___libc_reallocarray
 #define __CRT_HAVE___log10f128_finite
 #define __CRT_HAVE___log2f128_finite
 #define __CRT_HAVE___logf128_finite
 #define __CRT_HAVE___powf128_finite
 #define __CRT_HAVE___remainderf128_finite
-#define __CRT_HAVE___resolv_context_get
-#define __CRT_HAVE___resolv_context_get_override
-#define __CRT_HAVE___resolv_context_get_preinit
-#define __CRT_HAVE___resolv_context_put
 #define __CRT_HAVE___signbitf128
 #define __CRT_HAVE___sinhf128_finite
 #define __CRT_HAVE___sqrtf128_finite
@@ -4928,7 +4981,6 @@
 #define __CRT_HAVE_thrd_yield
 #endif /* __GLIBC_VERSION__ >= 22800 */
 #if __GLIBC_VERSION__ >= 22900
-#define __CRT_HAVE___inet_aton_exact
 #define __CRT_HAVE_getcpu
 #define __CRT_HAVE_posix_spawn_file_actions_addchdir_np
 #define __CRT_HAVE_posix_spawn_file_actions_addfchdir_np
