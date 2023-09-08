@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix various problems/deadlocks with weakref objects"
-DEEMON_VERSION="9c24a43092a530660d643e8c66d59af3191a652b"
+#     v -- "New function `posix.walklink()`"
+DEEMON_VERSION="156a7211b36152ffce9b1051606aecc852ef6ba6"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
