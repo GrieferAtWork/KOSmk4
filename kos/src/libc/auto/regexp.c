@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf58919c2 */
+/* HASH CRC-32:0x909f3232 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,9 @@ NOTHROW_NCX(LIBCCALL libc_advance)(char const *string,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__step, libc_step);
 DEFINE_PUBLIC_ALIAS(step, libc_step);
+DEFINE_PUBLIC_ALIAS(__advance, libc_advance);
 DEFINE_PUBLIC_ALIAS(advance, libc_advance);
 #endif /* !__KERNEL__ */
 

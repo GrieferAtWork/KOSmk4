@@ -213,6 +213,7 @@ char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eo
 [[requires(defined(__LOCAL_loc1) && defined(__LOCAL_loc2) &&
            defined(__REG_NOTEOL) && $has_function(regexec))]]
 [[impl_include("<libc/template/locN.h>")]]
+[[export_alias("__step")]] /* From Glibc 2.0.4 */
 int step(char const *string, char const *expbuf) {
 	regmatch_t match;
 	expbuf = (char *)((__UINTPTR_TYPE__)(expbuf + __COMPILER_ALIGNOF(regex_t) /*- 1*/) & /* Missing "-1" for compat with Glibc bug */
@@ -234,6 +235,7 @@ int step(char const *string, char const *expbuf) {
 [[requires_include("<libc/template/locN.h>")]]
 [[requires(defined(__LOCAL_loc2) && defined(__REG_NOTEOL) && $has_function(regexec))]]
 [[impl_include("<libc/template/locN.h>")]]
+[[export_alias("__advance")]] /* From Glibc 2.0.4 */
 int advance(char const *string, char const *expbuf) {
 	regmatch_t match;
 	expbuf = (char *)((__UINTPTR_TYPE__)(expbuf + __COMPILER_ALIGNOF(regex_t) /*- 1*/) & /* Missing "-1" for compat with Glibc bug */

@@ -66,14 +66,17 @@ struct rpcent *getrpcent();
 %
 %#ifdef __USE_MISC
 [[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
+[[export_as("__getrpcbyname_r")]] /* From Glibc 2.0.4 */
 int getrpcbyname_r(char const *name, struct rpcent *result_buf,
                    char *buffer, size_t buflen,
                    struct rpcent **result); /* XXX: [[nonnull]] annotations? */
 [[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
+[[export_as("__getrpcbynumber_r")]] /* From Glibc 2.0.4 */
 int getrpcbynumber_r(int number, struct rpcent *result_buf,
                      char *buffer, size_t buflen,
                      struct rpcent **result); /* XXX: [[nonnull]] annotations? */
 [[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
+[[export_as("__getrpcent_r")]] /* From Glibc 2.0.4 */
 int getrpcent_r(struct rpcent *result_buf,
                 char *buffer, size_t buflen,
                 struct rpcent **result); /* XXX: [[nonnull]] annotations? */

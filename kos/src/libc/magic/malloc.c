@@ -148,6 +148,7 @@ int crt_posix_memalign([[out]] void **__restrict pp,
 [[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]
 [[userimpl, requires_function(crt_posix_memalign)]]
+[[export_as("__memalign")]] /* From Glibc 2.0.4 */
 void *memalign(size_t alignment, size_t n_bytes) {
 	void *result;
 	if (crt_posix_memalign(&result, alignment, n_bytes))
@@ -158,11 +159,13 @@ void *memalign(size_t alignment, size_t n_bytes) {
 
 [[wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), decl_include("<hybrid/typecore.h>")]]
+[[export_as("__pvalloc")]] /* From Glibc 2.0.4 */
 void *pvalloc(size_t n_bytes);
 
 [[decl_include("<hybrid/typecore.h>"), export_alias("__libc_valloc")]]
 [[guard, wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
+[[export_as("__valloc")]] /* From Glibc 2.0.4 */
 void *valloc($size_t n_bytes) {
 	return memalign(getpagesize(), n_bytes);
 }
@@ -204,6 +207,7 @@ int _heapmin();
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[userimpl, section(".text.crt{|.dos}.heap.utility")]]
+[[export_as("__malloc_trim")]] /* From Glibc 2.0.4 */
 int malloc_trim(size_t pad) {
 @@pp_ifdef __BUILDING_LIBC@@
 	/* NO-OP (indicate failure to release memory) */
@@ -230,9 +234,11 @@ int malloc_trim(size_t pad) {
  * However, for safety we still only export this symbol, but don't bind it in headers. */
 [[dos_only_export_as("_msize_debug")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
+[[export_as("__malloc_usable_size")]] /* From Glibc 2.0.4 */
 size_t malloc_usable_size(void *__restrict mallptr);
 
 [[userimpl, section(".text.crt{|.dos}.heap.utility")]]
+[[export_as("__mallopt")]] /* From Glibc 2.0.4 */
 int mallopt(int parameter_number, int parameter_value) {
 	/* NO-OP */
 	COMPILER_IMPURE();
@@ -416,6 +422,7 @@ struct mallinfo2 crt_mallinfo2(void);
 [[decl_include("<bits/crt/mallinfo.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_SIZE_T__), alias("mallinfo2")]]
 [[userimpl, requires_function(crt_mallinfo2)]]
+[[export_as("__mallinfo")]] /* From Glibc 2.0.4 */
 struct mallinfo mallinfo(void) {
 	@struct mallinfo@ result;
 	@struct mallinfo2@ info = crt_mallinfo2();

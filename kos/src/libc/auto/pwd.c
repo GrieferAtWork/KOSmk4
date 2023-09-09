@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe69eb5fa */
+/* HASH CRC-32:0x301b58a3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -520,9 +520,11 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
+DEFINE_PUBLIC_ALIAS(__fgetpwent_r, libc_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(fgetpwuid_r, libc_fgetpwuid_r);
 DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);
+DEFINE_PUBLIC_ALIAS(__getpw, libc_getpw);
 DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 DEFINE_PUBLIC_ALIAS(_sgetpwent, libc_sgetpwent);
 DEFINE_PUBLIC_ALIAS(sgetpwent, libc_sgetpwent);

@@ -196,6 +196,7 @@ err:
 [[cp_stdio, decl_include("<bits/crt/db/mntent.h>")]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires(defined(__SEEK_END) && $has_function(fseek) && $has_function(fprintf))]]
+[[export_as("__addmntent")]] /* From Glibc 2.0.4 */
 int addmntent([[inout]] $FILE *__restrict stream,
               [[in]] struct mntent const *__restrict mnt) {
 	if unlikely(!mnt ||
@@ -219,6 +220,7 @@ int addmntent([[inout]] $FILE *__restrict stream,
 @@@return: * :   Address of the `opt'-string in `mnt->mnt_opts'
 @@@return: NULL: No option `opt' found in `mnt->mnt_opts'
 [[pure, wunused, decl_include("<bits/crt/db/mntent.h>")]]
+[[export_as("__hasmntopt")]] /* From Glibc 2.0.4 */
 char *hasmntopt([[in_opt]] struct mntent const *mnt,
                 [[in_opt]] char const *opt) {
 	char *str;

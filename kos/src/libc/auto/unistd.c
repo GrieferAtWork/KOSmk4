@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7b6c1fe */
+/* HASH CRC-32:0x1bd36801 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2262,6 +2262,7 @@ DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
+DEFINE_PUBLIC_ALIAS(__ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
@@ -2287,6 +2288,7 @@ DEFINE_PUBLIC_ALIAS(preadall64, libc_preadall64);
 DEFINE_PUBLIC_ALIAS(pwriteall64, libc_pwriteall64);
 DEFINE_PUBLIC_ALIAS(DOS$get_current_dir_name, libd_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
+DEFINE_PUBLIC_ALIAS(__group_member, libc_group_member);
 DEFINE_PUBLIC_ALIAS(group_member, libc_group_member);
 DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
 DEFINE_PUBLIC_ALIAS(DOS$getwd, libd_getwd);

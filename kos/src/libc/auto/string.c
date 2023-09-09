@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45295147 */
+/* HASH CRC-32:0x3302ec63 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7405,6 +7405,7 @@ DEFINE_PUBLIC_ALIAS(strerror_r, libc_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_strerror_r, libd___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(__xpg_strerror_r, libc___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(__strsep_g, libc_strsep);
+DEFINE_PUBLIC_ALIAS(__strsep, libc_strsep);
 DEFINE_PUBLIC_ALIAS(strsep, libc_strsep);
 DEFINE_PUBLIC_ALIAS(bcopy, libc_bcopy);
 #endif /* !__KERNEL__ */
@@ -7457,6 +7458,7 @@ DEFINE_PUBLIC_ALIAS(_strncmpi, libc_strncasecmp);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strnicmp, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
+DEFINE_PUBLIC_ALIAS(__strncasecmp, libc_strncasecmp);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strncasecmp, libc_strncasecmp);
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFS))

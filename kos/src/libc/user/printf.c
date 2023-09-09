@@ -994,8 +994,9 @@ NOTHROW_NCX(LIBCCALL libc_printf_size_info)(struct printf_info const *__restrict
 /*[[[end:libc_printf_size_info]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xfd739d1]]]*/
+/*[[[start:exports,hash:CRC-32=0xda2752ac]]]*/
 DEFINE_PUBLIC_ALIAS(register_printf_specifier, libc_register_printf_specifier);
+DEFINE_PUBLIC_ALIAS(__register_printf_function, libc_register_printf_function);
 DEFINE_PUBLIC_ALIAS(register_printf_function, libc_register_printf_function);
 DEFINE_PUBLIC_ALIAS(register_printf_modifier, libc_register_printf_modifier);
 DEFINE_PUBLIC_ALIAS(register_printf_type, libc_register_printf_type);

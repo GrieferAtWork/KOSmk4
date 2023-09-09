@@ -279,6 +279,7 @@ void argz_stringify([[inout(len)]] char *argz, size_t len, int sep) {
 [[decl_include("<bits/types.h>")]]
 [[requires_function(realloc)]]
 [[export_alias("__argz_create_sep")]]
+[[export_as("__argz_append")]] /* From Glibc 2.0.4 */
 [[impl_include("<libc/errno.h>")]]
 error_t argz_append([[inout]] char **__restrict pargz,
                     [[inout]] size_t *__restrict pargz_len,

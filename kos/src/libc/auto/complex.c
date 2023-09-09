@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9ad007e */
+/* HASH CRC-32:0xf5952f1b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3532,6 +3532,7 @@ NOTHROW(LIBCCALL libc_cprojl)(long double _Complex z) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__cabsf, libc_cabsf);
 DEFINE_PUBLIC_ALIAS(cabsf, libc_cabsf);
 DEFINE_PUBLIC_ALIAS(cexpf, libc_cexpf);
 DEFINE_PUBLIC_ALIAS(clogf, libc_clogf);
@@ -3557,6 +3558,7 @@ DEFINE_PUBLIC_ALIAS(cprojf, libc_cprojf);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_cabs, libc_cabs);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__cabs, libc_cabs);
 DEFINE_PUBLIC_ALIAS(cabs, libc_cabs);
 DEFINE_PUBLIC_ALIAS(cexp, libc_cexp);
 DEFINE_PUBLIC_ALIAS(clog, libc_clog);
@@ -3579,6 +3581,7 @@ DEFINE_PUBLIC_ALIAS(conj, libc_conj);
 DEFINE_PUBLIC_ALIAS(creal, libc_creal);
 DEFINE_PUBLIC_ALIAS(cimag, libc_cimag);
 DEFINE_PUBLIC_ALIAS(cproj, libc_cproj);
+DEFINE_PUBLIC_ALIAS(__cabsl, libc_cabsl);
 DEFINE_PUBLIC_ALIAS(cabsl, libc_cabsl);
 DEFINE_PUBLIC_ALIAS(cexpl, libc_cexpl);
 DEFINE_PUBLIC_ALIAS(clogl, libc_clogl);

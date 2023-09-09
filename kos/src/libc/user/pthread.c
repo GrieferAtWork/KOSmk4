@@ -4739,7 +4739,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7939cc82]]]*/
+/*[[[start:exports,hash:CRC-32=0x9ce8ab60]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -4850,6 +4850,7 @@ DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getkind_np, libc_pthread_mutexattr_gettype
 DEFINE_PUBLIC_ALIAS(pthread_mutexattr_gettype, libc_pthread_mutexattr_gettype);
 DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setkind_np, libc_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(__pthread_mutexattr_settype, libc_pthread_mutexattr_settype);
+DEFINE_PUBLIC_ALIAS(__pthread_mutexattr_setkind_np, libc_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(pthread_mutexattr_settype, libc_pthread_mutexattr_settype);
 DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getprotocol, libc_pthread_mutexattr_getprotocol);
 DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setprotocol, libc_pthread_mutexattr_setprotocol);
@@ -4938,6 +4939,7 @@ DEFINE_PUBLIC_ALIAS(__pthread_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(pthread_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(pthread_getspecificptr_np, libc_pthread_getspecificptr_np);
 DEFINE_PUBLIC_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
+DEFINE_PUBLIC_ALIAS(__pthread_atfork, libc_pthread_atfork);
 DEFINE_PUBLIC_ALIAS(pthread_atfork, libc_pthread_atfork);
 /*[[[end:exports]]]*/
 

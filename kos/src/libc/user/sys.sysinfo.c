@@ -72,11 +72,13 @@ NOTHROW(LIBCCALL libc_get_nprocs)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe7e7e7a6]]]*/
+/*[[[start:exports,hash:CRC-32=0x75ef5eda]]]*/
 DEFINE_PUBLIC_ALIAS(__sysinfo, libc_sysinfo);
 DEFINE_PUBLIC_ALIAS(__libc_sysinfo, libc_sysinfo);
 DEFINE_PUBLIC_ALIAS(sysinfo, libc_sysinfo);
+DEFINE_PUBLIC_ALIAS(__get_nprocs_conf, libc_get_nprocs_conf);
 DEFINE_PUBLIC_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
+DEFINE_PUBLIC_ALIAS(__get_nprocs, libc_get_nprocs);
 DEFINE_PUBLIC_ALIAS(get_nprocs, libc_get_nprocs);
 /*[[[end:exports]]]*/
 

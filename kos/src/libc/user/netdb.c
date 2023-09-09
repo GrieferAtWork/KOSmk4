@@ -975,7 +975,7 @@ NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const list[],
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd54b97ce]]]*/
+/*[[[start:exports,hash:CRC-32=0x5aa8ccb0]]]*/
 DEFINE_PUBLIC_ALIAS(sethostent, libc_sethostent);
 DEFINE_PUBLIC_ALIAS(endhostent, libc_endhostent);
 DEFINE_PUBLIC_ALIAS(gethostent, libc_gethostent);
@@ -1000,23 +1000,37 @@ DEFINE_PUBLIC_ALIAS(__h_errno_location, libc___h_errno_location);
 DEFINE_PUBLIC_ALIAS(herror, libc_herror);
 DEFINE_PUBLIC_ALIAS(hstrerror, libc_hstrerror);
 DEFINE_PUBLIC_ALIAS(gethostbyname2, libc_gethostbyname2);
+DEFINE_PUBLIC_ALIAS(__gethostent_r, libc_gethostent_r);
 DEFINE_PUBLIC_ALIAS(gethostent_r, libc_gethostent_r);
+DEFINE_PUBLIC_ALIAS(__gethostbyaddr_r, libc_gethostbyaddr_r);
 DEFINE_PUBLIC_ALIAS(gethostbyaddr_r, libc_gethostbyaddr_r);
+DEFINE_PUBLIC_ALIAS(__gethostbyname_r, libc_gethostbyname_r);
 DEFINE_PUBLIC_ALIAS(gethostbyname_r, libc_gethostbyname_r);
+DEFINE_PUBLIC_ALIAS(__gethostbyname2_r, libc_gethostbyname2_r);
 DEFINE_PUBLIC_ALIAS(gethostbyname2_r, libc_gethostbyname2_r);
+DEFINE_PUBLIC_ALIAS(__getnetent_r, libc_getnetent_r);
 DEFINE_PUBLIC_ALIAS(getnetent_r, libc_getnetent_r);
+DEFINE_PUBLIC_ALIAS(__getnetbyaddr_r, libc_getnetbyaddr_r);
 DEFINE_PUBLIC_ALIAS(getnetbyaddr_r, libc_getnetbyaddr_r);
+DEFINE_PUBLIC_ALIAS(__getnetbyname_r, libc_getnetbyname_r);
 DEFINE_PUBLIC_ALIAS(getnetbyname_r, libc_getnetbyname_r);
+DEFINE_PUBLIC_ALIAS(__getservent_r, libc_getservent_r);
 DEFINE_PUBLIC_ALIAS(getservent_r, libc_getservent_r);
+DEFINE_PUBLIC_ALIAS(__getservbyname_r, libc_getservbyname_r);
 DEFINE_PUBLIC_ALIAS(getservbyname_r, libc_getservbyname_r);
+DEFINE_PUBLIC_ALIAS(__getservbyport_r, libc_getservbyport_r);
 DEFINE_PUBLIC_ALIAS(getservbyport_r, libc_getservbyport_r);
+DEFINE_PUBLIC_ALIAS(__getprotoent_r, libc_getprotoent_r);
 DEFINE_PUBLIC_ALIAS(getprotoent_r, libc_getprotoent_r);
+DEFINE_PUBLIC_ALIAS(__getprotobyname_r, libc_getprotobyname_r);
 DEFINE_PUBLIC_ALIAS(getprotobyname_r, libc_getprotobyname_r);
+DEFINE_PUBLIC_ALIAS(__getprotobynumber_r, libc_getprotobynumber_r);
 DEFINE_PUBLIC_ALIAS(getprotobynumber_r, libc_getprotobynumber_r);
 DEFINE_PUBLIC_ALIAS(setnetgrent, libc_setnetgrent);
 DEFINE_PUBLIC_ALIAS(endnetgrent, libc_endnetgrent);
 DEFINE_PUBLIC_ALIAS(getnetgrent, libc_getnetgrent);
 DEFINE_PUBLIC_ALIAS(innetgr, libc_innetgr);
+DEFINE_PUBLIC_ALIAS(__getnetgrent_r, libc_getnetgrent_r);
 DEFINE_PUBLIC_ALIAS(getnetgrent_r, libc_getnetgrent_r);
 DEFINE_PUBLIC_ALIAS(rcmd, libc_rcmd);
 DEFINE_PUBLIC_ALIAS(rcmd_af, libc_rcmd_af);

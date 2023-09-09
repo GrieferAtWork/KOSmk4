@@ -350,6 +350,19 @@ struct mallinfo libc_mallinfo_int(void) {
 	return result;
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+
+/* Old aliases from Glibc 2.0.4 */
+DEFINE_PUBLIC_ALIAS(__free, libc_free);
+DEFINE_PUBLIC_ALIAS(__cfree, libc_free);
+DEFINE_PUBLIC_ALIAS(__malloc, libc_malloc);
+DEFINE_PUBLIC_ALIAS(__calloc, libc_calloc);
+DEFINE_PUBLIC_ALIAS(__realloc, libc_realloc);
+DEFINE_PUBLIC_ALIAS(__malloc_usable_size, libc_malloc_usable_size);
+DEFINE_PUBLIC_ALIAS(__pvalloc, libc_pvalloc);
+DEFINE_PUBLIC_ALIAS(__valloc, libc_valloc);
+DEFINE_PUBLIC_ALIAS(__mallinfo, libc_mallinfo);
+DEFINE_PUBLIC_ALIAS(__mallopt, libc_mallopt);
+DEFINE_PUBLIC_ALIAS(__malloc_trim, libc_malloc_trim);
 #endif /* __BUILDING_LIBC */
 
 

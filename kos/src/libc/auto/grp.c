@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49807c02 */
+/* HASH CRC-32:0x805c361f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -554,6 +554,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(putgrent, libc_putgrent);
+DEFINE_PUBLIC_ALIAS(__fgetgrent_r, libc_fgetgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrent_r, libc_fgetgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrgid_r, libc_fgetgrgid_r);
 DEFINE_PUBLIC_ALIAS(fgetgrnam_r, libc_fgetgrnam_r);

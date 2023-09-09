@@ -3457,6 +3457,7 @@ $errno_t __xpg_strerror_r($errno_t errnum, [[out(buflen)]] char *buf, $size_t bu
 %#ifdef __USE_MISC
 
 [[leaf, export_as("__strsep_g")]]
+[[export_as("__strsep")]] /* From Glibc 2.0.4 */
 char *strsep([[inout]] char **__restrict stringp,
              [[in]] char const *__restrict delim) {
 	char *result, *iter;
@@ -3759,6 +3760,7 @@ int strcasecmp([[in]] char const *s1, [[in]] char const *s2) {
 [[alias("strnicmp", "strncmpi", "_strnicmp", "_strncmpi")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_strnicmp", "_strncmpi")]]
 [[if(!defined(__KERNEL__)), export_as("strnicmp", "strncmpi")]]
+[[if(!defined(__KERNEL__)), export_as("__strncasecmp")]] /* From Glibc 2.0.4 */
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strncasecmp([[in(strnlen(., maxlen))]] char const *s1,
                 [[in(strnlen(., maxlen))]] char const *s2,

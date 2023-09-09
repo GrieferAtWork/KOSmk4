@@ -1107,6 +1107,7 @@ __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,char **,__NOTHROW_
 @@Set time conversion information from the `$TZ' environment variable.
 @@If  `$TZ'  is  not  defined,  a  locale-dependent  default  is  used
 [[dos_only_export_alias("_tzset")]]
+[[export_as("__tzset")]] /* From Glibc 2.0.4 */
 void tzset();
 %#endif /* __USE_POSIX */
 
@@ -2039,6 +2040,7 @@ struct $tm *gmtime_r([[in]] $time_t const *__restrict timer,
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime_r")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime64_r", "__localtime64_r")]]
+[[export_as("__localtime_r")]] /* From Glibc 2.0.4 */
 struct $tm *localtime_r([[in]] $time_t const *__restrict timer,
                         [[out]] struct $tm *__restrict tp) {
 @@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_localtime32_s) && !defined(__USE_TIME_BITS64)@@
@@ -2201,6 +2203,7 @@ DEFINE_TIME_ABBR_WDAY_NAMES
 DEFINE_TIME_ABBR_MONTH_NAMES
 @@pp_endif@@
 )]]
+[[export_as("__asctime_r")]] /* From Glibc 2.0.4 */
 char *asctime_r([[in]] struct $tm const *__restrict tp,
                 [[out]] char buf[26]) {
 @@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_asctime_s)@@

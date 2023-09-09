@@ -106,6 +106,7 @@ int register_printf_specifier(__STDC_INT_AS_UINT_T spec,
 [[doc_alias("register_printf_specifier")]]
 [[decl_include("<features.h>", "<bits/crt/printf_info.h>")]]
 [[crt_intern_alias("register_printf_specifier")]]
+[[export_as("__register_printf_function")]] /* From Glibc 2.0.4 */
 int register_printf_function(__STDC_INT_AS_UINT_T spec,
                              printf_function *func,
                              printf_arginfo_function *arginfo);

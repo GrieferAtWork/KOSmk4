@@ -53,11 +53,13 @@ int sysinfo([[out]] struct sysinfo *info);
 @@>> get_nprocs_conf(3)
 @@Return the # of configured online processors
 [[wunused, nothrow]]
+[[export_as("__get_nprocs_conf")]] /* From Glibc 2.0.4 */
 int get_nprocs_conf();
 
 @@>> get_nprocs(3)
 @@Return the # of currently online processors
 [[wunused, nothrow]]
+[[export_as("__get_nprocs")]] /* From Glibc 2.0.4 */
 int get_nprocs();
 
 @@>> get_phys_pages(3)
@@ -65,6 +67,7 @@ int get_nprocs();
 [[wunused, nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<linux/sysinfo.h>")]]
 [[requires_function(sysinfo, getpagesize)]]
+[[export_as("__get_phys_pages")]] /* From Glibc 2.0.4 */
 $intptr_t get_phys_pages() {
 	struct @sysinfo@ info;
 	uintptr_t result;
@@ -91,6 +94,7 @@ $intptr_t get_phys_pages() {
 [[wunused, nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<linux/sysinfo.h>")]]
 [[requires_function(sysinfo, getpagesize)]]
+[[export_as("__get_avphys_pages")]] /* From Glibc 2.0.4 */
 $intptr_t get_avphys_pages() {
 	struct @sysinfo@ info;
 	uintptr_t result;

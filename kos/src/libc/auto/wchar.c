@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f060be1 */
+/* HASH CRC-32:0x4b1c598b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7194,16 +7194,22 @@ DEFINE_PUBLIC_ALIAS(c16rtomb, libd_wcrtomb);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$c16rtomb, libd_wcrtomb);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(DOS$__wcrtomb, libd_wcrtomb);
 DEFINE_PUBLIC_ALIAS(DOS$wcrtomb, libd_wcrtomb);
 DEFINE_PUBLIC_ALIAS(c32rtomb, libc_wcrtomb);
+DEFINE_PUBLIC_ALIAS(__wcrtomb, libc_wcrtomb);
 DEFINE_PUBLIC_ALIAS(wcrtomb, libc_wcrtomb);
 DEFINE_PUBLIC_ALIAS(DOS$__mbrlen, libd_mbrlen);
 DEFINE_PUBLIC_ALIAS(DOS$mbrlen, libd_mbrlen);
 DEFINE_PUBLIC_ALIAS(__mbrlen, libc_mbrlen);
 DEFINE_PUBLIC_ALIAS(mbrlen, libc_mbrlen);
+DEFINE_PUBLIC_ALIAS(DOS$__mbsrtowcs, libd_mbsrtowcs);
 DEFINE_PUBLIC_ALIAS(DOS$mbsrtowcs, libd_mbsrtowcs);
+DEFINE_PUBLIC_ALIAS(__mbsrtowcs, libc_mbsrtowcs);
 DEFINE_PUBLIC_ALIAS(mbsrtowcs, libc_mbsrtowcs);
+DEFINE_PUBLIC_ALIAS(DOS$__wcsrtombs, libd_wcsrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$wcsrtombs, libd_wcsrtombs);
+DEFINE_PUBLIC_ALIAS(__wcsrtombs, libc_wcsrtombs);
 DEFINE_PUBLIC_ALIAS(wcsrtombs, libc_wcsrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$wcstol, libd_wcstol);
 #include <hybrid/typecore.h>
@@ -7371,13 +7377,21 @@ DEFINE_PUBLIC_ALIAS(DOS$__wcsxfrm_l, libd_wcsxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcsxfrm_l, libd_wcsxfrm_l);
 DEFINE_PUBLIC_ALIAS(__wcsxfrm_l, libc_wcsxfrm_l);
 DEFINE_PUBLIC_ALIAS(wcsxfrm_l, libc_wcsxfrm_l);
+DEFINE_PUBLIC_ALIAS(DOS$__wcpcpy, libd_wcpcpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcpcpy, libd_wcpcpy);
+DEFINE_PUBLIC_ALIAS(__wcpcpy, libc_wcpcpy);
 DEFINE_PUBLIC_ALIAS(wcpcpy, libc_wcpcpy);
+DEFINE_PUBLIC_ALIAS(DOS$__wcpncpy, libd_wcpncpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcpncpy, libd_wcpncpy);
+DEFINE_PUBLIC_ALIAS(__wcpncpy, libc_wcpncpy);
 DEFINE_PUBLIC_ALIAS(wcpncpy, libc_wcpncpy);
+DEFINE_PUBLIC_ALIAS(DOS$__mbsnrtowcs, libd_mbsnrtowcs);
 DEFINE_PUBLIC_ALIAS(DOS$mbsnrtowcs, libd_mbsnrtowcs);
+DEFINE_PUBLIC_ALIAS(__mbsnrtowcs, libc_mbsnrtowcs);
 DEFINE_PUBLIC_ALIAS(mbsnrtowcs, libc_mbsnrtowcs);
+DEFINE_PUBLIC_ALIAS(DOS$__wcsnrtombs, libd_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$wcsnrtombs, libd_wcsnrtombs);
+DEFINE_PUBLIC_ALIAS(__wcsnrtombs, libc_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(wcsnrtombs, libc_wcsnrtombs);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNLEN)

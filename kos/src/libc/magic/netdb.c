@@ -405,12 +405,14 @@ char const *hstrerror(int h_error);
 struct hostent *gethostbyname2(char const *name, int af);
 
 [[cp, decl_include("<hybrid/typecore.h>", "<bits/crt/db/hostent.h>")]]
+[[export_as("__gethostent_r")]] /* From Glibc 2.0.4 */
 int gethostent_r(struct hostent *__restrict result_buf,
                  char *__restrict buf, size_t buflen,
                  struct hostent **__restrict result,
                  int *__restrict h_errnop);
 
 [[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>", "<bits/crt/db/hostent.h>")]]
+[[export_as("__gethostbyaddr_r")]] /* From Glibc 2.0.4 */
 int gethostbyaddr_r(void const *__restrict addr, socklen_t len, int type,
                     struct hostent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
@@ -418,6 +420,7 @@ int gethostbyaddr_r(void const *__restrict addr, socklen_t len, int type,
                     int *__restrict h_errnop);
 
 [[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>", "<bits/crt/db/hostent.h>")]]
+[[export_as("__gethostbyname_r")]] /* From Glibc 2.0.4 */
 int gethostbyname_r(char const *__restrict name,
                     struct hostent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
@@ -425,6 +428,7 @@ int gethostbyname_r(char const *__restrict name,
                     int *__restrict h_errnop);
 
 [[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>", "<bits/crt/db/hostent.h>")]]
+[[export_as("__gethostbyname2_r")]] /* From Glibc 2.0.4 */
 int gethostbyname2_r(char const *__restrict name, int af,
                      struct hostent *__restrict result_buf,
                      char *__restrict buf, size_t buflen,
@@ -435,12 +439,14 @@ int gethostbyname2_r(char const *__restrict name, int af,
 
 
 [[cp, decl_include("<hybrid/typecore.h>", "<bits/crt/db/netent.h>")]]
+[[export_as("__getnetent_r")]] /* From Glibc 2.0.4 */
 int getnetent_r(struct netent *__restrict result_buf,
                 char *__restrict buf, size_t buflen,
                 struct netent **__restrict result,
                 int *__restrict h_errnop);
 
 [[cp, doc_alias("getnetent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/netent.h>")]]
+[[export_as("__getnetbyaddr_r")]] /* From Glibc 2.0.4 */
 int getnetbyaddr_r(uint32_t net, int type,
                    struct netent *__restrict result_buf,
                    char *__restrict buf, size_t buflen,
@@ -448,6 +454,7 @@ int getnetbyaddr_r(uint32_t net, int type,
                    int *__restrict h_errnop);
 
 [[cp, doc_alias("getnetent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/netent.h>")]]
+[[export_as("__getnetbyname_r")]] /* From Glibc 2.0.4 */
 int getnetbyname_r(char const *__restrict name,
                    struct netent *__restrict result_buf,
                    char *__restrict buf, size_t buflen,
@@ -458,11 +465,13 @@ int getnetbyname_r(char const *__restrict name,
 
 
 [[cp, decl_include("<hybrid/typecore.h>", "<bits/crt/db/servent.h>")]]
+[[export_as("__getservent_r")]] /* From Glibc 2.0.4 */
 int getservent_r(struct servent *__restrict result_buf,
                  char *__restrict buf, size_t buflen,
                  struct servent **__restrict result);
 
 [[cp, doc_alias("getservent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/servent.h>")]]
+[[export_as("__getservbyname_r")]] /* From Glibc 2.0.4 */
 int getservbyname_r(char const *__restrict name,
                     char const *__restrict proto,
                     struct servent *__restrict result_buf,
@@ -470,6 +479,7 @@ int getservbyname_r(char const *__restrict name,
                     struct servent **__restrict result);
 
 [[cp, doc_alias("getservent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/servent.h>")]]
+[[export_as("__getservbyport_r")]] /* From Glibc 2.0.4 */
 int getservbyport_r(int port, char const *__restrict proto,
                     struct servent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
@@ -479,11 +489,13 @@ int getservbyport_r(int port, char const *__restrict proto,
 
 
 [[cp, decl_include("<hybrid/typecore.h>", "<bits/crt/db/protoent.h>")]]
+[[export_as("__getprotoent_r")]] /* From Glibc 2.0.4 */
 int getprotoent_r(struct protoent *__restrict result_buf,
                   char *__restrict buf, size_t buflen,
                   struct protoent **__restrict result);
 
 [[cp, doc_alias("getprotoent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/protoent.h>")]]
+[[export_as("__getprotobyname_r")]] /* From Glibc 2.0.4 */
 int getprotobyname_r(char const *__restrict name,
                      struct protoent *__restrict result_buf,
                      char *__restrict buf, size_t buflen,
@@ -491,6 +503,7 @@ int getprotobyname_r(char const *__restrict name,
 
 [[cp, doc_alias("getprotoent_r")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/db/protoent.h>")]]
+[[export_as("__getprotobynumber_r")]] /* From Glibc 2.0.4 */
 int getprotobynumber_r(int proto,
                        struct protoent *__restrict result_buf,
                        char *__restrict buf, size_t buflen,
@@ -516,6 +529,7 @@ int innetgr(char const *netgroup,
             char const *domain);
 
 [[cp, decl_include("<hybrid/typecore.h>")]]
+[[export_as("__getnetgrent_r")]] /* From Glibc 2.0.4 */
 int getnetgrent_r(char **__restrict hostp,
                   char **__restrict userp,
                   char **__restrict domainp,

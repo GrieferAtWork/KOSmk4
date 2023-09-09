@@ -214,21 +214,28 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x33f34018]]]*/
+/*[[[start:exports,hash:CRC-32=0x3a847ee8]]]*/
 DEFINE_PUBLIC_ALIAS(login, libc_login);
 DEFINE_PUBLIC_ALIAS(logout, libc_logout);
 DEFINE_PUBLIC_ALIAS(logwtmp, libc_logwtmp);
 DEFINE_PUBLIC_ALIAS(updwtmp, libc_updwtmp);
+DEFINE_PUBLIC_ALIAS(__utmpname, libc_utmpname);
 DEFINE_PUBLIC_ALIAS(utmpname, libc_utmpname);
 DEFINE_PUBLIC_ALIAS(getutent, libc_getutent);
+DEFINE_PUBLIC_ALIAS(__setutent, libc_setutent);
 DEFINE_PUBLIC_ALIAS(setutent, libc_setutent);
+DEFINE_PUBLIC_ALIAS(__endutent, libc_endutent);
 DEFINE_PUBLIC_ALIAS(endutent, libc_endutent);
 DEFINE_PUBLIC_ALIAS(getutid, libc_getutid);
 DEFINE_PUBLIC_ALIAS(getutline, libc_getutline);
 DEFINE_PUBLIC_ALIAS(_pututline, libc_pututline);
+DEFINE_PUBLIC_ALIAS(__pututline, libc_pututline);
 DEFINE_PUBLIC_ALIAS(pututline, libc_pututline);
+DEFINE_PUBLIC_ALIAS(__getutent_r, libc_getutent_r);
 DEFINE_PUBLIC_ALIAS(getutent_r, libc_getutent_r);
+DEFINE_PUBLIC_ALIAS(__getutid_r, libc_getutid_r);
 DEFINE_PUBLIC_ALIAS(getutid_r, libc_getutid_r);
+DEFINE_PUBLIC_ALIAS(__getutline_r, libc_getutline_r);
 DEFINE_PUBLIC_ALIAS(getutline_r, libc_getutline_r);
 /*[[[end:exports]]]*/
 

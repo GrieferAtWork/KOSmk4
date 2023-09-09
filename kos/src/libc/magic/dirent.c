@@ -251,6 +251,7 @@ typedef struct __dirstream DIR;
 #include <bits/os/dirent.h>
 @@pp_endif@@
 )]]
+[[export_as("__opendir")]] /* From Glibc 2.0.4 */
 DIR *opendir([[in]] char const *name) {
 @@pp_if defined(__AT_FDCWD) && $has_function(opendirat)@@
 	return opendirat(__AT_FDCWD, name);
@@ -326,6 +327,7 @@ DIR *opendirat([[dirfd]] $fd_t dirfd, [[in]] char const *name) {
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_closedir")]]
 [[userimpl, requires_include("<bits/os/dirent.h>")]]
 [[requires(defined(__USE_DOS_DIRENT))]]
+[[export_as("__closedir")]] /* From Glibc 2.0.4 */
 int closedir([[inout]] DIR *dirp) {
 	return __dos_dirent_closedir(dirp);
 }

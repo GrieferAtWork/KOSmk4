@@ -227,11 +227,13 @@ err_inval:
 %
 %#ifdef __USE_POSIX
 [[cp, doc_alias("getgrgid"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[export_as("__getgrgid_r")]] /* From Glibc 2.0.4 */
 int getgrgid_r($gid_t gid, [[out]] struct group *__restrict resultbuf,
                [[out(buflen)]] char *__restrict buffer, size_t buflen,
                [[out]] struct group **__restrict result);
 
 [[cp, doc_alias("getgrnam"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[export_as("__getgrnam_r")]] /* From Glibc 2.0.4 */
 int getgrnam_r([[in]] char const *__restrict name,
                [[out]] struct group *__restrict resultbuf,
                [[out(buflen)]] char *__restrict buffer, size_t buflen,
@@ -242,6 +244,7 @@ int getgrnam_r([[in]] char const *__restrict name,
 %
 %#ifdef __USE_GNU
 [[cp, doc_alias("getgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[export_as("__getgrent_r")]] /* From Glibc 2.0.4 */
 int getgrent_r([[out]] struct group *__restrict resultbuf,
                [[out(buflen)]] char *__restrict buffer, size_t buflen,
                [[out]] struct group **__restrict result);
@@ -251,6 +254,7 @@ int getgrent_r([[out]] struct group *__restrict resultbuf,
 %#ifdef __USE_MISC
 [[cp_stdio, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r)]]
+[[export_as("__fgetgrent_r")]] /* From Glibc 2.0.4 */
 int fgetgrent_r([[inout]] $FILE *__restrict stream,
                 [[out]] struct group *__restrict resultbuf,
                 [[out(buflen)]] char *__restrict buffer, size_t buflen,

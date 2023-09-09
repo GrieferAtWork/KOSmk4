@@ -1931,6 +1931,7 @@ $errno_t pthread_mutexattr_gettype([[in]] pthread_mutexattr_t const *__restrict 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("pthread_mutexattr_setkind_np")]] /* OpenBSD-specific name */
 [[export_alias("__pthread_mutexattr_settype")]]
+[[export_as("__pthread_mutexattr_setkind_np")]] /* From Glibc 2.0.4 */
 $errno_t pthread_mutexattr_settype([[inout]] pthread_mutexattr_t *self, int kind);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
@@ -2837,6 +2838,7 @@ $errno_t pthread_getcpuclockid(pthread_t self, [[out]] $clockid_t *clock_id);
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to register callbacks
 [[guard, decl_include("<bits/types.h>")]]
+[[export_alias("__pthread_atfork")]]
 $errno_t pthread_atfork([[nullable]] void (LIBCCALL *prepare)(void),
                         [[nullable]] void (LIBCCALL *parent)(void),
                         [[nullable]] void (LIBCCALL *child)(void));

@@ -570,7 +570,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3bb109e6]]]*/
+/*[[[start:exports,hash:CRC-32=0xf22eb365]]]*/
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -586,6 +586,7 @@ DEFINE_PUBLIC_ALIAS(__time64, libc_time64);
 DEFINE_PUBLIC_ALIAS(time64, libc_time64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DEFINE_PUBLIC_ALIAS(_tzset, libc_tzset);
+DEFINE_PUBLIC_ALIAS(__tzset, libc_tzset);
 DEFINE_PUBLIC_ALIAS(tzset, libc_tzset);
 DEFINE_PUBLIC_ALIAS(__stime, libc_stime);
 DEFINE_PUBLIC_ALIAS(__libc_stime, libc_stime);

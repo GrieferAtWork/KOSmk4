@@ -85,6 +85,7 @@ NOTHROW(LIBCCALL libc___LIBM_GET_LIB_VERSION)(void) {
  * program doesn't export an override function by the same name. */
 /* IMPORTANT: WEAK, so the main program's override has higher priority! */
 DEFINE_PUBLIC_WEAK_ALIAS(matherr, libc_matherr);
+DEFINE_PUBLIC_WEAK_ALIAS(__matherr, libc_matherr); /* From Glibc 2.0.4 */
 INTERN ATTR_SECTION(".text.crt.math.math")
 int LIBKCALL libc_matherr(STRUCT_EXCEPTION *exc) {
 	COMPILER_IMPURE();

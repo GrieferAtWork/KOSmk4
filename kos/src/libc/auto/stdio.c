@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92bb78c1 */
+/* HASH CRC-32:0xa5f4a67a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4330,10 +4330,12 @@ DEFINE_PUBLIC_ALIAS(DOS$remove, libd_remove);
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(setbuf, libc_setbuf);
 DEFINE_PUBLIC_ALIAS(_fgetchar, libc_getchar);
+DEFINE_PUBLIC_ALIAS(getchar_locked, libc_getchar);
 DEFINE_PUBLIC_ALIAS(getchar, libc_getchar);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fputchar, libc_putchar);
 #endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(putchar_locked, libc_putchar);
 DEFINE_PUBLIC_ALIAS(putchar, libc_putchar);
 DEFINE_PUBLIC_ALIAS(_IO_fgets, libc_fgets);
 DEFINE_PUBLIC_ALIAS(fgets, libc_fgets);
@@ -4367,6 +4369,7 @@ DEFINE_PUBLIC_ALIAS(_IO_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(__vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(_doscan, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_ALIAS(_IO_vscanf, libc_vscanf);
 DEFINE_PUBLIC_ALIAS(vscanf, libc_vscanf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -4412,6 +4415,7 @@ DEFINE_PUBLIC_ALIAS(_IO_sprintf, libc_sprintf);
 DEFINE_PUBLIC_ALIAS(sprintf, libc_sprintf);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__vsnprintf, libc_vsnprintf);
+DEFINE_PUBLIC_ALIAS(_IO_vsnprintf, libc_vsnprintf);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(vsnprintf, libc_vsnprintf);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -4423,6 +4427,7 @@ DEFINE_PUBLIC_ALIAS(__snprintf, libc_snprintf);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(snprintf, libc_snprintf);
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_IO_vdprintf, libc_vdprintf);
 DEFINE_PUBLIC_ALIAS(vdprintf, libc_vdprintf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -4475,6 +4480,7 @@ DEFINE_PUBLIC_ALIAS(DOS$obstack_printf, libd_obstack_printf);
 DEFINE_PUBLIC_ALIAS(obstack_printf, libc_obstack_printf);
 DEFINE_PUBLIC_ALIAS(tmpfile64, libc_tmpfile64);
 DEFINE_PUBLIC_ALIAS(fopen_printer, libc_fopen_printer);
+DEFINE_PUBLIC_ALIAS(_IO_vasprintf, libc_vasprintf);
 DEFINE_PUBLIC_ALIAS(vasprintf, libc_vasprintf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

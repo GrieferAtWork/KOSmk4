@@ -130,6 +130,7 @@ void updwtmp([[in]] char const *wtmp_file,
 
 @@>> utmpname(3)
 [[cp_kos]]
+[[export_as("__utmpname")]] /* From Glibc 2.0.4 */
 int utmpname([[in]] char const *file);
 
 @@>> getutent(3), getutent_r(3)
@@ -138,9 +139,11 @@ struct utmp *getutent();
 
 @@>> setutent(3)
 [[cp_kos]]
+[[export_as("__setutent")]] /* From Glibc 2.0.4 */
 void setutent();
 
 @@>> endutent(3)
+[[export_as("__endutent")]] /* From Glibc 2.0.4 */
 void endutent();
 
 @@>> getutid(3), getutid_r(3)
@@ -156,20 +159,24 @@ struct utmp *getutline([[in]] struct utmp const *line);
 /* NOTE: Historically, `_pututline()' returned `struct utmp *', and
  *       `pututline()' returned `void'  (in some  implementations). */
 [[export_alias("_pututline")]]
+[[export_as("__pututline")]] /* From Glibc 2.0.4 */
 struct utmp *pututline([[in]] struct utmp const *utmp_ptr);
 
 %
 %#ifdef __USE_MISC
 [[cp_kos, doc_alias("getutent"), decl_include("<bits/crt/db/utmp.h>")]]
+[[export_as("__getutent_r")]] /* From Glibc 2.0.4 */
 int getutent_r([[out]] struct utmp *buffer,
                [[out]] struct utmp **result);
 
 [[cp_kos, doc_alias("getutid"), decl_include("<bits/crt/db/utmp.h>")]]
+[[export_as("__getutid_r")]] /* From Glibc 2.0.4 */
 int getutid_r([[in]] struct utmp const *id,
               [[out]] struct utmp *buffer,
               [[out]] struct utmp **result);
 
 [[cp_kos, doc_alias("getutline"), decl_include("<bits/crt/db/utmp.h>")]]
+[[export_as("__getutline_r")]] /* From Glibc 2.0.4 */
 int getutline_r([[in]] struct utmp const *line,
                 [[out]] struct utmp *buffer,
                 [[out]] struct utmp **result);

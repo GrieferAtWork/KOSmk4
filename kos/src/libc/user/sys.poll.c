@@ -91,8 +91,9 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x71c6aa9]]]*/
+/*[[[start:exports,hash:CRC-32=0xb9edfb30]]]*/
 DEFINE_PUBLIC_ALIAS(__poll, libc_poll);
+DEFINE_PUBLIC_ALIAS(__syscall_poll, libc_poll);
 DEFINE_PUBLIC_ALIAS(poll, libc_poll);
 DEFINE_PUBLIC_ALIAS(ppoll, libc_ppoll);
 #include <bits/types.h>

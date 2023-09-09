@@ -218,6 +218,7 @@ void verror_at_line(int status, $errno_t errnum, char const *filename,
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `status' is non-zero, follow up with a call to `exit(status)'
 [[fast, libc, stdio_throws, decl_include("<bits/types.h>"), requires_function(verror)]]
+[[export_as("__error")]] /* From Glibc 2.0.4 */
 void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -232,6 +233,7 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 @@Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
 @@for `filename' and `line' will not produce the error message.
 [[fast, libc, stdio_throws, decl_include("<bits/types.h>"), requires_function(verror_at_line)]]
+[[export_as("__error_at_line")]] /* From Glibc 2.0.4 */
 void error_at_line(int status, $errno_t errnum, char const *filename,
                    unsigned int line, [[nullable, format("printf")]] char const *format, ...) {
 	va_list args;

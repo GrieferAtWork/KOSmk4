@@ -325,14 +325,17 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x838d2ade]]]*/
+/*[[[start:exports,hash:CRC-32=0x9410d565]]]*/
 DEFINE_PUBLIC_ALIAS(getgrgid, libc_getgrgid);
 DEFINE_PUBLIC_ALIAS(getgrnam, libc_getgrnam);
 DEFINE_PUBLIC_ALIAS(setgrent, libc_setgrent);
 DEFINE_PUBLIC_ALIAS(endgrent, libc_endgrent);
 DEFINE_PUBLIC_ALIAS(getgrent, libc_getgrent);
+DEFINE_PUBLIC_ALIAS(__getgrgid_r, libc_getgrgid_r);
 DEFINE_PUBLIC_ALIAS(getgrgid_r, libc_getgrgid_r);
+DEFINE_PUBLIC_ALIAS(__getgrnam_r, libc_getgrnam_r);
 DEFINE_PUBLIC_ALIAS(getgrnam_r, libc_getgrnam_r);
+DEFINE_PUBLIC_ALIAS(__getgrent_r, libc_getgrent_r);
 DEFINE_PUBLIC_ALIAS(getgrent_r, libc_getgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrent, libc_fgetgrent);
 DEFINE_PUBLIC_ALIAS(__setgroups, libc_setgroups);

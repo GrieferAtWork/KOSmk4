@@ -355,7 +355,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 /*[[[end:libc_getpwent_r]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x23b54fb]]]*/
+/*[[[start:exports,hash:CRC-32=0x2dc19bbc]]]*/
 DEFINE_PUBLIC_ALIAS(_setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(_endpwent, libc_endpwent);
@@ -368,8 +368,11 @@ DEFINE_PUBLIC_ALIAS(_getpwnam, libc_getpwnam);
 DEFINE_PUBLIC_ALIAS(getpwnam, libc_getpwnam);
 DEFINE_PUBLIC_ALIAS(_fgetpwent, libc_fgetpwent);
 DEFINE_PUBLIC_ALIAS(fgetpwent, libc_fgetpwent);
+DEFINE_PUBLIC_ALIAS(__getpwuid_r, libc_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
+DEFINE_PUBLIC_ALIAS(__getpwnam_r, libc_getpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);
+DEFINE_PUBLIC_ALIAS(__getpwent_r, libc_getpwent_r);
 DEFINE_PUBLIC_ALIAS(getpwent_r, libc_getpwent_r);
 /*[[[end:exports]]]*/
 

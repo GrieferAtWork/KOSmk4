@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd75c6d62 */
+/* HASH CRC-32:0xf041ffb */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,15 +258,19 @@ NOTHROW_CB_NCX(VLIBCCALL libc_error_at_line)(int status,
 DECL_END
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__error, libd_error);
 DEFINE_PUBLIC_ALIAS(DOS$error, libd_error);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__error, libc_error);
 DEFINE_PUBLIC_ALIAS(error, libc_error);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__error_at_line, libd_error_at_line);
 DEFINE_PUBLIC_ALIAS(DOS$error_at_line, libd_error_at_line);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__error_at_line, libc_error_at_line);
 DEFINE_PUBLIC_ALIAS(error_at_line, libc_error_at_line);
 #endif /* !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa044202b */
+/* HASH CRC-32:0xbe02e950 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,6 +54,14 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_munlock)(void const *ad
 /* >> mlockall(2)
  * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlockall)(__STDC_INT_AS_UINT_T flags);
+/* Weird function that just returns "/dev/shm/" */
+INTDEF const char *NOTHROW_NCX(LIBDCALL libd___shm_directory)(size_t *len);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Weird function that just returns "/dev/shm/" */
+INTDEF const char *NOTHROW_NCX(LIBCCALL libc___shm_directory)(size_t *len);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> shm_open(3) */
 INTDEF ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

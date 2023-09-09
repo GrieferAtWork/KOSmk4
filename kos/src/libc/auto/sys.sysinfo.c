@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ee7bc5 */
+/* HASH CRC-32:0x1d92d118 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,9 @@ NOTHROW(LIBCCALL libc_get_avphys_pages)(void) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__get_phys_pages, libc_get_phys_pages);
 DEFINE_PUBLIC_ALIAS(get_phys_pages, libc_get_phys_pages);
+DEFINE_PUBLIC_ALIAS(__get_avphys_pages, libc_get_avphys_pages);
 DEFINE_PUBLIC_ALIAS(get_avphys_pages, libc_get_avphys_pages);
 #endif /* !__KERNEL__ */
 

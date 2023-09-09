@@ -770,6 +770,16 @@ int mlockall(__STDC_INT_AS_UINT_T flags);
 [[export_alias("__munlockall", "__libc_munlockall")]]
 int munlockall();
 
+@@Weird function that just returns "/dev/shm/"
+[[hidden, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<asm/os/paths.h>")]]
+[[section(".text.crt{|.dos}.compat.glibc")]]
+const char *__shm_directory($size_t *len) {
+	*len = COMPILER_STRLEN(__PATH_SHM "/");
+	return __PATH_SHM "/";
+}
+
+
 @@>> shm_open(3)
 [[cp, decl_include("<bits/types.h>"), requires_function(open)]]
 [[impl_include("<asm/os/paths.h>", "<asm/os/oflags.h>")]]

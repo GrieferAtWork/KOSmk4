@@ -129,12 +129,14 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6b7992dd]]]*/
+/*[[[start:exports,hash:CRC-32=0xbfa19374]]]*/
 DEFINE_PUBLIC_ALIAS(setaliasent, libc_setaliasent);
 DEFINE_PUBLIC_ALIAS(endaliasent, libc_endaliasent);
 DEFINE_PUBLIC_ALIAS(getaliasent, libc_getaliasent);
+DEFINE_PUBLIC_ALIAS(__getaliasent_r, libc_getaliasent_r);
 DEFINE_PUBLIC_ALIAS(getaliasent_r, libc_getaliasent_r);
 DEFINE_PUBLIC_ALIAS(getaliasbyname, libc_getaliasbyname);
+DEFINE_PUBLIC_ALIAS(__getaliasbyname_r, libc_getaliasbyname_r);
 DEFINE_PUBLIC_ALIAS(getaliasbyname_r, libc_getaliasbyname_r);
 /*[[[end:exports]]]*/
 

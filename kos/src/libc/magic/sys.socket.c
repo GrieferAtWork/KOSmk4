@@ -1168,6 +1168,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: 0 : Success (the sockets are stored in `fds[0]' and `fds[1]')
 @@@return: -1: Failed to create the socket pair (s.a. `errno')
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__socketpair")]] /* From Glibc 2.0.4 */
 int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
                __STDC_INT_AS_UINT_T protocol, [[out]] $fd_t fds[2]);
 
@@ -1180,6 +1181,7 @@ int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__bind")]] /* From Glibc 2.0.4 */
 int bind([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
          socklen_t addr_len);
 
@@ -1197,6 +1199,7 @@ int bind([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
 @@return: 0 : Success
 @@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__getsockname")]] /* From Glibc 2.0.4 */
 int getsockname([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
                 [[inout]] socklen_t *__restrict addr_len);
 
@@ -1227,6 +1230,7 @@ int connect([[fdarg]] $fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG ad
 @@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__getpeername")]] /* From Glibc 2.0.4 */
 int getpeername([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
                 [[inout]] socklen_t *__restrict addr_len);
 
@@ -1273,6 +1277,7 @@ ssize_t recv([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *buf,
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 @@@return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__sendto")]]      /* From Glibc 2.0.4 */
 [[export_as("__libc_sendto")]] /* From Glibc 2.3.2 */
 ssize_t sendto([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
@@ -1296,6 +1301,7 @@ ssize_t sendto([[fdwrite]] $fd_t sockfd, [[in(return <= bufsize)]] void const *b
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__recvfrom")]]      /* From Glibc 2.0.4 */
 [[export_as("__libc_recvfrom")]] /* From Glibc 2.3.2 */
 ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
@@ -1310,7 +1316,8 @@ ssize_t recvfrom([[fdread]] $fd_t sockfd, [[out(return <= bufsize)]] void *__res
 @@@return: * : [<= bufsize] The actual # of send payload bytes
 @@@return: -1: ... Same as for `send(2)' and `sendto(2)'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-[[export_as("__libc_sendmsg")]] /* From Glibc 2.3.2 */
+[[export_as("__sendmsg")]]          /* From Glibc 2.0.4 */
+[[export_as("__libc_sendmsg")]]     /* From Glibc 2.3.2 */
 [[time64_export_as("__sendmsg64")]] /* No idea why this has a time64-alias, but it does... */
 ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
@@ -1324,7 +1331,8 @@ ssize_t sendmsg([[fdwrite]] $fd_t sockfd, [[in]] struct msghdr const *message,
 @@@return: * : [<= bufsize] The actual # of received payload bytes
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-[[export_as("__libc_recvmsg")]] /* From Glibc 2.3.2 */
+[[export_as("__recvmsg")]]          /* From Glibc 2.0.4 */
+[[export_as("__libc_recvmsg")]]     /* From Glibc 2.3.2 */
 [[time64_export_as("__recvmsg64")]] /* No idea why this has a time64-alias, but it does... */
 ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
@@ -1341,6 +1349,7 @@ ssize_t recvmsg([[fdread]] $fd_t sockfd, [[inout]] struct msghdr *message,
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__getsockopt")]]          /* From Glibc 2.0.4 */
 [[time64_export_as("__getsockopt64")]] /* No idea why this has a time64-alias, but it does... */
 int getsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[out/*(*optlen <= *optlen)*/]] void *__restrict optval, [[inout]] socklen_t *__restrict optlen);
@@ -1355,6 +1364,7 @@ int getsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
 @@@return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__setsockopt")]]          /* From Glibc 2.0.4 */
 [[time64_export_as("__setsockopt64")]] /* No idea why this has a time64-alias, but it does... */
 int setsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[in(optlen)]] void const *optval, socklen_t optlen);
@@ -1369,6 +1379,7 @@ int setsockopt([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS
 @@@return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
 @@@return: -1: [errno=EOPNOTSUPP]  E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__listen")]] /* From Glibc 2.0.4 */
 int listen([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 
 @@>> accept(2)
@@ -1386,6 +1397,7 @@ int listen([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
+[[export_as("__accept")]]      /* From Glibc 2.0.4 */
 [[export_as("__libc_accept")]] /* From Glibc 2.3.2 */
 $fd_t accept([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
              [[inout_opt]] socklen_t *__restrict addr_len);
@@ -1398,6 +1410,7 @@ $fd_t accept([[fdarg]] $fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ _
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
 [[decl_include("<features.h>", "<bits/types.h>")]]
+[[export_as("__shutdown")]] /* From Glibc 2.0.4 */
 int shutdown([[fdarg]] $fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
 %

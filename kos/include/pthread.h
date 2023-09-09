@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da0f4f0 */
+/* HASH CRC-32:0x1573ee62 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2890,8 +2890,9 @@ __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED,void **,__NOTHROW_NCX,pthread_getspeci
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __self, __clockid_t *__clock_id),(__self,__clock_id))
 #endif /* __USE_XOPEN2K */
-#if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
+#ifndef __pthread_atfork_defined
 #define __pthread_atfork_defined
+#ifdef __CRT_HAVE_pthread_atfork
 /* >> pthread_atfork(3)
  * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
@@ -2906,7 +2907,25 @@ __CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthr
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)(void), void (__LIBCCALL *__parent)(void), void (__LIBCCALL *__child)(void)),(__prepare,__parent,__child))
-#endif /* !__pthread_atfork_defined && __CRT_HAVE_pthread_atfork */
+#elif defined(__CRT_HAVE___pthread_atfork)
+/* >> pthread_atfork(3)
+ * Install handlers to be called when a new process is created with  `fork(2)'.
+ * The `prepare' handler is called in the parent process just before performing
+ * `fork(2)'. The `parent' handler is called  in the parent process just  after
+ * `fork(2)'.  The `child' handler is called in  the child process. Each of the
+ * three  handlers can be `NULL', meaning that no handler needs to be called at
+ * that point.
+ * `pthread_atfork(3)' can be called several times, in which case the `prepare'
+ * handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
+ * first  called before `fork(2)'),  and the `parent'  and `child' handlers are
+ * called in FIFO order (first added -> first called)
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to register callbacks */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)(void), void (__LIBCCALL *__parent)(void), void (__LIBCCALL *__child)(void)),__pthread_atfork,(__prepare,__parent,__child))
+#else /* ... */
+#undef __pthread_atfork_defined
+#endif /* !... */
+#endif /* !__pthread_atfork_defined */
 
 
 /* Some more functions from winpthread. */

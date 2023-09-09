@@ -378,6 +378,7 @@ size_t mbrtowc([[out_opt]] wchar_t *pwc,
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("c16rtomb")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$c16rtomb")]]
 [[kos_export_as("c32rtomb")]]
+[[export_as("__wcrtomb")]] /* From Glibc 2.0.4 */
 size_t wcrtomb([[out_opt]] char *__restrict str/*char str[MB_CUR_MAX]*/, wchar_t wc,
                [[inout_opt]] mbstate_t *mbs) {
 	char *endptr;
@@ -442,6 +443,7 @@ $size_t mbrlen([[in_opt/*(maxlen)*/]] char const *__restrict str, $size_t maxlen
 @@>> mbsrtowcs(3)
 [[std, wchar, requires_function(mbsnrtowcs)]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
+[[export_as("__mbsrtowcs")]] /* From Glibc 2.0.4 */
 size_t mbsrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
                  [[inout]] char const **__restrict psrc, size_t dstlen,
                  [[inout_opt]] mbstate_t *mbs) {
@@ -451,6 +453,7 @@ size_t mbsrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
 @@>> wcsrtombs(3)
 [[std, wchar, requires_function(wcsnrtombs)]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
+[[export_as("__wcsrtombs")]] /* From Glibc 2.0.4 */
 size_t wcsrtombs([[out_opt/*(dstlen)*/]] char *dst,
                  [[inout]] wchar_t const **__restrict psrc, size_t dstlen,
                  [[inout_opt]] mbstate_t *mbs) {
@@ -1275,6 +1278,7 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 @@>> wcpcpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[export_as("__wcpcpy")]] /* From Glibc 2.0.4 */
 [[nonnull]] wchar_t *wcpcpy([[out]] wchar_t *__restrict dst,
                             [[in]] wchar_t const *__restrict src) {
 	return wmempcpy(dst, src, wcslen(src) + 1);
@@ -1283,6 +1287,7 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 @@>> wcpncpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[export_as("__wcpncpy")]] /* From Glibc 2.0.4 */
 [[nonnull]] wchar_t *wcpncpy([[out(buflen)]] wchar_t *__restrict buf,
                              [[in(wcsnlen(., buflen))]] wchar_t const *__restrict src,
                              $size_t buflen) {
@@ -1295,6 +1300,7 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 @@>> mbsnrtowcs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
+[[export_as("__mbsnrtowcs")]] /* From Glibc 2.0.4 */
 $size_t mbsnrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
                    [[inout]] char const **__restrict psrc, $size_t nmc, $size_t dstlen,
                    [[inout_opt]] $mbstate_t *mbs) {
@@ -1342,6 +1348,7 @@ $size_t mbsnrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
 @@>> wcsnrtombs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
+[[export_as("__wcsnrtombs")]] /* From Glibc 2.0.4 */
 $size_t wcsnrtombs([[out_opt/*(dstlen)*/]] char *dst,
                    [[inout]] wchar_t const **__restrict psrc, $size_t nwc, $size_t dstlen,
                    [[inout_opt]] $mbstate_t *mbs) {

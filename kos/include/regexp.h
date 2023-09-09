@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce33894c */
+/* HASH CRC-32:0x5a9cdd2d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,13 @@ char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eo
  * @return: 0: No match
  * @return: 1: Match was found in range `[loc1,loc2)' (yes: these are global variables) */
 __CDECLARE(,int,__NOTHROW_NCX,step,(char const *__string, char const *__expbuf),(__string,__expbuf))
-#else /* __CRT_HAVE_step */
+#elif defined(__CRT_HAVE___step)
+/* >> step(3)
+ * Find the next matching position in `string', given `expbuf' as previously passed to `compile(3)'
+ * @return: 0: No match
+ * @return: 1: Match was found in range `[loc1,loc2)' (yes: these are global variables) */
+__CREDIRECT(,int,__NOTHROW_NCX,step,(char const *__string, char const *__expbuf),__step,(__string,__expbuf))
+#else /* ... */
 #include <asm/crt/regex.h>
 #include <libc/template/locN.h>
 #if defined(__LOCAL_loc1) && defined(__LOCAL_loc2) && defined(__REG_NOTEOL) && defined(__CRT_HAVE_regexec)
@@ -208,7 +214,7 @@ __CDECLARE(,int,__NOTHROW_NCX,step,(char const *__string, char const *__expbuf),
  * @return: 1: Match was found in range `[loc1,loc2)' (yes: these are global variables) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(step, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL step)(char const *__string, char const *__expbuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(step))(__string, __expbuf); })
 #endif /* __LOCAL_loc1 && __LOCAL_loc2 && __REG_NOTEOL && __CRT_HAVE_regexec */
-#endif /* !__CRT_HAVE_step */
+#endif /* !... */
 #ifdef __CRT_HAVE_advance
 /* >> advance(3)
  * Match the beginning of `string' against `expbuf' as previously passed to `compile(3)'
@@ -216,7 +222,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(step, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHR
  * @return: 1: Match was found in range `[string,loc2)' (`string' being the first
  *             argument  to this  function, and  `loc2' being  a global variable) */
 __CDECLARE(,int,__NOTHROW_NCX,advance,(char const *__string, char const *__expbuf),(__string,__expbuf))
-#else /* __CRT_HAVE_advance */
+#elif defined(__CRT_HAVE___advance)
+/* >> advance(3)
+ * Match the beginning of `string' against `expbuf' as previously passed to `compile(3)'
+ * @return: 0: No match (or just not at the beginning of `string')
+ * @return: 1: Match was found in range `[string,loc2)' (`string' being the first
+ *             argument  to this  function, and  `loc2' being  a global variable) */
+__CREDIRECT(,int,__NOTHROW_NCX,advance,(char const *__string, char const *__expbuf),__advance,(__string,__expbuf))
+#else /* ... */
 #include <asm/crt/regex.h>
 #include <libc/template/locN.h>
 #if defined(__LOCAL_loc2) && defined(__REG_NOTEOL) && defined(__CRT_HAVE_regexec)
@@ -228,7 +241,7 @@ __CDECLARE(,int,__NOTHROW_NCX,advance,(char const *__string, char const *__expbu
  *             argument  to this  function, and  `loc2' being  a global variable) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(advance, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL advance)(char const *__string, char const *__expbuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(advance))(__string, __expbuf); })
 #endif /* __LOCAL_loc2 && __REG_NOTEOL && __CRT_HAVE_regexec */
-#endif /* !__CRT_HAVE_advance */
+#endif /* !... */
 
 #endif /* __BUILDING_LIBC || __DO_NOT_DEFINE_COMPILE || (GETC && PEEKC && RETURN && ERROR) */
 

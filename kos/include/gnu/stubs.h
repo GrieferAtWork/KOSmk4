@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9770427d */
+/* HASH CRC-32:0x206f7552 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,6 +160,7 @@
 #define __stub_endprotoent
 #define __stub_endrpcent
 #define __stub_endservent
+#define __stub___endutent
 #define __stub_endutent
 #define __stub_endutxent
 #define __stub_erand48
@@ -205,22 +206,30 @@
 #define __stub___gai_suspend_time64
 #define __stub_gai_suspend64
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#define __stub___get_nprocs
 #define __stub_get_nprocs
+#define __stub___get_nprocs_conf
 #define __stub_get_nprocs_conf
 #define __stub_getaddrinfo
 #define __stub_getaddrinfo_a
 #define __stub_getaliasbyname
+#define __stub___getaliasbyname_r
 #define __stub_getaliasbyname_r
 #define __stub_getaliasent
+#define __stub___getaliasent_r
 #define __stub_getaliasent_r
 #define __stub_getbsize
 #define __stub_gethostbyaddr
+#define __stub___gethostbyaddr_r
 #define __stub_gethostbyaddr_r
 #define __stub_gethostbyname
 #define __stub_gethostbyname2
+#define __stub___gethostbyname2_r
 #define __stub_gethostbyname2_r
+#define __stub___gethostbyname_r
 #define __stub_gethostbyname_r
 #define __stub_gethostent
+#define __stub___gethostent_r
 #define __stub_gethostent_r
 #define __stub_getifaddrs
 #define __stub_getipv4sourcefilter
@@ -229,39 +238,55 @@
 #define __stub_getmsg
 #define __stub_getnameinfo
 #define __stub_getnetbyaddr
+#define __stub___getnetbyaddr_r
 #define __stub_getnetbyaddr_r
 #define __stub_getnetbyname
+#define __stub___getnetbyname_r
 #define __stub_getnetbyname_r
 #define __stub_getnetent
+#define __stub___getnetent_r
 #define __stub_getnetent_r
 #define __stub_getnetgrent
+#define __stub___getnetgrent_r
 #define __stub_getnetgrent_r
 #define __stub_getpmsg
 #define __stub_getprotobyname
+#define __stub___getprotobyname_r
 #define __stub_getprotobyname_r
 #define __stub_getprotobynumber
+#define __stub___getprotobynumber_r
 #define __stub_getprotobynumber_r
 #define __stub_getprotoent
+#define __stub___getprotoent_r
 #define __stub_getprotoent_r
 #define __stub_getpt
 #define __stub_getrpcbyname
+#define __stub___getrpcbyname_r
 #define __stub_getrpcbyname_r
 #define __stub_getrpcbynumber
+#define __stub___getrpcbynumber_r
 #define __stub_getrpcbynumber_r
 #define __stub_getrpcent
+#define __stub___getrpcent_r
 #define __stub_getrpcent_r
 #define __stub_getservbyname
+#define __stub___getservbyname_r
 #define __stub_getservbyname_r
 #define __stub_getservbyport
+#define __stub___getservbyport_r
 #define __stub_getservbyport_r
 #define __stub_getservent
+#define __stub___getservent_r
 #define __stub_getservent_r
 #define __stub_getsourcefilter
 #define __stub_getutent
+#define __stub___getutent_r
 #define __stub_getutent_r
 #define __stub_getutid
+#define __stub___getutid_r
 #define __stub_getutid_r
 #define __stub_getutline
+#define __stub___getutline_r
 #define __stub_getutline_r
 #define __stub_getutmp
 #define __stub_getutmpx
@@ -305,6 +330,7 @@
 #define __stub_inet_pton
 #define __stub___initstate
 #define __stub_initstate
+#define __stub___initstate_r
 #define __stub_initstate_r
 #define __stub_innetgr
 #define __stub_iruserok
@@ -426,6 +452,7 @@
 #define __stub_posix_openpt
 #define __stub_printf_size
 #define __stub_printf_size_info
+#define __stub___pthread_atfork
 #define __stub_pthread_atfork
 #define __stub_pthread_getcpuclockid
 #define __stub_pthread_mutex_consistent_np
@@ -438,10 +465,12 @@
 #define __stub_putmsg
 #define __stub_putpmsg
 #define __stub__pututline
+#define __stub___pututline
 #define __stub_pututline
 #define __stub_pututxline
 #define __stub_pwait
 #define __stub_radixsort
+#define __stub___random_r
 #define __stub_random_r
 #define __stub_rcmd
 #define __stub_rcmd_af
@@ -524,7 +553,9 @@
 #define __stub_setsourcefilter
 #define __stub___setstate
 #define __stub_setstate
+#define __stub___setstate_r
 #define __stub_setstate_r
+#define __stub___setutent
 #define __stub_setutent
 #define __stub_setutxent
 #define __stub_shmat
@@ -536,6 +567,7 @@
 #define __stub_sradixsort
 #define __stub_srand48
 #define __stub_srand48_r
+#define __stub___srandom_r
 #define __stub_srandom_r
 #define __stub_strfmon
 #define __stub___strfmon_l
@@ -550,6 +582,7 @@
 #define __stub_tempnam
 #define __stub_tmpnam
 #define __stub__tzset
+#define __stub___tzset
 #define __stub_tzset
 #define __stub_ufromfp
 #define __stub_ufromfpx
@@ -559,6 +592,7 @@
 #define __stub_updwtmpx
 #define __stub___uselocale
 #define __stub_uselocale
+#define __stub___utmpname
 #define __stub_utmpname
 #define __stub_utmpxname
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL

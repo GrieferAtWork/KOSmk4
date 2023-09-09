@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d7ce072 */
+/* HASH CRC-32:0xb2cbaac */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1401,6 +1401,7 @@ DEFINE_PUBLIC_ALIAS(strptime_l, libc_strptime_l);
 DEFINE_PUBLIC_ALIAS(getdate_r, libc_getdate_r);
 DEFINE_PUBLIC_ALIAS(__gmtime_r, libc_gmtime_r);
 DEFINE_PUBLIC_ALIAS(gmtime_r, libc_gmtime_r);
+DEFINE_PUBLIC_ALIAS(__localtime_r, libc_localtime_r);
 DEFINE_PUBLIC_ALIAS(localtime_r, libc_localtime_r);
 DEFINE_PUBLIC_ALIAS(ctime_r, libc_ctime_r);
 #include <bits/types.h>
@@ -1418,6 +1419,7 @@ DEFINE_PUBLIC_ALIAS(localtime64_r, libc_localtime64_r);
 DEFINE_PUBLIC_ALIAS(__ctime64_r, libc_ctime64_r);
 DEFINE_PUBLIC_ALIAS(ctime64_r, libc_ctime64_r);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(__asctime_r, libc_asctime_r);
 DEFINE_PUBLIC_ALIAS(asctime_r, libc_asctime_r);
 DEFINE_PUBLIC_ALIAS(DOS$__daylight, libc___daylight);
 DEFINE_PUBLIC_ALIAS(__p__daylight, libc___daylight);

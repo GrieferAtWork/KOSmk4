@@ -76,6 +76,7 @@ char *dgettext([[in_opt]] char const *domainname,
 [[pure, wunused]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
+[[export_as("__gettext")]] /* From Glibc 2.0.4 */
 char *gettext([[in_opt, format_arg]] char const *msgid) {
 	return dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
 }
@@ -115,8 +116,12 @@ char *dcngettext([[in_opt]] char const *domainname,
 }
 
 
+[[export_as("__textdomain")]] /* From Glibc 2.0.4 */
 char *textdomain([[in_opt]] char const *domainname);
+
+[[export_as("__bindtextdomain")]] /* From Glibc 2.0.4 */
 char *bindtextdomain([[in_opt]] char const *domainname, [[in_opt]] char const *dirname);
+
 char *bind_textdomain_codeset([[in_opt]] char const *domainname, [[in_opt]] char const *codeset);
 
 %[insert:function(__dgettext = dgettext)]

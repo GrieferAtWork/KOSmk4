@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf43890af */
+/* HASH CRC-32:0x79ab4d5d */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,13 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <asm/os/paths.h>
+/* Weird function that just returns "/dev/shm/" */
+INTERN ATTR_SECTION(".text.crt.compat.glibc") const char *
+NOTHROW_NCX(LIBCCALL libc___shm_directory)(size_t *len) {
+	*len = COMPILER_STRLEN(__PATH_SHM "/");
+	return __PATH_SHM "/";
+}
 #include <asm/os/paths.h>
 #include <asm/os/oflags.h>
 #include <parts/malloca.h>
@@ -829,6 +836,7 @@ NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__shm_directory, libc___shm_directory);
 DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
 DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
 DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);

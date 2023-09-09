@@ -310,6 +310,7 @@ err_inval:
 @@@return: 0 : (*result == NULL) No entry for `uid'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[export_as("__getpwuid_r")]] /* From Glibc 2.0.4 */
 $errno_t getpwuid_r($uid_t uid,
                     [[out]] struct passwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
@@ -321,6 +322,7 @@ $errno_t getpwuid_r($uid_t uid,
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[export_as("__getpwnam_r")]] /* From Glibc 2.0.4 */
 $errno_t getpwnam_r([[in]] char const *__restrict name,
                     [[out]] struct passwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
@@ -334,6 +336,7 @@ $errno_t getpwnam_r([[in]] char const *__restrict name,
 @@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
+[[export_as("__getpwent_r")]] /* From Glibc 2.0.4 */
 $errno_t getpwent_r([[out]] struct passwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
                     [[out]] struct passwd **__restrict result);
@@ -346,6 +349,7 @@ $errno_t getpwent_r([[out]] struct passwd *__restrict resultbuf,
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[requires_function(fgetpwfiltered_r)]]
+[[export_as("__fgetpwent_r")]] /* From Glibc 2.0.4 */
 $errno_t fgetpwent_r([[inout]] $FILE *__restrict stream,
                      [[out]] struct passwd *__restrict resultbuf,
                      [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
@@ -606,6 +610,7 @@ nextline:
 [[cp, decl_include("<bits/types.h>")]]
 [[impl_include("<bits/types.h>", "<bits/crt/inttypes.h>")]]
 [[requires_function(getpwuid)]]
+[[export_as("__getpw")]] /* From Glibc 2.0.4 */
 int getpw($uid_t uid, [[out]] char *buffer) {
 	struct passwd *ent;
 	ent = getpwuid(uid);

@@ -787,6 +787,7 @@ void *crt_calloc(size_t count, size_t num_bytes);
 [[crtbuiltin, export_alias("__libc_malloc")]]
 [[userimpl, requires($has_function(crt_calloc) || $has_function(realloc) || $has_function(memalign))]]
 [[section(".text.crt{|.dos}.heap.malloc")]]
+[[export_as("__malloc")]] /* From Glibc 2.0.4 */
 void *malloc(size_t num_bytes) {
 @@pp_if $has_function(crt_calloc)@@
 	return crt_calloc(1, num_bytes);
@@ -803,6 +804,7 @@ void *malloc(size_t num_bytes) {
 [[userimpl, requires_function(malloc)]]
 [[impl_include("<hybrid/__overflow.h>")]]
 [[section(".text.crt{|.dos}.heap.malloc")]]
+[[export_as("__calloc")]] /* From Glibc 2.0.4 */
 void *calloc(size_t count, size_t num_bytes) {
 	void *result;
 	size_t total_bytes;
@@ -818,11 +820,13 @@ void *calloc(size_t count, size_t num_bytes) {
 [[crtbuiltin, export_alias("__libc_realloc")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.malloc")]]
+[[export_as("__realloc")]] /* From Glibc 2.0.4 */
 void *realloc(void *mallptr, size_t num_bytes);
 
 [[guard, std, libc]]
 [[crtbuiltin, export_alias("cfree", "__libc_free" /*, "__builtin_delete"*/ )]]
 [[section(".text.crt{|.dos}.heap.malloc")]]
+[[export_as("__cfree", "__free")]] /* From Glibc 2.0.4 */
 void free(void *mallptr);
 
 
@@ -2121,20 +2125,24 @@ int lcong48_r([[nonnull]] unsigned short param[7],
 
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/random-data.h>")]]
 [[section(".text.crt{|.dos}.random")]]
+[[export_as("__random_r")]] /* From Glibc 2.0.4 */
 int random_r([[nonnull]] struct random_data *__restrict buf, [[nonnull]] $int32_t *__restrict result);
 
 [[decl_include("<bits/crt/random-data.h>")]]
 [[section(".text.crt{|.dos}.random")]]
+[[export_as("__srandom_r")]] /* From Glibc 2.0.4 */
 int srandom_r(unsigned int seed, [[nonnull]] struct random_data *buf);
 
 [[decl_include("<bits/crt/random-data.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.random")]]
+[[export_as("__initstate_r")]] /* From Glibc 2.0.4 */
 int initstate_r(unsigned int seed,
                 [[nonnull]] char *__restrict statebuf, $size_t statelen,
                 [[nonnull]] struct random_data *__restrict buf);
 
 [[decl_include("<bits/crt/random-data.h>")]]
 [[section(".text.crt{|.dos}.random")]]
+[[export_as("__setstate_r")]] /* From Glibc 2.0.4 */
 int setstate_r([[nonnull]] char *__restrict statebuf,
                [[nonnull]] struct random_data *__restrict buf);
 
@@ -2148,6 +2156,7 @@ int on_exit([[nonnull]] void (LIBCCALL *func)(int status, void *arg), void *arg)
 [[requires_include("<libc/template/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
 [[section(".text.crt{|.dos}.fs.environ")]]
+[[export_as("__clearenv")]] /* From Glibc 2.0.4 */
 int clearenv(void) {
 	__LOCAL_environ = NULL;
 	return 0;

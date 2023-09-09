@@ -95,6 +95,7 @@ struct aliasent *getaliasent();
 @@>> getaliasent_r(3)
 @@Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
+[[export_as("__getaliasent_r")]] /* From Glibc 2.0.4 */
 $errno_t getaliasent_r([[out]] struct aliasent *__restrict result_buf,
                        [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
                        [[out]] struct aliasent **__restrict result);
@@ -110,6 +111,7 @@ struct aliasent *getaliasbyname([[in]] char const *name);
 @@>> getaliasbyname_r(3)
 @@Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
+[[export_as("__getaliasbyname_r")]] /* From Glibc 2.0.4 */
 $errno_t getaliasbyname_r([[in]] char const *__restrict name,
                           [[out]] struct aliasent *__restrict result_buf,
                           [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,

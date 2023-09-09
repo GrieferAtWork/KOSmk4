@@ -1164,7 +1164,9 @@ NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct glibc_dirent64 const **e1,
 DEFINE_PUBLIC_ALIAS(__libc_readdir, libc_readdir);
 DEFINE_PUBLIC_ALIAS(__libc_readdir_r, libc_readdir_r);
 DEFINE_PUBLIC_ALIAS(readdir, libc_readdir);
+DEFINE_PUBLIC_ALIAS(__readdir, libc_readdir); /* From Glibc 2.0.4 */
 DEFINE_PUBLIC_ALIAS(readdir_r, libc_readdir_r);
+DEFINE_PUBLIC_ALIAS(__readdir_r, libc_readdir_r); /* From Glibc 2.0.4 */
 DEFINE_PUBLIC_ALIAS(scandir, libc_scandir);
 DEFINE_PUBLIC_ALIAS(scandirat, libc_scandirat);
 DEFINE_PUBLIC_ALIAS(alphasort, libc_alphasortk);
@@ -1173,7 +1175,9 @@ DEFINE_PUBLIC_ALIAS(versionsort, libc_versionsortk);
 DEFINE_PUBLIC_IFUNC(__libc_readdir, libc_get_readdir64);
 DEFINE_PUBLIC_IFUNC(__libc_readdir_r, libc_get_readdir64_r);
 DEFINE_PUBLIC_IFUNC(readdir, libc_get_readdir64);
+DEFINE_PUBLIC_IFUNC(__readdir, libc_get_readdir64); /* From Glibc 2.0.4 */
 DEFINE_PUBLIC_IFUNC(readdir_r, libc_get_readdir64_r);
+DEFINE_PUBLIC_IFUNC(__readdir_r, libc_get_readdir64_r); /* From Glibc 2.0.4 */
 DEFINE_PUBLIC_IFUNC(scandir, libc_get_scandir64);
 DEFINE_PUBLIC_IFUNC(scandirat, libc_get_scandirat64);
 DEFINE_PUBLIC_IFUNC(alphasort, libc_get_alphasort64);
@@ -1238,16 +1242,19 @@ NOTHROW(LIBCCALL libc_get_versionsort64)(void) {
 
 
 
-/*[[[start:exports,hash:CRC-32=0xba18a3a9]]]*/
+/*[[[start:exports,hash:CRC-32=0xee509cf0]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__libc_opendir, libd_opendir);
+DEFINE_PUBLIC_ALIAS(DOS$__opendir, libd_opendir);
 DEFINE_PUBLIC_ALIAS(DOS$opendir, libd_opendir);
 DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
+DEFINE_PUBLIC_ALIAS(__opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(opendir, libc_opendir);
 DEFINE_PUBLIC_ALIAS(DOS$fopendirat, libd_fopendirat);
 DEFINE_PUBLIC_ALIAS(fopendirat, libc_fopendirat);
 DEFINE_PUBLIC_ALIAS(DOS$opendirat, libd_opendirat);
 DEFINE_PUBLIC_ALIAS(opendirat, libc_opendirat);
 DEFINE_PUBLIC_ALIAS(__libc_closedir, libc_closedir);
+DEFINE_PUBLIC_ALIAS(__closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(closedir, libc_closedir);
 DEFINE_PUBLIC_ALIAS(fdclosedir, libc_fdclosedir);
 DEFINE_PUBLIC_ALIAS(readdirk, libc_readdirk);

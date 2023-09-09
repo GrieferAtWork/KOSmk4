@@ -565,6 +565,7 @@ struct sigvec {
 #define SV_RESETHAND 0x0004 /* s.a. `SA_RESETHAND' */
 
 DEFINE_PUBLIC_ALIAS(sigvec, libc_sigvec);
+DEFINE_PUBLIC_ALIAS(__sigvec, libc_sigvec); /* From Glibc 2.0.4 */
 INTERN ATTR_SECTION(".text.crt.compat.linux.signal") int LIBCCALL
 libc_sigvec(signo_t sig, struct sigvec const *nvec, struct sigvec *ovec) {
 	int result;
@@ -1082,6 +1083,13 @@ NOTHROW_NCX(LIBCCALL libc_getdents)(fd_t fd, struct linux_dirent *buf, size_t co
 	return libc_seterrno_syserr(error);
 }
 
+DEFINE_PUBLIC_ALIAS(getdents64, libc_getdents64);
+INTERN ATTR_SECTION(".text.crt.compat.linux") ssize_t
+NOTHROW_NCX(LIBCCALL libc_getdents64)(fd_t fd, struct linux_dirent64 *buf, size_t count) {
+	ssize_t error = sys_getdents64(fd, buf, count);
+	return libc_seterrno_syserr(error);
+}
+
 
 
 
@@ -1382,9 +1390,16 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_banner[] =
 ;
 
 /* Program entry point for when you do `exec("/lib/libc.so")' */
+DEFINE_PUBLIC_ALIAS(__libc_print_version, libc_exec_print_version); /* From Glibc 2.0.4 */
+DEFINE_PUBLIC_ALIAS(__libc_main, libc_exec_main);                   /* From Glibc 2.0.4 */
+INTERN ATTR_SECTION(".text.crt.compat.glibc")
+void libc_exec_print_version(void) {
+	sys_write(STDOUT_FILENO, libc_banner, sizeof(libc_banner) - sizeof(char));
+	sys_exit_group(0);
+}
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.compat.glibc")
 void libc_exec_main(void) {
-	sys_write(STDOUT_FILENO, libc_banner, sizeof(libc_banner) - sizeof(char));
+	libc_exec_print_version();
 	sys_exit_group(0);
 }
 

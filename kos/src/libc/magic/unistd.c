@@ -931,6 +931,7 @@ err:
 [[impl_include("<bits/types.h>", "<libc/errno.h>", "<asm/os/dirent.h>", "<asm/os/stat.h>")]]
 [[impl_include("<paths.h>", "<bits/os/dirent.h>", "<bits/os/stat.h>", "<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.io.tty")]]
+[[export_as("__ttyname_r")]] /* From Glibc 2.0.4 */
 $errno_t ttyname_r([[fdarg]] $fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 
 	/* Ensure that it's actually a TTY */
@@ -1428,6 +1429,7 @@ int chdir([[in]] char const *path) {
 [[cp, guard, decl_include("<hybrid/typecore.h>")]]
 [[crt_dos_variant, dos_export_alias("_getcwd")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
+[[export_as("__getcwd")]] /* From Glibc 2.0.4 */
 char *getcwd([[out_opt/*(bufsize)*/]] char *buf, size_t bufsize);
 
 @@>> unlink(2)
@@ -1465,6 +1467,7 @@ int rmdir([[in]] char const *path) {
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
 [[userimpl, section(".text.crt{|.dos}.fs.property")]]
+[[export_as("__euidaccess")]] /* From Glibc 2.0.4 */
 int euidaccess([[in]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__AT_FDCWD, file, type, __AT_EACCESS);
 }
@@ -1583,6 +1586,7 @@ ssize_t freadlinkat([[dirfd]] $fd_t dfd, [[in]] char const *path,
 [[dos_only_export_alias("_lseeki64")]]
 [[export_alias("llseek", "__llseek")]]
 [[export_as("__libc_lseek64")]] /* From Glibc 2.3.2 */
+[[export_as("__sys_llseek")]]   /* From Glibc 2.0.4 */
 [[userimpl, requires_function(crt_lseek32)]]
 [[section(".text.crt{|.dos}.io.large.seek")]]
 $off64_t lseek64([[fdarg]] $fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
@@ -2044,6 +2048,7 @@ __LOCAL_LIBC(__group_member_impl) __ATTR_NOINLINE int
 @@pop_namespace@@
 )]]
 [[section(".text.crt{|.dos}.sched.user")]]
+[[export_as("__group_member")]] /* From Glibc 2.0.4 */
 int group_member($gid_t gid) {
 	int result;
 @@pp_if !defined(__NGROUPS_MAX) || __NGROUPS_MAX <= 0 || __NGROUPS_MAX >= 32@@
@@ -2231,6 +2236,7 @@ $pid_t getsid($pid_t pid);
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchownat))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify")]]
+[[export_as("__lchown")]] /* From Glibc 2.0.4 */
 int lchown([[in]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
 }

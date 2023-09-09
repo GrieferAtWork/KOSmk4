@@ -160,6 +160,7 @@ typedef __UINTPTR_TYPE__ nfds_t;
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)
 [[cp, export_alias("__poll"), decl_include("<bits/os/pollfd.h>")]]
+[[export_as("__syscall_poll")]] /* From Glibc 2.0.4 */
 int poll([[inout(nfds)]] struct pollfd *fds, nfds_t nfds, int timeout);
 
 %#ifdef __USE_GNU

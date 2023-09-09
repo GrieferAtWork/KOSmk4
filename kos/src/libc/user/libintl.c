@@ -1547,9 +1547,11 @@ DEFINE_PUBLIC_ALIAS(_libc_intl_domainname, libc__libc_intl_domainname);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2829af3a]]]*/
+/*[[[start:exports,hash:CRC-32=0xe0ac88e5]]]*/
 DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);
+DEFINE_PUBLIC_ALIAS(__textdomain, libc_textdomain);
 DEFINE_PUBLIC_ALIAS(textdomain, libc_textdomain);
+DEFINE_PUBLIC_ALIAS(__bindtextdomain, libc_bindtextdomain);
 DEFINE_PUBLIC_ALIAS(bindtextdomain, libc_bindtextdomain);
 DEFINE_PUBLIC_ALIAS(bind_textdomain_codeset, libc_bind_textdomain_codeset);
 /*[[[end:exports]]]*/

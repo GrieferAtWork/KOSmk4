@@ -231,12 +231,14 @@ err_inval:
 %
 %#ifdef __USE_MISC
 [[cp, decl_include("<bits/crt/db/spwd.h>", "<bits/types.h>")]]
+[[export_as("__getspent_r")]] /* From Glibc 2.0.4 */
 $errno_t getspent_r([[out]] struct spwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
                     [[out]] struct spwd **__restrict result);
 
 [[cp, doc_alias("getspent_r")]]
 [[decl_include("<bits/crt/db/spwd.h>", "<bits/types.h>")]]
+[[export_as("__getspnam_r")]] /* From Glibc 2.0.4 */
 $errno_t getspnam_r([[in]] char const *__restrict name,
                     [[out]] struct spwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
@@ -246,6 +248,7 @@ $errno_t getspnam_r([[in]] char const *__restrict name,
 [[decl_include("<bits/crt/db/spwd.h>", "<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[requires_function(fgetspent_r, fmemopen)]]
+[[export_as("__sgetspent_r")]] /* From Glibc 2.0.4 */
 $errno_t sgetspent_r([[in]] char const *__restrict string,
                      [[out]] struct spwd *__restrict resultbuf,
                      [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
@@ -270,6 +273,7 @@ $errno_t sgetspent_r([[in]] char const *__restrict string,
 [[cp, doc_alias("getspent_r")]]
 [[decl_include("<bits/crt/db/spwd.h>", "<bits/types.h>")]]
 [[requires_function(fgetspnam_r)]]
+[[export_as("__fgetspent_r")]] /* From Glibc 2.0.4 */
 $errno_t fgetspent_r([[inout]] $FILE *__restrict stream,
                      [[out]] struct spwd *__restrict resultbuf,
                      [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,

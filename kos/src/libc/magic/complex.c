@@ -252,6 +252,7 @@ double _ctans(double _Complex z) {
 
 
 
+[[export_as("__cabsf")]] /* From Glibc 2.0.4 */
 cabsf(*) %{generate(double2float("cabs"))}
 cexpf(*) %{generate(double2float("cexp"))}
 clogf(*) %{generate(double2float("clog"))}
@@ -277,6 +278,7 @@ cprojf(*) %{generate(double2float("cproj"))}
 
 [[requires_function(hypot, creal, cimag)]]
 [[dos_only_export_alias("_cabs")]] /* DOS-specific name */
+[[export_as("__cabs")]] /* From Glibc 2.0.4 */
 double cabs(double _Complex z) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
 	return hypot(creal(z), cimag(z));
@@ -698,7 +700,10 @@ double _Complex cproj(double _Complex z) {
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[ldouble_variant_of("cabs", ...)]]   cabsl(*)   %{generate(double2ldouble("cabs"))}
+[[ldouble_variant_of("cabs", ...)]]
+[[export_as("__cabsl")]] /* From Glibc 2.0.4 */
+cabsl(*) %{generate(double2ldouble("cabs"))}
+
 [[ldouble_variant_of("cexp", ...)]]   cexpl(*)   %{generate(double2ldouble("cexp"))}
 [[ldouble_variant_of("clog", ...)]]   clogl(*)   %{generate(double2ldouble("clog"))}
 [[ldouble_variant_of("cpow", ...)]]   cpowl(*)   %{generate(double2ldouble("cpow"))}

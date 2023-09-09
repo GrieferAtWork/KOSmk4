@@ -865,6 +865,7 @@ int fclose([[inout]] FILE *__restrict stream);
 [[                                                                           alias(CNL_fflush...)]]
 [[                                                                           alias(CNL_fflush_unlocked...)]]
 [[userimpl, section(".text.crt{|.dos}.FILE.locked.write.utility")]]
+[[export_as("fflush_locked")]] /* From Glibc 2.0.4 */
 int fflush([[nullable]] FILE *stream) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
@@ -913,6 +914,7 @@ int setvbuf([[inout]] FILE *__restrict stream,
 [[                                                                           alias(CNL_fgetc_unlocked...)]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread))]]
 [[impl_include("<bits/crt/io-file.h>", "<asm/crt/stdio.h>")]]
+[[export_as("getc_locked")]] /* From Glibc 2.0.4 */
 int fgetc([[inout]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_filbuf) && (defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fread))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)*stream->__f_ptr++) : _filbuf(stream);
@@ -933,6 +935,7 @@ int fgetc([[inout]] FILE *__restrict stream) {
 [[dos_only_export_alias("_fgetchar"), impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(fgetc))]]
+[[export_as("getchar_locked")]] /* From Glibc 2.0.4 */
 int getchar() {
 	return fgetc(stdin);
 }
@@ -948,6 +951,8 @@ int getchar() {
 [[                                                                           alias(CNL_fputc_unlocked...)]]
 [[crtbuiltin, userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]]
 [[impl_include("<bits/crt/io-file.h>", "<features.h>", "<asm/crt/stdio.h>")]]
+[[export_as("fputc_locked")]] /* From Glibc 2.0.4 */
+[[export_as("putc_locked")]]  /* From Glibc 2.0.4 */
 int fputc(int ch, [[inout]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf) && (defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fwrite))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)(*stream->__f_ptr++ = (char)ch)) : _flsbuf(ch, stream);
@@ -969,6 +974,7 @@ int fputc(int ch, [[inout]] FILE *__restrict stream) {
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(fputc))]]
+[[export_as("putchar_locked")]] /* From Glibc 2.0.4 */
 int putchar(int ch) {
 	return fputc(ch, stdout);
 }
@@ -1219,6 +1225,7 @@ void rewind([[inout]] FILE *__restrict stream) {
 [[std, export_alias("clearerr_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("clearerr_unlocked")]]
 [[section(".text.crt{|.dos}.FILE.locked.access")]]
+[[export_as("clearerr_locked")]] /* From Glibc 2.0.4 */
 void clearerr([[inout]] $FILE *__restrict stream);
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
@@ -1230,6 +1237,7 @@ void clearerr([[inout]] $FILE *__restrict stream);
 [[std, pure, wunused, export_alias("_IO_feof", "feof_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("feof_unlocked")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
+[[export_as("feof_locked")]] /* From Glibc 2.0.4 */
 int feof([[in]] $FILE __KOS_FIXED_CONST *__restrict stream);
 
 
@@ -1239,6 +1247,7 @@ int feof([[in]] $FILE __KOS_FIXED_CONST *__restrict stream);
 [[std, pure, wunused, export_alias("_IO_ferror", "ferror_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("ferror_unlocked")]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
+[[export_as("ferror_locked")]] /* From Glibc 2.0.4 */
 int ferror([[in]] $FILE __KOS_FIXED_CONST *__restrict stream);
 
 
@@ -1540,6 +1549,7 @@ __STDC_INT_AS_SIZE_T vfscanf([[inout]] FILE *__restrict stream,
 [[requires(defined(__LOCAL_stdin) && $has_function(vfscanf))]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
+[[export_as("_IO_vscanf")]]
 __STDC_INT_AS_SIZE_T vscanf([[in, format]] char const *__restrict format, $va_list args) {
 	return vfscanf(stdin, format, args);
 }
@@ -1680,7 +1690,7 @@ struct __format_snprintf_data {
 ), crtbuiltin, alias("__vsnprintf")]]
 [[dependency(format_snprintf_printer)]]
 [[section(".text.crt{|.dos}.unicode.static.format.printf")]]
-[[if(!defined(__KERNEL__)), export_as("__vsnprintf")]]
+[[if(!defined(__KERNEL__)), export_as("__vsnprintf", "_IO_vsnprintf")]]
 __STDC_INT_AS_SIZE_T vsnprintf([[out(? <= buflen)]] char *__restrict buf, size_t buflen,
                                [[in, format]] char const *__restrict format, $va_list args) {
 	struct __format_snprintf_data data;
@@ -1751,6 +1761,7 @@ __STDC_INT_AS_SIZE_T snprintf([[out(? <= buflen)]] char *__restrict buf, size_t 
 [[requires_dependent_function(write_printer)]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/crt/format-printer.h>")]]
 [[section(".text.crt{|.dos}.io.write")]]
+[[export_as("_IO_vdprintf")]]
 __STDC_INT_AS_SSIZE_T vdprintf([[fdwrite]] $fd_t fd, [[in, format]] char const *__restrict format, $va_list args) {
 	return format_vprintf(&write_printer,
 	                      (void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))fd,
@@ -2229,6 +2240,7 @@ $FILE *fdopen([[fdarg]] $fd_t fd, [[in]] char const *__restrict modes);
 [[wunused, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_fileno"), export_alias("fileno_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fileno_unlocked")]]
+[[export_as("fileno_locked")]] /* From Glibc 2.0.4 */
 $fd_t fileno([[inout]] $FILE *__restrict stream);
 %#endif /* __USE_POSIX || __USE_DOS */
 
@@ -2634,11 +2646,15 @@ int putchar_unlocked(int ch) {
 @@>> flockfile(3)
 @@Acquire a lock to `stream' and block until doing so succeeds
 [[cp, dos_only_export_alias("_lock_file"), export_alias("_IO_flockfile")]]
+[[export_as("__internal_flockfile")]] /* From Glibc 2.0.4 */
+[[export_as("__flockfile")]]          /* From Glibc 2.0.4 */
 void flockfile([[inout]] $FILE *__restrict stream);
 
 @@>> funlockfile(3)
 @@Release a previously acquired lock from `stream'
 [[dos_only_export_alias("_unlock_file"), export_alias("_IO_funlockfile")]]
+[[export_as("__internal_funlockfile")]] /* From Glibc 2.0.4 */
+[[export_as("__funlockfile")]]          /* From Glibc 2.0.4 */
 void funlockfile([[inout]] $FILE *__restrict stream);
 
 @@>> ftrylockfile(3)
@@ -2646,6 +2662,8 @@ void funlockfile([[inout]] $FILE *__restrict stream);
 @@@return: == 0 : Lock successfully acquired
 @@@return: != 0 : Failed to acquire lock
 [[wunused, export_alias("_IO_ftrylockfile")]]
+[[export_as("__internal_ftrylockfile")]] /* From Glibc 2.0.4 */
+[[export_as("__ftrylockfile")]]          /* From Glibc 2.0.4 */
 int ftrylockfile([[inout]] $FILE *__restrict stream);
 %#endif /* __USE_POSIX || __USE_REENTRANT */
 
@@ -2786,6 +2804,7 @@ int putw(int w, [[inout]] $FILE *__restrict stream) {
 @@>> fcloseall(3)
 @@Close all opened files
 [[stdio_throws, dos_only_export_alias("_fcloseall")]]
+[[export_as("__fcloseall")]] /* From Glibc 2.0.4 */
 int fcloseall();
 %#endif /* __USE_GNU || __USE_DOS */
 
@@ -3459,6 +3478,7 @@ struct @format_aprintf_data@ {
 };
 #endif /* !__format_aprintf_data_defined */
 ), dependency(format_aprintf_printer)]]
+[[export_as("_IO_vasprintf")]]
 __STDC_INT_AS_SSIZE_T vasprintf([[out]] char **__restrict pstr,
                                 [[in, format]] char const *__restrict format,
                                 $va_list args) {

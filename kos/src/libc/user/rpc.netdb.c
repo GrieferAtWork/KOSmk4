@@ -140,14 +140,17 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8cc5330b]]]*/
+/*[[[start:exports,hash:CRC-32=0xedd86fee]]]*/
 DEFINE_PUBLIC_ALIAS(setrpcent, libc_setrpcent);
 DEFINE_PUBLIC_ALIAS(endrpcent, libc_endrpcent);
 DEFINE_PUBLIC_ALIAS(getrpcbyname, libc_getrpcbyname);
 DEFINE_PUBLIC_ALIAS(getrpcbynumber, libc_getrpcbynumber);
 DEFINE_PUBLIC_ALIAS(getrpcent, libc_getrpcent);
+DEFINE_PUBLIC_ALIAS(__getrpcbyname_r, libc_getrpcbyname_r);
 DEFINE_PUBLIC_ALIAS(getrpcbyname_r, libc_getrpcbyname_r);
+DEFINE_PUBLIC_ALIAS(__getrpcbynumber_r, libc_getrpcbynumber_r);
 DEFINE_PUBLIC_ALIAS(getrpcbynumber_r, libc_getrpcbynumber_r);
+DEFINE_PUBLIC_ALIAS(__getrpcent_r, libc_getrpcent_r);
 DEFINE_PUBLIC_ALIAS(getrpcent_r, libc_getrpcent_r);
 /*[[[end:exports]]]*/
 

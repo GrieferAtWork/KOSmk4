@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69e7fd71 */
+/* HASH CRC-32:0x99976363 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,6 +186,7 @@
 #define __CRT_HAVE_DOS$__setusermatherr
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$__shm_directory
 #define __CRT_HAVE_DOS$__signbit
 #define __CRT_HAVE_DOS$__signbitf
 #define __CRT_HAVE_DOS$__signbitl
@@ -4602,6 +4603,7 @@
 #define __CRT_HAVE___read_nocancel
 #define __CRT_HAVE___res_state
 #define __CRT_HAVE___setusermatherr
+#define __CRT_HAVE___shm_directory
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl

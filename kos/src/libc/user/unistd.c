@@ -3487,7 +3487,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe1b61def]]]*/
+/*[[[start:exports,hash:CRC-32=0x52901429]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3633,7 +3633,9 @@ DEFINE_PUBLIC_ALIAS(__libc_chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(chdir_long, libc_chdir);
 DEFINE_PUBLIC_ALIAS(chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$_getcwd, libd_getcwd);
+DEFINE_PUBLIC_ALIAS(DOS$__getcwd, libd_getcwd);
 DEFINE_PUBLIC_ALIAS(DOS$getcwd, libd_getcwd);
+DEFINE_PUBLIC_ALIAS(__getcwd, libc_getcwd);
 DEFINE_PUBLIC_ALIAS(getcwd, libc_getcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_unlink, libd_unlink);
 DEFINE_PUBLIC_ALIAS(DOS$__unlink, libd_unlink);
@@ -3650,8 +3652,10 @@ DEFINE_PUBLIC_ALIAS(__rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(__libc_rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(DOS$eaccess, libd_euidaccess);
+DEFINE_PUBLIC_ALIAS(DOS$__euidaccess, libd_euidaccess);
 DEFINE_PUBLIC_ALIAS(DOS$euidaccess, libd_euidaccess);
 DEFINE_PUBLIC_ALIAS(eaccess, libc_euidaccess);
+DEFINE_PUBLIC_ALIAS(__euidaccess, libc_euidaccess);
 DEFINE_PUBLIC_ALIAS(euidaccess, libc_euidaccess);
 DEFINE_PUBLIC_ALIAS(DOS$faccessat, libd_faccessat);
 DEFINE_PUBLIC_ALIAS(faccessat, libc_faccessat);
@@ -3677,6 +3681,7 @@ DEFINE_PUBLIC_ALIAS(_lseeki64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__libc_lseek64, libc_lseek64);
+DEFINE_PUBLIC_ALIAS(__sys_llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(lseek64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__libc_pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(pread, libc_pread);
@@ -3709,7 +3714,9 @@ DEFINE_PUBLIC_ALIAS(getpgid, libc_getpgid);
 DEFINE_PUBLIC_ALIAS(__getsid, libc_getsid);
 DEFINE_PUBLIC_ALIAS(__libc_getsid, libc_getsid);
 DEFINE_PUBLIC_ALIAS(getsid, libc_getsid);
+DEFINE_PUBLIC_ALIAS(DOS$__lchown, libd_lchown);
 DEFINE_PUBLIC_ALIAS(DOS$lchown, libd_lchown);
+DEFINE_PUBLIC_ALIAS(__lchown, libc_lchown);
 DEFINE_PUBLIC_ALIAS(lchown, libc_lchown);
 DEFINE_PUBLIC_ALIAS(DOS$__truncate, libd_truncate);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_truncate, libd_truncate);

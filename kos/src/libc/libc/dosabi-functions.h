@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e675364 */
+/* HASH CRC-32:0x734fcf7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3053,6 +3053,7 @@ DFUN(".text.crt.dos.system.mman", libd_msync, libc_msync, TD, 3, TP, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_mlock, libc_mlock, TD, 2, TP, TI)
 DFUN(".text.crt.dos.system.mman", libd_munlock, libc_munlock, TD, 2, TP, TI)
 DFUN(".text.crt.dos.system.mman", libd_mlockall, libc_mlockall, TD, 1, TD)
+DFUN(".text.crt.dos.compat.glibc", libd___shm_directory, libc___shm_directory, TP, 1, TP)
 DFUN(".text.crt.dos.system.mman", libd_shm_open, libc_shm_open, TIn(__SIZEOF_FD_T__), 3, TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.system.mman", libd_shm_unlink, libc_shm_unlink, TD, 1, TP)
 DFUN(".text.crt.dos.system.mman", libd_madvise, libc_madvise, TD, 3, TP, TI, TD)

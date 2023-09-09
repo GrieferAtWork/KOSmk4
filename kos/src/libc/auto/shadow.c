@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe54c8bdb */
+/* HASH CRC-32:0x65343dc1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,7 +367,9 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(sgetspent, libc_sgetspent);
 DEFINE_PUBLIC_ALIAS(putspent, libc_putspent);
+DEFINE_PUBLIC_ALIAS(__sgetspent_r, libc_sgetspent_r);
 DEFINE_PUBLIC_ALIAS(sgetspent_r, libc_sgetspent_r);
+DEFINE_PUBLIC_ALIAS(__fgetspent_r, libc_fgetspent_r);
 DEFINE_PUBLIC_ALIAS(fgetspent_r, libc_fgetspent_r);
 DEFINE_PUBLIC_ALIAS(fgetspnam_r, libc_fgetspnam_r);
 #endif /* !__KERNEL__ */
