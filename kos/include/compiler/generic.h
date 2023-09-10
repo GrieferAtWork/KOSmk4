@@ -90,7 +90,7 @@
 #elif defined(__COMPILER_HAVE_C11_GENERIC)
 /* Use C11's _Generic keyword. */
 #define __builtin_choose_expr(c, tt, ff) \
-	_Generic((char(*)[1+!!(c)])0, char(*)[1]:(ff), default:(tt))
+	_Generic((char(*)[1+!!(c)])0,char(*)[1]:(ff),default:(tt))
 #else /* ... */
 #define __NO_builtin_choose_expr
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))

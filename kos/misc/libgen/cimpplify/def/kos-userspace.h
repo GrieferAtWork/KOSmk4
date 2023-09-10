@@ -72,12 +72,14 @@
 #define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                         __LIBC attr void nothrow(__LIBCCALL name) param __asm__(#asmname);
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                     __LIBC attr void nothrow(__LIBDCALL name) param __asm__("DOS$" #asmname);
 #define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     __LIBC attr void nothrow(__LIBKCALL name) param __asm__(#asmname);
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)                                               __LIBC attr Treturn nothrow(__LIBCCALL name) param;
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)                                           __LIBC attr Treturn nothrow(__LIBDCALL name) param;
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)                                           __LIBC attr Treturn nothrow(__LIBKCALL name) param;
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)                                      __LIBC attr Treturn nothrow(__LIBCCALL name) param;
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...)                                  __LIBC attr Treturn nothrow(__LIBDCALL name) param;
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...)                                  __LIBC attr Treturn nothrow(__LIBKCALL name) param;
+
+/* Don't expand these since that would only make headers larger than they would otherwise be. */
+//#define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __LIBC attr Treturn nothrow(__LIBCCALL name) param; __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+//#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param; __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+//#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBKCALL name) param; __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
+//#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __LIBC attr Treturn nothrow(__LIBCCALL name) param __asm__(#asmname);        __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
+//#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __asm__("DOS$" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
+//#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBKCALL name) param __asm__(#asmname);        __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
 
 #define __CDECLARE_OPT(attr,Treturn,nothrow,name,param,args) __CDECLARE(attr,Treturn,nothrow,name,param,args)
 #define __CDECLARE_VOID_OPT(attr,nothrow,name,param,args) __CDECLARE_VOID(attr,nothrow,name,param,args)

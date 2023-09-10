@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda83bd38 */
+/* HASH CRC-32:0x7b855bb3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ INTDEF WUNUSED ATTR_FDARG(1) ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_fre
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
+ * file pointed to by the symbolic link is printed.
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
  *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
@@ -131,7 +131,7 @@ INTDEF WUNUSED ATTR_IN(2) ATTR_OUT_OPT(3) char *NOTHROW_RPC(LIBDCALL libd_frealp
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
+ * file pointed to by the symbolic link is printed.
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
  *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.

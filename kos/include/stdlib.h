@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49674fac */
+/* HASH CRC-32:0x7e468850 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2852,7 +2852,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_FDARG(1) __ATTR_OUT_OPT(2),char *,__NOTHROW
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
+ * file pointed to by the symbolic link is printed.
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
  *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.

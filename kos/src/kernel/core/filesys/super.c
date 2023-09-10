@@ -417,6 +417,37 @@ again_locked:
 /************************************************************************/
 
 PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL fsuper_delete_mounts)(REF struct fsuper *__restrict self) {
+	struct fsuper_ops const *ops;
+	struct pathmount *mount;
+
+	/* Check if the superblock has any remaining mounting points.
+	 * This might happen if the superblock is being force-deleted
+	 * as a result of the  backing device-file being deleted  (as
+	 * can happen when  you recklessly unplug  a thumb drive,  or
+	 * similar)
+	 *
+	 * In these cases, we have to delete any remaining mounting
+	 * points! */
+	mount = atomic_read(&self->fs_mounts.lh_first);
+	if unlikely(mount && mount != FSUPER_MOUNTS_DELETED) {
+		/* TODO: Async re-implementation of `path_umount()' (when that function
+		 *       wants  to throw E_BADALLOC,  we can log an  error and skip the
+		 *       relevant mounting point (even though  doing so means that  the
+		 *       superblock remains mounted, though that is OK, since  behavior
+		 *       when the `MFILE_F_DELETED' flag is set is well-defined)) */
+	}
+
+	/* Finalize deletion of the superblock by deleting the mfile backing its root directory. */
+	ops = fsuper_getops(self);
+	if (ops->so_delete) {
+		(*ops->so_delete)(self);
+	} else {
+		mfile_delete_impl(&self->fs_root);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LOCKOP_CC fnode_remove_from_allnodes_postlop)(struct postlockop *__restrict self) {
 	REF struct fnode *me;
 	me = container_of(self, struct fnode, _mf_plop);
@@ -478,7 +509,6 @@ again_unbind_allnodes:
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict self,
                                              REF struct fsuper *__restrict me) {
-	struct fsuper_ops const *ops;
 	assert(self == &me->fs_root._mf_fsuperplop);
 	(void)self;
 
@@ -489,13 +519,7 @@ NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict s
 		fnode_delete_from_all_impl(node); /* This inherits the reference for us! */
 	}
 
-	/* Finalize deletion of the superblock by deleting the mfile backing its root directory. */
-	ops = fsuper_getops(me);
-	if (ops->so_delete) {
-		(*ops->so_delete)(me);
-	} else {
-		mfile_delete_impl(&me->fs_root);
-	}
+	fsuper_delete_mounts(me);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void

@@ -2400,12 +2400,12 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libd_frealpathat,hash:CRC-32=0xe79fc47]]]*/
+/*[[[head:libd_frealpathat,hash:CRC-32=0x28b27baf]]]*/
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
+ * file pointed to by the symbolic link is printed.
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
  *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
@@ -2427,12 +2427,12 @@ NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
 }
 /*[[[end:libd_frealpathat]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0x6feb2995]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0x2583b937]]]*/
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to  the symlink itself to  be printed. - Otherwise,  the
- * file pointed to by the symblic link is printed.
+ * file pointed to by the symbolic link is printed.
  * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
  *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.

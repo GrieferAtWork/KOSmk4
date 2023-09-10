@@ -2478,7 +2478,7 @@ char *frealpath4([[fdarg]] $fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $si
 @@Returns the absolute filesystem path for the specified file
 @@When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
 @@causing the path to  the symlink itself to  be printed. - Otherwise,  the
-@@file pointed to by the symblic link is printed.
+@@file pointed to by the symbolic link is printed.
 @@NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
 @@      representation  mode. This means  that if the  path would have normally
 @@      been printed as a unix path, it would instead be printed as a DOS path.

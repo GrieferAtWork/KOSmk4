@@ -420,8 +420,8 @@ done_bss:
 			 * and set-up the user-space register state. */
 			stack_end = (NCX byte_t *)stack_base + USER_STACK_SIZE;
 #ifdef __x86_64__
-#define PUSHP(val)                                                                        \
-	(stack_end -= sizeof_pointer,                                                         \
+#define PUSHP(val)                                                               \
+	(stack_end -= sizeof_pointer,                                                \
 	 IS_NATIVE ? (void)(*(NCX uint64_t *)stack_end = (uint64_t)(uintptr_t)(val)) \
 	           : (void)(*(NCX uint32_t *)stack_end = (uint32_t)(uintptr_t)(val)))
 #else /* __x86_64__ */
@@ -522,10 +522,10 @@ done_bss:
 #endif /* __x86_64__ */
 		{
 			uint32_t addr = x86_get_random_userkern_address32();
-			x86_set_user_fsbase(addr);                                /* re-roll the ukern address. */
-			gpregs_setpcx(&state->ics_gpregs, (uintptr_t)stack_end);  /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
-			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)loadaddr);   /* ELF_ARCH386_DL_LOADADDR_REGISTER */
-			gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);   /* ELF_ARCH386_PEB_REGISTER */
+			x86_set_user_fsbase(addr);                               /* re-roll the ukern address. */
+			gpregs_setpcx(&state->ics_gpregs, (uintptr_t)stack_end); /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
+			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)loadaddr);  /* ELF_ARCH386_DL_LOADADDR_REGISTER */
+			gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCH386_PEB_REGISTER */
 		}
 		icpustate_setusersp(state, stack_end);
 		icpustate_setpc(state, libdl_base); /* Entry point is at offset=0 */
