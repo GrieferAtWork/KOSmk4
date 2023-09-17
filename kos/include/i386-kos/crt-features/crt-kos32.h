@@ -527,6 +527,7 @@
 #define __CRT_HAVE___cygerrno_location
 #define __CRT_HAVE___daylight
 #define __CRT_HAVE___dcgettext
+#define __CRT_HAVE___dcngettext
 #define __CRT_HAVE___default_new_handler
 #define __CRT_HAVE___deregister_frame
 #define __CRT_HAVE___deregister_frame_info

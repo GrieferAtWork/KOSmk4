@@ -103,6 +103,7 @@ char *dngettext([[in_opt]] char const *domainname,
 
 
 [[pure, wunused, userimpl, decl_include("<hybrid/typecore.h>")]]
+[[export_as("__dcngettext")]] /* From Glibc 2.2.5 */
 char *dcngettext([[in_opt]] char const *domainname,
                  [[in_opt, format_arg]] char const *msgid_singular,
                  [[in_opt, format_arg]] char const *msgid_plural,

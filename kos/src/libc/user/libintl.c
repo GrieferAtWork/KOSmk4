@@ -1547,7 +1547,8 @@ DEFINE_PUBLIC_ALIAS(_libc_intl_domainname, libc__libc_intl_domainname);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe0ac88e5]]]*/
+/*[[[start:exports,hash:CRC-32=0x8f3b4b7f]]]*/
+DEFINE_PUBLIC_ALIAS(__dcngettext, libc_dcngettext);
 DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);
 DEFINE_PUBLIC_ALIAS(__textdomain, libc_textdomain);
 DEFINE_PUBLIC_ALIAS(textdomain, libc_textdomain);

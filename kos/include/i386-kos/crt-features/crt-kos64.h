@@ -515,6 +515,7 @@
 #define __CRT_HAVE___cygerrno_location
 #define __CRT_HAVE___daylight
 #define __CRT_HAVE___dcgettext
+#define __CRT_HAVE___dcngettext
 #define __CRT_HAVE___default_new_handler
 #define __CRT_HAVE___deregister_frame
 #define __CRT_HAVE___deregister_frame_info
@@ -6998,6 +6999,7 @@
 #define __CRT_HAVE_KOS$__crtSleep
 #define __CRT_HAVE_KOS$__daylight
 #define __CRT_HAVE_KOS$__dcgettext
+#define __CRT_HAVE_KOS$__dcngettext
 #define __CRT_HAVE_KOS$__dgettext
 #define __CRT_HAVE_KOS$__dn_comp
 #define __CRT_HAVE_KOS$__dn_count_labels
@@ -11516,6 +11518,7 @@
 #define __CRT_HAVE_DOS$__crtUnhandledException
 #define __CRT_HAVE_DOS$__daylight
 #define __CRT_HAVE_DOS$__dcgettext
+#define __CRT_HAVE_DOS$__dcngettext
 #define __CRT_HAVE_DOS$__dgettext
 #define __CRT_HAVE_DOS$__dn_comp
 #define __CRT_HAVE_DOS$__dn_count_labels
