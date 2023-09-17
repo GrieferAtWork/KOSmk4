@@ -1727,6 +1727,7 @@
 #define __CRT_HAVE__dl_argv
 #define __CRT_HAVE__dl_find_dso_for_object
 #define __CRT_HAVE__dl_find_object
+#define __CRT_HAVE__dl_get_origin
 #define __CRT_HAVE__dl_pagesize
 #define __CRT_HAVE__dl_tls_symaddr
 #define __CRT_HAVE__doprnt

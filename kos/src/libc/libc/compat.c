@@ -1237,6 +1237,26 @@ NOTHROW(LIBCCALL libc_resolve__dl_pagesize)(void) {
 }
 #endif /* !__ARCH_PAGESIZE */
 
+DEFINE_PUBLIC_ALIAS(_dl_get_origin, libc__dl_get_origin);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") char * /* From: `Glibc-2.3.2' */
+NOTHROW(LIBCCALL libc__dl_get_origin)(void) {
+	char *result;
+	char *progname = program_invocation_name;
+	size_t pathlen = strroff(progname, '/');
+	if (pathlen == (size_t)-1) {
+		result = strdup("/");
+	} else {
+		/* Return without trailing slash in this case! */
+		result = (char *)malloc(pathlen + 1, sizeof(char));
+		if likely(result)
+			*(char *)mempcpy(result, progname, pathlen, sizeof(char)) = '\0';
+	}
+	/* For some reason, this function returns `(char *)-1' on malloc error. */
+	if unlikely(!result)
+		result = (char *)-1;
+	return result;
+}
+
 
 
 
