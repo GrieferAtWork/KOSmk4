@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x545f83fa */
+/* HASH CRC-32:0xbd6dc618 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,12 +343,19 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
                                     size_t dstlen) {
 	return libc_wcsrtombs(dst, (char32_t const **)&src, dstlen, NULL);
 }
-#include <asm/os/wait.h>
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.system") ATTR_IN_OPT(1) int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 	int status;
@@ -378,15 +385,7 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 
 
 	}
-#ifdef __WIFEXITED
-	if (!__WIFEXITED(status))
-		return 1;
-#endif /* __WIFEXITED */
-#ifdef __WEXITSTATUS
-	return __WEXITSTATUS(status);
-#else /* __WEXITSTATUS */
 	return status;
-#endif /* !__WEXITSTATUS */
 }
 #ifndef LIBC_ARCH_HAVE_ABORT
 #include <asm/os/stdlib.h>

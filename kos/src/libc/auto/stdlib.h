@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24e2b620 */
+/* HASH CRC-32:0x9567ca91 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,17 +98,33 @@ INTDEF ATTR_IN(2) ATTR_OUTS(1, 3) size_t NOTHROW_NCX(LIBKCALL libc_wcstombs)(cha
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_system)(char const *command);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_system)(char const *command);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void);
 #endif /* !__KERNEL__ */

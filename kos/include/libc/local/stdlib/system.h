@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4be9a80c */
+/* HASH CRC-32:0xa15684b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,9 +122,6 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 #undef __local___localdep_waitpid_defined
 #endif /* !... */
 #endif /* !__local___localdep_waitpid_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/os/wait.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(system) __ATTR_IN_OPT(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system))(char const *__command) {
 	int __status;
@@ -154,15 +151,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system))(char const *__command) {
 		return -1;
 #endif /* !__libc_geterrno || !__EINTR */
 	}
-#ifdef __WIFEXITED
-	if (!__WIFEXITED(__status))
-		return 1;
-#endif /* __WIFEXITED */
-#ifdef __WEXITSTATUS
-	return __WEXITSTATUS(__status);
-#else /* __WEXITSTATUS */
 	return __status;
-#endif /* !__WEXITSTATUS */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_system_defined

@@ -249,7 +249,7 @@ INTERN_FUNCTION(libd_msabi64_RRRRRRn)
 	 */
 	movq   %rcx, %rdi /* arg1 */
 
-	/* Ensure that the stack stays aligned to 16-bit within libc_*
+	/* Ensure that the stack stays aligned to 16-byte within libc_*
 	 * >> if ((%r10 % 2) == 0) {
 	 * >>     pushq <ignored>
 	 * >> } */

@@ -685,15 +685,21 @@ size_t wcstombs([[out(return <= dstlen)]] char *__restrict dst,
 
 @@>> system(3)
 @@Execute a given `command' on the system interpreter (as in `sh -c $command')
-@@The   return   value   is   the   exit   status   after   running  `command'
-@@When `command' is `NULL' only check if a system interpreter is available.
-@@When  no   system   interpreter   is  available,   `127'   is   returned.
+@@The return value is the `union wait' status after running `command', and may
+@@be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+@@
+@@When `command' is `NULL' only check if a system interpreter is available, and
+@@return 0(false)/1(true) indicative of its present. When no system interpreter
+@@is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+@@
+@@@return: -1: Error (s.a. `errno')
+@@@return: 0 : [command == NULL] No system interpreter is available
+@@@return: 1 : [command == NULL] A system interpreter is available
+@@@return: * : The `union wait'-style exit status of running `command'
 [[cp, std, guard]]
 [[export_alias("__libc_system")]]
-[[requires($has_function(shexec) && $has_function(_Exit) &&
-           $has_function(waitpid) &&
+[[requires($has_function(shexec, _Exit, waitpid) &&
            ($has_function(vfork) || $has_function(fork)))]]
-[[impl_include("<asm/os/wait.h>")]]
 [[section(".text.crt{|.dos}.fs.exec.system")]]
 int system([[in_opt]] char const *command) {
 	int status;
@@ -723,15 +729,7 @@ int system([[in_opt]] char const *command) {
 		return -1;
 @@pp_endif@@
 	}
-@@pp_ifdef __WIFEXITED@@
-	if (!__WIFEXITED(status))
-		return 1;
-@@pp_endif@@
-@@pp_ifdef __WEXITSTATUS@@
-	return __WEXITSTATUS(status);
-@@pp_else@@
 	return status;
-@@pp_endif@@
 }
 
 

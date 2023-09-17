@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e468850 */
+/* HASH CRC-32:0x37c7a6aa */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -720,23 +720,47 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __system_defined
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 __NAMESPACE_GLB_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return :: system(__command); })
 #elif defined(__CRT_HAVE_system)
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 __CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #elif defined(__CRT_HAVE___libc_system)
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 __CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,system,(char const *__command),__libc_system,(__command))
 #else /* ... */
 __NAMESPACE_STD_END
@@ -748,9 +772,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The   return   value   is   the   exit   status   after   running  `command'
- * When `command' is `NULL' only check if a system interpreter is available.
- * When  no   system   interpreter   is  available,   `127'   is   returned. */
+ * The return value is the `union wait' status after running `command', and may
+ * be inspected using the `W*' macros (e.g. `WIFEXITED()') from `<sys/wait.h>'.
+ *
+ * When `command' is `NULL' only check if a system interpreter is available, and
+ * return 0(false)/1(true) indicative of its present. When no system interpreter
+ * is available and `command != NIL', `W_EXITCODE(127, 0)' is returned.
+ *
+ * @return: -1: Error (s.a. `errno')
+ * @return: 0 : [command == NULL] No system interpreter is available
+ * @return: 1 : [command == NULL] A system interpreter is available
+ * @return: * : The `union wait'-style exit status of running `command' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(system))(__command); })
 #else /* (__CRT_HAVE_shexec || __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __LOCAL_environ)) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork || __CRT_HAVE_fork || __CRT_HAVE___fork || __CRT_HAVE___libc_fork) */
 #undef __std_system_defined
