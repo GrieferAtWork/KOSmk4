@@ -37,6 +37,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <hybrid/host.h>
 #include <hybrid/sched/atomic-once.h>
 
+#include <asm/pagesize.h>
 #include <kos/except.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
@@ -1221,6 +1222,20 @@ NOTHROW(LIBCCALL libc__dl_tls_symaddr)(struct link_map *lm, ElfW(Sym) const *sym
 		abortf("[_dl_tls_symaddr] failed to allocate tls: %s", dlerror());
 	return (byte_t *)base + sym->st_value;
 }
+
+#ifdef __ARCH_PAGESIZE
+DEFINE_PUBLIC_ALIAS(_dl_pagesize, libc__dl_pagesize);
+INTERN ATTR_SECTION(".data.crt.compat.glibc") size_t libc__dl_pagesize = __ARCH_PAGESIZE;
+#else /* __ARCH_PAGESIZE */
+DEFINE_PUBLIC_IDATA(_dl_pagesize, libc_resolve__dl_pagesize, __SIZEOF_SIZE_T__);
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") size_t libc_saved__dl_pagesize = 0;
+INTERN ATTR_SECTION(".text.crt.compat.glibc") size_t *
+NOTHROW(LIBCCALL libc_resolve__dl_pagesize)(void) {
+	if (libc_saved__dl_pagesize == 0)
+		libc_saved__dl_pagesize = getpagesize();
+	return &libc_saved__dl_pagesize;
+}
+#endif /* !__ARCH_PAGESIZE */
 
 
 
