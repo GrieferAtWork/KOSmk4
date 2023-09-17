@@ -1088,6 +1088,7 @@
 #define __CRT_HAVE___memalign_hook
 #define __CRT_HAVE___memccpy
 #define __CRT_HAVE___memcdup
+#define __CRT_HAVE___memcmpeq
 #define __CRT_HAVE___memcpy_by2
 #define __CRT_HAVE___memcpy_by4
 #define __CRT_HAVE___memcpy_c

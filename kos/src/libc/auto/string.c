@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3302ec63 */
+/* HASH CRC-32:0xc2d1c02b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7439,6 +7439,9 @@ DEFINE_PUBLIC_ALIAS(bzeroc, libc_bzeroc);
 DEFINE_PUBLIC_ALIAS(bcmpc, libc_bcmpc);
 #endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__memcmpeq, libc_bcmp);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(bcmp, libc_bcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */
 #if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

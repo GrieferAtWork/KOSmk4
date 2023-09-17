@@ -6536,6 +6536,7 @@
 #define __CRT_HAVE___isascii
 #define __CRT_HAVE___lconv_init
 #define __CRT_HAVE___memalign
+#define __CRT_HAVE___memcmpeq
 #define __CRT_HAVE___p__commode
 #define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE___threadhandle
@@ -11956,6 +11957,7 @@
 #define __CRT_HAVE_DOS$__memalign
 #define __CRT_HAVE_DOS$__memccpy
 #define __CRT_HAVE_DOS$__memcdup
+#define __CRT_HAVE_DOS$__memcmpeq
 #define __CRT_HAVE_DOS$__memcpy_chk
 #define __CRT_HAVE_DOS$__memcpyc_chk
 #define __CRT_HAVE_DOS$__memcpyl_chk

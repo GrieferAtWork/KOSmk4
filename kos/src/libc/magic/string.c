@@ -3724,6 +3724,7 @@ int bcmpc([[in(elem_count * elem_size)]] void const *s1,
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMP))]]
 [[if(!defined(LIBC_ARCH_HAVE_BCMP)), crt_intern_alias(memcmp)]]
 [[alias("memcmp"), bind_local_function("memcmp")]]
+[[if(!defined(__KERNEL__)), export_as("__memcmpeq")]]
 int bcmp([[in(n_bytes)]] void const *s1,
          [[in(n_bytes)]] void const *s2, $size_t n_bytes) {
 	return memcmp(s1, s2, n_bytes);

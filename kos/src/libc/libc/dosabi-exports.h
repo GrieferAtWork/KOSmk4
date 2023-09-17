@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fab3b5c */
+/* HASH CRC-32:0x52ee6b04 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3091,6 +3091,7 @@ DEFINE_PUBLIC_ALIAS(DOS$bzeroc, libd_bzeroc);
 DEFINE_PUBLIC_ALIAS(DOS$bcmpc, libd_bcmpc);
 #endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
+DEFINE_PUBLIC_ALIAS(DOS$__memcmpeq, libd_bcmp);
 DEFINE_PUBLIC_ALIAS(DOS$bcmp, libd_bcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */
 DEFINE_PUBLIC_ALIAS(DOS$_stricmp, libd_strcasecmp);
