@@ -49,6 +49,7 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mfilemeta.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
@@ -1159,11 +1160,12 @@ NOTHROW(FCALL devfs_device_traced)(struct device const *__restrict dev) {
 	struct dnotify_controller *dnot;
 	struct dnotify_link *link;
 	notify_lock_acquire();
-	if unlikely(devfs.fs_root.mf_notify == NULL) {
+	if unlikely(devfs.fs_root.mf_meta == NULL ||
+	            devfs.fs_root.mf_meta->mfm_notify == NULL) {
 		notify_lock_release_br();
 		return DEVFS_SUPER_DIRENT_TRACED_NOCON; /* Controller was deleted :( */
 	}
-	dnot = inotify_controller_asdnotify(devfs.fs_root.mf_notify);
+	dnot = inotify_controller_asdnotify(devfs.fs_root.mf_meta->mfm_notify);
 	link = dnotify_link_tree_locate(dnot->dnc_files, &dev->dv_dirent->dd_dirent);
 	notify_lock_release();
 	return link ? DEVFS_SUPER_DIRENT_TRACED_YES

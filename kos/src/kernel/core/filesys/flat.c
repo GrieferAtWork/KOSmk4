@@ -1679,11 +1679,12 @@ NOTHROW(FCALL flatdirnode_dirent_traced)(struct flatdirnode const *__restrict se
 	struct dnotify_controller *dnot;
 	struct dnotify_link *link;
 	notify_lock_acquire();
-	if unlikely(self->mf_notify == NULL) {
+	if unlikely(self->mf_meta == NULL ||
+	            self->mf_meta->mfm_notify == NULL) {
 		notify_lock_release_br();
 		return FLATDIRNODE_DIRENT_TRACED_NOCON; /* Controller was deleted :( */
 	}
-	dnot = inotify_controller_asdnotify(self->mf_notify);
+	dnot = inotify_controller_asdnotify(self->mf_meta->mfm_notify);
 	link = dnotify_link_tree_locate(dnot->dnc_files, &ent->fde_ent);
 	notify_lock_release();
 	return link ? FLATDIRNODE_DIRENT_TRACED_YES

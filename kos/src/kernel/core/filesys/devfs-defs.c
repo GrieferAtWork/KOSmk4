@@ -46,7 +46,7 @@ INTDEF struct fdirnode_ops const devfs_cpu_ops;
 INTDEF struct fdirnode_ops const devfs_disk_ops;
 
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
+#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_meta,
 #else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #define MFILE_INIT_mf_notify_ /* nothing */
 #endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */

@@ -41,6 +41,7 @@
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mfilemeta.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -138,7 +139,8 @@ again:
 	inot = dnotify_link_getfil(self);
 	file = inot->inc_file;
 	assert(file);
-	assert(file->mf_notify == inot);
+	assert(file->mf_meta);
+	assert(file->mf_meta->mfm_notify == inot);
 	assert(!LIST_EMPTY(&inot->inc_dirs));
 	LIST_REMOVE(self, dnl_fillink);
 	DBG_memset(&self->dnl_fillink, 0xcc, sizeof(self->dnl_fillink));
@@ -150,8 +152,8 @@ again:
 		        "Because `inc_listeners' was already NULL at the start, "
 		        "there also shouldn't be any files in here (since files "
 		        "are only linked when there are explicit listeners)");
-		file->mf_notify = NULL; /* Remove link from file->notify_controller */
-		incref(file);           /* Inherited by `inotify_controller_slist_destroyall()' */
+		file->mf_meta->mfm_notify = NULL; /* Remove link from file->notify_controller */
+		incref(file);                     /* Inherited by `inotify_controller_slist_destroyall()' */
 		SLIST_INSERT(deadnotif, inot, _inc_deadlnk);
 	}
 
@@ -225,9 +227,10 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 		if ((file = ent->nl_file) != NULL) {
 			struct inotify_controller *inot;
 			DBG_memset(&ent->nl_file, 0xcc, sizeof(ent->nl_file));
-			inot = file->mf_notify;
-			assertf(inot, "Must be non-NULL because the listener "
-			              "we're about to remove still exists");
+			assertf(file->mf_meta && file->mf_meta->mfm_notify,
+			        "Must be non-NULL because the listener "
+			        "we're about to remove still exists");
+			inot = file->mf_meta->mfm_notify;
 			assertf(!LIST_EMPTY(&inot->inc_listeners),
 			        "Can't be empty because we're about to remove an element");
 			assertf(inot->inc_file == file, "Wrong file? (%p != %p)", inot->inc_file, file);
@@ -247,8 +250,8 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 				 * both in terms  of per-file and  per-directory, then  we
 				 * can safely delete it! */
 				if (LIST_EMPTY(&inot->inc_dirs)) {
-					file->mf_notify = NULL; /* Remove link from file->notify_controller */
-					incref(file);           /* Inherited by `inotify_controller_slist_destroyall()' */
+					file->mf_meta->mfm_notify = NULL; /* Remove link from file->notify_controller */
+					incref(file);                     /* Inherited by `inotify_controller_slist_destroyall()' */
 					SLIST_INSERT(&deadnotif, inot, _inc_deadlnk);
 				}
 			}
@@ -345,6 +348,7 @@ notifyfd_addwatch(struct notifyfd *__restrict self,
                   uint32_t mask_and_flags)
 		THROWS(E_BADALLOC) {
 	struct notify_listener *ent;
+	struct mfilemeta *meta = NULL;
 	struct inotify_controller *ctrl = NULL;
 	size_t ctrl_size = 0;
 	unsigned int i, result;
@@ -358,6 +362,7 @@ notifyfd_addwatch(struct notifyfd *__restrict self,
 					(*stream->mso_notify_detach)(file, ctrl->inc_fhnd);
 				kfree(ctrl);
 			}
+			mfilemeta_xfree(meta);
 		};
 again:
 		notify_lock_acquire();
@@ -435,8 +440,30 @@ again:
 			goto again;
 		}
 
+		/* Ensure that the file's got a meta-data handler. */
+		if (atomic_read(&file->mf_meta) == NULL) {
+			if (!meta) {
+				/* Must allocate a meta-data handler. */
+				notify_lock_release_br();
+				meta = mfilemeta_alloc();
+				goto again;
+			}
+
+			/* Install the meta-data handler. */
+			mfilemeta_init(meta, file);
+			if likely(atomic_cmpxch(&file->mf_meta, NULL, meta)) {
+				meta = NULL;
+			} else {
+				assert(file->mf_meta != NULL);
+#ifndef MFILEMETA_DESTROY_MAYOMIT_AFTER_FRESH_INIT
+				mfilemeta_destroy(meta, file);
+				meta = NULL;
+#endif /* !MFILEMETA_DESTROY_MAYOMIT_AFTER_FRESH_INIT */
+			}
+		}
+
 		/* Ensure that the file's got a controller. */
-		if (file->mf_notify == NULL) {
+		if (file->mf_meta->mfm_notify == NULL) {
 			size_t reqsize = sizeof(struct inotify_controller);
 			if (mfile_isdir(file))
 				reqsize = sizeof(struct dnotify_controller);
@@ -481,16 +508,16 @@ again:
 			LIST_INIT(&ctrl->inc_listeners);
 			ctrl->inc_file  = file;
 			/*ctrl->inc_fhnd = file_cookie;*/ /* Already initialized during alloc */
-			file->mf_notify = ctrl;
+			file->mf_meta->mfm_notify = ctrl;
 
 			/* Steal the controller. */
 			ctrl      = NULL;
 			ctrl_size = 0;
 		}
 
-		/* Register `ent' as a listener of `file->mf_notify' */
+		/* Register `ent' as a listener of `file->mf_meta->mfm_notify' */
 		ent = &self->nf_listenv[result];
-		LIST_INSERT_HEAD(&file->mf_notify->inc_listeners, ent, nl_link);
+		LIST_INSERT_HEAD(&file->mf_meta->mfm_notify->inc_listeners, ent, nl_link);
 		ent->nl_notfd = self;
 		ent->nl_file  = incref(file);
 set_ent_mask_and_done_release:
@@ -509,7 +536,7 @@ done_release:
 		struct fdirnode_ops const *ops;
 		struct fdirnode *dir;
 
-		/* Attach `file->mf_notify' to currently-loaded files in the directory */
+		/* Attach `file->mf_meta->mfm_notify' to currently-loaded files in the directory */
 		assert(mfile_isdir(file));
 		dir = mfile_asdir(file);
 		ops = fdirnode_getops(dir);
@@ -697,9 +724,10 @@ NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
 	ent->nl_file = NULL; /* Inherited by `file' // indicate deleted slot */
 	assert(ent->nl_notfd == self);
 	DBG_memset(&ent->nl_notfd, 0xcc, sizeof(ent->nl_notfd));
-	inot = file->mf_notify;
-	assertf(inot, "Must be non-NULL because the listener "
-	               "we're about to remove still exists");
+	assertf(file->mf_meta && file->mf_meta->mfm_notify,
+	        "Must be non-NULL because the listener "
+	        "we're about to remove still exists");
+	inot = file->mf_meta->mfm_notify;
 	assertf(!LIST_EMPTY(&inot->inc_listeners),
 	        "Can't be empty because we're about to remove an element");
 	assertf(inot->inc_file == file, "Wrong file? (%p != %p)", inot->inc_file, file);
@@ -720,8 +748,8 @@ NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
 		 * both in terms  of per-file and  per-directory, then  we
 		 * can safely delete it! */
 		if (LIST_EMPTY(&inot->inc_dirs)) {
-			file->mf_notify = NULL; /* Remove link from file->notify_controller */
-			incref(file);           /* Inherited by `inotify_controller_slist_destroyall()' */
+			file->mf_meta->mfm_notify = NULL; /* Remove link from file->notify_controller */
+			incref(file);                     /* Inherited by `inotify_controller_slist_destroyall()' */
 			SLIST_INSERT(&deadnotif, inot, _inc_deadlnk);
 		}
 	}
@@ -767,8 +795,9 @@ done_postlock:
 
 
 
-/* If `dir->mf_notify != NULL', ensure that `child_file->mf_notify' has
- * been allocated, and that it is linked in the dnotify child-file list
+/* If  `dir->mf_meta->mfm_notify != NULL',  ensure  that
+ * `child_file->mf_meta->mfm_notify' has been allocated,
+ * and that it is linked in the dnotify child-file  list
  * of `dir'.
  *
  * Always inherits a reference to `child_file' that is also always re-
@@ -779,25 +808,30 @@ dnotify_controller_bindchild(struct fdirnode *__restrict dir,
                              struct fdirent *__restrict child_dent,
                              /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...) {
-	if likely(dir->mf_notify == NULL)
+	if likely(dir->mf_meta == NULL)
+		return child_file; /* Nothing to do in this case! */
+	if likely(dir->mf_meta->mfm_notify == NULL)
 		return child_file; /* Nothing to do in this case! */
 	return dnotify_controller_bindchild_slow(dir, child_dent, child_file);
 }
+
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 dnotify_controller_bindchild_slow(struct fdirnode *__restrict dir,
                                   struct fdirent *__restrict child_dent,
                                   /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...) {
+	struct mfilemeta *child_file_meta;
 	struct dnotify_link *link = NULL;
 	if (child_file == NULL)
 		return child_file;
 	assert(!!mfile_isdir(child_file) == (child_dent->fd_type == DT_DIR));
-	/*if unlikely(dir->mf_notify == NULL)
+	/*if unlikely(dir->mf_meta == NULL || dir->mf_meta->mfm_notify == NULL)
 		return child_file;*/
 	RAII_FINALLY { dnotify_link_xfree(link); };
 again:
 	COMPILER_READ_BARRIER();
-	if (child_file->mf_notify == NULL) {
+	child_file_meta = mfile_getmeta(child_file);
+	if (child_file_meta->mfm_notify == NULL) {
 		struct inotify_controller *ctrl;
 allocate_missing_child_file_notify:
 		/* Allocate the notify controller for `child_file' */
@@ -847,8 +881,9 @@ allocate_missing_child_file_notify:
 		/* Now try to install the notify-controller for `child_file' */
 		notify_lock_acquire();
 		COMPILER_READ_BARRIER();
-		if unlikely(child_file->mf_notify != NULL ||
-		            dir->mf_notify == NULL) {
+		if unlikely(child_file_meta->mfm_notify != NULL ||
+		            dir->mf_meta == NULL ||
+		            dir->mf_meta->mfm_notify == NULL) {
 			struct mfile_stream_ops const *stream;
 			/* Race condition: someone else already created the controller in the mean time,
 			 *                 or the directory's notify controller has since been  deleted. */
@@ -863,14 +898,14 @@ allocate_missing_child_file_notify:
 		}
 
 		/* Install the controller and link it in the directory. */
-		assert(dir->mf_notify->inc_file == dir);
-		link->dnl_dir = inotify_controller_asdnotify(dir->mf_notify);
+		assert(dir->mf_meta->mfm_notify->inc_file == dir);
+		link->dnl_dir = inotify_controller_asdnotify(dir->mf_meta->mfm_notify);
 		assertf(!dnotify_link_tree_locate(link->dnl_dir->dnc_files, child_dent),
 		        "Directory entry %$q already present when we know for a fact "
 		        "that its associated file didn't have a notify controller...",
 		        (size_t)child_dent->fd_namelen, child_dent->fd_name);
 		dnotify_link_tree_insert(&link->dnl_dir->dnc_files, link);
-		child_file->mf_notify = ctrl;
+		child_file_meta->mfm_notify = ctrl;
 		link = NULL; /* Steal (and don't free) */
 		notify_lock_release();
 
@@ -888,9 +923,9 @@ after_file_got_controller:
 	COMPILER_READ_BARRIER();
 
 	/* Check for race condition: notify controller of `dir' was deleted. */
-	if unlikely(dir->mf_notify == NULL) {
+	if unlikely(dir->mf_meta == NULL || dir->mf_meta->mfm_notify == NULL) {
 		struct inotify_controller *cnot;
-		cnot = child_file->mf_notify;
+		cnot = child_file_meta->mfm_notify;
 		if (cnot != NULL &&
 		    LIST_EMPTY(&cnot->inc_dirs) &&
 		    LIST_EMPTY(&cnot->inc_listeners)) {
@@ -898,7 +933,7 @@ after_file_got_controller:
 			/* Nothing is using the notify controller of `child_file', but
 			 * we still allocated it above. -- As such, we have to destroy
 			 * it once again! */
-			child_file->mf_notify = NULL;
+			child_file_meta->mfm_notify = NULL;
 			notify_lock_release_br();
 			assert(cnot->inc_file == child_file);
 			assert(!mfile_isdir(child_file) ||
@@ -914,7 +949,7 @@ after_file_got_controller:
 	}
 
 	/* Check for race condition: the file's notify-controller was freed. */
-	if unlikely(child_file->mf_notify == NULL) {
+	if unlikely(child_file_meta->mfm_notify == NULL) {
 		notify_lock_release_br();
 		goto allocate_missing_child_file_notify;
 	}
@@ -925,8 +960,8 @@ after_file_got_controller:
 		struct dnotify_controller *dnot;
 		struct inotify_controller *cnot;
 		struct dnotify_link *clnk;
-		dnot = inotify_controller_asdnotify(dir->mf_notify);
-		cnot = child_file->mf_notify;
+		dnot = inotify_controller_asdnotify(dir->mf_meta->mfm_notify);
+		cnot = child_file_meta->mfm_notify;
 		clnk = dnotify_link_tree_locate(dnot->dnc_files, child_dent);
 		if (clnk != NULL) {
 			/* Directory is already referencing the child. */
@@ -1070,9 +1105,10 @@ NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restri
 		/* Actually delete the slot. */
 		self->nl_file = NULL; /* Inherited by `file' // indicate deleted slot */
 		DBG_memset(&self->nl_notfd, 0xcc, sizeof(self->nl_notfd));
-		inot = file->mf_notify;
-		assertf(inot, "Must be non-NULL because the listener "
-		               "we're about to remove still exists");
+		assertf(file->mf_meta && file->mf_meta->mfm_notify,
+		        "Must be non-NULL because the listener "
+		        "we're about to remove still exists");
+		inot = file->mf_meta->mfm_notify;
 		assertf(!LIST_EMPTY(&inot->inc_listeners),
 		        "Can't be empty because we're about to remove an element");
 		assertf(inot->inc_file == file, "Wrong file? (%p != %p)", inot->inc_file, file);
@@ -1093,8 +1129,8 @@ NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restri
 			 * both in terms  of per-file and  per-directory, then  we
 			 * can safely delete it! */
 			if (LIST_EMPTY(&inot->inc_dirs)) {
-				file->mf_notify = NULL; /* Remove link from file->notify_controller */
-				incref(file);           /* Inherited by `inotify_controller_slist_destroyall()' */
+				file->mf_meta->mfm_notify = NULL; /* Remove link from file->notify_controller */
+				incref(file);                     /* Inherited by `inotify_controller_slist_destroyall()' */
 				SLIST_INSERT(deadnotif, inot, _inc_deadlnk);
 			}
 		}
@@ -1168,14 +1204,16 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 	struct inotify_controller *notif;
 	assert(!wasdestroyed(self));
 	COMPILER_READ_BARRIER();
-	if (self->mf_notify == NULL)
+	if (self->mf_meta == NULL)
+		return;
+	if (self->mf_meta->mfm_notify == NULL)
 		return;
 	SLIST_INIT(&deadlinks);
 	SLIST_INIT(&deadnotif);
 	blist.slh_first = BLIST_EMPTY_MARKER;
 	notify_lock_acquire();
 	COMPILER_READ_BARRIER();
-	notif = self->mf_notify;
+	notif = self->mf_meta->mfm_notify;
 	if (notif != NULL) {
 		struct notify_listener *listen;
 		assert(notif->inc_file == self);
@@ -1219,8 +1257,8 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 #endif
 		{
 			/* Add the file's own notify controller to the free list. */
-			self->mf_notify = NULL; /* Steal (destroyed in `inotify_controller_slist_destroyall()') */
-			incref(self);           /* Inherited by `inotify_controller_slist_destroyall()' */
+			self->mf_meta->mfm_notify = NULL; /* Steal (destroyed in `inotify_controller_slist_destroyall()') */
+			incref(self);                     /* Inherited by `inotify_controller_slist_destroyall()' */
 			SLIST_INSERT(&deadnotif, notif, _inc_deadlnk);
 		}
 	}
@@ -1240,15 +1278,17 @@ NOTHROW(FCALL mfile_postfsevent_impl)(struct mfile *__restrict self,
 	struct dnotify_link_slist deadlinks;
 	struct inotify_controller_slist deadnotif;
 	COMPILER_READ_BARRIER();
-	if (self->mf_notify == NULL)
+	if (self->mf_meta == NULL)
+		return;
+	if (self->mf_meta->mfm_notify == NULL)
 		return;
 	blist.slh_first = BLIST_EMPTY_MARKER;
 	SLIST_INIT(&deadlinks);
 	SLIST_INIT(&deadnotif);
 	notify_lock_acquire();
 	COMPILER_READ_BARRIER();
-	if (self->mf_notify != NULL) {
-		inotify_controller_postfsevent_impl(self->mf_notify, &blist,
+	if (self->mf_meta->mfm_notify != NULL) {
+		inotify_controller_postfsevent_impl(self->mf_meta->mfm_notify, &blist,
 		                                    fil_mask, dir_mask, cookie,
 		                                    &deadlinks, &deadnotif);
 	}

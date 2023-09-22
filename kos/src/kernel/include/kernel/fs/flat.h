@@ -227,7 +227,7 @@ struct flatdirnode_xops {
 	 *  - return->*                          = ...;                # Any fields from sub-classes of `fnode'
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 1 + ...;   # +1: MFILE_FN_GLOBAL_REF
-	 *  - return->_fnode_file_ mf_notify     = NULL;
+	 *  - return->_fnode_file_ mf_meta       = NULL;
 	 *  - return->_fnode_file_ mf_flags     |= MFILE_FN_GLOBAL_REF;
 	 *  - return->_fnode_file_ mf_flags     |= self->_fdirnode_node_ _fnode_file_ mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	 *  - return->_fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;
@@ -708,7 +708,7 @@ struct flatsuper_ops {
 	 *  - return->*                          = ...;                # Any fields from sub-classes of `fnode'
 	 * The caller of this function will do the following additional init:
 	 *  - return->_fnode_file_ mf_refcnt     = 2;      # +1: MFILE_FN_GLOBAL_REF, +1: return of `flatsuper_opennode'
-	 *  - return->_fnode_file_ mf_notify     = NULL;
+	 *  - return->_fnode_file_ mf_meta       = NULL;
 	 *  - return->_fnode_file_ mf_flags     |= MFILE_FN_GLOBAL_REF;
 	 *  - return->_fnode_file_ mf_flags     |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	 *  - return->_fnode_file_ mf_lock       = ATOMIC_RWLOCK_INIT;

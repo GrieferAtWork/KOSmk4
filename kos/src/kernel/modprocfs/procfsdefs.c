@@ -36,7 +36,6 @@ gcc_opt.remove("-fno-rtti");
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
@@ -49,13 +48,6 @@ gcc_opt.remove("-fno-rtti");
 
 /**/
 #include "procfs.h"
-
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
-#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-#define MFILE_INIT_mf_notify_ /* nothing */
-#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
-
 
 /************************************************************************/
 /* Statically initialized data structures                               */
@@ -74,9 +66,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 		MFILE_INIT_mf_initdone,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-		MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+		MFILE_INIT_mf_meta,
 		MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
 		                    MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 		                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO),
@@ -140,7 +130,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_initdone,                                          \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                  \
-				MFILE_INIT_mf_notify_                                            \
+				MFILE_INIT_mf_meta,                                              \
 				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
@@ -176,7 +166,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_initdone,                                          \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                    \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                  \
-				MFILE_INIT_mf_notify_                                            \
+				MFILE_INIT_mf_meta,                                              \
 				MFILE_INIT_mf_flags(MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),   \
 				MFILE_INIT_mf_trunclock,                                         \
 				MFILE_INIT_mf_filesize((uint64_t)-1),                            \
@@ -219,7 +209,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 			MFILE_INIT_mf_initdone,                                                  \
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                            \
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                          \
-			MFILE_INIT_mf_notify_                                                    \
+			MFILE_INIT_mf_meta,                                                      \
 			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                \
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),           \
 			MFILE_INIT_mf_trunclock,                                                 \
@@ -262,7 +252,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 				MFILE_INIT_mf_initdone,                                         \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                   \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                 \
-				MFILE_INIT_mf_notify_                                           \
+				MFILE_INIT_mf_meta,                                             \
 				MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |       \
 				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),  \
 				MFILE_INIT_mf_trunclock,                                        \
@@ -337,9 +327,7 @@ INTERN struct fsuper procfs_super = {
 				MFILE_INIT_mf_initdone,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+				MFILE_INIT_mf_meta,
 				MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),

@@ -34,7 +34,6 @@ DECL_END
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/printnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
@@ -173,9 +172,7 @@ PRIVATE struct fnode const procfs_perproc_reg_template = {
 		MFILE_INIT_mf_initdone,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-		MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+		MFILE_INIT_mf_meta,
 		MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
 		                    MFILE_FN_FLEETING),
@@ -206,9 +203,7 @@ PRIVATE struct fnode const procfs_perproc_nomap_template = {
 		MFILE_INIT_mf_initdone,
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-		MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+		MFILE_INIT_mf_meta,
 		MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 		                    MFILE_FN_NODIRATIME | MFILE_F_NOUSRMMAP |
 		                    MFILE_F_NOUSRIO | MFILE_F_READONLY |
@@ -244,9 +239,7 @@ INTERN_CONST struct flnknode const procfs_pp_fdlnk_template = {
 			MFILE_INIT_mf_initdone,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-			MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+			MFILE_INIT_mf_meta,
 			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
@@ -283,9 +276,7 @@ INTERN_CONST struct printnode const procfs_pp_fdinfo_template = {
 			MFILE_INIT_mf_initdone,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-			MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+			MFILE_INIT_mf_meta,
 			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
 			                    MFILE_FN_FLEETING),
@@ -321,9 +312,7 @@ INTERN_CONST struct flnknode const procfs_perproc_dcwdlink_template = {
 			MFILE_INIT_mf_initdone,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-			MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+			MFILE_INIT_mf_meta,
 			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
@@ -360,9 +349,7 @@ INTERN_CONST struct flnknode const procfs_perproc_drivelink_template = {
 			MFILE_INIT_mf_initdone,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-			MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+			MFILE_INIT_mf_meta,
 			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
@@ -400,9 +387,7 @@ INTERN_CONST struct flnknode const perproc_mapfile_lnknode_template = {
 			MFILE_INIT_mf_initdone,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-			MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+			MFILE_INIT_mf_meta,
 			MFILE_INIT_mf_flags(MFILE_F_NOATIME | MFILE_F_NOMTIME |
 			                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |

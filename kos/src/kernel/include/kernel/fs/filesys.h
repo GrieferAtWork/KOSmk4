@@ -90,7 +90,7 @@ struct ffilesys {
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_initdone   = SIG_INIT;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_lockops    = SLIST_HEAD_INITIALIZER(~);
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_part_amask = MAX(PAGESIZE, 1 << return->fs_root._fdirnode_node_ _fnode_file_ mf_blockshift) - 1;
-		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_notify     = NULL;
+		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_meta       = NULL;
 		 *   - return->fs_root._fdirnode_node_ _fnode_file_ mf_flags |= ... & (MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |    # Conditionally set
 		 *                                                                     MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME | # ...
 		 *                                                                     MFILE_F_STRICTATIME | MFILE_F_LAZYTIME);                  # ...

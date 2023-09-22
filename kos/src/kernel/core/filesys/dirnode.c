@@ -40,6 +40,7 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdalign.h>
@@ -393,6 +394,7 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+	struct mfilemeta *newfile_meta;
 	struct inotify_controller *newfile_notcon;
 	struct dnotify_link *newfile_link;
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
@@ -456,6 +458,12 @@ again_lookup:
 	newfile_notcon->inc_file = NULL;
 	TRY {
 		newfile_link = dnotify_link_alloc();
+		TRY {
+			newfile_meta = mfilemeta_alloc();
+		} EXCEPT {
+			dnotify_link_free(newfile_link);
+			RETHROW();
+		}
 	} EXCEPT {
 		inotify_controller_free(newfile_notcon);
 		RETHROW();
@@ -513,24 +521,42 @@ again_lookup:
 	 * IMPORTANT: The bind here  must be done  such that  it
 	 * is NOTHROW, since (in case  a new file was  created),
 	 * we have no way of dealing with an allocation failure. */
-	if (self->mf_notify != NULL) {
+	if (_mfile_canpostfsevents(self)) {
 again_acquire_notify_lock:
 		notify_lock_acquire();
 		COMPILER_READ_BARRIER();
-		if (self->mf_notify != NULL) {
+		if likely(self->mf_meta != NULL &&
+		          self->mf_meta->mfm_notify != NULL) {
 			struct dnotify_link *olnk;
 			struct dnotify_controller *dnot;
-			dnot = inotify_controller_asdnotify(self->mf_notify);
+			dnot = inotify_controller_asdnotify(self->mf_meta->mfm_notify);
 			olnk = dnotify_link_tree_locate(dnot->dnc_files, info->mkf_dent);
 			if (olnk) {
 				assert(dnotify_link_getdir(olnk) == dnot);
-				assert(dnotify_link_getfil(olnk) == info->mkf_rnode->mf_notify);
+				assert(dnotify_link_getfil(olnk) == info->mkf_rnode->mf_meta->mfm_notify);
 			} else {
 				/* Link is missing -> create it */
 				struct mfile *rfile = info->mkf_rnode;
+				struct mfilemeta *rfilemeta;
 				assert(newfile_notcon->inc_file == NULL ||
 				       newfile_notcon->inc_file == rfile);
-				if (rfile->mf_notify == NULL) {
+				rfilemeta = atomic_read(&rfile->mf_meta);
+				if (rfilemeta == NULL) {
+					mfilemeta_init(newfile_meta, rfile);
+					if likely(atomic_cmpxch(&rfile->mf_meta, NULL, newfile_meta)) {
+						rfilemeta    = newfile_meta;
+						newfile_meta = NULL;
+					} else {
+						rfilemeta = atomic_read(&rfile->mf_meta);
+						assert(rfilemeta != NULL);
+#ifndef MFILEMETA_DESTROY_MAYOMIT_AFTER_FRESH_INIT
+						mfilemeta_destroy(newfile_meta, rfile);
+						newfile_meta = NULL;
+#endif /* !MFILEMETA_DESTROY_MAYOMIT_AFTER_FRESH_INIT */
+					}
+				}
+
+				if (rfilemeta->mfm_notify == NULL) {
 					if (newfile_notcon->inc_file == NULL) {
 						struct mfile_stream_ops const *stream;
 						newfile_notcon->inc_file = rfile;
@@ -553,12 +579,12 @@ again_acquire_notify_lock:
 					/* Assign a notify controller. */
 					LIST_INIT(&newfile_notcon->inc_listeners);
 					LIST_INIT(&newfile_notcon->inc_dirs);
-					rfile->mf_notify = newfile_notcon;
-					newfile_notcon   = NULL; /* Steal */
+					rfilemeta->mfm_notify = newfile_notcon;
+					newfile_notcon        = NULL; /* Steal */
 				}
 				/* Create the link */
 				newfile_link->dnl_dir = dnot;
-				newfile_link->dnl_fil = rfile->mf_notify;
+				newfile_link->dnl_fil = rfilemeta->mfm_notify;
 				newfile_link->dnl_ent = incref(info->mkf_dent);
 				LIST_INSERT_HEAD(&newfile_link->dnl_fil->inc_dirs, newfile_link, dnl_fillink);
 				dnotify_link_tree_insert(&dnot->dnc_files, newfile_link);
@@ -567,6 +593,7 @@ again_acquire_notify_lock:
 		}
 		notify_lock_release();
 	}
+	mfilemeta_xfree(newfile_meta);
 	dnotify_link_xfree(newfile_link);
 	if (newfile_notcon) {
 		if (newfile_notcon->inc_file) {

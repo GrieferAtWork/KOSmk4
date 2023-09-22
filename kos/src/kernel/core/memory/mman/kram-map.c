@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
@@ -92,9 +91,7 @@ PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_initdone,
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	MFILE_INIT_mf_meta,
 	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 	                    MFILE_F_FIXEDFILESIZE),

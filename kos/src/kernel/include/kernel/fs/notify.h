@@ -26,6 +26,7 @@
 
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mfilemeta.h>
 #include <kernel/types.h>
 #include <sched/sig.h>
 
@@ -41,8 +42,8 @@ DECL_BEGIN
 /*
  * Linux-compatible filesystem notifications
  *
- * - Every  mfile  has a  lazily-initialized  and self-deleting  (when  no longer  needed) field:
- *   >> struct inotify_controller *mf_notify; // [0..1][owned][lock(!PREEMPTION && :notify_lock)]
+ * - Every mfile  has  a lazily-initialized  and  self-deleting  (when no  longer  needed)  field:
+ *   >> struct inotify_controller *mfm_notify; // [0..1][owned][lock(!PREEMPTION && :notify_lock)]
  *
  * - Files not currently loaded are  not monitored, and no  attempt is made to  load
  *   more files  from disk.  The case  where the  directory may  contain other  hard
@@ -90,7 +91,7 @@ DECL_BEGIN
  *            ║                                      [0..n]      [...]       ║
  *            ║                                       [...]     inc_dirs     ║
  *            ║                                         │        [0..n]      ║
- *            v             mf_notify                   v          │         ║
+ *            v            mfm_notify                   v          │         ║
  *         [mfile] ──────────[0..1]──────────────> [inotify_controller] <════╝
  *            ^         [owned,notify_lock]             │
  *            │                                         │
@@ -109,7 +110,7 @@ DECL_BEGIN
  * ```
  *
  * NOTES:
- *   - `mf_notify' is lazily allocated, and deleted once `inc_listeners' and `inc_dirs' become empty
+ *   - `mfm_notify' is lazily allocated, and deleted once `inc_listeners' and `inc_dirs' become empty
  *   - `dnc_files'  and  `inc_dirs' form  the N-to-N  relation  between files  and containing
  *     directories. When a `fnode' is allocated for a monitored directory, it also allocates:
  *      - a `struct inotify_controller' for the node itself
@@ -152,7 +153,7 @@ DATDEF struct atomic_lock notify_lock;
 struct notify_listener {
 	struct notifyfd            *nl_notfd; /* [1..1][valid_if(nl_file)][const] Associated notify FD */
 	REF struct mfile           *nl_file;  /* [0..1][lock(!PREEMPTION && :notify_lock)] Attached notification controller. (only NULL if deleted) */
-	LIST_ENTRY(notify_listener) nl_link;  /* [0..1][valid_if(nl_file)][lock(!PREEMPTION && :notify_lock)] Link in list of listeners attached to `nl_file->mf_notify' */
+	LIST_ENTRY(notify_listener) nl_link;  /* [0..1][valid_if(nl_file)][lock(!PREEMPTION && :notify_lock)] Link in list of listeners attached to `nl_file->mf_meta->mfm_notify' */
 	uint32_t                    nl_mask;  /* [lock(!PREEMPTION && :notify_lock)] Mask of events to listen fork (set of `IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK') */
 #if __SIZEOF_POINTER__ > 4
 	byte_t _nl_pad[__SIZEOF_POINTER__ - 4]; /* ... */
@@ -270,8 +271,8 @@ struct dnotify_link {
 #endif /* !__WANT_DNOTIFY_LINK__dnl_rbword */
 	REF struct fdirent            *dnl_ent;     /* [1..1][const] Directory entry of `dnl_fil'. Note: the potential reference
 	                                             * loop that exists when `fdirent'  also references `:nl_file' is solved  by
-	                                             * the fact that `:nl_file->mf_notify' is  cleared when all event  listeners
-	                                             * (inc_listeners+inc_dirs) have been removed. */
+	                                             * the fact that `:nl_file->mf_meta->mfm_notify'  is cleared when all  event
+	                                             * listeners (inc_listeners+inc_dirs) have been removed. */
 };
 
 /* Allocate/free a given `struct dnotify_link' */
@@ -292,7 +293,7 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL dnotify_link_tree_insert)(stru
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL dnotify_link_tree_removenode)(struct dnotify_link **__restrict proot, struct dnotify_link *__restrict node);
 
 
-/* The base notification controller as pointed-to by `struct mfile::mf_notify' */
+/* The base notification controller as pointed-to by `struct mfilemeta::mfm_notify' */
 struct inotify_controller {
 #ifdef __WANT_INOTIFY_CONTROLLER__inc_deadlnk
 	union {
@@ -311,7 +312,7 @@ struct inotify_controller {
 #define inotify_controller_isdnotify(self) mfile_isdir((self)->inc_file)
 #define inotify_controller_asdnotify(self) ((struct dnotify_controller *)(self))
 
-/* `struct mfile::mf_notify' is actually a `struct dnotify_controller' when `mfile_isdir(inc_file)' */
+/* `struct mfilemeta::mfm_notify' is actually a `struct dnotify_controller' when `mfile_isdir(inc_file)' */
 struct dnotify_controller
 #ifdef __cplusplus
     : inotify_controller                   /* Underlying inotify controller */
@@ -341,8 +342,9 @@ struct dnotify_controller
 #define dnotify_controller_free(self)  inotify_controller_free(self)
 
 
-/* If `dir->mf_notify != NULL', ensure that `child_file->mf_notify' has
- * been allocated, and that it is linked in the dnotify child-file list
+/* If  `dir->mf_meta->mfm_notify != NULL',  ensure  that
+ * `child_file->mf_meta->mfm_notify' has been allocated,
+ * and that it is linked in the dnotify child-file  list
  * of `dir'.
  *
  * Always inherits a reference to `child_file' that is also always re-
@@ -358,7 +360,9 @@ EIDECLARE(BLOCKING WUNUSED NONNULL((1, 2)), REF struct fnode *, , KCALL,
                                          struct fdirent *__restrict child_dent,
                                          /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...), {
-	if likely(((struct mfile *)dir)->mf_notify == __NULLPTR)
+	if likely(((struct mfile *)dir)->mf_meta == __NULLPTR)
+		return child_file; /* Directory isn't being watched --> nothing to do here! */
+	if likely(((struct mfile *)dir)->mf_meta->mfm_notify == __NULLPTR)
 		return child_file; /* Directory isn't being watched --> nothing to do here! */
 	return dnotify_controller_bindchild_slow(dir, child_dent, child_file);
 });
@@ -377,7 +381,11 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent)(struct mfi
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
 /* Same as `_mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
-#define _mfile_canpostfsevents(self) (__hybrid_atomic_load(&(self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define _mfile_canpostfsevents(self)                                                                \
+	__XBLOCK({                                                                                      \
+		struct mfilemeta *const _mfmeta = __hybrid_atomic_load(&(self)->mf_meta, __ATOMIC_ACQUIRE); \
+		__XRETURN _mfmeta != __NULLPTR && _mfmeta->mfm_notify != __NULLPTR;                         \
+	})
 #ifdef __OPTIMIZE_SIZE__
 #define _mfile_maybepostfsevent(self, expr_) expr_
 #else /* __OPTIMIZE_SIZE__ */

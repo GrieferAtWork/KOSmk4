@@ -32,6 +32,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mfilemeta.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <sched/task.h>
@@ -181,14 +182,6 @@ NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 }
 
 
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#ifndef __dnotify_link_slist_defined
-#define __dnotify_link_slist_defined
-SLIST_HEAD(dnotify_link_slist, dnotify_link);
-#endif /* !__dnotify_link_slist_defined */
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-
-
 /* Destroy a given mem-file */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
@@ -207,56 +200,9 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "self->mf_msalign.lh_first = %p\n",
 	        self->mf_msalign.lh_first);
 
-	/* The  file may still  have a notify controller
-	 * if its containing directory is being watched. */
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	if (self->mf_notify != NULL) {
-		struct inotify_controller *notify;
-		struct dnotify_link_slist deadlinks;
-		COMPILER_READ_BARRIER();
-		SLIST_INIT(&deadlinks);
-		notify_lock_acquire();
-		if ((notify = self->mf_notify) != NULL) {
-			assertf(LIST_EMPTY(&notify->inc_listeners),
-			        "Per-file listeners should have kept us "
-			        "alive via `notify_listener::nl_file'");
-			assertf(!LIST_EMPTY(&notify->inc_dirs),
-			        "If this was also empty, then the notify "
-			        "controller should have already been freed!");
-			assertf(notify->inc_file == self,
-			        "Notify contrller of different file? (%p != %p)",
-			        notify->inc_file, self);
-
-			/* Remove the file from watched directories that contain it. */
-			do {
-				struct dnotify_link *link;
-				link = LIST_FIRST(&notify->inc_dirs);
-				assertf(dnotify_link_getfil(link) == notify,
-				        "%p != %p",
-				        dnotify_link_getfil(link), notify);
-				LIST_REMOVE(link, dnl_fillink);
-				dnotify_link_tree_removenode(&link->dnl_dir->dnc_files, link);
-				DBG_memset(&link->dnl_dir, 0xcc, sizeof(link->dnl_dir));
-				SLIST_INSERT(&deadlinks, link, _dnl_fildead);
-			} while (!LIST_EMPTY(&notify->inc_dirs));
-		}
-		notify_lock_release();
-		if (notify) {
-			struct mfile_stream_ops const *stream;
-			stream = self->mf_ops->mo_stream;
-			/* Detach the notify file handle (if that operator is defined) */
-			if (stream && stream->mso_notify_detach)
-				(*stream->mso_notify_detach)(self, notify->inc_fhnd);
-			inotify_controller_free(notify);
-		}
-		while (!SLIST_EMPTY(&deadlinks)) {
-			struct dnotify_link *link;
-			link = SLIST_FIRST(&deadlinks);
-			SLIST_REMOVE_HEAD(&deadlinks, _dnl_fildead);
-			dnotify_link_destroy(link);
-		}
-	}
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	/* Destroy a meta-data controller (if there is one) */
+	if (self->mf_meta != NULL)
+		mfilemeta_destroy(self->mf_meta, self);
 
 	sig_broadcast_for_fini(&self->mf_initdone);
 	if (self->mf_ops->mo_destroy) {
@@ -366,9 +312,7 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_initdone,
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	MFILE_INIT_mf_meta,
 	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 	                    MFILE_F_FIXEDFILESIZE),
@@ -380,13 +324,6 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_btime(0, 0),
 	MFILE_INIT_mf_msalign(NULL),
 };
-
-
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
-#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-#define MFILE_INIT_mf_notify_ /* nothing */
-#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 /* Fallback  files for anonymous memory. These behave the same as `mfile_zero',
@@ -404,7 +341,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_initdone,                                     \
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),               \
 		MFILE_INIT_mf_blockshift(i, i),                             \
-		MFILE_INIT_mf_notify_                                       \
+		MFILE_INIT_mf_meta,                                         \
 		MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED | \
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |     \
 		                    MFILE_F_FIXEDFILESIZE),                 \

@@ -28,7 +28,6 @@
 #ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 
 #include <kernel/except.h>
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
@@ -221,9 +220,7 @@ PUBLIC struct mfile userkern_segment_file = {
 	MFILE_INIT_mf_initdone,
 	MFILE_INIT_mf_changed(NULL),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	MFILE_INIT_mf_meta,
 	MFILE_INIT_mf_flags(MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME),
 	MFILE_INIT_mf_trunclock,
 	MFILE_INIT_mf_filesize(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
@@ -350,9 +347,7 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	MFILE_INIT_mf_initdone,
 	MFILE_INIT_mf_changed(NULL),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	MFILE_INIT_mf_meta,
 	MFILE_INIT_mf_flags(MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME),
 	MFILE_INIT_mf_trunclock,
 	MFILE_INIT_mf_filesize(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),

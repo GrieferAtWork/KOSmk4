@@ -349,8 +349,8 @@ struct mfile_stream_ops {
 
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* [0..1] Operator pair used for creating/destroying additional cookie objects
-	 *        that remain alive for as long as `mf_notify != NULL' (iow: for as long
-	 *        as fs events are being tracked for a file)
+	 *        that remain alive for as long as `mfm_notify != NULL' (iow: for as
+	 *        long as fs events are being tracked for a file)
 	 *
 	 * These operators can be used to start/stop object-specific async jobs for
 	 * the purpose of polling signals and generating file notification  events:
@@ -358,7 +358,7 @@ struct mfile_stream_ops {
 	 *  - `mso_notify_detach' is called when a `struct inotify_controller' is destroyed
 	 *
 	 * WARNING: `wasdestroyed(self)' may be the case when `mso_notify_detach' is called,
-	 *          but  in this  case it is  guarantied that (aside  from `mf_notify'), all
+	 *          but  in this case  it is guarantied that  (aside from `mfm_notify'), all
 	 *          other fields of `self' remain in a valid state until after the  operator
 	 *          return (though the operator still isn't allowed to incref(self)!)
 	 *
@@ -799,12 +799,10 @@ SLIST_HEAD(ramfs_dirent_slist, ramfs_dirent);
 #endif /* !__ramfs_dirent_slist_defined */
 #endif /* __WANT_MFILE__mf_deadrament */
 
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-struct inotify_controller;
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 struct misaligned_mfile;
 LIST_HEAD(misaligned_mfile_list, misaligned_mfile);
 
+struct mfilemeta;
 struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
 	struct mfile_ops const       *mf_ops;        /* [1..1][const] File operators. */
@@ -867,15 +865,11 @@ struct mfile {
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-#define MFILE_INIT_mf_notify              __NULLPTR
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#define MFILE_INIT_mf_meta                __NULLPTR
 #define MFILE_INIT_mf_flags(mf_flags)     mf_flags
 #define MFILE_INIT_mf_trunclock           0
 #endif /* __WANT_FS_INIT */
-#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
-	struct inotify_controller    *mf_notify;     /* [0..1][owned][lock(!PREEMPTION && :notify_lock)] Notify controller. */
-#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+	struct mfilemeta             *mf_meta;       /* [0..1][lock(WRITE_ONCE)] Meta-data controller (to encapsulate rarely used file-related data). */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC((RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))) && !(mf_flags & MFILE_F_DELETING)),
 	                                              *       DEC(ATOMIC))]
@@ -1247,14 +1241,6 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 #define _mfile_cinit_wrlockpc_(self) /* nothing */
 #endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 
-#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
-#define _mfile_init_notify_(self)  (self)->mf_notify = __NULLPTR,
-#define _mfile_cinit_notify_(self) __hybrid_assert((self)->mf_notify == __NULLPTR),
-#else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
-#define _mfile_init_notify_(self)  /* nothing */
-#define _mfile_cinit_notify_(self) /* nothing */
-#endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
-
 
 /* Initialize common fields. The caller must still initialize:
  *  - mf_ops, mf_parts, mf_changed, mf_part_amask, mf_blockshift,
@@ -1266,7 +1252,7 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	((self)->mf_refcnt = 1, __mfile_cinit_common_norefcnt(self))
 #define __mfile_init_common_norefcnt(self) \
 	(_mfile_init_wrlockpc_(self)           \
-	 _mfile_init_notify_(self)             \
+	 (self)->mf_meta = __NULLPTR,          \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 SLIST_INIT(&(self)->mf_lockops),      \
 	 sig_init(&(self)->mf_initdone),       \
@@ -1274,7 +1260,7 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	 (self)->mf_trunclock = 0)
 #define __mfile_cinit_common_norefcnt(self)             \
 	(_mfile_cinit_wrlockpc_(self)                       \
-	 _mfile_cinit_notify_(self)                         \
+	 __hybrid_assert((self)->mf_meta == __NULLPTR),     \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
 	 sig_cinit(&(self)->mf_initdone),                   \
