@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43003f0f */
+/* HASH CRC-32:0x52358d1a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,29 +145,41 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str,
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char **
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 
 		(void)libc_seterrno(EINVAL);
 
 		return NULL;
 	}
+#if __SIZEOF_POINTER__ == 4
+	count = libc_rawmemlenl(vector, 0);
+#elif __SIZEOF_POINTER__ == 8
+	count = libc_rawmemlenq(vector, 0);
+#else /* ... */
 	for (count = 0; vector[count]; ++count)
 		;
+#endif /* !... */
 	return libd_convert_wcstombsvn(vector, count);
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char **
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 
 		(void)libc_seterrno(EINVAL);
 
 		return NULL;
 	}
+#if __SIZEOF_POINTER__ == 4
+	count = libc_rawmemlenl(vector, 0);
+#elif __SIZEOF_POINTER__ == 8
+	count = libc_rawmemlenq(vector, 0);
+#else /* ... */
 	for (count = 0; vector[count]; ++count)
 		;
+#endif /* !... */
 	return libc_convert_wcstombsvn(vector, count);
 }
 #include <libc/errno.h>
@@ -305,29 +317,41 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str,
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char16_t **
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 
 		(void)libc_seterrno(EINVAL);
 
 		return NULL;
 	}
+#if __SIZEOF_POINTER__ == 4
+	count = libc_rawmemlenl(vector, 0);
+#elif __SIZEOF_POINTER__ == 8
+	count = libc_rawmemlenq(vector, 0);
+#else /* ... */
 	for (count = 0; vector[count]; ++count)
 		;
+#endif /* !... */
 	return libd_convert_mbstowcsvn(vector, count);
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char32_t **
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 
 		(void)libc_seterrno(EINVAL);
 
 		return NULL;
 	}
+#if __SIZEOF_POINTER__ == 4
+	count = libc_rawmemlenl(vector, 0);
+#elif __SIZEOF_POINTER__ == 8
+	count = libc_rawmemlenq(vector, 0);
+#else /* ... */
 	for (count = 0; vector[count]; ++count)
 		;
+#endif /* !... */
 	return libc_convert_mbstowcsvn(vector, count);
 }
 #include <libc/errno.h>

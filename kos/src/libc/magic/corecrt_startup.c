@@ -197,12 +197,12 @@ void _initterm(_PVFV *start, _PVFV *end) {
 		if (*start == NULL)
 			continue;
 @@pp_if $has_function(syslog)@@
-		syslog(__LOG_DEBUG, "[libd] _initterm: call %p\n", *start);
+		(void)syslog(__LOG_DEBUG, "[libd] _initterm: call %p\n", *start);
 @@pp_endif@@
 		(**start)();
 	}
 @@pp_if $has_function(syslog)@@
-	syslog(__LOG_DEBUG, "[libd] _initterm: done\n");
+	(void)syslog(__LOG_DEBUG, "[libd] _initterm: done\n");
 @@pp_endif@@
 }
 
@@ -216,18 +216,18 @@ int _initterm_e(_onexit_t *start, _onexit_t *end) {
 		if (!*start)
 			continue;
 @@pp_if $has_function(syslog)@@
-		syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *start);
+		(void)syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *start);
 @@pp_endif@@
 		result = (**start)();
 		if (result != 0) {
 @@pp_if $has_function(syslog)@@
-			syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *start, result);
+			(void)syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *start, result);
 @@pp_endif@@
 			break;
 		}
 	}
 @@pp_if $has_function(syslog)@@
-	syslog(__LOG_DEBUG, "[libd] _initterm_e: done\n");
+	(void)syslog(__LOG_DEBUG, "[libd] _initterm_e: done\n");
 @@pp_endif@@
 	return result;
 }
@@ -272,7 +272,7 @@ int _execute_onexit_table([[nullable]] struct _onexit_table_t *self) {
 	int result;
 	_onexit_t *first = (_onexit_t *)self->@_first@;
 	_onexit_t *last  = (_onexit_t *)self->@_last@;
-	_initialize_onexit_table(self);
+	(void)_initialize_onexit_table(self);
 	result = _initterm_e(first, last);
 @@pp_if $has_function(free)@@
 	free(first);

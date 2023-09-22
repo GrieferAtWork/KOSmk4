@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b014799 */
+/* HASH CRC-32:0xc06e594c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,17 +79,15 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(perror))(char const *__message) {
 	char const *__enodesc;
 	__enodesc = (__NAMESPACE_LOCAL_SYM __localdep_strerror)(__libc_geterrno());
 	if (__message) {
-		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: %s\n",
-		        __message, __enodesc);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: %s\n", __message, __enodesc);
 	} else {
-		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s\n",
-		        __enodesc);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s\n", __enodesc);
 	}
 #else /* __NO_PRINTF_STRERROR */
 	if (__message) {
-		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: %m\n", __message);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: %m\n", __message);
 	} else {
-		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%m\n");
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%m\n");
 	}
 #endif /* !__NO_PRINTF_STRERROR */
 }

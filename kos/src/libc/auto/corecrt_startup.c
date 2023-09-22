@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4c3ae5f */
+/* HASH CRC-32:0xf6a946a0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,12 +76,12 @@ NOTHROW_NCX(LIBDCALL libc__initterm)(_PVFV *start,
 		if (*start == NULL)
 			continue;
 
-		libc_syslog(__LOG_DEBUG, "[libd] _initterm: call %p\n", *start);
+		(void)libc_syslog(__LOG_DEBUG, "[libd] _initterm: call %p\n", *start);
 
 		(**start)();
 	}
 
-	libc_syslog(__LOG_DEBUG, "[libd] _initterm: done\n");
+	(void)libc_syslog(__LOG_DEBUG, "[libd] _initterm: done\n");
 
 }
 #include <bits/crt/dos/corecrt_startup.h>
@@ -94,18 +94,18 @@ NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start,
 		if (!*start)
 			continue;
 
-		libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *start);
+		(void)libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *start);
 
 		result = (**start)();
 		if (result != 0) {
 
-			libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *start, result);
+			(void)libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *start, result);
 
 			break;
 		}
 	}
 
-	libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: done\n");
+	(void)libc_syslog(__LOG_DEBUG, "[libd] _initterm_e: done\n");
 
 	return result;
 }
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self) {
 	int result;
 	_onexit_t *first = (_onexit_t *)self->_first;
 	_onexit_t *last  = (_onexit_t *)self->_last;
-	libc__initialize_onexit_table(self);
+	(void)libc__initialize_onexit_table(self);
 	result = libc__initterm_e(first, last);
 
 	libc_free(first);

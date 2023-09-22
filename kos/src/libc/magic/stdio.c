@@ -1216,7 +1216,7 @@ long int ftell([[inout]] FILE *__restrict stream) {
 [[requires(defined(__SEEK_SET) && $has_function(fseeko))]]
 [[section(".text.crt{|.dos}.FILE.locked.seek.utility")]]
 void rewind([[inout]] FILE *__restrict stream) {
-	fseeko(stream, 0, __SEEK_SET);
+	(void)fseeko(stream, 0, __SEEK_SET);
 }
 
 
@@ -1270,17 +1270,15 @@ void perror([[nullable]] char const *message) {
 	char const *enodesc;
 	enodesc = strerror(__libc_geterrno());
 	if (message) {
-		fprintf(stderr, "%s: %s\n",
-		        message, enodesc);
+		(void)fprintf(stderr, "%s: %s\n", message, enodesc);
 	} else {
-		fprintf(stderr, "%s\n",
-		        enodesc);
+		(void)fprintf(stderr, "%s\n", enodesc);
 	}
 @@pp_else@@
 	if (message) {
-		fprintf(stderr, "%s: %m\n", message);
+		(void)fprintf(stderr, "%s: %m\n", message);
 	} else {
-		fprintf(stderr, "%m\n");
+		(void)fprintf(stderr, "%m\n");
 	}
 @@pp_endif@@
 }
@@ -3723,17 +3721,20 @@ $ssize_t getdelim_unlocked([[inout]] char **__restrict lineptr,
 		buffer[result++] = (char)ch;
 		if (ch == delimiter)
 			break; /* Delimiter reached */
+
 		/* Special case for line-delimiter. */
 		if (delimiter == '\n' && ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
 			ch = fgetc_unlocked(stream);
 			if (ch != EOF && ch != '\n')
-				ungetc_unlocked(ch, stream);
+				(void)ungetc_unlocked(ch, stream);
+
 			/* Unify linefeeds (to use POSIX notation) */
 			buffer[result - 1] = '\n';
 			break;
 		}
 	}
+
 	/* NUL-Terminate the buffer. */
 	buffer[result] = '\0';
 	return result;
@@ -3844,7 +3845,7 @@ __STDC_INT_AS_SSIZE_T puts_unlocked([[in]] char const *__restrict string) {
 		if (temp <= 0) {
 			result = temp;
 		} else {
-			result += temp;
+			++result;
 		}
 	}
 	return result;

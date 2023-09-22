@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92d26f */
+/* HASH CRC-32:0x799f0b89 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,11 +99,5 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wmkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_I
 
 __SYSDECL_END
 #endif /* __CC__ */
-
-#ifdef __USE_UTF
-#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_DIRECT_H)
-#include <parts/uchar/direct.h>
-#endif /* _UCHAR_H && !_PARTS_UCHAR_DIRECT_H */
-#endif /* __USE_UTF */
 
 #endif /* !_CORECRT_WDIRECT_H */

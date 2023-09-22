@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b24c479 */
+/* HASH CRC-32:0xfbe73ca9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,20 +37,48 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_convert_mbstowcsvn_defined
 #endif /* !... */
 #endif /* !__local___localdep_convert_mbstowcsvn_defined */
+#ifndef __local___localdep_rawmemlenl_defined
+#define __local___localdep_rawmemlenl_defined
+#ifdef __CRT_HAVE_rawmemlenl
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_rawmemlenl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle),rawmemlenl,(__haystack,__needle))
+#else /* __CRT_HAVE_rawmemlenl */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/rawmemlenl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_rawmemlenl __LIBC_LOCAL_NAME(rawmemlenl)
+#endif /* !__CRT_HAVE_rawmemlenl */
+#endif /* !__local___localdep_rawmemlenl_defined */
+#ifndef __local___localdep_rawmemlenq_defined
+#define __local___localdep_rawmemlenq_defined
+#ifdef __CRT_HAVE_rawmemlenq
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_rawmemlenq,(void const *__restrict __haystack, __UINT64_TYPE__ __needle),rawmemlenq,(__haystack,__needle))
+#else /* __CRT_HAVE_rawmemlenq */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/rawmemlenq.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_rawmemlenq __LIBC_LOCAL_NAME(rawmemlenq)
+#endif /* !__CRT_HAVE_rawmemlenq */
+#endif /* !__local___localdep_rawmemlenq_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(convert_mbstowcsv) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1) __WCHAR_TYPE__ **
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_mbstowcsv))(char const *const *__restrict __vector) {
-	__SIZE_TYPE__ __count = 0;
+	__SIZE_TYPE__ __count;
 	if __unlikely(!__vector) {
 #ifdef __EINVAL
 		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		return __NULLPTR;
 	}
+#if __SIZEOF_POINTER__ == 4
+	__count = (__NAMESPACE_LOCAL_SYM __localdep_rawmemlenl)(__vector, 0);
+#elif __SIZEOF_POINTER__ == 8
+	__count = (__NAMESPACE_LOCAL_SYM __localdep_rawmemlenq)(__vector, 0);
+#else /* ... */
 	for (__count = 0; __vector[__count]; ++__count)
 		;
+#endif /* !... */
 	return (__NAMESPACE_LOCAL_SYM __localdep_convert_mbstowcsvn)(__vector, __count);
 }
 __NAMESPACE_LOCAL_END

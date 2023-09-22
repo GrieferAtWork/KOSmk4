@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fa2abe8 */
+/* HASH CRC-32:0xb8c9bedf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,17 +109,20 @@ __NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdelim_unlocked))(char **__restr
 		__buffer[__result++] = (char)__ch;
 		if (__ch == __delimiter)
 			break; /* Delimiter reached */
+
 		/* Special case for line-delimiter. */
 		if (__delimiter == '\n' && __ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
 			__ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)(__stream);
 			if (__ch != __EOF && __ch != '\n')
-				(__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)(__ch, __stream);
+				(void)(__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)(__ch, __stream);
+
 			/* Unify linefeeds (to use POSIX notation) */
 			__buffer[__result - 1] = '\n';
 			break;
 		}
 	}
+
 	/* NUL-Terminate the buffer. */
 	__buffer[__result] = '\0';
 	return __result;

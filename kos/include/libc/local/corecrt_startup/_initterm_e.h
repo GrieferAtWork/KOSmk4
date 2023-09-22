@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf283dbac */
+/* HASH CRC-32:0x19d840a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,18 +49,18 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_initterm_e))(_onexit_t *__start, _on
 		if (!*__start)
 			continue;
 #if defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
-		(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *__start);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: call %p\n", *__start);
 #endif /* __CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer */
 		__result = (**__start)();
 		if (__result != 0) {
 #if defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
-			(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *__start, __result);
+			(void)(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: call %p failed -> %d\n", *__start, __result);
 #endif /* __CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer */
 			break;
 		}
 	}
 #if defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
-	(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: done\n");
+	(void)(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_DEBUG, "[libd] _initterm_e: done\n");
 #endif /* __CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer */
 	return __result;
 }

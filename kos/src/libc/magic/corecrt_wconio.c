@@ -101,12 +101,13 @@ wint_t _getwch_nolock(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = fileno(fp);
-	tcgetattr(fd, &oios);
+	if unlikely(tcgetattr(fd, &oios) != 0)
+		bzero(&oios, sizeof(oios));
 	memcpy(&nios, &oios, sizeof(nios));
 	nios.@c_lflag@ &= ~__ECHO;
-	tcsetattr(fd, __TCSANOW, &nios);
+	(void)tcsetattr(fd, __TCSANOW, &nios);
 	result = fgetwc_unlocked(fp);
-	tcsetattr(fd, __TCSANOW, &oios);
+	(void)tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 
@@ -137,12 +138,13 @@ wint_t _getwche_nolock(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = fileno(fp);
-	tcgetattr(fd, &oios);
+	if unlikely(tcgetattr(fd, &oios) != 0)
+		bzero(&oios, sizeof(oios));
 	memcpy(&nios, &oios, sizeof(nios));
 	nios.@c_lflag@ |= __ECHO;
-	tcsetattr(fd, __TCSANOW, &nios);
+	(void)tcsetattr(fd, __TCSANOW, &nios);
 	result = fgetwc_unlocked(fp);
-	tcsetattr(fd, __TCSANOW, &oios);
+	(void)tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 

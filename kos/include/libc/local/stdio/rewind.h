@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe13af668 */
+/* HASH CRC-32:0xf0cc30de */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fseeko_defined */
 __LOCAL_LIBC(rewind) __ATTR_INOUT(1) void
 __NOTHROW_CB_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rewind))(__FILE *__restrict __stream) {
-	(__NAMESPACE_LOCAL_SYM __localdep_fseeko)(__stream, 0, __SEEK_SET);
+	(void)(__NAMESPACE_LOCAL_SYM __localdep_fseeko)(__stream, 0, __SEEK_SET);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rewind_defined

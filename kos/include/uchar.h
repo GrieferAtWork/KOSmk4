@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f352726 */
+/* HASH CRC-32:0x1fb12c92 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -517,17 +517,18 @@ __SYSDECL_END
  * >> #define _UTF_SOURCE
  * >> #include <string.h>  // Order of #includes doesn't matter; <string.h>
  * >> #include <uchar.h>   // also has a check if uchar was already included
- * >> // At this point, symbols `size_t c16slen(char16_t const *str)'
- * >> // have been defined (but be aware that calling conventions may
- * >> // not be identical between char16_t and char32_t variants of
- * >> // libc functions, and that utf-16 filesystem functions take
- * >> // DOS paths, rather than unix paths!)
+ *
+ * At this  point, symbols  like `size_t c16slen(char16_t const *str)'  have
+ * been defined (but be aware that calling conventions may not be  identical
+ * between char16_t and char32_t variants of libc functions, and that utf-16
+ * filesystem functions take DOS paths, when `dosfs_setenabled(3)' was  used
+ * to enable DOS compatibility mode)
  */
 #ifdef __USE_UTF
 
-#if defined(_CORECRT_WDIRECT_H) && !defined(_PARTS_UCHAR_DIRECT_H)
+#if defined(_DIRECT_H) && !defined(_PARTS_UCHAR_DIRECT_H)
 #include <parts/uchar/direct.h>
-#endif /* _CORECRT_WDIRECT_H && !_PARTS_UCHAR_DIRECT_H */
+#endif /* _DIRECT_H && !_PARTS_UCHAR_DIRECT_H */
 
 #if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
 #include <parts/uchar/fcntl.h>

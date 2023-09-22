@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5f4a67a */
+/* HASH CRC-32:0x47535851 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,12 +209,10 @@ NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
 
 
 
-
-
 	if (message) {
-		libc_fprintf(stderr, "%s: %m\n", message);
+		(void)libc_fprintf(stderr, "%s: %m\n", message);
 	} else {
-		libc_fprintf(stderr, "%m\n");
+		(void)libc_fprintf(stderr, "%m\n");
 	}
 
 }
@@ -2040,17 +2038,20 @@ NOTHROW_CB_NCX(LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr,
 		buffer[result++] = (char)ch;
 		if (ch == delimiter)
 			break; /* Delimiter reached */
+
 		/* Special case for line-delimiter. */
 		if (delimiter == '\n' && ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
 			ch = libc_fgetc_unlocked(stream);
 			if (ch != EOF && ch != '\n')
-				libc_ungetc_unlocked(ch, stream);
+				(void)libc_ungetc_unlocked(ch, stream);
+
 			/* Unify linefeeds (to use POSIX notation) */
 			buffer[result - 1] = '\n';
 			break;
 		}
 	}
+
 	/* NUL-Terminate the buffer. */
 	buffer[result] = '\0';
 	return result;
@@ -2073,7 +2074,7 @@ NOTHROW_CB_NCX(LIBCCALL libc_puts_unlocked)(char const *__restrict string) {
 		if (temp <= 0) {
 			result = temp;
 		} else {
-			result += temp;
+			++result;
 		}
 	}
 	return result;

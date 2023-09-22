@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228b8224 */
+/* HASH CRC-32:0xff8e7a54 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_execute_onexit_table))(struct _onexi
 	int __result;
 	_onexit_t *__first = (_onexit_t *)__self->_first;
 	_onexit_t *__last  = (_onexit_t *)__self->_last;
-	(__NAMESPACE_LOCAL_SYM __localdep__initialize_onexit_table)(__self);
+	(void)(__NAMESPACE_LOCAL_SYM __localdep__initialize_onexit_table)(__self);
 	__result = (__NAMESPACE_LOCAL_SYM __localdep__initterm_e)(__first, __last);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__first);

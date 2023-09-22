@@ -87,10 +87,4 @@ int _wmkdir([[in]] wchar_t const *path) {
 __SYSDECL_END
 #endif /* __CC__ */
 
-#ifdef __USE_UTF
-#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_DIRECT_H)
-#include <parts/uchar/direct.h>
-#endif /* _UCHAR_H && !_PARTS_UCHAR_DIRECT_H */
-#endif /* __USE_UTF */
-
 }

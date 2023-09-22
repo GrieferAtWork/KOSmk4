@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cedc50a */
+/* HASH CRC-32:0x1d8e7762 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,12 +74,13 @@ NOTHROW_RPC(LIBDCALL libd__getwch_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag &= ~__ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libd_fgetwc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <bits/types.h>
@@ -92,12 +93,13 @@ NOTHROW_RPC(LIBKCALL libc__getwch_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag &= ~__ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libc_fgetwc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <libc/template/stdtty.h>
@@ -138,12 +140,13 @@ NOTHROW_RPC(LIBDCALL libd__getwche_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag |= __ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libd_fgetwc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <bits/types.h>
@@ -156,12 +159,13 @@ NOTHROW_RPC(LIBKCALL libc__getwche_nolock)(void) {
 	struct termios oios, nios;
 	FILE *fp = stdtty;
 	fd_t fd  = libc_fileno(fp);
-	libc_tcgetattr(fd, &oios);
+	if unlikely(libc_tcgetattr(fd, &oios) != 0)
+		libc_bzero(&oios, sizeof(oios));
 	libc_memcpy(&nios, &oios, sizeof(nios));
 	nios.c_lflag |= __ECHO;
-	libc_tcsetattr(fd, __TCSANOW, &nios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &nios);
 	result = libc_fgetwc_unlocked(fp);
-	libc_tcsetattr(fd, __TCSANOW, &oios);
+	(void)libc_tcsetattr(fd, __TCSANOW, &oios);
 	return result;
 }
 #include <libc/template/stdtty.h>

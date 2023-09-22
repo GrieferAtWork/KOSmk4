@@ -189,10 +189,10 @@ size_t stdc_c32rtomb([[out_opt]] char *__restrict str, char32_t c32,
  * would be  too expensive  to have  4 variants  of every  wchar
  * function, for both wchar-sizes, and both calling conventions)
  *
- * The only  exception to  this rule  are these  four  functions,
- * which due the fact of being mandated by the C standard,  still
- * have to be  exported not only  by name, but  also be bound  to
- * in headers by-name, _and_ be exposed with a consistent calling
+ * The  only exception  to this  rule are  these four functions,
+ * which due the fact of being mandated by the C standard, still
+ * have to be exported  not only by name,  but also be bound  in
+ * headers by-name, _and_ be  exposed with a consistent  calling
  * convention that matches `LIBCCALL'!
  */
 [[ignore]] uchar_mbrtoc16(*) %{uchar16("mbrtowc")}
@@ -293,15 +293,21 @@ void convert_freevn(void *vector, $size_t count)
 [[requires_function(convert_wcstombsvn)]]
 [[impl_include("<libc/errno.h>")]]
 /*utf-8*/ char **convert_wcstombsv([[in_opt]] $wchar_t const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}
+@@pp_if __SIZEOF_POINTER__ == 4@@
+	count = rawmemlenl(vector, 0);
+@@pp_elif __SIZEOF_POINTER__ == 8@@
+	count = rawmemlenq(vector, 0);
+@@pp_else@@
 	for (count = 0; vector[count]; ++count)
 		;
+@@pp_endif@@
 	return convert_wcstombsvn(vector, count);
 }
 
@@ -380,15 +386,21 @@ $wchar_t *convert_mbstowcsn([[in(len)]] /*utf-8*/ char const *__restrict str,
 [[requires_function(convert_mbstowcsvn)]]
 [[impl_include("<libc/errno.h>")]]
 $wchar_t **convert_mbstowcsv([[in_opt]] /*utf-8*/ char const *const *__restrict vector) {
-	size_t count = 0;
+	size_t count;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}
+@@pp_if __SIZEOF_POINTER__ == 4@@
+	count = rawmemlenl(vector, 0);
+@@pp_elif __SIZEOF_POINTER__ == 8@@
+	count = rawmemlenq(vector, 0);
+@@pp_else@@
 	for (count = 0; vector[count]; ++count)
 		;
+@@pp_endif@@
 	return convert_mbstowcsvn(vector, count);
 }
 
@@ -453,17 +465,18 @@ __SYSDECL_END
  * >> #define _UTF_SOURCE
  * >> #include <string.h>  // Order of #includes doesn't matter; <string.h>
  * >> #include <uchar.h>   // also has a check if uchar was already included
- * >> // At this point, symbols `size_t c16slen(char16_t const *str)'
- * >> // have been defined (but be aware that calling conventions may
- * >> // not be identical between char16_t and char32_t variants of
- * >> // libc functions, and that utf-16 filesystem functions take
- * >> // DOS paths, rather than unix paths!)
+ *
+ * At this  point, symbols  like `size_t c16slen(char16_t const *str)'  have
+ * been defined (but be aware that calling conventions may not be  identical
+ * between char16_t and char32_t variants of libc functions, and that utf-16
+ * filesystem functions take DOS paths, when `dosfs_setenabled(3)' was  used
+ * to enable DOS compatibility mode)
  */
 #ifdef __USE_UTF
 
-#if defined(_CORECRT_WDIRECT_H) && !defined(_PARTS_UCHAR_DIRECT_H)
+#if defined(_DIRECT_H) && !defined(_PARTS_UCHAR_DIRECT_H)
 #include <parts/uchar/direct.h>
-#endif /* _CORECRT_WDIRECT_H && !_PARTS_UCHAR_DIRECT_H */
+#endif /* _DIRECT_H && !_PARTS_UCHAR_DIRECT_H */
 
 #if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
 #include <parts/uchar/fcntl.h>
