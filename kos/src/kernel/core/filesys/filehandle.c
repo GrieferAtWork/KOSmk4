@@ -36,6 +36,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mfilemeta.h>
 
 #include <hybrid/overflow.h>
 
@@ -53,9 +54,14 @@ DECL_BEGIN
 /* Destroy the given filehandle object. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL filehandle_destroy)(struct filehandle *__restrict self) {
+	REF struct mfile *file = self->fh_file;
+
+	/* Release a possible flock-based file lock. */
+	mfile_flock_release_expecting_nolock(file, filehandle_get_flock_key(self));
+
 	/* TODO: If the file was opened as writable, must post `IN_CLOSE_WRITE'! */
-	mfile_inotify_closero(self->fh_file); /* Post `IN_CLOSE_NOWRITE' */
-	decref_unlikely(self->fh_file);
+	mfile_inotify_closero(file); /* Post `IN_CLOSE_NOWRITE' */
+	decref_unlikely(file);
 	xdecref_unlikely(self->fh_path);
 	xdecref_unlikely(self->fh_dirent);
 	kfree(self);
@@ -276,6 +282,13 @@ handle_filehandle_allocate(struct filehandle *__restrict self,
 }
 
 INTERN NONNULL((1)) void KCALL
+handle_filehandle_flock(struct filehandle *__restrict self,
+                        syscall_ulong_t operation) THROWS(...) {
+	mfile_flock_key_t key = filehandle_get_flock_key(self);
+	mfile_flock(self->fh_file, operation, key);
+}
+
+INTERN NONNULL((1)) void KCALL
 handle_filehandle_sync(struct filehandle *__restrict self) THROWS(...) {
 	mfile_usync(self->fh_file);
 }
@@ -395,6 +408,7 @@ DEFINE_INTERN_ALIAS(handle_temphandle_ioctl, handle_filehandle_ioctl);
 DEFINE_INTERN_ALIAS(handle_temphandle_truncate, handle_filehandle_truncate);
 DEFINE_INTERN_ALIAS(handle_temphandle_mmap, handle_filehandle_mmap);
 DEFINE_INTERN_ALIAS(handle_temphandle_allocate, handle_filehandle_allocate);
+DEFINE_INTERN_ALIAS(handle_temphandle_flock, handle_filehandle_flock);
 DEFINE_INTERN_ALIAS(handle_temphandle_sync, handle_filehandle_sync);
 DEFINE_INTERN_ALIAS(handle_temphandle_datasync, handle_filehandle_datasync);
 DEFINE_INTERN_ALIAS(handle_temphandle_stat, handle_filehandle_stat);

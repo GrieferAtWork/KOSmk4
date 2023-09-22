@@ -436,6 +436,17 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_FCNTL */
 
+#ifdef __ARCH_WANT_SYSCALL_FLOCK
+DEFINE_SYSCALL2(errno_t, flock, fd_t, fd,
+                syscall_ulong_t, operation) {
+	struct handle hand;
+	hand = handles_lookup(fd);
+	RAII_FINALLY { decref_unlikely(hand); };
+	handle_flock(hand, operation);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FLOCK */
+
 
 DECL_END
 

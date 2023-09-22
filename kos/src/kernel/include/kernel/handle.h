@@ -176,6 +176,9 @@ struct handle_types {
 	                                                                   pos_t start, pos_t length)
 			THROWS(...);
 
+	/* @param: operation: One of `LOCK_SH', `LOCK_EX' or `LOCK_UN', optionally or'd with `LOCK_NB' */
+	void (BLOCKING NONNULL_T((1)) KCALL *h_flock[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t operation) THROWS(...);
+
 	/* Synchronize data */
 	void (BLOCKING NONNULL_T((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) THROWS(...);
 	void (BLOCKING NONNULL_T((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) THROWS(...);
@@ -283,6 +286,7 @@ handle_datasize(struct handle const &__restrict self,
 #define /*BLOCKING*/ handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
 #define /*BLOCKING*/ handle_mmap(self, info)                                  HANDLE_FUNC(self, h_mmap)((self).h_data, info)
 #define /*BLOCKING*/ handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
+#define /*BLOCKING*/ handle_flock(self, operation)                            HANDLE_FUNC(self, h_flock)((self).h_data, operation)
 #define /*BLOCKING*/ handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
 #define /*BLOCKING*/ handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)
 #define /*BLOCKING*/ handle_stat(self, result)                                HANDLE_FUNC(self, h_stat)((self).h_data, result)

@@ -160,6 +160,11 @@ typedef __pformatungetc pformatungetc;
 		   ("pos_t", "length") },                                                                             \
 		 "THROWS(...)",                                                                                       \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE);"),                         \
+		("flock", "BLOCKING NONNULL((1))", "void", "", "KCALL",                                               \
+		 { ("T *__restrict", "self"),                                                                         \
+		   ("syscall_ulong_t", "operation") },                                                                \
+		 "THROWS(...)",                                                                                       \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_FLOCK);"),                            \
 		("sync", "BLOCKING NONNULL((1))", "void", "", "KCALL",                                                \
 		 { ("T *__restrict", "self") },                                                                       \
 		 "THROWS(...)",                                                                                       \
@@ -360,6 +365,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_mfile_ioctl(struct mfi
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_mfile_truncate(struct mfile *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_mfile_mmap(struct mfile *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_mfile_allocate(struct mfile *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_mfile_flock(struct mfile *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_mfile_sync(struct mfile *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_mfile_datasync(struct mfile *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_mfile_stat(struct mfile *__restrict self, NCX struct stat *result) THROWS(...);
@@ -390,6 +396,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_dirent_ioctl(struct fd
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirent_truncate(struct fdirent *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_dirent_mmap(struct fdirent *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_dirent_allocate(struct fdirent *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirent_flock(struct fdirent *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirent_sync(struct fdirent *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirent_datasync(struct fdirent *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirent_stat(struct fdirent *__restrict self, NCX struct stat *result) THROWS(...);
@@ -420,6 +427,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_path_ioctl(struct path
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_path_truncate(struct path *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_path_mmap(struct path *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_path_allocate(struct path *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_path_flock(struct path *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_path_sync(struct path *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_path_datasync(struct path *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_path_stat(struct path *__restrict self, NCX struct stat *result) THROWS(...);
@@ -450,6 +458,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_filehandle_ioctl(struc
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_filehandle_truncate(struct filehandle *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_filehandle_mmap(struct filehandle *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_filehandle_allocate(struct filehandle *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_filehandle_flock(struct filehandle *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_filehandle_sync(struct filehandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_filehandle_datasync(struct filehandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_filehandle_stat(struct filehandle *__restrict self, NCX struct stat *result) THROWS(...);
@@ -480,6 +489,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_temphandle_ioctl(struc
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_truncate(struct filehandle *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_temphandle_mmap(struct filehandle *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_temphandle_allocate(struct filehandle *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_flock(struct filehandle *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_sync(struct filehandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_datasync(struct filehandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_temphandle_stat(struct filehandle *__restrict self, NCX struct stat *result) THROWS(...);
@@ -510,6 +520,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_dirhandle_ioctl(struct
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandle_truncate(struct dirhandle *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_dirhandle_mmap(struct dirhandle *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_dirhandle_allocate(struct dirhandle *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandle_flock(struct dirhandle *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandle_sync(struct dirhandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandle_datasync(struct dirhandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandle_stat(struct dirhandle *__restrict self, NCX struct stat *result) THROWS(...);
@@ -540,6 +551,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_fifohandle_ioctl(struc
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_fifohandle_truncate(struct fifohandle *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_fifohandle_mmap(struct fifohandle *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_fifohandle_allocate(struct fifohandle *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_fifohandle_flock(struct fifohandle *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_fifohandle_sync(struct fifohandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_fifohandle_datasync(struct fifohandle *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_fifohandle_stat(struct fifohandle *__restrict self, NCX struct stat *result) THROWS(...);
@@ -570,6 +582,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_socket_ioctl(struct so
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_socket_truncate(struct socket *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_socket_mmap(struct socket *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_socket_allocate(struct socket *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_socket_flock(struct socket *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_socket_sync(struct socket *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_socket_stat(struct socket *__restrict self, NCX struct stat *result) THROWS(...);
@@ -600,6 +613,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_epoll_ioctl(struct epo
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_epoll_truncate(struct epoll_controller *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_epoll_mmap(struct epoll_controller *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_epoll_allocate(struct epoll_controller *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_epoll_flock(struct epoll_controller *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_epoll_sync(struct epoll_controller *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_epoll_datasync(struct epoll_controller *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_epoll_stat(struct epoll_controller *__restrict self, NCX struct stat *result) THROWS(...);
@@ -630,6 +644,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_pipe_ioctl(struct pipe
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_truncate(struct pipe *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_pipe_mmap(struct pipe *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pipe_allocate(struct pipe *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_flock(struct pipe *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_sync(struct pipe *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_datasync(struct pipe *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_stat(struct pipe *__restrict self, NCX struct stat *result) THROWS(...);
@@ -660,6 +675,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_ioctl(stru
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_reader_truncate(struct pipe_reader *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_pipe_reader_mmap(struct pipe_reader *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pipe_reader_allocate(struct pipe_reader *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_reader_flock(struct pipe_reader *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_reader_sync(struct pipe_reader *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_reader_datasync(struct pipe_reader *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_reader_stat(struct pipe_reader *__restrict self, NCX struct stat *result) THROWS(...);
@@ -690,6 +706,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_ioctl(stru
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_writer_truncate(struct pipe_writer *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_pipe_writer_mmap(struct pipe_writer *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pipe_writer_allocate(struct pipe_writer *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_writer_flock(struct pipe_writer *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_writer_sync(struct pipe_writer *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_writer_datasync(struct pipe_writer *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pipe_writer_stat(struct pipe_writer *__restrict self, NCX struct stat *result) THROWS(...);
@@ -720,6 +737,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_ioctl(st
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_fence_truncate(struct eventfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_eventfd_fence_mmap(struct eventfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_eventfd_fence_allocate(struct eventfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_fence_flock(struct eventfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_fence_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_fence_datasync(struct eventfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_fence_stat(struct eventfd *__restrict self, NCX struct stat *result) THROWS(...);
@@ -750,6 +768,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_ioctl(str
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_sema_truncate(struct eventfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_eventfd_sema_mmap(struct eventfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_eventfd_sema_allocate(struct eventfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_sema_flock(struct eventfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_sema_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_sema_datasync(struct eventfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_eventfd_sema_stat(struct eventfd *__restrict self, NCX struct stat *result) THROWS(...);
@@ -780,6 +799,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_signalfd_ioctl(struct 
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_signalfd_truncate(struct signalfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_signalfd_mmap(struct signalfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_signalfd_allocate(struct signalfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_signalfd_flock(struct signalfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_signalfd_sync(struct signalfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_signalfd_datasync(struct signalfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_signalfd_stat(struct signalfd *__restrict self, NCX struct stat *result) THROWS(...);
@@ -810,6 +830,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_futexfd_ioctl(struct m
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_futexfd_truncate(struct mfutexfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_futexfd_mmap(struct mfutexfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_futexfd_allocate(struct mfutexfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_futexfd_flock(struct mfutexfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_futexfd_sync(struct mfutexfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_futexfd_datasync(struct mfutexfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_futexfd_stat(struct mfutexfd *__restrict self, NCX struct stat *result) THROWS(...);
@@ -840,6 +861,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_pidfd_ioctl(struct tas
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_pidfd_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pidfd_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_flock(struct taskpid *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_sync(struct taskpid *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_datasync(struct taskpid *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_stat(struct taskpid *__restrict self, NCX struct stat *result) THROWS(...);
@@ -870,6 +892,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_module_ioctl(struct mo
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_module_truncate(struct module *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_module_mmap(struct module *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_module_allocate(struct module *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_module_flock(struct module *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_module_sync(struct module *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_module_datasync(struct module *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_module_stat(struct module *__restrict self, NCX struct stat *result) THROWS(...);
@@ -900,6 +923,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_driver_loadlist_ioctl(
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_driver_loadlist_truncate(struct driver_loadlist *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_driver_loadlist_mmap(struct driver_loadlist *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_driver_loadlist_allocate(struct driver_loadlist *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_driver_loadlist_flock(struct driver_loadlist *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_driver_loadlist_sync(struct driver_loadlist *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_driver_loadlist_datasync(struct driver_loadlist *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_driver_loadlist_stat(struct driver_loadlist *__restrict self, NCX struct stat *result) THROWS(...);
@@ -930,6 +954,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_refcountable_ioctl(str
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_truncate(struct refcountable *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_refcountable_mmap(struct refcountable *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_refcountable_allocate(struct refcountable *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_flock(struct refcountable *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_sync(struct refcountable *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_datasync(struct refcountable *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_stat(struct refcountable *__restrict self, NCX struct stat *result) THROWS(...);
@@ -960,6 +985,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_notifyfd_ioctl(struct 
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_truncate(struct notifyfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_notifyfd_mmap(struct notifyfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_notifyfd_allocate(struct notifyfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_flock(struct notifyfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_sync(struct notifyfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_datasync(struct notifyfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_stat(struct notifyfd *__restrict self, NCX struct stat *result) THROWS(...);
@@ -990,6 +1016,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_dirhandlex_ioctl(struc
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_truncate(struct dirhandlex *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_dirhandlex_mmap(struct dirhandlex *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_dirhandlex_allocate(struct dirhandlex *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_flock(struct dirhandlex *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_sync(struct dirhandlex *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_datasync(struct dirhandlex *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_stat(struct dirhandlex *__restrict self, NCX struct stat *result) THROWS(...);
@@ -1020,6 +1047,7 @@ INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_timerfd_ioctl(struct t
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_truncate(struct timerfd *__restrict self, pos_t new_size) THROWS(...);
 INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_timerfd_mmap(struct timerfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_timerfd_allocate(struct timerfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_flock(struct timerfd *__restrict self, syscall_ulong_t operation) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_sync(struct timerfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_datasync(struct timerfd *__restrict self) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_stat(struct timerfd *__restrict self, NCX struct stat *result) THROWS(...);

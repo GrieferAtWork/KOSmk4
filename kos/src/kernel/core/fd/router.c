@@ -328,6 +328,7 @@ INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.ioctl")
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.truncate") void KCALL handle_undefined_truncate(void *__restrict UNUSED(self), pos_t UNUSED(new_size)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC); }
 INTERN BLOCKING NONNULL((1, 2)) ATTR_SECTION(".text.kernel.handle_undefined.mmap") void KCALL handle_undefined_mmap(void *__restrict UNUSED(self), struct handle_mmap_info *__restrict UNUSED(info)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.allocate") pos_t KCALL handle_undefined_allocate(void *__restrict UNUSED(self), fallocate_mode_t UNUSED(mode), pos_t UNUSED(start), pos_t UNUSED(length)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE); }
+INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.flock") void KCALL handle_undefined_flock(void *__restrict UNUSED(self), syscall_ulong_t UNUSED(operation)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_FLOCK); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.sync") void KCALL handle_undefined_sync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasync") void KCALL handle_undefined_datasync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC); }
 INTERN BLOCKING NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.stat") void KCALL handle_undefined_stat(void *__restrict UNUSED(self), NCX struct stat *UNUSED(result)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT); }
@@ -911,6 +912,32 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_DIRHANDLEX]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandlex_allocate,
 		[HANDLE_TYPE_TIMERFD]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_timerfd_allocate
 	},
+	.h_flock = {
+		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_undefined_flock,
+		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_mfile_flock,
+		[HANDLE_TYPE_DIRENT]          = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_dirent_flock,
+		[HANDLE_TYPE_PATH]            = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_path_flock,
+		[HANDLE_TYPE_FILEHANDLE]      = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_filehandle_flock,
+		[HANDLE_TYPE_TEMPHANDLE]      = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_temphandle_flock,
+		[HANDLE_TYPE_DIRHANDLE]       = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_dirhandle_flock,
+		[HANDLE_TYPE_FIFOHANDLE]      = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_fifohandle_flock,
+		[HANDLE_TYPE_SOCKET]          = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_socket_flock,
+		[HANDLE_TYPE_EPOLL]           = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_epoll_flock,
+		[HANDLE_TYPE_PIPE]            = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_pipe_flock,
+		[HANDLE_TYPE_PIPE_READER]     = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_pipe_reader_flock,
+		[HANDLE_TYPE_PIPE_WRITER]     = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_pipe_writer_flock,
+		[HANDLE_TYPE_EVENTFD_FENCE]   = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_eventfd_fence_flock,
+		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_eventfd_sema_flock,
+		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_signalfd_flock,
+		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_futexfd_flock,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_pidfd_flock,
+		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_module_flock,
+		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_driver_loadlist_flock,
+		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_refcountable_flock,
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_notifyfd_flock,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_dirhandlex_flock,
+		[HANDLE_TYPE_TIMERFD]         = (void (KCALL *)(void *__restrict, syscall_ulong_t))&handle_timerfd_flock
+	},
 	.h_sync = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict))&handle_undefined_sync,
 		[HANDLE_TYPE_MFILE]           = (void (KCALL *)(void *__restrict))&handle_mfile_sync,
@@ -1119,6 +1146,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_mfile_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_mfile_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_mfile_stat, handle_undefined_stat);
@@ -1152,6 +1180,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_dirent_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirent_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirent_stat, handle_undefined_stat);
@@ -1185,6 +1214,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
@@ -1218,6 +1248,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_filehandle_stat, handle_undefined_stat);
@@ -1251,6 +1282,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_temphandle_stat, handle_undefined_stat);
@@ -1284,6 +1316,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandle_stat, handle_undefined_stat);
@@ -1317,6 +1350,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifohandle_stat, handle_undefined_stat);
@@ -1350,6 +1384,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_stat, handle_undefined_stat);
@@ -1383,6 +1418,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_epoll_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_epoll_stat, handle_undefined_stat);
@@ -1416,6 +1452,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_stat, handle_undefined_stat);
@@ -1449,6 +1486,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_stat, handle_undefined_stat);
@@ -1482,6 +1520,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_stat, handle_undefined_stat);
@@ -1515,6 +1554,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_stat, handle_undefined_stat);
@@ -1548,6 +1588,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_stat, handle_undefined_stat);
@@ -1581,6 +1622,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_stat, handle_undefined_stat);
@@ -1614,6 +1656,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_stat, handle_undefined_stat);
@@ -1647,6 +1690,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_stat, handle_undefined_stat);
@@ -1680,6 +1724,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_module_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_module_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_module_stat, handle_undefined_stat);
@@ -1713,6 +1758,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_loadlist_stat, handle_undefined_stat);
@@ -1746,6 +1792,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_refcountable_stat, handle_undefined_stat);
@@ -1779,6 +1826,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_stat, handle_undefined_stat);
@@ -1812,6 +1860,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_stat, handle_undefined_stat);
@@ -1845,6 +1894,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_ioctl, handle_undefined_ioctl);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_truncate, handle_undefined_truncate);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_mmap, handle_undefined_mmap);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_flock, handle_undefined_flock);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_timerfd_stat, handle_undefined_stat);

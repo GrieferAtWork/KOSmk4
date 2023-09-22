@@ -198,6 +198,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS,        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 	E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 	E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL, /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
+	E_INVALID_ARGUMENT_CONTEXT_FLOCK_COMMAND,          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported value for `operation' passed to `flock(2)' */
 
 	/* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP = 0x1120,         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
@@ -494,6 +495,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
+#define E_INVALID_ARGUMENT_CONTEXT_FLOCK_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_FLOCK_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported value for `operation' passed to `flock(2)' */
 /* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
                                                                                                                                  * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
@@ -767,6 +769,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  4097  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   4098  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           4099  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
+#define E_INVALID_ARGUMENT_CONTEXT_FLOCK_COMMAND                    4100  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported value for `operation' passed to `flock(2)' */
 /* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        4384  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
                                                                            * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
