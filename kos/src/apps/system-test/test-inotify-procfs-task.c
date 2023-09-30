@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_C
-#define GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_C 1
+#ifndef GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_TASK_C
+#define GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_TASK_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 #undef NDEBUG
@@ -34,6 +34,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -58,56 +60,48 @@ PRIVATE struct inotify_event *inotify_read(fd_t notify_fd) {
 	return inotify_buf;
 }
 
-DEFINE_TEST(inotify_procfs) {
+PRIVATE sem_t my_thread_block;
+PRIVATE void *my_thread_main(void *arg) {
+	EQ(0, TEMP_FAILURE_RETRY(sem_wait(&my_thread_block)));
+	return arg;
+}
+
+DEFINE_TEST(inotify_procfs_task) {
 	fd_t notify_fd;
 	watchfd_t wfd;
-	pid_t cpid, wpid;
+	pid_t tid;
+	pthread_t pt;
 	struct inotify_event *ev;
-	int st;
-	char ascii_cpid[sizeof(PRIMAXdN(__SIZEOF_PID_T__))];
-	size_t ascii_cpid_len;
+	char ascii_tid[sizeof(PRIMAXdN(__SIZEOF_PID_T__))];
+	size_t ascii_tid_len;
 	ISpos((notify_fd = inotify_init1(IN_CLOEXEC | IN_CLOFORK | IN_NONBLOCK)));
-	ISpos((wfd = inotify_add_watch(notify_fd, "/proc", IN_ALL_EVENTS | IN_ONLYDIR)));
+	ISpos((wfd = inotify_add_watch(notify_fd, "/proc/self/task", IN_ALL_EVENTS | IN_ONLYDIR)));
 	ISnull((ev = inotify_read(notify_fd)));
 
-	/* Spawn a new process. */
-	ISpos((cpid = vfork()));
-	if (cpid == 0)
-		_exit(0);
+	/* Spawn a new thread. */
+	EQ(0, sem_init(&my_thread_block, 0, 0));
+	EQ(EOK, pthread_create(&pt, NULL, &my_thread_main, NULL));
 
-	/* At this point, the IN_CREATE event should have been posted (we used vfork(),
-	 * so we (the  parent process)  automatically blocked until  the child  process
-	 * called  _exit() above, so we know that the child process was spawned and has
-	 * also already exited).
-	 *
-	 * NOTE: If we used `fork()' instead of `vfork()', then `inotify_read()' would
-	 *       still be able to return `NULL' here (since the child process may  not
-	 *       have already exited). */
-	ascii_cpid_len = sprintf(ascii_cpid, "%" PRIdN(__SIZEOF_PID_T__), cpid);
+	/* At this point, the IN_CREATE event should have been posted. */
+	tid           = pthread_gettid_np(pt);
+	ascii_tid_len = sprintf(ascii_tid, "%" PRIdN(__SIZEOF_PID_T__), tid);
 	ISnonnull((ev = inotify_read(notify_fd)));
 	EQ(wfd, ev->wd);
 	EQ(IN_CREATE | IN_ISDIR, ev->mask);
-	EQ(ascii_cpid_len + 1, ev->len);
-	EQmem(ascii_cpid, ev->name, ascii_cpid_len);
-
-	/* Even though the child process has already exited, there should *NOT*
-	 * be an IN_DELETE event, yet, since the process has yet to be  reaped. */
+	EQ(ascii_tid_len + 1, ev->len);
+	EQmem(ascii_tid, ev->name, ascii_tid_len);
 	ISnull((ev = inotify_read(notify_fd)));
 
-	/* Wait (and thus reap) the child process. */
-	while ((wpid = wait(&st)) == -1)
-		EQerrno(EINTR);
-	EQ(cpid, wpid);
-	EQ(W_EXITCODE(0, 0), st);
+	/* Allow the thread to terminate and then join it. */
+	EQ(0, sem_post(&my_thread_block));
+	EQ(EOK, pthread_join(pt, NULL));
 
 	/* The IN_DELETE event should now be present. */
 	ISnonnull((ev = inotify_read(notify_fd)));
 	EQ(wfd, ev->wd);
 	EQ(IN_DELETE | IN_ISDIR, ev->mask);
-	EQ(ascii_cpid_len + 1, ev->len);
-	EQmem(ascii_cpid, ev->name, ascii_cpid_len);
-
-	/* There should not be any extra events. */
+	EQ(ascii_tid_len + 1, ev->len);
+	EQmem(ascii_tid, ev->name, ascii_tid_len);
 	ISnull((ev = inotify_read(notify_fd)));
 
 	/* Cleanup... */
@@ -116,4 +110,4 @@ DEFINE_TEST(inotify_procfs) {
 
 DECL_END
 
-#endif /* !GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_C */
+#endif /* !GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_PROCFS_TASK_C */

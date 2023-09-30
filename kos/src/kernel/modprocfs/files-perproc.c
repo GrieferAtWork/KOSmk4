@@ -3580,12 +3580,156 @@ procfs_perproc_task_v_enum(struct fdirenum *__restrict result) {
 	rt->ptd_pid   = pid;
 }
 
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+
+#ifndef __mfile_awref_defined
+#define __mfile_awref_defined
+AWREF(mfile_awref, mfile);
+#endif /* !__mfile_awref_defined */
+
+struct procfs_perproc_task_notify_controller {
+	WEAK refcnt_t         pfpptnc_refcnt;             /* Reference counter. */
+	struct taskpid       *pfpptnc_proc;               /* [1..1][const] Process main() thread (filter for thread events). */
+	struct mfile_awref    pfpptnc_task_folder;        /* [0..1] File to which events should be posted. */
+	struct sig_completion pfpptnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
+	struct sig_completion pfpptnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_perproc_task_notify_controller_destroy)(struct procfs_perproc_task_notify_controller *__restrict self) {
+	sig_completion_disconnect(&self->pfpptnc_addproc_completion);
+	sig_completion_disconnect(&self->pfpptnc_delproc_completion);
+	kfree(self);
+}
+
+DEFINE_REFCNT_FUNCTIONS(struct procfs_perproc_task_notify_controller, pfpptnc_refcnt,
+                        procfs_perproc_task_notify_controller_destroy);
+
+
+/* Structure that is passed via the dynamic buffer to `procfs_perproc_task_hand_postcompletion()' */
+struct procfs_perproc_task_event {
+	REF struct mfile *pfppfde_file; /* [1..1] File to which to post events. */
+	uint16_t          pfppfde_mask; /* The type of event (either IN_CREATE or IN_DELETE) */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sig_completion_context *__restrict context,
+                                                       void *buf) {
+	struct taskpid *tpid;
+	struct procfs_perproc_task_event *e;
+	notifyfd_event_name_t name;
+	e = (struct procfs_perproc_task_event *)buf;
+
+	/* FIXME: Don't unconditionally use the root namespace PID (the  PID
+	 * used should differ for each inotify receiver, and be based on the
+	 * receiver's  canonical PID namespace. Additionally, omit the event
+	 * if the receiver isn't supposed to see the process) */
+	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
+	name = NOTIFYFD_EVENT_NAME_DECIMAL(taskpid_getroottid(tpid));
+
+	/* Post the filesystem event to the /task directory. */
+	_mfile_postfsfilevent_ex(e->pfppfde_file, e->pfppfde_mask | IN_ISDIR, 0, name);
+	decref_unlikely(e->pfppfde_file);
+}
+
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sig_completion *__restrict self,
+                                                 struct sig_completion_context *__restrict context,
+                                                 struct procfs_perproc_task_notify_controller *__restrict controller,
+                                                 void *buf, size_t bufsize, uint16_t mask) {
+	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
+	struct procfs_perproc_task_event *e = (struct procfs_perproc_task_event *)buf;
+	if (taskpid_getprocpid(tpid) != controller->pfpptnc_proc)
+		return 0; /* Thread belongs to some other process (but not ours) */
+	if (bufsize < sizeof(struct procfs_perproc_task_event))
+		return sizeof(struct procfs_perproc_task_event);
+
+	/* Load the mfile of the `/proc/[pid]/fd' directory. */
+	e->pfppfde_file = awref_get(&controller->pfpptnc_task_folder);
+	if unlikely(e->pfppfde_file == NULL)
+		return 0; /* Special case: /fd directory was unloaded (stop monitoring) */
+	e->pfppfde_mask = mask;
+	context->scc_post = &procfs_perproc_task_hand_postcompletion;
+
+	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
+	sig_completion_reprime(self, true);
+	return sizeof(struct procfs_perproc_task_event);
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_perproc_task_addhand_completion)(struct sig_completion *__restrict self,
+                                                      struct sig_completion_context *__restrict context,
+                                                      void *buf, size_t bufsize) {
+	return procfs_perproc_task_hand_completion(self, context,
+	                                           container_of(self, struct procfs_perproc_task_notify_controller, pfpptnc_addproc_completion),
+	                                           buf, bufsize, IN_CREATE);
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_perproc_task_delhand_completion)(struct sig_completion *__restrict self,
+                                                      struct sig_completion_context *__restrict context,
+                                                      void *buf, size_t bufsize) {
+	return procfs_perproc_task_hand_completion(self, context,
+	                                           container_of(self, struct procfs_perproc_task_notify_controller, pfpptnc_delproc_completion),
+	                                           buf, bufsize, IN_DELETE);
+}
+
+
+PRIVATE BLOCKING NONNULL((1)) void *KCALL
+procfs_perproc_task_v_notify_attach(struct mfile *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	REF struct procfs_perproc_task_notify_controller *result;
+	struct taskpid *tpid;
+	assert(mfile_isnode(self));
+	tpid = mfile_asnode(self)->fn_fsdata;
+
+	/* Allocate the notify controller. */
+	result = (REF struct procfs_perproc_task_notify_controller *)kmalloc(sizeof(struct procfs_perproc_task_notify_controller),
+	                                                                   GFP_NORMAL);
+
+	/* Initialize the controller and connect it to the handle manager's add/del-hand signals. */
+	result->pfpptnc_refcnt = 1;
+	result->pfpptnc_proc   = taskpid_getprocpid(tpid);
+	awref_init(&result->pfpptnc_task_folder, self);
+	sig_completion_init(&result->pfpptnc_addproc_completion, &procfs_perproc_task_addhand_completion);
+	sig_completion_init(&result->pfpptnc_delproc_completion, &procfs_perproc_task_delhand_completion);
+	sig_connect_completion_for_poll(&pidns_root.pn_addproc, &result->pfpptnc_addproc_completion);
+	sig_connect_completion_for_poll(&pidns_root.pn_delproc, &result->pfpptnc_delproc_completion);
+	printk(KERN_INFO "[procfs] Notify object attached to '/proc/%d/task' [cookie:%p]\n",
+	       taskpid_getroottid(tpid), result);
+	return result;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_perproc_task_v_notify_detach)(struct mfile *__restrict self, void *cookie) {
+	REF struct procfs_perproc_task_notify_controller *controller;
+	(void)self;
+	assert(mfile_isnode(self));
+	printk(KERN_INFO "[procfs] Notify object detached from '/proc/%d/task' [cookie:%p]\n",
+	       taskpid_getroottid(mfile_asnode(self)->fn_fsdata), cookie);
+	controller = (struct procfs_perproc_task_notify_controller *)cookie;
+	awref_clear(&controller->pfpptnc_task_folder);
+	decref_likely(controller);
+}
+
+PRIVATE struct mfile_stream_ops const procfs_perproc_task_v_stream_ops = {
+	.mso_open          = &procfs_perproc_dir_v_open,
+	.mso_stat          = &procfs_perproc_dir_v_stat,
+	.mso_ioctl         = &procfs_perproc_dir_v_ioctl,
+	.mso_notify_attach = &procfs_perproc_task_v_notify_attach,
+	.mso_notify_detach = &procfs_perproc_task_v_notify_detach,
+};
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#define procfs_perproc_task_v_stream_ops procfs_perproc_dir_v_stream_ops
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
+
 INTERN_CONST struct fdirnode_ops const procfs_pp_task = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &procfs_perproc_dir_v_destroy,
 			.mo_changed = &procfs_perproc_dir_v_changed,
-			.mo_stream  = &procfs_perproc_dir_v_stream_ops,
+			.mo_stream  = &procfs_perproc_task_v_stream_ops,
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
