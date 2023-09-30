@@ -503,7 +503,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 PRIVATE ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL sem_wakeall)(sem_t *self) {
 	atomic_write(&self->s_wait, 0);
-	(void)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, (size_t)-1, NULL, 0);
+	(void)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKE, (size_t)-1, NULL, 0);
 }
 
 PRIVATE ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) void
@@ -514,7 +514,7 @@ again_check_waiters:
 	if (waiters != 0) {
 		if (!atomic_cmpxch_weak(&self->s_wait, waiters, waiters - 1))
 			goto again_check_waiters;
-		if (sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, 1, NULL, 0) == 0)
+		if (sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKE, 1, NULL, 0) == 0)
 			sem_wakeall(self);
 	}
 }
@@ -529,7 +529,7 @@ again_check_waiters:
 			new_waiters = 0;
 		if (!atomic_cmpxch_weak(&self->s_wait, waiters, new_waiters))
 			goto again_check_waiters;
-		if ((size_t)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKEMASK, count, NULL, 0) < count)
+		if ((size_t)sys_lfutex((lfutex_t *)&self->s_count, LFUTEX_WAKE, count, NULL, 0) < count)
 			sem_wakeall(self);
 	}
 }

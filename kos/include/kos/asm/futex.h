@@ -38,8 +38,8 @@
                                                            * >>     wakemask(timeout: ~0x80000000, val2: 0);
                                                            * Behavior:
                                                            * >> result = 0;
-                                                           * >> while (val && sig_send(uaddr))
-                                                           * >>     ++result, --val;
+                                                           * >> while (result < val && sig_send(uaddr))
+                                                           * >>     ++result;
                                                            * >> if (result < val && val != 0) {
                                                            * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
                                                            * >>     result += sig_broadcast(uaddr);
