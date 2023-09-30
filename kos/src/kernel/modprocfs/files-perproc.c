@@ -160,7 +160,7 @@ NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 #define NIBBLES_PER_PTR 4
 #elif __SIZEOF_POINTER__ == 1
 #define NIBBLES_PER_PTR 2
-#else /* __SIZEOF_POINTER__ == ... */
+#elif !defined(__DEEMON__) /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */
 
@@ -3949,96 +3949,91 @@ PRIVATE struct fdirent_ops const procfs_perproc_drives_dirent_ops = {
 	.fdo_getino   = &procfs_perproc_drives_v_getino,
 };
 
-#define DEFINE_DRIVE_DIRENT(name, letter, hash)                    \
-	PRIVATE struct fdirent procfs_perproc_dirent_dcwd_##name = {   \
-		.fd_refcnt  = 1,                                           \
-		.fd_ops     = &procfs_perproc_dcwd_dirent_ops,             \
-		.fd_ino     = (ino_t)(letter - 'A'),                       \
-		.fd_hash    = hash,                                        \
-		.fd_namelen = 1,                                           \
-		.fd_type    = DT_LNK,                                      \
-		/* .fd_name = */ { letter, 0 }                             \
-	};                                                             \
-	PRIVATE struct fdirent procfs_perproc_dirent_drives_##name = { \
-		.fd_refcnt  = 1,                                           \
-		.fd_ops     = &procfs_perproc_drives_dirent_ops,           \
-		.fd_ino     = (ino_t)(letter - 'A'),                       \
-		.fd_hash    = hash,                                        \
-		.fd_namelen = 1,                                           \
-		.fd_type    = DT_LNK,                                      \
-		/* .fd_name = */ { letter, 0 }                             \
-	}
+#ifndef VFS_DRIVECOUNT
+#define VFS_DRIVECOUNT 26
+#endif /* !VFS_DRIVECOUNT */
+
 /*[[[deemon
 #undef print
 import * from deemon;
 import * from ....misc.libgen.fdirent_hash;
-for (local x: [:26]) {
+print("/" "* FOREACH_DRIVE(cb(LETTER, letterChr, hash)) *" "/");
+print("#define FOREACH_DRIVE(cb) \\");
+for (local x: [:VFS_DRIVECOUNT]) {
 	local letter = string.chr("A".ord() + x);
-	print("DEFINE_DRIVE_DIRENT(", letter, ", '", letter, "', ",
-		fdirent_hash(letter), ");");
+	print("\tcb(", letter, ", '", letter, "', ", fdirent_hash(letter), ")"),;
+	if (x != (VFS_DRIVECOUNT - 1))
+		print("      \\"),;
+	print;
 }
-print("PRIVATE struct fdirent *const procfs_perproc_dirent_dcwd[VFS_DRIVECOUNT] = {");
-for (local x: [:26].segments(3)) {
-	print("	", ", ".join(for (local y: x)
-		"&procfs_perproc_dirent_dcwd_" + string.chr("A".ord() + y)), ",");
-}
-print("};");
-print("PRIVATE struct fdirent *const procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {");
-for (local x: [:26].segments(3)) {
-	print("	", ", ".join(for (local y: x)
-		"&procfs_perproc_dirent_drives_" + string.chr("A".ord() + y)), ",");
-}
-print("};");
 ]]]*/
-DEFINE_DRIVE_DIRENT(A, 'A', 0x41);
-DEFINE_DRIVE_DIRENT(B, 'B', 0x42);
-DEFINE_DRIVE_DIRENT(C, 'C', 0x43);
-DEFINE_DRIVE_DIRENT(D, 'D', 0x44);
-DEFINE_DRIVE_DIRENT(E, 'E', 0x45);
-DEFINE_DRIVE_DIRENT(F, 'F', 0x46);
-DEFINE_DRIVE_DIRENT(G, 'G', 0x47);
-DEFINE_DRIVE_DIRENT(H, 'H', 0x48);
-DEFINE_DRIVE_DIRENT(I, 'I', 0x49);
-DEFINE_DRIVE_DIRENT(J, 'J', 0x4a);
-DEFINE_DRIVE_DIRENT(K, 'K', 0x4b);
-DEFINE_DRIVE_DIRENT(L, 'L', 0x4c);
-DEFINE_DRIVE_DIRENT(M, 'M', 0x4d);
-DEFINE_DRIVE_DIRENT(N, 'N', 0x4e);
-DEFINE_DRIVE_DIRENT(O, 'O', 0x4f);
-DEFINE_DRIVE_DIRENT(P, 'P', 0x50);
-DEFINE_DRIVE_DIRENT(Q, 'Q', 0x51);
-DEFINE_DRIVE_DIRENT(R, 'R', 0x52);
-DEFINE_DRIVE_DIRENT(S, 'S', 0x53);
-DEFINE_DRIVE_DIRENT(T, 'T', 0x54);
-DEFINE_DRIVE_DIRENT(U, 'U', 0x55);
-DEFINE_DRIVE_DIRENT(V, 'V', 0x56);
-DEFINE_DRIVE_DIRENT(W, 'W', 0x57);
-DEFINE_DRIVE_DIRENT(X, 'X', 0x58);
-DEFINE_DRIVE_DIRENT(Y, 'Y', 0x59);
-DEFINE_DRIVE_DIRENT(Z, 'Z', 0x5a);
-PRIVATE struct fdirent *const procfs_perproc_dirent_dcwd[VFS_DRIVECOUNT] = {
-	&procfs_perproc_dirent_dcwd_A, &procfs_perproc_dirent_dcwd_B, &procfs_perproc_dirent_dcwd_C,
-	&procfs_perproc_dirent_dcwd_D, &procfs_perproc_dirent_dcwd_E, &procfs_perproc_dirent_dcwd_F,
-	&procfs_perproc_dirent_dcwd_G, &procfs_perproc_dirent_dcwd_H, &procfs_perproc_dirent_dcwd_I,
-	&procfs_perproc_dirent_dcwd_J, &procfs_perproc_dirent_dcwd_K, &procfs_perproc_dirent_dcwd_L,
-	&procfs_perproc_dirent_dcwd_M, &procfs_perproc_dirent_dcwd_N, &procfs_perproc_dirent_dcwd_O,
-	&procfs_perproc_dirent_dcwd_P, &procfs_perproc_dirent_dcwd_Q, &procfs_perproc_dirent_dcwd_R,
-	&procfs_perproc_dirent_dcwd_S, &procfs_perproc_dirent_dcwd_T, &procfs_perproc_dirent_dcwd_U,
-	&procfs_perproc_dirent_dcwd_V, &procfs_perproc_dirent_dcwd_W, &procfs_perproc_dirent_dcwd_X,
-	&procfs_perproc_dirent_dcwd_Y, &procfs_perproc_dirent_dcwd_Z,
-};
-PRIVATE struct fdirent *const procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {
-	&procfs_perproc_dirent_drives_A, &procfs_perproc_dirent_drives_B, &procfs_perproc_dirent_drives_C,
-	&procfs_perproc_dirent_drives_D, &procfs_perproc_dirent_drives_E, &procfs_perproc_dirent_drives_F,
-	&procfs_perproc_dirent_drives_G, &procfs_perproc_dirent_drives_H, &procfs_perproc_dirent_drives_I,
-	&procfs_perproc_dirent_drives_J, &procfs_perproc_dirent_drives_K, &procfs_perproc_dirent_drives_L,
-	&procfs_perproc_dirent_drives_M, &procfs_perproc_dirent_drives_N, &procfs_perproc_dirent_drives_O,
-	&procfs_perproc_dirent_drives_P, &procfs_perproc_dirent_drives_Q, &procfs_perproc_dirent_drives_R,
-	&procfs_perproc_dirent_drives_S, &procfs_perproc_dirent_drives_T, &procfs_perproc_dirent_drives_U,
-	&procfs_perproc_dirent_drives_V, &procfs_perproc_dirent_drives_W, &procfs_perproc_dirent_drives_X,
-	&procfs_perproc_dirent_drives_Y, &procfs_perproc_dirent_drives_Z,
-};
+/* FOREACH_DRIVE(cb(LETTER, letterChr, hash)) */
+#define FOREACH_DRIVE(cb) \
+	cb(A, 'A', 0x41)      \
+	cb(B, 'B', 0x42)      \
+	cb(C, 'C', 0x43)      \
+	cb(D, 'D', 0x44)      \
+	cb(E, 'E', 0x45)      \
+	cb(F, 'F', 0x46)      \
+	cb(G, 'G', 0x47)      \
+	cb(H, 'H', 0x48)      \
+	cb(I, 'I', 0x49)      \
+	cb(J, 'J', 0x4a)      \
+	cb(K, 'K', 0x4b)      \
+	cb(L, 'L', 0x4c)      \
+	cb(M, 'M', 0x4d)      \
+	cb(N, 'N', 0x4e)      \
+	cb(O, 'O', 0x4f)      \
+	cb(P, 'P', 0x50)      \
+	cb(Q, 'Q', 0x51)      \
+	cb(R, 'R', 0x52)      \
+	cb(S, 'S', 0x53)      \
+	cb(T, 'T', 0x54)      \
+	cb(U, 'U', 0x55)      \
+	cb(V, 'V', 0x56)      \
+	cb(W, 'W', 0x57)      \
+	cb(X, 'X', 0x58)      \
+	cb(Y, 'Y', 0x59)      \
+	cb(Z, 'Z', 0x5a)
 /*[[[end]]]*/
+
+struct procfs_drive_fdirent {
+	_FDIRENT_FIELDS_WITHOUT_NAME
+	char fd_name[2];
+};
+
+#define procfs_drive_fdirent_asdirent(self) ((struct fdirent *)(self))
+
+
+PRIVATE struct procfs_drive_fdirent procfs_perproc_dirent_dcwd[VFS_DRIVECOUNT] = {
+#define DEFINE_DCWD_DIRENT(name, letter, hash)         \
+	{                                                  \
+		.fd_refcnt  = 1,                               \
+		.fd_ops     = &procfs_perproc_dcwd_dirent_ops, \
+		.fd_ino     = (ino_t)(letter - 'A'),           \
+		.fd_hash    = hash,                            \
+		.fd_namelen = 1,                               \
+		.fd_type    = DT_LNK,                          \
+		/* .fd_name = */ { letter, 0 }                 \
+	},
+	FOREACH_DRIVE(DEFINE_DCWD_DIRENT)
+#undef DEFINE_DCWD_DIRENT
+};
+
+PRIVATE struct procfs_drive_fdirent procfs_perproc_dirent_drives[VFS_DRIVECOUNT] = {
+#define DEFINE_DRIVE_DIRENT(name, letter, hash)          \
+	{                                                    \
+		.fd_refcnt  = 1,                                 \
+		.fd_ops     = &procfs_perproc_drives_dirent_ops, \
+		.fd_ino     = (ino_t)(letter - 'A'),             \
+		.fd_hash    = hash,                              \
+		.fd_namelen = 1,                                 \
+		.fd_type    = DT_LNK,                            \
+		/* .fd_name = */ { letter, 0 }                   \
+	},
+	FOREACH_DRIVE(DEFINE_DRIVE_DIRENT)
+#undef DEFINE_DRIVE_DIRENT
+};
 
 
 /* Returns the drive ID referenced by `info' or `0xff' if
@@ -4078,7 +4073,7 @@ procfs_perproc_kos_dcwd_v_lookup(struct fdirnode *__restrict self,
 	uint8_t id = get_driveid(self, info);
 	if unlikely(id == 0xff)
 		return NULL;
-	return incref(procfs_perproc_dirent_dcwd[id]);
+	return incref(procfs_drive_fdirent_asdirent(&procfs_perproc_dirent_dcwd[id]));
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
@@ -4087,7 +4082,7 @@ procfs_perproc_kos_drives_v_lookup(struct fdirnode *__restrict self,
 	uint8_t id = get_driveid(self, info);
 	if unlikely(id == 0xff)
 		return NULL;
-	return incref(procfs_perproc_dirent_drives[id]);
+	return incref(procfs_drive_fdirent_asdirent(&procfs_perproc_dirent_drives[id]));
 }
 
 struct procfs_perproc_drives_enum: fdirenum {

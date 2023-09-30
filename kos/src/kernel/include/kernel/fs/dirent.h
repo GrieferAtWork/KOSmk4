@@ -83,16 +83,18 @@ struct fdirent {
 	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
 };
 
+#define _FDIRENT_FIELDS_WITHOUT_NAME                                                                                                        \
+	WEAK refcnt_t             fd_refcnt;  /* Reference counter. */                                                           \
+	struct fdirent_ops const *fd_ops;     /* [1..1][const] Operators. */                                                     \
+	ino_t                     fd_ino;     /* [const][valid_if(fd_ops->fdo_getino == NULL)] INode number of this directory    \
+	                                       * entry. WARNING: This  value becomes  invalid if the  entry/file is  deleted! */ \
+	uintptr_t                 fd_hash;    /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */  \
+	u16                       fd_namelen; /* [const][!0] Length of the directory entry name (in c-chars). */                 \
+	unsigned char             fd_type;    /* [const] Directory entry type (one of `DT_*') */
 #ifdef __WANT_FS_INLINE_STRUCTURES
-#define _FDIRENT_FIELDS                                                                                                                     \
-	WEAK refcnt_t                           fd_refcnt;   /* Reference counter. */                                                           \
-	struct fdirent_ops const               *fd_ops;      /* [1..1][const] Operators. */                                                     \
-	ino_t                                   fd_ino;      /* [const][valid_if(fd_ops->fdo_getino == NULL)] INode number of this directory    \
-	                                                      * entry. WARNING: This  value becomes  invalid if the  entry/file is  deleted! */ \
-	uintptr_t                               fd_hash;     /* [const][== fdirent_hash(fd_name, fd_namelen)] Hash of this directory entry. */  \
-	u16                                     fd_namelen;  /* [const][!0] Length of the directory entry name (in c-chars). */                 \
-	unsigned char                           fd_type;     /* [const] Directory entry type (one of `DT_*') */                                 \
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name);    /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
+#define _FDIRENT_FIELDS          \
+	_FDIRENT_FIELDS_WITHOUT_NAME \
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, fd_name); /* [const][fd_namelen] Directory entry name. (NUL-terminated) */
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 
 
