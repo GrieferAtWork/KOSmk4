@@ -59,10 +59,12 @@
 #include <assert.h>
 #include <atomic.h>
 #include <errno.h>
+#include <format-printer.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #define RBTREE_LEFT_LEANING
@@ -263,17 +265,18 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 	/* Clear all remaining unread events. */
 	notify_lock_acquire();
 	while (self->nf_eventc) {
-		REF struct fdirent *name;
+		notifyfd_event_name_t name;
 		assert(self->nf_eventr < self->nf_eventa);
-		name = self->nf_eventv[self->nf_eventr].mfe_name;
+		name = self->nf_eventv[self->nf_eventr].nfe_name;
 		DBG_memset(&self->nf_eventv[self->nf_eventr], 0xcc,
 		           sizeof(self->nf_eventv[self->nf_eventr]));
 		--self->nf_eventc;
 		++self->nf_eventr;
 		self->nf_eventr %= self->nf_eventa;
-		if (name) {
+		if (notifyfd_event_name_isfdirent(&name) &&
+		    !notifyfd_event_name_isnull(&name)) {
 			notify_lock_release_br();
-			decref(name);
+			decref(notifyfd_event_name_asfdirent(&name));
 			notify_lock_acquire_br();
 		}
 	}
@@ -605,7 +608,8 @@ NOTHROW(KCALL notifyfd_trytrim)(struct notifyfd *__restrict self,
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
                                              unsigned int wd, uint16_t mask,
-                                             uint16_t cookie, struct fdirent *ent) {
+                                             uint16_t cookie,
+                                             notifyfd_event_name_t name) {
 	unsigned int slot_wd;
 	struct notifyfd_event *slot;
 	if (self->nf_eventc >= self->nf_eventa) {
@@ -621,14 +625,16 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 	assert(!(wd & NOTIFYFD_EVENT_ISDIR_FLAG));
 	assert(wd < self->nf_listenc);
 	slot_wd = wd;
-	if (ent ? (ent->fd_type == DT_DIR)
-	        : mfile_isdir(self->nf_listenv[wd].nl_file))
+	if (notifyfd_event_name_isnull(&name)
+	    ? mfile_isdir(self->nf_listenv[wd].nl_file)
+	    : (!notifyfd_event_name_isfdirent(&name) ||
+	       (notifyfd_event_name_asfdirent(&name)->fd_type == DT_DIR)))
 		slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
 	if (self->nf_eventc != 0) {
 		/* Special case: linux documents that consecutive, identical events are merged. */
 		slot = &self->nf_eventv[(self->nf_eventr + self->nf_eventc - 1) % self->nf_eventa];
-		if (slot->nfe_wd == slot_wd && slot->mfe_mask == mask &&
-		    slot->mfe_cookie == cookie && slot->mfe_name == ent)
+		if (slot->nfe_wd == slot_wd && slot->nfe_mask == mask &&
+		    slot->nfe_cookie == cookie && slot->nfe_name == name)
 			return false; /* Auto-merge identical events. */
 	}
 
@@ -638,9 +644,9 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 		/* Last slot allocated -> must fill with `IN_Q_OVERFLOW' */
 		static_assert(!((unsigned int)INT_MAX & NOTIFYFD_EVENT_ISDIR_FLAG));
 		slot->nfe_wd     = (unsigned int)INT_MAX; /* Don't set most significant bit! */
-		slot->mfe_mask   = IN_Q_OVERFLOW;
-		slot->mfe_cookie = 0;
-		slot->mfe_name   = NULL;
+		slot->nfe_mask   = IN_Q_OVERFLOW;
+		slot->nfe_cookie = 0;
+		slot->nfe_name   = NOTIFYFD_EVENT_NAME_NULL;
 	} else {
 #ifdef INOTIFY_DEBUG_TRACE
 		printk(KERN_TRACE "[inotify] Post event ");
@@ -678,16 +684,24 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 			printk(KERN_TRACE "IN_IGNORED:");
 		printk(KERN_TRACE "[wd:%d,mask:%#" PRIx32 ",cookie:%#" PRIx32,
 		       slot_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG, mask, cookie);
-		if (ent != NULL)
-			printk(KERN_TRACE ",name:%$q", (size_t)ent->fd_namelen, ent->fd_name);
+		if (!notifyfd_event_name_isnull(&name)) {
+			if (notifyfd_event_name_isfdirent(&name)) {
+				struct fdirent *ent = notifyfd_event_name_asfdirent(&name);
+				printk(KERN_TRACE ",name:%$q", (size_t)ent->fd_namelen, ent->fd_name);
+			} else {
+				printk(KERN_TRACE ",name:\"%" PRIuPTR "\"",
+				       notifyfd_event_name_asdecimal(&name));
+			}
+		}
 		printk(KERN_TRACE "]\n");
 #endif /* INOTIFY_DEBUG_TRACE */
 
 		/* Fill in the new slot. */
 		slot->nfe_wd     = slot_wd;
-		slot->mfe_mask   = mask;
-		slot->mfe_cookie = cookie;
-		slot->mfe_name   = xincref(ent);
+		slot->nfe_mask   = mask;
+		slot->nfe_cookie = cookie;
+		slot->nfe_name   = name;
+		notifyfd_event_name_xincref(&name);
 	}
 	return true;
 }
@@ -717,7 +731,7 @@ NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
 		goto done; /* Fd was already deleted */
 
 	/* Notify watchfd deletion. */
-	if (notifyfd_postfsevent_raw_impl(self, watchfd, IN_IGNORED, 0, NULL))
+	if (notifyfd_postfsevent_raw_impl(self, watchfd, IN_IGNORED, 0, NOTIFYFD_EVENT_NAME_NULL))
 		should_broadcast = self->nf_eventc == 1;
 
 	/* Actually delete the slot. */
@@ -1013,14 +1027,14 @@ SLIST_HEAD(notifyfd_slist, notifyfd);
  * @param: wd:     s.a. `struct inotify_event::ine_wd'
  * @param: mask:   s.a. `struct inotify_event::ine_mask'
  * @param: cookie: s.a. `struct inotify_event::ine_cookie'
- * @param: ent:    s.a. `struct inotify_event::ine_(len|name)' */
+ * @param: name:   s.a. `struct inotify_event::ine_(len|name)' */
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
                                          struct REF notifyfd_slist *__restrict blist,
-                                         unsigned int wd, uint16_t mask,
-                                         uint16_t cookie, struct fdirent *ent) {
+                                         unsigned int wd, uint16_t mask, uint16_t cookie,
+                                         notifyfd_event_name_t name) {
 	/* Post the event. */
-	if (!notifyfd_postfsevent_raw_impl(self, wd, mask, cookie, ent))
+	if (!notifyfd_postfsevent_raw_impl(self, wd, mask, cookie, name))
 		return;
 
 	/* If we just posted the first  event to the notifyfd, then  we
@@ -1073,17 +1087,18 @@ NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL notify_listener_postfsevent_raw_impl)(struct notify_listener *__restrict self,
                                                     struct REF notifyfd_slist *__restrict blist,
-                                                    uint16_t mask, uint16_t cookie, struct fdirent *ent) {
+                                                    uint16_t mask, uint16_t cookie,
+                                                    notifyfd_event_name_t name) {
 	struct notifyfd *notfd = self->nl_notfd;
 	notifyfd_postfsevent_impl(notfd, blist,
 	                          (unsigned int)(self - notfd->nf_listenv),
-	                          mask, cookie, ent);
+	                          mask, cookie, name);
 }
 
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2, 6, 7)) void
 NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restrict self,
                                                 struct REF notifyfd_slist *__restrict blist,
-                                                uint16_t mask, uint16_t cookie, struct fdirent *ent,
+                                                uint16_t mask, uint16_t cookie, notifyfd_event_name_t name,
                                                 struct dnotify_link_slist *__restrict deadlinks,
                                                 struct inotify_controller_slist *__restrict deadnotif) {
 	struct notifyfd *notfd;
@@ -1094,13 +1109,13 @@ NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restri
 		return; /* Ignore event */
 	notfd = self->nl_notfd;
 	wd    = (unsigned int)(self - notfd->nf_listenv);
-	notifyfd_postfsevent_impl(notfd, blist, wd, mask, cookie, ent);
+	notifyfd_postfsevent_impl(notfd, blist, wd, mask, cookie, name);
 
 	/* Handle IN_ONESHOT descriptors */
 	if (self->nl_mask & IN_ONESHOT) {
 		struct mfile *file = self->nl_file;
 		struct inotify_controller *inot;
-		notifyfd_postfsevent_impl(notfd, blist, wd, IN_IGNORED, 0, NULL);
+		notifyfd_postfsevent_impl(notfd, blist, wd, IN_IGNORED, 0, NOTIFYFD_EVENT_NAME_NULL);
 
 		/* Actually delete the slot. */
 		self->nl_file = NULL; /* Inherited by `file' // indicate deleted slot */
@@ -1149,7 +1164,7 @@ NOTHROW(FCALL inotify_controller_postfsevent_impl)(struct inotify_controller *__
 		struct notify_listener *listener;
 		LIST_FOREACH_SAFE (listener, &self->inc_listeners, nl_link) {
 			notify_listener_postfsevent_impl(listener, blist, fil_mask, cookie,
-			                                 NULL, deadlinks, deadnotif);
+			                                 NOTIFYFD_EVENT_NAME_NULL, deadlinks, deadnotif);
 		}
 	}
 
@@ -1160,8 +1175,9 @@ NOTHROW(FCALL inotify_controller_postfsevent_impl)(struct inotify_controller *__
 			struct notify_listener *listener;
 			struct dnotify_controller *dir = dnotify_link_getdir(link);
 			LIST_FOREACH_SAFE (listener, &dir->inc_listeners, nl_link) {
+				struct fdirent *ent = dnotify_link_getent(link);
 				notify_listener_postfsevent_impl(listener, blist, dir_mask, cookie,
-				                                 dnotify_link_getent(link),
+				                                 NOTIFYFD_EVENT_NAME_FDIRENT(ent),
 				                                 deadlinks, deadnotif);
 			}
 		}
@@ -1219,7 +1235,7 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 		assert(notif->inc_file == self);
 		LIST_FOREACH_SAFE (listen, &notif->inc_listeners, nl_link) {
 			assert(listen->nl_file == self);
-			notify_listener_postfsevent_raw_impl(listen, &blist, IN_IGNORED, 0, NULL);
+			notify_listener_postfsevent_raw_impl(listen, &blist, IN_IGNORED, 0, NOTIFYFD_EVENT_NAME_NULL);
 			listen->nl_file = NULL; /* Mark as deleted. */
 			decref_nokill(self);    /* Reference stolen from `listen->nl_file' */
 			/* XXX: Somehow try to truncate the watch-fd vector of `listen->nl_notfd'?
@@ -1331,6 +1347,46 @@ NOTHROW(FCALL mfile_postfsevent_ex)(struct mfile *__restrict self,
 	mfile_postfsevent_impl(self, fil_mask, dir_mask, 0);
 }
 
+/* Post custom FS file event (i.e. these only appear in `self'),
+ * including the ability to post events with custom file  names.
+ *
+ * This function is pretty much only here to allow procfs to post
+ * filesystem  events for /proc when processes are added/removed. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsfilevent_ex)(struct mfile *__restrict self,
+                                       uint16_t mask, uint16_t cookie,
+                                       notifyfd_event_name_t name) {
+	struct REF notifyfd_slist blist;
+	struct dnotify_link_slist deadlinks;
+	struct inotify_controller_slist deadnotif;
+	struct inotify_controller *notify;
+	COMPILER_READ_BARRIER();
+	if (self->mf_meta == NULL)
+		return;
+	if (self->mf_meta->mfm_notify == NULL)
+		return;
+	blist.slh_first = BLIST_EMPTY_MARKER;
+	SLIST_INIT(&deadlinks);
+	SLIST_INIT(&deadnotif);
+	notify_lock_acquire();
+	COMPILER_READ_BARRIER();
+	notify = self->mf_meta->mfm_notify;
+	if likely(notify != NULL) {
+		struct notify_listener *listener;
+		LIST_FOREACH_SAFE (listener, &notify->inc_listeners, nl_link) {
+			notify_listener_postfsevent_impl(listener, &blist, mask, cookie,
+			                                 name, &deadlinks, &deadnotif);
+		}
+	}
+	notify_lock_release();
+
+	/* Free deleted objects. */
+	dnotify_link_slist_destroyall(&deadlinks);
+	inotify_controller_slist_destroyall(&deadnotif);
+	blist_serve(&blist);
+}
+
+
 
 
 
@@ -1359,14 +1415,25 @@ again:
 	}
 	slot = &self->nf_eventv[self->nf_eventr];
 	memcpy(&ne, slot, sizeof(ne));
-	xincref(ne.mfe_name);
+	notifyfd_event_name_xincref(&ne.nfe_name);
 	notify_lock_release();
-	FINALLY_XDECREF_UNLIKELY(ne.mfe_name);
+	RAII_FINALLY { notifyfd_event_name_xdecref(&ne.nfe_name); };
 
 	/* Calculate the required buffer size for this slot. */
 	reqsize = offsetof(struct inotify_event, ine_name);
-	if (ne.mfe_name != NULL)
-		reqsize += (ne.mfe_name->fd_namelen + 1) * sizeof(char);
+	if (!notifyfd_event_name_isnull(&ne.nfe_name)) {
+		if (notifyfd_event_name_isfdirent(&ne.nfe_name)) {
+			struct fdirent *ent = notifyfd_event_name_asfdirent(&ne.nfe_name);
+			reqsize += (ent->fd_namelen + 1) * sizeof(char);
+		} else {
+			uintptr_t decimal;
+			size_t decilen;
+			assert(notifyfd_event_name_isdecimal(&ne.nfe_name));
+			decimal = notifyfd_event_name_asdecimal(&ne.nfe_name);
+			decilen = (size_t)format_printf(&format_length, NULL, "%" PRIuPTR, decimal);
+			reqsize += (decilen + 1) * sizeof(char);
+		}
+	}
 
 	/* Check if the user-provided buffer is large enough. */
 	if (reqsize > num_bytes) {
@@ -1377,16 +1444,26 @@ again:
 
 	/* Copy the entry to user-space. */
 	uevent = (NCX struct inotify_event *)dst;
-	umask  = ne.mfe_mask;
+	umask  = ne.nfe_mask;
 	if (ne.nfe_wd & NOTIFYFD_EVENT_ISDIR_FLAG)
 		umask |= IN_ISDIR;
 	UNALIGNED_SET32(&uevent->ine_wd, ((uint32_t)ne.nfe_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG));
 	UNALIGNED_SET32(&uevent->ine_mask, umask);
-	UNALIGNED_SET32(&uevent->ine_cookie, (uint32_t)ne.mfe_cookie);
-	if (ne.mfe_name) {
-		UNALIGNED_SET32(&uevent->ine_len, (u32)(ne.mfe_name->fd_namelen + 1));
-		memcpy(uevent->ine_name, ne.mfe_name->fd_name,
-		       ne.mfe_name->fd_namelen + 1, sizeof(char));
+	UNALIGNED_SET32(&uevent->ine_cookie, (uint32_t)ne.nfe_cookie);
+	if (!notifyfd_event_name_isnull(&ne.nfe_name)) {
+		if (notifyfd_event_name_isfdirent(&ne.nfe_name)) {
+			struct fdirent *ent = notifyfd_event_name_asfdirent(&ne.nfe_name);
+			UNALIGNED_SET32(&uevent->ine_len, (u32)(ent->fd_namelen + 1));
+			memcpy(uevent->ine_name, ent->fd_name,
+			       ent->fd_namelen + 1, sizeof(char));
+		} else {
+			uintptr_t decimal;
+			size_t decilen;
+			assert(notifyfd_event_name_isdecimal(&ne.nfe_name));
+			decimal = notifyfd_event_name_asdecimal(&ne.nfe_name);
+			decilen = sprintf(uevent->ine_name, "%" PRIuPTR, decimal);
+			UNALIGNED_SET32(&uevent->ine_len, (u32)(decilen + 1));
+		}
 	} else {
 		UNALIGNED_SET32(&uevent->ine_len, 0);
 	}
@@ -1400,11 +1477,11 @@ again:
 		notify_lock_release_br();
 		goto again;
 	}
-	--self->nf_eventc; /* Inherited reference to `slot->mfe_name' (in `ne.mfe_name') */
+	--self->nf_eventc; /* Inherited reference to `slot->nfe_name' (in `ne.nfe_name') */
 	++self->nf_eventr;
 	self->nf_eventr %= self->nf_eventa;
 	notify_lock_release();
-	xdecref_nokill(ne.mfe_name); /* Inherited from `slot' */
+	notifyfd_event_name_xdecref(&ne.nfe_name); /* Inherited from `slot' */
 
 	/* Return the required buffer size back to user-space. */
 	return reqsize;

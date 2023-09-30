@@ -129,6 +129,19 @@ struct sig_completion
 	sig_completion_t       sc_cb;  /* [1..1][const] Completion callback. */
 };
 
+#ifdef __WANT_SIG_COMPLETION_INIT
+#define SIG_COMPLETION_INIT(cb)                                                                            \
+	{                                                                                                      \
+		/* .sc_con = */ {                                                                                  \
+			/* .tc_sig     = */ __NULLPTR,                                                                 \
+			/* .tc_connext = */ __NULLPTR,                                                                 \
+			/* .tc_signext = */ __NULLPTR,                                                                 \
+			/* .tc_stat    = */ { (struct task_connections *)(uintptr_t)(TASK_CONNECTION_STAT_BROADCAST) } \
+		},                                                                                                 \
+		/* .sc_cb = */ cb                                                                                  \
+	}
+#endif /* __WANT_SIG_COMPLETION_INIT */
+
 /* Initialize a given signal completion controller. */
 #define sig_completion_init(self, cb)                                       \
 	((self)->_sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST, \

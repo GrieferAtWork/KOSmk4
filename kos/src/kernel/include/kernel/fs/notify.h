@@ -175,12 +175,35 @@ struct notify_listener {
 #error "Unsupported sizeof(int)"
 #endif /* __SIZEOF_INT__ != ... */
 
+/* notifyfd_event_name_t is a union that behaves as follows:
+ * >> typedef union {
+ * >>     REF struct fdirent *nfen_fdirent; // [0..1] Name of associated file (or NULL if not a child-in-directory-event)
+ * >>     uintptr_t           nfen_decimal; // Name of associated file is the decimal `"%" PRIuPTR' representation of this number >> 1. (also: assumed to be a directory)
+ * >> } notifyfd_event_name_t; */
+typedef uintptr_t notifyfd_event_name_t;
+#define NOTIFYFD_EVENT_NAME_NULL           ((notifyfd_event_name_t)__NULLPTR)
+#define NOTIFYFD_EVENT_NAME_FDIRENT(ent)   ((notifyfd_event_name_t)(ent))
+#define NOTIFYFD_EVENT_NAME_DECIMAL(value) (((notifyfd_event_name_t)(value) << 1) | 1)
+
+#define notifyfd_event_name_isnull(self)    (*(self) == NOTIFYFD_EVENT_NAME_NULL)
+#define notifyfd_event_name_isfdirent(self) (((*(self)) & 1) == 0)
+#define notifyfd_event_name_asfdirent(self) ((REF struct fdirent *)(*(self)))
+#define notifyfd_event_name_isdecimal(self) (((*(self)) & 1) != 0)
+#define notifyfd_event_name_asdecimal(self) ((*(self)) >> 1)
+
+#define notifyfd_event_name_xincref(self) (void)(notifyfd_event_name_isfdirent(self) && (xincref(notifyfd_event_name_asfdirent(self)), 1))
+#define notifyfd_event_name_xdecref(self) (void)(notifyfd_event_name_isfdirent(self) && (xdecref(notifyfd_event_name_asfdirent(self)), 1))
+
+
 struct notifyfd_event {
-	unsigned int        nfe_wd;     /* [const] Descriptor number. (most significant bit represents `IN_ISDIR') */
-	uint16_t            mfe_mask;   /* [const] Event mask. */
-	uint16_t            mfe_cookie; /* [const] Event cookie */
-	REF struct fdirent *mfe_name;   /* [0..1][const] Name of associated file (or NULL if not a child-in-directory-event) */
+	unsigned int          nfe_wd;     /* [const] Descriptor number. (most significant bit represents `IN_ISDIR') */
+	uint16_t              nfe_mask;   /* [const] Event mask. */
+	uint16_t              nfe_cookie; /* [const] Event cookie and name kind. */
+	notifyfd_event_name_t nfe_name;   /* [const] Name of associated file. */
 };
+
+#define notifyfd_event_
+
 
 /* The main NOTIFYFD object (as also exposed via `HANDLE_TYPE_NOTIFYFD') */
 struct notifyfd {
@@ -381,6 +404,18 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent)(struct mfi
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
 /* Same as `_mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
+
+/* Post custom FS file event (i.e. these only appear in `self'),
+ * including the ability to post events with custom file  names.
+ *
+ * This function is pretty much only here to allow procfs to post
+ * filesystem  events for /proc when processes are added/removed. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _mfile_postfsfilevent_ex)(struct mfile *__restrict self,
+                                        uint16_t mask, uint16_t cookie,
+                                        notifyfd_event_name_t name)
+		ASMNAME("mfile_postfsfilevent_ex");
+
 #define _mfile_canpostfsevents(self)                                                                \
 	__XBLOCK({                                                                                      \
 		struct mfilemeta *const _mfmeta = __hybrid_atomic_load(&(self)->mf_meta, __ATOMIC_ACQUIRE); \
@@ -391,11 +426,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfi
 #else /* __OPTIMIZE_SIZE__ */
 #define _mfile_maybepostfsevent(self, expr_) (void)(_mfile_canpostfsevents(self) && (expr_, 1))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define _mfile_postfsevent(self, mask)                  _mfile_maybepostfsevent(self, (_mfile_postfsevent)(self, mask))
-#define _mfile_postfsfilevent(self, mask)               _mfile_maybepostfsevent(self, (_mfile_postfsfilevent)(self, mask))
-#define _mfile_postfsdirevent(self, mask)               _mfile_maybepostfsevent(self, (_mfile_postfsdirevent)(self, mask))
-#define _mfile_postfsdirevent2(self, mask, cookie)      _mfile_maybepostfsevent(self, (_mfile_postfsdirevent2)(self, mask, cookie))
-#define _mfile_postfsevent_ex(self, fil_mask, dir_mask) _mfile_maybepostfsevent(self, (_mfile_postfsevent_ex)(self, fil_mask, dir_mask))
+#define _mfile_postfsevent(self, mask)                     _mfile_maybepostfsevent(self, (_mfile_postfsevent)(self, mask))
+#define _mfile_postfsfilevent(self, mask)                  _mfile_maybepostfsevent(self, (_mfile_postfsfilevent)(self, mask))
+#define _mfile_postfsdirevent(self, mask)                  _mfile_maybepostfsevent(self, (_mfile_postfsdirevent)(self, mask))
+#define _mfile_postfsdirevent2(self, mask, cookie)         _mfile_maybepostfsevent(self, (_mfile_postfsdirevent2)(self, mask, cookie))
+#define _mfile_postfsevent_ex(self, fil_mask, dir_mask)    _mfile_maybepostfsevent(self, (_mfile_postfsevent_ex)(self, fil_mask, dir_mask))
+#define _mfile_postfsfilevent_ex(self, mask, cookie, name) _mfile_maybepostfsevent(self, (_mfile_postfsfilevent_ex)(self, mask, cookie, name))
 
 /* Helper macros for generating inotify events (use these instead of the functions above) */
 #define mfile_inotify_accessed(self)         _mfile_postfsevent(self, IN_ACCESS)                    /* TODO */

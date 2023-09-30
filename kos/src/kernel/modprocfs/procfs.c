@@ -27,7 +27,9 @@
 #include <kernel/fs/constdir.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/super.h>
+#include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/group.h>
 #include <sched/task.h>
@@ -48,6 +50,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
+
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+#include <sched/sig-completion.h>
+#include <sched/sig.h>
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+
 
 /**/
 #include "procfs.h"
@@ -602,6 +610,105 @@ procfs_root_v_enum(struct fdirenum *__restrict result) {
 }
 
 
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_notify_startstop)(struct taskpid *__restrict tpid, uint16_t mask) {
+	notifyfd_event_name_t name;
+	/* FIXME: Don't unconditionally use the root namespace PID (the  PID
+	 * used should differ for each inotify receiver, and be based on the
+	 * receiver's  canonical PID namespace. Additionally, omit the event
+	 * if the receiver isn't supposed to see the process) */
+	name = NOTIFYFD_EVENT_NAME_DECIMAL(taskpid_getroottid(tpid));
+	_mfile_postfsfilevent_ex(&procfs_super.fs_root, mask, 0, name);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_root_addproc_postcompletion)(struct sig_completion_context *__restrict context,
+                                                  void *buf) {
+	struct taskpid *tpid;
+	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
+	procfs_notify_startstop(tpid, IN_CREATE);
+	(void)buf;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sig_completion_context *__restrict context,
+                                                  void *buf) {
+	struct taskpid *tpid;
+	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
+	procfs_notify_startstop(tpid, IN_DELETE);
+	(void)buf;
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_root_addproc_completion)(struct sig_completion *__restrict self,
+                                              struct sig_completion_context *__restrict context,
+                                              void *buf, size_t bufsize) {
+	(void)buf;
+	(void)bufsize;
+	sig_completion_reprime(self, true);
+	context->scc_post = &procfs_root_addproc_postcompletion;
+	return 0;
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_root_delproc_completion)(struct sig_completion *__restrict self,
+                                              struct sig_completion_context *__restrict context,
+                                              void *buf, size_t bufsize) {
+	(void)buf;
+	(void)bufsize;
+	sig_completion_reprime(self, true);
+	context->scc_post = &procfs_root_delproc_postcompletion;
+	return 0;
+}
+
+
+struct procfs_root_notify_controller {
+	struct sig_completion pfrnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
+	struct sig_completion pfrnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
+};
+
+PRIVATE BLOCKING NONNULL((1)) void *KCALL
+procfs_root_v_notify_attach(struct mfile *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	struct procfs_root_notify_controller *result;
+	assert(self == &procfs_super.fs_root);
+	(void)self;
+	result = (REF struct procfs_root_notify_controller *)kmalloc(sizeof(struct procfs_root_notify_controller),
+	                                                             GFP_NORMAL);
+	sig_completion_init(&result->pfrnc_addproc_completion, &procfs_root_addproc_completion);
+	sig_completion_init(&result->pfrnc_delproc_completion, &procfs_root_delproc_completion);
+	sig_connect_completion_for_poll(&pidns_root.pn_addproc, &result->pfrnc_addproc_completion);
+	sig_connect_completion_for_poll(&pidns_root.pn_delproc, &result->pfrnc_delproc_completion);
+	printk(KERN_INFO "[procfs] Notify object attached to /proc [cookie:%p]\n", result);
+	return result; /* This will be destroyed by `procfs_root_v_notify_detach' */
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_root_v_notify_detach)(struct mfile *__restrict self, void *cookie) {
+	struct procfs_root_notify_controller *controller;
+	printk(KERN_INFO "[procfs] Notify object detached from /proc [cookie:%p]\n", cookie);
+	assert(self == &procfs_super.fs_root);
+	(void)self;
+	controller = (struct procfs_root_notify_controller *)cookie;
+
+	/* Disconnect signal completion callbacks and free the controller. */
+	sig_completion_disconnect(&controller->pfrnc_addproc_completion);
+	sig_completion_disconnect(&controller->pfrnc_delproc_completion);
+	kfree(controller);
+}
+
+PRIVATE struct mfile_stream_ops const procfs_root_v_stream_ops = {
+	.mso_open          = &fsuper_v_open,
+	.mso_stat          = &fsuper_v_stat,
+	.mso_ioctl         = &fsuper_v_ioctl,
+	.mso_notify_attach = &procfs_root_v_notify_attach,
+	.mso_notify_detach = &procfs_root_v_notify_detach,
+};
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#define procfs_root_v_stream_ops fsuper_v_stream_ops
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 INTERN_CONST struct fsuper_ops const procfs_super_ops = {
 	.so_fdir = {
@@ -609,7 +716,7 @@ INTERN_CONST struct fsuper_ops const procfs_super_ops = {
 			.no_file = {
 				.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
 				.mo_changed = &fsuper_v_changed,
-				.mo_stream  = &fdirnode_v_stream_ops,
+				.mo_stream  = &procfs_root_v_stream_ops,
 			},
 			.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
 			.no_wrattr = &fnode_v_wrattr_noop,
