@@ -454,7 +454,7 @@ PUBLIC_CONST struct fdirnode_ops const devdiskruledir_ops = {
 			.mo_changed = &fdirnode_v_changed,
 			.mo_stream  = &fdirnode_v_stream_ops,
 		},
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.dno_lookup = &devdiskruledir_v_lookup,
@@ -467,11 +467,11 @@ PUBLIC_CONST struct fdirnode_ops const devdiskruledir_ops = {
 INTERN_CONST struct fdirnode_ops const _devdiskruledir_default_ops = {
 	.dno_node = {
 		.no_file = {
-			.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
+			.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1,
 			.mo_changed = &fdirnode_v_changed,
 			.mo_stream  = &devfs_spec_v_stream_ops_with_boottime,
 		},
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.dno_lookup = &devdiskruledir_v_lookup,
@@ -779,11 +779,11 @@ devfs_disk_v_enum(struct fdirenum *__restrict result)
 INTERN_CONST struct fdirnode_ops const devfs_disk_ops = {
 	.dno_node = {
 		.no_file = {
-			.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
+			.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1,
 			.mo_changed = &fdirnode_v_changed,
 			.mo_stream  = &devfs_spec_v_stream_ops_with_boottime,
 		},
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.dno_lookup = &devfs_disk_v_lookup,

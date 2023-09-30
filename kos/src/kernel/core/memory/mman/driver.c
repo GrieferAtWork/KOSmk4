@@ -684,8 +684,8 @@ NOTHROW(FCALL kernel_get_dbase)(struct driver const *__restrict UNUSED(self)) {
 
 PRIVATE struct module_ops const kernel_module_ops = {
 	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_free_,  /* Needed for `module_isdriver()' */
-	.mo_destroy           = (typeoffield(struct module_ops, mo_destroy))(void *)-1, /* Must never be called! */
-	.mo_nonodes           = (typeoffield(struct module_ops, mo_nonodes))(void *)-1, /* Must never be called! */
+	.mo_destroy           = (typeof_field(struct module_ops, mo_destroy))(void *)-1, /* Must never be called! */
+	.mo_nonodes           = (typeof_field(struct module_ops, mo_nonodes))(void *)-1, /* Must never be called! */
 	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, NCX char const *))&kernel_locksection,
 	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
 	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,

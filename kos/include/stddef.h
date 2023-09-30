@@ -167,9 +167,9 @@ __pragma_GCC_diagnostic_ignored(Winvalid_offsetof)
 #define container_of(ptr, type, member) __COMPILER_CONTAINER_OF(ptr, type, member)
 #define lengthof(arr)                   __COMPILER_LENOF(arr)
 
-#define sizeoffield(s, m) sizeof(((s *)0)->m)
+#define sizeof_field(s, m) sizeof(((s *)0)->m)
 #ifdef __COMPILER_HAVE_TYPEOF
-#define typeoffield(s, m) __typeof__(((s *)0)->m)
+#define typeof_field(s, m) __typeof__(((s *)0)->m)
 #endif /* __COMPILER_HAVE_TYPEOF */
 #endif /* __USE_KOS */
 

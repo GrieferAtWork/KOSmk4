@@ -115,7 +115,7 @@ procfs_perproc_enum_impl(struct fdirent *const *files, size_t count,
 /* Common operators for all per-process files. */
 #define procfs_perproc_v_changed fnode_v_changed
 #define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
-#define procfs_perproc_v_free    (*(typeoffield(struct fnode_ops, no_free))(void *)-1)
+#define procfs_perproc_v_free    (*(typeof_field(struct fnode_ops, no_free))(void *)-1)
 #define procfs_perproc_v_ioctl   fnode_v_ioctl
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self) {
@@ -479,13 +479,13 @@ procfs_perproc_dirent_v_getino(struct fdirent *__restrict self,
 
 PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_reg = {
 	/* `struct procfs_perproc_dirent'-objects are only allocated statically, so destroy must never be called. */
-	.fdo_destroy  = (typeoffield(struct fdirent_ops, fdo_destroy))(void *)-1,
+	.fdo_destroy  = (typeof_field(struct fdirent_ops, fdo_destroy))(void *)-1,
 	.fdo_opennode = &procfs_perproc_dirent_v_opennode_reg,
 	.fdo_getino   = &procfs_perproc_dirent_v_getino,
 };
 PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 	/* `struct procfs_perproc_dirent'-objects are only allocated statically, so destroy must never be called. */
-	.fdo_destroy  = (typeoffield(struct fdirent_ops, fdo_destroy))(void *)-1,
+	.fdo_destroy  = (typeof_field(struct fdirent_ops, fdo_destroy))(void *)-1,
 	.fdo_opennode = &procfs_perproc_dirent_v_opennode_nomap,
 	.fdo_getino   = &procfs_perproc_dirent_v_getino,
 };

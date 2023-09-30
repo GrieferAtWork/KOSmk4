@@ -1256,11 +1256,11 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 	.so_fdir = {
 		.dno_node = {
 			.no_file = {
-				.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1, /* Must never be called */
+				.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1, /* Must never be called */
 				.mo_changed = &devfs_super_v_changed,
 				.mo_stream  = &devfs_super_v_stream_ops,
 			},
-			.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1, /* Must never be called */
+			.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1, /* Must never be called */
 			.no_wrattr = &devfs_super_v_wrattr,
 		},
 		.dno_lookup = &devfs_super_v_lookup,

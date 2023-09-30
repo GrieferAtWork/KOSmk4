@@ -304,7 +304,7 @@ service_part:
 
 PRIVATE struct async_ops const mpart_ajob_fallback_ops = {
 	.ao_driver  = &drv_self,
-	.ao_destroy = (typeoffield(struct async_ops, ao_destroy))(void *)-1,
+	.ao_destroy = (typeof_field(struct async_ops, ao_destroy))(void *)-1,
 	.ao_connect = &mpart_ajob_fallback_v_connect,
 	.ao_test    = &mpart_ajob_fallback_v_test,
 	.ao_work    = &mpart_ajob_fallback_v_work,

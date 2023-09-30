@@ -1160,7 +1160,7 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 
 INTERN_CONST struct device_ops const dev_tty_ops = {{{
 	.no_file = {
-		.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
+		.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1,
 		.mo_changed = &device_v_changed,
 		.mo_stream  = &devtty_stream_ops,
 	},
@@ -1180,7 +1180,7 @@ INTERN_CONST struct device_ops const dev_tty_ops = {{{
 #define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio) \
 	{{{{                                                              \
 		{                                                             \
-			(typeoffield(struct mfile_ops, mo_destroy))(void *)-1,    \
+			(typeof_field(struct mfile_ops, mo_destroy))(void *)-1,   \
 			mo_newpart, mo_loadblocks, NULL, NULL,                    \
 			&device_v_changed, mo_stream,                             \
 			IF_VIO_ENABLED(mo_vio)                                    \

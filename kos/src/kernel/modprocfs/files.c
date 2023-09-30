@@ -2056,11 +2056,11 @@ PRIVATE struct mfile_stream_ops const procfs_r_kos_leaks_v_stream_ops = {
 INTERN_CONST struct fregnode_ops const procfs_r_kos_leaks_ops = {
 	.rno_node = {
 		.no_file = {
-			.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
+			.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1,
 			.mo_changed = &fnode_v_changed,
 			.mo_stream  = &procfs_r_kos_leaks_v_stream_ops,
 		},
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 };

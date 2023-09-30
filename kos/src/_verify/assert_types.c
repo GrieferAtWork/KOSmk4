@@ -1983,11 +1983,11 @@ static_assert(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFS
 static_assert(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
 static_assert(sizeof(__EXCEPT_REGISTER_STATE_TYPE) == __SIZEOF_EXCEPT_REGISTER_STATE);
 static_assert(sizeof(union exception_data_pointers) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
-static_assert(sizeoffield(struct exception_info, ei_data.e_args) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
-static_assert(sizeoffield(struct exception_info, ei_data.e_args.e_pointers) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
+static_assert(sizeof_field(struct exception_info, ei_data.e_args) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
+static_assert(sizeof_field(struct exception_info, ei_data.e_args.e_pointers) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
 #if EXCEPT_BACKTRACE_SIZE != 0
 static_assert(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO_TRACE);
-static_assert(sizeoffield(struct exception_info, ei_trace) == EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__);
+static_assert(sizeof_field(struct exception_info, ei_trace) == EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 #ifdef __USE_KOS_KERNEL

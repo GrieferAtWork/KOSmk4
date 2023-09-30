@@ -215,7 +215,7 @@ DEFINE_PERTASK_RELOCATION(this_kernel_stackpart + OFFSET_MPART_SHARE_FIRST);
 DEFINE_PUBLIC_SYMBOL(this_task, 0, SIZEOF_STRUCT_TASK);
 #define DEFINE_FIELD_SYMBOL(name, BASE, OFFSET, SIZEOF, T, field) \
 	static_assert(offsetof(T, field) == (OFFSET));                \
-	static_assert(sizeoffield(T, field) == (SIZEOF));             \
+	static_assert(sizeof_field(T, field) == (SIZEOF));             \
 	DEFINE_PUBLIC_SYMBOL(name, (BASE) + (OFFSET), SIZEOF)
 
 DEFINE_FIELD_SYMBOL(this_cpu, 0, OFFSET_TASK_CPU, SIZEOF_POINTER, struct task, t_cpu);

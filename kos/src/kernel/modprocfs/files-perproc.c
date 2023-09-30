@@ -147,7 +147,7 @@ DECL_BEGIN
 #define procfs_perproc_v_changed fnode_v_changed
 #define procfs_perproc_v_wrattr  fnode_v_wrattr_noop
 #define procfs_perproc_v_ioctl   fnode_v_ioctl
-#define procfs_perproc_v_free    (*(typeoffield(struct fnode_ops, no_free))(void *)-1)
+#define procfs_perproc_v_free    (*(typeof_field(struct fnode_ops, no_free))(void *)-1)
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_perproc_v_destroy)(struct mfile *__restrict self);
 
@@ -3938,13 +3938,13 @@ procfs_perproc_drives_v_getino(struct fdirent *__restrict self,
 }
 
 PRIVATE struct fdirent_ops const procfs_perproc_dcwd_dirent_ops = {
-	.fdo_destroy  = (typeoffield(struct fdirent_ops, fdo_destroy))(void *)-1,
+	.fdo_destroy  = (typeof_field(struct fdirent_ops, fdo_destroy))(void *)-1,
 	.fdo_opennode = &procfs_perproc_dcwd_v_opennode,
 	.fdo_getino   = &procfs_perproc_dcwd_v_getino,
 };
 
 PRIVATE struct fdirent_ops const procfs_perproc_drives_dirent_ops = {
-	.fdo_destroy  = (typeoffield(struct fdirent_ops, fdo_destroy))(void *)-1,
+	.fdo_destroy  = (typeof_field(struct fdirent_ops, fdo_destroy))(void *)-1,
 	.fdo_opennode = &procfs_perproc_drives_v_opennode,
 	.fdo_getino   = &procfs_perproc_drives_v_getino,
 };

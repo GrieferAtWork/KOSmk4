@@ -185,7 +185,7 @@ INTERN_CONST struct flnknode_ops const devicelink_ops = {
 			.mo_changed = &flnknode_v_changed,
 			.mo_stream  = &flnknode_v_stream_ops_readlink_size,
 		},
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 	.lno_readlink = &devicelink_v_readlink,
@@ -540,15 +540,15 @@ devfs_cpu_v_enum(struct fdirenum *__restrict result)
 
 
 /* Operator tables for special /dev directories. */
-#define INIT_SPEC_FNODE_OPS                                                      \
-	{                                                                            \
-		.no_file = {                                                             \
-			.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1, \
-			.mo_changed = &fdirnode_v_changed,                                   \
-			.mo_stream  = &devfs_spec_v_stream_ops_with_boottime,                \
-		},                                                                       \
-		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,         \
-		.no_wrattr = &fnode_v_wrattr_noop,                                       \
+#define INIT_SPEC_FNODE_OPS                                                       \
+	{                                                                             \
+		.no_file = {                                                              \
+			.mo_destroy = (typeof_field(struct mfile_ops, mo_destroy))(void *)-1, \
+			.mo_changed = &fdirnode_v_changed,                                    \
+			.mo_stream  = &devfs_spec_v_stream_ops_with_boottime,                 \
+		},                                                                        \
+		.no_free   = (typeof_field(struct fnode_ops, no_free))(void *)-1,         \
+		.no_wrattr = &fnode_v_wrattr_noop,                                        \
 	}
 
 INTERN_CONST struct fdirnode_ops const devfs_block_ops = {
