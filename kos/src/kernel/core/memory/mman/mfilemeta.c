@@ -571,6 +571,17 @@ NOTHROW(FCALL mfilemeta_destroy)(struct mfilemeta *self,
 	}
 #endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
+	/* Assert that there  are no more  flock keys  (since
+	 * flock locks should have kept the file alive, whose
+	 * destruction *must* have lead us here) */
+	assert(self->mfm_flock.mffl_flock.sl_lock == 0);
+	assert(self->mfm_flock.mffl_wr_key == MFILE_FLOCK_KEY_NONE);
+	assert(self->mfm_flock.mffl_rl_mask == 0);
+	assert(self->mfm_flock.mffl_rl_size == 0);
+	assert(self->mfm_flock.mffl_rl_used == 0);
+	assert(self->mfm_flock.mffl_rl_elem == NULL);
+
+	/* Free the file meta-data controller. */
 	mfilemeta_free(self);
 }
 

@@ -367,7 +367,8 @@ struct mfile_stream_ops {
 	 *       have a harder time trying  to unload unused files in  those cases where it  is
 	 *       the containing directory that is being watched (rather than the file  itself),
 	 *       because  `system_cc()' won't  be able to  identify `self' as  unused until the
-	 *       user stops watching the containing directory.
+	 *       user stops watching the containing directory (it is recommended to use `AWREF'
+	 *       to reference the attached mfile and clear that reference in mso_notify_detach)
 	 *
 	 * @return: * : Cookie object to store alongside the `struct inotify_controller'.
 	 *              Whatever  is returned here (even if it's NULL) will eventually be

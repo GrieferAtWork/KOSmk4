@@ -107,7 +107,7 @@ again_determine_parent:
 	assert(caller_ctl == taskpid_getprocctl(parent_pid));
 	parent_proc = taskpid_gettask(parent_pid);
 	if unlikely(!parent_proc || (atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
-	                                                                  TASK_FTERMINATED))) {
+	                                                                   TASK_FTERMINATED))) {
 		/* Current process has exited. */
 		xdecref(parent_proc);
 		_taskpid_free(result_pid);
@@ -141,7 +141,7 @@ use_boottask_as_parent:
 		/* Re-use parent of calling process as parent of child process */
 		parent_proc = taskpid_getparentprocess(caller_pid);
 		if unlikely(atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
-		                                                 TASK_FTERMINATED)) {
+		                                                  TASK_FTERMINATED)) {
 			/* The calling process's parent has already terminated.
 			 * -> Simply use `boottask' instead, emulating what would
 			 *    have been done  by `parent_proc' in  `task_exit()'. */
@@ -152,7 +152,7 @@ use_boottask_as_parent:
 		/* Using calling process as parent. */
 		parent_proc = taskpid_gettask(taskpid_getprocpid(caller_pid));
 		if unlikely(!parent_proc || (atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATING |
-		                                                                  TASK_FTERMINATED))) {
+		                                                                   TASK_FTERMINATED))) {
 			/* Current process has exited. */
 			xdecref(parent_proc);
 			_procctl_free(result_ctl);
@@ -354,7 +354,7 @@ again_determine_group:
 		 * the  parent process to-be used (if the then-determined process has terminated,
 		 * and /bin/init cannot be used, clone(2) will fail) */
 		if unlikely(atomic_read(&parent_proc->t_flags) & (TASK_FTERMINATED |
-		                                                 TASK_FTERMINATING)) {
+		                                                  TASK_FTERMINATING)) {
 			LOCAL_RELEASE_ALL_LOCKS();
 #ifdef LOCAL_IS_PROC
 			decref_unlikely(result_grp);

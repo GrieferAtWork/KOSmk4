@@ -2574,7 +2574,6 @@ epoll_nextmon_locked:
 	}	break;
 
 	default:
-		fpos = 0;
 		break;
 	}
 }

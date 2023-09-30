@@ -216,9 +216,9 @@ typedef struct ATTR_PACKED {
 typedef struct ATTR_PACKED {
 	FatBiosParameterBlock f16_bpb;           /* BIOS Parameter Block. */
 	u8                    f16_driveno;       /* Drive number. The value here should be identical to the value returned by BIOS interrupt 0x13,
-	                                          * or passed  in  the  DL register;  i.e.  0x00  for a  floppy  disk  and 0x80  for  hard  disks.
-	                                          * This  number   is  useless   because   the  media   is  likely   to   be  moved   to   another
-	                                          * machine and inserted in a drive with a different drive number. */
+	                                          * or passed in the DL register; i.e. 0x00 for a floppy disk and 0x80 for hard disks. This number
+	                                          * is useless because the media is likely to be moved to another machine and inserted in a  drive
+	                                          * with a different drive number. */
 	u8                    f16_ntflags;       /* Windows NT Flags. (Set to 0) */
 	u8                    f16_signature;     /* Signature (Must be 0x28 or 0x29). */
 	le32                  f16_volid;         /* VolumeID ~Serial~ number. Used for tracking volumes between computers. */
@@ -240,9 +240,9 @@ typedef struct ATTR_PACKED {
 	le16                  f32_backup_cluster;  /* The sector number of the backup boot sector. */
 	u8                    f32_set2zero[12];    /* Reserved. When the volume is formated these bytes should be zero. */
 	u8                    f32_driveno;         /* Drive number. The value here should be identical to the value returned by BIOS interrupt 0x13,
-	                                            * or passed  in  the  DL register;  i.e.  0x00  for a  floppy  disk  and 0x80  for  hard  disks.
-	                                            * This  number   is  useless   because   the  media   is  likely   to   be  moved   to   another
-	                                            * machine and inserted in a drive with a different drive number. */
+	                                            * or passed in the DL register; i.e. 0x00 for a floppy disk and 0x80 for hard disks. This number
+	                                            * is useless because the media is likely to be moved to another machine and inserted in a  drive
+	                                            * with a different drive number. */
 	u8                    f32_ntflags;         /* Windows NT Flags. (Set to 0) */
 	u8                    f32_signature;       /* Signature (Must be 0x28 or 0x29). */
 	le32                  f32_volid;           /* VolumeID ~Serial~ number. Used for tracking volumes between computers. */
