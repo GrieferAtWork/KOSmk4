@@ -274,7 +274,15 @@ struct pidns {
 	LLRBTREE_ROOT(WEAK procgrp) pn_tree_pg; /* [LINK(->pgc_pids[pn_ind].pgs_link)][0..n][lock(pn_lock)]
 	                                         * Tree of process groups (groups remove themselves upon destruction). */
 	pid_t                       pn_npid;    /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
+	struct sig                  pn_addproc; /* Broadcast (with alt=PIDNS_PROCSIG_ENCODE(...)) when something is added to `pn_tree' */
+	struct sig                  pn_delproc; /* Broadcast (with alt=PIDNS_PROCSIG_ENCODE(...)) when something is removed from `pn_tree' */
 };
+
+/* Helpers to encode/decode `taskpid', as sent to `pn_addproc' and `pn_delproc'
+ * NOTE: `PIDNS_PROCSIG_DECODE()' can only be safely used from within the async
+ *       part of a signal completion callback! */
+#define PIDNS_PROCSIG_ENCODE(taskpid) ((struct sig *)(void *)(taskpid))
+#define PIDNS_PROCSIG_DECODE(sig)     ((struct taskpid *)(void *)(sig))
 
 /* Helper macros for working with `struct pidns::pn_lock' */
 #define pidns_mustreap(self)     oblockop_mustreap(&(self)->pn_lops)
@@ -319,13 +327,21 @@ DEFINE_REFCNT_FUNCTIONS(struct pidns, pn_refcnt, pidns_destroy)
 
 /* Allocate a new child PID namespace for `parent' */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL
-pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC);
+pidns_new(struct pidns *__restrict parent) THROWS(E_BADALLOC);
 
 /* Lookup a thread in a given PID namespace. */
-FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
-FUNDEF WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
+FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *FCALL
+pidns_lookup(struct pidns *__restrict self, pid_t pid)
+		THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) REF struct task *FCALL
+pidns_lookuptask(struct pidns *__restrict self, pid_t pid)
+		THROWS(E_WOULDBLOCK);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL
+pidns_lookup_srch(struct pidns *__restrict self, pid_t pid)
+		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid)
+		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
 
 /* Return the taskpid object associated with `pid' within `self' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct taskpid *

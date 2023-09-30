@@ -450,6 +450,8 @@ PUBLIC struct pidns pidns_root = {
 	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
 	.pn_tree_pg = &boottask_procgrp, /* First and initial process group */
 	.pn_npid    = 4, /* 1-3 are already in use */
+	.pn_addproc = SIG_INIT,
+	.pn_delproc = SIG_INIT,
 };
 
 
@@ -463,13 +465,14 @@ NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self) {
 	assert(SLIST_EMPTY(&self->pn_lops));
 	assertf(self->pn_tree == NULL, "Any taskpid should have kept us alive");
 	assertf(self->pn_tree_pg == NULL, "Any procgrp should have kept us alive");
+	assertf(self->pn_size == 0, "Then how come `pn_tree == NULL'?");
 	decref_unlikely(self->pn_par);
 	kfree(self);
 }
 
 /* Allocate a new child PID namespace for `parent' */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL
-pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
+pidns_new(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 	REF struct pidns *result;
 	result = (REF struct pidns *)kmalloc(sizeof(struct pidns), GFP_NORMAL);
 	result->pn_refcnt = 1;
@@ -480,6 +483,8 @@ pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 	result->pn_size = 0;
 	result->pn_tree = NULL;
 	result->pn_npid = PIDNS_FIRST_NONRESERVED_PID;
+	sig_init(&result->pn_addproc);
+	sig_init(&result->pn_delproc);
 	return result;
 }
 
@@ -661,6 +666,7 @@ NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
                                struct taskpid *__restrict tpid) {
 	_taskpid_tree_insert(&self->pn_tree, tpid, self->pn_ind);
 	++self->pn_size;
+	sig_altbroadcast(&self->pn_addproc, PIDNS_PROCSIG_ENCODE(tpid));
 }
 
 /* Do the reverse of `pidns_insertpid()' and remove the PID
@@ -673,8 +679,10 @@ PUBLIC NOBLOCK NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid) {
 	struct taskpid *result;
 	result = _taskpid_tree_remove(&self->pn_tree, pid, self->pn_ind);
-	if (result != NULL)
+	if (result != NULL) {
 		--self->pn_size;
+		sig_altbroadcast(&self->pn_delproc, PIDNS_PROCSIG_ENCODE(result));
+	}
 	return result;
 }
 

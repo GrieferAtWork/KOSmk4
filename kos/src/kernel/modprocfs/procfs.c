@@ -445,14 +445,6 @@ struct procfs_root_direnum
 	                            * For entries `< PROCFS_ROOT_COUNT', index into `procfs_root_files'.
 	                            * Otherwise, `- PROCFS_ROOT_COUNT' is a lower bound for the UPID  of
 	                            * the next thread that should be enumerated. */
-	/* TODO: On linux, processes are enumerated by PID (TGID),
-	 *       such that each read returns the process with  the
-	 *       lowest getpid() that is still > than any  process
-	 *       already enumerated  (read:  the  last  enumerated
-	 *       process)
-	 * Problem is that our `struct pidns' isn't designed with
-	 * find-first-pid-greater-or-equal in mind, and doing  so
-	 * with the current impl is an O(N) operation... */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void

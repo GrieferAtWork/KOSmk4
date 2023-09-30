@@ -86,7 +86,7 @@ task_clone_procpid(struct task *__restrict result,
 #ifdef LOCAL_IS_PROC
 	if unlikely(clone_flags & CLONE_NEWPID) {
 		REF struct pidns *ns;
-		ns = pidns_alloc(caller_pid->tp_ns);
+		ns = pidns_new(caller_pid->tp_ns);
 		TRY {
 			result_pid = _taskpid_alloc(ns);
 		} EXCEPT {
