@@ -40,7 +40,7 @@
                                                            * >> result = 0;
                                                            * >> while (result < val && sig_send(uaddr))
                                                            * >>     ++result;
-                                                           * >> if (result < val && val != 0) {
+                                                           * >> if (result < val) {
                                                            * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
                                                            * >>     result += sig_broadcast(uaddr);
                                                            * >>     if (result > val)
@@ -78,7 +78,7 @@
  * - When used with `lfutex(2)', only a singular expression can be specified.
  * - A futexfd object remembers:
  *   - `WEAK REF struct mman *': A weak reference to the creating thread's mman
- *   - `REF struct mfutex *':    Then futex object on which to wait
+ *   - `REF struct mfutex *':    The futex object on which to wait
  *   - `exprv':                  Everything relating to the expression being checked.
  *                               Note that a full copy of the caller-given `exprv' is
  *                               taken, meaning that  you can immediately  deallocate

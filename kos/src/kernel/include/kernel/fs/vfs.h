@@ -194,8 +194,8 @@ vfs_mounts_next(struct vfs *__restrict self,
 
 struct fdirnode;
 
-/* Return the path used to mount the given `dir' within `self'.
- * If the given directory doesn't have a mounting point  within
+/* Return some path used to mount the given `dir' within `self'.
+ * If the given directory doesn't  have a mounting point  within
  * the given VFS `self', return `NULL' */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct pathmount *FCALL
 vfs_mount_location(struct vfs *__restrict self,
