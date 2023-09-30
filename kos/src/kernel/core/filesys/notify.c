@@ -607,7 +607,7 @@ NOTHROW(KCALL notifyfd_trytrim)(struct notifyfd *__restrict self,
 
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
-                                             unsigned int wd, uint16_t mask,
+                                             unsigned int wd, uint32_t mask,
                                              uint16_t cookie,
                                              notifyfd_event_name_t name) {
 	unsigned int slot_wd;
@@ -625,11 +625,21 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 	assert(!(wd & NOTIFYFD_EVENT_ISDIR_FLAG));
 	assert(wd < self->nf_listenc);
 	slot_wd = wd;
-	if (notifyfd_event_name_isnull(&name)
-	    ? mfile_isdir(self->nf_listenv[wd].nl_file)
-	    : (!notifyfd_event_name_isfdirent(&name) ||
-	       (notifyfd_event_name_asfdirent(&name)->fd_type == DT_DIR)))
-		slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+	if (notifyfd_event_name_isnull(&name)) {
+		if (mfile_isdir(self->nf_listenv[wd].nl_file))
+			slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+	} else if (notifyfd_event_name_isfdirent(&name) ) {
+		if (notifyfd_event_name_asfdirent(&name)->fd_type == DT_DIR)
+			slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+	} else {
+		assert(notifyfd_event_name_isdecimal(&name));
+		if (mask & IN_ISDIR) {
+			slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+			mask &= ~IN_ISDIR;
+		}
+	}
+	assertf(!(mask & IN_ISDIR), "Can only be set when using decimal file names");
+
 	if (self->nf_eventc != 0) {
 		/* Special case: linux documents that consecutive, identical events are merged. */
 		slot = &self->nf_eventv[(self->nf_eventr + self->nf_eventc - 1) % self->nf_eventa];
@@ -1031,7 +1041,7 @@ SLIST_HEAD(notifyfd_slist, notifyfd);
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
                                          struct REF notifyfd_slist *__restrict blist,
-                                         unsigned int wd, uint16_t mask, uint16_t cookie,
+                                         unsigned int wd, uint32_t mask, uint16_t cookie,
                                          notifyfd_event_name_t name) {
 	/* Post the event. */
 	if (!notifyfd_postfsevent_raw_impl(self, wd, mask, cookie, name))
@@ -1098,7 +1108,7 @@ NOTHROW(FCALL notify_listener_postfsevent_raw_impl)(struct notify_listener *__re
 PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2, 6, 7)) void
 NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restrict self,
                                                 struct REF notifyfd_slist *__restrict blist,
-                                                uint16_t mask, uint16_t cookie, notifyfd_event_name_t name,
+                                                uint32_t mask, uint16_t cookie, notifyfd_event_name_t name,
                                                 struct dnotify_link_slist *__restrict deadlinks,
                                                 struct inotify_controller_slist *__restrict deadnotif) {
 	struct notifyfd *notfd;
@@ -1351,10 +1361,13 @@ NOTHROW(FCALL mfile_postfsevent_ex)(struct mfile *__restrict self,
  * including the ability to post events with custom file  names.
  *
  * This function is pretty much only here to allow procfs to post
- * filesystem  events for /proc when processes are added/removed. */
+ * filesystem  events for /proc when processes are added/removed.
+ *
+ * @param: mask: Unlike all other function, this  one may also include  `IN_ISDIR'
+ *               in order to indicate that `name' is to be treated as a directory. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_postfsfilevent_ex)(struct mfile *__restrict self,
-                                       uint16_t mask, uint16_t cookie,
+                                       uint32_t mask, uint16_t cookie,
                                        notifyfd_event_name_t name) {
 	struct REF notifyfd_slist blist;
 	struct dnotify_link_slist deadlinks;

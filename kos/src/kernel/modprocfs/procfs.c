@@ -613,7 +613,7 @@ procfs_root_v_enum(struct fdirenum *__restrict result) {
 #ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procfs_notify_startstop)(struct taskpid *__restrict tpid, uint16_t mask) {
+NOTHROW(FCALL procfs_notify_startstop)(struct taskpid *__restrict tpid, uint32_t mask) {
 	notifyfd_event_name_t name;
 	/* FIXME: Don't unconditionally use the root namespace PID (the  PID
 	 * used should differ for each inotify receiver, and be based on the
@@ -628,7 +628,7 @@ NOTHROW(FCALL procfs_root_addproc_postcompletion)(struct sig_completion_context 
                                                   void *buf) {
 	struct taskpid *tpid;
 	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
-	procfs_notify_startstop(tpid, IN_CREATE);
+	procfs_notify_startstop(tpid, IN_CREATE | IN_ISDIR);
 	(void)buf;
 }
 
@@ -637,7 +637,7 @@ NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sig_completion_context 
                                                   void *buf) {
 	struct taskpid *tpid;
 	tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
-	procfs_notify_startstop(tpid, IN_DELETE);
+	procfs_notify_startstop(tpid, IN_DELETE | IN_ISDIR);
 	(void)buf;
 }
 
@@ -681,14 +681,14 @@ procfs_root_v_notify_attach(struct mfile *__restrict self)
 	sig_completion_init(&result->pfrnc_delproc_completion, &procfs_root_delproc_completion);
 	sig_connect_completion_for_poll(&pidns_root.pn_addproc, &result->pfrnc_addproc_completion);
 	sig_connect_completion_for_poll(&pidns_root.pn_delproc, &result->pfrnc_delproc_completion);
-	printk(KERN_INFO "[procfs] Notify object attached to /proc [cookie:%p]\n", result);
+	printk(KERN_INFO "[procfs] Notify object attached to '/proc' [cookie:%p]\n", result);
 	return result; /* This will be destroyed by `procfs_root_v_notify_detach' */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_root_v_notify_detach)(struct mfile *__restrict self, void *cookie) {
 	struct procfs_root_notify_controller *controller;
-	printk(KERN_INFO "[procfs] Notify object detached from /proc [cookie:%p]\n", cookie);
+	printk(KERN_INFO "[procfs] Notify object detached from '/proc' [cookie:%p]\n", cookie);
 	assert(self == &procfs_super.fs_root);
 	(void)self;
 	controller = (struct procfs_root_notify_controller *)cookie;

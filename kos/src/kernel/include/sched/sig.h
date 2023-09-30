@@ -244,7 +244,7 @@ struct sig {
 #endif /* !CONFIG_NO_SMP */
 #define sig_init(x)    (void)((x)->s_con = __NULLPTR)
 #define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)
-#define sig_isempty(x) ((x)->s_con == __NULLPTR)
+#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
 
 
 
@@ -346,6 +346,28 @@ NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
                                               struct sig *sender);
+
+/* Same as the functions above, but hint that it is unlikely for anyone to still be connected. */
+#ifdef __OPTIMIZE_SIZE__
+#define sig_broadcast_unlikely                  sig_broadcast
+#define sig_altbroadcast_unlikely               sig_altbroadcast
+#define sig_broadcast_unlikely_nopr             sig_broadcast_nopr
+#define sig_altbroadcast_unlikely_nopr          sig_altbroadcast_nopr
+#define sig_broadcast_for_fini_unlikely         sig_broadcast_for_fini
+#define sig_altbroadcast_for_fini_unlikely      sig_altbroadcast_for_fini
+#define sig_broadcast_for_fini_unlikely_nopr    sig_broadcast_for_fini_nopr
+#define sig_altbroadcast_for_fini_unlikely_nopr sig_altbroadcast_for_fini_nopr
+#else /* __OPTIMIZE_SIZE__ */
+#define sig_broadcast_unlikely(self)                          (likely(sig_isempty(self)) ? 0 : sig_broadcast(self))
+#define sig_altbroadcast_unlikely(self, sender)               (likely(sig_isempty(self)) ? 0 : sig_altbroadcast(self, sender))
+#define sig_broadcast_unlikely_nopr(self)                     (likely(sig_isempty(self)) ? 0 : sig_broadcast_nopr(self))
+#define sig_altbroadcast_unlikely_nopr(self, sender)          (likely(sig_isempty(self)) ? 0 : sig_altbroadcast_nopr(self, sender))
+#define sig_broadcast_for_fini_unlikely(self)                 (likely(sig_isempty(self)) ? 0 : sig_broadcast_for_fini(self))
+#define sig_altbroadcast_for_fini_unlikely(self, sender)      (likely(sig_isempty(self)) ? 0 : sig_altbroadcast_for_fini(self, sender))
+#define sig_broadcast_for_fini_unlikely_nopr(self)            (likely(sig_isempty(self)) ? 0 : sig_broadcast_for_fini_nopr(self))
+#define sig_altbroadcast_for_fini_unlikely_nopr(self, sender) (likely(sig_isempty(self)) ? 0 : sig_altbroadcast_for_fini_nopr(self, sender))
+#endif /* !__OPTIMIZE_SIZE__ */
+
 
 /* Same as `sig_broadcast()', but impersonate `caller', and
  * wake up thread through use of `task_wake_as()'. The same

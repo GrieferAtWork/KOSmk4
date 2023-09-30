@@ -57,6 +57,7 @@ DECL_END
 #include <kernel/mman/ramfile.h>
 #include <kernel/mman/rw.h>
 #include <kernel/mman/stat.h>
+#include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/comm.h>
 #include <sched/cpu.h>
@@ -2353,12 +2354,150 @@ procfs_perproc_fd_v_enum(struct fdirenum *__restrict result) {
 	}
 }
 
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+
+#ifndef __mfile_awref_defined
+#define __mfile_awref_defined
+AWREF(mfile_awref, mfile);
+#endif /* !__mfile_awref_defined */
+
+struct procfs_perproc_fd_notify_controller {
+	WEAK refcnt_t         pfppfdnc_refcnt;             /* Reference counter. */
+	struct mfile_awref    pfppfdnc_procfd_folder;      /* [0..1] File to which events should be posted. */
+	struct sig_completion pfppfdnc_addhand_completion; /* Hook for `[handman]->hm_addhand' */
+	struct sig_completion pfppfdnc_delhand_completion; /* Hook for `[handman]->hm_delhand' */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_perproc_fd_notify_controller_destroy)(struct procfs_perproc_fd_notify_controller *__restrict self) {
+	sig_completion_disconnect(&self->pfppfdnc_addhand_completion);
+	sig_completion_disconnect(&self->pfppfdnc_delhand_completion);
+	kfree(self);
+}
+
+DEFINE_REFCNT_FUNCTIONS(struct procfs_perproc_fd_notify_controller, pfppfdnc_refcnt,
+                        procfs_perproc_fd_notify_controller_destroy);
+
+
+/* Structure that is passed via the dynamic buffer to `procfs_perproc_fd_hand_postcompletion()' */
+struct procfs_perproc_fd_event {
+	REF struct mfile *pfppfde_file; /* [1..1] File to which to post events. */
+	uint16_t          pfppfde_mask; /* The type of event (either IN_CREATE or IN_DELETE) */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procfs_perproc_fd_hand_postcompletion)(struct sig_completion_context *__restrict context,
+                                                     void *buf) {
+	struct procfs_perproc_fd_event *e;
+	fd_t fd = HANDMAN_HANDSIG_DECODE(context->scc_sender);
+	e = (struct procfs_perproc_fd_event *)buf;
+
+	/* Post the filesystem event to the /fd directory. */
+	_mfile_postfsfilevent_ex(e->pfppfde_file, e->pfppfde_mask, 0,
+	                         NOTIFYFD_EVENT_NAME_DECIMAL(fd));
+	decref_unlikely(e->pfppfde_file);
+}
+
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL procfs_perproc_fd_hand_completion)(struct sig_completion *__restrict self,
+                                                 struct sig_completion_context *__restrict context,
+                                                 struct procfs_perproc_fd_notify_controller *__restrict controller,
+                                                 void *buf, size_t bufsize, uint16_t mask) {
+	struct procfs_perproc_fd_event *e = (struct procfs_perproc_fd_event *)buf;
+	if (bufsize < sizeof(struct procfs_perproc_fd_event))
+		return sizeof(struct procfs_perproc_fd_event);
+
+	/* Load the mfile of the `/proc/[pid]/fd' directory. */
+	e->pfppfde_file = awref_get(&controller->pfppfdnc_procfd_folder);
+	if unlikely(e->pfppfde_file == NULL)
+		return 0; /* Special case: /fd directory was unloaded (stop monitoring) */
+	e->pfppfde_mask = mask;
+	context->scc_post = &procfs_perproc_fd_hand_postcompletion;
+
+	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
+	sig_completion_reprime(self, true);
+	return sizeof(struct procfs_perproc_fd_event);
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_perproc_fd_addhand_completion)(struct sig_completion *__restrict self,
+                                                    struct sig_completion_context *__restrict context,
+                                                    void *buf, size_t bufsize) {
+	return procfs_perproc_fd_hand_completion(self, context,
+	                                         container_of(self, struct procfs_perproc_fd_notify_controller, pfppfdnc_addhand_completion),
+	                                         buf, bufsize, IN_CREATE);
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL procfs_perproc_fd_delhand_completion)(struct sig_completion *__restrict self,
+                                                    struct sig_completion_context *__restrict context,
+                                                    void *buf, size_t bufsize) {
+	return procfs_perproc_fd_hand_completion(self, context,
+	                                         container_of(self, struct procfs_perproc_fd_notify_controller, pfppfdnc_delhand_completion),
+	                                         buf, bufsize, IN_DELETE);
+}
+
+
+PRIVATE BLOCKING NONNULL((1)) void *KCALL
+procfs_perproc_fd_v_notify_attach(struct mfile *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	REF struct procfs_perproc_fd_notify_controller *result;
+	struct taskpid *tpid;
+	REF struct task *thread;
+	REF struct handman *handman;
+	assert(mfile_isnode(self));
+	tpid    = mfile_asnode(self)->fn_fsdata;
+	thread  = taskpid_gettask_srch(tpid);
+	handman = task_gethandman(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(handman);
+
+	/* Allocate the notify controller. */
+	result = (REF struct procfs_perproc_fd_notify_controller *)kmalloc(sizeof(struct procfs_perproc_fd_notify_controller),
+	                                                                   GFP_NORMAL);
+
+	/* Initialize the controller and connect it to the handle manager's add/del-hand signals. */
+	result->pfppfdnc_refcnt = 1;
+	awref_init(&result->pfppfdnc_procfd_folder, self);
+	sig_completion_init(&result->pfppfdnc_addhand_completion, &procfs_perproc_fd_addhand_completion);
+	sig_completion_init(&result->pfppfdnc_delhand_completion, &procfs_perproc_fd_delhand_completion);
+	sig_connect_completion_for_poll(&handman->hm_addhand, &result->pfppfdnc_addhand_completion);
+	sig_connect_completion_for_poll(&handman->hm_delhand, &result->pfppfdnc_delhand_completion);
+	printk(KERN_INFO "[procfs] Notify object attached to '/proc/%d/fd' [cookie:%p]\n",
+	       taskpid_getroottid(tpid), result);
+	return result;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL procfs_perproc_fd_v_notify_detach)(struct mfile *__restrict self, void *cookie) {
+	REF struct procfs_perproc_fd_notify_controller *controller;
+	(void)self;
+	assert(mfile_isnode(self));
+	printk(KERN_INFO "[procfs] Notify object detached from '/proc/%d/fd' [cookie:%p]\n",
+	       taskpid_getroottid(mfile_asnode(self)->fn_fsdata), cookie);
+	controller = (struct procfs_perproc_fd_notify_controller *)cookie;
+	awref_clear(&controller->pfppfdnc_procfd_folder);
+	decref_likely(controller);
+}
+
+PRIVATE struct mfile_stream_ops const procfs_perproc_fd_v_stream_ops = {
+	.mso_open          = &procfs_perproc_dir_v_open,
+	.mso_stat          = &procfs_perproc_dir_v_stat,
+	.mso_ioctl         = &procfs_perproc_dir_v_ioctl,
+	.mso_notify_attach = &procfs_perproc_fd_v_notify_attach,
+	.mso_notify_detach = &procfs_perproc_fd_v_notify_detach,
+};
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#define procfs_perproc_fd_v_stream_ops procfs_perproc_dir_v_stream_ops
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
+
 INTERN_CONST struct fdirnode_ops const procfs_pp_fd = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &procfs_perproc_dir_v_destroy,
 			.mo_changed = &procfs_perproc_dir_v_changed,
-			.mo_stream  = &procfs_perproc_dir_v_stream_ops,
+			.mo_stream  = &procfs_perproc_fd_v_stream_ops,
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,
@@ -2772,12 +2911,16 @@ procfs_perproc_fdinfo_v_enum(struct fdirenum *__restrict result) {
 	}
 }
 
+/* Files in `/fdinfo' and `/fd' share names, so filesystem notifications for `/fd' also apply
+ * to `/fdinfo'. As  such, we  can simply  re-use stream  operators for  `/fd' in  `/fdinfo'. */
+#define procfs_perproc_fdinfo_v_stream_ops procfs_perproc_fd_v_stream_ops
+
 INTERN_CONST struct fdirnode_ops const procfs_pp_fdinfo = {
 	.dno_node = {
 		.no_file = {
 			.mo_destroy = &procfs_perproc_dir_v_destroy,
 			.mo_changed = &procfs_perproc_dir_v_changed,
-			.mo_stream  = &procfs_perproc_dir_v_stream_ops,
+			.mo_stream  = &procfs_perproc_fdinfo_v_stream_ops,
 		},
 		.no_free   = &procfs_perproc_dir_v_free,
 		.no_wrattr = &procfs_perproc_dir_v_wrattr,

@@ -178,7 +178,7 @@ struct notify_listener {
 /* notifyfd_event_name_t is a union that behaves as follows:
  * >> typedef union {
  * >>     REF struct fdirent *nfen_fdirent; // [0..1] Name of associated file (or NULL if not a child-in-directory-event)
- * >>     uintptr_t           nfen_decimal; // Name of associated file is the decimal `"%" PRIuPTR' representation of this number >> 1. (also: assumed to be a directory)
+ * >>     uintptr_t           nfen_decimal; // Name of associated file is the decimal `"%" PRIuPTR' representation of this number >> 1
  * >> } notifyfd_event_name_t; */
 typedef uintptr_t notifyfd_event_name_t;
 #define NOTIFYFD_EVENT_NAME_NULL           ((notifyfd_event_name_t)__NULLPTR)
@@ -409,10 +409,14 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfi
  * including the ability to post events with custom file  names.
  *
  * This function is pretty much only here to allow procfs to post
- * filesystem  events for /proc when processes are added/removed. */
+ * filesystem  events for /proc when processes are added/removed.
+ *
+ * @param: mask: Unlike all other function, this one may also include `IN_ISDIR'
+ *               in  order to  indicate that `name'  is a decimal  and should be
+ *               treated as a directory. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _mfile_postfsfilevent_ex)(struct mfile *__restrict self,
-                                        uint16_t mask, uint16_t cookie,
+                                        uint32_t mask, uint16_t cookie,
                                         notifyfd_event_name_t name)
 		ASMNAME("mfile_postfsfilevent_ex");
 

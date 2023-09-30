@@ -371,6 +371,7 @@ struct handrange {
 	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc(&(range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,         \
 	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc(&(range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,         \
 	 __hybrid_atomic_store(&(self)->_mh_words[1], _handslot_private_makeword2(mode, type), __ATOMIC_SEQ_CST), \
+	 handman_on_addhand(man, range, self, (range)->hr_minfd + (unsigned int)((self) - (range)->hr_hand)),     \
 	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                                     \
 	 sig_broadcast(&(man)->hm_changed))
 
@@ -421,6 +422,8 @@ struct handman {
 	                                      *  - a handle is closed
 	                                      *  - a handle is replaced
 	                                      *  - a handle's h_mode is changed. */
+	struct sig               hm_addhand; /* Broadcast (with alt=HANDMAN_HANDSIG_ENCODE(...)) when a new handle was added */
+	struct sig               hm_delhand; /* Broadcast (with alt=HANDMAN_HANDSIG_ENCODE(...)) when a handle was closed (unless closed by CLOFORK or CLOEXEC) */
 	unsigned int             hm_handles; /* [lock(INC(hm_lock), DEC(ATOMIC))]
 	                                      * Total # of non-HANDLE_TYPE_UNDEFINED handles. Due
 	                                      * to race conditions, this may be greater than  the
@@ -437,6 +440,38 @@ struct handman {
 	                                      *
 	                                      * This field must not be greater than INT_MAX! */
 };
+
+#if __SIZEOF_INT__ == 4
+#define _HANDMAN_HANDSIG_NONZERO_MASK 0x80000000u
+#elif __SIZEOF_INT__ == 8
+#define _HANDMAN_HANDSIG_NONZERO_MASK 0x8000000000000000u
+#elif __SIZEOF_INT__ == 2
+#define _HANDMAN_HANDSIG_NONZERO_MASK 0x8000u
+#elif __SIZEOF_INT__ == 1
+#define _HANDMAN_HANDSIG_NONZERO_MASK 0x80u
+#else /* __SIZEOF_INT__ == ... */
+#error "Unsupported sizeof(int)"
+#endif /* __SIZEOF_INT__ != ... */
+
+/* Helpers to encode/decode `fd_t', as sent to `hm_addhand' and `hm_delhand' */
+#define HANDMAN_HANDSIG_ENCODE(fd)  ((struct sig *)(void *)(uintptr_t)((__ufd_t)(fd) | _HANDMAN_HANDSIG_NONZERO_MASK))
+#define HANDMAN_HANDSIG_DECODE(sig) ((fd_t)((__ufd_t)(uintptr_t)(void *)(sig) & ~_HANDMAN_HANDSIG_NONZERO_MASK))
+
+
+#ifdef __INTELLISENSE__
+NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(handman_on_addhand)(struct handman *__restrict self, struct handrange *__restrict range,
+                            union handslot *__restrict slot, fd_t fd);
+NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(handman_on_delhand)(struct handman *__restrict self, struct handrange *__restrict range,
+                            union handslot *__restrict slot, fd_t fd);
+#else /* __INTELLISENSE__ */
+#define handman_on_addhand(self, range, slot, fd) \
+	sig_altbroadcast_unlikely(&(self)->hm_addhand, HANDMAN_HANDSIG_ENCODE(fd))
+#define handman_on_delhand(self, range, slot, fd) \
+	sig_altbroadcast_unlikely(&(self)->hm_delhand, HANDMAN_HANDSIG_ENCODE(fd))
+#endif /* !__INTELLISENSE__ */
+
 
 /* Destroy the given handle manager. */
 FUNDEF NOBLOCK NONNULL((1)) void

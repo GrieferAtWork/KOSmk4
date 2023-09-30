@@ -466,6 +466,8 @@ NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self) {
 	assertf(self->pn_tree == NULL, "Any taskpid should have kept us alive");
 	assertf(self->pn_tree_pg == NULL, "Any procgrp should have kept us alive");
 	assertf(self->pn_size == 0, "Then how come `pn_tree == NULL'?");
+	sig_altbroadcast_for_fini_unlikely(&self->pn_addproc, PIDNS_PROCSIG_ENCODE(&boottask_pid));
+	sig_altbroadcast_for_fini_unlikely(&self->pn_delproc, PIDNS_PROCSIG_ENCODE(&boottask_pid));
 	decref_unlikely(self->pn_par);
 	kfree(self);
 }

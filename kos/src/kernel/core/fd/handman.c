@@ -634,7 +634,9 @@ again:
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL handman_destroy)(struct handman *__restrict self) {
 	handman_reap(self);
-	sig_broadcast_for_fini(&self->hm_changed);
+	sig_broadcast_for_fini_unlikely(&self->hm_changed);
+	sig_altbroadcast_for_fini_unlikely(&self->hm_addhand, HANDMAN_HANDSIG_ENCODE(0));
+	sig_altbroadcast_for_fini_unlikely(&self->hm_delhand, HANDMAN_HANDSIG_ENCODE(0));
 	if likely(self->hm_ranges != NULL)
 		handrange_destroy_tree(self->hm_ranges);
 	kfree(self);
@@ -932,6 +934,8 @@ handman_fork(struct handman *__restrict self)
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
 	sig_init(&result->hm_changed);
+	sig_init(&result->hm_addhand);
+	sig_init(&result->hm_delhand);
 	result->hm_maxhand = atomic_read(&self->hm_maxhand);
 	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
@@ -990,6 +994,8 @@ handman_fork_and_closerange(struct handman *__restrict self,
 	atomic_rwlock_init(&result->hm_lock);
 	SLIST_INIT(&result->hm_lops);
 	sig_init(&result->hm_changed);
+	sig_init(&result->hm_addhand);
+	sig_init(&result->hm_delhand);
 	result->hm_maxhand = atomic_read(&self->hm_maxhand);
 	result->hm_maxfd   = atomic_read(&self->hm_maxfd);
 	return result;
@@ -1075,6 +1081,8 @@ PUBLIC struct handman handman_kernel = {
 	.hm_lops    = SLIST_HEAD_INITIALIZER(handman_kernel.hm_lops),
 	.hm_ranges  = NULL,
 	.hm_changed = SIG_INIT,
+	.hm_addhand = SIG_INIT,
+	.hm_delhand = SIG_INIT,
 	.hm_handles = 0,
 	.hm_maxhand = (unsigned int)FD_MAX + 1,
 	.hm_maxfd   = (unsigned int)FD_MAX,
@@ -1357,6 +1365,7 @@ handman_close(struct handman *__restrict self, fd_t fd,
 		goto err_badfd;
 
 	/* Copy information about the original handle. */
+	handman_on_delhand(self, range, &range->hr_hand[relfd], fd);
 	memcpy(ohand, &range->hr_hand[relfd].mh_hand, sizeof(struct handle));
 	DBG_memset(&range->hr_hand[relfd], 0xcc, sizeof(range->hr_hand[relfd]));
 	range->hr_hand[relfd].mh_hand.h_type = HANDLE_TYPE_UNDEFINED;
@@ -1618,8 +1627,9 @@ err_badfd:
 
 
 /* Close all handles within the given range. */
-PRIVATE NOBLOCK NONNULL((1, 2, 4, 6)) unsigned int
-NOTHROW(FCALL handrange_clorange)(struct handrange *__restrict self,
+PRIVATE NOBLOCK NONNULL((1, 2, 3, 5, 7)) unsigned int
+NOTHROW(FCALL handrange_clorange)(struct handman *__restrict hm,
+                                  struct handrange *__restrict self,
                                   unsigned int *__restrict p_minfd, unsigned int maxfd,
                                   struct handle *__restrict decref_buf, size_t decref_siz,
                                   size_t *__restrict p_decref_len) {
@@ -1635,7 +1645,9 @@ NOTHROW(FCALL handrange_clorange)(struct handrange *__restrict self,
 			continue;
 		if (*p_decref_len >= decref_siz)
 			break; /* Need more buffer space. */
+
 		/* Close this handle. */
+		handman_on_delhand(hm, self, &self->hr_hand[minfd], self->hr_minfd + minfd);
 		memcpy(&decref_buf[*p_decref_len], &self->hr_hand[minfd].mh_hand, sizeof(struct handle));
 		if (self->hr_hand[minfd].mh_hand.h_mode & IO_CLOFORK)
 			atomic_dec(&self->hr_cfork);
@@ -1692,7 +1704,7 @@ again_lock_and_findrange:
 again_findrange:
 	while ((range = handman_firstrangeafter(self, minfd)) != NULL) {
 		unsigned int part;
-		part = handrange_clorange(range, &minfd, maxfd,
+		part = handrange_clorange(self, range, &minfd, maxfd,
 		                          decref_buf, decref_siz,
 		                          &decref_len);
 		if (part != 0) {
@@ -2155,13 +2167,14 @@ insert_into_range:
 		relfd = (unsigned int)fd - range->hr_minfd;
 again_check_slot:
 		if (handrange_slotisfree(range, relfd)) {
-			/* Slot wasn't in use already */
+			/* Slot wasn't already in use */
 			if unlikely(self->hm_handles >= self->hm_maxhand) {
 				handman_endwrite(self);
 				THROW(E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS);
 			}
 			handrange_install_handle(range, relfd, nhand);
 			atomic_inc(&self->hm_handles);
+			handman_on_addhand(self, range, &range->hr_hand[relfd], fd);
 			handman_endwrite(self);
 			sig_broadcast(&self->hm_changed);
 			DBG_memset(ohand, 0xcc, sizeof(*ohand));
@@ -2183,6 +2196,7 @@ again_check_slot:
 			goto again_lock;
 		} else {
 			/* Slot is already in use. -- Override */
+			handman_on_delhand(self, range, &range->hr_hand[relfd], fd);
 			memcpy(ohand, &range->hr_hand[relfd].mh_hand, sizeof(struct handle));
 			memcpy(&range->hr_hand[relfd].mh_hand, nhand, sizeof(struct handle));
 
@@ -2202,6 +2216,7 @@ again_check_slot:
 				}
 			}
 			handle_incref(*nhand);
+			handman_on_addhand(self, range, &range->hr_hand[relfd], fd);
 			handman_endwrite(self);
 			sig_broadcast(&self->hm_changed);
 			return fd;
@@ -2322,6 +2337,7 @@ again_lock_for_newrange:
 
 	/* Do accounting */
 	atomic_inc(&self->hm_handles);
+	handman_on_addhand(self, range, &range->hr_hand[0], fd);
 	handman_endwrite(self);
 	sig_broadcast(&self->hm_changed);
 	DBG_memset(ohand, 0xcc, sizeof(*ohand));
@@ -2700,6 +2716,7 @@ handman_install(struct handman *__restrict self,
 		atomic_inc(&range->hr_cfork);
 
 	/* Release locks. */
+	handman_on_addhand(self, range, &range->hr_hand[relfd], result);
 	handman_endwrite(self);
 	return result;
 }
