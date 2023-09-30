@@ -1666,6 +1666,11 @@
 #define PAGEDIR_P_BEGINUSE_KEEP_PR(...)
 #define PAGEDIR_P_ENDUSE_KEEP_PR(...)
 
+#define IF_HAVE_PHYS_IDENTITY(...) __VA_ARGS__
+#define IF_PHYS_IDENTITY(a,b,...) do{__VA_ARGS__;}while(0)
+#define IF_PHYS_IDENTITY_PAGE(a,...) do{__VA_ARGS__;}while(0)
+#define PHYS_VARS byte_t *trampoline
+
 #define DEFINE_CMDLINE_FLAG_VAR(flagname,parname) bool flagname;
 #define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name,parname) char string_name[];
 #define DEFINE_CMDLINE_PARAM_INT8_VAR(varname,parname,defl) int8_t varname;
@@ -2489,3 +2494,8 @@
 #define __USERKERN_PAD_PID(x)
 #define __USERKERN_PAD_UID(x)
 #define __USERKERN_PAD_GID(x)
+
+#define phys_foreach_b(buf, buf_bytes, addr, num_bytes, ...) for(;;){__VA_ARGS__;}
+#define phys_foreach_w(buf, buf_words, addr, num_words, ...) for(;;){__VA_ARGS__;}
+#define phys_foreach_l(buf, buf_dwords, addr, num_dwords, ...) for(;;){__VA_ARGS__;}
+#define phys_foreach_q(buf, buf_qwords, addr, num_qwords, ...) for(;;){__VA_ARGS__;}

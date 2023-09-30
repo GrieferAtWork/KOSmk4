@@ -28,6 +28,7 @@
 #include <kos/unistd.h>
 #include <sys/mman.h>
 
+#include <alloca.h>
 #include <atomic.h>
 #include <fcntl.h>
 #include <string.h>
@@ -193,26 +194,64 @@ libphys_copytophys(physaddr_t dst, void const *src, size_t num_bytes)
 	        touch_all_pages(src, num_bytes));
 }
 
+PRIVATE NOBLOCK ATTR_NOINLINE void
+NOTHROW(CC libphys_copyinphys_fallback)(physaddr_t dst,
+                                        physaddr_t src,
+                                        size_t num_bytes) {
+	size_t pagesize = getpagesize();
+	size_t bufsize  = pagesize < num_bytes ? pagesize : num_bytes;
+	byte_t *tempbuf = (byte_t *)alloca(bufsize);
+	do {
+		size_t copy = bufsize;
+		if (copy > num_bytes)
+			copy = num_bytes;
+		libphys_copyfromphys(tempbuf, src, copy);
+		libphys_copytophys(dst, tempbuf, copy);
+		dst += copy;
+		src += copy;
+		num_bytes -= copy;
+	} while (num_bytes);
+}
+
 INTERN NOBLOCK void
 NOTHROW(CC libphys_copyinphys)(physaddr_t dst,
                                physaddr_t src,
                                size_t num_bytes) {
-	void *temp;
-	temp = libphys_mmapphys(src, num_bytes);
-	if unlikely(temp == MAP_FAILED)
+	void *temp = libphys_mmapphys(src, num_bytes);
+	if unlikely(temp == MAP_FAILED) {
+		libphys_copyinphys_fallback(dst, src, num_bytes);
 		return;
+	}
 	WITHMEM((size_t)pwrite64(dev_mem, temp, num_bytes, (pos64_t)dst) == num_bytes,
 	        (void)0);
 	libphys_munmapphys(temp, num_bytes);
 }
 
+PRIVATE NOBLOCK ATTR_NOINLINE void
+NOTHROW(CC libphys_memsetphys_fallback)(physaddr_t dst, int byte,
+                                        size_t num_bytes) {
+	size_t pagesize = getpagesize();
+	size_t bufsize  = pagesize < num_bytes ? pagesize : num_bytes;
+	byte_t *tempbuf = (byte_t *)alloca(bufsize);
+	memset(tempbuf, byte, bufsize);
+	do {
+		size_t copy = bufsize;
+		if (copy > num_bytes)
+			copy = num_bytes;
+		libphys_copytophys(dst, tempbuf, copy);
+		dst += copy;
+		num_bytes -= copy;
+	} while (num_bytes);
+}
+
 INTERN NOBLOCK void
 NOTHROW(CC libphys_memsetphys)(physaddr_t dst,
                                int byte, size_t num_bytes) {
-	void *temp;
-	temp = libphys_mmapphys(dst, num_bytes);
-	if unlikely(temp == MAP_FAILED)
+	void *temp = libphys_mmapphys(dst, num_bytes);
+	if unlikely(temp == MAP_FAILED) {
+		libphys_memsetphys_fallback(dst, byte, num_bytes);
 		return;
+	}
 	temp = memset(temp, byte, num_bytes);
 	libphys_munmapphys(temp, num_bytes);
 }
