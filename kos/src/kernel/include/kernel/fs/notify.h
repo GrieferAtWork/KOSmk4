@@ -202,8 +202,6 @@ struct notifyfd_event {
 	notifyfd_event_name_t nfe_name;   /* [const] Name of associated file. */
 };
 
-#define notifyfd_event_
-
 
 /* The main NOTIFYFD object (as also exposed via `HANDLE_TYPE_NOTIFYFD') */
 struct notifyfd {
