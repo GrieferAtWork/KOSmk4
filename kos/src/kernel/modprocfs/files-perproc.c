@@ -126,18 +126,18 @@ DECL_BEGIN
 	printer(struct printnode *__restrict self, \
 	        pformatprinter printer, void *arg, \
 	        pos_t offset_hint);
-#define MKREG_RW(ops_symbol_name, printer, writer)                      \
-	INTDEF NONNULL((1, 2)) void KCALL                                   \
-	printer(struct printnode *__restrict self,                          \
-	        pformatprinter printer_, void *arg,                         \
-	        pos_t offset_hint);                                        \
-	INTDEF WUNUSED NONNULL((1)) size_t KCALL                            \
+#define MKREG_RW(ops_symbol_name, printer, writer)             \
+	INTDEF NONNULL((1, 2)) void KCALL                          \
+	printer(struct printnode *__restrict self,                 \
+	        pformatprinter printer_, void *arg,                \
+	        pos_t offset_hint);                                \
+	INTDEF WUNUSED NONNULL((1)) size_t KCALL                   \
 	writer(struct mfile *__restrict self, NCX void const *src, \
 	       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 #define MKLNK(ops_symbol_name, readlink)       \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL   \
 	readlink(struct flnknode *__restrict self, \
-	         NCX /*utf-8*/ char *buf, \
+	         NCX /*utf-8*/ char *buf,          \
 	         size_t bufsize)                   \
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
 #include "perproc.def"
@@ -1210,8 +1210,8 @@ print_mounting_point(struct path *__restrict fsroot,
 		writer = stpcpy(writer, ",lazytime");
 	if (flags & MFILE_FS_NOSUID)
 		writer = stpcpy(writer, ",nosuid");
-//TODO:	if (flags & MS_NODEV)
-//TODO:		writer = stpcpy(writer, ",nodev");
+	if (super->fs_dev == NULL)
+		writer = stpcpy(writer, ",nodev");
 	if (flags & MFILE_FS_NOEXEC)
 		writer = stpcpy(writer, ",noexec");
 	if (flags & MFILE_F_NOATIME)
@@ -1225,7 +1225,7 @@ print_mounting_point(struct path *__restrict fsroot,
 	/* TODO: Filesystem drivers should also be able to print additional options:
 	 * - e.g.: "fat" should print `user_id=...,group_id=...' */
 
-	/* When  passed by `getmntent(3)', these 2 values become `mnt_freq' and `mnt_passno'.
+	/* When  parsed by `getmntent(3)', these 2 values become `mnt_freq' and `mnt_passno'.
 	 * Note that we unconditionally print `0' for both of them since linux does the same. */
 	return PRINT(" 0 0\n");
 err:
