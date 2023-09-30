@@ -1937,7 +1937,7 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 	/* Access checks */
 
 	/* Is caller allowed to access files of this process? */
-	if (me->fn_fsdata != task_gettaskpid())
+	if (taskpid_getprocpid(me->fn_fsdata) != task_getprocpid())
 		fnode_access(self, R_OK);
 
 	/* Check if file-access-permissions got less restrictive.
