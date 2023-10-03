@@ -660,7 +660,7 @@ __COMPILER_REDIRECT(LIBPCIACCESS_DECL,__ATTR_PURE __ATTR_WUNUSED,struct pci_devi
 #ifdef __INTELLISENSE__
 __ATTR_PURE __ATTR_WUNUSED struct pci_device *
 __NOTHROW(LIBPCIACCESS_CC pci_device_find_by_slot)(__uint32_t domain, __uint8_t bus,
-                                             __uint8_t dev, __uint8_t func);
+                                                   __uint8_t dev, __uint8_t func);
 #else /* __INTELLISENSE__ */
 #define pci_device_find_by_slot(domain, bus, dev, func)              \
 	__pci_device_byaddr(((pciaddr_t)__UINT32_C(0x80000000)) |        \
@@ -778,11 +778,11 @@ LIBPCIACCESS_DECL __ATTR_NONNULL((1)) __uint32_t __NOTHROW(LIBPCIACCESS_CC pci_d
 struct pci_agp_info {
 #ifdef __USE_KOS
 #ifdef __USE_KOS_ALTERATIONS
-	__uint8_t            pai_config_offset; /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
+	__uint8_t            pai_config_offset; /* PCI_ADDR_REGMASK-style offset for the capability matrix. */
 #else /* __USE_KOS_ALTERATIONS */
 	union {
-		__uint8_t        pai_config_offset; /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
-		__uint8_t        config_offset;     /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
+		__uint8_t        pai_config_offset; /* PCI_ADDR_REGMASK-style offset for the capability matrix. */
+		__uint8_t        config_offset;     /* PCI_ADDR_REGMASK-style offset for the capability matrix. */
 	};
 #endif /* !__USE_KOS_ALTERATIONS */
 	union {
@@ -812,7 +812,7 @@ struct pci_agp_info {
 		__uint32_t   _pai_cfg4_mod;         /* Slightly modified `pci_device_cfg_readl(config_offset + 4)' */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 			__HYBRID_BITFIELD8_T pai_fast_writes : 1;   /* Support for fast-writes. */
 			__HYBRID_BITFIELD8_T pai_addr64 : 1;        /* ... */
 			__HYBRID_BITFIELD8_T pai_htrans : 1;        /* ... */
@@ -830,13 +830,13 @@ struct pci_agp_info {
 			__HYBRID_BITFIELD8_T pai_htrans : 1;        /* ... */
 			__HYBRID_BITFIELD8_T pai_addr64 : 1;        /* ... */
 			__HYBRID_BITFIELD8_T pai_fast_writes : 1;   /* Support for fast-writes. */
-			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 			__HYBRID_BITFIELD8_T fast_writes : 1;   /* Support for fast-writes. */
 			__HYBRID_BITFIELD8_T addr64 : 1;        /* ... */
 			__HYBRID_BITFIELD8_T htrans : 1;        /* ... */
@@ -854,7 +854,7 @@ struct pci_agp_info {
 			__HYBRID_BITFIELD8_T htrans : 1;        /* ... */
 			__HYBRID_BITFIELD8_T addr64 : 1;        /* ... */
 			__HYBRID_BITFIELD8_T fast_writes : 1;   /* Support for fast-writes. */
-			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
@@ -878,7 +878,7 @@ struct pci_agp_info {
 	};
 #endif /* !__USE_KOS_ALTERATIONS */
 #else /* __USE_KOS */
-	__uint8_t            config_offset;            /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
+	__uint8_t            config_offset;            /* PCI_ADDR_REGMASK-style offset for the capability matrix. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	__HYBRID_BITFIELD8_T minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 	__HYBRID_BITFIELD8_T major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
@@ -887,7 +887,7 @@ struct pci_agp_info {
 	__HYBRID_BITFIELD8_T minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 	__HYBRID_BITFIELD8_T fast_writes : 1;          /* Support for fast-writes. */
 	__HYBRID_BITFIELD8_T addr64 : 1;               /* ... */
 	__HYBRID_BITFIELD8_T htrans : 1;               /* ... */
@@ -905,7 +905,7 @@ struct pci_agp_info {
 	__HYBRID_BITFIELD8_T htrans : 1;               /* ... */
 	__HYBRID_BITFIELD8_T addr64 : 1;               /* ... */
 	__HYBRID_BITFIELD8_T fast_writes : 1;          /* Support for fast-writes. */
-	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x) */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint8_t            async_req_size;           /* ... */
 	__uint8_t            calibration_cycle_timing; /* ... */

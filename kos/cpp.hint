@@ -1245,6 +1245,7 @@
 
 
 // <kos/exec/idata.h>
+#define DEFINE_PUBLIC_IFUNC(n,r) int n(){}
 #define DEFINE_PUBLIC_IDATA(n,r,s) int n(){}
 #define DEFINE_PRIVATE_SYMBOL(n,v,s) ;int n(){};
 #define DEFINE_PUBLIC_SYMBOL(n,v,s) ;int n(){};

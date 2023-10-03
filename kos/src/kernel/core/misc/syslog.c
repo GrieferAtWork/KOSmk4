@@ -502,6 +502,7 @@ success:
 		/* Recursive lock */
 		return;
 	}
+
 	/* Syslog  printing must  remain functional,  even if  some other CPU
 	 * crashed fatally during CPU initialization while holding this lock. */
 	if unlikely(!is_a_valid_cpu(oldcpu)) {
@@ -568,6 +569,7 @@ syslog_packet_append_impl(struct syslog_packet *__restrict self,
 		THROWS(E_SEGFAULT) {
 	char *dst;
 	unsigned int offset, result, count;
+
 	/* NOTE: We're allowed to assume that `datalen <= (SYSLOG_LINEMAX - 1)' */
 	offset = self->sp_len;
 	count  = (SYSLOG_LINEMAX - 1) - offset;
@@ -593,6 +595,7 @@ set_timestamp_and_write_data:
 		now           = realtime();
 		self->sp_time = (u64)now.tv_sec;
 		self->sp_nsec = now.tv_nsec;
+
 		/* Be _extremely_ careful about accessing TLS memory here!
 		 * We get called from sooo many places, and we must do our
 		 * best to be as fault-tolerant as possible. */
@@ -746,15 +749,18 @@ syslog_printer(void *level,
 		THROWS(E_SEGFAULT) {
 	ssize_t result = (ssize_t)datalen;
 	struct syslog_buffer *buffer;
+
 	/* Quick check: are log entries of level enabled. */
 	if (!(syslog_levels & ((uintptr_t)1 << (shift_t)(uintptr_t)level)))
 		goto done;
+
 	/* Check for special case: empty message */
 	if unlikely(!datalen)
 		goto done;
 	if unlikely((uintptr_t)level > SYSLOG_LEVEL_COUNT)
 		level = (void *)((uintptr_t)level % SYSLOG_LEVEL_COUNT);
 	buffer = &syslog_buffers[(uintptr_t)level];
+
 	/* Try to lock the buffer. */
 	SYSLOG_BUFFER_LOCK(buffer);
 	UNNESTED_TRY {
@@ -767,6 +773,7 @@ syslog_printer(void *level,
 				data    += (SYSLOG_LINEMAX - 1);
 			} while (datalen > (SYSLOG_LINEMAX - 1));
 		}
+
 		/* Append data to the buffer's packet. */
 		syslog_packet_append(&buffer->sb_packet, data,
 		                     (unsigned int)datalen,
@@ -776,6 +783,7 @@ syslog_printer(void *level,
 		SYSLOG_BUFFER_BREAK(buffer);
 		RETHROW();
 	}
+
 	/* Unlock the buffer. */
 	SYSLOG_BUFFER_UNLOCK(buffer);
 done:

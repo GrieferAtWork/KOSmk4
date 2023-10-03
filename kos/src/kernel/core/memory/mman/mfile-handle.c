@@ -78,8 +78,6 @@ PUBLIC BLOCKING NONNULL((1)) syscall_slong_t KCALL
 mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
               NCX UNCHECKED void *arg, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
-#define typeof_field(s, m) typeof(((s *)0)->m)
-#define sizeof_field(s, m) sizeof(((s *)0)->m)
 	/* Generate offset table for attributes referenced by ioctl codes. */
 	enum {
 		USER_ATTRIB_MINID = MIN_C(_IOC_NR(FILE_IOC_GETFSLINKMAX), _IOC_NR(FILE_IOC_GETFSNAMEMAX),

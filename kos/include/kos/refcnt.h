@@ -159,6 +159,8 @@ public:
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict self);                            \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict self);                        \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(T *__restrict self);                                 \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xincref)(T *__restrict self);                                                                          \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC incref)(T *__restrict self);                                     \
 	template<class __T> __NOBLOCK __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC xincref)(__T *__restrict self);                    \
 	template<class __T> __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC incref)(__T *__restrict self); \
 	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                            \
@@ -177,6 +179,8 @@ public:
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict self);                            \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict self);                        \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryweakincref)(T *__restrict self);                                 \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xweakincref)(T *__restrict self);                                                                          \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC weakincref)(T *__restrict self);                                     \
 	template<class __T> __NOBLOCK __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC xweakincref)(__T *__restrict self);                    \
 	template<class __T> __NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) __PRIVATE_REFCNT_INCREF_RT(__T, T) __REFCNT_NOTHROW(__REFCNT_CC weakincref)(__T *__restrict self); \
 	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_DESTROY_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                            \

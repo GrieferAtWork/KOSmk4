@@ -691,9 +691,6 @@ again:
 	return old_flags;
 }
 
-
-
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_LOCK_C */

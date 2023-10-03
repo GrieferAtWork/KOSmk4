@@ -319,7 +319,7 @@ bochs_v_strings(struct svga_chipset *__restrict self,
 	                  lengthof(PRIMAXx32),
 	                  lengthof("0x" PRIMAXx16 ".0x" PRIMAXx16),
 	                  lengthof("0x" PRIMAXx8 ".0x" PRIMAXx8 "."
-	                                 "0x" PRIMAXx8 ".0x" PRIMAXx8))];
+	                           "0x" PRIMAXx8 ".0x" PRIMAXx8))];
 	me = (struct bochs_chipset *)self;
 
 	sprintf(valbuf, "%" PRIu16, me->bc_maxresx);

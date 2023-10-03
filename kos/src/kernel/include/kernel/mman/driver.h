@@ -476,7 +476,7 @@ struct driver
 #undef _driver_weakrefcnt
 #define _driver_as_module(self)  (&(self)->d_module)
 #define _driver_destroy(self)    module_destroy(&(self)->d_module)
-#define _driver_free(self)      module_free(&(self)->d_module)
+#define _driver_free(self)       module_free(&(self)->d_module)
 #define _driver_refcnt(self)     (self)->d_module.md_refcnt
 #define _driver_weakrefcnt(self) (self)->d_module.md_weakrefcnt
 #ifndef __DRIVER_REFCNT_FUNCTIONS_DEFINED

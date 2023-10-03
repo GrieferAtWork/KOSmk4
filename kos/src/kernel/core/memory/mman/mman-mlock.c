@@ -409,11 +409,13 @@ mman_munlock(struct mman *__restrict self, void const *addr,
 		      E_INVALID_ARGUMENT_CONTEXT_MUNLOCK_SIZE,
 		      num_bytes);
 	}
+
 	/* Align address bounds to whole pages. */
 	minaddr = (byte_t const *)FLOOR_ALIGN((uintptr_t)minaddr, PAGESIZE);
 	maxaddr = (byte_t const *)(CEIL_ALIGN((uintptr_t)maxaddr + 1, PAGESIZE) - 1);
-again:
+
 	/* Acquire locks... */
+again:
 	mman_lock_acquire(self);
 	mrangelock_aq_init(&rl, self, minaddr, maxaddr);
 	if (!(flags & MLOCK_IFMAPPED) &&

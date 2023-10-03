@@ -79,7 +79,7 @@ struct syslog_packet {
 	s32    sp_tid;                         /* Root-TID of the thread that generated this packet. */
 	u16    sp_len;                         /* Syslog message length (including the trailing '\n'-character). */
 #ifdef SYSLOG_LINEMAX
-	char   sp_msg[SYSLOG_LINEMAX];         /* Syslog message. */
+	char   sp_msg[SYSLOG_LINEMAX];         /* Syslog message (terminated by '\n'). */
 #else /* SYSLOG_LINEMAX */
 	COMPILER_FLEXIBLE_ARRAY(char, sp_msg); /* Syslog message (terminated by '\n'). */
 #endif /* !SYSLOG_LINEMAX */

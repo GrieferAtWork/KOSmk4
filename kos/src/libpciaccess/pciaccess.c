@@ -905,7 +905,7 @@ NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device const *__restrict sel
 		result->pbi_prefetch_mem_limit = (uint64_t)(0xfff | (PCI_BDEV24_PREFETCH_MEMLIMIT(bdev24) & 0xf0) << 16) |
 		                                 ((uint64_t)pci_rdaddr(self->pd_addr | PCI_BDEV_PREFETCHLIMIT_HI32) << 32);
 	}
-	USER_EXCEPT(EACCES)
+	USER_EXCEPT(return EACCES)
 	return EOK;
 }
 
@@ -937,7 +937,7 @@ NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restr
 		result->pcbi_io[1].i_base          = pci_rdaddr(self->pd_addr | PCI_CDEV_IOBASE1);
 		result->pcbi_io[1].i_limit         = pci_rdaddr(self->pd_addr | PCI_CDEV_IOLIMIT1);
 	}
-	USER_EXCEPT(EACCES)
+	USER_EXCEPT(return EACCES)
 	return EOK;
 }
 
@@ -964,7 +964,7 @@ NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device const *
 			if (PCI_BDEV18_SECONDARY_BUS(bdev18) == self->pd_bus)
 				return iter;
 		}
-		USER_EXCEPT(NULL)
+		USER_EXCEPT(return NULL)
 	}
 	return NULL;
 }
