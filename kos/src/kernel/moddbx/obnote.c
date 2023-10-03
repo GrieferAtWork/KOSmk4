@@ -1658,7 +1658,7 @@ badobj:
 #define DEFINE_TIMESTRUCT_NOTE(name, T, note_time_value, a, b)     \
 	PRIVATE NONNULL((1, 4)) ssize_t                                \
 	NOTHROW(KCALL name)(pformatprinter printer, void *arg,         \
-	                    NCX void const *pointer,               \
+	                    NCX void const *pointer,                   \
 	                    unsigned int *__restrict pstatus) {        \
 		T tv;                                                      \
 		TRY {                                                      \

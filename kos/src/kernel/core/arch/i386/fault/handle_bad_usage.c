@@ -1454,7 +1454,7 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 #define DEFINE_DO_ATOMIC_CMPXCH(bwlq, Nbits)                                 \
 	PRIVATE NONNULL((1)) u##Nbits KCALL                                      \
 	do_atomic_cmpxch##bwlq(struct icpustate **__restrict pstate,             \
-	                       NCX u##Nbits *addr, u##Nbits oldval,     \
+	                       NCX u##Nbits *addr, u##Nbits oldval,              \
 	                       u##Nbits newval, bool force_atomic)               \
 			THROWS(E_SEGFAULT) {                                             \
 		u##Nbits result;                                                     \
@@ -1473,20 +1473,20 @@ NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
 		return result;                                                       \
 	}
 
-#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(bwlq, Nbits)                               \
-	PRIVATE NONNULL((1)) bool KCALL                                                 \
-	do_atomic_cmpxch##bwlq##_or_write(struct icpustate **__restrict pstate,         \
-	                                  NCX u##Nbits *addr, u##Nbits oldval, \
-	                                  u##Nbits newval, bool force_atomic)           \
-			THROWS(E_SEGFAULT) {                                                    \
-		u##Nbits result;                                                            \
-		if (force_atomic) {                                                         \
-			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval);        \
-		} else {                                                                    \
-			*addr = newval;                                                         \
-			return true;                                                            \
-		}                                                                           \
-		return result == oldval;                                                    \
+#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(bwlq, Nbits)                        \
+	PRIVATE NONNULL((1)) bool KCALL                                          \
+	do_atomic_cmpxch##bwlq##_or_write(struct icpustate **__restrict pstate,  \
+	                                  NCX u##Nbits *addr, u##Nbits oldval,   \
+	                                  u##Nbits newval, bool force_atomic)    \
+			THROWS(E_SEGFAULT) {                                             \
+		u##Nbits result;                                                     \
+		if (force_atomic) {                                                  \
+			result = x86_emulock_cmpxch##bwlq(pstate, addr, oldval, newval); \
+		} else {                                                             \
+			*addr = newval;                                                  \
+			return true;                                                     \
+		}                                                                    \
+		return result == oldval;                                             \
 	}
 
 

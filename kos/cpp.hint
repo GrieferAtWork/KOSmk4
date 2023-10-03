@@ -63,9 +63,9 @@
 
 
 // <__stdinc.h> + <hybrid/compiler.h>
-#define DECL_BEGIN extern "C" {
-#define __DECL_BEGIN extern "C" {
-#define __SYSDECL_BEGIN extern "C" {
+#define DECL_BEGIN extern "C"{
+#define __DECL_BEGIN extern "C"{
+#define __SYSDECL_BEGIN extern "C"{
 #define DECL_END }
 #define __DECL_END }
 #define __SYSDECL_END }
@@ -155,16 +155,16 @@
 #define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                                Treturn name param;
 #define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                                       Treturn name param;
 
-#define __NAMESPACE_GLB_SYM                 ::
-#define __NAMESPACE_STD_BEGIN               namespace std {
-#define __NAMESPACE_STD_END                 }
-#define __NAMESPACE_STD_SYM                 ::std::
-#define __NAMESPACE_STD_USING(x)            using ::std::x;
-#define __NAMESPACE_GLB_USING(x)            using ::x;
-#define __NAMESPACE_GLB_USING_TYPE(x)       using ::x;
-#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) using ::x;
+#define __NAMESPACE_GLB_SYM                ::
+#define __NAMESPACE_STD_BEGIN              namespace std{
+#define __NAMESPACE_STD_END                }
+#define __NAMESPACE_STD_SYM                ::std::
+#define __NAMESPACE_STD_USING(x)           using ::std::x;
+#define __NAMESPACE_GLB_USING(x)           using ::x;
+#define __NAMESPACE_GLB_USING_TYPE(x)      using ::x;
+#define __NAMESPACE_GLB_USING_OR_IMPL(x,i) using ::x;
 
-#define __NAMESPACE_INT_BEGIN namespace __intern {
+#define __NAMESPACE_INT_BEGIN namespace __intern{
 #define __NAMESPACE_INT_END   }
 #define __NAMESPACE_INT_SYM   ::__intern::
 #define __NAMESPACE_INT_LSYM  __intern::
@@ -510,7 +510,7 @@
 #define __CXX_DELETE_COPY(T) T(T const&)
 #define __CXX_DELETE_COPY_ASSIGN(T) T&operator=(T const&)
 #define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T&operator=(T const&)volatile
-#define __CXXDECL_BEGIN extern "C++" {
+#define __CXXDECL_BEGIN extern "C++"{
 #define __CXXDECL_END }
 #define __CXX_THROWS(...)
 #define __CXX_NOEXCEPT
@@ -668,38 +668,38 @@
 
 // <hybrid/int128.h>
 #define __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(op,name) \
-	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){} \
-	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){} \
-	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){} \
-	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){} \
-	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){} \
-	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){} \
-	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){} \
-	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){} \
-	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_uint128_t const&v){} \
-	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_int128_t const&v){} \
-	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_uint128_t const&v){} \
-	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_int128_t const&v){} \
-	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){} \
-	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
-	__hybrid_int128_t operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
+	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){}\
+	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){}\
+	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){}\
+	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){}\
+	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){}\
+	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){}\
+	template<class ValType>__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,ValType __v){}\
+	template<class ValType>__hybrid_int128_t operator op(__hybrid_int128_t const&self,ValType __v){}\
+	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_uint128_t const&v){}\
+	__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,__hybrid_int128_t const&v){}\
+	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_uint128_t const&v){}\
+	__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,__hybrid_int128_t const&v){}\
+	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){}\
+	__hybrid_uint128_t operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){}\
+	__hybrid_int128_t operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){}\
 	__hybrid_int128_t operator op(__hybrid_int128_t const&self,__hybrid_int128_t const&v){}
 #define __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(op,np,name) \
-	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){} \
-	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){} \
-	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){} \
-	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){} \
-	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){} \
-	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){} \
-	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){} \
-	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){} \
-	bool operator op(__hybrid_int128_t const&self,__hybrid_int128_t const&v){} \
-	bool operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
-	bool operator np(__hybrid_int128_t const&self,__hybrid_int128_t const&v){} \
-	bool operator np(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){} \
-	bool operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
-	bool operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){} \
-	bool operator np(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){} \
+	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){}\
+	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){}\
+	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){}\
+	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){}\
+	template<class ValType>bool operator op(__hybrid_uint128_t const&self,ValType v){}\
+	template<class ValType>bool operator np(__hybrid_uint128_t const&self,ValType v){}\
+	template<class ValType>bool operator op(__hybrid_int128_t const&self,ValType v){}\
+	template<class ValType>bool operator np(__hybrid_int128_t const&self,ValType v){}\
+	bool operator op(__hybrid_int128_t const&self,__hybrid_int128_t const&v){}\
+	bool operator op(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){}\
+	bool operator np(__hybrid_int128_t const&self,__hybrid_int128_t const&v){}\
+	bool operator np(__hybrid_int128_t const&self,__hybrid_uint128_t const&v){}\
+	bool operator op(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){}\
+	bool operator op(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){}\
+	bool operator np(__hybrid_uint128_t const&self,__hybrid_int128_t const&v){}\
 	bool operator np(__hybrid_uint128_t const&self,__hybrid_uint128_t const&v){}
 
 
@@ -908,21 +908,21 @@
 #define BSEARCH_RANGE(...) for(;;)
 #define BSEARCH_RANGE_EX(...) for(;;)
 #define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
-#define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
+#define ATOMIC_ONCE_RUN(self,...) __VA_ARGS__
 
 
 
 // <__crt.h>
 #define __KOS_FIXED_CONST const
 
-#define __NAMESPACE_FAST_BEGIN              namespace __optimized_imp {
+#define __NAMESPACE_FAST_BEGIN              namespace __optimized_imp{
 #define __NAMESPACE_FAST_END                }
 #define __NAMESPACE_FAST_SYM                ::__optimized_imp::
 #define __NAMESPACE_FAST_USING(x)           using ::__optimized_imp::x;
 #define __NAMESPACE_FAST_USING_OR_IMPL(x,i) using ::__optimized_imp::x;
 #define __LIBC_FAST_NAME(x)                 x
 
-#define __NAMESPACE_LOCAL_BEGIN              namespace __local_imp {
+#define __NAMESPACE_LOCAL_BEGIN              namespace __local_imp{
 #define __NAMESPACE_LOCAL_END                }
 #define __NAMESPACE_LOCAL_SYM                ::__local_imp::
 #define __NAMESPACE_LOCAL_USING(x)           using ::__local_imp::x;
@@ -932,11 +932,11 @@
 #define __LOCAL_LIBC_DATA(name)
 #define __LOCAL_LIBC_CONST_DATA(name)
 
-#define __LIBM_LOCAL_DECLARE_BEGIN             namespace __local_imp {
-#define __LIBM_LOCAL_DECLARE_END               }
-#define __LIBM_LOCAL_DECLARE(T, name, value)   T const __libm_##name;
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) T const __libm_##name[n] =
-#define __LIBM_LOCAL_VALUE(name)               ::__local_imp::__libm_##name
+#define __LIBM_LOCAL_DECLARE_BEGIN           namespace __local_imp{
+#define __LIBM_LOCAL_DECLARE_END             }
+#define __LIBM_LOCAL_DECLARE(T,name,value)   T const __libm_##name;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T,name,n) T const __libm_##name[n]=
+#define __LIBM_LOCAL_VALUE(name)             ::__local_imp::__libm_##name
 #define __LIBM_LOCAL_FUNC(name)
 
 #define __CASMNAME(x)
@@ -1154,6 +1154,10 @@
 #define THROWS_INDIRECT(...)
 #define __THROWS_INDIRECT(...)
 
+
+
+// <stddef.h>
+#define typeof_field(...) int
 
 
 // <libxxx/api.h>
@@ -1607,27 +1611,27 @@
 #define TASK_POLL_BEFORE_CONNECT(...)
 
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
-	refcnt_t handle_##name##_refcnt(T const *restrict self) {} \
-	void handle_##name##_incref(T *restrict self) {} \
-	void handle_##name##_decref(T *restrict self) {} \
-	bool handle_##name##_tryincref(T *restrict self) {} \
-	void *handle_##name##_weakgetref(T *restrict self) {} \
-	T *handle_##name##_weaklckref(void *restrict weakref_ptr) {} \
-	void handle_##name##_weakdecref(void *restrict self) {}
+	refcnt_t handle_##name##_refcnt(T const *restrict self){}\
+	void handle_##name##_incref(T *restrict self){}\
+	void handle_##name##_decref(T *restrict self){}\
+	bool handle_##name##_tryincref(T *restrict self){}\
+	void *handle_##name##_weakgetref(T *restrict self){}\
+	T *handle_##name##_weaklckref(void *restrict weakref_ptr){}\
+	void handle_##name##_weakdecref(void *restrict self){}
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(name,T) \
-	refcnt_t handle_##name##_refcnt(T const *restrict self) {} \
-	void handle_##name##_incref(T *restrict self) {} \
-	void handle_##name##_decref(T *restrict self) {} \
-	bool handle_##name##_tryincref(T *restrict self) {} \
-	void *handle_##name##_weakgetref(T *restrict self) {} \
-	T *handle_##name##_weaklckref(void *restrict weakref_ptr) {} \
-	void handle_##name##_weakdecref(void *restrict self) {}
+	refcnt_t handle_##name##_refcnt(T const *restrict self){}\
+	void handle_##name##_incref(T *restrict self){}\
+	void handle_##name##_decref(T *restrict self){}\
+	bool handle_##name##_tryincref(T *restrict self){}\
+	void *handle_##name##_weakgetref(T *restrict self){}\
+	T *handle_##name##_weaklckref(void *restrict weakref_ptr){}\
+	void handle_##name##_weakdecref(void *restrict self){}
 
 #define DBG_CALL
-#define DBG_COMMAND(name,...)            intptr_t dbg_command_##name(size_t argc, char *argv[])
-#define DBG_COMMAND_AUTO(name,...)       intptr_t dbg_command_##name(size_t argc, char *argv[])
-#define DBG_NAMED_COMMAND(name,...)      intptr_t dbg_command_##name(size_t argc, char *argv[])
-#define DBG_NAMED_COMMAND_AUTO(name,...) intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_COMMAND(name,...)            intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_COMMAND_AUTO(name,...)       intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_NAMED_COMMAND(name,...)      intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_NAMED_COMMAND_AUTO(name,...) intptr_t dbg_command_##name(size_t argc,char *argv[])
 #define DBG_INIT(func)  void dbg_init_##func(void)
 #define DBG_RESET(func) void dbg_reset_##func(void)
 #define DBG_FINI(func)  void dbg_fini_##func(void)
@@ -1639,7 +1643,7 @@
 #define DBG_DEFHOOK_RESET(...)
 #define DBG_DEFHOOK_FINI(...)
 #define DBG_DEFHOOK_COMMAND(...)
-#define DBG_AUTOCOMPLETE(name,argc,argv,cb,arg,...) void autocomplete_##name(size_t argc, char *argv[], dbg_autocomplete_cb_t cb, void *arg)
+#define DBG_AUTOCOMPLETE(name,argc,argv,cb,arg,...) void autocomplete_##name(size_t argc,char *argv[],dbg_autocomplete_cb_t cb,void *arg)
 
 #define SYSCALL_RETURN_TYPE_OF(...) int
 #define SYSCALL_ARG_TYPE_OF(...) int
@@ -1648,7 +1652,7 @@
 
 #define PAGEDIR_P_BEGINUSE(...)
 #define PAGEDIR_P_ENDUSE(...)
-#define SLAB_FOREACH_SIZE(func,_) func(8,_) func(16,_) func(24,_) func(32,_)
+#define SLAB_FOREACH_SIZE(f,_) f(8,_)f(16,_)f(24,_)f(32,_)
 #define FOREACH_thiscpu_threads(...) for(;;)
 #define FOREACH_thiscpu_running(...) for(;;)
 #define FOREACH_thiscpu_waiting(...) for(;;)
@@ -1660,7 +1664,7 @@
 #define DEFINE_ABS_CALLBACK(...)
 #define DEFINE_REL_CALLBACK(...)
 #define DEFINE_CALLBACK(...)
-#define DEFINE_PERTASK_FINI(func)
+#define DEFINE_PERTASK_FINI(f)
 
 #define PAGEDIR_P_BEGINUSE(...)
 #define PAGEDIR_P_ENDUSE(...)
@@ -1690,37 +1694,37 @@
 
 
 // <parts/timeval-cxx-support.h> + <parts/timespec-cxx-support.h>
-#define __TIMEVAL_CXX_DECL_BEGIN extern "C++" {
+#define __TIMEVAL_CXX_DECL_BEGIN extern "C++"{
 #define __TIMEVAL_CXX_DECL_END }
-#define __TIMEVAL_CXX_SUPPORT(T, TV_SEC_TYPE, TV_USEC_TYPE) \
-	void add_microseconds(TV_USEC_TYPE n); void sub_microseconds(TV_USEC_TYPE n); \
-	void add_milliseconds(TV_USEC_TYPE n); void sub_milliseconds(TV_USEC_TYPE n); \
-	T &operator+=(T const &other); T &operator-=(T const &other); \
-	T &operator*=(unsigned int n); T &operator/=(unsigned int n); \
-	T &operator%=(unsigned int n); T operator+(T const &other) const; \
-	T operator-(T const &other) const; T operator*(unsigned int n) const; \
-	T operator/(unsigned int n) const; T operator%(unsigned int n); \
-	bool operator==(T const &other) const; bool operator!=(T const &other) const; \
-	bool operator<(T const &other) const; bool operator<=(T const &other) const; \
-	bool operator>(T const &other) const; bool operator>=(T const &other) const;
-#define __TIMEVAL_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_USEC_TYPE) \
-	T operator*(unsigned int n, T const &tmv);
-#define __TIMESPEC_CXX_DECL_BEGIN extern "C++" {
+#define __TIMEVAL_CXX_SUPPORT(T,TV_SEC_TYPE,TV_USEC_TYPE) \
+	void add_microseconds(TV_USEC_TYPE n);void sub_microseconds(TV_USEC_TYPE n);\
+	void add_milliseconds(TV_USEC_TYPE n);void sub_milliseconds(TV_USEC_TYPE n);\
+	T &operator+=(T const &other);T &operator-=(T const &other);\
+	T &operator*=(unsigned int n);T &operator/=(unsigned int n);\
+	T &operator%=(unsigned int n);T operator+(T const &other) const;\
+	T operator-(T const &other) const;T operator*(unsigned int n) const;\
+	T operator/(unsigned int n) const;T operator%(unsigned int n);\
+	bool operator==(T const &other) const;bool operator!=(T const &other) const;\
+	bool operator<(T const &other) const;bool operator<=(T const &other) const;\
+	bool operator>(T const &other) const;bool operator>=(T const &other) const;
+#define __TIMEVAL_CXX_SUPPORT2(T,TV_SEC_TYPE,TV_USEC_TYPE) \
+	T operator*(unsigned int n,T const &tmv);
+#define __TIMESPEC_CXX_DECL_BEGIN extern "C++"{
 #define __TIMESPEC_CXX_DECL_END }
-#define __TIMESPEC_CXX_SUPPORT(T, TV_SEC_TYPE, TV_NSEC_TYPE) \
-	void add_nanoseconds(TV_NSEC_TYPE n); void sub_nanoseconds(TV_NSEC_TYPE n); \
-	void add_microseconds(TV_USEC_TYPE n); void sub_microseconds(TV_USEC_TYPE n); \
-	void add_milliseconds(TV_USEC_TYPE n); void sub_milliseconds(TV_USEC_TYPE n); \
-	T &operator+=(T const &other); T &operator-=(T const &other); \
-	T &operator*=(unsigned int n); T &operator/=(unsigned int n); \
-	T &operator%=(unsigned int n); T operator+(T const &other) const; \
-	T operator-(T const &other) const; T operator*(unsigned int n) const; \
-	T operator/(unsigned int n) const; T operator%(unsigned int n); \
-	bool operator==(T const &other) const; bool operator!=(T const &other) const; \
-	bool operator<(T const &other) const; bool operator<=(T const &other) const; \
-	bool operator>(T const &other) const; bool operator>=(T const &other) const;
-#define __TIMESPEC_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_NSEC_TYPE) \
-	T operator*(unsigned int n, T const &tmv);
+#define __TIMESPEC_CXX_SUPPORT(T,TV_SEC_TYPE,TV_NSEC_TYPE) \
+	void add_nanoseconds(TV_NSEC_TYPE n);void sub_nanoseconds(TV_NSEC_TYPE n);\
+	void add_microseconds(TV_USEC_TYPE n);void sub_microseconds(TV_USEC_TYPE n);\
+	void add_milliseconds(TV_USEC_TYPE n);void sub_milliseconds(TV_USEC_TYPE n);\
+	T &operator+=(T const &other);T &operator-=(T const &other);\
+	T &operator*=(unsigned int n);T &operator/=(unsigned int n);\
+	T &operator%=(unsigned int n);T operator+(T const &other) const;\
+	T operator-(T const &other) const;T operator*(unsigned int n) const;\
+	T operator/(unsigned int n) const;T operator%(unsigned int n);\
+	bool operator==(T const &other) const;bool operator!=(T const &other) const;\
+	bool operator<(T const &other) const;bool operator<=(T const &other) const;\
+	bool operator>(T const &other) const;bool operator>=(T const &other) const;
+#define __TIMESPEC_CXX_SUPPORT2(T,TV_SEC_TYPE,TV_NSEC_TYPE) \
+	T operator*(unsigned int n,T const &tmv);
 
 
 
@@ -1734,10 +1738,10 @@
 #define __NTH(fct) fct
 #define __ptr_t  void *
 #define __long_double_t long double
-#define __BEGIN_NAMESPACE_STD namespace std {
+#define __BEGIN_NAMESPACE_STD namespace std{
 #define __END_NAMESPACE_STD }
 #define __USING_NAMESPACE_STD(x) using std::x;
-#define __BEGIN_NAMESPACE_C99 namespace __c99 {
+#define __BEGIN_NAMESPACE_C99 namespace __c99{
 #define __END_NAMESPACE_C99 }
 #define __USING_NAMESPACE_C99(x) using __c99::x;
 #define __warndecl(name,msg)  void(name)(void)
@@ -1768,21 +1772,21 @@
 #define __extern_inline
 #define __extern_always_inline
 #define __fortify_function
-#define __LDBL_REDIR1(name, proto, alias)       name proto
-#define __LDBL_REDIR(name, proto)               name proto
-#define __LDBL_REDIR1_NTH(name, proto, alias)   name proto
-#define __LDBL_REDIR_NTH(name, proto)           name proto
-#define __LDBL_REDIR1_DECL(name, alias)         decltype(name) name;
+#define __LDBL_REDIR1(name,proto,alias)       name proto
+#define __LDBL_REDIR(name,proto)               name proto
+#define __LDBL_REDIR1_NTH(name,proto,alias)   name proto
+#define __LDBL_REDIR_NTH(name,proto)           name proto
+#define __LDBL_REDIR1_DECL(name,alias)         decltype(name) name;
 #define __LDBL_REDIR_DECL(name)                 decltype(name) name;
-#define __REDIRECT_LDBL(name, proto, alias)     name proto;
-#define __REDIRECT_NTH_LDBL(name, proto, alias) name proto;
+#define __REDIRECT_LDBL(name,proto,alias)     name proto;
+#define __REDIRECT_NTH_LDBL(name,proto,alias) name proto;
 #define __weak_symbol
 #define __used
 #define __section(x)
 #define __alloc_size(x)
 #define __alloc_size2(n,x)
 #define __alloc_align(x)
-#define	__generic(expr, t, yes, no) no
+#define	__generic(expr,t,yes,no) no
 #define __malloc_like
 #define __result_use_check
 #define __returns_twice
@@ -1855,7 +1859,7 @@
 #define _GLIBCXX_USE_NOEXCEPT
 #define _GLIBCXX_THROW(x)
 #define _GLIBCXX_NAMESPACE_CXX11       __cxx11::
-#define _GLIBCXX_BEGIN_NAMESPACE_CXX11 namespace __cxx11 {
+#define _GLIBCXX_BEGIN_NAMESPACE_CXX11 namespace __cxx11{
 #define _GLIBCXX_END_NAMESPACE_CXX11   }
 #define _GLIBCXX_DEFAULT_ABI_TAG
 #define _GLIBCXX_BEGIN_NAMESPACE_VERSION
@@ -1968,7 +1972,7 @@
 #define B32
 #define B16
 #define DRM_PRINTFLIKE(f,a)
-#define FT_BEGIN_HEADER extern "C" {
+#define FT_BEGIN_HEADER extern "C"{
 #define FT_END_HEADER }
 #define FT_LOCAL(x) x
 #define FT_LOCAL_DEF(x) x
@@ -1984,8 +1988,8 @@
 #define FT_BASE_CALLBACK_DEF(x) x
 #define FT_CALLBACK_TABLE
 #define FT_CALLBACK_TABLE_DEF
-#define FT_ENC_TAG(x, ...) x
-#define FT_IMAGE_TAG(x, ...) x
+#define FT_ENC_TAG(x,...) x
+#define FT_IMAGE_TAG(x,...) x
 #define FT_DEPRECATED_ATTRIBUTE
 #define PNG_CONST const
 #define PNGARG(x) x
@@ -2057,7 +2061,7 @@
 #define ossl_unused
 #define STACK_OF(type) struct stack_st_##type
 #define LHASH_OF(type) struct lhash_st_##type
-#define SKM_DEFINE_STACK_OF(t1,t2, t3)
+#define SKM_DEFINE_STACK_OF(t1,t2,t3)
 #define DEFINE_SPECIAL_STACK_OF(t1,t2)
 #define DEFINE_STACK_OF(t)
 #define DEFINE_SPECIAL_STACK_OF_CONST(t1,t2)
@@ -2079,11 +2083,13 @@
 #define externaldef(psect)
 #define _XtShell_h_Const const
 #define DLMALLOC_EXPORT
+#define FORCEINLINE
+#define NOINLINE
 #define FFI_API
 #define FFI_EXTERN
 #define JSON_EXPORT
 #define JSON_C_CONST_FUNCTION(x) x
-#define _FCFUNCPROTOBEGIN extern "C" {
+#define _FCFUNCPROTOBEGIN extern "C"{
 #define _FCFUNCPROTOEND }
 #define FcPublic
 #define FC_ATTRIBUTE_SENTINEL(x)
@@ -2475,28 +2481,66 @@
 #define LOCAL_IF_DECODE_ELSE(a,b) a
 #define LOCAL_IF_NX_ELSE(a,b) a
 #define LOCAL_NOTHROW(x) x
-#define DEFINE_LIBRARY_OPEN(open_libname, ...) void *open_libname(void);
+#define DEFINE_LIBRARY_OPEN(open_libname,...) void *open_libname(void);
 #define BUILTIN_GLOBALS_ENUMERATE(cb) cb(__gxx_personality_v0) cb(__cxa_begin_catch) cb(__cxa_end_catch) cb(__cxa_rethrow) cb(_Unwind_Resume)
 #define POINTER_SET_FOREACH(...) for(;;)
 #define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T) \
-	bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail); bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail) volatile; \
-	bool compare_exchange_weak(T &exp, T val, memory_order order = memory_order_seq_cst); bool compare_exchange_weak(T &exp, T val, memory_order order = memory_order_seq_cst) volatile; \
-	bool compare_exchange_strong(T &exp, T val, memory_order succ, memory_order fail); bool compare_exchange_strong(T &exp, T val, memory_order succ, memory_order fail) volatile; \
-	bool compare_exchange_strong(T &exp, T val, memory_order order = memory_order_seq_cst); bool compare_exchange_strong(T &exp, T val, memory_order order = memory_order_seq_cst) volatile; \
-	bool cmpxch(T oldv, T newv, memory_order succ, memory_order fail); bool cmpxch(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
-	bool cmpxch(T oldv, T newv, memory_order order = memory_order_seq_cst); bool cmpxch(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
-	T cmpxch_val(T oldv, T newv, memory_order succ, memory_order fail); T cmpxch_val(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
-	T cmpxch_val(T oldv, T newv, memory_order order = memory_order_seq_cst); T cmpxch_val(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
-	bool cmpxch_weak(T oldv, T newv, memory_order succ, memory_order fail); bool cmpxch_weak(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
-	bool cmpxch_weak(T oldv, T newv, memory_order order = memory_order_seq_cst); bool cmpxch_weak(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
-	T cmpxch_val_weak(T oldv, T newv, memory_order succ, memory_order fail); T cmpxch_val_weak(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
-	T cmpxch_val_weak(T oldv, T newv, memory_order order = memory_order_seq_cst); T cmpxch_val_weak(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile;
+	bool compare_exchange_weak(T &exp,T val,memory_order succ,memory_order fail);bool compare_exchange_weak(T &exp,T val,memory_order succ,memory_order fail) volatile;\
+	bool compare_exchange_weak(T &exp,T val,memory_order order=memory_order_seq_cst);bool compare_exchange_weak(T &exp,T val,memory_order order=memory_order_seq_cst) volatile;\
+	bool compare_exchange_strong(T &exp,T val,memory_order succ,memory_order fail);bool compare_exchange_strong(T &exp,T val,memory_order succ,memory_order fail) volatile;\
+	bool compare_exchange_strong(T &exp,T val,memory_order order=memory_order_seq_cst);bool compare_exchange_strong(T &exp,T val,memory_order order=memory_order_seq_cst) volatile;\
+	bool cmpxch(T oldv,T newv,memory_order succ,memory_order fail);bool cmpxch(T oldv,T newv,memory_order succ,memory_order fail) volatile;\
+	bool cmpxch(T oldv,T newv,memory_order order=memory_order_seq_cst);bool cmpxch(T oldv,T newv,memory_order order=memory_order_seq_cst) volatile;\
+	T cmpxch_val(T oldv,T newv,memory_order succ,memory_order fail);T cmpxch_val(T oldv,T newv,memory_order succ,memory_order fail) volatile;\
+	T cmpxch_val(T oldv,T newv,memory_order order=memory_order_seq_cst);T cmpxch_val(T oldv,T newv,memory_order order=memory_order_seq_cst) volatile;\
+	bool cmpxch_weak(T oldv,T newv,memory_order succ,memory_order fail);bool cmpxch_weak(T oldv,T newv,memory_order succ,memory_order fail) volatile;\
+	bool cmpxch_weak(T oldv,T newv,memory_order order=memory_order_seq_cst);bool cmpxch_weak(T oldv,T newv,memory_order order=memory_order_seq_cst) volatile;\
+	T cmpxch_val_weak(T oldv,T newv,memory_order succ,memory_order fail);T cmpxch_val_weak(T oldv,T newv,memory_order succ,memory_order fail) volatile;\
+	T cmpxch_val_weak(T oldv,T newv,memory_order order=memory_order_seq_cst);T cmpxch_val_weak(T oldv,T newv,memory_order order=memory_order_seq_cst) volatile;
 #define __PRIVATE_CXX_ATOMIC_SPECIALIZE_INTEGRAL(T)
 #define __USERKERN_PAD_PID(x)
 #define __USERKERN_PAD_UID(x)
 #define __USERKERN_PAD_GID(x)
 
-#define phys_foreach_b(buf, buf_bytes, addr, num_bytes, ...) for(;;){__VA_ARGS__;}
-#define phys_foreach_w(buf, buf_words, addr, num_words, ...) for(;;){__VA_ARGS__;}
-#define phys_foreach_l(buf, buf_dwords, addr, num_dwords, ...) for(;;){__VA_ARGS__;}
-#define phys_foreach_q(buf, buf_qwords, addr, num_qwords, ...) for(;;){__VA_ARGS__;}
+#define phys_foreach_b(buf,buf_bytes,addr,num_bytes,...) for(;;){__VA_ARGS__;}
+#define phys_foreach_w(buf,buf_words,addr,num_words,...) for(;;){__VA_ARGS__;}
+#define phys_foreach_l(buf,buf_dwords,addr,num_dwords,...) for(;;){__VA_ARGS__;}
+#define phys_foreach_q(buf,buf_qwords,addr,num_qwords,...) for(;;){__VA_ARGS__;}
+
+#define DEFINE_LAZY_LIBDL_RELOCATION(s,t,n) t libc_get_##n(){}
+#define DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(n) int n(){}void*libc_resolve_libiconv_##n(){}
+#define DEFINE_KERNEL32_RESOLVER(n) void*libd_resolve_##n(){}
+#define DEFINE_KERNEL32_FORWARDER_FUNCTION(T,c,n,p,k,a) T DOS$##n p{}T libd_##n p{}
+#define DEFINE_LIBC_SIGINFO_LIST(n,N,s) char const**libc_##n##_init(){}
+#define DEFINE_NOREL_GLOBAL_META(T,n,s) T*libc_pdyn_##n=0;T*libc_bind_##n(){}
+#define DECLARE_NOREL_GLOBAL_META(T,n) extern T*libc_pdyn_##n;T*libc_bind_##n()
+#define DEFINE_DO_ATOMIC_CMPXCH(X,N) u##N do_atomic_cmpxch##X(struct icpustate**pstate,u##N *addr,u##N oldval,u##N newval,bool force_atomic){}
+#define DEFINE_DO_ATOMIC_CMPXCH_OR_WRITE(X,N) bool do_atomic_cmpxch##X##_or_write(struct icpustate**pstate,u##N*addr,u##N oldval,u##N newval,bool force_atomic){}
+#define FOREACH_PAGING_FUNCTION(c) c(pagedir_init);c(pagedir_fini);c(pagedir_prepareone);c(pagedir_prepare);c(pagedir_unprepareone);c(pagedir_unprepare);c(pagedir_maphintone);c(pagedir_maphint);c(pagedir_gethint);c(pagedir_mapone);c(pagedir_map);c(pagedir_push_mapone);c(pagedir_pop_mapone);c(pagedir_unmapone);c(pagedir_unmap);c(pagedir_denywriteone);c(pagedir_denywrite);c(pagedir_unmap_userspace);c(pagedir_unmap_userspace_nosync);c(pagedir_translate);c(pagedir_ismapped);c(pagedir_iswritable);c(pagedir_isuseraccessible);c(pagedir_isuserwritable);c(pagedir_haschanged);c(pagedir_unsetchanged);
+#define DEFINE_PUBLIC_ALIAS_PAGING_P32(n) int n(){}
+#define DEFINE_PUBLIC_ALIAS_PAGING_PAE(n) int n(){}
+#define DEFINE_DISKRULE(devdiskrule_name,n,ino,symbol_byname,symbol_toname,h) struct blkdev*symbol_byname(struct devdiskruledir*self,struct flookup_info*info);ssize_t symbol_toname(struct devdiskruledir*self,__pformatprinter printer,void*arg,struct blkdev*dev,uintptr_t variant);struct devdiskruledir _dir_##devdiskrule_name={};struct devdiskrule devdiskrule_name={}
+#define DEFINE_PH_SLAB_MALLOC_FUNCTIONS(sz,_) void*ph_slab_malloc##sz(gfp_t flags);
+#define DEFINE_PH_SLAB_MALLOC_FUNCTIONS_IMPL(sz,_) void*ph_slab_malloc##sz(gfp_t flags){}
+#define DEFINE_PH_SLAB_KMALLOC_FUNCTIONS(sz,_) void*ph_slab_kmalloc##sz(gfp_t flags);void*ph_slab_kmalloc_nx##sz(gfp_t flags);
+#define DEFINE_PH_SLAB_KMALLOC_FUNCTIONS_IMPL(sz,_) void*ph_slab_kmalloc##sz(gfp_t flags){}void*ph_slab_kmalloc_nx##sz(gfp_t flags){}
+#define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz,_) void*slab_malloc##sz(gfp_t flags);void*slab_kmalloc##sz(gfp_t flags);void*slab_kmalloc_nx##sz(gfp_t flags);
+#define DEFINE_UNARY_VIO_OPERATOR(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr){}
+#define DEFINE_BINARY_VIO_OPERATOR_VOID(n,bwlqx,T,opcode) void n(struct vioargs*args,vio_addr_t addr,T arg0){}
+#define DEFINE_BINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr,T arg0,bool atomic){}
+#define DEFINE_TRINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr,T arg0,T arg1,bool atomic){}
+#define DEFINE_FIELD_SYMBOL(n,BASE,OFFSET,SIZEOF,T,field) ;int n(){};
+#define DEFINE_TIMESTRUCT_NOTE(n,T,note_time_value,a,b) ssize_t n(pformatprinter printer,void*arg,void const*pointer,unsigned int*pstatus){}
+#define _FDIRENT_FIELDS_WITHOUT_NAME refcnt_t fd_refcnt;struct fdirent_ops const*fd_ops;ino_t fd_ino;uintptr_t fd_hash;u16 fd_namelen;unsigned char fd_type;
+#define _FDIRENT_FIELDS _FDIRENT_FIELDS_WITHOUT_NAME char fd_name[];
+#define DEFINE_XSYSCALL_EXPORT(n,_) int libc_##n(){}int n(){}
+#define DEFINE_LIBICONV_SYMBOL_BINDING(T,n) T pdyn_##n=0;char const name_##n[]=#n;T libc_resolve_##n(){}
+#define DEFINE_SUPPLEMENTAL_LIBICONV_LIBRARY_BINDING(n) typedef void(*_PSUPENCODE_INIT_##n)(struct iconv_encode*self,struct iconv_printer*input);typedef void(*_PSUPDECODE_INIT_##n)(struct iconv_decode*self,struct iconv_printer*input);_PSUPENCODE_INIT_##n pdyn_iconv_##n##_encode_init=0;_PSUPDECODE_INIT_##n pdyn_iconv_##n##_decode_init=0;void*pdyn_libiconv_##n=0;bool load_libiconv_##n(){}
+#define DEFINE_CPUSTATE_GETTERS(get_struct_xcpustate,set_struct_xcpustate,libuw_unwind_getreg_xcpustate,b1,libuw_unwind_getreg_xcpustate_exclusive,libuw_unwind_setreg_xcpustate,b2,libuw_unwind_setreg_xcpustate_exclusive) unwind_errno_t libuw_unwind_getreg_xcpustate(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}unwind_errno_t libuw_unwind_getreg_xcpustate_exclusive(get_struct_xcpustate self,unwind_regno_t dw_regno,void*dst){}unwind_errno_t libuw_unwind_setreg_xcpustate_exclusive(set_struct_xcpustate self,unwind_regno_t dw_regno,void const*src){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union_type) video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union_type) video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union_type)  video_pixel_t n##_color2pixel(struct video_format const*format,video_color_t color){}video_color_t n##_pixel2color(struct video_format const*format,video_pixel_t pixel){}
+#define DEFINE_FORMAT_PIXEL_UNION(n,d,...) union pixel_##n{d data;struct __VA_ARGS__;};
+#define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
+#define DEFINE_FORMAT_CONVERTER_RGB(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
