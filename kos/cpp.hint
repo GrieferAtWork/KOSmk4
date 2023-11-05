@@ -627,14 +627,14 @@
 
 
 // <hybrid/pointer.h>
-#define __HYBRID_FUNCPTR32(return,cc,name,args) return (cc *name)args
-#define __HYBRID_FUNCPTR64(return,cc,name,args) return (cc *name)args
-#define FUNCPTR32(return,cc,name,args) return (cc *name)args
-#define FUNCPTR64(return,cc,name,args) return (cc *name)args
-#define __HYBRID_PTR32(T) T *
-#define __HYBRID_PTR64(T) T *
-#define PTR32(T) T *
-#define PTR64(T) T *
+#define __HYBRID_FUNCPTR32(return,cc,name,args) return (cc*name)args
+#define __HYBRID_FUNCPTR64(return,cc,name,args) return (cc*name)args
+#define FUNCPTR32(return,cc,name,args) return (cc*name)args
+#define FUNCPTR64(return,cc,name,args) return (cc*name)args
+#define __HYBRID_PTR32(T) T*
+#define __HYBRID_PTR64(T) T*
+#define PTR32(T) T*
+#define PTR64(T) T*
 
 
 
@@ -707,7 +707,7 @@
 // <hybrid/sequence/[...].h>
 #define __HYBRID_Q_STRUCT struct
 #define __HYBRID_Q_CLASS class
-#define LIST_HEAD(n,t) struct n{struct t *lh_first;}
+#define LIST_HEAD(n,t) struct n{struct t*lh_first;}
 #define LIST_HEAD_P(T) struct{T*lh_first;}
 #define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
 #define LIST_ENTRY_P(T) struct{T*le_next,**le_prev;}
@@ -723,7 +723,7 @@
 #define LIST_P_FOREACH(...) for(;;)
 #define LIST_P_FOREACH_P(...) for(;;)
 
-#define SLIST_HEAD(n,t) struct n{struct t *slh_first;}
+#define SLIST_HEAD(n,t) struct n{struct t*slh_first;}
 #define SLIST_HEAD_P(T) struct{T*slh_first;}
 #define SLIST_ENTRY(t) struct{struct t*sle_next;}
 #define SLIST_ENTRY_P(T) struct{T*sle_next;}
@@ -903,6 +903,14 @@
 #define __CDECL_OR_DEFAULT
 #define __HYBRID_LIBATOMIC_DECL
 #define __HYBRID_LIBATOMIC_CC
+#define ____IMPL_DO_FFS(...) {}
+#define ____IMPL_DO_CLZ(...) {}
+#define ____IMPL_DO_CTZ(...) {}
+#define ____IMPL_DO_POPCOUNT(...) {}
+#define ____IMPL_DO_PARITY(...) {}
+#define ____IMPL_DO_CLRSB(...) {}
+#define ____IMPL_DO_PDEP(...) {}
+#define ____IMPL_DO_PEXT(...) {}
 #define BSEARCH(...) for(;;)
 #define BSEARCH_EX(...) for(;;)
 #define BSEARCH_RANGE(...) for(;;)

@@ -76,11 +76,11 @@ function sizeofGreatestIntegerInBytes(values: {int...}): int {
 @@>> local a, b, shift = return...;
 @@>> tab[i] == b[(a[(unsigned)i >> shift] << shift) + (i & ((1 << shift)-1))];
 @@HINT: If  no  mapping exists  to optimize  for this,  shift will  equal `0'
-function splitTables(tab: {int: int}, errorValue: int) {
+function splitTables(tab: {int: int}, errorValue: int): ({int...}, {int...}, int) {
 	local maxShift = 0;
 	local table = List();
 	for (local key, value: tab) {
-		if (key > #table)
+		if (key >= #table)
 			table.resize(key + 1, errorValue);
 		table[key] = value;
 	}
@@ -232,7 +232,7 @@ for (local line: readLines("UnicodeData.txt")) {
 	local generalCategory = fields[2];
 	local biDiCategory    = fields[4];
 
-	if (generalCategory in ["Cc", "Cf", "Cs", "Co", "Cn"])
+	if (generalCategory in ["Cc", "Cf", "Cs", /*"Co",*/ "Cn"])
 		flags |= UNICODE_ISCNTRL;
 	if (biDiCategory == "B" || generalCategory in ["Zl", "Zp"]) {
 		flags |= UNICODE_ISLF;
@@ -300,7 +300,6 @@ for (local line: readLines("UnicodeData.txt")) {
 	if (flags || lower != ord || upper != ord || title != ord)
 		TRAITS[ord] = (flags, digit, none, lower, upper, title);
 }
-
 
 
 /* Parse DerivedCoreProperties.txt
@@ -594,13 +593,12 @@ function generateUnicodeDatabase() {
 	}
 
 	local tab1_mask = ((1 << shift) - 1);
-	local validCount = #unicode_tab1 << shift;
-	print("#define UNICODE_COUNT                ", ((ord2DescIndex.keys > ...) + 1).hex());
-	print("#define UNICODE_COUNT_VALID          ", validCount.hex());
+	local maxOrd = (ord2DescIndex.keys > ...);
+	print("#define UNICODE_COUNT                ", (maxOrd + 1).hex());
 	print("#define UNICODE_SHIFT                ", shift);
 	print("#define UNICODE_TAB1_MASK            ", tab1_mask.hex());
 	print("#define UNICODE_DESCRIPTOR_INDEX(ch) ",
-		"unicode_tab2[(unicode_tab1[(", cTypeForInteger(validCount - 1), ")(ch) >> ", shift, "] << ", shift,
+		"unicode_tab2[(unicode_tab1[(", cTypeForInteger(maxOrd), ")(ch) >> ", shift, "] << ", shift,
 		") + ((", cTypeForInteger(tab1_mask), ")(ch) & ", tab1_mask.hex(), ")]");
 	print("#define UNICODE_DESCRIPTOR(ch)       unicode_descriptors[UNICODE_DESCRIPTOR_INDEX(ch)]");
 	print("#define unicode_default_descriptor   unicode_descriptors[", desc2Index[NULL_DESCRIPTOR], "]");
