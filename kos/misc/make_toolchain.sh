@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "New function `posix.walklink()`"
-DEEMON_VERSION="156a7211b36152ffce9b1051606aecc852ef6ba6"
+#     v -- "Fix bad exception handler in `Mapping.popitem()`"
+DEEMON_VERSION="4f35e172e321c9a16e99575eeda3e5726d5bd1a5"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
