@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff40fcbc */
+/* HASH CRC-32:0x2e0406e6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -361,6 +361,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 	__SIZE_TYPE__ __bufused;
 	__SIZE_TYPE__ __buffree;
 
+	/* Helper macro that makes sure `errno(3)' is preserved across `expr' */
+#if defined(__libc_geterrno) && defined(__libc_seterrno)
+#define __LOCAL_preserve_errno(__expr)              \
+	do {                                          \
+		__errno_t ___saved_errno = __libc_geterrno(); \
+		__expr;                                     \
+		__libc_seterrno(___saved_errno);            \
+	}	__WHILE0
+#else /* __libc_geterrno && __libc_seterrno */
+#define __LOCAL_preserve_errno(__expr) (__expr)
+#endif /* !__libc_geterrno || !__libc_seterrno */
+
 	/* Validate the given `flags' */
 	if __unlikely(__flags & ~(__FMAPFILE_READALL | __FMAPFILE_MUSTMMAP |
 	                      __FMAPFILE_MAPSHARED | __FMAPFILE_ATSTART)) {
@@ -369,6 +381,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 #else /* __EINVAL */
 		return __libc_seterrno(1);
 #endif /* !__EINVAL */
+	}
+
+	/* Check for special case: map an empty portion of the file. */
+	if __unlikely(__max_bytes == 0) {
+#ifndef __REALLOC_ZERO_IS_NONNULL
+		if (__num_trailing_nulbytes == 0)
+			__num_trailing_nulbytes = 1;
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+		__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __num_trailing_nulbytes);
+		if __unlikely(!__buf)
+			return -1;
+		__mapping->mf_addr = __buf;
+		__mapping->mf_size = 0;
+		__mapping->__mf_mapsize = 0;
+		return 0;
 	}
 
 	/* Try to use mmap(2) */
@@ -428,9 +455,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 				/* Map file into memory. */
 				__SIZE_TYPE__ __mapsize, __used_nulbytes;
 				__used_nulbytes = __num_trailing_nulbytes;
-				if (__min_bytes > __map_bytes)
-					__used_nulbytes += __min_bytes - __map_bytes;
-				__mapsize = __map_bytes + __used_nulbytes;
+				if (__min_bytes > __map_bytes) {
+					if __unlikely(__hybrid_overflow_uadd(__used_nulbytes, __min_bytes - __map_bytes, &__used_nulbytes))
+						goto __err_2big;
+				}
+				if __unlikely(__hybrid_overflow_uadd(__map_bytes, __used_nulbytes, &__mapsize))
+					__mapsize = (__SIZE_TYPE__)-1; /* Force mmap failure */
 #ifdef __MAP_SHARED
 				if (__flags & __FMAPFILE_MAPSHARED) {
 					if __unlikely(__num_trailing_nulbytes) {
@@ -515,7 +545,12 @@ __after_mmap_attempt:
 		__bufsize = 0x10000;
 	if (__bufsize < __min_bytes)
 		__bufsize = __min_bytes;
-	__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(__bufsize + __num_trailing_nulbytes);
+	{
+		__SIZE_TYPE__ __alcsize;
+		if __unlikely(__hybrid_overflow_uadd(__bufsize, __num_trailing_nulbytes, &__alcsize))
+			goto __err_2big;
+		__LOCAL_preserve_errno(__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(__alcsize));
+	}
 	if __unlikely(!__buf) {
 		__bufsize = 1;
 		if (__bufsize < __min_bytes)
@@ -542,7 +577,7 @@ __after_mmap_attempt:
 					__used_nulbytes = __num_trailing_nulbytes;
 					if (__min_bytes > __bufused)
 						__used_nulbytes += __min_bytes - __bufused;
-					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes);
+					__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes));
 					if __likely(__newbuf)
 						__buf = __newbuf;
 					(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __used_nulbytes); /* Trailing NUL-bytes */
@@ -561,15 +596,25 @@ __after_mmap_attempt:
 			__buffree -= (__SIZE_TYPE__)__error;
 			if (__buffree < 1024) {
 				__BYTE_TYPE__ *__newbuf;
-				__SIZE_TYPE__ __newsize = __bufsize * 2;
-				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+				__SIZE_TYPE__ __newsize, __alcsize;
+				if __unlikely(__hybrid_overflow_umul(__bufsize, 2, &__newsize))
+					__newsize = (__SIZE_TYPE__)-1;
+				if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+					__alcsize = (__SIZE_TYPE__)-1;
+				__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize));
 				if (!__newbuf) {
-					__newsize = __bufsize + 1024;
-					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+					if __unlikely(__hybrid_overflow_uadd(__bufsize, 1024, &__newsize))
+						__newsize = (__SIZE_TYPE__)-1;
+					if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+						__alcsize = (__SIZE_TYPE__)-1;
+					__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize));
 					if (!__newbuf) {
 						if (!__buffree) {
-							__newsize = __bufsize + 1;
-							__newbuf  = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+							if __unlikely(__hybrid_overflow_uadd(__bufsize, 1, &__newsize))
+								goto __err_buf_2big;
+							if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+								goto __err_buf_2big;
+							__newbuf  = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize);
 							if __unlikely(!__newbuf)
 								goto __err_buf;
 						} else {
@@ -622,7 +667,7 @@ __after_mmap_attempt:
 				__used_nulbytes = __num_trailing_nulbytes;
 				if (__min_bytes > __bufused)
 					__used_nulbytes += __min_bytes - __bufused;
-				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes);
+				__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes));
 				if __likely(__newbuf)
 					__buf = __newbuf;
 				(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __used_nulbytes); /* Trailing NUL-bytes */
@@ -638,15 +683,25 @@ __after_mmap_attempt:
 		__buffree -= (__SIZE_TYPE__)__error;
 		if (__buffree < 1024) {
 			__BYTE_TYPE__ *__newbuf;
-			__SIZE_TYPE__ __newsize = __bufsize * 2;
-			__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+			__SIZE_TYPE__ __newsize, __alcsize;
+			if __unlikely(__hybrid_overflow_umul(__bufsize, 2, &__newsize))
+				__newsize = (__SIZE_TYPE__)-1;
+			if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+				__alcsize = (__SIZE_TYPE__)-1;
+			__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize));
 			if (!__newbuf) {
-				__newsize = __bufsize + 1024;
-				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+				if __unlikely(__hybrid_overflow_uadd(__bufsize, 1024, &__newsize))
+					__newsize = (__SIZE_TYPE__)-1;
+				if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+					__alcsize = (__SIZE_TYPE__)-1;
+				__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize));
 				if (!__newbuf) {
 					if (!__buffree) {
-						__newsize = __bufsize + 1;
-						__newbuf  = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+						if __unlikely(__hybrid_overflow_uadd(__bufsize, 1, &__newsize))
+							goto __err_buf_2big;
+						if __unlikely(__hybrid_overflow_uadd(__newsize, __num_trailing_nulbytes, &__alcsize))
+							goto __err_buf_2big;
+						__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __alcsize);
 						if __unlikely(!__newbuf)
 							goto __err_buf;
 					} else {
@@ -675,7 +730,7 @@ __after_mmap_attempt:
 		 * lead to memory becoming very badly fragmented. */
 __empty_file:
 		__used_nulbytes = __min_bytes + __num_trailing_nulbytes;
-		__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __used_nulbytes);
+		__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __used_nulbytes));
 		if __likely(__newbuf) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 			(__NAMESPACE_LOCAL_SYM __localdep_free)(__buf);
@@ -685,7 +740,7 @@ __empty_file:
 			if __unlikely(!__used_nulbytes)
 				__used_nulbytes = 1;
 #endif /* !__REALLOC_ZERO_IS_NONNULL */
-			__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __used_nulbytes);
+			__LOCAL_preserve_errno(__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __used_nulbytes));
 			if (!__newbuf)
 				__newbuf = __buf;
 			(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__newbuf, __used_nulbytes);
@@ -694,7 +749,18 @@ __empty_file:
 		__mapping->mf_size = 0;
 		__mapping->__mf_mapsize = 0;
 	}
+#undef __LOCAL_preserve_errno
 	return 0;
+__err_2big:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	__buf = __NULLPTR;
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+__err_buf_2big:
+#ifdef __ENOMEM
+	__libc_seterrno(__ENOMEM);
+#else /* __ENOMEM */
+	__libc_seterrno(1);
+#endif /* !__ENOMEM */
 __err_buf:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__buf);

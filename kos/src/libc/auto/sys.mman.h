@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe02e950 */
+/* HASH CRC-32:0x15218253 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,7 +142,7 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *ad
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fmapfile(3)
  * A function that can be used to map a specific sub-range of some file into memory.
- * This  function tries the following (in order)  when trying to create the mapping:
+ * This function tries the following (in this order) in order to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -198,7 +198,7 @@ INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)
 #ifndef __KERNEL__
 /* >> fmapfile(3)
  * A function that can be used to map a specific sub-range of some file into memory.
- * This  function tries the following (in order)  when trying to create the mapping:
+ * This function tries the following (in this order) in order to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'

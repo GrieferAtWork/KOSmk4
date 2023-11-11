@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aabd28b */
+/* HASH CRC-32:0x9418e0f1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -894,7 +894,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_fmapfile
 /* >> fmapfile(3)
  * A function that can be used to map a specific sub-range of some file into memory.
- * This  function tries the following (in order)  when trying to create the mapping:
+ * This function tries the following (in this order) in order to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -950,7 +950,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfi
 #include <libc/local/sys.mman/fmapfile.h>
 /* >> fmapfile(3)
  * A function that can be used to map a specific sub-range of some file into memory.
- * This  function tries the following (in order)  when trying to create the mapping:
+ * This function tries the following (in this order) in order to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'

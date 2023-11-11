@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79ab4d5d */
+/* HASH CRC-32:0x1943373c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,7 +287,7 @@ badkey:
 #include <asm/crt/malloc.h>
 /* >> fmapfile(3)
  * A function that can be used to map a specific sub-range of some file into memory.
- * This  function tries the following (in order)  when trying to create the mapping:
+ * This function tries the following (in this order) in order to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -351,6 +351,18 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 	size_t bufused;
 	size_t buffree;
 
+	/* Helper macro that makes sure `errno(3)' is preserved across `expr' */
+
+#define __LOCAL_preserve_errno(expr)              \
+	do {                                          \
+		errno_t _saved_errno = __libc_geterrno(); \
+		expr;                                     \
+		__libc_seterrno(_saved_errno);            \
+	}	__WHILE0
+
+
+
+
 	/* Validate the given `flags' */
 	if unlikely(flags & ~(__FMAPFILE_READALL | __FMAPFILE_MUSTMMAP |
 	                      __FMAPFILE_MAPSHARED | __FMAPFILE_ATSTART)) {
@@ -359,6 +371,21 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 
 
 
+	}
+
+	/* Check for special case: map an empty portion of the file. */
+	if unlikely(max_bytes == 0) {
+#ifndef __REALLOC_ZERO_IS_NONNULL
+		if (num_trailing_nulbytes == 0)
+			num_trailing_nulbytes = 1;
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+		buf = (byte_t *)libc_calloc(1, num_trailing_nulbytes);
+		if unlikely(!buf)
+			return -1;
+		mapping->mf_addr = buf;
+		mapping->mf_size = 0;
+		mapping->__mf_mapsize = 0;
+		return 0;
 	}
 
 	/* Try to use mmap(2) */
@@ -418,9 +445,12 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 				/* Map file into memory. */
 				size_t mapsize, used_nulbytes;
 				used_nulbytes = num_trailing_nulbytes;
-				if (min_bytes > map_bytes)
-					used_nulbytes += min_bytes - map_bytes;
-				mapsize = map_bytes + used_nulbytes;
+				if (min_bytes > map_bytes) {
+					if unlikely(__hybrid_overflow_uadd(used_nulbytes, min_bytes - map_bytes, &used_nulbytes))
+						goto err_2big;
+				}
+				if unlikely(__hybrid_overflow_uadd(map_bytes, used_nulbytes, &mapsize))
+					mapsize = (size_t)-1; /* Force mmap failure */
 
 				if (flags & __FMAPFILE_MAPSHARED) {
 					if unlikely(num_trailing_nulbytes) {
@@ -505,7 +535,12 @@ after_mmap_attempt:
 		bufsize = 0x10000;
 	if (bufsize < min_bytes)
 		bufsize = min_bytes;
-	buf = (byte_t *)libc_malloc(bufsize + num_trailing_nulbytes);
+	{
+		size_t alcsize;
+		if unlikely(__hybrid_overflow_uadd(bufsize, num_trailing_nulbytes, &alcsize))
+			goto err_2big;
+		__LOCAL_preserve_errno(buf = (byte_t *)libc_malloc(alcsize));
+	}
 	if unlikely(!buf) {
 		bufsize = 1;
 		if (bufsize < min_bytes)
@@ -532,7 +567,7 @@ after_mmap_attempt:
 					used_nulbytes = num_trailing_nulbytes;
 					if (min_bytes > bufused)
 						used_nulbytes += min_bytes - bufused;
-					newbuf = (byte_t *)libc_realloc(buf, bufused + used_nulbytes);
+					__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, bufused + used_nulbytes));
 					if likely(newbuf)
 						buf = newbuf;
 					libc_bzero(buf + bufused, used_nulbytes); /* Trailing NUL-bytes */
@@ -551,15 +586,25 @@ after_mmap_attempt:
 			buffree -= (size_t)error;
 			if (buffree < 1024) {
 				byte_t *newbuf;
-				size_t newsize = bufsize * 2;
-				newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+				size_t newsize, alcsize;
+				if unlikely(__hybrid_overflow_umul(bufsize, 2, &newsize))
+					newsize = (size_t)-1;
+				if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+					alcsize = (size_t)-1;
+				__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
 				if (!newbuf) {
-					newsize = bufsize + 1024;
-					newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+					if unlikely(__hybrid_overflow_uadd(bufsize, 1024, &newsize))
+						newsize = (size_t)-1;
+					if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+						alcsize = (size_t)-1;
+					__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
 					if (!newbuf) {
 						if (!buffree) {
-							newsize = bufsize + 1;
-							newbuf  = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+							if unlikely(__hybrid_overflow_uadd(bufsize, 1, &newsize))
+								goto err_buf_2big;
+							if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+								goto err_buf_2big;
+							newbuf  = (byte_t *)libc_realloc(buf, alcsize);
 							if unlikely(!newbuf)
 								goto err_buf;
 						} else {
@@ -612,7 +657,7 @@ after_mmap_attempt:
 				used_nulbytes = num_trailing_nulbytes;
 				if (min_bytes > bufused)
 					used_nulbytes += min_bytes - bufused;
-				newbuf = (byte_t *)libc_realloc(buf, bufused + used_nulbytes);
+				__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, bufused + used_nulbytes));
 				if likely(newbuf)
 					buf = newbuf;
 				libc_bzero(buf + bufused, used_nulbytes); /* Trailing NUL-bytes */
@@ -628,15 +673,25 @@ after_mmap_attempt:
 		buffree -= (size_t)error;
 		if (buffree < 1024) {
 			byte_t *newbuf;
-			size_t newsize = bufsize * 2;
-			newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+			size_t newsize, alcsize;
+			if unlikely(__hybrid_overflow_umul(bufsize, 2, &newsize))
+				newsize = (size_t)-1;
+			if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+				alcsize = (size_t)-1;
+			__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
 			if (!newbuf) {
-				newsize = bufsize + 1024;
-				newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+				if unlikely(__hybrid_overflow_uadd(bufsize, 1024, &newsize))
+					newsize = (size_t)-1;
+				if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+					alcsize = (size_t)-1;
+				__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
 				if (!newbuf) {
 					if (!buffree) {
-						newsize = bufsize + 1;
-						newbuf  = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+						if unlikely(__hybrid_overflow_uadd(bufsize, 1, &newsize))
+							goto err_buf_2big;
+						if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+							goto err_buf_2big;
+						newbuf = (byte_t *)libc_realloc(buf, alcsize);
 						if unlikely(!newbuf)
 							goto err_buf;
 					} else {
@@ -665,7 +720,7 @@ after_mmap_attempt:
 		 * lead to memory becoming very badly fragmented. */
 empty_file:
 		used_nulbytes = min_bytes + num_trailing_nulbytes;
-		newbuf = (byte_t *)libc_calloc(1, used_nulbytes);
+		__LOCAL_preserve_errno(newbuf = (byte_t *)libc_calloc(1, used_nulbytes));
 		if likely(newbuf) {
 
 			libc_free(buf);
@@ -675,7 +730,7 @@ empty_file:
 			if unlikely(!used_nulbytes)
 				used_nulbytes = 1;
 #endif /* !__REALLOC_ZERO_IS_NONNULL */
-			newbuf = (byte_t *)libc_realloc(buf, used_nulbytes);
+			__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, used_nulbytes));
 			if (!newbuf)
 				newbuf = buf;
 			libc_bzero(newbuf, used_nulbytes);
@@ -684,7 +739,18 @@ empty_file:
 		mapping->mf_size = 0;
 		mapping->__mf_mapsize = 0;
 	}
+#undef __LOCAL_preserve_errno
 	return 0;
+err_2big:
+
+	buf = NULL;
+
+err_buf_2big:
+
+	__libc_seterrno(ENOMEM);
+
+
+
 err_buf:
 
 	libc_free(buf);
