@@ -466,7 +466,7 @@ NOTHROW(FCALL libc_vabortf_failure_core)(struct abortf_args *__restrict args) {
 	/* If the user has defined a custom sigaction for `SIGABRT',
 	 * then instead of directly  triggering a coredump, we  must
 	 * raise that signal at the given `&args->af_state'! */
-	/* TODO:  */
+	/* TODO: Must still set `__abort_msg' before calling this! */
 	maybe_raise_SIGABRT(&args->af_state);
 
 	/* Normal abort handling. */

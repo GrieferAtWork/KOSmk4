@@ -28,7 +28,7 @@
 
 
 /* Coredump message string limits.
- * WARNING: These values as used as alloca() limits, so don't  set
+ * WARNING: These values are used as alloca() limits, so don't set
  *          them too high, or else user-space may be able to cause
  *          a kernel-space stack overflow... */
 #define COREDUMP_ASSERT_EXPR_MAXLEN 512  /* ci_assert.ca_expr */

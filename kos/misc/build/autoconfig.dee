@@ -29,8 +29,8 @@ function getPreviousBuildConfiguration(rootDir: string, targetName: string | non
 	local resultTimestamp = none;
 	local resultTargetName = targetName;
 	if (targetName is none) {
-		/* Figure out `targetName' was enumerating symlinks in "{rootDir}/bin"
-		 * and  picking whichever has the most-recent last-modified timestamp. */
+		/* Figure out `targetName' by enumerating symlinks in "{rootDir}/bin"
+		 * and picking whichever has the most-recent last-modified timestamp. */
 		local mostRecentTargets = [];
 		for (local ent: posix.opendir(rootDir + "bin")) {
 			if (ent.d_type != posix.DT_LNK)
@@ -114,7 +114,7 @@ function getMiOptionsBuildConfig(rootDir: string): (Bytes, Bytes) | none {
 @@Try to automatically determine the target/config for which to build
 @@This function is used when you invoke `magic.dee` without supplying
 @@a `--target=` or `--config=` option. It is also used by `make` when
-@@needing (buf missing) a `TARGET` or `CONFIG` argument.
+@@needing (but missing) a `TARGET` or `CONFIG` argument.
 @@
 @@The actual behavior of this function is not guarantied, but it tries
 @@to figure out the target/configuration which KOS has last been built

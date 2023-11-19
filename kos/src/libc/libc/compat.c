@@ -245,9 +245,9 @@ struct IO_FILE_84 {
 	 */
 
 	/*32|64-bit * .................................... *     32-bit | 64-bit */
-	/* 0|  0*/ uint32_t io84_flags;                   /* if_ptr     | if_ptr */
+	/* 0|  0*/ uint32_t           io84_flags;         /* if_ptr     | if_ptr */
 #if __SIZEOF_POINTER__ > 4
-	/*     4*/ uint32_t _io84_pad;                    /* -          | if_ptr (cont.) */
+	/*     4*/ uint32_t          _io84_pad;           /* -          | if_ptr (cont.) */
 #endif /* __SIZEOF_POINTER__ > 4 */
 	/* 4|  8*/ byte_t            *io84_IO_read_ptr;   /* if_cnt     | if_cnt+__if_pad0 */
 	/* 8| 16*/ byte_t            *io84_IO_read_end;   /* if_base    | if_base */
@@ -286,7 +286,7 @@ struct IO_FILE_84 {
 
 struct linux_default_stdio_file {
 #if __SIZEOF_POINTER__ == 4
-	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* 0 bytes... */
+	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* Pad with 0-bytes. */
 	FILE   ldsf_stdio;                                          /* The actual file object */
 #elif __SIZEOF_POINTER__ == 8
 	FILE   ldsf_stdio;                                          /* The actual file object */

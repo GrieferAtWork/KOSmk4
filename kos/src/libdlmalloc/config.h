@@ -295,13 +295,13 @@ DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
 DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
 DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
 
-#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#ifdef _MALLINFO_MATCHES_MALLINFO2
 DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
-#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#else /* _MALLINFO_MATCHES_MALLINFO2 */
 DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, libc_mallinfo_int);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, libc_mallinfo_int);
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 #endif /* __BUILDING_LIBC */
 #undef DEFINE_DL_EXPORT_ALIAS
 
@@ -322,17 +322,17 @@ DEFINE_INTERN_ALIAS(libc_memalign, dlmemalign);
 DEFINE_INTERN_ALIAS(libc_posix_memalign, dlposix_memalign);
 DEFINE_INTERN_ALIAS(libc_valloc, dlvalloc);
 DEFINE_INTERN_ALIAS(libc_mallopt, dlmallopt);
-#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#ifdef _MALLINFO_MATCHES_MALLINFO2
 DEFINE_INTERN_ALIAS(libc_mallinfo, dlmallinfo);
-#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#else /* _MALLINFO_MATCHES_MALLINFO2 */
 DEFINE_INTERN_ALIAS(libc_mallinfo, libc_mallinfo_int);
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 DEFINE_INTERN_ALIAS(libc_mallinfo2, dlmallinfo);
 DEFINE_INTERN_ALIAS(libc_pvalloc, dlpvalloc);
 DEFINE_INTERN_ALIAS(libc_malloc_trim, dlmalloc_trim);
 DEFINE_INTERN_ALIAS(libc_malloc_usable_size, dlmalloc_usable_size);
 
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 INTERN ATTR_SECTION(".text.crt.heap.malloc")
 struct mallinfo libc_mallinfo_int(void) {
 	struct mallinfo2 info = dlmallinfo();
@@ -349,7 +349,7 @@ struct mallinfo libc_mallinfo_int(void) {
 	result.keepcost = (int)(unsigned int)info.keepcost;
 	return result;
 }
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 
 /* Old aliases from Glibc 2.0.4 */
 DEFINE_PUBLIC_ALIAS(__free, libc_free);

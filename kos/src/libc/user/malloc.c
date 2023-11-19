@@ -59,6 +59,21 @@ DECL_BEGIN
 /*[[[skip:libc_mallinfo]]]*/
 /*[[[skip:libc_mallinfo2]]]*/
 
+#ifdef _MALLINFO_MATCHES_MALLINFO2
+static_assert(alignof(struct mallinfo) == alignof(struct mallinfo2));
+static_assert(sizeof(struct mallinfo) == sizeof(struct mallinfo2));
+static_assert(offsetof(struct mallinfo, arena) == offsetof(struct mallinfo2, arena));
+static_assert(offsetof(struct mallinfo, ordblks) == offsetof(struct mallinfo2, ordblks));
+static_assert(offsetof(struct mallinfo, smblks) == offsetof(struct mallinfo2, smblks));
+static_assert(offsetof(struct mallinfo, hblks) == offsetof(struct mallinfo2, hblks));
+static_assert(offsetof(struct mallinfo, hblkhd) == offsetof(struct mallinfo2, hblkhd));
+static_assert(offsetof(struct mallinfo, usmblks) == offsetof(struct mallinfo2, usmblks));
+static_assert(offsetof(struct mallinfo, fsmblks) == offsetof(struct mallinfo2, fsmblks));
+static_assert(offsetof(struct mallinfo, uordblks) == offsetof(struct mallinfo2, uordblks));
+static_assert(offsetof(struct mallinfo, fordblks) == offsetof(struct mallinfo2, fordblks));
+static_assert(offsetof(struct mallinfo, keepcost) == offsetof(struct mallinfo2, keepcost));
+#endif /* _MALLINFO_MATCHES_MALLINFO2 */
+
 #if __ARCH_REDIRECT_MAXBYTES != 0
 typedef void *(LIBCCALL *LPMALLOC)(size_t num_bytes);
 typedef void (LIBCCALL *LPFREE)(void *ptr);
@@ -95,9 +110,9 @@ struct user_malloc_abi {
 	LPPVALLOC            uma_pvalloc;
 	LPMALLOPT            uma_mallopt;
 	LPMALLINFO           uma_mallinfo;
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 	LPMALLINFO2          uma_mallinfo2;
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 	LPMALLOC_TRIM        uma_malloc_trim;
 	LPMALLOC_USABLE_SIZE uma_malloc_usable_size;
 
@@ -261,7 +276,7 @@ fallback_mallopt_NOOP(int param_number, int value) {
 	return 0;
 }
 
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 PRIVATE struct mallinfo2 LIBCCALL
 fallback_mallinfo2_with_mallinfo(void) {
 	struct mallinfo info = mallinfo();
@@ -302,7 +317,7 @@ fallback_mallinfo_with_mallinfo2(void) {
 	result.keepcost = (int)(unsigned int)info.keepcost;
 	return result;
 }
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 
 PRIVATE struct mallinfo LIBCCALL
 fallback_mallinfo_NOOP(void) {
@@ -362,12 +377,12 @@ user_malloc_abi_load(struct user_malloc_abi *__restrict self) {
 	*(void **)&self->uma_pvalloc = user_malloc_abi_dlsym(nameof_pvalloc, (void *)&libc_pvalloc);
 	*(void **)&self->uma_mallopt = user_malloc_abi_dlsym(nameof_mallopt, (void *)&libc_mallopt);
 	*(void **)&self->uma_mallinfo = user_malloc_abi_dlsym(nameof_mallinfo, (void *)&libc_mallinfo);
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 	*(void **)&self->uma_mallinfo2 = user_malloc_abi_dlsym(nameof_mallinfo2, (void *)&libc_mallinfo2);
-#else /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#else /* !_MALLINFO_MATCHES_MALLINFO2 */
 	if (self->uma_mallinfo == NULL)
 		*(void **)&self->uma_mallinfo = user_malloc_abi_dlsym(nameof_mallinfo2, (void *)&libc_mallinfo2);
-#endif /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#endif /* _MALLINFO_MATCHES_MALLINFO2 */
 	*(void **)&self->uma_malloc_trim = user_malloc_abi_dlsym(nameof_malloc_trim, (void *)&libc_malloc_trim);
 	*(void **)&self->uma_malloc_usable_size = user_malloc_abi_dlsym(nameof_malloc_usable_size, (void *)&libc_malloc_usable_size);
 	if (*(void **)&self->uma_malloc_usable_size == NULL) {
@@ -421,7 +436,7 @@ user_malloc_abi_load(struct user_malloc_abi *__restrict self) {
 		self->uma_pvalloc = &fallback_pvalloc_with_valloc;
 	if (self->uma_mallopt == NULL)
 		self->uma_mallopt = &fallback_mallopt_NOOP;
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 	if (self->uma_mallinfo2 == NULL) {
 		if (self->uma_mallinfo != NULL) {
 			self->uma_mallinfo2 = &fallback_mallinfo2_with_mallinfo;
@@ -437,10 +452,10 @@ user_malloc_abi_load(struct user_malloc_abi *__restrict self) {
 			self->uma_mallinfo = &fallback_mallinfo_NOOP;
 		}
 	}
-#else /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#else /* !_MALLINFO_MATCHES_MALLINFO2 */
 	if (self->uma_mallinfo == NULL)
 		self->uma_mallinfo = &fallback_mallinfo_NOOP;
-#endif /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#endif /* _MALLINFO_MATCHES_MALLINFO2 */
 	if (self->uma_malloc_trim == NULL)
 		self->uma_malloc_trim = &fallback_malloc_trim_NOOP;
 	if (self->uma_malloc_usable_size == NULL)
@@ -483,9 +498,9 @@ user_malloc_abi_install(struct user_malloc_abi *__restrict self) {
 	libc_malloc_redirect(nameof_pvalloc, (void *)&libc_pvalloc, *(void **)&self->uma_pvalloc);
 	libc_malloc_redirect(nameof_mallopt, (void *)&libc_mallopt, *(void **)&self->uma_mallopt);
 	libc_malloc_redirect(nameof_mallinfo, (void *)&libc_mallinfo, *(void **)&self->uma_mallinfo);
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 	libc_malloc_redirect(nameof_mallinfo2, (void *)&libc_mallinfo2, *(void **)&self->uma_mallinfo2);
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 	libc_malloc_redirect(nameof_malloc_trim, (void *)&libc_malloc_trim, *(void **)&self->uma_malloc_trim);
 	libc_malloc_redirect(nameof_malloc_usable_size, (void *)&libc_malloc_usable_size, *(void **)&self->uma_malloc_usable_size);
 	libc_malloc_redirect_opt(nameof_memdup, (void *)&libc_memdup, *(void **)&self->uma_memdup);
@@ -563,7 +578,7 @@ libc_init_malloc_hooks(void) {
  * NOTE: Since  this part happens *before* malloc() normally gets called, we don't
  *       have to worry about `libc_init_malloc_hooks()', since it will *never* get
  *       called! */
-typedef void (*LP__MALLOC_INITIALIZE_HOOK)(void);
+typedef void (LIBCCALL *LP__MALLOC_INITIALIZE_HOOK)(void);
 typedef void (LIBCCALL *LP__FREE_HOOK)(void *ptr, void const *return_address);
 typedef void *(LIBCCALL *LP__MALLOC_HOOK)(size_t num_bytes, void const *return_address);
 typedef void *(LIBCCALL *LP__REALLOC_HOOK)(void *ptr, size_t num_bytes, void const *return_address);
@@ -593,12 +608,12 @@ libdlmalloc_so_abi_load(struct user_malloc_abi *__restrict self) {
 	*(void **)&self->uma_valloc = get_dlmalloc_function(lib_dlmalloc, nameof_valloc);
 	*(void **)&self->uma_pvalloc = get_dlmalloc_function(lib_dlmalloc, nameof_pvalloc);
 	*(void **)&self->uma_mallopt = get_dlmalloc_function(lib_dlmalloc, nameof_mallopt);
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+#ifndef _MALLINFO_MATCHES_MALLINFO2
 	*(void **)&self->uma_mallinfo2 = get_dlmalloc_function(lib_dlmalloc, nameof_mallinfo2);
 	self->uma_mallinfo             = &fallback_mallinfo_with_mallinfo2;
-#else /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#else /* !_MALLINFO_MATCHES_MALLINFO2 */
 	*(void **)&self->uma_mallinfo = get_dlmalloc_function(lib_dlmalloc, nameof_mallinfo2);
-#endif /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#endif /* _MALLINFO_MATCHES_MALLINFO2 */
 	*(void **)&self->uma_malloc_trim = get_dlmalloc_function(lib_dlmalloc, nameof_malloc_trim);
 	*(void **)&self->uma_malloc_usable_size = get_dlmalloc_function(lib_dlmalloc, nameof_malloc_usable_size);
 }
@@ -929,7 +944,7 @@ void *LIBCCALL libc_hooked_recallocv(void *mallptr, size_t elem_count, size_t el
 
 
 
-PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void
+PRIVATE ATTR_SECTION(".text.crt.heap.rare_helpers") void LIBCCALL
 libc_malloc_hooks_doinit(void) {
 	struct user_malloc_abi abi;
 	syslog(LOG_INFO, "[libc] Enable support for `__malloc_hook'\n");

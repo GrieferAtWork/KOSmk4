@@ -70,6 +70,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc_noslab)(size_t n_bytes, gfp_t flags) 
 	assert(heapptr_getsiz(hptr) >= alloc_size);
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
+	mptr_assert_paranoid(result);
 	return mptr_user(result);
 LOCAL_IF_NX_ELSE(err:, err_overflow:)
 	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
@@ -80,21 +81,20 @@ LOCAL_IF_NX_ELSE(err:, err_overflow:)
 #define untraced_kmalloc_noslab     untraced_kmalloc
 #endif /* !... */
 
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
-	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
-		goto LOCAL_IF_NX_ELSE(err, err_overflow);
-#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (n_bytes <= CONFIG_KERNEL_SLAB_MAXSIZE) {
 		void *slab_ptr;
 		slab_ptr = slab_malloc(n_bytes, flags);
 		if (slab_ptr)
 			return slab_ptr;
 	}
-#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
+		goto LOCAL_IF_NX_ELSE(err, err_overflow);
 	hptr = LOCAL_heap_alloc_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 alloc_size, flags);
 	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
@@ -106,6 +106,9 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc)(size_t n_bytes, gfp_t flags) {
 LOCAL_IF_NX_ELSE(err:, err_overflow:)
 	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+DEFINE_INTERN_ALIAS(LOCAL_untraced_kmalloc, LOCAL_untraced_kmalloc_noslab);
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 INTERN ATTR_BLOCKLIKE_GFP(flags) ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmemalign)(size_t min_alignment,
@@ -163,7 +166,7 @@ LOCAL_NOTHROW(KCALL LOCAL_get_realloc_size)(size_t n_bytes) {
 	return result;
 err_overflow:
 	LOCAL_IF_NX_ELSE(return (size_t)-1,
-	          THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
+	                 THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
 INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *

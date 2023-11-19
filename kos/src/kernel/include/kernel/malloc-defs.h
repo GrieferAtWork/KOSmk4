@@ -198,8 +198,8 @@ DECL_BEGIN
 /*[[[end]]]*/
 
 #ifndef HEAP_ALIGNMENT
-#define HEAP_ALIGNMENT  CONFIG_KERNEL_HEAP_ALIGNMENT
-#endif
+#define HEAP_ALIGNMENT CONFIG_KERNEL_HEAP_ALIGNMENT
+#endif /* !HEAP_ALIGNMENT */
 #if HEAP_ALIGNMENT < __ALIGNOF_POINTER__
 #error "The kernel heap must support at least pointer alignment"
 #endif /* HEAP_ALIGNMENT < __ALIGNOF_POINTER__ */
@@ -209,7 +209,7 @@ DECL_BEGIN
 
 
 /* Kernel-space dynamic memory management. */
-#define __SIZEOF_GFP_T__ __SIZEOF_INT__
+#define __SIZEOF_GFP_T__ 4
 #ifdef __CC__
 typedef __UINT32_TYPE__ gfp_t;
 #endif /* __CC__ */

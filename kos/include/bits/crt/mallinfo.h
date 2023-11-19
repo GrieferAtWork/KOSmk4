@@ -24,6 +24,11 @@
 
 #include <hybrid/typecore.h>
 
+#undef _MALLINFO_MATCHES_MALLINFO2
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#define _MALLINFO_MATCHES_MALLINFO2
+#endif /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+
 #ifdef __CC__
 __DECL_BEGIN
 
