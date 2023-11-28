@@ -110,7 +110,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 		}
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
 		                 "atomic_once_enter(%p) : Invalid state: %p",
-		                 __self, (void *)__state);
+		                 __self, (void *)(__UINTPTR_TYPE__)__state);
 		__hybrid_yield();
 	}
 	return 0;
@@ -137,7 +137,7 @@ __NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self) {
 		}
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
 		                 "atomic_once_enter_nx(%p) : Invalid state: %p",
-		                 __self, (void *)__state);
+		                 __self, (void *)(__UINTPTR_TYPE__)__state);
 		if (!__hybrid_yield_nx())
 			return ATOMIC_ONCE_ENTER_NX_WOULDBLOCK;
 	}
@@ -165,7 +165,7 @@ __NOTHROW(atomic_once_tryenter)(struct atomic_once *__restrict __self) {
 		}
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
 		                 "atomic_once_tryenter(%p) : Invalid state: %p",
-		                 __self, (void *)__state);
+		                 __self, (void *)(__UINTPTR_TYPE__)__state);
 		break;
 	}
 	return __state;
@@ -179,7 +179,8 @@ __NOTHROW(atomic_once_success)(struct atomic_once *__restrict __self) {
 	do {
 		__state = __self->ao_state;
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
-		                 "atomic_once_success(%p): Invalid state: %p", (void *)__state);
+		                 "atomic_once_success(%p): Invalid state: %p",
+		                 (void *)(__UINTPTR_TYPE__)__state);
 	} while (!__hybrid_atomic_cmpxch_weak(&__self->ao_state,
 	                                      __ATOMIC_ONCE_RUNNING,
 	                                      __ATOMIC_ONCE_RUNDONE,
@@ -198,7 +199,8 @@ __NOTHROW(atomic_once_abort)(struct atomic_once *__restrict __self) {
 	do {
 		__state = __self->ao_state;
 		__hybrid_assertf(__state == __ATOMIC_ONCE_RUNNING,
-		                 "atomic_once_success(%p): Invalid state: %p", (void *)__state);
+		                 "atomic_once_success(%p): Invalid state: %p",
+		                 (void *)(__UINTPTR_TYPE__)__state);
 	} while (!__hybrid_atomic_cmpxch_weak(&__self->ao_state,
 	                                      __ATOMIC_ONCE_RUNNING,
 	                                      __ATOMIC_ONCE_PENDING,

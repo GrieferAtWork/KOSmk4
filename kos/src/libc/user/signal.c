@@ -658,13 +658,13 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_setsigmaskptr]]]*/
 
-/*[[[head:libc_setsigmaskfullptr,hash:CRC-32=0x305821b0]]]*/
+/*[[[head:libc_setsigmaskfullptr,hash:CRC-32=0x41a30a9a]]]*/
 /* >> setsigmaskfullptr(3)
  * Same as  `setsigmaskptr()',  but  set a  statically  allocated,  fully
  * filled signal  mask  as  the calling  thread's  current  signal  mask.
  * This essentially means that this  function can be used to  temporarily
  * disable the reception of all  signals within the calling thread,  thus
- * allowing the thread to run  without being interrupted (by another  but
+ * allowing  the thread to run without being interrupted (by anything but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;

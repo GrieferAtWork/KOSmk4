@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83a0e6a4 */
+/* HASH CRC-32:0xba7547a1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,7 +202,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct __sigset_struct *,__NOT
  * filled signal  mask  as  the calling  thread's  current  signal  mask.
  * This essentially means that this  function can be used to  temporarily
  * disable the reception of all  signals within the calling thread,  thus
- * allowing the thread to run  without being interrupted (by another  but
+ * allowing  the thread to run without being interrupted (by anything but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;
@@ -217,7 +217,7 @@ __CREDIRECT(__ATTR_RETNONNULL,struct __sigset_struct *,__NOTHROW_NCX,__libc_core
  * filled signal  mask  as  the calling  thread's  current  signal  mask.
  * This essentially means that this  function can be used to  temporarily
  * disable the reception of all  signals within the calling thread,  thus
- * allowing the thread to run  without being interrupted (by another  but
+ * allowing  the thread to run without being interrupted (by anything but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;

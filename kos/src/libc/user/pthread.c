@@ -1669,7 +1669,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t self,
 	sys_close(commfd);
 	if (E_ISERR(result))
 		return -result;
-	if ((size_t)result == buflen)
+	assert((size_t)result <= buflen);
+	if ((size_t)result >= buflen)
 		return ERANGE;  /* Need more space for trailing NUL */
 	buf[result] = '\0'; /* Append trailing NUL */
 	return EOK;

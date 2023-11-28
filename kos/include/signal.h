@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8730ddb */
+/* HASH CRC-32:0x3dfe1991 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1929,7 +1929,7 @@ __CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),sigset_t *,__NOTHROW_NCX,se
  * filled signal  mask  as  the calling  thread's  current  signal  mask.
  * This essentially means that this  function can be used to  temporarily
  * disable the reception of all  signals within the calling thread,  thus
- * allowing the thread to run  without being interrupted (by another  but
+ * allowing  the thread to run without being interrupted (by anything but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;
@@ -1944,7 +1944,7 @@ __CDECLARE(__ATTR_RETNONNULL,sigset_t *,__NOTHROW_NCX,setsigmaskfullptr,(void),(
  * filled signal  mask  as  the calling  thread's  current  signal  mask.
  * This essentially means that this  function can be used to  temporarily
  * disable the reception of all  signals within the calling thread,  thus
- * allowing the thread to run  without being interrupted (by another  but
+ * allowing  the thread to run without being interrupted (by anything but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;

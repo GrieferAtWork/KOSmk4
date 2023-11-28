@@ -1937,7 +1937,7 @@ sigset_t *setsigmaskptr([[/*async_inout*/nonnull]] sigset_t *sigmaskptr);
 @@filled signal  mask  as  the calling  thread's  current  signal  mask.
 @@This essentially means that this  function can be used to  temporarily
 @@disable the reception of all  signals within the calling thread,  thus
-@@allowing the thread to run  without being interrupted (by another  but
+@@allowing  the thread to run without being interrupted (by anything but
 @@SIGKILL and SIGSTOP, which can't be masked), until the returned signal
 @@mask is restored.
 @@>> sigset_t *os;

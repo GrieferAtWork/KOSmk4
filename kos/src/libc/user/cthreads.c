@@ -252,7 +252,8 @@ NOTHROW_NCX(LIBCCALL pthread_name_entry_alloc)(pthread_t self) {
 		}
 		bufsize += 64;
 	}
-	/* Ree unused memory. */
+
+	/* Free unused memory. */
 	bufsize = offsetof(struct pthread_name_entry, pne_name);
 	bufsize += strlen(entry->pne_name) * sizeof(char);
 	new_entry = (struct pthread_name_entry *)realloc(entry, bufsize);
