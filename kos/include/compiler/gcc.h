@@ -964,7 +964,9 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #endif /* __GCC_VERSION_NUM < 40402 */
 
 /* Support for complex numbers (test for with `#ifdef _Complex_I') */
-#if __GCC_VERSION_NUM >= 29700
+#ifdef __INTELLISENSE__
+#define _Complex_I 1.0F
+#elif __GCC_VERSION_NUM >= 29700
 #define _Complex_I (__extension__ 1.0iF)
 #if __STDC_VERSION__ < 199901
 #define _Complex __complex__
