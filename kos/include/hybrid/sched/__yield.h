@@ -1,4 +1,4 @@
-/* Copyright (c) 2019-2023 Griefer@Work                                       *
+/* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -12,7 +12,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -196,18 +196,21 @@ __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __IMPDEF __ULONG32_TYPE__ __ATTR_STDCALL SleepEx(__ULONG32_TYPE__ __msec, __INT32_TYPE__ __alertable);
 #define __hybrid_yield() ((__NAMESPACE_INT_SYM SleepEx)(0, 0))
 __NAMESPACE_INT_END __DECL_END
+#define __hybrid_yield_IS_SleepEx
 #elif (defined(__linux__) && (__has_include(<sched.h>) || defined(__NO_has_include)))
 /************************************************************************/
 /* Linux                                                                */
 /************************************************************************/
 #include <sched.h>
 #define __hybrid_yield sched_yield
+#define __hybrid_yield_IS_sched_yield
 #elif (__has_include(<pthread.h>) || (defined(__unix__) && defined(__NO_has_include)))
 /************************************************************************/
 /* PThread                                                              */
 /************************************************************************/
 #include <pthread.h>
 #define __hybrid_yield pthread_yield
+#define __hybrid_yield_IS_pthread_yield
 #elif (__has_include(<threads.h>) ||                                  \
        (defined(__NO_has_include) && !defined(__STDC_NO_THREADS__) && \
         defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
@@ -216,6 +219,7 @@ __NAMESPACE_INT_END __DECL_END
 /************************************************************************/
 #include <threads.h>
 #define __hybrid_yield thrd_yield
+#define __hybrid_yield_IS_thrd_yield
 #else /* Implementation... */
 #if (__has_include(<unistd.h>) || \
      (defined(__unix__) && defined(__NO_has_include)))

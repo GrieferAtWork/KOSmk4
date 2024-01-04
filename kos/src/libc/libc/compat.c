@@ -4,7 +4,7 @@ local gcc_opt = options.setdefault("GCC.options", []);
 if (gcc_opt.removeif(x -> x.startswith("-O")))
 	gcc_opt.append("-Os");
 ]]]*/
-/* Copyright (c) 2019-2023 Griefer@Work                                       *
+/* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -18,7 +18,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -1403,7 +1403,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_banner[] =
 "==========================================================================\n"
 "KOS System C Library.\n"
 "==========================================================================\n"
-"Copyright (c) 2019-2023 Griefer@Work\n"
+"Copyright (c) 2019-2024 Griefer@Work\n"
 "\n"
 "This software is provided 'as-is', without any express or implied\n"
 "warranty. In no event will the authors be held liable for any damages\n"
@@ -1417,7 +1417,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_banner[] =
 "   claim that you wrote the original software. If you use this software\n"
 "   in a product, an acknowledgement (see the following) in the product\n"
 "   documentation is required:\n"
-"   Portions Copyright (c) 2019-2023 Griefer@Work\n"
+"   Portions Copyright (c) 2019-2024 Griefer@Work\n"
 "2. Altered source versions must be plainly marked as such, and must not be\n"
 "   misrepresented as being the original software.\n"
 "3. This notice may not be removed or altered from any source distribution.\n"

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019-2023 Griefer@Work                                       *
+/* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -12,7 +12,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2023 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -3692,6 +3692,8 @@ __SYSDECL_BEGIN
 }
 
 %[default:section(".text.crt.dos.math.math")]
+
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@>> _fdtest(3), _dtest(3), _ldtest(3)
 [[pure, crt_dos_variant, wunused, decl_include("<features.h>")]]
