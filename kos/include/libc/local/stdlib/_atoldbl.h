@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15831830 */
+/* HASH CRC-32:0x5329f2bb */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,23 +27,21 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtold_defined
 #ifdef __CRT_HAVE_strtold
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
-#elif defined(__CRT_HAVE___strtold)
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
-#else /* ... */
+#else /* __CRT_HAVE_strtold */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
-#elif defined(__CRT_HAVE___strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),__strtod,(__nptr,__endptr))
+#elif defined(__CRT_HAVE___strtold)
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtold.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtold __LIBC_LOCAL_NAME(strtold)
 #endif /* !... */
-#endif /* !... */
+#endif /* !__CRT_HAVE_strtold */
 #endif /* !__local___localdep_strtold_defined */
 __LOCAL_LIBC(_atoldbl) __ATTR_IN(2) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoldbl))(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) {

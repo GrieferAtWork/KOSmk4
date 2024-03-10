@@ -574,7 +574,8 @@ global typeHeaders: {string: string} = Dict(defaultTypeHeaders);
 
 @@Include implications.
 @@e.g. "<bits/types.h>" implies "<hybrid/typecore.h>"
-@@Written     as     @{headerName:    {impliedBy...}}
+@@
+@@Written as @{headerName: {impliedBy...}}
 global typeHeadersImplications: {string: HashSet with string} = Dict({
 	"<hybrid/typecore.h>" : HashSet({ "<bits/types.h>" }),
 	"<features.h>" : HashSet({ "<bits/types.h>" }),

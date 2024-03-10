@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d38ca92 */
+/* HASH CRC-32:0xc1e83d71 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,14 +165,12 @@ __NAMESPACE_STD_USING(strtoull)
 #ifndef __NO_FPU
 __NAMESPACE_STD_USING(atof)
 __NAMESPACE_STD_USING(strtod)
-#if !defined(__strtof_defined) && defined(__std_strtof_defined)
-#define __strtof_defined
+#ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(strtof)
-#endif /* !__strtof_defined && __std_strtof_defined */
-#if !defined(__strtold_defined) && defined(__std_strtold_defined)
-#define __strtold_defined
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 __NAMESPACE_STD_USING(strtold)
-#endif /* !__strtold_defined && __std_strtold_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
 #endif /* !__NO_FPU */
 #if !defined(__aligned_alloc_defined) && defined(__std_aligned_alloc_defined)
 #define __aligned_alloc_defined
@@ -1157,6 +1155,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtold) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
+#elif defined(__CRT_HAVE___strtold) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/strtod.h>
@@ -1164,11 +1164,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) double __NOTHROW_NCX(__LIBCCALL strtod)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod))(__nptr, __endptr); })
 #endif /* !... */
 #ifdef __USE_ISOC99
-#ifndef __std_strtof_defined
-#define __std_strtof_defined
-#ifdef __strtof_defined
-__NAMESPACE_GLB_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return :: strtof(__nptr, __endptr); })
-#elif defined(__CRT_HAVE_strtof)
+#ifdef __CRT_HAVE_strtof
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),float,__NOTHROW_NCX,strtof,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
 #elif defined(__CRT_HAVE___strtof)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),float,__NOTHROW_NCX,strtof,(char const *__restrict __nptr, char **__endptr),__strtof,(__nptr,__endptr))
@@ -1178,27 +1174,19 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof))(__nptr, __endptr); })
 #endif /* !... */
-#endif /* !__std_strtof_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#ifndef __std_strtold_defined
-#define __std_strtold_defined
-#ifdef __strtold_defined
-__NAMESPACE_GLB_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return :: strtold(__nptr, __endptr); })
-#elif defined(__CRT_HAVE_strtold)
+#ifdef __CRT_HAVE_strtold
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
-#elif defined(__CRT_HAVE___strtold)
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
-#elif defined(__CRT_HAVE___strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),__strtod,(__nptr,__endptr))
+#elif defined(__CRT_HAVE___strtold)
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/strtold.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold))(__nptr, __endptr); })
 #endif /* !... */
-#endif /* !__std_strtold_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 #endif /* !__NO_FPU */
@@ -1337,15 +1325,17 @@ __NAMESPACE_STD_USING(strtoull)
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(atof)
 __NAMESPACE_STD_USING(strtod)
-#if !defined(__strtof_defined) && defined(__std_strtof_defined)
-#define __strtof_defined
-__NAMESPACE_STD_USING(strtof)
-#endif /* !__strtof_defined && __std_strtof_defined */
-#if !defined(__strtold_defined) && defined(__std_strtold_defined)
-#define __strtold_defined
-__NAMESPACE_STD_USING(strtold)
-#endif /* !__strtold_defined && __std_strtold_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_ISOC99
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(strtof)
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(strtold)
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
 #endif /* !__NO_FPU */
 
 #if !defined(__NO_FPU) && (defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__))

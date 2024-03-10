@@ -547,6 +547,7 @@ public:
 	__intellisense_long_double &operator=(__UINT128_TYPE__) throw();
 #endif /* __SIZEOF_INT128__ */
 	__intellisense_long_double operator-() const throw();
+	__intellisense_long_double operator+() const throw();
 	__intellisense_long_double operator+(__intellisense_long_double const &) const throw();
 	__intellisense_long_double operator-(__intellisense_long_double const &) const throw();
 	__intellisense_long_double operator*(__intellisense_long_double const &)const throw();

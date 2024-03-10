@@ -994,124 +994,220 @@ double atof([[in]] char const *__restrict nptr) {
 }
 
 [[std, leaf]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("strtold")]]
-[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<asm/crt/stdio.h>")]]
-[[impl_prefix(
-@@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSC16SCANF_HELPERS
-@@pp_else@@
-DEFINE_VSC32SCANF_HELPERS
-@@pp_endif@@
-)]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("strtold", "__strtold")]]
+[[impl_include("<ieee754.h>", "<libm/inf.h>", "<libm/nan.h>")]]
+[[impl_include("<libc/unicode.h>", "<hybrid/typecore.h>")]]
 double strtod([[in]] char const *__restrict nptr,
               [[out_opt]] char **endptr) {
-	double result;
-	char const *text_pointer = nptr;
-@@pp_if __SIZEOF_CHAR__ == 1@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
-	                  (void *)&text_pointer, "%lf", &result))
-		result = 0.0;
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
-	                  (void *)&text_pointer, "%lf", &result))
-		result = 0.0;
-@@pp_else@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
-	                  (void *)&text_pointer, "%lf", &result))
-		result = 0.0;
+	char sign, ch = *nptr;
+	double float_extension_mult;
+	double fltval = 0.0;
+	uint8_t numsys, digit;
+	while (isspace((unsigned char)ch))
+		ch = *++nptr;
+	sign = ch;
+	if (sign == '+' || sign == '-')
+		ch = *++nptr;
+	if (ch == '0') {
+		ch = *++nptr;
+		if (ch == 'x' || ch == 'X') {
+			ch = *++nptr;
+			numsys = 16;
+		} else if (ch == 'b' || ch == 'B') {
+			ch = *++nptr;
+			numsys = 2;
+		} else if (ch == '.') {
+			numsys = 10;
+		} else if (!isdigit((unsigned char)ch)) {
+			goto done;
+		} else {
+			/*numsys = 8;*/ /* Would be non-conforming */
+			numsys = 10;
+		}
+	} else {
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
+		if ((ch == 'i' || ch == 'I') &&
+		    (nptr[1] == 'n' || nptr[1] == 'N') &&
+		    (nptr[2] == 'f' || nptr[2] == 'F') &&
+		    !isalnum((unsigned char)nptr[3])) {
+			nptr += 3;
+			if (endptr)
+				*endptr = (char *)nptr;
+			return sign == '-' ? -__LIBM_MATHFUN0(@inf@)
+			                   : +__LIBM_MATHFUN0(@inf@);
+		}
+		if ((ch == 'n' || ch == 'N') &&
+		    (nptr[1] == 'a' || nptr[1] == 'A') &&
+		    (nptr[2] == 'n' || nptr[2] == 'N') &&
+		    !isalnum((unsigned char)nptr[3])) {
+			nptr += 3;
+			if (*nptr == '(') {
+				++nptr;
+				while (*nptr != ')')
+					++nptr;
+				++nptr;
+				/* XXX: Custom nan-tag? */
+			}
+			if (endptr)
+				*endptr = (char *)nptr;
+			return sign == '-' ? -__LIBM_MATHFUN1I(@nan@, NULL)
+			                   : +__LIBM_MATHFUN1I(@nan@, NULL);
+		}
 @@pp_endif@@
+		numsys = 10;
+	}
+
+	float_extension_mult = 0.0;
+next:
+	switch (ch) {
+	case 'p':
+	case 'P':
+		if (numsys == 10)
+			goto done;
+		goto flt_exp;
+
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+		digit = ch - '0';
+		break;
+
+	case 'e':
+		if (numsys == 10)
+			goto flt_exp;
+		ATTR_FALLTHROUGH
+	case 'a':
+	case 'b':
+	case 'c':
+	case 'd':
+	case 'f':
+		digit = 10 + ch - 'a';
+		break;
+
+	case 'E':
+		if (numsys == 10)
+			goto flt_exp;
+		ATTR_FALLTHROUGH
+	case 'A':
+	case 'B':
+	case 'C':
+	case 'D':
+	case 'F':
+		digit = 10 + ch - 'A';
+		break;
+
+	case '.':
+		if (float_extension_mult != 0.0)
+			goto done;
+		float_extension_mult = (double)numsys;
+		ch = *++nptr;
+		goto next;
+
+	default: {
+@@pp_if __SIZEOF_CHAR__ == 1@@
+		char const *new_nptr;
+		char32_t uni;
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+		if ((unsigned char)ch < 0x80)
+			goto done;
+@@pp_endif@@
+		new_nptr = nptr;
+		uni = @__libc_unicode_readutf8@(&new_nptr);
+		if (__libc_unicode_asdigit(uni, numsys, &digit)) {
+			nptr = new_nptr;
+		} else
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+		char16_t const *new_nptr;
+		char32_t uni;
+		new_nptr = (char16_t const *)nptr;
+		uni = @__libc_unicode_readutf16@(&new_nptr);
+		if (__libc_unicode_asdigit(uni, numsys, &digit)) {
+			nptr = new_nptr;
+		} else
+@@pp_else@@
+		if (__libc_unicode_asdigit(ch, numsys, &digit)) {
+			++nptr;
+		} else
+@@pp_endif@@
+		{
+			goto done;
+		}
+	}	break;
+
+	}
+	if unlikely(digit >= numsys)
+		goto done;
+	ch = *++nptr;
+	if (float_extension_mult != 0.0) {
+		fltval += (double)digit / float_extension_mult;
+		float_extension_mult *= numsys;
+	} else {
+		fltval = fltval * numsys + digit;
+	}
+	goto next;
+	{
+#define float_extension_pos digit
+		unsigned int float_extension_off;
+		char float_exp_mode;
+flt_exp:
+		float_exp_mode = ch;
+		float_extension_pos = 1;
+		float_extension_off = 0;
+		ch = *++nptr;
+		if (ch == '-' || ch == '+') {
+			float_extension_pos = (ch == '+');
+			ch = *++nptr;
+		}
+		while (ch >= '0' && ch <= '9') {
+			float_extension_off *= 10;
+			float_extension_off += ch - '0';
+			ch = *++nptr;
+		}
+		float_extension_mult = 1.0;
+		if (float_exp_mode == 'e' || float_exp_mode == 'E') {
+			while (float_extension_off != 0) {
+				float_extension_mult *= 10.0;
+				--float_extension_off;
+			}
+		} else {
+			while (float_extension_off != 0) {
+				float_extension_mult *= 2.0;
+				--float_extension_off;
+			}
+		}
+		if (float_extension_pos) {
+			fltval *= float_extension_mult;
+		} else {
+			fltval /= float_extension_mult;
+		}
+#undef float_extension_pos
+		/* FALLTHRU to "done" */
+	}
+done:
 	if (endptr)
-		*endptr = (char *)text_pointer;
-	return result;
+		*endptr = (char *)nptr;
+	if (sign == '-')
+		fltval = -fltval;
+	return fltval;
 }
 
-%(std)#ifdef __USE_ISOC99
-[[guard, std, leaf, export_alias("__strtof")]]
-[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<asm/crt/stdio.h>")]]
-[[impl_prefix(
-@@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSC16SCANF_HELPERS
-@@pp_else@@
-DEFINE_VSC32SCANF_HELPERS
-@@pp_endif@@
-)]]
+%(std, c, ccompat)#ifdef __USE_ISOC99
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-float strtof([[in]] char const *__restrict nptr,
-             [[out_opt]] char **endptr) {
-	float result;
-	char const *text_pointer = nptr;
-@@pp_if __SIZEOF_CHAR__ == 1@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
-	                  (void *)&text_pointer, "%f", &result))
-		result = 0.0f;
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
-	                  (void *)&text_pointer, "%f", &result))
-		result = 0.0f;
-@@pp_else@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
-	                  (void *)&text_pointer, "%f", &result))
-		result = 0.0f;
-@@pp_endif@@
-	if (endptr)
-		*endptr = (char *)text_pointer;
-	return result;
-}
-
-%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[guard, std, leaf, export_alias("__strtold")]]
-[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<asm/crt/stdio.h>")]]
-[[impl_prefix(
-@@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSC16SCANF_HELPERS
-@@pp_else@@
-DEFINE_VSC32SCANF_HELPERS
-@@pp_endif@@
-)]]
+[[std, export_alias("__strtof")]] strtof(*) %{generate(double2float("strtod"))}
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[ldouble_variant_of("strtod", ["__strtod"])]]
-__LONGDOUBLE strtold([[in]] char const *__restrict nptr,
-                     [[out_opt]] char **endptr) {
-	__LONGDOUBLE result;
-	char const *text_pointer = nptr;
-@@pp_if __SIZEOF_CHAR__ == 1@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
-	                  (void *)&text_pointer, "%Lf", &result))
-		result = 0.0L;
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
-	                  (void *)&text_pointer, "%Lf", &result))
-		result = 0.0L;
-@@pp_else@@
-	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
-	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
-	                  (void *)&text_pointer, "%Lf", &result))
-		result = 0.0L;
-@@pp_endif@@
-	if (endptr)
-		*endptr = (char *)text_pointer;
-	return result;
-}
-%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std)#endif /* __USE_ISOC99 */
+[[ldouble_variant_of("strtod", ...)]]
+[[std, export_alias("__strtold")]] strtold(*) %{generate(double2ldouble("strtod"))}
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 %(std, c, ccompat)#endif /* !__NO_FPU */
 
 
