@@ -42,43 +42,43 @@ class CParser {
 	}
 
 	@@Current filename (can be overwritten via directives)
-	public final member filename: string;
+	public final varying member filename: string;
 
 	@@Set of warnings that are currently being ignored
-	private final member ignoredWarnings: {string...} = [];
+	private member ignoredWarnings: {string...} = [];
 
 	@@When true, always extend the buffer (never clear it)
-	private final member peeking: bool = false;
+	private member peeking: bool = false;
 
 	@@The currently loaded token
-	public final member tok: string = "";
+	public final varying member tok: string = "";
 
 	@@Start of the currently loaded token (for @lc)
-	public final member tokStart: int = 0;
+	public final varying member tokStart: int = 0;
 
 	@@Mapping of defined exception IDs to their resp. name
-	public final member exceptByCode: {int: string} = Dict();
+	public final varying member exceptByCode: {int: string} = Dict();
 
 	@@Mapping of defined exception names to their resp. ID
-	public final member exceptByName: {string: int} = Dict();
+	public final varying member exceptByName: {string: int} = Dict();
 
 #define ParserBackup  Tuple
 
-	private final member fp: File | none;
-	private final member buf: Bytes = none;
-	private final member bufPos: int = 0;
-	private final member bufLen: int = 0;
+	private member fp: File | none;
+	private member buf: Bytes = none;
+	private member bufPos: int = 0;
+	private member bufLen: int = 0;
 
 	@@Starting line of @buf (1-based)
-	private final member bufStartLine: int = 1;
+	private member bufStartLine: int = 1;
 	@@Starting column of @buf (1-based)
-	private final member bufStartCol: int = 1;
+	private member bufStartCol: int = 1;
 
 	@@Stack for `#pragma GCC diagnostic push`
-	private final member ignoredWarningsStack: {{string...}...} = [];
+	private member ignoredWarningsStack: {{string...}...} = [];
 
 	@@Override for where warnings should be printed at
-	private final member warnLocationOverride: {(string, int, int)...} = [];
+	private member warnLocationOverride: {(string, int, int)...} = [];
 
 	public final function pushWarnLocationOverride(loc: (string, int, int)) {
 		warnLocationOverride.append(loc);
@@ -426,9 +426,9 @@ again:
 	}
 
 	@@Recursion counter for "{...}" pairs within an active static-if block
-	private final member staticIfRecursion: int = 0;
-	private final member staticIfDepth: int = 0;
-	private final member staticIfAllowed: bool = true;
+	private member staticIfRecursion: int = 0;
+	private member staticIfDepth: int = 0;
+	private member staticIfAllowed: bool = true;
 
 	@@Advance to the next token
 	public final function next(): string {

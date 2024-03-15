@@ -2093,14 +2093,14 @@ class CSymbolTemplate: CTypeRefTemplate {
 global CEnumClassType;
 class CNamespace {
 	this = default;
-	public final member name: string;
-	public final member symbols: {string: CSymbol | CSymbolTemplate} | none = none;
-	public final member typedefs: {string: CTypeRef | CTypeRefTemplate} | none = none;
-	public final member namespaces: {string: CNamespace} | none = none;
-	public final member structSymbols: {string: CStructType} | none = none;
-	public final member unionSymbols: {string: CStructType} | none = none;
-	public final member enumSymbols: {string: CEnumType} | none = none;
-	public final member importedNamespaces: {CNamespace...} | none = none;
+	public final varying member name: string;
+	public final varying member symbols: {string: CSymbol | CSymbolTemplate} | none = none;
+	public final varying member typedefs: {string: CTypeRef | CTypeRefTemplate} | none = none;
+	public final varying member namespaces: {string: CNamespace} | none = none;
+	public final varying member structSymbols: {string: CStructType} | none = none;
+	public final varying member unionSymbols: {string: CStructType} | none = none;
+	public final varying member enumSymbols: {string: CEnumType} | none = none;
+	public final varying member importedNamespaces: {CNamespace...} | none = none;
 
 	@@Only here so we don't need special handling when used as a @CScope
 	public property symbolValues = { get() -> none; };

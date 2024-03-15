@@ -113,9 +113,9 @@ function normalizeFilenameForLog(filename: string | Bytes): string {
 
 class Addr2line {
 
-	private final member proc: ipc.Process;
-	private final member reader: File;
-	private final member writer: File;
+	private member proc: ipc.Process;
+	private member reader: File;
+	private member writer: File;
 
 	this(config: Config, hostFile: string) {
 		local addr2lineExe = config.CROSS_PREFIX + "addr2line";

@@ -261,7 +261,7 @@ function fileMayHaveChanged(filename: string) {
 
 
 @@Selection for @Step.getRequiredFiles that refers to one file of many
-class FirstFileOf {
+final class FirstFileOf {
 	this = default;
 	public final member files: {string...};
 }
@@ -278,30 +278,30 @@ class Step {
 	operator repr() -> name;
 
 	@@The name of this step (Only for logs; no syntactical meaning)
-	final member name: string;
+	final varying member name: string;
 
 	@@> run(step: BoundStep): {Waitable...}
 	@@Execute the step and produce waitables
-	final member run: Callable;
+	final varying member run: Callable;
 
 	@@> tostr(step: BoundStep): string
 	@@Return a suitable, human-readable description for what this step does
-	final member tostr: Callable = none;
+	final varying member tostr: Callable = none;
 
 	@@Set of group options used by this step
-	final member options: {string...} = none;
+	final varying member options: {string...} = none;
 
 	@@> split(step: BoundStep): {BoundStep...}
 	@@Split this step into multiple, smaller steps
-	final member split: Callable = none;
+	final varying member split: Callable = none;
 
 	@@> getRequiredFiles(step: BoundStep): {string | FirstFileOf...}
 	@@Returns a List of required files
-	final member getRequiredFiles: Callable = none; /* in */
+	final varying member getRequiredFiles: Callable = none; /* in */
 
 	@@> getProducedFiles(step: BoundStep): {string...}
 	@@Returns a List of produced files
-	final member getProducedFiles: Callable = none; /* out */
+	final varying member getProducedFiles: Callable = none; /* out */
 
 	@@> getProducedOutputFiles(step: BoundStep): {string...}
 	@@Returns the filenames of the  primary output files, that  is
@@ -311,7 +311,7 @@ class Step {
 	@@also be produced by this build step are considered secondary
 	@@build artifacts who's timestamp will be ignored, except when
 	@@explicitly used as dependencies of other steps.
-	final member getProducedOutputFiles: Callable = none; /* out */
+	final varying member getProducedOutputFiles: Callable = none; /* out */
 
 	@@> getModifiedOutputFiles(step: BoundStep): {string...}
 	@@Returns  the names of  output files that  (may) be modified or
@@ -323,14 +323,14 @@ class Step {
 	@@      output file, that step is always executed first, allowing
 	@@      it to create the output file before steps that may modify
 	@@      it are then executed one by one.
-	final member getModifiedOutputFiles: Callable = none; /* in|out */
+	final varying member getModifiedOutputFiles: Callable = none; /* in|out */
 
 	@@> getMaybeModifiedOutputFiles(step: BoundStep): {string...}
 	@@Same  as  `getModifiedOutputFiles()',  but  the  enumerated  files  may
 	@@not  necessarily get modified when the step  is run. - Instead of using
 	@@the timestamp of the file itself, use a different file `.<name>.latest'
 	@@to keep  track of  the timestamp  when such  a file  was last  updated.
-	final member getMaybeModifiedOutputFiles: Callable = none; /* in|out */
+	final varying member getMaybeModifiedOutputFiles: Callable = none; /* in|out */
 
 
 	final function withRequiredFiles(files: {string...}): Step {
@@ -350,26 +350,26 @@ class Step {
 
 }
 
-class Group {
+final class Group {
 	this = default;
 
 	@@The name of this group (Only for logs; no syntactical meaning)
-	public final member name: string;
+	public final varying member name: string;
 
 	@@List  of  compilation steps,  which are  functions invoked
 	@@as  Callable(group:  Group, changed:  bool): {Waitable...}
 	@@The given parameter `changed' is set to true for the first
 	@@step,  as well as any step performed after a previous step
 	@@returned at least 1 Waitable Object
-	public final member steps: {Step...} = [];
+	public final varying member steps: {Step...} = [];
 
 	@@Group-specific options (for use by step callbacks)
-	public final member options: {string: Object} = Dict();
+	public final varying member options: {string: Object} = Dict();
 
 	@@The path in which this group is defined
-	public final member defPath: string = "";
+	public final varying member defPath: string = "";
 
-	public final function getDependencies(toolchain: Toolchain): {string | FirstFileOf...} {
+	public function getDependencies(toolchain: Toolchain): {string | FirstFileOf...} {
 		for (local s: steps) {
 			local bss = BoundStep(this, s, toolchain);
 			if (s.split !is none) {
@@ -382,7 +382,7 @@ class Group {
 		}
 	}
 
-	private member _wildcardEnumerationCache: {string: {string...}} = Dict();
+	private final member _wildcardEnumerationCache: {string: {string...}} = Dict();
 
 	function fixFilename(filename: string): string {
 		if (filename.startswith("/"))
@@ -498,35 +498,35 @@ class Configuration {
 
 
 @@Build configuration controller
-class Config {
+final class Config {
 	this = default;
 
 	@@The prefix that should be used by a cross-compiler  (needs
 	@@to be used in conjunction with the implementing toolchain)
-	public final member CROSS_PREFIX: string = "";
+	public final varying member CROSS_PREFIX: string = "";
 
 	@@Set to the location of where build artifacts should be placed
-	public final member BUILD_PATH: string = "build";
+	public final varying member BUILD_PATH: string = "build";
 
 	@@The default file extension for produced libraries
 #ifdef __WINDOWS__
-	public final member LIBRARY_SUFFIX: string = ".dll";
+	public final varying member LIBRARY_SUFFIX: string = ".dll";
 #else /* __WINDOWS__ */
-	public final member LIBRARY_SUFFIX: string = ".so";
+	public final varying member LIBRARY_SUFFIX: string = ".so";
 #endif /* !__WINDOWS__ */
 
 	@@Set to true if a re-build of all steps should be forced
-	public final member FORCE: bool = false;
+	public final varying member FORCE: bool = false;
 
 	@@Set to true if error messages printed by build-tools
 	@@should  be formatted into a singular, common format.
-	public final member FORMAT_ERRORS: bool = false;
+	public final varying member FORMAT_ERRORS: bool = false;
 
 	@@Enable verbose mode (print executed commands)
-	public final member VERBOSE: bool = false;
+	public final varying member VERBOSE: bool = false;
 
 	@@Extra hooks for configuration-specific compile/link overrides
-	public final member CONFIG: Configuration = none;
+	public final varying member CONFIG: Configuration = none;
 
 	@@Return the location of a some build artifact
 	final function getBuildArtifact(group: Group, srcFile: string, ext: string): string {
@@ -563,9 +563,8 @@ function tryJoinProcess(p: ipc.Process): bool {
 	return true;
 }
 
-class WaitableJoin: Waitable {
-
-	private member obj: ipc.Process | Thread | Object;
+final class WaitableJoin: Waitable {
+	private final member obj: ipc.Process | Thread | Object;
 
 	this(obj) {
 		this.obj = obj;
@@ -593,19 +592,19 @@ class WaitableJoin: Waitable {
 class Toolchain {
 	this = default;
 
-	member config: Config;
+	public final varying member config: Config;
 
 	@@Name of the toolchain (for logs; if @none, then it isn't used)
-	member name: string = none;
+	public final varying member name: string = none;
 
 	@@Storage for toolchain extension configurations (e.g. mtools)
-	member options: { string: Object } = Dict();
+	public final varying member options: { string: Object } = Dict();
 }
 
 
 
 
-class BoundStep {
+final class BoundStep {
 	this = default;
 	operator str(): string {
 		if (step.tostr !is none)
@@ -623,16 +622,16 @@ class BoundStep {
 	}
 
 	@@The bound group
-	public final member group: Group;
+	public final varying member group: Group;
 
 	@@The bound step
-	public final member step: Step;
+	public final varying member step: Step;
 
 	@@The used toolchain
-	public final member toolchain: Toolchain;
+	public final varying member toolchain: Toolchain;
 
 	@@Step-specific data
-	public final member userData: Object;
+	public final varying member userData: Object;
 
 	@@List of required input files
 	public final property requiredFiles: {string | FirstFileOf...} = {
@@ -791,7 +790,7 @@ class BoundStep {
 	}
 
 #ifdef CACHE_ALL_MODIFIED_OUTPUT_FILES
-	private final member _allModifiedOutputFiles: {(string, int | none)...};
+	private member _allModifiedOutputFiles: {(string, int | none)...};
 	public final property allModifiedOutputFiles: {(string, int | none)...} = {
 		get(): {(string, int | none)...} {
 			if (_allModifiedOutputFiles !is bound) {
@@ -910,22 +909,22 @@ class BoundStep {
 	}
 
 	@@Waitables that need to complete before this step can be finished
-	private final member _stepWaitables: {Waitable...};
+	private member _stepWaitables: {Waitable...};
 
 	@@Cache for @this.requiredFiles
-	private final member _requiredFiles: {string | FirstFileOf...};
+	private member _requiredFiles: {string | FirstFileOf...};
 
 	@@Cache for @this.producedFiles
-	private final member _producedFiles: {string...};
+	private member _producedFiles: {string...};
 
 	@@Cache for @this.producedOutputFiles
-	private final member _producedOutputFiles: {string...};
+	private member _producedOutputFiles: {string...};
 
 	@@Cache for @this.modifiedOutputFiles
-	private final member _modifiedOutputFiles: {(string, int | none)...};
+	private member _modifiedOutputFiles: {(string, int | none)...};
 
 	@@Cache for @this.maybeModifiedOutputFiles
-	private final member _maybeModifiedOutputFiles: {(string, int | none)...};
+	private member _maybeModifiedOutputFiles: {(string, int | none)...};
 
 	operator == (other) -> this === other;
 	operator != (other) -> this !== other;
@@ -1454,9 +1453,9 @@ again_search_fin_steps:
 
 
 #if 0
-class Timed {
+final class Timed {
 	this = default;
-	public member name: string = "Unnamed";
+	public final member name: string = "Unnamed";
 	private member start;
 	operator enter() {
 		start = tick();

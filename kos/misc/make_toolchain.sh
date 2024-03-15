@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix bad exception handler in `Mapping.popitem()`"
-DEEMON_VERSION="4f35e172e321c9a16e99575eeda3e5726d5bd1a5"
+#     v -- "Change semantics of `final` members in user-classes"
+DEEMON_VERSION="4bbb6065167ce0300ea4e1b1715b9e072acaab41"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
