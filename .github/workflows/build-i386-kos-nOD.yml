@@ -12,13 +12,13 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'true'
 
     - name: Restore binutils
       id: cache-binutils-i386-restore
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: |
           binutils
@@ -35,7 +35,7 @@ jobs:
     - name: Save binutils
       if: steps.cache-binutils-i386-restore.outputs.cache-hit != 'true'
       id: cache-binutils-i386-save
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: |
           binutils
@@ -52,7 +52,7 @@ jobs:
       run: bash -c "cd bin/i386-kos-nOD && tar zcvf ../../i386-kos-nOD-disk.tar.gz disk.img"
 
     - name: Save disk image as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ runner.os }}-${{ github.sha }}-disk
         if-no-files-found: ignore
