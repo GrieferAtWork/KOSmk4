@@ -638,6 +638,14 @@
 
 
 
+// <hybrid/bitset.h>
+#define __hybrid_bitset_decl(x,n) x[n]
+#define __hybrid_bitset_foreach(x,y,z) for(;;)
+#define bitset_decl(x,n) x[n]
+#define bitset_foreach(x,y,z) for(;;)
+
+
+
 // <hybrid/__assembly.h>
 #define PRIVATE_FUNCTION(sym)      ;int sym(){}
 #define INTERN_FUNCTION(sym)       ;int sym(){}

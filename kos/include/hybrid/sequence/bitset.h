@@ -23,7 +23,15 @@
 #include "../../__stdinc.h"
 #include "../__atomic.h"
 
-/* TODO: Get rid of this API and replace it with `<sys/bitstring.h>' */
+/* !!!!!!         DEPRECATED API         !!!!!! */
+/* !!!!!!         DEPRECATED API         !!!!!! */
+/* !!!!!!         DEPRECATED API         !!!!!! */
+/* !!!!!!                                !!!!!! */
+/* !!!!!! USE <hybrid/bitset.h> INSTEAD  !!!!!! */
+/* !!!!!!                                !!!!!! */
+/* !!!!!!         DEPRECATED API         !!!!!! */
+/* !!!!!!         DEPRECATED API         !!!!!! */
+/* !!!!!!         DEPRECATED API         !!!!!! */
 
 #ifdef __CC__
 
