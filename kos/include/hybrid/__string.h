@@ -40,6 +40,7 @@ __DECL_END
 #define __hybrid_bzero(dst, num_bytes)         __libc_bzero(dst, num_bytes)
 #define __hybrid_bzerow(dst, num_words)        __libc_bzerow(dst, num_words)
 #define __hybrid_bzerol(dst, num_dwords)       __libc_bzerol(dst, num_dwords)
+#include "typecore.h"
 #ifdef __UINT64_TYPE__
 #define __hybrid_memcpyq(dst, src, num_qwords) (void)__libc_memcpyq(dst, src, num_qwords)
 #define __hybrid_bzeroq(dst, num_qwords)       __libc_bzeroq(dst, num_bytes)
@@ -81,7 +82,6 @@ __DECL_END
 #ifdef __x86_64__
 __DECL_BEGIN
 extern void __movsq(unsigned long long *, unsigned long long const *, unsigned __int64);
-#undef memcpyq
 #define __hybrid_memcpyq(dst, src, num_qwords)               \
 	__movsq((unsigned long long *)(void *)(dst),             \
 	        (unsigned long long const *)(void const *)(src), \
