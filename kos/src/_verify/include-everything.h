@@ -694,12 +694,14 @@ incdir("");
 #include <hybrid/__atomic.h>
 #include <hybrid/__bit.h>
 #include <hybrid/__bitfield.h>
+#include <hybrid/__bitset.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__debug-alignment.h>
 #include <hybrid/__minmax.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/__rotate.h>
+#include <hybrid/__string.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/__va_size.h>
 #include <hybrid/__wordbits.h>
@@ -708,6 +710,7 @@ incdir("");
 #include <hybrid/altint.h>
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>
+#include <hybrid/bitset.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/compiler.h>
@@ -767,6 +770,8 @@ incdir("");
 #include <kos/bits/debugtrap.h>
 #include <kos/bits/except-compiler.h>
 #include <kos/bits/except-handler.h>
+#include <kos/bits/except-register-state-helpers.h>
+#include <kos/bits/except-register-state.h>
 #include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_info.h>

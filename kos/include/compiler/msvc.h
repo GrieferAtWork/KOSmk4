@@ -605,7 +605,9 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #define __GCC_HAS_WARNING_Wunreachable_code _xS(4702)
 #define __GCC_HAS_WARNING_Wmaybe_uninitialized _xS(4701 4703)
 #define __GCC_HAS_WARNING_Wcast_function_type _xS(4054 4152)
+#if _MSC_VER >= 1500
 #define __GCC_HAS_WARNING_MSconditional_expression_is_constant _xS(4127)
+#endif /* _MSC_VER >= 1500 */
 #define __GCC_HAS_WARNING_Wdiv_by_zero _xS(4723 4724)
 #define __GCC_HAS_WARNING_Winvalid_offsetof _xS(4597 4749 4842)
 #define __GCC_HAS_WARNING_Woverflow _xS(4056 4178 4340 4427 4756 4757)

@@ -146,10 +146,10 @@ __NOTHROW_NCX(__PRIVATE_bit_ffs)(bitstr_t const *__restrict __self, __SIZE_TYPE_
 #define bit_popcount(self, nbits)             __hybrid_bitset_popcount(self, nbits)
 
 /* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */
-#define bit_clz(self) (unsigned int)__hybrid_bitset_clz(self)
+#define bit_clz(self, nbits) (unsigned int)__hybrid_bitset_rawclz(self, nbits)
 
 /* Count-trailing-zeroes (undefined when `self' doesn't contain any set bits) */
-#define bit_ctz(self, nbits) (unsigned int)__hybrid_bitset_ctz(self, nbits)
+#define bit_ctz(self) (unsigned int)__hybrid_bitset_rawctz(self)
 #endif /* __USE_KOS */
 
 __DECL_END

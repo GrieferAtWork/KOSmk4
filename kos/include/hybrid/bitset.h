@@ -29,7 +29,7 @@ __DECL_BEGIN
 #define _BITSET_WORD_BITS       __HYBRID_BITSET_WORD_BITS        /* 8:     # of bits in a bitset_t-word */
 #define _BITSET_WORD_BMSK       __HYBRID_BITSET_WORD_BMSK        /* 7:     # of bits in a bitset_t-word minus 1 */
 #define _BITSET_WORD_SHFT       __HYBRID_BITSET_WORD_SHFT        /* 3:     log2(_BITSET_BITS) */
-#define _BITSET_BYTE(bitno)     __HYBRID_BITSET_BYTE(bitno)      /* Index of `bitno' in `bitset_t[]' */
+#define _BITSET_WORD(bitno)     __HYBRID_BITSET_WORD(bitno)      /* Index of `bitno' in `bitset_t[]' */
 #define _BITSET_MASK(bitno)     __HYBRID_BITSET_MASK(bitno)      /* Mask for `bitno' in `bitset_t[]' */
 #define BITSET_LENGTHOF(n_bits) __HYBRID_BITSET_LENGTHOF(n_bits) /* Length of `bitset_t[]' for `n_bits' bits */
 #define BITSET_SIZEOF(n_bits)   __HYBRID_BITSET_SIZEOF(n_bits)   /* Size (in bytes) of `bitset_t[]' for `n_bits' bits */
@@ -85,6 +85,30 @@ __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_ffc(bitset_t
  * its index. If no such bit exists, return some value `>= n_bits'. */
 __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_ffs(bitset_t const *self, __SIZE_TYPE__ n_bits);
 
+/* Find  the last bitno  within [0, n_bits) that  is off and return
+ * its index. If no such bit exists, return some value `>= n_bits'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_flc(bitset_t const *self, __SIZE_TYPE__ n_bits);
+
+/* Find  the last  bitno within [0,  n_bits) that is  on and return
+ * its index. If no such bit exists, return some value `>= n_bits'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_fls(bitset_t const *self, __SIZE_TYPE__ n_bits);
+
+/* Find the first bitno within [minbitno,maxbitno] that is on and return
+ * its index. If  no such  bit exists, return  some value  `> maxbitno'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_nffs(bitset_t const *self, __SIZE_TYPE__ minbitno, __SIZE_TYPE__ maxbitno);
+
+/* Find the first bitno within [minbitno,maxbitno] that is off and return
+ * its index.  If no  such bit  exists, return  some value  `> maxbitno'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_nffc(bitset_t const *self, __SIZE_TYPE__ minbitno, __SIZE_TYPE__ maxbitno);
+
+/* Find the last bitno within [minbitno,maxbitno] that is on and return
+ * its  index. If no  such bit exists,  return some value `> maxbitno'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_nfls(bitset_t const *self, __SIZE_TYPE__ minbitno, __SIZE_TYPE__ maxbitno);
+
+/* Find the last bitno within [minbitno,maxbitno] that is off and return
+ * its index. If  no such  bit exists, return  some value  `> maxbitno'. */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_nflc(bitset_t const *self, __SIZE_TYPE__ minbitno, __SIZE_TYPE__ maxbitno);
+
 /* Check if the bitset contains any 1-elements */
 __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL bitset_anyset(bitset_t const *self, __SIZE_TYPE__ n_bits);
 
@@ -103,11 +127,17 @@ __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_popcount(bit
 /* Returns the # of 1-bits within the given range */
 __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_npopcount(bitset_t const *self, __SIZE_TYPE__ minbitno, __SIZE_TYPE__ maxbitno);
 
-/* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */
-__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_clz(bitset_t const *__restrict self);
+/* Count-leading-zeroes (returns ">= n_bits" when `self' doesn't contain any set bits) */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_clz(bitset_t const *__restrict self, __SIZE_TYPE__ n_bits);
 
-/* Count-trailing-zeroes (undefined when `self' doesn't contain any set bits) */
+/* Count-trailing-zeroes (returns ">= n_bits" when `self' doesn't contain any set bits) */
 __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_ctz(bitset_t const *__restrict self, __SIZE_TYPE__ n_bits);
+
+/* Count-leading-zeroes (hard undefined behavior when `self' doesn't contain any set bits) */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_rawclz(bitset_t const *__restrict self, __SIZE_TYPE__ n_bits);
+
+/* Count-trailing-zeroes (hard undefined behavior when `self' doesn't contain any set bits) */
+__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_rawctz(bitset_t const *__restrict self);
 #else /* __INTELLISENSE__ */
 #define bitset_t                                   __hybrid_bitset_t
 #define bitset_test(self, bitno)                   __hybrid_bitset_test(self, bitno)
@@ -123,14 +153,22 @@ __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_ctz(bitset_t
 #define bitset_ffs_i(self, n_bits, p_value)        __hybrid_bitset_ffs_i(self, n_bits, p_value)
 #define bitset_ffc(self, n_bits)                   __hybrid_bitset_ffc(self, n_bits)
 #define bitset_ffs(self, n_bits)                   __hybrid_bitset_ffs(self, n_bits)
+#define bitset_flc(self, n_bits)                   __hybrid_bitset_flc(self, n_bits)
+#define bitset_fls(self, n_bits)                   __hybrid_bitset_fls(self, n_bits)
+#define bitset_nffc(self, minbitno, maxbitno)      __hybrid_bitset_nffc(self, minbitno, maxbitno)
+#define bitset_nffs(self, minbitno, maxbitno)      __hybrid_bitset_nffs(self, minbitno, maxbitno)
+#define bitset_nflc(self, minbitno, maxbitno)      __hybrid_bitset_nflc(self, minbitno, maxbitno)
+#define bitset_nfls(self, minbitno, maxbitno)      __hybrid_bitset_nfls(self, minbitno, maxbitno)
 #define bitset_anyset(self, n_bits)                __hybrid_bitset_anyset(self, n_bits)
 #define bitset_allset(self, n_bits)                __hybrid_bitset_allset(self, n_bits)
 #define bitset_nanyset(self, minbitno, maxbitno)   __hybrid_bitset_nanyset(self, minbitno, maxbitno)
 #define bitset_nallset(self, minbitno, maxbitno)   __hybrid_bitset_nallset(self, minbitno, maxbitno)
 #define bitset_popcount(self, n_bits)              __hybrid_bitset_popcount(self, n_bits)
 #define bitset_npopcount(self, minbitno, maxbitno) __hybrid_bitset_npopcount(self, minbitno, maxbitno)
-#define bitset_clz(self)                           __hybrid_bitset_clz(self)
+#define bitset_clz(self, n_bits)                   __hybrid_bitset_clz(self, n_bits)
 #define bitset_ctz(self, n_bits)                   __hybrid_bitset_ctz(self, n_bits)
+#define bitset_rawclz(self, n_bits)                __hybrid_bitset_rawclz(self, n_bits)
+#define bitset_rawctz(self)                        __hybrid_bitset_rawctz(self)
 #endif /* !__INTELLISENSE__ */
 
 /* >> size_t bitno;
@@ -141,6 +179,18 @@ __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ bitset_ctz(bitset_t
  * >> } */
 #define bitset_foreach(bitno, self, n_bits) \
 	__hybrid_bitset_foreach(bitno, self, n_bits)
+#define bitset_nforeach(bitno, self, minbitno, maxbitno) \
+	__hybrid_bitset_nforeach(bitno, self, minbitno, maxbitno)
+
+/* Atomic bitset operations. */
+#ifdef __GUARD_HYBRID___ATOMIC_H
+#define bitset_atomic_set(self, bitno)        __hybrid_bitset_atomic_set(self, bitno)
+#define bitset_atomic_clear(self, bitno)      __hybrid_bitset_atomic_clear(self, bitno)
+#define bitset_atomic_flip(self, bitno)       __hybrid_bitset_atomic_flip(self, bitno)
+#define bitset_atomic_fetchset(self, bitno)   __hybrid_bitset_atomic_fetchset(self, bitno)
+#define bitset_atomic_fetchclear(self, bitno) __hybrid_bitset_atomic_fetchclear(self, bitno)
+#define bitset_atomic_fetchflip(self, bitno)  __hybrid_bitset_atomic_fetchflip(self, bitno)
+#endif /* __GUARD_HYBRID___ATOMIC_H */
 
 __DECL_END
 #endif /* __CC__ */

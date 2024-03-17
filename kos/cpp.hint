@@ -641,8 +641,10 @@
 // <hybrid/bitset.h>
 #define __hybrid_bitset_decl(x,n) x[n]
 #define __hybrid_bitset_foreach(x,y,z) for(;;)
+#define __hybrid_bitset_nforeach(x,y,z,a) for(;;)
 #define bitset_decl(x,n) x[n]
 #define bitset_foreach(x,y,z) for(;;)
+#define bitset_nforeach(x,y,z,a) for(;;)
 
 
 

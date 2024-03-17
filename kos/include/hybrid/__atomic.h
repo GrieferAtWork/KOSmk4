@@ -1155,4 +1155,22 @@ template<class T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::__
 #define __GCC_ATOMIC_POINTER_LOCK_FREE __HYBRID_ATOMIC_LOCKFREE(__SIZEOF_POINTER__)
 #endif /* !__GCC_ATOMIC_POINTER_LOCK_FREE */
 
+/* Atomic bitset operations. */
+#ifdef __GUARD_HYBRID___BITSET_H
+#define __hybrid_bitset_atomic_set(self, bitno)        __hybrid_atomic_or(&(self)[__HYBRID_BITSET_WORD(bitno)], __HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST)
+#define __hybrid_bitset_atomic_clear(self, bitno)      __hybrid_atomic_and(&(self)[__HYBRID_BITSET_WORD(bitno)], ~__HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST)
+#define __hybrid_bitset_atomic_flip(self, bitno)       __hybrid_atomic_xor(&(self)[__HYBRID_BITSET_WORD(bitno)], __HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST)
+#define __hybrid_bitset_atomic_fetchset(self, bitno)   (__hybrid_atomic_fetchor(&(self)[__HYBRID_BITSET_WORD(bitno)], __HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST) & __HYBRID_BITSET_MASK(bitno))
+#define __hybrid_bitset_atomic_fetchclear(self, bitno) (__hybrid_atomic_fetchand(&(self)[__HYBRID_BITSET_WORD(bitno)], ~__HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST) & __HYBRID_BITSET_MASK(bitno))
+#define __hybrid_bitset_atomic_fetchflip(self, bitno)  (__hybrid_atomic_fetchxor(&(self)[__HYBRID_BITSET_WORD(bitno)], __HYBRID_BITSET_MASK(bitno), __ATOMIC_SEQ_CST) & __HYBRID_BITSET_MASK(bitno))
+#ifdef __GUARD_HYBRID_BITSET_H
+#define bitset_atomic_set(self, bitno)        __hybrid_bitset_atomic_set(self, bitno)
+#define bitset_atomic_clear(self, bitno)      __hybrid_bitset_atomic_clear(self, bitno)
+#define bitset_atomic_flip(self, bitno)       __hybrid_bitset_atomic_flip(self, bitno)
+#define bitset_atomic_fetchset(self, bitno)   __hybrid_bitset_atomic_fetchset(self, bitno)
+#define bitset_atomic_fetchclear(self, bitno) __hybrid_bitset_atomic_fetchclear(self, bitno)
+#define bitset_atomic_fetchflip(self, bitno)  __hybrid_bitset_atomic_fetchflip(self, bitno)
+#endif /* __GUARD_HYBRID_BITSET_H */
+#endif /* __GUARD_HYBRID___BITSET_H */
+
 #endif /* !__GUARD_HYBRID___ATOMIC_H */
