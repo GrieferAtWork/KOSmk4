@@ -87,7 +87,21 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
 		THROWS(E_BADALLOC);
 
 /* Helper-wrapper for `_clnknode_alloc()' that will populate the
- * link-node with `text_length'  characters copied from  `text'. */
+ * link-node with `text_length'  characters copied from  `text'.
+ *
+ * The caller must still initialize:
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops     (using `clnknode_v_*' operators)
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_btime
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_uid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_gid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_allnodes
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_nlink
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_ino
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK) */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
 _clnknode_new(struct fsuper *__restrict super,
               NCX char const *text, size_t text_length)

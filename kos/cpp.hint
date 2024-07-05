@@ -1703,6 +1703,8 @@
 #define __EXCEPT_NESTING_BEGIN_CC
 #define __EXCEPT_NESTING_END_CC
 #define PRPC_EXEC_CALLBACK_CC
+#define __LOCKOP_CC
+#define LOCKOP_CC
 
 
 

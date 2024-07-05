@@ -36,6 +36,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
 DECL_BEGIN
 
 /* Default implementation for  `flnknode_ops::lno_readlink' that may  be used  when
@@ -150,10 +156,11 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
 		THROWS(E_BADALLOC) {
 	REF struct clnknode *result;
 	result = (struct clnknode *)kmalloc(offsetof(struct clnknode, lnc_text) +
-	                                     (text_length + 1) * sizeof(char),
-	                                     GFP_NORMAL);
+	                                    (text_length + 1) * sizeof(char),
+	                                    GFP_NORMAL);
+
 	/* Initialize all common fields. */
-	_mfile_init_common(result);
+	_fnode_init_common(result);
 	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
 	result->mf_flags = (super->fs_root.mf_flags & (MFILE_F_DELETED | MFILE_F_PERSISTENT |
@@ -164,13 +171,28 @@ _clnknode_alloc(struct fsuper *__restrict super, size_t text_length)
 	result->mf_blockshift = super->fs_root.mf_blockshift;
 	result->mf_iobashift  = super->fs_root.mf_iobashift;
 	result->fn_super      = incref(super);
+	DBG_memset(&result->fn_fsdata, 0xcc, sizeof(result->fn_fsdata)); /* Unused */
 	atomic64_init(&result->mf_filesize, text_length);
 	result->lnc_text[text_length] = '\0';
 	return result;
 }
 
 /* Helper-wrapper for `_clnknode_alloc()' that will populate the
- * link-node with `text_length'  characters copied from  `text'. */
+ * link-node with `text_length'  characters copied from  `text'.
+ *
+ * The caller must still initialize:
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ops     (using `clnknode_v_*' operators)
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_btime
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_uid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_gid
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_allnodes
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_supent
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_nlink
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_ino
+ *  - return->_clnknode_lnode_ _flnknode_node_ fn_mode (with something or'd with S_IFLNK) */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct clnknode *FCALL
 _clnknode_new(struct fsuper *__restrict super,
               NCX char const *text, size_t text_length)

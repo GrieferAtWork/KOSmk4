@@ -163,7 +163,7 @@ stagedFiles.sort();
 /* Check if generate_headers.dee needs to be run */
 global final LIBC_MAGIC_SOURCE_PATH = "kos/src/libc/magic/";
 local stagedMagicSourceFiles = stagedFiles
-	.blocateall(LIBC_MAGIC_SOURCE_PATH, x -> x.substr(0, #LIBC_MAGIC_SOURCE_PATH))
+	.blocateall(LIBC_MAGIC_SOURCE_PATH, key: x -> x.substr(0, #LIBC_MAGIC_SOURCE_PATH))
 	.filter(x -> x.endswith(".c"));
 if (stagedMagicSourceFiles) {
 	checkMustRunScript(
