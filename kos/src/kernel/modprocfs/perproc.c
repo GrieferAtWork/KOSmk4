@@ -612,7 +612,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 	        pformatprinter printer_, void *arg,                                \
 	        pos_t offset_hint);                                                \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                                   \
-	writer(struct mfile *__restrict self, NCX void const *src,        \
+	writer(struct mfile *__restrict self, NCX void const *src,                 \
 	       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);           \
 	PRIVATE struct mfile_stream_ops const __##ops_symbol_name##_stream_ops = { \
 		.mso_pread  = &printnode_v_pread,                                      \
@@ -638,8 +638,7 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
 #define MKLNK(ops_symbol_name, readlink)                            \
 	INTDEF WUNUSED NONNULL((1)) size_t KCALL                        \
 	readlink(struct flnknode *__restrict self,                      \
-	         NCX /*utf-8*/ char *buf,                      \
-	         size_t bufsize)                                        \
+	         NCX /*utf-8*/ char *buf, size_t bufsize)               \
 			THROWS(E_SEGFAULT, E_IOERROR, ...);                     \
 	INTERN_CONST struct flnknode_ops const ops_symbol_name = {      \
 		.lno_node = {                                               \

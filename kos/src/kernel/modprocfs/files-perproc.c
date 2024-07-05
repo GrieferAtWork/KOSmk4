@@ -3686,7 +3686,7 @@ procfs_perproc_task_v_notify_attach(struct mfile *__restrict self)
 
 	/* Allocate the notify controller. */
 	result = (REF struct procfs_perproc_task_notify_controller *)kmalloc(sizeof(struct procfs_perproc_task_notify_controller),
-	                                                                   GFP_NORMAL);
+	                                                                     GFP_NORMAL);
 
 	/* Initialize the controller and connect it to the handle manager's add/del-hand signals. */
 	result->pfpptnc_refcnt = 1;

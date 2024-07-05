@@ -33,6 +33,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -52,6 +53,23 @@ PRIVATE byte_t _inotify_buf[offsetof(struct inotify_event, name) +
 PRIVATE struct inotify_event *inotify_read(fd_t notify_fd) {
 	ssize_t size;
 	size = read(notify_fd, inotify_buf, INOTIFY_BUFSIZE);
+	if (size == -1) {
+		EQerrno(EWOULDBLOCK);
+		return NULL;
+	}
+	ISpos(size);
+	return inotify_buf;
+}
+
+/* The kernel  is  allowed  to deliver  notify  events  asynchronously,  meaning
+ * that whenever we expect to receive an event, we have to blocking-wait for it. */
+PRIVATE struct inotify_event *inotify_read_blocking(fd_t notify_fd) {
+	ssize_t size;
+	int oflags;
+	NE(-1, (oflags = fcntl(notify_fd, F_GETFL)));
+	EQ(0, fcntl(notify_fd, F_SETFL, oflags & ~O_NONBLOCK));
+	size = read(notify_fd, inotify_buf, INOTIFY_BUFSIZE);
+	EQ(0, fcntl(notify_fd, F_SETFL, oflags));
 	if (size == -1) {
 		EQerrno(EWOULDBLOCK);
 		return NULL;
@@ -85,7 +103,7 @@ DEFINE_TEST(inotify_procfs_task) {
 	/* At this point, the IN_CREATE event should have been posted. */
 	tid           = pthread_gettid_np(pt);
 	ascii_tid_len = sprintf(ascii_tid, "%" PRIdN(__SIZEOF_PID_T__), tid);
-	ISnonnull((ev = inotify_read(notify_fd)));
+	ISnonnull((ev = inotify_read_blocking(notify_fd)));
 	EQ(wfd, ev->wd);
 	EQ(IN_CREATE | IN_ISDIR, ev->mask);
 	EQ(ascii_tid_len + 1, ev->len);
@@ -97,7 +115,7 @@ DEFINE_TEST(inotify_procfs_task) {
 	EQ(EOK, pthread_join(pt, NULL));
 
 	/* The IN_DELETE event should now be present. */
-	ISnonnull((ev = inotify_read(notify_fd)));
+	ISnonnull((ev = inotify_read_blocking(notify_fd)));
 	EQ(wfd, ev->wd);
 	EQ(IN_DELETE | IN_ISDIR, ev->mask);
 	EQ(ascii_tid_len + 1, ev->len);
