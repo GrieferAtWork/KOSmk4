@@ -3589,7 +3589,7 @@ AWREF(mfile_awref, mfile);
 
 struct procfs_perproc_task_notify_controller {
 	WEAK refcnt_t         pfpptnc_refcnt;             /* Reference counter. */
-	struct taskpid       *pfpptnc_proc;               /* [1..1][const] Process main() thread (filter for thread events). */
+	struct taskpid       *pfpptnc_proc;               /* [1..1][const] Process main() thread (filter for thread events). (not a reference because we never need to deref it) */
 	struct mfile_awref    pfpptnc_task_folder;        /* [0..1] File to which events should be posted. */
 	struct sig_completion pfpptnc_addproc_completion; /* Hook for `pidns_root.pn_addproc' */
 	struct sig_completion pfpptnc_delproc_completion; /* Hook for `pidns_root.pn_delproc' */
@@ -3635,20 +3635,22 @@ NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sig_completion_con
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sig_completion *__restrict self,
-                                                 struct sig_completion_context *__restrict context,
-                                                 struct procfs_perproc_task_notify_controller *__restrict controller,
-                                                 void *buf, size_t bufsize, uint16_t mask) {
+                                                   struct sig_completion_context *__restrict context,
+                                                   struct procfs_perproc_task_notify_controller *__restrict controller,
+                                                   void *buf, size_t bufsize, uint16_t mask) {
 	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
 	struct procfs_perproc_task_event *e = (struct procfs_perproc_task_event *)buf;
-	if (taskpid_getprocpid(tpid) != controller->pfpptnc_proc)
+	if (taskpid_getprocpid(tpid) != controller->pfpptnc_proc) {
+		sig_completion_reprime(self, true);
 		return 0; /* Thread belongs to some other process (but not ours) */
+	}
 	if (bufsize < sizeof(struct procfs_perproc_task_event))
 		return sizeof(struct procfs_perproc_task_event);
 
-	/* Load the mfile of the `/proc/[pid]/fd' directory. */
+	/* Load the mfile of the `/proc/[pid]/task' directory. */
 	e->pfppfde_file = awref_get(&controller->pfpptnc_task_folder);
 	if unlikely(e->pfppfde_file == NULL)
-		return 0; /* Special case: /fd directory was unloaded (stop monitoring) */
+		return 0; /* Special case: /task directory was unloaded (stop monitoring) */
 	e->pfppfde_mask = mask;
 	context->scc_post = &procfs_perproc_task_hand_postcompletion;
 
