@@ -530,8 +530,8 @@ file_destroy(FILE *__restrict self) {
 		atomic_write(&ex->io_refcnt, 1);
 
 		/* NOTE: Errors during this sync are ignored! */
-		file_sync(self);
-		shared_recursive_rwlock_endread(&ex->io_lock);
+		(void)file_sync(self);
+		(void)shared_recursive_rwlock_endread(&ex->io_lock);
 		refcnt = atomic_fetchdec(&ex->io_refcnt);
 		assert(refcnt != 0);
 		if (refcnt != 1)
@@ -559,7 +559,7 @@ file_destroy(FILE *__restrict self) {
 			return; /* The file was revived. */
 	} else {
 		if likely(self->if_fd >= 0)
-			sys_close(self->if_fd);
+			(void)sys_close(self->if_fd);
 	}
 	assert(!shared_recursive_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
@@ -605,10 +605,10 @@ again:
 		/* Synchronize this buffer. */
 		if (FMUSTLOCK(fp)) {
 			file_lock_write(fp);
-			file_sync(fp);
+			(void)file_sync(fp);
 			file_lock_endwrite(fp);
 		} else {
-			file_sync(fp);
+			(void)file_sync(fp);
 		}
 		decref(fp);
 		goto again;
@@ -634,11 +634,11 @@ do_flush_fp:
 		if (FMUSTLOCK(fp)) {
 			file_lock_write(fp);
 			fp->if_exdata->io_fver = version;
-			file_sync(fp);
+			(void)file_sync(fp);
 			file_lock_endwrite(fp);
 		} else {
 			fp->if_exdata->io_fver = version;
-			file_sync(fp);
+			(void)file_sync(fp);
 		}
 		all_files_read();
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
@@ -671,7 +671,7 @@ file_do_syncall_unlocked(uintptr_t version) {
 			break;
 do_flush_fp:
 		fp->if_exdata->io_fver = version;
-		file_sync(fp);
+		(void)file_sync(fp);
 		all_files_read();
 		next_fp = LIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
@@ -769,7 +769,7 @@ read_from_buffer:
 	/* The buf is empty and must be re-filled. */
 	/* First off: Flush any changes that had been made. */
 	COMPILER_BARRIER();
-	if (file_sync(self))
+	if unlikely(file_sync(self))
 		goto err;
 	if (self->if_flag & IO_LNIFTYY)
 		file_determine_isatty(self);
@@ -1021,7 +1021,9 @@ again:
 
 			/* Flush this file. */
 			COMPILER_BARRIER();
-			if ((self->if_flag & IO_ERR) || file_sync(self))
+			if unlikely(self->if_flag & IO_ERR)
+				goto err0;
+			if unlikely(file_sync(self))
 				goto err0;
 			COMPILER_BARRIER();
 			num_bytes -= bufavail;
@@ -1046,7 +1048,9 @@ again:
 		if (self->if_flag & IO_LNBUF)
 			file_sync_lnfiles();
 		COMPILER_BARRIER();
-		if ((self->if_flag & IO_ERR) || file_sync(self))
+		if unlikely(self->if_flag & IO_ERR)
+			goto err0;
+		if unlikely(file_sync(self))
 			goto err0;
 		COMPILER_BARRIER();
 		ex->io_chng = self->if_base;
@@ -1088,7 +1092,9 @@ do_writethrough:
 		if (self->if_flag & IO_LNBUF)
 			file_sync_lnfiles();
 		COMPILER_BARRIER();
-		if ((self->if_flag & IO_ERR) || file_sync(self))
+		if unlikely(self->if_flag & IO_ERR)
+			goto err0;
+		if unlikely(file_sync(self))
 			goto err0;
 		COMPILER_BARRIER();
 		ex->io_chng = self->if_base;
@@ -1192,7 +1198,9 @@ full_seek:
 
 	/* Synchronize the buffer. */
 	COMPILER_BARRIER();
-	if ((self->if_flag & IO_ERR) || file_sync(self))
+	if unlikely(self->if_flag & IO_ERR)
+		goto err0;
+	if unlikely(file_sync(self))
 		goto err0;
 	COMPILER_BARRIER();
 	ex->io_chng = self->if_base;
@@ -1248,7 +1256,7 @@ read_from_buffer:
 	/* The buffer is empty and must be re-filled. */
 	/* First off: Flush any changes that had been made. */
 	COMPILER_BARRIER();
-	if unlikely(file_sync(self) != 0)
+	if unlikely(file_sync(self))
 		goto err0;
 	COMPILER_BARRIER();
 	ex->io_chng = self->if_base;
@@ -1736,7 +1744,7 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 		(void)libc_seterrno(EPERM);
 		return NULL;
 	}
-	if (file_sync(self))
+	if unlikely(file_sync(self))
 		return NULL;
 	if (LIST_ISBOUND(self, if_exdata->io_lnch))
 		changed_linebuffered_remove(self);
@@ -1766,17 +1774,17 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 
 
 
-PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit") void LIBCCALL
-file_sync_std_stream(FILE *__restrict stream) {
+PRIVATE ATTR_SECTION(".text.crt.application.exit") void LIBCCALL
+file_sync_std_stream(FILE *stream) {
 	if unlikely(!stream)
 		return;
 	stream = file_fromuser(stream);
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
-		file_sync(stream);
+		(void)file_sync(stream);
 		file_lock_endwrite(stream);
 	} else {
-		file_sync(stream);
+		(void)file_sync(stream);
 	}
 }
 
@@ -1786,7 +1794,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") int
 NOTHROW_CB_NCX(LIBCCALL libc__flushall)(void)
 /*[[[body:libc__flushall]]]*/
 {
-	/* All all streams opened by the user. */
+	/* Flush all streams opened by the user. */
 	file_syncall_locked();
 
 	/* Flush active std-streams. */
@@ -1806,9 +1814,9 @@ NOTHROW_CB_NCX(LIBCCALL libc_flushall_unlocked)(void)
 	file_syncall_unlocked();
 
 	/* Flush the active STD streams. */
-	file_sync(file_fromuser(stdin));
-	file_sync(file_fromuser(stdout));
-	file_sync(file_fromuser(stderr));
+	(void)file_sync(file_fromuser(stdin));
+	(void)file_sync(file_fromuser(stdout));
+	(void)file_sync(file_fromuser(stderr));
 	return 0;
 }
 /*[[[end:libc_flushall_unlocked]]]*/
@@ -2740,7 +2748,7 @@ NOTHROW_NCX(LIBCCALL libc__IO_unbuffer_all)(void) {
 	FILE *fp;
 	all_files_read();
 	LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
-		setvbuf(file_touser(fp), NULL, _IONBF, 0);
+		(void)setvbuf(file_touser(fp), NULL, _IONBF, 0);
 	}
 	all_files_endread();
 }
@@ -3301,7 +3309,7 @@ NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -3329,7 +3337,7 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -3742,15 +3750,15 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 
 		/* Override file descriptors. */
 		if (child_override_fdvl != child_override_fdno)
-			sys_dup2(child_override_fdvl, child_override_fdno);
+			(void)sys_dup2(child_override_fdvl, child_override_fdno);
 
 		/* Don't keep the parent-process pipe end open.
 		 * Note that when `O_CLOEXEC' was set, the exec
 		 * below will automatically close the file! */
 		if (!(oflags & O_CLOEXEC)) {
-			sys_close(result->if_fd);
+			(void)sys_close(result->if_fd);
 			if (child_override_fdvl != child_override_fdno)
-				sys_close(child_override_fdvl);
+				(void)sys_close(child_override_fdvl);
 		}
 
 		/* Run another program. */
@@ -3774,8 +3782,8 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 
 	/* Check if vfork() may have failed. */
 	if unlikely(cpid == -1) {
-		sys_close(pipefds[0]);
-		sys_close(pipefds[1]);
+		(void)sys_close(pipefds[0]);
+		(void)sys_close(pipefds[1]);
 		goto err_r;
 	}
 
@@ -3857,7 +3865,7 @@ NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
 	 * will  cause that operation to be interrupted and indicate EOF (by
 	 * read(2) or write(2) returning `0'). */
 	if (stream->if_fd >= 0) {
-		sys_close(stream->if_fd);
+		(void)sys_close(stream->if_fd);
 		stream->if_fd = -1; /* Don't try to close again in `file_destroy()' */
 	}
 
@@ -4144,7 +4152,7 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 	stream->if_flag = IO_LNIFTYY | IO_RW | (stream->if_flag & IO_NOLOCK);
 	if (FMUSTLOCK(stream))
 		file_lock_endwrite(stream);
-	sys_close(oldfd);
+	(void)sys_close(oldfd);
 	stream = file_touser(stream);
 done:
 	return stream;
@@ -4175,7 +4183,7 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
 	}
 	stream->if_fd   = fd;
 	stream->if_flag = IO_LNIFTYY | IO_RW;
-	sys_close(oldfd);
+	(void)sys_close(oldfd);
 	stream = file_touser(stream);
 done:
 	return stream;
@@ -4210,7 +4218,7 @@ NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -4244,7 +4252,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -4272,7 +4280,7 @@ NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -4300,7 +4308,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 	if likely(result) {
 		result = file_touser(result);
 	} else {
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }

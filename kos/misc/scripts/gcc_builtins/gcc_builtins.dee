@@ -660,7 +660,7 @@ local knownBuiltins;
 with (local res = File.open("../../../include/compiler/gcc-builtins.h", "w"))
 	knownBuiltins = generateAllVersionsFeatureHistory(res);
 knownBuiltins = List(knownBuiltins);
-knownBuiltins.sort(GCCBuiltin.name);
+knownBuiltins.sort(key: GCCBuiltin.name);
 with (local res = File.open("gcc_builtins_known", "w")) {
 	for (local x: knownBuiltins) {
 		res << x.name << ":" << x.usesLibc << "\n";

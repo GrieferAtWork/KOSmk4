@@ -231,7 +231,7 @@ function sortPPBranch(b: Object) {
 	if (b is PPBranchNot) {
 		sortPPBranch(b.branch);
 	} else if (b is PPBranchAnd || b is PPBranchOr) {
-		b.conditions.sort(x -> str(x));
+		b.conditions.sort(key: x -> str(x));
 		for (local i: b.conditions)
 			sortPPBranch(i);
 	}

@@ -3201,6 +3201,38 @@ done_add_finalizer:
 		result = (void *)DlModule_ElfGetLocalSymbol(self, name, &elf_hash, &gnu_hash);
 	}	break;
 
+	case DLAUXCTRL_ELF_SYMADDR: {
+		NCX ElfW(Sym) const *symbol;
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
+		symbol = va_arg(args, NCX ElfW(Sym) const *);
+		if (symbol == NULL || symbol->st_shndx == SHN_UNDEF) {
+			result = NULL;
+		} else {
+			result = (void *)symbol->st_value;
+			if (ELFW(ST_TYPE)(symbol->st_info) == STT_TLS) {
+				void *tlsbase;
+				tlsbase = libdl_dltlsaddr(self);
+				if unlikely(!tlsbase)
+					goto err;
+				result = (void *)((ElfW(Addr))result + (ElfW(Addr))tlsbase);
+			} else {
+				if (symbol->st_shndx != SHN_ABS)
+					result = (void *)((ElfW(Addr))result + self->dm_loadaddr);
+				if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
+				    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA) {
+					TRY {
+						result = (void *)((*(ElfW(Addr)(*)(void))(void *)result)());
+					} EXCEPT {
+						va_end(args);
+						RETHROW();
+					}
+				}
+			}
+		}
+	}	break;
+
 	default:
 		/* Allow extensions to implement their own auxiliary control commands. */
 		if (self->dm_ops && self->dm_ops->df_dlauxctrl) {

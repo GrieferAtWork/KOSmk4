@@ -58,20 +58,28 @@
 #endif /* !__PREPROCESSOR_HAVE_STR */
 
 #ifdef __PREPROCESSOR_HAVE_CAT
-#define __PP_PRIVATE_CAT2(a, b)       a##b
-#define __PP_PRIVATE_CAT3(a, b, c)    a##b##c
-#define __PP_PRIVATE_CAT4(a, b, c, d) a##b##c##d
-#define __PP_CAT2(a, b)               __PP_PRIVATE_CAT2(a, b)
-#define __PP_CAT3(a, b, c)            __PP_PRIVATE_CAT3(a, b, c)
-#define __PP_CAT4(a, b, c, d)         __PP_PRIVATE_CAT4(a, b, c, d)
+#define __PP_PRIVATE_CAT2(a, b)             a##b
+#define __PP_PRIVATE_CAT3(a, b, c)          a##b##c
+#define __PP_PRIVATE_CAT4(a, b, c, d)       a##b##c##d
+#define __PP_PRIVATE_CAT5(a, b, c, d, e)    a##b##c##d##e
+#define __PP_PRIVATE_CAT6(a, b, c, d, e, f) a##b##c##d##e##f
+#define __PP_CAT2(a, b)                     __PP_PRIVATE_CAT2(a, b)
+#define __PP_CAT3(a, b, c)                  __PP_PRIVATE_CAT3(a, b, c)
+#define __PP_CAT4(a, b, c, d)               __PP_PRIVATE_CAT4(a, b, c, d)
+#define __PP_CAT5(a, b, c, d, e)            __PP_PRIVATE_CAT5(a, b, c, d, e)
+#define __PP_CAT6(a, b, c, d, e, f)         __PP_PRIVATE_CAT6(a, b, c, d, e, f)
 #else /* __PREPROCESSOR_HAVE_CAT */
 /* clang-format off */
-#define __PP_PRIVATE_CAT2(a, b)       a/**/b
-#define __PP_PRIVATE_CAT3(a, b, c)    a/**/b/**/c
-#define __PP_PRIVATE_CAT4(a, b, c, d) a/**/b/**/c/**/d
-#define __PP_CAT2(a, b)               a/**/b
-#define __PP_CAT3(a, b, c)            a/**/b/**/c
-#define __PP_CAT4(a, b, c, d)         a/**/b/**/c/**/d
+#define __PP_PRIVATE_CAT2(a, b)             a/**/b
+#define __PP_PRIVATE_CAT3(a, b, c)          a/**/b/**/c
+#define __PP_PRIVATE_CAT4(a, b, c, d)       a/**/b/**/c/**/d
+#define __PP_PRIVATE_CAT5(a, b, c, d, e)    a/**/b/**/c/**/d/**/e
+#define __PP_PRIVATE_CAT6(a, b, c, d, e, f) a/**/b/**/c/**/d/**/e/**/f
+#define __PP_CAT2(a, b)                     a/**/b
+#define __PP_CAT3(a, b, c)                  a/**/b/**/c
+#define __PP_CAT4(a, b, c, d)               a/**/b/**/c/**/d
+#define __PP_CAT5(a, b, c, d, e)            a/**/b/**/c/**/d/**/e
+#define __PP_CAT5(a, b, c, d, e, f)         a/**/b/**/c/**/d/**/e/**/f
 /* clang-format on */
 #endif /* !__PREPROCESSOR_HAVE_CAT */
 

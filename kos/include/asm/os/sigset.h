@@ -51,7 +51,7 @@
  *    such unknown signal is a no-op (iow: the signal will appear
  *    as though it is still blocked after the operation)
  *    - When a userprocmask is being used, bits relating to unknown
- *      signals are never modified by the kernel.
+ *      signals are  ignored  and  never modified  by  the  kernel.
  */
 #if defined(__KOS__) && defined(__KERNEL__)
 #define __SIZEOF_SIGSET_T__ 8 /* 64/8  (s.a. `NSIG') */

@@ -554,7 +554,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     If so, use that  header to create  a faux section  object that is  returned
 	 *     when requesting ".eh_frame_hdr"
 	 *   - The .eh_frame_hdr section isn't being processed / parsed. Note that
-	 *     it  is auxiliarly to  .eh_frame, but differs in  that it contains a
+	 *     it  is auxiliary  to .eh_frame, but  differs in that  it contains a
 	 *     lookup-table like:
 	 *         >> [{ pc_min: pointer, pc_max: pointer, eh_frame_data: pointer }...]
 	 *     I  couldn't find documentation on the actual format, but Glibc has

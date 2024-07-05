@@ -359,7 +359,7 @@ for (local tab: nl_cat.values) {
 // Sorted referenced byte-blobs by length (descendingly)
 function sortByLength(x) {
 	x = x.sorted();
-	x.sort(x -> -#x);
+	x.sort(key: x -> -#x);
 	return x;
 }
 knownBytesLe = sortByLength(knownBytesLe);

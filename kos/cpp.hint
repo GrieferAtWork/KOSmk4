@@ -1443,27 +1443,35 @@
 #define __daddr_t          daddr_t
 #define __caddr_t          caddr_t
 #define __qaddr_t          qaddr_t
+#define __off_t            off_t
 #define __off32_t          off32_t
 #define __off64_t          off64_t
+#define __blkcnt_t         blkcnt_t
 #define __blkcnt32_t       blkcnt32_t
 #define __blkcnt64_t       blkcnt64_t
+#define __fsblkcnt_t       fsblkcnt_t
 #define __fsblkcnt32_t     fsblkcnt32_t
 #define __fsblkcnt64_t     fsblkcnt64_t
+#define __fsfilcnt_t       fsfilcnt_t
 #define __fsfilcnt32_t     fsfilcnt32_t
 #define __fsfilcnt64_t     fsfilcnt64_t
+#define __ino_t            ino_t
 #define __ino32_t          ino32_t
 #define __ino64_t          ino64_t
+#define __pos_t            pos_t
 #define __pos32_t          pos32_t
 #define __pos64_t          pos64_t
 #define __loff_t           loff_t
 #define __lpos_t           lpos_t
 #define __socklen_t        socklen_t
 #define __ssocklen_t       ssocklen_t
+#define __rlim_t           rlim_t
 #define __rlim32_t         rlim32_t
 #define __rlim64_t         rlim64_t
 #define __blksize_t        blksize_t
 #define __nlink_t          nlink_t
 #define __fsid_t           fsid_t
+#define __time_t           time_t
 #define __time32_t         time32_t
 #define __time64_t         time64_t
 #define __clock_t          clock_t
@@ -1480,11 +1488,221 @@
 #define __sighandler_t     sighandler_t
 #define __sa_family_t      sa_family_t
 #define __port_t           port_t
+
+
+
+// <bits/[...].h>
 #define __WAIT_STATUS      union wait *
 #define __mbstate          mbstate_t
 #define __wctype_t         wctype_t
 #define __wctrans_t        wctrans_t
 #define __shift_t          shift_t
+#define __except_handler_t except_handler_t
+#define __EXCEPT_HANDLER_CC
+#define __EXCEPT_REGISTER_STATE_TYPE except_register_state_t
+#define __except_code_t    except_code_t
+#define __except_class_t   except_class_t
+#define __except_subclass_t except_subclass_t
+#define __postlockop_callback_t postlockop_callback_t
+#define __obpostlockop_callback_t obpostlockop_callback_t
+#define __lockop_callback_t lockop_callback_t
+#define __oblockop_callback_t oblockop_callback_t
+#define __rtm_status_t     rtm_status_t
+#define __shared_lock_timespec struct timespec const *
+#define __shared_rwlock_timespec struct timespec const *
+#define __shared_recursive_lock_tid_t __hybrid_tid_t
+#define __shared_recursive_rwlock_tid_t __hybrid_tid_t
+#define __USERKERN_PAD_PID(x)
+#define __USERKERN_PAD_UID(x)
+#define __USERKERN_PAD_GID(x)
+#define __uuid_t           uuid_t
+#define __sigset_struct    sigset_t
+#define __timespec         timespec
+#define __timespec32       timespec32
+#define __timespec64       timespec64
+#define timespecx64        timespec64
+#define __timespecx64      timespec64
+#define timespecx32_64     timespec64
+#define __timespecx32_64   timespec64
+#define __timespec_alt     timespec64
+#define __itimerspec       itimerspec
+#define __itimerspec32     itimerspec32
+#define __itimerspec64     itimerspec64
+#define itimerspecx64      itimerspec64
+#define __itimerspecx64    itimerspec64
+#define itimerspecx32_64   itimerspec64
+#define __itimerspecx32_64 itimerspec64
+#define __itimerspec_alt   itimerspec64
+#define __timeval          timeval
+#define __timeval32        timeval32
+#define __timeval64        timeval64
+#define timevalx64         timeval64
+#define __timevalx64       timeval64
+#define timevalx32_64      timeval64
+#define __timevalx32_64    timeval64
+#define __timeval_alt      timeval64
+#define __itimerval        itimerval
+#define __itimerval32      itimerval32
+#define __itimerval64      itimerval64
+#define itimervalx64       itimerval64
+#define __itimervalx64     itimerval64
+#define itimervalx32_64    itimerval64
+#define __itimervalx32_64  itimerval64
+#define __itimerval_alt    itimerval64
+#define __mqd_t            mqd_t
+#define __stat             stat
+#define __stat32           stat32
+#define __stat64           stat64
+#define __cpu_set_struct   cpu_set_t
+#define __dirent           dirent
+#define __dirent32         dirent32
+#define __dirent64         dirent64
+#define __flock            flock
+#define __flock32          flock32
+#define __flock64          flock64
+#define flockx64           flock64
+#define __flockx64         flock64
+#define flockx32_64        flock64
+#define __flockx32_64      flock64
+#define __flock_alt        flock64
+#define __rlimit           rlimit
+#define __rlimit32         rlimit32
+#define __rlimit64         rlimit64
+#define rlimitx64          rlimit64
+#define __rlimitx64        rlimit64
+#define rlimitx32_64       rlimit64
+#define __rlimitx32_64     rlimit64
+#define __rlimit_alt       rlimit64
+#define __rusage           rusage
+#define __rusage32         rusage32
+#define __rusage64         rusage64
+#define rusagex64          rusage64
+#define __rusagex64        rusage64
+#define rusagex32_64       rusage64
+#define __rusagex32_64     rusage64
+#define __rusage_alt       rusage64
+#define __sigaction_sa_sigaction_t sigaction_sa_sigaction_t
+#define __sigaction_sa_restorer_t sigaction_sa_restorer_t
+#define __sigaction_sa_handler_t sighandler_t
+#define __sighandler_t     sighandler_t
+#define __pthread_attr     pthread_attr_t
+#define __siginfo_struct   siginfo_t
+#define __statfs           statfs
+#define __statfs32         statfs32
+#define __statfs64         statfs64
+#define statfsx64          statfs64
+#define __statfsx64        statfs64
+#define statfsx32_64       statfs64
+#define __statfsx32_64     statfs64
+#define __statfs_alt       statfs64
+#define __statvfs          statvfs
+#define __statvfs32        statvfs32
+#define __statvfs64        statvfs64
+#define __timeb            timeb
+#define __timeb32          timeb32
+#define __timeb64          timeb64
+#define timebx64           timeb64
+#define __timebx64         timeb64
+#define timebx32_64        timeb64
+#define __timebx32_64      timeb64
+#define __timeb_alt        timeb64
+#define __timex            timex
+#define __timex32          timex32
+#define __timex64          timex64
+#define __utimbuf          utimbuf
+#define __utimbuf32        utimbuf32
+#define __utimbuf64        utimbuf64
+#define utimbufx64         utimbuf64
+#define __utimbufx64       utimbuf64
+#define utimbufx32_64      utimbuf64
+#define __utimbufx32_64    utimbuf64
+#define __utimbuf_alt      utimbuf64
+#define __aiocb            aiocb
+#define __aiocb32          aiocb32
+#define __aiocb64          aiocb64
+#define __div_struct       div_t
+#define __ldiv_struct      ldiv_t
+#define __lldiv_struct     lldiv_t
+#define __fexcept_t        fexcept_t
+#define __fenv_struct      fenv_t
+#define __pformatprinter   pformatprinter
+#define __pformatgetc      pformatgetc
+#define __pformatungetc    pformatungetc
+#define __pwformatprinter  pwformatprinter
+#define __pc16formatprinter pc16formatprinter
+#define __pc32formatprinter pc32formatprinter
+#define _ftsent            ftsent
+#define __ftsent           ftsent
+#define _ftsent32          ftsent32
+#define __ftsent32         ftsent32
+#define _ftsent64          ftsent64
+#define __ftsent64         ftsent64
+#define __fts              fts
+#define __fts32            fts32
+#define __fts64            fts64
+#define __FTW              FTW
+#define __glob_struct      glob_t
+#define __glob_struct32    glob32_t
+#define __glob_struct64    glob64_t
+#define __IO_FILE          FILE
+#define __locale_struct    locale_t
+#define __ntptimeval       ntptimeval
+#define __ntptimeval32     ntptimeval32
+#define __ntptimeval64     ntptimeval64
+#define __posix_spawnattr  posix_spawnattr_t
+#define __posix_spawn_file_actions posix_spawn_file_actions_t
+#define __pthread_key_t    pthread_key_t
+#define __pthread_once_t   pthread_once_t
+#define __pthread_t        pthread_t
+#define __pthread_attr     pthread_attr_t
+#define __pthread_attr_s   pthread_attr_t
+#define __pthread_attr_t   pthread_attr_t
+#define __pthread_mutexattr pthread_mutexattr_t
+#define __pthread_mutexattr_s pthread_mutexattr_t
+#define __pthread_mutexattr_t pthread_mutexattr_t
+#define __pthread_mutex    pthread_mutex_t
+#define __pthread_mutex_s  pthread_mutex_t
+#define __pthread_mutex_t  pthread_mutex_t
+#define __pthread_condattr pthread_condattr_t
+#define __pthread_condattr_s pthread_condattr_t
+#define __pthread_condattr_t pthread_condattr_t
+#define __pthread_cond     pthread_cond_t
+#define __pthread_cond_s   pthread_cond_t
+#define __pthread_cond_t   pthread_cond_t
+#define __pthread_rwlockattr pthread_rwlockattr_t
+#define __pthread_rwlockattr_s pthread_rwlockattr_t
+#define __pthread_rwlockattr_t pthread_rwlockattr_t
+#define __pthread_rwlock   pthread_rwlock_t
+#define __pthread_rwlock_s pthread_rwlock_t
+#define __pthread_rwlock_t pthread_rwlock_t
+#define __pthread_barrierattr pthread_barrierattr_t
+#define __pthread_barrierattr_s pthread_barrierattr_t
+#define __pthread_barrierattr_t pthread_barrierattr_t
+#define __pthread_barrier  pthread_barrier_t
+#define __pthread_barrier_s pthread_barrier_t
+#define __pthread_barrier_t pthread_barrier_t
+#define __reg_syntax_t     reg_syntax_t
+#define __regoff_t         regoff_t
+#define __re_registers     re_registers
+#define __regmatch         regmatch_t
+#define __sem_t            sem_t
+#define __fpos_t           pos_t
+#define __fpos32_t         pos32_t
+#define __fpos64_t         pos64_t
+#define __tss_t            tss_t
+#define __thrd_t           thrd_t
+#define __once_flag        once_flag
+#define __mtx_t            mtx_t
+#define __cnd_t            cnd_t
+#define __wordexp_struct   wordexp_t
+#define __fd_mask          fd_mask
+#define __fd_set_struct    fd_set
+#define __EXCEPT_UNWIND_CC
+#define __EXCEPT_THROW_CC
+#define __EXCEPT_THROWN_CC
+#define __EXCEPT_NESTING_BEGIN_CC
+#define __EXCEPT_NESTING_END_CC
+#define PRPC_EXEC_CALLBACK_CC
 
 
 
@@ -2537,7 +2755,7 @@
 #define FOREACH_PAGING_FUNCTION(c) c(pagedir_init);c(pagedir_fini);c(pagedir_prepareone);c(pagedir_prepare);c(pagedir_unprepareone);c(pagedir_unprepare);c(pagedir_maphintone);c(pagedir_maphint);c(pagedir_gethint);c(pagedir_mapone);c(pagedir_map);c(pagedir_push_mapone);c(pagedir_pop_mapone);c(pagedir_unmapone);c(pagedir_unmap);c(pagedir_denywriteone);c(pagedir_denywrite);c(pagedir_unmap_userspace);c(pagedir_unmap_userspace_nosync);c(pagedir_translate);c(pagedir_ismapped);c(pagedir_iswritable);c(pagedir_isuseraccessible);c(pagedir_isuserwritable);c(pagedir_haschanged);c(pagedir_unsetchanged);
 #define DEFINE_PUBLIC_ALIAS_PAGING_P32(n) int n(){}
 #define DEFINE_PUBLIC_ALIAS_PAGING_PAE(n) int n(){}
-#define DEFINE_DISKRULE(devdiskrule_name,n,ino,symbol_byname,symbol_toname,h) struct blkdev*symbol_byname(struct devdiskruledir*self,struct flookup_info*info);ssize_t symbol_toname(struct devdiskruledir*self,__pformatprinter printer,void*arg,struct blkdev*dev,uintptr_t variant);struct devdiskruledir _dir_##devdiskrule_name={};struct devdiskrule devdiskrule_name={}
+#define DEFINE_DISKRULE(devdiskrule_name,n,ino,symbol_byname,symbol_toname,h) struct blkdev*symbol_byname(struct devdiskruledir*self,struct flookup_info*info);ssize_t symbol_toname(struct devdiskruledir*self,pformatprinter printer,void*arg,struct blkdev*dev,uintptr_t variant);struct devdiskruledir _dir_##devdiskrule_name={};struct devdiskrule devdiskrule_name={}
 #define DEFINE_PH_SLAB_MALLOC_FUNCTIONS(sz,_) void*ph_slab_malloc##sz(gfp_t flags);
 #define DEFINE_PH_SLAB_MALLOC_FUNCTIONS_IMPL(sz,_) void*ph_slab_malloc##sz(gfp_t flags){}
 #define DEFINE_PH_SLAB_KMALLOC_FUNCTIONS(sz,_) void*ph_slab_kmalloc##sz(gfp_t flags);void*ph_slab_kmalloc_nx##sz(gfp_t flags);

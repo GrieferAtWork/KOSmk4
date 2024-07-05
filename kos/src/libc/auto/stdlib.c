@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90d30630 */
+/* HASH CRC-32:0x7a73f598 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3413,8 +3413,7 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 	libc_execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
 	libc_execl("/bin/csh", "csh", arg__c, command, (char *)NULL);
 	libc_execl("/bin/bash", "bash", arg__c, command, (char *)NULL);
-	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
-	return -1;
+	return libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

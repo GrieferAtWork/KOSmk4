@@ -27,7 +27,19 @@
 #include <hybrid/__bitset.h>
 #include <libc/stdlib.h>
 
-#define _bit_byte(bitno) __HYBRID_BITSET_BYTE(bitno) /* bitno / 8 */
+/*
+ * !!! NOTE
+ *
+ * Even though this header *does* define a couple of `__USE_KOS' extensions,
+ * these  are only here for the sake of legacy support. If you *truely* wish
+ * to target KOS (or maybe even the fully portable "hybrid" API), you should
+ * instead make use of <hybrid/bitset.h>
+ *
+ * !!! ----
+ */
+
+
+#define _bit_byte(bitno) __HYBRID_BITSET_WORD(bitno) /* bitno / 8 */
 #define _bit_mask(bitno) __HYBRID_BITSET_MASK(bitno) /* 1 << (bitno % 8) */
 
 /* Return the # of bytes needed to represent `nbits' bits */
@@ -38,6 +50,7 @@ __DECL_BEGIN
 
 typedef __hybrid_bitset_t bitstr_t;
 
+#ifdef ____libc_calloc_defined
 /* Allocate  a  zero-initialized   bitstring  on  the   heap.
  * If the allocation fails, then this function returns `NULL' */
 #ifdef __INTELLISENSE__
@@ -45,6 +58,7 @@ __ATTR_MALLOC __ATTR_WUNUSED bitstr_t *(bit_alloc)(int nbits);
 #else /* __INTELLISENSE__ */
 #define bit_alloc(nbits) (bitstr_t *)__libc_calloc((__size_t)bitstr_size(nbits), sizeof(bitstr_t))
 #endif /* !__INTELLISENSE__ */
+#endif /* ____libc_calloc_defined */
 
 /* Declare a bitstring  variable `self'  that can  hold at  least `nbits'  bits:
  * >> bitstr_t bit_decl(mybitstr, 42); // `mybitstr' can hold at least `42' bits */
@@ -107,8 +121,8 @@ __ATTR_NONNULL((1)) void (bit_nclear)(bitstr_t *__restrict self, int minbitno, i
  *       function still guaranties that nothing but `self' gets modified. */
 __ATTR_NONNULL((1)) void (bit_nset)(bitstr_t *__restrict self, int minbitno, int maxbitno);
 #else /* __INTELLISENSE__ */
-#define bit_nclear(self, minbitno, maxbitno) __hybrid_bitset_nclear(self, minbitno, maxbitno)
-#define bit_nset(self, minbitno, maxbitno)   __hybrid_bitset_nset(self, minbitno, maxbitno)
+#define bit_nclear(self, minbitno, maxbitno) __hybrid_bitset_nclear(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
+#define bit_nset(self, minbitno, maxbitno)   __hybrid_bitset_nset(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __INTELLISENSE__
@@ -142,7 +156,7 @@ __NOTHROW_NCX(__PRIVATE_bit_ffs)(bitstr_t const *__restrict __self, __SIZE_TYPE_
 #define bit_noneset(self, nbits)              (!bit_anyset(self, nbits))
 #define bit_anyset(self, nbits)               __hybrid_bitset_anyset(self, nbits)
 #define bit_allset(self, nbits)               __hybrid_bitset_allset(self, nbits)
-#define bit_nanyset(self, minbitno, maxbitno) __hybrid_bitset_nanyset(self, minbitno, maxbitno)
+#define bit_nanyset(self, minbitno, maxbitno) __hybrid_bitset_nanyset(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
 #define bit_popcount(self, nbits)             __hybrid_bitset_popcount(self, nbits)
 
 /* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */

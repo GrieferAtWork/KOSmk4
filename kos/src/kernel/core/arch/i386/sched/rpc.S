@@ -71,18 +71,17 @@ INTERN_FUNCTION(x86_task_asyncrpc_restore)
 	.cfi_startproc simple
 	.cfi_signal_frame
 /*[[[cfi{register='%cfa'}
-	push   %Psp                        # `(struct rpc_context *)%Psp'
-	add    $SIZEOF_POINTER             # `&((struct rpc_context *)%Psp)->rc_state'
-	deref                              # `((struct rpc_context *)%Psp)->rc_state'
-	add    $OFFSET_ICPUSTATE_IRREGS    # `&((struct rpc_context *)%Psp)->rc_state->ics_irregs'
+	push   %Psp            # `(struct rpc_context *)%Psp'
+	add    $SIZEOF_POINTER # `&((struct rpc_context *)%Psp)->rc_state'
+	deref                  # `((struct rpc_context *)%Psp)->rc_state'
 ]]]*/
 #ifdef __x86_64__
-	.cfi_escape 15,7,119,0,35,8,6,35,120
+	.cfi_escape 15,5,119,0,35,8,6
 #else /* __x86_64__ */
-	.cfi_escape 15,7,116,0,35,4,6,35,44
+	.cfi_escape 15,5,116,0,35,4,6
 #endif /* !__x86_64__ */
 /*[[[end]]]*/
-	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(-OFFSET_ICPUSTATE_IRREGS)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 
 	/* Load the return-icpustate into `%Psp' */
 	movP   rpc_context__rc_state(%Psp), %Psp

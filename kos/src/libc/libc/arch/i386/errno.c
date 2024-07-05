@@ -82,15 +82,9 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 	g_errno_sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, "errno");
 	if (g_errno_sym == NULL || g_errno_sym->st_shndx == SHN_UNDEF)
 		g_errno_sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, "_errno");
-	if (g_errno_sym == NULL || g_errno_sym->st_shndx == SHN_UNDEF) {
+	g_errno = (errno_t *)dlauxctrl(mainapp, DLAUXCTRL_ELF_SYMADDR, g_errno_sym);
+	if (g_errno == NULL)
 		g_errno = &nontls_errno_fallback;
-	} else {
-		ElfW(Addr) g_errno_addr;
-		g_errno_addr = g_errno_sym->st_value;
-		if (g_errno_sym->st_shndx != SHN_ABS)
-			g_errno_addr += (uintptr_t)dlmodulebase(mainapp);
-		g_errno = (errno_t *)g_errno_addr;
-	}
 
 	/* Re-write the implementation of some functions:
 	 * >> libc_errno_p:

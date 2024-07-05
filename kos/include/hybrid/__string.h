@@ -26,24 +26,45 @@
 #ifdef __INTELLISENSE__
 #include "typecore.h"
 __DECL_BEGIN
-void __hybrid_memcpy(void *__dst, void const *__src, __SIZE_TYPE__ __num_bytes);
+void __hybrid_memmove(void *__dst, void const *__src, __SIZE_TYPE__ __num_bytes);
+void __hybrid_memmoveup(void *__dst, void const *__src, __SIZE_TYPE__ __num_bytes);
+void __hybrid_memmovedown(void *__dst, void const *__src, __SIZE_TYPE__ __num_bytes);
+void __hybrid_memcpy(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __num_bytes);
 void __hybrid_memset(void *__dst, int __byte, __SIZE_TYPE__ __num_bytes);
+int __hybrid_bcmp(void const *__lhs, void const *__rhs, __SIZE_TYPE__ __num_bytes);
 __DECL_END
-#define __hybrid_memcpy(dst, src, num_bytes)  __hybrid_memcpy(dst, src, num_bytes)
-#define __hybrid_memset(dst, byte, num_bytes) __hybrid_memset(dst, byte, num_bytes)
+#define __hybrid_memmove(dst, src, num_bytes)     __hybrid_memmove(dst, src, num_bytes)
+#define __hybrid_memmoveup(dst, src, num_bytes)   __hybrid_memmoveup(dst, src, num_bytes)
+#define __hybrid_memmovedown(dst, src, num_bytes) __hybrid_memmovedown(dst, src, num_bytes)
+#define __hybrid_memcpy(dst, src, num_bytes)      __hybrid_memcpy(dst, src, num_bytes)
+#define __hybrid_memset(dst, byte, num_bytes)     __hybrid_memset(dst, byte, num_bytes)
+#define __hybrid_bcmp(lhs, rhs, num_bytes)        __hybrid_bcmp(lhs, rhs, num_bytes)
 #elif defined(__KOS_SYSTEM_HEADERS__)
 #include <libc/string.h>
-#define __hybrid_memcpy(dst, src, num_bytes)   (void)__libc_memcpy(dst, src, num_bytes)
-#define __hybrid_memcpyw(dst, src, num_words)  (void)__libc_memcpyw(dst, src, num_words)
-#define __hybrid_memcpyl(dst, src, num_dwords) (void)__libc_memcpyl(dst, src, num_dwords)
-#define __hybrid_memset(dst, byte, num_bytes)  (void)__libc_memset(dst, byte, num_bytes)
-#define __hybrid_bzero(dst, num_bytes)         __libc_bzero(dst, num_bytes)
-#define __hybrid_bzerow(dst, num_words)        __libc_bzerow(dst, num_words)
-#define __hybrid_bzerol(dst, num_dwords)       __libc_bzerol(dst, num_dwords)
+#define __hybrid_memcpy(dst, src, num_bytes)        (void)__libc_memcpy(dst, src, num_bytes)
+#define __hybrid_memcpyw(dst, src, num_words)       (void)__libc_memcpyw((__UINT16_TYPE__ *)(dst), (__UINT16_TYPE__ const *)(src), num_words)
+#define __hybrid_memcpyl(dst, src, num_dwords)      (void)__libc_memcpyl((__UINT32_TYPE__ *)(dst), (__UINT32_TYPE__ const *)(src), num_dwords)
+#define __hybrid_memmove(dst, src, num_bytes)       (void)__libc_memmove(dst, src, num_bytes)
+#define __hybrid_memmovew(dst, src, num_words)      (void)__libc_memmovew((__UINT16_TYPE__ *)(dst), (__UINT16_TYPE__ const *)(src), num_words)
+#define __hybrid_memmovel(dst, src, num_dwords)     (void)__libc_memmovel((__UINT32_TYPE__ *)(dst), (__UINT32_TYPE__ const *)(src), num_dwords)
+#define __hybrid_memmoveup(dst, src, num_bytes)     (void)__libc_memmoveup(dst, src, num_bytes)
+#define __hybrid_memmoveupw(dst, src, num_words)    (void)__libc_memmoveupw((__UINT16_TYPE__ *)(dst), (__UINT16_TYPE__ const *)(src), num_words)
+#define __hybrid_memmoveupl(dst, src, num_dwords)   (void)__libc_memmoveupl((__UINT32_TYPE__ *)(dst), (__UINT32_TYPE__ const *)(src), num_dwords)
+#define __hybrid_memmovedown(dst, src, num_bytes)   (void)__libc_memmovedown(dst, src, num_bytes)
+#define __hybrid_memmovedownw(dst, src, num_words)  (void)__libc_memmovedownw((__UINT16_TYPE__ *)(dst), (__UINT16_TYPE__ const *)(src), num_words)
+#define __hybrid_memmovedownl(dst, src, num_dwords) (void)__libc_memmovedownl((__UINT32_TYPE__ *)(dst), (__UINT32_TYPE__ const *)(src), num_dwords)
+#define __hybrid_memset(dst, byte, num_bytes)       (void)__libc_memset(dst, byte, num_bytes)
+#define __hybrid_bzero(dst, num_bytes)              __libc_bzero(dst, num_bytes)
+#define __hybrid_bzerow(dst, num_words)             __libc_bzerow((__UINT16_TYPE__ *)(dst), num_words)
+#define __hybrid_bzerol(dst, num_dwords)            __libc_bzerol((__UINT32_TYPE__ *)(dst), num_dwords)
+#define __hybrid_bcmp(lhs, rhs, num_bytes)          __libc_bcmp(lhs, rhs, num_bytes)
 #include "typecore.h"
 #ifdef __UINT64_TYPE__
-#define __hybrid_memcpyq(dst, src, num_qwords) (void)__libc_memcpyq(dst, src, num_qwords)
-#define __hybrid_bzeroq(dst, num_qwords)       __libc_bzeroq(dst, num_bytes)
+#define __hybrid_memcpyq(dst, src, num_qwords)      (void)__libc_memcpyq((__UINT64_TYPE__ *)(dst), (__UINT64_TYPE__ const *)(src), num_qwords)
+#define __hybrid_memmoveq(dst, src, num_qwords)     (void)__libc_memmoveq((__UINT64_TYPE__ *)(dst), (__UINT64_TYPE__ const *)(src), num_qwords)
+#define __hybrid_memmoveupq(dst, src, num_qwords)   (void)__libc_memmoveupq((__UINT64_TYPE__ *)(dst), (__UINT64_TYPE__ const *)(src), num_qwords)
+#define __hybrid_memmovedownq(dst, src, num_qwords) (void)__libc_memmovedownq((__UINT64_TYPE__ *)(dst), (__UINT64_TYPE__ const *)(src), num_qwords)
+#define __hybrid_bzeroq(dst, num_qwords)            __libc_bzeroq((__UINT64_TYPE__ *)(dst), num_bytes)
 #endif /* __UINT64_TYPE__ */
 #else /* __KOS_SYSTEM_HEADERS__ */
 
@@ -67,6 +88,14 @@ __DECL_END
      !(defined(HAVE_MEMCPY) || (- HAVE_MEMCPY - 1) != -1))
 #define __hybrid_memcpy(dst, src, num_bytes) (void)memcpy(dst, src, num_bytes)
 #endif /* ... */
+#if (!defined(CONFIG_NO_memmove) && !defined(CONFIG_NO_MEMMOVE) &&           \
+     !defined(NO_memmove) && !defined(NO_MEMMOVE) &&                         \
+     !(defined(CONFIG_HAVE_memmove) || (- CONFIG_HAVE_memmove - 1) != -1) && \
+     !(defined(CONFIG_HAVE_MEMMOVE) || (- CONFIG_HAVE_MEMMOVE - 1) != -1) && \
+     !(defined(HAVE_memmove) || (- HAVE_memmove - 1) != -1) &&               \
+     !(defined(HAVE_MEMMOVE) || (- HAVE_MEMMOVE - 1) != -1))
+#define __hybrid_memmove(dst, src, num_bytes) (void)memmove(dst, src, num_bytes)
+#endif /* ... */
 #if (!defined(CONFIG_NO_memset) && !defined(CONFIG_NO_MEMSET) &&           \
      !defined(NO_memset) && !defined(NO_MEMSET) &&                         \
      !(defined(CONFIG_HAVE_memset) || (- CONFIG_HAVE_memset - 1) != -1) && \
@@ -74,6 +103,16 @@ __DECL_END
      !(defined(HAVE_memset) || (- HAVE_memset - 1) != -1) &&               \
      !(defined(HAVE_MEMSET) || (- HAVE_MEMSET - 1) != -1))
 #define __hybrid_memset(dst, byte, num_bytes) (void)memset(dst, byte, num_bytes)
+#endif /* ... */
+#if defined(CONFIG_HAVE_bcmp)
+#define __hybrid_bcmp(lhs, rhs, num_bytes) bcmp(lhs, rhs, num_bytes)
+#elif (!defined(CONFIG_NO_memcmp) && !defined(CONFIG_NO_MEMCMP) &&           \
+     !defined(NO_memcmp) && !defined(NO_MEMCMP) &&                         \
+     !(defined(CONFIG_HAVE_memcmp) || (- CONFIG_HAVE_memcmp - 1) != -1) && \
+     !(defined(CONFIG_HAVE_MEMCMP) || (- CONFIG_HAVE_MEMCMP - 1) != -1) && \
+     !(defined(HAVE_memcmp) || (- HAVE_memcmp - 1) != -1) &&               \
+     !(defined(HAVE_MEMCMP) || (- HAVE_MEMCMP - 1) != -1))
+#define __hybrid_bcmp(lhs, rhs, num_bytes) memcmp(lhs, rhs, num_bytes)
 #endif /* ... */
 #endif /* __has_include(<string.h>) || (__NO_has_include && !...) */
 
@@ -134,6 +173,25 @@ extern void __movsw(unsigned short *, unsigned short const *, unsigned int);
 __DECL_END
 #endif /* __i386__ || __x86_64__ */
 #endif /* !__hybrid_memcpyw && _MSC_VER */
+
+#ifndef __hybrid_bcmp
+#include "typecore.h"
+__DECL_BEGIN
+#define __hybrid_bcmp __hybrid_bcmp
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__hybrid_bcmp(void const *__lhs, void const *__rhs, size_t __num_bytes) {
+	__BYTE_TYPE__ const *__p1 = (__BYTE_TYPE__ const *)__lhs;
+	__BYTE_TYPE__ const *__p2 = (__BYTE_TYPE__ const *)__rhs;
+	while (__num_bytes--) {
+		if (*__p1 != *__p2)
+			return 1;
+		++__p1;
+		++__p2;
+	}
+	return 0;
+}
+__DECL_END
+#endif /* !__hybrid_bcmp */
 #endif /* !__KOS_SYSTEM_HEADERS__ */
 
 
@@ -286,6 +344,133 @@ __DECL_END
 		}                                                                          \
 	}	__WHILE0
 #endif /* !__hybrid_memcpy */
+
+#ifndef __hybrid_memmoveup
+#ifdef __hybrid_memmove
+#define __hybrid_memmoveup(dst, src, num_bytes) __hybrid_memmove(dst, src, num_bytes)
+#else /* __hybrid_memmove */
+#include "typecore.h"
+#define __hybrid_memmoveup(dst, src, num_bytes)                                     \
+	do {                                                                            \
+		__BYTE_TYPE__ *__hmmu_d       = (__BYTE_TYPE__ *)(void *)(dst);             \
+		__BYTE_TYPE__ const *__hmmu_s = (__BYTE_TYPE__ const *)(void const *)(src); \
+		__SIZE_TYPE__ __hmmu_n        = (__SIZE_TYPE__)(num_bytes);                 \
+		while (__hmmu_n) {                                                          \
+			--__hmmu_n;                                                             \
+			__hmmu_d[__hmmu_n] = __hmmu_s[__hmmu_n];                                \
+		}                                                                           \
+	}	__WHILE0
+#endif /* !__hybrid_memmove */
+#endif /* !__hybrid_memmoveup */
+
+#ifndef __hybrid_memmovedown
+#ifdef __hybrid_memmove
+#define __hybrid_memmovedown(dst, src, num_bytes) __hybrid_memmove(dst, src, num_bytes)
+#else /* __hybrid_memmove */
+#include "typecore.h"
+#define __hybrid_memmovedown(dst, src, num_bytes)                                   \
+	do {                                                                            \
+		__BYTE_TYPE__ *__hmmd_d       = (__BYTE_TYPE__ *)(void *)(dst);             \
+		__BYTE_TYPE__ const *__hmmd_s = (__BYTE_TYPE__ const *)(void const *)(src); \
+		__SIZE_TYPE__ __hmmd_n        = (__SIZE_TYPE__)(num_bytes);                 \
+		while (__hmmd_n) {                                                          \
+			*__hmmd_d = *__hmmd_s;                                                  \
+			--__hmmd_n;                                                             \
+			++__hmmd_s;                                                             \
+			++__hmmd_d;                                                             \
+		}                                                                           \
+	}	__WHILE0
+#endif /* !__hybrid_memmove */
+#endif /* !__hybrid_memmovedown */
+
+#ifndef __hybrid_memmove
+#include "typecore.h"
+#define __hybrid_memmove(dst, src, num_bytes)                                      \
+	do {                                                                           \
+		__BYTE_TYPE__ *__hmm_d       = (__BYTE_TYPE__ *)(void *)(dst);             \
+		__BYTE_TYPE__ const *__hmm_s = (__BYTE_TYPE__ const *)(void const *)(src); \
+		__SIZE_TYPE__ __hmm_n        = (__SIZE_TYPE__)(num_bytes);                 \
+		if (__hmm_d <= __hmm_s) {                                                  \
+			while (__hmm_n) {                                                      \
+				*__hmm_d = *__hmm_s;                                               \
+				--__hmm_n;                                                         \
+				++__hmm_s;                                                         \
+				++__hmm_d;                                                         \
+			}                                                                      \
+		} else {                                                                   \
+			while (__hmm_n) {                                                      \
+				--__hmm_n;                                                         \
+				__hmm_d[__hmm_n] = __hmm_s[__hmm_n];                               \
+			}                                                                      \
+		}                                                                          \
+	}	__WHILE0
+#endif /* !__hybrid_memmove */
+
+#ifndef __hybrid_memmoveq
+#ifdef __hybrid_memmovel
+#define __hybrid_memmoveq(dst, src, num_qwords) __hybrid_memmovel(dst, src, (num_qwords) << 1)
+#elif defined(__hybrid_memmovew)
+#define __hybrid_memmoveq(dst, src, num_qwords) __hybrid_memmovew(dst, src, (num_qwords) << 2)
+#else /* ... */
+#define __hybrid_memmoveq(dst, src, num_qwords) __hybrid_memmove(dst, src, (num_qwords) << 3)
+#endif /* !... */
+#endif /* !__hybrid_memmoveq */
+
+#ifndef __hybrid_memmovel
+#ifdef __hybrid_memmovew
+#define __hybrid_memmovel(dst, src, num_dwords) __hybrid_memmovew(dst, src, (num_dwords) << 1)
+#else /* __hybrid_memmovew */
+#define __hybrid_memmovel(dst, src, num_dwords) __hybrid_memmove(dst, src, (num_dwords) << 2)
+#endif /* !__hybrid_memmovew */
+#endif /* !__hybrid_memmovel */
+
+#ifndef __hybrid_memmovew
+#define __hybrid_memmovew(dst, src, num_words) __hybrid_memmove(dst, src, (num_words) << 1)
+#endif /* !__hybrid_memmovew */
+
+#ifndef __hybrid_memmoveupq
+#ifdef __hybrid_memmoveupl
+#define __hybrid_memmoveupq(dst, src, num_qwords) __hybrid_memmoveupl(dst, src, (num_qwords) << 1)
+#elif defined(__hybrid_memmoveupw)
+#define __hybrid_memmoveupq(dst, src, num_qwords) __hybrid_memmoveupw(dst, src, (num_qwords) << 2)
+#else /* ... */
+#define __hybrid_memmoveupq(dst, src, num_qwords) __hybrid_memmoveup(dst, src, (num_qwords) << 3)
+#endif /* !... */
+#endif /* !__hybrid_memmoveupq */
+
+#ifndef __hybrid_memmoveupl
+#ifdef __hybrid_memmoveupw
+#define __hybrid_memmoveupl(dst, src, num_dwords) __hybrid_memmoveupw(dst, src, (num_dwords) << 1)
+#else /* __hybrid_memmoveupw */
+#define __hybrid_memmoveupl(dst, src, num_dwords) __hybrid_memmoveup(dst, src, (num_dwords) << 2)
+#endif /* !__hybrid_memmoveupw */
+#endif /* !__hybrid_memmoveupl */
+
+#ifndef __hybrid_memmovedownw
+#define __hybrid_memmovedownw(dst, src, num_words) __hybrid_memmovedown(dst, src, (num_words) << 1)
+#endif /* !__hybrid_memmovedownw */
+
+#ifndef __hybrid_memmovedownq
+#ifdef __hybrid_memmovedownl
+#define __hybrid_memmovedownq(dst, src, num_qwords) __hybrid_memmovedownl(dst, src, (num_qwords) << 1)
+#elif defined(__hybrid_memmovedownw)
+#define __hybrid_memmovedownq(dst, src, num_qwords) __hybrid_memmovedownw(dst, src, (num_qwords) << 2)
+#else /* ... */
+#define __hybrid_memmovedownq(dst, src, num_qwords) __hybrid_memmovedown(dst, src, (num_qwords) << 3)
+#endif /* !... */
+#endif /* !__hybrid_memmovedownq */
+
+#ifndef __hybrid_memmovedownl
+#ifdef __hybrid_memmovedownw
+#define __hybrid_memmovedownl(dst, src, num_dwords) __hybrid_memmovedownw(dst, src, (num_dwords) << 1)
+#else /* __hybrid_memmovedownw */
+#define __hybrid_memmovedownl(dst, src, num_dwords) __hybrid_memmovedown(dst, src, (num_dwords) << 2)
+#endif /* !__hybrid_memmovedownw */
+#endif /* !__hybrid_memmovedownl */
+
+#ifndef __hybrid_memmovedownw
+#define __hybrid_memmovedownw(dst, src, num_words) __hybrid_memmovedown(dst, src, (num_words) << 1)
+#endif /* !__hybrid_memmovedownw */
 
 #ifndef __hybrid_memset
 #include "typecore.h"

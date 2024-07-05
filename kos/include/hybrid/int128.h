@@ -2356,12 +2356,7 @@ typedef union __hybrid_int128_struct {
 #if defined(__cplusplus) && defined(WANT_INT128_CXX_INTEGRATION)
 	__CXX_CLASSMEMBER __CXX_DEFAULT_DTOR_NOEXCEPT(__hybrid_int128_struct);
 	__CXX_CLASSMEMBER __CXX_DEFAULT_CTOR_NOEXCEPT(__hybrid_int128_struct);
-	__CXX_DEFAULT_COPY_CTOR_AND_ASSIGN_NOEXCEPT(__CXX_CLASSMEMBER, __hybrid_int128_struct, __v, {
-		__i128_s32[0] = __v.__i128_s32[0];
-		__i128_s32[1] = __v.__i128_s32[1];
-		__i128_s32[2] = __v.__i128_s32[2];
-		__i128_s32[3] = __v.__i128_s32[3];
-	});
+	__CXX_DEFAULT_COPY_CTOR_AND_ASSIGN_NOEXCEPT(__CXX_CLASSMEMBER, __hybrid_int128_struct, __v, { __hybrid_int128_copy(*this, __v); });
 	__CXX_CLASSMEMBER explicit __hybrid_int128_struct(__hybrid_uint128_struct const &__v) __CXX_NOEXCEPT;
 	__CXX_CLASSMEMBER __hybrid_int128_struct &operator=(__hybrid_uint128_struct const &__v) __CXX_NOEXCEPT;
 	template<class __ValType> __CXX_CLASSMEMBER explicit __hybrid_int128_struct(__ValType __v, __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, int *) = 0) __CXX_NOEXCEPT { __hybrid_int128_set(*this, __v); }
@@ -2409,12 +2404,7 @@ typedef union __hybrid_uint128_struct {
 #if defined(__cplusplus) && defined(WANT_INT128_CXX_INTEGRATION)
 	__CXX_CLASSMEMBER __CXX_DEFAULT_DTOR_NOEXCEPT(__hybrid_uint128_struct);
 	__CXX_CLASSMEMBER __CXX_DEFAULT_CTOR_NOEXCEPT(__hybrid_uint128_struct);
-	__CXX_DEFAULT_COPY_CTOR_AND_ASSIGN_NOEXCEPT(__CXX_CLASSMEMBER, __hybrid_uint128_struct, __v, {
-		__i128_u32[0] = __v.__i128_u32[0];
-		__i128_u32[1] = __v.__i128_u32[1];
-		__i128_u32[2] = __v.__i128_u32[2];
-		__i128_u32[3] = __v.__i128_u32[3];
-	});
+	__CXX_DEFAULT_COPY_CTOR_AND_ASSIGN_NOEXCEPT(__CXX_CLASSMEMBER, __hybrid_uint128_struct, __v, { __hybrid_uint128_copy(*this, __v); });
 	__CXX_CLASSMEMBER explicit __hybrid_uint128_struct(__hybrid_int128_struct const &__v) __CXX_NOEXCEPT;
 	__CXX_CLASSMEMBER __hybrid_uint128_struct &operator=(__hybrid_int128_struct const &__v) __CXX_NOEXCEPT;
 	template<class __ValType> __CXX_CLASSMEMBER explicit __hybrid_uint128_struct(__ValType __v, __HYBRID_INT128_ENABLE_IF_SIGNED(__ValType, int *) = 0) __CXX_NOEXCEPT { __hybrid_int128_set(*this, __v); }
@@ -2445,9 +2435,9 @@ typedef union __hybrid_uint128_struct {
 #endif /* __cplusplus && WANT_INT128_CXX_INTEGRATION */
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) (((v).__i128_u64[(i) / 64] >> ((i) % 64)) & 1)
+#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_uint128_vec64_significand(v, (i) / 64) >> ((i) % 64)) & 1)
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) (((v).__i128_u32[(i) / 32] >> ((i) % 32)) & 1)
+#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_uint128_vec32_significand(v, (i) / 32) >> ((i) % 32)) & 1)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 __LOCAL __ATTR_INOUT(1) __ATTR_IN(2) void

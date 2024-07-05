@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85102b08 */
+/* HASH CRC-32:0xd0741d99 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -811,14 +811,14 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 			vala = c1 - '0';
 			valb = c2 - '0';
 			for (;;) {
-				c1 = *s1++;
+				c1 = *++s1;
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
 				vala += c1 - '0';
 			}
 			for (;;) {
-				c2 = *s2++;
+				c2 = *++s2;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
@@ -5886,7 +5886,8 @@ NOTHROW_NCX(LIBCCALL libc_strcasecoll_l)(char const *s1,
                                          char const *s2,
                                          locale_t locale) {
 	/* XXX: Implement properly? */
-	return libc_strcasecmp_l(s1, s2, locale);
+	(void)locale;
+	return libc_strcasecoll(s1, s2);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strncasecoll_l)(char const *s1,

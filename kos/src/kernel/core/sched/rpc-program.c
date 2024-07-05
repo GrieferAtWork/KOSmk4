@@ -304,8 +304,8 @@ struct rpc_mem {
 	size_t               rm_bankc;  /* # of memory banks. */
 	struct rpc_membank **rm_bankv;  /* [1..1][owned][0..rm_bankc][owned] Vector of memory banks (sorted ascendingly by `rmb_addrlo') */
 	size_t               rm_access; /* Total # of bytes ever accessed. */
-	size_t               rm_futxc;  /* Total # of bytes ever accessed. */
-	struct rpc_futex    *rm_futxv;  /* Total # of bytes ever accessed. */
+	size_t               rm_futxc;  /* # of futexes accessed. */
+	struct rpc_futex    *rm_futxv;  /* [0..rm_futxc][owned] Vector of accessed futexes. */
 };
 
 #define rpc_mem_init(self)     \
@@ -533,9 +533,10 @@ rw_bank:
 				int st = rpc_membank_getstatus(bank, reladdr);
 				if (st != (RPC_MEMBANK_STATUS_F_LOADED | RPC_MEMBANK_STATUS_F_CHANGED)) {
 					if (!(st & RPC_MEMBANK_STATUS_F_LOADED)) {
-						if (++self->rm_access >= RPC_PROG_MEMORY_MAX)
+						if (++self->rm_access >= RPC_PROG_MEMORY_MAX) {
 							THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
 							      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_MEMORY_EXCEEDED);
+						}
 					}
 					/* Ensure that the address is writable, but don't write the final value, yet. */
 					verify_writable_byte(addr + j);
@@ -549,9 +550,10 @@ rw_bank:
 			for (j = 0; j < avail; ++j, ++reladdr) {
 				int st = rpc_membank_getstatus(bank, reladdr);
 				if (!(st & RPC_MEMBANK_STATUS_F_LOADED)) {
-					if (++self->rm_access >= RPC_PROG_MEMORY_MAX)
+					if (++self->rm_access >= RPC_PROG_MEMORY_MAX) {
 						THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
 						      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_MEMORY_EXCEEDED);
+					}
 					bankdat[j] = atomic_read(&addr[j]);
 					st |= RPC_MEMBANK_STATUS_F_LOADED;
 					rpc_membank_setstatus(bank, reladdr, st);

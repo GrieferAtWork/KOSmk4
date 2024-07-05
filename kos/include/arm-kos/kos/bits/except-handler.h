@@ -36,8 +36,8 @@ struct ucpustate;
 struct exception_data;
 #define __EXCEPT_HANDLER_CC /* nothing */
 typedef /*__ATTR_NORETURN*/ void
-(__ATTR_FASTCALL *__except_handler_t)(struct ucpustate *__restrict state,
-                                      struct exception_data *__restrict error);
+(*__except_handler_t)(struct ucpustate *__restrict state,
+                      struct exception_data *__restrict error);
 
 __DECL_END
 #endif /* !__CC__ */

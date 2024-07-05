@@ -1494,14 +1494,14 @@ int strverscmp([[in]] char const *s1,
 			vala = c1 - '0';
 			valb = c2 - '0';
 			for (;;) {
-				c1 = *s1++;
+				c1 = *++s1;
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
 				vala += c1 - '0';
 			}
 			for (;;) {
-				c2 = *s2++;
+				c2 = *++s2;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
@@ -7662,7 +7662,8 @@ int strcasecoll_l([[in]] char const *s1,
                   [[in]] char const *s2,
                   $locale_t locale) {
 	/* XXX: Implement properly? */
-	return strcasecmp_l(s1, s2, locale);
+	(void)locale;
+	return strcasecoll(s1, s2);
 }
 
 [[decl_include("<hybrid/typecore.h>")]]

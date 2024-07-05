@@ -84,7 +84,7 @@
  *     appear to have happened atomically to other threads)
  *   - This is the case in 2 situations:
  *     - When building kernel-code for an operating system
- *       configured  to  now  support  more  than  one CPU
+ *       configured  to  not  support  more  than  one CPU
  *     - When building user-code when  threads aren't used, or  the
  *       threading library is based on signal + alarm + swapcontext
  *

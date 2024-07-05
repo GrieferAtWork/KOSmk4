@@ -69,7 +69,7 @@ __NAMESPACE_STD_USING(va_list)
 /* void va_start(va_list &ap, T &last_named_argument); */
 #define va_start __builtin_va_start
 
-/* void va_start(va_list &dest, va_list &src); */
+/* void __va_copy(va_list &dest, va_list &src); */
 #define __va_copy __builtin_va_copy
 
 /* void va_end(va_list &ap); */
@@ -82,6 +82,7 @@ __NAMESPACE_STD_USING(va_list)
      defined(__USE_XOPEN2K) || defined(__USE_NETBSD) ||                  \
      (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0 >= 199900L)) || \
      (defined(__cplusplus) && (__cplusplus + 0 >= 201103L)))
+/* void va_copy(va_list &dest, va_list &src); */
 #define va_copy __builtin_va_copy
 #endif /* ... */
 #endif /* __CC__ */

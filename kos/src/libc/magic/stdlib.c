@@ -3393,8 +3393,7 @@ int shexec([[in_opt]] char const *command) {
 	execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
 	execl("/bin/csh", "csh", arg__c, command, (char *)NULL);
 	execl("/bin/bash", "bash", arg__c, command, (char *)NULL);
-	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
-	return -1;
+	return execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 }
 
 

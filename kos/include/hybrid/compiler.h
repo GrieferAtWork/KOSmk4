@@ -215,6 +215,8 @@
 #define PP_CAT2         __PP_CAT2
 #define PP_CAT3         __PP_CAT3
 #define PP_CAT4         __PP_CAT4
+#define PP_CAT5         __PP_CAT5
+#define PP_CAT6         __PP_CAT6
 #define PP_PRIVATE_MUL8 __PP_PRIVATE_MUL8
 #define PP_MUL8         __PP_MUL8
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d41a318 */
+/* HASH CRC-32:0xbbac398c */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,8 +99,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shexec))(char const *__command) {
 	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
 	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/csh", "csh", __arg__c, __command, (char *)__NULLPTR);
 	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/bash", "bash", __arg__c, __command, (char *)__NULLPTR);
-	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	return -1;
+	return (__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_shexec_defined

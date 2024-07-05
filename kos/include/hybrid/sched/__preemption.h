@@ -84,7 +84,7 @@
  *     happened atomically to other threads)
  *   - This is the case in 2 situations:
  *     - When building kernel-code for an operating system
- *       configured  to  now  support  more  than  one CPU
+ *       configured  to  not  support  more  than  one CPU
  *     - When building user-code when  threads aren't used, or  the
  *       threading library is based on signal + alarm + swapcontext
  *
@@ -185,7 +185,7 @@ __hybrid_preemption_pop(__hybrid_preemption_flag_t *__restrict __p_flag);
  * current  preemption-state  (s.a.  `preemption_ison(3H)'). If  doing  so is
  * allowed,  yield to the next thread like  normal. Else, try to instruct the
  * CPU  to let another  core consume additional processing  power for a while
- * (if possible, as is the case with multi-threading), or simply do  nothing.
+ * (if possible, as is the case with hyper-threading), or simply do  nothing.
  *
  * - kernelspace: task_tryyield_or_pause()
  *                >> if (EFLAGS.IF) {     (x86)
@@ -352,8 +352,8 @@ __DECL_END
 #if defined(HAVE_SIGFILLSET) || (defined(__USE_POSIX) && !defined(NO_SIGFILLSET))
 #define __hybrid_sigfillset sigfillset
 #else /* HAVE_SIGFILLSET || (__USE_POSIX && !NO_SIGFILLSET) */
-#include <string.h>
-#define __hybrid_sigfillset(set) memset(set, 0xff, sizeof(sigset_t))
+#include "../__string.h"
+#define __hybrid_sigfillset(set) __hybrid_memset(set, 0xff, sizeof(sigset_t))
 #endif /* !HAVE_SIGFILLSET && (!__USE_POSIX || NO_SIGFILLSET) */
 
 #if defined(HAVE_SIGISEMPTYSET) || (defined(__USE_GNU) && !defined(NO_SIGISEMPTYSET))
@@ -394,28 +394,28 @@ __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
 	sigset_t __hpp_nss;
 	__hybrid_sigfillset(&__hpp_nss);
-	sigprocmask(SIG_SETMASK, &__hpp_nss, __p_flag);
+	(void)sigprocmask(SIG_SETMASK, &__hpp_nss, __p_flag);
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
 	sigset_t __hpio_nss;
-	sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
+	(void)sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
 	return !__hybrid_sigisemptyset(&__hpio_nss)
 }
 __NAMESPACE_INT_END
 __DECL_END
 #else /* __NO_XBLOCK */
-#define __hybrid_preemption_pushoff(p_flag)           \
-	__XBLOCK({                                        \
-		sigset_t __hpp_nss;                           \
-		__hybrid_sigfillset(&__hpp_nss);              \
-		sigprocmask(SIG_SETMASK, &__hpp_nss, p_flag); \
+#define __hybrid_preemption_pushoff(p_flag)                 \
+	__XBLOCK({                                              \
+		sigset_t __hpp_nss;                                 \
+		__hybrid_sigfillset(&__hpp_nss);                    \
+		(void)sigprocmask(SIG_SETMASK, &__hpp_nss, p_flag); \
 	})
-#define __hybrid_preemption_ison()                        \
-	__XBLOCK({                                            \
-		struct __sigset_struct __hpio_nss;                \
-		sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss); \
-		__XRETURN !__hybrid_sigisemptyset(&__hpio_nss);   \
+#define __hybrid_preemption_ison()                              \
+	__XBLOCK({                                                  \
+		struct __sigset_struct __hpio_nss;                      \
+		(void)sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss); \
+		__XRETURN !__hybrid_sigisemptyset(&__hpio_nss);         \
 	})
 #endif /* !__NO_XBLOCK */
 

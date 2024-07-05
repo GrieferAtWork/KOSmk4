@@ -335,11 +335,9 @@ NOTHROW(CC get_mainapp_std_stream_addr)(void *__restrict mainapp,
 	sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name1);
 	if (sym == NULL || sym->st_shndx == SHN_UNDEF)
 		sym = (ElfW(Sym) const *)dlauxctrl(mainapp, DLAUXCTRL_ELF_GET_LSYMBOL, name2);
-	if (sym == NULL || sym->st_shndx == SHN_UNDEF)
+	result = (byte_t *)dlauxctrl(mainapp, DLAUXCTRL_ELF_SYMADDR, sym);
+	if (result == NULL)
 		return (FILE *)fallback;
-	result = (byte_t *)sym->st_value;
-	if (sym->st_shndx != SHN_ABS)
-		result += (uintptr_t)dlmodulebase(mainapp);
 
 	/* Initialize the user-program STD stream. (This right here
 	 * emulates the R_*_COPY relocation which was no doubt  the

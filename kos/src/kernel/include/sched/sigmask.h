@@ -70,7 +70,7 @@ DATDEF sigset_t const sigmask_full;
 /* [lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
- * the associated thread make use of userprocmask.
+ * the associated thread makes use of userprocmask.
  *
  * WARNING: This signal set must  _NEVER_ contain `SIGKILL' or  `SIGSTOP'.
  *          Not when `TASK_USERPROCMASK' is set, and neither for only just

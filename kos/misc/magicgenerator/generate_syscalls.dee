@@ -1943,7 +1943,7 @@ function calculateSyscallTableRanges(ids: {int...}, arch/*: SyscallArch*/): {(in
 		}
 	}
 	/* Sort by gap starting index. */
-	usedGaps.sort(x -> x[0]);
+	usedGaps.sort(key: x -> x[0]);
 	local result = [];
 	local prevEnd = ids.first;
 	for (local min, max: usedGaps) {

@@ -432,8 +432,8 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		validate_readwrite(ctl, sizeof(*ctl));
 		COMPILER_BARRIER();
 
-		/* Load the address for the initial signal mask. We'll be copying
-		 * our threads kernel signal mask into this field for the purpose
+		/* Load  the address for the initial signal mask. We'll be copying
+		 * our thread's kernel signal mask into this field for the purpose
 		 * of initialization. */
 		new_sigset = ctl->pm_sigmask;
 		sigsetsize = ctl->pm_sigsize;

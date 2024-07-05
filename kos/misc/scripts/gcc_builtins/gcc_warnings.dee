@@ -355,7 +355,7 @@ local knownBuiltins;
 with (local res = File.open("../../../include/compiler/gcc-warnings.h", "w"))
 	knownBuiltins = generateAllVersionsFeatureHistory(res);
 //knownBuiltins = List(knownBuiltins);
-//knownBuiltins.sort(GCCWarning.name);
+//knownBuiltins.sort(key: GCCWarning.name);
 //with (local res = File.open("gcc_builtins_known", "w")) {
 //	for (local x: knownBuiltins) {
 //		res << x.name << ":" << x.usesLibc << "\n";
