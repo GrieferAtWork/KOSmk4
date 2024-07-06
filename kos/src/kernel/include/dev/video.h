@@ -149,7 +149,7 @@ struct vidttyaccess {
 
 	/* [1..1][lock(vta_lock)] Show the hardware cursor at the current cursor position.
 	 * NOTE: This operator is only called when `vta_cursor.vtc_celly < vta_resy', which
-	 *       compiled with the  invariant `vta_cursor.vtc_cellx < vta_resx' means  that
+	 *       combined with the  invariant `vta_cursor.vtc_cellx < vta_resx' means  that
 	 *       the cursor is guarantied visible on-screen.
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
 	NOBLOCK NONNULL_T((1)) void

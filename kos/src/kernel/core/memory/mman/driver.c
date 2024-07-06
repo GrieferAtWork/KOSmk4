@@ -1008,7 +1008,7 @@ driver_getfile(struct driver *__restrict self)
 /* Known arg$ entry types:
  *   - DRIVER_ARGCASH_ENTRY_TYPE_STRING:   char   drv_arg$foo$s$bar[];        // == EXISTS("foo=$value") ? "$value" : "bar"
  *   - DRIVER_ARGCASH_ENTRY_TYPE_HEX:      byte_t drv_arg$foo$x$00000000[4];  // == EXISTS("foo=$value") ? tohex("$value") : tohex("00000000")
- *   - DRIVER_ARGCASH_ENTRY_TYPE_PRESENT:  bool   drv_arg$foo;                // == EXISTS("foo=$value") ? true : false
+ *   - DRIVER_ARGCASH_ENTRY_TYPE_PRESENT:  bool   drv_arg$foo;                // == EXISTS("foo") ? true : false
  *   - DRIVER_ARGCASH_ENTRY_TYPE_INT:      int    drv_arg$foo$d$42;           // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
  *   - DRIVER_ARGCASH_ENTRY_TYPE_UINT:     u32    drv_arg$foo$I32u$42;        // == EXISTS("foo=$value") ? atoi("$value") : atoi("42")
  *
@@ -1707,7 +1707,8 @@ driver_dlsym_drv(struct driver *__restrict self,
 		goto ok;
 	}
 	if (strcmp(name, "file") == 0) {
-		info->dsi_addr = driver_getfile(self);
+		COMPILER_UNUSED(driver_getfile(self)); /* Make sure it was initialized */
+		info->dsi_addr = &self->d_module.md_file;
 		info->dsi_size = sizeof(void *);
 		goto ok;
 	}
@@ -2830,7 +2831,7 @@ bind_own_sym:
 		}
 	}
 
-	/* Search for kernel core for the requested symbol. */
+	/* Search the kernel core for the requested symbol. */
 	if (kernel_dlsym(self)) {
 		self->drs_orig = &kernel_driver;
 		return;

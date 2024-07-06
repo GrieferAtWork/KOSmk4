@@ -49,7 +49,7 @@ __DECL_BEGIN
  *   void free(void *ptr);
  *   size_t malloc_usable_size(void *ptr);           // Must return 0 when `ptr' is `NULL'
  * Examples:
- *   DEEMON: (1)(Dee_Malloc)(Dee_TryMalloc)(Dee_Realloc)(Dee_TryRealloc)(Dee_Free)
+ *   DEEMON: (0)(Dee_Malloc)(Dee_TryMalloc)(Dee_Realloc)(Dee_TryRealloc)(Dee_Free)
  *   KOS:    (1)(Malloc)(malloc)(Realloc)(realloc)(free)
  *   STD-C:  (0)(malloc)(realloc)(free)
  *   GNU-C:  (0)(malloc)(realloc)(free)(malloc_usable_size)  // If you want to use heap-allocation buffers

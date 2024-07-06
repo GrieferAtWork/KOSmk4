@@ -853,7 +853,7 @@ svgadev_v_alloclck(struct viddev *__restrict self, struct vidtty *active_tty)
 		RETHROW();
 	}
 
-	/* Fill in operators. (as requirested by the caller) */
+	/* Fill in operators. (as requested by the caller) */
 	result->mf_ops = &svgalck_ops.vlo_file;
 
 	/* If we're overriding an active TTY, then we know what the current video-mode is! */
@@ -933,7 +933,7 @@ svgadev_dbg_init(struct svgadev *__restrict self) {
 	 * clobbered. (And thus has to be saved+restored) */
 	mode = svgadev_dbg_selectmode(self);
 
-	/* Figure out how large the extended register must needs to be. */
+	/* Figure out how large the extended register buffer needs to be. */
 	dregsize = offsetof(struct svga_dbgregs, sdr_xdata);
 	dregsize += self->svd_chipset.sc_ops.sco_regsize;
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
