@@ -5868,7 +5868,7 @@ driver_loadmod(NCX char const *driver_name,
 		result = driver_fromfilename(driver_name);
 		if (result) {
 			if (pnew_driver_loaded)
-				*pnew_driver_loaded = true;
+				*pnew_driver_loaded = false;
 		} else {
 			result = driver_loadmod_filename(driver_name,
 			                                 driver_cmdline,
@@ -5876,7 +5876,7 @@ driver_loadmod(NCX char const *driver_name,
 		}
 	} else if ((result = driver_fromname(driver_name)) != NULL) {
 		if (pnew_driver_loaded)
-			*pnew_driver_loaded = true;
+			*pnew_driver_loaded = false;
 	} else {
 		REF struct driver_libpath_struct *lp;
 
