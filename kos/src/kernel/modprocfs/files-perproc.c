@@ -2139,8 +2139,8 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
                             struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
 	REF struct procfs_fd_lnknode *result;
-	result = (REF struct procfs_fd_lnknode *)memcpy(kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL),
-	                                                &procfs_pp_fdlnk_template, sizeof(struct flnknode));
+	result = (REF struct procfs_fd_lnknode *)kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL);
+	result = (REF struct procfs_fd_lnknode *)memcpy(result, &procfs_pp_fdlnk_template, sizeof(struct flnknode));
 	memcpy(&result->pfl_hand, &me->pfd_handle, sizeof(struct handle));
 	result->fn_fsdata = incref(me->pfd_thread);
 	result->fn_ino    = procfs_perproc_ino(me->pfd_handle.h_data, &procfs_pp_fdlnk_ops);
@@ -2764,8 +2764,8 @@ procfs_fdinfo_dirent_v_opennode(struct fdirent *__restrict self,
                                 struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fdinfo_dirent *me = fdirent_asfdinfo(self);
 	REF struct procfs_fdinfo_regnode *result;
-	result = (REF struct procfs_fdinfo_regnode *)memcpy(kmalloc(sizeof(REF struct procfs_fdinfo_regnode), GFP_NORMAL),
-	                                                    &procfs_pp_fdinfo_template, sizeof(struct printnode));
+	result = (REF struct procfs_fdinfo_regnode *)kmalloc(sizeof(REF struct procfs_fdinfo_regnode), GFP_NORMAL);
+	result = (REF struct procfs_fdinfo_regnode *)memcpy(result, &procfs_pp_fdinfo_template, sizeof(struct printnode));
 	result->pfir_hand = me->pfd_hand;
 	result->fn_fsdata = incref(me->pfd_thread);
 	result->fn_ino    = procfs_perproc_ino(me->pfd_hand.h_data, &procfs_pp_fdinfo_ops);
@@ -3037,8 +3037,8 @@ perproc_mapfile_dirent_v_opennode(struct fdirent *__restrict self,
                                   struct fdirnode *__restrict UNUSED(dir)) {
 	struct perproc_mapfile_dirent *me = fdirent_asmapfile(self);
 	REF struct perproc_mapfile_lnknode *result;
-	result = (REF struct perproc_mapfile_lnknode *)memcpy(kmalloc(sizeof(REF struct perproc_mapfile_lnknode), GFP_NORMAL),
-	                                                      &perproc_mapfile_lnknode_template, sizeof(struct flnknode));
+	result = (REF struct perproc_mapfile_lnknode *)kmalloc(sizeof(REF struct perproc_mapfile_lnknode), GFP_NORMAL);
+	result = (REF struct perproc_mapfile_lnknode *)memcpy(result, &perproc_mapfile_lnknode_template, sizeof(struct flnknode));
 	result->ppml_file   = mfile_asnode(incref(me->ppmd_file));
 	result->ppml_fspath = incref(me->ppmd_fspath);
 	result->ppml_fsname = incref(me->ppmd_fsname);
@@ -3899,8 +3899,8 @@ PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 procfs_perproc_dcwd_v_opennode(struct fdirent *__restrict self,
                                struct fdirnode *__restrict dir) {
 	REF struct procfs_perproc_drivelnk *result;
-	result = (REF struct procfs_perproc_drivelnk *)memcpy(kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL),
-	                                                      &procfs_perproc_dcwdlink_template, sizeof(struct fnode));
+	result = (REF struct procfs_perproc_drivelnk *)kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL);
+	result = (REF struct procfs_perproc_drivelnk *)memcpy(result, &procfs_perproc_dcwdlink_template, sizeof(struct flnknode));
 
 	/* Fill in fields. */
 	result->mf_ops       = &procfs_perproc_dcwdlink_ops.lno_node.no_file;
@@ -3914,8 +3914,8 @@ PRIVATE WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 procfs_perproc_drives_v_opennode(struct fdirent *__restrict self,
                                  struct fdirnode *__restrict dir) {
 	REF struct procfs_perproc_drivelnk *result;
-	result = (REF struct procfs_perproc_drivelnk *)memcpy(kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL),
-	                                                      &procfs_perproc_drivelink_template, sizeof(struct fnode));
+	result = (REF struct procfs_perproc_drivelnk *)kmalloc(sizeof(struct procfs_perproc_drivelnk), GFP_NORMAL);
+	result = (REF struct procfs_perproc_drivelnk *)memcpy(result, &procfs_perproc_drivelink_template, sizeof(struct flnknode));
 
 	/* Fill in fields. */
 	result->mf_ops       = &procfs_perproc_drivelink_ops.lno_node.no_file;

@@ -81,7 +81,7 @@ MKREG_RO(procfs_r_uptime, 0444, procfs_uptime_printer)
 
 /* /proc/kos */
 MKDIR_BEGIN(procfs_r_kos, 0555)
-	MKDIR_ENT("cc-max-attempts", DT_DIR, &procfs_r_kos_cc_max_attempts, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7ea7a820, 0x6b0cafdd43fdf2ef, 0xf4fdbc5b, 0x7ef00d48da9f0cdd)/*[[[end]]]*/)
+	MKDIR_ENT("cc-max-attempts", DT_REG, &procfs_r_kos_cc_max_attempts, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x7ea7a820, 0x6b0cafdd43fdf2ef, 0xf4fdbc5b, 0x7ef00d48da9f0cdd)/*[[[end]]]*/)
 	MKDIR_ENT("fs",              DT_DIR, &procfs_r_kos_fs,              /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
 	MKDIR_ENT("futexfd-maxexpr", DT_REG, &procfs_r_kos_futexfd_maxexpr, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd71498bb, 0x98fa0ab3f6908203, 0xb5bdd1df, 0x9a938809a111e702)/*[[[end]]]*/)
 	MKDIR_ENT("kstat",           DT_REG, &procfs_r_kos_kstat,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6d180f37, 0x746174736b, 0xc70f17dd, 0x746174736b)/*[[[end]]]*/)
