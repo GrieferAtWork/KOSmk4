@@ -50,7 +50,8 @@ udp_routepacket(struct nicdev *__restrict dev,
 	assert(packet_size >= sizeof(struct udphdr));
 	payload        = (byte_t const *)packet + sizeof(struct udphdr);
 	payload_length = ntohs(packet->uh_ulen);
-	/* Ensure that the */
+
+	/* Validate the payload length field within the UDP header. */
 	if unlikely(payload_length < sizeof(struct udphdr)) {
 		device_getname_lock_acquire(dev);
 		printk(KERN_ERR "[udp:%s] udp packet udp.size=%" PRIu16 " from "

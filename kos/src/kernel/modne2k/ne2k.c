@@ -54,7 +54,7 @@
 
 #include <libpciaccess/pciaccess.h>
 
-#if 0
+#if 1
 #define NE2K_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
 #else
 #define NE2K_DEBUG(...) (void)0

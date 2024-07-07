@@ -44,10 +44,10 @@
 
 DECL_BEGIN
 
-#define nic_packet_alloc(nic, num_payloads, ht_size)                                       \
-	((REF struct nic_packet *)kmalloc(offsetof(struct nic_packet, np_payloadv) +           \
+#define nic_packet_alloc(nic, num_payloads, ht_size)                                \
+	((REF struct nic_packet *)kmalloc(offsetof(struct nic_packet, np_payloadv) +    \
 	                                  ((num_payloads) * sizeof(struct iov_entry)) + \
-	                                  (ht_size),                                           \
+	                                  (ht_size),                                    \
 	                                  (nic)->nd_hdgfp))
 
 /* Allocate  a new NIC packet which may be used to send the given payload.
@@ -55,8 +55,8 @@ DECL_BEGIN
  * sizes to be included alongside the payload. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nicdev_newpacket(struct nicdev const *__restrict self,
-                     NCX void const *payload, size_t payload_size,
-                     size_t max_head_size, size_t max_tail_size)
+                 NCX void const *payload, size_t payload_size,
+                 size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
 	result = nic_packet_alloc(self, 1, max_head_size + max_tail_size);
@@ -73,8 +73,8 @@ nicdev_newpacket(struct nicdev const *__restrict self,
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL
 nicdev_newpacketv(struct nicdev const *__restrict self,
-                      struct iov_buffer const *__restrict payload,
-                      size_t max_head_size, size_t max_tail_size)
+                  struct iov_buffer const *__restrict payload,
+                  size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
 	size_t i, total;
@@ -101,7 +101,7 @@ nicdev_newpacketv(struct nicdev const *__restrict self,
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nicdev_newpacketh(struct nicdev const *__restrict self,
-                      size_t max_head_size, size_t max_tail_size)
+                  size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
 	result = nic_packet_alloc(self, 0, max_head_size + max_tail_size);
@@ -116,7 +116,7 @@ nicdev_newpacketh(struct nicdev const *__restrict self,
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nicdev_newpacketk_impl(struct nicdev const *__restrict self,
-                           size_t buffer_size)
+                       size_t buffer_size)
 		THROWS(E_BADALLOC) {
 	REF struct nic_packet *result;
 	result = nic_packet_alloc(self, 0, buffer_size);
@@ -151,8 +151,8 @@ NOTHROW(KCALL nicdev_v_destroy)(struct mfile *__restrict self) {
  * WARNING: This function may still clobber exception pointers! */
 PUBLIC NONNULL((1, 2, 3)) void
 NOTHROW(KCALL nicdev_send_nx)(struct nicdev *__restrict self,
-                                  struct nic_packet *__restrict packet,
-                                  /*out*/ struct aio_handle *__restrict aio) {
+                              struct nic_packet *__restrict packet,
+                              /*out*/ struct aio_handle *__restrict aio) {
 	TRY {
 		nicdev_send(self, packet, aio);
 	} EXCEPT {
@@ -165,7 +165,7 @@ NOTHROW(KCALL nicdev_send_nx)(struct nicdev *__restrict self,
  * NOTE: Transmit errors get logged, but are silently discarded. */
 PUBLIC NONNULL((1, 2)) void KCALL
 nicdev_send_background(struct nicdev *__restrict self,
-                           struct nic_packet *__restrict packet) {
+                       struct nic_packet *__restrict packet) {
 	struct aio_handle *aio;
 	aio = aio_handle_async_alloc();
 	TRY {
@@ -249,8 +249,8 @@ NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self) {
  *                     NOTE: The caller must ensure that this is at least `ETH_ZLEN' */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 nicdev_routepacket(struct nicdev *__restrict self,
-                       /*inherit(always)*/ struct nic_rpacket *__restrict packet,
-                       size_t real_packet_size) {
+                   /*inherit(always)*/ struct nic_rpacket *__restrict packet,
+                   size_t real_packet_size) {
 	assert(real_packet_size <= packet->rp_size);
 	assert(real_packet_size >= ETH_ZLEN);
 	/* XXX: Option to have the routing be done asynchronously! */

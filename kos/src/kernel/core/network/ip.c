@@ -315,7 +315,7 @@ ip_routepacket(struct nicdev *__restrict dev,
 			device_getname_lock_release(dev);
 			return;
 		}
-		/* Collect all of the information used to identity incoming datagrams. */
+		/* Collect all of the information used to identify incoming datagrams. */
 		uid.dg_src  = hdr->ip_src;
 		uid.dg_did  = hdr->ip_id;
 		uid.dg_pro  = hdr->ip_p;

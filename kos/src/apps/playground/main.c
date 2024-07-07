@@ -494,6 +494,16 @@ int main_float(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_sock(int argc, char *argv[], char *envp[]) {
+	/* NOTE: For this test-program, you need to:
+	 * - have `deemon kos/misc/scripts/udpecho.dee' running (on your host machine)
+	 * - Add to `qemu.conf':
+	 *   >> args=-netdev user,id=n1 -device ne2k_pci,netdev=n1
+	 *   >> args=-object filter-dump,id=f1,netdev=n1,file=qemu.netdump
+	 *
+	 * You should then see (in the externally running deemon):
+	 * >> Packet from: sockaddr("<hostname>:<random-port>")
+	 * >>     "Wazzzzaaaaaap!\n\0".bytes()
+	 */
 	fd_t sock;
 	struct sockaddr_in in;
 	char payload[] = "Wazzzzaaaaaap!\n";
@@ -511,6 +521,7 @@ int main_sock(int argc, char *argv[], char *envp[]) {
 		err(EXIT_FAILURE, "connect() failed");
 	if (send(sock, payload, sizeof(payload), 0) < 0)
 		err(EXIT_FAILURE, "send() failed");
+	/* This will always fail right now because packet routing isn't implemented, yet. */
 	resplen = recv(sock, response, sizeof(response), 0);
 	if (resplen < 0)
 		err(EXIT_FAILURE, "recv() failed");

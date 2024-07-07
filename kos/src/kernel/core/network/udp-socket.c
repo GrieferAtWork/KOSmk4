@@ -269,8 +269,8 @@ udp_sendtov(struct socket *__restrict self,
 
 	/* Construct the UDP packet to-be sent. */
 	packet = nicdev_newpacketv(dev, buf,
-	                               UDP_PACKET_HEADSIZE,
-	                               UDP_PACKET_TAILSIZE);
+	                           UDP_PACKET_HEADSIZE,
+	                           UDP_PACKET_TAILSIZE);
 	(void)bufsize;
 	assert(packet->np_payloads == bufsize);
 	FINALLY_DECREF(packet);

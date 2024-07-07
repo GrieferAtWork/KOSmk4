@@ -1256,6 +1256,7 @@
 #define DEFINE_TEST(x) void test_##x(void)
 #define PCI_FOREACH(...) for(;;)
 #define PCI_FOREACH_CLASS(...) for(;;)
+#define PCI_FOREACH_DEVICE_CLASS(...) for(;;)
 #define __NRFEAT_SYSCALL_TABLE_FOREACH(cb) cb(0) cb(1)
 
 
@@ -1913,6 +1914,8 @@
 #define IF_PHYS_IDENTITY(a,b,...) do{__VA_ARGS__;}while(0)
 #define IF_PHYS_IDENTITY_PAGE(a,...) do{__VA_ARGS__;}while(0)
 #define PHYS_VARS byte_t *trampoline
+#define HANDLE_FOREACH_TYPE(x) x(_,fdirent)x(_,filehandle)x(_,taskpid)x(_,epoll_controller)x(_,pipe_reader)x(_,pipe_writer)x(_,driver_state)x(_,mfutexfd)x(_,refcountable)x(_,timerfd)
+#define HANDLE_FOREACH_CUSTOMTYPE(x) x(_,mfile)x(_,driver)x(_,socket)x(_,refcountable)
 
 #define DEFINE_CMDLINE_FLAG_VAR(flagname,parname) bool flagname;
 #define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name,parname) char string_name[];
@@ -2782,3 +2785,8 @@
 #define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
 #define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
 #define DEFINE_FORMAT_CONVERTER_RGB(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
+
+#define _ASYNC_WORKER_CXX_DECLARE(_,T)\
+	async*async_worker_new(async_worker_ops const*ops,T*ob_pointer){}\
+	bool register_async_worker(async_worker_ops const*ops,T*ob_pointer){}\
+	bool unregister_async_worker(async_worker_ops const*ops,T*ob_pointer){}
