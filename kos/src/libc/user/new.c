@@ -71,11 +71,11 @@ NOTHROW_NCX(LIBDCALL libc__set_new_mode)(int newmode)
 }
 /*[[[end:libc__set_new_mode]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x1ef0ab6a]]]*/
-DEFINE_PUBLIC_ALIAS(_query_new_handler, libc__query_new_handler);
-DEFINE_PUBLIC_ALIAS(_set_new_handler, libc__set_new_handler);
-DEFINE_PUBLIC_ALIAS(_query_new_mode, libc__query_new_mode);
-DEFINE_PUBLIC_ALIAS(_set_new_mode, libc__set_new_mode);
+/*[[[start:exports,hash:CRC-32=0x5d7fdd2b]]]*/
+DEFINE_PUBLIC_ALIAS_P(_query_new_handler,libc__query_new_handler,,_PNH,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_set_new_handler,libc__set_new_handler,,_PNH,NOTHROW_NCX,LIBDCALL,(_PNH newhandler),(newhandler));
+DEFINE_PUBLIC_ALIAS_P(_query_new_mode,libc__query_new_mode,,int,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_set_new_mode,libc__set_new_mode,,int,NOTHROW_NCX,LIBDCALL,(int newmode),(newmode));
 /*[[[end:exports]]]*/
 
 DECL_END

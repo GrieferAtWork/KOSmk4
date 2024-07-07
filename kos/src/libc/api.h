@@ -163,6 +163,19 @@ __asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreac
 #define __ATTR_DEPRECATED_     /* nothing */
 
 
+#define DEFINE_PRIVATE_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args)      DEFINE_PRIVATE_ALIAS(n, o)
+#define DEFINE_PUBLIC_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args)       DEFINE_PUBLIC_ALIAS(n, o)
+#define DEFINE_INTERN_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args)       DEFINE_INTERN_ALIAS(n, o)
+#define DEFINE_PRIVATE_WEAK_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args) DEFINE_PRIVATE_WEAK_ALIAS(n, o)
+#define DEFINE_PUBLIC_WEAK_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args)  DEFINE_PUBLIC_WEAK_ALIAS(n, o)
+#define DEFINE_INTERN_WEAK_ALIAS_P(n, o, attr, Treturn, nothrow, cc, param, args)  DEFINE_INTERN_WEAK_ALIAS(n, o)
+#define DEFINE_PRIVATE_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)          DEFINE_PRIVATE_ALIAS(n, o)
+#define DEFINE_PUBLIC_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)           DEFINE_PUBLIC_ALIAS(n, o)
+#define DEFINE_INTERN_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)           DEFINE_INTERN_ALIAS(n, o)
+#define DEFINE_PRIVATE_WEAK_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)     DEFINE_PRIVATE_WEAK_ALIAS(n, o)
+#define DEFINE_PUBLIC_WEAK_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)      DEFINE_PUBLIC_WEAK_ALIAS(n, o)
+#define DEFINE_INTERN_WEAK_ALIAS_P_VOID(n, o, attr, nothrow, cc, param, args)      DEFINE_INTERN_WEAK_ALIAS(n, o)
+
 #include <hybrid/host.h>
 
 #include <bits/types.h>

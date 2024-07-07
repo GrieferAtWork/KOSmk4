@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a04ec31 */
+/* HASH CRC-32:0x4bedc49 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(login_tty, libc_login_tty);
+DEFINE_PUBLIC_ALIAS_P(login_tty,libc_login_tty,ATTR_FDARG(1),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t fd),(fd));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UTMP_C */

@@ -139,9 +139,9 @@ NOTHROW_NCX(LIBCCALL libc_sigunblockall)(void)
 /*[[[end:libc_sigunblockall]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x1ea4981b]]]*/
-DEFINE_PUBLIC_ALIAS(sigblockall, libc_sigblockall);
-DEFINE_PUBLIC_ALIAS(sigunblockall, libc_sigunblockall);
+/*[[[start:exports,hash:CRC-32=0x53f64859]]]*/
+DEFINE_PUBLIC_ALIAS_P(sigblockall,libc_sigblockall,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(sigunblockall,libc_sigunblockall,,int,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

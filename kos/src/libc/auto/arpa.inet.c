@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17a95971 */
+/* HASH CRC-32:0xb930262f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -375,16 +375,16 @@ too_small:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(inet_netof, libc_inet_netof);
-DEFINE_PUBLIC_ALIAS(inet_lnaof, libc_inet_lnaof);
-DEFINE_PUBLIC_ALIAS(inet_makeaddr, libc_inet_makeaddr);
-DEFINE_PUBLIC_ALIAS(inet_addr, libc_inet_addr);
-DEFINE_PUBLIC_ALIAS(inet_ntoa, libc_inet_ntoa);
-DEFINE_PUBLIC_ALIAS(inet_ntoa_r, libc_inet_ntoa_r);
-DEFINE_PUBLIC_ALIAS(inet_network, libc_inet_network);
-DEFINE_PUBLIC_ALIAS(inet_aton, libc_inet_aton);
-DEFINE_PUBLIC_ALIAS(inet_paton, libc_inet_paton);
-DEFINE_PUBLIC_ALIAS(inet_neta, libc_inet_neta);
+DEFINE_PUBLIC_ALIAS_P(inet_netof,libc_inet_netof,ATTR_CONST WUNUSED,uint32_t,NOTHROW,LIBCCALL,(struct in_addr inaddr),(inaddr));
+DEFINE_PUBLIC_ALIAS_P(inet_lnaof,libc_inet_lnaof,ATTR_CONST WUNUSED,uint32_t,NOTHROW,LIBCCALL,(struct in_addr inaddr),(inaddr));
+DEFINE_PUBLIC_ALIAS_P(inet_makeaddr,libc_inet_makeaddr,ATTR_CONST WUNUSED,struct in_addr,NOTHROW,LIBCCALL,(uint32_t net, uint32_t host),(net,host));
+DEFINE_PUBLIC_ALIAS_P(inet_addr,libc_inet_addr,ATTR_PURE ATTR_IN(1),in_addr_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp),(cp));
+DEFINE_PUBLIC_ALIAS_P(inet_ntoa,libc_inet_ntoa,ATTR_RETNONNULL WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(struct in_addr inaddr),(inaddr));
+DEFINE_PUBLIC_ALIAS_P(inet_ntoa_r,libc_inet_ntoa_r,ATTR_RETNONNULL ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct in_addr inaddr, char buf[16]),(inaddr,buf));
+DEFINE_PUBLIC_ALIAS_P(inet_network,libc_inet_network,ATTR_PURE ATTR_IN(1),uint32_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp),(cp));
+DEFINE_PUBLIC_ALIAS_P(inet_aton,libc_inet_aton,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp, struct in_addr *__restrict inp),(cp,inp));
+DEFINE_PUBLIC_ALIAS_P(inet_paton,libc_inet_paton,WUNUSED ATTR_INOUT(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr),(pcp,inp,network_addr));
+DEFINE_PUBLIC_ALIAS_P(inet_neta,libc_inet_neta,ATTR_OUTS(2, 3),char *,NOTHROW_NCX,LIBCCALL,(uint32_t net, char *buf, size_t len),(net,buf,len));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARPA_INET_C */

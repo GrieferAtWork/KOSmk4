@@ -290,30 +290,30 @@ NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x599a3e35]]]*/
-DEFINE_PUBLIC_ALIAS(__wait, libc_wait);
-DEFINE_PUBLIC_ALIAS(__libc_wait, libc_wait);
-DEFINE_PUBLIC_ALIAS(wait, libc_wait);
-DEFINE_PUBLIC_ALIAS(__waitpid, libc_waitpid);
-DEFINE_PUBLIC_ALIAS(__libc_waitpid, libc_waitpid);
-DEFINE_PUBLIC_ALIAS(waitpid, libc_waitpid);
-DEFINE_PUBLIC_ALIAS(__waitid, libc_waitid);
-DEFINE_PUBLIC_ALIAS(waitid, libc_waitid);
-DEFINE_PUBLIC_ALIAS(__wait3, libc_wait3);
-DEFINE_PUBLIC_ALIAS(wait3, libc_wait3);
+/*[[[start:exports,hash:CRC-32=0xbaa34e27]]]*/
+DEFINE_PUBLIC_ALIAS_P(__wait,libc_wait,,pid_t,NOTHROW_RPC,LIBCCALL,(__WAIT_STATUS stat_loc),(stat_loc));
+DEFINE_PUBLIC_ALIAS_P(__libc_wait,libc_wait,,pid_t,NOTHROW_RPC,LIBCCALL,(__WAIT_STATUS stat_loc),(stat_loc));
+DEFINE_PUBLIC_ALIAS_P(wait,libc_wait,,pid_t,NOTHROW_RPC,LIBCCALL,(__WAIT_STATUS stat_loc),(stat_loc));
+DEFINE_PUBLIC_ALIAS_P(__waitpid,libc_waitpid,,pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options),(pid,stat_loc,options));
+DEFINE_PUBLIC_ALIAS_P(__libc_waitpid,libc_waitpid,,pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options),(pid,stat_loc,options));
+DEFINE_PUBLIC_ALIAS_P(waitpid,libc_waitpid,,pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options),(pid,stat_loc,options));
+DEFINE_PUBLIC_ALIAS_P(__waitid,libc_waitid,ATTR_OUT_OPT(3),int,NOTHROW_RPC,LIBCCALL,(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options),(idtype,id,infop,options));
+DEFINE_PUBLIC_ALIAS_P(waitid,libc_waitid,ATTR_OUT_OPT(3),int,NOTHROW_RPC,LIBCCALL,(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options),(idtype,id,infop,options));
+DEFINE_PUBLIC_ALIAS_P(__wait3,libc_wait3,ATTR_OUT_OPT(3),pid_t,NOTHROW_RPC,LIBCCALL,(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage),(stat_loc,options,usage));
+DEFINE_PUBLIC_ALIAS_P(wait3,libc_wait3,ATTR_OUT_OPT(3),pid_t,NOTHROW_RPC,LIBCCALL,(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage),(stat_loc,options,usage));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__wait3_time64, libc_wait3_64);
-DEFINE_PUBLIC_ALIAS(wait3_64, libc_wait3_64);
+DEFINE_PUBLIC_ALIAS_P(__wait3_time64,libc_wait3_64,ATTR_OUT_OPT(3),pid_t,NOTHROW_NCX,LIBCCALL,(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage),(stat_loc,options,usage));
+DEFINE_PUBLIC_ALIAS_P(wait3_64,libc_wait3_64,ATTR_OUT_OPT(3),pid_t,NOTHROW_NCX,LIBCCALL,(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage),(stat_loc,options,usage));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(__wait4, libc_wait4);
-DEFINE_PUBLIC_ALIAS(__libc_wait4, libc_wait4);
-DEFINE_PUBLIC_ALIAS(wait4, libc_wait4);
+DEFINE_PUBLIC_ALIAS_P(__wait4,libc_wait4,ATTR_OUT_OPT(4),pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage),(pid,stat_loc,options,usage));
+DEFINE_PUBLIC_ALIAS_P(__libc_wait4,libc_wait4,ATTR_OUT_OPT(4),pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage),(pid,stat_loc,options,usage));
+DEFINE_PUBLIC_ALIAS_P(wait4,libc_wait4,ATTR_OUT_OPT(4),pid_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage),(pid,stat_loc,options,usage));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__wait4_time64, libc_wait4_64);
-DEFINE_PUBLIC_ALIAS(wait4_64, libc_wait4_64);
+DEFINE_PUBLIC_ALIAS_P(__wait4_time64,libc_wait4_64,ATTR_OUT_OPT(4),pid_t,NOTHROW_NCX,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage),(pid,stat_loc,options,usage));
+DEFINE_PUBLIC_ALIAS_P(wait4_64,libc_wait4_64,ATTR_OUT_OPT(4),pid_t,NOTHROW_NCX,LIBCCALL,(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage),(pid,stat_loc,options,usage));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(detach, libc_detach);
+DEFINE_PUBLIC_ALIAS_P(detach,libc_detach,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid),(pid));
 /*[[[end:exports]]]*/
 
 DECL_END

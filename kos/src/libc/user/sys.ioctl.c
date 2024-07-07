@@ -58,14 +58,14 @@ NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb0591502]]]*/
-DEFINE_PUBLIC_ALIAS(__ioctl, libc_ioctl);
-DEFINE_PUBLIC_ALIAS(__libc_ioctl, libc_ioctl);
+/*[[[start:exports,hash:CRC-32=0xa096e7f4]]]*/
+DEFINE_PUBLIC_ALIAS_P(__ioctl,libc_ioctl,ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(fd_t fd, ioctl_t request, ...),(fd,request,));
+DEFINE_PUBLIC_ALIAS_P(__libc_ioctl,libc_ioctl,ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(fd_t fd, ioctl_t request, ...),(fd,request,));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__ioctl_time64, libc_ioctl);
+DEFINE_PUBLIC_ALIAS_P(__ioctl_time64,libc_ioctl,ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(fd_t fd, ioctl_t request, ...),(fd,request,));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(ioctl, libc_ioctl);
+DEFINE_PUBLIC_ALIAS_P(ioctl,libc_ioctl,ATTR_FDARG(1),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(fd_t fd, ioctl_t request, ...),(fd,request,));
 /*[[[end:exports]]]*/
 
 DECL_END

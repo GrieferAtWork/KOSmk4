@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4d17c82 */
+/* HASH CRC-32:0x7de49606 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1278,7 +1278,7 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libd_wtruncate64, libd_wtruncate);
+DEFINE_INTERN_ALIAS_P(libd_wtruncate64,libd_wtruncate,ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *file, __PIO_OFFSET64 length),(file,length));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #include <features.h>
 #ifndef __PIO_OFFSET
@@ -1311,7 +1311,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_wtruncate64, libc_wtruncate);
+DEFINE_INTERN_ALIAS_P(libc_wtruncate64,libc_wtruncate,ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *file, __PIO_OFFSET64 length),(file,length));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #include <features.h>
 #ifndef __PIO_OFFSET
@@ -1771,73 +1771,73 @@ NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *path) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$wttyname, libd_wttyname);
-DEFINE_PUBLIC_ALIAS(wttyname, libc_wttyname);
-DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
-DEFINE_PUBLIC_ALIAS(wttyname_r, libc_wttyname_r);
-DEFINE_PUBLIC_ALIAS(DOS$wchown, libd_wchown);
-DEFINE_PUBLIC_ALIAS(wchown, libc_wchown);
-DEFINE_PUBLIC_ALIAS(DOS$wpathconf, libd_wpathconf);
-DEFINE_PUBLIC_ALIAS(wpathconf, libc_wpathconf);
-DEFINE_PUBLIC_ALIAS(DOS$wlink, libd_wlink);
-DEFINE_PUBLIC_ALIAS(wlink, libc_wlink);
-DEFINE_PUBLIC_ALIAS(DOS$_waccess, libd_waccess);
-DEFINE_PUBLIC_ALIAS(DOS$waccess, libd_waccess);
-DEFINE_PUBLIC_ALIAS(waccess, libc_waccess);
-DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd_wchdir);
-DEFINE_PUBLIC_ALIAS(DOS$wchdir, libd_wchdir);
-DEFINE_PUBLIC_ALIAS(wchdir, libc_wchdir);
-DEFINE_PUBLIC_ALIAS(DOS$_wgetcwd, libd_wgetcwd);
-DEFINE_PUBLIC_ALIAS(DOS$wgetcwd, libd_wgetcwd);
-DEFINE_PUBLIC_ALIAS(wgetcwd, libc_wgetcwd);
-DEFINE_PUBLIC_ALIAS(DOS$_wunlink, libd_wunlink);
-DEFINE_PUBLIC_ALIAS(DOS$wunlink, libd_wunlink);
-DEFINE_PUBLIC_ALIAS(wunlink, libc_wunlink);
-DEFINE_PUBLIC_ALIAS(DOS$_wrmdir, libd_wrmdir);
-DEFINE_PUBLIC_ALIAS(DOS$wrmdir, libd_wrmdir);
-DEFINE_PUBLIC_ALIAS(wrmdir, libc_wrmdir);
-DEFINE_PUBLIC_ALIAS(DOS$weuidaccess, libd_weuidaccess);
-DEFINE_PUBLIC_ALIAS(weuidaccess, libc_weuidaccess);
-DEFINE_PUBLIC_ALIAS(DOS$wget_current_dir_name, libd_wget_current_dir_name);
-DEFINE_PUBLIC_ALIAS(wget_current_dir_name, libc_wget_current_dir_name);
-DEFINE_PUBLIC_ALIAS(DOS$wfaccessat, libd_wfaccessat);
-DEFINE_PUBLIC_ALIAS(wfaccessat, libc_wfaccessat);
-DEFINE_PUBLIC_ALIAS(DOS$wfchownat, libd_wfchownat);
-DEFINE_PUBLIC_ALIAS(wfchownat, libc_wfchownat);
-DEFINE_PUBLIC_ALIAS(DOS$wlinkat, libd_wlinkat);
-DEFINE_PUBLIC_ALIAS(wlinkat, libc_wlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wsymlinkat, libd_wsymlinkat);
-DEFINE_PUBLIC_ALIAS(wsymlinkat, libc_wsymlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
-DEFINE_PUBLIC_ALIAS(wreadlinkat, libc_wreadlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wfsymlinkat, libd_wfsymlinkat);
-DEFINE_PUBLIC_ALIAS(wfsymlinkat, libc_wfsymlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
-DEFINE_PUBLIC_ALIAS(wfreadlinkat, libc_wfreadlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wunlinkat, libd_wunlinkat);
-DEFINE_PUBLIC_ALIAS(wunlinkat, libc_wunlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wlchown, libd_wlchown);
-DEFINE_PUBLIC_ALIAS(wlchown, libc_wlchown);
-DEFINE_PUBLIC_ALIAS(DOS$wtruncate, libd_wtruncate);
-DEFINE_PUBLIC_ALIAS(wtruncate, libc_wtruncate);
-DEFINE_PUBLIC_ALIAS(DOS$wtruncate64, libd_wtruncate64);
-DEFINE_PUBLIC_ALIAS(wtruncate64, libc_wtruncate64);
-DEFINE_PUBLIC_ALIAS(DOS$wsymlink, libd_wsymlink);
-DEFINE_PUBLIC_ALIAS(wsymlink, libc_wsymlink);
-DEFINE_PUBLIC_ALIAS(DOS$wreadlink, libd_wreadlink);
-DEFINE_PUBLIC_ALIAS(wreadlink, libc_wreadlink);
-DEFINE_PUBLIC_ALIAS(DOS$wgethostname, libd_wgethostname);
-DEFINE_PUBLIC_ALIAS(wgethostname, libc_wgethostname);
-DEFINE_PUBLIC_ALIAS(DOS$wsetlogin, libd_wsetlogin);
-DEFINE_PUBLIC_ALIAS(wsetlogin, libc_wsetlogin);
-DEFINE_PUBLIC_ALIAS(DOS$wsethostname, libd_wsethostname);
-DEFINE_PUBLIC_ALIAS(wsethostname, libc_wsethostname);
-DEFINE_PUBLIC_ALIAS(DOS$wgetdomainname, libd_wgetdomainname);
-DEFINE_PUBLIC_ALIAS(wgetdomainname, libc_wgetdomainname);
-DEFINE_PUBLIC_ALIAS(DOS$wsetdomainname, libd_wsetdomainname);
-DEFINE_PUBLIC_ALIAS(wsetdomainname, libc_wsetdomainname);
-DEFINE_PUBLIC_ALIAS(DOS$wchroot, libd_wchroot);
-DEFINE_PUBLIC_ALIAS(wchroot, libc_wchroot);
+DEFINE_PUBLIC_ALIAS_P(DOS$wttyname,libd_wttyname,WUNUSED ATTR_FDARG(1),char16_t *,NOTHROW_RPC,LIBDCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(wttyname,libc_wttyname,WUNUSED ATTR_FDARG(1),char32_t *,NOTHROW_RPC,LIBKCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(DOS$wttyname_r,libd_wttyname_r,ATTR_FDARG(1) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBDCALL,(fd_t fd, char16_t *buf, size_t buflen),(fd,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(wttyname_r,libc_wttyname_r,ATTR_FDARG(1) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBKCALL,(fd_t fd, char32_t *buf, size_t buflen),(fd,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wchown,libd_wchown,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, uid_t owner, gid_t group),(file,owner,group));
+DEFINE_PUBLIC_ALIAS_P(wchown,libc_wchown,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, uid_t owner, gid_t group),(file,owner,group));
+DEFINE_PUBLIC_ALIAS_P(DOS$wpathconf,libd_wpathconf,ATTR_IN(1),longptr_t,NOTHROW_RPC,LIBDCALL,(char16_t const *path, __STDC_INT_AS_UINT_T name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(wpathconf,libc_wpathconf,ATTR_IN(1),longptr_t,NOTHROW_RPC,LIBKCALL,(char32_t const *path, __STDC_INT_AS_UINT_T name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(DOS$wlink,libd_wlink,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *from, char16_t const *to),(from,to));
+DEFINE_PUBLIC_ALIAS_P(wlink,libc_wlink,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *from, char32_t const *to),(from,to));
+DEFINE_PUBLIC_ALIAS_P(DOS$_waccess,libd_waccess,WUNUSED ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(DOS$waccess,libd_waccess,WUNUSED ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(waccess,libc_waccess,WUNUSED ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wchdir,libd_wchdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wchdir,libd_wchdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(wchdir,libc_wchdir,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wgetcwd,libd_wgetcwd,ATTR_OUTS(1, 2),char16_t *,NOTHROW_RPC,LIBDCALL,(char16_t *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(DOS$wgetcwd,libd_wgetcwd,ATTR_OUTS(1, 2),char16_t *,NOTHROW_RPC,LIBDCALL,(char16_t *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(wgetcwd,libc_wgetcwd,ATTR_OUTS(1, 2),char32_t *,NOTHROW_RPC,LIBKCALL,(char32_t *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wunlink,libd_wunlink,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file),(file));
+DEFINE_PUBLIC_ALIAS_P(DOS$wunlink,libd_wunlink,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file),(file));
+DEFINE_PUBLIC_ALIAS_P(wunlink,libc_wunlink,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file),(file));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wrmdir,libd_wrmdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wrmdir,libd_wrmdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(wrmdir,libc_wrmdir,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(DOS$weuidaccess,libd_weuidaccess,WUNUSED ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(weuidaccess,libc_weuidaccess,WUNUSED ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(DOS$wget_current_dir_name,libd_wget_current_dir_name,ATTR_MALLOC WUNUSED,char16_t *,NOTHROW_RPC,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(wget_current_dir_name,libc_wget_current_dir_name,ATTR_MALLOC WUNUSED,char32_t *,NOTHROW_RPC,LIBKCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$wfaccessat,libd_wfaccessat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dfd, char16_t const *file, __STDC_INT_AS_UINT_T type, atflag_t flags),(dfd,file,type,flags));
+DEFINE_PUBLIC_ALIAS_P(wfaccessat,libc_wfaccessat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dfd, char32_t const *file, __STDC_INT_AS_UINT_T type, atflag_t flags),(dfd,file,type,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfchownat,libd_wfchownat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dfd, char16_t const *file, uid_t owner, gid_t group, atflag_t flags),(dfd,file,owner,group,flags));
+DEFINE_PUBLIC_ALIAS_P(wfchownat,libc_wfchownat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dfd, char32_t const *file, uid_t owner, gid_t group, atflag_t flags),(dfd,file,owner,group,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wlinkat,libd_wlinkat,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBDCALL,(fd_t fromfd, char16_t const *from, fd_t tofd, char16_t const *to, atflag_t flags),(fromfd,from,tofd,to,flags));
+DEFINE_PUBLIC_ALIAS_P(wlinkat,libc_wlinkat,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBKCALL,(fd_t fromfd, char32_t const *from, fd_t tofd, char32_t const *to, atflag_t flags),(fromfd,from,tofd,to,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsymlinkat,libd_wsymlinkat,ATTR_IN(1) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *link_text, fd_t tofd, char16_t const *target_path),(link_text,tofd,target_path));
+DEFINE_PUBLIC_ALIAS_P(wsymlinkat,libc_wsymlinkat,ATTR_IN(1) ATTR_IN(3),int,NOTHROW_RPC,LIBKCALL,(char32_t const *link_text, fd_t tofd, char32_t const *target_path),(link_text,tofd,target_path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wreadlinkat,libd_wreadlinkat,ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBDCALL,(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen),(dfd,path,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(wreadlinkat,libc_wreadlinkat,ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBKCALL,(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen),(dfd,path,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfsymlinkat,libd_wfsymlinkat,ATTR_IN(1) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *link_text, fd_t tofd, char16_t const *target_path, atflag_t flags),(link_text,tofd,target_path,flags));
+DEFINE_PUBLIC_ALIAS_P(wfsymlinkat,libc_wfsymlinkat,ATTR_IN(1) ATTR_IN(3),int,NOTHROW_RPC,LIBKCALL,(char32_t const *link_text, fd_t tofd, char32_t const *target_path, atflag_t flags),(link_text,tofd,target_path,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfreadlinkat,libd_wfreadlinkat,ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBDCALL,(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen, atflag_t flags),(dfd,path,buf,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(wfreadlinkat,libc_wfreadlinkat,ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBKCALL,(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen, atflag_t flags),(dfd,path,buf,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wunlinkat,libd_wunlinkat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dfd, char16_t const *file, atflag_t flags),(dfd,file,flags));
+DEFINE_PUBLIC_ALIAS_P(wunlinkat,libc_wunlinkat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dfd, char32_t const *file, atflag_t flags),(dfd,file,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wlchown,libd_wlchown,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, uid_t owner, gid_t group),(file,owner,group));
+DEFINE_PUBLIC_ALIAS_P(wlchown,libc_wlchown,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, uid_t owner, gid_t group),(file,owner,group));
+DEFINE_PUBLIC_ALIAS_P(DOS$wtruncate,libd_wtruncate,ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *file, __PIO_OFFSET length),(file,length));
+DEFINE_PUBLIC_ALIAS_P(wtruncate,libc_wtruncate,ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *file, __PIO_OFFSET length),(file,length));
+DEFINE_PUBLIC_ALIAS_P(DOS$wtruncate64,libd_wtruncate64,ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *file, __PIO_OFFSET64 length),(file,length));
+DEFINE_PUBLIC_ALIAS_P(wtruncate64,libc_wtruncate64,ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *file, __PIO_OFFSET64 length),(file,length));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsymlink,libd_wsymlink,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *link_text, char16_t const *target_path),(link_text,target_path));
+DEFINE_PUBLIC_ALIAS_P(wsymlink,libc_wsymlink,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *link_text, char32_t const *target_path),(link_text,target_path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wreadlink,libd_wreadlink,ATTR_IN(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBDCALL,(char16_t const *path, char16_t *buf, size_t buflen),(path,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(wreadlink,libc_wreadlink,ATTR_IN(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBKCALL,(char32_t const *path, char32_t *buf, size_t buflen),(path,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wgethostname,libd_wgethostname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBDCALL,(char16_t *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(wgethostname,libc_wgethostname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBKCALL,(char32_t *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsetlogin,libd_wsetlogin,ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(wsetlogin,libc_wsetlogin,ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsethostname,libd_wsethostname,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *name, size_t len),(name,len));
+DEFINE_PUBLIC_ALIAS_P(wsethostname,libc_wsethostname,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *name, size_t len),(name,len));
+DEFINE_PUBLIC_ALIAS_P(DOS$wgetdomainname,libd_wgetdomainname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBDCALL,(char16_t *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(wgetdomainname,libc_wgetdomainname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBKCALL,(char32_t *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsetdomainname,libd_wsetdomainname,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *name, size_t len),(name,len));
+DEFINE_PUBLIC_ALIAS_P(wsetdomainname,libc_wsetdomainname,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *name, size_t len),(name,len));
+DEFINE_PUBLIC_ALIAS_P(DOS$wchroot,libd_wchroot,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(wchroot,libc_wchroot,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *path),(path));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_UNISTD_C */

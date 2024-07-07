@@ -367,13 +367,13 @@ err:
 }
 /*[[[end:libc__unitombc_l]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x684938f5]]]*/
-DEFINE_PUBLIC_ALIAS(__p__mbctype, libc___p__mbctype);
-DEFINE_PUBLIC_ALIAS(__p__mbcasemap, libc___p__mbcasemap);
-DEFINE_PUBLIC_ALIAS(_setmbcp, libc__setmbcp);
-DEFINE_PUBLIC_ALIAS(_getmbcp, libc__getmbcp);
-DEFINE_PUBLIC_ALIAS(_mbctouni_l, libc__mbctouni_l);
-DEFINE_PUBLIC_ALIAS(_unitombc_l, libc__unitombc_l);
+/*[[[start:exports,hash:CRC-32=0x65185b2b]]]*/
+DEFINE_PUBLIC_ALIAS_P(__p__mbctype,libc___p__mbctype,ATTR_CONST ATTR_RETNONNULL WUNUSED,unsigned char *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__mbcasemap,libc___p__mbcasemap,ATTR_CONST ATTR_RETNONNULL WUNUSED,unsigned char *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_setmbcp,libc__setmbcp,,int,NOTHROW_NCX,LIBCCALL,(int cp),(cp));
+DEFINE_PUBLIC_ALIAS_P(_getmbcp,libc__getmbcp,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_mbctouni_l,libc__mbctouni_l,ATTR_PURE WUNUSED,char32_t,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_unitombc_l,libc__unitombc_l,ATTR_PURE WUNUSED,unsigned int,NOTHROW_NCX,LIBCCALL,(char32_t ch, locale_t locale),(ch,locale));
 /*[[[end:exports]]]*/
 
 DECL_END

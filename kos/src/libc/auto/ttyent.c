@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66e7855 */
+/* HASH CRC-32:0x2a9620ca */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(getttynam, libc_getttynam);
+DEFINE_PUBLIC_ALIAS_P(getttynam,libc_getttynam,ATTR_IN(1),struct ttyent *,NOTHROW_RPC_KOS,LIBCCALL,(char const *tty),(tty));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_TTYENT_C */

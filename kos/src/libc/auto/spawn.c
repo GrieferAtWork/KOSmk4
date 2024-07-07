@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe707d26 */
+/* HASH CRC-32:0x20442bf7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -975,32 +975,32 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(posix_fspawn_np, libc_posix_fspawn_np);
-DEFINE_PUBLIC_ALIAS(posix_spawn, libc_posix_spawn);
-DEFINE_PUBLIC_ALIAS(posix_spawnp, libc_posix_spawnp);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_init, libc_posix_spawnattr_init);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_destroy, libc_posix_spawnattr_destroy);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getflags, libc_posix_spawnattr_getflags);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setflags, libc_posix_spawnattr_setflags);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getsigdefault, libc_posix_spawnattr_getsigdefault);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setsigdefault, libc_posix_spawnattr_setsigdefault);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getsigmask, libc_posix_spawnattr_getsigmask);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setsigmask, libc_posix_spawnattr_setsigmask);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getpgroup, libc_posix_spawnattr_getpgroup);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setpgroup, libc_posix_spawnattr_setpgroup);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getschedpolicy, libc_posix_spawnattr_getschedpolicy);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setschedpolicy, libc_posix_spawnattr_setschedpolicy);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_getschedparam, libc_posix_spawnattr_getschedparam);
-DEFINE_PUBLIC_ALIAS(posix_spawnattr_setschedparam, libc_posix_spawnattr_setschedparam);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_init, libc_posix_spawn_file_actions_init);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_destroy, libc_posix_spawn_file_actions_destroy);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addopen, libc_posix_spawn_file_actions_addopen);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclose, libc_posix_spawn_file_actions_addclose);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addtcsetpgrp_np, libc_posix_spawn_file_actions_addtcsetpgrp_np);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclosefrom_np, libc_posix_spawn_file_actions_addclosefrom_np);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addchdir_np, libc_posix_spawn_file_actions_addchdir_np);
-DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addfchdir_np, libc_posix_spawn_file_actions_addfchdir_np);
+DEFINE_PUBLIC_ALIAS_P(posix_fspawn_np,libc_posix_fspawn_np,ATTR_FDREAD(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,execfd,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn,libc_posix_spawn,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,path,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnp,libc_posix_spawnp,ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP),(pid,file,file_actions,attrp,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_init,libc_posix_spawnattr_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr),(attr));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_destroy,libc_posix_spawnattr_destroy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr),(attr));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getflags,libc_posix_spawnattr_getflags,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags),(attr,pflags));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setflags,libc_posix_spawnattr_setflags,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, short int flags),(attr,flags));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getsigdefault,libc_posix_spawnattr_getsigdefault,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault),(attr,sigdefault));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setsigdefault,libc_posix_spawnattr_setsigdefault,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault),(attr,sigdefault));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getsigmask,libc_posix_spawnattr_getsigmask,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask),(attr,sigmask));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setsigmask,libc_posix_spawnattr_setsigmask,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask),(attr,sigmask));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getpgroup,libc_posix_spawnattr_getpgroup,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup),(attr,pgroup));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setpgroup,libc_posix_spawnattr_setpgroup,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, pid_t pgroup),(attr,pgroup));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getschedpolicy,libc_posix_spawnattr_getschedpolicy,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy),(attr,schedpolicy));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setschedpolicy,libc_posix_spawnattr_setschedpolicy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, int schedpolicy),(attr,schedpolicy));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_getschedparam,libc_posix_spawnattr_getschedparam,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam),(attr,schedparam));
+DEFINE_PUBLIC_ALIAS_P(posix_spawnattr_setschedparam,libc_posix_spawnattr_setschedparam,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam),(attr,schedparam));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_init,libc_posix_spawn_file_actions_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions),(file_actions));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_destroy,libc_posix_spawn_file_actions_destroy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions),(file_actions));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addopen,libc_posix_spawn_file_actions_addopen,ATTR_IN(3) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode),(file_actions,fd,path,oflags,mode));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addclose,libc_posix_spawn_file_actions_addclose,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd),(file_actions,fd));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_adddup2,libc_posix_spawn_file_actions_adddup2,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd),(file_actions,oldfd,newfd));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addtcsetpgrp_np,libc_posix_spawn_file_actions_addtcsetpgrp_np,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd),(file_actions,fd));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addclosefrom_np,libc_posix_spawn_file_actions_addclosefrom_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd),(file_actions,lowfd));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addchdir_np,libc_posix_spawn_file_actions_addchdir_np,ATTR_IN(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path),(file_actions,path));
+DEFINE_PUBLIC_ALIAS_P(posix_spawn_file_actions_addfchdir_np,libc_posix_spawn_file_actions_addfchdir_np,ATTR_FDARG(2) ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd),(file_actions,dfd));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SPAWN_C */

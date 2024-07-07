@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee5cd438 */
+/* HASH CRC-32:0x9641c94e */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timeval_add64, libc_timeval_add);
+DEFINE_INTERN_ALIAS_P_VOID(libc_timeval_add64,libc_timeval_add,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs),(result,lhs,rhs));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <bits/os/timeval.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_add64)(struct timeval64 *result,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timeval_sub64, libc_timeval_sub);
+DEFINE_INTERN_ALIAS_P_VOID(libc_timeval_sub64,libc_timeval_sub,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs),(result,lhs,rhs));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <bits/os/timeval.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
@@ -94,15 +94,15 @@ NOTHROW_NCX(LIBCCALL libc_timeval_sub64)(struct timeval64 *result,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(timeval_add, libc_timeval_add);
-DEFINE_PUBLIC_ALIAS(timeval_sub, libc_timeval_sub);
+DEFINE_PUBLIC_ALIAS_P_VOID(timeval_add,libc_timeval_add,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs),(result,lhs,rhs));
+DEFINE_PUBLIC_ALIAS_P_VOID(timeval_sub,libc_timeval_sub,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs),(result,lhs,rhs));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(timeval_add64, libc_timeval_add64);
+DEFINE_PUBLIC_ALIAS_P_VOID(timeval_add64,libc_timeval_add64,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs),(result,lhs,rhs));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(timeval_sub64, libc_timeval_sub64);
+DEFINE_PUBLIC_ALIAS_P_VOID(timeval_sub64,libc_timeval_sub64,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs),(result,lhs,rhs));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

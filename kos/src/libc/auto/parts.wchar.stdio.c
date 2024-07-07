@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5b48979 */
+/* HASH CRC-32:0xa204e85 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -414,27 +414,27 @@ done:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wremove, libd_wremove);
-DEFINE_PUBLIC_ALIAS(DOS$wremove, libd_wremove);
-DEFINE_PUBLIC_ALIAS(wremove, libc_wremove);
-DEFINE_PUBLIC_ALIAS(DOS$_wrename, libd_wrename);
-DEFINE_PUBLIC_ALIAS(DOS$wrename, libd_wrename);
-DEFINE_PUBLIC_ALIAS(wrename, libc_wrename);
-DEFINE_PUBLIC_ALIAS(DOS$wrenameat, libd_wrenameat);
-DEFINE_PUBLIC_ALIAS(wrenameat, libc_wrenameat);
-DEFINE_PUBLIC_ALIAS(DOS$wremoveat, libd_wremoveat);
-DEFINE_PUBLIC_ALIAS(wremoveat, libc_wremoveat);
-DEFINE_PUBLIC_ALIAS(DOS$wrenameat2, libd_wrenameat2);
-DEFINE_PUBLIC_ALIAS(wrenameat2, libc_wrenameat2);
-DEFINE_PUBLIC_ALIAS(DOS$_wfopen, libd_wfopen);
-DEFINE_PUBLIC_ALIAS(DOS$wfopen, libd_wfopen);
-DEFINE_PUBLIC_ALIAS(wfopen, libc_wfopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wfreopen, libd_wfreopen);
-DEFINE_PUBLIC_ALIAS(DOS$wfreopen, libd_wfreopen);
-DEFINE_PUBLIC_ALIAS(wfreopen, libc_wfreopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wpopen, libd_wpopen);
-DEFINE_PUBLIC_ALIAS(DOS$wpopen, libd_wpopen);
-DEFINE_PUBLIC_ALIAS(wpopen, libc_wpopen);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wremove,libd_wremove,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(DOS$wremove,libd_wremove,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(wremove,libc_wremove,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wrename,libd_wrename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *oldname, char16_t const *newname_or_path),(oldname,newname_or_path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wrename,libd_wrename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *oldname, char16_t const *newname_or_path),(oldname,newname_or_path));
+DEFINE_PUBLIC_ALIAS_P(wrename,libc_wrename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *oldname, char32_t const *newname_or_path),(oldname,newname_or_path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wrenameat,libd_wrenameat,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBDCALL,(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path),(oldfd,oldname,newfd,newname_or_path));
+DEFINE_PUBLIC_ALIAS_P(wrenameat,libc_wrenameat,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBKCALL,(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path),(oldfd,oldname,newfd,newname_or_path));
+DEFINE_PUBLIC_ALIAS_P(DOS$wremoveat,libd_wremoveat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *filename),(dirfd,filename));
+DEFINE_PUBLIC_ALIAS_P(wremoveat,libc_wremoveat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename),(dirfd,filename));
+DEFINE_PUBLIC_ALIAS_P(DOS$wrenameat2,libd_wrenameat2,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBDCALL,(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path, atflag_t flags),(oldfd,oldname,newfd,newname_or_path,flags));
+DEFINE_PUBLIC_ALIAS_P(wrenameat2,libc_wrenameat2,ATTR_IN(2) ATTR_IN(4),int,NOTHROW_RPC,LIBKCALL,(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path, atflag_t flags),(oldfd,oldname,newfd,newname_or_path,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wfopen,libd_wfopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, char16_t const *mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfopen,libd_wfopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, char16_t const *mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(wfopen,libc_wfopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, char32_t const *mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wfreopen,libd_wfreopen,WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(3),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, char16_t const *mode, FILE *stream),(filename,mode,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfreopen,libd_wfreopen,WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(3),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, char16_t const *mode, FILE *stream),(filename,mode,stream));
+DEFINE_PUBLIC_ALIAS_P(wfreopen,libc_wfreopen,WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(3),FILE *,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, char32_t const *mode, FILE *stream),(filename,mode,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wpopen,libd_wpopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *command, char16_t const *mode),(command,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wpopen,libd_wpopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBDCALL,(char16_t const *command, char16_t const *mode),(command,mode));
+DEFINE_PUBLIC_ALIAS_P(wpopen,libc_wpopen,WUNUSED ATTR_IN(1) ATTR_IN(2),FILE *,NOTHROW_NCX,LIBKCALL,(char32_t const *command, char32_t const *mode),(command,mode));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_STDIO_C */

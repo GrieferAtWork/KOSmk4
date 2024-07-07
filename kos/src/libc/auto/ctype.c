@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1380172 */
+/* HASH CRC-32:0xec3cac6c */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,7 +231,7 @@ NOTHROW(LIBCCALL libc_isblank)(int ch) {
 
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_iscntrl_l, libc_iscntrl);
+DEFINE_INTERN_ALIAS_P(libc_iscntrl_l,libc_iscntrl,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> iscntrl_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -243,7 +243,7 @@ NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isspace_l, libc_isspace);
+DEFINE_INTERN_ALIAS_P(libc_isspace_l,libc_isspace,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isspace_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -255,7 +255,7 @@ NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isupper_l, libc_isupper);
+DEFINE_INTERN_ALIAS_P(libc_isupper_l,libc_isupper,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -267,7 +267,7 @@ NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_islower_l, libc_islower);
+DEFINE_INTERN_ALIAS_P(libc_islower_l,libc_islower,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> islower_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -279,7 +279,7 @@ NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isalpha_l, libc_isalpha);
+DEFINE_INTERN_ALIAS_P(libc_isalpha_l,libc_isalpha,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isalpha_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -291,7 +291,7 @@ NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isdigit_l, libc_isdigit);
+DEFINE_INTERN_ALIAS_P(libc_isdigit_l,libc_isdigit,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -303,7 +303,7 @@ NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isxdigit_l, libc_isxdigit);
+DEFINE_INTERN_ALIAS_P(libc_isxdigit_l,libc_isxdigit,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isxdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -315,7 +315,7 @@ NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isalnum_l, libc_isalnum);
+DEFINE_INTERN_ALIAS_P(libc_isalnum_l,libc_isalnum,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isalnum_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -327,7 +327,7 @@ NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_ispunct_l, libc_ispunct);
+DEFINE_INTERN_ALIAS_P(libc_ispunct_l,libc_ispunct,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> ispunct_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -339,7 +339,7 @@ NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isgraph_l, libc_isgraph);
+DEFINE_INTERN_ALIAS_P(libc_isgraph_l,libc_isgraph,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isgraph_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -351,7 +351,7 @@ NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isprint_l, libc_isprint);
+DEFINE_INTERN_ALIAS_P(libc_isprint_l,libc_isprint,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isprint_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -363,7 +363,7 @@ NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_isblank_l, libc_isblank);
+DEFINE_INTERN_ALIAS_P(libc_isblank_l,libc_isblank,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> isblank_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -375,7 +375,7 @@ NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_tolower_l, libc_tolower);
+DEFINE_INTERN_ALIAS_P(libc_tolower_l,libc_tolower,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> tolower_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -387,7 +387,7 @@ NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
 }
 #endif /* !__LIBKCALL_CALLER_CLEANUP */
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc_toupper_l, libc_toupper);
+DEFINE_INTERN_ALIAS_P(libc_toupper_l,libc_toupper,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 /* >> toupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
@@ -438,7 +438,7 @@ NOTHROW(LIBCCALL libc___ctype_get_mb_cur_max)(void) {
 	return __LOCAL_MB_CUR_MAX;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc____mb_cur_max_l_func, libc___ctype_get_mb_cur_max);
+DEFINE_INTERN_ALIAS_P(libc____mb_cur_max_l_func,libc___ctype_get_mb_cur_max,,int,NOTHROW_NCX,LIBCCALL,(locale_t locale),(locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 #include <libc/template/MB_CUR_MAX.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") int
@@ -480,7 +480,7 @@ NOTHROW(LIBCCALL libc__isctype)(int ch,
 	return result;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc__isctype_l, libc__isctype);
+DEFINE_INTERN_ALIAS_P(libc__isctype_l,libc__isctype,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, int mask, locale_t locale),(ch,mask,locale));
 #else /* __LIBKCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
@@ -496,109 +496,109 @@ NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(iscntrl, libc_iscntrl);
-DEFINE_PUBLIC_ALIAS(isspace, libc_isspace);
-DEFINE_PUBLIC_ALIAS(isupper, libc_isupper);
-DEFINE_PUBLIC_ALIAS(islower, libc_islower);
-DEFINE_PUBLIC_ALIAS(isalpha, libc_isalpha);
-DEFINE_PUBLIC_ALIAS(isdigit, libc_isdigit);
-DEFINE_PUBLIC_ALIAS(isxdigit, libc_isxdigit);
-DEFINE_PUBLIC_ALIAS(isalnum, libc_isalnum);
-DEFINE_PUBLIC_ALIAS(ispunct, libc_ispunct);
-DEFINE_PUBLIC_ALIAS(isgraph, libc_isgraph);
-DEFINE_PUBLIC_ALIAS(isprint, libc_isprint);
-DEFINE_PUBLIC_ALIAS(tolower, libc_tolower);
-DEFINE_PUBLIC_ALIAS(toupper, libc_toupper);
-DEFINE_PUBLIC_ALIAS(isblank, libc_isblank);
+DEFINE_PUBLIC_ALIAS_P(iscntrl,libc_iscntrl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isspace,libc_isspace,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isupper,libc_isupper,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(islower,libc_islower,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isalpha,libc_isalpha,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isdigit,libc_isdigit,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isxdigit,libc_isxdigit,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isalnum,libc_isalnum,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(ispunct,libc_ispunct,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isgraph,libc_isgraph,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isprint,libc_isprint,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(tolower,libc_tolower,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(toupper,libc_toupper,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(isblank,libc_isblank,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iscntrl_l, libc_iscntrl_l);
+DEFINE_PUBLIC_ALIAS_P(_iscntrl_l,libc_iscntrl_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iscntrl_l, libc_iscntrl_l);
-DEFINE_PUBLIC_ALIAS(iscntrl_l, libc_iscntrl_l);
+DEFINE_PUBLIC_ALIAS_P(__iscntrl_l,libc_iscntrl_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(iscntrl_l,libc_iscntrl_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isspace_l, libc_isspace_l);
+DEFINE_PUBLIC_ALIAS_P(_isspace_l,libc_isspace_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isspace_l, libc_isspace_l);
-DEFINE_PUBLIC_ALIAS(isspace_l, libc_isspace_l);
+DEFINE_PUBLIC_ALIAS_P(__isspace_l,libc_isspace_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isspace_l,libc_isspace_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isupper_l, libc_isupper_l);
+DEFINE_PUBLIC_ALIAS_P(_isupper_l,libc_isupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isupper_l, libc_isupper_l);
-DEFINE_PUBLIC_ALIAS(isupper_l, libc_isupper_l);
+DEFINE_PUBLIC_ALIAS_P(__isupper_l,libc_isupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isupper_l,libc_isupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_islower_l, libc_islower_l);
+DEFINE_PUBLIC_ALIAS_P(_islower_l,libc_islower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__islower_l, libc_islower_l);
-DEFINE_PUBLIC_ALIAS(islower_l, libc_islower_l);
+DEFINE_PUBLIC_ALIAS_P(__islower_l,libc_islower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(islower_l,libc_islower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isalpha_l, libc_isalpha_l);
+DEFINE_PUBLIC_ALIAS_P(_isalpha_l,libc_isalpha_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isalpha_l, libc_isalpha_l);
-DEFINE_PUBLIC_ALIAS(isalpha_l, libc_isalpha_l);
+DEFINE_PUBLIC_ALIAS_P(__isalpha_l,libc_isalpha_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isalpha_l,libc_isalpha_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isdigit_l, libc_isdigit_l);
+DEFINE_PUBLIC_ALIAS_P(_isdigit_l,libc_isdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isdigit_l, libc_isdigit_l);
-DEFINE_PUBLIC_ALIAS(isdigit_l, libc_isdigit_l);
+DEFINE_PUBLIC_ALIAS_P(__isdigit_l,libc_isdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isdigit_l,libc_isdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isxdigit_l, libc_isxdigit_l);
+DEFINE_PUBLIC_ALIAS_P(_isxdigit_l,libc_isxdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isxdigit_l, libc_isxdigit_l);
-DEFINE_PUBLIC_ALIAS(isxdigit_l, libc_isxdigit_l);
+DEFINE_PUBLIC_ALIAS_P(__isxdigit_l,libc_isxdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isxdigit_l,libc_isxdigit_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isalnum_l, libc_isalnum_l);
+DEFINE_PUBLIC_ALIAS_P(_isalnum_l,libc_isalnum_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isalnum_l, libc_isalnum_l);
-DEFINE_PUBLIC_ALIAS(isalnum_l, libc_isalnum_l);
+DEFINE_PUBLIC_ALIAS_P(__isalnum_l,libc_isalnum_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isalnum_l,libc_isalnum_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_ispunct_l, libc_ispunct_l);
+DEFINE_PUBLIC_ALIAS_P(_ispunct_l,libc_ispunct_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__ispunct_l, libc_ispunct_l);
-DEFINE_PUBLIC_ALIAS(ispunct_l, libc_ispunct_l);
+DEFINE_PUBLIC_ALIAS_P(__ispunct_l,libc_ispunct_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(ispunct_l,libc_ispunct_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isgraph_l, libc_isgraph_l);
+DEFINE_PUBLIC_ALIAS_P(_isgraph_l,libc_isgraph_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isgraph_l, libc_isgraph_l);
-DEFINE_PUBLIC_ALIAS(isgraph_l, libc_isgraph_l);
+DEFINE_PUBLIC_ALIAS_P(__isgraph_l,libc_isgraph_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isgraph_l,libc_isgraph_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isprint_l, libc_isprint_l);
+DEFINE_PUBLIC_ALIAS_P(_isprint_l,libc_isprint_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isprint_l, libc_isprint_l);
-DEFINE_PUBLIC_ALIAS(isprint_l, libc_isprint_l);
+DEFINE_PUBLIC_ALIAS_P(__isprint_l,libc_isprint_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isprint_l,libc_isprint_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isblank_l, libc_isblank_l);
+DEFINE_PUBLIC_ALIAS_P(_isblank_l,libc_isblank_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isblank_l, libc_isblank_l);
-DEFINE_PUBLIC_ALIAS(isblank_l, libc_isblank_l);
+DEFINE_PUBLIC_ALIAS_P(__isblank_l,libc_isblank_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(isblank_l,libc_isblank_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_ALIAS_P(_tolower_l,libc_tolower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__tolower_l, libc_tolower_l);
-DEFINE_PUBLIC_ALIAS(tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_ALIAS_P(__tolower_l,libc_tolower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(tolower_l,libc_tolower_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_ALIAS_P(_toupper_l,libc_toupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__toupper_l, libc_toupper_l);
-DEFINE_PUBLIC_ALIAS(toupper_l, libc_toupper_l);
-DEFINE_PUBLIC_ALIAS(__iscsymf, libc___iscsymf);
-DEFINE_PUBLIC_ALIAS(__iscsym, libc___iscsym);
+DEFINE_PUBLIC_ALIAS_P(__toupper_l,libc_toupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(toupper_l,libc_toupper_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(__iscsymf,libc___iscsymf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(__iscsym,libc___iscsym,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(__isascii, libc_isascii);
+DEFINE_PUBLIC_ALIAS_P(__isascii,libc_isascii,ATTR_CONST,int,NOTHROW,LIBCCALL,(int c),(c));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(isascii, libc_isascii);
+DEFINE_PUBLIC_ALIAS_P(isascii,libc_isascii,ATTR_CONST,int,NOTHROW,LIBCCALL,(int c),(c));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(__toascii, libc_toascii);
+DEFINE_PUBLIC_ALIAS_P(__toascii,libc_toascii,ATTR_CONST,int,NOTHROW,LIBCCALL,(int c),(c));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(toascii, libc_toascii);
-DEFINE_PUBLIC_ALIAS(_tolower, libc__tolower);
-DEFINE_PUBLIC_ALIAS(_toupper, libc__toupper);
-DEFINE_PUBLIC_ALIAS(___mb_cur_max_func, libc___ctype_get_mb_cur_max);
-DEFINE_PUBLIC_ALIAS(__ctype_get_mb_cur_max, libc___ctype_get_mb_cur_max);
-DEFINE_PUBLIC_ALIAS(___mb_cur_max_l_func, libc____mb_cur_max_l_func);
-DEFINE_PUBLIC_ALIAS(_chvalidator_l, libc__chvalidator_l);
-DEFINE_PUBLIC_ALIAS(_chvalidator, libc__isctype);
-DEFINE_PUBLIC_ALIAS(_isctype, libc__isctype);
-DEFINE_PUBLIC_ALIAS(_isctype_l, libc__isctype_l);
+DEFINE_PUBLIC_ALIAS_P(toascii,libc_toascii,ATTR_CONST,int,NOTHROW,LIBCCALL,(int c),(c));
+DEFINE_PUBLIC_ALIAS_P(_tolower,libc__tolower,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_toupper,libc__toupper,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(___mb_cur_max_func,libc___ctype_get_mb_cur_max,ATTR_CONST WUNUSED,size_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__ctype_get_mb_cur_max,libc___ctype_get_mb_cur_max,ATTR_CONST WUNUSED,size_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(___mb_cur_max_l_func,libc____mb_cur_max_l_func,,int,NOTHROW_NCX,LIBCCALL,(locale_t locale),(locale));
+DEFINE_PUBLIC_ALIAS_P(_chvalidator_l,libc__chvalidator_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(locale_t locale, int ch, int mask),(locale,ch,mask));
+DEFINE_PUBLIC_ALIAS_P(_chvalidator,libc__isctype,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch, int mask),(ch,mask));
+DEFINE_PUBLIC_ALIAS_P(_isctype,libc__isctype,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(int ch, int mask),(ch,mask));
+DEFINE_PUBLIC_ALIAS_P(_isctype_l,libc__isctype_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(int ch, int mask, locale_t locale),(ch,mask,locale));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CTYPE_C */

@@ -126,15 +126,15 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify") ATTR_IN(1) void
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6cec8221]]]*/
-DEFINE_PUBLIC_ALIAS(LChMod, libc_LChMod);
-DEFINE_PUBLIC_ALIAS(MkFiFo, libc_MkFiFo);
-DEFINE_PUBLIC_ALIAS(MkFiFoAt, libc_MkFiFoAt);
-DEFINE_PUBLIC_ALIAS(MkNod, libc_MkNod);
-DEFINE_PUBLIC_ALIAS(FUTimens, libc_FUTimens);
+/*[[[start:exports,hash:CRC-32=0x4dbba2dc]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(LChMod,libc_LChMod,ATTR_IN(1),THROWING(...),LIBCCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P_VOID(MkFiFo,libc_MkFiFo,ATTR_IN(1),THROWING(...),LIBCCALL,(char const *fifoname, mode_t mode),(fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P_VOID(MkFiFoAt,libc_MkFiFoAt,ATTR_IN(2),THROWING(...),LIBCCALL,(fd_t dirfd, char const *fifoname, mode_t mode),(dirfd,fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P_VOID(MkNod,libc_MkNod,ATTR_IN(1),THROWING(...),LIBCCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P_VOID(FUTimens,libc_FUTimens,ATTR_FDARG(1) ATTR_IN_OPT(2),THROWING(...),LIBCCALL,(fd_t fd, struct timespec const times[2 /*or:3*/]),(fd,times));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(FUTimens64, libc_FUTimens64);
+DEFINE_PUBLIC_ALIAS_P_VOID(FUTimens64,libc_FUTimens64,ATTR_FDARG(1) ATTR_IN_OPT(2),THROWING(...),LIBCCALL,(fd_t fd, struct timespec64 const times[2 /*or:3*/]),(fd,times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

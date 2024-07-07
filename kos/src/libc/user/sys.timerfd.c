@@ -110,16 +110,16 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xcd802ea5]]]*/
-DEFINE_PUBLIC_ALIAS(timerfd_create, libc_timerfd_create);
-DEFINE_PUBLIC_ALIAS(timerfd_settime, libc_timerfd_settime);
-DEFINE_PUBLIC_ALIAS(timerfd_gettime, libc_timerfd_gettime);
+/*[[[start:exports,hash:CRC-32=0xa378a62]]]*/
+DEFINE_PUBLIC_ALIAS_P(timerfd_create,libc_timerfd_create,,fd_t,NOTHROW,LIBCCALL,(clockid_t clock_id, __STDC_INT_AS_UINT_T flags),(clock_id,flags));
+DEFINE_PUBLIC_ALIAS_P(timerfd_settime,libc_timerfd_settime,ATTR_FDARG(1) ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec const *utmr, struct itimerspec *otmr),(ufd,flags,utmr,otmr));
+DEFINE_PUBLIC_ALIAS_P(timerfd_gettime,libc_timerfd_gettime,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, struct itimerspec *__restrict otmr),(ufd,otmr));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__timerfd_settime64, libc_timerfd_settime64);
-DEFINE_PUBLIC_ALIAS(timerfd_settime64, libc_timerfd_settime64);
-DEFINE_PUBLIC_ALIAS(__timerfd_gettime64, libc_timerfd_gettime64);
-DEFINE_PUBLIC_ALIAS(timerfd_gettime64, libc_timerfd_gettime64);
+DEFINE_PUBLIC_ALIAS_P(__timerfd_settime64,libc_timerfd_settime64,ATTR_FDARG(1) ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *utmr, struct itimerspec64 *otmr),(ufd,flags,utmr,otmr));
+DEFINE_PUBLIC_ALIAS_P(timerfd_settime64,libc_timerfd_settime64,ATTR_FDARG(1) ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *utmr, struct itimerspec64 *otmr),(ufd,flags,utmr,otmr));
+DEFINE_PUBLIC_ALIAS_P(__timerfd_gettime64,libc_timerfd_gettime64,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, struct itimerspec64 *__restrict otmr),(ufd,otmr));
+DEFINE_PUBLIC_ALIAS_P(timerfd_gettime64,libc_timerfd_gettime64,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t ufd, struct itimerspec64 *__restrict otmr),(ufd,otmr));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

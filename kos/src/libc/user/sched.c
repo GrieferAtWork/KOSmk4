@@ -307,50 +307,50 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x10d6aa57]]]*/
+/*[[[start:exports,hash:CRC-32=0xa2219674]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
-DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
+DEFINE_PUBLIC_ALIAS_P(DOS$__clone,libd_clone,NONNULL((1)),pid_t,NOTHROW_NCX,VLIBDCALL,(int (LIBDCALL *fn)(void *arg), void *child_stack, int flags, void *arg, ...),(fn,child_stack,flags,arg,));
+DEFINE_PUBLIC_ALIAS_P(DOS$clone,libd_clone,NONNULL((1)),pid_t,NOTHROW_NCX,VLIBDCALL,(int (LIBDCALL *fn)(void *arg), void *child_stack, int flags, void *arg, ...),(fn,child_stack,flags,arg,));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
-DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
-DEFINE_PUBLIC_ALIAS(setns, libc_setns);
-DEFINE_PUBLIC_ALIAS(exit_thread, libc_exit_thread);
-DEFINE_PUBLIC_ALIAS(__sched_setparam, libc_sched_setparam);
-DEFINE_PUBLIC_ALIAS(__libc_sched_setparam, libc_sched_setparam);
-DEFINE_PUBLIC_ALIAS(sched_setparam, libc_sched_setparam);
-DEFINE_PUBLIC_ALIAS(__sched_getparam, libc_sched_getparam);
-DEFINE_PUBLIC_ALIAS(__libc_sched_getparam, libc_sched_getparam);
-DEFINE_PUBLIC_ALIAS(sched_getparam, libc_sched_getparam);
-DEFINE_PUBLIC_ALIAS(__sched_setscheduler, libc_sched_setscheduler);
-DEFINE_PUBLIC_ALIAS(__libc_sched_setscheduler, libc_sched_setscheduler);
-DEFINE_PUBLIC_ALIAS(sched_setscheduler, libc_sched_setscheduler);
-DEFINE_PUBLIC_ALIAS(__sched_getscheduler, libc_sched_getscheduler);
-DEFINE_PUBLIC_ALIAS(__libc_sched_getscheduler, libc_sched_getscheduler);
-DEFINE_PUBLIC_ALIAS(sched_getscheduler, libc_sched_getscheduler);
-DEFINE_PUBLIC_ALIAS(thrd_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(pthread_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(__sched_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(__libc_sched_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(thr_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(cthread_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(sched_yield, libc_sched_yield);
-DEFINE_PUBLIC_ALIAS(__sched_get_priority_max, libc_sched_get_priority_max);
-DEFINE_PUBLIC_ALIAS(__libc_sched_get_priority_max, libc_sched_get_priority_max);
-DEFINE_PUBLIC_ALIAS(sched_get_priority_max, libc_sched_get_priority_max);
-DEFINE_PUBLIC_ALIAS(__sched_get_priority_min, libc_sched_get_priority_min);
-DEFINE_PUBLIC_ALIAS(__libc_sched_get_priority_min, libc_sched_get_priority_min);
-DEFINE_PUBLIC_ALIAS(sched_get_priority_min, libc_sched_get_priority_min);
-DEFINE_PUBLIC_ALIAS(sched_setaffinity, libc_sched_setaffinity);
-DEFINE_PUBLIC_ALIAS(sched_getaffinity, libc_sched_getaffinity);
-DEFINE_PUBLIC_ALIAS(__sched_rr_get_interval, libc_sched_rr_get_interval);
-DEFINE_PUBLIC_ALIAS(__libc_sched_rr_get_interval, libc_sched_rr_get_interval);
-DEFINE_PUBLIC_ALIAS(sched_rr_get_interval, libc_sched_rr_get_interval);
+DEFINE_PUBLIC_ALIAS_P(unshare,libc_unshare,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(sched_getcpu,libc_sched_getcpu,,__STDC_INT_AS_UINT_T,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(setns,libc_setns,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T nstype),(fd,nstype));
+DEFINE_PUBLIC_ALIAS_P_VOID(exit_thread,libc_exit_thread,ATTR_NORETURN,NOTHROW_NCX,LIBCCALL,(int exit_code),(exit_code));
+DEFINE_PUBLIC_ALIAS_P(__sched_setparam,libc_sched_setparam,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param const *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_setparam,libc_sched_setparam,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param const *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(sched_setparam,libc_sched_setparam,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param const *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(__sched_getparam,libc_sched_getparam,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_getparam,libc_sched_getparam,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(sched_getparam,libc_sched_getparam,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct sched_param *param),(pid,param));
+DEFINE_PUBLIC_ALIAS_P(__sched_setscheduler,libc_sched_setscheduler,ATTR_IN(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, int policy, struct sched_param const *param),(pid,policy,param));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_setscheduler,libc_sched_setscheduler,ATTR_IN(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, int policy, struct sched_param const *param),(pid,policy,param));
+DEFINE_PUBLIC_ALIAS_P(sched_setscheduler,libc_sched_setscheduler,ATTR_IN(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, int policy, struct sched_param const *param),(pid,policy,param));
+DEFINE_PUBLIC_ALIAS_P(__sched_getscheduler,libc_sched_getscheduler,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(pid_t pid),(pid));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_getscheduler,libc_sched_getscheduler,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(pid_t pid),(pid));
+DEFINE_PUBLIC_ALIAS_P(sched_getscheduler,libc_sched_getscheduler,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(pid_t pid),(pid));
+DEFINE_PUBLIC_ALIAS_P(thrd_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__sched_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(thr_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(cthread_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(sched_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__sched_get_priority_max,libc_sched_get_priority_max,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_get_priority_max,libc_sched_get_priority_max,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(sched_get_priority_max,libc_sched_get_priority_max,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(__sched_get_priority_min,libc_sched_get_priority_min,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_get_priority_min,libc_sched_get_priority_min,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(sched_get_priority_min,libc_sched_get_priority_min,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
+DEFINE_PUBLIC_ALIAS_P(sched_setaffinity,libc_sched_setaffinity,ATTR_IN_OPT(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset),(pid,cpusetsize,cpuset));
+DEFINE_PUBLIC_ALIAS_P(sched_getaffinity,libc_sched_getaffinity,ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset),(pid,cpusetsize,cpuset));
+DEFINE_PUBLIC_ALIAS_P(__sched_rr_get_interval,libc_sched_rr_get_interval,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct timespec *tms),(pid,tms));
+DEFINE_PUBLIC_ALIAS_P(__libc_sched_rr_get_interval,libc_sched_rr_get_interval,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct timespec *tms),(pid,tms));
+DEFINE_PUBLIC_ALIAS_P(sched_rr_get_interval,libc_sched_rr_get_interval,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct timespec *tms),(pid,tms));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__sched_rr_get_interval64, libc_sched_rr_get_interval64);
-DEFINE_PUBLIC_ALIAS(sched_rr_get_interval64, libc_sched_rr_get_interval64);
+DEFINE_PUBLIC_ALIAS_P(__sched_rr_get_interval64,libc_sched_rr_get_interval64,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct timespec64 *tms),(pid,tms));
+DEFINE_PUBLIC_ALIAS_P(sched_rr_get_interval64,libc_sched_rr_get_interval64,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, struct timespec64 *tms),(pid,tms));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

@@ -85,14 +85,14 @@ NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6e080805]]]*/
-DEFINE_PUBLIC_ALIAS(__mount, libc_mount);
-DEFINE_PUBLIC_ALIAS(__libc_mount, libc_mount);
-DEFINE_PUBLIC_ALIAS(mount, libc_mount);
-DEFINE_PUBLIC_ALIAS(__umount, libc_umount);
-DEFINE_PUBLIC_ALIAS(__libc_umount, libc_umount);
-DEFINE_PUBLIC_ALIAS(umount, libc_umount);
-DEFINE_PUBLIC_ALIAS(umount2, libc_umount2);
+/*[[[start:exports,hash:CRC-32=0x46ddf1a1]]]*/
+DEFINE_PUBLIC_ALIAS_P(__mount,libc_mount,ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5),int,NOTHROW_RPC,LIBCCALL,(char const *special_file, char const *dir, char const *fstype, ulongptr_t mountflags, void const *data),(special_file,dir,fstype,mountflags,data));
+DEFINE_PUBLIC_ALIAS_P(__libc_mount,libc_mount,ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5),int,NOTHROW_RPC,LIBCCALL,(char const *special_file, char const *dir, char const *fstype, ulongptr_t mountflags, void const *data),(special_file,dir,fstype,mountflags,data));
+DEFINE_PUBLIC_ALIAS_P(mount,libc_mount,ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(5),int,NOTHROW_RPC,LIBCCALL,(char const *special_file, char const *dir, char const *fstype, ulongptr_t mountflags, void const *data),(special_file,dir,fstype,mountflags,data));
+DEFINE_PUBLIC_ALIAS_P(__umount,libc_umount,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *special_file),(special_file));
+DEFINE_PUBLIC_ALIAS_P(__libc_umount,libc_umount,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *special_file),(special_file));
+DEFINE_PUBLIC_ALIAS_P(umount,libc_umount,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *special_file),(special_file));
+DEFINE_PUBLIC_ALIAS_P(umount2,libc_umount2,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *special_file, __STDC_INT_AS_UINT_T flags),(special_file,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

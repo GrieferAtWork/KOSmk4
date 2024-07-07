@@ -282,9 +282,9 @@ not_found:
 /*[[[end:libc_getauxval]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x9d59b425]]]*/
-DEFINE_PUBLIC_ALIAS(__getauxval, libc_getauxval);
-DEFINE_PUBLIC_ALIAS(getauxval, libc_getauxval);
+/*[[[start:exports,hash:CRC-32=0x9998a10a]]]*/
+DEFINE_PUBLIC_ALIAS_P(__getauxval,libc_getauxval,ATTR_PURE WUNUSED,ulongptr_t,NOTHROW_NCX,LIBCCALL,(ulongptr_t type),(type));
+DEFINE_PUBLIC_ALIAS_P(getauxval,libc_getauxval,ATTR_PURE WUNUSED,ulongptr_t,NOTHROW_NCX,LIBCCALL,(ulongptr_t type),(type));
 /*[[[end:exports]]]*/
 
 DECL_END

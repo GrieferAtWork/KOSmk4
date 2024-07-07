@@ -146,13 +146,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb02206ab]]]*/
-DEFINE_PUBLIC_ALIAS(inet_net_ntop, libc_inet_net_ntop);
-DEFINE_PUBLIC_ALIAS(inet_net_pton, libc_inet_net_pton);
-DEFINE_PUBLIC_ALIAS(inet_nsap_addr, libc_inet_nsap_addr);
-DEFINE_PUBLIC_ALIAS(inet_nsap_ntoa, libc_inet_nsap_ntoa);
-DEFINE_PUBLIC_ALIAS(inet_pton, libc_inet_pton);
-DEFINE_PUBLIC_ALIAS(inet_ntop, libc_inet_ntop);
+/*[[[start:exports,hash:CRC-32=0x7347b250]]]*/
+DEFINE_PUBLIC_ALIAS_P(inet_net_ntop,libc_inet_net_ntop,,char *,NOTHROW_RPC_KOS,LIBCCALL,(int af, void const *cp, int bits, char *buf, size_t len),(af,cp,bits,buf,len));
+DEFINE_PUBLIC_ALIAS_P(inet_net_pton,libc_inet_net_pton,,int,NOTHROW_RPC_KOS,LIBCCALL,(int af, char const *cp, void *buf, size_t len),(af,cp,buf,len));
+DEFINE_PUBLIC_ALIAS_P(inet_nsap_addr,libc_inet_nsap_addr,,unsigned int,NOTHROW_RPC_KOS,LIBCCALL,(char const *cp, unsigned char *buf, int len),(cp,buf,len));
+DEFINE_PUBLIC_ALIAS_P(inet_nsap_ntoa,libc_inet_nsap_ntoa,,char *,NOTHROW_RPC_KOS,LIBCCALL,(int len, unsigned char const *cp, char *buf),(len,cp,buf));
+DEFINE_PUBLIC_ALIAS_P(inet_pton,libc_inet_pton,,int,NOTHROW_RPC_KOS,LIBCCALL,(int af, char const *__restrict cp, void *__restrict buf),(af,cp,buf));
+DEFINE_PUBLIC_ALIAS_P(inet_ntop,libc_inet_ntop,,char const *,NOTHROW_RPC_KOS,LIBCCALL,(int af, void const *__restrict cp, char *__restrict buf, socklen_t len),(af,cp,buf,len));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7179e1e1 */
+/* HASH CRC-32:0xdadd14f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -354,23 +354,23 @@ NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(thrd_equal, libc_pthread_equal);
-DEFINE_PUBLIC_ALIAS(pthread_equal, libc_pthread_equal);
-DEFINE_PUBLIC_ALIAS(call_once, libc_pthread_once);
-DEFINE_PUBLIC_ALIAS(__pthread_once, libc_pthread_once);
-DEFINE_PUBLIC_ALIAS(pthread_once, libc_pthread_once);
-DEFINE_PUBLIC_ALIAS(__pthread_cleanup_routine, libc___pthread_cleanup_routine);
-DEFINE_PUBLIC_ALIAS(pthread_spin_init, libc_pthread_spin_init);
-DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
-DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
-DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
-DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
-DEFINE_PUBLIC_ALIAS(thr_keycreate_once, libc_pthread_key_create_once_np);
-DEFINE_PUBLIC_ALIAS(pthread_key_create_once_np, libc_pthread_key_create_once_np);
-DEFINE_PUBLIC_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
-DEFINE_PUBLIC_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
-DEFINE_PUBLIC_ALIAS(thr_main, libc_pthread_main_np);
-DEFINE_PUBLIC_ALIAS(pthread_main_np, libc_pthread_main_np);
+DEFINE_PUBLIC_ALIAS_P(thrd_equal,libc_pthread_equal,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(pthread_t thr1, pthread_t thr2),(thr1,thr2));
+DEFINE_PUBLIC_ALIAS_P(pthread_equal,libc_pthread_equal,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(pthread_t thr1, pthread_t thr2),(thr1,thr2));
+DEFINE_PUBLIC_ALIAS_P(call_once,libc_pthread_once,ATTR_INOUT(1) NONNULL((2)),errno_t,NOTHROW_CB,LIBCCALL,(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void)),(once_control,init_routine));
+DEFINE_PUBLIC_ALIAS_P(__pthread_once,libc_pthread_once,ATTR_INOUT(1) NONNULL((2)),errno_t,NOTHROW_CB,LIBCCALL,(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void)),(once_control,init_routine));
+DEFINE_PUBLIC_ALIAS_P(pthread_once,libc_pthread_once,ATTR_INOUT(1) NONNULL((2)),errno_t,NOTHROW_CB,LIBCCALL,(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void)),(once_control,init_routine));
+DEFINE_PUBLIC_ALIAS_P_VOID(__pthread_cleanup_routine,libc___pthread_cleanup_routine,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct __pthread_cleanup_frame *frame),(frame));
+DEFINE_PUBLIC_ALIAS_P(pthread_spin_init,libc_pthread_spin_init,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_spinlock_t *self, int pshared),(self,pshared));
+DEFINE_PUBLIC_ALIAS_P(pthread_spin_destroy,libc_pthread_spin_destroy,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_spinlock_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_spin_lock,libc_pthread_spin_lock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_spinlock_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_spin_trylock,libc_pthread_spin_trylock,WUNUSED ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_spinlock_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_spin_unlock,libc_pthread_spin_unlock,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_spinlock_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(thr_keycreate_once,libc_pthread_key_create_once_np,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_key_t *key, void (LIBKCALL *destr_function)(void *)),(key,destr_function));
+DEFINE_PUBLIC_ALIAS_P(pthread_key_create_once_np,libc_pthread_key_create_once_np,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_key_t *key, void (LIBKCALL *destr_function)(void *)),(key,destr_function));
+DEFINE_PUBLIC_ALIAS_P(pthread_num_processors_np,libc_pthread_num_processors_np,WUNUSED,__STDC_INT_AS_SIZE_T,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_set_num_processors_np,libc_pthread_set_num_processors_np,,errno_t,NOTHROW_NCX,LIBCCALL,(int n),(n));
+DEFINE_PUBLIC_ALIAS_P(thr_main,libc_pthread_main_np,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_main_np,libc_pthread_main_np,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

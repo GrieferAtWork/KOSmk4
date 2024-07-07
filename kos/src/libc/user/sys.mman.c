@@ -370,45 +370,45 @@ NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x77b3c868]]]*/
-DEFINE_PUBLIC_ALIAS(__mmap, libc_mmap);
-DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
-DEFINE_PUBLIC_ALIAS(__munmap, libc_munmap);
-DEFINE_PUBLIC_ALIAS(__libc_munmap, libc_munmap);
-DEFINE_PUBLIC_ALIAS(munmap, libc_munmap);
-DEFINE_PUBLIC_ALIAS(__mprotect, libc_mprotect);
-DEFINE_PUBLIC_ALIAS(__libc_mprotect, libc_mprotect);
-DEFINE_PUBLIC_ALIAS(mprotect, libc_mprotect);
-DEFINE_PUBLIC_ALIAS(__msync, libc_msync);
-DEFINE_PUBLIC_ALIAS(__libc_msync, libc_msync);
-DEFINE_PUBLIC_ALIAS(msync, libc_msync);
-DEFINE_PUBLIC_ALIAS(__mlock, libc_mlock);
-DEFINE_PUBLIC_ALIAS(__libc_mlock, libc_mlock);
-DEFINE_PUBLIC_ALIAS(mlock, libc_mlock);
-DEFINE_PUBLIC_ALIAS(__munlock, libc_munlock);
-DEFINE_PUBLIC_ALIAS(__libc_munlock, libc_munlock);
-DEFINE_PUBLIC_ALIAS(munlock, libc_munlock);
-DEFINE_PUBLIC_ALIAS(__mlockall, libc_mlockall);
-DEFINE_PUBLIC_ALIAS(__libc_mlockall, libc_mlockall);
-DEFINE_PUBLIC_ALIAS(mlockall, libc_mlockall);
-DEFINE_PUBLIC_ALIAS(__munlockall, libc_munlockall);
-DEFINE_PUBLIC_ALIAS(__libc_munlockall, libc_munlockall);
-DEFINE_PUBLIC_ALIAS(munlockall, libc_munlockall);
-DEFINE_PUBLIC_ALIAS(__madvise, libc_madvise);
-DEFINE_PUBLIC_ALIAS(madvise, libc_madvise);
-DEFINE_PUBLIC_ALIAS(mincore, libc_mincore);
-DEFINE_PUBLIC_ALIAS(mmap64, libc_mmap64);
-DEFINE_PUBLIC_ALIAS(__mremap, libc_mremap);
-DEFINE_PUBLIC_ALIAS(__libc_mremap, libc_mremap);
-DEFINE_PUBLIC_ALIAS(mremap, libc_mremap);
-DEFINE_PUBLIC_ALIAS(remap_file_pages, libc_remap_file_pages);
-DEFINE_PUBLIC_ALIAS(memfd_create, libc_memfd_create);
-DEFINE_PUBLIC_ALIAS(mlock2, libc_mlock2);
+/*[[[start:exports,hash:CRC-32=0x37ed8182]]]*/
+DEFINE_PUBLIC_ALIAS_P(__mmap,libc_mmap,WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5),void *,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET offset),(addr,len,prot,flags,fd,offset));
+DEFINE_PUBLIC_ALIAS_P(mmap,libc_mmap,WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5),void *,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET offset),(addr,len,prot,flags,fd,offset));
+DEFINE_PUBLIC_ALIAS_P(__munmap,libc_munmap,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__libc_munmap,libc_munmap,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(munmap,libc_munmap,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__mprotect,libc_mprotect,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot),(addr,len,prot));
+DEFINE_PUBLIC_ALIAS_P(__libc_mprotect,libc_mprotect,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot),(addr,len,prot));
+DEFINE_PUBLIC_ALIAS_P(mprotect,libc_mprotect,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot),(addr,len,prot));
+DEFINE_PUBLIC_ALIAS_P(__msync,libc_msync,ATTR_ACCESS_NONE(1),int,NOTHROW_RPC,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T flags),(addr,len,flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_msync,libc_msync,ATTR_ACCESS_NONE(1),int,NOTHROW_RPC,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T flags),(addr,len,flags));
+DEFINE_PUBLIC_ALIAS_P(msync,libc_msync,ATTR_ACCESS_NONE(1),int,NOTHROW_RPC,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T flags),(addr,len,flags));
+DEFINE_PUBLIC_ALIAS_P(__mlock,libc_mlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__libc_mlock,libc_mlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(mlock,libc_mlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__munlock,libc_munlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__libc_munlock,libc_munlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(munlock,libc_munlock,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t len),(addr,len));
+DEFINE_PUBLIC_ALIAS_P(__mlockall,libc_mlockall,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_mlockall,libc_mlockall,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(mlockall,libc_mlockall,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(__munlockall,libc_munlockall,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__libc_munlockall,libc_munlockall,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(munlockall,libc_munlockall,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__madvise,libc_madvise,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T advice),(addr,len,advice));
+DEFINE_PUBLIC_ALIAS_P(madvise,libc_madvise,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T advice),(addr,len,advice));
+DEFINE_PUBLIC_ALIAS_P(mincore,libc_mincore,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *start, size_t len, unsigned char *vec),(start,len,vec));
+DEFINE_PUBLIC_ALIAS_P(mmap64,libc_mmap64,WUNUSED ATTR_ACCESS_NONE(1) ATTR_FDARG(5),void *,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset),(addr,len,prot,flags,fd,offset));
+DEFINE_PUBLIC_ALIAS_P(__mremap,libc_mremap,ATTR_ACCESS_NONE(1),void *,NOTHROW_NCX,VLIBCCALL,(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...),(addr,old_len,new_len,flags,));
+DEFINE_PUBLIC_ALIAS_P(__libc_mremap,libc_mremap,ATTR_ACCESS_NONE(1),void *,NOTHROW_NCX,VLIBCCALL,(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...),(addr,old_len,new_len,flags,));
+DEFINE_PUBLIC_ALIAS_P(mremap,libc_mremap,ATTR_ACCESS_NONE(1),void *,NOTHROW_NCX,VLIBCCALL,(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...),(addr,old_len,new_len,flags,));
+DEFINE_PUBLIC_ALIAS_P(remap_file_pages,libc_remap_file_pages,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags),(start,size,prot,pgoff,flags));
+DEFINE_PUBLIC_ALIAS_P(memfd_create,libc_memfd_create,,fd_t,NOTHROW_NCX,LIBCCALL,(char const *name, unsigned int flags),(name,flags));
+DEFINE_PUBLIC_ALIAS_P(mlock2,libc_mlock2,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void const *addr, size_t length, unsigned int flags),(addr,length,flags));
 #include <asm/pkey.h>
 #ifdef __ARCH_HAVE_PKEY
-DEFINE_PUBLIC_ALIAS(pkey_alloc, libc_pkey_alloc);
-DEFINE_PUBLIC_ALIAS(pkey_free, libc_pkey_free);
-DEFINE_PUBLIC_ALIAS(pkey_mprotect, libc_pkey_mprotect);
+DEFINE_PUBLIC_ALIAS_P(pkey_alloc,libc_pkey_alloc,,int,NOTHROW_NCX,LIBCCALL,(unsigned int flags, unsigned int access_rights),(flags,access_rights));
+DEFINE_PUBLIC_ALIAS_P(pkey_free,libc_pkey_free,,int,NOTHROW_NCX,LIBCCALL,(int pkey),(pkey));
+DEFINE_PUBLIC_ALIAS_P(pkey_mprotect,libc_pkey_mprotect,ATTR_ACCESS_NONE(1),int,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey),(addr,len,prot,pkey));
 #endif /* __ARCH_HAVE_PKEY */
 /*[[[end:exports]]]*/
 

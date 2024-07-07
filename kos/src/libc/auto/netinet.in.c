@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39929c91 */
+/* HASH CRC-32:0x9a609e9 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ NOTHROW(LIBCCALL libc_htons)(uint16_t hostword) {
 }
 #include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
-DEFINE_INTERN_ALIAS(libc_ntohs, libc_htons);
+DEFINE_INTERN_ALIAS_P(libc_ntohs,libc_htons,ATTR_CONST,uint16_t,NOTHROW,LIBCCALL,(uint16_t netshort),(netshort));
 #else /* __HYBRID_HTOBE_IS_BETOH */
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint16_t
 NOTHROW(LIBCCALL libc_ntohs)(uint16_t netshort) {
@@ -58,7 +58,7 @@ NOTHROW(LIBCCALL libc_htonl)(uint32_t hostlong) {
 }
 #include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
-DEFINE_INTERN_ALIAS(libc_ntohl, libc_htonl);
+DEFINE_INTERN_ALIAS_P(libc_ntohl,libc_htonl,ATTR_CONST,uint32_t,NOTHROW,LIBCCALL,(uint32_t netlong),(netlong));
 #else /* __HYBRID_HTOBE_IS_BETOH */
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint32_t
 NOTHROW(LIBCCALL libc_ntohl)(uint32_t netlong) {
@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL libc_htonq)(uint64_t hostquad) {
 }
 #include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
-DEFINE_INTERN_ALIAS(libc_ntohq, libc_htonq);
+DEFINE_INTERN_ALIAS_P(libc_ntohq,libc_htonq,ATTR_CONST WUNUSED,uint64_t,NOTHROW,LIBCCALL,(uint64_t netquad),(netquad));
 #else /* __HYBRID_HTOBE_IS_BETOH */
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST WUNUSED uint64_t
 NOTHROW(LIBCCALL libc_ntohq)(uint64_t netquad) {
@@ -84,16 +84,16 @@ NOTHROW(LIBCCALL libc_ntohq)(uint64_t netquad) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__htons, libc_htons);
-DEFINE_PUBLIC_ALIAS(htons, libc_htons);
-DEFINE_PUBLIC_ALIAS(__ntohs, libc_ntohs);
-DEFINE_PUBLIC_ALIAS(ntohs, libc_ntohs);
-DEFINE_PUBLIC_ALIAS(__htonl, libc_htonl);
-DEFINE_PUBLIC_ALIAS(htonl, libc_htonl);
-DEFINE_PUBLIC_ALIAS(__ntohl, libc_ntohl);
-DEFINE_PUBLIC_ALIAS(ntohl, libc_ntohl);
-DEFINE_PUBLIC_ALIAS(htonq, libc_htonq);
-DEFINE_PUBLIC_ALIAS(ntohq, libc_ntohq);
+DEFINE_PUBLIC_ALIAS_P(__htons,libc_htons,ATTR_CONST,uint16_t,NOTHROW,LIBCCALL,(uint16_t hostword),(hostword));
+DEFINE_PUBLIC_ALIAS_P(htons,libc_htons,ATTR_CONST,uint16_t,NOTHROW,LIBCCALL,(uint16_t hostword),(hostword));
+DEFINE_PUBLIC_ALIAS_P(__ntohs,libc_ntohs,ATTR_CONST,uint16_t,NOTHROW,LIBCCALL,(uint16_t netshort),(netshort));
+DEFINE_PUBLIC_ALIAS_P(ntohs,libc_ntohs,ATTR_CONST,uint16_t,NOTHROW,LIBCCALL,(uint16_t netshort),(netshort));
+DEFINE_PUBLIC_ALIAS_P(__htonl,libc_htonl,ATTR_CONST,uint32_t,NOTHROW,LIBCCALL,(uint32_t hostlong),(hostlong));
+DEFINE_PUBLIC_ALIAS_P(htonl,libc_htonl,ATTR_CONST,uint32_t,NOTHROW,LIBCCALL,(uint32_t hostlong),(hostlong));
+DEFINE_PUBLIC_ALIAS_P(__ntohl,libc_ntohl,ATTR_CONST,uint32_t,NOTHROW,LIBCCALL,(uint32_t netlong),(netlong));
+DEFINE_PUBLIC_ALIAS_P(ntohl,libc_ntohl,ATTR_CONST,uint32_t,NOTHROW,LIBCCALL,(uint32_t netlong),(netlong));
+DEFINE_PUBLIC_ALIAS_P(htonq,libc_htonq,ATTR_CONST WUNUSED,uint64_t,NOTHROW,LIBCCALL,(uint64_t hostquad),(hostquad));
+DEFINE_PUBLIC_ALIAS_P(ntohq,libc_ntohq,ATTR_CONST WUNUSED,uint64_t,NOTHROW,LIBCCALL,(uint64_t netquad),(netquad));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NETINET_IN_C */

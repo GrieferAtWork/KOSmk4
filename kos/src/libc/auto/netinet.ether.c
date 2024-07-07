@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8eccc24 */
+/* HASH CRC-32:0x39d965c8 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,15 +274,15 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(ether_ntoa, libc_ether_ntoa);
-DEFINE_PUBLIC_ALIAS(ether_ntoa_r, libc_ether_ntoa_r);
-DEFINE_PUBLIC_ALIAS(ether_aton, libc_ether_aton);
-DEFINE_PUBLIC_ALIAS(ether_aton_r, libc_ether_aton_r);
-DEFINE_PUBLIC_ALIAS(ether_aton_np, libc_ether_aton_np);
-DEFINE_PUBLIC_ALIAS(ether_line, libc_ether_line);
-DEFINE_PUBLIC_ALIAS(ether_line_np, libc_ether_line_np);
-DEFINE_PUBLIC_ALIAS(ether_ntohost, libc_ether_ntohost);
-DEFINE_PUBLIC_ALIAS(ether_hostton, libc_ether_hostton);
+DEFINE_PUBLIC_ALIAS_P(ether_ntoa,libc_ether_ntoa,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(struct ether_addr const *__restrict addr),(addr));
+DEFINE_PUBLIC_ALIAS_P(ether_ntoa_r,libc_ether_ntoa_r,ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct ether_addr const *__restrict addr, char *__restrict buf),(addr,buf));
+DEFINE_PUBLIC_ALIAS_P(ether_aton,libc_ether_aton,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct ether_addr *,NOTHROW_NCX,LIBCCALL,(char const *__restrict asc),(asc));
+DEFINE_PUBLIC_ALIAS_P(ether_aton_r,libc_ether_aton_r,WUNUSED ATTR_IN(1) ATTR_OUT(2),struct ether_addr *,NOTHROW_NCX,LIBCCALL,(char const *__restrict asc, struct ether_addr *__restrict addr),(asc,addr));
+DEFINE_PUBLIC_ALIAS_P(ether_aton_np,libc_ether_aton_np,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict asc, struct ether_addr *__restrict addr),(asc,addr));
+DEFINE_PUBLIC_ALIAS_P(ether_line,libc_ether_line,WUNUSED ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_NCX,LIBCCALL,(char const *line, struct ether_addr *addr, char *hostname),(line,addr,hostname));
+DEFINE_PUBLIC_ALIAS_P(ether_line_np,libc_ether_line_np,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(char *line, struct ether_addr *addr),(line,addr));
+DEFINE_PUBLIC_ALIAS_P(ether_ntohost,libc_ether_ntohost,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char *hostname, struct ether_addr const *addr),(hostname,addr));
+DEFINE_PUBLIC_ALIAS_P(ether_hostton,libc_ether_hostton,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *hostname, struct ether_addr *addr),(hostname,addr));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NETINET_ETHER_C */

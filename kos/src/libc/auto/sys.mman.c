@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f9ba8e0 */
+/* HASH CRC-32:0x9d85ab98 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -902,22 +902,22 @@ NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__shm_directory, libc___shm_directory);
-DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
-DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
-DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);
+DEFINE_PUBLIC_ALIAS_P(__shm_directory,libc___shm_directory,,const char *,NOTHROW_NCX,LIBCCALL,(size_t *len),(len));
+DEFINE_PUBLIC_ALIAS_P(shm_open,libc_shm_open,ATTR_IN(1),fd_t,NOTHROW_RPC,LIBCCALL,(char const *name, oflag_t oflags, mode_t mode),(name,oflags,mode));
+DEFINE_PUBLIC_ALIAS_P(shm_unlink,libc_shm_unlink,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(posix_madvise,libc_posix_madvise,ATTR_ACCESS_NONE(1),errno_t,NOTHROW_NCX,LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T advice),(addr,len,advice));
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
-DEFINE_PUBLIC_ALIAS(pkey_set, libc_pkey_set);
-DEFINE_PUBLIC_ALIAS(pkey_get, libc_pkey_get);
+DEFINE_PUBLIC_ALIAS_P(pkey_set,libc_pkey_set,,int,NOTHROW_NCX,LIBCCALL,(int pkey, unsigned int access_rights),(pkey,access_rights));
+DEFINE_PUBLIC_ALIAS_P(pkey_get,libc_pkey_get,,int,NOTHROW_NCX,LIBCCALL,(int pkey),(pkey));
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(fmapfile, libc_fmapfile);
-DEFINE_PUBLIC_ALIAS(DOS$fmapfileat, libd_fmapfileat);
-DEFINE_PUBLIC_ALIAS(fmapfileat, libc_fmapfileat);
-DEFINE_PUBLIC_ALIAS(DOS$mapfile, libd_mapfile);
-DEFINE_PUBLIC_ALIAS(mapfile, libc_mapfile);
-DEFINE_PUBLIC_ALIAS(unmapfile, libc_unmapfile);
+DEFINE_PUBLIC_ALIAS_P(fmapfile,libc_fmapfile,WUNUSED ATTR_FDARG(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,fd,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$fmapfileat,libd_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
+DEFINE_PUBLIC_ALIAS_P(fmapfileat,libc_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
+DEFINE_PUBLIC_ALIAS_P(DOS$mapfile,libd_mapfile,WUNUSED ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
+DEFINE_PUBLIC_ALIAS_P(mapfile,libc_mapfile,WUNUSED ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
+DEFINE_PUBLIC_ALIAS_P(unmapfile,libc_unmapfile,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping),(mapping));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_MMAN_C */

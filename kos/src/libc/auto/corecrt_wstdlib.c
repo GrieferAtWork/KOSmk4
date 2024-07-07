@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d26b72b */
+/* HASH CRC-32:0x3986b8db */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -625,7 +625,7 @@ NOTHROW_NCX(LIBDCALL libd__wtol_l)(char16_t const *__restrict nptr,
 	return libd_wcstol_l(nptr, NULL, 10, locale);
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc__wtol_l, libc__wtoi_l);
+DEFINE_INTERN_ALIAS_P(libc__wtol_l,libc__wtoi_l,ATTR_PURE WUNUSED ATTR_IN(1),long int,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_IN(1) long int
 NOTHROW_NCX(LIBKCALL libc__wtol_l)(char32_t const *__restrict nptr,
@@ -639,11 +639,11 @@ NOTHROW_NCX(LIBDCALL libd__wtoi64_l)(char16_t const *__restrict nptr,
 	return libd_wcsto64_l(nptr, NULL, 10, locale);
 }
 #if __SIZEOF_INT__ == 8
-DEFINE_INTERN_ALIAS(libc__wtoi64_l, libc__wtoi_l);
+DEFINE_INTERN_ALIAS_P(libc__wtoi64_l,libc__wtoi_l,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #elif __SIZEOF_LONG__ == 8
-DEFINE_INTERN_ALIAS(libc__wtoi64_l, libc__wtol_l);
+DEFINE_INTERN_ALIAS_P(libc__wtoi64_l,libc__wtol_l,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #elif __SIZEOF_LONG_LONG__ == 8
-DEFINE_INTERN_ALIAS(libc__wtoi64_l, libc__wtoll_l);
+DEFINE_INTERN_ALIAS_P(libc__wtoi64_l,libc__wtoll_l,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #else /* ... */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_IN(1) s64
 NOTHROW_NCX(LIBKCALL libc__wtoi64_l)(char32_t const *__restrict nptr,
@@ -657,9 +657,9 @@ NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *__restrict nptr,
 	return libd_wcstoll_l(nptr, NULL, 10, locale);
 }
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc__wtoll_l, libc__wtoi_l);
+DEFINE_INTERN_ALIAS_P(libc__wtoll_l,libc__wtoi_l,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc__wtoll_l, libc__wtol_l);
+DEFINE_INTERN_ALIAS_P(libc__wtoll_l,libc__wtol_l,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
 #else /* ... */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc__wtoll_l)(char32_t const *__restrict nptr,
@@ -1110,52 +1110,52 @@ err_range:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wtof, libd__wtof);
-DEFINE_PUBLIC_ALIAS(_wtof, libc__wtof);
-DEFINE_PUBLIC_ALIAS(DOS$_wtof_l, libd__wtof_l);
-DEFINE_PUBLIC_ALIAS(_wtof_l, libc__wtof_l);
-DEFINE_PUBLIC_ALIAS(DOS$_itow, libd__itow);
-DEFINE_PUBLIC_ALIAS(_itow, libc__itow);
-DEFINE_PUBLIC_ALIAS(DOS$_ltow, libd__ltow);
-DEFINE_PUBLIC_ALIAS(_ltow, libc__ltow);
-DEFINE_PUBLIC_ALIAS(DOS$_ultow, libd__ultow);
-DEFINE_PUBLIC_ALIAS(_ultow, libc__ultow);
-DEFINE_PUBLIC_ALIAS(DOS$_i64tow, libd__i64tow);
-DEFINE_PUBLIC_ALIAS(_i64tow, libc__i64tow);
-DEFINE_PUBLIC_ALIAS(DOS$_ui64tow, libd__ui64tow);
-DEFINE_PUBLIC_ALIAS(_ui64tow, libc__ui64tow);
-DEFINE_PUBLIC_ALIAS(DOS$_itow_s, libd__itow_s);
-DEFINE_PUBLIC_ALIAS(_itow_s, libc__itow_s);
-DEFINE_PUBLIC_ALIAS(DOS$_ltow_s, libd__ltow_s);
-DEFINE_PUBLIC_ALIAS(_ltow_s, libc__ltow_s);
-DEFINE_PUBLIC_ALIAS(DOS$_ultow_s, libd__ultow_s);
-DEFINE_PUBLIC_ALIAS(_ultow_s, libc__ultow_s);
-DEFINE_PUBLIC_ALIAS(DOS$_i64tow_s, libd__i64tow_s);
-DEFINE_PUBLIC_ALIAS(_i64tow_s, libc__i64tow_s);
-DEFINE_PUBLIC_ALIAS(DOS$_ui64tow_s, libd__ui64tow_s);
-DEFINE_PUBLIC_ALIAS(_ui64tow_s, libc__ui64tow_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoi64, libd__wtoi64);
-DEFINE_PUBLIC_ALIAS(_wtoi64, libc__wtoi64);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoi_l, libd__wtoi_l);
-DEFINE_PUBLIC_ALIAS(_wtoi_l, libc__wtoi_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wtol_l, libd__wtol_l);
-DEFINE_PUBLIC_ALIAS(_wtol_l, libc__wtol_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoi64_l, libd__wtoi64_l);
-DEFINE_PUBLIC_ALIAS(_wtoi64_l, libc__wtoi64_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoll_l, libd__wtoll_l);
-DEFINE_PUBLIC_ALIAS(_wtoll_l, libc__wtoll_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wfullpath, libd__wfullpath);
-DEFINE_PUBLIC_ALIAS(_wfullpath, libc__wfullpath);
-DEFINE_PUBLIC_ALIAS(DOS$_wmakepath_s, libd__wmakepath_s);
-DEFINE_PUBLIC_ALIAS(_wmakepath_s, libc__wmakepath_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wmakepath, libd__wmakepath);
-DEFINE_PUBLIC_ALIAS(_wmakepath, libc__wmakepath);
-DEFINE_PUBLIC_ALIAS(DOS$_wsearchenv, libd__wsearchenv);
-DEFINE_PUBLIC_ALIAS(_wsearchenv, libc__wsearchenv);
-DEFINE_PUBLIC_ALIAS(DOS$_wsplitpath, libd__wsplitpath);
-DEFINE_PUBLIC_ALIAS(_wsplitpath, libc__wsplitpath);
-DEFINE_PUBLIC_ALIAS(DOS$_wsplitpath_s, libd__wsplitpath_s);
-DEFINE_PUBLIC_ALIAS(_wsplitpath_s, libc__wsplitpath_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtof,libd__wtof,ATTR_PURE WUNUSED ATTR_IN(1),double,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(_wtof,libc__wtof,ATTR_PURE WUNUSED ATTR_IN(1),double,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtof_l,libd__wtof_l,ATTR_PURE WUNUSED ATTR_IN(1),double,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(_wtof_l,libc__wtof_l,ATTR_PURE WUNUSED ATTR_IN(1),double,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_itow,libd__itow,ATTR_OUT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(int val, char16_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(_itow,libc__itow,ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(int val, char32_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ltow,libd__ltow,ATTR_OUT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(long val, char16_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(_ltow,libc__ltow,ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(long val, char32_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ultow,libd__ultow,ATTR_OUT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(unsigned long val, char16_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(_ultow,libc__ultow,ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(unsigned long val, char32_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_i64tow,libd__i64tow,ATTR_OUT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(s64 val, char16_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(_i64tow,libc__i64tow,ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(s64 val, char32_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ui64tow,libd__ui64tow,ATTR_OUT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(u64 val, char16_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(_ui64tow,libc__ui64tow,ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(u64 val, char32_t *buf, int radix),(val,buf,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_itow_s,libd__itow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBDCALL,(int val, char16_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(_itow_s,libc__itow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBKCALL,(int val, char32_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ltow_s,libd__ltow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBDCALL,(long val, char16_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(_ltow_s,libc__ltow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBKCALL,(long val, char32_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ultow_s,libd__ultow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBDCALL,(unsigned long val, char16_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(_ultow_s,libc__ultow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBKCALL,(unsigned long val, char32_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_i64tow_s,libd__i64tow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBDCALL,(s64 val, char16_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(_i64tow_s,libc__i64tow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBKCALL,(s64 val, char32_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ui64tow_s,libd__ui64tow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBDCALL,(u64 val, char16_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(_ui64tow_s,libc__ui64tow_s,ATTR_OUTS(2, 3),errno_t,NOTHROW_NCX,LIBKCALL,(u64 val, char32_t *buf, size_t buflen, int radix),(val,buf,buflen,radix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoi64,libd__wtoi64,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(_wtoi64,libc__wtoi64,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoi_l,libd__wtoi_l,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(_wtoi_l,libc__wtoi_l,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtol_l,libd__wtol_l,ATTR_PURE WUNUSED ATTR_IN(1),long int,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(_wtol_l,libc__wtol_l,ATTR_PURE WUNUSED ATTR_IN(1),long int,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoi64_l,libd__wtoi64_l,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(_wtoi64_l,libc__wtoi64_l,ATTR_PURE WUNUSED ATTR_IN(1),s64,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoll_l,libd__wtoll_l,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(_wtoll_l,libc__wtoll_l,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, locale_t locale),(nptr,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wfullpath,libd__wfullpath,ATTR_IN(2) ATTR_OUTS(1, 3),char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t *buf, char16_t const *path, size_t buflen),(buf,path,buflen));
+DEFINE_PUBLIC_ALIAS_P(_wfullpath,libc__wfullpath,ATTR_IN(2) ATTR_OUTS(1, 3),char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t *buf, char32_t const *path, size_t buflen),(buf,path,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wmakepath_s,libd__wmakepath_s,ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen, char16_t const *drive, char16_t const *dir, char16_t const *file, char16_t const *ext),(buf,buflen,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P(_wmakepath_s,libc__wmakepath_s,ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen, char32_t const *drive, char32_t const *dir, char32_t const *file, char32_t const *ext),(buf,buflen,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$_wmakepath,libd__wmakepath,ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1),NOTHROW_NCX,LIBDCALL,(char16_t *__restrict buf, char16_t const *drive, char16_t const *dir, char16_t const *file, char16_t const *ext),(buf,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P_VOID(_wmakepath,libc__wmakepath,ATTR_IN_OPT(2) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1),NOTHROW_NCX,LIBKCALL,(char32_t *__restrict buf, char32_t const *drive, char32_t const *dir, char32_t const *file, char32_t const *ext),(buf,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$_wsearchenv,libd__wsearchenv,ATTR_IN(1) ATTR_IN(2) ATTR_OUT(3),NOTHROW_RPC,LIBDCALL,(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath),(file,envvar,resultpath));
+DEFINE_PUBLIC_ALIAS_P_VOID(_wsearchenv,libc__wsearchenv,ATTR_IN(1) ATTR_IN(2) ATTR_OUT(3),NOTHROW_RPC,LIBKCALL,(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath),(file,envvar,resultpath));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$_wsplitpath,libd__wsplitpath,ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) ATTR_OUT_OPT(4) ATTR_OUT_OPT(5),NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict abspath, char16_t *drive, char16_t *dir, char16_t *file, char16_t *ext),(abspath,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P_VOID(_wsplitpath,libc__wsplitpath,ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) ATTR_OUT_OPT(4) ATTR_OUT_OPT(5),NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict abspath, char32_t *drive, char32_t *dir, char32_t *file, char32_t *ext),(abspath,drive,dir,file,ext));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsplitpath_s,libd__wsplitpath_s,ATTR_IN(1) ATTR_OUTS(2, 3) ATTR_OUTS(4, 5) ATTR_OUTS(6, 7) ATTR_OUTS(8, 9),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict abspath, char16_t *drive, size_t drivelen, char16_t *dir, size_t dirlen, char16_t *file, size_t filelen, char16_t *ext, size_t extlen),(abspath,drive,drivelen,dir,dirlen,file,filelen,ext,extlen));
+DEFINE_PUBLIC_ALIAS_P(_wsplitpath_s,libc__wsplitpath_s,ATTR_IN(1) ATTR_OUTS(2, 3) ATTR_OUTS(4, 5) ATTR_OUTS(6, 7) ATTR_OUTS(8, 9),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict abspath, char32_t *drive, size_t drivelen, char32_t *dir, size_t dirlen, char32_t *file, size_t filelen, char32_t *ext, size_t extlen),(abspath,drive,drivelen,dir,dirlen,file,filelen,ext,extlen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CORECRT_WSTDLIB_C */

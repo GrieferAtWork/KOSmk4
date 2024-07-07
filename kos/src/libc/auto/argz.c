@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cdd9b40 */
+/* HASH CRC-32:0xf64b83b3 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -567,31 +567,31 @@ NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__argz_create, libc_argz_create);
-DEFINE_PUBLIC_ALIAS(argz_create, libc_argz_create);
-DEFINE_PUBLIC_ALIAS(__argz_create_sep, libc_argz_create_sep);
-DEFINE_PUBLIC_ALIAS(argz_create_sep, libc_argz_create_sep);
-DEFINE_PUBLIC_ALIAS(__argz_count, libc_argz_count);
-DEFINE_PUBLIC_ALIAS(argz_count, libc_argz_count);
-DEFINE_PUBLIC_ALIAS(__argz_extract, libc_argz_extract);
-DEFINE_PUBLIC_ALIAS(argz_extract, libc_argz_extract);
-DEFINE_PUBLIC_ALIAS(__argz_stringify, libc_argz_stringify);
-DEFINE_PUBLIC_ALIAS(argz_stringify, libc_argz_stringify);
-DEFINE_PUBLIC_ALIAS(__argz_create_sep, libc_argz_append);
-DEFINE_PUBLIC_ALIAS(__argz_append, libc_argz_append);
-DEFINE_PUBLIC_ALIAS(argz_append, libc_argz_append);
-DEFINE_PUBLIC_ALIAS(__argz_add, libc_argz_add);
-DEFINE_PUBLIC_ALIAS(argz_add, libc_argz_add);
-DEFINE_PUBLIC_ALIAS(__argz_add_sep, libc_argz_add_sep);
-DEFINE_PUBLIC_ALIAS(argz_add_sep, libc_argz_add_sep);
-DEFINE_PUBLIC_ALIAS(__argz_delete, libc_argz_delete);
-DEFINE_PUBLIC_ALIAS(argz_delete, libc_argz_delete);
-DEFINE_PUBLIC_ALIAS(__argz_insert, libc_argz_insert);
-DEFINE_PUBLIC_ALIAS(argz_insert, libc_argz_insert);
-DEFINE_PUBLIC_ALIAS(__argz_replace, libc_argz_replace);
-DEFINE_PUBLIC_ALIAS(argz_replace, libc_argz_replace);
-DEFINE_PUBLIC_ALIAS(__argz_next, libc_argz_next);
-DEFINE_PUBLIC_ALIAS(argz_next, libc_argz_next);
+DEFINE_PUBLIC_ALIAS_P(__argz_create,libc_argz_create,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),error_t,NOTHROW_NCX,LIBCCALL,(char *const argv[], char **__restrict pargz, size_t *__restrict pargz_len),(argv,pargz,pargz_len));
+DEFINE_PUBLIC_ALIAS_P(argz_create,libc_argz_create,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),error_t,NOTHROW_NCX,LIBCCALL,(char *const argv[], char **__restrict pargz, size_t *__restrict pargz_len),(argv,pargz,pargz_len));
+DEFINE_PUBLIC_ALIAS_P(__argz_create_sep,libc_argz_create_sep,ATTR_IN(1) ATTR_OUT(3) ATTR_OUT(4),error_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict string, int sep, char **__restrict pargz, size_t *__restrict pargz_len),(string,sep,pargz,pargz_len));
+DEFINE_PUBLIC_ALIAS_P(argz_create_sep,libc_argz_create_sep,ATTR_IN(1) ATTR_OUT(3) ATTR_OUT(4),error_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict string, int sep, char **__restrict pargz, size_t *__restrict pargz_len),(string,sep,pargz,pargz_len));
+DEFINE_PUBLIC_ALIAS_P(__argz_count,libc_argz_count,ATTR_PURE ATTR_INS(1, 2) NONNULL((1)),size_t,NOTHROW_NCX,LIBCCALL,(char const *argz, size_t argz_len),(argz,argz_len));
+DEFINE_PUBLIC_ALIAS_P(argz_count,libc_argz_count,ATTR_PURE ATTR_INS(1, 2) NONNULL((1)),size_t,NOTHROW_NCX,LIBCCALL,(char const *argz, size_t argz_len),(argz,argz_len));
+DEFINE_PUBLIC_ALIAS_P_VOID(__argz_extract,libc_argz_extract,ATTR_INS(1, 2) ATTR_OUT(3),NOTHROW_NCX,LIBCCALL,(char const *__restrict argz, size_t argz_len, char **__restrict argv),(argz,argz_len,argv));
+DEFINE_PUBLIC_ALIAS_P_VOID(argz_extract,libc_argz_extract,ATTR_INS(1, 2) ATTR_OUT(3),NOTHROW_NCX,LIBCCALL,(char const *__restrict argz, size_t argz_len, char **__restrict argv),(argz,argz_len,argv));
+DEFINE_PUBLIC_ALIAS_P_VOID(__argz_stringify,libc_argz_stringify,ATTR_INOUTS(1, 2),NOTHROW_NCX,LIBCCALL,(char *argz, size_t len, int sep),(argz,len,sep));
+DEFINE_PUBLIC_ALIAS_P_VOID(argz_stringify,libc_argz_stringify,ATTR_INOUTS(1, 2),NOTHROW_NCX,LIBCCALL,(char *argz, size_t len, int sep),(argz,len,sep));
+DEFINE_PUBLIC_ALIAS_P(__argz_create_sep,libc_argz_append,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INS(3, 4),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict buf, size_t buf_len),(pargz,pargz_len,buf,buf_len));
+DEFINE_PUBLIC_ALIAS_P(__argz_append,libc_argz_append,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INS(3, 4),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict buf, size_t buf_len),(pargz,pargz_len,buf,buf_len));
+DEFINE_PUBLIC_ALIAS_P(argz_append,libc_argz_append,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INS(3, 4),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict buf, size_t buf_len),(pargz,pargz_len,buf,buf_len));
+DEFINE_PUBLIC_ALIAS_P(__argz_add,libc_argz_add,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str),(pargz,pargz_len,str));
+DEFINE_PUBLIC_ALIAS_P(argz_add,libc_argz_add,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str),(pargz,pargz_len,str));
+DEFINE_PUBLIC_ALIAS_P(__argz_add_sep,libc_argz_add_sep,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict string, int sep),(pargz,pargz_len,string,sep));
+DEFINE_PUBLIC_ALIAS_P(argz_add_sep,libc_argz_add_sep,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict string, int sep),(pargz,pargz_len,string,sep));
+DEFINE_PUBLIC_ALIAS_P_VOID(__argz_delete,libc_argz_delete,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3),NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char *entry),(pargz,pargz_len,entry));
+DEFINE_PUBLIC_ALIAS_P_VOID(argz_delete,libc_argz_delete,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3),NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char *entry),(pargz,pargz_len,entry));
+DEFINE_PUBLIC_ALIAS_P(__argz_insert,libc_argz_insert,ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char *before, char const *__restrict entry),(pargz,pargz_len,before,entry));
+DEFINE_PUBLIC_ALIAS_P(argz_insert,libc_argz_insert,ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char *before, char const *__restrict entry),(pargz,pargz_len,before,entry));
+DEFINE_PUBLIC_ALIAS_P(__argz_replace,libc_argz_replace,ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT_OPT(5) ATTR_IN_OPT(3),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str, char const *__restrict with, unsigned int *__restrict replace_count),(pargz,pargz_len,str,with,replace_count));
+DEFINE_PUBLIC_ALIAS_P(argz_replace,libc_argz_replace,ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT_OPT(5) ATTR_IN_OPT(3),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str, char const *__restrict with, unsigned int *__restrict replace_count),(pargz,pargz_len,str,with,replace_count));
+DEFINE_PUBLIC_ALIAS_P(__argz_next,libc_argz_next,ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_IN_OPT(3) NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict argz, size_t argz_len, char const *__restrict entry),(argz,argz_len,entry));
+DEFINE_PUBLIC_ALIAS_P(argz_next,libc_argz_next,ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_IN_OPT(3) NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict argz, size_t argz_len, char const *__restrict entry),(argz,argz_len,entry));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARGZ_C */

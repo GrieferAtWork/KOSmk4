@@ -103,15 +103,15 @@ NOTHROW_NCX(LIBCCALL libc__argp_input)(struct argp const *__restrict ap,
 }
 /*[[[end:libc__argp_input]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xfac959b3]]]*/
-DEFINE_PUBLIC_ALIAS(__argp_parse, libc_argp_parse);
-DEFINE_PUBLIC_ALIAS(argp_parse, libc_argp_parse);
-DEFINE_PUBLIC_ALIAS(__argp_parse, libc_argp_help);
-DEFINE_PUBLIC_ALIAS(argp_help, libc_argp_help);
-DEFINE_PUBLIC_ALIAS(__argp_state_help, libc_argp_state_help);
-DEFINE_PUBLIC_ALIAS(argp_state_help, libc_argp_state_help);
-DEFINE_PUBLIC_ALIAS(__argp_input, libc__argp_input);
-DEFINE_PUBLIC_ALIAS(_argp_input, libc__argp_input);
+/*[[[start:exports,hash:CRC-32=0x83e2f8a7]]]*/
+DEFINE_PUBLIC_ALIAS_P(__argp_parse,libc_argp_parse,ATTR_IN(1) ATTR_INS(3, 2) ATTR_OUT(5),error_t,NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, int argc, char **__restrict argv, unsigned int flags, int *__restrict arg_index, void *input),(ap,argc,argv,flags,arg_index,input));
+DEFINE_PUBLIC_ALIAS_P(argp_parse,libc_argp_parse,ATTR_IN(1) ATTR_INS(3, 2) ATTR_OUT(5),error_t,NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, int argc, char **__restrict argv, unsigned int flags, int *__restrict arg_index, void *input),(ap,argc,argv,flags,arg_index,input));
+DEFINE_PUBLIC_ALIAS_P_VOID(__argp_parse,libc_argp_help,ATTR_IN(1) ATTR_IN(4) ATTR_INOUT(2),NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, FILE *__restrict stream, unsigned int flags, char __KOS_FIXED_CONST *__restrict name),(ap,stream,flags,name));
+DEFINE_PUBLIC_ALIAS_P_VOID(argp_help,libc_argp_help,ATTR_IN(1) ATTR_IN(4) ATTR_INOUT(2),NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, FILE *__restrict stream, unsigned int flags, char __KOS_FIXED_CONST *__restrict name),(ap,stream,flags,name));
+DEFINE_PUBLIC_ALIAS_P_VOID(__argp_state_help,libc_argp_state_help,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1),NOTHROW_NCX,LIBCCALL,(struct argp_state const *__restrict state, FILE *__restrict stream, unsigned int flags),(state,stream,flags));
+DEFINE_PUBLIC_ALIAS_P_VOID(argp_state_help,libc_argp_state_help,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1),NOTHROW_NCX,LIBCCALL,(struct argp_state const *__restrict state, FILE *__restrict stream, unsigned int flags),(state,stream,flags));
+DEFINE_PUBLIC_ALIAS_P(__argp_input,libc__argp_input,ATTR_IN_OPT(1) ATTR_IN_OPT(2),void *,NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, struct argp_state const *__restrict state),(ap,state));
+DEFINE_PUBLIC_ALIAS_P(_argp_input,libc__argp_input,ATTR_IN_OPT(1) ATTR_IN_OPT(2),void *,NOTHROW_NCX,LIBCCALL,(struct argp const *__restrict ap, struct argp_state const *__restrict state),(ap,state));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdb10e6b */
+/* HASH CRC-32:0x2ca9bcb4 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,10 +176,10 @@ NOTHROW_NCX(LIBCCALL libc_objalloc_free_block)(struct objalloc *self,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(objalloc_create, libc_objalloc_create);
-DEFINE_PUBLIC_ALIAS(_objalloc_alloc, libc__objalloc_alloc);
-DEFINE_PUBLIC_ALIAS(objalloc_free, libc_objalloc_free);
-DEFINE_PUBLIC_ALIAS(objalloc_free_block, libc_objalloc_free_block);
+DEFINE_PUBLIC_ALIAS_P(objalloc_create,libc_objalloc_create,,struct objalloc *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_objalloc_alloc,libc__objalloc_alloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INOUT(1),void *,NOTHROW_NCX,LIBCCALL,(struct objalloc *self, __ULONGPTR_TYPE__ num_bytes),(self,num_bytes));
+DEFINE_PUBLIC_ALIAS_P_VOID(objalloc_free,libc_objalloc_free,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct objalloc *self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(objalloc_free_block,libc_objalloc_free_block,ATTR_INOUT(1) NONNULL((2)),NOTHROW_NCX,LIBCCALL,(struct objalloc *self, void *ptr),(self,ptr));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_OBJALLOC_C */

@@ -87,10 +87,10 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1671125]]]*/
-DEFINE_PUBLIC_ALIAS(_getdrive, libc__getdrive);
-DEFINE_PUBLIC_ALIAS(_getdrives, libc__getdrives);
-DEFINE_PUBLIC_ALIAS(_getdiskfree, libc__getdiskfree);
+/*[[[start:exports,hash:CRC-32=0xaaef5724]]]*/
+DEFINE_PUBLIC_ALIAS_P(_getdrive,libc__getdrive,,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getdrives,libc__getdrives,,__ULONG32_TYPE__,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getdiskfree,libc__getdiskfree,ATTR_OUT(2),unsigned int,NOTHROW_RPC,LIBCCALL,(unsigned int drive, struct _diskfree_t *diskfree),(drive,diskfree));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -42,8 +42,8 @@ NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xef549e08]]]*/
-DEFINE_PUBLIC_ALIAS(ftok, libc_ftok);
+/*[[[start:exports,hash:CRC-32=0xd89dd9d4]]]*/
+DEFINE_PUBLIC_ALIAS_P(ftok,libc_ftok,ATTR_IN(1),key_t,NOTHROW_RPC,LIBCCALL,(char const *pathname, __STDC_INT_AS_UINT_T proj_id),(pathname,proj_id));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32ca1e13 */
+/* HASH CRC-32:0x8df0c9ab */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,7 +147,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *file,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_wutime64, libc_wutime);
+DEFINE_INTERN_ALIAS_P(libc_wutime64,libc_wutime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, struct utimbuf64 const *file_times),(file,file_times));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify_time") ATTR_IN(1) ATTR_IN_OPT(2) int
 NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *file,
@@ -188,18 +188,18 @@ NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *file,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wutime, libd_wutime);
-DEFINE_PUBLIC_ALIAS(DOS$_wutime32, libd_wutime);
-DEFINE_PUBLIC_ALIAS(DOS$wutime, libd_wutime);
-DEFINE_PUBLIC_ALIAS(wutime, libc_wutime);
-DEFINE_PUBLIC_ALIAS(DOS$_wutime64, libd_wutime64);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wutime,libd_wutime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, struct utimbuf const *file_times),(file,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wutime32,libd_wutime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, struct utimbuf const *file_times),(file,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$wutime,libd_wutime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, struct utimbuf const *file_times),(file,file_times));
+DEFINE_PUBLIC_ALIAS_P(wutime,libc_wutime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, struct utimbuf const *file_times),(file,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wutime64,libd_wutime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, struct utimbuf64 const *file_times),(file,file_times));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$wutime64, libd_wutime64);
+DEFINE_PUBLIC_ALIAS_P(DOS$wutime64,libd_wutime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *file, struct utimbuf64 const *file_times),(file,file_times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(wutime64, libc_wutime64);
+DEFINE_PUBLIC_ALIAS_P(wutime64,libc_wutime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *file, struct utimbuf64 const *file_times),(file,file_times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

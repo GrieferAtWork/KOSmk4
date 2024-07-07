@@ -105,11 +105,11 @@ NOTHROW_RPC(LIBCCALL libc_nftw64)(char const *dir,
 #endif /* MAGIC:alias */
 /*[[[end:libc_nftw64]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x5b98419e]]]*/
-DEFINE_PUBLIC_ALIAS(ftw, libc_ftw);
-DEFINE_PUBLIC_ALIAS(ftw64, libc_ftw64);
-DEFINE_PUBLIC_ALIAS(nftw, libc_nftw);
-DEFINE_PUBLIC_ALIAS(nftw64, libc_nftw64);
+/*[[[start:exports,hash:CRC-32=0xd8940346]]]*/
+DEFINE_PUBLIC_ALIAS_P(ftw,libc_ftw,ATTR_IN(1) NONNULL((2)),int,NOTHROW_RPC,LIBCCALL,(char const *dir, __ftw_func_t func, __STDC_INT_AS_UINT_T nopenfd),(dir,func,nopenfd));
+DEFINE_PUBLIC_ALIAS_P(ftw64,libc_ftw64,ATTR_IN(1) NONNULL((2)),int,NOTHROW_RPC,LIBCCALL,(char const *dir, __ftw64_func_t func, __STDC_INT_AS_UINT_T nopenfd),(dir,func,nopenfd));
+DEFINE_PUBLIC_ALIAS_P(nftw,libc_nftw,ATTR_IN(1) NONNULL((2)),int,NOTHROW_RPC,LIBCCALL,(char const *dir, __nftw_func_t func, __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags),(dir,func,descriptors,flags));
+DEFINE_PUBLIC_ALIAS_P(nftw64,libc_nftw64,ATTR_IN(1) NONNULL((2)),int,NOTHROW_RPC,LIBCCALL,(char const *dir, __nftw64_func_t func, __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags),(dir,func,descriptors,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

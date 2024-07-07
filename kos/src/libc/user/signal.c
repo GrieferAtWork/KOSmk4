@@ -1276,75 +1276,75 @@ NOTHROW(LIBCCALL libc___libc_current_sigrtmax)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb94d4f66]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
-DEFINE_PUBLIC_ALIAS(raise, libc_raise);
-DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
-DEFINE_PUBLIC_ALIAS(DOS$sysv_signal, libd_sysv_signal);
-DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
-DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
-DEFINE_PUBLIC_ALIAS(tgkill, libc_tgkill);
-DEFINE_PUBLIC_ALIAS(DOS$_signal, libd_signal);
-DEFINE_PUBLIC_ALIAS(DOS$signal, libd_signal);
-DEFINE_PUBLIC_ALIAS(signal, libc_signal);
-DEFINE_PUBLIC_ALIAS(DOS$ssignal, libd_ssignal);
-DEFINE_PUBLIC_ALIAS(ssignal, libc_ssignal);
-DEFINE_PUBLIC_ALIAS(DOS$gsignal, libd_gsignal);
-DEFINE_PUBLIC_ALIAS(gsignal, libc_gsignal);
-DEFINE_PUBLIC_ALIAS(__p_sys_siglist, libc___p_sys_siglist);
-DEFINE_PUBLIC_ALIAS(sigreturn, libc_sigreturn);
-DEFINE_PUBLIC_ALIAS(DOS$__bsd_signal, libd_bsd_signal);
-DEFINE_PUBLIC_ALIAS(DOS$bsd_signal, libd_bsd_signal);
-DEFINE_PUBLIC_ALIAS(__bsd_signal, libc_bsd_signal);
-DEFINE_PUBLIC_ALIAS(bsd_signal, libc_bsd_signal);
-DEFINE_PUBLIC_ALIAS(__kill, libc_kill);
-DEFINE_PUBLIC_ALIAS(__libc_kill, libc_kill);
-DEFINE_PUBLIC_ALIAS(kill, libc_kill);
-DEFINE_PUBLIC_ALIAS(__sigprocmask, libc_sigprocmask);
-DEFINE_PUBLIC_ALIAS(__libc_sigprocmask, libc_sigprocmask);
-DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
-DEFINE_PUBLIC_ALIAS(thr_sigsetmask, libc_sigprocmask);
-DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
-DEFINE_PUBLIC_ALIAS(getsigmaskptr, libc_getsigmaskptr);
-DEFINE_PUBLIC_ALIAS(setsigmaskptr, libc_setsigmaskptr);
-DEFINE_PUBLIC_ALIAS(setsigmaskfullptr, libc_setsigmaskfullptr);
+/*[[[start:exports,hash:CRC-32=0x3669a7c7]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$raise,libd_raise,,int,NOTHROW_NCX,LIBDCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(raise,libc_raise,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(DOS$__sysv_signal,libd_sysv_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(DOS$sysv_signal,libd_sysv_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(__sysv_signal,libc_sysv_signal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(sysv_signal,libc_sysv_signal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(tgkill,libc_tgkill,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid, pid_t tid, signo_t signo),(pid,tid,signo));
+DEFINE_PUBLIC_ALIAS_P(DOS$_signal,libd_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(DOS$signal,libd_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(signal,libc_signal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(DOS$ssignal,libd_ssignal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(ssignal,libc_ssignal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(DOS$gsignal,libd_gsignal,,int,NOTHROW_NCX,LIBDCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(gsignal,libc_gsignal,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(__p_sys_siglist,libc___p_sys_siglist,ATTR_CONST ATTR_RETNONNULL WUNUSED,char const *const *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(sigreturn,libc_sigreturn,ATTR_NORETURN,NOTHROW_NCX,LIBCCALL,(struct sigcontext const *scp),(scp));
+DEFINE_PUBLIC_ALIAS_P(DOS$__bsd_signal,libd_bsd_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(DOS$bsd_signal,libd_bsd_signal,,sighandler_t,NOTHROW_NCX,LIBDCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(__bsd_signal,libc_bsd_signal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(bsd_signal,libc_bsd_signal,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t handler),(signo,handler));
+DEFINE_PUBLIC_ALIAS_P(__kill,libc_kill,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid, signo_t signo),(pid,signo));
+DEFINE_PUBLIC_ALIAS_P(__libc_kill,libc_kill,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid, signo_t signo),(pid,signo));
+DEFINE_PUBLIC_ALIAS_P(kill,libc_kill,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid, signo_t signo),(pid,signo));
+DEFINE_PUBLIC_ALIAS_P(__sigprocmask,libc_sigprocmask,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset),(how,set,oset));
+DEFINE_PUBLIC_ALIAS_P(__libc_sigprocmask,libc_sigprocmask,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset),(how,set,oset));
+DEFINE_PUBLIC_ALIAS_P(pthread_sigmask,libc_sigprocmask,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset),(how,set,oset));
+DEFINE_PUBLIC_ALIAS_P(thr_sigsetmask,libc_sigprocmask,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset),(how,set,oset));
+DEFINE_PUBLIC_ALIAS_P(sigprocmask,libc_sigprocmask,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset),(how,set,oset));
+DEFINE_PUBLIC_ALIAS_P(getsigmaskptr,libc_getsigmaskptr,ATTR_RETNONNULL WUNUSED,sigset_t *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(setsigmaskptr,libc_setsigmaskptr,ATTR_RETNONNULL NONNULL((1)),sigset_t *,NOTHROW_NCX,LIBCCALL,(sigset_t *sigmaskptr),(sigmaskptr));
+DEFINE_PUBLIC_ALIAS_P(setsigmaskfullptr,libc_setsigmaskfullptr,ATTR_RETNONNULL,sigset_t *,NOTHROW_NCX,LIBCCALL,(void),());
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-DEFINE_PUBLIC_ALIAS(getuserprocmask, libc_getuserprocmask);
-DEFINE_PUBLIC_ALIAS(chkuserprocmask, libc_chkuserprocmask);
+DEFINE_PUBLIC_ALIAS_P(getuserprocmask,libc_getuserprocmask,ATTR_CONST ATTR_RETNONNULL WUNUSED,struct userprocmask *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(chkuserprocmask,libc_chkuserprocmask,,NOTHROW,LIBCCALL,(void),());
 #endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
-DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
-DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
-DEFINE_PUBLIC_ALIAS(__sigaction, libc_sigaction);
-DEFINE_PUBLIC_ALIAS(__libc_sigaction, libc_sigaction);
-DEFINE_PUBLIC_ALIAS(sigaction, libc_sigaction);
-DEFINE_PUBLIC_ALIAS(__sigpending, libc_sigpending);
-DEFINE_PUBLIC_ALIAS(__libc_sigpending, libc_sigpending);
-DEFINE_PUBLIC_ALIAS(sigpending, libc_sigpending);
-DEFINE_PUBLIC_ALIAS(__sigwait, libc_sigwait);
-DEFINE_PUBLIC_ALIAS(sigwait, libc_sigwait);
-DEFINE_PUBLIC_ALIAS(__sigwaitinfo, libc_sigwaitinfo);
-DEFINE_PUBLIC_ALIAS(sigwaitinfo, libc_sigwaitinfo);
-DEFINE_PUBLIC_ALIAS(__sigtimedwait, libc_sigtimedwait);
-DEFINE_PUBLIC_ALIAS(sigtimedwait, libc_sigtimedwait);
-DEFINE_PUBLIC_ALIAS(sigqueue, libc_sigqueue);
+DEFINE_PUBLIC_ALIAS_P(__sigsuspend,libc_sigsuspend,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *set),(set));
+DEFINE_PUBLIC_ALIAS_P(sigsuspend,libc_sigsuspend,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *set),(set));
+DEFINE_PUBLIC_ALIAS_P(__sigaction,libc_sigaction,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(signo_t signo, struct sigaction const *act, struct sigaction *oact),(signo,act,oact));
+DEFINE_PUBLIC_ALIAS_P(__libc_sigaction,libc_sigaction,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(signo_t signo, struct sigaction const *act, struct sigaction *oact),(signo,act,oact));
+DEFINE_PUBLIC_ALIAS_P(sigaction,libc_sigaction,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(signo_t signo, struct sigaction const *act, struct sigaction *oact),(signo,act,oact));
+DEFINE_PUBLIC_ALIAS_P(__sigpending,libc_sigpending,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *__restrict set),(set));
+DEFINE_PUBLIC_ALIAS_P(__libc_sigpending,libc_sigpending,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *__restrict set),(set));
+DEFINE_PUBLIC_ALIAS_P(sigpending,libc_sigpending,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *__restrict set),(set));
+DEFINE_PUBLIC_ALIAS_P(__sigwait,libc_sigwait,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, signo_t *__restrict signo),(set,signo));
+DEFINE_PUBLIC_ALIAS_P(sigwait,libc_sigwait,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, signo_t *__restrict signo),(set,signo));
+DEFINE_PUBLIC_ALIAS_P(__sigwaitinfo,libc_sigwaitinfo,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info),(set,info));
+DEFINE_PUBLIC_ALIAS_P(sigwaitinfo,libc_sigwaitinfo,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info),(set,info));
+DEFINE_PUBLIC_ALIAS_P(__sigtimedwait,libc_sigtimedwait,ATTR_IN(1) ATTR_IN_OPT(3) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout),(set,info,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(sigtimedwait,libc_sigtimedwait,ATTR_IN(1) ATTR_IN_OPT(3) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout),(set,info,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(sigqueue,libc_sigqueue,,int,NOTHROW_NCX,LIBCCALL,(pid_t pid, signo_t signo, union sigval const val),(pid,signo,val));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__sigtimedwait64, libc_sigtimedwait64);
-DEFINE_PUBLIC_ALIAS(sigtimedwait64, libc_sigtimedwait64);
+DEFINE_PUBLIC_ALIAS_P(__sigtimedwait64,libc_sigtimedwait64,ATTR_IN(1) ATTR_IN_OPT(3) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *rel_timeout),(set,info,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(sigtimedwait64,libc_sigtimedwait64,ATTR_IN(1) ATTR_IN_OPT(3) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *rel_timeout),(set,info,rel_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
-DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
-DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
-DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);
-DEFINE_PUBLIC_ALIAS(__libc_allocate_rtsig_private, libc___libc_allocate_rtsig);
-DEFINE_PUBLIC_ALIAS(__libc_allocate_rtsig, libc___libc_allocate_rtsig);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin_private, libc___libc_current_sigrtmin);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax_private, libc___libc_current_sigrtmax);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
-DEFINE_PUBLIC_ALIAS(thr_kill, libc_pthread_kill);
-DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
-DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
+DEFINE_PUBLIC_ALIAS_P(sigqueueinfo,libc_sigqueueinfo,ATTR_IN(3),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, signo_t signo, siginfo_t const *uinfo),(pid,signo,uinfo));
+DEFINE_PUBLIC_ALIAS_P(tgsigqueueinfo,libc_tgsigqueueinfo,ATTR_IN(4),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, pid_t tid, signo_t signo, siginfo_t const *uinfo),(pid,tid,signo,uinfo));
+DEFINE_PUBLIC_ALIAS_P(siginterrupt,libc_siginterrupt,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo, __STDC_INT_AS_UINT_T interrupt),(signo,interrupt));
+DEFINE_PUBLIC_ALIAS_P(sigaltstack,libc_sigaltstack,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct sigaltstack const *ss, struct sigaltstack *oss),(ss,oss));
+DEFINE_PUBLIC_ALIAS_P(__libc_allocate_rtsig_private,libc___libc_allocate_rtsig,WUNUSED,signo_t,NOTHROW_NCX,LIBCCALL,(int high),(high));
+DEFINE_PUBLIC_ALIAS_P(__libc_allocate_rtsig,libc___libc_allocate_rtsig,WUNUSED,signo_t,NOTHROW_NCX,LIBCCALL,(int high),(high));
+DEFINE_PUBLIC_ALIAS_P(__libc_current_sigrtmin_private,libc___libc_current_sigrtmin,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__libc_current_sigrtmin,libc___libc_current_sigrtmin,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__libc_current_sigrtmax_private,libc___libc_current_sigrtmax,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__libc_current_sigrtmax,libc___libc_current_sigrtmax,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(thr_kill,libc_pthread_kill,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t pthread, signo_t signo),(pthread,signo));
+DEFINE_PUBLIC_ALIAS_P(pthread_kill,libc_pthread_kill,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t pthread, signo_t signo),(pthread,signo));
+DEFINE_PUBLIC_ALIAS_P(pthread_sigqueue,libc_pthread_sigqueue,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t pthread, signo_t signo, union sigval const val),(pthread,signo,val));
 /*[[[end:exports]]]*/
 
 DECL_END

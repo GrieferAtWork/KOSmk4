@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5d7046 */
+/* HASH CRC-32:0x1ca6d515 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,10 +186,10 @@ already_printed:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(partition_new, libc_partition_new);
-DEFINE_PUBLIC_ALIAS(partition_delete, libc_partition_delete);
-DEFINE_PUBLIC_ALIAS(partition_union, libc_partition_union);
-DEFINE_PUBLIC_ALIAS(partition_print, libc_partition_print);
+DEFINE_PUBLIC_ALIAS_P(partition_new,libc_partition_new,ATTR_RETNONNULL,struct partition_def *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T num_elements),(num_elements));
+DEFINE_PUBLIC_ALIAS_P_VOID(partition_delete,libc_partition_delete,,NOTHROW_NCX,LIBCCALL,(struct partition_def *self),(self));
+DEFINE_PUBLIC_ALIAS_P(partition_union,libc_partition_union,ATTR_INOUT(1),__STDC_INT_AS_UINT_T,NOTHROW_NCX,LIBCCALL,(struct partition_def *self, __STDC_INT_AS_UINT_T a, __STDC_INT_AS_UINT_T b),(self,a,b));
+DEFINE_PUBLIC_ALIAS_P_VOID(partition_print,libc_partition_print,ATTR_IN(1) ATTR_INOUT(2),NOTHROW_CB_NCX,LIBCCALL,(struct partition_def __KOS_FIXED_CONST *self, FILE *fp),(self,fp));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTITION_C */

@@ -1547,14 +1547,14 @@ DEFINE_PUBLIC_ALIAS(_libc_intl_domainname, libc__libc_intl_domainname);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8f3b4b7f]]]*/
-DEFINE_PUBLIC_ALIAS(__dcngettext, libc_dcngettext);
-DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);
-DEFINE_PUBLIC_ALIAS(__textdomain, libc_textdomain);
-DEFINE_PUBLIC_ALIAS(textdomain, libc_textdomain);
-DEFINE_PUBLIC_ALIAS(__bindtextdomain, libc_bindtextdomain);
-DEFINE_PUBLIC_ALIAS(bindtextdomain, libc_bindtextdomain);
-DEFINE_PUBLIC_ALIAS(bind_textdomain_codeset, libc_bind_textdomain_codeset);
+/*[[[start:exports,hash:CRC-32=0x82db4133]]]*/
+DEFINE_PUBLIC_ALIAS_P(__dcngettext,libc_dcngettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category),(domainname,msgid_singular,msgid_plural,n,category));
+DEFINE_PUBLIC_ALIAS_P(dcngettext,libc_dcngettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category),(domainname,msgid_singular,msgid_plural,n,category));
+DEFINE_PUBLIC_ALIAS_P(__textdomain,libc_textdomain,ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname),(domainname));
+DEFINE_PUBLIC_ALIAS_P(textdomain,libc_textdomain,ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname),(domainname));
+DEFINE_PUBLIC_ALIAS_P(__bindtextdomain,libc_bindtextdomain,ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *dirname),(domainname,dirname));
+DEFINE_PUBLIC_ALIAS_P(bindtextdomain,libc_bindtextdomain,ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *dirname),(domainname,dirname));
+DEFINE_PUBLIC_ALIAS_P(bind_textdomain_codeset,libc_bind_textdomain_codeset,ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *codeset),(domainname,codeset));
 /*[[[end:exports]]]*/
 
 DECL_END

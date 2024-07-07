@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9bc7736 */
+/* HASH CRC-32:0x7d62b423 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,37 +279,37 @@ NOTHROW(LIBCCALL libc_memeq_nopf)(void const *lhs,
 DECL_END
 
 #ifndef __arch_readb_nopf
-DEFINE_PUBLIC_ALIAS(readb_nopf, libc_readb_nopf);
+DEFINE_PUBLIC_ALIAS_P(readb_nopf,libc_readb_nopf,WUNUSED __NOBLOCK ATTR_IN_OPT(1) ATTR_OUT(2),bool,NOTHROW,LIBCCALL,(void const *addr, uint8_t *presult),(addr,presult));
 #endif /* !__arch_readb_nopf */
 #ifndef __arch_readw_nopf
-DEFINE_PUBLIC_ALIAS(readw_nopf, libc_readw_nopf);
+DEFINE_PUBLIC_ALIAS_P(readw_nopf,libc_readw_nopf,WUNUSED __NOBLOCK ATTR_IN_OPT(1) ATTR_OUT(2),bool,NOTHROW,LIBCCALL,(void const *addr, uint16_t *presult),(addr,presult));
 #endif /* !__arch_readw_nopf */
 #ifndef __arch_readl_nopf
-DEFINE_PUBLIC_ALIAS(readl_nopf, libc_readl_nopf);
+DEFINE_PUBLIC_ALIAS_P(readl_nopf,libc_readl_nopf,WUNUSED __NOBLOCK ATTR_IN_OPT(1) ATTR_OUT(2),bool,NOTHROW,LIBCCALL,(void const *addr, uint32_t *presult),(addr,presult));
 #endif /* !__arch_readl_nopf */
 #ifndef __arch_readq_nopf
-DEFINE_PUBLIC_ALIAS(readq_nopf, libc_readq_nopf);
+DEFINE_PUBLIC_ALIAS_P(readq_nopf,libc_readq_nopf,WUNUSED __NOBLOCK ATTR_IN_OPT(1) ATTR_OUT(2),bool,NOTHROW,LIBCCALL,(void const *addr, uint64_t *presult),(addr,presult));
 #endif /* !__arch_readq_nopf */
 #ifndef __arch_writeb_nopf
-DEFINE_PUBLIC_ALIAS(writeb_nopf, libc_writeb_nopf);
+DEFINE_PUBLIC_ALIAS_P(writeb_nopf,libc_writeb_nopf,WUNUSED __NOBLOCK ATTR_OUT_OPT(1),bool,NOTHROW,LIBCCALL,(void *addr, uint8_t val),(addr,val));
 #endif /* !__arch_writeb_nopf */
 #ifndef __arch_writew_nopf
-DEFINE_PUBLIC_ALIAS(writew_nopf, libc_writew_nopf);
+DEFINE_PUBLIC_ALIAS_P(writew_nopf,libc_writew_nopf,WUNUSED __NOBLOCK ATTR_OUT_OPT(1),bool,NOTHROW,LIBCCALL,(void *addr, uint16_t val),(addr,val));
 #endif /* !__arch_writew_nopf */
 #ifndef __arch_writel_nopf
-DEFINE_PUBLIC_ALIAS(writel_nopf, libc_writel_nopf);
+DEFINE_PUBLIC_ALIAS_P(writel_nopf,libc_writel_nopf,WUNUSED __NOBLOCK ATTR_OUT_OPT(1),bool,NOTHROW,LIBCCALL,(void *addr, uint32_t val),(addr,val));
 #endif /* !__arch_writel_nopf */
 #ifndef __arch_writeq_nopf
-DEFINE_PUBLIC_ALIAS(writeq_nopf, libc_writeq_nopf);
+DEFINE_PUBLIC_ALIAS_P(writeq_nopf,libc_writeq_nopf,WUNUSED __NOBLOCK ATTR_OUT_OPT(1),bool,NOTHROW,LIBCCALL,(void *addr, uint64_t val),(addr,val));
 #endif /* !__arch_writeq_nopf */
 #ifndef __arch_memcpy_nopf
-DEFINE_PUBLIC_ALIAS(memcpy_nopf, libc_memcpy_nopf);
+DEFINE_PUBLIC_ALIAS_P(memcpy_nopf,libc_memcpy_nopf,WUNUSED __NOBLOCK ATTR_INS(2, 3) ATTR_OUTS(1, 3),size_t,NOTHROW,LIBCCALL,(void *dst, void const *src, size_t num_bytes),(dst,src,num_bytes));
 #endif /* !__arch_memcpy_nopf */
 #ifndef __arch_memset_nopf
-DEFINE_PUBLIC_ALIAS(memset_nopf, libc_memset_nopf);
+DEFINE_PUBLIC_ALIAS_P(memset_nopf,libc_memset_nopf,WUNUSED __NOBLOCK ATTR_OUTS(1, 3),size_t,NOTHROW,LIBCCALL,(void *dst, int byte, size_t num_bytes),(dst,byte,num_bytes));
 #endif /* !__arch_memset_nopf */
 #ifndef __arch_nopf_memeq
-DEFINE_PUBLIC_ALIAS(memeq_nopf, libc_memeq_nopf);
+DEFINE_PUBLIC_ALIAS_P(memeq_nopf,libc_memeq_nopf,WUNUSED __NOBLOCK ATTR_INS(1, 3) ATTR_INS(2, 3),ssize_t,NOTHROW,LIBCCALL,(void const *lhs, void const *rhs, size_t num_bytes),(lhs,rhs,num_bytes));
 #endif /* !__arch_nopf_memeq */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_NOPF_C */

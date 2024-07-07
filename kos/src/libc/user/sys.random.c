@@ -122,9 +122,9 @@ err:
 
 
 
-/*[[[start:exports,hash:CRC-32=0x52c4e2e3]]]*/
-DEFINE_PUBLIC_ALIAS(getrandom, libc_getrandom);
-DEFINE_PUBLIC_ALIAS(getentropy, libc_getentropy);
+/*[[[start:exports,hash:CRC-32=0xe8837891]]]*/
+DEFINE_PUBLIC_ALIAS_P(getrandom,libc_getrandom,WUNUSED ATTR_OUTS(1, 2),ssize_t,NOTHROW_NCX,LIBCCALL,(void *buf, size_t num_bytes, unsigned int flags),(buf,num_bytes,flags));
+DEFINE_PUBLIC_ALIAS_P(getentropy,libc_getentropy,WUNUSED ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(void *buf, size_t num_bytes),(buf,num_bytes));
 /*[[[end:exports]]]*/
 
 DECL_END

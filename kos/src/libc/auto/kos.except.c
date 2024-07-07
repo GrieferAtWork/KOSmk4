@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17367f5f */
+/* HASH CRC-32:0x7f933938 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1584,12 +1584,12 @@ restore_saved_exception:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(except_as_errno, libc_except_as_errno);
-DEFINE_PUBLIC_ALIAS(except_as_signal, libc_except_as_signal);
-DEFINE_PUBLIC_ALIAS(except_name, libc_except_name);
-DEFINE_PUBLIC_ALIAS(except_priority, libc_except_priority);
-DEFINE_PUBLIC_ALIAS(except_print_short_description, libc_except_print_short_description);
-DEFINE_PUBLIC_ALIAS(except_nesting_begin, libc_except_nesting_begin);
-DEFINE_PUBLIC_ALIAS(except_nesting_end, libc_except_nesting_end);
+DEFINE_PUBLIC_ALIAS_P(except_as_errno,libc_except_as_errno,ATTR_PURE WUNUSED ATTR_IN(1),errno_t,NOTHROW_NCX,LIBKCALL,(struct exception_data const *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(except_as_signal,libc_except_as_signal,WUNUSED ATTR_IN(1) ATTR_OUT(2),bool,NOTHROW_NCX,LIBKCALL,(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result),(self,result));
+DEFINE_PUBLIC_ALIAS_P(except_name,libc_except_name,ATTR_CONST WUNUSED,char const *,NOTHROW,LIBKCALL,(except_code_t code),(code));
+DEFINE_PUBLIC_ALIAS_P(except_priority,libc_except_priority,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBKCALL,(except_code_t code),(code));
+DEFINE_PUBLIC_ALIAS_P(except_print_short_description,libc_except_print_short_description,ATTR_IN(3) NONNULL((1)),ssize_t,NOTHROW_NCX,LIBKCALL,(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags),(printer,arg,data,flags));
+DEFINE_PUBLIC_ALIAS_P_VOID(except_nesting_begin,libc_except_nesting_begin,ATTR_INOUT(1),NOTHROW,__EXCEPT_NESTING_BEGIN_CC,(struct _exception_nesting_data *__restrict saved),(saved));
+DEFINE_PUBLIC_ALIAS_P_VOID(except_nesting_end,libc_except_nesting_end,ATTR_IN(1),NOTHROW,__EXCEPT_NESTING_END_CC,(struct _exception_nesting_data const *__restrict saved),(saved));
 
 #endif /* !GUARD_LIBC_AUTO_KOS_EXCEPT_C */

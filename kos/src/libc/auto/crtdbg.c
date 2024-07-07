@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65b70bc7 */
+/* HASH CRC-32:0x6271c382 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,51 +432,51 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetCheckCount)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_CrtSetDbgFlag, libc__CrtSetDbgFlag);
-DEFINE_PUBLIC_ALIAS(_malloc_dbg, libc__malloc_dbg);
-DEFINE_PUBLIC_ALIAS(_calloc_dbg, libc__calloc_dbg);
-DEFINE_PUBLIC_ALIAS(_realloc_dbg, libc__realloc_dbg);
-DEFINE_PUBLIC_ALIAS(_recalloc_dbg, libc__recalloc_dbg);
-DEFINE_PUBLIC_ALIAS(_expand_dbg, libc__expand_dbg);
-DEFINE_PUBLIC_ALIAS(_free_dbg, libc__free_dbg);
-DEFINE_PUBLIC_ALIAS(_msize_dbg, libc__msize_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_msize_dbg, libc__aligned_msize_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_malloc_dbg, libc__aligned_malloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_realloc_dbg, libc__aligned_realloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_recalloc_dbg, libc__aligned_recalloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_malloc_dbg, libc__aligned_offset_malloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_realloc_dbg, libc__aligned_offset_realloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_recalloc_dbg, libc__aligned_offset_recalloc_dbg);
-DEFINE_PUBLIC_ALIAS(_aligned_free_dbg, libc__aligned_free_dbg);
+DEFINE_PUBLIC_ALIAS_P(_CrtSetDbgFlag,libc__CrtSetDbgFlag,,int,NOTHROW_NCX,LIBDCALL,(int new_flag),(new_flag));
+DEFINE_PUBLIC_ALIAS_P(_malloc_dbg,libc__malloc_dbg,ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)),void *,NOTHROW_NCX,LIBDCALL,(size_t num_bytes, int block_type, char const *filename, int line),(num_bytes,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_calloc_dbg,libc__calloc_dbg,ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1, 2)),void *,NOTHROW_NCX,LIBDCALL,(size_t count, size_t num_bytes, int block_type, char const *filename, int line),(count,num_bytes,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_realloc_dbg,libc__realloc_dbg,WUNUSED ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t num_bytes, int block_type, char const *filename, int line),(ptr,num_bytes,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_recalloc_dbg,libc__recalloc_dbg,WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t count, size_t num_bytes, int block_type, char const *filename, int line),(ptr,count,num_bytes,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_expand_dbg,libc__expand_dbg,WUNUSED ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t num_bytes, int block_type, char const *filename, int line),(ptr,num_bytes,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P_VOID(_free_dbg,libc__free_dbg,,NOTHROW_NCX,LIBDCALL,(void *ptr, int block_type),(ptr,block_type));
+DEFINE_PUBLIC_ALIAS_P(_msize_dbg,libc__msize_dbg,ATTR_PURE WUNUSED,size_t,NOTHROW_NCX,LIBDCALL,(void *ptr, int block_type),(ptr,block_type));
+DEFINE_PUBLIC_ALIAS_P(_aligned_msize_dbg,libc__aligned_msize_dbg,ATTR_PURE WUNUSED,size_t,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t min_alignment, size_t offset),(ptr,min_alignment,offset));
+DEFINE_PUBLIC_ALIAS_P(_aligned_malloc_dbg,libc__aligned_malloc_dbg,ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)),void *,NOTHROW_NCX,LIBDCALL,(size_t num_bytes, size_t min_alignment, char const *filename, int line),(num_bytes,min_alignment,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_aligned_realloc_dbg,libc__aligned_realloc_dbg,WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t num_bytes, size_t min_alignment, char const *filename, int line),(ptr,num_bytes,min_alignment,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_aligned_recalloc_dbg,libc__aligned_recalloc_dbg,WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, char const *filename, int line),(ptr,count,num_bytes,min_alignment,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_aligned_offset_malloc_dbg,libc__aligned_offset_malloc_dbg,ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)),void *,NOTHROW_NCX,LIBDCALL,(size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line),(num_bytes,min_alignment,offset,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_aligned_offset_realloc_dbg,libc__aligned_offset_realloc_dbg,WUNUSED ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line),(ptr,num_bytes,min_alignment,offset,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_aligned_offset_recalloc_dbg,libc__aligned_offset_recalloc_dbg,WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBDCALL,(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line),(ptr,count,num_bytes,min_alignment,offset,filename,line));
+DEFINE_PUBLIC_ALIAS_P_VOID(_aligned_free_dbg,libc__aligned_free_dbg,,NOTHROW_NCX,LIBDCALL,(void *ptr),(ptr));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_mbsdup_dbg, libc__strdup_dbg);
-DEFINE_PUBLIC_ALIAS(mbsdup_dbg, libc__strdup_dbg);
+DEFINE_PUBLIC_ALIAS_P(_mbsdup_dbg,libc__strdup_dbg,ATTR_MALLOC WUNUSED,char *,NOTHROW_NCX,LIBDCALL,(char const *string, int block_type, char const *filename, int line),(string,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(mbsdup_dbg,libc__strdup_dbg,ATTR_MALLOC WUNUSED,char *,NOTHROW_NCX,LIBDCALL,(char const *string, int block_type, char const *filename, int line),(string,block_type,filename,line));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(_strdup_dbg, libc__strdup_dbg);
-DEFINE_PUBLIC_ALIAS(_wcsdup_dbg, libc__wcsdup_dbg);
-DEFINE_PUBLIC_ALIAS(_tempnam_dbg, libc__tempnam_dbg);
-DEFINE_PUBLIC_ALIAS(_wtempnam_dbg, libc__wtempnam_dbg);
-DEFINE_PUBLIC_ALIAS(_fullpath_dbg, libc__fullpath_dbg);
-DEFINE_PUBLIC_ALIAS(_wfullpath_dbg, libc__wfullpath_dbg);
-DEFINE_PUBLIC_ALIAS(_getcwd_dbg, libc__getcwd_dbg);
-DEFINE_PUBLIC_ALIAS(_wgetcwd_dbg, libc__wgetcwd_dbg);
-DEFINE_PUBLIC_ALIAS(_getdcwd_dbg, libc__getdcwd_dbg);
-DEFINE_PUBLIC_ALIAS(_wgetdcwd_dbg, libc__wgetdcwd_dbg);
-DEFINE_PUBLIC_ALIAS(_dupenv_s_dbg, libc__dupenv_s_dbg);
-DEFINE_PUBLIC_ALIAS(_wdupenv_s_dbg, libc__wdupenv_s_dbg);
-DEFINE_PUBLIC_ALIAS(_CrtCheckMemory, libc__CrtCheckMemory);
-DEFINE_PUBLIC_ALIAS(_CrtDoForAllClientObjects, libc__CrtDoForAllClientObjects);
-DEFINE_PUBLIC_ALIAS(_CrtIsValidPointer, libc__CrtIsValidPointer);
-DEFINE_PUBLIC_ALIAS(_CrtIsValidHeapPointer, libc__CrtIsValidHeapPointer);
-DEFINE_PUBLIC_ALIAS(_CrtIsMemoryBlock, libc__CrtIsMemoryBlock);
-DEFINE_PUBLIC_ALIAS(_CrtReportBlockType, libc__CrtReportBlockType);
-DEFINE_PUBLIC_ALIAS(_CrtMemCheckpoint, libc__CrtMemCheckpoint);
-DEFINE_PUBLIC_ALIAS(_CrtMemDifference, libc__CrtMemDifference);
-DEFINE_PUBLIC_ALIAS(_CrtMemDumpAllObjectsSince, libc__CrtMemDumpAllObjectsSince);
-DEFINE_PUBLIC_ALIAS(_CrtMemDumpStatistics, libc__CrtMemDumpStatistics);
-DEFINE_PUBLIC_ALIAS(_CrtDumpMemoryLeaks, libc__CrtDumpMemoryLeaks);
-DEFINE_PUBLIC_ALIAS(_CrtSetCheckCount, libc__CrtSetCheckCount);
-DEFINE_PUBLIC_ALIAS(_CrtGetCheckCount, libc__CrtGetCheckCount);
+DEFINE_PUBLIC_ALIAS_P(_strdup_dbg,libc__strdup_dbg,ATTR_MALLOC WUNUSED,char *,NOTHROW_NCX,LIBDCALL,(char const *string, int block_type, char const *filename, int line),(string,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wcsdup_dbg,libc__wcsdup_dbg,ATTR_MALLOC WUNUSED,__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line),(string,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_tempnam_dbg,libc__tempnam_dbg,ATTR_MALLOC WUNUSED,char *,NOTHROW_NCX,LIBDCALL,(char const *dir_name, char const *file_prefix, int block_type, char const *filename, int line),(dir_name,file_prefix,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wtempnam_dbg,libc__wtempnam_dbg,WUNUSED,__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(__WCHAR16_TYPE__ const *dir_name, __WCHAR16_TYPE__ const *file_prefix, int block_type, char const *filename, int line),(dir_name,file_prefix,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_fullpath_dbg,libc__fullpath_dbg,WUNUSED ATTR_IN(2) ATTR_OUTS(1, 3),char *,NOTHROW_NCX,LIBDCALL,(char *full_path, char const *path, size_t bufsize, int block_type, char const *filename, int line),(full_path,path,bufsize,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wfullpath_dbg,libc__wfullpath_dbg,WUNUSED ATTR_IN(2) ATTR_OUTS(1, 3),__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(__WCHAR16_TYPE__ *full_path, __WCHAR16_TYPE__ const *path, size_t buflen, int block_type, char const *filename, int line),(full_path,path,buflen,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_getcwd_dbg,libc__getcwd_dbg,WUNUSED ATTR_OUTS(1, 2),char *,NOTHROW_NCX,LIBDCALL,(char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line),(buf,bufsize,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wgetcwd_dbg,libc__wgetcwd_dbg,WUNUSED ATTR_OUTS(1, 2),__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(__WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line),(buf,buflen,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_getdcwd_dbg,libc__getdcwd_dbg,WUNUSED ATTR_OUTS(2, 3),char *,NOTHROW_NCX,LIBDCALL,(int driveno, char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line),(driveno,buf,bufsize,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wgetdcwd_dbg,libc__wgetdcwd_dbg,WUNUSED ATTR_OUTS(2, 3),__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(int driveno, __WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line),(driveno,buf,buflen,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_dupenv_s_dbg,libc__dupenv_s_dbg,_Check_return_wat_ ATTR_IN(3) ATTR_OUT(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBDCALL,(char **pbuf, size_t *pbufsize, char const *varname, int block_type, char const *filename, int line),(pbuf,pbufsize,varname,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_wdupenv_s_dbg,libc__wdupenv_s_dbg,_Check_return_wat_ ATTR_IN(3) ATTR_OUT(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBDCALL,(__WCHAR16_TYPE__ **pbuf, size_t *pbuflen, __WCHAR16_TYPE__ const *varname, int block_type, char const *filename, int line),(pbuf,pbuflen,varname,block_type,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_CrtCheckMemory,libc__CrtCheckMemory,,int,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_CrtDoForAllClientObjects,libc__CrtDoForAllClientObjects,NONNULL((1)),NOTHROW_NCX,LIBDCALL,(_PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context),(pfn,context));
+DEFINE_PUBLIC_ALIAS_P(_CrtIsValidPointer,libc__CrtIsValidPointer,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBDCALL,(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable),(ptr,num_bytes,writable));
+DEFINE_PUBLIC_ALIAS_P(_CrtIsValidHeapPointer,libc__CrtIsValidHeapPointer,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBDCALL,(void const *heap_ptr),(heap_ptr));
+DEFINE_PUBLIC_ALIAS_P(_CrtIsMemoryBlock,libc__CrtIsMemoryBlock,,int,NOTHROW_NCX,LIBDCALL,(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, __LONG32_TYPE__ *prequest_number, char **filename, int *line),(ptr,num_bytes,prequest_number,filename,line));
+DEFINE_PUBLIC_ALIAS_P(_CrtReportBlockType,libc__CrtReportBlockType,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBDCALL,(void const *ptr),(ptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(_CrtMemCheckpoint,libc__CrtMemCheckpoint,ATTR_OUT(1),NOTHROW_NCX,LIBDCALL,(_CrtMemState *state),(state));
+DEFINE_PUBLIC_ALIAS_P(_CrtMemDifference,libc__CrtMemDifference,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state),(state,old_state,new_state));
+DEFINE_PUBLIC_ALIAS_P_VOID(_CrtMemDumpAllObjectsSince,libc__CrtMemDumpAllObjectsSince,ATTR_IN(1),NOTHROW_NCX,LIBDCALL,(_CrtMemState const *state),(state));
+DEFINE_PUBLIC_ALIAS_P_VOID(_CrtMemDumpStatistics,libc__CrtMemDumpStatistics,ATTR_IN(1),NOTHROW_NCX,LIBDCALL,(_CrtMemState const *state),(state));
+DEFINE_PUBLIC_ALIAS_P(_CrtDumpMemoryLeaks,libc__CrtDumpMemoryLeaks,,int,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_CrtSetCheckCount,libc__CrtSetCheckCount,,int,NOTHROW_NCX,LIBDCALL,(int check_count),(check_count));
+DEFINE_PUBLIC_ALIAS_P(_CrtGetCheckCount,libc__CrtGetCheckCount,ATTR_PURE,int,NOTHROW_NCX,LIBDCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CRTDBG_C */

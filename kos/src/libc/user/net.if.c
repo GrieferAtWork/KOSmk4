@@ -46,8 +46,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xda14f0da]]]*/
-DEFINE_PUBLIC_ALIAS(if_nameindex, libc_if_nameindex);
+/*[[[start:exports,hash:CRC-32=0x6cfa7f94]]]*/
+DEFINE_PUBLIC_ALIAS_P(if_nameindex,libc_if_nameindex,WUNUSED,struct if_nameindex *,NOTHROW_RPC_KOS,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

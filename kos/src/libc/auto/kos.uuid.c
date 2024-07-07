@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79cb688a */
+/* HASH CRC-32:0xc68b73f2 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,6 +74,6 @@ inval:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(uuid_fromstr, libc_uuid_fromstr);
+DEFINE_PUBLIC_ALIAS_P(uuid_fromstr,libc_uuid_fromstr,ATTR_IN(1) ATTR_OUT(2),char const *,NOTHROW_NCX,LIBCCALL,(char const string[__UUID_STRLEN], uuid_t *__restrict result),(string,result));
 
 #endif /* !GUARD_LIBC_AUTO_KOS_UUID_C */

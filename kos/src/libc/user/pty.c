@@ -72,8 +72,8 @@ NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x624b46dc]]]*/
-DEFINE_PUBLIC_ALIAS(openpty, libc_openpty);
+/*[[[start:exports,hash:CRC-32=0x2dc27c54]]]*/
+DEFINE_PUBLIC_ALIAS_P(openpty,libc_openpty,ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) ATTR_OUT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp),(amaster,aslave,name,termp,winp));
 /*[[[end:exports]]]*/
 
 DECL_END

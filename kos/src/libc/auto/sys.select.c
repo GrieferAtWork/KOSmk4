@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49ec7d4e */
+/* HASH CRC-32:0x878228b7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,8 +44,8 @@ NOTHROW(LIBCCALL libc___fdelt_chk)(longptr_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__fdelt_warn, libc___fdelt_chk);
-DEFINE_PUBLIC_ALIAS(__fdelt_chk, libc___fdelt_chk);
+DEFINE_PUBLIC_ALIAS_P(__fdelt_warn,libc___fdelt_chk,ATTR_CONST WUNUSED,longptr_t,NOTHROW,LIBCCALL,(longptr_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(__fdelt_chk,libc___fdelt_chk,ATTR_CONST WUNUSED,longptr_t,NOTHROW,LIBCCALL,(longptr_t fd),(fd));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SELECT_C */

@@ -119,19 +119,19 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x56df6cfc]]]*/
-DEFINE_PUBLIC_ALIAS(__adjtimex, libc_adjtimex);
-DEFINE_PUBLIC_ALIAS(__libc_adjtimex, libc_adjtimex);
-DEFINE_PUBLIC_ALIAS(adjtimex, libc_adjtimex);
-DEFINE_PUBLIC_ALIAS(ntp_gettimex, libc_ntp_gettimex);
-DEFINE_PUBLIC_ALIAS(ntp_adjtime, libc_ntp_adjtime);
+/*[[[start:exports,hash:CRC-32=0x9407e8b9]]]*/
+DEFINE_PUBLIC_ALIAS_P(__adjtimex,libc_adjtimex,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex *__restrict ntx),(ntx));
+DEFINE_PUBLIC_ALIAS_P(__libc_adjtimex,libc_adjtimex,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex *__restrict ntx),(ntx));
+DEFINE_PUBLIC_ALIAS_P(adjtimex,libc_adjtimex,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex *__restrict ntx),(ntx));
+DEFINE_PUBLIC_ALIAS_P(ntp_gettimex,libc_ntp_gettimex,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct ntptimeval *__restrict ntv),(ntv));
+DEFINE_PUBLIC_ALIAS_P(ntp_adjtime,libc_ntp_adjtime,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex *__restrict tntx),(tntx));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(___adjtimex64, libc_adjtimex64);
-DEFINE_PUBLIC_ALIAS(adjtimex64, libc_adjtimex64);
-DEFINE_PUBLIC_ALIAS(ntp_adjtime64, libc_ntp_adjtime64);
-DEFINE_PUBLIC_ALIAS(__ntp_gettimex64, libc_ntp_gettimex64);
-DEFINE_PUBLIC_ALIAS(ntp_gettimex64, libc_ntp_gettimex64);
+DEFINE_PUBLIC_ALIAS_P(___adjtimex64,libc_adjtimex64,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex64 *__restrict ntx),(ntx));
+DEFINE_PUBLIC_ALIAS_P(adjtimex64,libc_adjtimex64,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex64 *__restrict ntx),(ntx));
+DEFINE_PUBLIC_ALIAS_P(ntp_adjtime64,libc_ntp_adjtime64,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timex64 *__restrict tntx),(tntx));
+DEFINE_PUBLIC_ALIAS_P(__ntp_gettimex64,libc_ntp_gettimex64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct ntptimeval64 *__restrict ntv),(ntv));
+DEFINE_PUBLIC_ALIAS_P(ntp_gettimex64,libc_ntp_gettimex64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct ntptimeval64 *__restrict ntv),(ntv));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

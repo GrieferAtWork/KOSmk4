@@ -137,9 +137,9 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_FDARG(1) ATTR_FDARG(2) A
 }
 /*[[[end:libc_EPollRpcExec]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xc414e5d7]]]*/
-DEFINE_PUBLIC_ALIAS(EPollPWait, libc_EPollPWait);
-DEFINE_PUBLIC_ALIAS(EPollRpcExec, libc_EPollRpcExec);
+/*[[[start:exports,hash:CRC-32=0x935d62be]]]*/
+DEFINE_PUBLIC_ALIAS_P(EPollPWait,libc_EPollPWait,ATTR_FDARG(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5),__STDC_UINT_AS_SIZE_T,THROWING(...),LIBCCALL,(fd_t epfd, struct epoll_event *events, __STDC_UINT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss),(epfd,events,maxevents,timeout,ss));
+DEFINE_PUBLIC_ALIAS_P_VOID(EPollRpcExec,libc_EPollRpcExec,ATTR_FDARG(1) ATTR_FDARG(2) ATTR_IN(3) NONNULL((6)),THROWING(...),LIBCCALL,(fd_t epfd, fd_t fd, struct epoll_event const *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func),(epfd,fd,event,target_tid,mode,func));
 /*[[[end:exports]]]*/
 
 DECL_END

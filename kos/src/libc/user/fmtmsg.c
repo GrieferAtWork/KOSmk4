@@ -535,9 +535,9 @@ NOTHROW_NCX(LIBCCALL libc_addseverity)(__STDC_INT_AS_UINT_T severity,
 }
 /*[[[end:libc_addseverity]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xf325bd60]]]*/
-DEFINE_PUBLIC_ALIAS(fmtmsg, libc_fmtmsg);
-DEFINE_PUBLIC_ALIAS(addseverity, libc_addseverity);
+/*[[[start:exports,hash:CRC-32=0xdbc0e2c0]]]*/
+DEFINE_PUBLIC_ALIAS_P(fmtmsg,libc_fmtmsg,,int,NOTHROW_NCX,LIBCCALL,(long classification, const char *label, __STDC_INT_AS_UINT_T severity, char const *text, char const *action, char const *tag),(classification,label,severity,text,action,tag));
+DEFINE_PUBLIC_ALIAS_P(addseverity,libc_addseverity,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T severity, const char *s),(severity,s));
 /*[[[end:exports]]]*/
 
 DECL_END

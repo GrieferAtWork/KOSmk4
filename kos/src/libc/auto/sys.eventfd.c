@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5931c35 */
+/* HASH CRC-32:0x55b5dc02 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,8 +67,8 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(eventfd_read, libc_eventfd_read);
-DEFINE_PUBLIC_ALIAS(eventfd_write, libc_eventfd_write);
+DEFINE_PUBLIC_ALIAS_P(eventfd_read,libc_eventfd_read,ATTR_FDREAD(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, eventfd_t *value),(fd,value));
+DEFINE_PUBLIC_ALIAS_P(eventfd_write,libc_eventfd_write,ATTR_FDWRITE(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, eventfd_t value),(fd,value));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_EVENTFD_C */

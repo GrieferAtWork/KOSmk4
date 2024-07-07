@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3df3ceaa */
+/* HASH CRC-32:0xd742de8b */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,12 +139,12 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") unsigned int
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(ShmOpen, libc_ShmOpen);
-DEFINE_PUBLIC_ALIAS(ShmUnlink, libc_ShmUnlink);
+DEFINE_PUBLIC_ALIAS_P(ShmOpen,libc_ShmOpen,ATTR_IN(1),fd_t,THROWING(...),LIBCCALL,(char const *name, oflag_t oflags, mode_t mode),(name,oflags,mode));
+DEFINE_PUBLIC_ALIAS_P_VOID(ShmUnlink,libc_ShmUnlink,ATTR_IN(1),THROWING(...),LIBCCALL,(char const *name),(name));
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
-DEFINE_PUBLIC_ALIAS(PKeySet, libc_PKeySet);
-DEFINE_PUBLIC_ALIAS(PKeyGet, libc_PKeyGet);
+DEFINE_PUBLIC_ALIAS_P_VOID(PKeySet,libc_PKeySet,,THROWING(E_INVALID_ARGUMENT_BAD_VALUE),LIBCCALL,(int pkey, unsigned int access_rights),(pkey,access_rights));
+DEFINE_PUBLIC_ALIAS_P(PKeyGet,libc_PKeyGet,,unsigned int,THROWING(E_INVALID_ARGUMENT_BAD_VALUE),LIBCCALL,(int pkey),(pkey));
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SYS_MMAN_C */

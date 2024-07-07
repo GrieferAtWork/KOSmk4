@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf06f0b71 */
+/* HASH CRC-32:0xfdac7b92 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ NOTHROW_NCX(LIBCCALL libc_wordfree)(wordexp_t *self) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(wordfree, libc_wordfree);
+DEFINE_PUBLIC_ALIAS_P_VOID(wordfree,libc_wordfree,ATTR_INOUT_OPT(1),NOTHROW_NCX,LIBCCALL,(wordexp_t *self),(self));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_WORDEXP_C */

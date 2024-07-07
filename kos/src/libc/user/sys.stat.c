@@ -1482,76 +1482,76 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x973b927c]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$__mkdir, libd_mkdir);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_mkdir, libd_mkdir);
-DEFINE_PUBLIC_ALIAS(DOS$mkdir, libd_mkdir);
-DEFINE_PUBLIC_ALIAS(__mkdir, libc_mkdir);
-DEFINE_PUBLIC_ALIAS(__libc_mkdir, libc_mkdir);
-DEFINE_PUBLIC_ALIAS(mkdir, libc_mkdir);
-DEFINE_PUBLIC_ALIAS(DOS$_chmod, libd_chmod);
-DEFINE_PUBLIC_ALIAS(DOS$__chmod, libd_chmod);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_chmod, libd_chmod);
-DEFINE_PUBLIC_ALIAS(DOS$chmod, libd_chmod);
-DEFINE_PUBLIC_ALIAS(__chmod, libc_chmod);
-DEFINE_PUBLIC_ALIAS(__libc_chmod, libc_chmod);
-DEFINE_PUBLIC_ALIAS(chmod, libc_chmod);
-DEFINE_PUBLIC_ALIAS(DOS$lchmod, libd_lchmod);
-DEFINE_PUBLIC_ALIAS(lchmod, libc_lchmod);
+/*[[[start:exports,hash:CRC-32=0x775ad819]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$__mkdir,libd_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$__libc_mkdir,libd_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$mkdir,libd_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(__mkdir,libc_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(__libc_mkdir,libc_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(mkdir,libc_mkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_chmod,libd_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$__chmod,libd_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$__libc_chmod,libd_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$chmod,libd_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(__chmod,libc_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(__libc_chmod,libc_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(chmod,libc_chmod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$lchmod,libd_lchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(lchmod,libc_lchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *filename, mode_t mode),(filename,mode));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_umask, libc_umask);
+DEFINE_PUBLIC_ALIAS_P(_umask,libc_umask,,mode_t,NOTHROW_NCX,LIBCCALL,(mode_t mode),(mode));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__umask, libc_umask);
-DEFINE_PUBLIC_ALIAS(__libc_umask, libc_umask);
-DEFINE_PUBLIC_ALIAS(umask, libc_umask);
-DEFINE_PUBLIC_ALIAS(getumask, libc_getumask);
-DEFINE_PUBLIC_ALIAS(DOS$fmkdirat, libd_fmkdirat);
-DEFINE_PUBLIC_ALIAS(fmkdirat, libc_fmkdirat);
-DEFINE_PUBLIC_ALIAS(DOS$fmknodat, libd_fmknodat);
-DEFINE_PUBLIC_ALIAS(fmknodat, libc_fmknodat);
-DEFINE_PUBLIC_ALIAS(DOS$fchmodat, libd_fchmodat);
-DEFINE_PUBLIC_ALIAS(fchmodat, libc_fchmodat);
-DEFINE_PUBLIC_ALIAS(DOS$mkdirat, libd_mkdirat);
-DEFINE_PUBLIC_ALIAS(mkdirat, libc_mkdirat);
-DEFINE_PUBLIC_ALIAS(__fchmod, libc_fchmod);
-DEFINE_PUBLIC_ALIAS(__libc_fchmod, libc_fchmod);
-DEFINE_PUBLIC_ALIAS(fchmod, libc_fchmod);
-DEFINE_PUBLIC_ALIAS(DOS$prev_mknod, libd_mknod);
-DEFINE_PUBLIC_ALIAS(DOS$__prev_mknod, libd_mknod);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_prev_mknod, libd_mknod);
-DEFINE_PUBLIC_ALIAS(DOS$mknod, libd_mknod);
-DEFINE_PUBLIC_ALIAS(prev_mknod, libc_mknod);
-DEFINE_PUBLIC_ALIAS(__prev_mknod, libc_mknod);
-DEFINE_PUBLIC_ALIAS(__libc_prev_mknod, libc_mknod);
-DEFINE_PUBLIC_ALIAS(mknod, libc_mknod);
-DEFINE_PUBLIC_ALIAS(DOS$mknodat, libd_mknodat);
-DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);
-DEFINE_PUBLIC_ALIAS(DOS$utimensat, libd_utimensat);
-DEFINE_PUBLIC_ALIAS(utimensat, libc_utimensat);
+DEFINE_PUBLIC_ALIAS_P(__umask,libc_umask,,mode_t,NOTHROW_NCX,LIBCCALL,(mode_t mode),(mode));
+DEFINE_PUBLIC_ALIAS_P(__libc_umask,libc_umask,,mode_t,NOTHROW_NCX,LIBCCALL,(mode_t mode),(mode));
+DEFINE_PUBLIC_ALIAS_P(umask,libc_umask,,mode_t,NOTHROW_NCX,LIBCCALL,(mode_t mode),(mode));
+DEFINE_PUBLIC_ALIAS_P(getumask,libc_getumask,,mode_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$fmkdirat,libd_fmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags),(dirfd,pathname,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(fmkdirat,libc_fmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags),(dirfd,pathname,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$fmknodat,libd_fmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags),(dirfd,nodename,mode,dev,flags));
+DEFINE_PUBLIC_ALIAS_P(fmknodat,libc_fmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags),(dirfd,nodename,mode,dev,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$fchmodat,libd_fchmodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags),(dirfd,filename,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(fchmodat,libc_fchmodat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags),(dirfd,filename,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$mkdirat,libd_mkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *pathname, mode_t mode),(dirfd,pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(mkdirat,libc_mkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *pathname, mode_t mode),(dirfd,pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(__fchmod,libc_fchmod,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, mode_t mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(__libc_fchmod,libc_fchmod,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, mode_t mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(fchmod,libc_fchmod,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, mode_t mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$prev_mknod,libd_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$__prev_mknod,libd_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$__libc_prev_mknod,libd_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$mknod,libd_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(prev_mknod,libc_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(__prev_mknod,libc_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(__libc_prev_mknod,libc_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(mknod,libc_mknod,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$mknodat,libd_mknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev),(dirfd,nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(mknodat,libc_mknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev),(dirfd,nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$utimensat,libd_utimensat,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
+DEFINE_PUBLIC_ALIAS_P(utimensat,libc_utimensat,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$__utimensat64, libd_utimensat64);
-DEFINE_PUBLIC_ALIAS(DOS$utimensat64, libd_utimensat64);
-DEFINE_PUBLIC_ALIAS(__utimensat64, libc_utimensat64);
-DEFINE_PUBLIC_ALIAS(utimensat64, libc_utimensat64);
+DEFINE_PUBLIC_ALIAS_P(DOS$__utimensat64,libd_utimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$utimensat64,libd_utimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
+DEFINE_PUBLIC_ALIAS_P(__utimensat64,libc_utimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
+DEFINE_PUBLIC_ALIAS_P(utimensat64,libc_utimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(futimens, libc_futimens);
+DEFINE_PUBLIC_ALIAS_P(futimens,libc_futimens,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct timespec const times[2 /*or:3*/]),(fd,times));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__futimens64, libc_futimens64);
-DEFINE_PUBLIC_ALIAS(futimens64, libc_futimens64);
+DEFINE_PUBLIC_ALIAS_P(__futimens64,libc_futimens64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct timespec64 const times[2 /*or:3*/]),(fd,times));
+DEFINE_PUBLIC_ALIAS_P(futimens64,libc_futimens64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct timespec64 const times[2 /*or:3*/]),(fd,times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(DOS$_wstat, libd__wstat32);
-DEFINE_PUBLIC_ALIAS(DOS$_wstat32, libd__wstat32);
-DEFINE_PUBLIC_ALIAS(_wstat, libc__wstat32);
-DEFINE_PUBLIC_ALIAS(_wstat32, libc__wstat32);
-DEFINE_PUBLIC_ALIAS(DOS$_wstat64, libd__wstat64);
-DEFINE_PUBLIC_ALIAS(_wstat64, libc__wstat64);
-DEFINE_PUBLIC_ALIAS(DOS$_wstati64, libd__wstat32i64);
-DEFINE_PUBLIC_ALIAS(DOS$_wstat32i64, libd__wstat32i64);
-DEFINE_PUBLIC_ALIAS(_wstati64, libc__wstat32i64);
-DEFINE_PUBLIC_ALIAS(_wstat32i64, libc__wstat32i64);
-DEFINE_PUBLIC_ALIAS(DOS$_wstat64i32, libd__wstat64i32);
-DEFINE_PUBLIC_ALIAS(_wstat64i32, libc__wstat64i32);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstat,libd__wstat32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat32 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstat32,libd__wstat32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat32 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstat,libc__wstat32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat32 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstat32,libc__wstat32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat32 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstat64,libd__wstat64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstat64,libc__wstat64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstati64,libd__wstat32i64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat32i64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstat32i64,libd__wstat32i64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat32i64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstati64,libc__wstat32i64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat32i64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstat32i64,libc__wstat32i64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat32i64 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstat64i32,libd__wstat64i32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBDCALL,(char16_t const *filename, struct __dos_stat64i32 *buf),(filename,buf));
+DEFINE_PUBLIC_ALIAS_P(_wstat64i32,libc__wstat64i32,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBKCALL,(char32_t const *filename, struct __dos_stat64i32 *buf),(filename,buf));
 /*[[[end:exports]]]*/
 
 DECL_END

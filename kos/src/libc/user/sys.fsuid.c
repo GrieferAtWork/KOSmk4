@@ -70,13 +70,13 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9e040ce9]]]*/
-DEFINE_PUBLIC_ALIAS(__setfsuid, libc_setfsuid);
-DEFINE_PUBLIC_ALIAS(__libc_setfsuid, libc_setfsuid);
-DEFINE_PUBLIC_ALIAS(setfsuid, libc_setfsuid);
-DEFINE_PUBLIC_ALIAS(__setfsgid, libc_setfsgid);
-DEFINE_PUBLIC_ALIAS(__libc_setfsgid, libc_setfsgid);
-DEFINE_PUBLIC_ALIAS(setfsgid, libc_setfsgid);
+/*[[[start:exports,hash:CRC-32=0xf2510ba1]]]*/
+DEFINE_PUBLIC_ALIAS_P(__setfsuid,libc_setfsuid,,int,NOTHROW_NCX,LIBCCALL,(uid_t uid),(uid));
+DEFINE_PUBLIC_ALIAS_P(__libc_setfsuid,libc_setfsuid,,int,NOTHROW_NCX,LIBCCALL,(uid_t uid),(uid));
+DEFINE_PUBLIC_ALIAS_P(setfsuid,libc_setfsuid,,int,NOTHROW_NCX,LIBCCALL,(uid_t uid),(uid));
+DEFINE_PUBLIC_ALIAS_P(__setfsgid,libc_setfsgid,,int,NOTHROW_NCX,LIBCCALL,(gid_t gid),(gid));
+DEFINE_PUBLIC_ALIAS_P(__libc_setfsgid,libc_setfsgid,,int,NOTHROW_NCX,LIBCCALL,(gid_t gid),(gid));
+DEFINE_PUBLIC_ALIAS_P(setfsgid,libc_setfsgid,,int,NOTHROW_NCX,LIBCCALL,(gid_t gid),(gid));
 /*[[[end:exports]]]*/
 
 DECL_END

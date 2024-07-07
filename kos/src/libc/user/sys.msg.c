@@ -93,13 +93,13 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7f590877]]]*/
-DEFINE_PUBLIC_ALIAS(msgctl, libc_msgctl);
-DEFINE_PUBLIC_ALIAS(msgget, libc_msgget);
-DEFINE_PUBLIC_ALIAS(__libc_msgrcv, libc_msgrcv);
-DEFINE_PUBLIC_ALIAS(msgrcv, libc_msgrcv);
-DEFINE_PUBLIC_ALIAS(__libc_msgsnd, libc_msgsnd);
-DEFINE_PUBLIC_ALIAS(msgsnd, libc_msgsnd);
+/*[[[start:exports,hash:CRC-32=0xedf1bd26]]]*/
+DEFINE_PUBLIC_ALIAS_P(msgctl,libc_msgctl,,int,NOTHROW_NCX,LIBCCALL,(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf),(msqid,cmd,buf));
+DEFINE_PUBLIC_ALIAS_P(msgget,libc_msgget,,int,NOTHROW_NCX,LIBCCALL,(key_t key, __STDC_INT_AS_UINT_T msgflg),(key,msgflg));
+DEFINE_PUBLIC_ALIAS_P(__libc_msgrcv,libc_msgrcv,,ssize_t,NOTHROW_RPC,LIBCCALL,(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg),(msqid,msgp,msgsz,msgtyp,msgflg));
+DEFINE_PUBLIC_ALIAS_P(msgrcv,libc_msgrcv,,ssize_t,NOTHROW_RPC,LIBCCALL,(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg),(msqid,msgp,msgsz,msgtyp,msgflg));
+DEFINE_PUBLIC_ALIAS_P(__libc_msgsnd,libc_msgsnd,,int,NOTHROW_RPC,LIBCCALL,(int msqid, const void *msgp, size_t msgsz, __STDC_INT_AS_UINT_T msgflg),(msqid,msgp,msgsz,msgflg));
+DEFINE_PUBLIC_ALIAS_P(msgsnd,libc_msgsnd,,int,NOTHROW_RPC,LIBCCALL,(int msqid, const void *msgp, size_t msgsz, __STDC_INT_AS_UINT_T msgflg),(msqid,msgp,msgsz,msgflg));
 /*[[[end:exports]]]*/
 
 DECL_END

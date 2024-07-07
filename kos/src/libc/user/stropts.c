@@ -144,14 +144,14 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6ef1e8e1]]]*/
-DEFINE_PUBLIC_ALIAS(isastream, libc_isastream);
-DEFINE_PUBLIC_ALIAS(getmsg, libc_getmsg);
-DEFINE_PUBLIC_ALIAS(getpmsg, libc_getpmsg);
-DEFINE_PUBLIC_ALIAS(putmsg, libc_putmsg);
-DEFINE_PUBLIC_ALIAS(putpmsg, libc_putpmsg);
-DEFINE_PUBLIC_ALIAS(fattach, libc_fattach);
-DEFINE_PUBLIC_ALIAS(fdetach, libc_fdetach);
+/*[[[start:exports,hash:CRC-32=0x12ab880c]]]*/
+DEFINE_PUBLIC_ALIAS_P(isastream,libc_isastream,ATTR_FDARG(1),int,NOTHROW,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(getmsg,libc_getmsg,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, __STDC_INT_AS_UINT_T *__restrict pflags),(fd,ctlptr,dataptr,pflags));
+DEFINE_PUBLIC_ALIAS_P(getpmsg,libc_getpmsg,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, __STDC_INT_AS_UINT_T *__restrict pflags),(fd,ctlptr,dataptr,bandp,pflags));
+DEFINE_PUBLIC_ALIAS_P(putmsg,libc_putmsg,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T flags),(fd,ctlptr,dataptr,flags));
+DEFINE_PUBLIC_ALIAS_P(putpmsg,libc_putpmsg,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T band, __STDC_INT_AS_UINT_T flags),(fd,ctlptr,dataptr,band,flags));
+DEFINE_PUBLIC_ALIAS_P(fattach,libc_fattach,ATTR_FDARG(1) ATTR_IN(2),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t fd, char const *__restrict path),(fd,path));
+DEFINE_PUBLIC_ALIAS_P(fdetach,libc_fdetach,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *__restrict path),(path));
 /*[[[end:exports]]]*/
 
 DECL_END

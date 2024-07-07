@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47a54110 */
+/* HASH CRC-32:0xee193ed2 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,16 +123,16 @@ NOTHROW_NCX(LIBCCALL libc_dn_expand)(u_char const *msg_ptr,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__sym_ston, libc_sym_ston);
-DEFINE_PUBLIC_ALIAS(sym_ston, libc_sym_ston);
-DEFINE_PUBLIC_ALIAS(__sym_ntos, libc_sym_ntos);
-DEFINE_PUBLIC_ALIAS(sym_ntos, libc_sym_ntos);
-DEFINE_PUBLIC_ALIAS(__sym_ntop, libc_sym_ntop);
-DEFINE_PUBLIC_ALIAS(sym_ntop, libc_sym_ntop);
-DEFINE_PUBLIC_ALIAS(__dn_skipname, libc_dn_skipname);
-DEFINE_PUBLIC_ALIAS(dn_skipname, libc_dn_skipname);
-DEFINE_PUBLIC_ALIAS(__dn_expand, libc_dn_expand);
-DEFINE_PUBLIC_ALIAS(dn_expand, libc_dn_expand);
+DEFINE_PUBLIC_ALIAS_P(__sym_ston,libc_sym_ston,ATTR_IN(1) ATTR_IN(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, char const *wanted_name, int *p_success),(symbols,wanted_name,p_success));
+DEFINE_PUBLIC_ALIAS_P(sym_ston,libc_sym_ston,ATTR_IN(1) ATTR_IN(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, char const *wanted_name, int *p_success),(symbols,wanted_name,p_success));
+DEFINE_PUBLIC_ALIAS_P(__sym_ntos,libc_sym_ntos,ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3),char const *,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, int wanted_number, int *p_success),(symbols,wanted_number,p_success));
+DEFINE_PUBLIC_ALIAS_P(sym_ntos,libc_sym_ntos,ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3),char const *,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, int wanted_number, int *p_success),(symbols,wanted_number,p_success));
+DEFINE_PUBLIC_ALIAS_P(__sym_ntop,libc_sym_ntop,ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3),char const *,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, int wanted_number, int *p_success),(symbols,wanted_number,p_success));
+DEFINE_PUBLIC_ALIAS_P(sym_ntop,libc_sym_ntop,ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3),char const *,NOTHROW_NCX,LIBCCALL,(struct res_sym const *symbols, int wanted_number, int *p_success),(symbols,wanted_number,p_success));
+DEFINE_PUBLIC_ALIAS_P(__dn_skipname,libc_dn_skipname,ATTR_IN(1) NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(u_char const *msg_ptr, u_char const *end_of_msg),(msg_ptr,end_of_msg));
+DEFINE_PUBLIC_ALIAS_P(dn_skipname,libc_dn_skipname,ATTR_IN(1) NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(u_char const *msg_ptr, u_char const *end_of_msg),(msg_ptr,end_of_msg));
+DEFINE_PUBLIC_ALIAS_P(__dn_expand,libc_dn_expand,,int,NOTHROW_NCX,LIBCCALL,(u_char const *msg_ptr, u_char const *end_of_msg, u_char const *srcbuf, char *dstbuf, int dstbufsize),(msg_ptr,end_of_msg,srcbuf,dstbuf,dstbufsize));
+DEFINE_PUBLIC_ALIAS_P(dn_expand,libc_dn_expand,,int,NOTHROW_NCX,LIBCCALL,(u_char const *msg_ptr, u_char const *end_of_msg, u_char const *srcbuf, char *dstbuf, int dstbufsize),(msg_ptr,end_of_msg,srcbuf,dstbuf,dstbufsize));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_RESOLV_C */

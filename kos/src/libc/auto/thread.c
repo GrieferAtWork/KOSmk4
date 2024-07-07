@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d2199a */
+/* HASH CRC-32:0xd128dae */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,12 +177,12 @@ NOTHROW_NCX(LIBCCALL libc_thr_stksegment)(stack_t *sinfo) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(thr_create, libc_thr_create);
-DEFINE_PUBLIC_ALIAS(thr_join, libc_thr_join);
-DEFINE_PUBLIC_ALIAS(thr_setprio, libc_thr_setprio);
-DEFINE_PUBLIC_ALIAS(thr_getprio, libc_thr_getprio);
-DEFINE_PUBLIC_ALIAS(thr_getspecific, libc_thr_getspecific);
-DEFINE_PUBLIC_ALIAS(thr_stksegment, libc_thr_stksegment);
+DEFINE_PUBLIC_ALIAS_P(thr_create,libc_thr_create,ATTR_OUT(6) NONNULL((3)),errno_t,NOTHROW_NCX,LIBCCALL,(void *stack_base, size_t stack_size, void *(LIBCCALL *start_routine)(void *arg), void *arg, long flags, thread_t *newthread),(stack_base,stack_size,start_routine,arg,flags,newthread));
+DEFINE_PUBLIC_ALIAS_P(thr_join,libc_thr_join,ATTR_OUT(2) ATTR_OUT_OPT(3),errno_t,NOTHROW_RPC,LIBCCALL,(thread_t thr, thread_t *p_departed, void **thread_return),(thr,p_departed,thread_return));
+DEFINE_PUBLIC_ALIAS_P(thr_setprio,libc_thr_setprio,,errno_t,NOTHROW_NCX,LIBCCALL,(thread_t thr, int priority),(thr,priority));
+DEFINE_PUBLIC_ALIAS_P(thr_getprio,libc_thr_getprio,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(thread_t thr, int *p_priority),(thr,p_priority));
+DEFINE_PUBLIC_ALIAS_P(thr_getspecific,libc_thr_getspecific,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(thread_key_t key, void **p_val),(key,p_val));
+DEFINE_PUBLIC_ALIAS_P(thr_stksegment,libc_thr_stksegment,,errno_t,NOTHROW_NCX,LIBCCALL,(stack_t *sinfo),(sinfo));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_THREAD_C */

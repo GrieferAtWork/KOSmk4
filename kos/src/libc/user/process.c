@@ -201,14 +201,14 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") ATTR_IN_OPT(1) intptr_t
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb29cf7a7]]]*/
-DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
-DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
-DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
-DEFINE_PUBLIC_ALIAS(_cexit, libc__cexit);
-DEFINE_PUBLIC_ALIAS(_register_thread_local_exe_atexit_callback, libc__register_thread_local_exe_atexit_callback);
-DEFINE_PUBLIC_ALIAS(DOS$_loaddll, libd__loaddll);
-DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
+/*[[[start:exports,hash:CRC-32=0x8fd4c1c7]]]*/
+DEFINE_PUBLIC_ALIAS_P(_beginthread,libc__beginthread,,uintptr_t,NOTHROW_NCX,LIBCCALL,(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg),(entry,stacksz,arg));
+DEFINE_PUBLIC_ALIAS_P(_beginthreadex,libc__beginthreadex,,uintptr_t,NOTHROW_NCX,LIBCCALL,(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr),(sec,stacksz,entry,arg,flags,threadaddr));
+DEFINE_PUBLIC_ALIAS_P_VOID(_endthreadex,libc__endthreadex,,NOTHROW_NCX,LIBCCALL,(u32 exitcode),(exitcode));
+DEFINE_PUBLIC_ALIAS_P_VOID(_cexit,libc__cexit,,,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_register_thread_local_exe_atexit_callback,libc__register_thread_local_exe_atexit_callback,NONNULL((1)),NOTHROW_NCX,LIBDCALL,(_tls_callback_type callback),(callback));
+DEFINE_PUBLIC_ALIAS_P(DOS$_loaddll,libd__loaddll,ATTR_IN_OPT(1),intptr_t,,LIBDCALL,(char __KOS_FIXED_CONST *file),(file));
+DEFINE_PUBLIC_ALIAS_P(_loaddll,libc__loaddll,ATTR_IN_OPT(1),intptr_t,,LIBCCALL,(char __KOS_FIXED_CONST *file),(file));
 /*[[[end:exports]]]*/
 
 DECL_END

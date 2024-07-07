@@ -398,24 +398,24 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x2924a674]]]*/
-DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
-DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
-DEFINE_PUBLIC_ALIAS(make_relative_prefix, libc_make_relative_prefix);
-DEFINE_PUBLIC_ALIAS(make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links);
-DEFINE_PUBLIC_ALIAS(pex_run, libc_pex_run);
-DEFINE_PUBLIC_ALIAS(pex_run_in_environment, libc_pex_run_in_environment);
-DEFINE_PUBLIC_ALIAS(pex_input_file, libc_pex_input_file);
-DEFINE_PUBLIC_ALIAS(pex_input_pipe, libc_pex_input_pipe);
-DEFINE_PUBLIC_ALIAS(pex_read_output, libc_pex_read_output);
-DEFINE_PUBLIC_ALIAS(pex_read_err, libc_pex_read_err);
-DEFINE_PUBLIC_ALIAS(pex_get_status, libc_pex_get_status);
-DEFINE_PUBLIC_ALIAS(pex_init, libc_pex_init);
-DEFINE_PUBLIC_ALIAS(pex_get_times, libc_pex_get_times);
-DEFINE_PUBLIC_ALIAS(pex_free, libc_pex_free);
-DEFINE_PUBLIC_ALIAS(pex_one, libc_pex_one);
-DEFINE_PUBLIC_ALIAS(pexecute, libc_pexecute);
-DEFINE_PUBLIC_ALIAS(pwait, libc_pwait);
+/*[[[start:exports,hash:CRC-32=0x7cf05580]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(xmalloc_set_program_name,libc_xmalloc_set_program_name,,NOTHROW_NCX,LIBCCALL,(char const *progname),(progname));
+DEFINE_PUBLIC_ALIAS_P(fdmatch,libc_fdmatch,WUNUSED ATTR_FDARG(1) ATTR_FDARG(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd1, fd_t fd2),(fd1,fd2));
+DEFINE_PUBLIC_ALIAS_P(make_relative_prefix,libc_make_relative_prefix,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(char const *a, char const *b, char const *c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(make_relative_prefix_ignore_links,libc_make_relative_prefix_ignore_links,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(char const *a, char const *b, char const *c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(pex_run,libc_pex_run,,char const *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char const *outname, char const *errname, int *err),(obj,flags,executable,argv,outname,errname,err));
+DEFINE_PUBLIC_ALIAS_P(pex_run_in_environment,libc_pex_run_in_environment,,char const *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char *const *env, char const *outname, char const *errname, int *err),(obj,flags,executable,argv,env,outname,errname,err));
+DEFINE_PUBLIC_ALIAS_P(pex_input_file,libc_pex_input_file,,FILE *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int flags, char const *in_name),(obj,flags,in_name));
+DEFINE_PUBLIC_ALIAS_P(pex_input_pipe,libc_pex_input_pipe,,FILE *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int binary),(obj,binary));
+DEFINE_PUBLIC_ALIAS_P(pex_read_output,libc_pex_read_output,,FILE *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int binary),(obj,binary));
+DEFINE_PUBLIC_ALIAS_P(pex_read_err,libc_pex_read_err,,FILE *,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int binary),(obj,binary));
+DEFINE_PUBLIC_ALIAS_P(pex_get_status,libc_pex_get_status,,int,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int count, int *vector),(obj,count,vector));
+DEFINE_PUBLIC_ALIAS_P(pex_init,libc_pex_init,,struct pex_obj *,NOTHROW_NCX,LIBCCALL,(int flags, char const *pname, char const *tempbase),(flags,pname,tempbase));
+DEFINE_PUBLIC_ALIAS_P(pex_get_times,libc_pex_get_times,,int,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj, int count, struct pex_time *vector),(obj,count,vector));
+DEFINE_PUBLIC_ALIAS_P_VOID(pex_free,libc_pex_free,,NOTHROW_NCX,LIBCCALL,(struct pex_obj *obj),(obj));
+DEFINE_PUBLIC_ALIAS_P(pex_one,libc_pex_one,,char const *,NOTHROW_NCX,LIBCCALL,(int flags, char const *executable, char *const *argv, char const *pname, char const *outname, char const *errname, int *status, int *err),(flags,executable,argv,pname,outname,errname,status,err));
+DEFINE_PUBLIC_ALIAS_P(pexecute,libc_pexecute,,int,NOTHROW_NCX,LIBCCALL,(char const *a, char *const *b, char const *c, char const *d, char **e, char **f, int g),(a,b,c,d,e,f,g));
+DEFINE_PUBLIC_ALIAS_P(pwait,libc_pwait,,int,NOTHROW_NCX,LIBCCALL,(int a, int *b, int c),(a,b,c));
 /*[[[end:exports]]]*/
 
 DECL_END

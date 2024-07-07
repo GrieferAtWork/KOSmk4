@@ -150,11 +150,11 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd435bc45]]]*/
-DEFINE_PUBLIC_ALIAS(statvfs, libc_statvfs);
-DEFINE_PUBLIC_ALIAS(fstatvfs, libc_fstatvfs);
-DEFINE_PUBLIC_ALIAS(statvfs64, libc_statvfs64);
-DEFINE_PUBLIC_ALIAS(fstatvfs64, libc_fstatvfs64);
+/*[[[start:exports,hash:CRC-32=0xe8edb8c9]]]*/
+DEFINE_PUBLIC_ALIAS_P(statvfs,libc_statvfs,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct statvfs *buf),(file,buf));
+DEFINE_PUBLIC_ALIAS_P(fstatvfs,libc_fstatvfs,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statvfs *buf),(filedes,buf));
+DEFINE_PUBLIC_ALIAS_P(statvfs64,libc_statvfs64,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(const char *file, struct statvfs64 *buf),(file,buf));
+DEFINE_PUBLIC_ALIAS_P(fstatvfs64,libc_fstatvfs64,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t filedes, struct statvfs64 *buf),(filedes,buf));
 /*[[[end:exports]]]*/
 
 DECL_END

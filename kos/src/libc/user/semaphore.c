@@ -598,23 +598,23 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
 /*[[[end:libc_sem_getvalue]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x8b60b9e]]]*/
-DEFINE_PUBLIC_ALIAS(sem_init, libc_sem_init);
-DEFINE_PUBLIC_ALIAS(sem_destroy, libc_sem_destroy);
-DEFINE_PUBLIC_ALIAS(sem_open, libc_sem_open);
-DEFINE_PUBLIC_ALIAS(sem_close, libc_sem_close);
-DEFINE_PUBLIC_ALIAS(sem_unlink, libc_sem_unlink);
-DEFINE_PUBLIC_ALIAS(sem_wait, libc_sem_wait);
-DEFINE_PUBLIC_ALIAS(sem_timedwait, libc_sem_timedwait);
+/*[[[start:exports,hash:CRC-32=0x4ecb39f6]]]*/
+DEFINE_PUBLIC_ALIAS_P(sem_init,libc_sem_init,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self, int pshared, unsigned int value),(self,pshared,value));
+DEFINE_PUBLIC_ALIAS_P(sem_destroy,libc_sem_destroy,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(sem_open,libc_sem_open,ATTR_IN(1),sem_t *,NOTHROW_RPC_KOS,VLIBCCALL,(char const *name, oflag_t oflags, ...),(name,oflags,));
+DEFINE_PUBLIC_ALIAS_P(sem_close,libc_sem_close,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(sem_unlink,libc_sem_unlink,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(const char *name),(name));
+DEFINE_PUBLIC_ALIAS_P(sem_wait,libc_sem_wait,ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(sem_timedwait,libc_sem_timedwait,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *__restrict self, struct timespec const *__restrict abstime),(self,abstime));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__sem_timedwait64, libc_sem_timedwait64);
-DEFINE_PUBLIC_ALIAS(sem_timedwait64, libc_sem_timedwait64);
+DEFINE_PUBLIC_ALIAS_P(__sem_timedwait64,libc_sem_timedwait64,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *__restrict self, struct timespec64 const *__restrict abstime),(self,abstime));
+DEFINE_PUBLIC_ALIAS_P(sem_timedwait64,libc_sem_timedwait64,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(sem_t *__restrict self, struct timespec64 const *__restrict abstime),(self,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(sem_trywait, libc_sem_trywait);
-DEFINE_PUBLIC_ALIAS(sem_post, libc_sem_post);
-DEFINE_PUBLIC_ALIAS(sem_post_multiple, libc_sem_post_multiple);
-DEFINE_PUBLIC_ALIAS(sem_getvalue, libc_sem_getvalue);
+DEFINE_PUBLIC_ALIAS_P(sem_trywait,libc_sem_trywait,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(sem_post,libc_sem_post,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(sem_post_multiple,libc_sem_post_multiple,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sem_t *self, __STDC_INT_AS_UINT_T count),(self,count));
+DEFINE_PUBLIC_ALIAS_P(sem_getvalue,libc_sem_getvalue,ATTR_INOUT(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(sem_t *__restrict self, __STDC_INT_AS_UINT_T *__restrict sval),(self,sval));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7cc8a2f */
+/* HASH CRC-32:0xda5b4195 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,11 +64,11 @@ NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level,
 DECL_END
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$syslog, libd_syslog);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$syslog,libd_syslog,ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T level, char const *format, ...),(level,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(syslog, libc_syslog);
-DEFINE_PUBLIC_ALIAS(vsyslog, libc_vsyslog);
+DEFINE_PUBLIC_ALIAS_P_VOID(syslog,libc_syslog,ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_RPC,VLIBCCALL,(__STDC_INT_AS_UINT_T level, char const *format, ...),(level,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(vsyslog,libc_vsyslog,ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0),NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_UINT_T level, char const *format, va_list args),(level,format,args));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SYSLOG_C */

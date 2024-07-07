@@ -91,15 +91,15 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb9edfb30]]]*/
-DEFINE_PUBLIC_ALIAS(__poll, libc_poll);
-DEFINE_PUBLIC_ALIAS(__syscall_poll, libc_poll);
-DEFINE_PUBLIC_ALIAS(poll, libc_poll);
-DEFINE_PUBLIC_ALIAS(ppoll, libc_ppoll);
+/*[[[start:exports,hash:CRC-32=0xa6c69d2b]]]*/
+DEFINE_PUBLIC_ALIAS_P(__poll,libc_poll,ATTR_INOUTS(1, 2),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, int timeout),(fds,nfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(__syscall_poll,libc_poll,ATTR_INOUTS(1, 2),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, int timeout),(fds,nfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(poll,libc_poll,ATTR_INOUTS(1, 2),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, int timeout),(fds,nfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(ppoll,libc_ppoll,ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, struct timespec const *timeout, sigset_t const *ss),(fds,nfds,timeout,ss));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__ppoll64, libc_ppoll64);
-DEFINE_PUBLIC_ALIAS(ppoll64, libc_ppoll64);
+DEFINE_PUBLIC_ALIAS_P(__ppoll64,libc_ppoll64,ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss),(fds,nfds,timeout,ss));
+DEFINE_PUBLIC_ALIAS_P(ppoll64,libc_ppoll64,ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss),(fds,nfds,timeout,ss));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

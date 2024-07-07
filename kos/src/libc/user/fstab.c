@@ -131,10 +131,10 @@ NOTHROW_NCX(LIBCCALL libc_getfsent)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe5091e76]]]*/
-DEFINE_PUBLIC_ALIAS(setfsent, libc_setfsent);
-DEFINE_PUBLIC_ALIAS(endfsent, libc_endfsent);
-DEFINE_PUBLIC_ALIAS(getfsent, libc_getfsent);
+/*[[[start:exports,hash:CRC-32=0x53fb853e]]]*/
+DEFINE_PUBLIC_ALIAS_P(setfsent,libc_setfsent,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endfsent,libc_endfsent,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getfsent,libc_getfsent,WUNUSED,struct fstab *,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

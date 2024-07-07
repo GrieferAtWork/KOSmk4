@@ -229,13 +229,13 @@ NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9879653f]]]*/
-DEFINE_PUBLIC_ALIAS(epoll_create, libc_epoll_create);
-DEFINE_PUBLIC_ALIAS(epoll_create1, libc_epoll_create1);
-DEFINE_PUBLIC_ALIAS(epoll_ctl, libc_epoll_ctl);
-DEFINE_PUBLIC_ALIAS(epoll_wait, libc_epoll_wait);
-DEFINE_PUBLIC_ALIAS(epoll_pwait, libc_epoll_pwait);
-DEFINE_PUBLIC_ALIAS(epoll_rpc_exec, libc_epoll_rpc_exec);
+/*[[[start:exports,hash:CRC-32=0x4554963b]]]*/
+DEFINE_PUBLIC_ALIAS_P(epoll_create,libc_epoll_create,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_SIZE_T size),(size));
+DEFINE_PUBLIC_ALIAS_P(epoll_create1,libc_epoll_create1,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(epoll_ctl,libc_epoll_ctl,ATTR_FDARG(1) ATTR_FDARG(3),int,NOTHROW_NCX,LIBCCALL,(fd_t epfd, __epoll_ctl_t op, fd_t fd, struct epoll_event *event),(epfd,op,fd,event));
+DEFINE_PUBLIC_ALIAS_P(epoll_wait,libc_epoll_wait,ATTR_FDARG(1) ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout),(epfd,events,maxevents,timeout));
+DEFINE_PUBLIC_ALIAS_P(epoll_pwait,libc_epoll_pwait,ATTR_FDARG(1) ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss),(epfd,events,maxevents,timeout,ss));
+DEFINE_PUBLIC_ALIAS_P(epoll_rpc_exec,libc_epoll_rpc_exec,ATTR_FDARG(1) ATTR_FDARG(2) ATTR_IN(3) NONNULL((6)),int,NOTHROW_NCX,LIBCCALL,(fd_t epfd, fd_t fd, struct epoll_event const *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func),(epfd,fd,event,target_tid,mode,func));
 /*[[[end:exports]]]*/
 
 DECL_END

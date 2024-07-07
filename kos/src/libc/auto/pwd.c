@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe47fb8d7 */
+/* HASH CRC-32:0x136e94a7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -519,19 +519,19 @@ NOTHROW_NCX(LIBCCALL libc_pw_dup)(struct passwd const *ent) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
-DEFINE_PUBLIC_ALIAS(__fgetpwent_r, libc_fgetpwent_r);
-DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
-DEFINE_PUBLIC_ALIAS(fgetpwuid_r, libc_fgetpwuid_r);
-DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);
-DEFINE_PUBLIC_ALIAS(__getpw, libc_getpw);
-DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
-DEFINE_PUBLIC_ALIAS(_sgetpwent, libc_sgetpwent);
-DEFINE_PUBLIC_ALIAS(sgetpwent, libc_sgetpwent);
-DEFINE_PUBLIC_ALIAS(setpassent, libc_setpassent);
-DEFINE_PUBLIC_ALIAS(uid_from_user, libc_uid_from_user);
-DEFINE_PUBLIC_ALIAS(user_from_uid, libc_user_from_uid);
-DEFINE_PUBLIC_ALIAS(pw_dup, libc_pw_dup);
+DEFINE_PUBLIC_ALIAS_P(putpwent,libc_putpwent,ATTR_IN(1) ATTR_INOUT(2),int,NOTHROW_CB_NCX,LIBCCALL,(struct passwd const *__restrict ent, FILE *__restrict stream),(ent,stream));
+DEFINE_PUBLIC_ALIAS_P(__fgetpwent_r,libc_fgetpwent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetpwent_r,libc_fgetpwent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetpwuid_r,libc_fgetpwuid_r,ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(stream,uid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetpwnam_r,libc_fgetpwnam_r,ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(stream,name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getpw,libc_getpw,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(uid_t uid, char *buffer),(uid,buffer));
+DEFINE_PUBLIC_ALIAS_P(getpw,libc_getpw,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(uid_t uid, char *buffer),(uid,buffer));
+DEFINE_PUBLIC_ALIAS_P(_sgetpwent,libc_sgetpwent,ATTR_IN(1),struct passwd *,NOTHROW_NCX,LIBCCALL,(char const *line),(line));
+DEFINE_PUBLIC_ALIAS_P(sgetpwent,libc_sgetpwent,ATTR_IN(1),struct passwd *,NOTHROW_NCX,LIBCCALL,(char const *line),(line));
+DEFINE_PUBLIC_ALIAS_P(setpassent,libc_setpassent,,int,NOTHROW_NCX,LIBCCALL,(int keep_open),(keep_open));
+DEFINE_PUBLIC_ALIAS_P(uid_from_user,libc_uid_from_user,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *name, uid_t *p_uid),(name,p_uid));
+DEFINE_PUBLIC_ALIAS_P(user_from_uid,libc_user_from_uid,WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(uid_t uid, int nouser),(uid,nouser));
+DEFINE_PUBLIC_ALIAS_P(pw_dup,libc_pw_dup,WUNUSED ATTR_IN(1),struct passwd *,NOTHROW_NCX,LIBCCALL,(struct passwd const *ent),(ent));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PWD_C */

@@ -540,18 +540,18 @@ NOTHROW_NCX(LIBCCALL libc_cthread_data)(cthread_t self)
 }
 /*[[[end:libc_cthread_data]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x986f97a6]]]*/
-DEFINE_PUBLIC_ALIAS(cond_signal, libc_cond_signal);
-DEFINE_PUBLIC_ALIAS(cond_broadcast, libc_cond_broadcast);
-DEFINE_PUBLIC_ALIAS(condition_wait, libc_condition_wait);
-DEFINE_PUBLIC_ALIAS(condition_implies, libc_condition_implies);
-DEFINE_PUBLIC_ALIAS(condition_unimplies, libc_condition_unimplies);
-DEFINE_PUBLIC_ALIAS(cthread_sp, libc_cthread_sp);
-DEFINE_PUBLIC_ALIAS(ur_cthread_self, libc_ur_cthread_self);
-DEFINE_PUBLIC_ALIAS(cthread_name, libc_cthread_name);
-DEFINE_PUBLIC_ALIAS(cthread_count, libc_cthread_count);
-DEFINE_PUBLIC_ALIAS(cthread_set_data, libc_cthread_set_data);
-DEFINE_PUBLIC_ALIAS(cthread_data, libc_cthread_data);
+/*[[[start:exports,hash:CRC-32=0x2a2b904a]]]*/
+DEFINE_PUBLIC_ALIAS_P(cond_signal,libc_cond_signal,,int,NOTHROW_NCX,LIBCCALL,(condition_t self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(cond_broadcast,libc_cond_broadcast,,NOTHROW_NCX,LIBCCALL,(condition_t self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(condition_wait,libc_condition_wait,,NOTHROW_NCX,LIBCCALL,(condition_t self, mutex_t mutex),(self,mutex));
+DEFINE_PUBLIC_ALIAS_P_VOID(condition_implies,libc_condition_implies,,NOTHROW_NCX,LIBCCALL,(condition_t implicator, condition_t implicatand),(implicator,implicatand));
+DEFINE_PUBLIC_ALIAS_P_VOID(condition_unimplies,libc_condition_unimplies,,NOTHROW_NCX,LIBCCALL,(condition_t implicator, condition_t implicatand),(implicator,implicatand));
+DEFINE_PUBLIC_ALIAS_P(cthread_sp,libc_cthread_sp,,vm_offset_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(ur_cthread_self,libc_ur_cthread_self,,ur_cthread_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(cthread_name,libc_cthread_name,ATTR_IN(1),char const *,NOTHROW_NCX,LIBCCALL,(cthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(cthread_count,libc_cthread_count,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(cthread_set_data,libc_cthread_set_data,ATTR_ACCESS_NONE(2),int,NOTHROW_NCX,LIBCCALL,(cthread_t self, void *value),(self,value));
+DEFINE_PUBLIC_ALIAS_P(cthread_data,libc_cthread_data,,void *,NOTHROW_NCX,LIBCCALL,(cthread_t self),(self));
 /*[[[end:exports]]]*/
 
 DECL_END

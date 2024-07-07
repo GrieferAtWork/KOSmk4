@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe77d233d */
+/* HASH CRC-32:0x3686e71d */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -232,19 +232,19 @@ NOTHROW_RPC(VLIBKCALL libc__wsopen)(char32_t const *filename,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_waccess_s, libd__waccess_s);
-DEFINE_PUBLIC_ALIAS(_waccess_s, libc__waccess_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wmktemp_s, libd__wmktemp_s);
-DEFINE_PUBLIC_ALIAS(_wmktemp_s, libc__wmktemp_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wmktemp, libd__wmktemp);
-DEFINE_PUBLIC_ALIAS(_wmktemp, libc__wmktemp);
-DEFINE_PUBLIC_ALIAS(DOS$_wsopen_s, libd__wsopen_s);
-DEFINE_PUBLIC_ALIAS(_wsopen_s, libc__wsopen_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wsopen_dispatch, libd__wsopen_dispatch);
-DEFINE_PUBLIC_ALIAS(_wsopen_dispatch, libc__wsopen_dispatch);
-DEFINE_PUBLIC_ALIAS("?_wsopen@@YAHPB_WHHH@Z", libd__wsopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wsopen, libd__wsopen);
-DEFINE_PUBLIC_ALIAS(_wsopen, libc__wsopen);
+DEFINE_PUBLIC_ALIAS_P(DOS$_waccess_s,libd__waccess_s,WUNUSED ATTR_IN(1),errno_t,NOTHROW_RPC,LIBDCALL,(char16_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(_waccess_s,libc__waccess_s,WUNUSED ATTR_IN(1),errno_t,NOTHROW_RPC,LIBKCALL,(char32_t const *file, __STDC_INT_AS_UINT_T type),(file,type));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wmktemp_s,libd__wmktemp_s,ATTR_INOUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *template_, size_t bufsize),(template_,bufsize));
+DEFINE_PUBLIC_ALIAS_P(_wmktemp_s,libc__wmktemp_s,ATTR_INOUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *template_, size_t bufsize),(template_,bufsize));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wmktemp,libd__wmktemp,ATTR_RETNONNULL ATTR_INOUT(1),char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t *template_),(template_));
+DEFINE_PUBLIC_ALIAS_P(_wmktemp,libc__wmktemp,ATTR_RETNONNULL ATTR_INOUT(1),char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t *template_),(template_));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsopen_s,libd__wsopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBDCALL,(fd_t *fd, char16_t const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(_wsopen_s,libc__wsopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBKCALL,(fd_t *fd, char32_t const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsopen_dispatch,libd__wsopen_dispatch,WUNUSED ATTR_IN(1) ATTR_OUT(5),errno_t,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure),(filename,oflags,sflags,mode,fd,bsecure));
+DEFINE_PUBLIC_ALIAS_P(_wsopen_dispatch,libc__wsopen_dispatch,WUNUSED ATTR_IN(1) ATTR_OUT(5),errno_t,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure),(filename,oflags,sflags,mode,fd,bsecure));
+DEFINE_PUBLIC_ALIAS_P("?_wsopen@@YAHPB_WHHH@Z",libd__wsopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsopen,libd__wsopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
+DEFINE_PUBLIC_ALIAS_P(_wsopen,libc__wsopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBKCALL,(char32_t const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CORECRT_WIO_C */

@@ -105,13 +105,13 @@ NOTHROW_NCX(LIBKCALL libc__wtmpnam)(char32_t *buf)
 }
 /*[[[end:libc__wtmpnam]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x41fbcb68]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$_wtempnam, libd__wtempnam);
-DEFINE_PUBLIC_ALIAS(_wtempnam, libc__wtempnam);
-DEFINE_PUBLIC_ALIAS(DOS$_wtmpnam_s, libd__wtmpnam_s);
-DEFINE_PUBLIC_ALIAS(_wtmpnam_s, libc__wtmpnam_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wtmpnam, libd__wtmpnam);
-DEFINE_PUBLIC_ALIAS(_wtmpnam, libc__wtmpnam);
+/*[[[start:exports,hash:CRC-32=0xa8d301df]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtempnam,libd__wtempnam,WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t const *directory, char16_t const *file_prefix),(directory,file_prefix));
+DEFINE_PUBLIC_ALIAS_P(_wtempnam,libc__wtempnam,WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t const *directory, char32_t const *file_prefix),(directory,file_prefix));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtmpnam_s,libd__wtmpnam_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *dst, size_t wchar_count),(dst,wchar_count));
+DEFINE_PUBLIC_ALIAS_P(_wtmpnam_s,libc__wtmpnam_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *dst, size_t wchar_count),(dst,wchar_count));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtmpnam,libd__wtmpnam,,char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t *buf),(buf));
+DEFINE_PUBLIC_ALIAS_P(_wtmpnam,libc__wtmpnam,,char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t *buf),(buf));
 /*[[[end:exports]]]*/
 
 DECL_END

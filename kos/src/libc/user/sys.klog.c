@@ -44,8 +44,8 @@ NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7159d9e]]]*/
-DEFINE_PUBLIC_ALIAS(klogctl, libc_klogctl);
+/*[[[start:exports,hash:CRC-32=0xac8092b0]]]*/
+DEFINE_PUBLIC_ALIAS_P(klogctl,libc_klogctl,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T type, char *bufp, __STDC_INT_AS_SIZE_T len),(type,bufp,len));
 /*[[[end:exports]]]*/
 
 DECL_END

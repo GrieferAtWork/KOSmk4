@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20f6487e */
+/* HASH CRC-32:0x78fc695f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -599,27 +599,27 @@ NOTHROW_NCX(LIBCCALL libc_tcsetwinsize)(fd_t fd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(cfgetospeed, libc_cfgetospeed);
-DEFINE_PUBLIC_ALIAS(cfgetispeed, libc_cfgetispeed);
-DEFINE_PUBLIC_ALIAS(cfsetospeed, libc_cfsetospeed);
-DEFINE_PUBLIC_ALIAS(cfsetispeed, libc_cfsetispeed);
-DEFINE_PUBLIC_ALIAS(__tcgetattr, libc_tcgetattr);
-DEFINE_PUBLIC_ALIAS(tcgetattr, libc_tcgetattr);
-DEFINE_PUBLIC_ALIAS(tcsetattr, libc_tcsetattr);
-DEFINE_PUBLIC_ALIAS(tcsendbreak, libc_tcsendbreak);
-DEFINE_PUBLIC_ALIAS(__libc_tcdrain, libc_tcdrain);
-DEFINE_PUBLIC_ALIAS(tcdrain, libc_tcdrain);
-DEFINE_PUBLIC_ALIAS(tcflush, libc_tcflush);
-DEFINE_PUBLIC_ALIAS(tcflow, libc_tcflow);
-DEFINE_PUBLIC_ALIAS(tcgetsid, libc_tcgetsid);
-DEFINE_PUBLIC_ALIAS(tcsetsid, libc_tcsetsid);
-DEFINE_PUBLIC_ALIAS(cfsetspeed, libc_cfsetspeed);
-DEFINE_PUBLIC_ALIAS(cfmakeraw, libc_cfmakeraw);
+DEFINE_PUBLIC_ALIAS_P(cfgetospeed,libc_cfgetospeed,ATTR_PURE WUNUSED ATTR_IN(1),speed_t,NOTHROW_NCX,LIBCCALL,(struct termios const *__restrict termios_p),(termios_p));
+DEFINE_PUBLIC_ALIAS_P(cfgetispeed,libc_cfgetispeed,ATTR_PURE WUNUSED ATTR_IN(1),speed_t,NOTHROW_NCX,LIBCCALL,(struct termios const *__restrict termios_p),(termios_p));
+DEFINE_PUBLIC_ALIAS_P(cfsetospeed,libc_cfsetospeed,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct termios *__restrict termios_p, speed_t speed),(termios_p,speed));
+DEFINE_PUBLIC_ALIAS_P(cfsetispeed,libc_cfsetispeed,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct termios *__restrict termios_p, speed_t speed),(termios_p,speed));
+DEFINE_PUBLIC_ALIAS_P(__tcgetattr,libc_tcgetattr,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct termios *__restrict termios_p),(fd,termios_p));
+DEFINE_PUBLIC_ALIAS_P(tcgetattr,libc_tcgetattr,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct termios *__restrict termios_p),(fd,termios_p));
+DEFINE_PUBLIC_ALIAS_P(tcsetattr,libc_tcsetattr,ATTR_FDARG(1) ATTR_IN(3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p),(fd,optional_actions,termios_p));
+DEFINE_PUBLIC_ALIAS_P(tcsendbreak,libc_tcsendbreak,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, int duration),(fd,duration));
+DEFINE_PUBLIC_ALIAS_P(__libc_tcdrain,libc_tcdrain,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(tcdrain,libc_tcdrain,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(tcflush,libc_tcflush,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T queue_selector),(fd,queue_selector));
+DEFINE_PUBLIC_ALIAS_P(tcflow,libc_tcflow,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T action),(fd,action));
+DEFINE_PUBLIC_ALIAS_P(tcgetsid,libc_tcgetsid,ATTR_FDARG(1),pid_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(tcsetsid,libc_tcsetsid,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, pid_t pid),(fd,pid));
+DEFINE_PUBLIC_ALIAS_P(cfsetspeed,libc_cfsetspeed,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct termios *__restrict termios_p, speed_t speed),(termios_p,speed));
+DEFINE_PUBLIC_ALIAS_P_VOID(cfmakeraw,libc_cfmakeraw,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct termios *__restrict termios_p),(termios_p));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(cfmakesane, libc_cfmakesane);
+DEFINE_PUBLIC_ALIAS_P_VOID(cfmakesane,libc_cfmakesane,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct termios *__restrict termios_p),(termios_p));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tcgetwinsize, libc_tcgetwinsize);
-DEFINE_PUBLIC_ALIAS(tcsetwinsize, libc_tcsetwinsize);
+DEFINE_PUBLIC_ALIAS_P(tcgetwinsize,libc_tcgetwinsize,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct winsize *winsize_p),(fd,winsize_p));
+DEFINE_PUBLIC_ALIAS_P(tcsetwinsize,libc_tcsetwinsize,ATTR_FDARG(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct winsize const *winsize_p),(fd,winsize_p));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_TERMIOS_C */

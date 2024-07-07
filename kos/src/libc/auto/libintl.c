@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac04baf3 */
+/* HASH CRC-32:0xf59d57f1 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,14 +82,14 @@ NOTHROW_NCX(LIBCCALL libc_dngettext)(char const *domainname,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__dcgettext, libc_dcgettext);
-DEFINE_PUBLIC_ALIAS(dcgettext, libc_dcgettext);
-DEFINE_PUBLIC_ALIAS(__dgettext, libc_dgettext);
-DEFINE_PUBLIC_ALIAS(dgettext, libc_dgettext);
-DEFINE_PUBLIC_ALIAS(__gettext, libc_gettext);
-DEFINE_PUBLIC_ALIAS(gettext, libc_gettext);
-DEFINE_PUBLIC_ALIAS(ngettext, libc_ngettext);
-DEFINE_PUBLIC_ALIAS(dngettext, libc_dngettext);
+DEFINE_PUBLIC_ALIAS_P(__dcgettext,libc_dcgettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) __ATTR_FORMAT_ARG(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid, int category),(domainname,msgid,category));
+DEFINE_PUBLIC_ALIAS_P(dcgettext,libc_dcgettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) __ATTR_FORMAT_ARG(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid, int category),(domainname,msgid,category));
+DEFINE_PUBLIC_ALIAS_P(__dgettext,libc_dgettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) __ATTR_FORMAT_ARG(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid),(domainname,msgid));
+DEFINE_PUBLIC_ALIAS_P(dgettext,libc_dgettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) __ATTR_FORMAT_ARG(2),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid),(domainname,msgid));
+DEFINE_PUBLIC_ALIAS_P(__gettext,libc_gettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(1),char *,NOTHROW_NCX,LIBCCALL,(char const *msgid),(msgid));
+DEFINE_PUBLIC_ALIAS_P(gettext,libc_gettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(1),char *,NOTHROW_NCX,LIBCCALL,(char const *msgid),(msgid));
+DEFINE_PUBLIC_ALIAS_P(ngettext,libc_ngettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2),char *,NOTHROW_NCX,LIBCCALL,(char const *msgid_singular, char const *msgid_plural, ulongptr_t n),(msgid_singular,msgid_plural,n));
+DEFINE_PUBLIC_ALIAS_P(dngettext,libc_dngettext,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,NOTHROW_NCX,LIBCCALL,(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n),(domainname,msgid_singular,msgid_plural,n));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBINTL_C */

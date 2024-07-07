@@ -65,8 +65,8 @@ NOTHROW(LIBCCALL libc__kbhit)(void)
 }
 /*[[[end:libc__kbhit]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x1bce5823]]]*/
-DEFINE_PUBLIC_ALIAS(_kbhit, libc__kbhit);
+/*[[[start:exports,hash:CRC-32=0xd0266c61]]]*/
+DEFINE_PUBLIC_ALIAS_P(_kbhit,libc__kbhit,WUNUSED,int,NOTHROW,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

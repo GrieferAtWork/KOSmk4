@@ -104,9 +104,9 @@ NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(unsigned int *pmode,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5365bf47]]]*/
-DEFINE_PUBLIC_ALIAS(set_exception_handler, libc_set_exception_handler);
-DEFINE_PUBLIC_ALIAS(get_exception_handler, libc_get_exception_handler);
+/*[[[start:exports,hash:CRC-32=0xb4867534]]]*/
+DEFINE_PUBLIC_ALIAS_P(set_exception_handler,libc_set_exception_handler,,int,NOTHROW,LIBCCALL,(unsigned int mode, except_handler_t handler, void *handler_sp),(mode,handler,handler_sp));
+DEFINE_PUBLIC_ALIAS_P(get_exception_handler,libc_get_exception_handler,,int,NOTHROW_NCX,LIBCCALL,(unsigned int *pmode, except_handler_t *phandler, void **phandler_sp),(pmode,phandler,phandler_sp));
 /*[[[end:exports]]]*/
 
 DECL_END

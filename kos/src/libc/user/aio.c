@@ -1465,31 +1465,31 @@ NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init)
 }
 /*[[[end:libc_aio_init]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xeaac856e]]]*/
-DEFINE_PUBLIC_ALIAS(aio_read, libc_aio_read);
-DEFINE_PUBLIC_ALIAS(aio_write, libc_aio_write);
-DEFINE_PUBLIC_ALIAS(aio_fsync, libc_aio_fsync);
-DEFINE_PUBLIC_ALIAS(lio_listio, libc_lio_listio);
-DEFINE_PUBLIC_ALIAS(aio_error, libc_aio_error);
-DEFINE_PUBLIC_ALIAS(aio_return, libc_aio_return);
-DEFINE_PUBLIC_ALIAS(aio_cancel, libc_aio_cancel);
-DEFINE_PUBLIC_ALIAS(aio_suspend, libc_aio_suspend);
-DEFINE_PUBLIC_ALIAS(aio_read64, libc_aio_read64);
-DEFINE_PUBLIC_ALIAS(aio_write64, libc_aio_write64);
-DEFINE_PUBLIC_ALIAS(aio_fsync64, libc_aio_fsync64);
-DEFINE_PUBLIC_ALIAS(lio_listio64, libc_lio_listio64);
-DEFINE_PUBLIC_ALIAS(aio_error64, libc_aio_error64);
-DEFINE_PUBLIC_ALIAS(aio_return64, libc_aio_return64);
-DEFINE_PUBLIC_ALIAS(aio_cancel64, libc_aio_cancel64);
-DEFINE_PUBLIC_ALIAS(aio_suspend64, libc_aio_suspend64);
+/*[[[start:exports,hash:CRC-32=0x587ee43]]]*/
+DEFINE_PUBLIC_ALIAS_P(aio_read,libc_aio_read,NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(struct aiocb *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_write,libc_aio_write,NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(struct aiocb *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_fsync,libc_aio_fsync,NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(oflag_t operation, struct aiocb *self),(operation,self));
+DEFINE_PUBLIC_ALIAS_P(lio_listio,libc_lio_listio,ATTR_INS(2, 3),int,NOTHROW_NCX,LIBCCALL,(int mode, struct aiocb *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev),(mode,list,nent,sigev));
+DEFINE_PUBLIC_ALIAS_P(aio_error,libc_aio_error,WUNUSED ATTR_IN(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct aiocb const *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_return,libc_aio_return,ATTR_INOUT(1),ssize_t,NOTHROW_NCX,LIBCCALL,(struct aiocb *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_cancel,libc_aio_cancel,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct aiocb *self),(fd,self));
+DEFINE_PUBLIC_ALIAS_P(aio_suspend,libc_aio_suspend,ATTR_INS(1, 2),int,NOTHROW_RPC,LIBCCALL,(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout),(list,nent,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(aio_read64,libc_aio_read64,NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_write64,libc_aio_write64,NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_fsync64,libc_aio_fsync64,NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(int operation, struct aiocb64 *self),(operation,self));
+DEFINE_PUBLIC_ALIAS_P(lio_listio64,libc_lio_listio64,ATTR_INS(2, 3),int,NOTHROW_NCX,LIBCCALL,(int mode, struct aiocb64 *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev),(mode,list,nent,sigev));
+DEFINE_PUBLIC_ALIAS_P(aio_error64,libc_aio_error64,WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 const *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_return64,libc_aio_return64,ATTR_INOUT(1),ssize_t,NOTHROW_NCX,LIBCCALL,(struct aiocb64 *self),(self));
+DEFINE_PUBLIC_ALIAS_P(aio_cancel64,libc_aio_cancel64,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fildes, struct aiocb64 *self),(fildes,self));
+DEFINE_PUBLIC_ALIAS_P(aio_suspend64,libc_aio_suspend64,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout),(list,nent,rel_timeout));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__aio_suspend_time64, libc_aio_suspendt64);
-DEFINE_PUBLIC_ALIAS(aio_suspendt64, libc_aio_suspendt64);
-DEFINE_PUBLIC_ALIAS(__aio_suspend64_time64, libc_aio_suspend64t64);
-DEFINE_PUBLIC_ALIAS(aio_suspend64t64, libc_aio_suspend64t64);
+DEFINE_PUBLIC_ALIAS_P(__aio_suspend_time64,libc_aio_suspendt64,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout),(list,nent,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(aio_suspendt64,libc_aio_suspendt64,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout),(list,nent,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(__aio_suspend64_time64,libc_aio_suspend64t64,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout),(list,nent,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(aio_suspend64t64,libc_aio_suspend64t64,ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout),(list,nent,rel_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(aio_init, libc_aio_init);
+DEFINE_PUBLIC_ALIAS_P_VOID(aio_init,libc_aio_init,ATTR_IN(1),NOTHROW_NCX,LIBCCALL,(struct aioinit const *init),(init));
 /*[[[end:exports]]]*/
 
 DECL_END

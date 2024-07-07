@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4902c9d8 */
+/* HASH CRC-32:0xeaea8dde */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,18 +144,18 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_allbits)(lfutex_t *uaddr,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile, libc_futex_trywaitwhile);
-DEFINE_PUBLIC_ALIAS(futex_trywaituntil, libc_futex_trywaituntil);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_equal, libc_futex_trywaitwhile_equal);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_notequal, libc_futex_trywaitwhile_notequal);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_above, libc_futex_trywaitwhile_above);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_below, libc_futex_trywaitwhile_below);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_aboveequal, libc_futex_trywaitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_belowequal, libc_futex_trywaitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_exactbits, libc_futex_trywaitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_trywaituntil_exactbits, libc_futex_trywaituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_anybit, libc_futex_trywaitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(futex_trywaitwhile_allbits, libc_futex_trywaitwhile_allbits);
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile,libc_futex_trywaitwhile,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t equal_to_value),(uaddr,equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaituntil,libc_futex_trywaituntil,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t not_equal_to_value),(uaddr,not_equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_equal,libc_futex_trywaitwhile_equal,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t equal_to_value),(uaddr,equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_notequal,libc_futex_trywaitwhile_notequal,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t not_equal_to_value),(uaddr,not_equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_above,libc_futex_trywaitwhile_above,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_value),(uaddr,above_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_below,libc_futex_trywaitwhile_below,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_value),(uaddr,below_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_aboveequal,libc_futex_trywaitwhile_aboveequal,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_or_equal_value),(uaddr,above_or_equal_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_belowequal,libc_futex_trywaitwhile_belowequal,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_or_equal_value),(uaddr,below_or_equal_value));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_exactbits,libc_futex_trywaitwhile_exactbits,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask),(uaddr,bitmask,setmask));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaituntil_exactbits,libc_futex_trywaituntil_exactbits,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask),(uaddr,bitmask,setmask));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_anybit,libc_futex_trywaitwhile_anybit,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask),(uaddr,bitmask));
+DEFINE_PUBLIC_ALIAS_P(futex_trywaitwhile_allbits,libc_futex_trywaitwhile_allbits,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask),(uaddr,bitmask));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_FUTEX_C */

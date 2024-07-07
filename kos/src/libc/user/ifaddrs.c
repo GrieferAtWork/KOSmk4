@@ -53,9 +53,9 @@ NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x50e02489]]]*/
-DEFINE_PUBLIC_ALIAS(getifaddrs, libc_getifaddrs);
-DEFINE_PUBLIC_ALIAS(freeifaddrs, libc_freeifaddrs);
+/*[[[start:exports,hash:CRC-32=0x7d8f3ba5]]]*/
+DEFINE_PUBLIC_ALIAS_P(getifaddrs,libc_getifaddrs,,int,NOTHROW_NCX,LIBCCALL,(struct ifaddrs **ifap),(ifap));
+DEFINE_PUBLIC_ALIAS_P_VOID(freeifaddrs,libc_freeifaddrs,,NOTHROW_NCX,LIBCCALL,(struct ifaddrs *ifa),(ifa));
 /*[[[end:exports]]]*/
 
 DECL_END

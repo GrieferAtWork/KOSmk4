@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f32f030 */
+/* HASH CRC-32:0x80c122b7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,10 +411,10 @@ return_fallback:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(attr_copy_file, libc_attr_copy_file);
-DEFINE_PUBLIC_ALIAS(attr_copy_fd, libc_attr_copy_fd);
-DEFINE_PUBLIC_ALIAS(attr_copy_check_permissions, libc_attr_copy_check_permissions);
-DEFINE_PUBLIC_ALIAS(attr_copy_action, libc_attr_copy_action);
+DEFINE_PUBLIC_ALIAS_P(attr_copy_file,libc_attr_copy_file,ATTR_IN(1) ATTR_IN(2) ATTR_INOUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(char const *src_path, char const *dst_path, int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx), struct error_context *ctx),(src_path,dst_path,check,ctx));
+DEFINE_PUBLIC_ALIAS_P(attr_copy_fd,libc_attr_copy_fd,ATTR_INOUT_OPT(6) ATTR_IN_OPT(1) ATTR_IN_OPT(3),int,NOTHROW_NCX,LIBCCALL,(char const *src_path, fd_t src_fd, char const *dst_path, fd_t dst_fd, int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx), struct error_context *ctx),(src_path,src_fd,dst_path,dst_fd,check,ctx));
+DEFINE_PUBLIC_ALIAS_P(attr_copy_check_permissions,libc_attr_copy_check_permissions,ATTR_IN(1) ATTR_INOUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *attr_name, struct error_context *ctx),(attr_name,ctx));
+DEFINE_PUBLIC_ALIAS_P(attr_copy_action,libc_attr_copy_action,ATTR_IN(1) ATTR_INOUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *attr_name, struct error_context *ctx),(attr_name,ctx));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ATTR_LIBATTR_C */

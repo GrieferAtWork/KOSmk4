@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc83da11c */
+/* HASH CRC-32:0xf0de1e2a */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,28 +239,28 @@ NOTHROW_NCX(LIBCCALL libc__option_is_end)(struct argp_option const *opt) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__argp_usage, libc_argp_usage);
-DEFINE_PUBLIC_ALIAS(argp_usage, libc_argp_usage);
+DEFINE_PUBLIC_ALIAS_P_VOID(__argp_usage,libc_argp_usage,ATTR_IN(1),NOTHROW_NCX,LIBCCALL,(struct argp_state const *state),(state));
+DEFINE_PUBLIC_ALIAS_P_VOID(argp_usage,libc_argp_usage,ATTR_IN(1),NOTHROW_NCX,LIBCCALL,(struct argp_state const *state),(state));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__argp_error, libd_argp_error);
-DEFINE_PUBLIC_ALIAS(DOS$argp_error, libd_argp_error);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__argp_error,libd_argp_error,ATTR_IN(2) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(2, 3),NOTHROW_NCX,VLIBDCALL,(struct argp_state const *__restrict state, char const *__restrict format, ...),(state,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$argp_error,libd_argp_error,ATTR_IN(2) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(2, 3),NOTHROW_NCX,VLIBDCALL,(struct argp_state const *__restrict state, char const *__restrict format, ...),(state,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__argp_error, libc_argp_error);
-DEFINE_PUBLIC_ALIAS(argp_error, libc_argp_error);
+DEFINE_PUBLIC_ALIAS_P_VOID(__argp_error,libc_argp_error,ATTR_IN(2) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(2, 3),NOTHROW_NCX,VLIBCCALL,(struct argp_state const *__restrict state, char const *__restrict format, ...),(state,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(argp_error,libc_argp_error,ATTR_IN(2) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(2, 3),NOTHROW_NCX,VLIBCCALL,(struct argp_state const *__restrict state, char const *__restrict format, ...),(state,format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__argp_failure, libd_argp_failure);
-DEFINE_PUBLIC_ALIAS(DOS$argp_failure, libd_argp_failure);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__argp_failure,libd_argp_failure,ATTR_IN(4) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(4, 5),NOTHROW_NCX,VLIBDCALL,(struct argp_state const *__restrict state, int status, errno_t errnum, char const *__restrict format, ...),(state,status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$argp_failure,libd_argp_failure,ATTR_IN(4) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(4, 5),NOTHROW_NCX,VLIBDCALL,(struct argp_state const *__restrict state, int status, errno_t errnum, char const *__restrict format, ...),(state,status,errnum,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__argp_failure, libc_argp_failure);
-DEFINE_PUBLIC_ALIAS(argp_failure, libc_argp_failure);
-DEFINE_PUBLIC_ALIAS(__option_is_short, libc__option_is_short);
-DEFINE_PUBLIC_ALIAS(_option_is_short, libc__option_is_short);
-DEFINE_PUBLIC_ALIAS(__option_is_end, libc__option_is_end);
-DEFINE_PUBLIC_ALIAS(_option_is_end, libc__option_is_end);
+DEFINE_PUBLIC_ALIAS_P_VOID(__argp_failure,libc_argp_failure,ATTR_IN(4) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(4, 5),NOTHROW_NCX,VLIBCCALL,(struct argp_state const *__restrict state, int status, errno_t errnum, char const *__restrict format, ...),(state,status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(argp_failure,libc_argp_failure,ATTR_IN(4) ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(4, 5),NOTHROW_NCX,VLIBCCALL,(struct argp_state const *__restrict state, int status, errno_t errnum, char const *__restrict format, ...),(state,status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P(__option_is_short,libc__option_is_short,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct argp_option const *opt),(opt));
+DEFINE_PUBLIC_ALIAS_P(_option_is_short,libc__option_is_short,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct argp_option const *opt),(opt));
+DEFINE_PUBLIC_ALIAS_P(__option_is_end,libc__option_is_end,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct argp_option const *opt),(opt));
+DEFINE_PUBLIC_ALIAS_P(_option_is_end,libc__option_is_end,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct argp_option const *opt),(opt));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARGP_C */

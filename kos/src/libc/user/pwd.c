@@ -355,25 +355,25 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 /*[[[end:libc_getpwent_r]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x2dc19bbc]]]*/
-DEFINE_PUBLIC_ALIAS(_setpwent, libc_setpwent);
-DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
-DEFINE_PUBLIC_ALIAS(_endpwent, libc_endpwent);
-DEFINE_PUBLIC_ALIAS(endpwent, libc_endpwent);
-DEFINE_PUBLIC_ALIAS(_getpwent, libc_getpwent);
-DEFINE_PUBLIC_ALIAS(getpwent, libc_getpwent);
-DEFINE_PUBLIC_ALIAS(_getpwuid, libc_getpwuid);
-DEFINE_PUBLIC_ALIAS(getpwuid, libc_getpwuid);
-DEFINE_PUBLIC_ALIAS(_getpwnam, libc_getpwnam);
-DEFINE_PUBLIC_ALIAS(getpwnam, libc_getpwnam);
-DEFINE_PUBLIC_ALIAS(_fgetpwent, libc_fgetpwent);
-DEFINE_PUBLIC_ALIAS(fgetpwent, libc_fgetpwent);
-DEFINE_PUBLIC_ALIAS(__getpwuid_r, libc_getpwuid_r);
-DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
-DEFINE_PUBLIC_ALIAS(__getpwnam_r, libc_getpwnam_r);
-DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);
-DEFINE_PUBLIC_ALIAS(__getpwent_r, libc_getpwent_r);
-DEFINE_PUBLIC_ALIAS(getpwent_r, libc_getpwent_r);
+/*[[[start:exports,hash:CRC-32=0x2e215a93]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(_setpwent,libc_setpwent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(setpwent,libc_setpwent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_endpwent,libc_endpwent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endpwent,libc_endpwent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getpwent,libc_getpwent,,struct passwd *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getpwent,libc_getpwent,,struct passwd *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getpwuid,libc_getpwuid,WUNUSED,struct passwd *,NOTHROW_RPC,LIBCCALL,(uid_t uid),(uid));
+DEFINE_PUBLIC_ALIAS_P(getpwuid,libc_getpwuid,WUNUSED,struct passwd *,NOTHROW_RPC,LIBCCALL,(uid_t uid),(uid));
+DEFINE_PUBLIC_ALIAS_P(_getpwnam,libc_getpwnam,WUNUSED ATTR_IN(1),struct passwd *,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(getpwnam,libc_getpwnam,WUNUSED ATTR_IN(1),struct passwd *,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(_fgetpwent,libc_fgetpwent,WUNUSED ATTR_INOUT(1),struct passwd *,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(fgetpwent,libc_fgetpwent,WUNUSED ATTR_INOUT(1),struct passwd *,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__getpwuid_r,libc_getpwuid_r,ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(uid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getpwuid_r,libc_getpwuid_r,ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(uid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getpwnam_r,libc_getpwnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getpwnam_r,libc_getpwnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getpwent_r,libc_getpwent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getpwent_r,libc_getpwent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result),(resultbuf,buffer,buflen,result));
 /*[[[end:exports]]]*/
 
 DECL_END

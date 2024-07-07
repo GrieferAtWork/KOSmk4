@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed980460 */
+/* HASH CRC-32:0xc5abda25 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ nomatch:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(fnmatch, libc_fnmatch);
+DEFINE_PUBLIC_ALIAS_P(fnmatch,libc_fnmatch,ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags),(pattern,name,match_flags));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FNMATCH_C */

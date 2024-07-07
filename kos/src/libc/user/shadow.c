@@ -286,24 +286,24 @@ NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x553038b6]]]*/
-DEFINE_PUBLIC_ALIAS(__setspent, libc_setspent);
-DEFINE_PUBLIC_ALIAS(setspent, libc_setspent);
-DEFINE_PUBLIC_ALIAS(__endspent, libc_endspent);
-DEFINE_PUBLIC_ALIAS(endspent, libc_endspent);
-DEFINE_PUBLIC_ALIAS(__getspent, libc_getspent);
-DEFINE_PUBLIC_ALIAS(getspent, libc_getspent);
-DEFINE_PUBLIC_ALIAS(__getspnam, libc_getspnam);
-DEFINE_PUBLIC_ALIAS(getspnam, libc_getspnam);
-DEFINE_PUBLIC_ALIAS(fgetspent, libc_fgetspent);
-DEFINE_PUBLIC_ALIAS(__getspent_r, libc_getspent_r);
-DEFINE_PUBLIC_ALIAS(getspent_r, libc_getspent_r);
-DEFINE_PUBLIC_ALIAS(__getspnam_r, libc_getspnam_r);
-DEFINE_PUBLIC_ALIAS(getspnam_r, libc_getspnam_r);
-DEFINE_PUBLIC_ALIAS(__lckpwdf, libc_lckpwdf);
-DEFINE_PUBLIC_ALIAS(lckpwdf, libc_lckpwdf);
-DEFINE_PUBLIC_ALIAS(__ulckpwdf, libc_ulckpwdf);
-DEFINE_PUBLIC_ALIAS(ulckpwdf, libc_ulckpwdf);
+/*[[[start:exports,hash:CRC-32=0xa3700ff1]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(__setspent,libc_setspent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(setspent,libc_setspent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(__endspent,libc_endspent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endspent,libc_endspent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getspent,libc_getspent,WUNUSED,struct spwd *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getspent,libc_getspent,WUNUSED,struct spwd *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getspnam,libc_getspnam,WUNUSED ATTR_IN(1),struct spwd *,NOTHROW_RPC,LIBCCALL,(char const *__restrict name),(name));
+DEFINE_PUBLIC_ALIAS_P(getspnam,libc_getspnam,WUNUSED ATTR_IN(1),struct spwd *,NOTHROW_RPC,LIBCCALL,(char const *__restrict name),(name));
+DEFINE_PUBLIC_ALIAS_P(fgetspent,libc_fgetspent,WUNUSED ATTR_INOUT(1),struct spwd *,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__getspent_r,libc_getspent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getspent_r,libc_getspent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getspnam_r,libc_getspnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getspnam_r,libc_getspnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__lckpwdf,libc_lckpwdf,,int,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(lckpwdf,libc_lckpwdf,,int,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__ulckpwdf,libc_ulckpwdf,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(ulckpwdf,libc_ulckpwdf,,int,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea205dcc */
+/* HASH CRC-32:0x8f96c8fc */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1248,116 +1248,116 @@ NOTHROW_CB_NCX(LIBCCALL libc__lsearch_s)(void const *key,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(insque, libc_insque);
-DEFINE_PUBLIC_ALIAS(remque, libc_remque);
-DEFINE_PUBLIC_ALIAS(hsearch, libc_hsearch);
-DEFINE_PUBLIC_ALIAS(hcreate, libc_hcreate);
-DEFINE_PUBLIC_ALIAS(hdestroy, libc_hdestroy);
-DEFINE_PUBLIC_ALIAS(hsearch_r, libc_hsearch_r);
-DEFINE_PUBLIC_ALIAS(hcreate_r, libc_hcreate_r);
-DEFINE_PUBLIC_ALIAS(hdestroy_r, libc_hdestroy_r);
+DEFINE_PUBLIC_ALIAS_P_VOID(insque,libc_insque,ATTR_INOUT_OPT(2) ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(void *__restrict elem, void *prev),(elem,prev));
+DEFINE_PUBLIC_ALIAS_P_VOID(remque,libc_remque,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(void *__restrict elem),(elem));
+DEFINE_PUBLIC_ALIAS_P(hsearch,libc_hsearch,,ENTRY *,NOTHROW_NCX,LIBCCALL,(ENTRY item, ACTION action),(item,action));
+DEFINE_PUBLIC_ALIAS_P(hcreate,libc_hcreate,,int,NOTHROW_NCX,LIBCCALL,(size_t nel),(nel));
+DEFINE_PUBLIC_ALIAS_P_VOID(hdestroy,libc_hdestroy,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(hsearch_r,libc_hsearch_r,ATTR_INOUT(4) ATTR_OUT(3),int,NOTHROW_NCX,LIBCCALL,(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab),(item,action,retval,htab));
+DEFINE_PUBLIC_ALIAS_P(hcreate_r,libc_hcreate_r,,int,NOTHROW_NCX,LIBCCALL,(size_t nel, struct hsearch_data *htab),(nel,htab));
+DEFINE_PUBLIC_ALIAS_P_VOID(hdestroy_r,libc_hdestroy_r,,NOTHROW_NCX,LIBCCALL,(struct hsearch_data *htab),(htab));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$tsearch_r, libd_tsearch_r);
+DEFINE_PUBLIC_ALIAS_P(DOS$tsearch_r,libd_tsearch_r,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tsearch_r, libc_tsearch_r);
+DEFINE_PUBLIC_ALIAS_P(tsearch_r,libc_tsearch_r,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$tfind_r, libd_tfind_r);
+DEFINE_PUBLIC_ALIAS_P(DOS$tfind_r,libd_tfind_r,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tfind_r, libc_tfind_r);
+DEFINE_PUBLIC_ALIAS_P(tfind_r,libc_tfind_r,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$tdelete_r, libd_tdelete_r);
+DEFINE_PUBLIC_ALIAS_P(DOS$tdelete_r,libd_tdelete_r,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tdelete_r, libc_tdelete_r);
+DEFINE_PUBLIC_ALIAS_P(tdelete_r,libc_tdelete_r,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg),(key,vrootp,compar,arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__twalk_r, libd_twalk_r);
-DEFINE_PUBLIC_ALIAS(DOS$twalk_r, libd_twalk_r);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__twalk_r,libd_twalk_r,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBDCALL,(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg),(root,action,arg));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$twalk_r,libd_twalk_r,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBDCALL,(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg),(root,action,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__twalk_r, libc_twalk_r);
-DEFINE_PUBLIC_ALIAS(twalk_r, libc_twalk_r);
+DEFINE_PUBLIC_ALIAS_P_VOID(__twalk_r,libc_twalk_r,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBCCALL,(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg),(root,action,arg));
+DEFINE_PUBLIC_ALIAS_P_VOID(twalk_r,libc_twalk_r,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBCCALL,(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg),(root,action,arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$tdestroy_r, libd_tdestroy_r);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$tdestroy_r,libd_tdestroy_r,ATTR_INOUT_OPT(1) NONNULL((2)),NOTHROW_CB_NCX,LIBDCALL,(void *root, void (LIBDCALL *freefct)(void *nodep, void *arg), void *arg),(root,freefct,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tdestroy_r, libc_tdestroy_r);
+DEFINE_PUBLIC_ALIAS_P_VOID(tdestroy_r,libc_tdestroy_r,ATTR_INOUT_OPT(1) NONNULL((2)),NOTHROW_CB_NCX,LIBCCALL,(void *root, void (LIBCCALL *freefct)(void *nodep, void *arg), void *arg),(root,freefct,arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__tsearch, libd_tsearch);
-DEFINE_PUBLIC_ALIAS(DOS$tsearch, libd_tsearch);
+DEFINE_PUBLIC_ALIAS_P(DOS$__tsearch,libd_tsearch,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(DOS$tsearch,libd_tsearch,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__tsearch, libc_tsearch);
-DEFINE_PUBLIC_ALIAS(tsearch, libc_tsearch);
+DEFINE_PUBLIC_ALIAS_P(__tsearch,libc_tsearch,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(tsearch,libc_tsearch,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__tfind, libd_tfind);
-DEFINE_PUBLIC_ALIAS(DOS$tfind, libd_tfind);
+DEFINE_PUBLIC_ALIAS_P(DOS$__tfind,libd_tfind,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(DOS$tfind,libd_tfind,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__tfind, libc_tfind);
-DEFINE_PUBLIC_ALIAS(tfind, libc_tfind);
+DEFINE_PUBLIC_ALIAS_P(__tfind,libc_tfind,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(tfind,libc_tfind,ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__tdelete, libd_tdelete);
-DEFINE_PUBLIC_ALIAS(DOS$tdelete, libd_tdelete);
+DEFINE_PUBLIC_ALIAS_P(DOS$__tdelete,libd_tdelete,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(DOS$tdelete,libd_tdelete,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__tdelete, libc_tdelete);
-DEFINE_PUBLIC_ALIAS(tdelete, libc_tdelete);
+DEFINE_PUBLIC_ALIAS_P(__tdelete,libc_tdelete,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
+DEFINE_PUBLIC_ALIAS_P(tdelete,libc_tdelete,ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b)),(key,vrootp,compar));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__twalk, libd_twalk);
-DEFINE_PUBLIC_ALIAS(DOS$twalk, libd_twalk);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__twalk,libd_twalk,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBDCALL,(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level)),(root,action));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$twalk,libd_twalk,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBDCALL,(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level)),(root,action));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__twalk, libc_twalk);
-DEFINE_PUBLIC_ALIAS(twalk, libc_twalk);
+DEFINE_PUBLIC_ALIAS_P_VOID(__twalk,libc_twalk,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBCCALL,(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level)),(root,action));
+DEFINE_PUBLIC_ALIAS_P_VOID(twalk,libc_twalk,ATTR_IN_OPT(1),NOTHROW_CB_NCX,LIBCCALL,(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level)),(root,action));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$tdestroy, libd_tdestroy);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$tdestroy,libd_tdestroy,ATTR_INOUT_OPT(1) NONNULL((2)),NOTHROW_CB_NCX,LIBDCALL,(void *root, void (LIBDCALL *freefct)(void *nodep)),(root,freefct));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(tdestroy, libc_tdestroy);
+DEFINE_PUBLIC_ALIAS_P_VOID(tdestroy,libc_tdestroy,ATTR_INOUT_OPT(1) NONNULL((2)),NOTHROW_CB_NCX,LIBCCALL,(void *root, void (LIBCCALL *freefct)(void *nodep)),(root,freefct));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_lfind, libd_lfind);
-DEFINE_PUBLIC_ALIAS(DOS$lfind, libd_lfind);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_lfind, libc_lfind);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(lfind, libc_lfind);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_lsearch, libd_lsearch);
-DEFINE_PUBLIC_ALIAS(DOS$lsearch, libd_lsearch);
+DEFINE_PUBLIC_ALIAS_P(DOS$_lfind,libd_lfind,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
+DEFINE_PUBLIC_ALIAS_P(DOS$lfind,libd_lfind,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_lsearch, libc_lsearch);
+DEFINE_PUBLIC_ALIAS_P(_lfind,libc_lfind,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(lsearch, libc_lsearch);
+DEFINE_PUBLIC_ALIAS_P(lfind,libc_lfind,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_lfind_s, libd__lfind_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_lsearch,libd_lsearch,ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
+DEFINE_PUBLIC_ALIAS_P(DOS$lsearch,libd_lsearch,ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_lfind_s, libc__lfind_s);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_lsearch,libc_lsearch,ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(lsearch,libc_lsearch,ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)),(key,pbase,pitem_count,item_size,compar));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_lsearch_s, libd__lsearch_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_lfind_s,libd__lfind_s,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg),(key,pbase,pitem_count,item_size,compar,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_lsearch_s, libc__lsearch_s);
+DEFINE_PUBLIC_ALIAS_P(_lfind_s,libc__lfind_s,WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg),(key,pbase,pitem_count,item_size,compar,arg));
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS_P(DOS$_lsearch_s,libd__lsearch_s,WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBDCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg),(key,pbase,pitem_count,item_size,compar,arg));
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS_P(_lsearch_s,libc__lsearch_s,WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)),void *,NOTHROW_CB_NCX,LIBCCALL,(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg),(key,pbase,pitem_count,item_size,compar,arg));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SEARCH_C */

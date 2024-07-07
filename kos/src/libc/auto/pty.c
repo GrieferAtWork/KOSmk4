@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1f94f71 */
+/* HASH CRC-32:0xf4c2830 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ done_slave:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(forkpty, libc_forkpty);
+DEFINE_PUBLIC_ALIAS_P(forkpty,libc_forkpty,ATTR_IN(3) ATTR_IN(4) ATTR_OUT(1) ATTR_OUT_OPT(2),pid_t,NOTHROW_NCX,LIBCCALL,(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp),(amaster,name,termp,winp));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTY_C */

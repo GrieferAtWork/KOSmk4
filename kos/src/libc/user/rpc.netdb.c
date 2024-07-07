@@ -140,18 +140,18 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xedd86fee]]]*/
-DEFINE_PUBLIC_ALIAS(setrpcent, libc_setrpcent);
-DEFINE_PUBLIC_ALIAS(endrpcent, libc_endrpcent);
-DEFINE_PUBLIC_ALIAS(getrpcbyname, libc_getrpcbyname);
-DEFINE_PUBLIC_ALIAS(getrpcbynumber, libc_getrpcbynumber);
-DEFINE_PUBLIC_ALIAS(getrpcent, libc_getrpcent);
-DEFINE_PUBLIC_ALIAS(__getrpcbyname_r, libc_getrpcbyname_r);
-DEFINE_PUBLIC_ALIAS(getrpcbyname_r, libc_getrpcbyname_r);
-DEFINE_PUBLIC_ALIAS(__getrpcbynumber_r, libc_getrpcbynumber_r);
-DEFINE_PUBLIC_ALIAS(getrpcbynumber_r, libc_getrpcbynumber_r);
-DEFINE_PUBLIC_ALIAS(__getrpcent_r, libc_getrpcent_r);
-DEFINE_PUBLIC_ALIAS(getrpcent_r, libc_getrpcent_r);
+/*[[[start:exports,hash:CRC-32=0x697e5077]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(setrpcent,libc_setrpcent,,NOTHROW_RPC_KOS,LIBCCALL,(int stayopen),(stayopen));
+DEFINE_PUBLIC_ALIAS_P_VOID(endrpcent,libc_endrpcent,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getrpcbyname,libc_getrpcbyname,,struct rpcent *,NOTHROW_RPC_KOS,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(getrpcbynumber,libc_getrpcbynumber,,struct rpcent *,NOTHROW_RPC_KOS,LIBCCALL,(int number),(number));
+DEFINE_PUBLIC_ALIAS_P(getrpcent,libc_getrpcent,,struct rpcent *,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getrpcbyname_r,libc_getrpcbyname_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(name,result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getrpcbyname_r,libc_getrpcbyname_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(name,result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getrpcbynumber_r,libc_getrpcbynumber_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(number,result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getrpcbynumber_r,libc_getrpcbynumber_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(number,result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getrpcent_r,libc_getrpcent_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getrpcent_r,libc_getrpcent_r,,int,NOTHROW_RPC_KOS,LIBCCALL,(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result),(result_buf,buffer,buflen,result));
 /*[[[end:exports]]]*/
 
 DECL_END

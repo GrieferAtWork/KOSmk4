@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd0d5109 */
+/* HASH CRC-32:0xf2656bd7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,8 +69,8 @@ NOTHROW_NCX(LIBCCALL libc_getfsfile)(const char *mount_point) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(getfsspec, libc_getfsspec);
-DEFINE_PUBLIC_ALIAS(getfsfile, libc_getfsfile);
+DEFINE_PUBLIC_ALIAS_P(getfsspec,libc_getfsspec,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(const char *special_file),(special_file));
+DEFINE_PUBLIC_ALIAS_P(getfsfile,libc_getfsfile,WUNUSED ATTR_IN(1),struct fstab *,NOTHROW_NCX,LIBCCALL,(const char *mount_point),(mount_point));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FSTAB_C */

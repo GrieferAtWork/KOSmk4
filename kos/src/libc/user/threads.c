@@ -92,12 +92,12 @@ NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point,
 /*[[[end:libc_thrd_sleep64]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xe0da9a4f]]]*/
-DEFINE_PUBLIC_ALIAS(thrd_sleep, libc_thrd_sleep);
+/*[[[start:exports,hash:CRC-32=0x610460d8]]]*/
+DEFINE_PUBLIC_ALIAS_P(thrd_sleep,libc_thrd_sleep,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec const *time_point, struct timespec *remaining),(time_point,remaining));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__thrd_sleep64, libc_thrd_sleep64);
-DEFINE_PUBLIC_ALIAS(thrd_sleep64, libc_thrd_sleep64);
+DEFINE_PUBLIC_ALIAS_P(__thrd_sleep64,libc_thrd_sleep64,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec64 const *time_point, struct timespec64 *remaining),(time_point,remaining));
+DEFINE_PUBLIC_ALIAS_P(thrd_sleep64,libc_thrd_sleep64,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec64 const *time_point, struct timespec64 *remaining),(time_point,remaining));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

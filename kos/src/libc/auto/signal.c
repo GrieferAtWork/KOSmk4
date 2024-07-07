@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31eebb0d */
+/* HASH CRC-32:0x1623138b */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1141,51 +1141,51 @@ NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__sigblock, libc_sigblock);
-DEFINE_PUBLIC_ALIAS(sigblock, libc_sigblock);
-DEFINE_PUBLIC_ALIAS(__sigsetmask, libc_sigsetmask);
-DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
-DEFINE_PUBLIC_ALIAS(__siggetmask, libc_siggetmask);
-DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
-DEFINE_PUBLIC_ALIAS(__sigpause, libc_sigpause);
-DEFINE_PUBLIC_ALIAS(sigpause, libc_sigpause);
-DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
+DEFINE_PUBLIC_ALIAS_P(__sigblock,libc_sigblock,,int,NOTHROW_NCX,LIBCCALL,(int mask),(mask));
+DEFINE_PUBLIC_ALIAS_P(sigblock,libc_sigblock,,int,NOTHROW_NCX,LIBCCALL,(int mask),(mask));
+DEFINE_PUBLIC_ALIAS_P(__sigsetmask,libc_sigsetmask,,int,NOTHROW_NCX,LIBCCALL,(int mask),(mask));
+DEFINE_PUBLIC_ALIAS_P(sigsetmask,libc_sigsetmask,,int,NOTHROW_NCX,LIBCCALL,(int mask),(mask));
+DEFINE_PUBLIC_ALIAS_P(__siggetmask,libc_siggetmask,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(siggetmask,libc_siggetmask,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__sigpause,libc_sigpause,,int,NOTHROW_NCX,LIBCCALL,(int sigmask0),(sigmask0));
+DEFINE_PUBLIC_ALIAS_P(sigpause,libc_sigpause,,int,NOTHROW_NCX,LIBCCALL,(int sigmask0),(sigmask0));
+DEFINE_PUBLIC_ALIAS_P(__xpg_sigpause,libc___xpg_sigpause,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(sigemptyset, libc_sigemptyset);
-DEFINE_PUBLIC_ALIAS(sigfillset, libc_sigfillset);
+DEFINE_PUBLIC_ALIAS_P(sigemptyset,libc_sigemptyset,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set),(set));
+DEFINE_PUBLIC_ALIAS_P(sigfillset,libc_sigfillset,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set),(set));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__sigaddset, libc_sigaddset);
+DEFINE_PUBLIC_ALIAS_P(__sigaddset,libc_sigaddset,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, signo_t signo),(set,signo));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(sigaddset, libc_sigaddset);
+DEFINE_PUBLIC_ALIAS_P(sigaddset,libc_sigaddset,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, signo_t signo),(set,signo));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__sigdelset, libc_sigdelset);
+DEFINE_PUBLIC_ALIAS_P(__sigdelset,libc_sigdelset,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, signo_t signo),(set,signo));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(sigdelset, libc_sigdelset);
+DEFINE_PUBLIC_ALIAS_P(sigdelset,libc_sigdelset,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, signo_t signo),(set,signo));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__sigismember, libc_sigismember);
+DEFINE_PUBLIC_ALIAS_P(__sigismember,libc_sigismember,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t const *set, signo_t signo),(set,signo));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(sigismember, libc_sigismember);
-DEFINE_PUBLIC_ALIAS(sigisemptyset, libc_sigisemptyset);
-DEFINE_PUBLIC_ALIAS(sigandset, libc_sigandset);
-DEFINE_PUBLIC_ALIAS(sigorset, libc_sigorset);
-DEFINE_PUBLIC_ALIAS(signandset, libc_signandset);
+DEFINE_PUBLIC_ALIAS_P(sigismember,libc_sigismember,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t const *set, signo_t signo),(set,signo));
+DEFINE_PUBLIC_ALIAS_P(sigisemptyset,libc_sigisemptyset,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t const *__restrict set),(set));
+DEFINE_PUBLIC_ALIAS_P(sigandset,libc_sigandset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, sigset_t const *left, sigset_t const *right),(set,left,right));
+DEFINE_PUBLIC_ALIAS_P(sigorset,libc_sigorset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, sigset_t const *left, sigset_t const *right),(set,left,right));
+DEFINE_PUBLIC_ALIAS_P(signandset,libc_signandset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, sigset_t const *left, sigset_t const *right),(set,left,right));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
-DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
-DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
+DEFINE_PUBLIC_ALIAS_P(killpg,libc_killpg,,int,NOTHROW_NCX,LIBCCALL,(pid_t pgrp, signo_t signo),(pgrp,signo));
+DEFINE_PUBLIC_ALIAS_P_VOID(psignal,libc_psignal,,NOTHROW_CB_NCX,LIBCCALL,(signo_t signo, char const *s),(signo,s));
+DEFINE_PUBLIC_ALIAS_P_VOID(psiginfo,libc_psiginfo,ATTR_IN(1) ATTR_IN_OPT(2),NOTHROW_CB_NCX,LIBCCALL,(siginfo_t const *pinfo, char const *s),(pinfo,s));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(sigcodename_np, libc_sigcodename_np);
-DEFINE_PUBLIC_ALIAS(sigcodedesc_np, libc_sigcodedesc_np);
+DEFINE_PUBLIC_ALIAS_P(sigcodename_np,libc_sigcodename_np,ATTR_CONST WUNUSED,char const *,NOTHROW,LIBCCALL,(signo_t signo, int code),(signo,code));
+DEFINE_PUBLIC_ALIAS_P(sigcodedesc_np,libc_sigcodedesc_np,ATTR_CONST WUNUSED,char const *,NOTHROW,LIBCCALL,(signo_t signo, int code),(signo,code));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);
-DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
-DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);
-DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
-DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
-DEFINE_PUBLIC_ALIAS(signalnumber, libc_signalnumber);
-DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
-DEFINE_PUBLIC_ALIAS(sig2str, libc_sig2str);
-DEFINE_PUBLIC_ALIAS(str2sig, libc_str2sig);
+DEFINE_PUBLIC_ALIAS_P(sigstack,libc_sigstack,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct sigstack const *ss, struct sigstack *oss),(ss,oss));
+DEFINE_PUBLIC_ALIAS_P(sighold,libc_sighold,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(sigrelse,libc_sigrelse,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(sigignore,libc_sigignore,,int,NOTHROW_NCX,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(sigset,libc_sigset,,sighandler_t,NOTHROW_NCX,LIBCCALL,(signo_t signo, sighandler_t disp),(signo,disp));
+DEFINE_PUBLIC_ALIAS_P(signalnumber,libc_signalnumber,ATTR_PURE WUNUSED ATTR_IN(1),signo_t,NOTHROW_NCX,LIBCCALL,(const char *name),(name));
+DEFINE_PUBLIC_ALIAS_P(signalnext,libc_signalnext,ATTR_CONST WUNUSED,signo_t,NOTHROW,LIBCCALL,(signo_t signo),(signo));
+DEFINE_PUBLIC_ALIAS_P(sig2str,libc_sig2str,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(signo_t signo, char buf[32]),(signo,buf));
+DEFINE_PUBLIC_ALIAS_P(str2sig,libc_str2sig,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(const char *name, signo_t *p_signo),(name,p_signo));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SIGNAL_C */

@@ -134,16 +134,16 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe77a9e72]]]*/
-DEFINE_PUBLIC_ALIAS(_clearfp, libc__clearfp);
-DEFINE_PUBLIC_ALIAS(_statusfp, libc__statusfp);
-DEFINE_PUBLIC_ALIAS(_statusfp2, libc__statusfp2);
-DEFINE_PUBLIC_ALIAS(__control87_2, libc___control87_2);
-DEFINE_PUBLIC_ALIAS(__fpecode, libc___fpecode);
-DEFINE_PUBLIC_ALIAS(_fpclass, libc__fpclass);
-DEFINE_PUBLIC_ALIAS(_fpclassf, libc__fpclassf);
-DEFINE_PUBLIC_ALIAS(_fpreset, libc_fpreset);
-DEFINE_PUBLIC_ALIAS(fpreset, libc_fpreset);
+/*[[[start:exports,hash:CRC-32=0x3862d1d4]]]*/
+DEFINE_PUBLIC_ALIAS_P(_clearfp,libc__clearfp,,uint32_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_statusfp,libc__statusfp,,uint32_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_statusfp2,libc__statusfp2,,NOTHROW_NCX,LIBCCALL,(uint32_t *x86_stat, uint32_t *sse2_stat),(x86_stat,sse2_stat));
+DEFINE_PUBLIC_ALIAS_P(__control87_2,libc___control87_2,,int,NOTHROW_NCX,LIBCCALL,(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word),(newval,mask,x86_control_word,sse2_control_word));
+DEFINE_PUBLIC_ALIAS_P(__fpecode,libc___fpecode,,int *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_fpclass,libc__fpclass,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(_fpclassf,libc__fpclassf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P_VOID(_fpreset,libc_fpreset,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(fpreset,libc_fpreset,,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

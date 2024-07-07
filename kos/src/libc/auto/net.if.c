@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe42e91f */
+/* HASH CRC-32:0xed17c2c9 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,9 +205,9 @@ NOTHROW_NCX(LIBCCALL libc_opensock)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(if_nametoindex, libc_if_nametoindex);
-DEFINE_PUBLIC_ALIAS(if_indextoname, libc_if_indextoname);
-DEFINE_PUBLIC_ALIAS(if_freenameindex, libc_if_freenameindex);
+DEFINE_PUBLIC_ALIAS_P(if_nametoindex,libc_if_nametoindex,ATTR_IN(1),__STDC_UINT_AS_SIZE_T,NOTHROW_RPC_KOS,LIBCCALL,(char const *ifname),(ifname));
+DEFINE_PUBLIC_ALIAS_P(if_indextoname,libc_if_indextoname,ATTR_OUT(2),char *,NOTHROW_RPC_KOS,LIBCCALL,(__STDC_UINT_AS_SIZE_T ifindex, char *ifname),(ifindex,ifname));
+DEFINE_PUBLIC_ALIAS_P_VOID(if_freenameindex,libc_if_freenameindex,NONNULL((1)),NOTHROW_NCX,LIBCCALL,(struct if_nameindex *ptr),(ptr));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NET_IF_C */

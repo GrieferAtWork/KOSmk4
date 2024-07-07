@@ -494,6 +494,14 @@ again_rd_stat:
 	st = atomic_read(&job->a_stat);
 	if unlikely(st != _ASYNC_ST_TRIGGERED) {
 		struct aio_handle *aio;
+		/* FIXME: This assert broke once:
+		 * - TSC clock got configured incorrectly
+		 * - Run system-test
+		 * - hit CTRL+C during the timerfd test
+		 * - was: st == 1 (_ASYNC_ST_INIT_STOP)
+		 *
+		 * -> Seems like we can get here with other states, too.
+		 */
 		assertf(st == _ASYNC_ST_TRIGGERED_STOP, "st = %u", st);
 /*do_handle_triggered_stop:*/
 		aio = atomic_xch(&job->a_aio, NULL);

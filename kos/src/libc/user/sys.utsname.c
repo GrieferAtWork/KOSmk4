@@ -43,10 +43,10 @@ NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 }
 /*[[[end:libc_uname]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xe2e9031d]]]*/
-DEFINE_PUBLIC_ALIAS(__uname, libc_uname);
-DEFINE_PUBLIC_ALIAS(__libc_uname, libc_uname);
-DEFINE_PUBLIC_ALIAS(uname, libc_uname);
+/*[[[start:exports,hash:CRC-32=0x5275782]]]*/
+DEFINE_PUBLIC_ALIAS_P(__uname,libc_uname,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct utsname *name),(name));
+DEFINE_PUBLIC_ALIAS_P(__libc_uname,libc_uname,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct utsname *name),(name));
+DEFINE_PUBLIC_ALIAS_P(uname,libc_uname,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct utsname *name),(name));
 /*[[[end:exports]]]*/
 
 DECL_END

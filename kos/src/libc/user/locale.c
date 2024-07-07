@@ -438,40 +438,40 @@ NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8c949b1e]]]*/
-DEFINE_PUBLIC_ALIAS(setlocale, libc_setlocale);
-DEFINE_PUBLIC_ALIAS(localeconv, libc_localeconv);
-DEFINE_PUBLIC_ALIAS(__newlocale, libc_newlocale);
-DEFINE_PUBLIC_ALIAS(newlocale, libc_newlocale);
-DEFINE_PUBLIC_ALIAS(__duplocale, libc_duplocale);
-DEFINE_PUBLIC_ALIAS(duplocale, libc_duplocale);
-DEFINE_PUBLIC_ALIAS(__freelocale, libc_freelocale);
-DEFINE_PUBLIC_ALIAS(freelocale, libc_freelocale);
-DEFINE_PUBLIC_ALIAS(__uselocale, libc_uselocale);
-DEFINE_PUBLIC_ALIAS(uselocale, libc_uselocale);
-DEFINE_PUBLIC_ALIAS(_lock_locales, libc__lock_locales);
-DEFINE_PUBLIC_ALIAS(_unlock_locales, libc__unlock_locales);
-DEFINE_PUBLIC_ALIAS(_configthreadlocale, libc__configthreadlocale);
-DEFINE_PUBLIC_ALIAS(__get_current_locale, libc__get_current_locale);
-DEFINE_PUBLIC_ALIAS(_get_current_locale, libc__get_current_locale);
-DEFINE_PUBLIC_ALIAS(__create_locale, libc__create_locale);
-DEFINE_PUBLIC_ALIAS(_create_locale, libc__create_locale);
-DEFINE_PUBLIC_ALIAS(__free_locale, libc__free_locale);
-DEFINE_PUBLIC_ALIAS(_free_locale, libc__free_locale);
-DEFINE_PUBLIC_ALIAS(DOS$_wsetlocale, libd__wsetlocale);
-DEFINE_PUBLIC_ALIAS(_wsetlocale, libc__wsetlocale);
-DEFINE_PUBLIC_ALIAS(DOS$_wcreate_locale, libd__wcreate_locale);
-DEFINE_PUBLIC_ALIAS(_wcreate_locale, libc__wcreate_locale);
-DEFINE_PUBLIC_ALIAS(DOS$___lc_locale_name_func, libd____lc_locale_name_func);
-DEFINE_PUBLIC_ALIAS(___lc_locale_name_func, libc____lc_locale_name_func);
-DEFINE_PUBLIC_ALIAS(___lc_codepage_func, libc____lc_codepage_func);
-DEFINE_PUBLIC_ALIAS(___lc_collate_cp_func, libc____lc_collate_cp_func);
-DEFINE_PUBLIC_ALIAS(_Gettnames, libc__Gettnames);
-DEFINE_PUBLIC_ALIAS(DOS$_W_Gettnames, libd__W_Gettnames);
-DEFINE_PUBLIC_ALIAS(_W_Gettnames, libc__W_Gettnames);
-DEFINE_PUBLIC_ALIAS(_Strftime, libc__Strftime);
-DEFINE_PUBLIC_ALIAS(DOS$_Wcsftime, libd__Wcsftime);
-DEFINE_PUBLIC_ALIAS(_Wcsftime, libc__Wcsftime);
+/*[[[start:exports,hash:CRC-32=0xb1770a74]]]*/
+DEFINE_PUBLIC_ALIAS_P(setlocale,libc_setlocale,ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(int category, char const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(localeconv,libc_localeconv,ATTR_RETNONNULL WUNUSED,struct lconv *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__newlocale,libc_newlocale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBCCALL,(int category_mask, char const *locale, locale_t base),(category_mask,locale,base));
+DEFINE_PUBLIC_ALIAS_P(newlocale,libc_newlocale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBCCALL,(int category_mask, char const *locale, locale_t base),(category_mask,locale,base));
+DEFINE_PUBLIC_ALIAS_P(__duplocale,libc_duplocale,,locale_t,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P(duplocale,libc_duplocale,,locale_t,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P_VOID(__freelocale,libc_freelocale,,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P_VOID(freelocale,libc_freelocale,,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P(__uselocale,libc_uselocale,,locale_t,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P(uselocale,libc_uselocale,,locale_t,NOTHROW_NCX,LIBCCALL,(locale_t dataset),(dataset));
+DEFINE_PUBLIC_ALIAS_P_VOID(_lock_locales,libc__lock_locales,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_unlock_locales,libc__unlock_locales,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_configthreadlocale,libc__configthreadlocale,,int,NOTHROW_NCX,LIBCCALL,(int flag),(flag));
+DEFINE_PUBLIC_ALIAS_P(__get_current_locale,libc__get_current_locale,,locale_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_current_locale,libc__get_current_locale,,locale_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__create_locale,libc__create_locale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBCCALL,(int category, char const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(_create_locale,libc__create_locale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBCCALL,(int category, char const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P_VOID(__free_locale,libc__free_locale,,NOTHROW_NCX,LIBCCALL,(locale_t locale),(locale));
+DEFINE_PUBLIC_ALIAS_P_VOID(_free_locale,libc__free_locale,,NOTHROW_NCX,LIBCCALL,(locale_t locale),(locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsetlocale,libd__wsetlocale,ATTR_IN_OPT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(int category, char16_t const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(_wsetlocale,libc__wsetlocale,ATTR_IN_OPT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(int category, char32_t const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wcreate_locale,libd__wcreate_locale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBDCALL,(int category, char16_t const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(_wcreate_locale,libc__wcreate_locale,ATTR_IN_OPT(2),locale_t,NOTHROW_NCX,LIBKCALL,(int category, char32_t const *locale),(category,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$___lc_locale_name_func,libd____lc_locale_name_func,WUNUSED,char16_t **,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(___lc_locale_name_func,libc____lc_locale_name_func,WUNUSED,char32_t **,NOTHROW_NCX,LIBKCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(___lc_codepage_func,libc____lc_codepage_func,WUNUSED,unsigned int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(___lc_collate_cp_func,libc____lc_collate_cp_func,WUNUSED,unsigned int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_Gettnames,libc__Gettnames,WUNUSED,void *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$_W_Gettnames,libd__W_Gettnames,WUNUSED,void *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_W_Gettnames,libc__W_Gettnames,WUNUSED,void *,NOTHROW_NCX,LIBKCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_Strftime,libc__Strftime,ATTR_IN(3) ATTR_IN(4) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg),(buf,bufsize,format,tms,lc_time_arg));
+DEFINE_PUBLIC_ALIAS_P(DOS$_Wcsftime,libd__Wcsftime,ATTR_IN(3) ATTR_IN(4) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t bufsize, char16_t const *format, struct tm const *tms, void *lc_time_arg),(buf,bufsize,format,tms,lc_time_arg));
+DEFINE_PUBLIC_ALIAS_P(_Wcsftime,libc__Wcsftime,ATTR_IN(3) ATTR_IN(4) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t bufsize, char32_t const *format, struct tm const *tms, void *lc_time_arg),(buf,bufsize,format,tms,lc_time_arg));
 /*[[[end:exports]]]*/
 
 DECL_END

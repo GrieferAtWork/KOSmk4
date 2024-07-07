@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed1a73da */
+/* HASH CRC-32:0x9a605866 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,20 +258,20 @@ NOTHROW_CB_NCX(VLIBCCALL libc_error_at_line)(int status,
 DECL_END
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__error, libd_error);
-DEFINE_PUBLIC_ALIAS(DOS$error, libd_error);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$error,libd_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__error, libc_error);
-DEFINE_PUBLIC_ALIAS(error, libc_error);
+DEFINE_PUBLIC_ALIAS_P_VOID(__error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(error,libc_error,ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, const char *format, ...),(status,errnum,format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$__error_at_line, libd_error_at_line);
-DEFINE_PUBLIC_ALIAS(DOS$error_at_line, libd_error_at_line);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$__error_at_line,libd_error_at_line,ATTR_LIBC_PRINTF(5, 6),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...),(status,errnum,filename,line,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$error_at_line,libd_error_at_line,ATTR_LIBC_PRINTF(5, 6),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...),(status,errnum,filename,line,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__error_at_line, libc_error_at_line);
-DEFINE_PUBLIC_ALIAS(error_at_line, libc_error_at_line);
+DEFINE_PUBLIC_ALIAS_P_VOID(__error_at_line,libc_error_at_line,ATTR_LIBC_PRINTF(5, 6),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...),(status,errnum,filename,line,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(error_at_line,libc_error_at_line,ATTR_LIBC_PRINTF(5, 6),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...),(status,errnum,filename,line,format,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ERROR_C */

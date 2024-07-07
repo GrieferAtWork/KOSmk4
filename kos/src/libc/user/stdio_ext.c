@@ -326,25 +326,25 @@ NOTHROW_NCX(LIBCCALL libc___freadptrinc)(FILE *stream,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7568027e]]]*/
-DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
-DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
-DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
-DEFINE_PUBLIC_ALIAS(__freadable, libc___freadable);
-DEFINE_PUBLIC_ALIAS(__fwritable, libc___fwritable);
-DEFINE_PUBLIC_ALIAS(__flbf, libc___flbf);
-DEFINE_PUBLIC_ALIAS(fpurge, libc___fpurge);
-DEFINE_PUBLIC_ALIAS(__fpurge, libc___fpurge);
-DEFINE_PUBLIC_ALIAS(__fpending, libc___fpending);
-DEFINE_PUBLIC_ALIAS(__fpending_unlocked, libc___fpending_unlocked);
-DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffered, libc__flushlbf);
-DEFINE_PUBLIC_ALIAS(_flushlbf, libc__flushlbf);
-DEFINE_PUBLIC_ALIAS(__fsetlocking, libc___fsetlocking);
-DEFINE_PUBLIC_ALIAS(__fseterr, libc___fseterr);
-DEFINE_PUBLIC_ALIAS(__freadahead, libc___freadahead);
-DEFINE_PUBLIC_ALIAS(__freadahead_unlocked, libc___freadahead_unlocked);
-DEFINE_PUBLIC_ALIAS(__freadptr, libc___freadptr);
-DEFINE_PUBLIC_ALIAS(__freadptrinc, libc___freadptrinc);
+/*[[[start:exports,hash:CRC-32=0xe08bed1b]]]*/
+DEFINE_PUBLIC_ALIAS_P(__fbufsize,libc___fbufsize,ATTR_PURE WUNUSED ATTR_IN(1),size_t,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__freading,libc___freading,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__fwriting,libc___fwriting,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__freadable,libc___freadable,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__fwritable,libc___fwritable,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__flbf,libc___flbf,ATTR_PURE WUNUSED ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P_VOID(fpurge,libc___fpurge,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P_VOID(__fpurge,libc___fpurge,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__fpending,libc___fpending,ATTR_PURE WUNUSED ATTR_IN(1),size_t,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__fpending_unlocked,libc___fpending_unlocked,ATTR_PURE WUNUSED ATTR_IN(1),size_t,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P_VOID(_IO_flush_all_linebuffered,libc__flushlbf,,NOTHROW_CB_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_flushlbf,libc__flushlbf,,NOTHROW_CB_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__fsetlocking,libc___fsetlocking,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(FILE *stream, int type),(stream,type));
+DEFINE_PUBLIC_ALIAS_P_VOID(__fseterr,libc___fseterr,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__freadahead,libc___freadahead,ATTR_PURE WUNUSED ATTR_IN(1),size_t,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__freadahead_unlocked,libc___freadahead_unlocked,ATTR_PURE WUNUSED ATTR_IN(1),size_t,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__freadptr,libc___freadptr,WUNUSED ATTR_IN(1),char const *,NOTHROW_NCX,LIBCCALL,(FILE __KOS_FIXED_CONST *stream, size_t *p_num_bytes),(stream,p_num_bytes));
+DEFINE_PUBLIC_ALIAS_P_VOID(__freadptrinc,libc___freadptrinc,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(FILE *stream, size_t num_bytes),(stream,num_bytes));
 /*[[[end:exports]]]*/
 
 DECL_END

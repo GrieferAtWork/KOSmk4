@@ -119,13 +119,13 @@ NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x31d221c2]]]*/
-DEFINE_PUBLIC_ALIAS(setkey, libc_setkey);
-DEFINE_PUBLIC_ALIAS(crypt, libc_crypt);
-DEFINE_PUBLIC_ALIAS(encrypt, libc_encrypt);
-DEFINE_PUBLIC_ALIAS(crypt_r, libc_crypt_r);
-DEFINE_PUBLIC_ALIAS(setkey_r, libc_setkey_r);
-DEFINE_PUBLIC_ALIAS(encrypt_r, libc_encrypt_r);
+/*[[[start:exports,hash:CRC-32=0x9a44b607]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(setkey,libc_setkey,ATTR_IN(1),NOTHROW_NCX,LIBCCALL,(char const *key),(key));
+DEFINE_PUBLIC_ALIAS_P(crypt,libc_crypt,ATTR_IN(1) ATTR_IN(2),char *,NOTHROW_NCX,LIBCCALL,(char const *key, char const *salt),(key,salt));
+DEFINE_PUBLIC_ALIAS_P_VOID(encrypt,libc_encrypt,NONNULL((1)),NOTHROW_NCX,LIBCCALL,(char *glibc_block, __STDC_INT_AS_UINT_T edflag),(glibc_block,edflag));
+DEFINE_PUBLIC_ALIAS_P(crypt_r,libc_crypt_r,ATTR_IN(1) ATTR_IN(2) NONNULL((3)),char *,NOTHROW_NCX,LIBCCALL,(char const *key, char const *salt, struct crypt_data *__restrict data),(key,salt,data));
+DEFINE_PUBLIC_ALIAS_P_VOID(setkey_r,libc_setkey_r,ATTR_IN(1) NONNULL((2)),NOTHROW_NCX,LIBCCALL,(char const *key, struct crypt_data *__restrict data),(key,data));
+DEFINE_PUBLIC_ALIAS_P_VOID(encrypt_r,libc_encrypt_r,NONNULL((1, 3)),NOTHROW_NCX,LIBCCALL,(char *glibc_block, int edflag, struct crypt_data *__restrict data),(glibc_block,edflag,data));
 /*[[[end:exports]]]*/
 
 DECL_END

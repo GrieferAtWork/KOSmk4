@@ -56,15 +56,15 @@ NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb074c8f7]]]*/
-DEFINE_PUBLIC_ALIAS(swapon, libc_swapon);
-DEFINE_PUBLIC_ALIAS(__swapon, libc_swapon);
-DEFINE_PUBLIC_ALIAS(__libc_swapon, libc_swapon);
-DEFINE_PUBLIC_ALIAS(swapon, libc_swapon);
-DEFINE_PUBLIC_ALIAS(swapoff, libc_swapoff);
-DEFINE_PUBLIC_ALIAS(__swapoff, libc_swapoff);
-DEFINE_PUBLIC_ALIAS(__libc_swapoff, libc_swapoff);
-DEFINE_PUBLIC_ALIAS(swapoff, libc_swapoff);
+/*[[[start:exports,hash:CRC-32=0xa591ef59]]]*/
+DEFINE_PUBLIC_ALIAS_P(swapon,libc_swapon,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T swapflags),(path,swapflags));
+DEFINE_PUBLIC_ALIAS_P(__swapon,libc_swapon,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T swapflags),(path,swapflags));
+DEFINE_PUBLIC_ALIAS_P(__libc_swapon,libc_swapon,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T swapflags),(path,swapflags));
+DEFINE_PUBLIC_ALIAS_P(swapon,libc_swapon,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T swapflags),(path,swapflags));
+DEFINE_PUBLIC_ALIAS_P(swapoff,libc_swapoff,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(__swapoff,libc_swapoff,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(__libc_swapoff,libc_swapoff,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(swapoff,libc_swapoff,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *path),(path));
 /*[[[end:exports]]]*/
 
 DECL_END

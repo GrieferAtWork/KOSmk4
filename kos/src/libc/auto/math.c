@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7722f2ad */
+/* HASH CRC-32:0xe7c9a7af */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -289,7 +289,7 @@ NOTHROW(LIBCCALL libc_tanf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_acosl, libc_acos);
+DEFINE_INTERN_ALIAS_P(libc_acosl,libc_acos,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -318,7 +318,7 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_asinl, libc_asin);
+DEFINE_INTERN_ALIAS_P(libc_asinl,libc_asin,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -347,7 +347,7 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_atanl, libc_atan);
+DEFINE_INTERN_ALIAS_P(libc_atanl,libc_atan,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -376,7 +376,7 @@ NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_atan2l, libc_atan2);
+DEFINE_INTERN_ALIAS_P(libc_atan2l,libc_atan2,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE y, __LONGDOUBLE x),(y,x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -399,7 +399,7 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cosl, libc_cos);
+DEFINE_INTERN_ALIAS_P(libc_cosl,libc_cos,WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/cos.h>
@@ -422,7 +422,7 @@ NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_sinl, libc_sin);
+DEFINE_INTERN_ALIAS_P(libc_sinl,libc_sin,WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/sin.h>
@@ -445,7 +445,7 @@ NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_tanl, libc_tan);
+DEFINE_INTERN_ALIAS_P(libc_tanl,libc_tan,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/isinf.h>
@@ -553,7 +553,7 @@ NOTHROW(LIBCCALL libc_tanhf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_coshl, libc_cosh);
+DEFINE_INTERN_ALIAS_P(libc_coshl,libc_cosh,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/cosh.h>
@@ -577,7 +577,7 @@ NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_sinhl, libc_sinh);
+DEFINE_INTERN_ALIAS_P(libc_sinhl,libc_sinh,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/sinh.h>
@@ -601,7 +601,7 @@ NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_tanhl, libc_tanh);
+DEFINE_INTERN_ALIAS_P(libc_tanhl,libc_tanh,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
@@ -711,7 +711,7 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_acoshl, libc_acosh);
+DEFINE_INTERN_ALIAS_P(libc_acoshl,libc_acosh,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -735,7 +735,7 @@ NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_asinhl, libc_asinh);
+DEFINE_INTERN_ALIAS_P(libc_asinhl,libc_asinh,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
@@ -753,7 +753,7 @@ NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_atanhl, libc_atanh);
+DEFINE_INTERN_ALIAS_P(libc_atanhl,libc_atanh,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -1007,7 +1007,7 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_expl, libc_exp);
+DEFINE_INTERN_ALIAS_P(libc_expl,libc_exp,WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -1038,7 +1038,7 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_frexpl, libc_frexp);
+DEFINE_INTERN_ALIAS_P(libc_frexpl,libc_frexp,ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *pexponent),(x,pexponent));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
@@ -1057,7 +1057,7 @@ NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ldexpl, libc_ldexp);
+DEFINE_INTERN_ALIAS_P(libc_ldexpl,libc_ldexp,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int exponent),(x,exponent));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libc/errno.h>
 #include <libm/finite.h>
@@ -1084,7 +1084,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_logl, libc_log);
+DEFINE_INTERN_ALIAS_P(libc_logl,libc_log,WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1117,7 +1117,7 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_log10l, libc_log10);
+DEFINE_INTERN_ALIAS_P(libc_log10l,libc_log10,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1150,7 +1150,7 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_modfl, libc_modf);
+DEFINE_INTERN_ALIAS_P(libc_modfl,libc_modf,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *iptr),(x,iptr));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
@@ -1282,7 +1282,7 @@ NOTHROW(LIBCCALL libc_logbf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_expm1l, libc_expm1);
+DEFINE_INTERN_ALIAS_P(libc_expm1l,libc_expm1,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/matherr.h>
 #include <libm/signbit.h>
@@ -1312,7 +1312,7 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_log1pl, libc_log1p);
+DEFINE_INTERN_ALIAS_P(libc_log1pl,libc_log1p,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1345,7 +1345,7 @@ NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_logbl, libc_logb);
+DEFINE_INTERN_ALIAS_P(libc_logbl,libc_logb,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/logb.h>
 /* >> logbf(3), logb(3), logbl(3)
@@ -1457,7 +1457,7 @@ NOTHROW(LIBCCALL libc_log2f)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_exp2l, libc_exp2);
+DEFINE_INTERN_ALIAS_P(libc_exp2l,libc_exp2,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/exp2.h>
 #include <libm/matherr.h>
@@ -1486,7 +1486,7 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_log2l, libc_log2);
+DEFINE_INTERN_ALIAS_P(libc_log2l,libc_log2,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1675,7 +1675,7 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_powl, libc_pow);
+DEFINE_INTERN_ALIAS_P(libc_powl,libc_pow,WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/isnan.h>
@@ -1745,7 +1745,7 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_sqrtl, libc_sqrt);
+DEFINE_INTERN_ALIAS_P(libc_sqrtl,libc_sqrt,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/nan.h>
@@ -1802,7 +1802,7 @@ NOTHROW(LIBCCALL libc_hypotf)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_hypotl, libc_hypot);
+DEFINE_INTERN_ALIAS_P(libc_hypotl,libc_hypot,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/matherr.h>
@@ -1847,7 +1847,7 @@ NOTHROW(LIBCCALL libc_cbrtf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cbrtl, libc_cbrt);
+DEFINE_INTERN_ALIAS_P(libc_cbrtl,libc_cbrt,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
@@ -1987,7 +1987,7 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ceill, libc_ceil);
+DEFINE_INTERN_ALIAS_P(libc_ceill,libc_ceil,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/ceil.h>
 /* >> ceilf(3), ceil(3), ceill(3)
@@ -2007,7 +2007,7 @@ NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fabsl, libc_fabs);
+DEFINE_INTERN_ALIAS_P(libc_fabsl,libc_fabs,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fabs.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
@@ -2023,7 +2023,7 @@ NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_floorl, libc_floor);
+DEFINE_INTERN_ALIAS_P(libc_floorl,libc_floor,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/floor.h>
 /* >> floorf(3), floor(3), floorl(3)
@@ -2043,7 +2043,7 @@ NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fmodl, libc_fmod);
+DEFINE_INTERN_ALIAS_P(libc_fmodl,libc_fmod,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isinf.h>
 #include <libm/fcomp.h>
@@ -2117,7 +2117,7 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_copysignl, libc_copysign);
+DEFINE_INTERN_ALIAS_P(libc_copysignl,libc_copysign,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE num, __LONGDOUBLE sign),(num,sign));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/copysign.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
@@ -2136,7 +2136,7 @@ NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_nanl, libc_nan);
+DEFINE_INTERN_ALIAS_P(libc_nanl,libc_nan,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nan.h>
 /* >> nanf(3), nan(3), nanl(3)
@@ -2200,7 +2200,7 @@ NOTHROW(LIBCCALL libc_lgammaf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_erfl, libc_erf);
+DEFINE_INTERN_ALIAS_P(libc_erfl,libc_erf,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/erf.h>
 /* >> erff(3), erf(3), erfl(3) */
@@ -2217,7 +2217,7 @@ NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_erfcl, libc_erfc);
+DEFINE_INTERN_ALIAS_P(libc_erfcl,libc_erfc,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -2293,7 +2293,7 @@ NOTHROW(LIBCCALL libc_tgammaf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_tgammal, libc_tgamma);
+DEFINE_INTERN_ALIAS_P(libc_tgammal,libc_tgamma,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/isinf.h>
@@ -2438,7 +2438,7 @@ NOTHROW(LIBCCALL libc_ilogbf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_rintl, libc_rint);
+DEFINE_INTERN_ALIAS_P(libc_rintl,libc_rint,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
@@ -2456,7 +2456,7 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_nextafterl, libc_nextafter);
+DEFINE_INTERN_ALIAS_P(libc_nextafterl,libc_nextafter,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nextafter.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
@@ -2475,7 +2475,7 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_remainderl, libc_remainder);
+DEFINE_INTERN_ALIAS_P(libc_remainderl,libc_remainder,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p),(x,p));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/matherr.h>
 #include <libm/isnan.h>
@@ -2501,7 +2501,7 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ilogbl, libc_ilogb);
+DEFINE_INTERN_ALIAS_P(libc_ilogbl,libc_ilogb,WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
@@ -2525,7 +2525,7 @@ NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_nexttoward, libc_nextafter);
+DEFINE_INTERN_ALIAS_P(libc_nexttoward,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nexttoward.h>
 /* >> nexttowardf(3), nexttoward(3), nexttowardl(3) */
@@ -2553,7 +2553,7 @@ NOTHROW(LIBCCALL libc_scalbn)(double x,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
+DEFINE_INTERN_ALIAS_P(libc_scalbln,libc_scalbn,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, long int n),(x,n));
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2692,7 +2692,7 @@ NOTHROW(LIBCCALL libc_fma)(double x,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
+DEFINE_INTERN_ALIAS_P(libc_llrint,libc_lrint,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
@@ -2708,7 +2708,7 @@ NOTHROW(LIBCCALL libc_llrint)(double x) {
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
+DEFINE_INTERN_ALIAS_P(libc_llround,libc_lround,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
@@ -2755,7 +2755,7 @@ NOTHROW(LIBCCALL libc_scalbnf)(float x,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_scalblnf, libc_scalbnf);
+DEFINE_INTERN_ALIAS_P(libc_scalblnf,libc_scalbnf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, long int n),(x,n));
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2906,7 +2906,7 @@ NOTHROW(LIBCCALL libc_fmaf)(float x,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
+DEFINE_INTERN_ALIAS_P(libc_llrintf,libc_lrintf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
@@ -2922,7 +2922,7 @@ NOTHROW(LIBCCALL libc_llrintf)(float x) {
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
+DEFINE_INTERN_ALIAS_P(libc_llroundf,libc_lroundf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
 #else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
@@ -2938,7 +2938,7 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_scalbnl, libc_scalbn);
+DEFINE_INTERN_ALIAS_P(libc_scalbnl,libc_scalbn,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int n),(x,n));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2957,11 +2957,11 @@ NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbn);
+DEFINE_INTERN_ALIAS_P(libc_scalblnl,libc_scalbn,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, long int n),(x,n));
 #elif __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbnl);
+DEFINE_INTERN_ALIAS_P(libc_scalblnl,libc_scalbnl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, long int n),(x,n));
 #elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbln);
+DEFINE_INTERN_ALIAS_P(libc_scalblnl,libc_scalbln,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, long int n),(x,n));
 #else /* ... */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2980,7 +2980,7 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
 #endif /* !... */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_roundl, libc_round);
+DEFINE_INTERN_ALIAS_P(libc_roundl,libc_round,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/round.h>
 /* >> roundf(3), round(3), roundl(3)
@@ -3007,7 +3007,7 @@ NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_truncl, libc_trunc);
+DEFINE_INTERN_ALIAS_P(libc_truncl,libc_trunc,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/trunc.h>
 /* >> truncf(3), trunc(3), truncl(3)
@@ -3024,7 +3024,7 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_remquol, libc_remquo);
+DEFINE_INTERN_ALIAS_P(libc_remquol,libc_remquo,WUNUSED ATTR_OUT(3),__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo),(x,p,pquo));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/remquo.h>
 /* >> remquof(3), remquo(3), remquol(3)
@@ -3046,7 +3046,7 @@ NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_lrintl, libc_remquo);
+DEFINE_INTERN_ALIAS_P(libc_lrintl,libc_remquo,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lrint.h>
 /* >> lrintf(3), lrint(3), lrintl(3)
@@ -3074,7 +3074,7 @@ NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fdiml, libc_fdim);
+DEFINE_INTERN_ALIAS_P(libc_fdiml,libc_fdim,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
@@ -3087,7 +3087,7 @@ NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fmaxl, libc_fmax);
+DEFINE_INTERN_ALIAS_P(libc_fmaxl,libc_fmax,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <ieee754.h>
 #include <libm/fcomp.h>
@@ -3111,7 +3111,7 @@ NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fminl, libc_fmin);
+DEFINE_INTERN_ALIAS_P(libc_fminl,libc_fmin,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <ieee754.h>
 #include <libm/fcomp.h>
@@ -3135,7 +3135,7 @@ NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fmal, libc_fma);
+DEFINE_INTERN_ALIAS_P(libc_fmal,libc_fma,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z),(x,y,z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
@@ -3149,11 +3149,11 @@ NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrint);
+DEFINE_INTERN_ALIAS_P(libc_llrintl,libc_lrint,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
+DEFINE_INTERN_ALIAS_P(libc_llrintl,libc_lrintl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llrintl, libc_llrint);
+DEFINE_INTERN_ALIAS_P(libc_llrintl,libc_llrint,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* ... */
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
@@ -3169,11 +3169,11 @@ NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x) {
 #endif /* !... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llroundl, libc_lround);
+DEFINE_INTERN_ALIAS_P(libc_llroundl,libc_lround,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
+DEFINE_INTERN_ALIAS_P(libc_llroundl,libc_lroundl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llroundl, libc_llround);
+DEFINE_INTERN_ALIAS_P(libc_llroundl,libc_llround,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* ... */
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
@@ -3316,7 +3316,7 @@ NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_pow10l, libc_pow10);
+DEFINE_INTERN_ALIAS_P(libc_pow10l,libc_pow10,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> pow10f(3), pow10(3), pow10l(3)
  * Another  name  occasionally  used */
@@ -3364,7 +3364,7 @@ NOTHROW(LIBCCALL libc_isinff)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_isinfl, libc_isinf);
+DEFINE_INTERN_ALIAS_P(libc_isinfl,libc_isinf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isinf.h>
 /* >> isinff(3), isinf(3), isinfl(3)
@@ -3438,7 +3438,7 @@ NOTHROW(LIBCCALL libc_significandf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_finitel, libc_finite);
+DEFINE_INTERN_ALIAS_P(libc_finitel,libc_finite,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 /* >> finitef(3), finite(3), finitel(3)
@@ -3461,7 +3461,7 @@ NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_significandl, libc_significand);
+DEFINE_INTERN_ALIAS_P(libc_significandl,libc_significand,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/significand.h>
 /* >> significandf(3), significand(3), significandl(3)
@@ -3499,7 +3499,7 @@ NOTHROW(LIBCCALL libc_isnanf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_isnanl, libc_isnan);
+DEFINE_INTERN_ALIAS_P(libc_isnanl,libc_isnan,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
@@ -3764,7 +3764,7 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_j0l, libc_j0);
+DEFINE_INTERN_ALIAS_P(libc_j0l,libc_j0,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/j0.h>
 #include <libm/fcomp.h>
@@ -3787,7 +3787,7 @@ NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_j1l, libc_j1);
+DEFINE_INTERN_ALIAS_P(libc_j1l,libc_j1,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/j1.h>
 #include <libm/fcomp.h>
@@ -3810,7 +3810,7 @@ NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_jnl, libc_jn);
+DEFINE_INTERN_ALIAS_P(libc_jnl,libc_jn,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/jn.h>
 #include <libm/fcomp.h>
@@ -3834,7 +3834,7 @@ NOTHROW(LIBCCALL libc_jnl)(int n,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_y0l, libc_y0);
+DEFINE_INTERN_ALIAS_P(libc_y0l,libc_y0,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3868,7 +3868,7 @@ NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_y1l, libc_y1);
+DEFINE_INTERN_ALIAS_P(libc_y1l,libc_y1,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3902,7 +3902,7 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ynl, libc_yn);
+DEFINE_INTERN_ALIAS_P(libc_ynl,libc_yn,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3981,7 +3981,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_lgammal_r, libc_lgamma_r);
+DEFINE_INTERN_ALIAS_P(libc_lgammal_r,libc_lgamma_r,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *signgamp),(x,signgamp));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
@@ -4121,7 +4121,7 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_scalbl, libc_scalb);
+DEFINE_INTERN_ALIAS_P(libc_scalbl,libc_scalb,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE fn),(x,fn));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/finite.h>
@@ -4228,7 +4228,7 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libd___fpclassifyl, libd___fpclassify);
+DEFINE_INTERN_ALIAS_P(libd___fpclassifyl,libd___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fpclassify(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -4236,7 +4236,7 @@ NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(lib
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc___fpclassifyl, libc___fpclassify);
+DEFINE_INTERN_ALIAS_P(libc___fpclassifyl,libc___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fpclassify.h>
 /* >> fpclassify(3) */
@@ -4253,7 +4253,7 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc___signbitl, libc___signbit);
+DEFINE_INTERN_ALIAS_P(libc___signbitl,libc___signbit,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
 /* >> signbit(3) */
@@ -4296,7 +4296,7 @@ NOTHROW(LIBCCALL libc___iscanonicall)(__LONGDOUBLE x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc___issignalingl, libc___issignaling);
+DEFINE_INTERN_ALIAS_P(libc___issignalingl,libc___issignaling,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
@@ -4345,7 +4345,7 @@ NOTHROW(LIBCCALL libc_nextupf)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_nextdownl, libc_nextdown);
+DEFINE_INTERN_ALIAS_P(libc_nextdownl,libc_nextdown,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -4359,7 +4359,7 @@ NOTHROW(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_nextupl, libc_nextup);
+DEFINE_INTERN_ALIAS_P(libc_nextupl,libc_nextup,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
@@ -4376,7 +4376,7 @@ NOTHROW(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_llogb, libc_ilogb);
+DEFINE_INTERN_ALIAS_P(libc_llogb,libc_ilogb,WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
 NOTHROW(LIBCCALL libc_llogb)(double x) {
@@ -4436,7 +4436,7 @@ NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_llogbf, libc_ilogbf);
+DEFINE_INTERN_ALIAS_P(libc_llogbf,libc_ilogbf,WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
 NOTHROW(LIBCCALL libc_llogbf)(float x) {
@@ -4544,11 +4544,11 @@ NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llogbl, libc_ilogb);
+DEFINE_INTERN_ALIAS_P(libc_llogbl,libc_ilogb,WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif __SIZEOF_INT__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_llogbl, libc_ilogbl);
+DEFINE_INTERN_ALIAS_P(libc_llogbl,libc_ilogbl,WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-DEFINE_INTERN_ALIAS(libc_llogbl, libc_llogbl);
+DEFINE_INTERN_ALIAS_P(libc_llogbl,libc_llogbl,WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* ... */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
 NOTHROW(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
@@ -4561,7 +4561,7 @@ NOTHROW(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
 #endif /* !... */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_roundevenl, libc_roundeven);
+DEFINE_INTERN_ALIAS_P(libc_roundevenl,libc_roundeven,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/roundeven.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -4577,7 +4577,7 @@ NOTHROW(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fromfpl, libc_fromfp);
+DEFINE_INTERN_ALIAS_P(libc_fromfpl,libc_fromfp,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpl)(__LONGDOUBLE x,
@@ -4588,7 +4588,7 @@ NOTHROW_NCX(LIBCCALL libc_fromfpl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ufromfpl, libc_ufromfp);
+DEFINE_INTERN_ALIAS_P(libc_ufromfpl,libc_ufromfp,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
 NOTHROW_NCX(LIBCCALL libc_ufromfpl)(__LONGDOUBLE x,
@@ -4599,7 +4599,7 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fromfpxl, libc_fromfpx);
+DEFINE_INTERN_ALIAS_P(libc_fromfpxl,libc_fromfpx,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpxl)(__LONGDOUBLE x,
@@ -4610,7 +4610,7 @@ NOTHROW_NCX(LIBCCALL libc_fromfpxl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ufromfpxl, libc_ufromfpx);
+DEFINE_INTERN_ALIAS_P(libc_ufromfpxl,libc_ufromfpx,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
 NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x,
@@ -4621,7 +4621,7 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fmaxmagl, libc_fmaxmag);
+DEFINE_INTERN_ALIAS_P(libc_fmaxmagl,libc_fmaxmag,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -4646,7 +4646,7 @@ NOTHROW(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_fminmagl, libc_fminmag);
+DEFINE_INTERN_ALIAS_P(libc_fminmagl,libc_fminmag,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -4671,7 +4671,7 @@ NOTHROW(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_canonicalizel, libc_canonicalize);
+DEFINE_INTERN_ALIAS_P(libc_canonicalizel,libc_canonicalize,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE *cx, __LONGDOUBLE const *x),(cx,x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
@@ -4742,7 +4742,7 @@ NOTHROW(LIBCCALL libc__fdpcomp)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc__ldpcomp, libc__dpcomp);
+DEFINE_INTERN_ALIAS_P(libc__ldpcomp,libc__dpcomp,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
@@ -4829,593 +4829,593 @@ NOTHROW(LIBCCALL libc__chgsign)(double x) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__acos, libc_acos);
-DEFINE_PUBLIC_ALIAS(acos, libc_acos);
-DEFINE_PUBLIC_ALIAS(__asin, libc_asin);
-DEFINE_PUBLIC_ALIAS(asin, libc_asin);
-DEFINE_PUBLIC_ALIAS(__atan, libc_atan);
-DEFINE_PUBLIC_ALIAS(atan, libc_atan);
-DEFINE_PUBLIC_ALIAS(__atan2, libc_atan2);
-DEFINE_PUBLIC_ALIAS(atan2, libc_atan2);
-DEFINE_PUBLIC_ALIAS(__cos, libc_cos);
-DEFINE_PUBLIC_ALIAS(cos, libc_cos);
-DEFINE_PUBLIC_ALIAS(__sin, libc_sin);
-DEFINE_PUBLIC_ALIAS(sin, libc_sin);
-DEFINE_PUBLIC_ALIAS(__tan, libc_tan);
-DEFINE_PUBLIC_ALIAS(tan, libc_tan);
-DEFINE_PUBLIC_ALIAS(__acosf, libc_acosf);
-DEFINE_PUBLIC_ALIAS(acosf, libc_acosf);
-DEFINE_PUBLIC_ALIAS(__asinf, libc_asinf);
-DEFINE_PUBLIC_ALIAS(asinf, libc_asinf);
-DEFINE_PUBLIC_ALIAS(__atanf, libc_atanf);
-DEFINE_PUBLIC_ALIAS(atanf, libc_atanf);
-DEFINE_PUBLIC_ALIAS(__atan2f, libc_atan2f);
-DEFINE_PUBLIC_ALIAS(atan2f, libc_atan2f);
-DEFINE_PUBLIC_ALIAS(__cosf, libc_cosf);
-DEFINE_PUBLIC_ALIAS(cosf, libc_cosf);
-DEFINE_PUBLIC_ALIAS(__sinf, libc_sinf);
-DEFINE_PUBLIC_ALIAS(sinf, libc_sinf);
-DEFINE_PUBLIC_ALIAS(__tanf, libc_tanf);
-DEFINE_PUBLIC_ALIAS(tanf, libc_tanf);
-DEFINE_PUBLIC_ALIAS(__acosl, libc_acosl);
-DEFINE_PUBLIC_ALIAS(acosl, libc_acosl);
-DEFINE_PUBLIC_ALIAS(__asinl, libc_asinl);
-DEFINE_PUBLIC_ALIAS(asinl, libc_asinl);
-DEFINE_PUBLIC_ALIAS(__atanl, libc_atanl);
-DEFINE_PUBLIC_ALIAS(atanl, libc_atanl);
-DEFINE_PUBLIC_ALIAS(__atan2l, libc_atan2l);
-DEFINE_PUBLIC_ALIAS(atan2l, libc_atan2l);
-DEFINE_PUBLIC_ALIAS(__cosl, libc_cosl);
-DEFINE_PUBLIC_ALIAS(cosl, libc_cosl);
-DEFINE_PUBLIC_ALIAS(__sinl, libc_sinl);
-DEFINE_PUBLIC_ALIAS(sinl, libc_sinl);
-DEFINE_PUBLIC_ALIAS(__tanl, libc_tanl);
-DEFINE_PUBLIC_ALIAS(tanl, libc_tanl);
-DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
-DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
-DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);
-DEFINE_PUBLIC_ALIAS(sinh, libc_sinh);
-DEFINE_PUBLIC_ALIAS(__tanh, libc_tanh);
-DEFINE_PUBLIC_ALIAS(tanh, libc_tanh);
-DEFINE_PUBLIC_ALIAS(__coshf, libc_coshf);
-DEFINE_PUBLIC_ALIAS(coshf, libc_coshf);
-DEFINE_PUBLIC_ALIAS(__sinhf, libc_sinhf);
-DEFINE_PUBLIC_ALIAS(sinhf, libc_sinhf);
-DEFINE_PUBLIC_ALIAS(__tanhf, libc_tanhf);
-DEFINE_PUBLIC_ALIAS(tanhf, libc_tanhf);
-DEFINE_PUBLIC_ALIAS(__coshl, libc_coshl);
-DEFINE_PUBLIC_ALIAS(coshl, libc_coshl);
-DEFINE_PUBLIC_ALIAS(__sinhl, libc_sinhl);
-DEFINE_PUBLIC_ALIAS(sinhl, libc_sinhl);
-DEFINE_PUBLIC_ALIAS(__tanhl, libc_tanhl);
-DEFINE_PUBLIC_ALIAS(tanhl, libc_tanhl);
-DEFINE_PUBLIC_ALIAS(__acosh, libc_acosh);
-DEFINE_PUBLIC_ALIAS(acosh, libc_acosh);
-DEFINE_PUBLIC_ALIAS(__asinh, libc_asinh);
-DEFINE_PUBLIC_ALIAS(asinh, libc_asinh);
-DEFINE_PUBLIC_ALIAS(__atanh, libc_atanh);
-DEFINE_PUBLIC_ALIAS(atanh, libc_atanh);
-DEFINE_PUBLIC_ALIAS(__acoshf, libc_acoshf);
-DEFINE_PUBLIC_ALIAS(acoshf, libc_acoshf);
-DEFINE_PUBLIC_ALIAS(__asinhf, libc_asinhf);
-DEFINE_PUBLIC_ALIAS(asinhf, libc_asinhf);
-DEFINE_PUBLIC_ALIAS(__atanhf, libc_atanhf);
-DEFINE_PUBLIC_ALIAS(atanhf, libc_atanhf);
-DEFINE_PUBLIC_ALIAS(__acoshl, libc_acoshl);
-DEFINE_PUBLIC_ALIAS(acoshl, libc_acoshl);
-DEFINE_PUBLIC_ALIAS(__asinhl, libc_asinhl);
-DEFINE_PUBLIC_ALIAS(asinhl, libc_asinhl);
-DEFINE_PUBLIC_ALIAS(__atanhl, libc_atanhl);
-DEFINE_PUBLIC_ALIAS(atanhl, libc_atanhl);
-DEFINE_PUBLIC_ALIAS(__exp, libc_exp);
-DEFINE_PUBLIC_ALIAS(exp, libc_exp);
-DEFINE_PUBLIC_ALIAS(__frexp, libc_frexp);
-DEFINE_PUBLIC_ALIAS(frexp, libc_frexp);
-DEFINE_PUBLIC_ALIAS(__ldexp, libc_ldexp);
-DEFINE_PUBLIC_ALIAS(ldexp, libc_ldexp);
-DEFINE_PUBLIC_ALIAS(__log, libc_log);
-DEFINE_PUBLIC_ALIAS(log, libc_log);
-DEFINE_PUBLIC_ALIAS(__log10, libc_log10);
-DEFINE_PUBLIC_ALIAS(log10, libc_log10);
-DEFINE_PUBLIC_ALIAS(__modf, libc_modf);
-DEFINE_PUBLIC_ALIAS(modf, libc_modf);
-DEFINE_PUBLIC_ALIAS(__expf, libc_expf);
-DEFINE_PUBLIC_ALIAS(expf, libc_expf);
-DEFINE_PUBLIC_ALIAS(__frexpf, libc_frexpf);
-DEFINE_PUBLIC_ALIAS(frexpf, libc_frexpf);
-DEFINE_PUBLIC_ALIAS(__ldexpf, libc_ldexpf);
-DEFINE_PUBLIC_ALIAS(ldexpf, libc_ldexpf);
-DEFINE_PUBLIC_ALIAS(__logf, libc_logf);
-DEFINE_PUBLIC_ALIAS(logf, libc_logf);
-DEFINE_PUBLIC_ALIAS(__log10f, libc_log10f);
-DEFINE_PUBLIC_ALIAS(log10f, libc_log10f);
-DEFINE_PUBLIC_ALIAS(__modff, libc_modff);
-DEFINE_PUBLIC_ALIAS(modff, libc_modff);
-DEFINE_PUBLIC_ALIAS(__expl, libc_expl);
-DEFINE_PUBLIC_ALIAS(expl, libc_expl);
-DEFINE_PUBLIC_ALIAS(__frexpl, libc_frexpl);
-DEFINE_PUBLIC_ALIAS(frexpl, libc_frexpl);
-DEFINE_PUBLIC_ALIAS(__ldexpl, libc_ldexpl);
-DEFINE_PUBLIC_ALIAS(ldexpl, libc_ldexpl);
-DEFINE_PUBLIC_ALIAS(__logl, libc_logl);
-DEFINE_PUBLIC_ALIAS(logl, libc_logl);
-DEFINE_PUBLIC_ALIAS(__log10l, libc_log10l);
-DEFINE_PUBLIC_ALIAS(log10l, libc_log10l);
-DEFINE_PUBLIC_ALIAS(__modfl, libc_modfl);
-DEFINE_PUBLIC_ALIAS(modfl, libc_modfl);
-DEFINE_PUBLIC_ALIAS(__expm1, libc_expm1);
-DEFINE_PUBLIC_ALIAS(expm1, libc_expm1);
-DEFINE_PUBLIC_ALIAS(__log1p, libc_log1p);
-DEFINE_PUBLIC_ALIAS(log1p, libc_log1p);
-DEFINE_PUBLIC_ALIAS(__logb, libc_logb);
+DEFINE_PUBLIC_ALIAS_P(__acos,libc_acos,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(acos,libc_acos,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asin,libc_asin,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(asin,libc_asin,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atan,libc_atan,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(atan,libc_atan,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atan2,libc_atan2,WUNUSED,double,NOTHROW,LIBCCALL,(double y, double x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(atan2,libc_atan2,WUNUSED,double,NOTHROW,LIBCCALL,(double y, double x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(__cos,libc_cos,WUNUSED __DECL_SIMD_cos,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(cos,libc_cos,WUNUSED __DECL_SIMD_cos,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sin,libc_sin,WUNUSED __DECL_SIMD_sin,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(sin,libc_sin,WUNUSED __DECL_SIMD_sin,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tan,libc_tan,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(tan,libc_tan,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__acosf,libc_acosf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(acosf,libc_acosf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asinf,libc_asinf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(asinf,libc_asinf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atanf,libc_atanf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(atanf,libc_atanf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atan2f,libc_atan2f,WUNUSED,float,NOTHROW,LIBCCALL,(float y, float x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(atan2f,libc_atan2f,WUNUSED,float,NOTHROW,LIBCCALL,(float y, float x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(__cosf,libc_cosf,WUNUSED __DECL_SIMD_cosf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(cosf,libc_cosf,WUNUSED __DECL_SIMD_cosf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sinf,libc_sinf,WUNUSED __DECL_SIMD_sinf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(sinf,libc_sinf,WUNUSED __DECL_SIMD_sinf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tanf,libc_tanf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(tanf,libc_tanf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__acosl,libc_acosl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(acosl,libc_acosl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asinl,libc_asinl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(asinl,libc_asinl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atanl,libc_atanl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(atanl,libc_atanl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atan2l,libc_atan2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE y, __LONGDOUBLE x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(atan2l,libc_atan2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE y, __LONGDOUBLE x),(y,x));
+DEFINE_PUBLIC_ALIAS_P(__cosl,libc_cosl,WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(cosl,libc_cosl,WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sinl,libc_sinl,WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(sinl,libc_sinl,WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tanl,libc_tanl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(tanl,libc_tanl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__cosh,libc_cosh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(cosh,libc_cosh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sinh,libc_sinh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(sinh,libc_sinh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tanh,libc_tanh,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(tanh,libc_tanh,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__coshf,libc_coshf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(coshf,libc_coshf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sinhf,libc_sinhf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(sinhf,libc_sinhf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tanhf,libc_tanhf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(tanhf,libc_tanhf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__coshl,libc_coshl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(coshl,libc_coshl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__sinhl,libc_sinhl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(sinhl,libc_sinhl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tanhl,libc_tanhl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(tanhl,libc_tanhl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__acosh,libc_acosh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(acosh,libc_acosh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asinh,libc_asinh,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(asinh,libc_asinh,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atanh,libc_atanh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(atanh,libc_atanh,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__acoshf,libc_acoshf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(acoshf,libc_acoshf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asinhf,libc_asinhf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(asinhf,libc_asinhf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atanhf,libc_atanhf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(atanhf,libc_atanhf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__acoshl,libc_acoshl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(acoshl,libc_acoshl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__asinhl,libc_asinhl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(asinhl,libc_asinhl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__atanhl,libc_atanhl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(atanhl,libc_atanhl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__exp,libc_exp,WUNUSED __DECL_SIMD_exp,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp,libc_exp,WUNUSED __DECL_SIMD_exp,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__frexp,libc_frexp,ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(frexp,libc_frexp,ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(__ldexp,libc_ldexp,WUNUSED,double,NOTHROW,LIBCCALL,(double x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(ldexp,libc_ldexp,WUNUSED,double,NOTHROW,LIBCCALL,(double x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(__log,libc_log,WUNUSED __DECL_SIMD_log,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(log,libc_log,WUNUSED __DECL_SIMD_log,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log10,libc_log10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(log10,libc_log10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__modf,libc_modf,WUNUSED ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, double *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(modf,libc_modf,WUNUSED ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, double *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(__expf,libc_expf,WUNUSED __DECL_SIMD_expf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(expf,libc_expf,WUNUSED __DECL_SIMD_expf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__frexpf,libc_frexpf,ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(frexpf,libc_frexpf,ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(__ldexpf,libc_ldexpf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(ldexpf,libc_ldexpf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(__logf,libc_logf,WUNUSED __DECL_SIMD_logf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(logf,libc_logf,WUNUSED __DECL_SIMD_logf,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log10f,libc_log10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(log10f,libc_log10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__modff,libc_modff,WUNUSED ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, float *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(modff,libc_modff,WUNUSED ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, float *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(__expl,libc_expl,WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(expl,libc_expl,WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__frexpl,libc_frexpl,ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(frexpl,libc_frexpl,ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *pexponent),(x,pexponent));
+DEFINE_PUBLIC_ALIAS_P(__ldexpl,libc_ldexpl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(ldexpl,libc_ldexpl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int exponent),(x,exponent));
+DEFINE_PUBLIC_ALIAS_P(__logl,libc_logl,WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(logl,libc_logl,WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log10l,libc_log10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(log10l,libc_log10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__modfl,libc_modfl,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(modfl,libc_modfl,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *iptr),(x,iptr));
+DEFINE_PUBLIC_ALIAS_P(__expm1,libc_expm1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(expm1,libc_expm1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log1p,libc_log1p,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(log1p,libc_log1p,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__logb,libc_logb,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_logb, libc_logb);
+DEFINE_PUBLIC_ALIAS_P(_logb,libc_logb,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(logb, libc_logb);
-DEFINE_PUBLIC_ALIAS(__expm1f, libc_expm1f);
-DEFINE_PUBLIC_ALIAS(expm1f, libc_expm1f);
-DEFINE_PUBLIC_ALIAS(__log1pf, libc_log1pf);
-DEFINE_PUBLIC_ALIAS(log1pf, libc_log1pf);
-DEFINE_PUBLIC_ALIAS(__logbf, libc_logbf);
+DEFINE_PUBLIC_ALIAS_P(logb,libc_logb,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__expm1f,libc_expm1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(expm1f,libc_expm1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log1pf,libc_log1pf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(log1pf,libc_log1pf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__logbf,libc_logbf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
 #if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
-DEFINE_PUBLIC_ALIAS(_logbf, libc_logbf);
+DEFINE_PUBLIC_ALIAS_P(_logbf,libc_logbf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
-DEFINE_PUBLIC_ALIAS(logbf, libc_logbf);
-DEFINE_PUBLIC_ALIAS(__expm1l, libc_expm1l);
-DEFINE_PUBLIC_ALIAS(expm1l, libc_expm1l);
-DEFINE_PUBLIC_ALIAS(__log1pl, libc_log1pl);
-DEFINE_PUBLIC_ALIAS(log1pl, libc_log1pl);
-DEFINE_PUBLIC_ALIAS(__logbl, libc_logbl);
-DEFINE_PUBLIC_ALIAS(logbl, libc_logbl);
-DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
-DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
-DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
-DEFINE_PUBLIC_ALIAS(log2, libc_log2);
-DEFINE_PUBLIC_ALIAS(__exp2f, libc_exp2f);
-DEFINE_PUBLIC_ALIAS(exp2f, libc_exp2f);
-DEFINE_PUBLIC_ALIAS(__log2f, libc_log2f);
-DEFINE_PUBLIC_ALIAS(log2f, libc_log2f);
-DEFINE_PUBLIC_ALIAS(__exp2l, libc_exp2l);
-DEFINE_PUBLIC_ALIAS(exp2l, libc_exp2l);
-DEFINE_PUBLIC_ALIAS(__log2l, libc_log2l);
-DEFINE_PUBLIC_ALIAS(log2l, libc_log2l);
-DEFINE_PUBLIC_ALIAS(__pow, libc_pow);
-DEFINE_PUBLIC_ALIAS(pow, libc_pow);
-DEFINE_PUBLIC_ALIAS(__sqrt, libc_sqrt);
-DEFINE_PUBLIC_ALIAS(sqrt, libc_sqrt);
-DEFINE_PUBLIC_ALIAS(__powf, libc_powf);
-DEFINE_PUBLIC_ALIAS(powf, libc_powf);
-DEFINE_PUBLIC_ALIAS(__sqrtf, libc_sqrtf);
-DEFINE_PUBLIC_ALIAS(sqrtf, libc_sqrtf);
-DEFINE_PUBLIC_ALIAS(__powl, libc_powl);
-DEFINE_PUBLIC_ALIAS(powl, libc_powl);
-DEFINE_PUBLIC_ALIAS(__sqrtl, libc_sqrtl);
-DEFINE_PUBLIC_ALIAS(sqrtl, libc_sqrtl);
+DEFINE_PUBLIC_ALIAS_P(logbf,libc_logbf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__expm1l,libc_expm1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(expm1l,libc_expm1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log1pl,libc_log1pl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(log1pl,libc_log1pl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__logbl,libc_logbl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(logbl,libc_logbl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__exp2,libc_exp2,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp2,libc_exp2,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log2,libc_log2,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(log2,libc_log2,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__exp2f,libc_exp2f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp2f,libc_exp2f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log2f,libc_log2f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(log2f,libc_log2f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__exp2l,libc_exp2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp2l,libc_exp2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__log2l,libc_log2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(log2l,libc_log2l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__pow,libc_pow,WUNUSED __DECL_SIMD_pow,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(pow,libc_pow,WUNUSED __DECL_SIMD_pow,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__sqrt,libc_sqrt,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(sqrt,libc_sqrt,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__powf,libc_powf,WUNUSED __DECL_SIMD_powf,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(powf,libc_powf,WUNUSED __DECL_SIMD_powf,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__sqrtf,libc_sqrtf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(sqrtf,libc_sqrtf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__powl,libc_powl,WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(powl,libc_powl,WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__sqrtl,libc_sqrtl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(sqrtl,libc_sqrtl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_hypot, libc_hypot);
+DEFINE_PUBLIC_ALIAS_P(_hypot,libc_hypot,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__hypot, libc_hypot);
-DEFINE_PUBLIC_ALIAS(hypot, libc_hypot);
+DEFINE_PUBLIC_ALIAS_P(__hypot,libc_hypot,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(hypot,libc_hypot,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_hypotf, libc_hypotf);
+DEFINE_PUBLIC_ALIAS_P(_hypotf,libc_hypotf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__hypotf, libc_hypotf);
-DEFINE_PUBLIC_ALIAS(hypotf, libc_hypotf);
-DEFINE_PUBLIC_ALIAS(__hypotl, libc_hypotl);
-DEFINE_PUBLIC_ALIAS(hypotl, libc_hypotl);
-DEFINE_PUBLIC_ALIAS(__cbrt, libc_cbrt);
-DEFINE_PUBLIC_ALIAS(cbrt, libc_cbrt);
-DEFINE_PUBLIC_ALIAS(__cbrtf, libc_cbrtf);
-DEFINE_PUBLIC_ALIAS(cbrtf, libc_cbrtf);
-DEFINE_PUBLIC_ALIAS(__cbrtl, libc_cbrtl);
-DEFINE_PUBLIC_ALIAS(cbrtl, libc_cbrtl);
-DEFINE_PUBLIC_ALIAS(__ceil, libc_ceil);
-DEFINE_PUBLIC_ALIAS(ceil, libc_ceil);
-DEFINE_PUBLIC_ALIAS(__fabs, libc_fabs);
-DEFINE_PUBLIC_ALIAS(fabs, libc_fabs);
-DEFINE_PUBLIC_ALIAS(__floor, libc_floor);
-DEFINE_PUBLIC_ALIAS(floor, libc_floor);
-DEFINE_PUBLIC_ALIAS(__fmod, libc_fmod);
-DEFINE_PUBLIC_ALIAS(fmod, libc_fmod);
-DEFINE_PUBLIC_ALIAS(__ceilf, libc_ceilf);
-DEFINE_PUBLIC_ALIAS(ceilf, libc_ceilf);
-DEFINE_PUBLIC_ALIAS(__fabsf, libc_fabsf);
-DEFINE_PUBLIC_ALIAS(fabsf, libc_fabsf);
-DEFINE_PUBLIC_ALIAS(__floorf, libc_floorf);
-DEFINE_PUBLIC_ALIAS(floorf, libc_floorf);
-DEFINE_PUBLIC_ALIAS(__fmodf, libc_fmodf);
-DEFINE_PUBLIC_ALIAS(fmodf, libc_fmodf);
-DEFINE_PUBLIC_ALIAS(__ceill, libc_ceill);
-DEFINE_PUBLIC_ALIAS(ceill, libc_ceill);
-DEFINE_PUBLIC_ALIAS(__fabsl, libc_fabsl);
-DEFINE_PUBLIC_ALIAS(fabsl, libc_fabsl);
-DEFINE_PUBLIC_ALIAS(__floorl, libc_floorl);
-DEFINE_PUBLIC_ALIAS(floorl, libc_floorl);
-DEFINE_PUBLIC_ALIAS(__fmodl, libc_fmodl);
-DEFINE_PUBLIC_ALIAS(fmodl, libc_fmodl);
-DEFINE_PUBLIC_ALIAS(__copysign, libc_copysign);
-DEFINE_PUBLIC_ALIAS(_copysign, libc_copysign);
-DEFINE_PUBLIC_ALIAS(copysign, libc_copysign);
-DEFINE_PUBLIC_ALIAS(__nan, libc_nan);
-DEFINE_PUBLIC_ALIAS(nan, libc_nan);
+DEFINE_PUBLIC_ALIAS_P(__hypotf,libc_hypotf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(hypotf,libc_hypotf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__hypotl,libc_hypotl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(hypotl,libc_hypotl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__cbrt,libc_cbrt,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(cbrt,libc_cbrt,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__cbrtf,libc_cbrtf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(cbrtf,libc_cbrtf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__cbrtl,libc_cbrtl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(cbrtl,libc_cbrtl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__ceil,libc_ceil,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(ceil,libc_ceil,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fabs,libc_fabs,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(fabs,libc_fabs,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__floor,libc_floor,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(floor,libc_floor,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fmod,libc_fmod,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmod,libc_fmod,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__ceilf,libc_ceilf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(ceilf,libc_ceilf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fabsf,libc_fabsf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(fabsf,libc_fabsf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__floorf,libc_floorf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(floorf,libc_floorf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fmodf,libc_fmodf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmodf,libc_fmodf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__ceill,libc_ceill,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(ceill,libc_ceill,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fabsl,libc_fabsl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(fabsl,libc_fabsl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__floorl,libc_floorl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(floorl,libc_floorl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fmodl,libc_fmodl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmodl,libc_fmodl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__copysign,libc_copysign,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double num, double sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(_copysign,libc_copysign,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double num, double sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(copysign,libc_copysign,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double num, double sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(__nan,libc_nan,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
+DEFINE_PUBLIC_ALIAS_P(nan,libc_nan,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_copysignf, libc_copysignf);
+DEFINE_PUBLIC_ALIAS_P(_copysignf,libc_copysignf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float num, float sign),(num,sign));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__copysignf, libc_copysignf);
-DEFINE_PUBLIC_ALIAS(copysignf, libc_copysignf);
-DEFINE_PUBLIC_ALIAS(__nanf, libc_nanf);
-DEFINE_PUBLIC_ALIAS(nanf, libc_nanf);
-DEFINE_PUBLIC_ALIAS(__copysignl, libc_copysignl);
-DEFINE_PUBLIC_ALIAS(copysignl, libc_copysignl);
-DEFINE_PUBLIC_ALIAS(__nanl, libc_nanl);
-DEFINE_PUBLIC_ALIAS(nanl, libc_nanl);
-DEFINE_PUBLIC_ALIAS(__erf, libc_erf);
-DEFINE_PUBLIC_ALIAS(erf, libc_erf);
-DEFINE_PUBLIC_ALIAS(__erfc, libc_erfc);
-DEFINE_PUBLIC_ALIAS(erfc, libc_erfc);
-DEFINE_PUBLIC_ALIAS(gamma, libc_lgamma);
-DEFINE_PUBLIC_ALIAS(__lgamma, libc_lgamma);
-DEFINE_PUBLIC_ALIAS(__gamma, libc_lgamma);
-DEFINE_PUBLIC_ALIAS(lgamma, libc_lgamma);
-DEFINE_PUBLIC_ALIAS(__erff, libc_erff);
-DEFINE_PUBLIC_ALIAS(erff, libc_erff);
-DEFINE_PUBLIC_ALIAS(__erfcf, libc_erfcf);
-DEFINE_PUBLIC_ALIAS(erfcf, libc_erfcf);
-DEFINE_PUBLIC_ALIAS(gammaf, libc_lgammaf);
-DEFINE_PUBLIC_ALIAS(__lgammaf, libc_lgammaf);
-DEFINE_PUBLIC_ALIAS(__gammaf, libc_lgammaf);
-DEFINE_PUBLIC_ALIAS(lgammaf, libc_lgammaf);
-DEFINE_PUBLIC_ALIAS(__erfl, libc_erfl);
-DEFINE_PUBLIC_ALIAS(erfl, libc_erfl);
-DEFINE_PUBLIC_ALIAS(__erfcl, libc_erfcl);
-DEFINE_PUBLIC_ALIAS(erfcl, libc_erfcl);
-DEFINE_PUBLIC_ALIAS(gammal, libc_lgammal);
-DEFINE_PUBLIC_ALIAS(__lgammal, libc_lgammal);
-DEFINE_PUBLIC_ALIAS(__gammal, libc_lgammal);
-DEFINE_PUBLIC_ALIAS(lgammal, libc_lgammal);
-DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
-DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
-DEFINE_PUBLIC_ALIAS(__tgammaf, libc_tgammaf);
-DEFINE_PUBLIC_ALIAS(tgammaf, libc_tgammaf);
-DEFINE_PUBLIC_ALIAS(__tgammal, libc_tgammal);
-DEFINE_PUBLIC_ALIAS(tgammal, libc_tgammal);
-DEFINE_PUBLIC_ALIAS(nearbyint, libc_rint);
-DEFINE_PUBLIC_ALIAS(__rint, libc_rint);
-DEFINE_PUBLIC_ALIAS(__nearbyint, libc_rint);
-DEFINE_PUBLIC_ALIAS(rint, libc_rint);
-DEFINE_PUBLIC_ALIAS(nexttoward, libc_nextafter);
-DEFINE_PUBLIC_ALIAS(__nextafter, libc_nextafter);
+DEFINE_PUBLIC_ALIAS_P(__copysignf,libc_copysignf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float num, float sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(copysignf,libc_copysignf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float num, float sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(__nanf,libc_nanf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
+DEFINE_PUBLIC_ALIAS_P(nanf,libc_nanf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
+DEFINE_PUBLIC_ALIAS_P(__copysignl,libc_copysignl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE num, __LONGDOUBLE sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(copysignl,libc_copysignl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE num, __LONGDOUBLE sign),(num,sign));
+DEFINE_PUBLIC_ALIAS_P(__nanl,libc_nanl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
+DEFINE_PUBLIC_ALIAS_P(nanl,libc_nanl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(char const *tagb),(tagb));
+DEFINE_PUBLIC_ALIAS_P(__erf,libc_erf,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(erf,libc_erf,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__erfc,libc_erfc,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(erfc,libc_erfc,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(gamma,libc_lgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lgamma,libc_lgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__gamma,libc_lgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(lgamma,libc_lgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__erff,libc_erff,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(erff,libc_erff,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__erfcf,libc_erfcf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(erfcf,libc_erfcf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(gammaf,libc_lgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lgammaf,libc_lgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__gammaf,libc_lgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(lgammaf,libc_lgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__erfl,libc_erfl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(erfl,libc_erfl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__erfcl,libc_erfcl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(erfcl,libc_erfcl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(gammal,libc_lgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lgammal,libc_lgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__gammal,libc_lgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(lgammal,libc_lgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tgamma,libc_tgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(tgamma,libc_tgamma,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tgammaf,libc_tgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(tgammaf,libc_tgammaf,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__tgammal,libc_tgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(tgammal,libc_tgammal,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(nearbyint,libc_rint,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__rint,libc_rint,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__nearbyint,libc_rint,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(rint,libc_rint,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(nexttoward,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__nextafter,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_nextafter, libc_nextafter);
+DEFINE_PUBLIC_ALIAS_P(_nextafter,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__nexttoward, libc_nextafter);
-DEFINE_PUBLIC_ALIAS(nextafter, libc_nextafter);
-DEFINE_PUBLIC_ALIAS(drem, libc_remainder);
-DEFINE_PUBLIC_ALIAS(__remainder, libc_remainder);
-DEFINE_PUBLIC_ALIAS(__drem, libc_remainder);
-DEFINE_PUBLIC_ALIAS(remainder, libc_remainder);
-DEFINE_PUBLIC_ALIAS(__ilogb, libc_ilogb);
-DEFINE_PUBLIC_ALIAS(ilogb, libc_ilogb);
-DEFINE_PUBLIC_ALIAS(nearbyintf, libc_rintf);
-DEFINE_PUBLIC_ALIAS(__rintf, libc_rintf);
-DEFINE_PUBLIC_ALIAS(__nearbyintf, libc_rintf);
-DEFINE_PUBLIC_ALIAS(rintf, libc_rintf);
-DEFINE_PUBLIC_ALIAS(nexttowardf, libc_nextafterf);
-DEFINE_PUBLIC_ALIAS(__nextafterf, libc_nextafterf);
-DEFINE_PUBLIC_ALIAS(__nexttowardf, libc_nextafterf);
+DEFINE_PUBLIC_ALIAS_P(__nexttoward,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(nextafter,libc_nextafter,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(drem,libc_remainder,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__remainder,libc_remainder,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__drem,libc_remainder,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(remainder,libc_remainder,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__ilogb,libc_ilogb,WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(ilogb,libc_ilogb,WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(nearbyintf,libc_rintf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__rintf,libc_rintf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__nearbyintf,libc_rintf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(rintf,libc_rintf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(nexttowardf,libc_nextafterf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__nextafterf,libc_nextafterf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__nexttowardf,libc_nextafterf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
 #if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
-DEFINE_PUBLIC_ALIAS(_nextafterf, libc_nextafterf);
+DEFINE_PUBLIC_ALIAS_P(_nextafterf,libc_nextafterf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
 #endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
-DEFINE_PUBLIC_ALIAS(nextafterf, libc_nextafterf);
-DEFINE_PUBLIC_ALIAS(dremf, libc_remainderf);
-DEFINE_PUBLIC_ALIAS(__remainderf, libc_remainderf);
-DEFINE_PUBLIC_ALIAS(__dremf, libc_remainderf);
-DEFINE_PUBLIC_ALIAS(remainderf, libc_remainderf);
-DEFINE_PUBLIC_ALIAS(__ilogbf, libc_ilogbf);
-DEFINE_PUBLIC_ALIAS(ilogbf, libc_ilogbf);
-DEFINE_PUBLIC_ALIAS(nearbyintl, libc_rintl);
-DEFINE_PUBLIC_ALIAS(__rintl, libc_rintl);
-DEFINE_PUBLIC_ALIAS(__nearbyintl, libc_rintl);
-DEFINE_PUBLIC_ALIAS(rintl, libc_rintl);
-DEFINE_PUBLIC_ALIAS(nexttowardl, libc_nextafterl);
-DEFINE_PUBLIC_ALIAS(__nextafterl, libc_nextafterl);
-DEFINE_PUBLIC_ALIAS(__nexttowardl, libc_nextafterl);
-DEFINE_PUBLIC_ALIAS(nextafterl, libc_nextafterl);
-DEFINE_PUBLIC_ALIAS(dreml, libc_remainderl);
-DEFINE_PUBLIC_ALIAS(__remainderl, libc_remainderl);
-DEFINE_PUBLIC_ALIAS(__dreml, libc_remainderl);
-DEFINE_PUBLIC_ALIAS(remainderl, libc_remainderl);
-DEFINE_PUBLIC_ALIAS(__ilogbl, libc_ilogbl);
-DEFINE_PUBLIC_ALIAS(ilogbl, libc_ilogbl);
-DEFINE_PUBLIC_ALIAS(__nexttoward, libc_nexttoward);
-DEFINE_PUBLIC_ALIAS(nexttoward, libc_nexttoward);
-DEFINE_PUBLIC_ALIAS(__scalbn, libc_scalbn);
-DEFINE_PUBLIC_ALIAS(scalbn, libc_scalbn);
-DEFINE_PUBLIC_ALIAS(__scalbln, libc_scalbln);
-DEFINE_PUBLIC_ALIAS(scalbln, libc_scalbln);
-DEFINE_PUBLIC_ALIAS(__round, libc_round);
-DEFINE_PUBLIC_ALIAS(round, libc_round);
-DEFINE_PUBLIC_ALIAS(__trunc, libc_trunc);
-DEFINE_PUBLIC_ALIAS(trunc, libc_trunc);
-DEFINE_PUBLIC_ALIAS(__remquo, libc_remquo);
-DEFINE_PUBLIC_ALIAS(remquo, libc_remquo);
-DEFINE_PUBLIC_ALIAS(__lrint, libc_lrint);
-DEFINE_PUBLIC_ALIAS(lrint, libc_lrint);
-DEFINE_PUBLIC_ALIAS(__lround, libc_lround);
-DEFINE_PUBLIC_ALIAS(lround, libc_lround);
-DEFINE_PUBLIC_ALIAS(__fdim, libc_fdim);
-DEFINE_PUBLIC_ALIAS(fdim, libc_fdim);
-DEFINE_PUBLIC_ALIAS(__fmax, libc_fmax);
-DEFINE_PUBLIC_ALIAS(fmax, libc_fmax);
-DEFINE_PUBLIC_ALIAS(__fmin, libc_fmin);
-DEFINE_PUBLIC_ALIAS(fmin, libc_fmin);
-DEFINE_PUBLIC_ALIAS(__fma, libc_fma);
-DEFINE_PUBLIC_ALIAS(fma, libc_fma);
-DEFINE_PUBLIC_ALIAS(__llrint, libc_llrint);
-DEFINE_PUBLIC_ALIAS(llrint, libc_llrint);
-DEFINE_PUBLIC_ALIAS(__llround, libc_llround);
-DEFINE_PUBLIC_ALIAS(llround, libc_llround);
-DEFINE_PUBLIC_ALIAS(__nexttowardf, libc_nexttowardf);
-DEFINE_PUBLIC_ALIAS(nexttowardf, libc_nexttowardf);
-DEFINE_PUBLIC_ALIAS(__scalbnf, libc_scalbnf);
-DEFINE_PUBLIC_ALIAS(scalbnf, libc_scalbnf);
-DEFINE_PUBLIC_ALIAS(__scalblnf, libc_scalblnf);
-DEFINE_PUBLIC_ALIAS(scalblnf, libc_scalblnf);
-DEFINE_PUBLIC_ALIAS(__roundf, libc_roundf);
-DEFINE_PUBLIC_ALIAS(roundf, libc_roundf);
-DEFINE_PUBLIC_ALIAS(__truncf, libc_truncf);
-DEFINE_PUBLIC_ALIAS(truncf, libc_truncf);
-DEFINE_PUBLIC_ALIAS(__remquof, libc_remquof);
-DEFINE_PUBLIC_ALIAS(remquof, libc_remquof);
-DEFINE_PUBLIC_ALIAS(__lrintf, libc_lrintf);
-DEFINE_PUBLIC_ALIAS(lrintf, libc_lrintf);
-DEFINE_PUBLIC_ALIAS(__lroundf, libc_lroundf);
-DEFINE_PUBLIC_ALIAS(lroundf, libc_lroundf);
-DEFINE_PUBLIC_ALIAS(__fdimf, libc_fdimf);
-DEFINE_PUBLIC_ALIAS(fdimf, libc_fdimf);
-DEFINE_PUBLIC_ALIAS(__fmaxf, libc_fmaxf);
-DEFINE_PUBLIC_ALIAS(fmaxf, libc_fmaxf);
-DEFINE_PUBLIC_ALIAS(__fminf, libc_fminf);
-DEFINE_PUBLIC_ALIAS(fminf, libc_fminf);
-DEFINE_PUBLIC_ALIAS(__fmaf, libc_fmaf);
-DEFINE_PUBLIC_ALIAS(fmaf, libc_fmaf);
-DEFINE_PUBLIC_ALIAS(__llrintf, libc_llrintf);
-DEFINE_PUBLIC_ALIAS(llrintf, libc_llrintf);
-DEFINE_PUBLIC_ALIAS(__llroundf, libc_llroundf);
-DEFINE_PUBLIC_ALIAS(llroundf, libc_llroundf);
-DEFINE_PUBLIC_ALIAS(__scalbnl, libc_scalbnl);
-DEFINE_PUBLIC_ALIAS(scalbnl, libc_scalbnl);
-DEFINE_PUBLIC_ALIAS(__scalblnl, libc_scalblnl);
-DEFINE_PUBLIC_ALIAS(scalblnl, libc_scalblnl);
-DEFINE_PUBLIC_ALIAS(__roundl, libc_roundl);
-DEFINE_PUBLIC_ALIAS(roundl, libc_roundl);
-DEFINE_PUBLIC_ALIAS(__truncl, libc_truncl);
-DEFINE_PUBLIC_ALIAS(truncl, libc_truncl);
-DEFINE_PUBLIC_ALIAS(__remquol, libc_remquol);
-DEFINE_PUBLIC_ALIAS(remquol, libc_remquol);
-DEFINE_PUBLIC_ALIAS(__lrintl, libc_lrintl);
-DEFINE_PUBLIC_ALIAS(lrintl, libc_lrintl);
-DEFINE_PUBLIC_ALIAS(__lroundl, libc_lroundl);
-DEFINE_PUBLIC_ALIAS(lroundl, libc_lroundl);
-DEFINE_PUBLIC_ALIAS(__fdiml, libc_fdiml);
-DEFINE_PUBLIC_ALIAS(fdiml, libc_fdiml);
-DEFINE_PUBLIC_ALIAS(__fmaxl, libc_fmaxl);
-DEFINE_PUBLIC_ALIAS(fmaxl, libc_fmaxl);
-DEFINE_PUBLIC_ALIAS(__fminl, libc_fminl);
-DEFINE_PUBLIC_ALIAS(fminl, libc_fminl);
-DEFINE_PUBLIC_ALIAS(__fmal, libc_fmal);
-DEFINE_PUBLIC_ALIAS(fmal, libc_fmal);
-DEFINE_PUBLIC_ALIAS(__llrintl, libc_llrintl);
-DEFINE_PUBLIC_ALIAS(llrintl, libc_llrintl);
-DEFINE_PUBLIC_ALIAS(__llroundl, libc_llroundl);
-DEFINE_PUBLIC_ALIAS(llroundl, libc_llroundl);
-DEFINE_PUBLIC_ALIAS(__sincos, libc_sincos);
-DEFINE_PUBLIC_ALIAS(sincos, libc_sincos);
-DEFINE_PUBLIC_ALIAS(__exp10, libc_exp10);
-DEFINE_PUBLIC_ALIAS(exp10, libc_exp10);
-DEFINE_PUBLIC_ALIAS(__pow10, libc_pow10);
-DEFINE_PUBLIC_ALIAS(pow10, libc_pow10);
-DEFINE_PUBLIC_ALIAS(__sincosf, libc_sincosf);
-DEFINE_PUBLIC_ALIAS(sincosf, libc_sincosf);
-DEFINE_PUBLIC_ALIAS(__exp10f, libc_exp10f);
-DEFINE_PUBLIC_ALIAS(exp10f, libc_exp10f);
-DEFINE_PUBLIC_ALIAS(__pow10f, libc_pow10f);
-DEFINE_PUBLIC_ALIAS(pow10f, libc_pow10f);
-DEFINE_PUBLIC_ALIAS(__sincosl, libc_sincosl);
-DEFINE_PUBLIC_ALIAS(sincosl, libc_sincosl);
-DEFINE_PUBLIC_ALIAS(__exp10l, libc_exp10l);
-DEFINE_PUBLIC_ALIAS(exp10l, libc_exp10l);
-DEFINE_PUBLIC_ALIAS(__pow10l, libc_pow10l);
-DEFINE_PUBLIC_ALIAS(pow10l, libc_pow10l);
-DEFINE_PUBLIC_ALIAS(__isinf, libc_isinf);
-DEFINE_PUBLIC_ALIAS(isinf, libc_isinf);
-DEFINE_PUBLIC_ALIAS(__isinff, libc_isinff);
-DEFINE_PUBLIC_ALIAS(isinff, libc_isinff);
-DEFINE_PUBLIC_ALIAS(__isinfl, libc_isinfl);
-DEFINE_PUBLIC_ALIAS(isinfl, libc_isinfl);
-DEFINE_PUBLIC_ALIAS(__finite, libc_finite);
-DEFINE_PUBLIC_ALIAS(_finite, libc_finite);
-DEFINE_PUBLIC_ALIAS(finite, libc_finite);
-DEFINE_PUBLIC_ALIAS(__significand, libc_significand);
-DEFINE_PUBLIC_ALIAS(significand, libc_significand);
-DEFINE_PUBLIC_ALIAS(__finitef, libc_finitef);
+DEFINE_PUBLIC_ALIAS_P(nextafterf,libc_nextafterf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(dremf,libc_remainderf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__remainderf,libc_remainderf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__dremf,libc_remainderf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(remainderf,libc_remainderf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__ilogbf,libc_ilogbf,WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(ilogbf,libc_ilogbf,WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(nearbyintl,libc_rintl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__rintl,libc_rintl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__nearbyintl,libc_rintl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(rintl,libc_rintl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(nexttowardl,libc_nextafterl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__nextafterl,libc_nextafterl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__nexttowardl,libc_nextafterl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(nextafterl,libc_nextafterl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(dreml,libc_remainderl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__remainderl,libc_remainderl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__dreml,libc_remainderl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(remainderl,libc_remainderl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p),(x,p));
+DEFINE_PUBLIC_ALIAS_P(__ilogbl,libc_ilogbl,WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(ilogbl,libc_ilogbl,WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__nexttoward,libc_nexttoward,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(nexttoward,libc_nexttoward,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__scalbn,libc_scalbn,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalbn,libc_scalbn,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__scalbln,libc_scalbln,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalbln,libc_scalbln,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__round,libc_round,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(round,libc_round,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__trunc,libc_trunc,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(trunc,libc_trunc,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__remquo,libc_remquo,WUNUSED ATTR_OUT(3),double,NOTHROW,LIBCCALL,(double x, double p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(remquo,libc_remquo,WUNUSED ATTR_OUT(3),double,NOTHROW,LIBCCALL,(double x, double p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(__lrint,libc_lrint,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(lrint,libc_lrint,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lround,libc_lround,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(lround,libc_lround,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fdim,libc_fdim,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fdim,libc_fdim,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmax,libc_fmax,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmax,libc_fmax,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmin,libc_fmin,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmin,libc_fmin,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fma,libc_fma,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y, double z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(fma,libc_fma,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y, double z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(__llrint,libc_llrint,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(llrint,libc_llrint,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__llround,libc_llround,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(llround,libc_llround,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__nexttowardf,libc_nexttowardf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(nexttowardf,libc_nexttowardf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__scalbnf,libc_scalbnf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalbnf,libc_scalbnf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__scalblnf,libc_scalblnf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalblnf,libc_scalblnf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__roundf,libc_roundf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(roundf,libc_roundf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__truncf,libc_truncf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(truncf,libc_truncf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__remquof,libc_remquof,WUNUSED ATTR_OUT(3),float,NOTHROW,LIBCCALL,(float x, float p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(remquof,libc_remquof,WUNUSED ATTR_OUT(3),float,NOTHROW,LIBCCALL,(float x, float p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(__lrintf,libc_lrintf,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(lrintf,libc_lrintf,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lroundf,libc_lroundf,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(lroundf,libc_lroundf,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fdimf,libc_fdimf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fdimf,libc_fdimf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmaxf,libc_fmaxf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmaxf,libc_fmaxf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fminf,libc_fminf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fminf,libc_fminf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmaf,libc_fmaf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y, float z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(fmaf,libc_fmaf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y, float z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(__llrintf,libc_llrintf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(llrintf,libc_llrintf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__llroundf,libc_llroundf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(llroundf,libc_llroundf,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__scalbnl,libc_scalbnl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalbnl,libc_scalbnl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__scalblnl,libc_scalblnl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(scalblnl,libc_scalblnl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, long int n),(x,n));
+DEFINE_PUBLIC_ALIAS_P(__roundl,libc_roundl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(roundl,libc_roundl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__truncl,libc_truncl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(truncl,libc_truncl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__remquol,libc_remquol,WUNUSED ATTR_OUT(3),__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(remquol,libc_remquol,WUNUSED ATTR_OUT(3),__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo),(x,p,pquo));
+DEFINE_PUBLIC_ALIAS_P(__lrintl,libc_lrintl,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(lrintl,libc_lrintl,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__lroundl,libc_lroundl,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(lroundl,libc_lroundl,ATTR_CONST WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__fdiml,libc_fdiml,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fdiml,libc_fdiml,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmaxl,libc_fmaxl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fmaxl,libc_fmaxl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fminl,libc_fminl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fminl,libc_fminl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(__fmal,libc_fmal,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(fmal,libc_fmal,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z),(x,y,z));
+DEFINE_PUBLIC_ALIAS_P(__llrintl,libc_llrintl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(llrintl,libc_llrintl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__llroundl,libc_llroundl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(llroundl,libc_llroundl,ATTR_CONST WUNUSED,__LONGLONG,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P_VOID(__sincos,libc_sincos,__DECL_SIMD_sincos ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(double x, double *psinx, double *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P_VOID(sincos,libc_sincos,__DECL_SIMD_sincos ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(double x, double *psinx, double *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P(__exp10,libc_exp10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp10,libc_exp10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__pow10,libc_pow10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(pow10,libc_pow10,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P_VOID(__sincosf,libc_sincosf,__DECL_SIMD_sincosf ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(float x, float *psinx, float *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P_VOID(sincosf,libc_sincosf,__DECL_SIMD_sincosf ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(float x, float *psinx, float *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P(__exp10f,libc_exp10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp10f,libc_exp10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__pow10f,libc_pow10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(pow10f,libc_pow10f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P_VOID(__sincosl,libc_sincosl,__DECL_SIMD_sincosl ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P_VOID(sincosl,libc_sincosl,__DECL_SIMD_sincosl ATTR_OUT(2) ATTR_OUT(3),NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx),(x,psinx,pcosx));
+DEFINE_PUBLIC_ALIAS_P(__exp10l,libc_exp10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(exp10l,libc_exp10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__pow10l,libc_pow10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(pow10l,libc_pow10l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__isinf,libc_isinf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(isinf,libc_isinf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__isinff,libc_isinff,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(isinff,libc_isinff,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__isinfl,libc_isinfl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(isinfl,libc_isinfl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__finite,libc_finite,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(_finite,libc_finite,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(finite,libc_finite,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__significand,libc_significand,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(significand,libc_significand,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__finitef,libc_finitef,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
-DEFINE_PUBLIC_ALIAS(_finitef, libc_finitef);
+DEFINE_PUBLIC_ALIAS_P(_finitef,libc_finitef,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
-DEFINE_PUBLIC_ALIAS(finitef, libc_finitef);
-DEFINE_PUBLIC_ALIAS(__significandf, libc_significandf);
-DEFINE_PUBLIC_ALIAS(significandf, libc_significandf);
-DEFINE_PUBLIC_ALIAS(__finitel, libc_finitel);
-DEFINE_PUBLIC_ALIAS(finitel, libc_finitel);
-DEFINE_PUBLIC_ALIAS(__significandl, libc_significandl);
-DEFINE_PUBLIC_ALIAS(significandl, libc_significandl);
+DEFINE_PUBLIC_ALIAS_P(finitef,libc_finitef,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__significandf,libc_significandf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(significandf,libc_significandf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__finitel,libc_finitel,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(finitel,libc_finitel,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__significandl,libc_significandl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(significandl,libc_significandl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isnan, libc_isnan);
+DEFINE_PUBLIC_ALIAS_P(_isnan,libc_isnan,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isnan, libc_isnan);
-DEFINE_PUBLIC_ALIAS(isnan, libc_isnan);
-DEFINE_PUBLIC_ALIAS(__isnanf, libc_isnanf);
+DEFINE_PUBLIC_ALIAS_P(__isnan,libc_isnan,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(isnan,libc_isnan,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__isnanf,libc_isnanf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
-DEFINE_PUBLIC_ALIAS(_isnanf, libc_isnanf);
+DEFINE_PUBLIC_ALIAS_P(_isnanf,libc_isnanf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
-DEFINE_PUBLIC_ALIAS(isnanf, libc_isnanf);
-DEFINE_PUBLIC_ALIAS(__isnanl, libc_isnanl);
-DEFINE_PUBLIC_ALIAS(isnanl, libc_isnanl);
+DEFINE_PUBLIC_ALIAS_P(isnanf,libc_isnanf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__isnanl,libc_isnanl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(isnanl,libc_isnanl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_j0, libc_j0);
+DEFINE_PUBLIC_ALIAS_P(_j0,libc_j0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
-DEFINE_PUBLIC_ALIAS(j0, libc_j0);
+DEFINE_PUBLIC_ALIAS_P(__j0,libc_j0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(j0,libc_j0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_j1, libc_j1);
+DEFINE_PUBLIC_ALIAS_P(_j1,libc_j1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__j1, libc_j1);
-DEFINE_PUBLIC_ALIAS(j1, libc_j1);
+DEFINE_PUBLIC_ALIAS_P(__j1,libc_j1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(j1,libc_j1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_jn, libc_jn);
+DEFINE_PUBLIC_ALIAS_P(_jn,libc_jn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__jn, libc_jn);
-DEFINE_PUBLIC_ALIAS(jn, libc_jn);
+DEFINE_PUBLIC_ALIAS_P(__jn,libc_jn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(jn,libc_jn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_y0, libc_y0);
+DEFINE_PUBLIC_ALIAS_P(_y0,libc_y0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
-DEFINE_PUBLIC_ALIAS(y0, libc_y0);
+DEFINE_PUBLIC_ALIAS_P(__y0,libc_y0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(y0,libc_y0,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_y1, libc_y1);
+DEFINE_PUBLIC_ALIAS_P(_y1,libc_y1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
-DEFINE_PUBLIC_ALIAS(y1, libc_y1);
+DEFINE_PUBLIC_ALIAS_P(__y1,libc_y1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(y1,libc_y1,WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_yn, libc_yn);
+DEFINE_PUBLIC_ALIAS_P(_yn,libc_yn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
-DEFINE_PUBLIC_ALIAS(yn, libc_yn);
-DEFINE_PUBLIC_ALIAS(__j0f, libc_j0f);
-DEFINE_PUBLIC_ALIAS(j0f, libc_j0f);
-DEFINE_PUBLIC_ALIAS(__j1f, libc_j1f);
-DEFINE_PUBLIC_ALIAS(j1f, libc_j1f);
-DEFINE_PUBLIC_ALIAS(__jnf, libc_jnf);
-DEFINE_PUBLIC_ALIAS(jnf, libc_jnf);
-DEFINE_PUBLIC_ALIAS(__y0f, libc_y0f);
-DEFINE_PUBLIC_ALIAS(y0f, libc_y0f);
-DEFINE_PUBLIC_ALIAS(__y1f, libc_y1f);
-DEFINE_PUBLIC_ALIAS(y1f, libc_y1f);
-DEFINE_PUBLIC_ALIAS(__ynf, libc_ynf);
-DEFINE_PUBLIC_ALIAS(ynf, libc_ynf);
-DEFINE_PUBLIC_ALIAS(__j0l, libc_j0l);
-DEFINE_PUBLIC_ALIAS(j0l, libc_j0l);
-DEFINE_PUBLIC_ALIAS(__j1l, libc_j1l);
-DEFINE_PUBLIC_ALIAS(j1l, libc_j1l);
-DEFINE_PUBLIC_ALIAS(__jnl, libc_jnl);
-DEFINE_PUBLIC_ALIAS(jnl, libc_jnl);
-DEFINE_PUBLIC_ALIAS(__y0l, libc_y0l);
-DEFINE_PUBLIC_ALIAS(y0l, libc_y0l);
-DEFINE_PUBLIC_ALIAS(__y1l, libc_y1l);
-DEFINE_PUBLIC_ALIAS(y1l, libc_y1l);
-DEFINE_PUBLIC_ALIAS(__ynl, libc_ynl);
-DEFINE_PUBLIC_ALIAS(ynl, libc_ynl);
-DEFINE_PUBLIC_ALIAS(__lgamma_r, libc_lgamma_r);
-DEFINE_PUBLIC_ALIAS(lgamma_r, libc_lgamma_r);
-DEFINE_PUBLIC_ALIAS(__lgammaf_r, libc_lgammaf_r);
-DEFINE_PUBLIC_ALIAS(lgammaf_r, libc_lgammaf_r);
-DEFINE_PUBLIC_ALIAS(__lgammal_r, libc_lgammal_r);
-DEFINE_PUBLIC_ALIAS(lgammal_r, libc_lgammal_r);
+DEFINE_PUBLIC_ALIAS_P(__yn,libc_yn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(yn,libc_yn,WUNUSED,double,NOTHROW,LIBCCALL,(int n, double x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(__j0f,libc_j0f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(j0f,libc_j0f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__j1f,libc_j1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(j1f,libc_j1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__jnf,libc_jnf,WUNUSED,float,NOTHROW,LIBCCALL,(int n, float x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(jnf,libc_jnf,WUNUSED,float,NOTHROW,LIBCCALL,(int n, float x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(__y0f,libc_y0f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(y0f,libc_y0f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__y1f,libc_y1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(y1f,libc_y1f,WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__ynf,libc_ynf,WUNUSED,float,NOTHROW,LIBCCALL,(int n, float x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(ynf,libc_ynf,WUNUSED,float,NOTHROW,LIBCCALL,(int n, float x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(__j0l,libc_j0l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(j0l,libc_j0l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__j1l,libc_j1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(j1l,libc_j1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__jnl,libc_jnl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(jnl,libc_jnl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(__y0l,libc_y0l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(y0l,libc_y0l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__y1l,libc_y1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(y1l,libc_y1l,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__ynl,libc_ynl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(ynl,libc_ynl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(int n, __LONGDOUBLE x),(n,x));
+DEFINE_PUBLIC_ALIAS_P(__lgamma_r,libc_lgamma_r,WUNUSED ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, int *signgamp),(x,signgamp));
+DEFINE_PUBLIC_ALIAS_P(lgamma_r,libc_lgamma_r,WUNUSED ATTR_OUT(2),double,NOTHROW_NCX,LIBCCALL,(double x, int *signgamp),(x,signgamp));
+DEFINE_PUBLIC_ALIAS_P(__lgammaf_r,libc_lgammaf_r,WUNUSED ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, int *signgamp),(x,signgamp));
+DEFINE_PUBLIC_ALIAS_P(lgammaf_r,libc_lgammaf_r,WUNUSED ATTR_OUT(2),float,NOTHROW_NCX,LIBCCALL,(float x, int *signgamp),(x,signgamp));
+DEFINE_PUBLIC_ALIAS_P(__lgammal_r,libc_lgammal_r,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *signgamp),(x,signgamp));
+DEFINE_PUBLIC_ALIAS_P(lgammal_r,libc_lgammal_r,WUNUSED ATTR_OUT(2),__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int *signgamp),(x,signgamp));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_scalb, libc_scalb);
+DEFINE_PUBLIC_ALIAS_P(_scalb,libc_scalb,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double fn),(x,fn));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__scalb, libc_scalb);
-DEFINE_PUBLIC_ALIAS(scalb, libc_scalb);
+DEFINE_PUBLIC_ALIAS_P(__scalb,libc_scalb,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double fn),(x,fn));
+DEFINE_PUBLIC_ALIAS_P(scalb,libc_scalb,WUNUSED,double,NOTHROW,LIBCCALL,(double x, double fn),(x,fn));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_scalbf, libc_scalbf);
+DEFINE_PUBLIC_ALIAS_P(_scalbf,libc_scalbf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float fn),(x,fn));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__scalbf, libc_scalbf);
-DEFINE_PUBLIC_ALIAS(scalbf, libc_scalbf);
-DEFINE_PUBLIC_ALIAS(__scalbl, libc_scalbl);
-DEFINE_PUBLIC_ALIAS(scalbl, libc_scalbl);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassify, libd___fpclassify);
-DEFINE_PUBLIC_ALIAS(DOS$_dclass, libd___fpclassify);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassify, libd___fpclassify);
-DEFINE_PUBLIC_ALIAS(fpclassify, libc___fpclassify);
+DEFINE_PUBLIC_ALIAS_P(__scalbf,libc_scalbf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float fn),(x,fn));
+DEFINE_PUBLIC_ALIAS_P(scalbf,libc_scalbf,WUNUSED,float,NOTHROW,LIBCCALL,(float x, float fn),(x,fn));
+DEFINE_PUBLIC_ALIAS_P(__scalbl,libc_scalbl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE fn),(x,fn));
+DEFINE_PUBLIC_ALIAS_P(scalbl,libc_scalbl,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE fn),(x,fn));
+DEFINE_PUBLIC_ALIAS_P(DOS$fpclassify,libd___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$_dclass,libd___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$__fpclassify,libd___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(fpclassify,libc___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_dclass, libc___fpclassify);
+DEFINE_PUBLIC_ALIAS_P(_dclass,libc___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__fpclassify, libc___fpclassify);
+DEFINE_PUBLIC_ALIAS_P(__fpclassify,libc___fpclassify,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_dsign, libc___signbit);
+DEFINE_PUBLIC_ALIAS_P(_dsign,libc___signbit,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__signbit, libc___signbit);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassifyf, libd___fpclassifyf);
-DEFINE_PUBLIC_ALIAS(DOS$_fdclass, libd___fpclassifyf);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyf, libd___fpclassifyf);
-DEFINE_PUBLIC_ALIAS(fpclassifyf, libc___fpclassifyf);
+DEFINE_PUBLIC_ALIAS_P(__signbit,libc___signbit,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$fpclassifyf,libd___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$_fdclass,libd___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$__fpclassifyf,libd___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(fpclassifyf,libc___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_fdclass, libc___fpclassifyf);
+DEFINE_PUBLIC_ALIAS_P(_fdclass,libc___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__fpclassifyf, libc___fpclassifyf);
+DEFINE_PUBLIC_ALIAS_P(__fpclassifyf,libc___fpclassifyf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_fdsign, libc___signbitf);
+DEFINE_PUBLIC_ALIAS_P(_fdsign,libc___signbitf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__signbitf, libc___signbitf);
-DEFINE_PUBLIC_ALIAS(DOS$fpclassifyl, libd___fpclassifyl);
-DEFINE_PUBLIC_ALIAS(DOS$_ldclass, libd___fpclassifyl);
-DEFINE_PUBLIC_ALIAS(DOS$__fpclassifyl, libd___fpclassifyl);
-DEFINE_PUBLIC_ALIAS(fpclassifyl, libc___fpclassifyl);
+DEFINE_PUBLIC_ALIAS_P(__signbitf,libc___signbitf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$fpclassifyl,libd___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ldclass,libd___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(DOS$__fpclassifyl,libd___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBDCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(fpclassifyl,libc___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_ldclass, libc___fpclassifyl);
+DEFINE_PUBLIC_ALIAS_P(_ldclass,libc___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__fpclassifyl, libc___fpclassifyl);
+DEFINE_PUBLIC_ALIAS_P(__fpclassifyl,libc___fpclassifyl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_ldsign, libc___signbitl);
+DEFINE_PUBLIC_ALIAS_P(_ldsign,libc___signbitl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__signbitl, libc___signbitl);
-DEFINE_PUBLIC_ALIAS(issignaling, libc___issignaling);
-DEFINE_PUBLIC_ALIAS(__issignaling, libc___issignaling);
-DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
-DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
-DEFINE_PUBLIC_ALIAS(__iscanonicall, libc___iscanonicall);
-DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
-DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
-DEFINE_PUBLIC_ALIAS(nextdown, libc_nextdown);
-DEFINE_PUBLIC_ALIAS(nextup, libc_nextup);
-DEFINE_PUBLIC_ALIAS(nextdownf, libc_nextdownf);
-DEFINE_PUBLIC_ALIAS(nextupf, libc_nextupf);
-DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
-DEFINE_PUBLIC_ALIAS(nextupl, libc_nextupl);
-DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
-DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
-DEFINE_PUBLIC_ALIAS(fmaxmag, libc_fmaxmag);
-DEFINE_PUBLIC_ALIAS(fminmag, libc_fminmag);
-DEFINE_PUBLIC_ALIAS(canonicalize, libc_canonicalize);
-DEFINE_PUBLIC_ALIAS(llogbf, libc_llogbf);
-DEFINE_PUBLIC_ALIAS(roundevenf, libc_roundevenf);
-DEFINE_PUBLIC_ALIAS(fromfpf, libc_fromfpf);
-DEFINE_PUBLIC_ALIAS(ufromfpf, libc_ufromfpf);
-DEFINE_PUBLIC_ALIAS(fromfpxf, libc_fromfpxf);
-DEFINE_PUBLIC_ALIAS(ufromfpxf, libc_ufromfpxf);
-DEFINE_PUBLIC_ALIAS(fmaxmagf, libc_fmaxmagf);
-DEFINE_PUBLIC_ALIAS(fminmagf, libc_fminmagf);
-DEFINE_PUBLIC_ALIAS(canonicalizef, libc_canonicalizef);
-DEFINE_PUBLIC_ALIAS(llogbl, libc_llogbl);
-DEFINE_PUBLIC_ALIAS(roundevenl, libc_roundevenl);
-DEFINE_PUBLIC_ALIAS(fromfpl, libc_fromfpl);
-DEFINE_PUBLIC_ALIAS(ufromfpl, libc_ufromfpl);
-DEFINE_PUBLIC_ALIAS(fromfpxl, libc_fromfpxl);
-DEFINE_PUBLIC_ALIAS(ufromfpxl, libc_ufromfpxl);
-DEFINE_PUBLIC_ALIAS(fmaxmagl, libc_fmaxmagl);
-DEFINE_PUBLIC_ALIAS(fminmagl, libc_fminmagl);
-DEFINE_PUBLIC_ALIAS(canonicalizel, libc_canonicalizel);
-DEFINE_PUBLIC_ALIAS(_dpcomp, libc__dpcomp);
-DEFINE_PUBLIC_ALIAS(_fdpcomp, libc__fdpcomp);
-DEFINE_PUBLIC_ALIAS(_ldpcomp, libc__ldpcomp);
-DEFINE_PUBLIC_ALIAS(DOS$_dtest, libd__dtest);
-DEFINE_PUBLIC_ALIAS(_dtest, libc__dtest);
-DEFINE_PUBLIC_ALIAS(DOS$_fdtest, libd__fdtest);
-DEFINE_PUBLIC_ALIAS(_fdtest, libc__fdtest);
-DEFINE_PUBLIC_ALIAS(DOS$_ldtest, libd__ldtest);
-DEFINE_PUBLIC_ALIAS(_ldtest, libc__ldtest);
-DEFINE_PUBLIC_ALIAS(_chgsignf, libc__chgsignf);
-DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
+DEFINE_PUBLIC_ALIAS_P(__signbitl,libc___signbitl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(issignaling,libc___issignaling,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(__issignaling,libc___issignaling,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(issignalingf,libc___issignalingf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__issignalingf,libc___issignalingf,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(__iscanonicall,libc___iscanonicall,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(issignalingl,libc___issignalingl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(__issignalingl,libc___issignalingl,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextdown,libc_nextdown,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextup,libc_nextup,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextdownf,libc_nextdownf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextupf,libc_nextupf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextdownl,libc_nextdownl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(nextupl,libc_nextupl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(llogb,libc_llogb,WUNUSED,long int,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(roundeven,libc_roundeven,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
+DEFINE_PUBLIC_ALIAS_P(fmaxmag,libc_fmaxmag,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fminmag,libc_fminmag,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(canonicalize,libc_canonicalize,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(double *cx, double const *x),(cx,x));
+DEFINE_PUBLIC_ALIAS_P(llogbf,libc_llogbf,WUNUSED,long int,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(roundevenf,libc_roundevenf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(fromfpf,libc_fromfpf,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(float x, int roundf, unsigned int width),(x,roundf,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfpf,libc_ufromfpf,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(float x, int roundf, unsigned int width),(x,roundf,width));
+DEFINE_PUBLIC_ALIAS_P(fromfpxf,libc_fromfpxf,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(float x, int roundf, unsigned int width),(x,roundf,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfpxf,libc_ufromfpxf,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(float x, int roundf, unsigned int width),(x,roundf,width));
+DEFINE_PUBLIC_ALIAS_P(fmaxmagf,libc_fmaxmagf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fminmagf,libc_fminmagf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(canonicalizef,libc_canonicalizef,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(float *cx, float const *x),(cx,x));
+DEFINE_PUBLIC_ALIAS_P(llogbl,libc_llogbl,WUNUSED,long int,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(roundevenl,libc_roundevenl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
+DEFINE_PUBLIC_ALIAS_P(fromfpl,libc_fromfpl,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfpl,libc_ufromfpl,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
+DEFINE_PUBLIC_ALIAS_P(fromfpxl,libc_fromfpxl,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfpxl,libc_ufromfpxl,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, int roundl, unsigned int width),(x,roundl,width));
+DEFINE_PUBLIC_ALIAS_P(fmaxmagl,libc_fmaxmagl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(fminmagl,libc_fminmagl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(canonicalizel,libc_canonicalizel,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE *cx, __LONGDOUBLE const *x),(cx,x));
+DEFINE_PUBLIC_ALIAS_P(_dpcomp,libc__dpcomp,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(double x, double y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(_fdpcomp,libc__fdpcomp,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(float x, float y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(_ldpcomp,libc__ldpcomp,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE y),(x,y));
+DEFINE_PUBLIC_ALIAS_P(DOS$_dtest,libd__dtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBDCALL,(double __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(_dtest,libc__dtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBCCALL,(double __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(DOS$_fdtest,libd__fdtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBDCALL,(float __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(_fdtest,libc__fdtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBCCALL,(float __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ldtest,libd__ldtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBDCALL,(__LONGDOUBLE __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(_ldtest,libc__ldtest,ATTR_PURE WUNUSED ATTR_IN(1),short,NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE __KOS_FIXED_CONST *px),(px));
+DEFINE_PUBLIC_ALIAS_P(_chgsignf,libc__chgsignf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float x),(x));
+DEFINE_PUBLIC_ALIAS_P(_chgsign,libc__chgsign,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double x),(x));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MATH_C */

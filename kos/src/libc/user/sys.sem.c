@@ -114,14 +114,14 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 /*[[[end:libc_semtimedop]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x879137b2]]]*/
+/*[[[start:exports,hash:CRC-32=0x75467587]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$semctl, libd_semctl);
+DEFINE_PUBLIC_ALIAS_P(DOS$semctl,libd_semctl,,int,NOTHROW_NCX,VLIBDCALL,(int semid, __STDC_INT_AS_UINT_T semnum, __STDC_INT_AS_UINT_T cmd, ...),(semid,semnum,cmd,));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(semctl, libc_semctl);
-DEFINE_PUBLIC_ALIAS(semget, libc_semget);
-DEFINE_PUBLIC_ALIAS(semop, libc_semop);
-DEFINE_PUBLIC_ALIAS(semtimedop, libc_semtimedop);
+DEFINE_PUBLIC_ALIAS_P(semctl,libc_semctl,,int,NOTHROW_NCX,VLIBCCALL,(int semid, __STDC_INT_AS_UINT_T semnum, __STDC_INT_AS_UINT_T cmd, ...),(semid,semnum,cmd,));
+DEFINE_PUBLIC_ALIAS_P(semget,libc_semget,,int,NOTHROW_NCX,LIBCCALL,(key_t key, __STDC_INT_AS_UINT_T nsems, __STDC_INT_AS_UINT_T semflg),(key,nsems,semflg));
+DEFINE_PUBLIC_ALIAS_P(semop,libc_semop,,int,NOTHROW_NCX,LIBCCALL,(int semid, struct sembuf *sops, size_t nsops),(semid,sops,nsops));
+DEFINE_PUBLIC_ALIAS_P(semtimedop,libc_semtimedop,,int,NOTHROW_NCX,LIBCCALL,(int semid, struct sembuf *sops, size_t nsops, struct timespec const *timeout),(semid,sops,nsops,timeout));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x877ab5fc */
+/* HASH CRC-32:0x313357b2 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,13 +365,13 @@ nextline:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(sgetspent, libc_sgetspent);
-DEFINE_PUBLIC_ALIAS(putspent, libc_putspent);
-DEFINE_PUBLIC_ALIAS(__sgetspent_r, libc_sgetspent_r);
-DEFINE_PUBLIC_ALIAS(sgetspent_r, libc_sgetspent_r);
-DEFINE_PUBLIC_ALIAS(__fgetspent_r, libc_fgetspent_r);
-DEFINE_PUBLIC_ALIAS(fgetspent_r, libc_fgetspent_r);
-DEFINE_PUBLIC_ALIAS(fgetspnam_r, libc_fgetspnam_r);
+DEFINE_PUBLIC_ALIAS_P(sgetspent,libc_sgetspent,WUNUSED ATTR_IN(1),struct spwd *,NOTHROW_RPC,LIBCCALL,(char const *__restrict string),(string));
+DEFINE_PUBLIC_ALIAS_P(putspent,libc_putspent,ATTR_IN(1) ATTR_INOUT(2),int,NOTHROW_CB_NCX,LIBCCALL,(struct spwd const *__restrict ent, FILE *__restrict stream),(ent,stream));
+DEFINE_PUBLIC_ALIAS_P(__sgetspent_r,libc_sgetspent_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict string, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(string,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(sgetspent_r,libc_sgetspent_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict string, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(string,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__fgetspent_r,libc_fgetspent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetspent_r,libc_fgetspent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetspnam_r,libc_fgetspnam_r,ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5),errno_t,NOTHROW_RPC,LIBCCALL,(FILE *__restrict stream, char const *filtered_name, struct spwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result),(stream,filtered_name,resultbuf,buffer,buflen,result));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SHADOW_C */

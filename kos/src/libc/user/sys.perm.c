@@ -77,15 +77,15 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 /*[[[end:libc_iopl]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x49144702]]]*/
+/*[[[start:exports,hash:CRC-32=0xc8ebc69d]]]*/
 #include <bits/typesizes.h>
 #ifdef __SIZEOF_PORT_T__
-DEFINE_PUBLIC_ALIAS(__ioperm, libc_ioperm);
-DEFINE_PUBLIC_ALIAS(__libc_ioperm, libc_ioperm);
-DEFINE_PUBLIC_ALIAS(ioperm, libc_ioperm);
-DEFINE_PUBLIC_ALIAS(__iopl, libc_iopl);
-DEFINE_PUBLIC_ALIAS(__libc_iopl, libc_iopl);
-DEFINE_PUBLIC_ALIAS(iopl, libc_iopl);
+DEFINE_PUBLIC_ALIAS_P(__ioperm,libc_ioperm,,int,NOTHROW_NCX,LIBCCALL,(ulongptr_t from, ulongptr_t num, __STDC_INT_AS_UINT_T turn_on),(from,num,turn_on));
+DEFINE_PUBLIC_ALIAS_P(__libc_ioperm,libc_ioperm,,int,NOTHROW_NCX,LIBCCALL,(ulongptr_t from, ulongptr_t num, __STDC_INT_AS_UINT_T turn_on),(from,num,turn_on));
+DEFINE_PUBLIC_ALIAS_P(ioperm,libc_ioperm,,int,NOTHROW_NCX,LIBCCALL,(ulongptr_t from, ulongptr_t num, __STDC_INT_AS_UINT_T turn_on),(from,num,turn_on));
+DEFINE_PUBLIC_ALIAS_P(__iopl,libc_iopl,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T level),(level));
+DEFINE_PUBLIC_ALIAS_P(__libc_iopl,libc_iopl,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T level),(level));
+DEFINE_PUBLIC_ALIAS_P(iopl,libc_iopl,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T level),(level));
 #endif /* __SIZEOF_PORT_T__ */
 /*[[[end:exports]]]*/
 

@@ -3051,8 +3051,8 @@ err:
 /*[[[end:libc_wordexp]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x182c4d42]]]*/
-DEFINE_PUBLIC_ALIAS(wordexp, libc_wordexp);
+/*[[[start:exports,hash:CRC-32=0x3a80479]]]*/
+DEFINE_PUBLIC_ALIAS_P(wordexp,libc_wordexp,ATTR_IN(1) NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(char const *__restrict string, wordexp_t *__restrict self, __STDC_INT_AS_UINT_T flags),(string,self,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

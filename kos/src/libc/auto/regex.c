@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e1cd2b0 */
+/* HASH CRC-32:0xe44c5e83 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -424,16 +424,16 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(re_set_syntax, libc_re_set_syntax);
-DEFINE_PUBLIC_ALIAS(re_compile_fastmap, libc_re_compile_fastmap);
-DEFINE_PUBLIC_ALIAS(re_set_registers, libc_re_set_registers);
-DEFINE_PUBLIC_ALIAS(regerror, libc_regerror);
-DEFINE_PUBLIC_ALIAS(regfree, libc_regfree);
-DEFINE_PUBLIC_ALIAS(regerrordesc_np, libc_regerrordesc_np);
-DEFINE_PUBLIC_ALIAS(regsubprintv, libc_regsubprintv);
-DEFINE_PUBLIC_ALIAS(regsubprint, libc_regsubprint);
-DEFINE_PUBLIC_ALIAS(regnsub, libc_regnsub);
-DEFINE_PUBLIC_ALIAS(regasub, libc_regasub);
+DEFINE_PUBLIC_ALIAS_P(re_set_syntax,libc_re_set_syntax,,reg_syntax_t,NOTHROW_NCX,LIBCCALL,(reg_syntax_t syntax),(syntax));
+DEFINE_PUBLIC_ALIAS_P(re_compile_fastmap,libc_re_compile_fastmap,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(regex_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(re_set_registers,libc_re_set_registers,ATTR_INOUT(1) ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(regex_t *self, struct __re_registers *regs, unsigned int num_regs, regoff_t *starts, regoff_t *ends),(self,regs,num_regs,starts,ends));
+DEFINE_PUBLIC_ALIAS_P(regerror,libc_regerror,ATTR_IN(2) ATTR_OUTS(3, 4),size_t,NOTHROW_NCX,LIBCCALL,(int errcode, regex_t const *__restrict self, char *__restrict errbuf, size_t errbuf_size),(errcode,self,errbuf,errbuf_size));
+DEFINE_PUBLIC_ALIAS_P_VOID(regfree,libc_regfree,,NOTHROW_NCX,LIBCCALL,(regex_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(regerrordesc_np,libc_regerrordesc_np,ATTR_CONST WUNUSED,char const *,NOTHROW,LIBCCALL,(int errcode),(errcode));
+DEFINE_PUBLIC_ALIAS_P(regsubprintv,libc_regsubprintv,ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)),ssize_t,NOTHROW_NCX,LIBCCALL,(__pformatprinter printer, void *arg, char const *sed_format, struct iovec const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]),(printer,arg,sed_format,srcbase,nmatch,pmatch));
+DEFINE_PUBLIC_ALIAS_P(regsubprint,libc_regsubprint,ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)),ssize_t,NOTHROW_NCX,LIBCCALL,(__pformatprinter printer, void *arg, char const *sed_format, void const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]),(printer,arg,sed_format,srcbase,nmatch,pmatch));
+DEFINE_PUBLIC_ALIAS_P(regnsub,libc_regnsub,ATTR_IN(3) ATTR_IN(5) ATTR_OUTS(1, 2) NONNULL((4)),size_t,NOTHROW_NCX,LIBCCALL,(char *buf, size_t len, char const *sed_format, regmatch_t const *pmatch, char const *srcbase),(buf,len,sed_format,pmatch,srcbase));
+DEFINE_PUBLIC_ALIAS_P(regasub,libc_regasub,ATTR_IN(2) ATTR_IN(4) ATTR_OUT(1) NONNULL((3)),ssize_t,NOTHROW_NCX,LIBCCALL,(char **p_buf, char const *sed_format, regmatch_t const *pmatch, char const *srcbase),(p_buf,sed_format,pmatch,srcbase));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_REGEX_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe7d060 */
+/* HASH CRC-32:0x3fdbda59 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,11 +137,11 @@ NOTHROW_NCX(LIBCCALL libc_sl_delete)(struct _stringlist *sl,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(sl_init, libc_sl_init);
-DEFINE_PUBLIC_ALIAS(sl_add, libc_sl_add);
-DEFINE_PUBLIC_ALIAS(sl_free, libc_sl_free);
-DEFINE_PUBLIC_ALIAS(sl_find, libc_sl_find);
-DEFINE_PUBLIC_ALIAS(sl_delete, libc_sl_delete);
+DEFINE_PUBLIC_ALIAS_P(sl_init,libc_sl_init,WUNUSED,struct _stringlist *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(sl_add,libc_sl_add,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct _stringlist *sl, char *name),(sl,name));
+DEFINE_PUBLIC_ALIAS_P_VOID(sl_free,libc_sl_free,ATTR_INOUT_OPT(1),NOTHROW_NCX,LIBCCALL,(struct _stringlist *sl, int freeit),(sl,freeit));
+DEFINE_PUBLIC_ALIAS_P(sl_find,libc_sl_find,ATTR_PURE ATTR_IN(1) ATTR_IN(2),char *,NOTHROW_NCX,LIBCCALL,(struct _stringlist __KOS_FIXED_CONST *sl, char const *name),(sl,name));
+DEFINE_PUBLIC_ALIAS_P(sl_delete,libc_sl_delete,WUNUSED ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct _stringlist *sl, char const *name, int freeit),(sl,name,freeit));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRINGLIST_C */

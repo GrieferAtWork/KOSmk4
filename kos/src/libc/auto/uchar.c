@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17b11436 */
+/* HASH CRC-32:0x66ad26e4 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,24 +411,24 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(convert_freev, libc_convert_freev);
-DEFINE_PUBLIC_ALIAS(convert_freevn, libc_convert_freevn);
-DEFINE_PUBLIC_ALIAS(DOS$convert_wcstombs, libd_convert_wcstombs);
-DEFINE_PUBLIC_ALIAS(convert_wcstombs, libc_convert_wcstombs);
-DEFINE_PUBLIC_ALIAS(DOS$convert_wcstombsn, libd_convert_wcstombsn);
-DEFINE_PUBLIC_ALIAS(convert_wcstombsn, libc_convert_wcstombsn);
-DEFINE_PUBLIC_ALIAS(DOS$convert_wcstombsv, libd_convert_wcstombsv);
-DEFINE_PUBLIC_ALIAS(convert_wcstombsv, libc_convert_wcstombsv);
-DEFINE_PUBLIC_ALIAS(DOS$convert_wcstombsvn, libd_convert_wcstombsvn);
-DEFINE_PUBLIC_ALIAS(convert_wcstombsvn, libc_convert_wcstombsvn);
-DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcs, libd_convert_mbstowcs);
-DEFINE_PUBLIC_ALIAS(convert_mbstowcs, libc_convert_mbstowcs);
-DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsn, libd_convert_mbstowcsn);
-DEFINE_PUBLIC_ALIAS(convert_mbstowcsn, libc_convert_mbstowcsn);
-DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsv, libd_convert_mbstowcsv);
-DEFINE_PUBLIC_ALIAS(convert_mbstowcsv, libc_convert_mbstowcsv);
-DEFINE_PUBLIC_ALIAS(DOS$convert_mbstowcsvn, libd_convert_mbstowcsvn);
-DEFINE_PUBLIC_ALIAS(convert_mbstowcsvn, libc_convert_mbstowcsvn);
+DEFINE_PUBLIC_ALIAS_P_VOID(convert_freev,libc_convert_freev,,NOTHROW_NCX,LIBCCALL,(void *vector),(vector));
+DEFINE_PUBLIC_ALIAS_P_VOID(convert_freevn,libc_convert_freevn,,NOTHROW_NCX,LIBCCALL,(void *vector, size_t count),(vector,count));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_wcstombs,libd_convert_wcstombs,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBDCALL,(char16_t const *str),(str));
+DEFINE_PUBLIC_ALIAS_P(convert_wcstombs,libc_convert_wcstombs,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBKCALL,(char32_t const *str),(str));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_wcstombsn,libd_convert_wcstombsn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3),char *,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict str, size_t len, size_t *preslen),(str,len,preslen));
+DEFINE_PUBLIC_ALIAS_P(convert_wcstombsn,libc_convert_wcstombsn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3),char *,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict str, size_t len, size_t *preslen),(str,len,preslen));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_wcstombsv,libd_convert_wcstombsv,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char **,NOTHROW_NCX,LIBDCALL,(char16_t const *const *__restrict vector),(vector));
+DEFINE_PUBLIC_ALIAS_P(convert_wcstombsv,libc_convert_wcstombsv,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char **,NOTHROW_NCX,LIBKCALL,(char32_t const *const *__restrict vector),(vector));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_wcstombsvn,libd_convert_wcstombsvn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2),char **,NOTHROW_NCX,LIBDCALL,(char16_t const *const *__restrict vector, size_t count),(vector,count));
+DEFINE_PUBLIC_ALIAS_P(convert_wcstombsvn,libc_convert_wcstombsvn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2),char **,NOTHROW_NCX,LIBKCALL,(char32_t const *const *__restrict vector, size_t count),(vector,count));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_mbstowcs,libd_convert_mbstowcs,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char16_t *,NOTHROW_NCX,LIBDCALL,(char const *__restrict str),(str));
+DEFINE_PUBLIC_ALIAS_P(convert_mbstowcs,libc_convert_mbstowcs,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char32_t *,NOTHROW_NCX,LIBKCALL,(char const *__restrict str),(str));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_mbstowcsn,libd_convert_mbstowcsn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3),char16_t *,NOTHROW_NCX,LIBDCALL,(char const *__restrict str, size_t len, size_t *preslen),(str,len,preslen));
+DEFINE_PUBLIC_ALIAS_P(convert_mbstowcsn,libc_convert_mbstowcsn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3),char32_t *,NOTHROW_NCX,LIBKCALL,(char const *__restrict str, size_t len, size_t *preslen),(str,len,preslen));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_mbstowcsv,libd_convert_mbstowcsv,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char16_t **,NOTHROW_NCX,LIBDCALL,(char const *const *__restrict vector),(vector));
+DEFINE_PUBLIC_ALIAS_P(convert_mbstowcsv,libc_convert_mbstowcsv,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char32_t **,NOTHROW_NCX,LIBKCALL,(char const *const *__restrict vector),(vector));
+DEFINE_PUBLIC_ALIAS_P(DOS$convert_mbstowcsvn,libd_convert_mbstowcsvn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2),char16_t **,NOTHROW_NCX,LIBDCALL,(char const *const *__restrict vector, size_t count),(vector,count));
+DEFINE_PUBLIC_ALIAS_P(convert_mbstowcsvn,libc_convert_mbstowcsvn,ATTR_MALLOC WUNUSED ATTR_INS(1, 2),char32_t **,NOTHROW_NCX,LIBKCALL,(char const *const *__restrict vector, size_t count),(vector,count));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UCHAR_C */

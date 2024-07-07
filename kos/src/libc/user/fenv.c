@@ -73,11 +73,11 @@ NOTHROW_NCX(LIBCCALL libc_fesetmode)(femode_t const *modep)
 }
 /*[[[end:libc_fesetmode]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x1d557cfe]]]*/
-DEFINE_PUBLIC_ALIAS(fesetexcept, libc_fesetexcept);
-DEFINE_PUBLIC_ALIAS(fetestexceptflag, libc_fetestexceptflag);
-DEFINE_PUBLIC_ALIAS(fegetmode, libc_fegetmode);
-DEFINE_PUBLIC_ALIAS(fesetmode, libc_fesetmode);
+/*[[[start:exports,hash:CRC-32=0x1dfc83ed]]]*/
+DEFINE_PUBLIC_ALIAS_P(fesetexcept,libc_fesetexcept,,int,NOTHROW_NCX,LIBCCALL,(int excepts),(excepts));
+DEFINE_PUBLIC_ALIAS_P(fetestexceptflag,libc_fetestexceptflag,,int,NOTHROW_NCX,LIBCCALL,(fexcept_t const *flagp, int excepts),(flagp,excepts));
+DEFINE_PUBLIC_ALIAS_P(fegetmode,libc_fegetmode,,int,NOTHROW_NCX,LIBCCALL,(femode_t *modep),(modep));
+DEFINE_PUBLIC_ALIAS_P(fesetmode,libc_fesetmode,,int,NOTHROW_NCX,LIBCCALL,(femode_t const *modep),(modep));
 /*[[[end:exports]]]*/
 
 DECL_END

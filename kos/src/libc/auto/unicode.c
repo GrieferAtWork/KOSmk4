@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x274116f */
+/* HASH CRC-32:0xc18b1007 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1825,64 +1825,64 @@ err:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(unicode_readutf8, libc_unicode_readutf8);
-DEFINE_PUBLIC_ALIAS(unicode_readutf8_rev, libc_unicode_readutf8_rev);
-DEFINE_PUBLIC_ALIAS(unicode_readutf8_n, libc_unicode_readutf8_n);
-DEFINE_PUBLIC_ALIAS(unicode_readutf8_rev_n, libc_unicode_readutf8_rev_n);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16, libc_unicode_readutf16);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_n, libc_unicode_readutf16_n);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap, libc_unicode_readutf16_swap);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_n, libc_unicode_readutf16_swap_n);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_rev, libc_unicode_readutf16_rev);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_rev, libc_unicode_readutf16_swap_rev);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_rev_n, libc_unicode_readutf16_rev_n);
-DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_rev_n, libc_unicode_readutf16_swap_rev_n);
-DEFINE_PUBLIC_ALIAS(unicode_writeutf8, libc_unicode_writeutf8);
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf8,libc_unicode_readutf8,WUNUSED ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf8_rev,libc_unicode_readutf8_rev,ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf8_n,libc_unicode_readutf8_n,ATTR_INOUT(1) NONNULL((2)),char32_t,NOTHROW_NCX,LIBCCALL,(char const **__restrict ptext, char const *text_end),(ptext,text_end));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf8_rev_n,libc_unicode_readutf8_rev_n,ATTR_IN(2) ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char const **__restrict ptext, char const *text_start),(ptext,text_start));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16,libc_unicode_readutf16,ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_n,libc_unicode_readutf16_n,ATTR_INOUT(1) NONNULL((2)),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext, char16_t const *text_end),(ptext,text_end));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_swap,libc_unicode_readutf16_swap,ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_swap_n,libc_unicode_readutf16_swap_n,ATTR_INOUT(1) NONNULL((2)),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext, char16_t const *text_end),(ptext,text_end));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_rev,libc_unicode_readutf16_rev,ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_swap_rev,libc_unicode_readutf16_swap_rev,ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext),(ptext));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_rev_n,libc_unicode_readutf16_rev_n,ATTR_INOUT(1) NONNULL((2)),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext, char16_t const *text_start),(ptext,text_start));
+DEFINE_PUBLIC_ALIAS_P(unicode_readutf16_swap_rev_n,libc_unicode_readutf16_swap_rev_n,ATTR_IN(2) ATTR_INOUT(1),char32_t,NOTHROW_NCX,LIBCCALL,(char16_t const **__restrict ptext, char16_t const *text_start),(ptext,text_start));
+DEFINE_PUBLIC_ALIAS_P(unicode_writeutf8,libc_unicode_writeutf8,ATTR_RETNONNULL ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict dst, char32_t ch),(dst,ch));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_writeutf8_n, libc_unicode_writeutf8_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_writeutf8_n,libc_unicode_writeutf8_n,ATTR_RETNONNULL ATTR_OUTS(1, 3),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict dst, char32_t ch, size_t dst_maxbytes),(dst,ch,dst_maxbytes));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_writeutf16, libc_unicode_writeutf16);
-DEFINE_PUBLIC_ALIAS(unicode_writeutf16_chk, libc_unicode_writeutf16_chk);
+DEFINE_PUBLIC_ALIAS_P(unicode_writeutf16,libc_unicode_writeutf16,ATTR_RETNONNULL ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict dst, char32_t ch),(dst,ch));
+DEFINE_PUBLIC_ALIAS_P(unicode_writeutf16_chk,libc_unicode_writeutf16_chk,WUNUSED ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict dst, char32_t ch),(dst,ch));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_len8to16, libc_unicode_len8to16);
-DEFINE_PUBLIC_ALIAS(unicode_len8to32, libc_unicode_len8to32);
+DEFINE_PUBLIC_ALIAS_P(unicode_len8to16,libc_unicode_len8to16,WUNUSED ATTR_INS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict utf8_text, size_t utf8_bytes),(utf8_text,utf8_bytes));
+DEFINE_PUBLIC_ALIAS_P(unicode_len8to32,libc_unicode_len8to32,WUNUSED ATTR_INS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict utf8_text, size_t utf8_bytes),(utf8_text,utf8_bytes));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_8to16, libc_unicode_8to16);
+DEFINE_PUBLIC_ALIAS_P(unicode_8to16,libc_unicode_8to16,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_bytes),(utf16_dst,utf8_text,utf8_bytes));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_8to16_n, libc_unicode_8to16_n);
-DEFINE_PUBLIC_ALIAS(unicode_8to16_chk, libc_unicode_8to16_chk);
-DEFINE_PUBLIC_ALIAS(unicode_8to16_chk_n, libc_unicode_8to16_chk_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_8to16_n,libc_unicode_8to16_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, size_t utf16_maxwords, char const *__restrict utf8_text, size_t utf8_bytes),(utf16_dst,utf16_maxwords,utf8_text,utf8_bytes));
+DEFINE_PUBLIC_ALIAS_P(unicode_8to16_chk,libc_unicode_8to16_chk,WUNUSED ATTR_INS(2, 3) ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_bytes),(utf16_dst,utf8_text,utf8_bytes));
+DEFINE_PUBLIC_ALIAS_P(unicode_8to16_chk_n,libc_unicode_8to16_chk_n,WUNUSED ATTR_INS(3, 4) ATTR_OUTS(1, 2),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, size_t utf16_maxwords, char const *__restrict utf8_text, size_t utf8_bytes),(utf16_dst,utf16_maxwords,utf8_text,utf8_bytes));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_8to32, libc_unicode_8to32);
+DEFINE_PUBLIC_ALIAS_P(unicode_8to32,libc_unicode_8to32,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char32_t *,NOTHROW_NCX,LIBCCALL,(char32_t *__restrict utf32_dst, char const *__restrict utf8_text, size_t utf8_bytes),(utf32_dst,utf8_text,utf8_bytes));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_8to32_n, libc_unicode_8to32_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_8to32_n,libc_unicode_8to32_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char32_t *,NOTHROW_NCX,LIBCCALL,(char32_t *__restrict utf32_dst, size_t utf32_maxwords, char const *__restrict utf8_text, size_t utf8_bytes),(utf32_dst,utf32_maxwords,utf8_text,utf8_bytes));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_16to8, libc_unicode_16to8);
+DEFINE_PUBLIC_ALIAS_P(unicode_16to8,libc_unicode_16to8,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict utf8_dst, char16_t const *__restrict utf16_text, size_t utf16_words),(utf8_dst,utf16_text,utf16_words));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_16to8_n, libc_unicode_16to8_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_16to8_n,libc_unicode_16to8_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict utf8_dst, size_t utf8_maxbytes, char16_t const *__restrict utf16_text, size_t utf16_words),(utf8_dst,utf8_maxbytes,utf16_text,utf16_words));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_16to32, libc_unicode_16to32);
+DEFINE_PUBLIC_ALIAS_P(unicode_16to32,libc_unicode_16to32,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char32_t *,NOTHROW_NCX,LIBCCALL,(char32_t *__restrict utf32_dst, char16_t const *__restrict utf16_text, size_t utf16_words),(utf32_dst,utf16_text,utf16_words));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_16to32_n, libc_unicode_16to32_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_16to32_n,libc_unicode_16to32_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char32_t *,NOTHROW_NCX,LIBCCALL,(char32_t *__restrict utf32_dst, size_t utf32_maxwords, char16_t const *__restrict utf16_text, size_t utf16_words),(utf32_dst,utf32_maxwords,utf16_text,utf16_words));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_32to8, libc_unicode_32to8);
+DEFINE_PUBLIC_ALIAS_P(unicode_32to8,libc_unicode_32to8,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict utf8_dst, char32_t const *__restrict utf32_text, size_t utf32_dwords),(utf8_dst,utf32_text,utf32_dwords));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_32to8_n, libc_unicode_32to8_n);
+DEFINE_PUBLIC_ALIAS_P(unicode_32to8_n,libc_unicode_32to8_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char *,NOTHROW_NCX,LIBCCALL,(char *__restrict utf8_dst, size_t utf8_maxbytes, char32_t const *__restrict utf32_text, size_t utf32_dwords),(utf8_dst,utf8_maxbytes,utf32_text,utf32_dwords));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(unicode_32to16, libc_unicode_32to16);
+DEFINE_PUBLIC_ALIAS_P(unicode_32to16,libc_unicode_32to16,ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, char32_t const *__restrict utf32_text, size_t utf32_dwords),(utf16_dst,utf32_text,utf32_dwords));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(unicode_32to16_n, libc_unicode_32to16_n);
-DEFINE_PUBLIC_ALIAS(unicode_c8toc16, libc_unicode_c8toc16);
-DEFINE_PUBLIC_ALIAS(unicode_c8toc32, libc_unicode_c8toc32);
-DEFINE_PUBLIC_ALIAS(unicode_c16toc8, libc_unicode_c16toc8);
-DEFINE_PUBLIC_ALIAS(DOS$format_8tow, libd_format_8tow);
-DEFINE_PUBLIC_ALIAS(format_8tow, libc_format_8tow);
-DEFINE_PUBLIC_ALIAS(DOS$format_wto8, libd_format_wto8);
-DEFINE_PUBLIC_ALIAS(format_wto8, libc_format_wto8);
-DEFINE_PUBLIC_ALIAS(DOS$format_wto32, libd_format_wto32);
-DEFINE_PUBLIC_ALIAS(format_wto32, libc_format_wto32);
-DEFINE_PUBLIC_ALIAS(DOS$format_wto16, libd_format_wto16);
-DEFINE_PUBLIC_ALIAS(format_wto16, libc_format_wto16);
+DEFINE_PUBLIC_ALIAS_P(unicode_32to16_n,libc_unicode_32to16_n,ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2),char16_t *,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict utf16_dst, size_t utf16_maxwords, char32_t const *__restrict utf32_text, size_t utf32_dwords),(utf16_dst,utf16_maxwords,utf32_text,utf32_dwords));
+DEFINE_PUBLIC_ALIAS_P(unicode_c8toc16,libc_unicode_c8toc16,ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1),size_t,NOTHROW_NCX,LIBCCALL,(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs),(pc16,s,n,mbs));
+DEFINE_PUBLIC_ALIAS_P(unicode_c8toc32,libc_unicode_c8toc32,ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1),size_t,NOTHROW_NCX,LIBCCALL,(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs),(pc32,s,n,mbs));
+DEFINE_PUBLIC_ALIAS_P(unicode_c16toc8,libc_unicode_c16toc8,ATTR_INOUT(3) ATTR_OUT(1),size_t,NOTHROW_NCX,LIBCCALL,(char pc8[3], char16_t c16, mbstate_t *__restrict mbs),(pc8,c16,mbs));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_8tow,libd_format_8tow,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_8tow,libc_format_8tow,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wto8,libd_format_wto8,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_wto8,libc_format_wto8,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wto32,libd_format_wto32,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_wto32,libc_format_wto32,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wto16,libd_format_wto16,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_wto16,libc_format_wto16,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *data, size_t datalen),(arg,data,datalen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNICODE_C */

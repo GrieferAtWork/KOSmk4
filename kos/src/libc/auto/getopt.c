@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf481becf */
+/* HASH CRC-32:0xc8e7120f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -753,11 +753,11 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(bsd_getopt, libc_getopt);
-DEFINE_PUBLIC_ALIAS(getopt, libc_getopt);
-DEFINE_PUBLIC_ALIAS(__posix_getopt, libc___posix_getopt);
-DEFINE_PUBLIC_ALIAS(getopt_long, libc_getopt_long);
-DEFINE_PUBLIC_ALIAS(getopt_long_only, libc_getopt_long_only);
+DEFINE_PUBLIC_ALIAS_P(bsd_getopt,libc_getopt,WUNUSED NONNULL((2, 3)),int,NOTHROW_NCX,LIBCCALL,(int argc, char *const argv[], char const *optstring),(argc,argv,optstring));
+DEFINE_PUBLIC_ALIAS_P(getopt,libc_getopt,WUNUSED NONNULL((2, 3)),int,NOTHROW_NCX,LIBCCALL,(int argc, char *const argv[], char const *optstring),(argc,argv,optstring));
+DEFINE_PUBLIC_ALIAS_P(__posix_getopt,libc___posix_getopt,WUNUSED NONNULL((2, 3)),int,NOTHROW_NCX,LIBCCALL,(int argc, char *const argv[], char const *optstring),(argc,argv,optstring));
+DEFINE_PUBLIC_ALIAS_P(getopt_long,libc_getopt_long,WUNUSED NONNULL((2, 3)),int,NOTHROW_NCX,LIBCCALL,(int argc, char *const argv[], char const *optstring, struct option const *longopts, int *longindex),(argc,argv,optstring,longopts,longindex));
+DEFINE_PUBLIC_ALIAS_P(getopt_long_only,libc_getopt_long_only,WUNUSED NONNULL((2, 3)),int,NOTHROW_NCX,LIBCCALL,(int argc, char *const argv[], char const *optstring, struct option const *longopts, int *longindex),(argc,argv,optstring,longopts,longindex));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_GETOPT_C */

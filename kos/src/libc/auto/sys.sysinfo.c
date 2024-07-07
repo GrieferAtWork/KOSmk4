@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0598a9a */
+/* HASH CRC-32:0xc711877 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,10 +81,10 @@ NOTHROW(LIBCCALL libc_get_avphys_pages)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__get_phys_pages, libc_get_phys_pages);
-DEFINE_PUBLIC_ALIAS(get_phys_pages, libc_get_phys_pages);
-DEFINE_PUBLIC_ALIAS(__get_avphys_pages, libc_get_avphys_pages);
-DEFINE_PUBLIC_ALIAS(get_avphys_pages, libc_get_avphys_pages);
+DEFINE_PUBLIC_ALIAS_P(__get_phys_pages,libc_get_phys_pages,WUNUSED,intptr_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(get_phys_pages,libc_get_phys_pages,WUNUSED,intptr_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__get_avphys_pages,libc_get_avphys_pages,WUNUSED,intptr_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(get_avphys_pages,libc_get_avphys_pages,WUNUSED,intptr_t,NOTHROW,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SYSINFO_C */

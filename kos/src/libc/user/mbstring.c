@@ -54,9 +54,9 @@ NOTHROW_NCX(LIBCCALL libc__mbctombb_l)(unsigned int ch,
 }
 /*[[[end:libc__mbctombb_l]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xa191700b]]]*/
-DEFINE_PUBLIC_ALIAS(_mbbtombc_l, libc__mbbtombc_l);
-DEFINE_PUBLIC_ALIAS(_mbctombb_l, libc__mbctombb_l);
+/*[[[start:exports,hash:CRC-32=0x61c6e2d7]]]*/
+DEFINE_PUBLIC_ALIAS_P(_mbbtombc_l,libc__mbbtombc_l,ATTR_PURE WUNUSED,unsigned int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_mbctombb_l,libc__mbctombb_l,ATTR_PURE WUNUSED,unsigned int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
 /*[[[end:exports]]]*/
 
 DECL_END

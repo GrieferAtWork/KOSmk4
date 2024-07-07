@@ -216,10 +216,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x21dee637]]]*/
-DEFINE_PUBLIC_ALIAS(getttyent, libc_getttyent);
-DEFINE_PUBLIC_ALIAS(setttyent, libc_setttyent);
-DEFINE_PUBLIC_ALIAS(endttyent, libc_endttyent);
+/*[[[start:exports,hash:CRC-32=0x210a9003]]]*/
+DEFINE_PUBLIC_ALIAS_P(getttyent,libc_getttyent,,struct ttyent *,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(setttyent,libc_setttyent,,int,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(endttyent,libc_endttyent,,int,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

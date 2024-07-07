@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c822e0b */
+/* HASH CRC-32:0x12dd0615 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,8 +173,8 @@ restart:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(flopen, libc_flopen);
-DEFINE_PUBLIC_ALIAS(flopenat, libc_flopenat);
+DEFINE_PUBLIC_ALIAS_P(flopen,libc_flopen,,fd_t,NOTHROW_RPC,VLIBCCALL,(const char *path, oflag_t flags, ...),(path,flags,));
+DEFINE_PUBLIC_ALIAS_P(flopenat,libc_flopenat,,fd_t,NOTHROW_RPC,VLIBCCALL,(fd_t dirfd, const char *path, oflag_t flags, ...),(dirfd,path,flags,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_BSD_LIBUTIL_C */

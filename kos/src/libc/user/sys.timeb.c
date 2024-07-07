@@ -156,20 +156,20 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xeb1992c0]]]*/
-DEFINE_PUBLIC_ALIAS(_ftime, libc__ftime32);
-DEFINE_PUBLIC_ALIAS(_ftime32, libc__ftime32);
+/*[[[start:exports,hash:CRC-32=0x166fa9f5]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(_ftime,libc__ftime32,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeb32 *timebuf),(timebuf));
+DEFINE_PUBLIC_ALIAS_P_VOID(_ftime32,libc__ftime32,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeb32 *timebuf),(timebuf));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(_ftime64, libc__ftime64);
+DEFINE_PUBLIC_ALIAS_P_VOID(_ftime64,libc__ftime64,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(struct timeb64 *timebuf),(timebuf));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(_ftime32_s, libc__ftime32_s);
+DEFINE_PUBLIC_ALIAS_P(_ftime32_s,libc__ftime32_s,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct timeb32 *timebuf),(timebuf));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(_ftime64_s, libc__ftime64_s);
+DEFINE_PUBLIC_ALIAS_P(_ftime64_s,libc__ftime64_s,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct timeb64 *timebuf),(timebuf));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(ftime, libc_ftime);
+DEFINE_PUBLIC_ALIAS_P(ftime,libc_ftime,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timeb *timebuf),(timebuf));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(ftime64, libc_ftime64);
+DEFINE_PUBLIC_ALIAS_P(ftime64,libc_ftime64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timeb64 *timebuf),(timebuf));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

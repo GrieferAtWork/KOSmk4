@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6cb568e */
+/* HASH CRC-32:0x8ce5849 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -856,28 +856,28 @@ err_synbad:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(vis, libc_vis);
-DEFINE_PUBLIC_ALIAS(nvis, libc_nvis);
-DEFINE_PUBLIC_ALIAS(svis, libc_svis);
-DEFINE_PUBLIC_ALIAS(snvis, libc_snvis);
-DEFINE_PUBLIC_ALIAS(strvis, libc_strvis);
-DEFINE_PUBLIC_ALIAS(stravis, libc_stravis);
-DEFINE_PUBLIC_ALIAS(strnvis_netbsd, libc_strnvis_netbsd);
-DEFINE_PUBLIC_ALIAS(strnvis, libc_strnvis);
-DEFINE_PUBLIC_ALIAS(strsvis, libc_strsvis);
-DEFINE_PUBLIC_ALIAS(strsnvis, libc_strsnvis);
-DEFINE_PUBLIC_ALIAS(strvisx, libc_strvisx);
-DEFINE_PUBLIC_ALIAS(strnvisx, libc_strnvisx);
-DEFINE_PUBLIC_ALIAS(strenvisx, libc_strenvisx);
-DEFINE_PUBLIC_ALIAS(strsvisx, libc_strsvisx);
-DEFINE_PUBLIC_ALIAS(strsnvisx, libc_strsnvisx);
-DEFINE_PUBLIC_ALIAS(strsenvisx, libc_strsenvisx);
-DEFINE_PUBLIC_ALIAS(strunvis, libc_strunvis);
-DEFINE_PUBLIC_ALIAS(strnunvis_netbsd, libc_strnunvis_netbsd);
-DEFINE_PUBLIC_ALIAS(strnunvis, libc_strnunvis);
-DEFINE_PUBLIC_ALIAS(strunvisx, libc_strunvisx);
-DEFINE_PUBLIC_ALIAS(strnunvisx, libc_strnunvisx);
-DEFINE_PUBLIC_ALIAS(unvis, libc_unvis);
+DEFINE_PUBLIC_ALIAS_P(vis,libc_vis,NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char *dst, int c, int flags, int nextc),(dst,c,flags,nextc));
+DEFINE_PUBLIC_ALIAS_P(nvis,libc_nvis,ATTR_OUTS(1, 2),char *,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, int c, int flags, int nextc),(dst,dstsize,c,flags,nextc));
+DEFINE_PUBLIC_ALIAS_P(svis,libc_svis,ATTR_IN(5) NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char *dst, int c, int flags, int nextc, char const *mbextra),(dst,c,flags,nextc,mbextra));
+DEFINE_PUBLIC_ALIAS_P(snvis,libc_snvis,ATTR_IN(6) ATTR_OUTS(1, 2),char *,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, int c, int flags, int nextc, char const *mbextra),(dst,dstsize,c,flags,nextc,mbextra));
+DEFINE_PUBLIC_ALIAS_P(strvis,libc_strvis,ATTR_IN(2) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, int flags),(dst,src,flags));
+DEFINE_PUBLIC_ALIAS_P(stravis,libc_stravis,ATTR_IN_OPT(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(char **p_resstr, char const *src, int flags),(p_resstr,src,flags));
+DEFINE_PUBLIC_ALIAS_P(strnvis_netbsd,libc_strnvis_netbsd,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, int flags),(dst,dstsize,src,flags));
+DEFINE_PUBLIC_ALIAS_P(strnvis,libc_strnvis,ATTR_OUTS(1, 3),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, size_t dstsize, int flags),(dst,src,dstsize,flags));
+DEFINE_PUBLIC_ALIAS_P(strsvis,libc_strsvis,ATTR_IN(4) ATTR_IN_OPT(2) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, int flags, char const *mbextra),(dst,src,flags,mbextra));
+DEFINE_PUBLIC_ALIAS_P(strsnvis,libc_strsnvis,ATTR_IN(5) ATTR_IN_OPT(3) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, int flags, char const *mbextra),(dst,dstsize,src,flags,mbextra));
+DEFINE_PUBLIC_ALIAS_P(strvisx,libc_strvisx,ATTR_INS(2, 3) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, size_t srclen, int flags),(dst,src,srclen,flags));
+DEFINE_PUBLIC_ALIAS_P(strnvisx,libc_strnvisx,ATTR_INS(3, 4) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, size_t srclen, int flags),(dst,dstsize,src,srclen,flags));
+DEFINE_PUBLIC_ALIAS_P(strenvisx,libc_strenvisx,ATTR_INS(3, 4) ATTR_OUTS(1, 2) ATTR_OUT_OPT(6),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, size_t srclen, int flags, int *cerr_ptr),(dst,dstsize,src,srclen,flags,cerr_ptr));
+DEFINE_PUBLIC_ALIAS_P(strsvisx,libc_strsvisx,ATTR_IN(5) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, size_t srclen, int flags, char const *mbextra),(dst,src,srclen,flags,mbextra));
+DEFINE_PUBLIC_ALIAS_P(strsnvisx,libc_strsnvisx,ATTR_IN(6) ATTR_INS(3, 4) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, size_t srclen, int flags, char const *mbextra),(dst,dstsize,src,srclen,flags,mbextra));
+DEFINE_PUBLIC_ALIAS_P(strsenvisx,libc_strsenvisx,ATTR_IN(6) ATTR_INS(3, 4) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, size_t srclen, int flags, char const *mbextra, int *cerr_ptr),(dst,dstsize,src,srclen,flags,mbextra,cerr_ptr));
+DEFINE_PUBLIC_ALIAS_P(strunvis,libc_strunvis,ATTR_IN(2) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(strnunvis_netbsd,libc_strnunvis_netbsd,ATTR_IN(3) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src),(dst,dstsize,src));
+DEFINE_PUBLIC_ALIAS_P(strnunvis,libc_strnunvis,ATTR_IN(2) ATTR_OUTS(1, 3),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, size_t dstsize),(dst,src,dstsize));
+DEFINE_PUBLIC_ALIAS_P(strunvisx,libc_strunvisx,ATTR_IN(2) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *dst, char const *src, int flags),(dst,src,flags));
+DEFINE_PUBLIC_ALIAS_P(strnunvisx,libc_strnunvisx,ATTR_IN(3) ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *dst, size_t dstsize, char const *src, int flags),(dst,dstsize,src,flags));
+DEFINE_PUBLIC_ALIAS_P(unvis,libc_unvis,ATTR_INOUT(3) NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char *p_outbyte, int inbyte, int *p_state, int flags),(p_outbyte,inbyte,p_state,flags));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_VIS_C */

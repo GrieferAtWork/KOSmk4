@@ -325,10 +325,10 @@ err:
 /*[[[end:libc_backtrace_symbol_printf]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xa014b7f7]]]*/
-DEFINE_PUBLIC_ALIAS(__backtrace, libc_backtrace);
-DEFINE_PUBLIC_ALIAS(backtrace, libc_backtrace);
-DEFINE_PUBLIC_ALIAS(backtrace_symbol_printf, libc_backtrace_symbol_printf);
+/*[[[start:exports,hash:CRC-32=0xac1c8535]]]*/
+DEFINE_PUBLIC_ALIAS_P(__backtrace,libc_backtrace,ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,NOTHROW_NCX,LIBCCALL,(void **array, __STDC_INT_AS_SIZE_T size),(array,size));
+DEFINE_PUBLIC_ALIAS_P(backtrace,libc_backtrace,ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,NOTHROW_NCX,LIBCCALL,(void **array, __STDC_INT_AS_SIZE_T size),(array,size));
+DEFINE_PUBLIC_ALIAS_P(backtrace_symbol_printf,libc_backtrace_symbol_printf,ATTR_IN_OPT(4) NONNULL((1)),ssize_t,NOTHROW_NCX,LIBCCALL,(pformatprinter printer, void *arg, void const *address, char const *format),(printer,arg,address,format));
 /*[[[end:exports]]]*/
 
 DECL_END

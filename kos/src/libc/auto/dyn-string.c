@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf80f6685 */
+/* HASH CRC-32:0x557459e7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,24 +290,24 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_eq)(struct dyn_string __KOS_FIXED_CONST *lh
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(dyn_string_init, libc_dyn_string_init);
-DEFINE_PUBLIC_ALIAS(dyn_string_new, libc_dyn_string_new);
-DEFINE_PUBLIC_ALIAS(dyn_string_delete, libc_dyn_string_delete);
-DEFINE_PUBLIC_ALIAS(dyn_string_release, libc_dyn_string_release);
-DEFINE_PUBLIC_ALIAS(dyn_string_resize, libc_dyn_string_resize);
-DEFINE_PUBLIC_ALIAS(dyn_string_clear, libc_dyn_string_clear);
-DEFINE_PUBLIC_ALIAS(dyn_string_copy, libc_dyn_string_copy);
-DEFINE_PUBLIC_ALIAS(dyn_string_copy_cstr, libc_dyn_string_copy_cstr);
-DEFINE_PUBLIC_ALIAS(dyn_string_prepend, libc_dyn_string_prepend);
-DEFINE_PUBLIC_ALIAS(dyn_string_prepend_cstr, libc_dyn_string_prepend_cstr);
-DEFINE_PUBLIC_ALIAS(dyn_string_insert, libc_dyn_string_insert);
-DEFINE_PUBLIC_ALIAS(dyn_string_insert_cstr, libc_dyn_string_insert_cstr);
-DEFINE_PUBLIC_ALIAS(dyn_string_insert_char, libc_dyn_string_insert_char);
-DEFINE_PUBLIC_ALIAS(dyn_string_append, libc_dyn_string_append);
-DEFINE_PUBLIC_ALIAS(dyn_string_append_cstr, libc_dyn_string_append_cstr);
-DEFINE_PUBLIC_ALIAS(dyn_string_append_char, libc_dyn_string_append_char);
-DEFINE_PUBLIC_ALIAS(dyn_string_substring, libc_dyn_string_substring);
-DEFINE_PUBLIC_ALIAS(dyn_string_eq, libc_dyn_string_eq);
+DEFINE_PUBLIC_ALIAS_P(dyn_string_init,libc_dyn_string_init,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *self, __STDC_INT_AS_SIZE_T min_chars),(self,min_chars));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_new,libc_dyn_string_new,ATTR_RETNONNULL,struct dyn_string *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_SIZE_T min_chars),(min_chars));
+DEFINE_PUBLIC_ALIAS_P_VOID(dyn_string_delete,libc_dyn_string_delete,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct dyn_string *self),(self));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_release,libc_dyn_string_release,ATTR_RETNONNULL ATTR_INOUT(1),char *,NOTHROW_NCX,LIBCCALL,(struct dyn_string *self),(self));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_resize,libc_dyn_string_resize,ATTR_RETNONNULL ATTR_INOUT(1),struct dyn_string *,NOTHROW_NCX,LIBCCALL,(struct dyn_string *self, __STDC_INT_AS_SIZE_T min_chars),(self,min_chars));
+DEFINE_PUBLIC_ALIAS_P_VOID(dyn_string_clear,libc_dyn_string_clear,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct dyn_string *self),(self));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_copy,libc_dyn_string_copy,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_copy_cstr,libc_dyn_string_copy_cstr,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, char const *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_prepend,libc_dyn_string_prepend,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_prepend_cstr,libc_dyn_string_prepend_cstr,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, char const *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_insert,libc_dyn_string_insert,ATTR_IN(3) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, __STDC_INT_AS_SIZE_T index, struct dyn_string __KOS_FIXED_CONST *src),(dst,index,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_insert_cstr,libc_dyn_string_insert_cstr,ATTR_IN(3) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, __STDC_INT_AS_SIZE_T index, char const *src),(dst,index,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_insert_char,libc_dyn_string_insert_char,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, __STDC_INT_AS_SIZE_T index, int ch),(dst,index,ch));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_append,libc_dyn_string_append,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_append_cstr,libc_dyn_string_append_cstr,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, char const *src),(dst,src));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_append_char,libc_dyn_string_append_char,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, int ch),(dst,ch));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_substring,libc_dyn_string_substring,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T end),(dst,src,start,end));
+DEFINE_PUBLIC_ALIAS_P(dyn_string_eq,libc_dyn_string_eq,ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(struct dyn_string __KOS_FIXED_CONST *lhs, struct dyn_string __KOS_FIXED_CONST *rhs),(lhs,rhs));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_DYN_STRING_C */

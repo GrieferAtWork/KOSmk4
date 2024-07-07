@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ed86884 */
+/* HASH CRC-32:0x63356356 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -456,7 +456,7 @@ NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__
-DEFINE_INTERN_ALIAS(libc_copylist, libc_copylist_sz);
+DEFINE_INTERN_ALIAS_P(libc_copylist,libc_copylist_sz,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET *p_filesize),(filename,p_filesize));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
@@ -524,7 +524,7 @@ NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename,
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_SIZE_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-DEFINE_INTERN_ALIAS(libd_copylist64, libd_copylist);
+DEFINE_INTERN_ALIAS_P(libd_copylist64,libd_copylist,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBDCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
 #else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
@@ -587,11 +587,11 @@ NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename,
 #endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist);
+DEFINE_INTERN_ALIAS_P(libc_copylist64,libc_copylist,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
 #elif __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist);
+DEFINE_INTERN_ALIAS_P(libc_copylist64,libc_copylist,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
 #elif __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__
-DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist_sz);
+DEFINE_INTERN_ALIAS_P(libc_copylist64,libc_copylist_sz,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
 #else /* ... */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
@@ -832,22 +832,22 @@ NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(dirname, libc_dirname);
-DEFINE_PUBLIC_ALIAS(__gnu_basename, libc___xpg_basename);
-DEFINE_PUBLIC_ALIAS(__xpg_basename, libc___xpg_basename);
-DEFINE_PUBLIC_ALIAS(bgets, libc_bgets);
-DEFINE_PUBLIC_ALIAS(bufsplit, libc_bufsplit);
-DEFINE_PUBLIC_ALIAS(DOS$copylist, libd_copylist);
-DEFINE_PUBLIC_ALIAS(copylist, libc_copylist);
-DEFINE_PUBLIC_ALIAS(DOS$copylist64, libd_copylist64);
-DEFINE_PUBLIC_ALIAS(copylist64, libc_copylist64);
-DEFINE_PUBLIC_ALIAS(strcadd, libc_strcadd);
-DEFINE_PUBLIC_ALIAS(strccpy, libc_strccpy);
-DEFINE_PUBLIC_ALIAS(streadd, libc_streadd);
-DEFINE_PUBLIC_ALIAS(strecpy, libc_strecpy);
-DEFINE_PUBLIC_ALIAS(strfind, libc_strfind);
-DEFINE_PUBLIC_ALIAS(strrspn, libc_strrspn);
-DEFINE_PUBLIC_ALIAS(strtrns, libc_strtrns);
+DEFINE_PUBLIC_ALIAS_P(dirname,libc_dirname,ATTR_RETNONNULL ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char *path),(path));
+DEFINE_PUBLIC_ALIAS_P(__gnu_basename,libc___xpg_basename,ATTR_RETNONNULL ATTR_INOUT_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(__xpg_basename,libc___xpg_basename,ATTR_RETNONNULL ATTR_INOUT_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(bgets,libc_bgets,ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars),(buf,buflen_minus_one,fp,stop_chars));
+DEFINE_PUBLIC_ALIAS_P(bufsplit,libc_bufsplit,ATTR_INOUT_OPT(1) ATTR_OUT_OPT(3),size_t,NOTHROW_NCX,LIBCCALL,(char *string, size_t result_c, char **result_v),(string,result_c,result_v));
+DEFINE_PUBLIC_ALIAS_P(DOS$copylist,libd_copylist,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBDCALL,(char const *filename, __PIO_OFFSET *p_filesize),(filename,p_filesize));
+DEFINE_PUBLIC_ALIAS_P(copylist,libc_copylist,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET *p_filesize),(filename,p_filesize));
+DEFINE_PUBLIC_ALIAS_P(DOS$copylist64,libd_copylist64,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBDCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
+DEFINE_PUBLIC_ALIAS_P(copylist64,libc_copylist64,WUNUSED ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *filename, __PIO_OFFSET64 *p_filesize),(filename,p_filesize));
+DEFINE_PUBLIC_ALIAS_P(strcadd,libc_strcadd,ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *dstbuf, char const *string),(dstbuf,string));
+DEFINE_PUBLIC_ALIAS_P(strccpy,libc_strccpy,ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *dstbuf, char const *string),(dstbuf,string));
+DEFINE_PUBLIC_ALIAS_P(streadd,libc_streadd,ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *dstbuf, char const *string, char const *dont_encode),(dstbuf,string,dont_encode));
+DEFINE_PUBLIC_ALIAS_P(strecpy,libc_strecpy,ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char *dstbuf, char const *string, char const *dont_encode),(dstbuf,string,dont_encode));
+DEFINE_PUBLIC_ALIAS_P(strfind,libc_strfind,ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(char const *haystack, char const *needle),(haystack,needle));
+DEFINE_PUBLIC_ALIAS_P(strrspn,libc_strrspn,ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_IN(2),char *,NOTHROW_NCX,LIBCCALL,(char const *haystack, char const *accept),(haystack,accept));
+DEFINE_PUBLIC_ALIAS_P(strtrns,libc_strtrns,ATTR_RETNONNULL ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) ATTR_OUT(4),char *,NOTHROW_NCX,LIBCCALL,(char const *string, char const *find_map, char const *repl_map, char *result),(string,find_map,repl_map,result));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBGEN_C */

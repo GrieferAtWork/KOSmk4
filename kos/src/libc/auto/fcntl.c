@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd997369d */
+/* HASH CRC-32:0xf99bcea5 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,11 +101,11 @@ NOTHROW_NCX(VLIBCCALL libc___open_nocancel)(char const *filename,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(directio, libc_directio);
-DEFINE_PUBLIC_ALIAS(DOS$__open64_nocancel, libd___open_nocancel);
-DEFINE_PUBLIC_ALIAS(DOS$__open_nocancel, libd___open_nocancel);
-DEFINE_PUBLIC_ALIAS(__open64_nocancel, libc___open_nocancel);
-DEFINE_PUBLIC_ALIAS(__open_nocancel, libc___open_nocancel);
+DEFINE_PUBLIC_ALIAS_P(directio,libc_directio,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, int mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$__open64_nocancel,libd___open_nocancel,WUNUSED ATTR_IN(1),fd_t,NOTHROW_NCX,VLIBDCALL,(char const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$__open_nocancel,libd___open_nocancel,WUNUSED ATTR_IN(1),fd_t,NOTHROW_NCX,VLIBDCALL,(char const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(__open64_nocancel,libc___open_nocancel,WUNUSED ATTR_IN(1),fd_t,NOTHROW_NCX,VLIBCCALL,(char const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(__open_nocancel,libc___open_nocancel,WUNUSED ATTR_IN(1),fd_t,NOTHROW_NCX,VLIBCCALL,(char const *filename, oflag_t oflags, ...),(filename,oflags,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FCNTL_C */

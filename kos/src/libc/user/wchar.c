@@ -713,40 +713,40 @@ NOTHROW_CB_NCX(LIBDCALL libd_file_wprinter_unlocked)(void *arg,
 }
 /*[[[end:libd_file_wprinter_unlocked]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xc66a9a01]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
-DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
-DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
-DEFINE_PUBLIC_ALIAS(fgetwc, libc_fgetwc);
-DEFINE_PUBLIC_ALIAS(DOS$putwc, libd_fputwc);
-DEFINE_PUBLIC_ALIAS(DOS$fputwc, libd_fputwc);
-DEFINE_PUBLIC_ALIAS(putwc, libc_fputwc);
-DEFINE_PUBLIC_ALIAS(fputwc, libc_fputwc);
-DEFINE_PUBLIC_ALIAS(DOS$ungetwc, libd_ungetwc);
-DEFINE_PUBLIC_ALIAS(ungetwc, libc_ungetwc);
-DEFINE_PUBLIC_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
-DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
-DEFINE_PUBLIC_ALIAS(DOS$getwc_unlocked, libd_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_getwc_nolock, libd_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_fgetwc_nolock, libd_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$fgetwc_unlocked, libd_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(getwc_unlocked, libc_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(fgetwc_unlocked, libc_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$putwc_unlocked, libd_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_putwc_nolock, libd_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_fputwc_nolock, libd_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$fputwc_unlocked, libd_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(putwc_unlocked, libc_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(fputwc_unlocked, libc_fputwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$file_wprinter, libd_file_wprinter);
-DEFINE_PUBLIC_ALIAS(file_wprinter, libc_file_wprinter);
-DEFINE_PUBLIC_ALIAS(DOS$file_wprinter_unlocked, libd_file_wprinter_unlocked);
-DEFINE_PUBLIC_ALIAS(file_wprinter_unlocked, libc_file_wprinter_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_ungetwc_nolock, libd_ungetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$ungetwc_unlocked, libd_ungetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(ungetwc_unlocked, libc_ungetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$fgetwln, libd_fgetwln);
-DEFINE_PUBLIC_ALIAS(fgetwln, libc_fgetwln);
+/*[[[start:exports,hash:CRC-32=0xcc8ae557]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$getwc,libd_fgetwc,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$fgetwc,libd_fgetwc,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(getwc,libc_fgetwc,ATTR_INOUT(1),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(fgetwc,libc_fgetwc,ATTR_INOUT(1),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$putwc,libd_fputwc,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$fputwc,libd_fputwc,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(putwc,libc_fputwc,ATTR_INOUT(2),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(char32_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(fputwc,libc_fputwc,ATTR_INOUT(2),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(char32_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$ungetwc,libd_ungetwc,ATTR_INOUT(2),wint16_t,NOTHROW_NCX,LIBDCALL,(wint16_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(ungetwc,libc_ungetwc,ATTR_INOUT(2),wint32_t,NOTHROW_NCX,LIBKCALL,(wint32_t wc, FILE *stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$open_wmemstream,libd_open_wmemstream,,FILE *,NOTHROW_NCX,LIBDCALL,(char16_t **bufloc, size_t *sizeloc),(bufloc,sizeloc));
+DEFINE_PUBLIC_ALIAS_P(open_wmemstream,libc_open_wmemstream,,FILE *,NOTHROW_NCX,LIBKCALL,(char32_t **bufloc, size_t *sizeloc),(bufloc,sizeloc));
+DEFINE_PUBLIC_ALIAS_P(DOS$getwc_unlocked,libd_fgetwc_unlocked,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$_getwc_nolock,libd_fgetwc_unlocked,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$_fgetwc_nolock,libd_fgetwc_unlocked,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$fgetwc_unlocked,libd_fgetwc_unlocked,ATTR_INOUT(1),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(getwc_unlocked,libc_fgetwc_unlocked,ATTR_INOUT(1),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(fgetwc_unlocked,libc_fgetwc_unlocked,ATTR_INOUT(1),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$putwc_unlocked,libd_fputwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$_putwc_nolock,libd_fputwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$_fputwc_nolock,libd_fputwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$fputwc_unlocked,libd_fputwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_CB_NCX,LIBDCALL,(char16_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(putwc_unlocked,libc_fputwc_unlocked,ATTR_INOUT(2),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(char32_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(fputwc_unlocked,libc_fputwc_unlocked,ATTR_INOUT(2),wint32_t,NOTHROW_CB_NCX,LIBKCALL,(char32_t wc, FILE *__restrict stream),(wc,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$file_wprinter,libd_file_wprinter,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_CB_NCX,LIBDCALL,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(file_wprinter,libc_file_wprinter,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_CB_NCX,LIBKCALL,(void *arg, char32_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$file_wprinter_unlocked,libd_file_wprinter_unlocked,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_CB_NCX,LIBDCALL,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(file_wprinter_unlocked,libc_file_wprinter_unlocked,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_CB_NCX,LIBKCALL,(void *arg, char32_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$_ungetwc_nolock,libd_ungetwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_NCX,LIBDCALL,(wint16_t ch, FILE *__restrict stream),(ch,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$ungetwc_unlocked,libd_ungetwc_unlocked,ATTR_INOUT(2),wint16_t,NOTHROW_NCX,LIBDCALL,(wint16_t ch, FILE *__restrict stream),(ch,stream));
+DEFINE_PUBLIC_ALIAS_P(ungetwc_unlocked,libc_ungetwc_unlocked,ATTR_INOUT(2),wint32_t,NOTHROW_NCX,LIBKCALL,(wint32_t ch, FILE *__restrict stream),(ch,stream));
+DEFINE_PUBLIC_ALIAS_P(DOS$fgetwln,libd_fgetwln,WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(FILE *__restrict stream, size_t *__restrict lenp),(stream,lenp));
+DEFINE_PUBLIC_ALIAS_P(fgetwln,libc_fgetwln,WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(FILE *__restrict stream, size_t *__restrict lenp),(stream,lenp));
 /*[[[end:exports]]]*/
 
 DECL_END

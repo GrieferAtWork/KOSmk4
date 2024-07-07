@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef458ce */
+/* HASH CRC-32:0x476b6f55 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ eof:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__cmsg_nxthdr, libc___cmsg_nxthdr);
+DEFINE_PUBLIC_ALIAS_P(__cmsg_nxthdr,libc___cmsg_nxthdr,ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2),struct cmsghdr *,NOTHROW_NCX,LIBCCALL,(struct msghdr *mhdr, struct cmsghdr *cmsg),(mhdr,cmsg));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SOCKET_C */

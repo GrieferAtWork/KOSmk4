@@ -55,9 +55,9 @@ NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x974c9a28]]]*/
-DEFINE_PUBLIC_ALIAS(gtty, libc_gtty);
-DEFINE_PUBLIC_ALIAS(stty, libc_stty);
+/*[[[start:exports,hash:CRC-32=0x94e82167]]]*/
+DEFINE_PUBLIC_ALIAS_P(gtty,libc_gtty,ATTR_FDARG(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct sgttyb *params),(fd,params));
+DEFINE_PUBLIC_ALIAS_P(stty,libc_stty,ATTR_FDARG(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct sgttyb const *params),(fd,params));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -134,18 +134,18 @@ NOTHROW(LIBCCALL libc_rtm_test)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe0fcce17]]]*/
+/*[[[start:exports,hash:CRC-32=0xec014d29]]]*/
 #ifndef LIBC_ARCH_HAVE_RTM_BEGIN
-DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin);
+DEFINE_PUBLIC_ALIAS_P(rtm_begin,libc_rtm_begin,,rtm_status_t,NOTHROW,LIBCCALL,(void),());
 #endif /* !LIBC_ARCH_HAVE_RTM_BEGIN */
 #ifndef LIBC_ARCH_HAVE_RTM_END
-DEFINE_PUBLIC_ALIAS(rtm_end, libc_rtm_end);
+DEFINE_PUBLIC_ALIAS_P_VOID(rtm_end,libc_rtm_end,,NOTHROW,LIBCCALL,(void),());
 #endif /* !LIBC_ARCH_HAVE_RTM_END */
 #ifndef LIBC_ARCH_HAVE_RTM_ABORT
-DEFINE_PUBLIC_ALIAS(rtm_abort, libc_rtm_abort);
+DEFINE_PUBLIC_ALIAS_P_VOID(rtm_abort,libc_rtm_abort,,NOTHROW,__FCALL,(unsigned int code),(code));
 #endif /* !LIBC_ARCH_HAVE_RTM_ABORT */
 #ifndef LIBC_ARCH_HAVE_RTM_TEST
-DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test);
+DEFINE_PUBLIC_ALIAS_P(rtm_test,libc_rtm_test,ATTR_PURE WUNUSED,int,NOTHROW,LIBCCALL,(void),());
 #endif /* !LIBC_ARCH_HAVE_RTM_TEST */
 /*[[[end:exports]]]*/
 

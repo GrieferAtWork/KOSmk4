@@ -136,11 +136,11 @@ libc_LFutexExpr(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 
-/*[[[start:exports,hash:CRC-32=0x7134ca14]]]*/
-DEFINE_PUBLIC_ALIAS(lfutexexpr, libc_lfutexexpr);
+/*[[[start:exports,hash:CRC-32=0xf7b54ae9]]]*/
+DEFINE_PUBLIC_ALIAS_P(lfutexexpr,libc_lfutexexpr,ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags),(ulockaddr,base,expr,timeout,timeout_flags));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(lfutexexpr64, libc_lfutexexpr64);
+DEFINE_PUBLIC_ALIAS_P(lfutexexpr64,libc_lfutexexpr64,ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags),(ulockaddr,base,expr,timeout,timeout_flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

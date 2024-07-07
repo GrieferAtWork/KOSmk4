@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c99b3f3 */
+/* HASH CRC-32:0x7c540a32 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,8 +161,8 @@ NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(attr_multi, libc_attr_multi);
-DEFINE_PUBLIC_ALIAS(attr_multif, libc_attr_multif);
+DEFINE_PUBLIC_ALIAS_P(attr_multi,libc_attr_multi,ATTR_IN(1) ATTR_INOUTS(2, 3),int,NOTHROW_NCX,LIBCCALL,(char const *path, struct attr_multiop *oplist, int count, int flags),(path,oplist,count,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_multif,libc_attr_multif,ATTR_FDARG(1) ATTR_INOUTS(2, 3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct attr_multiop *oplist, int count, int flags),(fd,oplist,count,flags));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ATTR_ATTRIBUTES_C */

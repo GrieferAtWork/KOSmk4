@@ -85,11 +85,11 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 /*[[[end:libc_shmdt]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x8b4a25ab]]]*/
-DEFINE_PUBLIC_ALIAS(shmctl, libc_shmctl);
-DEFINE_PUBLIC_ALIAS(shmget, libc_shmget);
-DEFINE_PUBLIC_ALIAS(shmat, libc_shmat);
-DEFINE_PUBLIC_ALIAS(shmdt, libc_shmdt);
+/*[[[start:exports,hash:CRC-32=0xb09707fb]]]*/
+DEFINE_PUBLIC_ALIAS_P(shmctl,libc_shmctl,,int,NOTHROW_NCX,LIBCCALL,(int shmid, __STDC_INT_AS_UINT_T cmd, struct shmid_ds *buf),(shmid,cmd,buf));
+DEFINE_PUBLIC_ALIAS_P(shmget,libc_shmget,,int,NOTHROW_NCX,LIBCCALL,(key_t key, size_t size, __STDC_INT_AS_UINT_T shmflg),(key,size,shmflg));
+DEFINE_PUBLIC_ALIAS_P(shmat,libc_shmat,,void *,NOTHROW_NCX,LIBCCALL,(int shmid, void const *shmaddr, __STDC_INT_AS_UINT_T shmflg),(shmid,shmaddr,shmflg));
+DEFINE_PUBLIC_ALIAS_P(shmdt,libc_shmdt,,int,NOTHROW_NCX,LIBCCALL,(void const *shmaddr),(shmaddr));
 /*[[[end:exports]]]*/
 
 DECL_END

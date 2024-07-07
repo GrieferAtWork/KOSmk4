@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca002501 */
+/* HASH CRC-32:0x1f505103 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,13 @@ NOTHROW_NCX(LIBDCALL libc__configure_narrow_argv)(_crt_argv_mode mode) {
 	(void)mode;
 	return 0;
 }
-DEFINE_INTERN_ALIAS(libc__configure_wide_argv, libc_libc__configure_narrow_argv);
+DEFINE_INTERN_ALIAS_P(libc__configure_wide_argv,libc_libc__configure_narrow_argv,,errno_t,NOTHROW_NCX,LIBDCALL,(_crt_argv_mode mode),(mode));
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initialize_narrow_environment)(void) {
 	COMPILER_IMPURE();
 	return 0;
 }
-DEFINE_INTERN_ALIAS(libc__initialize_wide_environment, libc_libc__initialize_narrow_environment);
+DEFINE_INTERN_ALIAS_P(libc__initialize_wide_environment,libc_libc__initialize_narrow_environment,,int,NOTHROW_NCX,LIBDCALL,(void),());
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED char **
 NOTHROW_NCX(LIBDCALL libc__get_initial_narrow_environment)(void) {
 	return *libc___p___initenv();
@@ -170,21 +170,21 @@ NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_query_app_type, libc__query_app_type);
-DEFINE_PUBLIC_ALIAS(_configure_narrow_argv, libc__configure_narrow_argv);
-DEFINE_PUBLIC_ALIAS(_configure_wide_argv, libc__configure_wide_argv);
-DEFINE_PUBLIC_ALIAS(_initialize_narrow_environment, libc__initialize_narrow_environment);
-DEFINE_PUBLIC_ALIAS(_initialize_wide_environment, libc__initialize_wide_environment);
-DEFINE_PUBLIC_ALIAS(_get_initial_narrow_environment, libc__get_initial_narrow_environment);
-DEFINE_PUBLIC_ALIAS(_get_initial_wide_environment, libc__get_initial_wide_environment);
-DEFINE_PUBLIC_ALIAS(_get_narrow_winmain_command_line, libc__get_narrow_winmain_command_line);
-DEFINE_PUBLIC_ALIAS(_get_wide_winmain_command_line, libc__get_wide_winmain_command_line);
-DEFINE_PUBLIC_ALIAS(_initterm, libc__initterm);
-DEFINE_PUBLIC_ALIAS(_initterm_e, libc__initterm_e);
-DEFINE_PUBLIC_ALIAS(_initialize_onexit_table, libc__initialize_onexit_table);
-DEFINE_PUBLIC_ALIAS(_register_onexit_function, libc__register_onexit_function);
-DEFINE_PUBLIC_ALIAS(_execute_onexit_table, libc__execute_onexit_table);
-DEFINE_PUBLIC_ALIAS(__dllonexit, libc___dllonexit);
+DEFINE_PUBLIC_ALIAS_P(_query_app_type,libc__query_app_type,ATTR_CONST WUNUSED,_crt_app_type,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_configure_narrow_argv,libc__configure_narrow_argv,,errno_t,NOTHROW_NCX,LIBDCALL,(_crt_argv_mode mode),(mode));
+DEFINE_PUBLIC_ALIAS_P(_configure_wide_argv,libc__configure_wide_argv,,errno_t,NOTHROW_NCX,LIBDCALL,(_crt_argv_mode mode),(mode));
+DEFINE_PUBLIC_ALIAS_P(_initialize_narrow_environment,libc__initialize_narrow_environment,,int,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_initialize_wide_environment,libc__initialize_wide_environment,,int,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_initial_narrow_environment,libc__get_initial_narrow_environment,ATTR_PURE WUNUSED,char **,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_initial_wide_environment,libc__get_initial_wide_environment,ATTR_PURE WUNUSED,__WCHAR16_TYPE__ **,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_narrow_winmain_command_line,libc__get_narrow_winmain_command_line,ATTR_PURE WUNUSED,char *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_wide_winmain_command_line,libc__get_wide_winmain_command_line,ATTR_PURE WUNUSED,__WCHAR16_TYPE__ *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(_initterm,libc__initterm,,NOTHROW_NCX,LIBDCALL,(_PVFV *start, _PVFV *end),(start,end));
+DEFINE_PUBLIC_ALIAS_P(_initterm_e,libc__initterm_e,,int,NOTHROW_NCX,LIBDCALL,(_onexit_t *start, _onexit_t *end),(start,end));
+DEFINE_PUBLIC_ALIAS_P(_initialize_onexit_table,libc__initialize_onexit_table,,int,NOTHROW_NCX,LIBDCALL,(struct _onexit_table_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(_register_onexit_function,libc__register_onexit_function,,int,NOTHROW_NCX,LIBDCALL,(struct _onexit_table_t *self, _onexit_t function),(self,function));
+DEFINE_PUBLIC_ALIAS_P(_execute_onexit_table,libc__execute_onexit_table,,int,NOTHROW_NCX,LIBDCALL,(struct _onexit_table_t *self),(self));
+DEFINE_PUBLIC_ALIAS_P(__dllonexit,libc___dllonexit,ATTR_INOUT(2) ATTR_INOUT(3),int,NOTHROW_NCX,LIBDCALL,(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end),(func,p_begin,p_end));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CORECRT_STARTUP_C */

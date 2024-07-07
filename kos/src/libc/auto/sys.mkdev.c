@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed6ea6aa */
+/* HASH CRC-32:0x4686d6f1 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,15 +72,15 @@ NOTHROW(LIBCCALL libc___minor)(int version,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(gnu_dev_makedev, libc_makedev);
-DEFINE_PUBLIC_ALIAS(makedev, libc_makedev);
-DEFINE_PUBLIC_ALIAS(gnu_dev_major, libc_major);
-DEFINE_PUBLIC_ALIAS(major, libc_major);
-DEFINE_PUBLIC_ALIAS(gnu_dev_minor, libc_minor);
-DEFINE_PUBLIC_ALIAS(minor, libc_minor);
-DEFINE_PUBLIC_ALIAS(__makedev, libc___makedev);
-DEFINE_PUBLIC_ALIAS(__major, libc___major);
-DEFINE_PUBLIC_ALIAS(__minor, libc___minor);
+DEFINE_PUBLIC_ALIAS_P(gnu_dev_makedev,libc_makedev,ATTR_CONST WUNUSED,dev_t,NOTHROW,LIBCCALL,(major_t maj, minor_t min),(maj,min));
+DEFINE_PUBLIC_ALIAS_P(makedev,libc_makedev,ATTR_CONST WUNUSED,dev_t,NOTHROW,LIBCCALL,(major_t maj, minor_t min),(maj,min));
+DEFINE_PUBLIC_ALIAS_P(gnu_dev_major,libc_major,ATTR_CONST WUNUSED,major_t,NOTHROW,LIBCCALL,(dev_t dev),(dev));
+DEFINE_PUBLIC_ALIAS_P(major,libc_major,ATTR_CONST WUNUSED,major_t,NOTHROW,LIBCCALL,(dev_t dev),(dev));
+DEFINE_PUBLIC_ALIAS_P(gnu_dev_minor,libc_minor,ATTR_CONST WUNUSED,minor_t,NOTHROW,LIBCCALL,(dev_t dev),(dev));
+DEFINE_PUBLIC_ALIAS_P(minor,libc_minor,ATTR_CONST WUNUSED,minor_t,NOTHROW,LIBCCALL,(dev_t dev),(dev));
+DEFINE_PUBLIC_ALIAS_P(__makedev,libc___makedev,ATTR_CONST WUNUSED,dev_t,NOTHROW,LIBCCALL,(int version, major_t maj, minor_t min),(version,maj,min));
+DEFINE_PUBLIC_ALIAS_P(__major,libc___major,ATTR_CONST WUNUSED,major_t,NOTHROW,LIBCCALL,(int version, dev_t dev),(version,dev));
+DEFINE_PUBLIC_ALIAS_P(__minor,libc___minor,ATTR_CONST WUNUSED,minor_t,NOTHROW,LIBCCALL,(int version, dev_t dev),(version,dev));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_MKDEV_C */

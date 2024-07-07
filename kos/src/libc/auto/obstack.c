@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ba877b */
+/* HASH CRC-32:0x2191877b */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -320,14 +320,14 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_obstack_begin, libc__obstack_begin);
-DEFINE_PUBLIC_ALIAS(_obstack_begin_1, libc__obstack_begin_1);
-DEFINE_PUBLIC_ALIAS(_obstack_newchunk, libc__obstack_newchunk);
-DEFINE_PUBLIC_ALIAS(_obstack_free, libc_obstack_free);
-DEFINE_PUBLIC_ALIAS(obstack_free, libc_obstack_free);
-DEFINE_PUBLIC_ALIAS(_obstack_memory_used, libc__obstack_memory_used);
-DEFINE_PUBLIC_ALIAS(_obstack_allocated_p, libc__obstack_allocated_p);
-DEFINE_PUBLIC_ALIAS(obstack_printer, libc_obstack_printer);
+DEFINE_PUBLIC_ALIAS_P(_obstack_begin,libc__obstack_begin,ATTR_OUT(1) NONNULL((4, 5)),int,NOTHROW_NCX,LIBCCALL,(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(__LIBCCALL *ob_malloc)(size_t num_bytes), void (__LIBCCALL *ob_free)(void *ptr)),(self,min_chunk_size,min_object_alignment,ob_malloc,ob_free));
+DEFINE_PUBLIC_ALIAS_P(_obstack_begin_1,libc__obstack_begin_1,ATTR_OUT(1) NONNULL((4, 5)),int,NOTHROW_NCX,LIBCCALL,(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(*ob_malloc)(void *arg, size_t num_bytes), void (*ob_free)(void *arg, void *ptr), void *arg),(self,min_chunk_size,min_object_alignment,ob_malloc,ob_free,arg));
+DEFINE_PUBLIC_ALIAS_P_VOID(_obstack_newchunk,libc__obstack_newchunk,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct obstack *self, _OBSTACK_SIZE_T num_bytes),(self,num_bytes));
+DEFINE_PUBLIC_ALIAS_P_VOID(_obstack_free,libc_obstack_free,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct obstack *self, void *obj),(self,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(obstack_free,libc_obstack_free,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(struct obstack *self, void *obj),(self,obj));
+DEFINE_PUBLIC_ALIAS_P(_obstack_memory_used,libc__obstack_memory_used,ATTR_PURE WUNUSED ATTR_IN(1),_OBSTACK_SIZE_T,NOTHROW_NCX,LIBCCALL,(struct obstack __KOS_FIXED_CONST *self),(self));
+DEFINE_PUBLIC_ALIAS_P(_obstack_allocated_p,libc__obstack_allocated_p,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(struct obstack const *self, void const *obj),(self,obj));
+DEFINE_PUBLIC_ALIAS_P(obstack_printer,libc_obstack_printer,WUNUSED ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_OBSTACK_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22784cc6 */
+/* HASH CRC-32:0x5e4a4dd7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,15 +179,15 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__endmntent, libc_endmntent);
-DEFINE_PUBLIC_ALIAS(endmntent, libc_endmntent);
-DEFINE_PUBLIC_ALIAS(getmntent, libc_getmntent);
-DEFINE_PUBLIC_ALIAS(__getmntent_r, libc_getmntent_r);
-DEFINE_PUBLIC_ALIAS(getmntent_r, libc_getmntent_r);
-DEFINE_PUBLIC_ALIAS(__addmntent, libc_addmntent);
-DEFINE_PUBLIC_ALIAS(addmntent, libc_addmntent);
-DEFINE_PUBLIC_ALIAS(__hasmntopt, libc_hasmntopt);
-DEFINE_PUBLIC_ALIAS(hasmntopt, libc_hasmntopt);
+DEFINE_PUBLIC_ALIAS_P(__endmntent,libc_endmntent,ATTR_INOUT(1),int,NOTHROW_RPC_NOKOS,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(endmntent,libc_endmntent,ATTR_INOUT(1),int,NOTHROW_RPC_NOKOS,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(getmntent,libc_getmntent,ATTR_INOUT(1),struct mntent *,NOTHROW_CB_NCX,LIBCCALL,(FILE *stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__getmntent_r,libc_getmntent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4),struct mntent *,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize),(stream,result,buffer,bufsize));
+DEFINE_PUBLIC_ALIAS_P(getmntent_r,libc_getmntent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4),struct mntent *,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize),(stream,result,buffer,bufsize));
+DEFINE_PUBLIC_ALIAS_P(__addmntent,libc_addmntent,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct mntent const *__restrict mnt),(stream,mnt));
+DEFINE_PUBLIC_ALIAS_P(addmntent,libc_addmntent,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct mntent const *__restrict mnt),(stream,mnt));
+DEFINE_PUBLIC_ALIAS_P(__hasmntopt,libc_hasmntopt,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(struct mntent const *mnt, char const *opt),(mnt,opt));
+DEFINE_PUBLIC_ALIAS_P(hasmntopt,libc_hasmntopt,ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(struct mntent const *mnt, char const *opt),(mnt,opt));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MNTENT_C */

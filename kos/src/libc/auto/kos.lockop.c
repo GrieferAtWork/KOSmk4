@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1166cbd */
+/* HASH CRC-32:0xc1c2c967 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #include <hybrid/host.h>
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
-DEFINE_INTERN_ALIAS(libc_lockop_reap_ex, libc_oblockop_reap_ex);
+DEFINE_INTERN_ALIAS_P_VOID(libc_lockop_reap_ex,libc_oblockop_reap_ex,__NOBLOCK ATTR_INOUT(1) NONNULL((2, 3)),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie),(self,trylock,unlock,cookie));
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <kos/bits/lockop.h>
 #include <hybrid/__atomic.h>
@@ -66,7 +66,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict sel
 #endif /* !__INTELLISENSE__ */
 }
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
-DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_lock, libc_oblockop_reap_atomic_lock);
+DEFINE_INTERN_ALIAS_P_VOID(libc_lockop_reap_atomic_lock,libc_oblockop_reap_atomic_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock),(self,lock));
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <hybrid/sched/atomic-lock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
@@ -95,7 +95,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__res
 #endif /* !__INTELLISENSE__ */
 }
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
-DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_rwlock, libc_oblockop_reap_atomic_rwlock);
+DEFINE_INTERN_ALIAS_P_VOID(libc_lockop_reap_atomic_rwlock,libc_oblockop_reap_atomic_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock),(self,lock));
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <hybrid/sched/atomic-rwlock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
@@ -124,7 +124,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__r
 #endif /* !__INTELLISENSE__ */
 }
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
-DEFINE_INTERN_ALIAS(libc_lockop_reap_shared_lock, libc_oblockop_reap_shared_lock);
+DEFINE_INTERN_ALIAS_P_VOID(libc_lockop_reap_shared_lock,libc_oblockop_reap_shared_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock),(self,lock));
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <kos/sched/shared-lock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
@@ -153,7 +153,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__res
 #endif /* !__INTELLISENSE__ */
 }
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
-DEFINE_INTERN_ALIAS(libc_lockop_reap_shared_rwlock, libc_oblockop_reap_shared_rwlock);
+DEFINE_INTERN_ALIAS_P_VOID(libc_lockop_reap_shared_rwlock,libc_oblockop_reap_shared_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock),(self,lock));
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self,
@@ -225,19 +225,19 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock_LO)(void *__restrict obj,
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(lockop_reap_ex, libc_lockop_reap_ex);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_ex, libc_oblockop_reap_ex);
-DEFINE_PUBLIC_ALIAS(lockop_reap_atomic_lock, libc_lockop_reap_atomic_lock);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_lock, libc_oblockop_reap_atomic_lock);
-DEFINE_PUBLIC_ALIAS(lockop_reap_atomic_rwlock, libc_lockop_reap_atomic_rwlock);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_rwlock, libc_oblockop_reap_atomic_rwlock);
-DEFINE_PUBLIC_ALIAS(lockop_reap_shared_lock, libc_lockop_reap_shared_lock);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_shared_lock, libc_oblockop_reap_shared_lock);
-DEFINE_PUBLIC_ALIAS(lockop_reap_shared_rwlock, libc_lockop_reap_shared_rwlock);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_shared_rwlock, libc_oblockop_reap_shared_rwlock);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_lock_OL, libc_oblockop_reap_atomic_lock_OL);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_lock_LO, libc_oblockop_reap_atomic_lock_LO);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_rwlock_OL, libc_oblockop_reap_atomic_rwlock_OL);
-DEFINE_PUBLIC_ALIAS(oblockop_reap_atomic_rwlock_LO, libc_oblockop_reap_atomic_rwlock_LO);
+DEFINE_PUBLIC_ALIAS_P_VOID(lockop_reap_ex,libc_lockop_reap_ex,__NOBLOCK ATTR_INOUT(1) NONNULL((2, 3)),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie),(self,trylock,unlock,cookie));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_ex,libc_oblockop_reap_ex,__NOBLOCK ATTR_INOUT(1) NONNULL((2, 3, 5)),NOTHROW,__LOCKOP_CC,(struct oblockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie, void *__restrict obj),(self,trylock,unlock,cookie,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(lockop_reap_atomic_lock,libc_lockop_reap_atomic_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock),(self,lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_lock,libc_oblockop_reap_atomic_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)),NOTHROW,__LOCKOP_CC,(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *__restrict obj),(self,lock,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(lockop_reap_atomic_rwlock,libc_lockop_reap_atomic_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock),(self,lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_rwlock,libc_oblockop_reap_atomic_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)),NOTHROW,__LOCKOP_CC,(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *__restrict obj),(self,lock,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(lockop_reap_shared_lock,libc_lockop_reap_shared_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock),(self,lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_shared_lock,libc_oblockop_reap_shared_lock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)),NOTHROW,__LOCKOP_CC,(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *__restrict obj),(self,lock,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(lockop_reap_shared_rwlock,libc_lockop_reap_shared_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW,__LOCKOP_CC,(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock),(self,lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_shared_rwlock,libc_oblockop_reap_shared_rwlock,__NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)),NOTHROW,__LOCKOP_CC,(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *__restrict obj),(self,lock,obj));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_lock_OL,libc_oblockop_reap_atomic_lock_OL,__NOBLOCK NONNULL((1)),NOTHROW,__LOCKOP_CC,(void *__restrict obj, ptrdiff_t offsetof_lockop_slist),(obj,offsetof_lockop_slist));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_lock_LO,libc_oblockop_reap_atomic_lock_LO,__NOBLOCK NONNULL((1)),NOTHROW,__LOCKOP_CC,(void *__restrict obj, ptrdiff_t offsetof_atomic_lock),(obj,offsetof_atomic_lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_rwlock_OL,libc_oblockop_reap_atomic_rwlock_OL,__NOBLOCK NONNULL((1)),NOTHROW,__LOCKOP_CC,(void *__restrict obj, ptrdiff_t offsetof_lockop_slist),(obj,offsetof_lockop_slist));
+DEFINE_PUBLIC_ALIAS_P_VOID(oblockop_reap_atomic_rwlock_LO,libc_oblockop_reap_atomic_rwlock_LO,__NOBLOCK NONNULL((1)),NOTHROW,__LOCKOP_CC,(void *__restrict obj, ptrdiff_t offsetof_atomic_rwlock),(obj,offsetof_atomic_rwlock));
 
 #endif /* !GUARD_LIBC_AUTO_KOS_LOCKOP_C */

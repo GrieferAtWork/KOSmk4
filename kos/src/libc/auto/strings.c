@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55e48613 */
+/* HASH CRC-32:0x1f60ad01 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
-DEFINE_INTERN_ALIAS(libc_popcount, libc_popcount32);
+DEFINE_INTERN_ALIAS_P(libc_popcount,libc_popcount32,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned int i),(i));
 #elif __SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
-DEFINE_INTERN_ALIAS(libc_popcount, libc_popcount64);
+DEFINE_INTERN_ALIAS_P(libc_popcount,libc_popcount64,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned int i),(i));
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNT)
 #include <hybrid/__bit.h>
 /* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
@@ -45,9 +45,9 @@ NOTHROW(LIBCCALL libc_popcount)(unsigned int i) {
 #endif /* ... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
-DEFINE_INTERN_ALIAS(libc_popcountl, libc_popcount32);
+DEFINE_INTERN_ALIAS_P(libc_popcountl,libc_popcount32,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned long i),(i));
 #elif __SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
-DEFINE_INTERN_ALIAS(libc_popcountl, libc_popcount64);
+DEFINE_INTERN_ALIAS_P(libc_popcountl,libc_popcount64,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned long i),(i));
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNTL)
 #include <hybrid/__bit.h>
 /* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
@@ -59,9 +59,9 @@ NOTHROW(LIBCCALL libc_popcountl)(unsigned long i) {
 #endif /* ... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
-DEFINE_INTERN_ALIAS(libc_popcountll, libc_popcount32);
+DEFINE_INTERN_ALIAS_P(libc_popcountll,libc_popcount32,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(__ULONGLONG i),(i));
 #elif __SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
-DEFINE_INTERN_ALIAS(libc_popcountll, libc_popcount64);
+DEFINE_INTERN_ALIAS_P(libc_popcountll,libc_popcount64,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(__ULONGLONG i),(i));
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNTLL)
 #include <hybrid/__bit.h>
 /* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
@@ -95,19 +95,19 @@ DECL_END
 
 #include <hybrid/typecore.h>
 #if !defined(__KERNEL__) && ((__SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNT))
-DEFINE_PUBLIC_ALIAS(popcount, libc_popcount);
+DEFINE_PUBLIC_ALIAS_P(popcount,libc_popcount,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned int i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_INT__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_INT__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNT) */
 #if !defined(__KERNEL__) && ((__SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNTL))
-DEFINE_PUBLIC_ALIAS(popcountl, libc_popcountl);
+DEFINE_PUBLIC_ALIAS_P(popcountl,libc_popcountl,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(unsigned long i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_LONG__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_LONG__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNTL) */
 #if !defined(__KERNEL__) && ((__SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)) || (__SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)) || !defined(LIBC_ARCH_HAVE_POPCOUNTLL))
-DEFINE_PUBLIC_ALIAS(popcountll, libc_popcountll);
+DEFINE_PUBLIC_ALIAS_P(popcountll,libc_popcountll,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(__ULONGLONG i),(i));
 #endif /* !__KERNEL__ && ((__SIZEOF_LONG_LONG__ == 4 && !LIBC_ARCH_HAVE_POPCOUNT32) || (__SIZEOF_LONG_LONG__ == 8 && !LIBC_ARCH_HAVE_POPCOUNT64) || !LIBC_ARCH_HAVE_POPCOUNTLL) */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_POPCOUNT32)
-DEFINE_PUBLIC_ALIAS(popcount32, libc_popcount32);
+DEFINE_PUBLIC_ALIAS_P(popcount32,libc_popcount32,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(uint32_t i),(i));
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_POPCOUNT32 */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_POPCOUNT64)
-DEFINE_PUBLIC_ALIAS(popcount64, libc_popcount64);
+DEFINE_PUBLIC_ALIAS_P(popcount64,libc_popcount64,ATTR_CONST WUNUSED,unsigned int,NOTHROW,LIBCCALL,(uint64_t i),(i));
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_POPCOUNT64 */
 
 #endif /* !GUARD_LIBC_AUTO_STRINGS_C */

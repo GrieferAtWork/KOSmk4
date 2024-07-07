@@ -502,23 +502,23 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") WUNUSED longptr_t
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5f429b4]]]*/
-DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
-DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
-DEFINE_PUBLIC_ALIAS(FPathConf, libc_FPathConf);
-DEFINE_PUBLIC_ALIAS(PathConf, libc_PathConf);
-DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);
-DEFINE_PUBLIC_ALIAS(FExecve, libc_FExecve);
-DEFINE_PUBLIC_ALIAS(Execvpe, libc_Execvpe);
-DEFINE_PUBLIC_ALIAS(ConfStr, libc_ConfStr);
-DEFINE_PUBLIC_ALIAS(Nice, libc_Nice);
-DEFINE_PUBLIC_ALIAS(SetPGrp, libc_SetPGrp);
-DEFINE_PUBLIC_ALIAS(SetEUid, libc_SetEUid);
-DEFINE_PUBLIC_ALIAS(SetEGid, libc_SetEGid);
-DEFINE_PUBLIC_ALIAS(GetHostName, libc_GetHostName);
-DEFINE_PUBLIC_ALIAS(GetDomainName, libc_GetDomainName);
-DEFINE_PUBLIC_ALIAS(LPathConf, libc_LPathConf);
-DEFINE_PUBLIC_ALIAS(SysConf, libc_SysConf);
+/*[[[start:exports,hash:CRC-32=0xe7e4cf1a]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(Execv,libc_Execv,ATTR_NORETURN ATTR_IN(1) ATTR_IN(2),THROWING(...),LIBCCALL,(char const *__restrict path, __TARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P_VOID(Execvp,libc_Execvp,ATTR_NORETURN ATTR_IN(1) ATTR_IN(2),THROWING(...),LIBCCALL,(char const *__restrict file, __TARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(FPathConf,libc_FPathConf,WUNUSED ATTR_FDARG(1),longptr_t,THROWING(...),LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T name),(fd,name));
+DEFINE_PUBLIC_ALIAS_P(PathConf,libc_PathConf,ATTR_IN(1),longptr_t,THROWING(...),LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(GetCwd,libc_GetCwd,ATTR_OUTS(1, 2),char *,THROWING(...),LIBCCALL,(char *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P_VOID(FExecve,libc_FExecve,ATTR_NORETURN ATTR_FDREAD(1) ATTR_IN(2) ATTR_IN(3),THROWING(...),LIBCCALL,(fd_t fd, __TARGV, __TENVP),(fd,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P_VOID(Execvpe,libc_Execvpe,ATTR_NORETURN ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),THROWING(...),LIBCCALL,(char const *__restrict file, __TARGV, __TENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(ConfStr,libc_ConfStr,ATTR_OUTS(2, 3),size_t,THROWING(...),LIBCCALL,(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen),(name,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(Nice,libc_Nice,,int,THROWING(...),LIBCCALL,(int inc),(inc));
+DEFINE_PUBLIC_ALIAS_P_VOID(SetPGrp,libc_SetPGrp,,THROWING(...),LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(SetEUid,libc_SetEUid,,THROWING(...),LIBCCALL,(uid_t euid),(euid));
+DEFINE_PUBLIC_ALIAS_P_VOID(SetEGid,libc_SetEGid,,THROWING(...),LIBCCALL,(gid_t egid),(egid));
+DEFINE_PUBLIC_ALIAS_P_VOID(GetHostName,libc_GetHostName,ATTR_OUTS(1, 2),THROWING(...),LIBCCALL,(char *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P_VOID(GetDomainName,libc_GetDomainName,ATTR_OUTS(1, 2),THROWING(...),LIBCCALL,(char *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(LPathConf,libc_LPathConf,ATTR_IN(1),longptr_t,THROWING(...),LIBCCALL,(char const *path, __STDC_INT_AS_UINT_T name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(SysConf,libc_SysConf,WUNUSED,longptr_t,THROWING(...),LIBCCALL,(__STDC_INT_AS_UINT_T name),(name));
 /*[[[end:exports]]]*/
 
 DECL_END

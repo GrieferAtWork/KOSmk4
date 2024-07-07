@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f2cae36 */
+/* HASH CRC-32:0xfe732408 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -183,12 +183,12 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(envz_entry, libc_envz_entry);
-DEFINE_PUBLIC_ALIAS(envz_get, libc_envz_get);
-DEFINE_PUBLIC_ALIAS(envz_add, libc_envz_add);
-DEFINE_PUBLIC_ALIAS(envz_merge, libc_envz_merge);
-DEFINE_PUBLIC_ALIAS(envz_remove, libc_envz_remove);
-DEFINE_PUBLIC_ALIAS(envz_strip, libc_envz_strip);
+DEFINE_PUBLIC_ALIAS_P(envz_entry,libc_envz_entry,ATTR_PURE WUNUSED ATTR_IN(3) ATTR_INS(1, 2) NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict envz, size_t envz_len, char const *__restrict name),(envz,envz_len,name));
+DEFINE_PUBLIC_ALIAS_P(envz_get,libc_envz_get,ATTR_PURE WUNUSED ATTR_IN(3) ATTR_INS(1, 2) NONNULL((1)),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict envz, size_t envz_len, char const *__restrict name),(envz,envz_len,name));
+DEFINE_PUBLIC_ALIAS_P(envz_add,libc_envz_add,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(4),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name, char const *value),(penvz,penvz_len,name,value));
+DEFINE_PUBLIC_ALIAS_P(envz_merge,libc_envz_merge,ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INS(3, 4),error_t,NOTHROW_NCX,LIBCCALL,(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict envz2, size_t envz2_len, int override_),(penvz,penvz_len,envz2,envz2_len,override_));
+DEFINE_PUBLIC_ALIAS_P_VOID(envz_remove,libc_envz_remove,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW_NCX,LIBCCALL,(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name),(penvz,penvz_len,name));
+DEFINE_PUBLIC_ALIAS_P_VOID(envz_strip,libc_envz_strip,ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW_NCX,LIBCCALL,(char **__restrict penvz, size_t *__restrict penvz_len),(penvz,penvz_len));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ENVZ_C */

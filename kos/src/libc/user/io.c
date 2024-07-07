@@ -375,27 +375,27 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 #undef _findnext
 #undef _findnexti64
 
-/*[[[start:exports,hash:CRC-32=0xdf2d67f2]]]*/
-DEFINE_PUBLIC_ALIAS(_findclose, libc__findclose);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirst, libd__findfirst32);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirst32, libd__findfirst32);
-DEFINE_PUBLIC_ALIAS(_findfirst, libc__findfirst32);
-DEFINE_PUBLIC_ALIAS(_findfirst32, libc__findfirst32);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirsti64, libd__findfirst32i64);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirst32i64, libd__findfirst32i64);
-DEFINE_PUBLIC_ALIAS(_findfirsti64, libc__findfirst32i64);
-DEFINE_PUBLIC_ALIAS(_findfirst32i64, libc__findfirst32i64);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirst64i32, libd__findfirst64);
-DEFINE_PUBLIC_ALIAS(DOS$_findfirst64, libd__findfirst64);
-DEFINE_PUBLIC_ALIAS(_findfirst64i32, libc__findfirst64);
-DEFINE_PUBLIC_ALIAS(_findfirst64, libc__findfirst64);
-DEFINE_PUBLIC_ALIAS(_findnext, libc__findnext32);
-DEFINE_PUBLIC_ALIAS(_findnext32, libc__findnext32);
-DEFINE_PUBLIC_ALIAS(_findnexti64, libc__findnext32i64);
-DEFINE_PUBLIC_ALIAS(_findnext32i64, libc__findnext32i64);
-DEFINE_PUBLIC_ALIAS(_findnext64i32, libc__findnext64);
-DEFINE_PUBLIC_ALIAS(_findnext64, libc__findnext64);
-DEFINE_PUBLIC_ALIAS(_mktemp_s, libc__mktemp_s);
+/*[[[start:exports,hash:CRC-32=0xfec9a1b]]]*/
+DEFINE_PUBLIC_ALIAS_P(_findclose,libc__findclose,,int,NOTHROW_NCX,LIBCCALL,(intptr_t findfd),(findfd));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirst,libd__findfirst32,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct _finddata32_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirst32,libd__findfirst32,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct _finddata32_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirst,libc__findfirst32,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct _finddata32_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirst32,libc__findfirst32,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct _finddata32_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirsti64,libd__findfirst32i64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct _finddata32i64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirst32i64,libd__findfirst32i64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct _finddata32i64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirsti64,libc__findfirst32i64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct _finddata32i64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirst32i64,libc__findfirst32i64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct _finddata32i64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirst64i32,libd__findfirst64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct __finddata64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(DOS$_findfirst64,libd__findfirst64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBDCALL,(char const *__restrict filename, struct __finddata64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirst64i32,libc__findfirst64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct __finddata64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findfirst64,libc__findfirst64,WUNUSED ATTR_IN(1) ATTR_OUT(2),intptr_t,NOTHROW_RPC,LIBCCALL,(char const *__restrict filename, struct __finddata64_t *__restrict finddata),(filename,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnext,libc__findnext32,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct _finddata32_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnext32,libc__findnext32,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct _finddata32_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnexti64,libc__findnext32i64,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct _finddata32i64_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnext32i64,libc__findnext32i64,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct _finddata32i64_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnext64i32,libc__findnext64,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct __finddata64_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_findnext64,libc__findnext64,ATTR_OUT(2),int,NOTHROW_RPC,LIBCCALL,(intptr_t findfd, struct __finddata64_t *__restrict finddata),(findfd,finddata));
+DEFINE_PUBLIC_ALIAS_P(_mktemp_s,libc__mktemp_s,ATTR_INOUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *template_, size_t size),(template_,size));
 /*[[[end:exports]]]*/
 
 DECL_END

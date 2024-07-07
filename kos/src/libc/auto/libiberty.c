@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3e30cd */
+/* HASH CRC-32:0x652c0a16 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1091,78 +1091,78 @@ NOTHROW_NCX(LIBCCALL libc_hex_init)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(C_alloca, libc_C_alloca);
-DEFINE_PUBLIC_ALIAS(stack_limit_increase, libc_stack_limit_increase);
-DEFINE_PUBLIC_ALIAS(dos_lbasename, libc_dos_lbasename);
-DEFINE_PUBLIC_ALIAS(lrealpath, libc_lrealpath);
-DEFINE_PUBLIC_ALIAS(getpwd, libc_getpwd);
-DEFINE_PUBLIC_ALIAS(errno_max, libc_errno_max);
-DEFINE_PUBLIC_ALIAS(signo_max, libc_signo_max);
-DEFINE_PUBLIC_ALIAS(strtoerrno, libc_strtoerrno);
-DEFINE_PUBLIC_ALIAS(unlock_stream, libc_unlock_stream);
-DEFINE_PUBLIC_ALIAS(unlock_std_streams, libc_unlock_std_streams);
-DEFINE_PUBLIC_ALIAS(fopen_unlocked, libc_fopen_unlocked);
-DEFINE_PUBLIC_ALIAS(fdopen_unlocked, libc_fdopen_unlocked);
-DEFINE_PUBLIC_ALIAS(spaces, libc_spaces);
-DEFINE_PUBLIC_ALIAS(xmalloc, libc_xmalloc);
-DEFINE_PUBLIC_ALIAS(xrealloc, libc_xrealloc);
-DEFINE_PUBLIC_ALIAS(xcalloc, libc_xcalloc);
-DEFINE_PUBLIC_ALIAS(xstrdup, libc_xstrdup);
-DEFINE_PUBLIC_ALIAS(xstrndup, libc_xstrndup);
-DEFINE_PUBLIC_ALIAS(xmemdup, libc_xmemdup);
-DEFINE_PUBLIC_ALIAS(xvasprintf, libc_xvasprintf);
+DEFINE_PUBLIC_ALIAS_P(C_alloca,libc_C_alloca,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)),void *,NOTHROW_NCX,LIBCCALL,(size_t num_bytes),(num_bytes));
+DEFINE_PUBLIC_ALIAS_P_VOID(stack_limit_increase,libc_stack_limit_increase,,NOTHROW_NCX,LIBCCALL,(ulongptr_t newlim),(newlim));
+DEFINE_PUBLIC_ALIAS_P(dos_lbasename,libc_dos_lbasename,ATTR_PURE ATTR_RETNONNULL WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(char const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(lrealpath,libc_lrealpath,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(char const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(getpwd,libc_getpwd,WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(errno_max,libc_errno_max,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(signo_max,libc_signo_max,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(strtoerrno,libc_strtoerrno,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P_VOID(unlock_stream,libc_unlock_stream,,NOTHROW_NCX,LIBCCALL,(FILE *fp),(fp));
+DEFINE_PUBLIC_ALIAS_P_VOID(unlock_std_streams,libc_unlock_std_streams,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(fopen_unlocked,libc_fopen_unlocked,,FILE *,NOTHROW_NCX,LIBCCALL,(char const *filename, char const *mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(fdopen_unlocked,libc_fdopen_unlocked,ATTR_FDARG(1),FILE *,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(spaces,libc_spaces,WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_SIZE_T count),(count));
+DEFINE_PUBLIC_ALIAS_P(xmalloc,libc_xmalloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)),void *,NOTHROW_NCX,LIBCCALL,(size_t num_bytes),(num_bytes));
+DEFINE_PUBLIC_ALIAS_P(xrealloc,libc_xrealloc,ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBCCALL,(void *ptr, size_t num_bytes),(ptr,num_bytes));
+DEFINE_PUBLIC_ALIAS_P(xcalloc,libc_xcalloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2)),void *,NOTHROW_NCX,LIBCCALL,(size_t elem_count, size_t elem_size),(elem_count,elem_size));
+DEFINE_PUBLIC_ALIAS_P(xstrdup,libc_xstrdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict string),(string));
+DEFINE_PUBLIC_ALIAS_P(xstrndup,libc_xstrndup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(char const *string, size_t max_chars),(string,max_chars));
+DEFINE_PUBLIC_ALIAS_P(xmemdup,libc_xmemdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((3)) ATTR_INS(1, 2),void *,NOTHROW_NCX,LIBCCALL,(void const *src, size_t src_bytes, size_t alloc_size),(src,src_bytes,alloc_size));
+DEFINE_PUBLIC_ALIAS_P(xvasprintf,libc_xvasprintf,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0),char *,NOTHROW_NCX,LIBCCALL,(char const *format, va_list args),(format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$xasprintf, libd_xasprintf);
+DEFINE_PUBLIC_ALIAS_P(DOS$xasprintf,libd_xasprintf,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),char *,NOTHROW_NCX,VLIBDCALL,(char const *__restrict format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(xasprintf, libc_xasprintf);
-DEFINE_PUBLIC_ALIAS(dupargv, libc_dupargv);
-DEFINE_PUBLIC_ALIAS(freeargv, libc_freeargv);
-DEFINE_PUBLIC_ALIAS(countargv, libc_countargv);
-DEFINE_PUBLIC_ALIAS(buildargv, libc_buildargv);
-DEFINE_PUBLIC_ALIAS(expandargv, libc_expandargv);
-DEFINE_PUBLIC_ALIAS(writeargv, libc_writeargv);
+DEFINE_PUBLIC_ALIAS_P(xasprintf,libc_xasprintf,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),char *,NOTHROW_NCX,VLIBCCALL,(char const *__restrict format, ...),(format,));
+DEFINE_PUBLIC_ALIAS_P(dupargv,libc_dupargv,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1),char **,NOTHROW_NCX,LIBCCALL,(char *__KOS_FIXED_CONST *argv),(argv));
+DEFINE_PUBLIC_ALIAS_P_VOID(freeargv,libc_freeargv,ATTR_IN_OPT(1),NOTHROW_NCX,LIBCCALL,(char **argv),(argv));
+DEFINE_PUBLIC_ALIAS_P(countargv,libc_countargv,ATTR_PURE WUNUSED ATTR_IN_OPT(1),__STDC_INT_AS_SIZE_T,NOTHROW_NCX,LIBCCALL,(char *const *argv),(argv));
+DEFINE_PUBLIC_ALIAS_P(buildargv,libc_buildargv,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1),char **,NOTHROW_NCX,LIBCCALL,(char const *cmdline),(cmdline));
+DEFINE_PUBLIC_ALIAS_P_VOID(expandargv,libc_expandargv,ATTR_INOUT(1) ATTR_INOUT(2),NOTHROW_NCX,LIBCCALL,(int *p_argc, char ***p_argv),(p_argc,p_argv));
+DEFINE_PUBLIC_ALIAS_P(writeargv,libc_writeargv,ATTR_IN(1) ATTR_INOUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char *const *argv, FILE *fp),(argv,fp));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$concat, libd_concat);
+DEFINE_PUBLIC_ALIAS_P(DOS$concat,libd_concat,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,VLIBDCALL,(char const *first, ...),(first,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(concat, libc_concat);
+DEFINE_PUBLIC_ALIAS_P(concat,libc_concat,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,VLIBCCALL,(char const *first, ...),(first,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$reconcat, libd_reconcat);
+DEFINE_PUBLIC_ALIAS_P(DOS$reconcat,libd_reconcat,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,VLIBDCALL,(char *old_ptr, char const *first, ...),(old_ptr,first,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(reconcat, libc_reconcat);
+DEFINE_PUBLIC_ALIAS_P(reconcat,libc_reconcat,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,VLIBCCALL,(char *old_ptr, char const *first, ...),(old_ptr,first,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$concat_length, libd_concat_length);
+DEFINE_PUBLIC_ALIAS_P(DOS$concat_length,libd_concat_length,ATTR_IN_OPT(1),ulongptr_t,NOTHROW_NCX,VLIBDCALL,(char const *first, ...),(first,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(concat_length, libc_concat_length);
+DEFINE_PUBLIC_ALIAS_P(concat_length,libc_concat_length,ATTR_IN_OPT(1),ulongptr_t,NOTHROW_NCX,VLIBCCALL,(char const *first, ...),(first,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$concat_copy, libd_concat_copy);
+DEFINE_PUBLIC_ALIAS_P(DOS$concat_copy,libd_concat_copy,ATTR_RETNONNULL ATTR_IN_OPT(2) ATTR_OUT(1),char *,NOTHROW_NCX,VLIBDCALL,(char *dst, char const *first, ...),(dst,first,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(concat_copy, libc_concat_copy);
+DEFINE_PUBLIC_ALIAS_P(concat_copy,libc_concat_copy,ATTR_RETNONNULL ATTR_IN_OPT(2) ATTR_OUT(1),char *,NOTHROW_NCX,VLIBCCALL,(char *dst, char const *first, ...),(dst,first,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);
+DEFINE_PUBLIC_ALIAS_P(DOS$concat_copy2,libd_concat_copy2,ATTR_IN_OPT(1),char *,NOTHROW_NCX,VLIBDCALL,(char const *first, ...),(first,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(concat_copy2, libc_concat_copy2);
-DEFINE_PUBLIC_ALIAS(get_run_time, libc_get_run_time);
-DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
-DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);
-DEFINE_PUBLIC_ALIAS(make_temp_file_with_prefix, libc_make_temp_file_with_prefix);
-DEFINE_PUBLIC_ALIAS(make_temp_file, libc_make_temp_file);
-DEFINE_PUBLIC_ALIAS(unlink_if_ordinary, libc_unlink_if_ordinary);
-DEFINE_PUBLIC_ALIAS(physmem_total, libc_physmem_total);
-DEFINE_PUBLIC_ALIAS(physmem_available, libc_physmem_available);
-DEFINE_PUBLIC_ALIAS(xcrc32, libc_xcrc32);
-DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);
+DEFINE_PUBLIC_ALIAS_P(concat_copy2,libc_concat_copy2,ATTR_IN_OPT(1),char *,NOTHROW_NCX,VLIBCCALL,(char const *first, ...),(first,));
+DEFINE_PUBLIC_ALIAS_P(get_run_time,libc_get_run_time,WUNUSED,long,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(choose_temp_base,libc_choose_temp_base,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(choose_tmpdir,libc_choose_tmpdir,ATTR_PURE ATTR_RETNONNULL WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(make_temp_file_with_prefix,libc_make_temp_file_with_prefix,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(char const *prefix, char const *suffix),(prefix,suffix));
+DEFINE_PUBLIC_ALIAS_P(make_temp_file,libc_make_temp_file,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char const *suffix),(suffix));
+DEFINE_PUBLIC_ALIAS_P(unlink_if_ordinary,libc_unlink_if_ordinary,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(char const *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(physmem_total,libc_physmem_total,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(physmem_available,libc_physmem_available,ATTR_PURE WUNUSED,double,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(xcrc32,libc_xcrc32,ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)),__UINT32_TYPE__,NOTHROW_NCX,LIBCCALL,(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc),(buf,len,crc));
+DEFINE_PUBLIC_ALIAS_P_VOID(hex_init,libc_hex_init,,NOTHROW_NCX,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBIBERTY_C */

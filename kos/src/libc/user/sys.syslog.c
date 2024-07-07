@@ -84,11 +84,11 @@ NOTHROW_RPC(__FORMATPRINTER_CC libc_syslog_printer)(void *arg,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x730b2bf7]]]*/
-DEFINE_PUBLIC_ALIAS(closelog, libc_closelog);
-DEFINE_PUBLIC_ALIAS(openlog, libc_openlog);
-DEFINE_PUBLIC_ALIAS(setlogmask, libc_setlogmask);
-DEFINE_PUBLIC_ALIAS(syslog_printer, libc_syslog_printer);
+/*[[[start:exports,hash:CRC-32=0x5675a480]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(closelog,libc_closelog,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(openlog,libc_openlog,,NOTHROW_RPC,LIBCCALL,(char const *ident, __STDC_INT_AS_UINT_T option, __STDC_INT_AS_UINT_T facility),(ident,option,facility));
+DEFINE_PUBLIC_ALIAS_P(setlogmask,libc_setlogmask,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T mask),(mask));
+DEFINE_PUBLIC_ALIAS_P(syslog_printer,libc_syslog_printer,ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 /*[[[end:exports]]]*/
 
 DECL_END

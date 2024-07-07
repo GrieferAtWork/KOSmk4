@@ -1027,49 +1027,49 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x71ad0d5a]]]*/
-DEFINE_PUBLIC_ALIAS(lfutex, libc_lfutex);
+/*[[[start:exports,hash:CRC-32=0x5644abe2]]]*/
+DEFINE_PUBLIC_ALIAS_P(lfutex,libc_lfutex,NONNULL((1)),ssize_t,NOTHROW_RPC,VLIBCCALL,(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, ...),(uaddr,futex_op,val,));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(lfutex64, libc_lfutex64);
+DEFINE_PUBLIC_ALIAS_P(lfutex64,libc_lfutex64,NONNULL((1)),ssize_t,NOTHROW_RPC,VLIBCCALL,(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, ...),(uaddr,futex_op,val,));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(futex_wake, libc_futex_wake);
-DEFINE_PUBLIC_ALIAS(futex_wakeall, libc_futex_wakeall);
-DEFINE_PUBLIC_ALIAS(futex_wakemask, libc_futex_wakemask);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile, libc_futex_waitwhile);
-DEFINE_PUBLIC_ALIAS(futex_waituntil, libc_futex_waituntil);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_above, libc_futex_waitwhile_above);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_below, libc_futex_waitwhile_below);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_aboveequal, libc_futex_waitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_belowequal, libc_futex_waitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_exactbits, libc_futex_waitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_waituntil_exactbits, libc_futex_waituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_anybit, libc_futex_waitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(futex_waitwhile_allbits, libc_futex_waitwhile_allbits);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile, libc_futex_timedwaitwhile);
-DEFINE_PUBLIC_ALIAS(futex_timedwaituntil, libc_futex_timedwaituntil);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above, libc_futex_timedwaitwhile_above);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below, libc_futex_timedwaitwhile_below);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal, libc_futex_timedwaitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal, libc_futex_timedwaitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits, libc_futex_timedwaitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits, libc_futex_timedwaituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit, libc_futex_timedwaitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits, libc_futex_timedwaitwhile_allbits);
+DEFINE_PUBLIC_ALIAS_P(futex_wake,libc_futex_wake,NONNULL((1)),ssize_t,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, size_t max_wake),(uaddr,max_wake));
+DEFINE_PUBLIC_ALIAS_P(futex_wakeall,libc_futex_wakeall,NONNULL((1)),ssize_t,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr),(uaddr));
+DEFINE_PUBLIC_ALIAS_P(futex_wakemask,libc_futex_wakemask,NONNULL((1)),ssize_t,NOTHROW_NCX,LIBCCALL,(lfutex_t *uaddr, size_t max_wake, lfutex_t mask_and, lfutex_t mask_or),(uaddr,max_wake,mask_and,mask_or));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile,libc_futex_waitwhile,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t equal_to_value),(uaddr,equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waituntil,libc_futex_waituntil,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t not_equal_to_value),(uaddr,not_equal_to_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_above,libc_futex_waitwhile_above,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_value),(uaddr,above_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_below,libc_futex_waitwhile_below,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_value),(uaddr,below_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_aboveequal,libc_futex_waitwhile_aboveequal,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_or_equal_value),(uaddr,above_or_equal_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_belowequal,libc_futex_waitwhile_belowequal,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_or_equal_value),(uaddr,below_or_equal_value));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_exactbits,libc_futex_waitwhile_exactbits,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask),(uaddr,bitmask,setmask));
+DEFINE_PUBLIC_ALIAS_P(futex_waituntil_exactbits,libc_futex_waituntil_exactbits,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask),(uaddr,bitmask,setmask));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_anybit,libc_futex_waitwhile_anybit,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask),(uaddr,bitmask));
+DEFINE_PUBLIC_ALIAS_P(futex_waitwhile_allbits,libc_futex_waitwhile_allbits,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask),(uaddr,bitmask));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile,libc_futex_timedwaitwhile,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec const *rel_timeout),(uaddr,equal_to_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaituntil,libc_futex_timedwaituntil,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec const *rel_timeout),(uaddr,not_equal_to_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_above,libc_futex_timedwaitwhile_above,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_value, struct timespec const *rel_timeout),(uaddr,above_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_below,libc_futex_timedwaitwhile_below,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_value, struct timespec const *rel_timeout),(uaddr,below_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_aboveequal,libc_futex_timedwaitwhile_aboveequal,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec const *rel_timeout),(uaddr,above_or_equal_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_belowequal,libc_futex_timedwaitwhile_belowequal,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec const *rel_timeout),(uaddr,below_or_equal_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_exactbits,libc_futex_timedwaitwhile_exactbits,ATTR_IN(1) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout),(uaddr,bitmask,setmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaituntil_exactbits,libc_futex_timedwaituntil_exactbits,ATTR_IN(1) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout),(uaddr,bitmask,setmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_anybit,libc_futex_timedwaitwhile_anybit,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout),(uaddr,bitmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_allbits,libc_futex_timedwaitwhile_allbits,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout),(uaddr,bitmask,rel_timeout));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile64, libc_futex_timedwaitwhile64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaituntil64, libc_futex_timedwaituntil64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits64);
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile64,libc_futex_timedwaitwhile64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec64 const *rel_timeout),(uaddr,equal_to_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaituntil64,libc_futex_timedwaituntil64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout),(uaddr,not_equal_to_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_above64,libc_futex_timedwaitwhile_above64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_value, struct timespec64 const *rel_timeout),(uaddr,above_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_below64,libc_futex_timedwaitwhile_below64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_value, struct timespec64 const *rel_timeout),(uaddr,below_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_aboveequal64,libc_futex_timedwaitwhile_aboveequal64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec64 const *rel_timeout),(uaddr,above_or_equal_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_belowequal64,libc_futex_timedwaitwhile_belowequal64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec64 const *rel_timeout),(uaddr,below_or_equal_value,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_exactbits64,libc_futex_timedwaitwhile_exactbits64,ATTR_IN(1) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout),(uaddr,bitmask,setmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaituntil_exactbits64,libc_futex_timedwaituntil_exactbits64,ATTR_IN(1) ATTR_IN_OPT(4),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout),(uaddr,bitmask,setmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_anybit64,libc_futex_timedwaitwhile_anybit64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout),(uaddr,bitmask,rel_timeout));
+DEFINE_PUBLIC_ALIAS_P(futex_timedwaitwhile_allbits64,libc_futex_timedwaitwhile_allbits64,ATTR_IN(1) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBCCALL,(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout),(uaddr,bitmask,rel_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(futex_getspin, libc_futex_getspin);
-DEFINE_PUBLIC_ALIAS(futex_setspin, libc_futex_setspin);
+DEFINE_PUBLIC_ALIAS_P(futex_getspin,libc_futex_getspin,WUNUSED,unsigned int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(futex_setspin,libc_futex_setspin,,unsigned int,NOTHROW,LIBCCALL,(unsigned int new_spin),(new_spin));
 /*[[[end:exports]]]*/
 
 DECL_END

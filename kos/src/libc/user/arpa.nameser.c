@@ -559,36 +559,36 @@ NOTHROW_NCX(LIBCCALL libc_ns_samename)(char const *a,
 }
 /*[[[end:libc_ns_samename]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x871e2899]]]*/
-DEFINE_PUBLIC_ALIAS(ns_initparse, libc_ns_initparse);
-DEFINE_PUBLIC_ALIAS(ns_skiprr, libc_ns_skiprr);
-DEFINE_PUBLIC_ALIAS(ns_parserr, libc_ns_parserr);
-DEFINE_PUBLIC_ALIAS(ns_sprintrr, libc_ns_sprintrr);
-DEFINE_PUBLIC_ALIAS(ns_sprintrrf, libc_ns_sprintrrf);
-DEFINE_PUBLIC_ALIAS(ns_format_ttl, libc_ns_format_ttl);
-DEFINE_PUBLIC_ALIAS(ns_parse_ttl, libc_ns_parse_ttl);
-DEFINE_PUBLIC_ALIAS(ns_datetosecs, libc_ns_datetosecs);
-DEFINE_PUBLIC_ALIAS(ns_name_ntol, libc_ns_name_ntol);
-DEFINE_PUBLIC_ALIAS(ns_name_ntop, libc_ns_name_ntop);
-DEFINE_PUBLIC_ALIAS(ns_name_pton, libc_ns_name_pton);
-DEFINE_PUBLIC_ALIAS(ns_name_unpack, libc_ns_name_unpack);
-DEFINE_PUBLIC_ALIAS(ns_name_pack, libc_ns_name_pack);
-DEFINE_PUBLIC_ALIAS(ns_name_uncompress, libc_ns_name_uncompress);
-DEFINE_PUBLIC_ALIAS(ns_name_skip, libc_ns_name_skip);
-DEFINE_PUBLIC_ALIAS(ns_name_rollback, libc_ns_name_rollback);
-DEFINE_PUBLIC_ALIAS(ns_sign, libc_ns_sign);
-DEFINE_PUBLIC_ALIAS(ns_sign2, libc_ns_sign2);
-DEFINE_PUBLIC_ALIAS(ns_sign_tcp, libc_ns_sign_tcp);
-DEFINE_PUBLIC_ALIAS(ns_sign_tcp2, libc_ns_sign_tcp2);
-DEFINE_PUBLIC_ALIAS(ns_sign_tcp_init, libc_ns_sign_tcp_init);
-DEFINE_PUBLIC_ALIAS(ns_find_tsig, libc_ns_find_tsig);
-DEFINE_PUBLIC_ALIAS(ns_verify, libc_ns_verify);
-DEFINE_PUBLIC_ALIAS(ns_verify_tcp, libc_ns_verify_tcp);
-DEFINE_PUBLIC_ALIAS(ns_verify_tcp_init, libc_ns_verify_tcp_init);
-DEFINE_PUBLIC_ALIAS(ns_samedomain, libc_ns_samedomain);
-DEFINE_PUBLIC_ALIAS(ns_subdomain, libc_ns_subdomain);
-DEFINE_PUBLIC_ALIAS(ns_makecanon, libc_ns_makecanon);
-DEFINE_PUBLIC_ALIAS(ns_samename, libc_ns_samename);
+/*[[[start:exports,hash:CRC-32=0xfa89c8c1]]]*/
+DEFINE_PUBLIC_ALIAS_P(ns_initparse,libc_ns_initparse,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, int b, ns_msg *c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_skiprr,libc_ns_skiprr,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char const *b, ns_sect c, int d),(a,b,c,d));
+DEFINE_PUBLIC_ALIAS_P(ns_parserr,libc_ns_parserr,,int,NOTHROW_NCX,LIBCCALL,(ns_msg *a, ns_sect b, int c, ns_rr *d),(a,b,c,d));
+DEFINE_PUBLIC_ALIAS_P(ns_sprintrr,libc_ns_sprintrr,,int,NOTHROW_NCX,LIBCCALL,(ns_msg const *a, ns_rr const *b, char const *c, char const *d, char *e, size_t f),(a,b,c,d,e,f));
+DEFINE_PUBLIC_ALIAS_P(ns_sprintrrf,libc_ns_sprintrrf,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, size_t, char const *b, ns_class c, ns_type d, u_long e, u_char const *f, size_t g, char const *h, char const *i, char *j, size_t k),(a,,b,c,d,e,f,g,h,i,j,k));
+DEFINE_PUBLIC_ALIAS_P(ns_format_ttl,libc_ns_format_ttl,,int,NOTHROW_NCX,LIBCCALL,(u_long a, char *b, size_t c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_parse_ttl,libc_ns_parse_ttl,,int,NOTHROW_NCX,LIBCCALL,(char const *a, u_long *b),(a,b));
+DEFINE_PUBLIC_ALIAS_P(ns_datetosecs,libc_ns_datetosecs,,u_int32_t,NOTHROW_NCX,LIBCCALL,(char const *a, int *b),(a,b));
+DEFINE_PUBLIC_ALIAS_P(ns_name_ntol,libc_ns_name_ntol,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char *b, size_t c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_name_ntop,libc_ns_name_ntop,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, char *b, size_t c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_name_pton,libc_ns_name_pton,,int,NOTHROW_NCX,LIBCCALL,(char const *a, u_char *b, size_t c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_name_unpack,libc_ns_name_unpack,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char const *b, u_char const *c, u_char *d, size_t e),(a,b,c,d,e));
+DEFINE_PUBLIC_ALIAS_P(ns_name_pack,libc_ns_name_pack,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char *b, int c, u_char const **d, u_char const **e),(a,b,c,d,e));
+DEFINE_PUBLIC_ALIAS_P(ns_name_uncompress,libc_ns_name_uncompress,,int,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char const *b, u_char const *c, char *d, size_t e),(a,b,c,d,e));
+DEFINE_PUBLIC_ALIAS_P(ns_name_skip,libc_ns_name_skip,ATTR_INOUT(1) NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(u_char const **p_msg_ptr, u_char const *msg_end),(p_msg_ptr,msg_end));
+DEFINE_PUBLIC_ALIAS_P_VOID(ns_name_rollback,libc_ns_name_rollback,,NOTHROW_NCX,LIBCCALL,(u_char const *a, u_char const **b, u_char const **c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_sign,libc_ns_sign,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j),(a,b,c,d,e,f,g,h,i,j));
+DEFINE_PUBLIC_ALIAS_P(ns_sign2,libc_ns_sign2,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j, u_char **k, u_char **l),(a,b,c,d,e,f,g,h,i,j,k,l));
+DEFINE_PUBLIC_ALIAS_P(ns_sign_tcp,libc_ns_sign_tcp,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f),(a,b,c,d,e,f));
+DEFINE_PUBLIC_ALIAS_P(ns_sign_tcp2,libc_ns_sign_tcp2,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f, u_char **g, u_char **h),(a,b,c,d,e,f,g,h));
+DEFINE_PUBLIC_ALIAS_P(ns_sign_tcp_init,libc_ns_sign_tcp_init,,int,NOTHROW_NCX,LIBCCALL,(void *a, u_char const *b, int c, ns_tcp_tsig_state *d),(a,b,c,d));
+DEFINE_PUBLIC_ALIAS_P(ns_find_tsig,libc_ns_find_tsig,,u_char *,NOTHROW_NCX,LIBCCALL,(u_char *a, u_char *b),(a,b));
+DEFINE_PUBLIC_ALIAS_P(ns_verify,libc_ns_verify,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, void *c, u_char const *d, int e, u_char *f, int *g, time_t *h, int i),(a,b,c,d,e,f,g,h,i));
+DEFINE_PUBLIC_ALIAS_P(ns_verify_tcp,libc_ns_verify_tcp,,int,NOTHROW_NCX,LIBCCALL,(u_char *a, int *b, ns_tcp_tsig_state *c, int d),(a,b,c,d));
+DEFINE_PUBLIC_ALIAS_P(ns_verify_tcp_init,libc_ns_verify_tcp_init,,int,NOTHROW_NCX,LIBCCALL,(void *a, u_char const *b, int c, ns_tcp_tsig_state *d),(a,b,c,d));
+DEFINE_PUBLIC_ALIAS_P(ns_samedomain,libc_ns_samedomain,,int,NOTHROW_NCX,LIBCCALL,(char const *a, char const *b),(a,b));
+DEFINE_PUBLIC_ALIAS_P(ns_subdomain,libc_ns_subdomain,,int,NOTHROW_NCX,LIBCCALL,(char const *a, char const *b),(a,b));
+DEFINE_PUBLIC_ALIAS_P(ns_makecanon,libc_ns_makecanon,,int,NOTHROW_NCX,LIBCCALL,(char const *a, char *b, size_t c),(a,b,c));
+DEFINE_PUBLIC_ALIAS_P(ns_samename,libc_ns_samename,,int,NOTHROW_NCX,LIBCCALL,(char const *a, char const *b),(a,b));
 /*[[[end:exports]]]*/
 
 DECL_END

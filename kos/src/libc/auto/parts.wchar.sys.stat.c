@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x146f60b9 */
+/* HASH CRC-32:0xb579eb36 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -625,7 +625,7 @@ NOTHROW_RPC(LIBDCALL libd_wutimensat64)(fd_t dirfd,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_wutimensat64, libc_wutimensat);
+DEFINE_INTERN_ALIAS_P(libc_wutimensat64,libc_wutimensat,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
@@ -676,38 +676,38 @@ NOTHROW_RPC(LIBKCALL libc_wutimensat64)(fd_t dirfd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$wmkdir, libd_wmkdir);
-DEFINE_PUBLIC_ALIAS(wmkdir, libc_wmkdir);
-DEFINE_PUBLIC_ALIAS(DOS$_wchmod, libd_wchmod);
-DEFINE_PUBLIC_ALIAS(DOS$wchmod, libd_wchmod);
-DEFINE_PUBLIC_ALIAS(wchmod, libc_wchmod);
-DEFINE_PUBLIC_ALIAS(DOS$wlchmod, libd_wlchmod);
-DEFINE_PUBLIC_ALIAS(wlchmod, libc_wlchmod);
-DEFINE_PUBLIC_ALIAS(DOS$wfmkdirat, libd_wfmkdirat);
-DEFINE_PUBLIC_ALIAS(wfmkdirat, libc_wfmkdirat);
-DEFINE_PUBLIC_ALIAS(DOS$wfmknodat, libd_wfmknodat);
-DEFINE_PUBLIC_ALIAS(wfmknodat, libc_wfmknodat);
-DEFINE_PUBLIC_ALIAS(DOS$wmkfifo, libd_wmkfifo);
-DEFINE_PUBLIC_ALIAS(wmkfifo, libc_wmkfifo);
-DEFINE_PUBLIC_ALIAS(DOS$wfchmodat, libd_wfchmodat);
-DEFINE_PUBLIC_ALIAS(wfchmodat, libc_wfchmodat);
-DEFINE_PUBLIC_ALIAS(DOS$wmkdirat, libd_wmkdirat);
-DEFINE_PUBLIC_ALIAS(wmkdirat, libc_wmkdirat);
-DEFINE_PUBLIC_ALIAS(DOS$wmkfifoat, libd_wmkfifoat);
-DEFINE_PUBLIC_ALIAS(wmkfifoat, libc_wmkfifoat);
-DEFINE_PUBLIC_ALIAS(DOS$wmknod, libd_wmknod);
-DEFINE_PUBLIC_ALIAS(wmknod, libc_wmknod);
-DEFINE_PUBLIC_ALIAS(DOS$wmknodat, libd_wmknodat);
-DEFINE_PUBLIC_ALIAS(wmknodat, libc_wmknodat);
-DEFINE_PUBLIC_ALIAS(DOS$wutimensat, libd_wutimensat);
-DEFINE_PUBLIC_ALIAS(wutimensat, libc_wutimensat);
+DEFINE_PUBLIC_ALIAS_P(DOS$wmkdir,libd_wmkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(wmkdir,libc_wmkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *pathname, mode_t mode),(pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wchmod,libd_wchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wchmod,libd_wchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(wchmod,libc_wchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wlchmod,libd_wlchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(wlchmod,libc_wlchmod,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfmkdirat,libd_wfmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *pathname, mode_t mode, atflag_t flags),(dirfd,pathname,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(wfmkdirat,libc_wfmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *pathname, mode_t mode, atflag_t flags),(dirfd,pathname,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfmknodat,libd_wfmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev, atflag_t flags),(dirfd,nodename,mode,dev,flags));
+DEFINE_PUBLIC_ALIAS_P(wfmknodat,libc_wfmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev, atflag_t flags),(dirfd,nodename,mode,dev,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wmkfifo,libd_wmkfifo,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *fifoname, mode_t mode),(fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(wmkfifo,libc_wmkfifo,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *fifoname, mode_t mode),(fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfchmodat,libd_wfchmodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *filename, mode_t mode, atflag_t flags),(dirfd,filename,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(wfchmodat,libc_wfchmodat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename, mode_t mode, atflag_t flags),(dirfd,filename,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wmkdirat,libd_wmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *pathname, mode_t mode),(dirfd,pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(wmkdirat,libc_wmkdirat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *pathname, mode_t mode),(dirfd,pathname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wmkfifoat,libd_wmkfifoat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *fifoname, mode_t mode),(dirfd,fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(wmkfifoat,libc_wmkfifoat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *fifoname, mode_t mode),(dirfd,fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wmknod,libd_wmknod,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(wmknod,libc_wmknod,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *nodename, mode_t mode, dev_t dev),(nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$wmknodat,libd_wmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev),(dirfd,nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(wmknodat,libc_wmknodat,ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev),(dirfd,nodename,mode,dev));
+DEFINE_PUBLIC_ALIAS_P(DOS$wutimensat,libd_wutimensat,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
+DEFINE_PUBLIC_ALIAS_P(wutimensat,libc_wutimensat,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$wutimensat64, libd_wutimensat64);
+DEFINE_PUBLIC_ALIAS_P(DOS$wutimensat64,libd_wutimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(wutimensat64, libc_wutimensat64);
+DEFINE_PUBLIC_ALIAS_P(wutimensat64,libc_wutimensat64,ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags),(dirfd,filename,times,flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

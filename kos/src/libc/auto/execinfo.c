@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5306dd21 */
+/* HASH CRC-32:0x381465da */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,14 +166,14 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols, libc_backtrace_symbols_fmt);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols_fmt, libc_backtrace_symbols_fmt);
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd_fmt);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols_fd_fmt, libc_backtrace_symbols_fd_fmt);
+DEFINE_PUBLIC_ALIAS_P(__backtrace_symbols,libc_backtrace_symbols,ATTR_INS(1, 2),char **,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size),(array,size));
+DEFINE_PUBLIC_ALIAS_P(backtrace_symbols,libc_backtrace_symbols,ATTR_INS(1, 2),char **,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size),(array,size));
+DEFINE_PUBLIC_ALIAS_P(__backtrace_symbols_fd,libc_backtrace_symbols_fd,ATTR_FDWRITE(3) ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd),(array,size,fd));
+DEFINE_PUBLIC_ALIAS_P(backtrace_symbols_fd,libc_backtrace_symbols_fd,ATTR_FDWRITE(3) ATTR_INS(1, 2),int,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd),(array,size,fd));
+DEFINE_PUBLIC_ALIAS_P(__backtrace_symbols,libc_backtrace_symbols_fmt,ATTR_INS(1, 2) ATTR_IN_OPT(3),char **,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, char const *format),(array,size,format));
+DEFINE_PUBLIC_ALIAS_P(backtrace_symbols_fmt,libc_backtrace_symbols_fmt,ATTR_INS(1, 2) ATTR_IN_OPT(3),char **,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, char const *format),(array,size,format));
+DEFINE_PUBLIC_ALIAS_P(__backtrace_symbols_fd,libc_backtrace_symbols_fd_fmt,ATTR_FDWRITE(3) ATTR_INS(1, 2) ATTR_IN_OPT(4),int,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format),(array,size,fd,format));
+DEFINE_PUBLIC_ALIAS_P(backtrace_symbols_fd_fmt,libc_backtrace_symbols_fd_fmt,ATTR_FDWRITE(3) ATTR_INS(1, 2) ATTR_IN_OPT(4),int,NOTHROW_NCX,LIBCCALL,(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd, char const *format),(array,size,fd,format));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_EXECINFO_C */

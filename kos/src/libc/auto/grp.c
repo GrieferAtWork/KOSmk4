@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a8196c8 */
+/* HASH CRC-32:0x83fa5070 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -553,16 +553,16 @@ NOTHROW_NCX(LIBCCALL libc_group_from_gid)(gid_t gid,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(putgrent, libc_putgrent);
-DEFINE_PUBLIC_ALIAS(__fgetgrent_r, libc_fgetgrent_r);
-DEFINE_PUBLIC_ALIAS(fgetgrent_r, libc_fgetgrent_r);
-DEFINE_PUBLIC_ALIAS(fgetgrgid_r, libc_fgetgrgid_r);
-DEFINE_PUBLIC_ALIAS(fgetgrnam_r, libc_fgetgrnam_r);
-DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
-DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);
-DEFINE_PUBLIC_ALIAS(setgroupent, libc_setgroupent);
-DEFINE_PUBLIC_ALIAS(gid_from_group, libc_gid_from_group);
-DEFINE_PUBLIC_ALIAS(group_from_gid, libc_group_from_gid);
+DEFINE_PUBLIC_ALIAS_P(putgrent,libc_putgrent,ATTR_IN(1) ATTR_INOUT(2),int,NOTHROW_CB_NCX,LIBCCALL,(struct group const *__restrict entry, FILE *__restrict stream),(entry,stream));
+DEFINE_PUBLIC_ALIAS_P(__fgetgrent_r,libc_fgetgrent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetgrent_r,libc_fgetgrent_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(stream,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetgrgid_r,libc_fgetgrgid_r,ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5),errno_t,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(stream,gid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetgrnam_r,libc_fgetgrnam_r,ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5),errno_t,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(stream,name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getgrouplist,libc_getgrouplist,ATTR_IN(1) ATTR_INOUT(4) ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *user, gid_t group, gid_t *groups, __STDC_INT_AS_SIZE_T *ngroups),(user,group,groups,ngroups));
+DEFINE_PUBLIC_ALIAS_P(initgroups,libc_initgroups,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *user, gid_t group),(user,group));
+DEFINE_PUBLIC_ALIAS_P(setgroupent,libc_setgroupent,,int,NOTHROW_NCX,LIBCCALL,(int keep_open),(keep_open));
+DEFINE_PUBLIC_ALIAS_P(gid_from_group,libc_gid_from_group,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *name, gid_t *p_gid),(name,p_gid));
+DEFINE_PUBLIC_ALIAS_P(group_from_gid,libc_group_from_gid,WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(gid_t gid, int nogroup),(gid,nogroup));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_GRP_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e535ca6 */
+/* HASH CRC-32:0x441a4d94 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_sort_pointers)(size_t count,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(sort_pointers, libc_sort_pointers);
+DEFINE_PUBLIC_ALIAS_P_VOID(sort_pointers,libc_sort_pointers,ATTR_INOUTS(2, 1) ATTR_OUTS(3, 1),NOTHROW_NCX,LIBCCALL,(size_t count, void **sortme, void **work),(count,sortme,work));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SORT_C */

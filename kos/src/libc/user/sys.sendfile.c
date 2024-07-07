@@ -61,9 +61,9 @@ NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
 /*[[[end:libc_sendfile64]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x7772fdfe]]]*/
-DEFINE_PUBLIC_ALIAS(sendfile, libc_sendfile);
-DEFINE_PUBLIC_ALIAS(sendfile64, libc_sendfile64);
+/*[[[start:exports,hash:CRC-32=0x712f70d]]]*/
+DEFINE_PUBLIC_ALIAS_P(sendfile,libc_sendfile,ATTR_FDREAD(2) ATTR_FDWRITE(1) ATTR_INOUT_OPT(3),ssize_t,NOTHROW_NCX,LIBCCALL,(fd_t out_fd, fd_t in_fd, off_t *offset, size_t count),(out_fd,in_fd,offset,count));
+DEFINE_PUBLIC_ALIAS_P(sendfile64,libc_sendfile64,ATTR_FDREAD(2) ATTR_FDWRITE(1) ATTR_INOUT_OPT(3),ssize_t,NOTHROW_NCX,LIBCCALL,(fd_t out_fd, fd_t in_fd, off64_t *offset, size_t count),(out_fd,in_fd,offset,count));
 /*[[[end:exports]]]*/
 
 DECL_END

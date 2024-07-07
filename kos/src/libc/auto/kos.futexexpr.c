@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94a0f9c7 */
+/* HASH CRC-32:0xd0229881 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) N
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_LFutexExprI64, libc_LFutexExprI);
+DEFINE_INTERN_ALIAS_P(libc_LFutexExprI64,libc_LFutexExprI,ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)),int,THROWING(...),LIBCCALL,(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags),(ulockaddr,base,expr,timeout,timeout_flags));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_LFutexExprI)
 #include <kos/except.h>
@@ -134,10 +134,10 @@ INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) N
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(LFutexExprI, libc_LFutexExprI);
+DEFINE_PUBLIC_ALIAS_P(LFutexExprI,libc_LFutexExprI,ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)),int,THROWING(...),LIBCCALL,(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags),(ulockaddr,base,expr,timeout,timeout_flags));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(LFutexExprI64, libc_LFutexExprI64);
+DEFINE_PUBLIC_ALIAS_P(LFutexExprI64,libc_LFutexExprI64,ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)),int,THROWING(...),LIBCCALL,(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags),(ulockaddr,base,expr,timeout,timeout_flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

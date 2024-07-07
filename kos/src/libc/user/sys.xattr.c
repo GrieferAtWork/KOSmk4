@@ -208,19 +208,19 @@ NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1435a00]]]*/
-DEFINE_PUBLIC_ALIAS(setxattr, libc_setxattr);
-DEFINE_PUBLIC_ALIAS(lsetxattr, libc_lsetxattr);
-DEFINE_PUBLIC_ALIAS(fsetxattr, libc_fsetxattr);
-DEFINE_PUBLIC_ALIAS(getxattr, libc_getxattr);
-DEFINE_PUBLIC_ALIAS(lgetxattr, libc_lgetxattr);
-DEFINE_PUBLIC_ALIAS(fgetxattr, libc_fgetxattr);
-DEFINE_PUBLIC_ALIAS(listxattr, libc_listxattr);
-DEFINE_PUBLIC_ALIAS(llistxattr, libc_llistxattr);
-DEFINE_PUBLIC_ALIAS(flistxattr, libc_flistxattr);
-DEFINE_PUBLIC_ALIAS(removexattr, libc_removexattr);
-DEFINE_PUBLIC_ALIAS(lremovexattr, libc_lremovexattr);
-DEFINE_PUBLIC_ALIAS(fremovexattr, libc_fremovexattr);
+/*[[[start:exports,hash:CRC-32=0xf9ce52a4]]]*/
+DEFINE_PUBLIC_ALIAS_P(setxattr,libc_setxattr,ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4),int,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags),(path,name,buf,bufsize,flags));
+DEFINE_PUBLIC_ALIAS_P(lsetxattr,libc_lsetxattr,ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4),int,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags),(path,name,buf,bufsize,flags));
+DEFINE_PUBLIC_ALIAS_P(fsetxattr,libc_fsetxattr,ATTR_FDARG(1) ATTR_IN(2) ATTR_INS(3, 4),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags),(fd,name,buf,bufsize,flags));
+DEFINE_PUBLIC_ALIAS_P(getxattr,libc_getxattr,ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name, void *buf, size_t bufsize),(path,name,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(lgetxattr,libc_lgetxattr,ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name, void *buf, size_t bufsize),(path,name,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(fgetxattr,libc_fgetxattr,ATTR_FDARG(1) ATTR_IN(2) ATTR_OUTS(3, 4),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char const *name, void *buf, size_t bufsize),(fd,name,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(listxattr,libc_listxattr,ATTR_IN(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(char const *path, char *listbuf, size_t listbufsize),(path,listbuf,listbufsize));
+DEFINE_PUBLIC_ALIAS_P(llistxattr,libc_llistxattr,ATTR_IN(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(char const *path, char *listbuf, size_t listbufsize),(path,listbuf,listbufsize));
+DEFINE_PUBLIC_ALIAS_P(flistxattr,libc_flistxattr,ATTR_FDARG(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *listbuf, size_t listbufsize),(fd,listbuf,listbufsize));
+DEFINE_PUBLIC_ALIAS_P(removexattr,libc_removexattr,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(lremovexattr,libc_lremovexattr,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(char const *path, char const *name),(path,name));
+DEFINE_PUBLIC_ALIAS_P(fremovexattr,libc_fremovexattr,ATTR_FDARG(1) ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, char const *name),(fd,name));
 /*[[[end:exports]]]*/
 
 DECL_END

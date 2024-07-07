@@ -42,8 +42,8 @@ NOTHROW_NCX(LIBCCALL libc___solaris_sysinfo)(__STDC_INT_AS_UINT_T command,
 }
 /*[[[end:libc___solaris_sysinfo]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x4865c117]]]*/
-DEFINE_PUBLIC_ALIAS(__solaris_sysinfo, libc___solaris_sysinfo);
+/*[[[start:exports,hash:CRC-32=0xfe558f04]]]*/
+DEFINE_PUBLIC_ALIAS_P(__solaris_sysinfo,libc___solaris_sysinfo,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T command, char *buf, __STDC_LONG_AS_SIZE_T buflen),(command,buf,buflen));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c0f103 */
+/* HASH CRC-32:0xb44c60d8 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_vtimes)(struct vtimes *current,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(vtimes, libc_vtimes);
+DEFINE_PUBLIC_ALIAS_P(vtimes,libc_vtimes,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct vtimes *current, struct vtimes *child),(current,child));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_VTIMES_C */

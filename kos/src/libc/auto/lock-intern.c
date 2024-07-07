@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x595223c4 */
+/* HASH CRC-32:0x7c8875d4 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,20 +71,20 @@ NOTHROW_NCX(LIBCCALL libc___mutex_unlock_solid)(void *lock) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__mutex_init, libc___spin_lock_init);
-DEFINE_PUBLIC_ALIAS(__spin_lock_init, libc___spin_lock_init);
-DEFINE_PUBLIC_ALIAS(__spin_lock, libc___spin_lock_solid);
-DEFINE_PUBLIC_ALIAS(__mutex_lock, libc___spin_lock_solid);
-DEFINE_PUBLIC_ALIAS(__mutex_lock_solid, libc___spin_lock_solid);
-DEFINE_PUBLIC_ALIAS(mutex_wait_lock, libc___spin_lock_solid);
-DEFINE_PUBLIC_ALIAS(__spin_lock_solid, libc___spin_lock_solid);
-DEFINE_PUBLIC_ALIAS(__mutex_unlock, libc___spin_unlock);
-DEFINE_PUBLIC_ALIAS(mutex_unlock, libc___spin_unlock);
-DEFINE_PUBLIC_ALIAS(__spin_unlock, libc___spin_unlock);
-DEFINE_PUBLIC_ALIAS(__mutex_trylock, libc___spin_try_lock);
-DEFINE_PUBLIC_ALIAS(__spin_try_lock, libc___spin_try_lock);
-DEFINE_PUBLIC_ALIAS(__spin_lock_locked, libc___spin_lock_locked);
-DEFINE_PUBLIC_ALIAS(__mutex_unlock_solid, libc___mutex_unlock_solid);
+DEFINE_PUBLIC_ALIAS_P_VOID(__mutex_init,libc___spin_lock_init,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__spin_lock_init,libc___spin_lock_init,ATTR_OUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__spin_lock,libc___spin_lock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__mutex_lock,libc___spin_lock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__mutex_lock_solid,libc___spin_lock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(mutex_wait_lock,libc___spin_lock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__spin_lock_solid,libc___spin_lock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__mutex_unlock,libc___spin_unlock,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(mutex_unlock,libc___spin_unlock,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__spin_unlock,libc___spin_unlock,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P(__mutex_trylock,libc___spin_try_lock,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P(__spin_try_lock,libc___spin_try_lock,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(__spin_lock_t *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P(__spin_lock_locked,libc___spin_lock_locked,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(__spin_lock_t __KOS_FIXED_CONST *lock),(lock));
+DEFINE_PUBLIC_ALIAS_P_VOID(__mutex_unlock_solid,libc___mutex_unlock_solid,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(void *lock),(lock));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LOCK_INTERN_C */

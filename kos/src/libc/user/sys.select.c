@@ -236,17 +236,17 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdcc86d0]]]*/
-DEFINE_PUBLIC_ALIAS(__select, libc_select);
-DEFINE_PUBLIC_ALIAS(select, libc_select);
-DEFINE_PUBLIC_ALIAS(__pselect, libc_pselect);
-DEFINE_PUBLIC_ALIAS(pselect, libc_pselect);
+/*[[[start:exports,hash:CRC-32=0xdf755497]]]*/
+DEFINE_PUBLIC_ALIAS_P(__select,libc_select,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout),(nfds,readfds,writefds,exceptfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(select,libc_select,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout),(nfds,readfds,writefds,exceptfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(__pselect,libc_pselect,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask),(nfds,readfds,writefds,exceptfds,timeout,sigmask));
+DEFINE_PUBLIC_ALIAS_P(pselect,libc_pselect,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask),(nfds,readfds,writefds,exceptfds,timeout,sigmask));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__select64, libc_select64);
-DEFINE_PUBLIC_ALIAS(select64, libc_select64);
-DEFINE_PUBLIC_ALIAS(__pselect64, libc_pselect64);
-DEFINE_PUBLIC_ALIAS(pselect64, libc_pselect64);
+DEFINE_PUBLIC_ALIAS_P(__select64,libc_select64,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout),(nfds,readfds,writefds,exceptfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(select64,libc_select64,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout),(nfds,readfds,writefds,exceptfds,timeout));
+DEFINE_PUBLIC_ALIAS_P(__pselect64,libc_pselect64,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask),(nfds,readfds,writefds,exceptfds,timeout,sigmask));
+DEFINE_PUBLIC_ALIAS_P(pselect64,libc_pselect64,ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask),(nfds,readfds,writefds,exceptfds,timeout,sigmask));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

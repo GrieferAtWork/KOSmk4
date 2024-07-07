@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7be33de7 */
+/* HASH CRC-32:0xfbab73c0 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -704,7 +704,7 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_preadall64, libc_preadall);
+DEFINE_INTERN_ALIAS_P(libc_preadall64,libc_preadall,ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset),(fd,buf,bufsize,offset));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -736,7 +736,7 @@ NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
+DEFINE_INTERN_ALIAS_P(libc_pwriteall64,libc_pwriteall,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset),(fd,buf,bufsize,offset));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
@@ -2157,7 +2157,7 @@ NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd) {
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_tell64, libc_tell);
+DEFINE_INTERN_ALIAS_P(libc_tell64,libc_tell,WUNUSED ATTR_FDARG(1),off64_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
@@ -2239,108 +2239,108 @@ NOTHROW_NCX(LIBCCALL libc___pause_nocancel)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_execv, libd_execv);
-DEFINE_PUBLIC_ALIAS(DOS$execv, libd_execv);
-DEFINE_PUBLIC_ALIAS(execv, libc_execv);
-DEFINE_PUBLIC_ALIAS(DOS$_execvp, libd_execvp);
-DEFINE_PUBLIC_ALIAS(DOS$execvp, libd_execvp);
-DEFINE_PUBLIC_ALIAS(execvp, libc_execvp);
-DEFINE_PUBLIC_ALIAS(DOS$_execl, libd_execl);
-DEFINE_PUBLIC_ALIAS(DOS$execl, libd_execl);
-DEFINE_PUBLIC_ALIAS(execl, libc_execl);
-DEFINE_PUBLIC_ALIAS(DOS$_execle, libd_execle);
-DEFINE_PUBLIC_ALIAS(DOS$execle, libd_execle);
-DEFINE_PUBLIC_ALIAS(execle, libc_execle);
-DEFINE_PUBLIC_ALIAS(DOS$_execlp, libd_execlp);
-DEFINE_PUBLIC_ALIAS(DOS$execlp, libd_execlp);
-DEFINE_PUBLIC_ALIAS(execlp, libc_execlp);
-DEFINE_PUBLIC_ALIAS(DOS$_execvpe, libd_execvpe);
-DEFINE_PUBLIC_ALIAS(DOS$execvpe, libd_execvpe);
-DEFINE_PUBLIC_ALIAS(execvpe, libc_execvpe);
-DEFINE_PUBLIC_ALIAS(DOS$_execlpe, libd_execlpe);
-DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
-DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
-DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
-DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
-DEFINE_PUBLIC_ALIAS(__ttyname_r, libc_ttyname_r);
-DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
-DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
-DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
-DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
-DEFINE_PUBLIC_ALIAS(readall, libc_readall);
+DEFINE_PUBLIC_ALIAS_P(DOS$_execv,libd_execv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict path, __TARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$execv,libd_execv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict path, __TARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(execv,libc_execv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict path, __TARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execvp,libd_execvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict file, __TARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$execvp,libd_execvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict file, __TARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(execvp,libc_execvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict file, __TARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execl,libd_execl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$execl,libd_execl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(execl,libc_execl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBCCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execle,libd_execle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$execle,libd_execle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(execle,libc_execle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBCCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execlp,libd_execlp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$execlp,libd_execlp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(execlp,libc_execlp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBCCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execvpe,libd_execvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict file, __TARGV, __TENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$execvpe,libd_execvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict file, __TARGV, __TENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(execvpe,libc_execvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict file, __TARGV, __TENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_execlpe,libd_execlpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$execlpe,libd_execlpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(execlpe,libc_execlpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBCCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(__ttyname,libc_ttyname,WUNUSED ATTR_FDARG(1),char *,NOTHROW_RPC,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(ttyname,libc_ttyname,WUNUSED ATTR_FDARG(1),char *,NOTHROW_RPC,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(__ttyname_r,libc_ttyname_r,ATTR_FDARG(1) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *buf, size_t buflen),(fd,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(ttyname_r,libc_ttyname_r,ATTR_FDARG(1) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *buf, size_t buflen),(fd,buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(tcgetpgrp,libc_tcgetpgrp,WUNUSED ATTR_FDARG(1),pid_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(tcsetpgrp,libc_tcsetpgrp,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, pid_t pgrp_id),(fd,pgrp_id));
+DEFINE_PUBLIC_ALIAS_P(getlogin,libc_getlogin,WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(readall,libc_readall,ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void *buf, size_t bufsize),(fd,buf,bufsize));
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
-DEFINE_PUBLIC_ALIAS(write_printer, libc_writeall);
+DEFINE_PUBLIC_ALIAS_P(write_printer,libc_writeall,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
-DEFINE_PUBLIC_ALIAS(writeall, libc_writeall);
+DEFINE_PUBLIC_ALIAS_P(writeall,libc_writeall,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
-DEFINE_PUBLIC_ALIAS(write_printer, libc_write_printer);
+DEFINE_PUBLIC_ALIAS_P(write_printer,libc_write_printer,ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,__FORMATPRINTER_CC,(void *fd, char const *__restrict buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
+DEFINE_PUBLIC_ALIAS_P(_isatty,libc_isatty,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__isatty, libc_isatty);
-DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
-DEFINE_PUBLIC_ALIAS(preadall, libc_preadall);
-DEFINE_PUBLIC_ALIAS(pwriteall, libc_pwriteall);
-DEFINE_PUBLIC_ALIAS(preadall64, libc_preadall64);
-DEFINE_PUBLIC_ALIAS(pwriteall64, libc_pwriteall64);
-DEFINE_PUBLIC_ALIAS(DOS$get_current_dir_name, libd_get_current_dir_name);
-DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
-DEFINE_PUBLIC_ALIAS(__group_member, libc_group_member);
-DEFINE_PUBLIC_ALIAS(group_member, libc_group_member);
-DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
-DEFINE_PUBLIC_ALIAS(DOS$getwd, libd_getwd);
-DEFINE_PUBLIC_ALIAS(getwd, libc_getwd);
-DEFINE_PUBLIC_ALIAS(ualarm, libc_ualarm);
-DEFINE_PUBLIC_ALIAS(setpgrp, libc_setpgrp);
-DEFINE_PUBLIC_ALIAS(gethostid, libc_gethostid);
-DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
-DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
-DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
-DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
-DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
-DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
-DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
-DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
-DEFINE_PUBLIC_ALIAS(__gethostname, libc_gethostname);
-DEFINE_PUBLIC_ALIAS(gethostname, libc_gethostname);
-DEFINE_PUBLIC_ALIAS(sethostid, libc_sethostid);
-DEFINE_PUBLIC_ALIAS(getdomainname, libc_getdomainname);
-DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
-DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);
-DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
+DEFINE_PUBLIC_ALIAS_P(__isatty,libc_isatty,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(isatty,libc_isatty,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(preadall,libc_preadall,ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(pwriteall,libc_pwriteall,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(preadall64,libc_preadall64,ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(pwriteall64,libc_pwriteall64,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(DOS$get_current_dir_name,libd_get_current_dir_name,ATTR_MALLOC WUNUSED,char *,NOTHROW_RPC,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(get_current_dir_name,libc_get_current_dir_name,ATTR_MALLOC WUNUSED,char *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__group_member,libc_group_member,,int,NOTHROW_NCX,LIBCCALL,(gid_t gid),(gid));
+DEFINE_PUBLIC_ALIAS_P(group_member,libc_group_member,,int,NOTHROW_NCX,LIBCCALL,(gid_t gid),(gid));
+DEFINE_PUBLIC_ALIAS_P(usleep,libc_usleep,,int,NOTHROW_RPC,LIBCCALL,(useconds_t useconds),(useconds));
+DEFINE_PUBLIC_ALIAS_P(DOS$getwd,libd_getwd,ATTR_OUT(1),char *,NOTHROW_RPC,LIBDCALL,(char *buf),(buf));
+DEFINE_PUBLIC_ALIAS_P(getwd,libc_getwd,ATTR_OUT(1),char *,NOTHROW_RPC,LIBCCALL,(char *buf),(buf));
+DEFINE_PUBLIC_ALIAS_P(ualarm,libc_ualarm,,useconds_t,NOTHROW_NCX,LIBCCALL,(useconds_t value, useconds_t interval),(value,interval));
+DEFINE_PUBLIC_ALIAS_P(setpgrp,libc_setpgrp,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(gethostid,libc_gethostid,WUNUSED,longptr_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getpagesize,libc_getpagesize,ATTR_CONST WUNUSED,__STDC_INT_AS_SIZE_T,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getpagesize,libc_getpagesize,ATTR_CONST WUNUSED,__STDC_INT_AS_SIZE_T,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getdtablesize,libc_getdtablesize,ATTR_CONST WUNUSED,__STDC_INT_AS_SIZE_T,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getdtablesize,libc_getdtablesize,ATTR_CONST WUNUSED,__STDC_INT_AS_SIZE_T,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(seteuid,libc_seteuid,,int,NOTHROW_NCX,LIBCCALL,(uid_t euid),(euid));
+DEFINE_PUBLIC_ALIAS_P(setegid,libc_setegid,,int,NOTHROW_NCX,LIBCCALL,(gid_t egid),(egid));
+DEFINE_PUBLIC_ALIAS_P(ttyslot,libc_ttyslot,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getlogin_r,libc_getlogin_r,ATTR_OUTS(1, 2),int,NOTHROW_RPC,LIBCCALL,(char *name, size_t name_len),(name,name_len));
+DEFINE_PUBLIC_ALIAS_P(__gethostname,libc_gethostname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(gethostname,libc_gethostname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(sethostid,libc_sethostid,,int,NOTHROW_NCX,LIBCCALL,(longptr_t id),(id));
+DEFINE_PUBLIC_ALIAS_P(getdomainname,libc_getdomainname,ATTR_OUTS(1, 2),int,NOTHROW_NCX,LIBCCALL,(char *name, size_t buflen),(name,buflen));
+DEFINE_PUBLIC_ALIAS_P(daemon,libc_daemon,,int,NOTHROW_RPC,LIBCCALL,(int nochdir, int noclose),(nochdir,noclose));
+DEFINE_PUBLIC_ALIAS_P(getpassphrase,libc_getpass,WUNUSED,char *,NOTHROW_RPC,LIBCCALL,(char const *__restrict prompt),(prompt));
+DEFINE_PUBLIC_ALIAS_P(getpass,libc_getpass,WUNUSED,char *,NOTHROW_RPC,LIBCCALL,(char const *__restrict prompt),(prompt));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
+DEFINE_PUBLIC_ALIAS_P_VOID(_swab,libc_swab,ATTR_INS(1, 3) ATTR_OUTS(2, 3),NOTHROW_NCX,LIBCCALL,(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes),(from,to,n_bytes));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(swab, libc_swab);
-DEFINE_PUBLIC_ALIAS(ctermid, libc_ctermid);
-DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
-DEFINE_PUBLIC_ALIAS(getpassfd, libc_getpassfd);
-DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
-DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
-DEFINE_PUBLIC_ALIAS(setruid, libc_setruid);
-DEFINE_PUBLIC_ALIAS(setrgid, libc_setrgid);
-DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
-DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
-DEFINE_PUBLIC_ALIAS(issetugid, libc_issetugid);
-DEFINE_PUBLIC_ALIAS(DOS$fchroot, libd_fchroot);
-DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
-DEFINE_PUBLIC_ALIAS(DOS$resolvepath, libd_resolvepath);
-DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);
+DEFINE_PUBLIC_ALIAS_P_VOID(swab,libc_swab,ATTR_INS(1, 3) ATTR_OUTS(2, 3),NOTHROW_NCX,LIBCCALL,(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes),(from,to,n_bytes));
+DEFINE_PUBLIC_ALIAS_P(ctermid,libc_ctermid,ATTR_RETNONNULL,char *,NOTHROW_NCX,LIBCCALL,(char *s),(s));
+DEFINE_PUBLIC_ALIAS_P(cuserid,libc_cuserid,ATTR_OUT_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char *s),(s));
+DEFINE_PUBLIC_ALIAS_P(getpassfd,libc_getpassfd,WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(4) ATTR_OUT_OPT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *prompt, char *buf, size_t buflen, fd_t fds[3], __STDC_INT_AS_UINT_T flags, int timeout_in_seconds),(prompt,buf,buflen,fds,flags,timeout_in_seconds));
+DEFINE_PUBLIC_ALIAS_P(getpass_r,libc_getpass_r,WUNUSED ATTR_IN_OPT(1) ATTR_OUT_OPT(2),char *,NOTHROW_RPC,LIBCCALL,(char const *prompt, char *buf, size_t bufsize),(prompt,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(getpeereid,libc_getpeereid,ATTR_FDARG(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, uid_t *euid, gid_t *egid),(sockfd,euid,egid));
+DEFINE_PUBLIC_ALIAS_P(setruid,libc_setruid,,int,NOTHROW_NCX,LIBCCALL,(uid_t ruid),(ruid));
+DEFINE_PUBLIC_ALIAS_P(setrgid,libc_setrgid,,int,NOTHROW_NCX,LIBCCALL,(gid_t rgid),(rgid));
+DEFINE_PUBLIC_ALIAS_P(ctermid_r,libc_ctermid_r,ATTR_OUT_OPT(1),char *,NOTHROW_NCX,LIBCCALL,(char *s),(s));
+DEFINE_PUBLIC_ALIAS_P_VOID(closefrom,libc_closefrom,,NOTHROW_NCX,LIBCCALL,(fd_t lowfd),(lowfd));
+DEFINE_PUBLIC_ALIAS_P(issetugid,libc_issetugid,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$fchroot,libd_fchroot,ATTR_FDARG(1),int,NOTHROW_NCX,LIBDCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(fchroot,libc_fchroot,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(DOS$resolvepath,libd_resolvepath,ATTR_IN(1) ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBDCALL,(char const *filename, char *resolved, size_t buflen),(filename,resolved,buflen));
+DEFINE_PUBLIC_ALIAS_P(resolvepath,libc_resolvepath,ATTR_IN(1) ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(char const *filename, char *resolved, size_t buflen),(filename,resolved,buflen));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_tell, libc_tell);
+DEFINE_PUBLIC_ALIAS_P(_tell,libc_tell,WUNUSED ATTR_FDARG(1),off_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(tell, libc_tell);
+DEFINE_PUBLIC_ALIAS_P(tell,libc_tell,WUNUSED ATTR_FDARG(1),off_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_telli64, libc_tell64);
+DEFINE_PUBLIC_ALIAS_P(_telli64,libc_tell64,WUNUSED ATTR_FDARG(1),off64_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(tell64, libc_tell64);
-DEFINE_PUBLIC_ALIAS(__read_nocancel, libc___read_nocancel);
-DEFINE_PUBLIC_ALIAS(__write_nocancel, libc___write_nocancel);
-DEFINE_PUBLIC_ALIAS(__pread64_nocancel, libc___pread64_nocancel);
-DEFINE_PUBLIC_ALIAS(__pause_nocancel, libc___pause_nocancel);
+DEFINE_PUBLIC_ALIAS_P(tell64,libc_tell64,WUNUSED ATTR_FDARG(1),off64_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(__read_nocancel,libc___read_nocancel,WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_NCX,LIBCCALL,(fd_t fd, void *buf, size_t bufsize),(fd,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(__write_nocancel,libc___write_nocancel,WUNUSED ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_NCX,LIBCCALL,(fd_t fd, void const *buf, size_t bufsize),(fd,buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(__pread64_nocancel,libc___pread64_nocancel,ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_NCX,LIBCCALL,(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(__pause_nocancel,libc___pause_nocancel,,int,NOTHROW_NCX,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

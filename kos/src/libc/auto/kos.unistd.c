@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0f94e22 */
+/* HASH CRC-32:0x20abdb2a */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_FDWRITE(1) ATTR_INS(2, 3) 
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
+DEFINE_INTERN_ALIAS_P(libc_PReadAll64,libc_PReadAll,ATTR_FDREAD(1) ATTR_OUTS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void *buf, size_t bufsize, pos64_t offset),(fd,buf,bufsize,offset));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -277,7 +277,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.large.read") ATTR_FDREAD(1) ATTR_OUTS(2
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_PWriteAll64, libc_PWriteAll);
+DEFINE_INTERN_ALIAS_P(libc_PWriteAll64,libc_PWriteAll,ATTR_FDWRITE(1) ATTR_INS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, pos64_t offset),(fd,buf,bufsize,offset));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
@@ -346,7 +346,7 @@ INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED ATTR_FDARG(1) pos_t
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_Tell64, libc_Tell);
+DEFINE_INTERN_ALIAS_P(libc_Tell64,libc_Tell,WUNUSED ATTR_FDARG(1),pos64_t,THROWING(...),LIBCCALL,(fd_t fd),(fd));
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 #include <asm/os/stdio.h>
 /* >> tell(3), tell64(3)
@@ -361,32 +361,32 @@ INTERN ATTR_SECTION(".text.crt.except.solaris") WUNUSED ATTR_FDARG(1) pos64_t
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(Execl, libc_Execl);
-DEFINE_PUBLIC_ALIAS(Execle, libc_Execle);
-DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
-DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
-DEFINE_PUBLIC_ALIAS(TCGetPGrp, libc_TCGetPGrp);
-DEFINE_PUBLIC_ALIAS(TCSetPGrp, libc_TCSetPGrp);
-DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
+DEFINE_PUBLIC_ALIAS_P_VOID(Execl,libc_Execl,ATTR_NORETURN ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),THROWING(...),VLIBCCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P_VOID(Execle,libc_Execle,ATTR_NORETURN ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),THROWING(...),VLIBCCALL,(char const *__restrict path, char const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P_VOID(Execpl,libc_Execpl,ATTR_NORETURN ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),THROWING(...),VLIBCCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P_VOID(Execlpe,libc_Execlpe,ATTR_NORETURN ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),THROWING(...),VLIBCCALL,(char const *__restrict file, char const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(TCGetPGrp,libc_TCGetPGrp,WUNUSED ATTR_FDARG(1),pid_t,THROWING(...),LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P_VOID(TCSetPGrp,libc_TCSetPGrp,ATTR_FDARG(1),THROWING(...),LIBCCALL,(fd_t fd, pid_t pgrp_id),(fd,pgrp_id));
+DEFINE_PUBLIC_ALIAS_P(ReadAll,libc_ReadAll,ATTR_FDREAD(1) ATTR_OUTS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void *buf, size_t bufsize),(fd,buf,bufsize));
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
-DEFINE_PUBLIC_ALIAS(WritePrinter, libc_WriteAll);
+DEFINE_PUBLIC_ALIAS_P(WritePrinter,libc_WriteAll,ATTR_FDWRITE(1) ATTR_INS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void const *buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
-DEFINE_PUBLIC_ALIAS(WriteAll, libc_WriteAll);
+DEFINE_PUBLIC_ALIAS_P(WriteAll,libc_WriteAll,ATTR_FDWRITE(1) ATTR_INS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void const *buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
-DEFINE_PUBLIC_ALIAS(WritePrinter, libc_WritePrinter);
+DEFINE_PUBLIC_ALIAS_P(WritePrinter,libc_WritePrinter,ATTR_INS(2, 3),ssize_t,THROWING(...),__FORMATPRINTER_CC,(void *fd, char const *__restrict buf, size_t bufsize),(fd,buf,bufsize));
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(PReadAll, libc_PReadAll);
-DEFINE_PUBLIC_ALIAS(PWriteAll, libc_PWriteAll);
-DEFINE_PUBLIC_ALIAS(PReadAll64, libc_PReadAll64);
-DEFINE_PUBLIC_ALIAS(PWriteAll64, libc_PWriteAll64);
-DEFINE_PUBLIC_ALIAS(GetCurrentDirName, libc_GetCurrentDirName);
-DEFINE_PUBLIC_ALIAS(SetRUid, libc_SetRUid);
-DEFINE_PUBLIC_ALIAS(SetRGid, libc_SetRGid);
-DEFINE_PUBLIC_ALIAS(FChRoot, libc_FChRoot);
-DEFINE_PUBLIC_ALIAS(Tell, libc_Tell);
-DEFINE_PUBLIC_ALIAS(Tell64, libc_Tell64);
+DEFINE_PUBLIC_ALIAS_P(PReadAll,libc_PReadAll,ATTR_FDREAD(1) ATTR_OUTS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void *buf, size_t bufsize, pos_t offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(PWriteAll,libc_PWriteAll,ATTR_FDWRITE(1) ATTR_INS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, pos_t offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(PReadAll64,libc_PReadAll64,ATTR_FDREAD(1) ATTR_OUTS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void *buf, size_t bufsize, pos64_t offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(PWriteAll64,libc_PWriteAll64,ATTR_FDWRITE(1) ATTR_INS(2, 3),size_t,THROWING(...),LIBCCALL,(fd_t fd, void const *buf, size_t bufsize, pos64_t offset),(fd,buf,bufsize,offset));
+DEFINE_PUBLIC_ALIAS_P(GetCurrentDirName,libc_GetCurrentDirName,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED,char *,THROWING(...),LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(SetRUid,libc_SetRUid,,THROWING(...),LIBCCALL,(uid_t ruid),(ruid));
+DEFINE_PUBLIC_ALIAS_P_VOID(SetRGid,libc_SetRGid,,THROWING(...),LIBCCALL,(gid_t rgid),(rgid));
+DEFINE_PUBLIC_ALIAS_P_VOID(FChRoot,libc_FChRoot,ATTR_FDARG(1),THROWING(...),LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(Tell,libc_Tell,WUNUSED ATTR_FDARG(1),pos_t,THROWING(...),LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(Tell64,libc_Tell64,WUNUSED ATTR_FDARG(1),pos64_t,THROWING(...),LIBCCALL,(fd_t fd),(fd));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_UNISTD_C */

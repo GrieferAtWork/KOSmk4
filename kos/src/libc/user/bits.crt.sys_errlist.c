@@ -120,11 +120,11 @@ NOTHROW(LIBCCALL libc___sys_nerr)(void)
 }
 /*[[[end:libc___sys_nerr]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x24fd56d9]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$__sys_errlist, libd___sys_errlist);
-DEFINE_PUBLIC_ALIAS(__sys_errlist, libc___sys_errlist);
-DEFINE_PUBLIC_ALIAS(DOS$__sys_nerr, libd___sys_nerr);
-DEFINE_PUBLIC_ALIAS(__sys_nerr, libc___sys_nerr);
+/*[[[start:exports,hash:CRC-32=0x91b84704]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$__sys_errlist,libd___sys_errlist,ATTR_CONST ATTR_RETNONNULL WUNUSED,char const *const *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__sys_errlist,libc___sys_errlist,ATTR_CONST ATTR_RETNONNULL WUNUSED,char const *const *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$__sys_nerr,libd___sys_nerr,ATTR_CONST ATTR_RETNONNULL WUNUSED,int *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__sys_nerr,libc___sys_nerr,ATTR_CONST ATTR_RETNONNULL WUNUSED,int *,NOTHROW,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

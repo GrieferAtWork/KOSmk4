@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9afbe7ef */
+/* HASH CRC-32:0xe47ee470 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,11 +74,11 @@ NOTHROW_RPC(LIBKCALL libc__wmkdir)(char32_t const *path) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wgetdcwd_nolock, libd__wgetdcwd);
-DEFINE_PUBLIC_ALIAS(DOS$_wgetdcwd, libd__wgetdcwd);
-DEFINE_PUBLIC_ALIAS(_wgetdcwd, libc__wgetdcwd);
-DEFINE_PUBLIC_ALIAS(DOS$_wmkdir, libd__wmkdir);
-DEFINE_PUBLIC_ALIAS(_wmkdir, libc__wmkdir);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wgetdcwd_nolock,libd__wgetdcwd,ATTR_OUTS(2, 3),char16_t *,NOTHROW_RPC,LIBDCALL,(int drive, char16_t *buf, size_t size),(drive,buf,size));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wgetdcwd,libd__wgetdcwd,ATTR_OUTS(2, 3),char16_t *,NOTHROW_RPC,LIBDCALL,(int drive, char16_t *buf, size_t size),(drive,buf,size));
+DEFINE_PUBLIC_ALIAS_P(_wgetdcwd,libc__wgetdcwd,ATTR_OUTS(2, 3),char32_t *,NOTHROW_RPC,LIBKCALL,(int drive, char32_t *buf, size_t size),(drive,buf,size));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wmkdir,libd__wmkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char16_t const *path),(path));
+DEFINE_PUBLIC_ALIAS_P(_wmkdir,libc__wmkdir,ATTR_IN(1),int,NOTHROW_RPC,LIBKCALL,(char32_t const *path),(path));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CORECRT_WDIRECT_C */

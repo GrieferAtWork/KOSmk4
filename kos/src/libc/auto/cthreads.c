@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x683c906b */
+/* HASH CRC-32:0xbd65c8d8 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,15 +102,15 @@ NOTHROW_NCX(LIBCCALL libc_cthread_setspecific)(cthread_key_t key,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(cthread_init, libc_cthread_init);
-DEFINE_PUBLIC_ALIAS(cthread_fork, libc_cthread_fork);
-DEFINE_PUBLIC_ALIAS(cthread_join, libc_cthread_join);
-DEFINE_PUBLIC_ALIAS(cthread_abort, libc_cthread_abort);
-DEFINE_PUBLIC_ALIAS(cthread_set_limit, libc_cthread_set_limit);
-DEFINE_PUBLIC_ALIAS(cthread_limit, libc_cthread_limit);
-DEFINE_PUBLIC_ALIAS(cthread_keycreate, libc_cthread_keycreate);
-DEFINE_PUBLIC_ALIAS(cthread_getspecific, libc_cthread_getspecific);
-DEFINE_PUBLIC_ALIAS(cthread_setspecific, libc_cthread_setspecific);
+DEFINE_PUBLIC_ALIAS_P(cthread_init,libc_cthread_init,,vm_offset_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(cthread_fork,libc_cthread_fork,NONNULL((1)),cthread_t,NOTHROW_NCX,LIBCCALL,(any_t (LIBCCALL *start_routine)(any_t arg), any_t arg),(start_routine,arg));
+DEFINE_PUBLIC_ALIAS_P(cthread_join,libc_cthread_join,,any_t,NOTHROW_NCX,LIBCCALL,(cthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(cthread_abort,libc_cthread_abort,,int,NOTHROW_NCX,LIBCCALL,(cthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(cthread_set_limit,libc_cthread_set_limit,,NOTHROW_NCX,LIBCCALL,(int limit),(limit));
+DEFINE_PUBLIC_ALIAS_P(cthread_limit,libc_cthread_limit,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(cthread_keycreate,libc_cthread_keycreate,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(cthread_key_t *key),(key));
+DEFINE_PUBLIC_ALIAS_P(cthread_getspecific,libc_cthread_getspecific,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(cthread_key_t key, void **p_value),(key,p_value));
+DEFINE_PUBLIC_ALIAS_P(cthread_setspecific,libc_cthread_setspecific,ATTR_ACCESS_NONE(2),int,NOTHROW_NCX,LIBCCALL,(cthread_key_t key, void *value),(key,value));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CTHREADS_C */

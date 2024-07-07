@@ -204,29 +204,29 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc00fb06e]]]*/
-DEFINE_PUBLIC_ALIAS(prlimit, libc_prlimit);
-DEFINE_PUBLIC_ALIAS(prlimit64, libc_prlimit64);
-DEFINE_PUBLIC_ALIAS(__getrlimit, libc_getrlimit);
-DEFINE_PUBLIC_ALIAS(__libc_getrlimit, libc_getrlimit);
-DEFINE_PUBLIC_ALIAS(getrlimit, libc_getrlimit);
-DEFINE_PUBLIC_ALIAS(__setrlimit, libc_setrlimit);
-DEFINE_PUBLIC_ALIAS(__libc_setrlimit, libc_setrlimit);
-DEFINE_PUBLIC_ALIAS(setrlimit, libc_setrlimit);
-DEFINE_PUBLIC_ALIAS(__getrusage, libc_getrusage);
-DEFINE_PUBLIC_ALIAS(__libc_getrusage, libc_getrusage);
-DEFINE_PUBLIC_ALIAS(getrusage, libc_getrusage);
+/*[[[start:exports,hash:CRC-32=0x34b31934]]]*/
+DEFINE_PUBLIC_ALIAS_P(prlimit,libc_prlimit,ATTR_IN_OPT(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, __rlimit_resource_t resource, struct rlimit const *new_limit, struct rlimit *old_limit),(pid,resource,new_limit,old_limit));
+DEFINE_PUBLIC_ALIAS_P(prlimit64,libc_prlimit64,ATTR_IN_OPT(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(pid_t pid, __rlimit_resource_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit),(pid,resource,new_limit,old_limit));
+DEFINE_PUBLIC_ALIAS_P(__getrlimit,libc_getrlimit,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(__libc_getrlimit,libc_getrlimit,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(getrlimit,libc_getrlimit,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(__setrlimit,libc_setrlimit,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit const *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(__libc_setrlimit,libc_setrlimit,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit const *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(setrlimit,libc_setrlimit,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit const *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(__getrusage,libc_getrusage,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rusage_who_t who, struct rusage *usage),(who,usage));
+DEFINE_PUBLIC_ALIAS_P(__libc_getrusage,libc_getrusage,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rusage_who_t who, struct rusage *usage),(who,usage));
+DEFINE_PUBLIC_ALIAS_P(getrusage,libc_getrusage,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rusage_who_t who, struct rusage *usage),(who,usage));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__getrusage64, libc_getrusage64);
-DEFINE_PUBLIC_ALIAS(getrusage64, libc_getrusage64);
+DEFINE_PUBLIC_ALIAS_P(__getrusage64,libc_getrusage64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rusage_who_t who, struct rusage64 *usage),(who,usage));
+DEFINE_PUBLIC_ALIAS_P(getrusage64,libc_getrusage64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rusage_who_t who, struct rusage64 *usage),(who,usage));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(getpriority, libc_getpriority);
-DEFINE_PUBLIC_ALIAS(__setpriority, libc_setpriority);
-DEFINE_PUBLIC_ALIAS(__libc_setpriority, libc_setpriority);
-DEFINE_PUBLIC_ALIAS(setpriority, libc_setpriority);
-DEFINE_PUBLIC_ALIAS(getrlimit64, libc_getrlimit64);
-DEFINE_PUBLIC_ALIAS(setrlimit64, libc_setrlimit64);
+DEFINE_PUBLIC_ALIAS_P(getpriority,libc_getpriority,,int,NOTHROW_NCX,LIBCCALL,(__priority_which_t which, id_t who),(which,who));
+DEFINE_PUBLIC_ALIAS_P(__setpriority,libc_setpriority,,int,NOTHROW_NCX,LIBCCALL,(__priority_which_t which, id_t who, int prio),(which,who,prio));
+DEFINE_PUBLIC_ALIAS_P(__libc_setpriority,libc_setpriority,,int,NOTHROW_NCX,LIBCCALL,(__priority_which_t which, id_t who, int prio),(which,who,prio));
+DEFINE_PUBLIC_ALIAS_P(setpriority,libc_setpriority,,int,NOTHROW_NCX,LIBCCALL,(__priority_which_t which, id_t who, int prio),(which,who,prio));
+DEFINE_PUBLIC_ALIAS_P(getrlimit64,libc_getrlimit64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit64 *rlimits),(resource,rlimits));
+DEFINE_PUBLIC_ALIAS_P(setrlimit64,libc_setrlimit64,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(__rlimit_resource_t resource, struct rlimit64 const *rlimits),(resource,rlimits));
 /*[[[end:exports]]]*/
 
 DECL_END

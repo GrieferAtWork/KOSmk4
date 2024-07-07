@@ -945,7 +945,7 @@
 #define __NAMESPACE_LOCAL_SYM                ::__local_imp::
 #define __NAMESPACE_LOCAL_USING(x)           using ::__local_imp::x;
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) using ::__local_imp::x;
-#define __LIBC_LOCAL_NAME(x)                 x
+#define __LIBC_LOCAL_NAME(x)                 __l_##x
 #define __LOCAL_LIBC(name)
 #define __LOCAL_LIBC_DATA(name)
 #define __LOCAL_LIBC_CONST_DATA(name)
@@ -2135,6 +2135,8 @@
 #define __gthrw_(x) x
 #define __gthrw(...)
 #define _GLIBCXX_GTHRW(x) int __glibcxx_##x(pthread_rwlock_t *rwlock);
+#define _GLIBCXX_DEFINE_BINARY_PREDICATE_OP_CONSTRAINT(_,N) template<class _First,class _Second>struct N{void __constraints(){}bool __constraints_(){}_First __a;_Second __b;}
+#define _GLIBCXX_DEFINE_BINARY_OPERATOR_CONSTRAINT(_,N) template<class _Ret,class _First,class _Second>struct N{void __constraints(){}_Ret __constraints_(){}_First __a;_Second __b;}
 
 
 
@@ -2169,6 +2171,23 @@
 #define __MINGW_TYPEDEF_AW(x) typedef x##A x;
 #define __MINGW_NAME_AW(x) x##A
 #define DECLARE_HANDLE(HMODULE) typedef void *HMODULE
+
+
+
+// libc
+#define DEFINE_PRIVATE_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PUBLIC_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_INTERN_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PRIVATE_WEAK_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PUBLIC_WEAK_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_INTERN_WEAK_ALIAS_P(n,o,attr,Treturn,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PRIVATE_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PUBLIC_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_INTERN_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PRIVATE_WEAK_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_PUBLIC_WEAK_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+#define DEFINE_INTERN_WEAK_ALIAS_P_VOID(n,o,attr,nothrow,cc,param,args) Treturn n param{}
+
 
 
 
@@ -2790,3 +2809,6 @@
 	async*async_worker_new(async_worker_ops const*ops,T*ob_pointer){}\
 	bool register_async_worker(async_worker_ops const*ops,T*ob_pointer){}\
 	bool unregister_async_worker(async_worker_ops const*ops,T*ob_pointer){}
+
+#define USER_TRY
+#define USER_EXCEPT(x)

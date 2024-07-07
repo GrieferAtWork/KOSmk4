@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc85f45c4 */
+/* HASH CRC-32:0xd5ee56d7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,10 +64,10 @@ NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$mkfifo, libd_mkfifo);
-DEFINE_PUBLIC_ALIAS(mkfifo, libc_mkfifo);
-DEFINE_PUBLIC_ALIAS(DOS$mkfifoat, libd_mkfifoat);
-DEFINE_PUBLIC_ALIAS(mkfifoat, libc_mkfifoat);
+DEFINE_PUBLIC_ALIAS_P(DOS$mkfifo,libd_mkfifo,ATTR_IN(1),int,NOTHROW_RPC,LIBDCALL,(char const *fifoname, mode_t mode),(fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(mkfifo,libc_mkfifo,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *fifoname, mode_t mode),(fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$mkfifoat,libd_mkfifoat,ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *fifoname, mode_t mode),(dirfd,fifoname,mode));
+DEFINE_PUBLIC_ALIAS_P(mkfifoat,libc_mkfifoat,ATTR_IN(2),int,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *fifoname, mode_t mode),(dirfd,fifoname,mode));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_STAT_C */

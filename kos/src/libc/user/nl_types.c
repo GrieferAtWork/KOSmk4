@@ -70,10 +70,10 @@ NOTHROW_NCX(LIBCCALL libc_catclose)(nl_catd catalog)
 }
 /*[[[end:libc_catclose]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x62ebdd09]]]*/
-DEFINE_PUBLIC_ALIAS(catopen, libc_catopen);
-DEFINE_PUBLIC_ALIAS(catgets, libc_catgets);
-DEFINE_PUBLIC_ALIAS(catclose, libc_catclose);
+/*[[[start:exports,hash:CRC-32=0x97c8f11]]]*/
+DEFINE_PUBLIC_ALIAS_P(catopen,libc_catopen,ATTR_IN(1),nl_catd,NOTHROW_RPC,LIBCCALL,(char const *cat_name, int flag),(cat_name,flag));
+DEFINE_PUBLIC_ALIAS_P(catgets,libc_catgets,ATTR_INOUT(1),char *,NOTHROW_NCX,LIBCCALL,(nl_catd catalog, int set, int number, char const *string),(catalog,set,number,string));
+DEFINE_PUBLIC_ALIAS_P(catclose,libc_catclose,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(nl_catd catalog),(catalog));
 /*[[[end:exports]]]*/
 
 DECL_END

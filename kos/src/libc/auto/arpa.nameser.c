@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x559ad519 */
+/* HASH CRC-32:0xa7417835 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_compress)(char const *srcbuf,
 	return 0;
 }
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-DEFINE_INTERN_ALIAS(libc_dn_comp, libc_ns_name_compress);
+DEFINE_INTERN_ALIAS_P(libc_dn_comp,libc_ns_name_compress,,int,NOTHROW_NCX,LIBCCALL,(char const *srcbuf, u_char *dstbuf, int dstbufsize, u_char **d, u_char **e),(srcbuf,dstbuf,dstbufsize,d,e));
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 INTERN ATTR_SECTION(".text.crt.net.nameser") int
 NOTHROW_NCX(LIBCCALL libc_dn_comp)(char const *srcbuf,
@@ -87,17 +87,17 @@ NOTHROW_NCX(LIBCCALL libc_dn_comp)(char const *srcbuf,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(ns_get16, libc_ns_get16);
-DEFINE_PUBLIC_ALIAS(ns_get32, libc_ns_get32);
-DEFINE_PUBLIC_ALIAS(putshort, libc_ns_put16);
-DEFINE_PUBLIC_ALIAS(__putshort, libc_ns_put16);
-DEFINE_PUBLIC_ALIAS(ns_put16, libc_ns_put16);
-DEFINE_PUBLIC_ALIAS(putlong, libc_ns_put32);
-DEFINE_PUBLIC_ALIAS(__putlong, libc_ns_put32);
-DEFINE_PUBLIC_ALIAS(ns_put32, libc_ns_put32);
-DEFINE_PUBLIC_ALIAS(ns_name_compress, libc_ns_name_compress);
-DEFINE_PUBLIC_ALIAS(__dn_comp, libc_dn_comp);
-DEFINE_PUBLIC_ALIAS(dn_comp, libc_dn_comp);
+DEFINE_PUBLIC_ALIAS_P(ns_get16,libc_ns_get16,ATTR_PURE WUNUSED ATTR_IN(1),u_int,NOTHROW_NCX,LIBCCALL,(u_char const *srcptr),(srcptr));
+DEFINE_PUBLIC_ALIAS_P(ns_get32,libc_ns_get32,ATTR_PURE WUNUSED ATTR_IN(1),u_long,NOTHROW_NCX,LIBCCALL,(u_char const *srcptr),(srcptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(putshort,libc_ns_put16,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_int val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(__putshort,libc_ns_put16,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_int val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(ns_put16,libc_ns_put16,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_int val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(putlong,libc_ns_put32,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_long val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(__putlong,libc_ns_put32,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_long val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P_VOID(ns_put32,libc_ns_put32,ATTR_OUT(2),NOTHROW_NCX,LIBCCALL,(u_long val, u_char *destptr),(val,destptr));
+DEFINE_PUBLIC_ALIAS_P(ns_name_compress,libc_ns_name_compress,,int,NOTHROW_NCX,LIBCCALL,(char const *srcbuf, u_char *dstbuf, size_t dstbufsize, u_char const **d, u_char const **e),(srcbuf,dstbuf,dstbufsize,d,e));
+DEFINE_PUBLIC_ALIAS_P(__dn_comp,libc_dn_comp,,int,NOTHROW_NCX,LIBCCALL,(char const *srcbuf, u_char *dstbuf, int dstbufsize, u_char **d, u_char **e),(srcbuf,dstbuf,dstbufsize,d,e));
+DEFINE_PUBLIC_ALIAS_P(dn_comp,libc_dn_comp,,int,NOTHROW_NCX,LIBCCALL,(char const *srcbuf, u_char *dstbuf, int dstbufsize, u_char **d, u_char **e),(srcbuf,dstbuf,dstbufsize,d,e));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARPA_NAMESER_C */

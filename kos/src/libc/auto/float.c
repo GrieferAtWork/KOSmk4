@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2878d9e */
+/* HASH CRC-32:0x953fcf65 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,11 +75,11 @@ NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__fpe_flt_rounds, libc___fpe_flt_rounds);
-DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
-DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
-DEFINE_PUBLIC_ALIAS(_controlfp_s, libc__controlfp_s);
-DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
+DEFINE_PUBLIC_ALIAS_P(__fpe_flt_rounds,libc___fpe_flt_rounds,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_controlfp,libc__controlfp,,uint32_t,NOTHROW_NCX,LIBCCALL,(uint32_t newval, uint32_t mask),(newval,mask));
+DEFINE_PUBLIC_ALIAS_P_VOID(_set_controlfp,libc__set_controlfp,,NOTHROW_NCX,LIBCCALL,(uint32_t newval, uint32_t mask),(newval,mask));
+DEFINE_PUBLIC_ALIAS_P(_controlfp_s,libc__controlfp_s,,errno_t,NOTHROW_NCX,LIBCCALL,(uint32_t *pcurrent, uint32_t newval, uint32_t mask),(pcurrent,newval,mask));
+DEFINE_PUBLIC_ALIAS_P(_control87,libc__control87,,uint32_t,NOTHROW_NCX,LIBCCALL,(uint32_t newval, uint32_t mask),(newval,mask));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FLOAT_C */

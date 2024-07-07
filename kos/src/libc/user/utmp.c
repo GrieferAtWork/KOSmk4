@@ -214,29 +214,29 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3a847ee8]]]*/
-DEFINE_PUBLIC_ALIAS(login, libc_login);
-DEFINE_PUBLIC_ALIAS(logout, libc_logout);
-DEFINE_PUBLIC_ALIAS(logwtmp, libc_logwtmp);
-DEFINE_PUBLIC_ALIAS(updwtmp, libc_updwtmp);
-DEFINE_PUBLIC_ALIAS(__utmpname, libc_utmpname);
-DEFINE_PUBLIC_ALIAS(utmpname, libc_utmpname);
-DEFINE_PUBLIC_ALIAS(getutent, libc_getutent);
-DEFINE_PUBLIC_ALIAS(__setutent, libc_setutent);
-DEFINE_PUBLIC_ALIAS(setutent, libc_setutent);
-DEFINE_PUBLIC_ALIAS(__endutent, libc_endutent);
-DEFINE_PUBLIC_ALIAS(endutent, libc_endutent);
-DEFINE_PUBLIC_ALIAS(getutid, libc_getutid);
-DEFINE_PUBLIC_ALIAS(getutline, libc_getutline);
-DEFINE_PUBLIC_ALIAS(_pututline, libc_pututline);
-DEFINE_PUBLIC_ALIAS(__pututline, libc_pututline);
-DEFINE_PUBLIC_ALIAS(pututline, libc_pututline);
-DEFINE_PUBLIC_ALIAS(__getutent_r, libc_getutent_r);
-DEFINE_PUBLIC_ALIAS(getutent_r, libc_getutent_r);
-DEFINE_PUBLIC_ALIAS(__getutid_r, libc_getutid_r);
-DEFINE_PUBLIC_ALIAS(getutid_r, libc_getutid_r);
-DEFINE_PUBLIC_ALIAS(__getutline_r, libc_getutline_r);
-DEFINE_PUBLIC_ALIAS(getutline_r, libc_getutline_r);
+/*[[[start:exports,hash:CRC-32=0xb6871423]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(login,libc_login,ATTR_IN(1),NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *entry),(entry));
+DEFINE_PUBLIC_ALIAS_P(logout,libc_logout,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *ut_line),(ut_line));
+DEFINE_PUBLIC_ALIAS_P_VOID(logwtmp,libc_logwtmp,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),NOTHROW_RPC_KOS,LIBCCALL,(char const *ut_line, char const *ut_name, char const *ut_host),(ut_line,ut_name,ut_host));
+DEFINE_PUBLIC_ALIAS_P_VOID(updwtmp,libc_updwtmp,ATTR_IN(1) ATTR_IN(2),NOTHROW_RPC_KOS,LIBCCALL,(char const *wtmp_file, struct utmp const *utmp),(wtmp_file,utmp));
+DEFINE_PUBLIC_ALIAS_P(__utmpname,libc_utmpname,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *file),(file));
+DEFINE_PUBLIC_ALIAS_P(utmpname,libc_utmpname,ATTR_IN(1),int,NOTHROW_RPC_KOS,LIBCCALL,(char const *file),(file));
+DEFINE_PUBLIC_ALIAS_P(getutent,libc_getutent,,struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(__setutent,libc_setutent,,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(setutent,libc_setutent,,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(__endutent,libc_endutent,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endutent,libc_endutent,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getutid,libc_getutid,ATTR_IN(1),struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *id),(id));
+DEFINE_PUBLIC_ALIAS_P(getutline,libc_getutline,ATTR_IN(1),struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *line),(line));
+DEFINE_PUBLIC_ALIAS_P(_pututline,libc_pututline,ATTR_IN(1),struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *utmp_ptr),(utmp_ptr));
+DEFINE_PUBLIC_ALIAS_P(__pututline,libc_pututline,ATTR_IN(1),struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *utmp_ptr),(utmp_ptr));
+DEFINE_PUBLIC_ALIAS_P(pututline,libc_pututline,ATTR_IN(1),struct utmp *,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *utmp_ptr),(utmp_ptr));
+DEFINE_PUBLIC_ALIAS_P(__getutent_r,libc_getutent_r,ATTR_OUT(1) ATTR_OUT(2),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp *buffer, struct utmp **result),(buffer,result));
+DEFINE_PUBLIC_ALIAS_P(getutent_r,libc_getutent_r,ATTR_OUT(1) ATTR_OUT(2),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp *buffer, struct utmp **result),(buffer,result));
+DEFINE_PUBLIC_ALIAS_P(__getutid_r,libc_getutid_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *id, struct utmp *buffer, struct utmp **result),(id,buffer,result));
+DEFINE_PUBLIC_ALIAS_P(getutid_r,libc_getutid_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *id, struct utmp *buffer, struct utmp **result),(id,buffer,result));
+DEFINE_PUBLIC_ALIAS_P(__getutline_r,libc_getutline_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *line, struct utmp *buffer, struct utmp **result),(line,buffer,result));
+DEFINE_PUBLIC_ALIAS_P(getutline_r,libc_getutline_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC_KOS,LIBCCALL,(struct utmp const *line, struct utmp *buffer, struct utmp **result),(line,buffer,result));
 /*[[[end:exports]]]*/
 
 DECL_END

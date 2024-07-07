@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0229e48 */
+/* HASH CRC-32:0xe8b3d3bf */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_read_with_timeout64, libc_shared_recursive_rwlock_read_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_recursive_rwlock_read_with_timeout64,libc_shared_recursive_rwlock_read_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_recursive_rwlock_read_with_timeout(3), shared_recursive_rwlock_read_with_timeout64(3)
  * Acquire a read-lock to the given shared_recursive_rwlock.
@@ -258,7 +258,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_write_with_timeout64, libc_shared_recursive_rwlock_write_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_recursive_rwlock_write_with_timeout64,libc_shared_recursive_rwlock_write_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_recursive_rwlock_write_with_timeout(3), shared_recursive_rwlock_write_with_timeout64(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
@@ -281,7 +281,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_waitread_with_timeout64, libc_shared_recursive_rwlock_waitread_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_recursive_rwlock_waitread_with_timeout64,libc_shared_recursive_rwlock_waitread_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_recursive_rwlock_waitread_with_timeout(3), shared_recursive_rwlock_waitread_with_timeout64(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
@@ -298,7 +298,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_waitwrite_with_timeout64, libc_shared_recursive_rwlock_waitwrite_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_recursive_rwlock_waitwrite_with_timeout64,libc_shared_recursive_rwlock_waitwrite_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_recursive_rwlock_waitwrite_with_timeout(3), shared_recursive_rwlock_waitwrite_with_timeout64(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
@@ -318,35 +318,35 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_tryread, libc_shared_recursive_rwlock_tryread);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_trywrite, libc_shared_recursive_rwlock_trywrite);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_endwrite, libc_shared_recursive_rwlock_endwrite);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_endread, libc_shared_recursive_rwlock_endread);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_downgrade, libc_shared_recursive_rwlock_downgrade);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_upgrade, libc_shared_recursive_rwlock_upgrade);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_read, libc_shared_recursive_rwlock_read);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_write, libc_shared_recursive_rwlock_write);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_read_with_timeout, libc_shared_recursive_rwlock_read_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_write_with_timeout, libc_shared_recursive_rwlock_write_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread, libc_shared_recursive_rwlock_waitread);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite, libc_shared_recursive_rwlock_waitwrite);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread_with_timeout, libc_shared_recursive_rwlock_waitread_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite_with_timeout, libc_shared_recursive_rwlock_waitwrite_with_timeout);
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_tryread,libc_shared_recursive_rwlock_tryread,WUNUSED __NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_trywrite,libc_shared_recursive_rwlock_trywrite,WUNUSED __NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_endwrite,libc_shared_recursive_rwlock_endwrite,__NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_endread,libc_shared_recursive_rwlock_endread,__NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_recursive_rwlock_downgrade,libc_shared_recursive_rwlock_downgrade,__NOBLOCK ATTR_INOUT(1),NOTHROW,__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_upgrade,libc_shared_recursive_rwlock_upgrade,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_recursive_rwlock_read,libc_shared_recursive_rwlock_read,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_recursive_rwlock_write,libc_shared_recursive_rwlock_write,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_read_with_timeout,libc_shared_recursive_rwlock_read_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_write_with_timeout,libc_shared_recursive_rwlock_write_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_recursive_rwlock_waitread,libc_shared_recursive_rwlock_waitread,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_recursive_rwlock_waitwrite,libc_shared_recursive_rwlock_waitwrite,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_waitread_with_timeout,libc_shared_recursive_rwlock_waitread_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_waitwrite_with_timeout,libc_shared_recursive_rwlock_waitwrite_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_read_with_timeout64, libc_shared_recursive_rwlock_read_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_read_with_timeout64,libc_shared_recursive_rwlock_read_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_write_with_timeout64, libc_shared_recursive_rwlock_write_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_write_with_timeout64,libc_shared_recursive_rwlock_write_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitread_with_timeout64, libc_shared_recursive_rwlock_waitread_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_waitread_with_timeout64,libc_shared_recursive_rwlock_waitread_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_recursive_rwlock_waitwrite_with_timeout64, libc_shared_recursive_rwlock_waitwrite_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_recursive_rwlock_waitwrite_with_timeout64,libc_shared_recursive_rwlock_waitwrite_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

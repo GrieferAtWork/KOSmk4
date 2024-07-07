@@ -98,9 +98,9 @@ NOTHROW(LIBCCALL libc_dosfs_setenabled)(unsigned int newmode)
 }
 /*[[[end:libc_dosfs_setenabled]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xfeb97267]]]*/
-DEFINE_PUBLIC_ALIAS(dosfs_getenabled, libc_dosfs_getenabled);
-DEFINE_PUBLIC_ALIAS(dosfs_setenabled, libc_dosfs_setenabled);
+/*[[[start:exports,hash:CRC-32=0xb575b4a5]]]*/
+DEFINE_PUBLIC_ALIAS_P(dosfs_getenabled,libc_dosfs_getenabled,ATTR_PURE WUNUSED,unsigned int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(dosfs_setenabled,libc_dosfs_setenabled,,unsigned int,NOTHROW,LIBCCALL,(unsigned int newmode),(newmode));
 /*[[[end:exports]]]*/
 
 DECL_END

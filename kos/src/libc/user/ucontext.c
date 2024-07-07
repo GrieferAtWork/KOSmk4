@@ -157,18 +157,18 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_makecontext]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xede21b1d]]]*/
+/*[[[start:exports,hash:CRC-32=0xf9c34369]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT
-DEFINE_PUBLIC_ALIAS(getcontext, libc_getcontext);
+DEFINE_PUBLIC_ALIAS_P(getcontext,libc_getcontext,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(ucontext_t *__restrict ucp),(ucp));
 #endif /* !LIBC_ARCH_HAVE_GETCONTEXT */
 #ifndef LIBC_ARCH_HAVE_SETCONTEXT
-DEFINE_PUBLIC_ALIAS(setcontext, libc_setcontext);
+DEFINE_PUBLIC_ALIAS_P(setcontext,libc_setcontext,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(ucontext_t const *__restrict ucp),(ucp));
 #endif /* !LIBC_ARCH_HAVE_SETCONTEXT */
 #ifndef LIBC_ARCH_HAVE_SWAPCONTEXT
-DEFINE_PUBLIC_ALIAS(swapcontext, libc_swapcontext);
+DEFINE_PUBLIC_ALIAS_P(swapcontext,libc_swapcontext,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(ucontext_t *__restrict oucp, ucontext_t const *__restrict ucp),(oucp,ucp));
 #endif /* !LIBC_ARCH_HAVE_SWAPCONTEXT */
 #ifndef LIBC_ARCH_HAVE_MAKECONTEXT
-DEFINE_PUBLIC_ALIAS(makecontext, libc_makecontext);
+DEFINE_PUBLIC_ALIAS_P_VOID(makecontext,libc_makecontext,ATTR_OUT(1) NONNULL((2)),NOTHROW_NCX,VLIBCCALL,(ucontext_t *ucp, void (LIBKCALL *func)(void), __STDC_INT_AS_SIZE_T argc, ...),(ucp,func,argc,));
 #endif /* !LIBC_ARCH_HAVE_MAKECONTEXT */
 /*[[[end:exports]]]*/
 

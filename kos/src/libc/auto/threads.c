@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72beba3b */
+/* HASH CRC-32:0xeb75abe */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,7 +188,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
+DEFINE_INTERN_ALIAS_P(libc_mtx_timedlock64,libc_mtx_timedlock,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(mutex,time_point));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
@@ -332,7 +332,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_cnd_timedwait64, libc_cnd_timedwait);
+DEFINE_INTERN_ALIAS_P(libc_cnd_timedwait64,libc_cnd_timedwait,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_RPC,LIBCCALL,(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(cond,mutex,time_point));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
@@ -411,36 +411,36 @@ NOTHROW(LIBCCALL libc_thr_min_stack)(void) {
 DECL_END
 
 #if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$thrd_create, libd_thrd_create);
+DEFINE_PUBLIC_ALIAS_P(DOS$thrd_create,libd_thrd_create,ATTR_OUT(1) NONNULL((2)),int,NOTHROW_NCX,LIBDCALL,(thrd_t *thr, int (LIBDCALL *func)(void *arg), void *arg),(thr,func,arg));
 #endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(thrd_create, libc_thrd_create);
-DEFINE_PUBLIC_ALIAS(thrd_exit, libc_thrd_exit);
-DEFINE_PUBLIC_ALIAS(thrd_detach, libc_thrd_detach);
-DEFINE_PUBLIC_ALIAS(thrd_join, libc_thrd_join);
-DEFINE_PUBLIC_ALIAS(mtx_init, libc_mtx_init);
-DEFINE_PUBLIC_ALIAS(mtx_lock, libc_mtx_lock);
-DEFINE_PUBLIC_ALIAS(mtx_timedlock, libc_mtx_timedlock);
+DEFINE_PUBLIC_ALIAS_P(thrd_create,libc_thrd_create,ATTR_OUT(1) NONNULL((2)),int,NOTHROW_NCX,LIBCCALL,(thrd_t *thr, int (LIBCCALL *func)(void *arg), void *arg),(thr,func,arg));
+DEFINE_PUBLIC_ALIAS_P_VOID(thrd_exit,libc_thrd_exit,ATTR_NORETURN,,LIBCCALL,(int res),(res));
+DEFINE_PUBLIC_ALIAS_P(thrd_detach,libc_thrd_detach,,int,NOTHROW_NCX,LIBCCALL,(thrd_t thr),(thr));
+DEFINE_PUBLIC_ALIAS_P(thrd_join,libc_thrd_join,ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(thrd_t thr, int *res),(thr,res));
+DEFINE_PUBLIC_ALIAS_P(mtx_init,libc_mtx_init,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type),(mutex,type));
+DEFINE_PUBLIC_ALIAS_P(mtx_lock,libc_mtx_lock,ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(mtx_t *__restrict mutex),(mutex));
+DEFINE_PUBLIC_ALIAS_P(mtx_timedlock,libc_mtx_timedlock,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(mtx_t *__restrict mutex, struct timespec const *__restrict time_point),(mutex,time_point));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__mtx_timedlock64, libc_mtx_timedlock64);
-DEFINE_PUBLIC_ALIAS(mtx_timedlock64, libc_mtx_timedlock64);
+DEFINE_PUBLIC_ALIAS_P(__mtx_timedlock64,libc_mtx_timedlock64,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(mutex,time_point));
+DEFINE_PUBLIC_ALIAS_P(mtx_timedlock64,libc_mtx_timedlock64,ATTR_IN(2) ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(mutex,time_point));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(mtx_trylock, libc_mtx_trylock);
-DEFINE_PUBLIC_ALIAS(mtx_unlock, libc_mtx_unlock);
-DEFINE_PUBLIC_ALIAS(cnd_init, libc_cnd_init);
-DEFINE_PUBLIC_ALIAS(cnd_signal, libc_cnd_signal);
-DEFINE_PUBLIC_ALIAS(cnd_broadcast, libc_cnd_broadcast);
-DEFINE_PUBLIC_ALIAS(cnd_wait, libc_cnd_wait);
-DEFINE_PUBLIC_ALIAS(cnd_timedwait, libc_cnd_timedwait);
+DEFINE_PUBLIC_ALIAS_P(mtx_trylock,libc_mtx_trylock,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(mtx_t *__restrict mutex),(mutex));
+DEFINE_PUBLIC_ALIAS_P(mtx_unlock,libc_mtx_unlock,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(mtx_t *__restrict mutex),(mutex));
+DEFINE_PUBLIC_ALIAS_P(cnd_init,libc_cnd_init,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(cnd_t *__restrict cond),(cond));
+DEFINE_PUBLIC_ALIAS_P(cnd_signal,libc_cnd_signal,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(cnd_t *__restrict cond),(cond));
+DEFINE_PUBLIC_ALIAS_P(cnd_broadcast,libc_cnd_broadcast,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(cnd_t *__restrict cond),(cond));
+DEFINE_PUBLIC_ALIAS_P(cnd_wait,libc_cnd_wait,ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_RPC,LIBCCALL,(cnd_t *__restrict cond, mtx_t *__restrict mutex),(cond,mutex));
+DEFINE_PUBLIC_ALIAS_P(cnd_timedwait,libc_cnd_timedwait,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_RPC,LIBCCALL,(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec const *__restrict time_point),(cond,mutex,time_point));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__cnd_timedwait64, libc_cnd_timedwait64);
-DEFINE_PUBLIC_ALIAS(cnd_timedwait64, libc_cnd_timedwait64);
+DEFINE_PUBLIC_ALIAS_P(__cnd_timedwait64,libc_cnd_timedwait64,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_RPC,LIBCCALL,(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(cond,mutex,time_point));
+DEFINE_PUBLIC_ALIAS_P(cnd_timedwait64,libc_cnd_timedwait64,ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_RPC,LIBCCALL,(cnd_t *__restrict cond, mtx_t *__restrict mutex, struct timespec64 const *__restrict time_point),(cond,mutex,time_point));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(tss_create, libc_tss_create);
-DEFINE_PUBLIC_ALIAS(tss_set, libc_tss_set);
-DEFINE_PUBLIC_ALIAS(thr_min_stack, libc_thr_min_stack);
+DEFINE_PUBLIC_ALIAS_P(tss_create,libc_tss_create,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(tss_t *tss_id, void (LIBKCALL *destructor)(void *arg)),(tss_id,destructor));
+DEFINE_PUBLIC_ALIAS_P(tss_set,libc_tss_set,ATTR_ACCESS_NONE(2),int,NOTHROW_NCX,LIBCCALL,(tss_t tss_id, void *val),(tss_id,val));
+DEFINE_PUBLIC_ALIAS_P(thr_min_stack,libc_thr_min_stack,ATTR_CONST WUNUSED,size_t,NOTHROW,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_THREADS_C */

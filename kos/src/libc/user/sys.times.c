@@ -41,10 +41,10 @@ NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
 }
 /*[[[end:libc_times]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xf638c414]]]*/
-DEFINE_PUBLIC_ALIAS(__times, libc_times);
-DEFINE_PUBLIC_ALIAS(__libc_times, libc_times);
-DEFINE_PUBLIC_ALIAS(times, libc_times);
+/*[[[start:exports,hash:CRC-32=0xe45587a8]]]*/
+DEFINE_PUBLIC_ALIAS_P(__times,libc_times,ATTR_OUT_OPT(1),clock_t,NOTHROW_NCX,LIBCCALL,(struct tms *buffer),(buffer));
+DEFINE_PUBLIC_ALIAS_P(__libc_times,libc_times,ATTR_OUT_OPT(1),clock_t,NOTHROW_NCX,LIBCCALL,(struct tms *buffer),(buffer));
+DEFINE_PUBLIC_ALIAS_P(times,libc_times,ATTR_OUT_OPT(1),clock_t,NOTHROW_NCX,LIBCCALL,(struct tms *buffer),(buffer));
 /*[[[end:exports]]]*/
 
 DECL_END

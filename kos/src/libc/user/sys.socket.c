@@ -624,75 +624,75 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9bcf31ac]]]*/
-DEFINE_PUBLIC_ALIAS(__socket, libc_socket);
-DEFINE_PUBLIC_ALIAS(socket, libc_socket);
-DEFINE_PUBLIC_ALIAS(__socketpair, libc_socketpair);
-DEFINE_PUBLIC_ALIAS(socketpair, libc_socketpair);
-DEFINE_PUBLIC_ALIAS(__bind, libc_bind);
-DEFINE_PUBLIC_ALIAS(bind, libc_bind);
-DEFINE_PUBLIC_ALIAS(__getsockname, libc_getsockname);
-DEFINE_PUBLIC_ALIAS(getsockname, libc_getsockname);
-DEFINE_PUBLIC_ALIAS(__connect, libc_connect);
-DEFINE_PUBLIC_ALIAS(__libc_connect, libc_connect);
-DEFINE_PUBLIC_ALIAS(connect, libc_connect);
-DEFINE_PUBLIC_ALIAS(__getpeername, libc_getpeername);
-DEFINE_PUBLIC_ALIAS(getpeername, libc_getpeername);
-DEFINE_PUBLIC_ALIAS(__send, libc_send);
-DEFINE_PUBLIC_ALIAS(__libc_send, libc_send);
-DEFINE_PUBLIC_ALIAS(send, libc_send);
-DEFINE_PUBLIC_ALIAS(__recv, libc_recv);
-DEFINE_PUBLIC_ALIAS(__libc_recv, libc_recv);
-DEFINE_PUBLIC_ALIAS(recv, libc_recv);
-DEFINE_PUBLIC_ALIAS(__sendto, libc_sendto);
-DEFINE_PUBLIC_ALIAS(__libc_sendto, libc_sendto);
-DEFINE_PUBLIC_ALIAS(sendto, libc_sendto);
-DEFINE_PUBLIC_ALIAS(__recvfrom, libc_recvfrom);
-DEFINE_PUBLIC_ALIAS(__libc_recvfrom, libc_recvfrom);
-DEFINE_PUBLIC_ALIAS(recvfrom, libc_recvfrom);
-DEFINE_PUBLIC_ALIAS(__sendmsg, libc_sendmsg);
-DEFINE_PUBLIC_ALIAS(__libc_sendmsg, libc_sendmsg);
+/*[[[start:exports,hash:CRC-32=0x73c83cc7]]]*/
+DEFINE_PUBLIC_ALIAS_P(__socket,libc_socket,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol),(domain,type,protocol));
+DEFINE_PUBLIC_ALIAS_P(socket,libc_socket,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol),(domain,type,protocol));
+DEFINE_PUBLIC_ALIAS_P(__socketpair,libc_socketpair,ATTR_OUT(4),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol, fd_t fds[2]),(domain,type,protocol,fds));
+DEFINE_PUBLIC_ALIAS_P(socketpair,libc_socketpair,ATTR_OUT(4),int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol, fd_t fds[2]),(domain,type,protocol,fds));
+DEFINE_PUBLIC_ALIAS_P(__bind,libc_bind,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(bind,libc_bind,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__getsockname,libc_getsockname,ATTR_FDARG(1) ATTR_INOUT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(getsockname,libc_getsockname,ATTR_FDARG(1) ATTR_INOUT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__connect,libc_connect,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__libc_connect,libc_connect,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(connect,libc_connect,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__getpeername,libc_getpeername,ATTR_FDARG(1) ATTR_INOUT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(getpeername,libc_getpeername,ATTR_FDARG(1) ATTR_INOUT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__send,libc_send,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_send,libc_send,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(send,libc_send,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__recv,libc_recv,WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_recv,libc_recv,WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(recv,libc_recv,WUNUSED ATTR_FDREAD(1) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags),(sockfd,buf,bufsize,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__sendto,libc_sendto,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__libc_sendto,libc_sendto,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(sendto,libc_sendto,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__recvfrom,libc_recvfrom,WUNUSED ATTR_FDREAD(1) ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__libc_recvfrom,libc_recvfrom,WUNUSED ATTR_FDREAD(1) ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(recvfrom,libc_recvfrom,WUNUSED ATTR_FDREAD(1) ATTR_INOUT_OPT(6) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,buf,bufsize,msg_flags,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__sendmsg,libc_sendmsg,ATTR_FDWRITE(1) ATTR_IN(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_sendmsg,libc_sendmsg,ATTR_FDWRITE(1) ATTR_IN(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__sendmsg64, libc_sendmsg);
+DEFINE_PUBLIC_ALIAS_P(__sendmsg64,libc_sendmsg,ATTR_FDWRITE(1) ATTR_IN(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(sendmsg, libc_sendmsg);
-DEFINE_PUBLIC_ALIAS(__recvmsg, libc_recvmsg);
-DEFINE_PUBLIC_ALIAS(__libc_recvmsg, libc_recvmsg);
+DEFINE_PUBLIC_ALIAS_P(sendmsg,libc_sendmsg,ATTR_FDWRITE(1) ATTR_IN(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__recvmsg,libc_recvmsg,WUNUSED ATTR_FDREAD(1) ATTR_INOUT(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__libc_recvmsg,libc_recvmsg,WUNUSED ATTR_FDREAD(1) ATTR_INOUT(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__recvmsg64, libc_recvmsg);
+DEFINE_PUBLIC_ALIAS_P(__recvmsg64,libc_recvmsg,WUNUSED ATTR_FDREAD(1) ATTR_INOUT(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(recvmsg, libc_recvmsg);
-DEFINE_PUBLIC_ALIAS(__getsockopt, libc_getsockopt);
+DEFINE_PUBLIC_ALIAS_P(recvmsg,libc_recvmsg,WUNUSED ATTR_FDREAD(1) ATTR_INOUT(2),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags),(sockfd,message,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(__getsockopt,libc_getsockopt,ATTR_FDARG(1) ATTR_INOUT(5) ATTR_OUT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen),(sockfd,level,optname,optval,optlen));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__getsockopt64, libc_getsockopt);
+DEFINE_PUBLIC_ALIAS_P(__getsockopt64,libc_getsockopt,ATTR_FDARG(1) ATTR_INOUT(5) ATTR_OUT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen),(sockfd,level,optname,optval,optlen));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(getsockopt, libc_getsockopt);
-DEFINE_PUBLIC_ALIAS(__setsockopt, libc_setsockopt);
+DEFINE_PUBLIC_ALIAS_P(getsockopt,libc_getsockopt,ATTR_FDARG(1) ATTR_INOUT(5) ATTR_OUT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen),(sockfd,level,optname,optval,optlen));
+DEFINE_PUBLIC_ALIAS_P(__setsockopt,libc_setsockopt,ATTR_FDARG(1) ATTR_INS(4, 5),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen),(sockfd,level,optname,optval,optlen));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__setsockopt64, libc_setsockopt);
+DEFINE_PUBLIC_ALIAS_P(__setsockopt64,libc_setsockopt,ATTR_FDARG(1) ATTR_INS(4, 5),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen),(sockfd,level,optname,optval,optlen));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(setsockopt, libc_setsockopt);
-DEFINE_PUBLIC_ALIAS(__listen, libc_listen);
-DEFINE_PUBLIC_ALIAS(listen, libc_listen);
-DEFINE_PUBLIC_ALIAS(__accept, libc_accept);
-DEFINE_PUBLIC_ALIAS(__libc_accept, libc_accept);
-DEFINE_PUBLIC_ALIAS(accept, libc_accept);
-DEFINE_PUBLIC_ALIAS(__shutdown, libc_shutdown);
-DEFINE_PUBLIC_ALIAS(shutdown, libc_shutdown);
-DEFINE_PUBLIC_ALIAS(accept4, libc_accept4);
-DEFINE_PUBLIC_ALIAS(__sendmmsg, libc_sendmmsg);
+DEFINE_PUBLIC_ALIAS_P(setsockopt,libc_setsockopt,ATTR_FDARG(1) ATTR_INS(4, 5),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen),(sockfd,level,optname,optval,optlen));
+DEFINE_PUBLIC_ALIAS_P(__listen,libc_listen,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog),(sockfd,max_backlog));
+DEFINE_PUBLIC_ALIAS_P(listen,libc_listen,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog),(sockfd,max_backlog));
+DEFINE_PUBLIC_ALIAS_P(__accept,libc_accept,ATTR_FDARG(1) ATTR_INOUT_OPT(3),fd_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__libc_accept,libc_accept,ATTR_FDARG(1) ATTR_INOUT_OPT(3),fd_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(accept,libc_accept,ATTR_FDARG(1) ATTR_INOUT_OPT(3),fd_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len),(sockfd,addr,addr_len));
+DEFINE_PUBLIC_ALIAS_P(__shutdown,libc_shutdown,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T how),(sockfd,how));
+DEFINE_PUBLIC_ALIAS_P(shutdown,libc_shutdown,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd, __STDC_INT_AS_UINT_T how),(sockfd,how));
+DEFINE_PUBLIC_ALIAS_P(accept4,libc_accept4,ATTR_FDARG(1) ATTR_INOUT_OPT(3),fd_t,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags),(sockfd,addr,addr_len,sock_flags));
+DEFINE_PUBLIC_ALIAS_P(__sendmmsg,libc_sendmmsg,ATTR_FDWRITE(1) ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags),(sockfd,vmessages,vlen,msg_flags));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__sendmmsg64, libc_sendmmsg);
+DEFINE_PUBLIC_ALIAS_P(__sendmmsg64,libc_sendmmsg,ATTR_FDWRITE(1) ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags),(sockfd,vmessages,vlen,msg_flags));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(sendmmsg, libc_sendmmsg);
-DEFINE_PUBLIC_ALIAS(recvmmsg, libc_recvmmsg);
+DEFINE_PUBLIC_ALIAS_P(sendmmsg,libc_sendmmsg,ATTR_FDWRITE(1) ATTR_INOUT(2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags),(sockfd,vmessages,vlen,msg_flags));
+DEFINE_PUBLIC_ALIAS_P(recvmmsg,libc_recvmmsg,ATTR_FDREAD(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo),(sockfd,vmessages,vlen,msg_flags,tmo));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__recvmmsg64, libc_recvmmsg64);
-DEFINE_PUBLIC_ALIAS(recvmmsg64, libc_recvmmsg64);
+DEFINE_PUBLIC_ALIAS_P(__recvmmsg64,libc_recvmmsg64,ATTR_FDREAD(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo),(sockfd,vmessages,vlen,msg_flags,tmo));
+DEFINE_PUBLIC_ALIAS_P(recvmmsg64,libc_recvmmsg64,ATTR_FDREAD(1) ATTR_INOUTS(2, 3) ATTR_IN_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo),(sockfd,vmessages,vlen,msg_flags,tmo));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(sockatmark, libc_sockatmark);
-DEFINE_PUBLIC_ALIAS(isfdtype, libc_isfdtype);
+DEFINE_PUBLIC_ALIAS_P(sockatmark,libc_sockatmark,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t sockfd),(sockfd));
+DEFINE_PUBLIC_ALIAS_P(isfdtype,libc_isfdtype,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T fdtype),(fd,fdtype));
 /*[[[end:exports]]]*/
 
 DECL_END

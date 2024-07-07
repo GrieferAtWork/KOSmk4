@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35fc7d16 */
+/* HASH CRC-32:0x3bf7a0c9 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -260,46 +260,46 @@ NOTHROW_CB_NCX(LIBCCALL libc_verrx)(int status,
 DECL_END
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$warn, libd_warn);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$warn,libd_warn,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2),NOTHROW_CB_NCX,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(warn, libc_warn);
-DEFINE_PUBLIC_ALIAS(vwarn, libc_vwarn);
+DEFINE_PUBLIC_ALIAS_P_VOID(warn,libc_warn,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2),NOTHROW_CB_NCX,VLIBCCALL,(char const *format, ...),(format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(vwarn,libc_vwarn,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0),NOTHROW_CB_NCX,LIBCCALL,(char const *format, va_list args),(format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$warnc, libd_warnc);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$warnc,libd_warnc,ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBDCALL,(errno_t used_errno, char const *format, ...),(used_errno,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(warnc, libc_warnc);
-DEFINE_PUBLIC_ALIAS(vwarnc, libc_vwarnc);
+DEFINE_PUBLIC_ALIAS_P_VOID(warnc,libc_warnc,ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBCCALL,(errno_t used_errno, char const *format, ...),(used_errno,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(vwarnc,libc_vwarnc,ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0),NOTHROW_CB_NCX,LIBCCALL,(errno_t used_errno, char const *format, va_list args),(used_errno,format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$warnx, libd_warnx);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$warnx,libd_warnx,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2),NOTHROW_CB_NCX,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(warnx, libc_warnx);
-DEFINE_PUBLIC_ALIAS(vwarnx, libc_vwarnx);
+DEFINE_PUBLIC_ALIAS_P_VOID(warnx,libc_warnx,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2),NOTHROW_CB_NCX,VLIBCCALL,(char const *format, ...),(format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(vwarnx,libc_vwarnx,ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0),NOTHROW_CB_NCX,LIBCCALL,(char const *format, va_list args),(format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$err, libd_err);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$err,libd_err,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBDCALL,(int status, char const *format, ...),(status,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(err, libc_err);
-DEFINE_PUBLIC_ALIAS(verr, libc_verr);
+DEFINE_PUBLIC_ALIAS_P_VOID(err,libc_err,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBCCALL,(int status, char const *format, ...),(status,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(verr,libc_verr,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0),NOTHROW_CB_NCX,LIBCCALL,(int status, char const *format, va_list args),(status,format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$errc, libd_errc);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$errc,libd_errc,ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBDCALL,(int status, errno_t used_errno, char const *format, ...),(status,used_errno,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(errc, libc_errc);
-DEFINE_PUBLIC_ALIAS(verrc, libc_verrc);
+DEFINE_PUBLIC_ALIAS_P_VOID(errc,libc_errc,ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4),NOTHROW_CB_NCX,VLIBCCALL,(int status, errno_t used_errno, char const *format, ...),(status,used_errno,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(verrc,libc_verrc,ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0),NOTHROW_CB_NCX,LIBCCALL,(int status, errno_t used_errno, char const *format, va_list args),(status,used_errno,format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$errx, libd_errx);
+DEFINE_PUBLIC_ALIAS_P_VOID(DOS$errx,libd_errx,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBDCALL,(int status, char const *format, ...),(status,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(errx, libc_errx);
-DEFINE_PUBLIC_ALIAS(verrx, libc_verrx);
+DEFINE_PUBLIC_ALIAS_P_VOID(errx,libc_errx,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3),NOTHROW_CB_NCX,VLIBCCALL,(int status, char const *format, ...),(status,format,));
+DEFINE_PUBLIC_ALIAS_P_VOID(verrx,libc_verrx,ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0),NOTHROW_CB_NCX,LIBCCALL,(int status, char const *format, va_list args),(status,format,args));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ERR_C */

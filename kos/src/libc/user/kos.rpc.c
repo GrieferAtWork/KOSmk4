@@ -252,13 +252,13 @@ INTERN ATTR_SECTION(".text.crt.sched.rpc") void
 }
 /*[[[end:libc_RpcInterrupt]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x4adde8ce]]]*/
-DEFINE_PUBLIC_ALIAS(rpc_schedule, libc_rpc_schedule);
-DEFINE_PUBLIC_ALIAS(rpc_serve, libc_rpc_serve);
-DEFINE_PUBLIC_ALIAS(rpc_exec, libc_rpc_exec);
-DEFINE_PUBLIC_ALIAS(rpc_interrupt, libc_rpc_interrupt);
-DEFINE_PUBLIC_ALIAS(RpcExec, libc_RpcExec);
-DEFINE_PUBLIC_ALIAS(RpcInterrupt, libc_RpcInterrupt);
+/*[[[start:exports,hash:CRC-32=0xcbaf0195]]]*/
+DEFINE_PUBLIC_ALIAS_P(rpc_schedule,libc_rpc_schedule,ATTR_IN(3) ATTR_INS(4, 5),int,NOTHROW_RPC,LIBCCALL,(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count),(target_tid,mode,program,params,max_param_count));
+DEFINE_PUBLIC_ALIAS_P(rpc_serve,libc_rpc_serve,,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(rpc_exec,libc_rpc_exec,NONNULL((3)),int,NOTHROW_RPC,LIBCCALL,(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie),(target_tid,mode,func,cookie));
+DEFINE_PUBLIC_ALIAS_P(rpc_interrupt,libc_rpc_interrupt,,int,NOTHROW_RPC,LIBCCALL,(pid_t target_tid, unsigned int mode),(target_tid,mode));
+DEFINE_PUBLIC_ALIAS_P_VOID(RpcExec,libc_RpcExec,NONNULL((3)),THROWING(...),LIBCCALL,(pid_t target_tid, unsigned int mode, prpc_exec_callback_t func, void *cookie),(target_tid,mode,func,cookie));
+DEFINE_PUBLIC_ALIAS_P_VOID(RpcInterrupt,libc_RpcInterrupt,,THROWING(...),LIBCCALL,(pid_t target_tid, unsigned int mode),(target_tid,mode));
 /*[[[end:exports]]]*/
 
 DECL_END

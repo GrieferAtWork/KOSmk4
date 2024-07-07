@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf57cef50 */
+/* HASH CRC-32:0x6c459b8c */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1776,31 +1776,31 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$format_wrepeat, libd_format_wrepeat);
-DEFINE_PUBLIC_ALIAS(format_wrepeat, libc_format_wrepeat);
-DEFINE_PUBLIC_ALIAS(DOS$format_wescape, libd_format_wescape);
-DEFINE_PUBLIC_ALIAS(format_wescape, libc_format_wescape);
-DEFINE_PUBLIC_ALIAS(DOS$format_whexdump, libd_format_whexdump);
-DEFINE_PUBLIC_ALIAS(format_whexdump, libc_format_whexdump);
-DEFINE_PUBLIC_ALIAS(DOS$format_vwprintf, libd_format_vwprintf);
-DEFINE_PUBLIC_ALIAS(format_vwprintf, libc_format_vwprintf);
-DEFINE_PUBLIC_ALIAS(DOS$format_wprintf, libd_format_wprintf);
-DEFINE_PUBLIC_ALIAS(format_wprintf, libc_format_wprintf);
-DEFINE_PUBLIC_ALIAS(DOS$format_vwscanf, libd_format_vwscanf);
-DEFINE_PUBLIC_ALIAS(format_vwscanf, libc_format_vwscanf);
-DEFINE_PUBLIC_ALIAS(DOS$format_wscanf, libd_format_wscanf);
-DEFINE_PUBLIC_ALIAS(format_wscanf, libc_format_wscanf);
-DEFINE_PUBLIC_ALIAS(DOS$format_wsprintf_printer, libd_format_wsprintf_printer);
-DEFINE_PUBLIC_ALIAS(format_wsprintf_printer, libc_format_wsprintf_printer);
-DEFINE_PUBLIC_ALIAS(DOS$format_wsnprintf_printer, libd_format_wsnprintf_printer);
-DEFINE_PUBLIC_ALIAS(format_wsnprintf_printer, libc_format_wsnprintf_printer);
-DEFINE_PUBLIC_ALIAS(DOS$format_wwidth, libd_format_wwidth);
-DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_pack, libd_format_waprintf_pack);
-DEFINE_PUBLIC_ALIAS(format_waprintf_pack, libc_format_waprintf_pack);
-DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_alloc, libd_format_waprintf_alloc);
-DEFINE_PUBLIC_ALIAS(format_waprintf_alloc, libc_format_waprintf_alloc);
-DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_printer, libd_format_waprintf_printer);
-DEFINE_PUBLIC_ALIAS(format_waprintf_printer, libc_format_waprintf_printer);
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wrepeat,libd_format_wrepeat,NONNULL((1)),ssize_t,NOTHROW_CB,LIBDCALL,(pc16formatprinter printer, void *arg, char16_t ch, size_t num_repetitions),(printer,arg,ch,num_repetitions));
+DEFINE_PUBLIC_ALIAS_P(format_wrepeat,libc_format_wrepeat,NONNULL((1)),ssize_t,NOTHROW_CB,LIBKCALL,(pc32formatprinter printer, void *arg, char32_t ch, size_t num_repetitions),(printer,arg,ch,num_repetitions));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wescape,libd_format_wescape,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBDCALL,(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags),(printer,arg,text,textlen,flags));
+DEFINE_PUBLIC_ALIAS_P(format_wescape,libc_format_wescape,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBKCALL,(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags),(printer,arg,text,textlen,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_whexdump,libd_format_whexdump,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBDCALL,(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags),(printer,arg,data,size,linesize,flags));
+DEFINE_PUBLIC_ALIAS_P(format_whexdump,libc_format_whexdump,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBKCALL,(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags),(printer,arg,data,size,linesize,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_vwprintf,libd_format_vwprintf,ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)),ssize_t,NOTHROW_CB,LIBDCALL,(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args),(printer,arg,format,args));
+DEFINE_PUBLIC_ALIAS_P(format_vwprintf,libc_format_vwprintf,ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)),ssize_t,NOTHROW_CB,LIBKCALL,(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args),(printer,arg,format,args));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wprintf,libd_format_wprintf,ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)),ssize_t,NOTHROW_CB,LIBDCALL,(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...),(printer,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(format_wprintf,libc_format_wprintf,ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)),ssize_t,NOTHROW_CB,LIBKCALL,(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...),(printer,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_vwscanf,libd_format_vwscanf,ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)),ssize_t,NOTHROW_CB,LIBDCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, va_list args),(pgetc,pungetc,arg,format,args));
+DEFINE_PUBLIC_ALIAS_P(format_vwscanf,libc_format_vwscanf,ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)),ssize_t,NOTHROW_CB,LIBKCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, va_list args),(pgetc,pungetc,arg,format,args));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wscanf,libd_format_wscanf,ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)),ssize_t,NOTHROW_CB,LIBDCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, ...),(pgetc,pungetc,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(format_wscanf,libc_format_wscanf,ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)),ssize_t,NOTHROW_CB,LIBKCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, ...),(pgetc,pungetc,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wsprintf_printer,libd_format_wsprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_wsprintf_printer,libc_format_wsprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wsnprintf_printer,libd_format_wsnprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_wsnprintf_printer,libc_format_wsnprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_wwidth,libd_format_wwidth,ATTR_PURE ATTR_INS(2, 3) NONNULL((2)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_waprintf_pack,libd_format_waprintf_pack,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2),char16_t *,NOTHROW_NCX,LIBDCALL,(struct format_c16aprintf_data *__restrict self, size_t *pstrlen),(self,pstrlen));
+DEFINE_PUBLIC_ALIAS_P(format_waprintf_pack,libc_format_waprintf_pack,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2),char32_t *,NOTHROW_NCX,LIBKCALL,(struct format_c32aprintf_data *__restrict self, size_t *pstrlen),(self,pstrlen));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_waprintf_alloc,libd_format_waprintf_alloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1),char16_t *,NOTHROW_NCX,LIBDCALL,(struct format_c16aprintf_data *__restrict self, size_t num_wchars),(self,num_wchars));
+DEFINE_PUBLIC_ALIAS_P(format_waprintf_alloc,libc_format_waprintf_alloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1),char32_t *,NOTHROW_NCX,LIBKCALL,(struct format_c32aprintf_data *__restrict self, size_t num_wchars),(self,num_wchars));
+DEFINE_PUBLIC_ALIAS_P(DOS$format_waprintf_printer,libd_format_waprintf_printer,WUNUSED ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C16FORMATPRINTER_CC,(void *arg, char16_t const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_waprintf_printer,libc_format_waprintf_printer,WUNUSED ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__C32FORMATPRINTER_CC,(void *arg, char32_t const *__restrict data, size_t datalen),(arg,data,datalen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_FORMAT_PRINTER_C */

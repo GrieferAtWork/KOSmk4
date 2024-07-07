@@ -183,44 +183,44 @@ NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x447b0445]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$__utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$_utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$_utime32, libd_utime);
-DEFINE_PUBLIC_ALIAS(DOS$utime, libd_utime);
-DEFINE_PUBLIC_ALIAS(__utime, libc_utime);
-DEFINE_PUBLIC_ALIAS(__libc_utime, libc_utime);
+/*[[[start:exports,hash:CRC-32=0x27ef11ee]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$__utime,libd_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$__libc_utime,libd_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$_utime,libd_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$_utime32,libd_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(DOS$utime,libd_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(__utime,libc_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(__libc_utime,libc_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_utime, libc_utime);
-DEFINE_PUBLIC_ALIAS(_utime32, libc_utime);
+DEFINE_PUBLIC_ALIAS_P(_utime,libc_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(_utime32,libc_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(utime, libc_utime);
+DEFINE_PUBLIC_ALIAS_P(utime,libc_utime,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf const *file_times),(filename,file_times));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$__utime64, libd_utime64);
+DEFINE_PUBLIC_ALIAS_P(DOS$__utime64,libd_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(DOS$_utime64, libd_utime64);
+DEFINE_PUBLIC_ALIAS_P(DOS$_utime64,libd_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(DOS$utime64, libd_utime64);
-DEFINE_PUBLIC_ALIAS(__utime64, libc_utime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_utime64, libc_utime64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(utime64, libc_utime64);
+DEFINE_PUBLIC_ALIAS_P(DOS$utime64,libd_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBDCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
+DEFINE_PUBLIC_ALIAS_P(__utime64,libc_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_futime, libc_futime);
-DEFINE_PUBLIC_ALIAS(_futime32, libc_futime);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(futime, libc_futime);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_futime64, libc_futime64);
+DEFINE_PUBLIC_ALIAS_P(_utime64,libc_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(futime64, libc_futime64);
+DEFINE_PUBLIC_ALIAS_P(utime64,libc_utime64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(char const *filename, struct utimbuf64 const *file_times),(filename,file_times));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_futime,libc_futime,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct utimbuf const *file_times),(fd,file_times));
+DEFINE_PUBLIC_ALIAS_P(_futime32,libc_futime,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct utimbuf const *file_times),(fd,file_times));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(futime,libc_futime,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct utimbuf const *file_times),(fd,file_times));
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_futime64,libc_futime64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct utimbuf64 const *file_times),(fd,file_times));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(futime64,libc_futime64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct utimbuf64 const *file_times),(fd,file_times));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

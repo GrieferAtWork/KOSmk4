@@ -52,8 +52,8 @@ NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,
 /*[[[end:libc_signalfd]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xcd6e98ec]]]*/
-DEFINE_PUBLIC_ALIAS(signalfd, libc_signalfd);
+/*[[[start:exports,hash:CRC-32=0x2ecaa63]]]*/
+DEFINE_PUBLIC_ALIAS_P(signalfd,libc_signalfd,WUNUSED ATTR_IN(2),fd_t,NOTHROW_NCX,LIBCCALL,(fd_t fd, sigset_t const *sigmask, __STDC_INT_AS_UINT_T flags),(fd,sigmask,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

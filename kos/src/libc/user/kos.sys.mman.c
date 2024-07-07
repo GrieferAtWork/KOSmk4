@@ -98,8 +98,8 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_ACCESS_NONE(1) void
 }
 /*[[[end:libc_PosixMAdvise]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x378d1d]]]*/
-DEFINE_PUBLIC_ALIAS(PosixMAdvise, libc_PosixMAdvise);
+/*[[[start:exports,hash:CRC-32=0xbc0c4f2b]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(PosixMAdvise,libc_PosixMAdvise,ATTR_ACCESS_NONE(1),THROWING(...),LIBCCALL,(void *addr, size_t len, __STDC_INT_AS_UINT_T advice),(addr,len,advice));
 /*[[[end:exports]]]*/
 
 DECL_END

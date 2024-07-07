@@ -58,11 +58,11 @@ NOTHROW_NCX(LIBCCALL libc__xustat)(int version, dev_t dev, struct ustat *ubuf) {
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbd0b2e3c]]]*/
-DEFINE_PUBLIC_ALIAS(prev_ustat, libc_ustat);
-DEFINE_PUBLIC_ALIAS(__prev_ustat, libc_ustat);
-DEFINE_PUBLIC_ALIAS(__libc_prev_ustat, libc_ustat);
-DEFINE_PUBLIC_ALIAS(ustat, libc_ustat);
+/*[[[start:exports,hash:CRC-32=0xb0725dbc]]]*/
+DEFINE_PUBLIC_ALIAS_P(prev_ustat,libc_ustat,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(dev_t dev, struct ustat *ubuf),(dev,ubuf));
+DEFINE_PUBLIC_ALIAS_P(__prev_ustat,libc_ustat,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(dev_t dev, struct ustat *ubuf),(dev,ubuf));
+DEFINE_PUBLIC_ALIAS_P(__libc_prev_ustat,libc_ustat,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(dev_t dev, struct ustat *ubuf),(dev,ubuf));
+DEFINE_PUBLIC_ALIAS_P(ustat,libc_ustat,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(dev_t dev, struct ustat *ubuf),(dev,ubuf));
 /*[[[end:exports]]]*/
 
 DECL_END

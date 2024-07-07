@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a97d65b */
+/* HASH CRC-32:0x992ac6f6 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,54 +365,54 @@ NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
 DECL_END
 
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(imaxabs, libc_imaxabs);
+DEFINE_PUBLIC_ALIAS_P(imaxabs,libc_imaxabs,ATTR_CONST,intmax_t,NOTHROW,LIBCCALL,(intmax_t x),(x));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
-DEFINE_PUBLIC_ALIAS(imaxdiv, libc_imaxdiv);
+DEFINE_PUBLIC_ALIAS_P(imaxdiv,libc_imaxdiv,__ATTR_CONST,imaxdiv_t,NOTHROW_NCX,LIBCCALL,(intmax_t numer, intmax_t denom),(numer,denom));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(strtoimax, libc_strtoimax);
-DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtoumax);
+DEFINE_PUBLIC_ALIAS_P(strtoimax,libc_strtoimax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
+DEFINE_PUBLIC_ALIAS_P(strtoumax,libc_strtoumax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcstoimax);
+DEFINE_PUBLIC_ALIAS_P(DOS$wcstoimax,libd_wcstoimax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcstoimax);
+DEFINE_PUBLIC_ALIAS_P(wcstoimax,libc_wcstoimax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstoumax);
+DEFINE_PUBLIC_ALIAS_P(DOS$wcstoumax,libd_wcstoumax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoumax);
+DEFINE_PUBLIC_ALIAS_P(wcstoumax,libc_wcstoumax,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base),(nptr,endptr,base));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtoimax_l);
+DEFINE_PUBLIC_ALIAS_P(_strtoimax_l,libc_strtoimax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtoimax_l);
+DEFINE_PUBLIC_ALIAS_P(strtoimax_l,libc_strtoimax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoumax_l);
+DEFINE_PUBLIC_ALIAS_P(_strtoumax_l,libc_strtoumax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoumax_l);
+DEFINE_PUBLIC_ALIAS_P(strtoumax_l,libc_strtoumax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstoimax_l);
-DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstoimax_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wcstoimax_l,libd_wcstoimax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$wcstoimax_l,libd_wcstoimax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstoimax_l);
+DEFINE_PUBLIC_ALIAS_P(wcstoimax_l,libc_wcstoimax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),intmax_t,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoumax_l);
-DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoumax_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wcstoumax_l,libd_wcstoumax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
+DEFINE_PUBLIC_ALIAS_P(DOS$wcstoumax_l,libd_wcstoumax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBDCALL,(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
-DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoumax_l);
+DEFINE_PUBLIC_ALIAS_P(wcstoumax_l,libc_wcstoumax_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2),uintmax_t,NOTHROW_NCX,LIBKCALL,(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale),(nptr,endptr,base,locale));
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(strtoi, libc_strtoi);
-DEFINE_PUBLIC_ALIAS(strtou, libc_strtou);
-DEFINE_PUBLIC_ALIAS(strtoi_l, libc_strtoi_l);
-DEFINE_PUBLIC_ALIAS(strtou_l, libc_strtou_l);
+DEFINE_PUBLIC_ALIAS_P(strtoi,libc_strtoi,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(6),intmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus),(nptr,endptr,base,lo,hi,rstatus));
+DEFINE_PUBLIC_ALIAS_P(strtou,libc_strtou,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(6),uintmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus),(nptr,endptr,base,lo,hi,rstatus));
+DEFINE_PUBLIC_ALIAS_P(strtoi_l,libc_strtoi_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(6),intmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, intmax_t lo, intmax_t hi, errno_t *rstatus, locale_t locale),(nptr,endptr,base,lo,hi,rstatus,locale));
+DEFINE_PUBLIC_ALIAS_P(strtou_l,libc_strtou_l,ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(6),uintmax_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict nptr, char **__restrict endptr, __STDC_INT_AS_UINT_T base, uintmax_t lo, uintmax_t hi, errno_t *rstatus, locale_t locale),(nptr,endptr,base,lo,hi,rstatus,locale));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_INTTYPES_C */

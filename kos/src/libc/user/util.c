@@ -44,8 +44,8 @@ NOTHROW_RPC(LIBCCALL libc_opendev)(char const *path,
 }
 /*[[[end:libc_opendev]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x631bf773]]]*/
-DEFINE_PUBLIC_ALIAS(opendev, libc_opendev);
+/*[[[start:exports,hash:CRC-32=0x76884f6f]]]*/
+DEFINE_PUBLIC_ALIAS_P(opendev,libc_opendev,WUNUSED ATTR_IN(1) ATTR_OUT_OPT(4),fd_t,NOTHROW_RPC,LIBCCALL,(char const *path, oflag_t oflags, __STDC_INT_AS_UINT_T dflags, char **realpath),(path,oflags,dflags,realpath));
 /*[[[end:exports]]]*/
 
 DECL_END

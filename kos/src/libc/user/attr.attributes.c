@@ -205,15 +205,15 @@ NOTHROW_NCX(LIBCCALL libc_attr_listf)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1bac3ddb]]]*/
-DEFINE_PUBLIC_ALIAS(attr_get, libc_attr_get);
-DEFINE_PUBLIC_ALIAS(attr_getf, libc_attr_getf);
-DEFINE_PUBLIC_ALIAS(attr_set, libc_attr_set);
-DEFINE_PUBLIC_ALIAS(attr_setf, libc_attr_setf);
-DEFINE_PUBLIC_ALIAS(attr_remove, libc_attr_remove);
-DEFINE_PUBLIC_ALIAS(attr_removef, libc_attr_removef);
-DEFINE_PUBLIC_ALIAS(attr_list, libc_attr_list);
-DEFINE_PUBLIC_ALIAS(attr_listf, libc_attr_listf);
+/*[[[start:exports,hash:CRC-32=0x8914b218]]]*/
+DEFINE_PUBLIC_ALIAS_P(attr_get,libc_attr_get,ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(4),int,NOTHROW_NCX,LIBCCALL,(char const *path, char const *attrname, char *attrvalue, int *valuelength, int flags),(path,attrname,attrvalue,valuelength,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_getf,libc_attr_getf,ATTR_FDARG(1) ATTR_IN(2) ATTR_INOUT(4),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *attrname, char *attrvalue, int *valuelength, int flags),(fd,attrname,attrvalue,valuelength,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_set,libc_attr_set,ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4),int,NOTHROW_NCX,LIBCCALL,(char const *path, char const *attrname, char const *attrvalue, int valuelength, int flags),(path,attrname,attrvalue,valuelength,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_setf,libc_attr_setf,ATTR_FDARG(1) ATTR_IN(2) ATTR_INS(3, 4),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *attrname, char const *attrvalue, int valuelength, int flags),(fd,attrname,attrvalue,valuelength,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_remove,libc_attr_remove,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(char const *path, char const *attrname, int flags),(path,attrname,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_removef,libc_attr_removef,ATTR_FDARG(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *attrname, int flags),(fd,attrname,flags));
+DEFINE_PUBLIC_ALIAS_P(attr_list,libc_attr_list,ATTR_IN(1) ATTR_INOUT(5) ATTR_OUTS(2, 3),int,NOTHROW_NCX,LIBCCALL,(char const *path, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor),(path,buffer,buffersize,flags,cursor));
+DEFINE_PUBLIC_ALIAS_P(attr_listf,libc_attr_listf,ATTR_FDARG(1) ATTR_INOUT(5) ATTR_OUTS(2, 3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor),(fd,buffer,buffersize,flags,cursor));
 /*[[[end:exports]]]*/
 
 DECL_END

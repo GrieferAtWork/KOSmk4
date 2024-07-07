@@ -129,15 +129,15 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbfa19374]]]*/
-DEFINE_PUBLIC_ALIAS(setaliasent, libc_setaliasent);
-DEFINE_PUBLIC_ALIAS(endaliasent, libc_endaliasent);
-DEFINE_PUBLIC_ALIAS(getaliasent, libc_getaliasent);
-DEFINE_PUBLIC_ALIAS(__getaliasent_r, libc_getaliasent_r);
-DEFINE_PUBLIC_ALIAS(getaliasent_r, libc_getaliasent_r);
-DEFINE_PUBLIC_ALIAS(getaliasbyname, libc_getaliasbyname);
-DEFINE_PUBLIC_ALIAS(__getaliasbyname_r, libc_getaliasbyname_r);
-DEFINE_PUBLIC_ALIAS(getaliasbyname_r, libc_getaliasbyname_r);
+/*[[[start:exports,hash:CRC-32=0x49778015]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(setaliasent,libc_setaliasent,,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endaliasent,libc_endaliasent,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getaliasent,libc_getaliasent,WUNUSED,struct aliasent *,NOTHROW_RPC_KOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getaliasent_r,libc_getaliasent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC_KOS,LIBCCALL,(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result),(result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getaliasent_r,libc_getaliasent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),errno_t,NOTHROW_RPC_KOS,LIBCCALL,(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result),(result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getaliasbyname,libc_getaliasbyname,WUNUSED ATTR_IN(1),struct aliasent *,NOTHROW_RPC_KOS,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(__getaliasbyname_r,libc_getaliasbyname_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC_KOS,LIBCCALL,(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result),(name,result_buf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getaliasbyname_r,libc_getaliasbyname_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),errno_t,NOTHROW_RPC_KOS,LIBCCALL,(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result),(name,result_buf,buffer,buflen,result));
 /*[[[end:exports]]]*/
 
 DECL_END

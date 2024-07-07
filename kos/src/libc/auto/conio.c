@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec1ec4fe */
+/* HASH CRC-32:0x3819d8eb */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,7 +208,7 @@ NOTHROW_RPC(LIBCCALL libc___conio_common_vcprintf_s)(uint64_t options,
                                                      va_list args) {
 	return libc___stdio_common_vfprintf_s(options, stdtty, format, locale, args);
 }
-DEFINE_INTERN_ALIAS(libc___conio_common_vcprintf_p, libc___conio_common_vcprintf);
+DEFINE_INTERN_ALIAS_P(libc___conio_common_vcprintf_p,libc___conio_common_vcprintf,ATTR_IN(2) ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(uint64_t options, char const *format, locale_t locale, va_list args),(options,format,locale,args));
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(conio_common_vcscanf_getc) __format_word_t
 (__FORMATPRINTER_CC conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
@@ -244,7 +244,7 @@ NOTHROW_RPC(LIBCCALL libc__vcprintf_s_l)(char const *format,
                                          va_list args) {
 	return libc___conio_common_vcprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
-DEFINE_INTERN_ALIAS(libc__vcprintf_p_l, libc__vcprintf_l);
+DEFINE_INTERN_ALIAS_P(libc__vcprintf_p_l,libc__vcprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
 #include <corecrt_stdio_config.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc__vcscanf_l)(char const *format,
@@ -271,7 +271,7 @@ NOTHROW_RPC(LIBCCALL libc__vcprintf_s)(char const *format,
                                        va_list args) {
 	return libc__vcprintf_s_l(format, NULL, args);
 }
-DEFINE_INTERN_ALIAS(libc__vcprintf_p, libc__vcprintf);
+DEFINE_INTERN_ALIAS_P(libc__vcprintf_p,libc__vcprintf,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc__vcscanf)(char const *format,
                                     va_list args) {
@@ -384,16 +384,16 @@ NOTHROW_RPC(VLIBCCALL libc__cprintf_s_l)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_INTERN_ALIAS(libd__cprintf_p, libd__cprintf);
+DEFINE_INTERN_ALIAS_P(libd__cprintf_p,libd__cprintf,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_INTERN_ALIAS(libc__cprintf_p, libc__cprintf);
+DEFINE_INTERN_ALIAS_P(libc__cprintf_p,libc__cprintf,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_INTERN_ALIAS(libd__cprintf_p_l, libd__cprintf_l);
+DEFINE_INTERN_ALIAS_P(libd__cprintf_p_l,libd__cprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_INTERN_ALIAS(libc__cprintf_p_l, libc__cprintf_l);
+DEFINE_INTERN_ALIAS_P(libc__cprintf_p_l,libc__cprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T
@@ -782,110 +782,110 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_getch, libc__getch);
-DEFINE_PUBLIC_ALIAS(_getch_nolock, libc__getch_nolock);
-DEFINE_PUBLIC_ALIAS(_getche, libc__getche);
-DEFINE_PUBLIC_ALIAS(_getche_nolock, libc__getche_nolock);
-DEFINE_PUBLIC_ALIAS(_putch, libc__putch);
-DEFINE_PUBLIC_ALIAS(_putch_nolock, libc__putch_nolock);
-DEFINE_PUBLIC_ALIAS(_ungetch, libc__ungetch);
-DEFINE_PUBLIC_ALIAS(_ungetch_nolock, libc__ungetch_nolock);
-DEFINE_PUBLIC_ALIAS(_cgets, libc__cgets);
-DEFINE_PUBLIC_ALIAS(_cgets_s, libc__cgets_s);
-DEFINE_PUBLIC_ALIAS(_cputs, libc__cputs);
-DEFINE_PUBLIC_ALIAS(__conio_common_vcprintf, libc___conio_common_vcprintf);
-DEFINE_PUBLIC_ALIAS(__conio_common_vcprintf_s, libc___conio_common_vcprintf_s);
-DEFINE_PUBLIC_ALIAS(__conio_common_vcprintf_p, libc___conio_common_vcprintf_p);
-DEFINE_PUBLIC_ALIAS(__conio_common_vcscanf, libc___conio_common_vcscanf);
-DEFINE_PUBLIC_ALIAS(_vcprintf_l, libc__vcprintf_l);
-DEFINE_PUBLIC_ALIAS(_vcprintf_s_l, libc__vcprintf_s_l);
-DEFINE_PUBLIC_ALIAS(_vcprintf_p_l, libc__vcprintf_p_l);
-DEFINE_PUBLIC_ALIAS(_vcscanf_l, libc__vcscanf_l);
-DEFINE_PUBLIC_ALIAS(_vcscanf_s_l, libc__vcscanf_s_l);
-DEFINE_PUBLIC_ALIAS(_vcprintf, libc__vcprintf);
-DEFINE_PUBLIC_ALIAS(_vcprintf_s, libc__vcprintf_s);
-DEFINE_PUBLIC_ALIAS(_vcprintf_p, libc__vcprintf_p);
-DEFINE_PUBLIC_ALIAS(_vcscanf, libc__vcscanf);
-DEFINE_PUBLIC_ALIAS(_vcscanf_s, libc__vcscanf_s);
+DEFINE_PUBLIC_ALIAS_P(_getch,libc__getch,WUNUSED,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getch_nolock,libc__getch_nolock,WUNUSED,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getche,libc__getche,WUNUSED,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_getche_nolock,libc__getche_nolock,WUNUSED,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_putch,libc__putch,,int,NOTHROW_RPC,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_putch_nolock,libc__putch_nolock,,int,NOTHROW_RPC,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ungetch,libc__ungetch,,int,NOTHROW_NCX,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ungetch_nolock,libc__ungetch_nolock,,int,NOTHROW_NCX,LIBCCALL,(int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_cgets,libc__cgets,ATTR_INOUT(1),char *,NOTHROW_RPC,LIBCCALL,(char *__restrict buf),(buf));
+DEFINE_PUBLIC_ALIAS_P(_cgets_s,libc__cgets_s,ATTR_OUT(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_RPC,LIBCCALL,(char *buf, size_t bufsize, size_t *__restrict p_readsize),(buf,bufsize,p_readsize));
+DEFINE_PUBLIC_ALIAS_P(_cputs,libc__cputs,ATTR_IN(1),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict str),(str));
+DEFINE_PUBLIC_ALIAS_P(__conio_common_vcprintf,libc___conio_common_vcprintf,ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(uint64_t options, char const *format, locale_t locale, va_list args),(options,format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(__conio_common_vcprintf_s,libc___conio_common_vcprintf_s,ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(uint64_t options, char const *format, locale_t locale, va_list args),(options,format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(__conio_common_vcprintf_p,libc___conio_common_vcprintf_p,ATTR_IN(2) ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(uint64_t options, char const *format, locale_t locale, va_list args),(options,format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(__conio_common_vcscanf,libc___conio_common_vcscanf,WUNUSED ATTR_IN(2) ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(uint64_t options, char const *format, locale_t locale, va_list args),(options,format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf_l,libc__vcprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf_s_l,libc__vcprintf_s_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf_p_l,libc__vcprintf_p_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcscanf_l,libc__vcscanf_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcscanf_s_l,libc__vcscanf_s_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, locale_t locale, va_list args),(format,locale,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf,libc__vcprintf,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf_s,libc__vcprintf_s,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
+DEFINE_PUBLIC_ALIAS_P(_vcprintf_p,libc__vcprintf_p,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
+DEFINE_PUBLIC_ALIAS_P(_vcscanf,libc__vcscanf,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
+DEFINE_PUBLIC_ALIAS_P(_vcscanf_s,libc__vcscanf_s,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *format, va_list args),(format,args));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf, libd__cprintf);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf,libd__cprintf,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf, libc__cprintf);
+DEFINE_PUBLIC_ALIAS_P(_cprintf,libc__cprintf,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf_l, libd__cprintf_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf_l,libd__cprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf_l, libc__cprintf_l);
+DEFINE_PUBLIC_ALIAS_P(_cprintf_l,libc__cprintf_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf_s, libd__cprintf_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf_s,libd__cprintf_s,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf_s, libc__cprintf_s);
+DEFINE_PUBLIC_ALIAS_P(_cprintf_s,libc__cprintf_s,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf_s_l, libd__cprintf_s_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf_s_l,libd__cprintf_s_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf_s_l, libc__cprintf_s_l);
+DEFINE_PUBLIC_ALIAS_P(_cprintf_s_l,libc__cprintf_s_l,ATTR_IN(1) ATTR_LIBC_PRINTF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf_p, libd__cprintf_p);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf_p,libd__cprintf_p,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf_p, libc__cprintf_p);
+DEFINE_PUBLIC_ALIAS_P(_cprintf_p,libc__cprintf_p,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cprintf_p_l, libd__cprintf_p_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cprintf_p_l,libd__cprintf_p_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cprintf_p_l, libc__cprintf_p_l);
+DEFINE_PUBLIC_ALIAS_P(_cprintf_p_l,libc__cprintf_p_l,ATTR_IN(1) ATTR_LIBC_PRINTF_P(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cscanf, libd__cscanf);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cscanf,libd__cscanf,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cscanf, libc__cscanf);
+DEFINE_PUBLIC_ALIAS_P(_cscanf,libc__cscanf,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cscanf_l, libd__cscanf_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cscanf_l,libd__cscanf_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cscanf_l, libc__cscanf_l);
+DEFINE_PUBLIC_ALIAS_P(_cscanf_l,libc__cscanf_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cscanf_s, libd__cscanf_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cscanf_s,libd__cscanf_s,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, ...),(format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cscanf_s, libc__cscanf_s);
+DEFINE_PUBLIC_ALIAS_P(_cscanf_s,libc__cscanf_s,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, ...),(format,));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$_cscanf_s_l, libd__cscanf_s_l);
+DEFINE_PUBLIC_ALIAS_P(DOS$_cscanf_s_l,libd__cscanf_s_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBDCALL,(char const *format, locale_t locale, ...),(format,locale,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_cscanf_s_l, libc__cscanf_s_l);
-DEFINE_PUBLIC_ALIAS(clreol, libc_clreol);
-DEFINE_PUBLIC_ALIAS(clrscr, libc_clrscr);
-DEFINE_PUBLIC_ALIAS(gotoxy, libc_gotoxy);
-DEFINE_PUBLIC_ALIAS(delline, libc_delline);
-DEFINE_PUBLIC_ALIAS(insline, libc_insline);
-DEFINE_PUBLIC_ALIAS(highvideo, libc_highvideo);
-DEFINE_PUBLIC_ALIAS(lowvideo, libc_lowvideo);
-DEFINE_PUBLIC_ALIAS(normvideo, libc_normvideo);
-DEFINE_PUBLIC_ALIAS(textcolor, libc_textcolor);
-DEFINE_PUBLIC_ALIAS(textbackground, libc_textbackground);
-DEFINE_PUBLIC_ALIAS(textattr, libc_textattr);
-DEFINE_PUBLIC_ALIAS(clearkeybuf, libc_clearkeybuf);
-DEFINE_PUBLIC_ALIAS(_conio_getpass, libc__conio_getpass);
-DEFINE_PUBLIC_ALIAS(cputsxy, libc_cputsxy);
-DEFINE_PUBLIC_ALIAS(putchxy, libc_putchxy);
-DEFINE_PUBLIC_ALIAS(wherex, libc_wherex);
-DEFINE_PUBLIC_ALIAS(wherey, libc_wherey);
-DEFINE_PUBLIC_ALIAS(window, libc_window);
-DEFINE_PUBLIC_ALIAS(movetext, libc_movetext);
+DEFINE_PUBLIC_ALIAS_P(_cscanf_s_l,libc__cscanf_s_l,WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,VLIBCCALL,(char const *format, locale_t locale, ...),(format,locale,));
+DEFINE_PUBLIC_ALIAS_P_VOID(clreol,libc_clreol,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(clrscr,libc_clrscr,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(gotoxy,libc_gotoxy,,NOTHROW_RPC,LIBCCALL,(int x, int y),(x,y));
+DEFINE_PUBLIC_ALIAS_P_VOID(delline,libc_delline,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(insline,libc_insline,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(highvideo,libc_highvideo,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(lowvideo,libc_lowvideo,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(normvideo,libc_normvideo,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(textcolor,libc_textcolor,,NOTHROW_RPC,LIBCCALL,(int color),(color));
+DEFINE_PUBLIC_ALIAS_P_VOID(textbackground,libc_textbackground,,NOTHROW_RPC,LIBCCALL,(int color),(color));
+DEFINE_PUBLIC_ALIAS_P_VOID(textattr,libc_textattr,,NOTHROW_RPC,LIBCCALL,(int attr),(attr));
+DEFINE_PUBLIC_ALIAS_P_VOID(clearkeybuf,libc_clearkeybuf,,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_conio_getpass,libc__conio_getpass,ATTR_IN(1) ATTR_INOUT(2),char *,NOTHROW_RPC,LIBCCALL,(const char *prompt, char *str),(prompt,str));
+DEFINE_PUBLIC_ALIAS_P_VOID(cputsxy,libc_cputsxy,ATTR_IN(3),NOTHROW_RPC,LIBCCALL,(int x, int y, char __KOS_FIXED_CONST *str),(x,y,str));
+DEFINE_PUBLIC_ALIAS_P_VOID(putchxy,libc_putchxy,,NOTHROW_RPC,LIBCCALL,(int x, int y, char ch),(x,y,ch));
+DEFINE_PUBLIC_ALIAS_P(wherex,libc_wherex,,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(wherey,libc_wherey,,int,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(window,libc_window,,NOTHROW_RPC,LIBCCALL,(int left, int top, int right, int bottom),(left,top,right,bottom));
+DEFINE_PUBLIC_ALIAS_P(movetext,libc_movetext,,int,NOTHROW_RPC,LIBCCALL,(int left, int top, int right, int bottom, int destleft, int desttop),(left,top,right,bottom,destleft,desttop));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CONIO_C */

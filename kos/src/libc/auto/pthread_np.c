@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e9409bb */
+/* HASH CRC-32:0xc6457684 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t self,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(pthread_stackseg_np, libc_pthread_stackseg_np);
+DEFINE_PUBLIC_ALIAS_P(pthread_stackseg_np,libc_pthread_stackseg_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, stack_t *sinfo),(self,sinfo));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_NP_C */

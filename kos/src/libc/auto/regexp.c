@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x508fdc78 */
+/* HASH CRC-32:0x890d94b4 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,10 +72,10 @@ NOTHROW_NCX(LIBCCALL libc_advance)(char const *string,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__step, libc_step);
-DEFINE_PUBLIC_ALIAS(step, libc_step);
-DEFINE_PUBLIC_ALIAS(__advance, libc_advance);
-DEFINE_PUBLIC_ALIAS(advance, libc_advance);
+DEFINE_PUBLIC_ALIAS_P(__step,libc_step,,int,NOTHROW_NCX,LIBCCALL,(char const *string, char const *expbuf),(string,expbuf));
+DEFINE_PUBLIC_ALIAS_P(step,libc_step,,int,NOTHROW_NCX,LIBCCALL,(char const *string, char const *expbuf),(string,expbuf));
+DEFINE_PUBLIC_ALIAS_P(__advance,libc_advance,,int,NOTHROW_NCX,LIBCCALL,(char const *string, char const *expbuf),(string,expbuf));
+DEFINE_PUBLIC_ALIAS_P(advance,libc_advance,,int,NOTHROW_NCX,LIBCCALL,(char const *string, char const *expbuf),(string,expbuf));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_REGEXP_C */

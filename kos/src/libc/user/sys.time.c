@@ -377,46 +377,46 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x934b1544]]]*/
-DEFINE_PUBLIC_ALIAS(__gettimeofday, libc_gettimeofday);
-DEFINE_PUBLIC_ALIAS(__libc_gettimeofday, libc_gettimeofday);
-DEFINE_PUBLIC_ALIAS(gettimeofday, libc_gettimeofday);
-DEFINE_PUBLIC_ALIAS(__getitimer, libc_getitimer);
-DEFINE_PUBLIC_ALIAS(__libc_getitimer, libc_getitimer);
-DEFINE_PUBLIC_ALIAS(getitimer, libc_getitimer);
-DEFINE_PUBLIC_ALIAS(__setitimer, libc_setitimer);
-DEFINE_PUBLIC_ALIAS(__libc_setitimer, libc_setitimer);
-DEFINE_PUBLIC_ALIAS(setitimer, libc_setitimer);
-DEFINE_PUBLIC_ALIAS(__utimes, libc_utimes);
-DEFINE_PUBLIC_ALIAS(utimes, libc_utimes);
-DEFINE_PUBLIC_ALIAS(futimesat, libc_futimesat);
-DEFINE_PUBLIC_ALIAS(__settimeofday, libc_settimeofday);
-DEFINE_PUBLIC_ALIAS(__libc_settimeofday, libc_settimeofday);
-DEFINE_PUBLIC_ALIAS(settimeofday, libc_settimeofday);
-DEFINE_PUBLIC_ALIAS(__adjtime, libc_adjtime);
-DEFINE_PUBLIC_ALIAS(adjtime, libc_adjtime);
-DEFINE_PUBLIC_ALIAS(lutimes, libc_lutimes);
-DEFINE_PUBLIC_ALIAS(futimes, libc_futimes);
+/*[[[start:exports,hash:CRC-32=0x3bbee8da]]]*/
+DEFINE_PUBLIC_ALIAS_P(__gettimeofday,libc_gettimeofday,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval *__restrict tv, __timezone_ptr_t tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__libc_gettimeofday,libc_gettimeofday,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval *__restrict tv, __timezone_ptr_t tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(gettimeofday,libc_gettimeofday,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval *__restrict tv, __timezone_ptr_t tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__getitimer,libc_getitimer,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval *curr_value),(which,curr_value));
+DEFINE_PUBLIC_ALIAS_P(__libc_getitimer,libc_getitimer,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval *curr_value),(which,curr_value));
+DEFINE_PUBLIC_ALIAS_P(getitimer,libc_getitimer,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval *curr_value),(which,curr_value));
+DEFINE_PUBLIC_ALIAS_P(__setitimer,libc_setitimer,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval),(which,newval,oldval));
+DEFINE_PUBLIC_ALIAS_P(__libc_setitimer,libc_setitimer,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval),(which,newval,oldval));
+DEFINE_PUBLIC_ALIAS_P(setitimer,libc_setitimer,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval),(which,newval,oldval));
+DEFINE_PUBLIC_ALIAS_P(__utimes,libc_utimes,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(utimes,libc_utimes,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(futimesat,libc_futimesat,ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *file, struct timeval const tvp[2]),(fd,file,tvp));
+DEFINE_PUBLIC_ALIAS_P(__settimeofday,libc_settimeofday,ATTR_IN_OPT(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval const *tv, struct timezone const *tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__libc_settimeofday,libc_settimeofday,ATTR_IN_OPT(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval const *tv, struct timezone const *tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(settimeofday,libc_settimeofday,ATTR_IN_OPT(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval const *tv, struct timezone const *tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__adjtime,libc_adjtime,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval const *delta, struct timeval *olddelta),(delta,olddelta));
+DEFINE_PUBLIC_ALIAS_P(adjtime,libc_adjtime,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval const *delta, struct timeval *olddelta),(delta,olddelta));
+DEFINE_PUBLIC_ALIAS_P(lutimes,libc_lutimes,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(futimes,libc_futimes,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct timeval const tvp[2]),(fd,tvp));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__gettimeofday64, libc_gettimeofday64);
-DEFINE_PUBLIC_ALIAS(gettimeofday64, libc_gettimeofday64);
-DEFINE_PUBLIC_ALIAS(__getitimer64, libc_getitimer64);
-DEFINE_PUBLIC_ALIAS(getitimer64, libc_getitimer64);
-DEFINE_PUBLIC_ALIAS(__setitimer64, libc_setitimer64);
-DEFINE_PUBLIC_ALIAS(setitimer64, libc_setitimer64);
-DEFINE_PUBLIC_ALIAS(__utimes64, libc_utimes64);
-DEFINE_PUBLIC_ALIAS(utimes64, libc_utimes64);
-DEFINE_PUBLIC_ALIAS(__settimeofday64, libc_settimeofday64);
-DEFINE_PUBLIC_ALIAS(settimeofday64, libc_settimeofday64);
-DEFINE_PUBLIC_ALIAS(__adjtime64, libc_adjtime64);
-DEFINE_PUBLIC_ALIAS(adjtime64, libc_adjtime64);
-DEFINE_PUBLIC_ALIAS(__lutimes64, libc_lutimes64);
-DEFINE_PUBLIC_ALIAS(lutimes64, libc_lutimes64);
-DEFINE_PUBLIC_ALIAS(__futimes64, libc_futimes64);
-DEFINE_PUBLIC_ALIAS(futimes64, libc_futimes64);
-DEFINE_PUBLIC_ALIAS(__futimesat64, libc_futimesat64);
-DEFINE_PUBLIC_ALIAS(futimesat64, libc_futimesat64);
+DEFINE_PUBLIC_ALIAS_P(__gettimeofday64,libc_gettimeofday64,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 *__restrict tv, __timezone_ptr_t tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(gettimeofday64,libc_gettimeofday64,ATTR_OUT_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 *__restrict tv, __timezone_ptr_t tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__getitimer64,libc_getitimer64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval64 *curr_value),(which,curr_value));
+DEFINE_PUBLIC_ALIAS_P(getitimer64,libc_getitimer64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval64 *curr_value),(which,curr_value));
+DEFINE_PUBLIC_ALIAS_P(__setitimer64,libc_setitimer64,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval64 const *newval, struct itimerval64 *oldval),(which,newval,oldval));
+DEFINE_PUBLIC_ALIAS_P(setitimer64,libc_setitimer64,ATTR_IN_OPT(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(__itimer_which_t which, struct itimerval64 const *newval, struct itimerval64 *oldval),(which,newval,oldval));
+DEFINE_PUBLIC_ALIAS_P(__utimes64,libc_utimes64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval64 const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(utimes64,libc_utimes64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval64 const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(__settimeofday64,libc_settimeofday64,ATTR_IN_OPT(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 const *tv, struct timezone const *tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(settimeofday64,libc_settimeofday64,ATTR_IN_OPT(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 const *tv, struct timezone const *tz),(tv,tz));
+DEFINE_PUBLIC_ALIAS_P(__adjtime64,libc_adjtime64,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 const *delta, struct timeval64 *olddelta),(delta,olddelta));
+DEFINE_PUBLIC_ALIAS_P(adjtime64,libc_adjtime64,ATTR_IN_OPT(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timeval64 const *delta, struct timeval64 *olddelta),(delta,olddelta));
+DEFINE_PUBLIC_ALIAS_P(__lutimes64,libc_lutimes64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval64 const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(lutimes64,libc_lutimes64,ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(char const *file, struct timeval64 const tvp[2]),(file,tvp));
+DEFINE_PUBLIC_ALIAS_P(__futimes64,libc_futimes64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct timeval64 const tvp[2]),(fd,tvp));
+DEFINE_PUBLIC_ALIAS_P(futimes64,libc_futimes64,ATTR_FDARG(1) ATTR_IN_OPT(2),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, struct timeval64 const tvp[2]),(fd,tvp));
+DEFINE_PUBLIC_ALIAS_P(__futimesat64,libc_futimesat64,ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *file, struct timeval64 const tvp[2]),(fd,file,tvp));
+DEFINE_PUBLIC_ALIAS_P(futimesat64,libc_futimesat64,ATTR_FDARG(1) ATTR_IN(2) ATTR_IN_OPT(3),int,NOTHROW_NCX,LIBCCALL,(fd_t fd, char const *file, struct timeval64 const tvp[2]),(fd,file,tvp));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

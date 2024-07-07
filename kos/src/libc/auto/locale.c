@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd42fc2c6 */
+/* HASH CRC-32:0xc1baa735 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,12 +241,12 @@ NOTHROW_NCX(LIBKCALL libc__W_Getmonths)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_Getdays, libc__Getdays);
-DEFINE_PUBLIC_ALIAS(DOS$_W_Getdays, libd__W_Getdays);
-DEFINE_PUBLIC_ALIAS(_W_Getdays, libc__W_Getdays);
-DEFINE_PUBLIC_ALIAS(_Getmonths, libc__Getmonths);
-DEFINE_PUBLIC_ALIAS(DOS$_W_Getmonths, libd__W_Getmonths);
-DEFINE_PUBLIC_ALIAS(_W_Getmonths, libc__W_Getmonths);
+DEFINE_PUBLIC_ALIAS_P(_Getdays,libc__Getdays,WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$_W_Getdays,libd__W_Getdays,WUNUSED,char16_t *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_W_Getdays,libc__W_Getdays,WUNUSED,char32_t *,NOTHROW_NCX,LIBKCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_Getmonths,libc__Getmonths,WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$_W_Getmonths,libd__W_Getmonths,WUNUSED,char16_t *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_W_Getmonths,libc__W_Getmonths,WUNUSED,char32_t *,NOTHROW_NCX,LIBKCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LOCALE_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ab78d11 */
+/* HASH CRC-32:0xb781b4d3 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,7 +102,7 @@ NOTHROW_NCX(LIBCCALL libc_vlimit)(int resource,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(vlimit, libc_vlimit);
+DEFINE_PUBLIC_ALIAS_P(vlimit,libc_vlimit,,int,NOTHROW_NCX,LIBCCALL,(int resource, int value),(resource,value));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_VLIMIT_C */

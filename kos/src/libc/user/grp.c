@@ -325,22 +325,22 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9410d565]]]*/
-DEFINE_PUBLIC_ALIAS(getgrgid, libc_getgrgid);
-DEFINE_PUBLIC_ALIAS(getgrnam, libc_getgrnam);
-DEFINE_PUBLIC_ALIAS(setgrent, libc_setgrent);
-DEFINE_PUBLIC_ALIAS(endgrent, libc_endgrent);
-DEFINE_PUBLIC_ALIAS(getgrent, libc_getgrent);
-DEFINE_PUBLIC_ALIAS(__getgrgid_r, libc_getgrgid_r);
-DEFINE_PUBLIC_ALIAS(getgrgid_r, libc_getgrgid_r);
-DEFINE_PUBLIC_ALIAS(__getgrnam_r, libc_getgrnam_r);
-DEFINE_PUBLIC_ALIAS(getgrnam_r, libc_getgrnam_r);
-DEFINE_PUBLIC_ALIAS(__getgrent_r, libc_getgrent_r);
-DEFINE_PUBLIC_ALIAS(getgrent_r, libc_getgrent_r);
-DEFINE_PUBLIC_ALIAS(fgetgrent, libc_fgetgrent);
-DEFINE_PUBLIC_ALIAS(__setgroups, libc_setgroups);
-DEFINE_PUBLIC_ALIAS(__libc_setgroups, libc_setgroups);
-DEFINE_PUBLIC_ALIAS(setgroups, libc_setgroups);
+/*[[[start:exports,hash:CRC-32=0x8ef8f3c3]]]*/
+DEFINE_PUBLIC_ALIAS_P(getgrgid,libc_getgrgid,WUNUSED,struct group *,NOTHROW_RPC,LIBCCALL,(gid_t gid),(gid));
+DEFINE_PUBLIC_ALIAS_P(getgrnam,libc_getgrnam,WUNUSED ATTR_IN(1),struct group *,NOTHROW_RPC,LIBCCALL,(char const *__restrict name),(name));
+DEFINE_PUBLIC_ALIAS_P_VOID(setgrent,libc_setgrent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endgrent,libc_endgrent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getgrent,libc_getgrent,WUNUSED,struct group *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__getgrgid_r,libc_getgrgid_r,ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_RPC,LIBCCALL,(gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(gid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getgrgid_r,libc_getgrgid_r,ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_RPC,LIBCCALL,(gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(gid,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getgrnam_r,libc_getgrnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getgrnam_r,libc_getgrnam_r,ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4),int,NOTHROW_RPC,LIBCCALL,(char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(name,resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(__getgrent_r,libc_getgrent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),int,NOTHROW_RPC,LIBCCALL,(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(getgrent_r,libc_getgrent_r,ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3),int,NOTHROW_RPC,LIBCCALL,(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result),(resultbuf,buffer,buflen,result));
+DEFINE_PUBLIC_ALIAS_P(fgetgrent,libc_fgetgrent,ATTR_INOUT(1),struct group *,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(__setgroups,libc_setgroups,ATTR_INS(2, 1),int,NOTHROW_RPC,LIBCCALL,(size_t count, gid_t const *groups),(count,groups));
+DEFINE_PUBLIC_ALIAS_P(__libc_setgroups,libc_setgroups,ATTR_INS(2, 1),int,NOTHROW_RPC,LIBCCALL,(size_t count, gid_t const *groups),(count,groups));
+DEFINE_PUBLIC_ALIAS_P(setgroups,libc_setgroups,ATTR_INS(2, 1),int,NOTHROW_RPC,LIBCCALL,(size_t count, gid_t const *groups),(count,groups));
 /*[[[end:exports]]]*/
 
 DECL_END

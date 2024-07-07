@@ -45,12 +45,12 @@ NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3f6187e5]]]*/
-DEFINE_PUBLIC_ALIAS(__flock, libc_flock);
-DEFINE_PUBLIC_ALIAS(syscall_flock, libc_flock);
-DEFINE_PUBLIC_ALIAS(__syscall_flock, libc_flock);
-DEFINE_PUBLIC_ALIAS(__libc_syscall_flock, libc_flock);
-DEFINE_PUBLIC_ALIAS(flock, libc_flock);
+/*[[[start:exports,hash:CRC-32=0xf9a72016]]]*/
+DEFINE_PUBLIC_ALIAS_P(__flock,libc_flock,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T operation),(fd,operation));
+DEFINE_PUBLIC_ALIAS_P(syscall_flock,libc_flock,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T operation),(fd,operation));
+DEFINE_PUBLIC_ALIAS_P(__syscall_flock,libc_flock,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T operation),(fd,operation));
+DEFINE_PUBLIC_ALIAS_P(__libc_syscall_flock,libc_flock,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T operation),(fd,operation));
+DEFINE_PUBLIC_ALIAS_P(flock,libc_flock,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd, __STDC_INT_AS_UINT_T operation),(fd,operation));
 /*[[[end:exports]]]*/
 
 DECL_END

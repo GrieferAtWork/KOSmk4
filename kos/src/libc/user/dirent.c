@@ -1242,49 +1242,49 @@ NOTHROW(LIBCCALL libc_get_versionsort64)(void) {
 
 
 
-/*[[[start:exports,hash:CRC-32=0xee509cf0]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$__libc_opendir, libd_opendir);
-DEFINE_PUBLIC_ALIAS(DOS$__opendir, libd_opendir);
-DEFINE_PUBLIC_ALIAS(DOS$opendir, libd_opendir);
-DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
-DEFINE_PUBLIC_ALIAS(__opendir, libc_opendir);
-DEFINE_PUBLIC_ALIAS(opendir, libc_opendir);
-DEFINE_PUBLIC_ALIAS(DOS$fopendirat, libd_fopendirat);
-DEFINE_PUBLIC_ALIAS(fopendirat, libc_fopendirat);
-DEFINE_PUBLIC_ALIAS(DOS$opendirat, libd_opendirat);
-DEFINE_PUBLIC_ALIAS(opendirat, libc_opendirat);
-DEFINE_PUBLIC_ALIAS(__libc_closedir, libc_closedir);
-DEFINE_PUBLIC_ALIAS(__closedir, libc_closedir);
-DEFINE_PUBLIC_ALIAS(closedir, libc_closedir);
-DEFINE_PUBLIC_ALIAS(fdclosedir, libc_fdclosedir);
-DEFINE_PUBLIC_ALIAS(readdirk, libc_readdirk);
-DEFINE_PUBLIC_ALIAS(__libc_rewinddir, libc_rewinddir);
-DEFINE_PUBLIC_ALIAS(rewinddir, libc_rewinddir);
-DEFINE_PUBLIC_ALIAS(fdopendir, libc_fdopendir);
-DEFINE_PUBLIC_ALIAS(readdirk64, libc_readdirk64);
-DEFINE_PUBLIC_ALIAS(readdirk_r, libc_readdirk_r);
-DEFINE_PUBLIC_ALIAS(readdirk64_r, libc_readdirk64_r);
-DEFINE_PUBLIC_ALIAS(__libc_seekdir, libc_seekdir);
-DEFINE_PUBLIC_ALIAS(seekdir, libc_seekdir);
-DEFINE_PUBLIC_ALIAS(__libc_telldir, libc_telldir);
-DEFINE_PUBLIC_ALIAS(telldir, libc_telldir);
-DEFINE_PUBLIC_ALIAS(dirfd, libc_dirfd);
-DEFINE_PUBLIC_ALIAS(scandirk, libc_scandirk);
-DEFINE_PUBLIC_ALIAS(alphasortk, libc_alphasortk);
-DEFINE_PUBLIC_ALIAS(alphasortk64, libc_alphasortk64);
-DEFINE_PUBLIC_ALIAS(scandiratk, libc_scandiratk);
-DEFINE_PUBLIC_ALIAS(scandirk64, libc_scandirk64);
-DEFINE_PUBLIC_ALIAS(scandiratk64, libc_scandiratk64);
-DEFINE_PUBLIC_ALIAS(__getdirentries, libc_getdirentries);
-DEFINE_PUBLIC_ALIAS(__libc_getdirentries, libc_getdirentries);
-DEFINE_PUBLIC_ALIAS(getdirentries, libc_getdirentries);
-DEFINE_PUBLIC_ALIAS(getdirentries64, libc_getdirentries64);
-DEFINE_PUBLIC_ALIAS(versionsortk, libc_versionsortk);
-DEFINE_PUBLIC_ALIAS(versionsortk64, libc_versionsortk64);
-DEFINE_PUBLIC_ALIAS(kreaddir, libc_kreaddir);
-DEFINE_PUBLIC_ALIAS(kreaddirf, libc_kreaddirf);
-DEFINE_PUBLIC_ALIAS(kreaddir64, libc_kreaddir64);
-DEFINE_PUBLIC_ALIAS(kreaddirf64, libc_kreaddirf64);
+/*[[[start:exports,hash:CRC-32=0xbba56ec]]]*/
+DEFINE_PUBLIC_ALIAS_P(DOS$__libc_opendir,libd_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBDCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(DOS$__opendir,libd_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBDCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(DOS$opendir,libd_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBDCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(__libc_opendir,libc_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(__opendir,libc_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(opendir,libc_opendir,WUNUSED ATTR_IN(1),DIR *,NOTHROW_RPC,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(DOS$fopendirat,libd_fopendirat,WUNUSED ATTR_IN(2),DIR *,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *name, oflag_t oflags),(dirfd,name,oflags));
+DEFINE_PUBLIC_ALIAS_P(fopendirat,libc_fopendirat,WUNUSED ATTR_IN(2),DIR *,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *name, oflag_t oflags),(dirfd,name,oflags));
+DEFINE_PUBLIC_ALIAS_P(DOS$opendirat,libd_opendirat,WUNUSED ATTR_IN(2),DIR *,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char const *name),(dirfd,name));
+DEFINE_PUBLIC_ALIAS_P(opendirat,libc_opendirat,WUNUSED ATTR_IN(2),DIR *,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *name),(dirfd,name));
+DEFINE_PUBLIC_ALIAS_P(__libc_closedir,libc_closedir,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(DIR *dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(__closedir,libc_closedir,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(DIR *dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(closedir,libc_closedir,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(DIR *dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(fdclosedir,libc_fdclosedir,WUNUSED ATTR_INOUT(1),fd_t,NOTHROW_NCX,LIBCCALL,(DIR *dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(readdirk,libc_readdirk,ATTR_INOUT(1),struct dirent *,NOTHROW_RPC,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P_VOID(__libc_rewinddir,libc_rewinddir,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P_VOID(rewinddir,libc_rewinddir,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(fdopendir,libc_fdopendir,WUNUSED ATTR_FDREAD(1),DIR *,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(readdirk64,libc_readdirk64,ATTR_INOUT(1),struct dirent64 *,NOTHROW_RPC,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(readdirk_r,libc_readdirk_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC,LIBCCALL,(DIR *__restrict dirp, struct dirent *__restrict entry, struct dirent **__restrict result),(dirp,entry,result));
+DEFINE_PUBLIC_ALIAS_P(readdirk64_r,libc_readdirk64_r,ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(3),int,NOTHROW_RPC,LIBCCALL,(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result),(dirp,entry,result));
+DEFINE_PUBLIC_ALIAS_P_VOID(__libc_seekdir,libc_seekdir,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp, longptr_t pos),(dirp,pos));
+DEFINE_PUBLIC_ALIAS_P_VOID(seekdir,libc_seekdir,ATTR_INOUT(1),NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp, longptr_t pos),(dirp,pos));
+DEFINE_PUBLIC_ALIAS_P(__libc_telldir,libc_telldir,ATTR_INOUT(1),longptr_t,NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(telldir,libc_telldir,ATTR_INOUT(1),longptr_t,NOTHROW_NCX,LIBCCALL,(DIR *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(dirfd,libc_dirfd,ATTR_PURE ATTR_IN(1),fd_t,NOTHROW_NCX,LIBCCALL,(DIR __KOS_FIXED_CONST *__restrict dirp),(dirp));
+DEFINE_PUBLIC_ALIAS_P(scandirk,libc_scandirk,ATTR_IN(1) ATTR_OUT(2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b)),(dir,namelist,selector,cmp));
+DEFINE_PUBLIC_ALIAS_P(alphasortk,libc_alphasortk,ATTR_PURE ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(struct dirent const **e1, struct dirent const **e2),(e1,e2));
+DEFINE_PUBLIC_ALIAS_P(alphasortk64,libc_alphasortk64,ATTR_PURE ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(struct dirent64 const **e1, struct dirent64 const **e2),(e1,e2));
+DEFINE_PUBLIC_ALIAS_P(scandiratk,libc_scandiratk,ATTR_IN(2) ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b)),(dirfd,dir,namelist,selector,cmp));
+DEFINE_PUBLIC_ALIAS_P(scandirk64,libc_scandirk64,ATTR_IN(1) ATTR_OUT(2),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b)),(dir,namelist,selector,cmp));
+DEFINE_PUBLIC_ALIAS_P(scandiratk64,libc_scandiratk64,ATTR_IN(2) ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,NOTHROW_RPC,LIBCCALL,(fd_t dirfd, char const *__restrict dir, struct dirent64 ***__restrict namelist, int (LIBKCALL *selector)(struct dirent64 const *entry), int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b)),(dirfd,dir,namelist,selector,cmp));
+DEFINE_PUBLIC_ALIAS_P(__getdirentries,libc_getdirentries,ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep),(fd,buf,nbytes,basep));
+DEFINE_PUBLIC_ALIAS_P(__libc_getdirentries,libc_getdirentries,ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep),(fd,buf,nbytes,basep));
+DEFINE_PUBLIC_ALIAS_P(getdirentries,libc_getdirentries,ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep),(fd,buf,nbytes,basep));
+DEFINE_PUBLIC_ALIAS_P(getdirentries64,libc_getdirentries64,ATTR_FDREAD(1) ATTR_INOUT(4) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep),(fd,buf,nbytes,basep));
+DEFINE_PUBLIC_ALIAS_P(versionsortk,libc_versionsortk,ATTR_PURE ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(struct dirent const **e1, struct dirent const **e2),(e1,e2));
+DEFINE_PUBLIC_ALIAS_P(versionsortk64,libc_versionsortk64,ATTR_PURE ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(struct dirent64 const **e1, struct dirent64 const **e2),(e1,e2));
+DEFINE_PUBLIC_ALIAS_P(kreaddir,libc_kreaddir,WUNUSED ATTR_FDREAD(1),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode),(fd,buf,bufsize,mode));
+DEFINE_PUBLIC_ALIAS_P(kreaddirf,libc_kreaddirf,WUNUSED ATTR_FDREAD(1),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, oflag_t flags),(fd,buf,bufsize,mode,flags));
+DEFINE_PUBLIC_ALIAS_P(kreaddir64,libc_kreaddir64,WUNUSED ATTR_FDREAD(1),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode),(fd,buf,bufsize,mode));
+DEFINE_PUBLIC_ALIAS_P(kreaddirf64,libc_kreaddirf64,WUNUSED ATTR_FDREAD(1),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, oflag_t flags),(fd,buf,bufsize,mode,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

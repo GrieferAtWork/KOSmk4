@@ -1659,12 +1659,12 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe57a21f9]]]*/
-DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr, libc___locale_ctype_ptr);
-DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr_l, libc___locale_ctype_ptr_l);
-DEFINE_PUBLIC_ALIAS(__ctype_b_loc, libc___ctype_b_loc);
-DEFINE_PUBLIC_ALIAS(__ctype_tolower_loc, libc___ctype_tolower_loc);
-DEFINE_PUBLIC_ALIAS(__ctype_toupper_loc, libc___ctype_toupper_loc);
+/*[[[start:exports,hash:CRC-32=0x7e199722]]]*/
+DEFINE_PUBLIC_ALIAS_P(__locale_ctype_ptr,libc___locale_ctype_ptr,ATTR_CONST WUNUSED,char const *,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__locale_ctype_ptr_l,libc___locale_ctype_ptr_l,ATTR_PURE WUNUSED,char const *,NOTHROW_NCX,LIBCCALL,(locale_t locale),(locale));
+DEFINE_PUBLIC_ALIAS_P(__ctype_b_loc,libc___ctype_b_loc,ATTR_PURE WUNUSED,uint16_t const **,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__ctype_tolower_loc,libc___ctype_tolower_loc,ATTR_PURE WUNUSED,int32_t const **,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__ctype_toupper_loc,libc___ctype_toupper_loc,ATTR_PURE WUNUSED,int32_t const **,NOTHROW,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

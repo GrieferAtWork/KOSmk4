@@ -51,8 +51,8 @@ NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xeeda6583]]]*/
-DEFINE_PUBLIC_ALIAS(ptrace, libc_ptrace);
+/*[[[start:exports,hash:CRC-32=0x9ab373fc]]]*/
+DEFINE_PUBLIC_ALIAS_P(ptrace,libc_ptrace,,longptr_t,NOTHROW_NCX,VLIBCCALL,(__ptrace_request_t request, ...),(request,));
 /*[[[end:exports]]]*/
 
 DECL_END

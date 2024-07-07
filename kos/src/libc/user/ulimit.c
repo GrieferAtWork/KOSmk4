@@ -76,9 +76,9 @@ NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
 }
 /*[[[end:libc_ulimit]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x147fd897]]]*/
-DEFINE_PUBLIC_ALIAS(__ulimit, libc_ulimit);
-DEFINE_PUBLIC_ALIAS(ulimit, libc_ulimit);
+/*[[[start:exports,hash:CRC-32=0xfd3dcb67]]]*/
+DEFINE_PUBLIC_ALIAS_P(__ulimit,libc_ulimit,,longptr_t,NOTHROW_NCX,VLIBCCALL,(__STDC_INT_AS_UINT_T cmd, ...),(cmd,));
+DEFINE_PUBLIC_ALIAS_P(ulimit,libc_ulimit,,longptr_t,NOTHROW_NCX,VLIBCCALL,(__STDC_INT_AS_UINT_T cmd, ...),(cmd,));
 /*[[[end:exports]]]*/
 
 DECL_END

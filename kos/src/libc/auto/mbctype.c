@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aa6bf38 */
+/* HASH CRC-32:0x3e16b9f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -171,30 +171,30 @@ NOTHROW_NCX(LIBCCALL libc__ismbbgraph_l)(unsigned int ch,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(_ismbbkalnum, libc__ismbbkalnum);
-DEFINE_PUBLIC_ALIAS(_ismbbkprint, libc__ismbbkana);
-DEFINE_PUBLIC_ALIAS(_ismbbkana, libc__ismbbkana);
-DEFINE_PUBLIC_ALIAS(_ismbbkpunct, libc__ismbbkpunct);
-DEFINE_PUBLIC_ALIAS(_ismbbalpha, libc__ismbbalpha);
-DEFINE_PUBLIC_ALIAS(_ismbbpunct, libc__ismbbpunct);
-DEFINE_PUBLIC_ALIAS(_ismbbblank, libc__ismbbblank);
-DEFINE_PUBLIC_ALIAS(_ismbbalnum, libc__ismbbalnum);
-DEFINE_PUBLIC_ALIAS(_ismbbprint, libc__ismbbprint);
-DEFINE_PUBLIC_ALIAS(_ismbbgraph, libc__ismbbgraph);
-DEFINE_PUBLIC_ALIAS(_ismbblead, libc__ismbblead);
-DEFINE_PUBLIC_ALIAS(_ismbbtrail, libc__ismbbtrail);
-DEFINE_PUBLIC_ALIAS(_ismbblead_l, libc__ismbblead_l);
-DEFINE_PUBLIC_ALIAS(_ismbbtrail_l, libc__ismbbtrail_l);
-DEFINE_PUBLIC_ALIAS(_ismbbkalnum_l, libc__ismbbkalnum_l);
-DEFINE_PUBLIC_ALIAS(_ismbbkprint_l, libc__ismbbkana_l);
-DEFINE_PUBLIC_ALIAS(_ismbbkana_l, libc__ismbbkana_l);
-DEFINE_PUBLIC_ALIAS(_ismbbkpunct_l, libc__ismbbkpunct_l);
-DEFINE_PUBLIC_ALIAS(_ismbbalpha_l, libc__ismbbalpha_l);
-DEFINE_PUBLIC_ALIAS(_ismbbpunct_l, libc__ismbbpunct_l);
-DEFINE_PUBLIC_ALIAS(_ismbbblank_l, libc__ismbbblank_l);
-DEFINE_PUBLIC_ALIAS(_ismbbalnum_l, libc__ismbbalnum_l);
-DEFINE_PUBLIC_ALIAS(_ismbbprint_l, libc__ismbbprint_l);
-DEFINE_PUBLIC_ALIAS(_ismbbgraph_l, libc__ismbbgraph_l);
+DEFINE_PUBLIC_ALIAS_P(_ismbbkalnum,libc__ismbbkalnum,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkprint,libc__ismbbkana,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkana,libc__ismbbkana,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkpunct,libc__ismbbkpunct,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbalpha,libc__ismbbalpha,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbpunct,libc__ismbbpunct,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbblank,libc__ismbbblank,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbalnum,libc__ismbbalnum,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbprint,libc__ismbbprint,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbgraph,libc__ismbbgraph,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbblead,libc__ismbblead,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbbtrail,libc__ismbbtrail,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(_ismbblead_l,libc__ismbblead_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbtrail_l,libc__ismbbtrail_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkalnum_l,libc__ismbbkalnum_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkprint_l,libc__ismbbkana_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkana_l,libc__ismbbkana_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbkpunct_l,libc__ismbbkpunct_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbalpha_l,libc__ismbbalpha_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbpunct_l,libc__ismbbpunct_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbblank_l,libc__ismbbblank_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbalnum_l,libc__ismbbalnum_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbprint_l,libc__ismbbprint_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
+DEFINE_PUBLIC_ALIAS_P(_ismbbgraph_l,libc__ismbbgraph_l,ATTR_PURE WUNUSED,int,NOTHROW_NCX,LIBCCALL,(unsigned int ch, locale_t locale),(ch,locale));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MBCTYPE_C */

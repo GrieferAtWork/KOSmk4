@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0bbf428 */
+/* HASH CRC-32:0x10cba440 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,7 +213,7 @@ success:
 #ifndef __KERNEL__
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_acquire_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_lock_acquire_with_timeout64,libc_shared_lock_acquire_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
@@ -231,7 +231,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_waitfor_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_lock_waitfor_with_timeout64,libc_shared_lock_waitfor_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
@@ -362,28 +362,28 @@ success:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(shared_lock_tryacquire, libc_shared_lock_tryacquire);
-DEFINE_PUBLIC_ALIAS(shared_lock_release_ex, libc_shared_lock_release_ex);
+DEFINE_PUBLIC_ALIAS_P(shared_lock_tryacquire,libc_shared_lock_tryacquire,ATTR_INOUT(1),bool,NOTHROW_NCX,__FCALL,(struct shared_lock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_release_ex,libc_shared_lock_release_ex,ATTR_INOUT(1),bool,NOTHROW_NCX,__FCALL,(struct shared_lock *__restrict self),(self));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(shared_lock_acquire, libc_shared_lock_acquire);
-DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout, libc_shared_lock_acquire_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_lock_waitfor, libc_shared_lock_waitfor);
-DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_with_timeout, libc_shared_lock_waitfor_with_timeout);
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_lock_acquire,libc_shared_lock_acquire,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_acquire_with_timeout,libc_shared_lock_acquire_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_lock_waitfor,libc_shared_lock_waitfor,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_waitfor_with_timeout,libc_shared_lock_waitfor_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout),(self,abs_timeout));
 #ifndef __KERNEL__
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout64, libc_shared_lock_acquire_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_lock_acquire_with_timeout64,libc_shared_lock_acquire_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_with_timeout64, libc_shared_lock_waitfor_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_lock_waitfor_with_timeout64,libc_shared_lock_waitfor_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
-DEFINE_PUBLIC_ALIAS(shared_lock_acquire_nx, libc_shared_lock_acquire_nx);
-DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout_nx, libc_shared_lock_acquire_with_timeout_nx);
-DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_nx, libc_shared_lock_waitfor_nx);
-DEFINE_PUBLIC_ALIAS(shared_lock_waitfor_with_timeout_nx, libc_shared_lock_waitfor_with_timeout_nx);
+DEFINE_PUBLIC_ALIAS_P(shared_lock_acquire_nx,libc_shared_lock_acquire_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_acquire_with_timeout_nx,libc_shared_lock_acquire_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_waitfor_nx,libc_shared_lock_waitfor_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_lock_waitfor_with_timeout_nx,libc_shared_lock_waitfor_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, E_INTERRUPT),__FCALL,(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout),(self,abs_timeout));
 #endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SCHED_SHARED_LOCK_C */

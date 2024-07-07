@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa591a72c */
+/* HASH CRC-32:0xf4c9c7e7 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -451,7 +451,7 @@ NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr) {
 #endif /* __SIZEOF_LONG__ > 4 */
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc_wtol, libc_wtoi);
+DEFINE_INTERN_ALIAS_P(libc_wtol,libc_wtoi,ATTR_PURE WUNUSED ATTR_IN(1),long,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_IN(1) long
@@ -473,9 +473,9 @@ NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr) {
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtoi);
+DEFINE_INTERN_ALIAS_P(libc_wtoll,libc_wtoi,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtol);
+DEFINE_INTERN_ALIAS_P(libc_wtoll,libc_wtol,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
 #else /* ... */
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG
@@ -492,26 +492,26 @@ NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wsystem, libd_wsystem);
-DEFINE_PUBLIC_ALIAS(DOS$wsystem, libd_wsystem);
-DEFINE_PUBLIC_ALIAS(wsystem, libc_wsystem);
-DEFINE_PUBLIC_ALIAS(DOS$wrealpath, libd_wrealpath);
-DEFINE_PUBLIC_ALIAS(wrealpath, libc_wrealpath);
-DEFINE_PUBLIC_ALIAS(DOS$wfrealpath, libd_wfrealpath);
-DEFINE_PUBLIC_ALIAS(wfrealpath, libc_wfrealpath);
-DEFINE_PUBLIC_ALIAS(DOS$wfrealpath4, libd_wfrealpath4);
-DEFINE_PUBLIC_ALIAS(wfrealpath4, libc_wfrealpath4);
-DEFINE_PUBLIC_ALIAS(DOS$wfrealpathat, libd_wfrealpathat);
-DEFINE_PUBLIC_ALIAS(wfrealpathat, libc_wfrealpathat);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoi, libd_wtoi);
-DEFINE_PUBLIC_ALIAS(DOS$wtoi, libd_wtoi);
-DEFINE_PUBLIC_ALIAS(wtoi, libc_wtoi);
-DEFINE_PUBLIC_ALIAS(DOS$_wtol, libd_wtol);
-DEFINE_PUBLIC_ALIAS(DOS$wtol, libd_wtol);
-DEFINE_PUBLIC_ALIAS(wtol, libc_wtol);
-DEFINE_PUBLIC_ALIAS(DOS$_wtoll, libd_wtoll);
-DEFINE_PUBLIC_ALIAS(DOS$wtoll, libd_wtoll);
-DEFINE_PUBLIC_ALIAS(wtoll, libc_wtoll);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wsystem,libd_wsystem,,int,NOTHROW_RPC,LIBDCALL,(char16_t const *cmd),(cmd));
+DEFINE_PUBLIC_ALIAS_P(DOS$wsystem,libd_wsystem,,int,NOTHROW_RPC,LIBDCALL,(char16_t const *cmd),(cmd));
+DEFINE_PUBLIC_ALIAS_P(wsystem,libc_wsystem,,int,NOTHROW_RPC,LIBKCALL,(char32_t const *cmd),(cmd));
+DEFINE_PUBLIC_ALIAS_P(DOS$wrealpath,libd_wrealpath,WUNUSED ATTR_IN(1) ATTR_OUT_OPT(2),char16_t *,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, char16_t *resolved),(filename,resolved));
+DEFINE_PUBLIC_ALIAS_P(wrealpath,libc_wrealpath,WUNUSED ATTR_IN(1) ATTR_OUT_OPT(2),char32_t *,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, char32_t *resolved),(filename,resolved));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfrealpath,libd_wfrealpath,WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3),char16_t *,NOTHROW_RPC,LIBDCALL,(fd_t fd, char16_t *resolved, size_t buflen),(fd,resolved,buflen));
+DEFINE_PUBLIC_ALIAS_P(wfrealpath,libc_wfrealpath,WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3),char32_t *,NOTHROW_RPC,LIBKCALL,(fd_t fd, char32_t *resolved, size_t buflen),(fd,resolved,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfrealpath4,libd_wfrealpath4,WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3),char16_t *,NOTHROW_RPC,LIBDCALL,(fd_t fd, char16_t *resolved, size_t buflen, atflag_t flags),(fd,resolved,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(wfrealpath4,libc_wfrealpath4,WUNUSED ATTR_FDARG(1) ATTR_OUTS(2, 3),char32_t *,NOTHROW_RPC,LIBKCALL,(fd_t fd, char32_t *resolved, size_t buflen, atflag_t flags),(fd,resolved,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$wfrealpathat,libd_wfrealpathat,WUNUSED ATTR_IN(2) ATTR_OUTS(3, 4),char16_t *,NOTHROW_RPC,LIBDCALL,(fd_t dirfd, char16_t const *filename, char16_t *resolved, size_t buflen, atflag_t flags),(dirfd,filename,resolved,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(wfrealpathat,libc_wfrealpathat,WUNUSED ATTR_IN(2) ATTR_OUTS(3, 4),char32_t *,NOTHROW_RPC,LIBKCALL,(fd_t dirfd, char32_t const *filename, char32_t *resolved, size_t buflen, atflag_t flags),(dirfd,filename,resolved,buflen,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoi,libd_wtoi,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$wtoi,libd_wtoi,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(wtoi,libc_wtoi,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtol,libd_wtol,ATTR_PURE WUNUSED ATTR_IN(1),long,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$wtol,libd_wtol,ATTR_PURE WUNUSED ATTR_IN(1),long,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(wtol,libc_wtol,ATTR_PURE WUNUSED ATTR_IN(1),long,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wtoll,libd_wtoll,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(DOS$wtoll,libd_wtoll,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBDCALL,(char16_t const *nptr),(nptr));
+DEFINE_PUBLIC_ALIAS_P(wtoll,libc_wtoll,ATTR_PURE WUNUSED ATTR_IN(1),__LONGLONG,NOTHROW_NCX,LIBKCALL,(char32_t const *nptr),(nptr));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_C */

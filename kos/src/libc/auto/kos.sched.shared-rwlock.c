@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ef5e7fd */
+/* HASH CRC-32:0x3cd11fe1 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -434,7 +434,7 @@ success:
 #ifndef __KERNEL__
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_rwlock_read_with_timeout64, libc_shared_rwlock_read_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_rwlock_read_with_timeout64,libc_shared_rwlock_read_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -469,7 +469,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_rwlock_write_with_timeout64, libc_shared_rwlock_write_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_rwlock_write_with_timeout64,libc_shared_rwlock_write_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -504,7 +504,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitread_with_timeout64, libc_shared_rwlock_waitread_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_rwlock_waitread_with_timeout64,libc_shared_rwlock_waitread_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -541,7 +541,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_shared_rwlock_waitwrite_with_timeout64, libc_shared_rwlock_waitwrite_with_timeout);
+DEFINE_INTERN_ALIAS_P(libc_shared_rwlock_waitwrite_with_timeout64,libc_shared_rwlock_waitwrite_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -800,48 +800,48 @@ success:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(shared_rwlock_tryread, libc_shared_rwlock_tryread);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_trywrite, libc_shared_rwlock_trywrite);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_endwrite, libc_shared_rwlock_endwrite);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_endread, libc_shared_rwlock_endread);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_end, libc_shared_rwlock_end);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_downgrade, libc_shared_rwlock_downgrade);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_upgrade, libc_shared_rwlock_upgrade);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_read, libc_shared_rwlock_read);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_write, libc_shared_rwlock_write);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout, libc_shared_rwlock_read_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout, libc_shared_rwlock_write_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread, libc_shared_rwlock_waitread);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite, libc_shared_rwlock_waitwrite);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout, libc_shared_rwlock_waitread_with_timeout);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout, libc_shared_rwlock_waitwrite_with_timeout);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_tryread,libc_shared_rwlock_tryread,WUNUSED __NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_trywrite,libc_shared_rwlock_trywrite,WUNUSED __NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_endwrite,libc_shared_rwlock_endwrite,__NOBLOCK ATTR_INOUT(1),NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_endread,libc_shared_rwlock_endread,__NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_end,libc_shared_rwlock_end,__NOBLOCK ATTR_INOUT(1),bool,NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_downgrade,libc_shared_rwlock_downgrade,__NOBLOCK ATTR_INOUT(1),NOTHROW,__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_upgrade,libc_shared_rwlock_upgrade,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_read,libc_shared_rwlock_read,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_write,libc_shared_rwlock_write,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_read_with_timeout,libc_shared_rwlock_read_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_write_with_timeout,libc_shared_rwlock_write_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_waitread,libc_shared_rwlock_waitread,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P_VOID(shared_rwlock_waitwrite,libc_shared_rwlock_waitwrite,__BLOCKING ATTR_INOUT(1),THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitread_with_timeout,libc_shared_rwlock_waitread_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitwrite_with_timeout,libc_shared_rwlock_waitwrite_with_timeout,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
 #ifndef __KERNEL__
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout64, libc_shared_rwlock_read_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_read_with_timeout64,libc_shared_rwlock_read_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout64, libc_shared_rwlock_write_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_write_with_timeout64,libc_shared_rwlock_write_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout64, libc_shared_rwlock_waitread_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitread_with_timeout64,libc_shared_rwlock_waitread_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout64, libc_shared_rwlock_waitwrite_with_timeout64);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitwrite_with_timeout64,libc_shared_rwlock_waitwrite_with_timeout64,WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, struct timespec64 const *abs_timeout),(self,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
-DEFINE_PUBLIC_ALIAS(shared_rwlock_read_nx, libc_shared_rwlock_read_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_write_nx, libc_shared_rwlock_write_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_read_with_timeout_nx, libc_shared_rwlock_read_with_timeout_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_write_with_timeout_nx, libc_shared_rwlock_write_with_timeout_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_nx, libc_shared_rwlock_waitread_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_nx, libc_shared_rwlock_waitwrite_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitread_with_timeout_nx, libc_shared_rwlock_waitread_with_timeout_nx);
-DEFINE_PUBLIC_ALIAS(shared_rwlock_waitwrite_with_timeout_nx, libc_shared_rwlock_waitwrite_with_timeout_nx);
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_read_nx,libc_shared_rwlock_read_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_write_nx,libc_shared_rwlock_write_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_read_with_timeout_nx,libc_shared_rwlock_read_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_write_with_timeout_nx,libc_shared_rwlock_write_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitread_nx,libc_shared_rwlock_waitread_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitwrite_nx,libc_shared_rwlock_waitwrite_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitread_with_timeout_nx,libc_shared_rwlock_waitread_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(shared_rwlock_waitwrite_with_timeout_nx,libc_shared_rwlock_waitwrite_with_timeout_nx,WUNUSED __BLOCKING ATTR_INOUT(1),bool,THROWING(E_WOULDBLOCK, ...),__FCALL,(struct shared_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout),(self,abs_timeout));
 #endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_KOS_SCHED_SHARED_RWLOCK_C */

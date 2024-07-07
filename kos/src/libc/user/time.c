@@ -570,69 +570,69 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf22eb365]]]*/
-DEFINE_PUBLIC_ALIAS(__time, libc_time);
-DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
+/*[[[start:exports,hash:CRC-32=0x5d9266fc]]]*/
+DEFINE_PUBLIC_ALIAS_P(__time,libc_time,ATTR_OUT_OPT(1),time_t,NOTHROW_NCX,LIBCCALL,(time_t *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(__libc_time,libc_time,ATTR_OUT_OPT(1),time_t,NOTHROW_NCX,LIBCCALL,(time_t *timer),(timer));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_time32, libc_time);
+DEFINE_PUBLIC_ALIAS_P(_time32,libc_time,ATTR_OUT_OPT(1),time_t,NOTHROW_NCX,LIBCCALL,(time_t *timer),(timer));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(time, libc_time);
+DEFINE_PUBLIC_ALIAS_P(time,libc_time,ATTR_OUT_OPT(1),time_t,NOTHROW_NCX,LIBCCALL,(time_t *timer),(timer));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_time64, libc_time64);
+DEFINE_PUBLIC_ALIAS_P(_time64,libc_time64,ATTR_OUT_OPT(1),time64_t,NOTHROW_NCX,LIBCCALL,(time64_t *timer),(timer));
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__time64, libc_time64);
-DEFINE_PUBLIC_ALIAS(time64, libc_time64);
+DEFINE_PUBLIC_ALIAS_P(__time64,libc_time64,ATTR_OUT_OPT(1),time64_t,NOTHROW_NCX,LIBCCALL,(time64_t *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(time64,libc_time64,ATTR_OUT_OPT(1),time64_t,NOTHROW_NCX,LIBCCALL,(time64_t *timer),(timer));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(_tzset, libc_tzset);
-DEFINE_PUBLIC_ALIAS(__tzset, libc_tzset);
-DEFINE_PUBLIC_ALIAS(tzset, libc_tzset);
-DEFINE_PUBLIC_ALIAS(__stime, libc_stime);
-DEFINE_PUBLIC_ALIAS(__libc_stime, libc_stime);
-DEFINE_PUBLIC_ALIAS(stime, libc_stime);
+DEFINE_PUBLIC_ALIAS_P_VOID(_tzset,libc_tzset,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(__tzset,libc_tzset,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(tzset,libc_tzset,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__stime,libc_stime,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(time_t const *when),(when));
+DEFINE_PUBLIC_ALIAS_P(__libc_stime,libc_stime,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(time_t const *when),(when));
+DEFINE_PUBLIC_ALIAS_P(stime,libc_stime,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(time_t const *when),(when));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(stime64, libc_stime64);
+DEFINE_PUBLIC_ALIAS_P(stime64,libc_stime64,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(time64_t const *when),(when));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(__nanosleep, libc_nanosleep);
-DEFINE_PUBLIC_ALIAS(__libc_nanosleep, libc_nanosleep);
-DEFINE_PUBLIC_ALIAS(__libc_nanosleep, libc_nanosleep);
-DEFINE_PUBLIC_ALIAS(nanosleep, libc_nanosleep);
-DEFINE_PUBLIC_ALIAS(__clock_getres, libc_clock_getres);
-DEFINE_PUBLIC_ALIAS(clock_getres, libc_clock_getres);
-DEFINE_PUBLIC_ALIAS(__clock_gettime, libc_clock_gettime);
-DEFINE_PUBLIC_ALIAS(clock_gettime, libc_clock_gettime);
-DEFINE_PUBLIC_ALIAS(__clock_settime, libc_clock_settime);
-DEFINE_PUBLIC_ALIAS(clock_settime, libc_clock_settime);
-DEFINE_PUBLIC_ALIAS(timer_create, libc_timer_create);
-DEFINE_PUBLIC_ALIAS(timer_delete, libc_timer_delete);
-DEFINE_PUBLIC_ALIAS(timer_settime, libc_timer_settime);
-DEFINE_PUBLIC_ALIAS(timer_gettime, libc_timer_gettime);
-DEFINE_PUBLIC_ALIAS(timer_getoverrun, libc_timer_getoverrun);
-DEFINE_PUBLIC_ALIAS(__clock_nanosleep, libc_clock_nanosleep);
-DEFINE_PUBLIC_ALIAS(clock_nanosleep, libc_clock_nanosleep);
-DEFINE_PUBLIC_ALIAS(__clock_getcpuclockid, libc_clock_getcpuclockid);
-DEFINE_PUBLIC_ALIAS(clock_getcpuclockid, libc_clock_getcpuclockid);
+DEFINE_PUBLIC_ALIAS_P(__nanosleep,libc_nanosleep,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec const *requested_time, struct timespec *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(__libc_nanosleep,libc_nanosleep,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec const *requested_time, struct timespec *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(__libc_nanosleep,libc_nanosleep,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec const *requested_time, struct timespec *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(nanosleep,libc_nanosleep,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec const *requested_time, struct timespec *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(__clock_getres,libc_clock_getres,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec *res),(clock_id,res));
+DEFINE_PUBLIC_ALIAS_P(clock_getres,libc_clock_getres,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec *res),(clock_id,res));
+DEFINE_PUBLIC_ALIAS_P(__clock_gettime,libc_clock_gettime,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(clock_gettime,libc_clock_gettime,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(__clock_settime,libc_clock_settime,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec const *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(clock_settime,libc_clock_settime,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec const *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(timer_create,libc_timer_create,ATTR_IN_OPT(2) ATTR_OUT(3),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *__restrict timerid),(clock_id,evp,timerid));
+DEFINE_PUBLIC_ALIAS_P(timer_delete,libc_timer_delete,,int,NOTHROW_NCX,LIBCCALL,(timer_t timerid),(timerid));
+DEFINE_PUBLIC_ALIAS_P(timer_settime,libc_timer_settime,ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec const *__restrict value, struct itimerspec *__restrict ovalue),(timerid,flags,value,ovalue));
+DEFINE_PUBLIC_ALIAS_P(timer_gettime,libc_timer_gettime,ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, struct itimerspec *value),(timerid,value));
+DEFINE_PUBLIC_ALIAS_P(timer_getoverrun,libc_timer_getoverrun,,int,NOTHROW_NCX,LIBCCALL,(timer_t timerid),(timerid));
+DEFINE_PUBLIC_ALIAS_P(__clock_nanosleep,libc_clock_nanosleep,ATTR_IN(3) ATTR_OUT_OPT(4),errno_t,NOTHROW_RPC,LIBCCALL,(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining),(clock_id,flags,requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(clock_nanosleep,libc_clock_nanosleep,ATTR_IN(3) ATTR_OUT_OPT(4),errno_t,NOTHROW_RPC,LIBCCALL,(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining),(clock_id,flags,requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(__clock_getcpuclockid,libc_clock_getcpuclockid,,errno_t,NOTHROW_NCX,LIBCCALL,(pid_t pid, clockid_t *clock_id),(pid,clock_id));
+DEFINE_PUBLIC_ALIAS_P(clock_getcpuclockid,libc_clock_getcpuclockid,,errno_t,NOTHROW_NCX,LIBCCALL,(pid_t pid, clockid_t *clock_id),(pid,clock_id));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__nanosleep64, libc_nanosleep64);
-DEFINE_PUBLIC_ALIAS(nanosleep64, libc_nanosleep64);
-DEFINE_PUBLIC_ALIAS(__clock_getres64, libc_clock_getres64);
-DEFINE_PUBLIC_ALIAS(clock_getres64, libc_clock_getres64);
-DEFINE_PUBLIC_ALIAS(__clock_gettime64, libc_clock_gettime64);
-DEFINE_PUBLIC_ALIAS(clock_gettime64, libc_clock_gettime64);
-DEFINE_PUBLIC_ALIAS(__clock_settime64, libc_clock_settime64);
-DEFINE_PUBLIC_ALIAS(clock_settime64, libc_clock_settime64);
-DEFINE_PUBLIC_ALIAS(__timer_settime64, libc_timer_settime64);
-DEFINE_PUBLIC_ALIAS(timer_settime64, libc_timer_settime64);
-DEFINE_PUBLIC_ALIAS(__timer_gettime64, libc_timer_gettime64);
-DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
-DEFINE_PUBLIC_ALIAS(__clock_nanosleep_time64, libc_clock_nanosleep64);
-DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
+DEFINE_PUBLIC_ALIAS_P(__nanosleep64,libc_nanosleep64,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec64 const *__restrict requested_time, struct timespec64 *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(nanosleep64,libc_nanosleep64,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_RPC,LIBCCALL,(struct timespec64 const *__restrict requested_time, struct timespec64 *remaining),(requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(__clock_getres64,libc_clock_getres64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 *res),(clock_id,res));
+DEFINE_PUBLIC_ALIAS_P(clock_getres64,libc_clock_getres64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 *res),(clock_id,res));
+DEFINE_PUBLIC_ALIAS_P(__clock_gettime64,libc_clock_gettime64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(clock_gettime64,libc_clock_gettime64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(__clock_settime64,libc_clock_settime64,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 const *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(clock_settime64,libc_clock_settime64,ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timespec64 const *tp),(clock_id,tp));
+DEFINE_PUBLIC_ALIAS_P(__timer_settime64,libc_timer_settime64,ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *__restrict value, struct itimerspec64 *__restrict ovalue),(timerid,flags,value,ovalue));
+DEFINE_PUBLIC_ALIAS_P(timer_settime64,libc_timer_settime64,ATTR_IN(3) ATTR_OUT_OPT(4),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *__restrict value, struct itimerspec64 *__restrict ovalue),(timerid,flags,value,ovalue));
+DEFINE_PUBLIC_ALIAS_P(__timer_gettime64,libc_timer_gettime64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, struct itimerspec64 *value),(timerid,value));
+DEFINE_PUBLIC_ALIAS_P(timer_gettime64,libc_timer_gettime64,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(timer_t timerid, struct itimerspec64 *value),(timerid,value));
+DEFINE_PUBLIC_ALIAS_P(__clock_nanosleep_time64,libc_clock_nanosleep64,ATTR_IN(3) ATTR_OUT_OPT(4),errno_t,NOTHROW_RPC,LIBCCALL,(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining),(clock_id,flags,requested_time,remaining));
+DEFINE_PUBLIC_ALIAS_P(clock_nanosleep64,libc_clock_nanosleep64,ATTR_IN(3) ATTR_OUT_OPT(4),errno_t,NOTHROW_RPC,LIBCCALL,(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining),(clock_id,flags,requested_time,remaining));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
+DEFINE_PUBLIC_ALIAS_P(clock_adjtime,libc_clock_adjtime,ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timex *utx),(clock_id,utx));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__clock_adjtime64, libc_clock_adjtime64);
-DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
+DEFINE_PUBLIC_ALIAS_P(__clock_adjtime64,libc_clock_adjtime64,ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timex64 *utx),(clock_id,utx));
+DEFINE_PUBLIC_ALIAS_P(clock_adjtime64,libc_clock_adjtime64,ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(clockid_t clock_id, struct timex64 *utx),(clock_id,utx));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

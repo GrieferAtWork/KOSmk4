@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc526df1b */
+/* HASH CRC-32:0xf403624f */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename,
 }
 #include <asm/os/oflags.h>
 #if !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_wopen64, libc_wopen);
+DEFINE_INTERN_ALIAS_P(libc_wopen64,libc_wopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBKCALL,(char32_t const *filename, oflag_t oflags, ...),(filename,oflags,));
 #else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename,
@@ -217,7 +217,7 @@ NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename,
 }
 #include <asm/os/oflags.h>
 #if !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_wcreat64, libc_wcreat);
+DEFINE_INTERN_ALIAS_P(libc_wcreat64,libc_wcreat,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, mode_t mode),(filename,mode));
 #else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename,
@@ -327,7 +327,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd,
 }
 #include <asm/os/oflags.h>
 #if !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_wopenat64, libc_wopenat);
+DEFINE_INTERN_ALIAS_P(libc_wopenat64,libc_wopenat,WUNUSED ATTR_IN(2),fd_t,NOTHROW_RPC,VLIBKCALL,(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...),(dirfd,filename,oflags,));
 #else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd,
@@ -368,21 +368,21 @@ NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wopen, libd_wopen);
-DEFINE_PUBLIC_ALIAS("?_wopen@@YAHPB_WHH@Z", libd_wopen);
-DEFINE_PUBLIC_ALIAS(DOS$wopen, libd_wopen);
-DEFINE_PUBLIC_ALIAS(wopen, libc_wopen);
-DEFINE_PUBLIC_ALIAS(DOS$_wcreat, libd_wcreat);
-DEFINE_PUBLIC_ALIAS(DOS$wcreat, libd_wcreat);
-DEFINE_PUBLIC_ALIAS(wcreat, libc_wcreat);
-DEFINE_PUBLIC_ALIAS(DOS$wopen64, libd_wopen64);
-DEFINE_PUBLIC_ALIAS(wopen64, libc_wopen64);
-DEFINE_PUBLIC_ALIAS(DOS$wcreat64, libd_wcreat64);
-DEFINE_PUBLIC_ALIAS(wcreat64, libc_wcreat64);
-DEFINE_PUBLIC_ALIAS(DOS$wopenat, libd_wopenat);
-DEFINE_PUBLIC_ALIAS(wopenat, libc_wopenat);
-DEFINE_PUBLIC_ALIAS(DOS$wopenat64, libd_wopenat64);
-DEFINE_PUBLIC_ALIAS(wopenat64, libc_wopenat64);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wopen,libd_wopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P("?_wopen@@YAHPB_WHH@Z",libd_wopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wopen,libd_wopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(wopen,libc_wopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBKCALL,(char32_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wcreat,libd_wcreat,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wcreat,libd_wcreat,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(wcreat,libc_wcreat,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wopen64,libd_wopen64,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char16_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(wopen64,libc_wopen64,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBKCALL,(char32_t const *filename, oflag_t oflags, ...),(filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wcreat64,libd_wcreat64,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBDCALL,(char16_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(wcreat64,libc_wcreat64,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,LIBKCALL,(char32_t const *filename, mode_t mode),(filename,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$wopenat,libd_wopenat,WUNUSED ATTR_IN(2),fd_t,NOTHROW_RPC,VLIBDCALL,(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...),(dirfd,filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(wopenat,libc_wopenat,WUNUSED ATTR_IN(2),fd_t,NOTHROW_RPC,VLIBKCALL,(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...),(dirfd,filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wopenat64,libd_wopenat64,WUNUSED ATTR_IN(2),fd_t,NOTHROW_RPC,VLIBDCALL,(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...),(dirfd,filename,oflags,));
+DEFINE_PUBLIC_ALIAS_P(wopenat64,libc_wopenat64,WUNUSED ATTR_IN(2),fd_t,NOTHROW_RPC,VLIBKCALL,(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...),(dirfd,filename,oflags,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_FCNTL_C */

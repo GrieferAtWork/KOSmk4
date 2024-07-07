@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fb64bde */
+/* HASH CRC-32:0x24d3d787 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1010,33 +1010,33 @@ err:
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(format_repeat, libc_format_repeat);
+DEFINE_PUBLIC_ALIAS_P(format_repeat,libc_format_repeat,NONNULL((1)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatprinter printer, void *arg, char ch, size_t num_repetitions),(printer,arg,ch,num_repetitions));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(format_quote, libc_format_escape);
+DEFINE_PUBLIC_ALIAS_P(format_quote,libc_format_escape,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags),(printer,arg,text,textlen,flags));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(format_escape, libc_format_escape);
-DEFINE_PUBLIC_ALIAS(format_hexdump, libc_format_hexdump);
-DEFINE_PUBLIC_ALIAS(format_vprintf, libc_format_vprintf);
+DEFINE_PUBLIC_ALIAS_P(format_escape,libc_format_escape,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags),(printer,arg,text,textlen,flags));
+DEFINE_PUBLIC_ALIAS_P(format_hexdump,libc_format_hexdump,ATTR_INS(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags),(printer,arg,data,size,linesize,flags));
+DEFINE_PUBLIC_ALIAS_P(format_vprintf,libc_format_vprintf,ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatprinter printer, void *arg, char const *__restrict format, va_list args),(printer,arg,format,args));
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$format_printf, libd_format_printf);
+DEFINE_PUBLIC_ALIAS_P(DOS$format_printf,libd_format_printf,ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,VLIBDCALL,(pformatprinter printer, void *arg, char const *__restrict format, ...),(printer,arg,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(format_printf, libc_format_printf);
-DEFINE_PUBLIC_ALIAS(format_vscanf, libc_format_vscanf);
+DEFINE_PUBLIC_ALIAS_P(format_printf,libc_format_printf,ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)),ssize_t,NOTHROW_CB,VLIBCCALL,(pformatprinter printer, void *arg, char const *__restrict format, ...),(printer,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(format_vscanf,libc_format_vscanf,ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)),ssize_t,NOTHROW_CB,LIBCCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args),(pgetc,pungetc,arg,format,args));
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-DEFINE_PUBLIC_ALIAS(DOS$format_scanf, libd_format_scanf);
+DEFINE_PUBLIC_ALIAS_P(DOS$format_scanf,libd_format_scanf,ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)),ssize_t,NOTHROW_CB,VLIBDCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...),(pgetc,pungetc,arg,format,));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(format_scanf, libc_format_scanf);
-DEFINE_PUBLIC_ALIAS(format_sprintf_printer, libc_format_sprintf_printer);
-DEFINE_PUBLIC_ALIAS(format_snprintf_printer, libc_format_snprintf_printer);
-DEFINE_PUBLIC_ALIAS(format_width, libc_format_width);
+DEFINE_PUBLIC_ALIAS_P(format_scanf,libc_format_scanf,ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)),ssize_t,NOTHROW_CB,VLIBCCALL,(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...),(pgetc,pungetc,arg,format,));
+DEFINE_PUBLIC_ALIAS_P(format_sprintf_printer,libc_format_sprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_snprintf_printer,libc_format_snprintf_printer,ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
+DEFINE_PUBLIC_ALIAS_P(format_width,libc_format_width,ATTR_PURE ATTR_INS(2, 3) NONNULL((2)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(format_wwidth, libc_format_length);
+DEFINE_PUBLIC_ALIAS_P(format_wwidth,libc_format_length,ATTR_CONST ATTR_INS(2, 3) NONNULL((2)),ssize_t,NOTHROW,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_ALIAS(format_length, libc_format_length);
+DEFINE_PUBLIC_ALIAS_P(format_length,libc_format_length,ATTR_CONST ATTR_INS(2, 3) NONNULL((2)),ssize_t,NOTHROW,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
-DEFINE_PUBLIC_ALIAS(format_aprintf_alloc, libc_format_aprintf_alloc);
-DEFINE_PUBLIC_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);
+DEFINE_PUBLIC_ALIAS_P(format_aprintf_pack,libc_format_aprintf_pack,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2),char *,NOTHROW_NCX,LIBCCALL,(struct format_aprintf_data *__restrict self, size_t *pstrlen),(self,pstrlen));
+DEFINE_PUBLIC_ALIAS_P(format_aprintf_alloc,libc_format_aprintf_alloc,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INOUT(1),char *,NOTHROW_NCX,LIBCCALL,(struct format_aprintf_data *__restrict self, size_t num_chars),(self,num_chars));
+DEFINE_PUBLIC_ALIAS_P(format_aprintf_printer,libc_format_aprintf_printer,WUNUSED ATTR_INS(2, 3) NONNULL((1)),ssize_t,NOTHROW_NCX,__FORMATPRINTER_CC,(void *arg, char const *__restrict data, size_t datalen),(arg,data,datalen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FORMAT_PRINTER_C */

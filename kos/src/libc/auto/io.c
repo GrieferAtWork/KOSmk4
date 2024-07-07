@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ee685d */
+/* HASH CRC-32:0x53de6478 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,29 +258,29 @@ NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
-DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
-DEFINE_PUBLIC_ALIAS(_umask_s, libc__umask_s);
-DEFINE_PUBLIC_ALIAS(_setmode, libc__setmode);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen_s_nolock, libd__sopen_s);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);
-DEFINE_PUBLIC_ALIAS(_sopen_s_nolock, libc__sopen_s);
-DEFINE_PUBLIC_ALIAS(_sopen_s, libc__sopen_s);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen_dispatch, libd__sopen_dispatch);
-DEFINE_PUBLIC_ALIAS(_sopen_dispatch, libc__sopen_dispatch);
-DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);
-DEFINE_PUBLIC_ALIAS(_filelengthi64, libc__filelengthi64);
-DEFINE_PUBLIC_ALIAS(DOS$umask_s, libd_umask_s);
-DEFINE_PUBLIC_ALIAS(umask_s, libc_umask_s);
-DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
-DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
-DEFINE_PUBLIC_ALIAS(_get_osfhandle, libc__get_osfhandle);
-DEFINE_PUBLIC_ALIAS(_open_osfhandle, libc__open_osfhandle);
-DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
-DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
-DEFINE_PUBLIC_ALIAS(sopen, libc_sopen);
-DEFINE_PUBLIC_ALIAS(_filelength, libc__filelength);
-DEFINE_PUBLIC_ALIAS(_eof, libc__eof);
+DEFINE_PUBLIC_ALIAS_P(DOS$_access_s,libd__access_s,ATTR_IN(1),errno_t,NOTHROW_RPC,LIBDCALL,(char const *filename, __STDC_INT_AS_UINT_T type),(filename,type));
+DEFINE_PUBLIC_ALIAS_P(_access_s,libc__access_s,ATTR_IN(1),errno_t,NOTHROW_RPC,LIBCCALL,(char const *filename, __STDC_INT_AS_UINT_T type),(filename,type));
+DEFINE_PUBLIC_ALIAS_P(_umask_s,libc__umask_s,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(mode_t nmode, mode_t *omode),(nmode,omode));
+DEFINE_PUBLIC_ALIAS_P(_setmode,libc__setmode,ATTR_FDARG(1),oflag_t,NOTHROW_NCX,LIBCCALL,(fd_t fd, oflag_t mode),(fd,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_sopen_s_nolock,libd__sopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBDCALL,(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_sopen_s,libd__sopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBDCALL,(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(_sopen_s_nolock,libc__sopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(_sopen_s,libc__sopen_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_RPC,LIBCCALL,(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode),(fd,filename,oflags,sflags,mode));
+DEFINE_PUBLIC_ALIAS_P(DOS$_sopen_dispatch,libd__sopen_dispatch,WUNUSED ATTR_IN(1) ATTR_OUT(5),errno_t,NOTHROW_RPC,LIBDCALL,(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure),(filename,oflags,sflags,mode,fd,bsecure));
+DEFINE_PUBLIC_ALIAS_P(_sopen_dispatch,libc__sopen_dispatch,WUNUSED ATTR_IN(1) ATTR_OUT(5),errno_t,NOTHROW_RPC,LIBCCALL,(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure),(filename,oflags,sflags,mode,fd,bsecure));
+DEFINE_PUBLIC_ALIAS_P(_pipe,libc__pipe,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode),(pipedes,pipesize,textmode));
+DEFINE_PUBLIC_ALIAS_P(_filelengthi64,libc__filelengthi64,WUNUSED ATTR_FDARG(1),int64_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(DOS$umask_s,libd_umask_s,,errno_t,NOTHROW_NCX,LIBDCALL,(mode_t newmode, mode_t *oldmode),(newmode,oldmode));
+DEFINE_PUBLIC_ALIAS_P(umask_s,libc_umask_s,,errno_t,NOTHROW_NCX,LIBCCALL,(mode_t newmode, mode_t *oldmode),(newmode,oldmode));
+DEFINE_PUBLIC_ALIAS_P(__lock_fhandle,libc___lock_fhandle,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P_VOID(_unlock_fhandle,libc__unlock_fhandle,ATTR_FDARG(1),NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(_get_osfhandle,libc__get_osfhandle,ATTR_PURE WUNUSED ATTR_FDARG(1),intptr_t,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(_open_osfhandle,libc__open_osfhandle,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(intptr_t osfd, oflag_t flags),(osfd,flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$_sopen,libd_sopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
+DEFINE_PUBLIC_ALIAS_P(DOS$sopen,libd_sopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBDCALL,(char const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
+DEFINE_PUBLIC_ALIAS_P(sopen,libc_sopen,WUNUSED ATTR_IN(1),fd_t,NOTHROW_RPC,VLIBCCALL,(char const *filename, oflag_t oflags, int sflags, ...),(filename,oflags,sflags,));
+DEFINE_PUBLIC_ALIAS_P(_filelength,libc__filelength,WUNUSED ATTR_FDARG(1),__LONG32_TYPE__,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
+DEFINE_PUBLIC_ALIAS_P(_eof,libc__eof,WUNUSED ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t fd),(fd));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_IO_C */

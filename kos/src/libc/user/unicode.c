@@ -227,13 +227,13 @@ NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
 }
 /*[[[end:libc_unicode_fold]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xccdb6d5b]]]*/
-DEFINE_PUBLIC_ALIAS(__unicode_descriptor, libc___unicode_descriptor);
-DEFINE_PUBLIC_ALIAS(__unicode_descriptor_digit, libc___unicode_descriptor_digit);
-DEFINE_PUBLIC_ALIAS(__unicode_descriptor_digit64, libc___unicode_descriptor_digit64);
-DEFINE_PUBLIC_ALIAS(__unicode_descriptor_digitd, libc___unicode_descriptor_digitd);
-DEFINE_PUBLIC_ALIAS(__unicode_descriptor_digitld, libc___unicode_descriptor_digitld);
-DEFINE_PUBLIC_ALIAS(unicode_fold, libc_unicode_fold);
+/*[[[start:exports,hash:CRC-32=0x194de0f7]]]*/
+DEFINE_PUBLIC_ALIAS_P(__unicode_descriptor,libc___unicode_descriptor,ATTR_CONST ATTR_RETNONNULL,struct __unitraits const *,NOTHROW,LIBCCALL,(char32_t ch),(ch));
+DEFINE_PUBLIC_ALIAS_P(__unicode_descriptor_digit,libc___unicode_descriptor_digit,ATTR_CONST WUNUSED,uint8_t,NOTHROW,LIBCCALL,(uint8_t digit_idx),(digit_idx));
+DEFINE_PUBLIC_ALIAS_P(__unicode_descriptor_digit64,libc___unicode_descriptor_digit64,ATTR_CONST WUNUSED,uint64_t,NOTHROW,LIBCCALL,(uint8_t digit_idx),(digit_idx));
+DEFINE_PUBLIC_ALIAS_P(__unicode_descriptor_digitd,libc___unicode_descriptor_digitd,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(uint8_t digit_idx),(digit_idx));
+DEFINE_PUBLIC_ALIAS_P(__unicode_descriptor_digitld,libc___unicode_descriptor_digitld,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(uint8_t digit_idx),(digit_idx));
+DEFINE_PUBLIC_ALIAS_P(unicode_fold,libc_unicode_fold,ATTR_RETNONNULL ATTR_OUT(2),char32_t *,NOTHROW_NCX,LIBCCALL,(char32_t ch, char32_t buf[3]),(ch,buf));
 /*[[[end:exports]]]*/
 
 DECL_END

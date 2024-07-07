@@ -150,14 +150,14 @@ NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd,
 }
 /*[[[end:libc_inotify_add_watch_at]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x792fe03c]]]*/
-DEFINE_PUBLIC_ALIAS(inotify_init, libc_inotify_init);
-DEFINE_PUBLIC_ALIAS(inotify_init1, libc_inotify_init1);
-DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch, libd_inotify_add_watch);
-DEFINE_PUBLIC_ALIAS(inotify_add_watch, libc_inotify_add_watch);
-DEFINE_PUBLIC_ALIAS(inotify_rm_watch, libc_inotify_rm_watch);
-DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch_at, libd_inotify_add_watch_at);
-DEFINE_PUBLIC_ALIAS(inotify_add_watch_at, libc_inotify_add_watch_at);
+/*[[[start:exports,hash:CRC-32=0xd0292b02]]]*/
+DEFINE_PUBLIC_ALIAS_P(inotify_init,libc_inotify_init,,fd_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(inotify_init1,libc_inotify_init1,,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T flags),(flags));
+DEFINE_PUBLIC_ALIAS_P(DOS$inotify_add_watch,libd_inotify_add_watch,ATTR_FDARG(1) ATTR_IN(2),__watchfd_t,NOTHROW_NCX,LIBDCALL,(fd_t notify_fd, char const *pathname, uint32_t mask),(notify_fd,pathname,mask));
+DEFINE_PUBLIC_ALIAS_P(inotify_add_watch,libc_inotify_add_watch,ATTR_FDARG(1) ATTR_IN(2),__watchfd_t,NOTHROW_NCX,LIBCCALL,(fd_t notify_fd, char const *pathname, uint32_t mask),(notify_fd,pathname,mask));
+DEFINE_PUBLIC_ALIAS_P(inotify_rm_watch,libc_inotify_rm_watch,ATTR_FDARG(1),int,NOTHROW_NCX,LIBCCALL,(fd_t notify_fd, __watchfd_t wd),(notify_fd,wd));
+DEFINE_PUBLIC_ALIAS_P(DOS$inotify_add_watch_at,libd_inotify_add_watch_at,ATTR_FDARG(1) ATTR_IN(3),__watchfd_t,NOTHROW_NCX,LIBDCALL,(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask),(notify_fd,dirfd,pathname,atflags,mask));
+DEFINE_PUBLIC_ALIAS_P(inotify_add_watch_at,libc_inotify_add_watch_at,ATTR_FDARG(1) ATTR_IN(3),__watchfd_t,NOTHROW_NCX,LIBCCALL,(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask),(notify_fd,dirfd,pathname,atflags,mask));
 /*[[[end:exports]]]*/
 
 DECL_END

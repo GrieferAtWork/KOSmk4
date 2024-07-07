@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x954bc6f1 */
+/* HASH CRC-32:0x1b2951ec */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ NOTHROW_NCX(LIBKCALL libc__wasctime_s)(char32_t *buf,
 	return 0;
 }
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libd__wctime32, libd__wctime64);
+DEFINE_INTERN_ALIAS_P(libd__wctime32,libd__wctime64,WUNUSED ATTR_IN(1),char16_t *,NOTHROW_NCX,LIBDCALL,(time32_t const *timer),(timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer) {
@@ -129,7 +129,7 @@ NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer) {
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc__wctime32, libc__wctime64);
+DEFINE_INTERN_ALIAS_P(libc__wctime32,libc__wctime64,WUNUSED ATTR_IN(1),char32_t *,NOTHROW_NCX,LIBKCALL,(time32_t const *timer),(timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wctime32)(time32_t const *timer) {
@@ -194,7 +194,7 @@ NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer) {
 }
 #undef wctime_buf
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libd__wctime32_s, libd__wctime64_s);
+DEFINE_INTERN_ALIAS_P(libd__wctime32_s,libd__wctime64_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen, time32_t const *timer),(buf,buflen,timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf,
@@ -205,7 +205,7 @@ NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf,
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc__wctime32_s, libc__wctime64_s);
+DEFINE_INTERN_ALIAS_P(libc__wctime32_s,libc__wctime64_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen, time32_t const *timer),(buf,buflen,timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wctime32_s)(char32_t *buf,
@@ -364,27 +364,27 @@ NOTHROW_NCX(LIBKCALL libc__wstrdate_s)(char32_t *buf,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wasctime, libd__wasctime);
-DEFINE_PUBLIC_ALIAS(_wasctime, libc__wasctime);
-DEFINE_PUBLIC_ALIAS(DOS$_wasctime_s, libd__wasctime_s);
-DEFINE_PUBLIC_ALIAS(_wasctime_s, libc__wasctime_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wctime, libd__wctime32);
-DEFINE_PUBLIC_ALIAS(DOS$_wctime32, libd__wctime32);
-DEFINE_PUBLIC_ALIAS(_wctime32, libc__wctime32);
-DEFINE_PUBLIC_ALIAS(DOS$_wctime64, libd__wctime64);
-DEFINE_PUBLIC_ALIAS(_wctime64, libc__wctime64);
-DEFINE_PUBLIC_ALIAS(DOS$_wctime32_s, libd__wctime32_s);
-DEFINE_PUBLIC_ALIAS(_wctime32_s, libc__wctime32_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wctime64_s, libd__wctime64_s);
-DEFINE_PUBLIC_ALIAS(_wctime64_s, libc__wctime64_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wstrtime, libd__wstrtime);
-DEFINE_PUBLIC_ALIAS(_wstrtime, libc__wstrtime);
-DEFINE_PUBLIC_ALIAS(DOS$_wstrdate, libd__wstrdate);
-DEFINE_PUBLIC_ALIAS(_wstrdate, libc__wstrdate);
-DEFINE_PUBLIC_ALIAS(DOS$_wstrtime_s, libd__wstrtime_s);
-DEFINE_PUBLIC_ALIAS(_wstrtime_s, libc__wstrtime_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wstrdate_s, libd__wstrdate_s);
-DEFINE_PUBLIC_ALIAS(_wstrdate_s, libc__wstrdate_s);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wasctime,libd__wasctime,WUNUSED ATTR_IN(1),char16_t *,NOTHROW_NCX,LIBDCALL,(struct tm const *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(_wasctime,libc__wasctime,WUNUSED ATTR_IN(1),char32_t *,NOTHROW_NCX,LIBKCALL,(struct tm const *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wasctime_s,libd__wasctime_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen, struct tm const *tp),(buf,buflen,tp));
+DEFINE_PUBLIC_ALIAS_P(_wasctime_s,libc__wasctime_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen, struct tm const *tp),(buf,buflen,tp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wctime,libd__wctime32,WUNUSED ATTR_IN(1),char16_t *,NOTHROW_NCX,LIBDCALL,(time32_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wctime32,libd__wctime32,WUNUSED ATTR_IN(1),char16_t *,NOTHROW_NCX,LIBDCALL,(time32_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(_wctime32,libc__wctime32,WUNUSED ATTR_IN(1),char32_t *,NOTHROW_NCX,LIBKCALL,(time32_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wctime64,libd__wctime64,WUNUSED ATTR_IN(1),char16_t *,NOTHROW_NCX,LIBDCALL,(time64_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(_wctime64,libc__wctime64,WUNUSED ATTR_IN(1),char32_t *,NOTHROW_NCX,LIBKCALL,(time64_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wctime32_s,libd__wctime32_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen, time32_t const *timer),(buf,buflen,timer));
+DEFINE_PUBLIC_ALIAS_P(_wctime32_s,libc__wctime32_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen, time32_t const *timer),(buf,buflen,timer));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wctime64_s,libd__wctime64_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen, time64_t const *timer),(buf,buflen,timer));
+DEFINE_PUBLIC_ALIAS_P(_wctime64_s,libc__wctime64_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen, time64_t const *timer),(buf,buflen,timer));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstrtime,libd__wstrtime,ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(_wstrtime,libc__wstrtime,ATTR_OUT(1),char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstrdate,libd__wstrdate,ATTR_OUT(1),char16_t *,NOTHROW_NCX,LIBDCALL,(char16_t buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(_wstrdate,libc__wstrdate,ATTR_OUT(1),char32_t *,NOTHROW_NCX,LIBKCALL,(char32_t buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstrtime_s,libd__wstrtime_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen),(buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(_wstrtime_s,libc__wstrtime_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen),(buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wstrdate_s,libd__wstrdate_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char16_t *buf, size_t buflen),(buf,buflen));
+DEFINE_PUBLIC_ALIAS_P(_wstrdate_s,libc__wstrdate_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBKCALL,(char32_t *buf, size_t buflen),(buf,buflen));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CORECRT_WTIME_C */

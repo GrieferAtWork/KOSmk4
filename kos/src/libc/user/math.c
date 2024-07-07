@@ -94,11 +94,11 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpx)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xeb4bef0d]]]*/
-DEFINE_PUBLIC_ALIAS(fromfp, libc_fromfp);
-DEFINE_PUBLIC_ALIAS(ufromfp, libc_ufromfp);
-DEFINE_PUBLIC_ALIAS(fromfpx, libc_fromfpx);
-DEFINE_PUBLIC_ALIAS(ufromfpx, libc_ufromfpx);
+/*[[[start:exports,hash:CRC-32=0x98d6570f]]]*/
+DEFINE_PUBLIC_ALIAS_P(fromfp,libc_fromfp,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(double x, int round, unsigned int width),(x,round,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfp,libc_ufromfp,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(double x, int round, unsigned int width),(x,round,width));
+DEFINE_PUBLIC_ALIAS_P(fromfpx,libc_fromfpx,WUNUSED,intmax_t,NOTHROW_NCX,LIBCCALL,(double x, int round, unsigned int width),(x,round,width));
+DEFINE_PUBLIC_ALIAS_P(ufromfpx,libc_ufromfpx,WUNUSED,uintmax_t,NOTHROW_NCX,LIBCCALL,(double x, int round, unsigned int width),(x,round,width));
 /*[[[end:exports]]]*/
 
 DECL_END

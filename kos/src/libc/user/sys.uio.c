@@ -207,25 +207,25 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1732eb3f]]]*/
-DEFINE_PUBLIC_ALIAS(process_vm_readv, libc_process_vm_readv);
-DEFINE_PUBLIC_ALIAS(process_vm_writev, libc_process_vm_writev);
-DEFINE_PUBLIC_ALIAS(__readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(syscall_readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(__syscall_readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(__libc_syscall_readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(__libc_readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(readv, libc_readv);
-DEFINE_PUBLIC_ALIAS(__writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(__libc_writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(syscall_writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(__syscall_writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(__libc_syscall_writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(writev, libc_writev);
-DEFINE_PUBLIC_ALIAS(preadv, libc_preadv);
-DEFINE_PUBLIC_ALIAS(pwritev, libc_pwritev);
-DEFINE_PUBLIC_ALIAS(preadv64, libc_preadv64);
-DEFINE_PUBLIC_ALIAS(pwritev64, libc_pwritev64);
+/*[[[start:exports,hash:CRC-32=0xbcd35752]]]*/
+DEFINE_PUBLIC_ALIAS_P(process_vm_readv,libc_process_vm_readv,WUNUSED ATTR_INS(2, 3) ATTR_INS(4, 5),ssize_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, struct iovec const *local_iov, ulongptr_t liovcnt, struct iovec const *remote_iov, ulongptr_t riovcnt, ulongptr_t flags),(pid,local_iov,liovcnt,remote_iov,riovcnt,flags));
+DEFINE_PUBLIC_ALIAS_P(process_vm_writev,libc_process_vm_writev,ATTR_INS(2, 3) ATTR_INS(4, 5),ssize_t,NOTHROW_RPC,LIBCCALL,(pid_t pid, struct iovec const *local_iov, ulongptr_t liovcnt, struct iovec const *remote_iov, ulongptr_t riovcnt, ulongptr_t flags),(pid,local_iov,liovcnt,remote_iov,riovcnt,flags));
+DEFINE_PUBLIC_ALIAS_P(__readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(syscall_readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__syscall_readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__libc_syscall_readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__libc_readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(readv,libc_readv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__libc_writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(syscall_writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__syscall_writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(__libc_syscall_writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(writev,libc_writev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count),(fd,iov,count));
+DEFINE_PUBLIC_ALIAS_P(preadv,libc_preadv,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off_t offset),(fd,iov,count,offset));
+DEFINE_PUBLIC_ALIAS_P(pwritev,libc_pwritev,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off_t offset),(fd,iov,count,offset));
+DEFINE_PUBLIC_ALIAS_P(preadv64,libc_preadv64,WUNUSED ATTR_FDREAD(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off64_t offset),(fd,iov,count,offset));
+DEFINE_PUBLIC_ALIAS_P(pwritev64,libc_pwritev64,ATTR_FDWRITE(1) ATTR_INS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off64_t offset),(fd,iov,count,offset));
 /*[[[end:exports]]]*/
 
 DECL_END

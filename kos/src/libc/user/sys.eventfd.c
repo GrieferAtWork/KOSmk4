@@ -47,8 +47,8 @@ NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count,
 }
 /*[[[end:libc_eventfd]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x375e61b3]]]*/
-DEFINE_PUBLIC_ALIAS(eventfd, libc_eventfd);
+/*[[[start:exports,hash:CRC-32=0x21ee4a3a]]]*/
+DEFINE_PUBLIC_ALIAS_P(eventfd,libc_eventfd,WUNUSED,fd_t,NOTHROW_NCX,LIBCCALL,(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags),(count,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

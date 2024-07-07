@@ -19,7 +19,7 @@ global COPYRIGHT =
  * 3. This notice may not be removed or altered from any source distribution. *
  */";
 
-
+#define USE_DEFINE_ALIAS_P
 
 /* Definitions for data structures used to represent pre-parsed C headers
  * definition files, as well as helper functions used to construct system
@@ -869,6 +869,43 @@ class FunctionPrototype {
 		cprintArgumentListWithoutTypes(fp, escapeMode);
 		fp << ")\n";
 	}
+
+#ifdef USE_DEFINE_ALIAS_P
+	@@Print a declaration akin to:
+	@@> (strlen,ATTR_WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,LIBCCALL,libc_strlen,(char const *__str),(__str))
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintDefineAliasPParamList(
+			fp: CWriter, escapeMode: int,
+			newName: string, oldName: string) {
+		local isVoidReturn = returnType.isVoid;
+		if (isVoidReturn)
+			fp << "_VOID";
+		fp << "(" << newName << "," << oldName << ",";
+		/* Attributes */
+		cprintAttributeList(fp, escapeMode, true);
+		/* Return type */
+		fp << ",";
+		if (!isVoidReturn) {
+			returnType.cprint(fp, escapeMode);
+			fp << ",";
+		}
+		/* NOTHROW behavior */
+		escapeTextIntoFile(fp, isNothrowThrowing
+			? nothrowThrowingSpec
+			: nothrow, escapeMode);
+		fp << ",";
+		/* Calling convention */
+		escapeTextIntoFile(fp, cc, escapeMode);
+		/* Assembly import symbol name */
+		fp << ",";
+		/* Argument list */
+		cprintArgumentListWithTypes(fp, escapeMode);
+		fp << ",";
+		/* Argument names */
+		cprintArgumentListWithoutTypes(fp, escapeMode);
+		fp << ")";
+	}
+#endif /* USE_DEFINE_ALIAS_P */
 
 	@@Print a declaration akin to:
 	@@> __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t
@@ -3623,9 +3660,13 @@ class LibraryFunction {
 				} else if (impl is MacroBinding) {
 					/* Don't generate code for this case! */
 				} else {
-					fp << "DEFINE_" << decl << "_ALIAS("
-						<< this.name << ", "
-						<< impl << ");\n";
+#ifdef USE_DEFINE_ALIAS_P
+					fp << "DEFINE_" << decl << "_ALIAS_P";
+					proto.cprintDefineAliasPParamList(fp, escapeMode, this.name, impl);
+					fp << ";\n";
+#else /* USE_DEFINE_ALIAS_P */
+					fp << "DEFINE_" << decl << "_ALIAS(" << this.name << ", " << impl << ");\n";
+#endif /* !USE_DEFINE_ALIAS_P */
 				}
 			}
 			fp.ppEndifN(numAdditionalEndifs);
@@ -3674,7 +3715,13 @@ class LibraryFunction {
 			CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 			if (!symbolName.issymbol())
 				symbolName = repr(symbolName);
+#ifdef USE_DEFINE_ALIAS_P
+			fp << "DEFINE_PUBLIC_ALIAS_P";
+			functionPrototype.cprintDefineAliasPParamList(fp, escapeMode, symbolName, this.name);
+			fp << ";\n";
+#else /* USE_DEFINE_ALIAS_P */
 			fp << "DEFINE_PUBLIC_ALIAS(" << symbolName << ", " << this.name << ");\n";
+#endif /* !USE_DEFINE_ALIAS_P */
 			fp.ppEndif();
 		}
 		if (!hasUniversalBinding)
@@ -4001,8 +4048,13 @@ class SystemHeader {
 				CWriter_ppIfEscaped(fp, ppCond, ESCAPE_MODE_NONE);
 				if (!asmname.issymbol())
 					asmname = repr(asmname);
-				fp << "DEFINE_PUBLIC_ALIAS("
-					<< asmname << ", " << part.name << ");\n";
+#ifdef USE_DEFINE_ALIAS_P
+				fp << "DEFINE_PUBLIC_ALIAS_P";
+				part.functionPrototype.cprintDefineAliasPParamList(fp, ESCAPE_MODE_NONE, asmname, part.name);
+				fp << ";\n";
+#else /* USE_DEFINE_ALIAS_P */
+				fp << "DEFINE_PUBLIC_ALIAS(" << asmname << ", " << part.name << ");\n";
+#endif /* !USE_DEFINE_ALIAS_P */
 				fp.ppEndif();
 			}
 			fp.ppEndif();

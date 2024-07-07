@@ -156,17 +156,17 @@ NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x570fae3d]]]*/
-DEFINE_PUBLIC_ALIAS(setutxent, libc_setutxent);
-DEFINE_PUBLIC_ALIAS(endutxent, libc_endutxent);
-DEFINE_PUBLIC_ALIAS(getutxent, libc_getutxent);
-DEFINE_PUBLIC_ALIAS(getutxid, libc_getutxid);
-DEFINE_PUBLIC_ALIAS(getutxline, libc_getutxline);
-DEFINE_PUBLIC_ALIAS(pututxline, libc_pututxline);
-DEFINE_PUBLIC_ALIAS(utmpxname, libc_utmpxname);
-DEFINE_PUBLIC_ALIAS(updwtmpx, libc_updwtmpx);
-DEFINE_PUBLIC_ALIAS(getutmp, libc_getutmp);
-DEFINE_PUBLIC_ALIAS(getutmpx, libc_getutmpx);
+/*[[[start:exports,hash:CRC-32=0xc77dc47f]]]*/
+DEFINE_PUBLIC_ALIAS_P_VOID(setutxent,libc_setutxent,,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(endutxent,libc_endutxent,,NOTHROW_RPC_NOKOS,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getutxent,libc_getutxent,,struct utmpx *,NOTHROW_RPC,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(getutxid,libc_getutxid,,struct utmpx *,NOTHROW_RPC,LIBCCALL,(struct utmpx const *id),(id));
+DEFINE_PUBLIC_ALIAS_P(getutxline,libc_getutxline,,struct utmpx *,NOTHROW_RPC,LIBCCALL,(struct utmpx const *line),(line));
+DEFINE_PUBLIC_ALIAS_P(pututxline,libc_pututxline,,struct utmpx *,NOTHROW_RPC,LIBCCALL,(struct utmpx const *utmpx),(utmpx));
+DEFINE_PUBLIC_ALIAS_P(utmpxname,libc_utmpxname,,int,NOTHROW_RPC,LIBCCALL,(char const *file),(file));
+DEFINE_PUBLIC_ALIAS_P_VOID(updwtmpx,libc_updwtmpx,,NOTHROW_RPC,LIBCCALL,(char const *wtmpx_file, struct utmpx const *utmpx),(wtmpx_file,utmpx));
+DEFINE_PUBLIC_ALIAS_P_VOID(getutmp,libc_getutmp,,NOTHROW_RPC,LIBCCALL,(struct utmpx const *utmpx, struct utmp *utmp),(utmpx,utmp));
+DEFINE_PUBLIC_ALIAS_P_VOID(getutmpx,libc_getutmpx,,NOTHROW_RPC,LIBCCALL,(struct utmp const *utmp, struct utmpx *utmpx),(utmp,utmpx));
 /*[[[end:exports]]]*/
 
 DECL_END

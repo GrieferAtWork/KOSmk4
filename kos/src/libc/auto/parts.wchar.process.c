@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cc87923 */
+/* HASH CRC-32:0xa98a492a */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -582,54 +582,54 @@ NOTHROW_RPC(VLIBKCALL libc_wspawnlpe)(__STDC_INT_AS_UINT_T mode,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(DOS$_wexecv, libd_wexecv);
-DEFINE_PUBLIC_ALIAS(DOS$wexecv, libd_wexecv);
-DEFINE_PUBLIC_ALIAS(wexecv, libc_wexecv);
-DEFINE_PUBLIC_ALIAS(DOS$_wexecve, libd_wexecve);
-DEFINE_PUBLIC_ALIAS(DOS$wexecve, libd_wexecve);
-DEFINE_PUBLIC_ALIAS(wexecve, libc_wexecve);
-DEFINE_PUBLIC_ALIAS(DOS$_wexecvp, libd_wexecvp);
-DEFINE_PUBLIC_ALIAS(DOS$wexecvp, libd_wexecvp);
-DEFINE_PUBLIC_ALIAS(wexecvp, libc_wexecvp);
-DEFINE_PUBLIC_ALIAS(DOS$_wexecvpe, libd_wexecvpe);
-DEFINE_PUBLIC_ALIAS(DOS$wexecvpe, libd_wexecvpe);
-DEFINE_PUBLIC_ALIAS(wexecvpe, libc_wexecvpe);
-DEFINE_PUBLIC_ALIAS(DOS$_wexecl, libd_wexecl);
-DEFINE_PUBLIC_ALIAS(DOS$wexecl, libd_wexecl);
-DEFINE_PUBLIC_ALIAS(wexecl, libc_wexecl);
-DEFINE_PUBLIC_ALIAS(DOS$_wexecle, libd_wexecle);
-DEFINE_PUBLIC_ALIAS(DOS$wexecle, libd_wexecle);
-DEFINE_PUBLIC_ALIAS(wexecle, libc_wexecle);
-DEFINE_PUBLIC_ALIAS(DOS$_wexeclp, libd_wexeclp);
-DEFINE_PUBLIC_ALIAS(DOS$wexeclp, libd_wexeclp);
-DEFINE_PUBLIC_ALIAS(wexeclp, libc_wexeclp);
-DEFINE_PUBLIC_ALIAS(DOS$_wexeclpe, libd_wexeclpe);
-DEFINE_PUBLIC_ALIAS(DOS$wexeclpe, libd_wexeclpe);
-DEFINE_PUBLIC_ALIAS(wexeclpe, libc_wexeclpe);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnv, libd_wspawnv);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnv, libd_wspawnv);
-DEFINE_PUBLIC_ALIAS(wspawnv, libc_wspawnv);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnve, libd_wspawnve);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnve, libd_wspawnve);
-DEFINE_PUBLIC_ALIAS(wspawnve, libc_wspawnve);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnvp, libd_wspawnvp);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnvp, libd_wspawnvp);
-DEFINE_PUBLIC_ALIAS(wspawnvp, libc_wspawnvp);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnvpe, libd_wspawnvpe);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnvpe, libd_wspawnvpe);
-DEFINE_PUBLIC_ALIAS(wspawnvpe, libc_wspawnvpe);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnl, libd_wspawnl);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnl, libd_wspawnl);
-DEFINE_PUBLIC_ALIAS(wspawnl, libc_wspawnl);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnle, libd_wspawnle);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnle, libd_wspawnle);
-DEFINE_PUBLIC_ALIAS(wspawnle, libc_wspawnle);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnlp, libd_wspawnlp);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnlp, libd_wspawnlp);
-DEFINE_PUBLIC_ALIAS(wspawnlp, libc_wspawnlp);
-DEFINE_PUBLIC_ALIAS(DOS$_wspawnlpe, libd_wspawnlpe);
-DEFINE_PUBLIC_ALIAS(DOS$wspawnlpe, libd_wspawnlpe);
-DEFINE_PUBLIC_ALIAS(wspawnlpe, libc_wspawnlpe);
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecv,libd_wexecv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict path, __T16ARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecv,libd_wexecv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict path, __T16ARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(wexecv,libc_wexecv,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *__restrict path, __T32ARGV),(path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecve,libd_wexecve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict path, __T16ARGV, __T16ENVP),(path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecve,libd_wexecve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict path, __T16ARGV, __T16ENVP),(path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(wexecve,libc_wexecve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBKCALL,(char32_t const *__restrict path, __T32ARGV, __T32ENVP),(path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecvp,libd_wexecvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict file, __T16ARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecvp,libd_wexecvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict file, __T16ARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(wexecvp,libc_wexecvp,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBKCALL,(char32_t const *__restrict file, __T32ARGV),(file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecvpe,libd_wexecvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict file, __T16ARGV, __T16ENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecvpe,libd_wexecvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char16_t const *__restrict file, __T16ARGV, __T16ENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(wexecvpe,libc_wexecvpe,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBKCALL,(char32_t const *__restrict file, __T32ARGV, __T32ENVP),(file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecl,libd_wexecl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict path, char16_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecl,libd_wexecl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict path, char16_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(wexecl,libc_wexecl,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBKCALL,(char32_t const *__restrict path, char32_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexecle,libd_wexecle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict path, char16_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexecle,libd_wexecle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict path, char16_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(wexecle,libc_wexecle,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBKCALL,(char32_t const *__restrict path, char32_t const *args, ...),(path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexeclp,libd_wexeclp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict file, char16_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexeclp,libd_wexeclp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict file, char16_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(wexeclp,libc_wexeclp,ATTR_SENTINEL ATTR_IN(1) ATTR_IN_OPT(2),int,NOTHROW_RPC,VLIBKCALL,(char32_t const *__restrict file, char32_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wexeclpe,libd_wexeclpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict file, char16_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wexeclpe,libd_wexeclpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBDCALL,(char16_t const *__restrict file, char16_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(wexeclpe,libc_wexeclpe,ATTR_IN(1) ATTR_IN_OPT(2) ATTR_SENTINEL_O(1),int,NOTHROW_RPC,VLIBKCALL,(char32_t const *__restrict file, char32_t const *args, ...),(file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnv,libd_wspawnv,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, __T16ARGV),(mode,path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnv,libd_wspawnv,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, __T16ARGV),(mode,path,___argv));
+DEFINE_PUBLIC_ALIAS_P(wspawnv,libc_wspawnv,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict path, __T32ARGV),(mode,path,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnve,libd_wspawnve,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, __T16ARGV, __T16ENVP),(mode,path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnve,libd_wspawnve,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, __T16ARGV, __T16ENVP),(mode,path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(wspawnve,libc_wspawnve,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict path, __T32ARGV, __T32ENVP),(mode,path,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnvp,libd_wspawnvp,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, __T16ARGV),(mode,file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnvp,libd_wspawnvp,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, __T16ARGV),(mode,file,___argv));
+DEFINE_PUBLIC_ALIAS_P(wspawnvp,libc_wspawnvp,ATTR_IN(2) ATTR_IN(3),pid_t,NOTHROW_RPC,LIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, __T32ARGV),(mode,file,___argv));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnvpe,libd_wspawnvpe,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, __T16ARGV, __T16ENVP),(mode,file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnvpe,libd_wspawnvpe,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, __T16ARGV, __T16ENVP),(mode,file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(wspawnvpe,libc_wspawnvpe,ATTR_IN(2) ATTR_IN(3) ATTR_IN(4),pid_t,NOTHROW_RPC,LIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, __T32ARGV, __T32ENVP),(mode,file,___argv,___envp));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnl,libd_wspawnl,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, char16_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnl,libd_wspawnl,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, char16_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(wspawnl,libc_wspawnl,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict path, char32_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnle,libd_wspawnle,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, char16_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnle,libd_wspawnle,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict path, char16_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(wspawnle,libc_wspawnle,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict path, char32_t const *args, ...),(mode,path,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnlp,libd_wspawnlp,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, char16_t const *args, ...),(mode,file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnlp,libd_wspawnlp,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, char16_t const *args, ...),(mode,file,args,));
+DEFINE_PUBLIC_ALIAS_P(wspawnlp,libc_wspawnlp,ATTR_SENTINEL ATTR_IN(2) ATTR_IN_OPT(3),pid_t,NOTHROW_RPC,VLIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, char32_t const *args, ...),(mode,file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$_wspawnlpe,libd_wspawnlpe,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, char16_t const *args, ...),(mode,file,args,));
+DEFINE_PUBLIC_ALIAS_P(DOS$wspawnlpe,libd_wspawnlpe,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBDCALL,(__STDC_INT_AS_UINT_T mode, char16_t const *__restrict file, char16_t const *args, ...),(mode,file,args,));
+DEFINE_PUBLIC_ALIAS_P(wspawnlpe,libc_wspawnlpe,ATTR_IN(2) ATTR_IN_OPT(3) ATTR_SENTINEL_O(1),pid_t,NOTHROW_RPC,VLIBKCALL,(__STDC_INT_AS_UINT_T mode, char32_t const *__restrict file, char32_t const *args, ...),(mode,file,args,));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_PROCESS_C */

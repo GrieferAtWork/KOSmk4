@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9819bf64 */
+/* HASH CRC-32:0x619aebe9 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ NOTHROW(LIBCCALL libc___p_program_invocation_short_name)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__p_program_invocation_short_name, libc___p_program_invocation_short_name);
+DEFINE_PUBLIC_ALIAS_P(__p_program_invocation_short_name,libc___p_program_invocation_short_name,ATTR_CONST ATTR_RETNONNULL WUNUSED,char **,NOTHROW,LIBCCALL,(void),());
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ERRNO_C */

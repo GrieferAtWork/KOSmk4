@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x236dd353 */
+/* HASH CRC-32:0xfcce0a2d */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc__cchshf)(float x,
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc__cchshl, libc__cchsh);
+DEFINE_INTERN_ALIAS_P_VOID(libc__cchshl,libc__cchsh,ATTR_OUT(2) ATTR_OUT(3),NOTHROW_NCX,LIBCCALL,(__LONGDOUBLE x, __LONGDOUBLE *c, __LONGDOUBLE *s),(x,c,s));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* calculate cosh and sinh */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
@@ -249,7 +249,7 @@ NOTHROW(LIBCCALL libc__redupif)(float x) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc__redupil, libc__redupi);
+DEFINE_INTERN_ALIAS_P(libc__redupil,libc__redupi,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
@@ -466,7 +466,7 @@ NOTHROW(LIBCCALL libc__ctansf)(float _Complex z) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc__ctansl, libc__ctans);
+DEFINE_INTERN_ALIAS_P(libc__ctansl,libc__ctans,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -2463,7 +2463,7 @@ NOTHROW(LIBCCALL libc_cproj)(double _Complex z) {
 }
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cabsl, libc_cabs);
+DEFINE_INTERN_ALIAS_P(libc_cabsl,libc_cabs,,__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_cabsl)(long double _Complex z) {
@@ -2505,7 +2505,7 @@ NOTHROW_NCX(LIBCCALL libc_cabsl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cexpl, libc_cexp);
+DEFINE_INTERN_ALIAS_P(libc_cexpl,libc_cexp,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2556,7 +2556,7 @@ NOTHROW_NCX(LIBCCALL libc_cexpl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_clogl, libc_clog);
+DEFINE_INTERN_ALIAS_P(libc_clogl,libc_clog,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2605,7 +2605,7 @@ NOTHROW_NCX(LIBCCALL libc_clogl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cpowl, libc_cpow);
+DEFINE_INTERN_ALIAS_P(libc_cpowl,libc_cpow,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex a, long double _Complex z),(a,z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2666,7 +2666,7 @@ NOTHROW_NCX(LIBCCALL libc_cpowl)(long double _Complex a,
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_csqrtl, libc_csqrt);
+DEFINE_INTERN_ALIAS_P(libc_csqrtl,libc_csqrt,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/floatcore.h>
 #include <bits/math-constants.h>
@@ -2835,7 +2835,7 @@ NOTHROW_NCX(LIBCCALL libc_csqrtl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_csinl, libc_csin);
+DEFINE_INTERN_ALIAS_P(libc_csinl,libc_csin,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2884,7 +2884,7 @@ NOTHROW_NCX(LIBCCALL libc_csinl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ccosl, libc_ccos);
+DEFINE_INTERN_ALIAS_P(libc_ccosl,libc_ccos,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2933,7 +2933,7 @@ NOTHROW_NCX(LIBCCALL libc_ccosl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ctanl, libc_ctan);
+DEFINE_INTERN_ALIAS_P(libc_ctanl,libc_ctan,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 #include <hybrid/floatcore.h>
@@ -2990,7 +2990,7 @@ NOTHROW_NCX(LIBCCALL libc_ctanl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_casinl, libc_casin);
+DEFINE_INTERN_ALIAS_P(libc_casinl,libc_casin,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3050,7 +3050,7 @@ NOTHROW_NCX(LIBCCALL libc_casinl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cacosl, libc_cacos);
+DEFINE_INTERN_ALIAS_P(libc_cacosl,libc_cacos,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3100,7 +3100,7 @@ NOTHROW_NCX(LIBCCALL libc_cacosl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_catanl, libc_catan);
+DEFINE_INTERN_ALIAS_P(libc_catanl,libc_catan,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 #include <hybrid/floatcore.h>
@@ -3167,7 +3167,7 @@ ovrf:
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_csinhl, libc_csinh);
+DEFINE_INTERN_ALIAS_P(libc_csinhl,libc_csinh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3217,7 +3217,7 @@ NOTHROW_NCX(LIBCCALL libc_csinhl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ccoshl, libc_ccosh);
+DEFINE_INTERN_ALIAS_P(libc_ccoshl,libc_ccosh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3267,7 +3267,7 @@ NOTHROW_NCX(LIBCCALL libc_ccoshl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_ctanhl, libc_ctanh);
+DEFINE_INTERN_ALIAS_P(libc_ctanhl,libc_ctanh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3318,7 +3318,7 @@ NOTHROW_NCX(LIBCCALL libc_ctanhl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_casinhl, libc_casinh);
+DEFINE_INTERN_ALIAS_P(libc_casinhl,libc_casinh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_casinhl)(long double _Complex z) {
@@ -3362,7 +3362,7 @@ NOTHROW_NCX(LIBCCALL libc_casinhl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cacoshl, libc_cacosh);
+DEFINE_INTERN_ALIAS_P(libc_cacoshl,libc_cacosh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cacoshl)(long double _Complex z) {
@@ -3406,7 +3406,7 @@ NOTHROW_NCX(LIBCCALL libc_cacoshl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_catanhl, libc_catanh);
+DEFINE_INTERN_ALIAS_P(libc_catanhl,libc_catanh,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_catanhl)(long double _Complex z) {
@@ -3450,7 +3450,7 @@ NOTHROW_NCX(LIBCCALL libc_catanhl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cargl, libc_carg);
+DEFINE_INTERN_ALIAS_P(libc_cargl,libc_carg,WUNUSED,__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z) {
@@ -3463,7 +3463,7 @@ NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_conjl, libc_conj);
+DEFINE_INTERN_ALIAS_P(libc_conjl,libc_conj,ATTR_CONST WUNUSED,long double _Complex,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
 NOTHROW(LIBCCALL libc_conjl)(long double _Complex z) {
@@ -3478,7 +3478,7 @@ NOTHROW(LIBCCALL libc_conjl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_creall, libc_creal);
+DEFINE_INTERN_ALIAS_P(libc_creall,libc_creal,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_creall)(long double _Complex z) {
@@ -3492,7 +3492,7 @@ NOTHROW(LIBCCALL libc_creall)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cimagl, libc_cimag);
+DEFINE_INTERN_ALIAS_P(libc_cimagl,libc_cimag,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_cimagl)(long double _Complex z) {
@@ -3506,7 +3506,7 @@ NOTHROW(LIBCCALL libc_cimagl)(long double _Complex z) {
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
-DEFINE_INTERN_ALIAS(libc_cprojl, libc_cproj);
+DEFINE_INTERN_ALIAS_P(libc_cprojl,libc_cproj,ATTR_CONST WUNUSED,long double _Complex,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/math-constants.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
@@ -3532,78 +3532,78 @@ NOTHROW(LIBCCALL libc_cprojl)(long double _Complex z) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(__cabsf, libc_cabsf);
-DEFINE_PUBLIC_ALIAS(cabsf, libc_cabsf);
-DEFINE_PUBLIC_ALIAS(cexpf, libc_cexpf);
-DEFINE_PUBLIC_ALIAS(clogf, libc_clogf);
-DEFINE_PUBLIC_ALIAS(cpowf, libc_cpowf);
-DEFINE_PUBLIC_ALIAS(csqrtf, libc_csqrtf);
-DEFINE_PUBLIC_ALIAS(csinf, libc_csinf);
-DEFINE_PUBLIC_ALIAS(ccosf, libc_ccosf);
-DEFINE_PUBLIC_ALIAS(ctanf, libc_ctanf);
-DEFINE_PUBLIC_ALIAS(casinf, libc_casinf);
-DEFINE_PUBLIC_ALIAS(cacosf, libc_cacosf);
-DEFINE_PUBLIC_ALIAS(catanf, libc_catanf);
-DEFINE_PUBLIC_ALIAS(csinhf, libc_csinhf);
-DEFINE_PUBLIC_ALIAS(ccoshf, libc_ccoshf);
-DEFINE_PUBLIC_ALIAS(ctanhf, libc_ctanhf);
-DEFINE_PUBLIC_ALIAS(casinhf, libc_casinhf);
-DEFINE_PUBLIC_ALIAS(cacoshf, libc_cacoshf);
-DEFINE_PUBLIC_ALIAS(catanhf, libc_catanhf);
-DEFINE_PUBLIC_ALIAS(cargf, libc_cargf);
-DEFINE_PUBLIC_ALIAS(conjf, libc_conjf);
-DEFINE_PUBLIC_ALIAS(crealf, libc_crealf);
-DEFINE_PUBLIC_ALIAS(cimagf, libc_cimagf);
-DEFINE_PUBLIC_ALIAS(cprojf, libc_cprojf);
+DEFINE_PUBLIC_ALIAS_P(__cabsf,libc_cabsf,,float,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cabsf,libc_cabsf,,float,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cexpf,libc_cexpf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(clogf,libc_clogf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cpowf,libc_cpowf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex a, float _Complex z),(a,z));
+DEFINE_PUBLIC_ALIAS_P(csqrtf,libc_csqrtf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csinf,libc_csinf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccosf,libc_ccosf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctanf,libc_ctanf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casinf,libc_casinf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacosf,libc_cacosf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catanf,libc_catanf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csinhf,libc_csinhf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccoshf,libc_ccoshf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctanhf,libc_ctanhf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casinhf,libc_casinhf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacoshf,libc_cacoshf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catanhf,libc_catanhf,WUNUSED,float _Complex,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cargf,libc_cargf,WUNUSED,float,NOTHROW_NCX,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(conjf,libc_conjf,ATTR_CONST WUNUSED,float _Complex,NOTHROW,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(crealf,libc_crealf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cimagf,libc_cimagf,ATTR_CONST WUNUSED,float,NOTHROW,LIBCCALL,(float _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cprojf,libc_cprojf,ATTR_CONST WUNUSED,float _Complex,NOTHROW,LIBCCALL,(float _Complex z),(z));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_cabs, libc_cabs);
+DEFINE_PUBLIC_ALIAS_P(_cabs,libc_cabs,,double,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__cabs, libc_cabs);
-DEFINE_PUBLIC_ALIAS(cabs, libc_cabs);
-DEFINE_PUBLIC_ALIAS(cexp, libc_cexp);
-DEFINE_PUBLIC_ALIAS(clog, libc_clog);
-DEFINE_PUBLIC_ALIAS(cpow, libc_cpow);
-DEFINE_PUBLIC_ALIAS(csqrt, libc_csqrt);
-DEFINE_PUBLIC_ALIAS(csin, libc_csin);
-DEFINE_PUBLIC_ALIAS(ccos, libc_ccos);
-DEFINE_PUBLIC_ALIAS(ctan, libc_ctan);
-DEFINE_PUBLIC_ALIAS(casin, libc_casin);
-DEFINE_PUBLIC_ALIAS(cacos, libc_cacos);
-DEFINE_PUBLIC_ALIAS(catan, libc_catan);
-DEFINE_PUBLIC_ALIAS(csinh, libc_csinh);
-DEFINE_PUBLIC_ALIAS(ccosh, libc_ccosh);
-DEFINE_PUBLIC_ALIAS(ctanh, libc_ctanh);
-DEFINE_PUBLIC_ALIAS(casinh, libc_casinh);
-DEFINE_PUBLIC_ALIAS(cacosh, libc_cacosh);
-DEFINE_PUBLIC_ALIAS(catanh, libc_catanh);
-DEFINE_PUBLIC_ALIAS(carg, libc_carg);
-DEFINE_PUBLIC_ALIAS(conj, libc_conj);
-DEFINE_PUBLIC_ALIAS(creal, libc_creal);
-DEFINE_PUBLIC_ALIAS(cimag, libc_cimag);
-DEFINE_PUBLIC_ALIAS(cproj, libc_cproj);
-DEFINE_PUBLIC_ALIAS(__cabsl, libc_cabsl);
-DEFINE_PUBLIC_ALIAS(cabsl, libc_cabsl);
-DEFINE_PUBLIC_ALIAS(cexpl, libc_cexpl);
-DEFINE_PUBLIC_ALIAS(clogl, libc_clogl);
-DEFINE_PUBLIC_ALIAS(cpowl, libc_cpowl);
-DEFINE_PUBLIC_ALIAS(csqrtl, libc_csqrtl);
-DEFINE_PUBLIC_ALIAS(csinl, libc_csinl);
-DEFINE_PUBLIC_ALIAS(ccosl, libc_ccosl);
-DEFINE_PUBLIC_ALIAS(ctanl, libc_ctanl);
-DEFINE_PUBLIC_ALIAS(casinl, libc_casinl);
-DEFINE_PUBLIC_ALIAS(cacosl, libc_cacosl);
-DEFINE_PUBLIC_ALIAS(catanl, libc_catanl);
-DEFINE_PUBLIC_ALIAS(csinhl, libc_csinhl);
-DEFINE_PUBLIC_ALIAS(ccoshl, libc_ccoshl);
-DEFINE_PUBLIC_ALIAS(ctanhl, libc_ctanhl);
-DEFINE_PUBLIC_ALIAS(casinhl, libc_casinhl);
-DEFINE_PUBLIC_ALIAS(cacoshl, libc_cacoshl);
-DEFINE_PUBLIC_ALIAS(catanhl, libc_catanhl);
-DEFINE_PUBLIC_ALIAS(cargl, libc_cargl);
-DEFINE_PUBLIC_ALIAS(conjl, libc_conjl);
-DEFINE_PUBLIC_ALIAS(creall, libc_creall);
-DEFINE_PUBLIC_ALIAS(cimagl, libc_cimagl);
-DEFINE_PUBLIC_ALIAS(cprojl, libc_cprojl);
+DEFINE_PUBLIC_ALIAS_P(__cabs,libc_cabs,,double,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cabs,libc_cabs,,double,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cexp,libc_cexp,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(clog,libc_clog,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cpow,libc_cpow,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex a, double _Complex z),(a,z));
+DEFINE_PUBLIC_ALIAS_P(csqrt,libc_csqrt,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csin,libc_csin,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccos,libc_ccos,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctan,libc_ctan,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casin,libc_casin,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacos,libc_cacos,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catan,libc_catan,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csinh,libc_csinh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccosh,libc_ccosh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctanh,libc_ctanh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casinh,libc_casinh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacosh,libc_cacosh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catanh,libc_catanh,WUNUSED,double _Complex,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(carg,libc_carg,WUNUSED,double,NOTHROW_NCX,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(conj,libc_conj,ATTR_CONST WUNUSED,double _Complex,NOTHROW,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(creal,libc_creal,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cimag,libc_cimag,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cproj,libc_cproj,ATTR_CONST WUNUSED,double _Complex,NOTHROW,LIBCCALL,(double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(__cabsl,libc_cabsl,,__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cabsl,libc_cabsl,,__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cexpl,libc_cexpl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(clogl,libc_clogl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cpowl,libc_cpowl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex a, long double _Complex z),(a,z));
+DEFINE_PUBLIC_ALIAS_P(csqrtl,libc_csqrtl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csinl,libc_csinl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccosl,libc_ccosl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctanl,libc_ctanl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casinl,libc_casinl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacosl,libc_cacosl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catanl,libc_catanl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(csinhl,libc_csinhl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ccoshl,libc_ccoshl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(ctanhl,libc_ctanhl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(casinhl,libc_casinhl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cacoshl,libc_cacoshl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(catanhl,libc_catanhl,WUNUSED,long double _Complex,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cargl,libc_cargl,WUNUSED,__LONGDOUBLE,NOTHROW_NCX,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(conjl,libc_conjl,ATTR_CONST WUNUSED,long double _Complex,NOTHROW,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(creall,libc_creall,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cimagl,libc_cimagl,ATTR_CONST WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(long double _Complex z),(z));
+DEFINE_PUBLIC_ALIAS_P(cprojl,libc_cprojl,ATTR_CONST WUNUSED,long double _Complex,NOTHROW,LIBCCALL,(long double _Complex z),(z));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_COMPLEX_C */

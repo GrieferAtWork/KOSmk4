@@ -441,32 +441,32 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x411506f3]]]*/
-DEFINE_PUBLIC_ALIAS(bindresvport, libc_bindresvport);
-DEFINE_PUBLIC_ALIAS(bindresvport6, libc_bindresvport6);
-DEFINE_PUBLIC_ALIAS(inet6_option_space, libc_inet6_option_space);
-DEFINE_PUBLIC_ALIAS(inet6_option_init, libc_inet6_option_init);
-DEFINE_PUBLIC_ALIAS(inet6_option_append, libc_inet6_option_append);
-DEFINE_PUBLIC_ALIAS(inet6_option_alloc, libc_inet6_option_alloc);
-DEFINE_PUBLIC_ALIAS(inet6_option_next, libc_inet6_option_next);
-DEFINE_PUBLIC_ALIAS(inet6_option_find, libc_inet6_option_find);
-DEFINE_PUBLIC_ALIAS(inet6_opt_init, libc_inet6_opt_init);
-DEFINE_PUBLIC_ALIAS(inet6_opt_append, libc_inet6_opt_append);
-DEFINE_PUBLIC_ALIAS(inet6_opt_finish, libc_inet6_opt_finish);
-DEFINE_PUBLIC_ALIAS(inet6_opt_set_val, libc_inet6_opt_set_val);
-DEFINE_PUBLIC_ALIAS(inet6_opt_next, libc_inet6_opt_next);
-DEFINE_PUBLIC_ALIAS(inet6_opt_find, libc_inet6_opt_find);
-DEFINE_PUBLIC_ALIAS(inet6_opt_get_val, libc_inet6_opt_get_val);
-DEFINE_PUBLIC_ALIAS(inet6_rth_space, libc_inet6_rth_space);
-DEFINE_PUBLIC_ALIAS(inet6_rth_init, libc_inet6_rth_init);
-DEFINE_PUBLIC_ALIAS(inet6_rth_add, libc_inet6_rth_add);
-DEFINE_PUBLIC_ALIAS(inet6_rth_reverse, libc_inet6_rth_reverse);
-DEFINE_PUBLIC_ALIAS(inet6_rth_segments, libc_inet6_rth_segments);
-DEFINE_PUBLIC_ALIAS(inet6_rth_getaddr, libc_inet6_rth_getaddr);
-DEFINE_PUBLIC_ALIAS(getipv4sourcefilter, libc_getipv4sourcefilter);
-DEFINE_PUBLIC_ALIAS(setipv4sourcefilter, libc_setipv4sourcefilter);
-DEFINE_PUBLIC_ALIAS(getsourcefilter, libc_getsourcefilter);
-DEFINE_PUBLIC_ALIAS(setsourcefilter, libc_setsourcefilter);
+/*[[[start:exports,hash:CRC-32=0x55bdd1ee]]]*/
+DEFINE_PUBLIC_ALIAS_P(bindresvport,libc_bindresvport,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct sockaddr_in *sock_in),(sockfd,sock_in));
+DEFINE_PUBLIC_ALIAS_P(bindresvport6,libc_bindresvport6,ATTR_FDARG(1),int,NOTHROW_RPC,LIBCCALL,(fd_t sockfd, struct sockaddr_in6 *sock_in),(sockfd,sock_in));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_space,libc_inet6_option_space,,int,NOTHROW_RPC_KOS,LIBCCALL,(int nbytes),(nbytes));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_init,libc_inet6_option_init,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *bp, struct cmsghdr **cmsgp, int type),(bp,cmsgp,type));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_append,libc_inet6_option_append,,int,NOTHROW_RPC_KOS,LIBCCALL,(struct cmsghdr *cmsg, uint8_t const *typep, int multx, int plusy),(cmsg,typep,multx,plusy));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_alloc,libc_inet6_option_alloc,,uint8_t *,NOTHROW_RPC_KOS,LIBCCALL,(struct cmsghdr *cmsg, int datalen, int multx, int plusy),(cmsg,datalen,multx,plusy));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_next,libc_inet6_option_next,,int,NOTHROW_RPC_KOS,LIBCCALL,(struct cmsghdr const *cmsg, uint8_t **tptrp),(cmsg,tptrp));
+DEFINE_PUBLIC_ALIAS_P(inet6_option_find,libc_inet6_option_find,,int,NOTHROW_RPC_KOS,LIBCCALL,(struct cmsghdr const *cmsg, uint8_t **tptrp, int type),(cmsg,tptrp,type));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_init,libc_inet6_opt_init,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *extbuf, socklen_t extlen),(extbuf,extlen));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_append,libc_inet6_opt_append,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *extbuf, socklen_t extlen, int offset, uint8_t type, socklen_t len, uint8_t align, void **databufp),(extbuf,extlen,offset,type,len,align,databufp));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_finish,libc_inet6_opt_finish,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *extbuf, socklen_t extlen, int offset),(extbuf,extlen,offset));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_set_val,libc_inet6_opt_set_val,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *databuf, int offset, void *val, socklen_t vallen),(databuf,offset,val,vallen));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_next,libc_inet6_opt_next,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *extbuf, socklen_t extlen, int offset, uint8_t *typep, socklen_t *lenp, void **databufp),(extbuf,extlen,offset,typep,lenp,databufp));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_find,libc_inet6_opt_find,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *extbuf, socklen_t extlen, int offset, uint8_t type, socklen_t *lenp, void **databufp),(extbuf,extlen,offset,type,lenp,databufp));
+DEFINE_PUBLIC_ALIAS_P(inet6_opt_get_val,libc_inet6_opt_get_val,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *databuf, int offset, void *val, socklen_t vallen),(databuf,offset,val,vallen));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_space,libc_inet6_rth_space,,socklen_t,NOTHROW_RPC_KOS,LIBCCALL,(int type, int segments),(type,segments));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_init,libc_inet6_rth_init,,void *,NOTHROW_RPC_KOS,LIBCCALL,(void *bp, socklen_t bp_len, int type, int segments),(bp,bp_len,type,segments));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_add,libc_inet6_rth_add,,int,NOTHROW_RPC_KOS,LIBCCALL,(void *bp, struct in6_addr const *addr),(bp,addr));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_reverse,libc_inet6_rth_reverse,,int,NOTHROW_RPC_KOS,LIBCCALL,(void const *in, void *out),(in,out));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_segments,libc_inet6_rth_segments,,int,NOTHROW_RPC_KOS,LIBCCALL,(void const *bp),(bp));
+DEFINE_PUBLIC_ALIAS_P(inet6_rth_getaddr,libc_inet6_rth_getaddr,,struct in6_addr *,NOTHROW_RPC_KOS,LIBCCALL,(void const *bp, int index),(bp,index));
+DEFINE_PUBLIC_ALIAS_P(getipv4sourcefilter,libc_getipv4sourcefilter,ATTR_FDARG(1),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist),(sockfd,interface_addr,group,fmode,numsrc,slist));
+DEFINE_PUBLIC_ALIAS_P(setipv4sourcefilter,libc_setipv4sourcefilter,ATTR_FDARG(1),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, struct in_addr const *slist),(sockfd,interface_addr,group,fmode,numsrc,slist));
+DEFINE_PUBLIC_ALIAS_P(getsourcefilter,libc_getsourcefilter,ATTR_FDARG(1),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist),(sockfd,interface_addr,group,grouplen,fmode,numsrc,slist));
+DEFINE_PUBLIC_ALIAS_P(setsourcefilter,libc_setsourcefilter,ATTR_FDARG(1),int,NOTHROW_RPC_KOS,LIBCCALL,(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, struct sockaddr_storage const *slist),(sockfd,interface_addr,group,grouplen,fmode,numsrc,slist));
 /*[[[end:exports]]]*/
 
 DECL_END

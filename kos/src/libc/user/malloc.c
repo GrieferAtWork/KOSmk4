@@ -1147,16 +1147,16 @@ NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfdd7a9ce]]]*/
-DEFINE_PUBLIC_ALIAS(__memdup, libc_memdup);
-DEFINE_PUBLIC_ALIAS(memdup, libc_memdup);
-DEFINE_PUBLIC_ALIAS(__memcdup, libc_memcdup);
-DEFINE_PUBLIC_ALIAS(memcdup, libc_memcdup);
-DEFINE_PUBLIC_ALIAS(__libc_reallocarray, libc_reallocarray);
-DEFINE_PUBLIC_ALIAS(reallocarray, libc_reallocarray);
-DEFINE_PUBLIC_ALIAS(recalloc, libc_recalloc);
-DEFINE_PUBLIC_ALIAS(_recalloc, libc_recallocv);
-DEFINE_PUBLIC_ALIAS(recallocv, libc_recallocv);
+/*[[[start:exports,hash:CRC-32=0x3b5164f4]]]*/
+DEFINE_PUBLIC_ALIAS_P(__memdup,libc_memdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 2),void *,NOTHROW_NCX,LIBCCALL,(void const *__restrict ptr, size_t n_bytes),(ptr,n_bytes));
+DEFINE_PUBLIC_ALIAS_P(memdup,libc_memdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 2),void *,NOTHROW_NCX,LIBCCALL,(void const *__restrict ptr, size_t n_bytes),(ptr,n_bytes));
+DEFINE_PUBLIC_ALIAS_P(__memcdup,libc_memcdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 3),void *,NOTHROW_NCX,LIBCCALL,(void const *__restrict ptr, int needle, size_t n_bytes),(ptr,needle,n_bytes));
+DEFINE_PUBLIC_ALIAS_P(memcdup,libc_memcdup,ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INS(1, 3),void *,NOTHROW_NCX,LIBCCALL,(void const *__restrict ptr, int needle, size_t n_bytes),(ptr,needle,n_bytes));
+DEFINE_PUBLIC_ALIAS_P(__libc_reallocarray,libc_reallocarray,ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBCCALL,(void *ptr, size_t elem_count, size_t elem_size),(ptr,elem_count,elem_size));
+DEFINE_PUBLIC_ALIAS_P(reallocarray,libc_reallocarray,ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBCCALL,(void *ptr, size_t elem_count, size_t elem_size),(ptr,elem_count,elem_size));
+DEFINE_PUBLIC_ALIAS_P(recalloc,libc_recalloc,ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)),void *,NOTHROW_NCX,LIBCCALL,(void *mallptr, size_t num_bytes),(mallptr,num_bytes));
+DEFINE_PUBLIC_ALIAS_P(_recalloc,libc_recallocv,ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBCCALL,(void *mallptr, size_t elem_count, size_t elem_size),(mallptr,elem_count,elem_size));
+DEFINE_PUBLIC_ALIAS_P(recallocv,libc_recallocv,ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)),void *,NOTHROW_NCX,LIBCCALL,(void *mallptr, size_t elem_count, size_t elem_size),(mallptr,elem_count,elem_size));
 /*[[[end:exports]]]*/
 
 DECL_END

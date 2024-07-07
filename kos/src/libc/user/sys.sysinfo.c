@@ -72,14 +72,14 @@ NOTHROW(LIBCCALL libc_get_nprocs)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x75ef5eda]]]*/
-DEFINE_PUBLIC_ALIAS(__sysinfo, libc_sysinfo);
-DEFINE_PUBLIC_ALIAS(__libc_sysinfo, libc_sysinfo);
-DEFINE_PUBLIC_ALIAS(sysinfo, libc_sysinfo);
-DEFINE_PUBLIC_ALIAS(__get_nprocs_conf, libc_get_nprocs_conf);
-DEFINE_PUBLIC_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
-DEFINE_PUBLIC_ALIAS(__get_nprocs, libc_get_nprocs);
-DEFINE_PUBLIC_ALIAS(get_nprocs, libc_get_nprocs);
+/*[[[start:exports,hash:CRC-32=0x7032be3c]]]*/
+DEFINE_PUBLIC_ALIAS_P(__sysinfo,libc_sysinfo,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct sysinfo *info),(info));
+DEFINE_PUBLIC_ALIAS_P(__libc_sysinfo,libc_sysinfo,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct sysinfo *info),(info));
+DEFINE_PUBLIC_ALIAS_P(sysinfo,libc_sysinfo,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct sysinfo *info),(info));
+DEFINE_PUBLIC_ALIAS_P(__get_nprocs_conf,libc_get_nprocs_conf,WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(get_nprocs_conf,libc_get_nprocs_conf,WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__get_nprocs,libc_get_nprocs,WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(get_nprocs,libc_get_nprocs,WUNUSED,int,NOTHROW,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

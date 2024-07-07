@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c5af6dd */
+/* HASH CRC-32:0x3d802f1e */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -406,7 +406,7 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(readpassphrase, libc_readpassphrase);
+DEFINE_PUBLIC_ALIAS_P(readpassphrase,libc_readpassphrase,ATTR_IN_OPT(1) ATTR_OUTS(2, 3),char *,NOTHROW_NCX,LIBCCALL,(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags),(prompt,buf,bufsize,flags));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_READPASSPHRASE_C */

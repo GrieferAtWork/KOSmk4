@@ -55,9 +55,9 @@ NOTHROW_NCX(LIBCCALL libc_capget)(cap_user_header_t header,
 }
 /*[[[end:libc_capget]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x27cabb50]]]*/
-DEFINE_PUBLIC_ALIAS(capset, libc_capset);
-DEFINE_PUBLIC_ALIAS(capget, libc_capget);
+/*[[[start:exports,hash:CRC-32=0x8ad7ba6e]]]*/
+DEFINE_PUBLIC_ALIAS_P(capset,libc_capset,,int,NOTHROW_NCX,LIBCCALL,(cap_user_header_t header, cap_user_data_t data),(header,data));
+DEFINE_PUBLIC_ALIAS_P(capget,libc_capget,,int,NOTHROW_NCX,LIBCCALL,(cap_user_header_t header, cap_user_data_t const data),(header,data));
 /*[[[end:exports]]]*/
 
 DECL_END

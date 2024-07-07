@@ -65,8 +65,8 @@ NOTHROW_NCX(VLIBCCALL libc_prctl)(__STDC_INT_AS_UINT_T command,
 }
 /*[[[end:libc_prctl]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xe92871e6]]]*/
-DEFINE_PUBLIC_ALIAS(prctl, libc_prctl);
+/*[[[start:exports,hash:CRC-32=0x98db17f2]]]*/
+DEFINE_PUBLIC_ALIAS_P(prctl,libc_prctl,,int,NOTHROW_NCX,VLIBCCALL,(__STDC_INT_AS_UINT_T command, ...),(command,));
 /*[[[end:exports]]]*/
 
 DECL_END

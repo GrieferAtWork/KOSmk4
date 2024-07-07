@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eca422f */
+/* HASH CRC-32:0xc46ebd75 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,7 +343,7 @@ NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_difftime64, libc_difftime);
+DEFINE_INTERN_ALIAS_P(libc_difftime64,libc_difftime,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time64_t time1, time64_t time0),(time1,time0));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
@@ -359,7 +359,7 @@ NOTHROW(LIBCCALL libc_difftime64)(time64_t time1,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
+DEFINE_INTERN_ALIAS_P(libc_mktime64,libc_mktime,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
@@ -371,7 +371,7 @@ NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm *tp) {
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
+DEFINE_INTERN_ALIAS_P(libc_ctime64,libc_ctime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include "../libc/tls-globals.h"
 /* >> ctime(3), ctime64(3)
@@ -391,7 +391,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
+DEFINE_INTERN_ALIAS_P(libc_gmtime64,libc_gmtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include "../libc/tls-globals.h"
 /* >> gmtime(3), gmtime64(3)
@@ -412,7 +412,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
+DEFINE_INTERN_ALIAS_P(libc_localtime64,libc_localtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include "../libc/tls-globals.h"
 /* >> localtime(3), localtime64(3)
@@ -477,7 +477,7 @@ NOTHROW(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year) {
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
+DEFINE_INTERN_ALIAS_P(libc_timegm64,libc_timegm,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
@@ -517,7 +517,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timespec_get64, libc_timespec_get);
+DEFINE_INTERN_ALIAS_P(libc_timespec_get64,libc_timespec_get,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
@@ -546,7 +546,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_getres)(struct timespec *ts,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timespec_getres64, libc_timespec_getres);
+DEFINE_INTERN_ALIAS_P(libc_timespec_getres64,libc_timespec_getres,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> timespec_getres(3), timespec_getres64(3)
  * Set `ts' to calendar time based in time base `base' */
@@ -769,7 +769,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_gmtime64_r, libc_gmtime_r);
+DEFINE_INTERN_ALIAS_P(libc_gmtime64_r,libc_gmtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE__gmtime64_s)
 #ifndef ____TIME_MONTHSTART_YDAY_DEFINED
@@ -850,7 +850,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_localtime64_r, libc_localtime_r);
+DEFINE_INTERN_ALIAS_P(libc_localtime64_r,libc_localtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
@@ -867,7 +867,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
+DEFINE_INTERN_ALIAS_P(libc_ctime64_r,libc_ctime_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, char buf[26]),(timer,buf));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
@@ -1019,7 +1019,7 @@ NOTHROW_NCX(LIBCCALL libc__gmtime32_s)(struct tm *__restrict tp,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc__gmtime64_s, libc__gmtime32_s);
+DEFINE_INTERN_ALIAS_P(libc__gmtime64_s,libc__gmtime32_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time64_t const *__restrict timer),(tp,timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> gmtime_r(3), gmtime64_r(3)
@@ -1062,7 +1062,7 @@ NOTHROW_NCX(LIBCCALL libc__localtime32_s)(struct tm *__restrict tp,
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc__localtime64_s, libc__localtime32_s);
+DEFINE_INTERN_ALIAS_P(libc__localtime64_s,libc__localtime32_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time64_t const *__restrict timer),(tp,timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
@@ -1104,7 +1104,7 @@ NOTHROW_NCX(LIBCCALL libc__ctime32_s)(char buf[26],
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc__ctime64_s, libc__ctime32_s);
+DEFINE_INTERN_ALIAS_P(libc__ctime64_s,libc__ctime32_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char buf[26], size_t bufsize, time64_t const *__restrict timer),(buf,bufsize,timer));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> ctime_r(3), ctime64_r(3)
@@ -1253,7 +1253,7 @@ NOTHROW_NCX(LIBCCALL libc___nanosleep_nocancel)(struct timespec const *requested
 }
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc___nanosleep64_nocancel, libc___nanosleep_nocancel);
+DEFINE_INTERN_ALIAS_P(libc___nanosleep64_nocancel,libc___nanosleep_nocancel,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 const *requested_time, struct timespec64 *remaining),(requested_time,remaining));
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <bits/os/sigset.h>
 #include <bits/os/timespec.h>
@@ -1278,180 +1278,180 @@ NOTHROW_NCX(LIBCCALL libc___nanosleep64_nocancel)(struct timespec64 const *reque
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(clock, libc_clock);
+DEFINE_PUBLIC_ALIAS_P(clock,libc_clock,WUNUSED,clock_t,NOTHROW_NCX,LIBCCALL,(void),());
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_difftime32, libc_difftime);
+DEFINE_PUBLIC_ALIAS_P(_difftime32,libc_difftime,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time_t time1, time_t time0),(time1,time0));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(difftime, libc_difftime);
+DEFINE_PUBLIC_ALIAS_P(difftime,libc_difftime,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time_t time1, time_t time0),(time1,time0));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_mktime32, libc_mktime);
+DEFINE_PUBLIC_ALIAS_P(_mktime32,libc_mktime,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(timelocal, libc_mktime);
-DEFINE_PUBLIC_ALIAS(mktime, libc_mktime);
+DEFINE_PUBLIC_ALIAS_P(timelocal,libc_mktime,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(mktime,libc_mktime,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_ctime32, libc_ctime);
+DEFINE_PUBLIC_ALIAS_P(_ctime32,libc_ctime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(ctime, libc_ctime);
+DEFINE_PUBLIC_ALIAS_P(ctime,libc_ctime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_gmtime32, libc_gmtime);
+DEFINE_PUBLIC_ALIAS_P(_gmtime32,libc_gmtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(gmtime, libc_gmtime);
+DEFINE_PUBLIC_ALIAS_P(gmtime,libc_gmtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_localtime32, libc_localtime);
+DEFINE_PUBLIC_ALIAS_P(_localtime32,libc_localtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
 #endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(localtime, libc_localtime);
-DEFINE_PUBLIC_ALIAS(strftime, libc_strftime);
-DEFINE_PUBLIC_ALIAS(asctime, libc_asctime);
-DEFINE_PUBLIC_ALIAS(asctime_s, libc_asctime_s);
+DEFINE_PUBLIC_ALIAS_P(localtime,libc_localtime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(strftime,libc_strftime,ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_STRFTIME(3, 0) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp),(buf,bufsize,format,tp));
+DEFINE_PUBLIC_ALIAS_P(asctime,libc_asctime,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(struct tm const *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(asctime_s,libc_asctime_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t buflen, struct tm const *__restrict tp),(buf,buflen,tp));
 #ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_difftime64, libc_difftime64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__difftime64, libc_difftime64);
-DEFINE_PUBLIC_ALIAS(difftime64, libc_difftime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(timelocal64, libc_mktime64);
-DEFINE_PUBLIC_ALIAS(__mktime64, libc_mktime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_mktime64, libc_mktime64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(mktime64, libc_mktime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__ctime64, libc_ctime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_ctime64, libc_ctime64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(ctime64, libc_ctime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__gmtime64, libc_gmtime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_gmtime64, libc_gmtime64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(gmtime64, libc_gmtime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_localtime64, libc_localtime64);
+DEFINE_PUBLIC_ALIAS_P(_difftime64,libc_difftime64,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time64_t time1, time64_t time0),(time1,time0));
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__localtime64, libc_localtime64);
-DEFINE_PUBLIC_ALIAS(localtime64, libc_localtime64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_mkgmtime, libc_timegm);
-DEFINE_PUBLIC_ALIAS(_mkgmtime32, libc_timegm);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(timegm, libc_timegm);
-DEFINE_PUBLIC_ALIAS(dysize, libc_dysize);
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__timegm64, libc_timegm64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_mkgmtime64, libc_timegm64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(timegm64, libc_timegm64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_timespec32_get, libc_timespec_get);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_get64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__timespec_get64, libc_timespec_get64);
-DEFINE_PUBLIC_ALIAS(timespec_get64, libc_timespec_get64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_timespec32_get, libc_timespec_getres);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(timespec_getres, libc_timespec_getres);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_getres64);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__timespec_getres64, libc_timespec_getres64);
-DEFINE_PUBLIC_ALIAS(timespec_getres64, libc_timespec_getres64);
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_strftime_l, libc_strftime_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__strftime_l, libc_strftime_l);
-DEFINE_PUBLIC_ALIAS(strftime_l, libc_strftime_l);
-DEFINE_PUBLIC_ALIAS(strptime, libc_strptime);
-DEFINE_PUBLIC_ALIAS(strptime_l, libc_strptime_l);
-DEFINE_PUBLIC_ALIAS(getdate_r, libc_getdate_r);
-DEFINE_PUBLIC_ALIAS(__gmtime_r, libc_gmtime_r);
-DEFINE_PUBLIC_ALIAS(gmtime_r, libc_gmtime_r);
-DEFINE_PUBLIC_ALIAS(__localtime_r, libc_localtime_r);
-DEFINE_PUBLIC_ALIAS(localtime_r, libc_localtime_r);
-DEFINE_PUBLIC_ALIAS(ctime_r, libc_ctime_r);
-#include <bits/types.h>
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__gmtime64_r, libc_gmtime64_r);
-DEFINE_PUBLIC_ALIAS(gmtime64_r, libc_gmtime64_r);
+DEFINE_PUBLIC_ALIAS_P(__difftime64,libc_difftime64,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time64_t time1, time64_t time0),(time1,time0));
+DEFINE_PUBLIC_ALIAS_P(difftime64,libc_difftime64,ATTR_CONST WUNUSED,double,NOTHROW,LIBCCALL,(time64_t time1, time64_t time0),(time1,time0));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__localtime64_r, libc_localtime64_r);
-DEFINE_PUBLIC_ALIAS(localtime64_r, libc_localtime64_r);
+DEFINE_PUBLIC_ALIAS_P(timelocal64,libc_mktime64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(__mktime64,libc_mktime64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_mktime64,libc_mktime64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(mktime64,libc_mktime64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__ctime64_r, libc_ctime64_r);
-DEFINE_PUBLIC_ALIAS(ctime64_r, libc_ctime64_r);
+DEFINE_PUBLIC_ALIAS_P(__ctime64,libc_ctime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-DEFINE_PUBLIC_ALIAS(__asctime_r, libc_asctime_r);
-DEFINE_PUBLIC_ALIAS(asctime_r, libc_asctime_r);
-DEFINE_PUBLIC_ALIAS(DOS$__daylight, libc___daylight);
-DEFINE_PUBLIC_ALIAS(__p__daylight, libc___daylight);
-DEFINE_PUBLIC_ALIAS(DOS$__timezone, libc___timezone);
-DEFINE_PUBLIC_ALIAS(__p__timezone, libc___timezone);
-DEFINE_PUBLIC_ALIAS(DOS$__tzname, libc___tzname);
-DEFINE_PUBLIC_ALIAS(__p__tzname, libc___tzname);
-DEFINE_PUBLIC_ALIAS(DOS$__dstbias, libc___dstbias);
-DEFINE_PUBLIC_ALIAS(__p__dstbias, libc___dstbias);
-DEFINE_PUBLIC_ALIAS(_get_daylight, libc__get_daylight);
-DEFINE_PUBLIC_ALIAS(_get_timezone, libc__get_timezone);
-DEFINE_PUBLIC_ALIAS(_get_dstbias, libc__get_dstbias);
-DEFINE_PUBLIC_ALIAS(DOS$_get_tzname, libd__get_tzname);
-DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);
-DEFINE_PUBLIC_ALIAS(_gmtime32_s, libc__gmtime32_s);
-DEFINE_PUBLIC_ALIAS(_gmtime64_s, libc__gmtime64_s);
-DEFINE_PUBLIC_ALIAS(_localtime32_s, libc__localtime32_s);
-DEFINE_PUBLIC_ALIAS(_localtime64_s, libc__localtime64_s);
-DEFINE_PUBLIC_ALIAS(_ctime32_s, libc__ctime32_s);
-DEFINE_PUBLIC_ALIAS(_ctime64_s, libc__ctime64_s);
-DEFINE_PUBLIC_ALIAS(_strtime, libc__strtime);
-DEFINE_PUBLIC_ALIAS(_strdate, libc__strdate);
-DEFINE_PUBLIC_ALIAS(DOS$_strtime_s, libd__strtime_s);
-DEFINE_PUBLIC_ALIAS(_strtime_s, libc__strtime_s);
-DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
-DEFINE_PUBLIC_ALIAS(_strdate_s, libc__strdate_s);
-DEFINE_PUBLIC_ALIAS(_getsystime, libc__getsystime);
-DEFINE_PUBLIC_ALIAS(_setsystime, libc__setsystime);
-DEFINE_PUBLIC_ALIAS(__nanosleep_nocancel, libc___nanosleep_nocancel);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_ctime64,libc_ctime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(ctime64,libc_ctime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__nanosleep64_nocancel, libc___nanosleep64_nocancel);
+DEFINE_PUBLIC_ALIAS_P(__gmtime64,libc_gmtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_gmtime64,libc_gmtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(gmtime64,libc_gmtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_localtime64,libc_localtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__localtime64,libc_localtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+DEFINE_PUBLIC_ALIAS_P(localtime64,libc_localtime64,ATTR_RETNONNULL WUNUSED ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *timer),(timer));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_mkgmtime,libc_timegm,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(_mkgmtime32,libc_timegm,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(timegm,libc_timegm,ATTR_PURE WUNUSED ATTR_INOUT(1),time_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(dysize,libc_dysize,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(__STDC_INT_AS_UINT_T year),(year));
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__timegm64,libc_timegm64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_mkgmtime64,libc_timegm64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(timegm64,libc_timegm64,ATTR_PURE WUNUSED ATTR_INOUT(1),time64_t,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_timespec32_get,libc_timespec_get,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec *ts, int base),(ts,base));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(timespec_get,libc_timespec_get,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec *ts, int base),(ts,base));
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_timespec64_get,libc_timespec_get64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__timespec_get64,libc_timespec_get64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+DEFINE_PUBLIC_ALIAS_P(timespec_get64,libc_timespec_get64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_timespec32_get,libc_timespec_getres,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec *ts, int base),(ts,base));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(timespec_getres,libc_timespec_getres,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec *ts, int base),(ts,base));
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_timespec64_get,libc_timespec_getres64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__timespec_getres64,libc_timespec_getres64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+DEFINE_PUBLIC_ALIAS_P(timespec_getres64,libc_timespec_getres64,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 *ts, int base),(ts,base));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(getdate,libc_getdate,ATTR_IN(1),struct tm *,NOTHROW_NCX,LIBCCALL,(const char *string),(string));
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS_P(_strftime_l,libc_strftime_l,ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_STRFTIME(3, 0) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale),(buf,bufsize,format,tp,locale));
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS_P(__strftime_l,libc_strftime_l,ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_STRFTIME(3, 0) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale),(buf,bufsize,format,tp,locale));
+DEFINE_PUBLIC_ALIAS_P(strftime_l,libc_strftime_l,ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_STRFTIME(3, 0) ATTR_OUTS(1, 2),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale),(buf,bufsize,format,tp,locale));
+DEFINE_PUBLIC_ALIAS_P(strptime,libc_strptime,ATTR_IN(1) ATTR_IN(2) ATTR_OUT(3),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp),(s,format,tp));
+DEFINE_PUBLIC_ALIAS_P(strptime_l,libc_strptime_l,ATTR_IN(1) ATTR_IN(2) ATTR_OUT(3),char *,NOTHROW_NCX,LIBCCALL,(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp, locale_t locale),(s,format,tp,locale));
+DEFINE_PUBLIC_ALIAS_P(getdate_r,libc_getdate_r,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *__restrict string, struct tm *__restrict resbufp),(string,resbufp));
+DEFINE_PUBLIC_ALIAS_P(__gmtime_r,libc_gmtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(gmtime_r,libc_gmtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(__localtime_r,libc_localtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(localtime_r,libc_localtime_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(ctime_r,libc_ctime_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(time_t const *__restrict timer, char buf[26]),(timer,buf));
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__gmtime64_r,libc_gmtime64_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(gmtime64_r,libc_gmtime64_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__localtime64_r,libc_localtime64_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+DEFINE_PUBLIC_ALIAS_P(localtime64_r,libc_localtime64_r,ATTR_IN(1) ATTR_OUT(2),struct tm *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, struct tm *__restrict tp),(timer,tp));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__ctime64_r,libc_ctime64_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, char buf[26]),(timer,buf));
+DEFINE_PUBLIC_ALIAS_P(ctime64_r,libc_ctime64_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(time64_t const *__restrict timer, char buf[26]),(timer,buf));
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(__asctime_r,libc_asctime_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct tm const *__restrict tp, char buf[26]),(tp,buf));
+DEFINE_PUBLIC_ALIAS_P(asctime_r,libc_asctime_r,ATTR_IN(1) ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct tm const *__restrict tp, char buf[26]),(tp,buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$__daylight,libc___daylight,ATTR_CONST ATTR_RETNONNULL WUNUSED,int *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__daylight,libc___daylight,ATTR_CONST ATTR_RETNONNULL WUNUSED,int *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$__timezone,libc___timezone,ATTR_CONST ATTR_RETNONNULL WUNUSED,long *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__timezone,libc___timezone,ATTR_CONST ATTR_RETNONNULL WUNUSED,long *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$__tzname,libc___tzname,ATTR_CONST ATTR_RETNONNULL WUNUSED,char **,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__tzname,libc___tzname,ATTR_CONST ATTR_RETNONNULL WUNUSED,char **,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$__dstbias,libc___dstbias,ATTR_CONST ATTR_RETNONNULL WUNUSED,__LONG32_TYPE__ *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__dstbias,libc___dstbias,ATTR_CONST ATTR_RETNONNULL WUNUSED,__LONG32_TYPE__ *,NOTHROW,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_get_daylight,libc__get_daylight,,errno_t,NOTHROW_NCX,LIBCCALL,(int *p_result),(p_result));
+DEFINE_PUBLIC_ALIAS_P(_get_timezone,libc__get_timezone,,errno_t,NOTHROW_NCX,LIBCCALL,(long *p_seconds),(p_seconds));
+DEFINE_PUBLIC_ALIAS_P(_get_dstbias,libc__get_dstbias,,errno_t,NOTHROW_NCX,LIBCCALL,(__LONG32_TYPE__ *p_result),(p_result));
+DEFINE_PUBLIC_ALIAS_P(DOS$_get_tzname,libd__get_tzname,ATTR_OUT(1) ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBDCALL,(size_t *result, char *buf, size_t bufsize, int index),(result,buf,bufsize,index));
+DEFINE_PUBLIC_ALIAS_P(_get_tzname,libc__get_tzname,ATTR_OUT(1) ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(size_t *result, char *buf, size_t bufsize, int index),(result,buf,bufsize,index));
+DEFINE_PUBLIC_ALIAS_P(_gmtime32_s,libc__gmtime32_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time32_t const *__restrict timer),(tp,timer));
+DEFINE_PUBLIC_ALIAS_P(_gmtime64_s,libc__gmtime64_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time64_t const *__restrict timer),(tp,timer));
+DEFINE_PUBLIC_ALIAS_P(_localtime32_s,libc__localtime32_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time32_t const *__restrict timer),(tp,timer));
+DEFINE_PUBLIC_ALIAS_P(_localtime64_s,libc__localtime64_s,ATTR_IN(2) ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(struct tm *__restrict tp, time64_t const *__restrict timer),(tp,timer));
+DEFINE_PUBLIC_ALIAS_P(_ctime32_s,libc__ctime32_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char buf[26], size_t bufsize, time32_t const *__restrict timer),(buf,bufsize,timer));
+DEFINE_PUBLIC_ALIAS_P(_ctime64_s,libc__ctime64_s,ATTR_IN(3) ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char buf[26], size_t bufsize, time64_t const *__restrict timer),(buf,bufsize,timer));
+DEFINE_PUBLIC_ALIAS_P(_strtime,libc__strtime,ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(_strdate,libc__strdate,ATTR_OUT(1),char *,NOTHROW_NCX,LIBCCALL,(char buf[9]),(buf));
+DEFINE_PUBLIC_ALIAS_P(DOS$_strtime_s,libd__strtime_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(_strtime_s,libc__strtime_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(DOS$_strdate_s,libd__strdate_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBDCALL,(char *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(_strdate_s,libc__strdate_s,ATTR_OUTS(1, 2),errno_t,NOTHROW_NCX,LIBCCALL,(char *buf, size_t bufsize),(buf,bufsize));
+DEFINE_PUBLIC_ALIAS_P(_getsystime,libc__getsystime,ATTR_OUT(1),unsigned int,NOTHROW_NCX,LIBCCALL,(struct tm *tp),(tp));
+DEFINE_PUBLIC_ALIAS_P(_setsystime,libc__setsystime,ATTR_INOUT(1),unsigned int,NOTHROW_NCX,LIBCCALL,(struct tm *tp, unsigned int milliseconds),(tp,milliseconds));
+DEFINE_PUBLIC_ALIAS_P(__nanosleep_nocancel,libc___nanosleep_nocancel,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timespec const *requested_time, struct timespec *remaining),(requested_time,remaining));
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+DEFINE_PUBLIC_ALIAS_P(__nanosleep64_nocancel,libc___nanosleep64_nocancel,ATTR_IN(1) ATTR_OUT_OPT(2),int,NOTHROW_NCX,LIBCCALL,(struct timespec64 const *requested_time, struct timespec64 *remaining),(requested_time,remaining));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 

@@ -259,28 +259,28 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe4f493c4]]]*/
-DEFINE_PUBLIC_ALIAS(__p__crtAssertBusy, libc___p__crtAssertBusy);
-DEFINE_PUBLIC_ALIAS(__p__crtBreakAlloc, libc___p__crtBreakAlloc);
-DEFINE_PUBLIC_ALIAS(__p__crtDbgFlag, libc___p__crtDbgFlag);
-DEFINE_PUBLIC_ALIAS(_CrtGetReportHook, libc__CrtGetReportHook);
-DEFINE_PUBLIC_ALIAS(_CrtSetReportHook, libc__CrtSetReportHook);
-DEFINE_PUBLIC_ALIAS(_CrtSetReportHook2, libc__CrtSetReportHook2);
-DEFINE_PUBLIC_ALIAS(_CrtSetReportHookW2, libc__CrtSetReportHookW2);
-DEFINE_PUBLIC_ALIAS(_CrtGetAllocHook, libc__CrtGetAllocHook);
-DEFINE_PUBLIC_ALIAS(_CrtSetAllocHook, libc__CrtSetAllocHook);
-DEFINE_PUBLIC_ALIAS(_CrtGetDumpClient, libc__CrtGetDumpClient);
-DEFINE_PUBLIC_ALIAS(_CrtSetDumpClient, libc__CrtSetDumpClient);
-DEFINE_PUBLIC_ALIAS(_CrtSetReportMode, libc__CrtSetReportMode);
-DEFINE_PUBLIC_ALIAS(_CrtSetReportFile, libc__CrtSetReportFile);
-DEFINE_PUBLIC_ALIAS(_CrtSetDebugFillThreshold, libc__CrtSetDebugFillThreshold);
-DEFINE_PUBLIC_ALIAS(_CrtDbgReport, libc__CrtDbgReport);
-DEFINE_PUBLIC_ALIAS("?_CrtDbgReportW@@YAHHPBGH00ZZ", libc__CrtDbgReportW);
-DEFINE_PUBLIC_ALIAS(_CrtDbgReportW, libc__CrtDbgReportW);
+/*[[[start:exports,hash:CRC-32=0x93acf27a]]]*/
+DEFINE_PUBLIC_ALIAS_P(__p__crtAssertBusy,libc___p__crtAssertBusy,,__LONG32_TYPE__ *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__crtBreakAlloc,libc___p__crtBreakAlloc,,__LONG32_TYPE__ *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(__p__crtDbgFlag,libc___p__crtDbgFlag,,int *,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_CrtGetReportHook,libc__CrtGetReportHook,,_CRT_REPORT_HOOK,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_CrtSetReportHook,libc__CrtSetReportHook,,_CRT_REPORT_HOOK,NOTHROW_NCX,LIBDCALL,(_CRT_REPORT_HOOK pfn_new_hook),(pfn_new_hook));
+DEFINE_PUBLIC_ALIAS_P(_CrtSetReportHook2,libc__CrtSetReportHook2,,int,NOTHROW_NCX,LIBDCALL,(int mode, _CRT_REPORT_HOOK pfn_new_hook),(mode,pfn_new_hook));
+DEFINE_PUBLIC_ALIAS_P(_CrtSetReportHookW2,libc__CrtSetReportHookW2,,int,NOTHROW_NCX,LIBDCALL,(int mode, _CRT_REPORT_HOOKW pfn_new_hook),(mode,pfn_new_hook));
+DEFINE_PUBLIC_ALIAS_P(_CrtGetAllocHook,libc__CrtGetAllocHook,,_CRT_ALLOC_HOOK,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_CrtSetAllocHook,libc__CrtSetAllocHook,,_CRT_ALLOC_HOOK,NOTHROW_NCX,LIBDCALL,(_CRT_ALLOC_HOOK pfn_new_hook),(pfn_new_hook));
+DEFINE_PUBLIC_ALIAS_P(_CrtGetDumpClient,libc__CrtGetDumpClient,,_CRT_DUMP_CLIENT,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(_CrtSetDumpClient,libc__CrtSetDumpClient,,_CRT_DUMP_CLIENT,NOTHROW_NCX,LIBDCALL,(_CRT_DUMP_CLIENT pfn_new_dump),(pfn_new_dump));
+DEFINE_PUBLIC_ALIAS_P(_CrtSetReportMode,libc__CrtSetReportMode,,int,NOTHROW_NCX,LIBDCALL,(int report_type, int report_mode),(report_type,report_mode));
+DEFINE_PUBLIC_ALIAS_P(_CrtSetReportFile,libc__CrtSetReportFile,,_HFILE,NOTHROW_NCX,LIBDCALL,(int report_type, _HFILE report_file),(report_type,report_file));
+DEFINE_PUBLIC_ALIAS_P(_CrtSetDebugFillThreshold,libc__CrtSetDebugFillThreshold,,size_t,NOTHROW_NCX,LIBDCALL,(size_t new_debug_fill_threshold),(new_debug_fill_threshold));
+DEFINE_PUBLIC_ALIAS_P(_CrtDbgReport,libc__CrtDbgReport,,int,NOTHROW_NCX,VLIBDCALL,(int report_type, char const *filename, int line, char const *module_name, char const *format, ...),(report_type,filename,line,module_name,format,));
+DEFINE_PUBLIC_ALIAS_P("?_CrtDbgReportW@@YAHHPBGH00ZZ",libc__CrtDbgReportW,,int,NOTHROW_NCX,VLIBDCALL,(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...),(report_type,filename,line,module_name,format,));
+DEFINE_PUBLIC_ALIAS_P(_CrtDbgReportW,libc__CrtDbgReportW,,int,NOTHROW_NCX,VLIBDCALL,(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...),(report_type,filename,line,module_name,format,));
 #ifndef LIBC_ARCH_HAVE_CRTDBGBREAK
-DEFINE_PUBLIC_ALIAS(_CrtDbgBreak, libc__CrtDbgBreak);
+DEFINE_PUBLIC_ALIAS_P_VOID(_CrtDbgBreak,libc__CrtDbgBreak,,NOTHROW_NCX,LIBDCALL,(void),());
 #endif /* !LIBC_ARCH_HAVE_CRTDBGBREAK */
-DEFINE_PUBLIC_ALIAS(_CrtSetBreakAlloc, libc__CrtSetBreakAlloc);
+DEFINE_PUBLIC_ALIAS_P(_CrtSetBreakAlloc,libc__CrtSetBreakAlloc,,__LONG32_TYPE__,NOTHROW_NCX,LIBDCALL,(__LONG32_TYPE__ break_alloc),(break_alloc));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -42,10 +42,10 @@ NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8612bfee]]]*/
-DEFINE_PUBLIC_ALIAS(__acct, libc_acct);
-DEFINE_PUBLIC_ALIAS(__libc_acct, libc_acct);
-DEFINE_PUBLIC_ALIAS(acct, libc_acct);
+/*[[[start:exports,hash:CRC-32=0x1c2e4bd]]]*/
+DEFINE_PUBLIC_ALIAS_P(__acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(__libc_acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
+DEFINE_PUBLIC_ALIAS_P(acct,libc_acct,ATTR_IN_OPT(1),int,NOTHROW_RPC,LIBCCALL,(const char *filename),(filename));
 /*[[[end:exports]]]*/
 
 DECL_END

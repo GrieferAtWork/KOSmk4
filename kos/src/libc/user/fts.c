@@ -199,17 +199,17 @@ NOTHROW_NCX(LIBCCALL libc_fts64_set)(FTS64 *ftsp,
 #endif /* MAGIC:alias */
 /*[[[end:libc_fts64_set]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x255e42a]]]*/
-DEFINE_PUBLIC_ALIAS(fts_children, libc_fts_children);
-DEFINE_PUBLIC_ALIAS(fts_close, libc_fts_close);
-DEFINE_PUBLIC_ALIAS(fts_open, libc_fts_open);
-DEFINE_PUBLIC_ALIAS(fts_read, libc_fts_read);
-DEFINE_PUBLIC_ALIAS(fts_set, libc_fts_set);
-DEFINE_PUBLIC_ALIAS(fts64_children, libc_fts64_children);
-DEFINE_PUBLIC_ALIAS(fts64_close, libc_fts64_close);
-DEFINE_PUBLIC_ALIAS(fts64_open, libc_fts64_open);
-DEFINE_PUBLIC_ALIAS(fts64_read, libc_fts64_read);
-DEFINE_PUBLIC_ALIAS(fts64_set, libc_fts64_set);
+/*[[[start:exports,hash:CRC-32=0x4606122e]]]*/
+DEFINE_PUBLIC_ALIAS_P(fts_children,libc_fts_children,WUNUSED ATTR_INOUT(1),FTSENT *,NOTHROW_RPC,LIBCCALL,(FTS *ftsp, __STDC_INT_AS_UINT_T instr),(ftsp,instr));
+DEFINE_PUBLIC_ALIAS_P(fts_close,libc_fts_close,ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(FTS *ftsp),(ftsp));
+DEFINE_PUBLIC_ALIAS_P(fts_open,libc_fts_open,WUNUSED ATTR_IN(1),FTS *,NOTHROW_RPC,LIBCCALL,(char *const *path_argv, __STDC_INT_AS_UINT_T options, int (LIBKCALL *compar)(FTSENT const **lhs, FTSENT const **rhs)),(path_argv,options,compar));
+DEFINE_PUBLIC_ALIAS_P(fts_read,libc_fts_read,WUNUSED ATTR_INOUT(1),FTSENT *,NOTHROW_RPC,LIBCCALL,(FTS *ftsp),(ftsp));
+DEFINE_PUBLIC_ALIAS_P(fts_set,libc_fts_set,ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(FTS *ftsp, FTSENT *f, __STDC_INT_AS_UINT_T instr),(ftsp,f,instr));
+DEFINE_PUBLIC_ALIAS_P(fts64_children,libc_fts64_children,WUNUSED ATTR_INOUT(1),FTSENT64 *,NOTHROW_RPC,LIBCCALL,(FTS64 *ftsp, __STDC_INT_AS_UINT_T instr),(ftsp,instr));
+DEFINE_PUBLIC_ALIAS_P(fts64_close,libc_fts64_close,WUNUSED ATTR_INOUT(1),int,NOTHROW_RPC,LIBCCALL,(FTS64 *ftsp),(ftsp));
+DEFINE_PUBLIC_ALIAS_P(fts64_open,libc_fts64_open,WUNUSED ATTR_IN(1),FTS64 *,NOTHROW_RPC,LIBCCALL,(char *const *path_argv, __STDC_INT_AS_UINT_T options, int (LIBKCALL *compar)(FTSENT64 const **lhs, FTSENT64 const **rhs)),(path_argv,options,compar));
+DEFINE_PUBLIC_ALIAS_P(fts64_read,libc_fts64_read,WUNUSED ATTR_INOUT(1),FTSENT64 *,NOTHROW_RPC,LIBCCALL,(FTS64 *ftsp),(ftsp));
+DEFINE_PUBLIC_ALIAS_P(fts64_set,libc_fts64_set,ATTR_INOUT(1) ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(FTS64 *ftsp, FTSENT64 *f, __STDC_INT_AS_UINT_T instr),(ftsp,f,instr));
 /*[[[end:exports]]]*/
 
 DECL_END

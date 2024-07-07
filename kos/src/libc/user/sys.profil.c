@@ -44,8 +44,8 @@ NOTHROW_NCX(LIBCCALL libc_sprofil)(struct prof *profp,
 }
 /*[[[end:libc_sprofil]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xb8a98b5d]]]*/
-DEFINE_PUBLIC_ALIAS(sprofil, libc_sprofil);
+/*[[[start:exports,hash:CRC-32=0x71773d1c]]]*/
+DEFINE_PUBLIC_ALIAS_P(sprofil,libc_sprofil,,int,NOTHROW_NCX,LIBCCALL,(struct prof *profp, int profcnt, struct timeval *tvp, unsigned int flags),(profp,profcnt,tvp,flags));
 /*[[[end:exports]]]*/
 
 DECL_END

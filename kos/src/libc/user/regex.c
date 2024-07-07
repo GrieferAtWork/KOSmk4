@@ -929,16 +929,16 @@ NOTHROW_NCX(LIBCCALL libc_re_exec)(char const *string)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x80680e6b]]]*/
-DEFINE_PUBLIC_ALIAS(re_compile_pattern, libc_re_compile_pattern);
-DEFINE_PUBLIC_ALIAS(re_search, libc_re_search);
-DEFINE_PUBLIC_ALIAS(re_search_2, libc_re_search_2);
-DEFINE_PUBLIC_ALIAS(re_match, libc_re_match);
-DEFINE_PUBLIC_ALIAS(re_match_2, libc_re_match_2);
-DEFINE_PUBLIC_ALIAS(regcomp, libc_regcomp);
-DEFINE_PUBLIC_ALIAS(regexec, libc_regexec);
-DEFINE_PUBLIC_ALIAS(re_comp, libc_re_comp);
-DEFINE_PUBLIC_ALIAS(re_exec, libc_re_exec);
+/*[[[start:exports,hash:CRC-32=0x3a41833]]]*/
+DEFINE_PUBLIC_ALIAS_P(re_compile_pattern,libc_re_compile_pattern,ATTR_INS(1, 2) ATTR_OUT(3),char const *,NOTHROW_NCX,LIBCCALL,(char const *pattern, size_t length, regex_t *self),(pattern,length,self));
+DEFINE_PUBLIC_ALIAS_P(re_search,libc_re_search,ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(6),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(regex_t __KOS_FIXED_CONST *self, char const *string, __STDC_INT_AS_SIZE_T length, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T range, struct __re_registers *regs),(self,string,length,start,range,regs));
+DEFINE_PUBLIC_ALIAS_P(re_search_2,libc_re_search_2,ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(8),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(regex_t __KOS_FIXED_CONST *self, char const *string1, __STDC_INT_AS_SIZE_T length1, char const *string2, __STDC_INT_AS_SIZE_T length2, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T range, struct __re_registers *regs, __STDC_INT_AS_SIZE_T stop),(self,string1,length1,string2,length2,start,range,regs,stop));
+DEFINE_PUBLIC_ALIAS_P(re_match,libc_re_match,ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(5),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(regex_t __KOS_FIXED_CONST *self, char const *string, __STDC_INT_AS_SIZE_T length, __STDC_INT_AS_SIZE_T start, struct __re_registers *regs),(self,string,length,start,regs));
+DEFINE_PUBLIC_ALIAS_P(re_match_2,libc_re_match_2,ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(7),__STDC_INT_AS_SSIZE_T,NOTHROW_NCX,LIBCCALL,(regex_t __KOS_FIXED_CONST *self, char const *string1, __STDC_INT_AS_SIZE_T length1, char const *string2, __STDC_INT_AS_SIZE_T length2, __STDC_INT_AS_SIZE_T start, struct __re_registers *regs, __STDC_INT_AS_SIZE_T stop),(self,string1,length1,string2,length2,start,regs,stop));
+DEFINE_PUBLIC_ALIAS_P(regcomp,libc_regcomp,ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(regex_t *__restrict self, char const *__restrict pattern, int cflags),(self,pattern,cflags));
+DEFINE_PUBLIC_ALIAS_P(regexec,libc_regexec,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_NCX,LIBCCALL,(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags),(self,string,nmatch,pmatch,eflags));
+DEFINE_PUBLIC_ALIAS_P(re_comp,libc_re_comp,,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(char const *pattern),(pattern));
+DEFINE_PUBLIC_ALIAS_P(re_exec,libc_re_exec,ATTR_PURE WUNUSED NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(char const *string),(string));
 /*[[[end:exports]]]*/
 
 DECL_END

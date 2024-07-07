@@ -266,23 +266,23 @@ NOTHROW_RPC(LIBCCALL libc_mq_timedsend64)(mqd_t mqdes,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mq_timedsend64]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x835b7aef]]]*/
-DEFINE_PUBLIC_ALIAS(mq_open, libc_mq_open);
-DEFINE_PUBLIC_ALIAS(mq_close, libc_mq_close);
-DEFINE_PUBLIC_ALIAS(mq_getattr, libc_mq_getattr);
-DEFINE_PUBLIC_ALIAS(mq_setattr, libc_mq_setattr);
-DEFINE_PUBLIC_ALIAS(mq_unlink, libc_mq_unlink);
-DEFINE_PUBLIC_ALIAS(mq_notify, libc_mq_notify);
-DEFINE_PUBLIC_ALIAS(mq_receive, libc_mq_receive);
-DEFINE_PUBLIC_ALIAS(mq_send, libc_mq_send);
-DEFINE_PUBLIC_ALIAS(mq_timedreceive, libc_mq_timedreceive);
-DEFINE_PUBLIC_ALIAS(mq_timedsend, libc_mq_timedsend);
+/*[[[start:exports,hash:CRC-32=0xb0ff794b]]]*/
+DEFINE_PUBLIC_ALIAS_P(mq_open,libc_mq_open,WUNUSED ATTR_IN(1),mqd_t,NOTHROW_RPC,VLIBCCALL,(char const *__restrict name, oflag_t oflags, ...),(name,oflags,));
+DEFINE_PUBLIC_ALIAS_P(mq_close,libc_mq_close,,int,NOTHROW,LIBCCALL,(mqd_t mqdes),(mqdes));
+DEFINE_PUBLIC_ALIAS_P(mq_getattr,libc_mq_getattr,ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(mqd_t mqdes, struct mq_attr *__restrict mqstat),(mqdes,mqstat));
+DEFINE_PUBLIC_ALIAS_P(mq_setattr,libc_mq_setattr,ATTR_IN(2) ATTR_OUT_OPT(3),int,NOTHROW_NCX,LIBCCALL,(mqd_t mqdes, struct mq_attr const *__restrict mqstat, struct mq_attr *__restrict old_mqstat),(mqdes,mqstat,old_mqstat));
+DEFINE_PUBLIC_ALIAS_P(mq_unlink,libc_mq_unlink,ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(char const *name),(name));
+DEFINE_PUBLIC_ALIAS_P(mq_notify,libc_mq_notify,,int,NOTHROW_NCX,LIBCCALL,(mqd_t mqdes, struct sigevent const *notification),(mqdes,notification));
+DEFINE_PUBLIC_ALIAS_P(mq_receive,libc_mq_receive,ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio),(mqdes,msg_ptr,msg_len,pmsg_prio));
+DEFINE_PUBLIC_ALIAS_P(mq_send,libc_mq_send,ATTR_INS(2, 3),int,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio),(mqdes,msg_ptr,msg_len,msg_prio));
+DEFINE_PUBLIC_ALIAS_P(mq_timedreceive,libc_mq_timedreceive,ATTR_IN(5) ATTR_OUTS(2, 3) ATTR_OUT_OPT(4),ssize_t,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec const *__restrict abs_timeout),(mqdes,msg_ptr,msg_len,pmsg_prio,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(mq_timedsend,libc_mq_timedsend,ATTR_IN(5) ATTR_INS(2, 3),int,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec const *abs_timeout),(mqdes,msg_ptr,msg_len,msg_prio,abs_timeout));
 #include <bits/types.h>
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-DEFINE_PUBLIC_ALIAS(__mq_timedreceive_time64, libc_mq_timedreceive64);
-DEFINE_PUBLIC_ALIAS(mq_timedreceive64, libc_mq_timedreceive64);
-DEFINE_PUBLIC_ALIAS(__mq_timedsend_time64, libc_mq_timedsend64);
-DEFINE_PUBLIC_ALIAS(mq_timedsend64, libc_mq_timedsend64);
+DEFINE_PUBLIC_ALIAS_P(__mq_timedreceive_time64,libc_mq_timedreceive64,ATTR_IN(5) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec64 const *__restrict abs_timeout),(mqdes,msg_ptr,msg_len,pmsg_prio,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(mq_timedreceive64,libc_mq_timedreceive64,ATTR_IN(5) ATTR_OUTS(2, 3),ssize_t,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec64 const *__restrict abs_timeout),(mqdes,msg_ptr,msg_len,pmsg_prio,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(__mq_timedsend_time64,libc_mq_timedsend64,ATTR_IN(5) ATTR_INS(2, 3),int,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec64 const *abs_timeout),(mqdes,msg_ptr,msg_len,msg_prio,abs_timeout));
+DEFINE_PUBLIC_ALIAS_P(mq_timedsend64,libc_mq_timedsend64,ATTR_IN(5) ATTR_INS(2, 3),int,NOTHROW_RPC,LIBCCALL,(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec64 const *abs_timeout),(mqdes,msg_ptr,msg_len,msg_prio,abs_timeout));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /*[[[end:exports]]]*/
 

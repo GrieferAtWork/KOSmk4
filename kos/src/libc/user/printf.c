@@ -994,15 +994,15 @@ NOTHROW_NCX(LIBCCALL libc_printf_size_info)(struct printf_info const *__restrict
 /*[[[end:libc_printf_size_info]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xda2752ac]]]*/
-DEFINE_PUBLIC_ALIAS(register_printf_specifier, libc_register_printf_specifier);
-DEFINE_PUBLIC_ALIAS(__register_printf_function, libc_register_printf_function);
-DEFINE_PUBLIC_ALIAS(register_printf_function, libc_register_printf_function);
-DEFINE_PUBLIC_ALIAS(register_printf_modifier, libc_register_printf_modifier);
-DEFINE_PUBLIC_ALIAS(register_printf_type, libc_register_printf_type);
-DEFINE_PUBLIC_ALIAS(parse_printf_format, libc_parse_printf_format);
-DEFINE_PUBLIC_ALIAS(printf_size, libc_printf_size);
-DEFINE_PUBLIC_ALIAS(printf_size_info, libc_printf_size_info);
+/*[[[start:exports,hash:CRC-32=0x820e3a9e]]]*/
+DEFINE_PUBLIC_ALIAS_P(register_printf_specifier,libc_register_printf_specifier,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T spec, printf_function *func, printf_arginfo_size_function *arginfo),(spec,func,arginfo));
+DEFINE_PUBLIC_ALIAS_P(__register_printf_function,libc_register_printf_function,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T spec, printf_function *func, printf_arginfo_function *arginfo),(spec,func,arginfo));
+DEFINE_PUBLIC_ALIAS_P(register_printf_function,libc_register_printf_function,,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T spec, printf_function *func, printf_arginfo_function *arginfo),(spec,func,arginfo));
+DEFINE_PUBLIC_ALIAS_P(register_printf_modifier,libc_register_printf_modifier,WUNUSED NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(__WCHAR32_TYPE__ const *str),(str));
+DEFINE_PUBLIC_ALIAS_P(register_printf_type,libc_register_printf_type,WUNUSED NONNULL((1)),int,NOTHROW_NCX,LIBCCALL,(printf_va_arg_function *fct),(fct));
+DEFINE_PUBLIC_ALIAS_P(parse_printf_format,libc_parse_printf_format,ATTR_OUTS(3, 2) NONNULL((1)),size_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict fmt, size_t n, int *__restrict argtypes),(fmt,n,argtypes));
+DEFINE_PUBLIC_ALIAS_P(printf_size,libc_printf_size,NONNULL((1, 2, 3)),int,NOTHROW_NCX,LIBCCALL,(FILE *__restrict fp, struct printf_info const *info, void const *const *__restrict args),(fp,info,args));
+DEFINE_PUBLIC_ALIAS_P(printf_size_info,libc_printf_size_info,NONNULL((1, 3)),int,NOTHROW_NCX,LIBCCALL,(struct printf_info const *__restrict info, size_t n, int *__restrict argtypes),(info,n,argtypes));
 /*[[[end:exports]]]*/
 
 DECL_END

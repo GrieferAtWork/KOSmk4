@@ -267,13 +267,13 @@ NOTHROW_NCX(LIBDCALL libc___p__wcmdln)(void)
 }
 /*[[[end:libc___p__wcmdln]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x7a4654b2]]]*/
-DEFINE_PUBLIC_ALIAS(_seh_filter_dll, libc__seh_filter_dll);
-DEFINE_PUBLIC_ALIAS(_seh_filter_exe, libc__seh_filter_exe);
-DEFINE_PUBLIC_ALIAS(__set_app_type, libc__set_app_type);
-DEFINE_PUBLIC_ALIAS(_set_app_type, libc__set_app_type);
-DEFINE_PUBLIC_ALIAS(__p__acmdln, libc___p__acmdln);
-DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libc___p__wcmdln);
+/*[[[start:exports,hash:CRC-32=0x710acc7f]]]*/
+DEFINE_PUBLIC_ALIAS_P(_seh_filter_dll,libc__seh_filter_dll,ATTR_INOUT(2),int,NOTHROW_NCX,LIBDCALL,(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs),(xno,infp_ptrs));
+DEFINE_PUBLIC_ALIAS_P(_seh_filter_exe,libc__seh_filter_exe,ATTR_INOUT(2),int,NOTHROW_NCX,LIBDCALL,(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs),(xno,infp_ptrs));
+DEFINE_PUBLIC_ALIAS_P_VOID(__set_app_type,libc__set_app_type,,NOTHROW_NCX,LIBDCALL,(_crt_app_type type),(type));
+DEFINE_PUBLIC_ALIAS_P_VOID(_set_app_type,libc__set_app_type,,NOTHROW_NCX,LIBDCALL,(_crt_app_type type),(type));
+DEFINE_PUBLIC_ALIAS_P(__p__acmdln,libc___p__acmdln,,char **,NOTHROW_NCX,LIBDCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(DOS$__p__wcmdln,libc___p__wcmdln,,__WCHAR16_TYPE__ **,NOTHROW_NCX,LIBDCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END
