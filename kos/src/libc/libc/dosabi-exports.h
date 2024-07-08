@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8d87bd4 */
+/* HASH CRC-32:0xc72f80d3 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2657,6 +2657,18 @@ DEFINE_PUBLIC_ALIAS(DOS$cfree, libd_free);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_free, libd_free);
 DEFINE_PUBLIC_ALIAS(DOS$__cfree, libd_free);
 DEFINE_PUBLIC_ALIAS(DOS$__free, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdaPv, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdlPv, libd_free);
+#ifdef __LIBCCALL_CALLER_CLEANUP
+DEFINE_PUBLIC_ALIAS(DOS$_ZdaPvRKSt9nothrow_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdlPvRKSt9nothrow_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdaPvSt11align_val_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdlPvSt11align_val_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdaPvmSt11align_val_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdlPvmSt11align_val_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdaPvSt11align_val_tRKSt9nothrow_t, libd_free);
+DEFINE_PUBLIC_ALIAS(DOS$_ZdlPvSt11align_val_tRKSt9nothrow_t, libd_free);
+#endif /* __LIBCCALL_CALLER_CLEANUP */
 DEFINE_PUBLIC_ALIAS(DOS$free, libd_free);
 DEFINE_PUBLIC_ALIAS(DOS$srand, libd_srand);
 DEFINE_PUBLIC_ALIAS(DOS$atoi, libd_atoi);

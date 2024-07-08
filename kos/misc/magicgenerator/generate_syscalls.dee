@@ -1794,7 +1794,7 @@ function printSyscallDeclarations(
 	if (pragmaPushMacroNames) {
 		fp << "\n";
 		fp << "#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO\n";
-		pragmaPushMacroNames.reverse();
+		pragmaPushMacroNames = pragmaPushMacroNames.reversed();
 		for (local x: pragmaPushMacroNames)
 			fp << "#pragma pop_macro(" << repr(x) << ")\n";
 		fp << "#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */\n";

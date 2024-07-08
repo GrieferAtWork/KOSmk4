@@ -246,7 +246,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] &= (__HYBRID_BITSET_LO_MASKIN(__startbitno & __HYBRID_BITSET_WORD_BMSK) |
 		                                     __HYBRID_BITSET_LO_MASKOU_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if likely(__startbitno < __endbitno) {
+	} else if __likely(__startbitno < __endbitno) {
 		__self[(__SIZE_TYPE__)__minword] &= __HYBRID_BITSET_LO_MASKIN(__startbitno & __HYBRID_BITSET_WORD_BMSK);
 		__hybrid_memset_zero(&__self[(__SIZE_TYPE__)__minword + 1], (__SIZE_TYPE__)__maxword - ((__SIZE_TYPE__)__minword + 1));
 		__self[(__SIZE_TYPE__)__maxword] &= __HYBRID_BITSET_LO_MASKOU_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK);
@@ -267,7 +267,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] |= (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &
 		                                     __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if likely(__startbitno < __endbitno) {
+	} else if __likely(__startbitno < __endbitno) {
 		__self[(__SIZE_TYPE__)__minword] |= __HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK);
 		__hybrid_memset_one(&__self[__minword + 1], (__SIZE_TYPE__)__maxword - ((__SIZE_TYPE__)__minword + 1));
 		__self[(__SIZE_TYPE__)__maxword] |= __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK);
@@ -288,7 +288,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] ^= (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &
 		                                     __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if likely(__startbitno < __endbitno) {
+	} else if __likely(__startbitno < __endbitno) {
 		__SSIZE_TYPE__ __i;
 		__self[(__SIZE_TYPE__)__minword] ^= __HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK);
 		for (__i = __minword + 1; __i < __maxword; ++__i)
@@ -459,7 +459,7 @@ __NOTHROW_NCX(__hybrid_bitset_nffs)(__hybrid_bitset_t const *__restrict __self,
 	__SSIZE_TYPE__ __minword = (__SSIZE_TYPE__)__HYBRID_BITSET_WORD(__startbitno);
 	__SSIZE_TYPE__ __maxword = __HYBRID_BITSET_WORD(__maxbitno);
 	if (__minword >= __maxword) {
-		if likely(__startbitno < __endbitno) {
+		if __likely(__startbitno < __endbitno) {
 			__hybrid_bitset_t __word;
 			__word = __self[__maxword] & (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &
 			                              __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
@@ -497,7 +497,7 @@ __NOTHROW_NCX(__hybrid_bitset_nffc)(__hybrid_bitset_t const *__restrict __self,
 	__SSIZE_TYPE__ __minword = (__SSIZE_TYPE__)__HYBRID_BITSET_WORD(__startbitno);
 	__SSIZE_TYPE__ __maxword = __HYBRID_BITSET_WORD(__maxbitno);
 	if (__minword >= __maxword) {
-		if likely(__startbitno < __endbitno) {
+		if __likely(__startbitno < __endbitno) {
 			__hybrid_bitset_t __word;
 			__hybrid_bitset_t __mask;
 			__mask = (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &
@@ -540,7 +540,7 @@ __NOTHROW_NCX(__hybrid_bitset_nfls)(__hybrid_bitset_t const *__restrict __self,
 	__SSIZE_TYPE__ __minword = (__SSIZE_TYPE__)__HYBRID_BITSET_WORD(__startbitno);
 	__SSIZE_TYPE__ __maxword = __HYBRID_BITSET_WORD(__maxbitno);
 	if (__minword >= __maxword) {
-		if likely(__startbitno < __endbitno) {
+		if __likely(__startbitno < __endbitno) {
 			__hybrid_bitset_t __word;
 			__word = __self[__maxword] & (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &
 			                              __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
@@ -582,7 +582,7 @@ __NOTHROW_NCX(__hybrid_bitset_nflc)(__hybrid_bitset_t const *__restrict __self,
 	__SSIZE_TYPE__ __minword = (__SSIZE_TYPE__)__HYBRID_BITSET_WORD(__startbitno);
 	__SSIZE_TYPE__ __maxword = __HYBRID_BITSET_WORD(__maxbitno);
 	if (__minword >= __maxword) {
-		if likely(__startbitno < __endbitno) {
+		if __likely(__startbitno < __endbitno) {
 			__hybrid_bitset_t __word;
 			__hybrid_bitset_t __mask;
 			__mask = (__HYBRID_BITSET_LO_MASKOU(__startbitno & __HYBRID_BITSET_WORD_BMSK) &

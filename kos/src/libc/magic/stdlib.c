@@ -825,7 +825,18 @@ void *realloc(void *mallptr, size_t num_bytes);
 [[crtbuiltin, export_alias("cfree", "__libc_free" /*, "__builtin_delete"*/ )]]
 [[section(".text.crt{|.dos}.heap.malloc")]]
 [[export_as("__cfree", "__free")]] /* From Glibc 2.0.4 */
+[[export_as("_ZdaPv")]] /* operator delete[](void*) */
+[[export_as("_ZdlPv")]] /* operator delete(void*) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdaPvRKSt9nothrow_t")]]                /* operator delete[](void*, std::nothrow_t const&) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdlPvRKSt9nothrow_t")]]                /* operator delete(void*, std::nothrow_t const&) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdaPvSt11align_val_t")]]               /* operator delete[](void*, std::align_val_t) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdlPvSt11align_val_t")]]               /* operator delete(void*, std::align_val_t) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdaPvmSt11align_val_t")]]              /* operator delete[](void*, unsigned long, std::align_val_t) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdlPvmSt11align_val_t")]]              /* operator delete(void*, unsigned long, std::align_val_t) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdaPvSt11align_val_tRKSt9nothrow_t")]] /* operator delete[](void*, std::align_val_t, std::nothrow_t const&) */
+[[if(defined(__LIBCCALL_CALLER_CLEANUP)), export_as("_ZdlPvSt11align_val_tRKSt9nothrow_t")]] /* operator delete(void*, std::align_val_t, std::nothrow_t const&) */
 void free(void *mallptr);
+
 
 
 [[std, nothrow, userimpl]]

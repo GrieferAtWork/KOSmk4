@@ -295,6 +295,19 @@ DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
 DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
 DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
 
+DEFINE_DL_EXPORT_ALIAS(_ZdaPv, dlfree); /* operator delete[](void*) */
+DEFINE_DL_EXPORT_ALIAS(_ZdlPv, dlfree); /* operator delete(void*) */
+#ifdef __LIBCCALL_CALLER_CLEANUP
+DEFINE_DL_EXPORT_ALIAS(_ZdaPvRKSt9nothrow_t, dlfree);                /* operator delete[](void*, std::nothrow_t const&) */
+DEFINE_DL_EXPORT_ALIAS(_ZdlPvRKSt9nothrow_t, dlfree);                /* operator delete(void*, std::nothrow_t const&) */
+DEFINE_DL_EXPORT_ALIAS(_ZdaPvSt11align_val_t, dlfree);               /* operator delete[](void*, std::align_val_t) */
+DEFINE_DL_EXPORT_ALIAS(_ZdlPvSt11align_val_t, dlfree);               /* operator delete(void*, std::align_val_t) */
+DEFINE_DL_EXPORT_ALIAS(_ZdaPvmSt11align_val_t, dlfree);              /* operator delete[](void*, unsigned long, std::align_val_t) */
+DEFINE_DL_EXPORT_ALIAS(_ZdlPvmSt11align_val_t, dlfree);              /* operator delete(void*, unsigned long, std::align_val_t) */
+DEFINE_DL_EXPORT_ALIAS(_ZdaPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete[](void*, std::align_val_t, std::nothrow_t const&) */
+DEFINE_DL_EXPORT_ALIAS(_ZdlPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete(void*, std::align_val_t, std::nothrow_t const&) */
+#endif /* __LIBCCALL_CALLER_CLEANUP */
+
 #ifdef _MALLINFO_MATCHES_MALLINFO2
 DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
