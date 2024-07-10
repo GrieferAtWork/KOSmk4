@@ -195,8 +195,10 @@ ForEachMacros:
   - BSEARCH_EX
   - bitset_foreach
   - bitset_nforeach
+  - bitset_nforeach_r
   - __hybrid_bitset_foreach
   - __hybrid_bitset_nforeach
+  - __hybrid_bitset_nforeach_r
   - PCI_FOREACH_DEVICE
   - PCI_FOREACH_DEVICE_CLASS
   - __STATIC_IF

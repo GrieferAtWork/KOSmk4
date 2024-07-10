@@ -121,8 +121,8 @@ __ATTR_NONNULL((1)) void (bit_nclear)(bitstr_t *__restrict self, int minbitno, i
  *       function still guaranties that nothing but `self' gets modified. */
 __ATTR_NONNULL((1)) void (bit_nset)(bitstr_t *__restrict self, int minbitno, int maxbitno);
 #else /* __INTELLISENSE__ */
-#define bit_nclear(self, minbitno, maxbitno) __hybrid_bitset_nclear(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
-#define bit_nset(self, minbitno, maxbitno)   __hybrid_bitset_nset(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
+#define bit_nclear(self, minbitno, maxbitno) __hybrid_bitset_nclear_r(self, (unsigned int)(minbitno), (unsigned int)(maxbitno))
+#define bit_nset(self, minbitno, maxbitno)   __hybrid_bitset_nset_r(self, (unsigned int)(minbitno), (unsigned int)(maxbitno))
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __INTELLISENSE__
@@ -156,7 +156,7 @@ __NOTHROW_NCX(__PRIVATE_bit_ffs)(bitstr_t const *__restrict __self, __SIZE_TYPE_
 #define bit_noneset(self, nbits)              (!bit_anyset(self, nbits))
 #define bit_anyset(self, nbits)               __hybrid_bitset_anyset(self, nbits)
 #define bit_allset(self, nbits)               __hybrid_bitset_allset(self, nbits)
-#define bit_nanyset(self, minbitno, maxbitno) __hybrid_bitset_nanyset(self, (unsigned int)(minbitno), (unsigned int)(maxbitno) + 1)
+#define bit_nanyset(self, minbitno, maxbitno) __hybrid_bitset_nanyset_r(self, (unsigned int)(minbitno), (unsigned int)(maxbitno))
 #define bit_popcount(self, nbits)             __hybrid_bitset_popcount(self, nbits)
 
 /* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */
