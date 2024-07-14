@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32acf50f */
+/* HASH CRC-32:0xbd541900 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,7 +168,7 @@ INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(7) __STDC_INT_AS_SS
  * @return: REG_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
  * @return: REG_EEND:     Unexpected end of pattern.
  * @return: REG_ESIZE:    Compiled pattern bigger than 2^16 bytes.
- * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' wasn't set)
  * @return: REG_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: REG_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen) */

@@ -651,7 +651,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
 }
 /*[[[end:libc_re_match_2]]]*/
 
-/*[[[head:libc_regcomp,hash:CRC-32=0x67b26bae]]]*/
+/*[[[head:libc_regcomp,hash:CRC-32=0xa966d049]]]*/
 /* >> regcomp(3)
  * Compile a regular expression `pattern' and initialize `self'
  * @param: self:    Storage for the produced regex pattern.
@@ -672,7 +672,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
  * @return: REG_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
  * @return: REG_EEND:     Unexpected end of pattern.
  * @return: REG_ESIZE:    Compiled pattern bigger than 2^16 bytes.
- * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' wasn't set)
  * @return: REG_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: REG_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen) */

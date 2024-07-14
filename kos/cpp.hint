@@ -59,6 +59,7 @@
 #define __clrcall
 #define __ms_abi
 #define __sysv_abi
+#define register
 
 
 
@@ -92,6 +93,7 @@
 #define XRETURN
 #define __XRETURN
 
+#define __register
 #define __P(x) x
 #define __builtin_va_list va_list
 #define DFL(x) =x
@@ -2806,11 +2808,15 @@
 #define DEFINE_FORMAT_CONVERTER_RGBA(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(n,d,union pixel_##n)
 #define DEFINE_FORMAT_CONVERTER_RGBX(n,d,...) DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(n,d,union pixel_##n)
 #define DEFINE_FORMAT_CONVERTER_RGB(n,d,...)  DEFINE_FORMAT_PIXEL_UNION(n,d,__VA_ARGS__) DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(n,d,union pixel_##n)
-
 #define _ASYNC_WORKER_CXX_DECLARE(_,T)\
 	async*async_worker_new(async_worker_ops const*ops,T*ob_pointer){}\
 	bool register_async_worker(async_worker_ops const*ops,T*ob_pointer){}\
 	bool unregister_async_worker(async_worker_ops const*ops,T*ob_pointer){}
+#define __NRFEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
+#define __NR32FEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
+#define __NR64FEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
 
 #define USER_TRY
 #define USER_EXCEPT(x)
+#define TARGET(...)
+#define XTARGET(...)
