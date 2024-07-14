@@ -272,8 +272,7 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	/* For *very* large reads (6 pages or more), replace part of the
 	 * target  buffer memory mapping with a new MAP_PRIVATE|MAP_FILE
 	 * mapping of  `self', so  memory can  be loaded  lazily and  be
-	 * unloaded in case of OOM. (TODO: there should be a /proc  file
-	 * to configure this threshold, with PAGESIZE as minimum)
+	 * unloaded in case of OOM.
 	 *
 	 * Note however that leading/trailing pages where only parts of
 	 * the page are *actually* being read into must still be loaded
