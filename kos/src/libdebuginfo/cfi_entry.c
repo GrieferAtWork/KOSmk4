@@ -1078,6 +1078,7 @@ NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
 	ce = cfientry_alloc(unwind_rega);
 	ce->_ce_unwind_rega = unwind_rega;
 	ce->ce_unwind_regc  = 0;
+	ce->ce_emulator     = self; /* Initialize "ce_emulator" here because `cfientry_init()' might need it. */
 
 	/* Initialize the CFI-entry controller. */
 	result = cfientry_init(ce, self->ue_regget, self->ue_regget_arg);
@@ -1094,7 +1095,6 @@ NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
 	/* Fill in the callee-register accessor callback of `ce' */
 	ce->ce_regget     = self->ue_regget;
 	ce->ce_regget_arg = self->ue_regget_arg;
-	ce->ce_emulator   = self;
 	ce->ce_module     = NULL;
 
 	/* Re-configure `self' for execution. */

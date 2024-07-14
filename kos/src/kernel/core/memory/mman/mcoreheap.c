@@ -666,7 +666,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 		ccstate_t ccstate = CCSTATE_INIT;
 		do {
 			if (!system_cc_s_noblock(&ccstate))
-				THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, sizeof(*result));
+				return NULL;
 			result = mcoreheap_alloc_locked_nx_nocc();
 		} while (!result);
 	}

@@ -218,9 +218,10 @@ NOTHROW(FCALL allocate_physical_memory)(PAGEDIR_PAGEALIGNED void *addr,
 fail:
 	while (i) {
 		physaddr_t phys;
-		byte_t *vaddr = (byte_t *)addr + i;
+		byte_t *vaddr;
 		i -= PAGESIZE;
-		phys = pagedir_translate(vaddr);
+		vaddr = (byte_t *)addr + i;
+		phys  = pagedir_translate(vaddr);
 		pagedir_unmapone(vaddr);
 		page_freeone(physaddr2page(phys));
 	}

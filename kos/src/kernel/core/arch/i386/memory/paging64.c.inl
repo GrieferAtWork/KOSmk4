@@ -565,16 +565,16 @@ again:
 
 		/* Allocate vectors. */
 		e3_vector = page_mallocone_noblock_for_paging();
-		if unlikely(!e3_vector)
+		if unlikely(e3_vector == PHYSPAGE_INVALID)
 			goto err;
 		e2_vector = page_mallocone_noblock_for_paging();
-		if unlikely(!e2_vector) {
+		if unlikely(e2_vector == PHYSPAGE_INVALID) {
 err_e3_vector:
 			page_freeone_for_paging(e3_vector);
 			goto err;
 		}
 		e1_vector = page_mallocone_noblock_for_paging();
-		if unlikely(!e1_vector) {
+		if unlikely(e1_vector == PHYSPAGE_INVALID) {
 			page_freeone_for_paging(e2_vector);
 			goto err_e3_vector;
 		}
