@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0de1e2a */
+/* HASH CRC-32:0x98d3d571 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #include <sysexits.h> /* for `EX_USAGE' */
+#ifndef __KERNEL__
 #undef argp_program_version
 #undef argp_program_version_hook
 #undef argp_program_bug_address
@@ -50,6 +51,7 @@ DEFINE_PUBLIC_ALIAS(argp_err_exit_status, libc_argp_err_exit_status);
 #define argp_program_version_hook GET_NOREL_GLOBAL(argp_program_version_hook)
 #define argp_program_bug_address  GET_NOREL_GLOBAL(argp_program_bug_address)
 #define argp_err_exit_status      GET_NOREL_GLOBAL(argp_err_exit_status)
+#endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.compat.glibc.string.argp") ATTR_IN(1) void
 NOTHROW_NCX(LIBCCALL libc_argp_usage)(struct argp_state const *state) {

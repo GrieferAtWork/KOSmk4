@@ -303,6 +303,7 @@ __CSDECLARE(, int, argp_err_exit_status)
 
 
 %(auto_source){
+#ifndef __KERNEL__
 #undef argp_program_version
 #undef argp_program_version_hook
 #undef argp_program_bug_address
@@ -319,6 +320,7 @@ DEFINE_PUBLIC_ALIAS(argp_err_exit_status, libc_argp_err_exit_status);
 #define argp_program_version_hook GET_NOREL_GLOBAL(argp_program_version_hook)
 #define argp_program_bug_address  GET_NOREL_GLOBAL(argp_program_bug_address)
 #define argp_err_exit_status      GET_NOREL_GLOBAL(argp_err_exit_status)
+#endif /* !__KERNEL__ */
 }
 
 

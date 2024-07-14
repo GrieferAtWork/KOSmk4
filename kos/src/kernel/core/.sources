@@ -199,7 +199,11 @@ BEGIN
 		END
 	}
 
+#define HAVE_KERNEL_EXPORTS_SYMLIST
 	local final KERNEL_EXPORTS_SOURCE = f"/{config.BUILD_PATH}/kernel-symtab.S";
+#ifdef HAVE_KERNEL_EXPORTS_SYMLIST
+	local final KERNEL_EXPORTS_SYMLIST = f"/{config.BUILD_PATH}/kernel-symtab.txt";
+#endif /* HAVE_KERNEL_EXPORTS_SYMLIST */
 	BEGIN GROUP("kernel") { DILINK, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
@@ -287,10 +291,23 @@ BEGIN
 							fp << ".Lname" << i << ":\n\t.string " << repr str data[0] << "\n";
 						}
 					});
+#ifdef HAVE_KERNEL_EXPORTS_SYMLIST
+					local final KERNEL_EXPORTS_SYMLIST = f"/{config.BUILD_PATH}/kernel-symtab.txt";
+					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SYMLIST), [](fp: File) {
+						for (local key: sorted_keys)
+							fp << key << "\n";
+					});
+#endif /* HAVE_KERNEL_EXPORTS_SYMLIST */
 				}
 			).withMaybeModifiedOutputFiles({
 				KERNEL_EXPORTS_SOURCE
-			}),
+			})
+#ifdef HAVE_KERNEL_EXPORTS_SYMLIST
+			.withModifiedOutputFiles({
+				KERNEL_EXPORTS_SYMLIST
+			})
+#endif /* HAVE_KERNEL_EXPORTS_SYMLIST */
+			,
 		};
 
 		/* Bindings for compressed debug section data, and where to map them. */
