@@ -285,7 +285,9 @@ LOCAL_mpart_rw(struct mpart *__restrict self,
 	 *
 	 * NOTE: Only do this for  target buffers located in  user-space,
 	 *       since doing this in kernel-space would turn buffers into
-	 *       NCX memory in places where that wouldn't be expected.
+	 *       NCX memory in  places where that  wouldn't be  expected.
+	 *       His  check is performed within `mpart_mmapread()', which
+	 *       returns "0" when "buffer" is part of kernel-space.
 	 */
 	if (num_bytes >= atomic_read(&mpart_mmapread_threshold)) {
 #ifdef LOCAL_BUFFER_IS_IOVEC

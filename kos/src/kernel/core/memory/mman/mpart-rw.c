@@ -364,13 +364,20 @@ again_lock_fmap_and_mm:
 	mnode_range_remove_and_unmap(mm, mima.mm_min, mima.mm_max, &deleted_nodes);
 
 	/* Delete page directory mappings within the buffer area such
-	 * that these mappings will  get re-loaded as file  mappings. */
+	 * that these mappings will  get re-loaded as file  mappings.
+	 *
+	 * This can be done before we insert the new nodes, since we're
+	 * still  holding a lock  to the mman,  meaning that if another
+	 * thread  were to fault  before we inserted  the new nodes, it
+	 * would  simply block until  it could lock  the mman (at which
+	 * point the new nodes will be present). */
 	if likely(pagedir_prepare(mmap_minaddr, map_size)) {
 		pagedir_unmap(mmap_minaddr, map_size);
-		pagedir_sync_smp(mmap_minaddr, map_size);
 		pagedir_unprepare(mmap_minaddr, map_size);
+		pagedir_sync_smp(mmap_minaddr, map_size);
 	} else {
 		pagedir_unmap_userspace();
+		pagedir_syncall_smp();
 	}
 
 	/* Insert the new file nodes into the mman. */
