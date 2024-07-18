@@ -932,8 +932,8 @@ nope:
 	return false;
 }
 
-/* Same  as `mpart_setcore_or_unlock()', but  keep even after a
- * lock was lost, keep working to force the part into the core. */
+/* Same as `mpart_setcore_or_unlock()', but even after a lock
+ * was  lost, keep working  to force the  part into the core. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) bool FCALL
 mpart_setcore_or_unlock2(struct mpart *__restrict self,
                          struct unlockinfo *unlock)

@@ -987,8 +987,8 @@ mpart_setcore_or_unlock(struct mpart *__restrict self,
                         struct mpart_setcore_data *__restrict data)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
-/* Same  as `mpart_setcore_or_unlock()', but  keep even after a
- * lock was lost, keep working to force the part into the core. */
+/* Same as `mpart_setcore_or_unlock()', but even after a lock
+ * was  lost, keep working  to force the  part into the core. */
 FUNDEF BLOCKING WUNUSED NONNULL((1)) __BOOL FCALL
 mpart_setcore_or_unlock2(struct mpart *__restrict self,
                          struct unlockinfo *unlock)
@@ -1920,7 +1920,7 @@ DATDEF size_t mpart_all_size;
 #endif /* CONFIG_NO_MPART_ALL_SIZE */
 
 /* Direct insert/remove a given part from `mpart_all_list'
- * The caller must be holding a  lock to `mpart_all_lock'! */
+ * The caller must be holding a lock to  `mpart_all_lock'! */
 #define _mpart_all_list_insert(part) (TAILQ_INSERT_TAIL(&mpart_all_list, part, mp_allparts), _mpart_all_size_inc())
 #define _mpart_all_list_remove(part) (_mpart_all_size_dec(), TAILQ_REMOVE(&mpart_all_list, part, mp_allparts))
 
