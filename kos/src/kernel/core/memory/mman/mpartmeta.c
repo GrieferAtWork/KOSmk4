@@ -510,7 +510,7 @@ mfile_lookupfutex(struct mfile *__restrict self, pos_t addr)
 	addr &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 again:
 	mfile_lock_read(self);
-	if unlikely(!mfile_isanon(self))
+	if unlikely(mfile_isanon(self))
 		goto unlock_file_and_done;
 	part = mpart_tree_locate(self->mf_parts, addr);
 	if (part == NULL) {
