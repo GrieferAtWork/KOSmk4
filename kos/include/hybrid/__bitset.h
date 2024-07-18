@@ -1051,7 +1051,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __BOOL
 				return 0;
 		}
 	} else {
-		/* Bitsets aren't aligned -> cmopare 1 bit at-a-time */
+		/* Bitsets aren't aligned -> compare 1 bit at-a-time */
 		__SIZE_TYPE__ __i;
 		for (__i = 0; __i < __n_bits; ++__i) {
 			if ((!!__hybrid_bitset_test(__lhs, __lhs_startbitno + __i)) !=

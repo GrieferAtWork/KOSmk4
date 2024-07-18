@@ -1927,8 +1927,7 @@ copy_next_tx:
 			/* perform the transfer using our buffer copies. */
 			uhci_transfer(self, tx_firstcopy, &aio);
 			RAII_FINALLY { aio_handle_generic_fini(&aio); };
-			aio_handle_generic_waitfor(&aio);
-			aio_handle_generic_checkerror(&aio);
+			aio_handle_generic_await(&aio);
 			assert(aio.ah_type == &uhci_aio_type);
 			result = uhci_aio_retsize(&aio);
 		}

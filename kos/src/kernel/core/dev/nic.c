@@ -198,8 +198,7 @@ nicdev_v_write(struct mfile *__restrict self,
 
 	/* Wait for the send to finish. */
 	RAII_FINALLY { aio_handle_generic_fini(&aio); };
-	aio_handle_generic_waitfor(&aio);
-	aio_handle_generic_checkerror(&aio);
+	aio_handle_generic_await(&aio);
 	return num_bytes;
 }
 

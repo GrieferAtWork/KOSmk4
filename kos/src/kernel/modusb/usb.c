@@ -578,8 +578,7 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 	aio_handle_generic_init(&aio);
 	usb_controller_transfer(self, tx, &aio);
 	RAII_FINALLY { aio_handle_generic_fini(&aio); };
-	aio_handle_generic_waitfor(&aio);
-	aio_handle_generic_checkerror(&aio);
+	aio_handle_generic_await(&aio);
 	assert(aio.ah_type);
 	assert(aio.ah_type->ht_retsize != NULL);
 	result = (*aio.ah_type->ht_retsize)(&aio);
@@ -655,8 +654,7 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
 	usb_controller_request(self, endp, request, buf, &aio);
 	{
 		RAII_FINALLY { aio_handle_generic_fini(&aio); };
-		aio_handle_generic_waitfor(&aio);
-		aio_handle_generic_checkerror(&aio);
+		aio_handle_generic_await(&aio);
 		assert(aio.ah_type);
 		assert(aio.ah_type->ht_retsize != NULL);
 		result = (*aio.ah_type->ht_retsize)(&aio);

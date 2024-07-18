@@ -327,8 +327,7 @@ do_blocking_connect:
 		aio_handle_generic_init(&aio);
 		(*self->sk_ops->so_connect)(self, addr, addr_len, &aio);
 		RAII_FINALLY { aio_handle_generic_fini(&aio); };
-		aio_handle_generic_waitfor(&aio);
-		aio_handle_generic_checkerror(&aio);
+		aio_handle_generic_await(&aio);
 	}
 	return SOCKET_CONNECT_COMPLETED;
 }
@@ -505,8 +504,7 @@ waitfor_send_aio(struct socket *__restrict self,
 	/* Allow for send timeouts. */
 	if (timeout != KTIME_INFINITE) {
 		timeout += ktime();
-		if (!aio_handle_generic_waitfor(aio, timeout)) {
-			aio_handle_cancel(aio); /* Force AIO completion one way or another... */
+		if (!aio_handle_generic_await(aio, timeout)) {
 			COMPILER_READ_BARRIER();
 
 			/* Only throw an error  if we did actually  manage to cancel the  AIO
@@ -518,7 +516,7 @@ waitfor_send_aio(struct socket *__restrict self,
 				THROW(E_NET_TIMEOUT);
 		}
 	} else {
-		aio_handle_generic_waitfor(aio);
+		aio_handle_generic_await(aio);
 	}
 }
 
@@ -553,7 +551,6 @@ socket_send(struct socket *__restrict self,
 		} else {
 			TRY {
 				waitfor_send_aio(self, &aio);
-				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
 				RETHROW();
@@ -601,7 +598,6 @@ socket_sendv(struct socket *__restrict self,
 		} else {
 			TRY {
 				waitfor_send_aio(self, &aio);
-				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
 				RETHROW();
@@ -910,7 +906,6 @@ socket_sendto(struct socket *__restrict self,
 		} else {
 			TRY {
 				waitfor_send_aio(self, &aio);
-				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
 				RETHROW();
@@ -959,7 +954,6 @@ socket_sendtov(struct socket *__restrict self,
 		} else {
 			TRY {
 				waitfor_send_aio(self, &aio);
-				aio_handle_generic_checkerror(&aio);
 			} EXCEPT {
 				aio_handle_generic_fini(&aio);
 				RETHROW();

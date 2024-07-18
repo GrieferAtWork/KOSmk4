@@ -39,6 +39,10 @@
 #include <libc/string.h>
 #endif /* !NDEBUG && !NDEBUG_FINI */
 
+#ifndef __cplusplus
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus */
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -73,16 +77,16 @@ DECL_BEGIN
  * >>                   │                           │  │   >> ent = atomic_xch(&d_aio_pending, NULL);
  * >> async_operation(device, [...], &aio);  ──┐    │  │   >> for (r = ent; r && !(*pred)(r); r = r->ah_next);
  * >> TRY {                                    │    │  │   >> if (r) REMOVE_FROM_CHAIN(&ent, r);
- * >>     aio_handle_generic_waitfor(&aio);    │    │  │   >> if (ent) RESTORE_ALL(ent);
- * >>     aio_handle_generic_checkerror(&aio); │    │  │   >> return r;
- * >> } EXCEPT {                               │    │  │   REMOVE(ent):
- * >>     aio_handle_generic_fini(&aio);       │    │  │   >> do {
- * >>     RETHROW();                           │    │  │   >>     chain = atomic_xch(&d_aio_pending, NULL);
- * >> }                                        │    │  │   >>     found = REMOVE_FROM_CHAIN(&chain, ent);
- * >> aio_handle_generic_fini(&aio);           │    │  │   >>     if (chain)
- *                                             │    │  │   >>         RESTORE_ALL(chain);
- *                                             │    │  │   >> } while (!found);
- *   ┌─────────────────────────────────────────┘    │  │
+ * >>     aio_handle_generic_await(&aio);      │    │  │   >> if (ent) RESTORE_ALL(ent);
+ * >> } EXCEPT {                               │    │  │   >> return r;
+ * >>     aio_handle_generic_fini(&aio);       │    │  │   REMOVE(ent):
+ * >>     RETHROW();                           │    │  │   >> do {
+ * >> }                                        │    │  │   >>     chain = atomic_xch(&d_aio_pending, NULL);
+ * >> aio_handle_generic_fini(&aio);           │    │  │   >>     found = REMOVE_FROM_CHAIN(&chain, ent);
+ *                                             │    │  │   >>     if (chain)
+ *   ┌─────────────────────────────────────────┘    │  │   >>         RESTORE_ALL(chain);
+ *   │                                              │  │   >> } while (!found);
+ *   │                                              │  │
  *   │                                              │  └─> [SIGNAL_PENDING_AIO_BECAME_AVAILABLE(device)]
  *   │                                              │      NOTE: This part doesn't necessarily have to be implemented by
  *   │                                              │            an async-worker, so-long as the process of kick-starting
@@ -476,14 +480,7 @@ NOTHROW(KCALL aio_handle_complete)(/*inherit(always)*/ struct aio_handle *__rest
  * >> //       handle that hasn't actually be used with any sort of async
  * >> //       I/O function, you'd end up with undefined behavior!
  * >> block_device_aread_sector(dev, phys_dest, virt_dest, 2, 0, &handle);
- * >> TRY {
- * >>     aio_handle_generic_waitfor(&handle);
- * >>     aio_handle_generic_checkerror(&handle);
- * >> } EXCEPT {
- * >>     aio_handle_generic_fini(&handle);
- * >>     RETHROW();
- * >> }
- * >> aio_handle_generic_fini(&handle);
+ * >> aio_handle_generic_await(&handle);
  */
 
 /* A general purpose AIO handle that can be used for synchronizing for completion. */
@@ -523,37 +520,34 @@ NOTHROW(KCALL aio_handle_generic_init)(struct aio_handle_generic *__restrict sel
 	(__hybrid_atomic_load(&(self)->hg_status, __ATOMIC_ACQUIRE) != 0)
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
-LOCAL NONNULL((1)) void KCALL
-aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
-		THROWS(E_IOERROR, ...) {
+__COMPILER_EIDECLARE(NONNULL((1)), void, , KCALL, aio_handle_generic_checkerror,
+                     (struct aio_handle_generic *__restrict self) THROWS(E_IOERROR, ...), {
 	if unlikely(self->hg_status == AIO_COMPLETION_FAILURE) {
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->hg_error, sizeof(self->hg_error));
 		except_throw_current();
 	}
-}
+})
 
 /* Connect to the given AIO handle. */
-LOCAL NONNULL((1)) void KCALL
-aio_handle_generic_connect_for_poll(struct aio_handle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
-	task_connect_for_poll(&self->hg_signal);
-}
-
-LOCAL NONNULL((1)) bool KCALL
-aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
+#define aio_handle_generic_connect_for_poll(self) \
+	task_connect_for_poll(&(self)->hg_signal)
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_handle_generic_poll,
+                     (struct aio_handle_generic *__restrict self) THROWS(E_BADALLOC), {
 	if (aio_handle_generic_hascompleted(self))
 		return true;
 	aio_handle_generic_connect_for_poll(self);
 	return aio_handle_generic_hascompleted(self);
-}
+})
 
+
+/* Wait for an AIO handle to be completed. If the calling thread is interrupted,
+ * or the given `abs_timeout' expires, the AIO operation will have already  been
+ * canceled by the time this function returns. */
 #ifdef TRY
-LOCAL NONNULL((1)) bool KCALL
-aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
-                           ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_WOULDBLOCK, ...) {
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_handle_generic_waitfor_or_cancel,
+                     (struct aio_handle_generic *__restrict self,
+                      ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK, ...), {
 	__hybrid_assert(!task_wasconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
 		TRY {
@@ -572,8 +566,52 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 		}
 	}
 	return true;
-}
-#endif /* TRY */
+})
+#else /* TRY */
+FUNDEF NONNULL((1)) bool KCALL
+aio_handle_generic_waitfor_or_cancel(struct aio_handle_generic *__restrict self,
+                                     ktime_t abs_timeout DFL(KTIME_INFINITE))
+		THROWS(E_WOULDBLOCK, ...);
+#endif /* !TRY */
+
+/* Convenience wrapper for:
+ * >> result = aio_handle_generic_waitfor_or_cancel(self, abs_timeout);
+ * >> if (result)
+ * >>     aio_handle_generic_checkerror(self);
+ * >> return result;
+ *
+ * This function will do everything necessary to:
+ * - Ensure completion of `self'
+ * - Cancel `self' in case the calling thread is interrupted, or `abs_timeout' expires
+ * - When there was no timeout, check if `self' encountered an error, and propagate it
+ * - Finalize the AIO controller `self' */
+__COMPILER_EIDECLARE(NONNULL((1)), void, , KCALL, aio_handle_generic_await,
+                     (struct aio_handle_generic *__restrict self)
+                     THROWS(E_WOULDBLOCK, ...), {
+	aio_handle_generic_waitfor_or_cancel(self, KTIME_INFINITE);
+	aio_handle_generic_checkerror(self);
+})
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_handle_generic_await_timed,
+                     (struct aio_handle_generic *__restrict self, ktime_t abs_timeout)
+                     THROWS(E_WOULDBLOCK, ...), {
+	bool result = aio_handle_generic_waitfor_or_cancel(self, abs_timeout);
+	if likely(result)
+		aio_handle_generic_checkerror(self);
+	return result;
+})
+#ifdef __cplusplus
+extern "C++" {
+__COMPILER_EIREDIRECT(NONNULL((1)), bool, , KCALL, aio_handle_generic_await,
+                      (struct aio_handle_generic *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK, ...),
+                      aio_handle_generic_await_timed, {
+	return aio_handle_generic_await_timed(self, abs_timeout);
+})
+} /* extern "C++" */
+#elif defined(__HYBRID_PP_VA_OVERLOAD)
+#define __PRIVATE_aio_handle_generic_await_1 (aio_handle_generic_await)
+#define __PRIVATE_aio_handle_generic_await_2 (aio_handle_generic_await_timed)
+#define aio_handle_generic_await(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_aio_handle_generic_await_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* ... */
 
 
 

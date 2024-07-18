@@ -112,6 +112,83 @@ NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 	sig_broadcast_cleanup_nopr(&self->hg_signal, &cleanup);
 }
 
+
+
+
+PUBLIC NONNULL((1)) void KCALL
+aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
+		THROWS(E_IOERROR, ...) {
+	if unlikely(self->hg_status == AIO_COMPLETION_FAILURE) {
+		memcpy(&THIS_EXCEPTION_DATA,
+		       &self->hg_error, sizeof(self->hg_error));
+		except_throw_current();
+	}
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
+		THROWS(E_BADALLOC) {
+	if (aio_handle_generic_hascompleted(self))
+		return true;
+	aio_handle_generic_connect_for_poll(self);
+	return aio_handle_generic_hascompleted(self);
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_handle_generic_waitfor_or_cancel(struct aio_handle_generic *__restrict self,
+                                     ktime_t abs_timeout /*DFL(KTIME_INFINITE)*/)
+		THROWS(E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	while (!aio_handle_generic_hascompleted(self)) {
+		TRY {
+			aio_handle_generic_connect_for_poll(self);
+			if unlikely(aio_handle_generic_hascompleted(self)) {
+				task_disconnectall();
+				break;
+			}
+			if (!task_waitfor(abs_timeout)) {
+				aio_handle_cancel(self);
+				return false;
+			}
+		} EXCEPT {
+			aio_handle_cancel(self);
+			RETHROW();
+		}
+	}
+	return true;
+}
+
+/* Convenience wrapper for:
+ * >> result = aio_handle_generic_waitfor_or_cancel(self, abs_timeout);
+ * >> if (result)
+ * >>     aio_handle_generic_checkerror(self);
+ * >> return result;
+ *
+ * This function will do everything necessary to:
+ * - Ensure completion of `self'
+ * - Cancel `self' in case the calling thread is interrupted, or `abs_timeout' expires
+ * - When there was no timeout, check if `self' encountered an error, and propagate it
+ * - Finalize the AIO controller `self' */
+PUBLIC NONNULL((1)) void KCALL
+aio_handle_generic_await(struct aio_handle_generic *__restrict self)
+		THROWS(E_WOULDBLOCK, ...) {
+	aio_handle_generic_waitfor_or_cancel(self);
+	aio_handle_generic_checkerror(self);
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_handle_generic_await_timed(struct aio_handle_generic *__restrict self,
+                               ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...) {
+	bool result = aio_handle_generic_waitfor_or_cancel(self, abs_timeout);
+	if likely(result)
+		aio_handle_generic_checkerror(self);
+	return result;
+}
+
+
+
+
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int status)
