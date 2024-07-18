@@ -201,6 +201,71 @@ NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__r
 	aio_multihandle_release(self);
 }
 
+/* Check if the AIO operation failed, and propagate the error if it did. */
+PUBLIC NONNULL((1)) void KCALL
+aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
+		THROWS(E_IOERROR, ...) {
+	if unlikely((self->_aio_multihandle_generic_base_ am_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) ==
+	           ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT)) {
+		memcpy(&THIS_EXCEPTION_DATA,
+		       &self->_aio_multihandle_generic_base_ am_error,
+		       sizeof(self->_aio_multihandle_generic_base_ am_error));
+		except_throw_current();
+	}
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
+		THROWS(E_BADALLOC) {
+	if (aio_multihandle_generic_hascompleted(self))
+		return true;
+	aio_multihandle_generic_connect_for_poll(self);
+	return aio_multihandle_generic_hascompleted(self);
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_multihandle_generic_waitfor_or_cancel(struct aio_multihandle_generic *__restrict self,
+                                          ktime_t abs_timeout /*DFL(KTIME_INFINITE)*/)
+		THROWS(E_WOULDBLOCK, ...) {
+	assert(!task_wasconnected());
+	while (!aio_multihandle_generic_hascompleted(self)) {
+		TRY {
+			aio_multihandle_generic_connect_for_poll(self);
+			if unlikely(aio_multihandle_generic_hascompleted(self)) {
+				task_disconnectall();
+				break;
+			}
+			if (!task_waitfor(abs_timeout)) {
+				aio_multihandle_cancel(self);
+				return false;
+			}
+		} EXCEPT {
+			aio_multihandle_cancel(self);
+			RETHROW();
+		}
+	}
+	return true;
+}
+
+PUBLIC NONNULL((1)) void KCALL
+aio_multihandle_generic_await(struct aio_multihandle_generic *__restrict self)
+		THROWS(E_WOULDBLOCK, ...) {
+	aio_multihandle_generic_waitfor_or_cancel(self);
+	aio_multihandle_generic_checkerror(self);
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+aio_multihandle_generic_await_timed(struct aio_multihandle_generic *__restrict self,
+                                    ktime_t abs_timeout)
+		THROWS(E_WOULDBLOCK, ...) {
+	bool result = aio_multihandle_generic_waitfor_or_cancel(self, abs_timeout);
+	if likely(result)
+		aio_multihandle_generic_checkerror(self);
+	return result;
+}
+
+
+
 
 
 

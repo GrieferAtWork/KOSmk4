@@ -747,8 +747,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
  * >> }
  * >> aio_multihandle_done(&multihandle);
  * >> RAII_FINALLY { aio_multihandle_generic_fini(&multihandle); };
- * >> aio_multihandle_generic_waitfor(&multihandle);
- * >> aio_multihandle_generic_checkerror(&multihandle);
+ * >> aio_multihandle_generic_await(&multihandle);
  */
 
 /* Generic  multi-handle  that  is  capable  of  being  used  as  a  signal   source.
@@ -788,31 +787,10 @@ NOTHROW(KCALL aio_multihandle_generic_init)(struct aio_multihandle_generic *__re
 	(((self)->_aio_multihandle_generic_base_ am_status & (AIO_MULTIHANDLE_STATUS_ALLRUNNING | AIO_MULTIHANDLE_STATUS_RUNMASK)) == \
 	 AIO_MULTIHANDLE_STATUS_ALLRUNNING)
 
-/* Check if the AIO operation failed, and propagate the error if it did. */
-LOCAL NONNULL((1)) void KCALL
-aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
-		THROWS(E_IOERROR, ...) {
-	if unlikely((self->_aio_multihandle_generic_base_ am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING |
-	                                                                AIO_MULTIHANDLE_STATUS_FAILED)) ==
-	            AIO_COMPLETION_FAILURE) {
-		__libc_memcpy(&THIS_EXCEPTION_DATA,
-		              &self->_aio_multihandle_generic_base_ am_error,
-		              sizeof(self->_aio_multihandle_generic_base_ am_error));
-		except_throw_current();
-	}
-}
-
-/* Connect to the given AIO multihandle. */
-LOCAL NONNULL((1)) void KCALL
-aio_multihandle_generic_connect(struct aio_multihandle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
-	task_connect_for_poll(&self->mg_signal);
-}
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
-LOCAL NONNULL((1)) void KCALL
-aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
-		THROWS(E_IOERROR, ...) {
+__COMPILER_EIDECLARE(NONNULL((1)), void, , KCALL, aio_multihandle_generic_checkerror,
+                     (struct aio_multihandle_generic *__restrict self) THROWS(E_IOERROR, ...), {
 	if unlikely((self->_aio_multihandle_generic_base_ am_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) ==
 	           ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT)) {
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
@@ -820,40 +798,31 @@ aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict se
 		              sizeof(self->_aio_multihandle_generic_base_ am_error));
 		except_throw_current();
 	}
-}
+})
 
-LOCAL NONNULL((1)) bool KCALL
-aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
+/* Connect to the given AIO multihandle. */
+#define aio_multihandle_generic_connect_for_poll(self) \
+	task_connect_for_poll(&(self)->mg_signal)
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_multihandle_generic_poll,
+                     (struct aio_multihandle_generic *__restrict self) THROWS(E_BADALLOC), {
 	if (aio_multihandle_generic_hascompleted(self))
 		return true;
-	aio_multihandle_generic_connect(self);
+	aio_multihandle_generic_connect_for_poll(self);
 	return aio_multihandle_generic_hascompleted(self);
-}
+})
 
-LOCAL NONNULL((1)) bool KCALL
-aio_multihandle_generic_poll_err(struct aio_multihandle_generic *__restrict self)
-		THROWS(...) {
-	if (aio_multihandle_generic_hascompleted(self))
-		goto check_error_and_return_true;
-	aio_multihandle_generic_connect(self);
-	if (aio_multihandle_generic_hascompleted(self))
-		goto check_error_and_return_true;
-	return false;
-check_error_and_return_true:
-	aio_multihandle_generic_checkerror(self);
-	return true;
-}
 
+/* Wait for an AIO handle to be completed. If the calling thread is interrupted,
+ * or the given `abs_timeout' expires, the AIO operation will have already  been
+ * canceled by the time this function returns. */
 #ifdef TRY
-LOCAL NONNULL((1)) bool KCALL
-aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
-                                ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_WOULDBLOCK, ...) {
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_multihandle_generic_waitfor_or_cancel,
+                     (struct aio_multihandle_generic *__restrict self,
+                      ktime_t abs_timeout DFL(KTIME_INFINITE)) THROWS(E_WOULDBLOCK, ...), {
 	__hybrid_assert(!task_wasconnected());
 	while (!aio_multihandle_generic_hascompleted(self)) {
 		TRY {
-			aio_multihandle_generic_connect(self);
+			aio_multihandle_generic_connect_for_poll(self);
 			if unlikely(aio_multihandle_generic_hascompleted(self)) {
 				task_disconnectall();
 				break;
@@ -868,8 +837,53 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
 		}
 	}
 	return true;
-}
-#endif /* TRY */
+})
+#else /* TRY */
+FUNDEF NONNULL((1)) bool KCALL
+aio_multihandle_generic_waitfor_or_cancel(struct aio_multihandle_generic *__restrict self,
+                                     ktime_t abs_timeout DFL(KTIME_INFINITE))
+		THROWS(E_WOULDBLOCK, ...);
+#endif /* !TRY */
+
+/* Convenience wrapper for:
+ * >> result = aio_multihandle_generic_waitfor_or_cancel(self, abs_timeout);
+ * >> if (result)
+ * >>     aio_multihandle_generic_checkerror(self);
+ * >> return result;
+ *
+ * This function will do everything necessary to:
+ * - Ensure completion of `self'
+ * - Cancel `self' in case the calling thread is interrupted, or `abs_timeout' expires
+ * - When there was no timeout, check if `self' encountered an error, and propagate it
+ * - Finalize the AIO controller `self' */
+__COMPILER_EIDECLARE(NONNULL((1)), void, , KCALL, aio_multihandle_generic_await,
+                     (struct aio_multihandle_generic *__restrict self)
+                     THROWS(E_WOULDBLOCK, ...), {
+	aio_multihandle_generic_waitfor_or_cancel(self, KTIME_INFINITE);
+	aio_multihandle_generic_checkerror(self);
+})
+__COMPILER_EIDECLARE(NONNULL((1)), bool, , KCALL, aio_multihandle_generic_await_timed,
+                     (struct aio_multihandle_generic *__restrict self, ktime_t abs_timeout)
+                     THROWS(E_WOULDBLOCK, ...), {
+	bool result = aio_multihandle_generic_waitfor_or_cancel(self, abs_timeout);
+	if likely(result)
+		aio_multihandle_generic_checkerror(self);
+	return result;
+})
+#ifdef __cplusplus
+extern "C++" {
+__COMPILER_EIREDIRECT(NONNULL((1)), bool, , KCALL, aio_multihandle_generic_await,
+                      (struct aio_multihandle_generic *__restrict self, ktime_t abs_timeout) THROWS(E_WOULDBLOCK, ...),
+                      aio_multihandle_generic_await_timed, {
+	return aio_multihandle_generic_await_timed(self, abs_timeout);
+})
+} /* extern "C++" */
+#elif defined(__HYBRID_PP_VA_OVERLOAD)
+#define __PRIVATE_aio_multihandle_generic_await_1 (aio_multihandle_generic_await)
+#define __PRIVATE_aio_multihandle_generic_await_2 (aio_multihandle_generic_await_timed)
+#define aio_multihandle_generic_await(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_aio_multihandle_generic_await_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* ... */
+
 
 
 

@@ -953,7 +953,7 @@ ip_arp_and_datagrams_connect(struct async *__restrict self) {
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
 		/* Wait for the send to be completed. */
-		aio_multihandle_generic_connect(&me->adj_done);
+		aio_multihandle_generic_connect_for_poll(&me->adj_done);
 		return KTIME_INFINITE;
 	}
 	/* Wait for the peer's MAC to become available. */

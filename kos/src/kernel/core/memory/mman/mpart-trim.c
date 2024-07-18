@@ -2288,8 +2288,7 @@ mpart_unlock_and_writeback_range(struct mpart *__restrict self,
 		}
 		aio_multihandle_done(&aio);
 		RAII_FINALLY { aio_multihandle_generic_fini(&aio); };
-		aio_multihandle_generic_waitfor(&aio);
-		aio_multihandle_generic_checkerror(&aio);
+		aio_multihandle_generic_await(&aio);
 	} EXCEPT {
 		mpart_setblockstate_r_from(self, minblock, endblock,
 		                           MPART_BLOCK_ST_INIT,

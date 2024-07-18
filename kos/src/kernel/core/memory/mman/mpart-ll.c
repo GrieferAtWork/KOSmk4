@@ -294,8 +294,7 @@ mpart_ll_populate(struct mpart *__restrict self,
 
 	/* Wait for AIO completion. */
 	RAII_FINALLY { aio_multihandle_generic_fini(&hand); };
-	aio_multihandle_generic_waitfor(&hand);
-	aio_multihandle_generic_checkerror(&hand);
+	aio_multihandle_generic_await(&hand);
 }
 
 

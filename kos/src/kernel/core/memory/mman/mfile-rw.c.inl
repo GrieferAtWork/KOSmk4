@@ -433,8 +433,7 @@ again:
 
 	/* Wait for AIO completion. */
 	RAII_FINALLY { aio_multihandle_generic_fini(&hand); };
-	aio_multihandle_generic_waitfor(&hand);
-	aio_multihandle_generic_checkerror(&hand);
+	aio_multihandle_generic_await(&hand);
 	return result;
 #elif defined(LOCAL_DIRECT) && defined(LOCAL_ASYNC) && !defined(LOCAL_BUFFER_IS_PHYS)
 #ifdef LOCAL_READING
