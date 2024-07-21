@@ -104,7 +104,7 @@ LIBVIO_DECL __ATTR_NONNULL((1)) __uint32_t LIBVIO_CC vio_xorl(struct vioargs *__
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
 /* Copy memory to/from VIO, or exchange memory with VIO
- * NOTE: `oldbuf' and `newbuf' may no overlap, though with the exception that they are allowed to be identical */
+ * NOTE: `oldbuf' and `newbuf' may not overlap, though with the exception that they are allowed to be identical */
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_XCHWITHVIO)(struct vioargs *__restrict args, vio_addr_t offset, __NCX void *oldbuf, __NCX void const *newbuf, __size_t num_bytes, __BOOL atomic) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO)(struct vioargs *__restrict args, vio_addr_t offset, __NCX void *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL_T((1)) void (LIBVIO_CC *PVIO_COPYTOVIO)(struct vioargs *__restrict args, vio_addr_t offset, __NCX void const *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;

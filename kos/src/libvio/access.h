@@ -73,7 +73,7 @@ INTDEF NONNULL((1)) u16 CC libvio_xorw(struct vioargs *__restrict args, vio_addr
 INTDEF NONNULL((1)) u32 CC libvio_xorl(struct vioargs *__restrict args, vio_addr_t addr, u32 mask, bool atomic);
 
 /* Copy memory to/from VIO, or exchange memory with VIO
- * NOTE: `oldbuf' and `newbuf' may no overlap, though with the exception that they are allowed to be identical */
+ * NOTE: `oldbuf' and `newbuf' may not overlap, though with the exception that they are allowed to be identical */
 INTDEF NONNULL((1)) void CC libvio_xchwithvio(struct vioargs *__restrict args, vio_addr_t offset, NCX void *oldbuf, NCX void const *newbuf, size_t num_bytes, bool atomic) THROWS(E_SEGFAULT, ...);
 INTDEF NONNULL((1)) void CC libvio_copyfromvio(struct vioargs *__restrict args, vio_addr_t offset, NCX void *buf, size_t num_bytes) THROWS(E_SEGFAULT, ...);
 INTDEF NONNULL((1)) void CC libvio_copytovio(struct vioargs *__restrict args, vio_addr_t offset, NCX void const *buf, size_t num_bytes) THROWS(E_SEGFAULT, ...);
