@@ -202,7 +202,7 @@ NOTHROW(FCALL mpart_ll_ccfreemem)(struct mpart *__restrict self) {
 }
 
 /* Reset the `page_iszero()' for physical memory of `self'.
- * -> This is helper wrapper around `page_resetzero()'. */
+ * -> This is a helper wrapper around `page_resetzero()'. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mpart_ll_resetzero)(struct mpart *__restrict self) {
 	if (self->mp_state == MPART_ST_MEM) {

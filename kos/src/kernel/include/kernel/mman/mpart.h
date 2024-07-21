@@ -833,7 +833,7 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
                                    size_t num_bytes);
 
 /* Reset the `page_iszero()' for physical memory of `self'.
- * -> This is helper wrapper around `page_resetzero()'. */
+ * -> This is a helper wrapper around `page_resetzero()'. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mpart_ll_resetzero)(struct mpart *__restrict self);
 

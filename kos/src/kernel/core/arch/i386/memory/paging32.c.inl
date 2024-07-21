@@ -357,14 +357,14 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 	 * >> movl   $2, %eax
 	 * >> invpcid (%eax), %eax // The first operand is ignored.
 	 * >> ret */
-	if (!HAVE_PAGE_GLOBAL_BIT) {
+	if __untraced(!HAVE_PAGE_GLOBAL_BIT) {
 		/* If global TLBs don't exist, we can simply use the mov-to-cr3 trick to flush TLBs */
 		/* Also: Since global TLBs don't exist, we can re-write `x86_pagedir_syncall_maybe_global'
 		 *       to  always  unconditionally  reload  cr3  with  the  same  code  we  already  use
 		 *       for `pagedir_syncall' */
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
-	} else if (!HAVE_INSTR_INVPCID) {
+	} else if __untraced(!HAVE_INSTR_INVPCID) {
 		/* From `4.10.4.1     Operations that Invalidate TLBs and Paging-Structure Caches'
 		 *    `MOV to CR4. The behavior of the instruction depends on the bits being modified:'
 		 *       `The instruction invalidates all TLB entries (including global entries) and all entries
@@ -373,8 +373,8 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 	}
 
-	if (!HAVE_INSTR_INVLPG) {
-		if (HAVE_PAGE_GLOBAL_BIT) {
+	if __untraced(!HAVE_INSTR_INVLPG) {
+		if __untraced(HAVE_PAGE_GLOBAL_BIT) {
 			/* Must re-write `pagedir_syncone' and `arch_pagedir_sync' to use cr4 for flushing */
 			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 			memcpy((void *)&arch_pagedir_sync, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
