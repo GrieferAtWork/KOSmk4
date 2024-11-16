@@ -4034,13 +4034,16 @@ done:
 
 /* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
  * This function is specifically designed to-be used by `system_cc()' (in case you  were
- * wondering about the meaning of `data->mtd_ccinfo')
+ * wondering about the meaning of  `data->mtd_ccinfo'), which uses it with  increasingly
+ * more aggressive configurations in order to reclaim ram when memory gets low.
+ *
  * NOTE: The caller must be holding a lock to `self' when calling this function.
  * NOTE: This  function operates with respect to `ccinfo_noblock(data->mtd_ccinfo)',
  *       in that it will operate as a  no-op whenever something comes up that  would
  *       need to block, in which case `MPART_NXOP_ST_SUCCESS' is returned (emulating
  *       the behavior when  `self' was  trimmed, or  nothing about  `self' could  be
  *       trimmed)
+ *
  * @param: data: [in|out] Storage  area for dynamically allocated memory. Note that
  *                        unlike usually, this  data-area does  NOT become  invalid
  *                        when this function succeeds. Even  more so, it may  still

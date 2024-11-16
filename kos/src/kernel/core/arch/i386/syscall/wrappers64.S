@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4041322c */
+/* HASH CRC-32:0x2cb06bc1 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11824,7 +11824,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_serve_sysret)
 	.cfi_endproc
 END(__x86_asm64_syscall_rpc_serve_sysret)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
@@ -24533,7 +24534,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
@@ -29932,7 +29934,8 @@ END(__x86_asm32_sysenter_waitid64)
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
@@ -36293,7 +36296,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utimes64)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

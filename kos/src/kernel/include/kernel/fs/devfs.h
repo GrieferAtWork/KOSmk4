@@ -203,7 +203,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
  *  - self->_device_devnode_ _fdevnode_node_ fn_ino       # s.a. `device_registerf()'
  *  - self->_device_devnode_ _fdevnode_node_ fn_mode      # Something or'd with S_IFCHR or S_IFBLK
  *  - self->_device_devnode_ dn_devno                     # s.a. `device_registerf()'
- *  - self->dv_driver                                     # As `incref(drv_self)'
+ *  - self->dv_driver                                     # As `incref(&drv_self)'
  *  - self->dv_dirent                                     # s.a. `device_registerf()'
  *  - self->dv_byname_node                                # s.a. `device_registerf()'
  * @param: struct device     *self:  Device to initialize.

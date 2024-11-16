@@ -167,7 +167,7 @@
 
 
 #ifdef __LIBC_BIND_CRTBUILTINS
-#if (__LIBC_BIND_CRTBUILTINS + 0) == 0
+#if (-__LIBC_BIND_CRTBUILTINS - 1) == -1 /* #if (#define __LIBC_BIND_CRTBUILTINS 0) */
 #undef __LIBC_BIND_CRTBUILTINS
 #endif /* !__LIBC_BIND_CRTBUILTINS */
 #elif (!defined(__INTELLISENSE__) && !defined(__NO_has_builtin) &&                              \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35e8eaaa */
+/* HASH CRC-32:0x5bb87e17 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2040,7 +2040,8 @@ __CDECLARE_SC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 __CDECLARE_SC(,__errno_t,set_tls,(void const *__tlsval),(__tlsval))
 #endif /* __CRT_HAVE_SC(set_tls) */
 #if __CRT_HAVE_SC(set_userprocmask_address)
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
@@ -4508,7 +4509,8 @@ __CDECLARE_XSC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 __CDECLARE_XSC(,__errno_t,set_tls,(void const *__tlsval),(__tlsval))
 #endif /* __CRT_HAVE_XSC(set_tls) */
 #if __CRT_HAVE_XSC(set_userprocmask_address)
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

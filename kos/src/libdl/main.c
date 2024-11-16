@@ -165,7 +165,7 @@ PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
 		++value;
 
 		/* Parse variables. */
-#define ISENV(name) (namelen == COMPILER_STRLEN(name) && memcmp(env, name, COMPILER_STRLEN(name)) == 0)
+#define ISENV(name) (namelen == COMPILER_STRLEN(name) && bcmp(env, name, COMPILER_STRLEN(name)) == 0)
 		if (ISENV("LIBRARY_PATH")) {
 			/* Specs state that `LD_LIBRARY_PATH' should be ignored under AT_SECURE-mode */
 			if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0)) {

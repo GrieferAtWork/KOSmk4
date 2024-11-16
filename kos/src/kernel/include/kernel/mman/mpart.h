@@ -1401,7 +1401,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
  * NOTE: This function may also assume that at least the first byte (that
  *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
-FUNDEF NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
                                     mpart_reladdr_t partrel_offset,
                                     struct mpart_physloc *__restrict result);
@@ -1432,9 +1432,9 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 
 
 
-/* Split the given mem-part `self' (which  should be a member of  `file')
- * after `offset' bytes from the start of backing file. For this purpose,
- * the given `offset' should  be `> mpart_getminaddr(self)', and must  be
+/* Split the given mem-part `self' (which should be a member of  `file')
+ * after `offset' bytes from the backing file's start. For this purpose,
+ * the given `offset' should be `> mpart_getminaddr(self)', and must  be
  * both page- and block-aligned.
  * @return: NULL: The given `offset' is outside  the bounds of file  memory
  *                represented by `part'. The caller should handle this case
@@ -1465,7 +1465,7 @@ mpart_lock_acquire_and_setcore_denywrite_sync(struct mpart *__restrict self)
  *   - mpart_lock_acquired(self)               (unless `self' was accessed from a hinted node,
  *                                              or the caller knows that `self' can't be accessed
  *                                              from the outside world)
- *   - pagedir_prepare_p(self, addr, size)     (was called)
+ *   - pagedir_prepare_p(pdir, addr, size)     (was called)
  *
  * NOTES:
  *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
@@ -1569,29 +1569,37 @@ struct ccinfo;
                                            * with status `MPART_BLOCK_ST_CHNG') of the given mem-part (this is also
                                            * what `mpart_trim()' does, except that it *only* trims parts if they're
                                            * anonymous, meaning it can just ignore `MPART_BLOCK_ST_CHNG') */
-#define MPART_TRIM_MODE_UNINITIALIZED 1   /* Trim  uninitialized blocks of the given mem-part  (even if mappings exist for them.
-                                           * Since  those blocks aren't initialized, we can assume that they don't appear in any
-                                           * page directory, meaning they can be unloaded safely). Parts that are not mapped are
+#define MPART_TRIM_MODE_UNINITIALIZED 1   /* Trim uninitialized blocks of the given mem-part (even if mappings exist for them).
+                                           * Since those blocks aren't initialized, we can assume that they don't appear in any
+                                           * page directory, meaning they can be unloaded safely. Parts that are not mapped are
                                            * unmapped also (just as with `MPART_TRIM_MODE_UNMAPPED')
-                                           * NOTE: When `MPART_F_MLOCK' is set this behaves the same as `MPART_TRIM_MODE_UNMAPPED' */
+                                           * NOTE: For parts where `MPART_F_MLOCK' is set this behaves
+                                           *       the same as `MPART_TRIM_MODE_UNMAPPED' */
 #define MPART_TRIM_MODE_UNCHANGED     2   /* Trim all blocks that don't have status `MPART_BLOCK_ST_CHNG'
                                            * Any blocks that are initialized+mapped will be unmapped such
                                            * that they are loaded once again during the next access.
-                                           * NOTE: When `MPART_F_MLOCK' is set this behaves the same as `MPART_TRIM_MODE_UNMAPPED' */
+                                           *
+                                           * This mode is essentially the back-bone that drives clearing
+                                           * of filesystem caches (though it also clears allocated,  but
+                                           * unused/unchanged anonymous memory;  aka. preallocated  heap
+                                           * memory))
+                                           *
+                                           * NOTE: For parts where `MPART_F_MLOCK' is set this behaves
+                                           *       the same as `MPART_TRIM_MODE_UNMAPPED' */
 #define MPART_TRIM_MODEMASK           0x3 /* Mask of mode bits */
-#define MPART_TRIM_FLAG_SYNC          0x4 /* FLAG: Blocks that normally couldn't be  unloaded because they are marked  as
-                                           *       `MPART_BLOCK_ST_CHNG' can now also be unloaded. This is done by rather
-                                           *       than skipping such blocks, they are  written back to disk (any  errors
-                                           *       that during this are discarded before returning `MPART_NXOP_ST_ERROR')
-                                           *       and marking the block as `MPART_BLOCK_ST_LOAD' and treating it as such
+#define MPART_TRIM_FLAG_SYNC          0x4 /* FLAG: Blocks  that normally couldn't  be unloaded because  they are marked as
+                                           *       `MPART_BLOCK_ST_CHNG'  can now also be unloaded. This is done by rather
+                                           *       than  skipping such blocks,  they are written back  to disk (any errors
+                                           *       during this write are discarded before returning `MPART_NXOP_ST_ERROR')
+                                           *       and  marking the block as `MPART_BLOCK_ST_LOAD' and treating it as such
                                            * NOTE: When the part is anonymous, or the file doesn't implement the `mo_saveblocks'
                                            *       operator, this flag is simply ignored.
                                            * NOTE: When the part has the `MPART_F_MLOCK' flag, this flag is ignored. */
-#define MPART_TRIM_FLAG_SWAP          0x8 /* FLAG: Blocks that normally couldn't be  unloaded because they are marked  as
-                                           *       `MPART_BLOCK_ST_CHNG' can now also be unloaded. This is done by rather
-                                           *       than  skipping such blocks,  they are split  into a separate mem-part,
-                                           *       then written to swap (any errors that during this are discarded before
-                                           *       trying to re-merge the split part and returning `MPART_NXOP_ST_ERROR')
+#define MPART_TRIM_FLAG_SWAP          0x8 /* FLAG: Blocks  that normally couldn't  be unloaded because  they are marked as
+                                           *       `MPART_BLOCK_ST_CHNG'  can now also be unloaded. This is done by rather
+                                           *       than skipping such  blocks, they  are split into  a separate  mem-part,
+                                           *       then written to swap (any errors during this write are discarded before
+                                           *       trying to re-merge the split part and returning  `MPART_NXOP_ST_ERROR')
                                            *       The part is then marked as `MPART_ST_VOID'
                                            * NOTE: When the part isn't anonymous, and the file implements the `mo_saveblocks'
                                            *       operator, this flag is simply ignored.
@@ -1636,8 +1644,8 @@ struct mpart_trim_data {
 	       (self)->mtd_mmlocked  = (mmlocked),                   \
 	       (self)->mtd_rstart    = 0,                            \
 	       (self)->mtd_rend      = (mpart_reladdr_t)-1,          \
-	       (self)->mtd_xhand     = __NULLPTR,                            \
-	       (self)->mtd_bytes     = 0,                       \
+	       (self)->mtd_xhand     = __NULLPTR,                    \
+	       (self)->mtd_bytes     = 0,                            \
 	       (self)->mtd_mode      = (mode))
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
@@ -1656,13 +1664,16 @@ NOTHROW(FCALL mpart_trim_data_fini)(struct mpart_trim_data *__restrict self);
 
 /* Synchronous version of `mpart_trim()' (that is also able to trim non-anonymous parts)
  * This function is specifically designed to-be used by `system_cc()' (in case you  were
- * wondering about the meaning of `data->mtd_ccinfo')
+ * wondering about the meaning of  `data->mtd_ccinfo'), which uses it with  increasingly
+ * more aggressive configurations in order to reclaim ram when memory gets low.
+ *
  * NOTE: The caller must be holding a lock to `self' when calling this function.
  * NOTE: This  function operates with respect to `ccinfo_noblock(data->mtd_ccinfo)',
  *       in that it will operate as a  no-op whenever something comes up that  would
  *       need to block, in which case `MPART_NXOP_ST_SUCCESS' is returned (emulating
  *       the behavior when  `self' was  trimmed, or  nothing about  `self' could  be
  *       trimmed)
+ *
  * @param: data: [in|out] Storage  area for dynamically allocated memory. Note that
  *                        unlike usually, this  data-area does  NOT become  invalid
  *                        when this function succeeds. Even  more so, it may  still
@@ -1696,14 +1707,14 @@ mpart_trim_or_unlock(struct mpart *__restrict self,
 
 
 
-/* Try to allocate a new async job to  do `what', but if that fails use a  fallback
- * global  async job to do the same thing. _DONT_ call this function directly! This
- * function is used as the fallback-path when one of mpart named mem-part functions
- * can't be completed without  blocking, meaning that it  needs to be finished  via
- * async means. - If  you were to  call this function  directly, that initial  non-
- * blocking  attempt  would not  be  performed, which  would  introduce unnecessary
- * overhead  in the  case where the  operation could have  been done synchronously.
- * When multiple operations are scheduled at the same time, they will be  performed
+/* Try to allocate a new async job to do `what', but if that fails, use a fallback
+ * global async job to do the same thing. _DONT_ call this function directly! This
+ * function is used as the fallback-path when one of the named mem-part  functions
+ * can't  be completed without blocking, meaning that  it needs to be finished via
+ * async means. - If you  were to call this  function directly, that initial  non-
+ * blocking attempt  would not  be performed,  which would  introduce  unnecessary
+ * overhead  in the case  where the operation could  have been done synchronously.
+ * When multiple operations are scheduled at the same time, they will be performed
  * in the following order:
  *  - MPART_XF_WILLMERGE:  `mpart_merge()'
  *  - MPART_XF_WILLTRIM:   `mpart_trim()'
@@ -1723,7 +1734,7 @@ NOTHROW(FCALL mpart_start_asyncjob)(/*inherit(always)*/ REF struct mpart *__rest
  *
  * For this purpose, direct write-access is only granted when the given
  * sub-range is not visible anywhere else (iow: when `node' effectively
- * has exclusive ownership of that range):
+ * has exclusive ownership over that range):
  *   - mpart_isanon(self)                                     // The part must be anon (else: changes would
  *                                                            // be visible when read(2)-ing from its file)
  *   - self->mp_share.filter(MAPS(addr, num_bytes)) == []     // No shared memory mappings
@@ -1747,7 +1758,8 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
 #define mpart_issharewritable(self, addr, num_bytes) \
 	(LIST_EMPTY(&(self)->mp_copy) || _mpart_issharewritable(self, addr, num_bytes))
 #else /* !__OPTIMIZE_SIZE__ */
-#define mpart_issharewritable(self, addr, num_bytes) _mpart_issharewritable(self, addr, num_bytes)
+#define mpart_issharewritable(self, addr, num_bytes) \
+	_mpart_issharewritable(self, addr, num_bytes)
 #endif /* __OPTIMIZE_SIZE__ */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
@@ -1765,16 +1777,16 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 
 
 /* A slightly smarter equivalent of:
- * >> pagedir_prot_t perm;
- * >> perm = mnode_getprot(node);
- * >> perm = mpart_mmap(self, addr, size, offset);
- * >> return perm;
+ * >> pagedir_prot_t prot;
+ * >> prot = mnode_getprot(node);
+ * >> prot = mpart_mmap(self, addr, size, offset, prot);
+ * >> return prot;
  * However, unlike that piece of code, this one determines if write
  * access can be granted on a per-page basis (see the documentation
  * of `mpart_iscopywritable()'  and  `mpart_issharewritable()'  for
  * when write-access can be given)
- * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
- *              flags  used to  map pages  from the  given address range. */
+ * @return: * : The union (aka. |-ed together) set of `PAGEDIR_PROT_*'
+ *              flags used to map pages from the given address  range. */
 FUNDEF NOBLOCK NONNULL((1, 5)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
                                PAGEDIR_PAGEALIGNED void *addr,
@@ -1882,7 +1894,8 @@ FUNDEF NONNULL((1, 2)) size_t KCALL mpart_mmapreadv(struct mpart *__restrict sel
  *   set to a value lower  than this, `mpart_read()' and  `mpart_mmapread()'
  *   might call each other and cause a stack overflow.
  * - Set this value to `(size_t)-1' to soft-disable the auto-mmap feature.
- * - When set to `0', the kernel was configured to have this feature be hard-disabled.
+ * - When set to `0', the kernel was configured to have this feature be
+ *   hard-disabled (s.a. `CONFIG_HAVE_AUTO_MMAP').
  *
  * The value of this variable is exposed in `/proc/kos/mm/part-automap-threshold' */
 DATDEF size_t mpart_mmapread_threshold;
@@ -1945,11 +1958,11 @@ DATDEF size_t mpart_all_size;
 /* [0..n][lock(ATOMIC)] List of lock-ops for `mpart_all_list' */
 DATDEF struct lockop_slist mpart_all_lops;
 
-/* Add the given mpart `self'  to the global list of  parts.
- * This function will initialize `self->mp_allparts', though
- * may do so asynchronously (meaning  that the part may  not
- * have  been added to  the all-parts list  yet, even if you
- * acquire a lock to said  list immediately after call  this
+/* Add  the given mpart  `self' to the  global list of parts.
+ * This function will initialize `self->mp_allparts',  though
+ * may do so  asynchronously (meaning that  the part may  not
+ * have been added  to the  all-parts list yet,  even if  you
+ * acquire a lock to said list immediately after calling this
  * function) */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self);

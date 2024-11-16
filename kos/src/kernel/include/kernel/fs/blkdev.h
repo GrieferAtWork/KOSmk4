@@ -238,7 +238,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino       # s.a. `device_registerf()'
  *  - self->_blkdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode      # Something or'd with S_IFBLK
  *  - self->_blkdev_dev_ _device_devnode_ dn_devno                     # s.a. `device_registerf()'
- *  - self->_blkdev_dev_ dv_driver                                     # As `incref(drv_self)'
+ *  - self->_blkdev_dev_ dv_driver                                     # As `incref(&drv_self)'
  *  - self->_blkdev_dev_ dv_dirent                                     # s.a. `device_registerf()'
  *  - self->_blkdev_dev_ dv_byname_node                                # s.a. `device_registerf()'
  *  - self->bd_rootinfo.br_ata_serial_no

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16cb23cb */
+/* HASH CRC-32:0x9de27383 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1142,7 +1142,8 @@
  * @param: times[0]: New access time
  * @param: times[1]: New last-modified time */
 #define __NR_utimes64                     __UINT32_C(0xfffffef1) /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

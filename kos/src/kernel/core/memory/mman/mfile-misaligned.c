@@ -400,7 +400,7 @@ again_lock_write_inner:
 		 * - When 2 threads run in parallel, and one of them does a write(),
 		 *   while the other does a mmap(MAP_PRIVATE), there *already* is no
 		 *   guaranty as to what exactly the memory mapping will contain.
-		 * - If we *were* to wait  for `mf_trunclock == 0', then only  thing
+		 * - If we *were*  to wait for  `mf_trunclock == 0', the only  thing
 		 *   we'd be ensuring is that there's no way for only *part* of  the
 		 *   mapping to be the  old memory, and some  other part to be  new,
 		 *   but there also isn't anything in the specs that says that write
@@ -419,7 +419,7 @@ again_lock_write_inner:
 		 *
 		 * TLDR: This is unnecessary since  it's absence doesn't break  anything,
 		 *       and read()/write() (CONSUMER/PRODUCER)  already need some  extra
-		 *       locking mechanism if the intend it to sync them with each other.
+		 *       locking mechanism if the intend is to sync them with each other.
 		 */
 #if 0
 		/* Wait for `mf_trunclock' to become 0.
@@ -480,15 +480,8 @@ again_lock_write_inner:
 	/* Insert the new misaligned file into the base file's list. */
 	if (predecessor) {
 		/* Insert after `predecessor' */
-		struct misaligned_mfile *next;
 		used_predecessor = predecessor;
-		while ((next = LIST_NEXT(used_predecessor, mam_link)) != NULL) {
-			if (next->mam_offs > misalign)
-				break;
-			used_predecessor = next;
-		}
 	} else {
-		struct misaligned_mfile *next;
 		/* Must re-discover where to insert the new file. */
 		used_predecessor = LIST_FIRST(&inner->mf_msalign);
 		if (likely(used_predecessor == NULL) ||
@@ -497,6 +490,11 @@ again_lock_write_inner:
 			LIST_INSERT_HEAD(&inner->mf_msalign, result, mam_link);
 			goto did_insert;
 		}
+	}
+
+	/* Scan ahead to find the appropriate predecessor */
+	{
+		struct misaligned_mfile *next;
 		while ((next = LIST_NEXT(used_predecessor, mam_link)) != NULL) {
 			if (next->mam_offs > misalign)
 				break;
@@ -868,7 +866,7 @@ _mfile_msalign_makeanon_or_unlock(struct mfile *__restrict self,
 	 * >> pread(fd, buf, sizeof(buf), 0);  // This will trigger the mmapread system
 	 * >> pwrite(fd, "FOO", 3, offset);
 	 * >> // Because memory wasn't unshared during the write, the buffer now also contains "FOO"
-	 * >> assert(memcmp(buf + offset, "BAR") == 0);
+	 * >> assert(bcmp(buf + offset, "BAR") == 0);
 	 *
 	 * In  order to fix this, we essentially treat the mpart-s of misaligned files the
 	 * same way we  treat copy-on-write  nodes (as per  `mpart::mp_copy'). This  means

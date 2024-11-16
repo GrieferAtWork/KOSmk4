@@ -167,16 +167,18 @@ PRIVATE struct async_worker_ops const ttyfwd_cb = {
 	.awo_work    = &ttyfwd_work,
 };
 
-/* Start/Stop forwarding  input  handle  data  on  the  given  TTY
+/* Start/Stop forwarding input handle data on the given TTY.
+ *
  * Note that for any given input handle, only a single TTY  should
  * ever be allowed to process data. - Allowing multiple TTYs to do
  * so could result  in weakly  undefined behavior as  it would  no
  * longer  be clear  who should  actually receive  data, causing a
  * soft race condition with the potential of data being  scattered
  * between readers, or some random reader getting all of the data.
+ *
  * @return: true:  The FWD thread was started/stopped
  * @return: false: The FWD thread was already running/halted */
-PUBLIC bool KCALL
+PUBLIC NONNULL((1)) bool KCALL
 mkttydev_startfwd(struct mkttydev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	bool result;
@@ -184,7 +186,7 @@ mkttydev_startfwd(struct mkttydev *__restrict self)
 	return result;
 }
 
-PUBLIC NOBLOCK bool
+PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self) {
 	bool result;
 	result = unregister_async_worker(&ttyfwd_cb, self);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe819d9d */
+/* HASH CRC-32:0xa57009ad */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1492,7 +1492,8 @@
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 #define SYS_lfutexexpr                   __NR_lfutexexpr                   /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

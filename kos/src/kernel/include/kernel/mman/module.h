@@ -245,8 +245,8 @@ struct module {
 	byte_t                     _md_pad[sizeof(void *)];
 #endif /* !_MODULE_HAVE_SIZEOF_POINTER */
 	/* Module-specific data goes here.
-	 * NOTE: Module-descriptors for  `/lib/libdl.so' have  `md_fspath == NULL',
-	 *       while `md_fsname' points to a string reference that specific path. */
+	 * NOTE: Module-descriptors  for  `/lib/libdl.so'  have  `md_fspath == NULL',
+	 *       while `md_fsname' points to a string referencing that specific path. */
 };
 
 /* Increment/decrement  the  `md_nodecount' counter  of `self'

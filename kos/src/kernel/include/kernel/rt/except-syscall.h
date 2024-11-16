@@ -122,8 +122,8 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  *         described further below).
  *         In this case, rather than modifying its own, original signal mask, the kernel
  *         will  instead load the `pm_sigmask' pointer, and apply the same modifications
- *         it would have applied to the thread's internal (kernel-space) signal mask the
- *         signal set pointed-to by user-space. In this case, the system call doesn't do
+ *         it would have applied to the thread's internal (kernel-space) signal mask  to
+ *         the one pointed-to by  user-space. In this case,  the system call doesn't  do
  *         anything  that couldn't already be implemented in user-space, but still works
  *         as expected for the sake of compatibility.
  *
@@ -146,17 +146,17 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  *      signals, rather than individually for each signal (which would result in race conditions
  *      when  unmasking  one signal  triggers a  signal handler  that would  get executed  in an
  *      inconsistent context)
- *      As such, user-space making use of userprocmask somewhat increases the overhead needed
- *      for raising signals, however given that  raising signals in general aren't  something
- *      done  by programs  with the intend  of using them  for performance-critical purposes,
- *      this is completely acceptable.
+ *      As such, user-space making use of userprocmask somewhat increases the overhead  needed
+ *      for raising signals, however given that raising signals generally isn't something done
+ *      by  programs with the intend of using  them for performance-critical purposes, this is
+ *      completely acceptable.
  *
  *    - During a (successful) call to exec(), userprocmask-mode is disabled, the same way it
  *      would  also be disabled from user-space calling `sys_set_userprocmask_address(NULL)'
  *      As such, the final contents of `pm_sigmask'  from the thread calling exec() will  be
  *      loaded into the kernel's internal (legacy) sigprocmask buffer, such that the  signal
  *      mask  itself is inherited by a new process  the same way it would be if userprocmask
- *      hadn't been using by the original process.
+ *      hadn't been used by the original process.
  *
  *    - During a call to fork() or clone() (w/o CLONE_VM), the parent thread's
  *      TASK_FUSERPROCMASK    attribute    is    inherited    unconditionally.
@@ -176,8 +176,8 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  *      vfork() without userprocmask.
  *      The child thread is started with the `TASK_FUSERPROCMASK' attribute  set,
  *      which will be cleared the normal way once the child performs a successful
- *      call  to either  exec(2) or _Exit(2),  at which pointer  the process will
- *      once again wake up.
+ *      call  to either  exec(2) or _Exit(2),  at which point  the parent process
+ *      will once again wake up.
  *      Back in the parent process, the kernel will now perform 2 copy operations:
  *       - memcpy(orig_pm_sigmask, &saved_sigmask, sizeof(sigset_t));
  *       - THIS_USERPROCMASK_POINTER->pm_sigmask = orig_pm_sigmask;
@@ -204,9 +204,9 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  * Example code:
  * >> sigset_t os, ns;
  * >> sigfillset(&ns);
- * >> sigprocmask(SIG_SETMASK, &ns, &os);   // preemption_pushoff()
+ * >> sigprocmask(SIG_SETMASK, &ns, &os);   // user-space equivalent of `preemption_pushoff()'
  * >> ...
- * >> sigprocmask(SIG_SETMASK, &os, NULL);  // preemption_pop()
+ * >> sigprocmask(SIG_SETMASK, &os, NULL);  // user-space equivalent of `preemption_pop()'
  *
  *
  * Implementation of libc's `sigprocmask()':
@@ -226,8 +226,10 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  * >> };
  * >>
  * >>
+ * >>
  * >> // New system calls
  * >>
+ * >> // >> set_userprocmask_address(2)
  * >> // Register the address of the calling thread's userprocmask controller.
  * >> // This also initializes `*pm_sigmask' and `pm_pending', such that
  * >> // `*pm_sigmask' is filled with the current kernel-level signal mask,
@@ -252,16 +254,26 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  * >> // Service asynchronous (posix-signal-style) RPCs before returning to user-space
  * >> // NOTE: Not a cancellation point, and only serves async RPCs!
  * >> // @return: 0 : Always, unconditionally returned.
- * >> [restart(dont)] sys_rpc_serve_sysret:() -> errno_t;
+ * >> [restart(dont)] errno_t sys_rpc_serve_sysret(void);
+ * >>
  * >>
  * >>
  * >> // Per-thread user-space signal mask controller
  * >> __thread struct userprocmask mymask;
  * >>
+ * >>
+ * >>
  * >> // Run during startup, or lazily on first call to `libc:sigprocmask()'
+ * >> //
+ * >> // When `sys_set_userprocmask_address()' returns -ENOSYS, libc should
+ * >> // provide an alternative implementation of `sigprocmask()' that makes
+ * >> // use of `rt_sigprocmask(2)' (for compatibility with kernels where
+ * >> // this feature is disabled, and compatibility in general)
  * >> mymask.pm_sigsize = sizeof(sigset_t);
  * >> mymask.pm_sigmask = &mymask.pm_masks[0];
  * >> sys_set_userprocmask_address(&mymask);
+ * >>
+ * >>
  * >>
  * >> int sigprocmask(int how, sigset_t *ns, sigset_t *os) {
  * >>     sigset_t *oldset, *newset;
@@ -338,6 +350,7 @@ DATDEF ATTR_PERTASK NCX pid_t *this_tid_address;
  * >>     if (mymask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
  * >>         for (signo_t i = 1; i < NSIG; ++i) {
  * >>             if (sigismember(&mymask.pm_pending, i) && !sigismember(sigmaskptr, i)) {
+ * >>                 atomic_and(&mymask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
  * >>                 sigemptyset(&mymask.pm_pending);
  * >>                 sys_rpc_serve_sysret();
  * >>                 break;

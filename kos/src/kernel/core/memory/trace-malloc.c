@@ -1491,7 +1491,7 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 	 *  - fallsuper_list: `fsuper_opendev()' when already opened.
 	 * NOTE: sync(2) is implemented via `fchangedsuper_list', so doesn't use `fallsuper_list'
 	 *
-	 * To tell me: what reason is there for anything reachable via these lists to
+	 * So tell me: what reason is there for anything reachable via these lists to
 	 *             be considered globally visible  from a logical (not  semantic)
 	 *             stance?
 	 * Answer: there is no reason; any object found in those lists always has
@@ -2344,8 +2344,8 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 	size_t num_leaks = 0;
 	ssize_t temp, result = 0;
 	struct trace_node *iter;
-	for (iter = (struct trace_node *)leaks;
-	     iter; iter = trace_node_leak_next(iter))
+	for (iter = (struct trace_node *)leaks; iter;
+	     iter = trace_node_leak_next(iter))
 		++num_leaks;
 	if (pnum_leaks)
 		*pnum_leaks = num_leaks;
@@ -2919,7 +2919,7 @@ NOTHROW(KCALL kmalloc_islocked)(VIRT void *ptr) {
 	}
 #endif /* HAVE_kmalloc_validate_node */
 
-	/* Calculate the user-payload-size of the trace-node. */
+	/* Check if the node was allocated as locked memory. */
 	result = (node->tn_flags & GFP_LOCKED) != 0;
 	tm_lock_release();
 	return result;

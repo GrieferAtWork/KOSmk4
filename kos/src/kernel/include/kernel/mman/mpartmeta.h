@@ -60,7 +60,7 @@ SLIST_HEAD(mfutex_slist, mfutex);
 typedef size_t mpart_reladdr_t;
 #endif /* !__mpart_reladdr_t_defined */
 
-#define MFUTEX_ADDR_ALIGNMENT 2 /* Minimum alignment for mem-futex addresses. */
+#define MFUTEX_ADDR_ALIGNMENT 2 /* Minimum alignment for mem-futex addresses (>= 2 because least significant bit is RED-bit). */
 
 #ifndef __mpart_awref_defined
 #define __mpart_awref_defined

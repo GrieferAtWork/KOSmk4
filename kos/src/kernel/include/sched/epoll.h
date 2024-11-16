@@ -107,11 +107,11 @@ struct epoll_handle_monitor {
 	uintptr_half_t               ehm_raised;  /* [lock(ATOMIC)][valid_if(!epoll_handle_monitor_isrpc)]
 	                                           * Incremented  once the monitored  condition is met.  When this happens, the
 	                                           * monitor is added to the chain of raised monitors, and `ehm_ctrl->ec_avail'
-	                                           * will be send (using `sig_send()', thus waking up whatever a thread waiting
-	                                           * in  `epoll_wait(2)')  Note  that   `ehm_comp'  doesn't  (and  can't)   use
+	                                           * will  be send (using `sig_send()', thus waking up whichever thread waiting
+	                                           * in  `epoll_wait(2)').  Note  that  `ehm_comp'  doesn't  (and  can't)   use
 	                                           * `sig_completion_reprime()', since the  effective set of  signals to  which
-	                                           * one must listen when polling `ehm_hand' may depend on some internal state,
-	                                           * and  may  change over  time.  As such,  the  consumer of  epoll  events is
+	                                           * one  must  listen when  polling `ehm_hand*'  may  depend on  some internal
+	                                           * state,  and may change over time. As such, the consumer of epoll events is
 	                                           * responsible for resetting the set of signals monitored by `ehm_comp' every
 	                                           * time that signal is broadcast. */
 	uintptr_half_t               ehm_handtyp; /* [const] The type of handle being monitored. */
@@ -126,9 +126,9 @@ struct epoll_handle_monitor {
 #else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] Epoll user data. */
 #endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
-	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand'
-	                                           * Signals monitored by this controller are established by doing  a
-	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
+	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand*'
+	                                           * Signals monitored by this controller  are established by doing  a
+	                                           * regular `handle_poll()' on `ehm_hand*', followed by making use of
 	                                           * `sig_multicompletion_connect_from_task()'. */
 };
 

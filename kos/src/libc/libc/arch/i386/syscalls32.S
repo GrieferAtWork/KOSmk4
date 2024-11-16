@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bca4812 */
+/* HASH CRC-32:0xc0b53465 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3972,7 +3972,8 @@ INTERN_FUNCTION(libc_sys_utimes64)
 END(libc_sys_utimes64)
 DEFINE_PUBLIC_ALIAS(sys_utimes64, libc_sys_utimes64)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
@@ -8439,7 +8440,8 @@ INTERN_FUNCTION(libc_sys_Xutimes64)
 END(libc_sys_Xutimes64)
 DEFINE_PUBLIC_ALIAS(sys_Xutimes64, libc_sys_Xutimes64)
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

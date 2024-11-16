@@ -324,7 +324,7 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC _vidtty_v_termios(struct ansitty *__
  *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
  *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
  *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
- *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(&drv_self)'
  *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_vidtty_ansi_ _ansittydev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
  *  - self->vty_dev;
@@ -356,7 +356,7 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC _vidtty_v_termios(struct ansitty *__
 /* VIDEO LOCK                                                           */
 /************************************************************************/
 
-/* Operators for `struct vidtty' */
+/* Operators for `struct vidlck' */
 struct vidlck_ops {
 	struct mfile_ops vlo_file; /* Mem-file operators. */
 
@@ -384,7 +384,7 @@ struct vidlck
 #define _vidlck_file_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 	REF struct viddev *vlc_dev;    /* [1..1][const] Video device. */
-	REF struct vidtty *vlc_oldtty; /* [0..1][lock(vlc_dev->vd_lock)] TTY that is made active when this tty is destroyed. */
+	REF struct vidtty *vlc_oldtty; /* [0..1][lock(vlc_dev->vd_lock)] TTY that is made active when this lock is destroyed. */
 	struct async       vlc_rstor;  /* A pre-allocated async controller used to release the lock. */
 	/* Sub-classes will define everything register data to restore here. */
 };
@@ -491,7 +491,9 @@ struct viddev_ops {
 	/* [0..1] Restore video registers as the result of exiting the builtin debugger.
 	 * - Called while the debugger is still active (dbg_active).
 	 * - s.a. `vdo_enterdbg()'
-	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
+	 * - This function and `vdo_enterdbg()' are also used to implement the `screen'
+	 *   command, which lets the debugger display  a freeze-frame of what was  last
+	 *   shown on-screen before the debugger was entered. */
 	NONNULL_T((1)) void
 	NOTHROW_T(FCALL *vdo_leavedbg)(struct viddev *__restrict self);
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
@@ -575,7 +577,7 @@ DATDEF struct mfile_stream_ops const viddev_v_stream_ops;
  *  - self->_viddev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
  *  - self->_viddev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
  *  - self->_viddev_chr_ _chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
- *  - self->_viddev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_viddev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(&drv_self)'
  *  - self->_viddev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_viddev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
  * @param: struct viddev           *self: Video device to initialize.

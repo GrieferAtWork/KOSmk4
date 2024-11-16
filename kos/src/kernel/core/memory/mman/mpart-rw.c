@@ -75,7 +75,8 @@ DECL_BEGIN
  *   set to a value lower  than this, `mpart_read()' and  `mpart_mmapread()'
  *   might call each other and cause a stack overflow.
  * - Set this value to `(size_t)-1' to soft-disable the auto-mmap feature.
- * - When set to `0', the kernel was configured to have this feature be hard-disabled.
+ * - When set to `0', the kernel was configured to have this feature be
+ *   hard-disabled (s.a. `CONFIG_HAVE_AUTO_MMAP').
  *
  * The value of this variable is exposed in `/proc/kos/mm/part-automap-threshold' */
 #ifdef CONFIG_HAVE_AUTO_MMAP

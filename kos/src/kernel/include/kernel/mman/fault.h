@@ -309,10 +309,10 @@ mfault_or_unlock(struct mfault *__restrict self)
 
 
 /* Threshold (in bytes) that specifies the upper limit on how many bytes
- * of physical memory  are (technically useless)  allocated in calls  to
+ * of physical memory are (technically uselessly) allocated in calls  to
  * `mpart_setcore_or_unlock()',  even  when only  parts of  the mem-part
  * actually  need to be allocated as a result of `mfault_or_unlock()' or
- * some other operation that requires parts to loaded into memory.
+ * some  other operation that  requires parts to  be loaded into memory.
  *
  * Note that this "overallocation" never poses a problem for available
  * system memory, as such memory  (if truly unused) is always  trimmed

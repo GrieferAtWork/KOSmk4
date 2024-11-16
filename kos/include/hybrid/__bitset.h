@@ -250,7 +250,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] &= (__HYBRID_BITSET_LO_MASKIN(__minbitno & __HYBRID_BITSET_WORD_BMSK) |
 		                                     __HYBRID_BITSET_LO_MASKOU_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if __likely(__minbitno <= __maxbitno) {
+	} else if __likely(__minword <= __maxword) {
 		__self[(__SIZE_TYPE__)__minword] &= __HYBRID_BITSET_LO_MASKIN(__minbitno & __HYBRID_BITSET_WORD_BMSK);
 		__hybrid_memset_zero(&__self[(__SIZE_TYPE__)__minword + 1], (__SIZE_TYPE__)__maxword - ((__SIZE_TYPE__)__minword + 1));
 		__self[(__SIZE_TYPE__)__maxword] &= __HYBRID_BITSET_LO_MASKOU_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK);
@@ -281,7 +281,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] |= (__HYBRID_BITSET_LO_MASKOU(__minbitno & __HYBRID_BITSET_WORD_BMSK) &
 		                                     __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if __likely(__minbitno <= __maxbitno) {
+	} else if __likely(__minword <= __maxword) {
 		__self[(__SIZE_TYPE__)__minword] |= __HYBRID_BITSET_LO_MASKOU(__minbitno & __HYBRID_BITSET_WORD_BMSK);
 		__hybrid_memset_one(&__self[__minword + 1], (__SIZE_TYPE__)__maxword - ((__SIZE_TYPE__)__minword + 1));
 		__self[(__SIZE_TYPE__)__maxword] |= __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK);
@@ -312,7 +312,7 @@ __LOCAL __ATTR_NONNULL((1)) void
 	if (__minword == __maxword) {
 		__self[(__SIZE_TYPE__)__maxword] ^= (__HYBRID_BITSET_LO_MASKOU(__minbitno & __HYBRID_BITSET_WORD_BMSK) &
 		                                     __HYBRID_BITSET_LO_MASKIN_P1(__maxbitno & __HYBRID_BITSET_WORD_BMSK));
-	} else if __likely(__minbitno <= __maxbitno) {
+	} else if __likely(__minword <= __maxword) {
 		__SIZE_TYPE__ __i;
 		__self[(__SIZE_TYPE__)__minword] ^= __HYBRID_BITSET_LO_MASKOU(__minbitno & __HYBRID_BITSET_WORD_BMSK);
 		for (__i = __minword + 1; __i < __maxword; ++__i)
@@ -1063,7 +1063,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __BOOL
 }
 
 /* Check if all 1-bits from `lhs:lhs_startbitno...+=n_bits' also appear in `rhs:rhs_startbitno...+=n_bits'.
- * This function implements the a is-subset-or-equal check. */
+ * This function implements a is-subset-or-equal check. */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __BOOL
 (__hybrid_bitset_ncmple)(__hybrid_bitset_t const *__lhs, __SIZE_TYPE__ __lhs_startbitno,
                          __hybrid_bitset_t const *__rhs, __SIZE_TYPE__ __rhs_startbitno,

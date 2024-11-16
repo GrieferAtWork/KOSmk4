@@ -485,7 +485,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
-			if (!pending_word)
+			if likely(!pending_word)
 				continue; /* Nothing pending in here. */
 
 			/* Check if any of the pending signals are currently unmasked. */
@@ -622,7 +622,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
-			if (!pending_word)
+			if likely(!pending_word)
 				continue; /* Nothing pending in here. */
 
 			/* Check if any of the pending signals are currently unmasked. */
@@ -749,7 +749,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
-			if (!pending_word)
+			if likely(!pending_word)
 				continue; /* Nothing pending in here. */
 
 			/* Check if any of the pending signals are currently unmasked. */

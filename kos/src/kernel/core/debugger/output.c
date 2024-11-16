@@ -504,8 +504,8 @@ NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer,
  * NOTE: Out-of-bound cells  are read  as the  same value  as a  space-character
  *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
- * NOTE: These functions will read/write the SCROLL-TOP screen data, and
- *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'
+ * NOTE: These functions will read/write the SCROLL-TOP screen data,
+ *       and  `dbg_setscreendata()'  will  apply  `dbg_setscroll(0)'
  *       before actually copying cells.
  * @param: buf: A buffer capable of holding `size_x * size_y * dbg_screen_cellsize' bytes of data. */
 PUBLIC ATTR_DBGTEXT NONNULL((5)) void FCALL

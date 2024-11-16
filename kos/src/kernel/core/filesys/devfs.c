@@ -1603,8 +1603,8 @@ device_register(struct device *__restrict self)
 
 struct devdirent_printer_data {
 	struct devdirent *fpd_ent; /* [0..fpd_len*][owned] entry. */
-	size_t               fpd_avl; /* Unused length. */
-	size_t               fpd_pos; /* Write offset. */
+	size_t            fpd_avl; /* Unused length. */
+	size_t            fpd_pos; /* Write offset. */
 };
 
 PRIVATE ssize_t FORMATPRINTER_CC
@@ -1613,8 +1613,8 @@ devdirent_printer(void *arg, char const *__restrict text, size_t textlen) {
 	me = (struct devdirent_printer_data *)arg;
 	if (textlen > me->fpd_avl) {
 		me->fpd_ent = (struct devdirent *)krealloc(me->fpd_ent,
-		                                              me->fpd_pos + textlen + 1,
-		                                              GFP_NORMAL);
+		                                           me->fpd_pos + textlen + 1,
+		                                           GFP_NORMAL);
 		me->fpd_avl = ((kmalloc_usable_size(me->fpd_ent) / sizeof(char)) - 1) - me->fpd_pos;
 	}
 	memcpy((char *)me->fpd_ent + me->fpd_pos, text, textlen, sizeof(char));
@@ -1629,7 +1629,7 @@ devdirent_vnewf(char const *__restrict format, va_list args)
 		THROWS(E_BADALLOC) {
 	struct devdirent_printer_data dat;
 	dat.fpd_ent = (struct devdirent *)kmalloc(offsetof(struct devdirent, dd_dirent.fd_name) +
-	                                             (16 + 1) * sizeof(char), GFP_NORMAL);
+	                                          (16 + 1) * sizeof(char), GFP_NORMAL);
 	dat.fpd_pos = offsetof(struct devdirent, dd_dirent.fd_name);
 	dat.fpd_avl = ((kmalloc_usable_size(dat.fpd_ent) / sizeof(char)) - 1) - dat.fpd_pos;
 	TRY {
@@ -1644,8 +1644,8 @@ devdirent_vnewf(char const *__restrict format, va_list args)
 	if (dat.fpd_avl) {
 		struct devdirent *fin;
 		fin = (struct devdirent *)krealloc_nx(dat.fpd_ent,
-		                                         dat.fpd_pos + 1,
-		                                         GFP_NORMAL);
+		                                      dat.fpd_pos + 1,
+		                                      GFP_NORMAL);
 		if likely(fin)
 			dat.fpd_ent = fin;
 	}
@@ -1662,7 +1662,7 @@ devdirent_vnewf(char const *__restrict format, va_list args)
 	dat.fpd_ent->dd_dirent.fd_refcnt  = 1;
 	dat.fpd_ent->dd_dirent.fd_ops     = &devdirent_ops;
 	dat.fpd_ent->dd_dirent.fd_hash = fdirent_hash(dat.fpd_ent->dd_dirent.fd_name,
-	                                               dat.fpd_ent->dd_dirent.fd_namelen);
+	                                              dat.fpd_ent->dd_dirent.fd_namelen);
 	dat.fpd_ent->dd_dirent.fd_name[dat.fpd_pos] = '\0';
 
 	/* Rest of init is done by caller. */
@@ -2077,6 +2077,7 @@ device_lookup_bystring(NCX char const *string,
 				goto done;
 		}
 	}
+
 	/* sscanf for a valid device ID */
 	if (st_mode != 0 && stringlen < 128) {
 		major_t major;

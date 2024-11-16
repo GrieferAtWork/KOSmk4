@@ -71,7 +71,7 @@ struct chrdev
  *  - self->_chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
  *  - self->_chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
  *  - self->_chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
- *  - self->_chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_chrdev_dev_ dv_driver;                                     # As `incref(&drv_self)'
  *  - self->_chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
  * @param: struct chrdev           *self: Character device to initialize.

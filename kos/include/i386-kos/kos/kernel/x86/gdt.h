@@ -151,9 +151,9 @@
 
 
 #ifdef __x86_64__
-/* Because of stuff  like `mov $0, %ax; mov %ax, %fs;',  `0' must  also
- * be allowed as user-space segment index (except for %ss or %cs, which
- * aren't allowed to be loaded with a zero-selector) */
+/* Because of stuff like `mov $0, %ax; mov %ax, %fs;', `0' must also
+ * be  allowed as  user-space segment  index (except  for %cs, which
+ * isn't allowed to be loaded with a zero-selector) */
 #define SEGMENT_IS_VALID_USERCODE(x)   ((x) == SEGMENT_USER_CODE64_RPL || (x) == SEGMENT_USER_CODE32_RPL)
 #define SEGMENT_IS_VALID_USERCODE32(x) ((x) == SEGMENT_USER_CODE32_RPL)
 #define SEGMENT_IS_VALID_USERCODE64(x) ((x) == SEGMENT_USER_CODE64_RPL)

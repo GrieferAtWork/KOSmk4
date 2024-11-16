@@ -42,14 +42,14 @@ DECL_BEGIN
 /* A slightly smarter equivalent of:
  * >> pagedir_prot_t prot;
  * >> prot = mnode_getprot(node);
- * >> prot = mpart_mmap(self, addr, size, offset);
+ * >> prot = mpart_mmap(self, addr, size, offset, prot);
  * >> return prot;
  * However, unlike that piece of code, this one determines if write
  * access can be granted on a per-page basis (see the documentation
  * of `mpart_iscopywritable()'  and  `mpart_issharewritable()'  for
  * when write-access can be given)
- * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
- *              flags  used to  map pages  from the  given address range. */
+ * @return: * : The union (aka. |-ed together) set of `PAGEDIR_PROT_*'
+ *              flags used to map pages from the given address  range. */
 #ifdef DEFINE_mpart_mmap_node
 PUBLIC NOBLOCK NONNULL((1, 5)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,

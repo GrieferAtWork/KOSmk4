@@ -189,14 +189,14 @@ PRIVATE struct REF mpart_slist mpart_ajob_fallback_list =
 SLIST_HEAD_INITIALIZER(mpart_ajob_fallback_list);
 
 
-/* Try to allocate a new async job to  do `what', but if that fails use a  fallback
- * global  async job to do the same thing. _DONT_ call this function directly! This
- * function is used as the fallback-path when one of mpart named mem-part functions
- * can't be completed without  blocking, meaning that it  needs to be finished  via
- * async means. - If  you were to  call this function  directly, that initial  non-
- * blocking  attempt  would not  be  performed, which  would  introduce unnecessary
- * overhead  in the  case where the  operation could have  been done synchronously.
- * When multiple operations are scheduled at the same time, they will be  performed
+/* Try to allocate a new async job to do `what', but if that fails, use a fallback
+ * global async job to do the same thing. _DONT_ call this function directly! This
+ * function is used as the fallback-path when one of the named mem-part  functions
+ * can't  be completed without blocking, meaning that  it needs to be finished via
+ * async means. - If you  were to call this  function directly, that initial  non-
+ * blocking attempt  would not  be performed,  which would  introduce  unnecessary
+ * overhead  in the case  where the operation could  have been done synchronously.
+ * When multiple operations are scheduled at the same time, they will be performed
  * in the following order:
  *  - MPART_XF_WILLMERGE:  `mpart_merge()'
  *  - MPART_XF_WILLTRIM:   `mpart_trim()'

@@ -670,7 +670,7 @@ struct mfile_ops {
 #define MFILE_F_DELETED         0x00000020 /* [lock(WRITE_ONCE)] The file has been marked as  deleted. When this flag is  set,
                                             * new parts may be created with `mfile_anon[*]' set for their pointed-to `mp_file'
                                             * field. This  flag also  means that  `mfile_isanon(self)' and  `mf_filesize == 0'
-                                            * will be the same  sooner or later, though  this may not be  the case yet,  since
+                                            * will be the case  sooner or later, though  this may not be  the case yet,  since
                                             * file anonymization &  all of  that jazz  happens asynchronously  through use  of
                                             * lockops!
                                             * Note  that this flag  implies `MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE', but also
@@ -680,7 +680,7 @@ struct mfile_ops {
                                             * Once async deletion is complete, the file's part-tree and changed-list will be set
                                             * to  MFILE_PARTS_ANONYMOUS, the file will have a zero  of `0', and all of its used-
                                             * to-be parts will be anon, too.
-                                            * TODO: After setting this flag, `mf_initdone' is broadcast */
+                                            * Once `mfile_delete()' has set this flag, `mf_initdone' is broadcast */
 /*      MFILE_F_                0x00000040  * ... Reserved: MS_MANDLOCK */
 /*      MFILE_F_                0x00000080  * ... Reserved: MS_DIRSYNC */
 #define MFILE_F_ATTRCHANGED     0x00000100 /* [lock(SET(ATOMIC), CLEAR(WEAK))][const_SET_if(MFILE_F_DELETED)]

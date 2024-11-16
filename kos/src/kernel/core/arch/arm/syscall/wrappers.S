@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf65f95af */
+/* HASH CRC-32:0xaa56462a */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2424,7 +2424,8 @@
 /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323313) */
 
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

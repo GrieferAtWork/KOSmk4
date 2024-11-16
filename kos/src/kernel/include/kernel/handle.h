@@ -87,9 +87,6 @@ struct handle_mmap_info {
 	REF struct fdirent *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */
 };
 
-#ifdef __INTELLISENSE__
-DATDEF
-#endif /* __INTELLISENSE__ */
 struct handle_types {
 	/* NOTE: _ALL_ callbacks in here are _always_ defined. (aka. `[1..1]')
 	 *       Those that aren't explicitly implemented are aliased to `h_*[HANDLE_TYPE_UNDEFINED]',
@@ -102,11 +99,13 @@ struct handle_types {
 	 *       (since `handle_type_db' is known at compile-time, and offsets to fields
 	 *       are known, also), with the type-index then only having to be multiplied
 	 *       by the size of a pointer.
-	 *       Thanks to this, the necessary call operation can be encoded as a single
-	 *       instruction on X86:
-	 *       >> movl   HANDLE_TYPE, %eax
-	 *       >> calll  *handle_type_db+h_sync(,%eax,4)
-	 */
+	 * Thanks to this, the necessary call operation can be encoded as a single instruction on X86:
+	 * >> movl   HANDLE_TYPE, %eax
+	 * >> calll  *handle_type_db+h_sync(,%eax,4)
+	 * If we put the whole structure into an array, more code would be needed:
+	 * >> movl   HANDLE_TYPE, %eax
+	 * >> mull   $sizeof(struct handle_types), %eax // %eax = HANDLE_TYPE * sizeof(struct handle_types)
+	 * >> calll  *handle_type_db+h_sync(%eax) */
 	char const *h_typename[HANDLE_TYPE_COUNT];
 
 	/* ============== Normal (strong) reference counting API */
@@ -207,13 +206,10 @@ struct handle_types {
 	/* Print the text that should appear when doing `readlink("/proc/[pid]/fd/[fdno]")' */
 	ssize_t (BLOCKING NONNULL_T((1, 2)) KCALL *h_printlink[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, __pformatprinter printer, void *arg)
 			THROWS(E_WOULDBLOCK, ...);
-}
-#ifdef __INTELLISENSE__
-	const handle_type_db;
-#else /* __INTELLISENSE__ */
-;
+};
+
+/* Handle operator vectors database */
 DATDEF struct handle_types const handle_type_db;
-#endif /* !__INTELLISENSE__ */
 
 
 struct handle {
@@ -370,14 +366,13 @@ handle_tryas_noinherit(struct handle const *__restrict self,
 }
 
 /* Extended handle converted functions */
-
-#define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
-#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
-#define handle_as_path(self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
-#define handle_as_taskpid(self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_PIDFD))
-#define handle_as_pipe(self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
-#define handle_as_module(self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
-#define handle_as_socket(self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
+#define handle_as_mfile(/*inherit(on_success)*/ self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
+#define handle_as_fdirent(/*inherit(on_success)*/ self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
+#define handle_as_path(/*inherit(on_success)*/ self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
+#define handle_as_taskpid(/*inherit(on_success)*/ self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_PIDFD))
+#define handle_as_pipe(/*inherit(on_success)*/ self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
+#define handle_as_module(/*inherit(on_success)*/ self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
+#define handle_as_socket(/*inherit(on_success)*/ self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
 
 #if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
 extern "C++" {
@@ -387,7 +382,7 @@ handle_as(/*inherit(on_success)*/ REF struct handle const &__restrict self,
 		THROWS(E_INVALID_HANDLE_FILETYPE)
 		ASMNAME("handle_as");
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
-handle_as_noinherit(/*inherit(on_success)*/ REF struct handle const &__restrict self,
+handle_as_noinherit(struct handle const &__restrict self,
                     uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE)
 		ASMNAME("handle_as_noinherit");

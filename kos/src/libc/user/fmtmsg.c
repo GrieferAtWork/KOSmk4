@@ -81,7 +81,7 @@ NOTHROW(LIBCCALL fmtmsg_parse_msgverb)(char const *msgverb) {
 				}
 				goto err;
 			}
-			if (memcmp(fmtmsg_verbs[i], msgverb, len * sizeof(char)) == 0 &&
+			if (bcmp(fmtmsg_verbs[i], msgverb, len * sizeof(char)) == 0 &&
 			    fmtmsg_verbs[i][len] == '\0')
 				break;
 		}

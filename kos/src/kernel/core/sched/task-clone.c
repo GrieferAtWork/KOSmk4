@@ -460,8 +460,10 @@ task_clone(struct icpustate const *init_state,
 					      (syscall_ulong_t)clone_flags,
 					      CLONE_VM | CLONE_VFORK, CLONE_VFORK);
 				}
+
 				/* The mman is being shared */
 				result->t_mman = incref(caller->t_mman);
+
 				/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
 				 * This must be done before we  start making the thread visible  to
 				 * other kernel components, since this also affects things such  as

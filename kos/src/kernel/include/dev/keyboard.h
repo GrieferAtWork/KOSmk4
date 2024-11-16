@@ -239,7 +239,7 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
  *  - self->_kbddev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_ino;       # s.a. `device_registerf()'
  *  - self->_kbddev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_mode;      # Something or'd with S_IFCHR
  *  - self->_kbddev_chr_ _chrdev_dev_ _device_devnode_ dn_devno;                     # s.a. `device_registerf()'
- *  - self->_kbddev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(drv_self)'
+ *  - self->_kbddev_chr_ _chrdev_dev_ dv_driver;                                     # As `incref(&drv_self)'
  *  - self->_kbddev_chr_ _chrdev_dev_ dv_dirent;                                     # s.a. `device_registerf()'
  *  - self->_kbddev_chr_ _chrdev_dev_ dv_byname_node;                                # s.a. `device_registerf()'
  * @param: struct kbddev     *self: Keyboard to initialize.

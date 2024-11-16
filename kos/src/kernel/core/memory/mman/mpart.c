@@ -1026,7 +1026,7 @@ mpart_lock_acquire_and_setcore_denywrite_sync(struct mpart *__restrict self)
  *
  * For this purpose, direct write-access is only granted when the given
  * sub-range is not visible anywhere else (iow: when `node' effectively
- * has exclusive ownership of that range):
+ * has exclusive ownership over that range):
  *   - mpart_isanon(self)                                     // The part must be anon (else: changes would
  *                                                            // be visible when read(2)-ing from its file)
  *   - self->mp_share.filter(MAPS(addr, num_bytes)) == []     // No shared memory mappings
@@ -1121,11 +1121,11 @@ NOTHROW(FCALL async_add2all_mpart_lop_cb)(struct lockop *__restrict self) {
 }
 
 
-/* Add the given mpart `self'  to the global list of  parts.
- * This function will initialize `self->mp_allparts', though
- * may do so asynchronously (meaning  that the part may  not
- * have  been added to  the all-parts list  yet, even if you
- * acquire a lock to said  list immediately after call  this
+/* Add  the given mpart  `self' to the  global list of parts.
+ * This function will initialize `self->mp_allparts',  though
+ * may do so  asynchronously (meaning that  the part may  not
+ * have been added  to the  all-parts list yet,  even if  you
+ * acquire a lock to said list immediately after calling this
  * function) */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {

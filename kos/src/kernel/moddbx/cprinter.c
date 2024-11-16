@@ -1671,7 +1671,7 @@ NOTHROW_CB_NCX(KCALL print_special_struct)(struct ctyperef const *__restrict sel
 					++name;
 					continue;
 				}
-				if (memcmp(name, "hybrid_", COMPILER_STRLEN("hybrid_") * sizeof(char)) == 0) {
+				if (bcmp(name, "hybrid_", COMPILER_STRLEN("hybrid_") * sizeof(char)) == 0) {
 					name += COMPILER_STRLEN("hybrid_");
 					continue;
 				}

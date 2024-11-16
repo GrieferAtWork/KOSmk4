@@ -26,24 +26,26 @@
 
 DECL_BEGIN
 
-/* Terminal  display drivers  such as  VGA should  not implement the
- * tty interface.  Instead,  they  should  only  need  to  implement
- * the   normal  chrdev  interface   and  provide  a  write-operator
- * that implements an ansi-compliant display port (using libansitty)
+/* Terminal display drivers such as VGA should not implement the
+ * tty interface. Instead,  they should only  need to  implement
+ * the normal chrdev interface and provide a write-operator that
+ * implements  an ansi-compliant display port (using libansitty)
  *
  * An actual `struct mkttydev' shouldn't actually be something that gets created
  * implicitly, but should be created  explicitly (using the mktty() syscall)  by
  * combining  2 arbitrary  file descriptors,  one providing  a read-operator and
- * presumably  being  implemented  by something  like  the ps2  driver,  and the
- * other  providing  a  write-operator  and  presumably  being  implemented   by
- * something like the VGA driver.
+ * presumably being implemented by something like the ps2 driver, and the  other
+ * providing a write-operator and presumably being implemented by something like
+ * the VGA driver.
  *
- * The actual `struct mkttydev' then uses `struct terminal' to implement the TERMIOS
- * interface, forwarding/pulling data from  its connected read/write object  handles
- * as needed, while also encapsulating all of the required POSIX job control
+ * The actual `struct mkttydev' then uses `struct terminal' to implement the
+ * TERMIOS  interface, forwarding/pulling data from its connected read/write
+ * object  handles as needed,  while also encapsulating  all of the required
+ * POSIX job control
  *
- * On-top  of this, it would then also be  possible to allow the tty objects to
- * react to the CTRL+ALT+F{1-NN} key combinations to switch between each other.
+ * On-top  of this, it would then also be possible to allow the tty objects
+ * to react to the CTRL+ALT+F{1-NN} key combinations to switch between each
+ * other.
  *
  * The common base-class of this and PTY objects is `struct ttydev'
  */
@@ -112,19 +114,21 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
              NCX char const *name, size_t namelen)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
-/* Start/Stop forwarding  input  handle  data  on  the  given  TTY
+/* Start/Stop forwarding input handle data on the given TTY.
+ *
  * Note that for any given input handle, only a single TTY  should
  * ever be allowed to process data. - Allowing multiple TTYs to do
  * so could result  in weakly  undefined behavior as  it would  no
  * longer  be clear  who should  actually receive  data, causing a
  * soft race condition with the potential of data being  scattered
  * between readers, or some random reader getting all of the data.
+ *
  * @return: true:  The FWD thread was started/stopped
  * @return: false: The FWD thread was already running/halted */
-FUNDEF bool KCALL
+FUNDEF NONNULL((1)) bool KCALL
 mkttydev_startfwd(struct mkttydev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK bool
+FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL mkttydev_stopfwd)(struct mkttydev *__restrict self);
 
 #endif /* __CC__ */

@@ -1555,6 +1555,7 @@ rt_sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
                 [tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *oset,
                 size_t sigsetsize) -> errno_t;
 
+@@>> set_userprocmask_address(2)
 @@Register the address of  the calling thread's userprocmask  controller.
 @@This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
 @@that `*ctl->pm_sigmask' is filled with the current kernel-level  signal

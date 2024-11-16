@@ -116,7 +116,7 @@ typedef struct {
 #define dbg_pprinter_arg_init(self, x, y) \
 	((self)->p_printx = (x),              \
 	 (self)->p_printy = (y),              \
-	 __libc_memset((self)->p_utf8, 0, 8))
+	 __libc_bzero((self)->p_utf8, 8))
 
 FUNDEF void NOTHROW(FCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
 FUNDEF size_t FCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
@@ -174,8 +174,8 @@ DATDEF struct ansitty dbg_tty;
  * NOTE: Out-of-bound cells  are read  as the  same value  as a  space-character
  *       cell when written using `dbg_putc(' ')' at the current cursor position.
  * NOTE: Writing Out-of-bound cells is a no-op.
- * NOTE: These functions will read/write the SCROLL-TOP screen data, and
- *      `dbg_setscreendata()' will apply `dbg_setscroll(0)'
+ * NOTE: These functions will read/write the SCROLL-TOP screen data,
+ *       and  `dbg_setscreendata()'  will  apply  `dbg_setscroll(0)'
  *       before actually copying cells.
  * @param: buf: A buffer capable of holding `size_x * size_y * dbg_screen_cellsize' bytes of data. */
 FUNDEF NONNULL((5)) void FCALL dbg_getscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void *__restrict buf);

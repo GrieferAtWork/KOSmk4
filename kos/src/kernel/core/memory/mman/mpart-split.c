@@ -810,9 +810,9 @@ again:
 
 
 
-/* Split the given mem-part `self' (which  should be a member of  `file')
- * after `offset' bytes from the start of backing file. For this purpose,
- * the given `offset' should  be `> mpart_getminaddr(self)', and must  be
+/* Split the given mem-part `self' (which should be a member of  `file')
+ * after `offset' bytes from the backing file's start. For this purpose,
+ * the given `offset' should be `> mpart_getminaddr(self)', and must  be
  * both page- and block-aligned.
  * @return: NULL: The given `offset' is outside  the bounds of file  memory
  *                represented by `part'. The caller should handle this case

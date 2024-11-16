@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa5fc688 */
+/* HASH CRC-32:0x5ffdf4aa */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1055,7 +1055,8 @@
  * 
  * @return: 0 : Always, unconditionally returned. */
 #define __NR64_rpc_serve_sysret         __UINT64_C(0xffffffffffffffdb) /* errno_t rpc_serve_sysret(void) */
-/* Register the address of  the calling thread's userprocmask  controller.
+/* >> set_userprocmask_address(2)
+ * Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'

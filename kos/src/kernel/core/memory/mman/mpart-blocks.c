@@ -843,7 +843,7 @@ initdone:
  * NOTE: This function may also assume that at least the first byte (that
  *       is: the byte described by `partrel_offset') is in-bounds of the
  *       given mem-part `self' */
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
                                     mpart_reladdr_t partrel_offset,
                                     struct mpart_physloc *__restrict result) {
