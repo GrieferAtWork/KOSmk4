@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Update libregex"
-DEEMON_VERSION="f5a933fb9034b1c52d574762452b26b4a8d2a928"
+#     v -- "Make `CONFIG_EXPERIMENTAL_NEW_SEQUENCE_OPERATORS` mandatory"
+DEEMON_VERSION="cfa3256b3739c1239f177d6a909cc015da4a4a94"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

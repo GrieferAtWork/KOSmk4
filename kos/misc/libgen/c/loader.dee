@@ -3950,8 +3950,8 @@ function loadSystemHeaderDefinitions(
 	/* Standard system header prefix */
 	if (isPrimaryDefinitionsFile) {
 		result.order_header.append(
-			"#include {0[0]}\n"
-			"#include {0[1]}\n"
+			"#include {0[$0]}\n"
+			"#include {0[$1]}\n"
 			"\n"
 			"#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER\n"
 			"#pragma GCC system_header\n"
