@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Make `CONFIG_EXPERIMENTAL_NEW_SEQUENCE_OPERATORS` mandatory"
-DEEMON_VERSION="cfa3256b3739c1239f177d6a909cc015da4a4a94"
+#     v -- "Fix missing backwards compat for `HashSet.popitem()`"
+DEEMON_VERSION="de972ebebb969e15a7de2d42bc3f1e428b8de6c4"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
