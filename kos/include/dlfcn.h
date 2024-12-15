@@ -829,8 +829,8 @@ typedef struct __dl_info_struct Dl_info;
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.
- * @return: 0 : Success.
- * @return: -1: Error (s.a. `dlerror(3D)') */
+ * @return: 1 : Success. (yes: this function returns boolean-style)
+ * @return: 0 : Error (s.a. `dlerror(3D)') */
 __IMPDEF __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
                                  Dl_info *__info);

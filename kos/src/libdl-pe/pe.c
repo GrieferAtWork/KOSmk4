@@ -817,7 +817,7 @@ libpe_v_dladdr(DlModule *__restrict self,
 	(void)module_relative_pointer;
 	(void)info;
 	COMPILER_IMPURE();
-	return -1;
+	return 0;
 }
 
 PRIVATE NONNULL((1, 2)) uintptr_t LIBDL_CC

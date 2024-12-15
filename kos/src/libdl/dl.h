@@ -405,8 +405,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(NCX char const *name, unsigned int flags
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.
- * @return: 0 : Success.
- * @return: -1: Error (s.a. `dlerror()') */
+ * @return: 1 : Success. (yes: this function returns boolean-style)
+ * @return: 0 : Error (s.a. `dlerror(3D)') */
 INTDEF NONNULL((2)) int
 NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
                                    NCX Dl_info *info)

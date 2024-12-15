@@ -1169,8 +1169,8 @@ got_result:
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.
- * @return: 0 : Success.
- * @return: -1: Error (s.a. `dlerror()') */
+ * @return: 1 : Success. (yes: this function returns boolean-style)
+ * @return: 0 : Error (s.a. `dlerror(3D)') */
 INTERN NONNULL((2)) int
 NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
                                    NCX Dl_info *info)
@@ -1224,13 +1224,13 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
 		}
 	}
 	/* XXX: set dl error? */
-	return -1;
+	return 0;
 done:
 	if (!(mod->dm_flags & RTLD_NODELETE))
 		decref(mod);
-	return 0;
+	return 1;
 err:
-	return -1;
+	return 0;
 }
 
 

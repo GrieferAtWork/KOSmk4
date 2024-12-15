@@ -198,7 +198,9 @@ struct dlmodule_format {
 #define DLMODULE_FORMAT_DLSYM_OK    0    /* Symbol found */
 #define DLMODULE_FORMAT_DLSYM_ERROR (-1) /* Symbol could not be found (dlerror() was not modified) */
 
-	/* [0..1] Format-specific implementation of `dladdr()'. */
+	/* [0..1] Format-specific implementation of `dladdr()'.
+	 * @return: 1 : Success. (yes: this function returns boolean-style)
+	 * @return: 0 : Error (s.a. `dlerror(3D)') */
 	NONNULL((1)) int (LIBDL_CC *df_dladdr)(DlModule *__restrict self,
 	                                       uintptr_t module_relative_pointer,
 	                                       struct __dl_info_struct *info);
