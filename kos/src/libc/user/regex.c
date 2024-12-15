@@ -313,7 +313,7 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 	self->syntax           = comp.rec_parser.rep_syntax;
 	self->re_nsub          = code->rc_ngrps;
 	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
-	self->fastmap_accurate = 1;
+	self->fastmap_accurate = 0;
 	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
 	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) ? 1 : 0;
 	return NULL;
@@ -718,7 +718,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 	self->syntax           = comp.rec_parser.rep_syntax;
 	self->re_nsub          = code->rc_ngrps;
 	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
-	self->fastmap_accurate = 1;
+	self->fastmap_accurate = 0;
 	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
 	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) ? 1 : 0;
 	return RE_NOERROR;

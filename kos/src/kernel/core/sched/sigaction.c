@@ -36,6 +36,7 @@
 #include <sched/task.h>
 
 #include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
 
 #include <bits/os/sigaction.h>
@@ -634,8 +635,12 @@ DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
                 NCX UNCHECKED struct kernel_sigaction *, oact,
                 size_t, sigsetsize) {
 	/* Validate user-structure pointers. */
-	validate_readable_opt(act, offsetof(struct kernel_sigaction, sa_mask) + sigsetsize);
-	validate_writable_opt(oact, offsetof(struct kernel_sigaction, sa_mask) + sigsetsize);
+	size_t struct_size;
+	if unlikely(OVERFLOW_UADD(offsetof(struct kernel_sigaction, sa_mask),
+	                          sigsetsize, &struct_size))
+		struct_size = (size_t)-1;
+	validate_readable_opt(act, struct_size);
+	validate_writable_opt(oact, struct_size);
 	sys_sigaction_impl(signo, act, oact, sigsetsize);
 	return -EOK;
 }

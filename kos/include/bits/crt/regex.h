@@ -54,7 +54,7 @@ struct re_pattern_buffer {
 	__SIZE_TYPE__ re_nsub;                        /* [== ((struct re_code *)buffer)->rc_ngrps] */
 	unsigned __REPB_PREFIX(can_be_null) : 1;      /* [== (((struct re_code *)buffer)->rc_minmatch == 0)] */
 	unsigned __REPB_PREFIX(regs_allocated) : 2;   /* Unused... */
-	unsigned __REPB_PREFIX(fastmap_accurate) : 1; /* [== 1] */
+	unsigned __REPB_PREFIX(fastmap_accurate) : 1; /* [== 0] We don't provide glibc's "fastmap", so it can't be accurate. */
 	unsigned __REPB_PREFIX(no_sub) : 1;           /* [== ((syntax & RE_SYNTAX_NO_SUB) != 0)] */
 	unsigned __REPB_PREFIX(not_bol) : 1;          /* Input argument bit for `re_match[_2](3)' and `re_search[_2](3)' (`== REG_NOTBOL') */
 	unsigned __REPB_PREFIX(not_eol) : 1;          /* Input argument bit for `re_match[_2](3)' and `re_search[_2](3)' (`== REG_NOTEOL') */

@@ -1004,11 +1004,12 @@ struct __locale_struct;
 
 /* Special c-declare functions that are needed to work around a GCC bug that
  * causes certain functions to  _always_ be considered as  nothrow/noexcept,
- * irregardless of compiler options passed, or how they are declared.
+ * irregardless of compiler options passed, or how they are declared:
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96985
  *
- * The  only  thing  that seems  to  work as  far  as  workarounds go,  is  to declare
- * the function with extern "C++" linkage, and use `__COMPILER_ASMNAME()' to re-assign
- * the proper symbol name. */
+ * The only thing that seems to work as far as workarounds go, is to declare
+ * the function with extern "C++" linkage, and use `__COMPILER_ASMNAME()' to
+ * re-assign the proper symbol name. */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 #define __CASMNAME_GCCNCX          __CASMNAME
 #define __CASMNAME_DOS_GCCNCX      __CASMNAME_DOS

@@ -662,7 +662,7 @@ $1=$2"
 					# NOTE: Options were discovered by searching through 3rd party packages for:
 					#   - AC_TRY_RUN
 					#   - AC_RUN_IFELSE
-					# Matches where then individually looked at for use of AC_CACHE_CHECK
+					# Matches were then individually looked at for use of AC_CACHE_CHECK
 
 					local line="$1"
 					case "$line" in
@@ -1181,7 +1181,7 @@ $1=$2"
 						_config_site_option "gl_cv_func_printf_directive_n" "yes"; ;;
 					*gl_cv_func_printf_directive_ls*)
 						_config_site_option "gl_cv_func_printf_directive_ls" "yes"; ;;
-					*gl_cv_func_printf_positions*) # Probably someday... (but already say we do)
+					*gl_cv_func_printf_positions*) # Yes: KOS has had support for these added a while ago!
 						_config_site_option "gl_cv_func_printf_positions" "yes"; ;;
 					*gl_cv_func_printf_flag_grouping*)
 						_config_site_option "gl_cv_func_printf_flag_grouping" "yes"; ;;
@@ -1227,7 +1227,7 @@ $1=$2"
 						_config_site_option "gl_cv_func_readlink_truncate" "yes"; ;;
 					*ac_cv_func_realloc_0_nonnull*) # assert(realloc(NULL, 0) != NULL)
 						_config_site_option "ac_cv_func_realloc_0_nonnull" "yes"; ;;
-					*gl_cv_func_re_compile_pattern_working*) # Not yet, but hopefully someday
+					*gl_cv_func_re_compile_pattern_working*)
 						_config_site_option "gl_cv_func_re_compile_pattern_working" "yes"; ;;
 					*gl_cv_func_remainder_ieee*)
 						_config_site_option "gl_cv_func_remainder_ieee" "yes"; ;;
@@ -1465,7 +1465,7 @@ $1=$2"
 							# Prevent gnulib from replacing perfectly operational functions
 							# with a bloated replacement that exhibits the same "bugs" it was
 							# meant to "fix" in the first place (though I wouldn't call them
-							# "bugs", since THEY INTENDED, CORRECT, DOCUMENTED, AND EXPECTED
+							# "bugs", since THEY'RE INTENDED, CORRECT, DOCUMENTED, AND EXPECTED
 							# BEHAVIOR!!!!)
 							_config_site_option "gl_cv_func_mbrtoc32_C_locale_sans_EILSEQ" "yes"
 							_config_site_option "gl_cv_func_mbrtowc_C_locale_sans_EILSEQ" "yes"
@@ -1525,13 +1525,13 @@ $1=$2"
 					# Some more found in misc programs
 
 					# nano
-					*gl_cv_func_printf_enomem*) # printf() still works are ENOMEM
+					*gl_cv_func_printf_enomem*) # printf() still works after ENOMEM
 						_config_site_option "gl_cv_func_printf_enomem" "yes"; ;;
 					*gt_cv_func_printf_posix*) # printf() is POSIX compliant
 						_config_site_option "gt_cv_func_printf_posix" "yes"; ;;
 					*gl_cv_func_gettimeofday_clobber*) # No, our gettimeofday() doesn't clobber localtime(3)'s buffer
 						_config_site_option "gl_cv_func_gettimeofday_clobber" "no"; ;;
-					*gt_cv_int_divbyzero_sigfpe*) # integer divide-by-zero raises SIGFPE (as long as you don't do `catch(...)' w/o rethrow)
+					*gt_cv_int_divbyzero_sigfpe*) # integer divide-by-zero raises SIGFPE (as long as you don't do a c++ `catch(...)' that doesn't rethrow the KOS exception)
 						_config_site_option "gt_cv_int_divbyzero_sigfpe" "yes"; ;;
 
 					# Xorg
