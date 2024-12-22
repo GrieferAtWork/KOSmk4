@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix missing backwards compat for `HashSet.popitem()`"
-DEEMON_VERSION="de972ebebb969e15a7de2d42bc3f1e428b8de6c4"
+#     v -- "Remove debug/test assertion"
+DEEMON_VERSION="0cff7a593aa16da2415afe07569781b5fde51761"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
