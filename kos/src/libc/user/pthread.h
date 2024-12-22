@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8feec7d */
+/* HASH CRC-32:0x4909ea98 */
 /* Copyright (c) 2019-2024 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -270,7 +270,7 @@ INTDEF ATTR_CONST WUNUSED pthread_t NOTHROW(LIBCCALL libc_pthread_mainthread_np)
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `self' to-be  executed the next time it  makes
  * a call to a cancellation-point system call (or interrupt an active
- * system call, should one such currently be in progress).
+ * system call, should one currently be in progress).
  *   - RPCs are also executed by `pthread_testcancel(3)'
  *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
  * @return: 0:      Success

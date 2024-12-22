@@ -1973,11 +1973,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
 
-/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x65efdc6c]]]*/
+/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x412dc627]]]*/
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `self' to-be  executed the next time it  makes
  * a call to a cancellation-point system call (or interrupt an active
- * system call, should one such currently be in progress).
+ * system call, should one currently be in progress).
  *   - RPCs are also executed by `pthread_testcancel(3)'
  *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
  * @return: 0:      Success
