@@ -620,8 +620,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t self,
                                                 void **thread_return)
 /*[[[body:libc_pthread_getresult_np]]]*/
 {
+	errno_t result;
 	atomic_inc(&self->pt_refcnt); /* Consumed by `pthread_join(3)' */
-	return pthread_join(self, thread_return);
+	result = pthread_join(self, thread_return);
+	if unlikely(!E_ISOK(result))
+		atomic_dec(&self->pt_refcnt); /* Wasn't actually consumed... */
+	return result;
 }
 /*[[[end:libc_pthread_getresult_np]]]*/
 
@@ -1567,7 +1571,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t self,
 		 * Try to undo the damage we've caused...
 		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
-		sys_sched_setscheduler(tid, old_policy, &old_param);
+		(void)sys_sched_setscheduler(tid, old_policy, &old_param);
 		return ESRCH;
 	}
 	return EOK;
@@ -1636,7 +1640,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t self,
 		/* The thread has terminated in the mean time.
 		 * Note: This is  a race  condition that  Glibc
 		 *       doesn't even check and simply ignores! */
-		sys_setpriority(PRIO_PROCESS, tid, old_prio);
+		(void)sys_setpriority(PRIO_PROCESS, tid, old_prio);
 		return ESRCH;
 	}
 	return EOK;
@@ -1661,12 +1665,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t self,
 	tid = atomic_read(&self->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	sprintf(pathname, "/proc/%u/comm", tid);
+	(void)sprintf(pathname, "/proc/%u/comm", tid);
 	commfd = sys_open(pathname, O_RDONLY, 0);
 	if unlikely(E_ISERR(commfd))
 		return -commfd;
 	result = sys_read(commfd, buf, buflen);
-	sys_close(commfd);
+	(void)sys_close(commfd);
 	if (E_ISERR(result))
 		return -result;
 	assert((size_t)result <= buflen);
@@ -1713,12 +1717,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self,
 		if unlikely(namelen > (TASK_COMM_LEN - 1))
 			return ERANGE;
 #endif /* TASK_COMM_LEN */
-		sprintf(pathname, "/proc/%u/comm", tid);
+		(void)sprintf(pathname, "/proc/%u/comm", tid);
 		commfd = sys_open(pathname, O_WRONLY, 0);
 		if unlikely(E_ISERR(commfd))
 			return -commfd;
 		result = sys_write(commfd, name, namelen * sizeof(char));
-		sys_close(commfd);
+		(void)sys_close(commfd);
 	}
 	if (E_ISERR(result))
 		return -result;
@@ -1726,6 +1730,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_setname_np]]]*/
 
+/* Unused... (pthread threads on KOS are controlled entirely by the kernel) */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") int pthread_concurrency_level = 0;
 
 /*[[[head:libc_pthread_getconcurrency,hash:CRC-32=0x2040f7e9]]]*/

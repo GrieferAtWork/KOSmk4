@@ -328,7 +328,7 @@ INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
 		ofd.of_hint  = MAX_RESERVED_FD + 1;
 		error = sys_ioctl(fd, FD_IOC_DUPFD, &ofd);
 		if likely(E_ISOK(error)) {
-			sys_close(fd);
+			(void)sys_close(fd);
 			return (fd_t)error;
 		}
 	}
@@ -455,7 +455,7 @@ DlModule_OpenFilename(NCX char const *filename,
 	fd     = reopen_bigfd(fd);
 	result = DlModule_OpenFd(fd, mode);
 	if unlikely(!result)
-		sys_close(fd);
+		(void)sys_close(fd);
 done:
 	return result;
 done_existing:
@@ -1071,7 +1071,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 	ssize_t error;
 	result = DlModule_FindFromFilename(filename);
 	if (result) {
-		sys_close(fd);
+		(void)sys_close(fd);
 		free(filename);
 		DlModule_UpdateFlags(result, mode);
 		goto done;

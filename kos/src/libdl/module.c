@@ -199,7 +199,7 @@ done_fini:
 
 	/* Close the module's file (if loaded) */
 	if (self->dm_file > 0)
-		sys_close(self->dm_file);
+		(void)sys_close(self->dm_file);
 
 	/* Free dynamically allocated heap-memory. */
 	if (self->dm_sections) {
@@ -278,7 +278,7 @@ NOTHROW_NCX(CC DlModule_GetFd)(NCX DlModule *self)
 		result    = reopen_bigfd(result);
 		newresult = atomic_cmpxch_val(&self->dm_file, -1, result);
 		if unlikely(newresult != -1) {
-			sys_close(result);
+			(void)sys_close(result);
 			result = newresult;
 		}
 	}

@@ -298,10 +298,10 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 		*lpThreadId = tid;
 	result = libk32_OpenThread(0, FALSE, tid);
 	if (result == NULL)
-		pthread_cancel(thread);
+		(void)pthread_cancel(thread);
 
 	/* Detach the pthread object. */
-	pthread_detach(thread);
+	(void)pthread_detach(thread);
 
 	if (dwCreationFlags & CREATE_SUSPENDED) {
 		/* TODO: Wait for the thread to suspend itself */

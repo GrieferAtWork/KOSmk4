@@ -74,9 +74,9 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
 	(((self)->ds_buf != (struct dirent *)((self)->ds_sbuf + dirbuf_compat_offset)) \
 	 ? free((byte_t *)(self)->ds_buf - dirbuf_compat_offset)                       \
 	 : (void)0)
-#define dirstream_fini(self)      \
-	(dirstream_fini_keepfd(self), \
-	 sys_close((self)->ds_fd))
+#define dirstream_fini(self)            \
+	(void)(dirstream_fini_keepfd(self), \
+	       sys_close((self)->ds_fd))
 
 
 
@@ -107,7 +107,7 @@ NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name)
 		goto err;
 	result = fdopendir(fd);
 	if unlikely(!result)
-		sys_close(fd);
+		(void)sys_close(fd);
 	return result;
 err:
 	return NULL;
@@ -144,7 +144,7 @@ NOTHROW_RPC(LIBCCALL libc_fopendirat)(fd_t dirfd,
 		goto err;
 	result = fdopendir(fd);
 	if unlikely(!result)
-		sys_close(fd);
+		(void)sys_close(fd);
 	return result;
 err:
 	return NULL;

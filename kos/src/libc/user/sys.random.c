@@ -71,7 +71,7 @@ NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
 	if unlikely(fd < 0)
 		goto err;
 	result = read(fd, buf, num_bytes);
-	sys_close(fd);
+	(void)sys_close(fd);
 	return result;
 err:
 	return -1;

@@ -1396,7 +1396,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate(fd, length);
-	sys_close(fd);
+	(void)sys_close(fd);
 	return result;
 }
 /*[[[end:libd_truncate]]]*/
@@ -1415,7 +1415,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate(fd, length);
-	sys_close(fd);
+	(void)sys_close(fd);
 	return result;
 #else /* !SYS_truncate */
 	errno_t result = sys_truncate(file, (syscall_ulong_t)length);
@@ -1440,7 +1440,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate64(fd, length);
-	sys_close(fd);
+	(void)sys_close(fd);
 	return result;
 }
 #endif /* MAGIC:alias */
@@ -1463,7 +1463,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate64(fd, length);
-	sys_close(fd);
+	(void)sys_close(fd);
 	return result;
 #else /* !SYS_truncate64 */
 	errno_t result = sys_truncate64(file, (uint64_t)(__pos64_t)length);
@@ -1756,7 +1756,7 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 	if (fd < 0)
 		return -1;
 	result = libd_fchroot(fd);
-	sys_close(fd);
+	(void)sys_close(fd);
 #if 0 /* Already done for us by `libd_fchroot()' (which calls `libd_dup2()') */
 	if (result == 0)
 		libd_dos_fsroot_changed();
@@ -2113,7 +2113,7 @@ NOTHROW_RPC(LIBDCALL libc_do_pathconf)(char const *path,
 		if unlikely(fd < 0)
 			return -1;
 		result = libc_fpathconf(fd, name);
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }
@@ -2192,7 +2192,7 @@ libc_do_PathConf(char const *path, __STDC_INT_AS_UINT_T name, oflag_t path_oflag
 		if unlikely(fd < 0)
 			return -1;
 		result = libc_do_FPathConf(fd, name);
-		sys_close(fd);
+		(void)sys_close(fd);
 	}
 	return result;
 }

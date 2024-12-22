@@ -212,7 +212,7 @@ again_open_or_create:
 		if (fd != -1) {
 			/* Semaphore already exists. */
 			if unlikely(oflags & O_EXCL) {
-				sys_close(fd);
+				(void)sys_close(fd);
 				libc_seterrno(EEXIST);
 				goto err_filename;
 			}
@@ -260,7 +260,7 @@ err_tempname_filename:
 				}
 			}
 			result = MMAP_SEMAPHORE(fd);
-			sys_close(fd);
+			(void)sys_close(fd);
 			if unlikely(result == (sem_t *)MAP_FAILED) {
 				sys_unlink(tempname);
 				goto err_tempname_filename;
@@ -305,7 +305,7 @@ err_tempname_filename:
 		goto err_filename;
 	freea(filename);
 	result = MMAP_SEMAPHORE(fd);
-	sys_close(fd);
+	(void)sys_close(fd);
 	if unlikely(result == (sem_t *)MAP_FAILED)
 		goto err;
 	return result;

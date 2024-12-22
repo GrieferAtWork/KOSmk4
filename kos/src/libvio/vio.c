@@ -457,7 +457,7 @@ spawn_uvio_service_thread(fd_t fd,
 		goto err_args;
 
 	/* Let the thread do its thing... */
-	pthread_detach(thread);
+	(void)pthread_detach(thread);
 	return 0;
 err_args:
 	free(args);
@@ -507,10 +507,8 @@ NOTHROW_NCX(CC libvio_create)(struct vio_ops const *ops, void *cookie,
 		errno = -result;
 		goto err;
 	}
-	if unlikely(spawn_uvio_service_thread(result,
-	                                      ops,
-	                                      cookie) != 0) {
-		sys_close(result);
+	if unlikely(spawn_uvio_service_thread(result, ops, cookie) != 0) {
+		(void)sys_close(result);
 		goto err;
 	}
 	return result;

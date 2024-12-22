@@ -109,7 +109,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
 		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
-			sys_close(result);
+			(void)sys_close(result);
 			return libc_seterrno(EISDIR);
 		}
 	}
@@ -210,7 +210,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
 		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
-			sys_close(result);
+			(void)sys_close(result);
 			return libc_seterrno(EISDIR);
 		}
 	}
