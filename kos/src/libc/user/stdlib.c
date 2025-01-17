@@ -940,7 +940,7 @@ struct environ_special_struct {
 	char          es_name[7]; /* Environment variable name. */
 	unsigned char es_type;    /* One of `ENVIRON_SPECIAL_*' */
 #define ENVIRON_SPECIAL_PATH  0 /* Singular path */
-#define ENVIRON_SPECIAL_PATHS 1 /* ':'-seperated path list (becomes ';'-seperated under DOS) */
+#define ENVIRON_SPECIAL_PATHS 1 /* ':'-separated path list (becomes ';'-separated under DOS) */
 };
 
 /* Cygwin converts the following paths:

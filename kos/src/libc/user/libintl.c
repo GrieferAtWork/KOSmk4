@@ -194,9 +194,9 @@ struct mo_file_header {
 	/* NOTE: The .mo file format is described here:
 	 * https://www.gnu.org/software/gettext/manual/html_node/MO-Files.html
 	 */
-#define MO_FILE_MAGIC 0x950412de /* Actually could also be the BSWAP32 of this, in which
-                                  * case  other fields also  use the reversed byteorder.
-                                  * Note  that KOS only supports native-endian mo files! */
+#define MO_FILE_MAGIC UINT32_C(0x950412de) /* Actually could also be the BSWAP32 of this, in which
+                                            * case  other fields also  use the reversed byteorder.
+                                            * Note  that KOS only supports native-endian mo files! */
 	u32 mo_magic;    /* .mo file magic (== MO_FILE_MAGIC) */
 	u32 mo_revision; /* .mo file revision (ignored; we only use features from the initial revision!) */
 	u32 mo_strcount; /* # of strings */
@@ -847,7 +847,7 @@ NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header
 				++iter;
 			if (*iter == ':') {
 				++iter;
-				/* Found it! The rest of the  line is a sequence of  ";"-seperated
+				/* Found it! The rest of the  line is a sequence of  ";"-separated
 				 * expressions of the form "NAME=VALUE". We're looking for the one
 				 * where NAME is `plural' */
 				for (;;) {
@@ -974,12 +974,12 @@ err_r_fd:
 		                                     MAP_PRIVATE | MAP_FILE, fd, 0);
 		if unlikely(base == (struct mo_file_header *)MAP_FAILED)
 			goto err_r_fd;
-		close(fd);
+		(void)close(fd);
 
 		/* Make sure that the .mo file header is intact. */
 		if unlikely(base->mo_magic != MO_FILE_MAGIC) {
 err_r_map:
-			munmap(base, (size_t)st.st_size);
+			(void)munmap(base, (size_t)st.st_size);
 			goto err_r;
 		}
 		{
@@ -1038,7 +1038,7 @@ err_r_map:
 	if unlikely(!mofiletree_tryinsert(&mofiletree_root, result)) {
 		/* Race condition: another thread was faster. */
 		mofiletree_endwrite();
-		munmap((void *)result->mf_base, result->mf_size);
+		(void)munmap((void *)result->mf_base, result->mf_size);
 		free(result);
 		goto again_load_from_tree;
 	}
@@ -1051,7 +1051,7 @@ done:
 err_r:
 	free(result);
 err:
-	libc_seterrno(saved_errno);
+	(void)libc_seterrno(saved_errno);
 fail:
 	result = NULL;
 	goto done;

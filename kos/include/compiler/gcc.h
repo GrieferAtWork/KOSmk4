@@ -764,12 +764,9 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 
 #if __GCC_VERSION_NUM >= 30000
 #define __ATTR_FORCEINLINE __ATTR_INLINE __attribute__((__always_inline__))
-#elif __GCC_VERSION_NUM >= 20700
-#define __NO_ATTR_FORCEINLINE
-#define __ATTR_FORCEINLINE __ATTR_INLINE
 #else /* ... */
 #define __NO_ATTR_FORCEINLINE
-#define __ATTR_FORCEINLINE /* Nothing */
+#define __ATTR_FORCEINLINE __ATTR_INLINE
 #endif /* !... */
 
 #if __GCC_VERSION_NUM >= 40300
@@ -786,8 +783,8 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_FORMAT_ARG(x) /* Nothing */
 #endif /* !__has_attribute(__format_arg__) */
 
-#define __LOCAL      static __ATTR_INLINE
-#define __FORCELOCAL static __ATTR_FORCEINLINE
+#define __LOCAL       static __ATTR_INLINE
+#define __FORCELOCAL  static __ATTR_FORCEINLINE
 
 #ifdef __INTELLISENSE__
 #define __NO_EXTERN_INLINE /* Intellisense likes to freeze when parsing `__attribute__((__gnu_inline__))'... */

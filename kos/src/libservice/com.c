@@ -461,16 +461,19 @@ again:
 	neighbor = sf_remove(&self->s_shm_freetree, service_shm_free_getminaddr(range) - 1);
 	if (neighbor) {
 		LIST_REMOVE(neighbor, ssf_bysize);
-		neighbor->ssf_size = service_shm_free_getsize(neighbor) + service_shm_free_getsize(range);
+		neighbor->ssf_size = service_shm_free_getsize(neighbor) +
+		                     service_shm_free_getsize(range);
 		range = neighbor;
 		goto again;
 	}
 	neighbor = sf_remove(&self->s_shm_freetree, service_shm_free_getmaxaddr(range) + 1);
 	if (neighbor) {
 		LIST_REMOVE(neighbor, ssf_bysize);
-		range->ssf_size = service_shm_free_getsize(range) + service_shm_free_getsize(neighbor);
+		range->ssf_size = service_shm_free_getsize(range) +
+		                  service_shm_free_getsize(neighbor);
 		goto again;
 	}
+
 	/* Insert into the free-tree. */
 	sf_insert(&self->s_shm_freetree, range);
 

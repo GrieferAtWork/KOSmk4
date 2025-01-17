@@ -42,7 +42,7 @@
  *            that include calls to `task_serve()'. As such, the function must not
  *            be called while holding  any sort of atomic  lock, and care must  be
  *            taken  if called while holding non-atomic locks, in which case there
- *            exists the possibility of a deadlock scenario.
+ *            may exist the possibility of a deadlock scenario.
  *
  */
 

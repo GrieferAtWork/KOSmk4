@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5e64368 */
+/* HASH CRC-32:0x820e4d1a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -58,7 +58,7 @@ INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) error_t NOTHROW_NCX(LIBDCALL libd_argz
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'

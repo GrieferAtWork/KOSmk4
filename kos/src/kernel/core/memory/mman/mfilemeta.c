@@ -149,6 +149,7 @@ NOTHROW(FCALL mfilemeta_flock_rl_remkey)(struct mfilemeta *__restrict self,
 		if (ikey == key) {
 			/* Found the key! */
 			item->mfflri_key = MFILE_FLOCK_KEY_DELETED;
+			break;
 		}
 	}
 	assert(self->mfm_flock.mffl_rl_used);
@@ -427,7 +428,7 @@ mfile_flock_acquire(struct mfile *__restrict self,
 				break;
 			}
 
-			/* Wait for a writer to get woken. */
+			/* Wait for a reader to get woken. */
 			task_waitfor();
 		}
 		break;

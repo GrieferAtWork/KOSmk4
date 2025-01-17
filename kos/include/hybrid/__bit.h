@@ -797,13 +797,14 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__hybrid_pext64)(_
 #endif /* !__cplusplus */
 
 
-#undef ____IMPL_DO_PDEP
 #undef ____IMPL_DO_FFS
 #undef ____IMPL_DO_CLZ
 #undef ____IMPL_DO_CTZ
 #undef ____IMPL_DO_POPCOUNT
 #undef ____IMPL_DO_PARITY
 #undef ____IMPL_DO_CLRSB
+#undef ____IMPL_DO_PDEP
+#undef ____IMPL_DO_PEXT
 
 
 #ifdef __UINT64_TYPE__

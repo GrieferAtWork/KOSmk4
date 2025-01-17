@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e4df185 */
+/* HASH CRC-32:0x7abda076 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ typedef __errno_t error_t;
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -91,7 +91,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,argz_c
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -116,7 +116,7 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,argz_
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -141,7 +141,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_create, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -165,7 +165,7 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,__arg
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
@@ -190,7 +190,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,__argz
 /* >> argz_create(3)
  * Construct  an  argz-string  from  a  given  NULL-terminated  `argv'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
- * An  argz-string is imply a string of '\0'-seperated sub-strings, where each
+ * An  argz-string is imply a string of '\0'-separated sub-strings, where each
  * sub-string represents one of the original strings from `argv'
  *
  * The base-pointer to this string is stored in `*pargz'
