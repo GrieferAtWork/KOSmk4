@@ -77,8 +77,9 @@ local final function DILINK_run(self: BoundStep): string {
 			with (local fp = File.open(savedDebugSectionSizeCacheFilename, "r")) {
 				for (local l: fp) {
 					local a, b, c = l.rstrip().split("\t")...;
+					a = a.decode("utf-8");
 					if (a in guessedSectionOffsetsAndSizes)
-						guessedSectionOffsetsAndSizes[a.decode("utf-8")] = (int(b), int(c));
+						guessedSectionOffsetsAndSizes[a] = (int(b), int(c));
 				}
 			}
 		} catch (e...) {
@@ -184,6 +185,7 @@ link_again_with_new_guesses:
 								} catch (...) {
 									break;
 								}
+								name = name.decode("utf-8");
 								/* Check if we care about this section. */
 								if (name !in guessedSectionOffsetsAndSizes)
 									continue;
@@ -228,12 +230,13 @@ link_again_with_new_guesses:
 			local diSectionsFileOffset =
 				correctSectionOffsetsAndSizes.values.each[0] < ...;
 			/* Adjust the minimum file offsets to be relative to one-another */
-			for (local name: correctSectionOffsetsAndSizes.keys) {
+			for (local name: correctSectionOffsetsAndSizes.keys.frozen) {
 				local data = correctSectionOffsetsAndSizes[name];
 				data = (data[0] - diSectionsFileOffset, data[1]);
 				correctSectionOffsetsAndSizes[name] = data;
 			}
-			/* Check if we've guessed correctly! */
+
+			/* Check for missing sections. */
 			for (local name: guessedSectionOffsetsAndSizes.keys) {
 				if (name !in correctSectionOffsetsAndSizes) {
 #if 1
@@ -243,6 +246,8 @@ link_again_with_new_guesses:
 #endif
 				}
 			}
+
+			/* Check if we've guessed correctly! */
 			for (local name, data: guessedSectionOffsetsAndSizes) {
 				if (data != correctSectionOffsetsAndSizes[name]) {
 					/* Wrong guess */
@@ -251,6 +256,7 @@ link_again_with_new_guesses:
 					goto link_again_with_new_guesses;
 				}
 			}
+
 			/* If the offsets were correct, then find the ELF program header
 			 * responsible  for  loading  debug  data  from  the  ELF  file.
 			 * This header can be identified as:
@@ -271,7 +277,10 @@ link_again_with_new_guesses:
 						linkAttemptOutput, diLinkStartSymbol,
 						options.get(DILINK_PHYS2VIRT, 0));
 			}
+
 			/* Manually edit the ELF binary. */
+			print "diSectionsFileOffset:", repr diSectionsFileOffset;
+			print "totalDebugSize:      ", repr totalDebugSize;
 			with (local fp = File.open(linkAttemptOutput, "r+")) {
 				local e_ident = fp.read(EI_NIDENT);
 				local endian = e_ident[EI_DATA] == ELFDATA2LSB ? "little" : "big";
