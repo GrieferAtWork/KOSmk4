@@ -1,5 +1,5 @@
-/* HASH CRC-32:0x4b515e10 */
-/* Copyright (c) 2019-2024 Griefer@Work                                       *
+/* HASH CRC-32:0x6f4ac461 */
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -13,7 +13,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -1034,7 +1034,7 @@
 #define __NRATR2_rt_sigprocmask           SC_REPR_POINTER                                                      /* oset */ 
 #define __NRATR3_rt_sigprocmask           SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NRRTR_rt_sigprocmask            SC_REPR_ERRNO_T                                                      /* return */
-#define __NRRTR_rt_sigreturn              SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_rt_sigreturn              SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_ioctl                    SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_ioctl                    SC_REPR_IOCTL_COMMAND                                                /* command */ 
 #define __NRATR2_ioctl                    SC_REPR_IOCTL_ARG                                                    /* arg */ 
@@ -1094,7 +1094,7 @@
 #define __NRATR1_madvise                  SC_REPR_SIZE_T                                                       /* len */ 
 #define __NRATR2_madvise                  SC_REPR_SYSCALL_ULONG_T                                              /* advice */ 
 #define __NRRTR_madvise                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_shmget                   SC_REPR_SIGNO_T                                                      /* key */ 
+#define __NRATR0_shmget                   SC_REPR_CHAR                                                         /* key */ 
 #define __NRATR1_shmget                   SC_REPR_SIZE_T                                                       /* size */ 
 #define __NRATR2_shmget                   SC_REPR_SYSCALL_ULONG_T                                              /* shmflg */ 
 #define __NRRTR_shmget                    SC_REPR_ERRNO_T                                                      /* return */
@@ -1222,7 +1222,7 @@
 #define __NRATR2_execve                   SC_REPR_STRING_VECTOR64                                              /* envp */ 
 #define __NRRTR_execve                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_exit                     SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
-#define __NRRTR_exit                      SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_exit                      SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_wait4                    SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_wait4                    SC_REPR_POINTER                                                      /* stat_loc */ 
 #define __NRATR2_wait4                    SC_REPR_WAITFLAGS                                                    /* options */ 
@@ -1333,7 +1333,7 @@
 #define __NRATR0_sysinfo                  SC_REPR_POINTER                                                      /* info */ 
 #define __NRRTR_sysinfo                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_times                    SC_REPR_POINTER                                                      /* buf */ 
-#define __NRRTR_times                     SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_times                     SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_ptrace                   SC_REPR_SYSCALL_ULONG_T                                              /* request */ 
 #define __NRATR1_ptrace                   SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR2_ptrace                   SC_REPR_POINTER                                                      /* addr */ 
@@ -1717,7 +1717,7 @@
 #define __NRATR3_clock_nanosleep          SC_REPR_POINTER                                                      /* remaining */ 
 #define __NRRTR_clock_nanosleep           SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_exit_group               SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
-#define __NRRTR_exit_group                SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_exit_group                SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_epoll_wait               SC_REPR_FD_T                                                         /* epfd */ 
 #define __NRATR1_epoll_wait               SC_REPR_POINTER                                                      /* events */ 
 #define __NRATR2_epoll_wait               SC_REPR_SIZE_T                                                       /* maxevents */ 
@@ -2290,7 +2290,7 @@
 #define __NRATR0_rtm_abort                SC_REPR_SYSCALL_ULONG_T                                              /* code */ 
 #define __NRRTR_rtm_abort                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_rtm_end                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRRTR_rtm_begin                 SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_rtm_begin                 SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_userviofd                SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NRATR1_userviofd                SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NRRTR_userviofd                 SC_REPR_FD_T                                                         /* return */
@@ -2354,7 +2354,7 @@
 #define __NRATR3_ioctlf                   SC_REPR_IOCTL_ARG                                                    /* arg */ 
 #define __NRATL3_ioctlf                   1                                                                    /* arg -> command */ 
 #define __NRRTR_ioctlf                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRRTR_ksigreturn                SC_REPR_SIGNO_T                                                      /* return */
+#define __NRRTR_ksigreturn                SC_REPR_CHAR                                                         /* return */
 #define __NRATR0_openpty                  SC_REPR_POINTER                                                      /* amaster */ 
 #define __NRATR1_openpty                  SC_REPR_POINTER                                                      /* aslave */ 
 #define __NRATR2_openpty                  SC_REPR_POINTER                                                      /* name */ 

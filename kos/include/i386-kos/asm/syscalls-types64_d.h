@@ -1,5 +1,5 @@
-/* HASH CRC-32:0x9510dfc0 */
-/* Copyright (c) 2019-2024 Griefer@Work                                       *
+/* HASH CRC-32:0xc193cc98 */
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -13,7 +13,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -38,6 +38,7 @@
 #define HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH
 #define HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH
 #define HAVE_SC_REPR_BUFFER
+#define HAVE_SC_REPR_CHAR
 #define HAVE_SC_REPR_CLOCKID_T
 #define HAVE_SC_REPR_CLONE_FLAGS
 #define HAVE_SC_REPR_CLONE_FLAGS_SETNS
@@ -197,6 +198,7 @@ __SYSCALL_REPR(SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)
 __SYSCALL_REPR(SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)
 __SYSCALL_REPR(SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH)
 __SYSCALL_REPR(SC_REPR_BUFFER)
+__SYSCALL_REPR(SC_REPR_CHAR)
 __SYSCALL_REPR(SC_REPR_CLOCKID_T)
 __SYSCALL_REPR(SC_REPR_CLONE_FLAGS)
 __SYSCALL_REPR(SC_REPR_CLONE_FLAGS_SETNS)

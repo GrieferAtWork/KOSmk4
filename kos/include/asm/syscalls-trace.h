@@ -1,5 +1,5 @@
-/* HASH CRC-32:0x1cb2555e */
-/* Copyright (c) 2019-2024 Griefer@Work                                       *
+/* HASH CRC-32:0x3fb32bd6 */
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -13,7 +13,7 @@
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement (see the following) in the product     *
  *    documentation is required:                                              *
- *    Portions Copyright (c) 2019-2024 Griefer@Work                           *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -1133,9 +1133,9 @@
 #define __NRATR0_personality            SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_personality             SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_exit                   SC_REPR_EXIT_STATUS                                     /* exit_code */ 
-#define __NRRTR_exit                    SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_exit                    SC_REPR_CHAR                                            /* return */
 #define __NRATR0_exit_group             SC_REPR_EXIT_STATUS                                     /* exit_code */ 
-#define __NRRTR_exit_group              SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_exit_group              SC_REPR_CHAR                                            /* return */
 #define __NRATR0_waitid                 SC_REPR_IDTYPE_T                                        /* idtype */ 
 #define __NRATR1_waitid                 SC_REPR_ID_T                                            /* id */ 
 #define __NRATL1_waitid                 0                                                       /* id -> idtype */ 
@@ -1290,7 +1290,7 @@
 #define __NRATR1_rt_sigqueueinfo        SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR2_rt_sigqueueinfo        SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo         SC_REPR_ERRNO_T                                         /* return */
-#define __NRRTR_rt_sigreturn            SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_rt_sigreturn            SC_REPR_CHAR                                            /* return */
 #define __NRATR0_setpriority            SC_REPR_SCHED_PRIORITY_WHICH                            /* which */ 
 #define __NRATR1_setpriority            SC_REPR_ID_T                                            /* who */ 
 #define __NRATR2_setpriority            SC_REPR_SYSCALL_ULONG_T                                 /* value */ 
@@ -1331,7 +1331,7 @@
 #define __NRATR0_setfsgid               SC_REPR_GID_T                                           /* gid */ 
 #define __NRRTR_setfsgid                SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_times                  SC_REPR_POINTER                                         /* buf */ 
-#define __NRRTR_times                   SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_times                   SC_REPR_CHAR                                            /* return */
 #define __NRATR0_setpgid                SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_setpgid                SC_REPR_PID_T                                           /* pgid */ 
 #define __NRRTR_setpgid                 SC_REPR_ERRNO_T                                         /* return */
@@ -1438,7 +1438,7 @@
 #define __NRRTR_semtimedop              SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_semop                  SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_semop                   SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_shmget                 SC_REPR_SIGNO_T                                         /* key */ 
+#define __NRATR0_shmget                 SC_REPR_CHAR                                            /* key */ 
 #define __NRATR1_shmget                 SC_REPR_SIZE_T                                          /* size */ 
 #define __NRATR2_shmget                 SC_REPR_SYSCALL_ULONG_T                                 /* shmflg */ 
 #define __NRRTR_shmget                  SC_REPR_ERRNO_T                                         /* return */
