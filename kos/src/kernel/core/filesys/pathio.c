@@ -1044,7 +1044,7 @@ fdirnode_rename_in_path(struct path *oldpath, struct path *newpath,
  * @throw: E_FSERROR_IS_A_DIRECTORY:E_FILESYSTEM_IS_A_DIRECTORY_RENAME: ...
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS:     `AT_RENAME_NOREPLACE' was given and `newname' already exists.
  *                                            When `AT_RENAME_MOVETODIR' is also given: ... and isn't  dir,
- *                                            or is is a directory and already contains a file `oldname'
+ *                                            or is a directory and already contains a file `oldname'
  * @throw: E_FSERROR_ILLEGAL_PATH:            newname isn't a valid filename for the target filesystem
  * @throw: E_FSERROR_DIRECTORY_MOVE_TO_CHILD: The move would make a directory become a child of itself
  * @throw: E_FSERROR_DISK_FULL:               ...

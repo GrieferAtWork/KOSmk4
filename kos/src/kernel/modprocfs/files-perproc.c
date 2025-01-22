@@ -775,9 +775,11 @@ procfs_pp_comm_write(struct mfile *__restrict self, NCX void const *src,
 	struct printnode *me = mfile_asprintnode(self);
 	char newname[TASK_COMM_LEN];
 	size_t setlen;
+
 	/* Can only write at addr=0 */
 	if (addr != 0)
 		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+
 	/* Must be within the same process. */
 	if (taskpid_getprocpid(me->fn_fsdata) != task_getprocpid()) {
 		THROW(E_ILLEGAL_BECAUSE_GROUPING,
@@ -790,6 +792,7 @@ procfs_pp_comm_write(struct mfile *__restrict self, NCX void const *src,
 	if (setlen > TASK_COMM_LEN * sizeof(char))
 		setlen = TASK_COMM_LEN * sizeof(char);
 	memcpy(newname, src, setlen);
+
 	/* NOTE: `task_setcomm_of()' does all of the
 	 * NUL-termination and sanitization for  us! */
 	if (!task_setcomm_of(thread, newname))

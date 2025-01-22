@@ -213,7 +213,6 @@ NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
 	memcpy(nameptr, used_newname, TASK_COMM_LEN, sizeof(char));
 	COMPILER_BARRIER();
 	preemption_pop(&was);
-
 }
 
 

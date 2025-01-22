@@ -47,7 +47,7 @@ struct shared_recursive_lock {
 	__uintptr_t                   sr_rcnt;  /* [lock(WRITING)] Number of recursive locks (0 means only one lock remains) */
 };
 
-/* Check if the caller is is the owner of `self' */
+/* Check if the caller is the owner of `self' */
 #define __shared_recursive_lock_isown(self) \
 	__shared_recursive_lock_mytid((self)->sr_owner)
 

@@ -217,7 +217,7 @@ DATDEF bool dbg_memory_managed;
 FUNDEF size_t NOTHROW(KCALL dbg_readmemory)(NCX UNCHECKED void const *addr, void *__restrict buf, size_t num_bytes);
 FUNDEF size_t NOTHROW(KCALL dbg_writememory)(NCX UNCHECKED void *addr, void const *__restrict buf, size_t num_bytes, bool force);
 FUNDEF size_t NOTHROW(KCALL dbg_setmemory)(NCX UNCHECKED void *addr, byte_t byte, size_t num_bytes, bool force);
-/* Move memory from `src', and write it back to `dst' */
+/* Read memory from `src', and write it back to `dst' */
 FUNDEF size_t NOTHROW(KCALL dbg_movememory)(NCX UNCHECKED void *dst, NCX UNCHECKED void const *src, size_t num_bytes, bool force);
 #define dbg_movememorydown dbg_movememory
 #define dbg_movememoryup   dbg_movememory
@@ -269,7 +269,10 @@ for (local state: STATES) {
 		print("#define DBG_RT_STATEKIND_", name, "_ISALIAS");
 		print("#define DBG_RT_STATEKIND_", name, " DBG_RT_STATEKIND_", aliasName);
 	}
-	local lowerAliasCount = " + ".join(for (local a: aliases[1:]) f"defined({a.upper()}_ALIAS)");
+	local lowerAliasCount = " + ".join(
+		for (local a: aliases[1:])
+			f"defined(DBG_RT_STATEKIND_{a.rsstrip("state").upper()}_ISALIAS)"
+	);
 	for (local n: [1:#aliases]) {
 		local eqN = #aliases - n;
 		if (isFirst) {
@@ -313,7 +316,7 @@ for (local state: STATES) {
 #elif defined(KCPUSTATE_IS_LCPUSTATE)
 #define DBG_RT_STATEKIND_KCPU_ISALIAS
 #define DBG_RT_STATEKIND_KCPU DBG_RT_STATEKIND_LCPU
-#elif defined(LCPUSTATE_ALIAS)
+#elif defined(DBG_RT_STATEKIND_LCPU_ISALIAS)
 #define DBG_RT_STATEKIND_KCPU 2
 #else /* ... */
 #define DBG_RT_STATEKIND_KCPU 3
@@ -329,9 +332,9 @@ for (local state: STATES) {
 #elif defined(ICPUSTATE_IS_KCPUSTATE)
 #define DBG_RT_STATEKIND_ICPU_ISALIAS
 #define DBG_RT_STATEKIND_ICPU DBG_RT_STATEKIND_KCPU
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS)) == 2
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS)) == 2
 #define DBG_RT_STATEKIND_ICPU 2
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS)) == 1
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS)) == 1
 #define DBG_RT_STATEKIND_ICPU 3
 #else /* ... */
 #define DBG_RT_STATEKIND_ICPU 4
@@ -350,11 +353,11 @@ for (local state: STATES) {
 #elif defined(SCPUSTATE_IS_ICPUSTATE)
 #define DBG_RT_STATEKIND_SCPU_ISALIAS
 #define DBG_RT_STATEKIND_SCPU DBG_RT_STATEKIND_ICPU
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS)) == 3
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS)) == 3
 #define DBG_RT_STATEKIND_SCPU 2
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS)) == 2
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS)) == 2
 #define DBG_RT_STATEKIND_SCPU 3
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS)) == 1
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS)) == 1
 #define DBG_RT_STATEKIND_SCPU 4
 #else /* ... */
 #define DBG_RT_STATEKIND_SCPU 5
@@ -376,13 +379,13 @@ for (local state: STATES) {
 #elif defined(FCPUSTATE_IS_SCPUSTATE)
 #define DBG_RT_STATEKIND_FCPU_ISALIAS
 #define DBG_RT_STATEKIND_FCPU DBG_RT_STATEKIND_SCPU
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS) + defined(SCPUSTATE_ALIAS)) == 4
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS) + defined(DBG_RT_STATEKIND_SCPU_ISALIAS)) == 4
 #define DBG_RT_STATEKIND_FCPU 2
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS) + defined(SCPUSTATE_ALIAS)) == 3
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS) + defined(DBG_RT_STATEKIND_SCPU_ISALIAS)) == 3
 #define DBG_RT_STATEKIND_FCPU 3
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS) + defined(SCPUSTATE_ALIAS)) == 2
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS) + defined(DBG_RT_STATEKIND_SCPU_ISALIAS)) == 2
 #define DBG_RT_STATEKIND_FCPU 4
-#elif (defined(LCPUSTATE_ALIAS) + defined(KCPUSTATE_ALIAS) + defined(ICPUSTATE_ALIAS) + defined(SCPUSTATE_ALIAS)) == 1
+#elif (defined(DBG_RT_STATEKIND_LCPU_ISALIAS) + defined(DBG_RT_STATEKIND_KCPU_ISALIAS) + defined(DBG_RT_STATEKIND_ICPU_ISALIAS) + defined(DBG_RT_STATEKIND_SCPU_ISALIAS)) == 1
 #define DBG_RT_STATEKIND_FCPU 5
 #else /* ... */
 #define DBG_RT_STATEKIND_FCPU 6

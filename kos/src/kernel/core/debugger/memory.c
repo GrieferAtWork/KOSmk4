@@ -83,7 +83,7 @@ NOTHROW(KCALL dbg_rt_verifypagedir)(pagedir_phys_t pdir) {
 /* [default(true)]
  * Allow managed memory access to be performed by  `dbg_(read|write)memory'
  * and friends. What this means is that (so-long as the kernel hasn't  been
- * poisoned, and this field is set to `true' (which is is during a debugger
+ * poisoned, and this field is set to `true' (which it is during a debugger
  * reset))  the below functions  can be used to  load lazy memory mappings,
  * and initiate the regular copy-on-write semantics expected by  high-level
  * memory access, and as would  also be done if  the access was being  done
@@ -342,7 +342,7 @@ NOTHROW(KCALL dbg_setmemory)(NCX UNCHECKED void *addr, byte_t byte,
 	return 0;
 }
 
-/* Move memory from `src', and write it back to `dst' */
+/* Read memory from `src', and write it back to `dst' */
 PUBLIC size_t
 NOTHROW(KCALL dbg_movememory)(NCX UNCHECKED void *dst,
                               NCX UNCHECKED void const *src,

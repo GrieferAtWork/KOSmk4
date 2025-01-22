@@ -78,7 +78,7 @@ linebuffer_waitfor(struct linebuffer *__restrict self) {
 	/* We've got 2 conditions that must be met in order to be allowed to wait:
 	 *  - self->lb_limt == CACHED_LIMIT
 	 *  - self->lb_line.lc_size >= CACHED_LIMIT
-	 * ... where `CACHED_LIMIT' is is the lazily loaded value of `self->lb_limt' */
+	 * ... where `CACHED_LIMIT' is the lazily loaded value of `self->lb_limt' */
 	struct lfutexexpr expr[3];
 	size_t limit = atomic_read(&self->lb_limt);
 	if (!limit)

@@ -47,7 +47,7 @@ struct shared_recursive_rwlock {
 	__uintptr_t                     srr_wrcnt;  /* [lock(WRITING)] Number of additional write-locks (0 means only one write-lock remains) */
 };
 
-/* Check if the caller is is the write-lock owner of `self' */
+/* Check if the caller is the write-lock owner of `self' */
 #define __shared_recursive_rwlock_isown(self) \
 	__shared_recursive_rwlock_mytid((self)->srr_writer)
 

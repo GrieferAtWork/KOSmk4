@@ -99,10 +99,10 @@ DATDEF struct syslog_sink dmesg_sink;
  *          These chances are extremely slim, however still non-zero,
  *          so be aware that the produced message may not be what was
  *          originally written!
- * HINT: Please  note   that  while   this  function   technically  allows   you
- *       to extract messages that are longer than `CONFIG_KERNEL_SYSLOG_LINEMAX'
- *       bytes  of  raw  text  (without   the  trailing  \n-character),  it   is
- *       impossible  to  write messages  longer than  this  to the  dmesg buffer
+ * HINT: Please  note  that while  this  function technically  allows  you to
+ *       extract messages that are longer than `CONFIG_KERNEL_SYSLOG_LINEMAX'
+ *       bytes  of  raw  text  (without  the  trailing  \n-character),  it is
+ *       impossible  to write messages  longer than this  to the dmesg buffer
  * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
  * @param: message_offset: Offset into the dmesg buffer where the message starts.
  * @param: message_length: The length of the written message.

@@ -1733,12 +1733,12 @@ NOTHROW_CB_NCX(KCALL ctype_printvalue)(struct ctyperef const *__restrict self,
 	 *       structures  such as printing libc's `current' (the main
 	 *       problem being its `struct exception_info'-member)
 	 * Solution:
-	 *       Use  a virtual printer  that is limited by  the number of characters
-	 *       it is is  allowed to print.  If one  tries to print  more than  that
-	 *       amount, it will simply error out. On error, we know that a line-feed
-	 *       needs to be  inserted, and on  success, we can  just use its  return
-	 *       value  as the additional  indentation that will  be active after the
-	 *       associated component is printed in-line.
+	 *       Use a virtual printer that is limited by the number of characters
+	 *       it is allowed  to print.  If one tries  to print  more than  that
+	 *       amount, it will simply error out. On error, we know that a  line-
+	 *       feed needs to be  inserted, and on success,  we can just use  its
+	 *       return value as  the additional indentation  that will be  active
+	 *       after the associated component is printed in-line.
 	 *       Additionally,  when doing these checks we can always just pass the
 	 *       `CTYPE_PRINTVALUE_FLAG_ONELINE' flag during the recursive calls to
 	 *       `ctype_printvalue()', since we only care  if the next element  can

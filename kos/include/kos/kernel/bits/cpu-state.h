@@ -60,7 +60,7 @@ struct lcpustate { /* l -- Little */
 	__uintptr_t __l_pad[128];
 };
 
-struct kcpustate {
+struct kcpustate { /* k -- Kernel */
 	/* A CPU state used to describe a known, valid register state in kernel-space.
 	 * This  kind of state is also used  by exception handling, and the associated
 	 * stack unwinding. */
