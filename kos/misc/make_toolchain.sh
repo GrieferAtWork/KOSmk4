@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Remove debug/test assertion"
-DEEMON_VERSION="0cff7a593aa16da2415afe07569781b5fde51761"
+#     v -- "Add files for building deemon with `v143`"
+DEEMON_VERSION="9e32562db73dde3babeb61b316f0fe31560cf494"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
