@@ -22,10 +22,15 @@
 
 #include "../__stdinc.h"
 #include "__byteswap.h"
+#include "byteorder.h"
 #include "typecore.h"
 
 #ifdef __CC__
 #if defined(__INT128_TYPE__) && defined(__UINT128_TYPE__)
+#ifndef __ALIGNOF_INT128__
+#define __ALIGNOF_INT128__ 16
+#endif /* !__ALIGNOF_INT128__ */
+
 #define __hybrid_int128_t  __INT128_TYPE__
 #define __hybrid_uint128_t __UINT128_TYPE__
 
@@ -77,15 +82,129 @@
 #define __HYBRID_UINT128_INIT64N(_2, _1) \
 	((__UINT128_TYPE__)(__UINT64_TYPE__)(_1) | (__UINT128_TYPE__)(__UINT64_TYPE__)(_2) << 64)
 
+__NAMESPACE_INT_BEGIN
+union __hybrid_int128_words_union {
+	__INT128_TYPE__  __i128_s128;
+	__UINT128_TYPE__ __i128_u128;
+	__INT64_TYPE__   __i128_s64[2];
+	__UINT64_TYPE__  __i128_u64[2];
+	__INT32_TYPE__   __i128_s32[4];
+	__UINT32_TYPE__  __i128_u32[4];
+	__INT16_TYPE__   __i128_s16[8];
+	__UINT16_TYPE__  __i128_u16[8];
+	__INT8_TYPE__    __i128_s8[16];
+	__UINT8_TYPE__   __i128_u8[16];
+};
+__NAMESPACE_INT_END
+
+#ifdef __NO_XBLOCK
+#define __HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_int128_getword8, __hybrid_int128_setword8,       \
+                                                   __hybrid_int128_t, __INT8_TYPE__, __i128_s128, __i128_s8) \
+	__FORCELOCAL __ATTR_WUNUSED __ATTR_IN(1) __INT8_TYPE__                                                   \
+	__NOTHROW(__hybrid_int128_getword8)(__hybrid_int128_t __var, unsigned int __i) {                         \
+		union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp;                                  \
+		__hi128_temp.__i128_s128 = __var;                                                                    \
+		return __hi128_temp.__i128_s8[__i];                                                                  \
+	}                                                                                                        \
+	__FORCELOCAL __ATTR_INOUT(1) void                                                                        \
+	__NOTHROW(__hybrid_int128_setword8)(__hybrid_int128_t *__pvar, unsigned int __i, __INT8_TYPE__ __v) {    \
+		union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp;                                  \
+		__hi128_temp.__i128_s128 = *__pvar;                                                                  \
+		__hi128_temp.__i128_s8[__i] = __v;                                                                   \
+		*__pvar = __hi128_temp.__i128_s128;                                                                  \
+	}
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_int128_getword8, __hybrid_PRIVATE_int128_setword8, __hybrid_int128_t, __INT8_TYPE__, __i128_s128, __i128_s8)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_int128_getword16, __hybrid_PRIVATE_int128_setword16, __hybrid_int128_t, __INT16_TYPE__, __i128_s128, __i128_s16)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_int128_getword32, __hybrid_PRIVATE_int128_setword32, __hybrid_int128_t, __INT32_TYPE__, __i128_s128, __i128_s32)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_int128_getword64, __hybrid_PRIVATE_int128_setword64, __hybrid_int128_t, __INT64_TYPE__, __i128_s128, __i128_s64)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_uint128_getword8, __hybrid_PRIVATE_uint128_setword8, __hybrid_uint128_t, __UINT8_TYPE__, __i128_u128, __i128_u8)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_uint128_getword16, __hybrid_PRIVATE_uint128_setword16, __hybrid_uint128_t, __UINT16_TYPE__, __i128_u128, __i128_u16)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_uint128_getword32, __hybrid_PRIVATE_uint128_setword32, __hybrid_uint128_t, __UINT32_TYPE__, __i128_u128, __i128_u32)
+__HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(__hybrid_PRIVATE_uint128_getword64, __hybrid_PRIVATE_uint128_setword64, __hybrid_uint128_t, __UINT64_TYPE__, __i128_u128, __i128_u64)
+#undef __HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD
+#define __hybrid_int128_getword8(var, i)      __hybrid_PRIVATE_int128_getword8(var, i)
+#define __hybrid_int128_getword16(var, i)     __hybrid_PRIVATE_int128_getword16(var, i)
+#define __hybrid_int128_getword32(var, i)     __hybrid_PRIVATE_int128_getword32(var, i)
+#define __hybrid_int128_getword64(var, i)     __hybrid_PRIVATE_int128_getword64(var, i)
+#define __hybrid_uint128_getword8(var, i)     __hybrid_PRIVATE_uint128_getword8(var, i)
+#define __hybrid_uint128_getword16(var, i)    __hybrid_PRIVATE_uint128_getword16(var, i)
+#define __hybrid_uint128_getword32(var, i)    __hybrid_PRIVATE_uint128_getword32(var, i)
+#define __hybrid_uint128_getword64(var, i)    __hybrid_PRIVATE_uint128_getword64(var, i)
+#define __hybrid_int128_setword8(var, i, v)   __hybrid_PRIVATE_int128_setword8(&(var), i, v)
+#define __hybrid_int128_setword16(var, i, v)  __hybrid_PRIVATE_int128_setword16(&(var), i, v)
+#define __hybrid_int128_setword32(var, i, v)  __hybrid_PRIVATE_int128_setword32(&(var), i, v)
+#define __hybrid_int128_setword64(var, i, v)  __hybrid_PRIVATE_int128_setword64(&(var), i, v)
+#define __hybrid_uint128_setword8(var, i, v)  __hybrid_PRIVATE_uint128_setword8(&(var), i, v)
+#define __hybrid_uint128_setword16(var, i, v) __hybrid_PRIVATE_uint128_setword16(&(var), i, v)
+#define __hybrid_uint128_setword32(var, i, v) __hybrid_PRIVATE_uint128_setword32(&(var), i, v)
+#define __hybrid_uint128_setword64(var, i, v) __hybrid_PRIVATE_uint128_setword64(&(var), i, v)
+#else /* __NO_XBLOCK */
+#define __hybrid_int128_getword8(var, i)      __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __XRETURN __hi128_temp.__i128_s8[i]; })
+#define __hybrid_int128_getword16(var, i)     __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __XRETURN __hi128_temp.__i128_s16[i]; })
+#define __hybrid_int128_getword32(var, i)     __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __XRETURN __hi128_temp.__i128_s32[i]; })
+#define __hybrid_int128_getword64(var, i)     __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __XRETURN __hi128_temp.__i128_s64[i]; })
+#define __hybrid_uint128_getword8(var, i)     __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __XRETURN __hi128_temp.__i128_u8[i]; })
+#define __hybrid_uint128_getword16(var, i)    __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __XRETURN __hi128_temp.__i128_u16[i]; })
+#define __hybrid_uint128_getword32(var, i)    __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __XRETURN __hi128_temp.__i128_u32[i]; })
+#define __hybrid_uint128_getword64(var, i)    __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __XRETURN __hi128_temp.__i128_u64[i]; })
+#define __hybrid_int128_setword8(var, i, v)   __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __hi128_temp.__i128_s8[i] = (v); (var) = __hi128_temp.__i128_s128; })
+#define __hybrid_int128_setword16(var, i, v)  __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __hi128_temp.__i128_s16[i] = (v); (var) = __hi128_temp.__i128_s128; })
+#define __hybrid_int128_setword32(var, i, v)  __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __hi128_temp.__i128_s32[i] = (v); (var) = __hi128_temp.__i128_s128; })
+#define __hybrid_int128_setword64(var, i, v)  __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_s128 = (var); __hi128_temp.__i128_s64[i] = (v); (var) = __hi128_temp.__i128_s128; })
+#define __hybrid_uint128_setword8(var, i, v)  __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __hi128_temp.__i128_s8[i] = (v); (var) = __hi128_temp.__i128_u128; })
+#define __hybrid_uint128_setword16(var, i, v) __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __hi128_temp.__i128_s16[i] = (v); (var) = __hi128_temp.__i128_u128; })
+#define __hybrid_uint128_setword32(var, i, v) __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __hi128_temp.__i128_s32[i] = (v); (var) = __hi128_temp.__i128_u128; })
+#define __hybrid_uint128_setword64(var, i, v) __XBLOCK({ union __NAMESPACE_INT_SYM __hybrid_int128_words_union __hi128_temp; __hi128_temp.__i128_u128 = (var); __hi128_temp.__i128_s64[i] = (v); (var) = __hi128_temp.__i128_u128; })
+#endif /* !__NO_XBLOCK */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __hybrid_int128_getword8_significand(var, i)      __hybrid_int128_getword8(var, i)
+#define __hybrid_int128_getword16_significand(var, i)     __hybrid_int128_getword16(var, i)
+#define __hybrid_int128_getword32_significand(var, i)     __hybrid_int128_getword32(var, i)
+#define __hybrid_int128_getword64_significand(var, i)     __hybrid_int128_getword64(var, i)
+#define __hybrid_uint128_getword8_significand(var, i)     __hybrid_uint128_getword8(var, i)
+#define __hybrid_uint128_getword16_significand(var, i)    __hybrid_uint128_getword16(var, i)
+#define __hybrid_uint128_getword32_significand(var, i)    __hybrid_uint128_getword32(var, i)
+#define __hybrid_uint128_getword64_significand(var, i)    __hybrid_uint128_getword64(var, i)
+#define __hybrid_int128_setword8_significand(var, i, v)   __hybrid_int128_setword8(var, i, v)
+#define __hybrid_int128_setword16_significand(var, i, v)  __hybrid_int128_setword16(var, i, v)
+#define __hybrid_int128_setword32_significand(var, i, v)  __hybrid_int128_setword32(var, i, v)
+#define __hybrid_int128_setword64_significand(var, i, v)  __hybrid_int128_setword64(var, i, v)
+#define __hybrid_uint128_setword8_significand(var, i, v)  __hybrid_uint128_setword8(var, i, v)
+#define __hybrid_uint128_setword16_significand(var, i, v) __hybrid_uint128_setword16(var, i, v)
+#define __hybrid_uint128_setword32_significand(var, i, v) __hybrid_uint128_setword32(var, i, v)
+#define __hybrid_uint128_setword64_significand(var, i, v) __hybrid_uint128_setword64(var, i, v)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __hybrid_int128_getword8_significand(var, i)      __hybrid_int128_getword8(var, 15 - (i))
+#define __hybrid_int128_getword16_significand(var, i)     __hybrid_int128_getword16(var, 7 - (i))
+#define __hybrid_int128_getword32_significand(var, i)     __hybrid_int128_getword32(var, 3 - (i))
+#define __hybrid_int128_getword64_significand(var, i)     __hybrid_int128_getword64(var, 1 - (i))
+#define __hybrid_uint128_getword8_significand(var, i)     __hybrid_uint128_getword8(var, 15 - (i))
+#define __hybrid_uint128_getword16_significand(var, i)    __hybrid_uint128_getword16(var, 7 - (i))
+#define __hybrid_uint128_getword32_significand(var, i)    __hybrid_uint128_getword32(var, 3 - (i))
+#define __hybrid_uint128_getword64_significand(var, i)    __hybrid_uint128_getword64(var, 1 - (i))
+#define __hybrid_int128_setword8_significand(var, i, v)   __hybrid_int128_setword8(var, 15 - (i), v)
+#define __hybrid_int128_setword16_significand(var, i, v)  __hybrid_int128_setword16(var, 7 - (i), v)
+#define __hybrid_int128_setword32_significand(var, i, v)  __hybrid_int128_setword32(var, 3 - (i), v)
+#define __hybrid_int128_setword64_significand(var, i, v)  __hybrid_int128_setword64(var, 1 - (i), v)
+#define __hybrid_uint128_setword8_significand(var, i, v)  __hybrid_uint128_setword8(var, 15 - (i), v)
+#define __hybrid_uint128_setword16_significand(var, i, v) __hybrid_uint128_setword16(var, 7 - (i), v)
+#define __hybrid_uint128_setword32_significand(var, i, v) __hybrid_uint128_setword32(var, 3 - (i), v)
+#define __hybrid_uint128_setword64_significand(var, i, v) __hybrid_uint128_setword64(var, 1 - (i), v)
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+
+/* !!! DEPRECATED !!!
+ * Reason:      implementation requires breakage of strict aliasing rules
+ * Replacement: use __hybrid_int128_[get|set]wordN[_significand] */
 #define __hybrid_int128_vec8(var)   ((__INT8_TYPE__ *)&(var))
 #define __hybrid_int128_vec16(var)  ((__INT16_TYPE__ *)&(var))
 #define __hybrid_int128_vec32(var)  ((__INT32_TYPE__ *)&(var))
+#define __hybrid_int128_vec64(var)  ((__INT64_TYPE__ *)&(var))
 #define __hybrid_uint128_vec8(var)  ((__UINT8_TYPE__ *)&(var))
 #define __hybrid_uint128_vec16(var) ((__UINT16_TYPE__ *)&(var))
 #define __hybrid_uint128_vec32(var) ((__UINT32_TYPE__ *)&(var))
-#define __hybrid_int128_vec64(var)  ((__INT64_TYPE__ *)&(var))
 #define __hybrid_uint128_vec64(var) ((__UINT64_TYPE__ *)&(var))
-
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __hybrid_int128_vec8_significand(var, i)   __hybrid_int128_vec8(var)[i]
 #define __hybrid_int128_vec16_significand(var, i)  __hybrid_int128_vec16(var)[i]
@@ -591,70 +710,160 @@ __DECL_END
 #define __HYBRID_UINT128_INIT64N __HYBRID_INT128_INIT64N
 #endif /* __UINT64_TYPE__ */
 
+
 #ifdef __INTELLISENSE__ /* Only for syntax highlighting... */
-#define __hybrid_int128_vec8(var)                  (var).__s128_8
-#define __hybrid_int128_vec16(var)                 (var).__s128_16
-#define __hybrid_int128_vec32(var)                 (var).__s128_32
-#define __hybrid_uint128_vec8(var)                 (var).__u128_8
-#define __hybrid_uint128_vec16(var)                (var).__u128_16
-#define __hybrid_uint128_vec32(var)                (var).__u128_32
-#define __hybrid_int128_vec8_significand(var, i)   (var).__s128_8[i]
-#define __hybrid_int128_vec16_significand(var, i)  (var).__s128_16[i]
-#define __hybrid_int128_vec32_significand(var, i)  (var).__s128_32[i]
-#define __hybrid_uint128_vec8_significand(var, i)  (var).__u128_8[i]
-#define __hybrid_uint128_vec16_significand(var, i) (var).__u128_16[i]
-#define __hybrid_uint128_vec32_significand(var, i) (var).__u128_32[i]
-#define __hybrid_uint128_assigned(var)             (*(__hybrid_int128_t const *)&(var).__u128_8)
-#define __hybrid_int128_asunsigned(var)            (*(__hybrid_uint128_t const *)&(var).__s128_8)
+#define __hybrid_int128_getword8(var, i)       (var).__s128_8[i]
+#define __hybrid_int128_getword16(var, i)      (var).__s128_16[i]
+#define __hybrid_int128_getword32(var, i)      (var).__s128_32[i]
+#define __hybrid_int128_getword64(var, i)      (var).__s128_64[i]
+#define __hybrid_uint128_getword8(var, i)      (var).__u128_8[i]
+#define __hybrid_uint128_getword16(var, i)     (var).__u128_16[i]
+#define __hybrid_uint128_getword32(var, i)     (var).__u128_32[i]
+#define __hybrid_uint128_getword64(var, i)     (var).__u128_64[i]
+#define __hybrid_int128_setword8(var, i, v)    (void)((var).__s128_8[i] = (v))
+#define __hybrid_int128_setword16(var, i, v)   (void)((var).__s128_16[i] = (v))
+#define __hybrid_int128_setword32(var, i, v)   (void)((var).__s128_32[i] = (v))
+#define __hybrid_int128_setword64(var, i, v)   (void)((var).__s128_64[i] = (v))
+#define __hybrid_uint128_setword8(var, i, v)   (void)((var).__u128_8[i] = (v))
+#define __hybrid_uint128_setword16(var, i, v)  (void)((var).__u128_16[i] = (v))
+#define __hybrid_uint128_setword32(var, i, v)  (void)((var).__u128_32[i] = (v))
+#define __hybrid_uint128_setword64(var, i, v)  (void)((var).__u128_64[i] = (v))
+#define __hybrid_int128_getword8_significand   __hybrid_int128_getword8
+#define __hybrid_int128_getword16_significand  __hybrid_int128_getword16
+#define __hybrid_int128_getword32_significand  __hybrid_int128_getword32
+#define __hybrid_int128_getword64_significand  __hybrid_int128_getword64
+#define __hybrid_uint128_getword8_significand  __hybrid_uint128_getword8
+#define __hybrid_uint128_getword16_significand __hybrid_uint128_getword16
+#define __hybrid_uint128_getword32_significand __hybrid_uint128_getword32
+#define __hybrid_uint128_getword64_significand __hybrid_uint128_getword64
+#define __hybrid_int128_setword8_significand   __hybrid_int128_setword8
+#define __hybrid_int128_setword16_significand  __hybrid_int128_setword16
+#define __hybrid_int128_setword32_significand  __hybrid_int128_setword32
+#define __hybrid_int128_setword64_significand  __hybrid_int128_setword64
+#define __hybrid_uint128_setword8_significand  __hybrid_uint128_setword8
+#define __hybrid_uint128_setword16_significand __hybrid_uint128_setword16
+#define __hybrid_uint128_setword32_significand __hybrid_uint128_setword32
+#define __hybrid_uint128_setword64_significand __hybrid_uint128_setword64
+
+#define __hybrid_PRIVATE_int128_vec8(var)                  (var).__s128_8
+#define __hybrid_PRIVATE_int128_vec16(var)                 (var).__s128_16
+#define __hybrid_PRIVATE_int128_vec32(var)                 (var).__s128_32
+#define __hybrid_PRIVATE_uint128_vec8(var)                 (var).__u128_8
+#define __hybrid_PRIVATE_uint128_vec16(var)                (var).__u128_16
+#define __hybrid_PRIVATE_uint128_vec32(var)                (var).__u128_32
+#define __hybrid_PRIVATE_int128_vec8_significand(var, i)   (var).__s128_8[i]
+#define __hybrid_PRIVATE_int128_vec16_significand(var, i)  (var).__s128_16[i]
+#define __hybrid_PRIVATE_int128_vec32_significand(var, i)  (var).__s128_32[i]
+#define __hybrid_PRIVATE_uint128_vec8_significand(var, i)  (var).__u128_8[i]
+#define __hybrid_PRIVATE_uint128_vec16_significand(var, i) (var).__u128_16[i]
+#define __hybrid_PRIVATE_uint128_vec32_significand(var, i) (var).__u128_32[i]
 #ifdef __UINT64_TYPE__
-#define __hybrid_int128_vec64(var)                 (var).__s128_64
-#define __hybrid_uint128_vec64(var)                (var).__u128_64
-#define __hybrid_int128_vec64_significand(var, i)  (var).__s128_64[i]
-#define __hybrid_uint128_vec64_significand(var, i) (var).__u128_64[i]
+#define __hybrid_PRIVATE_int128_vec64(var)                 (var).__s128_64
+#define __hybrid_PRIVATE_uint128_vec64(var)                (var).__u128_64
+#define __hybrid_PRIVATE_int128_vec64_significand(var, i)  (var).__s128_64[i]
+#define __hybrid_PRIVATE_uint128_vec64_significand(var, i) (var).__u128_64[i]
 #endif /* __UINT64_TYPE__ */
+
+#define __hybrid_uint128_assigned(var)             (*(__hybrid_int128_t const *)(var).__u128_8)
+#define __hybrid_int128_asunsigned(var)            (*(__hybrid_uint128_t const *)(var).__s128_8)
 #define __hybrid_int128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) \
-	(void)(__hybrid_int128_vec8_significand(var, 0)  = (a) + (b) + (c) + (d) + (e) + (f) + (g) + (h) + (i) + (j) + (k) + (l) + (m) + (n) + (o) + (p))
+	__hybrid_int128_setword8(var, 0, (a) + (b) + (c) + (d) + (e) + (f) + (g) + (h) + (i) + (j) + (k) + (l) + (m) + (n) + (o) + (p))
 #define __hybrid_int128_pack16(var, a, b, c, d, e, f, g, h) \
-	(void)(__hybrid_int128_vec16_significand(var, 0) = (a) + (b) + (c) + (d) + (e) + (f) + (g) + (h))
+	__hybrid_int128_setword16(var, 0, (a) + (b) + (c) + (d) + (e) + (f) + (g) + (h))
 #define __hybrid_int128_pack32(var, a, b, c, d) \
-	(void)(__hybrid_int128_vec32_significand(var, 0) = (a) + (b) + (c) + (d))
-#define __hybrid_int128_copy(dst, src) (void)(__hybrid_int128_vec64(dst)[0] = __hybrid_int128_vec64(src)[0])
-#define __hybrid_int128_inc(var)       (void)++__hybrid_int128_vec64(var)[0]
-#define __hybrid_int128_dec(var)       (void)++__hybrid_int128_vec64(var)[0]
-#define __hybrid_int128_inv(var)       (void)++__hybrid_int128_vec64(var)[0]
+	__hybrid_int128_setword32(var, 0, (a) + (b) + (c) + (d))
+#define __hybrid_int128_copy(dst, src) __hybrid_int128_setword64(dst, 0, __hybrid_int128_getword64(src, 0))
+#define __hybrid_int128_inc(var)       (void)++__hybrid_PRIVATE_int128_vec64(var)[0]
+#define __hybrid_int128_dec(var)       (void)--__hybrid_PRIVATE_int128_vec64(var)[0]
+#define __hybrid_int128_inv(var)       (void)++__hybrid_PRIVATE_int128_vec64(var)[0]
 #else /* __INTELLISENSE__ */
-#define __hybrid_int128_vec8(var)    (var).__i128_s8
-#define __hybrid_int128_vec16(var)   (var).__i128_s16
-#define __hybrid_int128_vec32(var)   (var).__i128_s32
-#define __hybrid_uint128_vec8(var)   (var).__i128_u8
-#define __hybrid_uint128_vec16(var)  (var).__i128_u16
-#define __hybrid_uint128_vec32(var)  (var).__i128_u32
+
+#define __hybrid_int128_getword8(var, i)      (var).__i128_s8[i]
+#define __hybrid_int128_getword16(var, i)     (var).__i128_s16[i]
+#define __hybrid_int128_getword32(var, i)     (var).__i128_s32[i]
+#define __hybrid_int128_getword64(var, i)     (var).__i128_s64[i]
+#define __hybrid_uint128_getword8(var, i)     (var).__i128_u8[i]
+#define __hybrid_uint128_getword16(var, i)    (var).__i128_u16[i]
+#define __hybrid_uint128_getword32(var, i)    (var).__i128_u32[i]
+#define __hybrid_uint128_getword64(var, i)    (var).__i128_u64[i]
+#define __hybrid_int128_setword8(var, i, v)   (void)((var).__i128_s8[i] = (v))
+#define __hybrid_int128_setword16(var, i, v)  (void)((var).__i128_s16[i] = (v))
+#define __hybrid_int128_setword32(var, i, v)  (void)((var).__i128_s32[i] = (v))
+#define __hybrid_int128_setword64(var, i, v)  (void)((var).__i128_s64[i] = (v))
+#define __hybrid_uint128_setword8(var, i, v)  (void)((var).__i128_u8[i] = (v))
+#define __hybrid_uint128_setword16(var, i, v) (void)((var).__i128_u16[i] = (v))
+#define __hybrid_uint128_setword32(var, i, v) (void)((var).__i128_u32[i] = (v))
+#define __hybrid_uint128_setword64(var, i, v) (void)((var).__i128_u64[i] = (v))
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __hybrid_int128_getword8_significand(var, i)      __hybrid_int128_getword8(var, i)
+#define __hybrid_int128_getword16_significand(var, i)     __hybrid_int128_getword16(var, i)
+#define __hybrid_int128_getword32_significand(var, i)     __hybrid_int128_getword32(var, i)
+#define __hybrid_int128_getword64_significand(var, i)     __hybrid_int128_getword64(var, i)
+#define __hybrid_uint128_getword8_significand(var, i)     __hybrid_uint128_getword8(var, i)
+#define __hybrid_uint128_getword16_significand(var, i)    __hybrid_uint128_getword16(var, i)
+#define __hybrid_uint128_getword32_significand(var, i)    __hybrid_uint128_getword32(var, i)
+#define __hybrid_uint128_getword64_significand(var, i)    __hybrid_uint128_getword64(var, i)
+#define __hybrid_int128_setword8_significand(var, i, v)   __hybrid_int128_setword8(var, i, v)
+#define __hybrid_int128_setword16_significand(var, i, v)  __hybrid_int128_setword16(var, i, v)
+#define __hybrid_int128_setword32_significand(var, i, v)  __hybrid_int128_setword32(var, i, v)
+#define __hybrid_int128_setword64_significand(var, i, v)  __hybrid_int128_setword64(var, i, v)
+#define __hybrid_uint128_setword8_significand(var, i, v)  __hybrid_uint128_setword8(var, i, v)
+#define __hybrid_uint128_setword16_significand(var, i, v) __hybrid_uint128_setword16(var, i, v)
+#define __hybrid_uint128_setword32_significand(var, i, v) __hybrid_uint128_setword32(var, i, v)
+#define __hybrid_uint128_setword64_significand(var, i, v) __hybrid_uint128_setword64(var, i, v)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __hybrid_int128_getword8_significand(var, i)      __hybrid_int128_getword8(var, 15 - (i))
+#define __hybrid_int128_getword16_significand(var, i)     __hybrid_int128_getword16(var, 7 - (i))
+#define __hybrid_int128_getword32_significand(var, i)     __hybrid_int128_getword32(var, 3 - (i))
+#define __hybrid_int128_getword64_significand(var, i)     __hybrid_int128_getword64(var, 1 - (i))
+#define __hybrid_uint128_getword8_significand(var, i)     __hybrid_uint128_getword8(var, 15 - (i))
+#define __hybrid_uint128_getword16_significand(var, i)    __hybrid_uint128_getword16(var, 7 - (i))
+#define __hybrid_uint128_getword32_significand(var, i)    __hybrid_uint128_getword32(var, 3 - (i))
+#define __hybrid_uint128_getword64_significand(var, i)    __hybrid_uint128_getword64(var, 1 - (i))
+#define __hybrid_int128_setword8_significand(var, i, v)   __hybrid_int128_setword8(var, 15 - (i), v)
+#define __hybrid_int128_setword16_significand(var, i, v)  __hybrid_int128_setword16(var, 7 - (i), v)
+#define __hybrid_int128_setword32_significand(var, i, v)  __hybrid_int128_setword32(var, 3 - (i), v)
+#define __hybrid_int128_setword64_significand(var, i, v)  __hybrid_int128_setword64(var, 1 - (i), v)
+#define __hybrid_uint128_setword8_significand(var, i, v)  __hybrid_uint128_setword8(var, 15 - (i), v)
+#define __hybrid_uint128_setword16_significand(var, i, v) __hybrid_uint128_setword16(var, 7 - (i), v)
+#define __hybrid_uint128_setword32_significand(var, i, v) __hybrid_uint128_setword32(var, 3 - (i), v)
+#define __hybrid_uint128_setword64_significand(var, i, v) __hybrid_uint128_setword64(var, 1 - (i), v)
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+
+#define __hybrid_PRIVATE_int128_vec8(var)    (var).__i128_s8
+#define __hybrid_PRIVATE_int128_vec16(var)   (var).__i128_s16
+#define __hybrid_PRIVATE_int128_vec32(var)   (var).__i128_s32
+#define __hybrid_PRIVATE_uint128_vec8(var)   (var).__i128_u8
+#define __hybrid_PRIVATE_uint128_vec16(var)  (var).__i128_u16
+#define __hybrid_PRIVATE_uint128_vec32(var)  (var).__i128_u32
 #ifdef __UINT64_TYPE__
-#define __hybrid_int128_vec64(var)   (var).__i128_s64
-#define __hybrid_uint128_vec64(var)  (var).__i128_u64
+#define __hybrid_PRIVATE_int128_vec64(var)   (var).__i128_s64
+#define __hybrid_PRIVATE_uint128_vec64(var)  (var).__i128_u64
 #endif /* __UINT64_TYPE__ */
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __hybrid_int128_vec8_significand(var, i)   (var).__i128_s8[i]
-#define __hybrid_int128_vec16_significand(var, i)  (var).__i128_s16[i]
-#define __hybrid_int128_vec32_significand(var, i)  (var).__i128_s32[i]
-#define __hybrid_uint128_vec8_significand(var, i)  (var).__i128_u8[i]
-#define __hybrid_uint128_vec16_significand(var, i) (var).__i128_u16[i]
-#define __hybrid_uint128_vec32_significand(var, i) (var).__i128_u32[i]
+#define __hybrid_PRIVATE_int128_vec8_significand(var, i)   (var).__i128_s8[i]
+#define __hybrid_PRIVATE_int128_vec16_significand(var, i)  (var).__i128_s16[i]
+#define __hybrid_PRIVATE_int128_vec32_significand(var, i)  (var).__i128_s32[i]
+#define __hybrid_PRIVATE_uint128_vec8_significand(var, i)  (var).__i128_u8[i]
+#define __hybrid_PRIVATE_uint128_vec16_significand(var, i) (var).__i128_u16[i]
+#define __hybrid_PRIVATE_uint128_vec32_significand(var, i) (var).__i128_u32[i]
 #ifdef __UINT64_TYPE__
-#define __hybrid_int128_vec64_significand(var, i)  (var).__i128_s64[i]
-#define __hybrid_uint128_vec64_significand(var, i) (var).__i128_u64[i]
+#define __hybrid_PRIVATE_int128_vec64_significand(var, i)  (var).__i128_s64[i]
+#define __hybrid_PRIVATE_uint128_vec64_significand(var, i) (var).__i128_u64[i]
 #endif /* __UINT64_TYPE__ */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __hybrid_int128_vec8_significand(var, i)   (var).__i128_s8[15 - (i)]
-#define __hybrid_int128_vec16_significand(var, i)  (var).__i128_s16[7 - (i)]
-#define __hybrid_int128_vec32_significand(var, i)  (var).__i128_s32[3 - (i)]
-#define __hybrid_uint128_vec8_significand(var, i)  (var).__i128_u8[15 - (i)]
-#define __hybrid_uint128_vec16_significand(var, i) (var).__i128_u16[7 - (i)]
-#define __hybrid_uint128_vec32_significand(var, i) (var).__i128_u32[3 - (i)]
+#define __hybrid_PRIVATE_int128_vec8_significand(var, i)   (var).__i128_s8[15 - (i)]
+#define __hybrid_PRIVATE_int128_vec16_significand(var, i)  (var).__i128_s16[7 - (i)]
+#define __hybrid_PRIVATE_int128_vec32_significand(var, i)  (var).__i128_s32[3 - (i)]
+#define __hybrid_PRIVATE_uint128_vec8_significand(var, i)  (var).__i128_u8[15 - (i)]
+#define __hybrid_PRIVATE_uint128_vec16_significand(var, i) (var).__i128_u16[7 - (i)]
+#define __hybrid_PRIVATE_uint128_vec32_significand(var, i) (var).__i128_u32[3 - (i)]
 #ifdef __UINT64_TYPE__
-#define __hybrid_int128_vec64_significand(var, i)  (var).__i128_s64[1 - (i)]
-#define __hybrid_uint128_vec64_significand(var, i) (var).__i128_u64[1 - (i)]
+#define __hybrid_PRIVATE_int128_vec64_significand(var, i)  (var).__i128_s64[1 - (i)]
+#define __hybrid_PRIVATE_uint128_vec64_significand(var, i) (var).__i128_u64[1 - (i)]
 #endif /* __UINT64_TYPE__ */
 #else /* __BYTE_ORDER__ == ... */
 #error "Unsupported byteorder"
@@ -672,87 +881,111 @@ __DECL_END
 #endif /* !__INTELLISENSE__ */
 
 
+/* !!! DEPRECATED !!!
+ * Reason:      implementation requires breakage of strict aliasing rules
+ * Replacement: use __hybrid_int128_[get|set]wordN[_significand] */
+#define __hybrid_int128_vec8               __hybrid_PRIVATE_int128_vec8
+#define __hybrid_int128_vec16              __hybrid_PRIVATE_int128_vec16
+#define __hybrid_int128_vec32              __hybrid_PRIVATE_int128_vec32
+#define __hybrid_uint128_vec8              __hybrid_PRIVATE_uint128_vec8
+#define __hybrid_uint128_vec16             __hybrid_PRIVATE_uint128_vec16
+#define __hybrid_uint128_vec32             __hybrid_PRIVATE_uint128_vec32
+#define __hybrid_int128_vec8_significand   __hybrid_PRIVATE_int128_vec8_significand
+#define __hybrid_int128_vec16_significand  __hybrid_PRIVATE_int128_vec16_significand
+#define __hybrid_int128_vec32_significand  __hybrid_PRIVATE_int128_vec32_significand
+#define __hybrid_uint128_vec8_significand  __hybrid_PRIVATE_uint128_vec8_significand
+#define __hybrid_uint128_vec16_significand __hybrid_PRIVATE_uint128_vec16_significand
+#define __hybrid_uint128_vec32_significand __hybrid_PRIVATE_uint128_vec32_significand
+#ifdef __UINT64_TYPE__
+#define __hybrid_int128_vec64              __hybrid_PRIVATE_int128_vec64
+#define __hybrid_uint128_vec64             __hybrid_PRIVATE_uint128_vec64
+#define __hybrid_int128_vec64_significand  __hybrid_PRIVATE_int128_vec64_significand
+#define __hybrid_uint128_vec64_significand __hybrid_PRIVATE_uint128_vec64_significand
+#endif /* __UINT64_TYPE__ */
+
+
+
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_copy(dst, src)                                     \
-	(void)(__hybrid_uint128_vec64(dst)[0] = __hybrid_uint128_vec64(src)[0], \
-	       __hybrid_uint128_vec64(dst)[1] = __hybrid_uint128_vec64(src)[1])
+#define __hybrid_uint128_copy(dst, src)                                                     \
+	(void)(__hybrid_PRIVATE_uint128_vec64(dst)[0] = __hybrid_PRIVATE_uint128_vec64(src)[0], \
+	       __hybrid_PRIVATE_uint128_vec64(dst)[1] = __hybrid_PRIVATE_uint128_vec64(src)[1])
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_copy(dst, src)                                     \
-	(void)(__hybrid_uint128_vec32(dst)[0] = __hybrid_uint128_vec32(src)[0], \
-	       __hybrid_uint128_vec32(dst)[1] = __hybrid_uint128_vec32(src)[1], \
-	       __hybrid_uint128_vec32(dst)[2] = __hybrid_uint128_vec32(src)[2], \
-	       __hybrid_uint128_vec32(dst)[3] = __hybrid_uint128_vec32(src)[3])
+#define __hybrid_uint128_copy(dst, src)                                                     \
+	(void)(__hybrid_PRIVATE_uint128_vec32(dst)[0] = __hybrid_PRIVATE_uint128_vec32(src)[0], \
+	       __hybrid_PRIVATE_uint128_vec32(dst)[1] = __hybrid_PRIVATE_uint128_vec32(src)[1], \
+	       __hybrid_PRIVATE_uint128_vec32(dst)[2] = __hybrid_PRIVATE_uint128_vec32(src)[2], \
+	       __hybrid_PRIVATE_uint128_vec32(dst)[3] = __hybrid_PRIVATE_uint128_vec32(src)[3])
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 /* Construct a 128-bit integer, given its individual words in least->most significand order. */
 #define __hybrid_uint128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) \
-	(void)(__hybrid_uint128_vec8_significand(var, 0)  = (a),                        \
-	       __hybrid_uint128_vec8_significand(var, 1)  = (b),                        \
-	       __hybrid_uint128_vec8_significand(var, 2)  = (c),                        \
-	       __hybrid_uint128_vec8_significand(var, 3)  = (d),                        \
-	       __hybrid_uint128_vec8_significand(var, 4)  = (e),                        \
-	       __hybrid_uint128_vec8_significand(var, 5)  = (f),                        \
-	       __hybrid_uint128_vec8_significand(var, 6)  = (g),                        \
-	       __hybrid_uint128_vec8_significand(var, 7)  = (h),                        \
-	       __hybrid_uint128_vec8_significand(var, 8)  = (i),                        \
-	       __hybrid_uint128_vec8_significand(var, 9)  = (j),                        \
-	       __hybrid_uint128_vec8_significand(var, 10) = (k),                        \
-	       __hybrid_uint128_vec8_significand(var, 11) = (l),                        \
-	       __hybrid_uint128_vec8_significand(var, 12) = (m),                        \
-	       __hybrid_uint128_vec8_significand(var, 13) = (n),                        \
-	       __hybrid_uint128_vec8_significand(var, 14) = (o),                        \
-	       __hybrid_uint128_vec8_significand(var, 15) = (p))
-#define __hybrid_uint128_pack16(var, a, b, c, d, e, f, g, h) \
-	(void)(__hybrid_uint128_vec16_significand(var, 0) = (a), \
-	       __hybrid_uint128_vec16_significand(var, 1) = (b), \
-	       __hybrid_uint128_vec16_significand(var, 2) = (c), \
-	       __hybrid_uint128_vec16_significand(var, 3) = (d), \
-	       __hybrid_uint128_vec16_significand(var, 4) = (e), \
-	       __hybrid_uint128_vec16_significand(var, 5) = (f), \
-	       __hybrid_uint128_vec16_significand(var, 6) = (g), \
-	       __hybrid_uint128_vec16_significand(var, 7) = (h))
-#define __hybrid_uint128_pack32(var, a, b, c, d)             \
-	(void)(__hybrid_uint128_vec32_significand(var, 0) = (a), \
-	       __hybrid_uint128_vec32_significand(var, 1) = (b), \
-	       __hybrid_uint128_vec32_significand(var, 2) = (c), \
-	       __hybrid_uint128_vec32_significand(var, 3) = (d))
+	(void)(__hybrid_PRIVATE_uint128_vec8_significand(var, 0)  = (a),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 1)  = (b),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 2)  = (c),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 3)  = (d),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 4)  = (e),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 5)  = (f),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 6)  = (g),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 7)  = (h),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 8)  = (i),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 9)  = (j),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 10) = (k),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 11) = (l),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 12) = (m),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 13) = (n),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 14) = (o),                \
+	       __hybrid_PRIVATE_uint128_vec8_significand(var, 15) = (p))
+#define __hybrid_uint128_pack16(var, a, b, c, d, e, f, g, h)         \
+	(void)(__hybrid_PRIVATE_uint128_vec16_significand(var, 0) = (a), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 1) = (b), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 2) = (c), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 3) = (d), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 4) = (e), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 5) = (f), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 6) = (g), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 7) = (h))
+#define __hybrid_uint128_pack32(var, a, b, c, d)                     \
+	(void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = (a), \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = (b), \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = (c), \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = (d))
 
 #ifdef __UINT64_TYPE__
-#define __hybrid_uint128_pack64(var, lo, hi)                  \
-	(void)(__hybrid_uint128_vec64_significand(var, 0) = (lo), \
-	       __hybrid_uint128_vec64_significand(var, 1) = (hi))
+#define __hybrid_uint128_pack64(var, lo, hi)                          \
+	(void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) = (lo), \
+	       __hybrid_PRIVATE_uint128_vec64_significand(var, 1) = (hi))
 #define __hybrid_int128_pack64(var, lo, hi) \
 	__hybrid_uint128_pack64(var, lo, hi)
-#define __hybrid_int128_get64(var) __hybrid_int128_vec64_significand(var, 0)
-#define __hybrid_int128_set64(var, v)                                       \
-	(void)(__hybrid_int128_vec64_significand(var, 0) = (__INT64_TYPE__)(v), \
-	       __hybrid_int128_vec64_significand(var, 1) = __hybrid_int128_vec64_significand(var, 0) < 0 ? -1 : 0)
+#define __hybrid_int128_get64(var) __hybrid_PRIVATE_int128_vec64_significand(var, 0)
+#define __hybrid_int128_set64(var, v)                                               \
+	(void)(__hybrid_PRIVATE_int128_vec64_significand(var, 0) = (__INT64_TYPE__)(v), \
+	       __hybrid_PRIVATE_int128_vec64_significand(var, 1) = __hybrid_PRIVATE_int128_vec64_significand(var, 0) < 0 ? -1 : 0)
 #define __hybrid_uint128_get64(var) \
-	__hybrid_uint128_vec64_significand(var, 0)
-#define __hybrid_uint128_set64(var, v)                                        \
-	(void)(__hybrid_uint128_vec64_significand(var, 0) = (__UINT64_TYPE__)(v), \
-	       __hybrid_uint128_vec64_significand(var, 1) = 0)
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0)
+#define __hybrid_uint128_set64(var, v)                                                \
+	(void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) = (__UINT64_TYPE__)(v), \
+	       __hybrid_PRIVATE_uint128_vec64_significand(var, 1) = 0)
 #endif /* __UINT64_TYPE__ */
 
-#define __hybrid_int128_get32(var)  __hybrid_int128_vec32_significand(var, 0)
-#define __hybrid_uint128_get32(var) __hybrid_uint128_vec32_significand(var, 0)
+#define __hybrid_int128_get32(var)  __hybrid_PRIVATE_int128_vec32_significand(var, 0)
+#define __hybrid_uint128_get32(var) __hybrid_PRIVATE_uint128_vec32_significand(var, 0)
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 #define __hybrid_int128_set32(var, v)  __hybrid_int128_set64(var, v)
 #define __hybrid_uint128_set32(var, v) __hybrid_uint128_set64(var, v)
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_int128_set32(var, v)                                                                          \
-	(void)(__hybrid_int128_vec32_significand(var, 0) = (__INT32_TYPE__)(v),                                    \
-	       __hybrid_int128_vec32_significand(var, 1) = __hybrid_int128_vec32_significand(var, 0) < 0 ? -1 : 0, \
-	       __hybrid_int128_vec32_significand(var, 2) = __hybrid_int128_vec32_significand(var, 1),              \
-	       __hybrid_int128_vec32_significand(var, 3) = __hybrid_int128_vec32_significand(var, 1))
-#define __hybrid_uint128_set32(var, v)                                        \
-	(void)(__hybrid_uint128_vec32_significand(var, 0) = (__UINT32_TYPE__)(v), \
-	       __hybrid_uint128_vec32_significand(var, 1) = 0,                    \
-	       __hybrid_uint128_vec32_significand(var, 2) = 0,                    \
-	       __hybrid_uint128_vec32_significand(var, 3) = 0)
+#define __hybrid_int128_set32(var, v)                                                                                          \
+	(void)(__hybrid_PRIVATE_int128_vec32_significand(var, 0) = (__INT32_TYPE__)(v),                                            \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 1) = __hybrid_PRIVATE_int128_vec32_significand(var, 0) < 0 ? -1 : 0, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 2) = __hybrid_PRIVATE_int128_vec32_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 3) = __hybrid_PRIVATE_int128_vec32_significand(var, 1))
+#define __hybrid_uint128_set32(var, v)                                                \
+	(void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = (__UINT32_TYPE__)(v), \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
-#define __hybrid_int128_get16(var)  __hybrid_int128_vec16_significand(var, 0)
-#define __hybrid_uint128_get16(var) __hybrid_uint128_vec16_significand(var, 0)
+#define __hybrid_int128_get16(var)  __hybrid_PRIVATE_int128_vec16_significand(var, 0)
+#define __hybrid_uint128_get16(var) __hybrid_PRIVATE_uint128_vec16_significand(var, 0)
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 #define __hybrid_int128_set16(var, v)  __hybrid_int128_set64(var, v)
 #define __hybrid_uint128_set16(var, v) __hybrid_uint128_set64(var, v)
@@ -760,28 +993,28 @@ __DECL_END
 #define __hybrid_int128_set16(var, v)  __hybrid_int128_set32(var, v)
 #define __hybrid_uint128_set16(var, v) __hybrid_uint128_set32(var, v)
 #else /* __SIZEOF_BUSINT__ >= ... */
-#define __hybrid_int128_set16(var, v)                                                                          \
-	(void)(__hybrid_int128_vec16_significand(var, 0) = (__INT16_TYPE__)(v),                                    \
-	       __hybrid_int128_vec16_significand(var, 1) = __hybrid_int128_vec16_significand(var, 0) < 0 ? -1 : 0, \
-	       __hybrid_int128_vec16_significand(var, 2) = __hybrid_int128_vec16_significand(var, 1),              \
-	       __hybrid_int128_vec16_significand(var, 3) = __hybrid_int128_vec16_significand(var, 1),              \
-	       __hybrid_int128_vec16_significand(var, 4) = __hybrid_int128_vec16_significand(var, 1),              \
-	       __hybrid_int128_vec16_significand(var, 5) = __hybrid_int128_vec16_significand(var, 1),              \
-	       __hybrid_int128_vec16_significand(var, 6) = __hybrid_int128_vec16_significand(var, 1),              \
-	       __hybrid_int128_vec16_significand(var, 7) = __hybrid_int128_vec16_significand(var, 1))
-#define __hybrid_uint128_set16(var, v)                                        \
-	(void)(__hybrid_uint128_vec16_significand(var, 0) = (__UINT16_TYPE__)(v), \
-	       __hybrid_uint128_vec16_significand(var, 1) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 2) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 3) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 4) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 5) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 6) = 0,                    \
-	       __hybrid_uint128_vec16_significand(var, 7) = 0)
+#define __hybrid_int128_set16(var, v)                                                                                          \
+	(void)(__hybrid_PRIVATE_int128_vec16_significand(var, 0) = (__INT16_TYPE__)(v),                                            \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 1) = __hybrid_PRIVATE_int128_vec16_significand(var, 0) < 0 ? -1 : 0, \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 2) = __hybrid_PRIVATE_int128_vec16_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 3) = __hybrid_PRIVATE_int128_vec16_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 4) = __hybrid_PRIVATE_int128_vec16_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 5) = __hybrid_PRIVATE_int128_vec16_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 6) = __hybrid_PRIVATE_int128_vec16_significand(var, 1),              \
+	       __hybrid_PRIVATE_int128_vec16_significand(var, 7) = __hybrid_PRIVATE_int128_vec16_significand(var, 1))
+#define __hybrid_uint128_set16(var, v)                                                \
+	(void)(__hybrid_PRIVATE_uint128_vec16_significand(var, 0) = (__UINT16_TYPE__)(v), \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 1) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 2) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 3) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 4) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 5) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 6) = 0,                    \
+	       __hybrid_PRIVATE_uint128_vec16_significand(var, 7) = 0)
 #endif /* __SIZEOF_BUSINT__ < ... */
 
-#define __hybrid_int128_get8(var)  __hybrid_int128_vec8_significand(var, 0)
-#define __hybrid_uint128_get8(var) __hybrid_uint128_vec8_significand(var, 0)
+#define __hybrid_int128_get8(var)  __hybrid_PRIVATE_int128_vec8_significand(var, 0)
+#define __hybrid_uint128_get8(var) __hybrid_PRIVATE_uint128_vec8_significand(var, 0)
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 #define __hybrid_int128_set8(var, v)  __hybrid_int128_set64(var, v)
 #define __hybrid_uint128_set8(var, v) __hybrid_uint128_set64(var, v)
@@ -810,74 +1043,74 @@ __DECL_END
 #endif /* __SIZEOF_BUSINT__ < ... */
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_inc(var)                               \
-	(void)(++__hybrid_uint128_vec64_significand(var, 0) != 0 || \
-	       (++__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_dec(var)                                                            \
-	(void)(--__hybrid_uint128_vec64_significand(var, 0) != __UINT64_C(0xffffffffffffffff) || \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_inv(var)                                            \
-	(void)(__hybrid_uint128_vec64(var)[0] = ~__hybrid_uint128_vec64(var)[0], \
-	       __hybrid_uint128_vec64(var)[1] = ~__hybrid_uint128_vec64(var)[1])
+#define __hybrid_uint128_inc(var)                                       \
+	(void)(++__hybrid_PRIVATE_uint128_vec64_significand(var, 0) != 0 || \
+	       (++__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_dec(var)                                                                    \
+	(void)(--__hybrid_PRIVATE_uint128_vec64_significand(var, 0) != __UINT64_C(0xffffffffffffffff) || \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_inv(var)                                                            \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] = ~__hybrid_PRIVATE_uint128_vec64(var)[0], \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] = ~__hybrid_PRIVATE_uint128_vec64(var)[1])
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_inc(var)                               \
-	(void)(++__hybrid_uint128_vec32_significand(var, 0) != 0 || \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 || \
-	       ++__hybrid_uint128_vec32_significand(var, 2) != 0 || \
-	       (++__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_dec(var)                                                    \
-	(void)(--__hybrid_uint128_vec32_significand(var, 0) != __UINT32_C(0xffffffff) || \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) || \
-	       --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
-	       (--__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_inv(var)                                            \
-	(void)(__hybrid_uint128_vec32(var)[0] = ~__hybrid_uint128_vec32(var)[0], \
-	       __hybrid_uint128_vec32(var)[1] = ~__hybrid_uint128_vec32(var)[1], \
-	       __hybrid_uint128_vec32(var)[2] = ~__hybrid_uint128_vec32(var)[2], \
-	       __hybrid_uint128_vec32(var)[3] = ~__hybrid_uint128_vec32(var)[3])
+#define __hybrid_uint128_inc(var)                                       \
+	(void)(++__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != 0 || \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 || \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 || \
+	       (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_dec(var)                                                            \
+	(void)(--__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != __UINT32_C(0xffffffff) || \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) || \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
+	       (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_inv(var)                                                            \
+	(void)(__hybrid_PRIVATE_uint128_vec32(var)[0] = ~__hybrid_PRIVATE_uint128_vec32(var)[0], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[1] = ~__hybrid_PRIVATE_uint128_vec32(var)[1], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[2] = ~__hybrid_PRIVATE_uint128_vec32(var)[2], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[3] = ~__hybrid_PRIVATE_uint128_vec32(var)[3])
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #define __hybrid_int128_neg(var)   (__hybrid_int128_dec(var), __hybrid_int128_inv(var))
-#define __hybrid_int128_isneg(var) (__hybrid_int128_vec8_significand(var, 15) < 0)
+#define __hybrid_int128_isneg(var) (__hybrid_PRIVATE_int128_vec8_significand(var, 15) < 0)
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_and128(var, v)                                    \
-	(void)(__hybrid_uint128_vec64(var)[0] &= __hybrid_uint128_vec64(v)[0], \
-	       __hybrid_uint128_vec64(var)[1] &= __hybrid_uint128_vec64(v)[1])
-#define __hybrid_uint128_or128(var, v)                                     \
-	(void)(__hybrid_uint128_vec64(var)[0] |= __hybrid_uint128_vec64(v)[0], \
-	       __hybrid_uint128_vec64(var)[1] |= __hybrid_uint128_vec64(v)[1])
-#define __hybrid_uint128_xor128(var, v)                                    \
-	(void)(__hybrid_uint128_vec64(var)[0] ^= __hybrid_uint128_vec64(v)[0], \
-	       __hybrid_uint128_vec64(var)[1] ^= __hybrid_uint128_vec64(v)[1])
+#define __hybrid_uint128_and128(var, v)                                                    \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] &= __hybrid_PRIVATE_uint128_vec64(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] &= __hybrid_PRIVATE_uint128_vec64(v)[1])
+#define __hybrid_uint128_or128(var, v)                                                     \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] |= __hybrid_PRIVATE_uint128_vec64(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] |= __hybrid_PRIVATE_uint128_vec64(v)[1])
+#define __hybrid_uint128_xor128(var, v)                                                    \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] ^= __hybrid_PRIVATE_uint128_vec64(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] ^= __hybrid_PRIVATE_uint128_vec64(v)[1])
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_and128(var, v)                                    \
-	(void)(__hybrid_uint128_vec32(var)[0] &= __hybrid_uint128_vec32(v)[0], \
-	       __hybrid_uint128_vec32(var)[1] &= __hybrid_uint128_vec32(v)[1], \
-	       __hybrid_uint128_vec32(var)[2] &= __hybrid_uint128_vec32(v)[2], \
-	       __hybrid_uint128_vec32(var)[3] &= __hybrid_uint128_vec32(v)[3])
-#define __hybrid_uint128_or128(var, v)                                     \
-	(void)(__hybrid_uint128_vec32(var)[0] |= __hybrid_uint128_vec32(v)[0], \
-	       __hybrid_uint128_vec32(var)[1] |= __hybrid_uint128_vec32(v)[1], \
-	       __hybrid_uint128_vec32(var)[2] |= __hybrid_uint128_vec32(v)[2], \
-	       __hybrid_uint128_vec32(var)[3] |= __hybrid_uint128_vec32(v)[3])
-#define __hybrid_uint128_xor128(var, v)                                    \
-	(void)(__hybrid_uint128_vec32(var)[0] ^= __hybrid_uint128_vec32(v)[0], \
-	       __hybrid_uint128_vec32(var)[1] ^= __hybrid_uint128_vec32(v)[1], \
-	       __hybrid_uint128_vec32(var)[2] ^= __hybrid_uint128_vec32(v)[2], \
-	       __hybrid_uint128_vec32(var)[3] ^= __hybrid_uint128_vec32(v)[3])
+#define __hybrid_uint128_and128(var, v)                                                    \
+	(void)(__hybrid_PRIVATE_uint128_vec32(var)[0] &= __hybrid_PRIVATE_uint128_vec32(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[1] &= __hybrid_PRIVATE_uint128_vec32(v)[1], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[2] &= __hybrid_PRIVATE_uint128_vec32(v)[2], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[3] &= __hybrid_PRIVATE_uint128_vec32(v)[3])
+#define __hybrid_uint128_or128(var, v)                                                     \
+	(void)(__hybrid_PRIVATE_uint128_vec32(var)[0] |= __hybrid_PRIVATE_uint128_vec32(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[1] |= __hybrid_PRIVATE_uint128_vec32(v)[1], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[2] |= __hybrid_PRIVATE_uint128_vec32(v)[2], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[3] |= __hybrid_PRIVATE_uint128_vec32(v)[3])
+#define __hybrid_uint128_xor128(var, v)                                                    \
+	(void)(__hybrid_PRIVATE_uint128_vec32(var)[0] ^= __hybrid_PRIVATE_uint128_vec32(v)[0], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[1] ^= __hybrid_PRIVATE_uint128_vec32(v)[1], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[2] ^= __hybrid_PRIVATE_uint128_vec32(v)[2], \
+	       __hybrid_PRIVATE_uint128_vec32(var)[3] ^= __hybrid_PRIVATE_uint128_vec32(v)[3])
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #ifdef __UINT64_TYPE__
 #define __hybrid_uint128_and64(var, v) \
 	__hybrid_uint128_set64(var, __hybrid_uint128_get64(var) & (__UINT64_TYPE__)(v))
 #define __hybrid_int128_and64(var, v)  __hybrid_int128_set64(var, __hybrid_int128_get64(var) & (__INT64_TYPE__)(v))
-#define __hybrid_uint128_or64(var, v) (void)(__hybrid_uint128_vec64_significand(var, 0) |= (v))
-#define __hybrid_int128_or64(var, v)                                   \
-	(__hybrid_int128_vec64_significand(var, 0) |= (__INT64_TYPE__)(v), \
-	 (__INT64_TYPE__)(v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) = -1) : (void)0)
-#define __hybrid_uint128_xor64(var, v) (void)(__hybrid_uint128_vec64_significand(var, 0) ^= (v))
-#define __hybrid_int128_xor64(var, v)                                   \
-	(__hybrid_int128_vec64_significand(var, 0) ^= (__INT64_TYPE__)(v), \
-	 (__INT64_TYPE__)(v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_uint128_or64(var, v) (void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) |= (v))
+#define __hybrid_int128_or64(var, v)                                           \
+	(__hybrid_PRIVATE_int128_vec64_significand(var, 0) |= (__INT64_TYPE__)(v), \
+	 (__INT64_TYPE__)(v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) = -1) : (void)0)
+#define __hybrid_uint128_xor64(var, v) (void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) ^= (v))
+#define __hybrid_int128_xor64(var, v)                                          \
+	(__hybrid_PRIVATE_int128_vec64_significand(var, 0) ^= (__INT64_TYPE__)(v), \
+	 (__INT64_TYPE__)(v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) ^= -1) : (void)0)
 #endif /* __UINT64_TYPE__ */
 
 #define __hybrid_uint128_and8(var, v)  __hybrid_uint128_set8(var, __hybrid_uint128_get8(var) & (__UINT8_TYPE__)(v))
@@ -886,18 +1119,18 @@ __DECL_END
 #define __hybrid_int128_and8(var, v)   __hybrid_int128_set8(var, __hybrid_int128_get8(var) & (__INT8_TYPE__)(v))
 #define __hybrid_int128_and16(var, v)  __hybrid_int128_set16(var, __hybrid_int128_get16(var) & (__INT16_TYPE__)(v))
 #define __hybrid_int128_and32(var, v)  __hybrid_int128_set32(var, __hybrid_int128_get32(var) & (__INT32_TYPE__)(v))
-#define __hybrid_uint128_or8(var, v)   (void)(__hybrid_uint128_vec8_significand(var, 0) |= (v))
-#define __hybrid_uint128_or16(var, v)  (void)(__hybrid_uint128_vec16_significand(var, 0) |= (v))
-#define __hybrid_uint128_or32(var, v)  (void)(__hybrid_uint128_vec32_significand(var, 0) |= (v))
-#define __hybrid_uint128_xor8(var, v)  (void)(__hybrid_uint128_vec8_significand(var, 0) ^= (v))
-#define __hybrid_uint128_xor16(var, v) (void)(__hybrid_uint128_vec16_significand(var, 0) ^= (v))
-#define __hybrid_uint128_xor32(var, v) (void)(__hybrid_uint128_vec32_significand(var, 0) ^= (v))
+#define __hybrid_uint128_or8(var, v)   (void)(__hybrid_PRIVATE_uint128_vec8_significand(var, 0) |= (v))
+#define __hybrid_uint128_or16(var, v)  (void)(__hybrid_PRIVATE_uint128_vec16_significand(var, 0) |= (v))
+#define __hybrid_uint128_or32(var, v)  (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) |= (v))
+#define __hybrid_uint128_xor8(var, v)  (void)(__hybrid_PRIVATE_uint128_vec8_significand(var, 0) ^= (v))
+#define __hybrid_uint128_xor16(var, v) (void)(__hybrid_PRIVATE_uint128_vec16_significand(var, 0) ^= (v))
+#define __hybrid_uint128_xor32(var, v) (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) ^= (v))
 
 #ifdef __INTELLISENSE__ /* Only for syntax highlighting... */
-#define __hybrid_int128_and128(var, v) (void)(__hybrid_int128_vec8_significand(var, 0) = __hybrid_int128_vec8_significand(v, 0))
+#define __hybrid_int128_and128(var, v) (void)(__hybrid_PRIVATE_int128_vec8_significand(var, 0) = __hybrid_PRIVATE_int128_vec8_significand(v, 0))
 #define __hybrid_int128_or128          __hybrid_int128_and128
 #define __hybrid_int128_xor128         __hybrid_int128_and128
-#define __hybrid_int128_or8(var, v)    (void)(__hybrid_int128_vec8_significand(var, 0) = (v))
+#define __hybrid_int128_or8(var, v)    (void)(__hybrid_PRIVATE_int128_vec8_significand(var, 0) = (v))
 #define __hybrid_int128_or16           __hybrid_int128_or8
 #define __hybrid_int128_or32           __hybrid_int128_or8
 #define __hybrid_int128_xor8           __hybrid_int128_or8
@@ -908,172 +1141,172 @@ __DECL_END
 #define __hybrid_int128_or128  __hybrid_uint128_or128
 #define __hybrid_int128_xor128 __hybrid_uint128_xor128
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_int128_or8(var, v)    (__hybrid_uint128_vec8_significand(var, 0) |= (v), (v) < 0  ? (void)(__hybrid_int128_vec64_significand(var, 1) = -1, __hybrid_int128_vec32_significand(var, 1) = -1, __hybrid_int128_vec16_significand(var, 1) = -1, __hybrid_int128_vec8_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_or16(var, v)   (__hybrid_uint128_vec16_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) = -1, __hybrid_int128_vec32_significand(var, 1) = -1, __hybrid_int128_vec16_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_or32(var, v)   (__hybrid_uint128_vec32_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) = -1, __hybrid_int128_vec32_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_xor8(var, v)   (__hybrid_uint128_vec8_significand(var, 0) ^= (v), (v) < 0  ? (void)(__hybrid_int128_vec64_significand(var, 1) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1, __hybrid_int128_vec16_significand(var, 1) ^= -1, __hybrid_int128_vec8_significand(var, 1) ^= -1) : (void)0)
-#define __hybrid_int128_xor16(var, v)  (__hybrid_uint128_vec16_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1, __hybrid_int128_vec16_significand(var, 1) ^= -1) : (void)0)
-#define __hybrid_int128_xor32(var, v)  (__hybrid_uint128_vec32_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_int128_vec64_significand(var, 1) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_or8(var, v)    (__hybrid_PRIVATE_uint128_vec8_significand(var, 0) |= (v), (v) < 0  ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec8_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_or16(var, v)   (__hybrid_PRIVATE_uint128_vec16_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_or32(var, v)   (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_xor8(var, v)   (__hybrid_PRIVATE_uint128_vec8_significand(var, 0) ^= (v), (v) < 0  ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec8_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_xor16(var, v)  (__hybrid_PRIVATE_uint128_vec16_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_xor32(var, v)  (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec64_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1) : (void)0)
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_int128_or8(var, v)    (__hybrid_uint128_vec8_significand(var, 0) |= (v), (v) < 0  ? (void)(__hybrid_int128_vec32_significand(var, 3) = -1, __hybrid_int128_vec32_significand(var, 2) = -1, __hybrid_int128_vec32_significand(var, 1) = -1, __hybrid_int128_vec16_significand(var, 1) = -1, __hybrid_int128_vec8_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_or16(var, v)   (__hybrid_uint128_vec16_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_int128_vec32_significand(var, 3) = -1, __hybrid_int128_vec32_significand(var, 2) = -1, __hybrid_int128_vec32_significand(var, 1) = -1, __hybrid_int128_vec16_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_or32(var, v)   (__hybrid_uint128_vec32_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_int128_vec32_significand(var, 3) = -1, __hybrid_int128_vec32_significand(var, 2) = -1, __hybrid_int128_vec32_significand(var, 1) = -1) : (void)0)
-#define __hybrid_int128_xor8(var, v)   (__hybrid_uint128_vec8_significand(var, 0) ^= (v), (v) < 0  ? (void)(__hybrid_int128_vec32_significand(var, 3) ^= -1, __hybrid_int128_vec32_significand(var, 2) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1, __hybrid_int128_vec16_significand(var, 1) ^= -1, __hybrid_int128_vec8_significand(var, 1) ^= -1) : (void)0)
-#define __hybrid_int128_xor16(var, v)  (__hybrid_uint128_vec16_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_int128_vec32_significand(var, 3) ^= -1, __hybrid_int128_vec32_significand(var, 2) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1, __hybrid_int128_vec16_significand(var, 1) ^= -1) : (void)0)
-#define __hybrid_int128_xor32(var, v)  (__hybrid_uint128_vec32_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_int128_vec32_significand(var, 3) ^= -1, __hybrid_int128_vec32_significand(var, 2) ^= -1, __hybrid_int128_vec32_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_or8(var, v)    (__hybrid_PRIVATE_uint128_vec8_significand(var, 0) |= (v), (v) < 0  ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec8_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_or16(var, v)   (__hybrid_PRIVATE_uint128_vec16_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_or32(var, v)   (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) |= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) = -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1) : (void)0)
+#define __hybrid_int128_xor8(var, v)   (__hybrid_PRIVATE_uint128_vec8_significand(var, 0) ^= (v), (v) < 0  ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec8_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_xor16(var, v)  (__hybrid_PRIVATE_uint128_vec16_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1, __hybrid_PRIVATE_int128_vec16_significand(var, 1) ^= -1) : (void)0)
+#define __hybrid_int128_xor32(var, v)  (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) ^= (v), (v) < 0 ? (void)(__hybrid_PRIVATE_int128_vec32_significand(var, 3) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 2) ^= -1, __hybrid_PRIVATE_int128_vec32_significand(var, 1) ^= -1) : (void)0)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #endif /* !__INTELLISENSE__ */
 
 
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_add8(var, v)                                                               \
-	(void)(!__hybrid_overflow_uadd8(__hybrid_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
-	                                &__hybrid_uint128_vec8_significand(var, 0)) ||                  \
-	       ++__hybrid_uint128_vec8_significand(var, 1) != 0 ||                                      \
-	       ++__hybrid_uint128_vec16_significand(var, 1) != 0 ||                                     \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                     \
-	       (++__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_add16(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd16(__hybrid_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec16_significand(var, 0)) ||                   \
-	       ++__hybrid_uint128_vec16_significand(var, 1) != 0 ||                                        \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                        \
-	       (++__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_add32(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd32(__hybrid_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec32_significand(var, 0)) ||                   \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                        \
-	       (++__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_add64(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd64(__hybrid_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) ||                   \
-	       (++__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_add128(var, v)                                              \
-	(void)(!__hybrid_overflow_uadd64(__hybrid_uint128_vec64_significand(var, 0),     \
-	                                 __hybrid_uint128_vec64_significand(v, 0),       \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) || \
-	       ++__hybrid_uint128_vec64_significand(var, 1),                             \
-	       __hybrid_uint128_vec64_significand(var, 1) += __hybrid_uint128_vec64_significand(v, 1))
-#define __hybrid_uint128_sub8(var, v)                                                               \
-	(void)(!__hybrid_overflow_usub8(__hybrid_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
-	                                &__hybrid_uint128_vec8_significand(var, 0)) ||                  \
-	       --__hybrid_uint128_vec8_significand(var, 1) != __UINT8_C(0xff) ||                        \
-	       --__hybrid_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                    \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_sub16(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub16(__hybrid_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec16_significand(var, 0)) ||                   \
-	       --__hybrid_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                       \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_sub32(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub32(__hybrid_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec32_significand(var, 0)) ||                   \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_sub64(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub64(__hybrid_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) ||                   \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0))
-#define __hybrid_uint128_sub128(var, v)                                              \
-	(void)(!__hybrid_overflow_usub64(__hybrid_uint128_vec64_significand(var, 0),     \
-	                                 __hybrid_uint128_vec64_significand(v, 0),       \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) || \
-	       (--__hybrid_uint128_vec64_significand(var, 1), 0),                        \
-	       __hybrid_uint128_vec64_significand(var, 1) -= __hybrid_uint128_vec64_significand(v, 1))
+#define __hybrid_uint128_add8(var, v)                                                                       \
+	(void)(!__hybrid_overflow_uadd8(__hybrid_PRIVATE_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
+	                                &__hybrid_PRIVATE_uint128_vec8_significand(var, 0)) ||                  \
+	       ++__hybrid_PRIVATE_uint128_vec8_significand(var, 1) != 0 ||                                      \
+	       ++__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != 0 ||                                     \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                     \
+	       (++__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_add16(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd16(__hybrid_PRIVATE_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec16_significand(var, 0)) ||                   \
+	       ++__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != 0 ||                                        \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                        \
+	       (++__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_add32(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) ||                   \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                        \
+	       (++__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_add64(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) ||                   \
+	       (++__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_add128(var, v)                                                      \
+	(void)(!__hybrid_overflow_uadd64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0),     \
+	                                 __hybrid_PRIVATE_uint128_vec64_significand(v, 0),       \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) || \
+	       ++__hybrid_PRIVATE_uint128_vec64_significand(var, 1),                             \
+	       __hybrid_PRIVATE_uint128_vec64_significand(var, 1) += __hybrid_PRIVATE_uint128_vec64_significand(v, 1))
+#define __hybrid_uint128_sub8(var, v)                                                                       \
+	(void)(!__hybrid_overflow_usub8(__hybrid_PRIVATE_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
+	                                &__hybrid_PRIVATE_uint128_vec8_significand(var, 0)) ||                  \
+	       --__hybrid_PRIVATE_uint128_vec8_significand(var, 1) != __UINT8_C(0xff) ||                        \
+	       --__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                    \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_sub16(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub16(__hybrid_PRIVATE_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec16_significand(var, 0)) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                       \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_sub32(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_sub64(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0))
+#define __hybrid_uint128_sub128(var, v)                                                      \
+	(void)(!__hybrid_overflow_usub64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0),     \
+	                                 __hybrid_PRIVATE_uint128_vec64_significand(v, 0),       \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) || \
+	       (--__hybrid_PRIVATE_uint128_vec64_significand(var, 1), 0),                        \
+	       __hybrid_PRIVATE_uint128_vec64_significand(var, 1) -= __hybrid_PRIVATE_uint128_vec64_significand(v, 1))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_add8(var, v)                                                               \
-	(void)(!__hybrid_overflow_uadd8(__hybrid_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
-	                                &__hybrid_uint128_vec8_significand(var, 0)) ||                  \
-	       ++__hybrid_uint128_vec8_significand(var, 1) != 0 ||                                      \
-	       ++__hybrid_uint128_vec16_significand(var, 1) != 0 ||                                     \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                     \
-	       ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                                     \
-	       (++__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_add16(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd16(__hybrid_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec16_significand(var, 0)) ||                   \
-	       ++__hybrid_uint128_vec16_significand(var, 1) != 0 ||                                        \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                        \
-	       ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                                        \
-	       (++__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_add32(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd32(__hybrid_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec32_significand(var, 0)) ||                   \
-	       ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                                        \
-	       ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                                        \
-	       (++__hybrid_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_add8(var, v)                                                                       \
+	(void)(!__hybrid_overflow_uadd8(__hybrid_PRIVATE_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
+	                                &__hybrid_PRIVATE_uint128_vec8_significand(var, 0)) ||                  \
+	       ++__hybrid_PRIVATE_uint128_vec8_significand(var, 1) != 0 ||                                      \
+	       ++__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != 0 ||                                     \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                     \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                                     \
+	       (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_add16(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd16(__hybrid_PRIVATE_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec16_significand(var, 0)) ||                   \
+	       ++__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != 0 ||                                        \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                        \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                                        \
+	       (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_add32(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) ||                   \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                        \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                                        \
+	       (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
 #ifdef __UINT64_TYPE__
-#define __hybrid_uint128_add64(var, v)                                                                 \
-	(void)(!__hybrid_overflow_uadd64(__hybrid_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) ||                   \
-	       ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                                        \
-	       (++__hybrid_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_add64(var, v)                                                                         \
+	(void)(!__hybrid_overflow_uadd64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) ||                   \
+	       ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                                        \
+	       (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
 #endif /* __UINT64_TYPE__ */
-#define __hybrid_uint128_add128(var, v)                                               \
-	((void)(!__hybrid_overflow_uadd32(__hybrid_uint128_vec32_significand(var, 0),     \
-	                                  __hybrid_uint128_vec32_significand(v, 0),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 0)) || \
-	        ++__hybrid_uint128_vec32_significand(var, 1) != 0 ||                      \
-	        ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                      \
-	        (++__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(!__hybrid_overflow_uadd32(__hybrid_uint128_vec32_significand(var, 1),     \
-	                                  __hybrid_uint128_vec32_significand(v, 1),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 1)) || \
-	        ++__hybrid_uint128_vec32_significand(var, 2) != 0 ||                      \
-	        (++__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(!__hybrid_overflow_uadd32(__hybrid_uint128_vec32_significand(var, 2),     \
-	                                  __hybrid_uint128_vec32_significand(v, 2),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 2)) || \
-	        (++__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(__hybrid_uint128_vec32_significand(var, 3) += __hybrid_uint128_vec32_significand(v, 3)))
-#define __hybrid_uint128_sub8(var, v)                                                               \
-	(void)(!__hybrid_overflow_usub8(__hybrid_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
-	                                &__hybrid_uint128_vec8_significand(var, 0)) ||                  \
-	       --__hybrid_uint128_vec8_significand(var, 1) != __UINT8_C(0xff) ||                        \
-	       --__hybrid_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                    \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                \
-	       --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                \
-	       (--__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_sub16(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub16(__hybrid_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec16_significand(var, 0)) ||                   \
-	       --__hybrid_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                       \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
-	       --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
-	       (--__hybrid_uint128_vec32_significand(var, 3), 0))
-#define __hybrid_uint128_sub32(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub32(__hybrid_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec32_significand(var, 0)) ||                   \
-	       --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
-	       --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
-	       (--__hybrid_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_add128(var, v)                                                       \
+	((void)(!__hybrid_overflow_uadd32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 0),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) || \
+	        ++__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                      \
+	        ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                      \
+	        (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(!__hybrid_overflow_uadd32(__hybrid_PRIVATE_uint128_vec32_significand(var, 1),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 1),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 1)) || \
+	        ++__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                      \
+	        (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(!__hybrid_overflow_uadd32(__hybrid_PRIVATE_uint128_vec32_significand(var, 2),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 2),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 2)) || \
+	        (++__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) += __hybrid_PRIVATE_uint128_vec32_significand(v, 3)))
+#define __hybrid_uint128_sub8(var, v)                                                                       \
+	(void)(!__hybrid_overflow_usub8(__hybrid_PRIVATE_uint128_vec8_significand(var, 0), (__UINT8_TYPE__)(v), \
+	                                &__hybrid_PRIVATE_uint128_vec8_significand(var, 0)) ||                  \
+	       --__hybrid_PRIVATE_uint128_vec8_significand(var, 1) != __UINT8_C(0xff) ||                        \
+	       --__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                    \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                \
+	       (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_sub16(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub16(__hybrid_PRIVATE_uint128_vec16_significand(var, 0), (__UINT16_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec16_significand(var, 0)) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec16_significand(var, 1) != __UINT16_C(0xffff) ||                       \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_sub32(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0), (__UINT32_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
 #ifdef __UINT64_TYPE__
-#define __hybrid_uint128_sub64(var, v)                                                                 \
-	(void)(!__hybrid_overflow_usub64(__hybrid_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
-	                                 &__hybrid_uint128_vec64_significand(var, 0)) ||                   \
-	       --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
-	       (--__hybrid_uint128_vec32_significand(var, 3), 0))
+#define __hybrid_uint128_sub64(var, v)                                                                         \
+	(void)(!__hybrid_overflow_usub64(__hybrid_PRIVATE_uint128_vec64_significand(var, 0), (__UINT64_TYPE__)(v), \
+	                                 &__hybrid_PRIVATE_uint128_vec64_significand(var, 0)) ||                   \
+	       --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) ||                   \
+	       (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0))
 #endif /* __UINT64_TYPE__ */
-#define __hybrid_uint128_sub128(var, v)                                               \
-	((void)(!__hybrid_overflow_usub32(__hybrid_uint128_vec32_significand(var, 0),     \
-	                                  __hybrid_uint128_vec32_significand(v, 0),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 0)) || \
-	        --__hybrid_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) || \
-	        --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
-	        (--__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(!__hybrid_overflow_usub32(__hybrid_uint128_vec32_significand(var, 1),     \
-	                                  __hybrid_uint128_vec32_significand(v, 1),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 1)) || \
-	        --__hybrid_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
-	        (--__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(!__hybrid_overflow_usub32(__hybrid_uint128_vec32_significand(var, 2),     \
-	                                  __hybrid_uint128_vec32_significand(v, 2),       \
-	                                  &__hybrid_uint128_vec32_significand(var, 2)) || \
-	        (--__hybrid_uint128_vec32_significand(var, 3), 0)),                       \
-	 (void)(__hybrid_uint128_vec32_significand(var, 3) -= __hybrid_uint128_vec32_significand(v, 3)))
+#define __hybrid_uint128_sub128(var, v)                                                       \
+	((void)(!__hybrid_overflow_usub32(__hybrid_PRIVATE_uint128_vec32_significand(var, 0),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 0),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 0)) || \
+	        --__hybrid_PRIVATE_uint128_vec32_significand(var, 1) != __UINT32_C(0xffffffff) || \
+	        --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
+	        (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(!__hybrid_overflow_usub32(__hybrid_PRIVATE_uint128_vec32_significand(var, 1),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 1),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 1)) || \
+	        --__hybrid_PRIVATE_uint128_vec32_significand(var, 2) != __UINT32_C(0xffffffff) || \
+	        (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(!__hybrid_overflow_usub32(__hybrid_PRIVATE_uint128_vec32_significand(var, 2),     \
+	                                  __hybrid_PRIVATE_uint128_vec32_significand(v, 2),       \
+	                                  &__hybrid_PRIVATE_uint128_vec32_significand(var, 2)) || \
+	        (--__hybrid_PRIVATE_uint128_vec32_significand(var, 3), 0)),                       \
+	 (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) -= __hybrid_PRIVATE_uint128_vec32_significand(v, 3)))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 #ifdef __INTELLISENSE__ /* Only for syntax highlighting... */
@@ -1187,8 +1420,8 @@ __DECL_END
 
 
 #ifdef __INTELLISENSE__ /* Only for syntax highlighting... */
-#define __hybrid_uint128_shl_overflows(var, shift)   (__hybrid_uint128_vec8_significand(var, 0) && (shift))
-#define __hybrid_uint128_shl(var, shift)             (void)(__hybrid_uint128_vec8_significand(var, 0) = (shift))
+#define __hybrid_uint128_shl_overflows(var, shift)   (__hybrid_PRIVATE_uint128_vec8_significand(var, 0) && (shift))
+#define __hybrid_uint128_shl(var, shift)             (void)(__hybrid_PRIVATE_uint128_vec8_significand(var, 0) = (shift))
 #define __hybrid_uint128_shl32_overflows             __hybrid_uint128_shl_overflows
 #define __hybrid_uint128_shl32                       __hybrid_uint128_shl
 #define __hybrid_uint128_shl64_overflows             __hybrid_uint128_shl_overflows
@@ -1199,8 +1432,8 @@ __DECL_END
 #define __hybrid_uint128_shr32                       __hybrid_uint128_shl
 #define __hybrid_uint128_shr64_overflows             __hybrid_uint128_shl_overflows
 #define __hybrid_uint128_shr64                       __hybrid_uint128_shl
-#define __hybrid_int128_shl_overflows(var, shift)    (__hybrid_int128_vec8_significand(var, 0) && (shift))
-#define __hybrid_int128_shl(var, shift)              (void)(__hybrid_int128_vec8_significand(var, 0) = (shift))
+#define __hybrid_int128_shl_overflows(var, shift)    (__hybrid_PRIVATE_int128_vec8_significand(var, 0) && (shift))
+#define __hybrid_int128_shl(var, shift)              (void)(__hybrid_PRIVATE_int128_vec8_significand(var, 0) = (shift))
 #define __hybrid_int128_shl32_overflows              __hybrid_int128_shl_overflows
 #define __hybrid_int128_shl32                        __hybrid_int128_shl
 #define __hybrid_int128_shl64_overflows              __hybrid_int128_shl_overflows
@@ -1213,87 +1446,87 @@ __DECL_END
 #define __hybrid_int128_shr64                        __hybrid_int128_shl
 #else /* __INTELLISENSE__ */
 #define __hybrid_uint128_shl32_overflows(var, shift) \
-	((shift) != 0 && (__hybrid_uint128_vec32_significand(var, 3) >> (32 - (shift))) != 0)
+	((shift) != 0 && (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) >> (32 - (shift))) != 0)
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 /* Unsigned <<= shift-left for `shift < 64' */
-#define __hybrid_uint128_shl64(var, shift) (!(shift) ? (void)0 : (void)(                                        \
-	__hybrid_uint128_vec64_significand(var, 1) <<= (shift),                                                     \
-	__hybrid_uint128_vec64_significand(var, 1) |= __hybrid_uint128_vec64_significand(var, 0) >> (64 - (shift)), \
-	__hybrid_uint128_vec64_significand(var, 0) <<= (shift)))
+#define __hybrid_uint128_shl64(var, shift) (!(shift) ? (void)0 : (void)(                                                        \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 1) <<= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 1) |= __hybrid_PRIVATE_uint128_vec64_significand(var, 0) >> (64 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0) <<= (shift)))
 #define __hybrid_uint128_shl64_overflows(var, shift) \
-	((shift) != 0 && (__hybrid_uint128_vec64_significand(var, 1) >> (64 - (shift))) != 0)
+	((shift) != 0 && (__hybrid_PRIVATE_uint128_vec64_significand(var, 1) >> (64 - (shift))) != 0)
 #define __hybrid_uint128_shl32 __hybrid_uint128_shl64
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 /* Unsigned <<= shift-left for `shift < 32' */
-#define __hybrid_uint128_shl32(var, shift) (!(shift) ? (void)0 : (void)(                                        \
-	__hybrid_uint128_vec32_significand(var, 3) <<= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 3) |= __hybrid_uint128_vec32_significand(var, 2) >> (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 2) <<= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 2) |= __hybrid_uint128_vec32_significand(var, 1) >> (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 1) <<= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 1) |= __hybrid_uint128_vec32_significand(var, 0) >> (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 0) <<= (shift)))
+#define __hybrid_uint128_shl32(var, shift) (!(shift) ? (void)0 : (void)(                                                        \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 3) <<= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 3) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 2) >> (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) <<= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 1) >> (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) <<= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 0) >> (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 0) <<= (shift)))
 /* Unsigned <<= shift-left for `shift < 64' */
-#define __hybrid_uint128_shl64(var, shift)                                                             \
-	((shift) >= 32                                                                                     \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 3) = __hybrid_uint128_vec32_significand(var, 2), \
-	          __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 1), \
-	          __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 0), \
-	          __hybrid_uint128_vec32_significand(var, 0) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_uint128_shl64(var, shift)                                                                             \
+	((shift) >= 32                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 0), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 0) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_uint128_shl32(var, (shift) % 32))
-#define __hybrid_uint128_shl64_overflows(var, shift)                                \
-	((shift) >= 32                                                                  \
-	 ? (__hybrid_uint128_vec32_significand(var, 3) != 0 ||                          \
-	    (__hybrid_uint128_vec32_significand(var, 2) >> (32 - ((shift) % 32))) != 0) \
+#define __hybrid_uint128_shl64_overflows(var, shift)                                        \
+	((shift) >= 32                                                                          \
+	 ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) != 0 ||                          \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) >> (32 - ((shift) % 32))) != 0) \
 	 : __hybrid_uint128_shl32_overflows(var, shift))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 /* Unsigned <<= shift-left for `shift < 128' */
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_shl(var, shift)                                                               \
-	((shift) >= 64                                                                                     \
-	 ? (void)(__hybrid_uint128_vec64_significand(var, 1) = __hybrid_uint128_vec64_significand(var, 0), \
-	          __hybrid_uint128_vec64_significand(var, 0) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_uint128_shl(var, shift)                                                                               \
+	((shift) >= 64                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 1) = __hybrid_PRIVATE_uint128_vec64_significand(var, 0), \
+	          __hybrid_PRIVATE_uint128_vec64_significand(var, 0) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_uint128_shl64(var, (shift) % 64))
-#define __hybrid_uint128_shl_overflows(var, shift)                                  \
-	((shift) >= 64                                                                  \
-	 ? (__hybrid_uint128_vec64_significand(var, 1) != 0 ||                          \
-	    (__hybrid_uint128_vec64_significand(var, 0) >> (64 - ((shift) % 64))) != 0) \
+#define __hybrid_uint128_shl_overflows(var, shift)                                          \
+	((shift) >= 64                                                                          \
+	 ? (__hybrid_PRIVATE_uint128_vec64_significand(var, 1) != 0 ||                          \
+	    (__hybrid_PRIVATE_uint128_vec64_significand(var, 0) >> (64 - ((shift) % 64))) != 0) \
 	 : __hybrid_uint128_shl64_overflows(var, shift))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_shl(var, shift)                                                                   \
-	((shift) >= 96                                                                                         \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 3) = __hybrid_uint128_vec32_significand(var, 0),     \
-	          __hybrid_uint128_vec32_significand(var, 2) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 1) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 0) = 0)                                              \
-	 : (shift) >= 64                                                                                       \
-	   ? (void)(__hybrid_uint128_vec32_significand(var, 3) = __hybrid_uint128_vec32_significand(var, 1),   \
-	            __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 0),   \
-	            __hybrid_uint128_vec32_significand(var, 1) = 0,                                            \
-	            __hybrid_uint128_vec32_significand(var, 0) = 0)                                            \
-	   : (shift) >= 32                                                                                     \
-	     ? (void)(__hybrid_uint128_vec32_significand(var, 3) = __hybrid_uint128_vec32_significand(var, 2), \
-	              __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 1), \
-	              __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 0), \
-	              __hybrid_uint128_vec32_significand(var, 0) = 0)                                          \
-	     : (void)0,                                                                                        \
+#define __hybrid_uint128_shl(var, shift)                                                                                   \
+	((shift) >= 96                                                                                                         \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) = __hybrid_PRIVATE_uint128_vec32_significand(var, 0),     \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 0) = 0)                                                      \
+	 : (shift) >= 64                                                                                                       \
+	   ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 0),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0,                                                    \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 0) = 0)                                                    \
+	   : (shift) >= 32                                                                                                     \
+	     ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 0), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 0) = 0)                                                  \
+	     : (void)0,                                                                                                        \
 	 __hybrid_uint128_shl32(var, (shift) % 32))
-#define __hybrid_uint128_shl_overflows(var, shift)                                      \
-	((shift) >= 96                                                                      \
-	 ? (__hybrid_uint128_vec32_significand(var, 3) != 0 ||                              \
-	    __hybrid_uint128_vec32_significand(var, 2) != 0 ||                              \
-	    __hybrid_uint128_vec32_significand(var, 1) != 0 ||                              \
-	    (__hybrid_uint128_vec32_significand(var, 0) >> (32 - ((shift) % 32))) != 0)     \
-	 : (shift) >= 64                                                                    \
-	   ? (__hybrid_uint128_vec32_significand(var, 3) != 0 ||                            \
-	      __hybrid_uint128_vec32_significand(var, 2) != 0 ||                            \
-	      (__hybrid_uint128_vec32_significand(var, 1) >> (32 - ((shift) % 32))) != 0)   \
-	   : (shift) >= 32                                                                  \
-	     ? (__hybrid_uint128_vec32_significand(var, 3) != 0 ||                          \
-	        (__hybrid_uint128_vec32_significand(var, 2) >> (32 - ((shift) % 32))) != 0) \
+#define __hybrid_uint128_shl_overflows(var, shift)                                              \
+	((shift) >= 96                                                                              \
+	 ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) != 0 ||                              \
+	    __hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                              \
+	    __hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                              \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) >> (32 - ((shift) % 32))) != 0)     \
+	 : (shift) >= 64                                                                            \
+	   ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) != 0 ||                            \
+	      __hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                            \
+	      (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) >> (32 - ((shift) % 32))) != 0)   \
+	   : (shift) >= 32                                                                          \
+	     ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) != 0 ||                          \
+	        (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) >> (32 - ((shift) % 32))) != 0) \
 	     : __hybrid_uint128_shl32_overflows(var, shift))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
@@ -1305,87 +1538,87 @@ __DECL_END
 #define __hybrid_int128_shl64           __hybrid_uint128_shl64
 #define __hybrid_int128_shl64_overflows __hybrid_uint128_shl64_overflows
 #define __hybrid_uint128_shr32_overflows(var, shift) \
-	((__hybrid_int128_vec32_significand(var, 0) & ((__UINT32_C(1) << (shift)) - 1)) != 0)
+	((__hybrid_PRIVATE_int128_vec32_significand(var, 0) & ((__UINT32_C(1) << (shift)) - 1)) != 0)
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 /* Unsigned >>= shift-right for `shift < 64' */
-#define __hybrid_uint128_shr64(var, shift) (!(shift) ? (void)0 : (void)(                                         \
-	__hybrid_uint128_vec64_significand(var, 0) >>= (shift),                                                     \
-	__hybrid_uint128_vec64_significand(var, 0) |= __hybrid_uint128_vec64_significand(var, 1) << (64 - (shift)), \
-	__hybrid_uint128_vec64_significand(var, 1) >>= (shift)))
+#define __hybrid_uint128_shr64(var, shift) (!(shift) ? (void)0 : (void)(                                                        \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0) |= __hybrid_PRIVATE_uint128_vec64_significand(var, 1) << (64 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 1) >>= (shift)))
 #define __hybrid_uint128_shr64_overflows(var, shift) \
-	((__hybrid_int128_vec64_significand(var, 0) & ((__UINT64_C(1) << (shift)) - 1)) != 0)
+	((__hybrid_PRIVATE_int128_vec64_significand(var, 0) & ((__UINT64_C(1) << (shift)) - 1)) != 0)
 #define __hybrid_uint128_shr32 __hybrid_uint128_shr64
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 /* Unsigned >>= shift-right for `shift < 32' */
-#define __hybrid_uint128_shr32(var, shift) (!(shift) ? (void)0 : (void)(                                        \
-	__hybrid_uint128_vec32_significand(var, 0) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 0) |= __hybrid_uint128_vec32_significand(var, 1) << (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 1) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 1) |= __hybrid_uint128_vec32_significand(var, 2) << (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 2) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 2) |= __hybrid_uint128_vec32_significand(var, 3) << (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 3) >>= (shift)))
+#define __hybrid_uint128_shr32(var, shift) (!(shift) ? (void)0 : (void)(                                                        \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 0) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 0) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 1) << (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 2) << (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 3) << (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 3) >>= (shift)))
 /* Unsigned >>= shift-right for `shift < 64' */
-#define __hybrid_uint128_shr64(var, shift)                                                             \
-	((shift) >= 32                                                                                     \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1), \
-	          __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 2), \
-	          __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 3), \
-	          __hybrid_uint128_vec32_significand(var, 3) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_uint128_shr64(var, shift)                                                                             \
+	((shift) >= 32                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_uint128_shr32(var, (shift) % 32))
-#define __hybrid_uint128_shr64_overflows(var, shift)                                                 \
-	((shift) >= 32                                                                                   \
-	 ? (__hybrid_uint128_vec32_significand(var, 0) != 0 ||                                           \
-	    (__hybrid_uint128_vec32_significand(var, 1) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0) \
+#define __hybrid_uint128_shr64_overflows(var, shift)                                                         \
+	((shift) >= 32                                                                                           \
+	 ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != 0 ||                                           \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0) \
 	 : __hybrid_uint128_shr32_overflows(var, shift))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 /* Unsigned >>= shift-right for `shift < 128' */
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_shr(var, shift)                                                               \
-	((shift) >= 64                                                                                     \
-	 ? (void)(__hybrid_uint128_vec64_significand(var, 0) = __hybrid_uint128_vec64_significand(var, 1), \
-	          __hybrid_uint128_vec64_significand(var, 1) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_uint128_shr(var, shift)                                                                               \
+	((shift) >= 64                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) = __hybrid_PRIVATE_uint128_vec64_significand(var, 1), \
+	          __hybrid_PRIVATE_uint128_vec64_significand(var, 1) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_uint128_shr64(var, (shift) % 64))
-#define __hybrid_uint128_shr_overflows(var, shift)                                                   \
-	((shift) >= 64                                                                                   \
-	 ? (__hybrid_uint128_vec64_significand(var, 0) != 0 ||                                           \
-	    (__hybrid_uint128_vec64_significand(var, 1) & ((__UINT64_C(1) << ((shift) % 64)) - 1)) != 0) \
+#define __hybrid_uint128_shr_overflows(var, shift)                                                           \
+	((shift) >= 64                                                                                           \
+	 ? (__hybrid_PRIVATE_uint128_vec64_significand(var, 0) != 0 ||                                           \
+	    (__hybrid_PRIVATE_uint128_vec64_significand(var, 1) & ((__UINT64_C(1) << ((shift) % 64)) - 1)) != 0) \
 	 : __hybrid_uint128_shr64_overflows(var, shift))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_shr(var, shift)                                                                   \
-	((shift) >= 96                                                                                         \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 3),     \
-	          __hybrid_uint128_vec32_significand(var, 1) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 2) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 3) = 0)                                              \
-	 : (shift) >= 64                                                                                       \
-	   ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 2),   \
-	            __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 3),   \
-	            __hybrid_uint128_vec32_significand(var, 2) = 0,                                            \
-	            __hybrid_uint128_vec32_significand(var, 3) = 0)                                            \
-	   : (shift) >= 32                                                                                     \
-	     ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1), \
-	              __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 2), \
-	              __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 3), \
-	              __hybrid_uint128_vec32_significand(var, 3) = 0)                                          \
-	     : (void)0,                                                                                        \
+#define __hybrid_uint128_shr(var, shift)                                                                                   \
+	((shift) >= 96                                                                                                         \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3),     \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                      \
+	 : (shift) >= 64                                                                                                       \
+	   ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                                                    \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                    \
+	   : (shift) >= 32                                                                                                     \
+	     ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                  \
+	     : (void)0,                                                                                                        \
 	 __hybrid_uint128_shr32(var, (shift) % 32))
-#define __hybrid_uint128_shr_overflows(var, shift)                                                       \
-	((shift) >= 96                                                                                       \
-	 ? (__hybrid_uint128_vec32_significand(var, 0) != 0 ||                                               \
-	    __hybrid_uint128_vec32_significand(var, 1) != 0 ||                                               \
-	    __hybrid_uint128_vec32_significand(var, 2) != 0 ||                                               \
-	    (__hybrid_uint128_vec32_significand(var, 3) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0)     \
-	 : (shift) >= 64                                                                                     \
-	   ? (__hybrid_uint128_vec32_significand(var, 0) != 0 ||                                             \
-	      __hybrid_uint128_vec32_significand(var, 1) != 0 ||                                             \
-	      (__hybrid_uint128_vec32_significand(var, 2) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0)   \
-	   : (shift) >= 32                                                                                   \
-	     ? (__hybrid_uint128_vec32_significand(var, 0) != 0 ||                                           \
-	        (__hybrid_uint128_vec32_significand(var, 1) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0) \
+#define __hybrid_uint128_shr_overflows(var, shift)                                                               \
+	((shift) >= 96                                                                                               \
+	 ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != 0 ||                                               \
+	    __hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                               \
+	    __hybrid_PRIVATE_uint128_vec32_significand(var, 2) != 0 ||                                               \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0)     \
+	 : (shift) >= 64                                                                                             \
+	   ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != 0 ||                                             \
+	      __hybrid_PRIVATE_uint128_vec32_significand(var, 1) != 0 ||                                             \
+	      (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0)   \
+	   : (shift) >= 32                                                                                           \
+	     ? (__hybrid_PRIVATE_uint128_vec32_significand(var, 0) != 0 ||                                           \
+	        (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0) \
 	     : __hybrid_uint128_shr32_overflows(var, shift))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
@@ -1395,58 +1628,58 @@ __DECL_END
 #define __hybrid_int128_shr_overflows   __hybrid_uint128_shr_overflows
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 /* Unsigned >>= shift-right for `shift < 64' */
-#define __hybrid_int128_shr64(var, shift) (!(shift) ? (void)0 : (void)(                                         \
-	__hybrid_uint128_vec64_significand(var, 0) >>= (shift),                                                     \
-	__hybrid_uint128_vec64_significand(var, 0) |= __hybrid_uint128_vec64_significand(var, 1) << (64 - (shift)), \
-	__hybrid_int128_vec64_significand(var, 1) >>= (shift)))
+#define __hybrid_int128_shr64(var, shift) (!(shift) ? (void)0 : (void)(                                                         \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec64_significand(var, 0) |= __hybrid_PRIVATE_uint128_vec64_significand(var, 1) << (64 - (shift)), \
+	__hybrid_PRIVATE_int128_vec64_significand(var, 1) >>= (shift)))
 #define __hybrid_int128_shr32 __hybrid_int128_shr64
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 /* Unsigned >>= shift-right for `shift < 32' */
-#define __hybrid_int128_shr32(var, shift) (!(shift) ? (void)0 : (void)(                                         \
-	__hybrid_uint128_vec32_significand(var, 0) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 0) |= __hybrid_uint128_vec32_significand(var, 1) << (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 1) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 1) |= __hybrid_uint128_vec32_significand(var, 2) << (32 - (shift)), \
-	__hybrid_uint128_vec32_significand(var, 2) >>= (shift),                                                     \
-	__hybrid_uint128_vec32_significand(var, 2) |= __hybrid_uint128_vec32_significand(var, 3) << (32 - (shift)), \
-	__hybrid_int128_vec32_significand(var, 3) >>= (shift)))
+#define __hybrid_int128_shr32(var, shift) (!(shift) ? (void)0 : (void)(                                                         \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 0) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 0) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 1) << (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 1) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 2) << (32 - (shift)), \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) >>= (shift),                                                             \
+	__hybrid_PRIVATE_uint128_vec32_significand(var, 2) |= __hybrid_PRIVATE_uint128_vec32_significand(var, 3) << (32 - (shift)), \
+	__hybrid_PRIVATE_int128_vec32_significand(var, 3) >>= (shift)))
 /* Unsigned >>= shift-right for `shift < 64' */
-#define __hybrid_int128_shr64(var, shift)                                                              \
-	((shift) >= 32                                                                                     \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1), \
-	          __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 2), \
-	          __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 3), \
-	          __hybrid_uint128_vec32_significand(var, 3) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_int128_shr64(var, shift)                                                                              \
+	((shift) >= 32                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3), \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_int128_shr32(var, (shift) % 32))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 /* Unsigned >>= shift-right for `shift < 128' */
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_int128_shr(var, shift)                                                                \
-	((shift) >= 64                                                                                     \
-	 ? (void)(__hybrid_uint128_vec64_significand(var, 0) = __hybrid_uint128_vec64_significand(var, 1), \
-	          __hybrid_uint128_vec64_significand(var, 1) = 0)                                          \
-	 : (void)0,                                                                                        \
+#define __hybrid_int128_shr(var, shift)                                                                                \
+	((shift) >= 64                                                                                                     \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) = __hybrid_PRIVATE_uint128_vec64_significand(var, 1), \
+	          __hybrid_PRIVATE_uint128_vec64_significand(var, 1) = 0)                                                  \
+	 : (void)0,                                                                                                        \
 	 __hybrid_int128_shr64(var, (shift) % 64))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_int128_shr(var, shift)                                                                    \
-	((shift) >= 96                                                                                         \
-	 ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 3),     \
-	          __hybrid_uint128_vec32_significand(var, 1) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 2) = 0,                                              \
-	          __hybrid_uint128_vec32_significand(var, 3) = 0)                                              \
-	 : (shift) >= 64                                                                                       \
-	   ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 2),   \
-	            __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 3),   \
-	            __hybrid_uint128_vec32_significand(var, 2) = 0,                                            \
-	            __hybrid_uint128_vec32_significand(var, 3) = 0)                                            \
-	   : (shift) >= 32                                                                                     \
-	     ? (void)(__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1), \
-	              __hybrid_uint128_vec32_significand(var, 1) = __hybrid_uint128_vec32_significand(var, 2), \
-	              __hybrid_uint128_vec32_significand(var, 2) = __hybrid_uint128_vec32_significand(var, 3), \
-	              __hybrid_uint128_vec32_significand(var, 3) = 0)                                          \
-	     : (void)0,                                                                                        \
+#define __hybrid_int128_shr(var, shift)                                                                                    \
+	((shift) >= 96                                                                                                         \
+	 ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3),     \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                                                      \
+	          __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                      \
+	 : (shift) >= 64                                                                                                       \
+	   ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3),   \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0,                                                    \
+	            __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                    \
+	   : (shift) >= 32                                                                                                     \
+	     ? (void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = __hybrid_PRIVATE_uint128_vec32_significand(var, 1), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = __hybrid_PRIVATE_uint128_vec32_significand(var, 2), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = __hybrid_PRIVATE_uint128_vec32_significand(var, 3), \
+	              __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)                                                  \
+	     : (void)0,                                                                                                        \
 	 __hybrid_int128_shr32(var, (shift) % 32))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #endif /* !__INTELLISENSE__ */
@@ -1456,10 +1689,10 @@ __DECL_END
 
 
 #ifdef __INTELLISENSE__ /* Only for syntax highlighting... */
-#define __hybrid_uint128_iszero(var)  (__hybrid_uint128_vec64(var)[0] == 0)
-#define __hybrid_uint128_setzero(var) (void)(__hybrid_uint128_vec64(var)[0] = 0)
-#define __hybrid_int128_iszero(var)   (__hybrid_int128_vec64(var)[0] == 0)
-#define __hybrid_int128_setzero(var)  (void)(__hybrid_int128_vec64(var)[0] = 0)
+#define __hybrid_uint128_iszero(var)  (__hybrid_PRIVATE_uint128_vec64(var)[0] == 0)
+#define __hybrid_uint128_setzero(var) (void)(__hybrid_PRIVATE_uint128_vec64(var)[0] = 0)
+#define __hybrid_int128_iszero(var)   (__hybrid_PRIVATE_int128_vec64(var)[0] == 0)
+#define __hybrid_int128_setzero(var)  (void)(__hybrid_PRIVATE_int128_vec64(var)[0] = 0)
 #define __hybrid_uint128_isone        __hybrid_uint128_iszero
 #define __hybrid_uint128_setone       __hybrid_uint128_setzero
 #define __hybrid_int128_isone         __hybrid_int128_iszero
@@ -1474,87 +1707,87 @@ __DECL_END
 #define __hybrid_int128_setmax        __hybrid_int128_setzero
 #else /* __INTELLISENSE__ */
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_iszero(var)        \
-	(__hybrid_uint128_vec64(var)[0] == 0 && \
-	 __hybrid_uint128_vec64(var)[1] == 0)
-#define __hybrid_uint128_setzero(var)          \
-	(void)(__hybrid_uint128_vec64(var)[0] = 0, \
-	       __hybrid_uint128_vec64(var)[1] = 0)
-#define __hybrid_uint128_isone(var)                     \
-	(__hybrid_uint128_vec64_significand(var, 0) == 1 && \
-	 __hybrid_uint128_vec64_significand(var, 1) == 0)
-#define __hybrid_uint128_setone(var)                       \
-	(void)(__hybrid_uint128_vec64_significand(var, 0) = 1, \
-	       __hybrid_uint128_vec64_significand(var, 1) = 0)
-#define __hybrid_int128_isminusone(var)      \
-	(__hybrid_uint128_vec64(var)[0] == -1 && \
-	 __hybrid_uint128_vec64(var)[1] == -1)
-#define __hybrid_int128_setminusone(var)        \
-	(void)(__hybrid_uint128_vec64(var)[0] = -1, \
-	       __hybrid_uint128_vec64(var)[1] = -1)
-#define __hybrid_int128_ismin(var)                     \
-	(__hybrid_int128_vec64_significand(var, 0) == 0 && \
-	 __hybrid_int128_vec64_significand(var, 1) == __PRIVATE_MIN_S8)
-#define __hybrid_int128_setmin(var)                       \
-	(void)(__hybrid_int128_vec64_significand(var, 0) = 0, \
-	       __hybrid_int128_vec64_significand(var, 1) = __PRIVATE_MIN_S8)
-#define __hybrid_int128_ismax(var)                      \
-	(__hybrid_int128_vec64_significand(var, 0) == -1 && \
-	 __hybrid_int128_vec64_significand(var, 1) == __PRIVATE_MAX_S8)
-#define __hybrid_int128_setmax(var)                        \
-	(void)(__hybrid_int128_vec64_significand(var, 0) = -1, \
-	       __hybrid_int128_vec64_significand(var, 1) = __PRIVATE_MAX_S8)
+#define __hybrid_uint128_iszero(var)                \
+	(__hybrid_PRIVATE_uint128_vec64(var)[0] == 0 && \
+	 __hybrid_PRIVATE_uint128_vec64(var)[1] == 0)
+#define __hybrid_uint128_setzero(var)                  \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] = 0, \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] = 0)
+#define __hybrid_uint128_isone(var)                             \
+	(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) == 1 && \
+	 __hybrid_PRIVATE_uint128_vec64_significand(var, 1) == 0)
+#define __hybrid_uint128_setone(var)                               \
+	(void)(__hybrid_PRIVATE_uint128_vec64_significand(var, 0) = 1, \
+	       __hybrid_PRIVATE_uint128_vec64_significand(var, 1) = 0)
+#define __hybrid_int128_isminusone(var)              \
+	(__hybrid_PRIVATE_uint128_vec64(var)[0] == -1 && \
+	 __hybrid_PRIVATE_uint128_vec64(var)[1] == -1)
+#define __hybrid_int128_setminusone(var)                \
+	(void)(__hybrid_PRIVATE_uint128_vec64(var)[0] = -1, \
+	       __hybrid_PRIVATE_uint128_vec64(var)[1] = -1)
+#define __hybrid_int128_ismin(var)                             \
+	(__hybrid_PRIVATE_int128_vec64_significand(var, 0) == 0 && \
+	 __hybrid_PRIVATE_int128_vec64_significand(var, 1) == __PRIVATE_MIN_S8)
+#define __hybrid_int128_setmin(var)                               \
+	(void)(__hybrid_PRIVATE_int128_vec64_significand(var, 0) = 0, \
+	       __hybrid_PRIVATE_int128_vec64_significand(var, 1) = __PRIVATE_MIN_S8)
+#define __hybrid_int128_ismax(var)                              \
+	(__hybrid_PRIVATE_int128_vec64_significand(var, 0) == -1 && \
+	 __hybrid_PRIVATE_int128_vec64_significand(var, 1) == __PRIVATE_MAX_S8)
+#define __hybrid_int128_setmax(var)                                \
+	(void)(__hybrid_PRIVATE_int128_vec64_significand(var, 0) = -1, \
+	       __hybrid_PRIVATE_int128_vec64_significand(var, 1) = __PRIVATE_MAX_S8)
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_iszero(var)        \
-	(__hybrid_uint128_vec32(var)[0] == 0 && \
-	 __hybrid_uint128_vec32(var)[1] == 0 && \
-	 __hybrid_uint128_vec32(var)[2] == 0 && \
-	 __hybrid_uint128_vec32(var)[3] == 0)
-#define __hybrid_uint128_setzero(var)          \
-	(void)(__hybrid_uint128_vec32(var)[0] = 0, \
-	       __hybrid_uint128_vec32(var)[1] = 0, \
-	       __hybrid_uint128_vec32(var)[2] = 0, \
-	       __hybrid_uint128_vec32(var)[3] = 0)
-#define __hybrid_uint128_isone(var)                     \
-	(__hybrid_uint128_vec32_significand(var, 0) == 1 && \
-	 __hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 3) == 0)
-#define __hybrid_uint128_setone(var)                       \
-	(void)(__hybrid_uint128_vec32_significand(var, 0) = 1, \
-	       __hybrid_uint128_vec32_significand(var, 1) = 0, \
-	       __hybrid_uint128_vec32_significand(var, 2) = 0, \
-	       __hybrid_uint128_vec32_significand(var, 3) = 0)
-#define __hybrid_int128_isminusone(var)                  \
-	(__hybrid_int128_vec32_significand(var, 0) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 3) == -1)
-#define __hybrid_int128_setminusone(var)                   \
-	(void)(__hybrid_int128_vec32_significand(var, 0) = -1, \
-	       __hybrid_int128_vec32_significand(var, 1) = -1, \
-	       __hybrid_int128_vec32_significand(var, 2) = -1, \
-	       __hybrid_int128_vec32_significand(var, 3) = -1)
-#define __hybrid_int128_ismin(var)                     \
-	(__hybrid_int128_vec32_significand(var, 0) == 0 && \
-	 __hybrid_int128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_int128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_int128_vec32_significand(var, 3) == __PRIVATE_MIN_S4)
-#define __hybrid_int128_setmin(var)                       \
-	(void)(__hybrid_int128_vec32_significand(var, 0) = 0, \
-	       __hybrid_int128_vec32_significand(var, 1) = 0, \
-	       __hybrid_int128_vec32_significand(var, 2) = 0, \
-	       __hybrid_int128_vec32_significand(var, 3) = __PRIVATE_MIN_S4)
-#define __hybrid_int128_ismax(var)                      \
-	(__hybrid_int128_vec32_significand(var, 0) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	 __hybrid_int128_vec32_significand(var, 3) == __PRIVATE_MAX_S4)
-#define __hybrid_int128_setmax(var)                        \
-	(void)(__hybrid_int128_vec32_significand(var, 0) = -1, \
-	       __hybrid_int128_vec32_significand(var, 1) = -1, \
-	       __hybrid_int128_vec32_significand(var, 2) = -1, \
-	       __hybrid_int128_vec32_significand(var, 3) = __PRIVATE_MAX_S4)
+#define __hybrid_uint128_iszero(var)                \
+	(__hybrid_PRIVATE_uint128_vec32(var)[0] == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32(var)[1] == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32(var)[2] == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32(var)[3] == 0)
+#define __hybrid_uint128_setzero(var)                  \
+	(void)(__hybrid_PRIVATE_uint128_vec32(var)[0] = 0, \
+	       __hybrid_PRIVATE_uint128_vec32(var)[1] = 0, \
+	       __hybrid_PRIVATE_uint128_vec32(var)[2] = 0, \
+	       __hybrid_PRIVATE_uint128_vec32(var)[3] = 0)
+#define __hybrid_uint128_isone(var)                             \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) == 1 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 3) == 0)
+#define __hybrid_uint128_setone(var)                               \
+	(void)(__hybrid_PRIVATE_uint128_vec32_significand(var, 0) = 1, \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 1) = 0, \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 2) = 0, \
+	       __hybrid_PRIVATE_uint128_vec32_significand(var, 3) = 0)
+#define __hybrid_int128_isminusone(var)                         \
+	(__hybrid_PRIVATE_int128_vec32_significand(var, 0) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 3) == -1)
+#define __hybrid_int128_setminusone(var)                           \
+	(void)(__hybrid_PRIVATE_int128_vec32_significand(var, 0) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 2) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 3) = -1)
+#define __hybrid_int128_ismin(var)                             \
+	(__hybrid_PRIVATE_int128_vec32_significand(var, 0) == 0 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 3) == __PRIVATE_MIN_S4)
+#define __hybrid_int128_setmin(var)                               \
+	(void)(__hybrid_PRIVATE_int128_vec32_significand(var, 0) = 0, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 1) = 0, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 2) = 0, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 3) = __PRIVATE_MIN_S4)
+#define __hybrid_int128_ismax(var)                              \
+	(__hybrid_PRIVATE_int128_vec32_significand(var, 0) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	 __hybrid_PRIVATE_int128_vec32_significand(var, 3) == __PRIVATE_MAX_S4)
+#define __hybrid_int128_setmax(var)                                \
+	(void)(__hybrid_PRIVATE_int128_vec32_significand(var, 0) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 1) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 2) = -1, \
+	       __hybrid_PRIVATE_int128_vec32_significand(var, 3) = __PRIVATE_MAX_S4)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #define __hybrid_int128_iszero  __hybrid_uint128_iszero
 #define __hybrid_int128_setzero __hybrid_uint128_setzero
@@ -1569,192 +1802,192 @@ __DECL_END
 
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_is8bit(var)                    \
-	(__hybrid_uint128_vec8_significand(var, 1) == 0 &&  \
-	 __hybrid_uint128_vec16_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec64_significand(var, 1) == 0)
-#define __hybrid_uint128_is16bit(var)                   \
-	(__hybrid_uint128_vec16_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec64_significand(var, 1) == 0)
-#define __hybrid_uint128_is32bit(var)                   \
-	(__hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec64_significand(var, 1) == 0)
+#define __hybrid_uint128_is8bit(var)                            \
+	(__hybrid_PRIVATE_uint128_vec8_significand(var, 1) == 0 &&  \
+	 __hybrid_PRIVATE_uint128_vec16_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec64_significand(var, 1) == 0)
+#define __hybrid_uint128_is16bit(var)                           \
+	(__hybrid_PRIVATE_uint128_vec16_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec64_significand(var, 1) == 0)
+#define __hybrid_uint128_is32bit(var)                           \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec64_significand(var, 1) == 0)
 #define __hybrid_uint128_is64bit(var) \
-	(__hybrid_uint128_vec64_significand(var, 1) == 0)
-#define __hybrid_int128_is8bit(var)                        \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec8_significand(var, 0) < 0 &&    \
-	    __hybrid_int128_vec8_significand(var, 1) == -1 &&  \
-	    __hybrid_int128_vec16_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec64_significand(var, 1) == -1)   \
-	 : (__hybrid_int128_vec8_significand(var, 0) >= 0 &&   \
-	    __hybrid_int128_vec8_significand(var, 1) == 0 &&   \
-	    __hybrid_int128_vec16_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec64_significand(var, 1) == 0))
-#define __hybrid_int128_is16bit(var)                       \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec16_significand(var, 0) < 0 &&   \
-	    __hybrid_int128_vec16_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec64_significand(var, 1) == -1)   \
-	 : (__hybrid_int128_vec16_significand(var, 0) >= 0 &&  \
-	    __hybrid_int128_vec16_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec64_significand(var, 1) == 0))
-#define __hybrid_int128_is32bit(var)                       \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec32_significand(var, 0) < 0 &&   \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec64_significand(var, 1) == -1)   \
-	 : (__hybrid_int128_vec32_significand(var, 0) >= 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec64_significand(var, 1) == 0))
-#define __hybrid_int128_is64bit(var)                      \
-	(__hybrid_int128_isneg(var)                           \
-	 ? (__hybrid_int128_vec64_significand(var, 0) < 0 &&  \
-	    __hybrid_int128_vec64_significand(var, 1) == -1)  \
-	 : (__hybrid_int128_vec64_significand(var, 0) >= 0 && \
-	    __hybrid_int128_vec64_significand(var, 1) == 0))
+	(__hybrid_PRIVATE_uint128_vec64_significand(var, 1) == 0)
+#define __hybrid_int128_is8bit(var)                                \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec8_significand(var, 0) < 0 &&    \
+	    __hybrid_PRIVATE_int128_vec8_significand(var, 1) == -1 &&  \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec8_significand(var, 0) >= 0 &&   \
+	    __hybrid_PRIVATE_int128_vec8_significand(var, 1) == 0 &&   \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == 0))
+#define __hybrid_int128_is16bit(var)                               \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec16_significand(var, 0) < 0 &&   \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec16_significand(var, 0) >= 0 &&  \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == 0))
+#define __hybrid_int128_is32bit(var)                               \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec32_significand(var, 0) < 0 &&   \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec32_significand(var, 0) >= 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == 0))
+#define __hybrid_int128_is64bit(var)                              \
+	(__hybrid_int128_isneg(var)                                   \
+	 ? (__hybrid_PRIVATE_int128_vec64_significand(var, 0) < 0 &&  \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == -1)  \
+	 : (__hybrid_PRIVATE_int128_vec64_significand(var, 0) >= 0 && \
+	    __hybrid_PRIVATE_int128_vec64_significand(var, 1) == 0))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_is8bit(var)                    \
-	(__hybrid_uint128_vec8_significand(var, 1) == 0 &&  \
-	 __hybrid_uint128_vec16_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 3) == 0)
-#define __hybrid_uint128_is16bit(var)                   \
-	(__hybrid_uint128_vec16_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 3) == 0)
-#define __hybrid_uint128_is32bit(var)                   \
-	(__hybrid_uint128_vec32_significand(var, 1) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 3) == 0)
-#define __hybrid_uint128_is64bit(var)                   \
-	(__hybrid_uint128_vec32_significand(var, 2) == 0 && \
-	 __hybrid_uint128_vec32_significand(var, 3) == 0)
-#define __hybrid_int128_is8bit(var)                        \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec8_significand(var, 0) < 0 &&    \
-	    __hybrid_int128_vec8_significand(var, 1) == -1 &&  \
-	    __hybrid_int128_vec16_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 3) == -1)   \
-	 : (__hybrid_int128_vec8_significand(var, 0) >= 0 &&   \
-	    __hybrid_int128_vec8_significand(var, 1) == 0 &&   \
-	    __hybrid_int128_vec16_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 2) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 3) == 0))
-#define __hybrid_int128_is16bit(var)                       \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec16_significand(var, 0) < 0 &&   \
-	    __hybrid_int128_vec16_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 3) == -1)   \
-	 : (__hybrid_int128_vec16_significand(var, 0) >= 0 &&  \
-	    __hybrid_int128_vec16_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 2) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 3) == 0))
-#define __hybrid_int128_is32bit(var)                       \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec32_significand(var, 0) < 0 &&   \
-	    __hybrid_int128_vec32_significand(var, 1) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 3) == -1)   \
-	 : (__hybrid_int128_vec32_significand(var, 0) >= 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 1) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 2) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 3) == 0))
-#define __hybrid_int128_is64bit(var)                       \
-	(__hybrid_int128_isneg(var)                            \
-	 ? (__hybrid_int128_vec32_significand(var, 1) < 0 &&   \
-	    __hybrid_int128_vec32_significand(var, 2) == -1 && \
-	    __hybrid_int128_vec32_significand(var, 3) == -1)   \
-	 : (__hybrid_int128_vec32_significand(var, 1) >= 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 2) == 0 &&  \
-	    __hybrid_int128_vec32_significand(var, 3) == 0))
+#define __hybrid_uint128_is8bit(var)                            \
+	(__hybrid_PRIVATE_uint128_vec8_significand(var, 1) == 0 &&  \
+	 __hybrid_PRIVATE_uint128_vec16_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 3) == 0)
+#define __hybrid_uint128_is16bit(var)                           \
+	(__hybrid_PRIVATE_uint128_vec16_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 3) == 0)
+#define __hybrid_uint128_is32bit(var)                           \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 1) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 3) == 0)
+#define __hybrid_uint128_is64bit(var)                           \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 2) == 0 && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 3) == 0)
+#define __hybrid_int128_is8bit(var)                                \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec8_significand(var, 0) < 0 &&    \
+	    __hybrid_PRIVATE_int128_vec8_significand(var, 1) == -1 &&  \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec8_significand(var, 0) >= 0 &&   \
+	    __hybrid_PRIVATE_int128_vec8_significand(var, 1) == 0 &&   \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == 0))
+#define __hybrid_int128_is16bit(var)                               \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec16_significand(var, 0) < 0 &&   \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec16_significand(var, 0) >= 0 &&  \
+	    __hybrid_PRIVATE_int128_vec16_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == 0))
+#define __hybrid_int128_is32bit(var)                               \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec32_significand(var, 0) < 0 &&   \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec32_significand(var, 0) >= 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 1) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == 0))
+#define __hybrid_int128_is64bit(var)                               \
+	(__hybrid_int128_isneg(var)                                    \
+	 ? (__hybrid_PRIVATE_int128_vec32_significand(var, 1) < 0 &&   \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == -1 && \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == -1)   \
+	 : (__hybrid_PRIVATE_int128_vec32_significand(var, 1) >= 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 2) == 0 &&  \
+	    __hybrid_PRIVATE_int128_vec32_significand(var, 3) == 0))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
-#define __hybrid_uint128_eq8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_uint128_vec8_significand(var, 0) == (__UINT8_TYPE__)(v))
-#define __hybrid_uint128_eq16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_uint128_vec16_significand(var, 0) == (__UINT16_TYPE__)(v))
-#define __hybrid_uint128_eq32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_uint128_vec32_significand(var, 0) == (__UINT32_TYPE__)(v))
-#define __hybrid_int128_eq8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_int128_vec8_significand(var, 0) == (__INT8_TYPE__)(v))
-#define __hybrid_int128_eq16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_int128_vec16_significand(var, 0) == (__INT16_TYPE__)(v))
-#define __hybrid_int128_eq32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_int128_vec32_significand(var, 0) == (__INT32_TYPE__)(v))
+#define __hybrid_uint128_eq8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_PRIVATE_uint128_vec8_significand(var, 0) == (__UINT8_TYPE__)(v))
+#define __hybrid_uint128_eq16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_PRIVATE_uint128_vec16_significand(var, 0) == (__UINT16_TYPE__)(v))
+#define __hybrid_uint128_eq32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_PRIVATE_uint128_vec32_significand(var, 0) == (__UINT32_TYPE__)(v))
+#define __hybrid_int128_eq8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_PRIVATE_int128_vec8_significand(var, 0) == (__INT8_TYPE__)(v))
+#define __hybrid_int128_eq16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_PRIVATE_int128_vec16_significand(var, 0) == (__INT16_TYPE__)(v))
+#define __hybrid_int128_eq32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_PRIVATE_int128_vec32_significand(var, 0) == (__INT32_TYPE__)(v))
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_eq128(var, v)                                                         \
-	(__hybrid_uint128_vec64_significand(var, 1) == __hybrid_uint128_vec64_significand(v, 1) && \
-	 __hybrid_uint128_vec64_significand(var, 0) == __hybrid_uint128_vec64_significand(v, 0))
+#define __hybrid_uint128_eq128(var, v)                                                                         \
+	(__hybrid_PRIVATE_uint128_vec64_significand(var, 1) == __hybrid_PRIVATE_uint128_vec64_significand(v, 1) && \
+	 __hybrid_PRIVATE_uint128_vec64_significand(var, 0) == __hybrid_PRIVATE_uint128_vec64_significand(v, 0))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_eq128(var, v)                                                         \
-	(__hybrid_uint128_vec32_significand(var, 3) == __hybrid_uint128_vec32_significand(v, 3) && \
-	 __hybrid_uint128_vec32_significand(var, 2) == __hybrid_uint128_vec32_significand(v, 2) && \
-	 __hybrid_uint128_vec32_significand(var, 1) == __hybrid_uint128_vec32_significand(v, 1) && \
-	 __hybrid_uint128_vec32_significand(var, 0) == __hybrid_uint128_vec32_significand(v, 0))
+#define __hybrid_uint128_eq128(var, v)                                                                         \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) == __hybrid_PRIVATE_uint128_vec32_significand(v, 3) && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 2) == __hybrid_PRIVATE_uint128_vec32_significand(v, 2) && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 1) == __hybrid_PRIVATE_uint128_vec32_significand(v, 1) && \
+	 __hybrid_PRIVATE_uint128_vec32_significand(var, 0) == __hybrid_PRIVATE_uint128_vec32_significand(v, 0))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #ifdef __UINT64_TYPE__
-#define __hybrid_uint128_eq64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_uint128_vec64_significand(var, 0) == (__UINT64_TYPE__)(v))
-#define __hybrid_int128_eq64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_int128_vec64_significand(var, 0) == (__INT64_TYPE__)(v))
+#define __hybrid_uint128_eq64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_PRIVATE_uint128_vec64_significand(var, 0) == (__UINT64_TYPE__)(v))
+#define __hybrid_int128_eq64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_PRIVATE_int128_vec64_significand(var, 0) == (__INT64_TYPE__)(v))
 #endif /* __UINT64_TYPE__ */
 
-#define __hybrid_uint128_lo8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_uint128_vec8_significand(var, 0) < (__UINT8_TYPE__)(v))
-#define __hybrid_uint128_le8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_uint128_vec8_significand(var, 0) <= (__UINT8_TYPE__)(v))
-#define __hybrid_uint128_lo16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_uint128_vec16_significand(var, 0) < (__UINT16_TYPE__)(v))
-#define __hybrid_uint128_le16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_uint128_vec16_significand(var, 0) <= (__UINT16_TYPE__)(v))
-#define __hybrid_uint128_lo32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_uint128_vec32_significand(var, 0) < (__UINT32_TYPE__)(v))
-#define __hybrid_uint128_le32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_uint128_vec32_significand(var, 0) <= (__UINT32_TYPE__)(v))
-#define __hybrid_int128_lo8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_int128_vec8_significand(var, 0) < (__INT8_TYPE__)(v))
-#define __hybrid_int128_le8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_int128_vec8_significand(var, 0) <= (__INT8_TYPE__)(v))
-#define __hybrid_int128_lo16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_int128_vec16_significand(var, 0) < (__INT16_TYPE__)(v))
-#define __hybrid_int128_le16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_int128_vec16_significand(var, 0) <= (__INT16_TYPE__)(v))
-#define __hybrid_int128_lo32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_int128_vec32_significand(var, 0) < (__INT32_TYPE__)(v))
-#define __hybrid_int128_le32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_int128_vec32_significand(var, 0) <= (__INT32_TYPE__)(v))
+#define __hybrid_uint128_lo8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_PRIVATE_uint128_vec8_significand(var, 0) < (__UINT8_TYPE__)(v))
+#define __hybrid_uint128_le8(var, v)  (__hybrid_uint128_is8bit(var) && __hybrid_PRIVATE_uint128_vec8_significand(var, 0) <= (__UINT8_TYPE__)(v))
+#define __hybrid_uint128_lo16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_PRIVATE_uint128_vec16_significand(var, 0) < (__UINT16_TYPE__)(v))
+#define __hybrid_uint128_le16(var, v) (__hybrid_uint128_is16bit(var) && __hybrid_PRIVATE_uint128_vec16_significand(var, 0) <= (__UINT16_TYPE__)(v))
+#define __hybrid_uint128_lo32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_PRIVATE_uint128_vec32_significand(var, 0) < (__UINT32_TYPE__)(v))
+#define __hybrid_uint128_le32(var, v) (__hybrid_uint128_is32bit(var) && __hybrid_PRIVATE_uint128_vec32_significand(var, 0) <= (__UINT32_TYPE__)(v))
+#define __hybrid_int128_lo8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_PRIVATE_int128_vec8_significand(var, 0) < (__INT8_TYPE__)(v))
+#define __hybrid_int128_le8(var, v)   (__hybrid_int128_is8bit(var) && __hybrid_PRIVATE_int128_vec8_significand(var, 0) <= (__INT8_TYPE__)(v))
+#define __hybrid_int128_lo16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_PRIVATE_int128_vec16_significand(var, 0) < (__INT16_TYPE__)(v))
+#define __hybrid_int128_le16(var, v)  (__hybrid_int128_is16bit(var) && __hybrid_PRIVATE_int128_vec16_significand(var, 0) <= (__INT16_TYPE__)(v))
+#define __hybrid_int128_lo32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_PRIVATE_int128_vec32_significand(var, 0) < (__INT32_TYPE__)(v))
+#define __hybrid_int128_le32(var, v)  (__hybrid_int128_is32bit(var) && __hybrid_PRIVATE_int128_vec32_significand(var, 0) <= (__INT32_TYPE__)(v))
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __hybrid_uint128_lo128(var, v)                                                          \
-	(__hybrid_uint128_vec64_significand(var, 1) < __hybrid_uint128_vec64_significand(v, 1) ||   \
-	 (__hybrid_uint128_vec64_significand(var, 1) == __hybrid_uint128_vec64_significand(v, 1) && \
-	  __hybrid_uint128_vec64_significand(var, 0) < __hybrid_uint128_vec64_significand(v, 0)))
-#define __hybrid_uint128_le128(var, v)                                                          \
-	(__hybrid_uint128_vec64_significand(var, 1) < __hybrid_uint128_vec64_significand(v, 1) ||   \
-	 (__hybrid_uint128_vec64_significand(var, 1) == __hybrid_uint128_vec64_significand(v, 1) && \
-	  __hybrid_uint128_vec64_significand(var, 0) <= __hybrid_uint128_vec64_significand(v, 0)))
+#define __hybrid_uint128_lo128(var, v)                                                                          \
+	(__hybrid_PRIVATE_uint128_vec64_significand(var, 1) < __hybrid_PRIVATE_uint128_vec64_significand(v, 1) ||   \
+	 (__hybrid_PRIVATE_uint128_vec64_significand(var, 1) == __hybrid_PRIVATE_uint128_vec64_significand(v, 1) && \
+	  __hybrid_PRIVATE_uint128_vec64_significand(var, 0) < __hybrid_PRIVATE_uint128_vec64_significand(v, 0)))
+#define __hybrid_uint128_le128(var, v)                                                                          \
+	(__hybrid_PRIVATE_uint128_vec64_significand(var, 1) < __hybrid_PRIVATE_uint128_vec64_significand(v, 1) ||   \
+	 (__hybrid_PRIVATE_uint128_vec64_significand(var, 1) == __hybrid_PRIVATE_uint128_vec64_significand(v, 1) && \
+	  __hybrid_PRIVATE_uint128_vec64_significand(var, 0) <= __hybrid_PRIVATE_uint128_vec64_significand(v, 0)))
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __hybrid_uint128_lo128(var, v)                                                              \
-	(__hybrid_uint128_vec32_significand(var, 3) < __hybrid_uint128_vec32_significand(v, 3) ||       \
-	 (__hybrid_uint128_vec32_significand(var, 3) == __hybrid_uint128_vec32_significand(v, 3) &&     \
-	  (__hybrid_uint128_vec32_significand(var, 2) < __hybrid_uint128_vec32_significand(v, 2) ||     \
-	   (__hybrid_uint128_vec32_significand(var, 2) == __hybrid_uint128_vec32_significand(v, 2) &&   \
-	    (__hybrid_uint128_vec32_significand(var, 1) < __hybrid_uint128_vec32_significand(v, 1) ||   \
-	     (__hybrid_uint128_vec32_significand(var, 1) == __hybrid_uint128_vec32_significand(v, 1) && \
-	      __hybrid_uint128_vec32_significand(var, 0) < __hybrid_uint128_vec32_significand(v, 0)))))))
-#define __hybrid_uint128_le128(var, v)                                                              \
-	(__hybrid_uint128_vec32_significand(var, 3) < __hybrid_uint128_vec32_significand(v, 3) ||       \
-	 (__hybrid_uint128_vec32_significand(var, 3) == __hybrid_uint128_vec32_significand(v, 3) &&     \
-	  (__hybrid_uint128_vec32_significand(var, 2) < __hybrid_uint128_vec32_significand(v, 2) ||     \
-	   (__hybrid_uint128_vec32_significand(var, 2) == __hybrid_uint128_vec32_significand(v, 2) &&   \
-	    (__hybrid_uint128_vec32_significand(var, 1) < __hybrid_uint128_vec32_significand(v, 1) ||   \
-	     (__hybrid_uint128_vec32_significand(var, 1) == __hybrid_uint128_vec32_significand(v, 1) && \
-	      __hybrid_uint128_vec32_significand(var, 0) <= __hybrid_uint128_vec32_significand(v, 0)))))))
+#define __hybrid_uint128_lo128(var, v)                                                                              \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) < __hybrid_PRIVATE_uint128_vec32_significand(v, 3) ||       \
+	 (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) == __hybrid_PRIVATE_uint128_vec32_significand(v, 3) &&     \
+	  (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) < __hybrid_PRIVATE_uint128_vec32_significand(v, 2) ||     \
+	   (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) == __hybrid_PRIVATE_uint128_vec32_significand(v, 2) &&   \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) < __hybrid_PRIVATE_uint128_vec32_significand(v, 1) ||   \
+	     (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) == __hybrid_PRIVATE_uint128_vec32_significand(v, 1) && \
+	      __hybrid_PRIVATE_uint128_vec32_significand(var, 0) < __hybrid_PRIVATE_uint128_vec32_significand(v, 0)))))))
+#define __hybrid_uint128_le128(var, v)                                                                              \
+	(__hybrid_PRIVATE_uint128_vec32_significand(var, 3) < __hybrid_PRIVATE_uint128_vec32_significand(v, 3) ||       \
+	 (__hybrid_PRIVATE_uint128_vec32_significand(var, 3) == __hybrid_PRIVATE_uint128_vec32_significand(v, 3) &&     \
+	  (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) < __hybrid_PRIVATE_uint128_vec32_significand(v, 2) ||     \
+	   (__hybrid_PRIVATE_uint128_vec32_significand(var, 2) == __hybrid_PRIVATE_uint128_vec32_significand(v, 2) &&   \
+	    (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) < __hybrid_PRIVATE_uint128_vec32_significand(v, 1) ||   \
+	     (__hybrid_PRIVATE_uint128_vec32_significand(var, 1) == __hybrid_PRIVATE_uint128_vec32_significand(v, 1) && \
+	      __hybrid_PRIVATE_uint128_vec32_significand(var, 0) <= __hybrid_PRIVATE_uint128_vec32_significand(v, 0)))))))
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 #ifdef __UINT64_TYPE__
-#define __hybrid_uint128_lo64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_uint128_vec64_significand(var, 0) < (__UINT64_TYPE__)(v))
-#define __hybrid_uint128_le64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_uint128_vec64_significand(var, 0) <= (__UINT64_TYPE__)(v))
-#define __hybrid_int128_lo64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_int128_vec64_significand(var, 0) < (__INT64_TYPE__)(v))
-#define __hybrid_int128_le64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_int128_vec64_significand(var, 0) <= (__INT64_TYPE__)(v))
+#define __hybrid_uint128_lo64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_PRIVATE_uint128_vec64_significand(var, 0) < (__UINT64_TYPE__)(v))
+#define __hybrid_uint128_le64(var, v) (__hybrid_uint128_is64bit(var) && __hybrid_PRIVATE_uint128_vec64_significand(var, 0) <= (__UINT64_TYPE__)(v))
+#define __hybrid_int128_lo64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_PRIVATE_int128_vec64_significand(var, 0) < (__INT64_TYPE__)(v))
+#define __hybrid_int128_le64(var, v)  (__hybrid_int128_is64bit(var) && __hybrid_PRIVATE_int128_vec64_significand(var, 0) <= (__INT64_TYPE__)(v))
 #endif /* __UINT64_TYPE__ */
 
 #ifdef __INTELLISENSE__
-#define __hybrid_int128_eq128(var, v) (__hybrid_int128_vec64_significand(var, 0) == __hybrid_int128_vec64_significand(v, 0))
+#define __hybrid_int128_eq128(var, v) (__hybrid_PRIVATE_int128_vec64_significand(var, 0) == __hybrid_PRIVATE_int128_vec64_significand(v, 0))
 #define __hybrid_int128_lo128         __hybrid_int128_eq128
 #define __hybrid_int128_le128         __hybrid_int128_eq128
 #else /* __INTELLISENSE__ */
@@ -2344,7 +2577,10 @@ typedef union __hybrid_int128_struct {
 #ifdef __UINT64_TYPE__
 	__UINT64_TYPE__ __i128_u64[2];
 	__INT64_TYPE__  __i128_s64[2];
-#endif /* __UINT64_TYPE__ */
+#define __ALIGNOF_INT128__ __ALIGNOF_INT64__
+#else /* __UINT64_TYPE__ */
+#define __ALIGNOF_INT128__ __ALIGNOF_INT32__
+#endif /* !__UINT64_TYPE__ */
 #ifdef __INTELLISENSE__
 	__INT8_TYPE__ __s128_8[16];
 	__INT16_TYPE__ __s128_16[8];
@@ -2435,9 +2671,9 @@ typedef union __hybrid_uint128_struct {
 #endif /* __cplusplus && WANT_INT128_CXX_INTEGRATION */
 
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_uint128_vec64_significand(v, (i) / 64) >> ((i) % 64)) & 1)
+#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_PRIVATE_uint128_vec64_significand(v, (i) / 64) >> ((i) % 64)) & 1)
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
-#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_uint128_vec32_significand(v, (i) / 32) >> ((i) % 32)) & 1)
+#define __HYBRID_PRIVATE_UINT128_BIT128(v, i) ((__hybrid_PRIVATE_uint128_vec32_significand(v, (i) / 32) >> ((i) % 32)) & 1)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 __LOCAL __ATTR_INOUT(1) __ATTR_IN(2) void
@@ -2904,17 +3140,17 @@ __LOCAL __ATTR_INOUT(1) void
 (__hybrid_PRIVATE_uint128_bswap)(__hybrid_uint128_t *__self) {
 #ifdef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
 	__UINT64_TYPE__ __temp;
-	__temp = __hybrid_bswap64(__hybrid_uint128_vec64(*__self)[0]);
-	__hybrid_uint128_vec64(*__self)[0] = __hybrid_bswap64(__hybrid_uint128_vec64(*__self)[1]);
-	__hybrid_uint128_vec64(*__self)[1] = __temp;
+	__temp = __hybrid_bswap64(__hybrid_PRIVATE_uint128_vec64(*__self)[0]);
+	__hybrid_PRIVATE_uint128_vec64(*__self)[0] = __hybrid_bswap64(__hybrid_PRIVATE_uint128_vec64(*__self)[1]);
+	__hybrid_PRIVATE_uint128_vec64(*__self)[1] = __temp;
 #else /* __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 	__UINT32_TYPE__ __temp;
-	__temp = __hybrid_bswap32(__hybrid_uint128_vec32(*__self)[0]);
-	__hybrid_uint128_vec32(*__self)[0] = __hybrid_bswap32(__hybrid_uint128_vec32(*__self)[3]);
-	__hybrid_uint128_vec32(*__self)[3] = __temp;
-	__temp = __hybrid_bswap32(__hybrid_uint128_vec32(*__self)[1]);
-	__hybrid_uint128_vec32(*__self)[1] = __hybrid_bswap32(__hybrid_uint128_vec32(*__self)[2]);
-	__hybrid_uint128_vec32(*__self)[2] = __temp;
+	__temp = __hybrid_bswap32(__hybrid_PRIVATE_uint128_vec32(*__self)[0]);
+	__hybrid_PRIVATE_uint128_vec32(*__self)[0] = __hybrid_bswap32(__hybrid_PRIVATE_uint128_vec32(*__self)[3]);
+	__hybrid_PRIVATE_uint128_vec32(*__self)[3] = __temp;
+	__temp = __hybrid_bswap32(__hybrid_PRIVATE_uint128_vec32(*__self)[1]);
+	__hybrid_PRIVATE_uint128_vec32(*__self)[1] = __hybrid_bswap32(__hybrid_PRIVATE_uint128_vec32(*__self)[2]);
+	__hybrid_PRIVATE_uint128_vec32(*__self)[2] = __temp;
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 }
 
@@ -3145,6 +3381,5 @@ __DECL_END
 #define __hybrid_int128_ge128(var, v)  (!__hybrid_int128_lo128(var, v))
 
 #endif /* __CC__ */
-
 
 #endif /* !__GUARD_HYBRID_INT128_H */

@@ -681,6 +681,8 @@
 
 
 // <hybrid/int128.h>
+#define __HYBRID_PRIVATE_DEFINE_INT128_GETSET_WORD(a,b,T,S,...)\
+	static T a(S var,unsigned int i);static void b(S*pvar,unsigned int i,T v);
 #define __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(op,name) \
 	template<class ValType>__hybrid_uint128_t&operator op##=(__hybrid_uint128_t&self,ValType v){}\
 	template<class ValType>__hybrid_int128_t&operator op##=(__hybrid_int128_t&self,ValType v){}\

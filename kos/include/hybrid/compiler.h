@@ -231,6 +231,7 @@
 #define WUNUSED     __ATTR_WUNUSED
 #define WUNUSED_T   __ATTR_WUNUSED_T
 #define UNUSED      __UNUSED
+#define UNUSED2     __UNUSED2
 
 /* C++ default arguments */
 #define DFL __DFL

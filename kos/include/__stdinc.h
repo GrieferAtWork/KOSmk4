@@ -599,18 +599,24 @@
 
 #ifndef __UNUSED
 #ifdef __INTELLISENSE__
-#define __UNUSED       /* Nothing */
+#define __UNUSED        /* Nothing */
+#define __UNUSED2(a, b) a b
 #elif defined(__cplusplus) || defined(__DEEMON__)
-#define __UNUSED(name) /* Nothing */
+#define __UNUSED(name)  /* Nothing */
+#define __UNUSED2(a, b) b
 #elif !defined(__NO_ATTR_UNUSED)
-#define __UNUSED(name) name __ATTR_UNUSED
+#define __UNUSED(name)  name __ATTR_UNUSED
+#define __UNUSED2(a, b) a b __ATTR_UNUSED
 #elif defined(__LCLINT__)
-#define __UNUSED(name) /*@unused@*/ name
+#define __UNUSED(name)  /*@unused@*/ name
+#define __UNUSED2(a, b) /*@unused@*/ a b
 #elif defined(_MSC_VER)
-#define __UNUSED(name) name
+#define __UNUSED(name)  name
+#define __UNUSED2(a, b) a b
 #pragma warning(disable: 4100)
 #else /* ... */
-#define __UNUSED(name) name
+#define __UNUSED(name)  name
+#define __UNUSED2(a, b) a b
 #endif /* !... */
 #endif /* !__UNUSED */
 

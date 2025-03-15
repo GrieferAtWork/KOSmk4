@@ -1806,6 +1806,22 @@
 #endif /* !_POINTER_ALIGNMENT */
 #endif /* !__ALIGNOF_POINTER__ */
 
+#ifndef __ALIGNOF_SIZE_T__
+#ifdef _SIZE_T_ALIGNMENT
+#define __ALIGNOF_SIZE_T__ _SIZE_T_ALIGNMENT
+#elif __SIZEOF_SIZE_T__ == __SIZEOF_POINTER__
+#define __ALIGNOF_SIZE_T__ __ALIGNOF_POINTER__
+#elif __SIZEOF_SIZE_T__ == 2
+#define __ALIGNOF_SIZE_T__ __ALIGNOF_INT16__
+#elif __SIZEOF_SIZE_T__ == 4
+#define __ALIGNOF_SIZE_T__ __ALIGNOF_INT32__
+#elif __SIZEOF_SIZE_T__ == 8
+#define __ALIGNOF_SIZE_T__ __ALIGNOF_INT64__
+#else /* __SIZEOF_SIZE_T__ == ... */
+#define __ALIGNOF_SIZE_T__ __SIZEOF_SIZE_T__
+#endif /* __SIZEOF_SIZE_T__ != ... */
+#endif /* !__ALIGNOF_SIZE_T__ */
+
 #ifndef __ALIGNOF_WCHAR_T__
 #if __SIZEOF_WCHAR_T__ == 2
 #define __ALIGNOF_WCHAR_T__ __ALIGNOF_INT16__
