@@ -3120,6 +3120,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __
 /* Type-generic functions */
 
 #ifndef __cplusplus
+#ifndef __HYBRID_ATOMIC_RECAST
 #ifdef __COMPILER_HAVE_TYPEOF
 #define __HYBRID_ATOMIC_RECAST(p, y) ((__typeof__(*(p)))(y))
 #elif 1
@@ -3127,6 +3128,7 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT128_TYPE__ __
 #else /* ... */
 #define __HYBRID_ATOMIC_RECAST(p, y) (y)
 #endif /* !... */
+#endif /* !__HYBRID_ATOMIC_RECAST */
 #endif /* !__cplusplus */
 
 #if defined(_MSC_VER) && !defined(__cplusplus)

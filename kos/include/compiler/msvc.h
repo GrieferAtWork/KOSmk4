@@ -347,7 +347,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __builtin_constant_p(x) (__LINE__ == -1)
 #define __restrict_arr __restrict
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
-#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[0xffff]
 #define __attribute__(x)         /* Nothing */
 #define __NO_COMPILER_IGNORE_UNINITIALIZED
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
@@ -549,6 +549,9 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #ifdef _PREFAST_ /* Disable BS code analysis warnings that are based on miss-guided opinions */
 #pragma warning(disable: 26493 26494 26477 26438 26446 26482 26485 26448 26462 26496 26461 26476 26481 6255 26427)
 #pragma warning(disable: 26489 26486 26487 26451 26492 26430 28182) /* There warnings would be helpful... IF THEY WORKED! */
+#ifdef __cplusplus
+#pragma warning(disable: 26429 26440 26457 26826)
+#endif /* __cplusplus */
 #endif /* _PREFAST_ */
 
 #pragma warning(disable: 4514) /* Unused inline function was removed. */
@@ -558,10 +561,6 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #pragma warning(disable: 4201) /* nonstandard extension used: nameless struct/union (they're standard now...) */
 #ifdef __cplusplus
 #pragma warning(disable: 4644) /* Annoying warning about use of `offsetof' in constant expressions (). */
-#pragma warning(disable: 26429)
-#pragma warning(disable: 26440)
-#pragma warning(disable: 26457)
-#pragma warning(disable: 6011) /* TODO: REMOVE THIS ONE */
 #define __SYSDECL_BEGIN __DECL_BEGIN
 #define __SYSDECL_END   __DECL_END
 #else /* __cplusplus */

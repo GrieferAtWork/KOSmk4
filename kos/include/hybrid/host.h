@@ -322,6 +322,8 @@
 #endif /* __powerpc64__... */
 
 
+
+
 /************************************************************************/
 /* PORTABLE ARCH FEATURES                                               */
 /************************************************************************/
@@ -341,22 +343,7 @@
 #endif /* _ALIGNMENT_REQUIRED == 0 */
 #endif /* ... */
 
-/* >> __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
- * When defined, properly aligned writes to word types with sizes
- * that are <=  sizeof(__REGISTER_TYPE__) are inherently  atomic.
- *
- * As a consequence, `__hybrid_atomic_load()' can be used to load
- * such words, even if those words are written without the use of
- * `__hybrid_atomic_store()' or similar.
- *
- * Another   way  of  looking   at  this  option  is:
- * >> #ifdef __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
- * >> __hybrid_atomic_store(&p, v, __ATOMIC_RELAXED);
- * >> p = v; // ^ literally the same as as this line.
- * >> #endif
- */
-#undef __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
-#define __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
+
 
 #undef __ARCH_STACK_GROWS_UPWARDS
 #undef __ARCH_STACK_GROWS_DOWNWARDS
@@ -378,6 +365,8 @@
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS && !__ARCH_STACK_GROWS_UPWARDS */
 #endif /* !... */
 
+
+
 #undef __ARCH_STACK_ALIGNMENT
 #ifdef __x86_64__
 #define __ARCH_STACK_ALIGNMENT 16
@@ -390,6 +379,7 @@
 #elif defined(__i386__)
 #define __ARCH_STACK_ALIGNMENT 8
 #endif /* ... */
+
 
 
 /* The native PAGE size of the hosting arch (if known to be  constant)

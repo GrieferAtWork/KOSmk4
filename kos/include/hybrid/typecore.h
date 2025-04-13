@@ -1619,14 +1619,6 @@
 #define __ULONG64_TYPE__ __UINT64_TYPE__
 #endif /* __SIZEOF_LONG__ != 8 */
 
-/* The max integral type that the target's main address bus is optimized
- * for. Currently, that  is equal to  `sizeof(void *)' for all  targets. */
-#ifndef __SIZEOF_BUSINT__
-#define __SIZEOF_BUSINT__ __SIZEOF_POINTER__
-#define __BUSINT_TYPE__   __INTPTR_TYPE__
-#define __UBUSIINT_TYPE__ __UINTPTR_TYPE__
-#endif /* !__SIZEOF_BUSINT__ */
-
 /* General-purpose register type.
  * Currently, that is equal to `sizeof(void *)' for all targets. */
 #ifndef __SIZEOF_REGISTER__
@@ -1634,6 +1626,14 @@
 #define __REGISTER_TYPE__    __ULONGPTR_TYPE__
 #define __SREGISTER_TYPE__   __LONGPTR_TYPE__
 #endif /* !__SIZEOF_REGISTER__ */
+
+/* The max integral type that the target's main address bus is optimized
+ * for. Currently, that  is equal to  `sizeof(void *)' for all  targets. */
+#ifndef __SIZEOF_BUSINT__
+#define __SIZEOF_BUSINT__ __SIZEOF_POINTER__
+#define __BUSINT_TYPE__   __INTPTR_TYPE__
+#define __UBUSIINT_TYPE__ __UINTPTR_TYPE__
+#endif /* !__SIZEOF_BUSINT__ */
 
 #ifdef __UINT128_TYPE__
 #ifndef __ALIGNOF_INT128__
@@ -2610,6 +2610,33 @@ __NAMESPACE_INT_END
 #endif /* __ALIGNOF_INT128__ */
 #define __HYBRID_PRIVATE_ALIGNOF(sizeof) __HYBRID_PRIVATE_ALIGNOF##sizeof
 #define __HYBRID_ALIGNOF(sizeof)         __HYBRID_PRIVATE_ALIGNOF(sizeof)
+
+
+/************************************************************************/
+/* PORTABLE ARCH FEATURES                                               */
+/************************************************************************/
+
+/* >> __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
+ * When defined, properly aligned writes  to word types with  sizes
+ * that are <= __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC are inherently
+ * atomic.
+ *
+ * As a consequence, `__hybrid_atomic_load()' can be used to load
+ * such words, even if those words are written without the use of
+ * `__hybrid_atomic_store()' or similar.
+ *
+ * Another   way  of  looking   at  this  option  is:
+ * >> if (__ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC >= sizeof(*p)) {
+ * >>     __hybrid_atomic_store(&p, v, __ATOMIC_RELAXED);
+ * >>     p = v; // ^ literally the same as as this line.
+ * >> }
+ */
+#undef __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC
+#if 1
+#define __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC __SIZEOF_BUSINT__
+#else
+#define __ARCH_HAVE_ALIGNED_WRITES_ARE_ATOMIC 0
+#endif
 
 #endif /* !__DEEMON__ */
 

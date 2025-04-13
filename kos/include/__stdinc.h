@@ -961,8 +961,7 @@
 #include "hybrid/typecore.h"
 #define __INTELLISENSE_SIZE_TYPE__ __SIZE_TYPE__
 #endif /* !__INTELLISENSE_SIZE_TYPE__ */
-#define __COMPILER_OFFSETAFTER(s, m) \
-	((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
+#define __COMPILER_OFFSETAFTER(s, m) ((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
 #if defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_builtin_types_compatible_p)
 /* Syntax highlighting for improper use of `container_of' (typeof(*ptr) != typeof(type::member))
  * Only  do this with intellisense, since GCC's VLA extension might try to turn int(*)[expr(-1)]
@@ -981,16 +980,7 @@
 #include "hybrid/typecore.h"
 #endif /* !__SIZE_TYPE__ || !__UINTPTR_TYPE__ */
 #ifndef __COMPILER_OFFSETAFTER
-#if __has_builtin(__builtin_offsetof) || defined(__GNUC__)
-/* Needed,  because some compilers (like GCC) will otherwise
- * claim that `offsetafter()' is a "non-constant" expression
- * (even though it  clearly isn't). So  work around this  by
- * using the native offsetof() builtin, in conjunection with
- * sizeof(), both of which are _required_ to be constant! */
 #define __COMPILER_OFFSETAFTER(s, m) (__builtin_offsetof(s, m) + sizeof(((s *)0)->m))
-#else /* __has_builtin(__builtin_offsetof) || __GNUC__ */
-#define __COMPILER_OFFSETAFTER(s, m) ((__SIZE_TYPE__)(&((s *)0)->m + 1))
-#endif /* !__has_builtin(__builtin_offsetof) && !__GNUC__ */
 #endif /* !__COMPILER_OFFSETAFTER */
 #ifndef __COMPILER_CONTAINER_OF
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
