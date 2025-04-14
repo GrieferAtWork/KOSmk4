@@ -1750,7 +1750,7 @@ with_next_token:
 				for (local dep: forcedDependencies) {
 					if ("." !in dep)
 						continue;
-					if (tok == dep.rpartition(".")[2]) {
+					if (tok == dep.rpartition(".").last) {
 						knownNonDependencies.insert(tok);
 						prevToken = tok;
 						goto next_token;

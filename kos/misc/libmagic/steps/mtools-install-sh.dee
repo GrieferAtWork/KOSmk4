@@ -42,7 +42,7 @@ function MCOPY_install_sh_run(self: BoundStep): {Waitable...} {
 	if (knownDirs is none)
 		mmdCache[diskname] = knownDirs = HashSet();
 	local output: string = mt.MCOPY_getOutputFilename(options, input);
-	local outputDirname: string = output.rpartition("/")[0];
+	local outputDirname: string = output.rpartition("/").first;
 	if (outputDirname !in knownDirs) {
 		with (INSTALL_SH_OUTFILE_LOCK)
 			print INSTALL_SH_OUTFILE: ('mkdir -p "$DESTDIR/', outputDirname, '"');

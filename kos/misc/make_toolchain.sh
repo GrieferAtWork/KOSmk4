@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add files for building deemon with `v143`"
-DEEMON_VERSION="9e32562db73dde3babeb61b316f0fe31560cf494"
+#     v -- "Work around MSCV "P.A.B." code generation bug"
+DEEMON_VERSION="2a16c31b694680d04bb7177ccdd081d04e31a241"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

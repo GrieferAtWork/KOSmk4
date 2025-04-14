@@ -984,7 +984,7 @@ again:
 				value = value[1:-1].strip();
 			if ("," in value) {
 				/* XXX: Assert that the base class didn't change? */
-				value = value.rpartition(",")[2].lstrip();
+				value = value.rpartition(",").last.lstrip();
 				goto again;
 			}
 			try {

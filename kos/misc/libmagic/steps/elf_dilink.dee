@@ -150,7 +150,7 @@ link_again_with_new_guesses:
 			 */
 			@@The index of the program header that should be modified.
 			@@Set  to  @none  if  unknown,  and  @false  if  ambiguous
-			local programHeaderIndexToModify: int = none;
+			local programHeaderIndexToModify: int | none | bool = none;
 			@@The correct section offsets and sizes
 			local correctSectionOffsetsAndSizes: {string: (int, int)} = Dict();
 			{
@@ -279,8 +279,8 @@ link_again_with_new_guesses:
 			}
 
 			/* Manually edit the ELF binary. */
-			print "diSectionsFileOffset:", repr diSectionsFileOffset;
-			print "totalDebugSize:      ", repr totalDebugSize;
+			print "diSectionsFileOffset:", diSectionsFileOffset.hex();
+			print "totalDebugSize:      ", totalDebugSize.hex();
 			with (local fp = File.open(linkAttemptOutput, "r+")) {
 				local e_ident = fp.read(EI_NIDENT);
 				local endian = e_ident[EI_DATA] == ELFDATA2LSB ? "little" : "big";
