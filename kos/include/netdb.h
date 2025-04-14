@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbfae5a4 */
+/* HASH CRC-32:0x54da9797 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,10 +50,10 @@
 #include <bits/crt/db/netdb.h>
 #include <bits/types.h>
 #include <netinet/in.h>
-
 #include <bits/crt/db/hostent.h>
 #include <bits/crt/db/servent.h>
 #include <bits/crt/db/protoent.h>
+
 #ifdef __USE_XOPEN2K
 #include <bits/crt/addrinfo.h>
 #ifdef __USE_GNU
@@ -292,7 +292,7 @@ __CDECLARE_OPT(,struct hostent *,__NOTHROW_RPC,gethostbyname,(char const *__name
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setnetent,(int __stay_open),(__stay_open))
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endnetent,(void),())
 __CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetent,(void),())
-__CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetbyaddr,(uint32_t __net, int __type),(__net,__type))
+__CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetbyaddr,(__UINT32_TYPE__ __net, int __type),(__net,__type))
 __CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetbyname,(char const *__name),(__name))
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setservent,(int __stay_open),(__stay_open))
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endservent,(void),())
@@ -329,7 +329,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyaddr_r,(void const *__restrict __addr
 __CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyname_r,(char const *__restrict __name, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyname2_r,(char const *__restrict __name, int __af, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__af,__result_buf,__buf,__buflen,__result,__h_errnop))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetent_r,(struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__result_buf,__buf,__buflen,__result,__h_errnop))
-__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetbyaddr_r,(uint32_t __net, int __type, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__net,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetbyaddr_r,(__UINT32_TYPE__ __net, int __type, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__net,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getnetbyname_r,(char const *__restrict __name, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getservent_r,(struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__result_buf,__buf,__buflen,__result))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getservbyname_r,(char const *__restrict __name, char const *__restrict __proto, struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__name,__proto,__result_buf,__buf,__buflen,__result))
@@ -360,7 +360,7 @@ __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, 
 __CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
 #endif /* !__ruserok_defined && __CRT_HAVE_ruserok */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,ruserok_af,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__rhost,__suser,__remuser,__locuser,__af))
-__CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char const *__remuser, char const *__locuser),(__raddr,__suser,__remuser,__locuser))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(__UINT32_TYPE__ __raddr, int __suser, char const *__remuser, char const *__locuser),(__raddr,__suser,__remuser,__locuser))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))
 #if !defined(__rresvport_defined) && defined(__CRT_HAVE_rresvport)
 #define __rresvport_defined

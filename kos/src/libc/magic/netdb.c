@@ -69,11 +69,14 @@
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <netinet/in.h>
+)]%[insert:prefix(
+#include <bits/crt/db/hostent.h>
+)]%[insert:prefix(
+#include <bits/crt/db/servent.h>
+)]%[insert:prefix(
+#include <bits/crt/db/protoent.h>
 )]%{
 
-#include <bits/crt/db/hostent.h>
-#include <bits/crt/db/servent.h>
-#include <bits/crt/db/protoent.h>
 #ifdef __USE_XOPEN2K
 #include <bits/crt/addrinfo.h>
 #ifdef __USE_GNU
@@ -333,7 +336,7 @@ void endnetent();
 struct netent *getnetent();
 
 [[cp, decl_include("<hybrid/typecore.h>", "<bits/crt/db/netent.h>")]]
-struct netent *getnetbyaddr(uint32_t net, int type);
+struct netent *getnetbyaddr($uint32_t net, int type);
 
 [[cp, decl_include("<bits/crt/db/netent.h>")]]
 struct netent *getnetbyname(char const *name);
@@ -447,7 +450,7 @@ int getnetent_r(struct netent *__restrict result_buf,
 
 [[cp, doc_alias("getnetent_r"), decl_include("<hybrid/typecore.h>", "<bits/crt/db/netent.h>")]]
 [[export_as("__getnetbyaddr_r")]] /* From Glibc 2.0.4 */
-int getnetbyaddr_r(uint32_t net, int type,
+int getnetbyaddr_r($uint32_t net, int type,
                    struct netent *__restrict result_buf,
                    char *__restrict buf, size_t buflen,
                    struct netent **__restrict result,
@@ -580,7 +583,7 @@ int ruserok_af(char const *rhost, int suser,
                sa_family_t af);
 
 [[cp, decl_include("<hybrid/typecore.h>")]]
-int iruserok(uint32_t raddr, int suser,
+int iruserok($uint32_t raddr, int suser,
              char const *remuser,
              char const *locuser);
 
