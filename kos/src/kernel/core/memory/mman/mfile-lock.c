@@ -294,7 +294,8 @@ NOTHROW(FCALL mfile_tryincref_and_lock_parts_r)(struct mfile *__restrict self,
 			if (!mpart_lock_tryacquire(iter)) {
 				next = iter;
 				while (next != mima.mm_min) {
-					next = mpart_tree_nextnode(next);
+					next = mpart_tree_prevnode(next);
+					assert(next);
 					mpart_lock_release(next);
 					decref_unlikely(next);
 				}
