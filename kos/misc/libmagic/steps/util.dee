@@ -41,6 +41,7 @@ local final function COPYFILE_run(self: BoundStep): {Waitable...} {
 	th.start();
 	yield WaitableJoin(th);
 }
+
 local final function COPYFILE_tostr(self: BoundStep): string {
 	local group = self.group;
 	return f"Copy {
@@ -49,10 +50,12 @@ local final function COPYFILE_tostr(self: BoundStep): string {
 		repr group.fixFilename(group.options[OPT_COPYFILE_DST])
 	}";
 }
+
 local final function COPYFILE_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_COPYFILE_SRC]);
 }
+
 local final function COPYFILE_getProducedFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_COPYFILE_DST]);

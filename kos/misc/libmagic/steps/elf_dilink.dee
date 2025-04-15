@@ -111,6 +111,7 @@ link_again_with_new_guesses:
 				if (totalDebugSize < offsetAndSize)
 					totalDebugSize = offsetAndSize;
 			}
+
 			/* This prevents infinite loops when increasing the debug-section size
 			 * causes the actual debug-sections to  grow to no longer fit,  whilst
 			 * decreasing them causes the actual debug-sections to shrink to where
@@ -123,6 +124,7 @@ link_again_with_new_guesses:
 			if (totalDebugSize < prevTotalDebugSize)
 				totalDebugSize = prevTotalDebugSize;
 			prevTotalDebugSize = totalDebugSize;
+
 			/* Total size (== offset+size of the greatest section) */
 			opt_ldFlags.append(f"--defsym={diLinkSizeSymbol}={totalDebugSize}");
 			toolchain.createLinkerProcess(
@@ -137,6 +139,7 @@ link_again_with_new_guesses:
 				libraries:    opt_libraries,
 				noStdLib:     opt_noStdLib,
 			).waitfor();
+
 			/* Check if our guesses were correct:
 			 * >> ELF_DATA                = READ_ELF_DATA(linkAttemptOutput);
 			 * >> DATA_FOR_DEBUG_SECTIONS = ELF_DATA.SECTIONS(bindings.each[0]...);
@@ -229,6 +232,7 @@ link_again_with_new_guesses:
 			}
 			local diSectionsFileOffset =
 				correctSectionOffsetsAndSizes.values.each[0] < ...;
+
 			/* Adjust the minimum file offsets to be relative to one-another */
 			for (local name: correctSectionOffsetsAndSizes.keys.frozen) {
 				local data = correctSectionOffsetsAndSizes[name];
@@ -315,6 +319,7 @@ link_again_with_new_guesses:
 						<< offsetAndSize[1] << "\n";
 			}
 		}
+
 		/* Once we were successful, use the latest link attempt as the actual output */
 		local realLinkOutput = group.fixFilename(linkOutput);
 		try {

@@ -184,19 +184,20 @@ local final function ELF_FLATTEN_run(self: BoundStep): {Waitable...} {
 		if (input is none)
 			input = options[OPT_LINK_OUTPUT];
 		flattenElfBinary(
-			inputFile:            group.fixFilename(input),
-			outputFile:           group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
-			physBase:             options.get(OPT_ELF_FLATTEN_PHYS_BASE, 0),
-			virtBase:             options.get(OPT_ELF_FLATTEN_VIRT_BASE, 0),
-			keepBss:              options.get(OPT_ELF_FLATTEN_KEEP_BSS, false),
-			overrideEntry:        options.get(OPT_ELF_FLATTEN_OVERRIDE_ENTRY, false),
-			allowedHeaders:       options.get(OPT_ELF_FLATTEN_ALLOWED_HEADERS),
-			requireNoRelocations: options.get(OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS, true),
+				inputFile:            group.fixFilename(input),
+				outputFile:           group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
+				physBase:             options.get(OPT_ELF_FLATTEN_PHYS_BASE, 0),
+				virtBase:             options.get(OPT_ELF_FLATTEN_VIRT_BASE, 0),
+				keepBss:              options.get(OPT_ELF_FLATTEN_KEEP_BSS, false),
+				overrideEntry:        options.get(OPT_ELF_FLATTEN_OVERRIDE_ENTRY, false),
+				allowedHeaders:       options.get(OPT_ELF_FLATTEN_ALLOWED_HEADERS),
+				requireNoRelocations: options.get(OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS, true),
 		);
 	}, (self, ));
 	th.start();
 	yield WaitableJoin(th);
 }
+
 local final function ELF_FLATTEN_tostr(self: BoundStep): string {
 	local group = self.group;
 	local options = group.options;
@@ -209,6 +210,7 @@ local final function ELF_FLATTEN_tostr(self: BoundStep): string {
 		repr group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT])
 	}";
 }
+
 local final function ELF_FLATTEN_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local options = group.options;
@@ -217,6 +219,7 @@ local final function ELF_FLATTEN_getRequiredFiles(self: BoundStep): {string...} 
 		input = options[OPT_LINK_OUTPUT];
 	yield group.fixFilename(input);
 }
+
 local final function ELF_FLATTEN_getProducedFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_ELF_FLATTEN_OUTPUT]);

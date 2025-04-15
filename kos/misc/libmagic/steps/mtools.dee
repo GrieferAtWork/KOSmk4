@@ -139,9 +139,11 @@ function MCOPY_run(self: BoundStep): {Waitable...} {
 		if (knownDirs is none)
 			mmdCache[diskname] = knownDirs = HashSet();
 		local output: string = MCOPY_getOutputFilename(options, input);
+
 		/* Make sure that all directories leading up
 		 * to the file  to-be created created  exist */
 		MMD(self, knownDirs, output.rpartition("/").first);
+
 		/* Copy the actual file onto the disk. */
 		mtoolsInvoke(self, "mcopy", {
 			"-D", "o", input, "::/" + output

@@ -1577,7 +1577,7 @@ class FunctionImplementation {
 				ignoreFastBindings:        true,
 				printDoc: __TPP_EVAL(defined(CONFIG_DOC_STRINGS_IN_LIBC_LOCAL)),
 				hideDeprecationAttributes: true
-				);
+			);
 		}
 		if (implPrefix) {
 			fp.namespace = GLOBAL_NAMESPACE;
@@ -3181,6 +3181,7 @@ normal_guardName_binding:
 					}
 				} /* if (#usedBindings == 1) */
 			} /* if (guardName is none) */
+
 			local isFirst = true;
 			local numNeededEndif = [];
 			for (local bind: usedBindings) {

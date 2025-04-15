@@ -38,12 +38,14 @@ local final function KEYMAP_getOutputFilename(self: BoundStep): string {
 		result = result + fs.tailof(self.userData);
 	return result;
 }
+
 local final function KEYMAP_split(self: BoundStep): {BoundStep...} {
 	local group = self.group;
 	for (local f: group.enumerateWildcardFiles(group.options.get(OPT_KEYMAP_SRC))) {
 		yield self.createChildStep(f);
 	}
 }
+
 local final function KEYMAP_run(self: BoundStep): {Waitable...} {
 	local th = Thread((self: BoundStep) -> {
 		libkeymap_compiler.compileKeymap(
@@ -53,6 +55,7 @@ local final function KEYMAP_run(self: BoundStep): {Waitable...} {
 	th.start();
 	yield WaitableJoin(th);
 }
+
 local final function KEYMAP_tostr(self: BoundStep): string {
 	return f"Link keymap file {
 		repr self.userData
@@ -60,9 +63,11 @@ local final function KEYMAP_tostr(self: BoundStep): string {
 		repr KEYMAP_getOutputFilename(self)
 	}";
 }
+
 local final function KEYMAP_getRequiredFiles(self: BoundStep): {string...} {
 	yield self.userData;
 }
+
 local final function KEYMAP_getProducedFiles(self: BoundStep): {string...} {
 	yield KEYMAP_getOutputFilename(self);
 }
