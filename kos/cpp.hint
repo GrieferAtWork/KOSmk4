@@ -1382,6 +1382,11 @@
 
 
 
+// <kos/bits/nopf.h>
+#define __X86_NOPF_DEFFUN(n) void n(void);
+
+
+
 // <bits/types.h>
 #define __FS_TYPE(x)       x##_t
 #define __FS_ALTTYPE(x)    x##_t

@@ -52,6 +52,14 @@ global final ROOTDIR = fs.getcwd().replace("/", "\\").rstrip("\\");
 @@S.a. `SET_LANGUAGE("c++")' in `/kos/.sources'
 global final DEFAULT_COMPILE_LANGUAGE = "c++";
 
+function getCompileAsOptionForLanguage(lang: string): string | none {
+	return {
+		"c": "CompileAsC",
+		"c++": "CompileAsCpp",
+	}.get(lang);
+}
+
+
 global final DEFAULT_ADDITIONAL_OPTIONS = {
 	"-x", DEFAULT_COMPILE_LANGUAGE, "-std=c++17",
 	"-undef", "-nostdlib", "-nostdinc" };
@@ -75,8 +83,16 @@ global final PROJ_TARGETS: {string: (string, {string...}, {string...})} = Dict.F
 				for (local name, value: enumerateTargetSpecificMacros(targetName, TARGET))
 					f"{name}={value}"
 			),
-			{ f"kos/include/{TARGET.XARCH}-kos", f"kos/include" },
-			{ f"kos/src/kernel/include/{TARGET.XARCH}-kos", f"kos/src/kernel/include" },
+			{
+				f"kos/include/{TARGET.XARCH}-kos/c++/12.1.0/{TARGET.CPUNAME}-kos",
+				f"kos/include/{TARGET.XARCH}-kos/c++/12.1.0",
+				f"kos/include/{TARGET.XARCH}-kos",
+				f"kos/include"
+			},
+			{
+				f"kos/src/kernel/include/{TARGET.XARCH}-kos",
+				f"kos/src/kernel/include"
+			},
 		));
 	}
 }());
@@ -378,6 +394,17 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 "			<AdditionalOptions>"
 						<< " ".join(fileSpecificAdditionalOptions)
 						<< "</AdditionalOptions>\n";
+					local xOptIndex = fileSpecificAdditionalOptions.find("-x");
+					if (xOptIndex >= 0 && (xOptIndex + 1) < #fileSpecificAdditionalOptions) {
+						local lang = fileSpecificAdditionalOptions[xOptIndex + 1];
+						if (lang != DEFAULT_COMPILE_LANGUAGE) {
+							lang = getCompileAsOptionForLanguage(lang);
+							if (lang !is none) {
+								fp <<
+"			<CompileAs>" << lang << "</CompileAs>\n";
+							}
+						}
+					}
 				}
 				if (configSpecificExtraIncDirs) {
 					for (local config: PROJ_CONFIGS.keys.sorted()) {
@@ -434,7 +461,11 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 "		<ConfigurationType>Makefile</ConfigurationType>\n"
 "		<UseDebugLibraries>" << ("NDEBUG" in config ? "false" : "true") << "</UseDebugLibraries>\n"
 #ifndef ENABLE_GDB
-"		<PlatformToolset>v141</PlatformToolset>\n"
+		/* Used to  be  "v141", but  must  set  garbage here  to  prevent  error:
+		 * >> C++ command-line error: language modes specified are incompatible
+		 * No idea why this helps, but it does and it took forever to figure that
+		 * out, so I'm not going to question it. */
+"		<PlatformToolset>INTENTIONAL_GARBAGE</PlatformToolset>\n"
 "		<CharacterSet>MultiByte</CharacterSet>\n"
 #endif /* !ENABLE_GDB */
 "	</PropertyGroup>\n";
@@ -480,10 +511,44 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 		/* This  is where the actual magic happens in terms of tricking
 		 * Intellisense into using its linux/gcc-compatibler sub-system
 		 * https://github.com/AntonioColino/Clang/blob/f18080410d89b93da1e9e81059f39dc1081ce654/InstallShield%202015%20Projects/x64/PlatformToolsets/Clang/1033/llvm-general.xml#L160
+		 *
+		 *
+		 * TODO: There is even more to this: by writing:
+		 * >> <ToolsetISenseIdentifier>Linux;C:\path\to\file.json</ToolsetISenseIdentifier>
+		 * ...  we  can   configure  the  target,   with  that   "C:\path\to\file.jsonjson"
+		 * file looking like this:
+		 * >>{
+		 * >>	"predefines": {
+		 * >>		"cpp_compiler_defines": {},
+		 * >>		"cpp_user_defines": {},
+		 * >>		"cpp_user_undefines": [],
+		 * >>		"c_compiler_defines": {},
+		 * >>		"c_user_defines": {},
+		 * >>		"c_user_undefines": []
+		 * >>	},
+		 * >>	"target_sizes": {
+		 * >>		"char_bit": 8,
+		 * >>		"short": 2,
+		 * >>		"int": 4,
+		 * >>		"long": 8,
+		 * >>		"float": 4,
+		 * >>		"double": 8,
+		 * >>		"long_double": 16,
+		 * >>		"pointer": 8,
+		 * >>		"ldbl_mant_dig": 64,
+		 * >>		"char": 1
+		 * >>	},
+		 * >>	"wchar_t_type": "short",
+		 * >>	"ptrdiff_t_type": "long",
+		 * >>	"size_t_type": "unsigned long",
+		 * >>	"supports_x86_64": true
+		 * >>}
+		 * ^ Looks like this could be used to fix some compatibility-problems with intellisense listing
+		 *   an incorrect size for "long" on x86_64!
+		 * src: https://github.com/MaryaLichko/DagorEngine/tree/85e35af65739db0a754e00b723eac09642d280b7/prog/_jBuild/msbuild
 		 */
 		fp <<
 "		<ToolsetISenseIdentifier>Linux</ToolsetISenseIdentifier>\n"
-"		<ToolsetISenseIdentifierType>Linux</ToolsetISenseIdentifierType>\n"
 "		<NMakeBuildCommandLine>C:\\Windows\\system32\\cmd.exe /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
 			" " << ROOTDIR << "\\magic.dee"
 			" --build-only"     /* Force rebuild */
@@ -505,6 +570,9 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 "		<NMakePreprocessorDefinitions>" << ";".join(defines) << "</NMakePreprocessorDefinitions>\n"
 "		<NMakeForcedIncludes>" << ROOTDIR << "\\kos\\include\\compiler\\intellisense-gcc.h</NMakeForcedIncludes>\n"
 "		<AdditionalOptions>" << " ".join(DEFAULT_ADDITIONAL_OPTIONS) << "</AdditionalOptions>\n"
+"		<ExternalIncludePath></ExternalIncludePath>\n"
+"		<IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>\n"
+"		<UndefineAllPreprocessorDefinitions>true</UndefineAllPreprocessorDefinitions>\n"
 "	</PropertyGroup>\n";
 		}
 	}
@@ -517,6 +585,7 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 "		<ClCompile>\n"
 			/* This `<ClangMode>true</ClangMode>' causes `AdditionalOptions' to accept -foo style switches */
 "			<ClangMode>true</ClangMode>\n"
+"			<CompileAs>" << getCompileAsOptionForLanguage(DEFAULT_COMPILE_LANGUAGE) << "</CompileAs>\n"
 "			<TreatWarningAsError>true</TreatWarningAsError>\n"
 "			<WarningLevel>Level3</WarningLevel>\n"
 "			<Optimization>" << ("Optimize" in config ? "MaxSpeed" : "Disabled") << "</Optimization>\n";
@@ -527,6 +596,8 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 			}
 			fp <<
 "			<SDLCheck>true</SDLCheck>\n"
+//"			<LanguageStandard>stdcpp17</LanguageStandard>\n"
+//"			<LanguageStandard_C>stdc11</LanguageStandard_C>\n"
 "		</ClCompile>\n"
 "		<Link>\n"
 "			<GenerateDebugInformation>true</GenerateDebugInformation>\n";
