@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86907335 */
+/* HASH CRC-32:0xb0f1c424 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,44 +213,23 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_NONNULL((1)),void
  * Return `NULL' if `needle' wasn't found. */
 #define __libc_core_memrchr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr)
 #endif /* !__CRT_HAVE_memrchr */
-#include <features.h>
-#if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
+#ifdef __CRT_HAVE_memmem
 #include <hybrid/typecore.h>
 /* >> memmem(3)
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
-#elif defined(__CRT_HAVE_memmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
-#include <hybrid/typecore.h>
-/* >> memmem(3)
- * Return the first address of a sub-string `needle...+=needlelen'
- * stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
-#else /* ... */
+#else /* __CRT_HAVE_memmem */
 #include <libc/local/string/memmem.h>
 /* >> memmem(3)
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 #define __libc_core_memmem __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmem */
 #ifdef __CRT_HAVE_mempcpy
 #include <hybrid/typecore.h>
 /* >> mempcpy(3)
@@ -1357,40 +1336,21 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_NONNULL((1)),__SI
  * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_core_memrlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen)
 #endif /* !__CRT_HAVE_memrlen */
-#if defined(__CRT_HAVE_memrmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
+#ifdef __CRT_HAVE_memrmem
 #include <hybrid/typecore.h>
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem0,(__haystack,__haystacklen,__needle,__needlelen))
-#elif defined(__CRT_HAVE_memrmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
-#include <hybrid/typecore.h>
-/* >> memrmem(3)
- * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem,(__haystack,__haystacklen,__needle,__needlelen))
-#else /* ... */
+#else /* __CRT_HAVE_memrmem */
 #include <libc/local/string/memrmem.h>
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 #define __libc_core_memrmem __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrmem)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memrmem */
 #ifdef __CRT_HAVE_mempatw
 #include <hybrid/typecore.h>
 /* >> mempatw(3)

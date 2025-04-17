@@ -1109,7 +1109,7 @@ $1=$2"
 						_config_site_option "gl_cv_func_memchr_works" "yes"; ;;
 					*gl_cv_func_memcmp_working*)
 						_config_site_option "gl_cv_func_memcmp_working" "yes"; ;;
-					*gl_cv_func_memmem_works_always*) # We actually have 2 memmem() versions (s.a. _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE; but the regular one is standard-conforming)
+					*gl_cv_func_memmem_works_always*) # Yes: memmem() works
 						_config_site_option "gl_cv_func_memmem_works_always" "yes"; ;;
 					*gl_cv_func_memmem_works_fast*) # Yes: our memmem() does a memchr(needle[0]) to filter candidates, so its the \"fast\" variant
 						_config_site_option "gl_cv_func_memmem_works_fast" "yes"; ;;

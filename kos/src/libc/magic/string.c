@@ -53,110 +53,6 @@
 %[default:section(".text.crt{|.dos}.string.memory")]
 
 
-%(auto_source){
-#include "../user/stdio.h"
-#ifndef __KERNEL__
-#include "../libc/errno.h"
-
-
-/* Variants for `__USE_MEMMEM_EMPTY_NEEDLE_NULL' */
-DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.locale.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memcasemem0_l)(void const *haystack, size_t haystacklen,
-                                         void const *needle, size_t needlelen,
-                                         locale_t locale) {
-	byte_t *candidate, marker;
-	byte_t *hayend;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = tolower_l(*(byte_t *)needle, locale);
-	hayend       = (byte_t *)haystack + haystacklen;
-	for (;;) {
-		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
-			byte_t b = *candidate;
-			if (b == marker || tolower_l(b, locale) == marker)
-				goto got_candidate;
-		}
-		break;
-got_candidate:
-		if (memcasecmp_l(candidate, needle, needlelen, locale) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memcasemem0, libc_memcasemem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.static.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
-                                       void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	byte_t *hayend;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)tolower(*(byte_t *)needle);
-	hayend       = (byte_t *)haystack + haystacklen;
-	for (;;) {
-		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
-			byte_t b = *candidate;
-			if (b == marker || (byte_t)tolower(b) == marker)
-				goto got_candidate;
-		}
-		break;
-got_candidate:
-		if (memcasecmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
-                                   void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
-	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (bcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
-                                    void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= needlelen - 1;
-	marker = *(uint8_t const *)needle;
-	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (bcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		haystacklen = (size_t)(candidate - (byte_t *)haystack);
-	}
-	return NULL;
-}
-
-#endif /* !__KERNEL__ */
-}
-
-
 %(auto_header){
 /* Bind optimized variants  of various string  functions,
  * so those get used when building the automatic portions
@@ -1307,14 +1203,8 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 @@Return the first address of a sub-string `needle...+=needlelen'
 @@stored within `haystack...+=haystacklen'
 @@If no such sub-string exists, return `NULL' instead.
-@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
-@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
-@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[libc, pure, wunused, decl_include("<hybrid/typecore.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memmem0")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memmem")]]
+[[libc, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMEM))]]
 [[impl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[nullable]] void *memmem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen)
@@ -1322,22 +1212,17 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 	[([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen): [[nullable]] void const *]
 {
 	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (void *)haystack;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
+	marker = *(byte_t const *)needle;
 	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
 		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystacklen = ((byte_t const *)haystack + haystacklen) - candidate;
 		haystack    = (void const *)candidate;
 	}
 	return NULL;
@@ -6524,14 +6409,8 @@ $size_t rawmemrlen([[nonnull]] void const *__restrict haystack, int needle) {
 @@>> memrmem(3)
 @@Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
 @@If no such sub-string exists, return `NULL' instead.
-@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
-@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
-@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[libc, pure, wunused, decl_include("<hybrid/typecore.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memrmem0")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memrmem")]]
+[[libc, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRMEM))]]
 [[impl_include("<hybrid/typecore.h>", "<features.h>")]]
 void *memrmem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen)
@@ -6539,15 +6418,10 @@ void *memrmem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[i
 	[([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen): void const *]
 {
 	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
@@ -6743,14 +6617,8 @@ int memcasecmp([[in(num_chars)]] void const *s1,
 @@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
 @@During comparisons, casing of character is ignored (s.a. `memmem()')
 @@If no such sub-string exists, return `NULL' instead.
-@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
-@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
-@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[pure, wunused, decl_include("<hybrid/typecore.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memcasemem0")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memcasemem")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 void *memcasemem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen)
@@ -6758,19 +6626,15 @@ void *memcasemem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, 
 	[([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[in(needlelen)]] void const *needle, $size_t needlelen): void const *]
 {
 	byte_t *candidate, marker;
-	byte_t *hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	byte_t const *hayend;
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)tolower(*(byte_t *)needle);
-	hayend       = (byte_t *)haystack + haystacklen;
+	marker = *(byte_t const *)needle;
+	marker = (byte_t)tolower(marker);
+	hayend = (byte_t const *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
@@ -6782,7 +6646,7 @@ got_candidate:
 		if (memcasecmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystacklen = ((byte_t const *)haystack + haystacklen) - candidate;
 		haystack    = (void const *)candidate;
 	}
 	return NULL;
@@ -6800,9 +6664,7 @@ int memcasecmp_l([[in(num_chars)]] void const *s1,
 }
 
 
-[[pure, wunused, decl_include("<hybrid/typecore.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memcasemem0_l")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), alias("memcasemem_l")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<features.h>"), doc_alias("memcasemem")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 [[impl_include("<hybrid/typecore.h>")]]
@@ -6812,18 +6674,13 @@ void *memcasemem_l([[in(haystacklen)]] void const *haystack, $size_t haystacklen
 {
 	byte_t *candidate, marker;
 	byte_t *hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)tolower_l(*(byte_t *)needle, locale);
-	hayend       = (byte_t *)haystack + haystacklen;
+	marker = (byte_t)tolower_l(*(byte_t *)needle, locale);
+	hayend = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;

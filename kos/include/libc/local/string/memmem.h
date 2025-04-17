@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7e1b1bc */
+/* HASH CRC-32:0xd213b759 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,22 +53,17 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memmem) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmem))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) {
 	__BYTE_TYPE__ *__candidate, __marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if __unlikely(!__needlelen || __needlelen > __haystacklen)
-		return __NULLPTR;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if __unlikely(!__needlelen)
 		return (void *)__haystack;
 	if __unlikely(__needlelen > __haystacklen)
 		return __NULLPTR;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
-	__marker       = *(__BYTE_TYPE__ *)__needle;
+	__marker = *(__BYTE_TYPE__ const *)__needle;
 	while ((__candidate = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memchr)(__haystack, __marker, __haystacklen)) != __NULLPTR) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmp)(__candidate, __needle, __needlelen) == 0)
 			return (void *)__candidate;
 		++__candidate;
-		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;
+		__haystacklen = ((__BYTE_TYPE__ const *)__haystack + __haystacklen) - __candidate;
 		__haystack    = (void const *)__candidate;
 	}
 	return __NULLPTR;

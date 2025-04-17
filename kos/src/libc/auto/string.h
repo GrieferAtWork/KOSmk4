@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1e98246 */
+/* HASH CRC-32:0x88e5e228 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -671,11 +671,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL 
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -683,11 +679,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOT
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1992,22 +1984,14 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrle
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memrmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2045,11 +2029,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHR
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memcasemem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2057,11 +2037,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOT
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2077,11 +2053,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHR
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memcasemem_l)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2089,11 +2061,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOT
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

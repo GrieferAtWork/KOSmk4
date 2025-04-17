@@ -3681,8 +3681,6 @@
 #define __CRT_HAVE_memcasecmp
 #define __CRT_HAVE_memcasecmp_l
 #define __CRT_HAVE_memcasemem
-#define __CRT_HAVE_memcasemem0
-#define __CRT_HAVE_memcasemem0_l
 #define __CRT_HAVE_memcasemem_l
 #define __CRT_HAVE_memccpy
 #define __CRT_HAVE_memcdup
@@ -3716,7 +3714,6 @@
 #define __CRT_HAVE_memlenq
 #define __CRT_HAVE_memlenw
 #define __CRT_HAVE_memmem
-#define __CRT_HAVE_memmem0
 #define __CRT_HAVE_memmove
 #define __CRT_HAVE_memmove_s
 #define __CRT_HAVE_memmovec
@@ -3777,7 +3774,6 @@
 #define __CRT_HAVE_memrlenq
 #define __CRT_HAVE_memrlenw
 #define __CRT_HAVE_memrmem
-#define __CRT_HAVE_memrmem0
 #define __CRT_HAVE_memrxchr
 #define __CRT_HAVE_memrxchrl
 #define __CRT_HAVE_memrxchrq

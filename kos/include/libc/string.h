@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc04cd33f */
+/* HASH CRC-32:0xe6e63cf1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,11 +118,7 @@
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 #define __libc_memmem __libc_core_memmem
 #ifdef __fast_mempcpy_defined
 /* >> mempcpy(3)
@@ -752,11 +748,7 @@
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 #define __libc_memrmem __libc_core_memrmem
 #ifdef __fast_mempatw_defined
 /* >> mempatw(3)

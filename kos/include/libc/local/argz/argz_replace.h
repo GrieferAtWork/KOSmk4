@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd17c9a4 */
+/* HASH CRC-32:0xd11d0655 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,25 +26,17 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmem_defined
 #define __local___localdep_memmem_defined
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__localdep_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
-#elif defined(__CRT_HAVE_memmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
+#ifdef __CRT_HAVE_memmem
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__localdep_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
-#else /* ... */
+#else /* __CRT_HAVE_memmem */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmem.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmem __LIBC_LOCAL_NAME(memmem)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmem */
 #endif /* !__local___localdep_memmem_defined */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined

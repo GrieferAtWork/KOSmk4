@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61680e8e */
+/* HASH CRC-32:0x797ecb7e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,18 +69,13 @@ __LOCAL_LIBC(memcasemem_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen, __locale_t __locale) {
 	__BYTE_TYPE__ *__candidate, __marker;
 	__BYTE_TYPE__ *__hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if __unlikely(!__needlelen || __needlelen > __haystacklen)
-		return __NULLPTR;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if __unlikely(!__needlelen)
 		return (__BYTE_TYPE__ *)__haystack + __haystacklen;
 	if __unlikely(__needlelen > __haystacklen)
 		return __NULLPTR;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
-	__marker       = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(*(__BYTE_TYPE__ *)__needle, __locale);
-	__hayend       = (__BYTE_TYPE__ *)__haystack + __haystacklen;
+	__marker = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(*(__BYTE_TYPE__ *)__needle, __locale);
+	__hayend = (__BYTE_TYPE__ *)__haystack + __haystacklen;
 	for (;;) {
 		for (__candidate = (__BYTE_TYPE__ *)__haystack; __candidate < __hayend; ++__candidate) {
 			__BYTE_TYPE__ __b = *__candidate;

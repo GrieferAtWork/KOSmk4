@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7bf50a */
+/* HASH CRC-32:0x1be7b797 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,19 +64,15 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memcasemem) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_INS(3, 4) __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) {
 	__BYTE_TYPE__ *__candidate, __marker;
-	__BYTE_TYPE__ *__hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if __unlikely(!__needlelen || __needlelen > __haystacklen)
-		return __NULLPTR;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	__BYTE_TYPE__ const *__hayend;
 	if __unlikely(!__needlelen)
 		return (__BYTE_TYPE__ *)__haystack + __haystacklen;
 	if __unlikely(__needlelen > __haystacklen)
 		return __NULLPTR;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
-	__marker       = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(*(__BYTE_TYPE__ *)__needle);
-	__hayend       = (__BYTE_TYPE__ *)__haystack + __haystacklen;
+	__marker = *(__BYTE_TYPE__ const *)__needle;
+	__marker = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(__marker);
+	__hayend = (__BYTE_TYPE__ const *)__haystack + __haystacklen;
 	for (;;) {
 		for (__candidate = (__BYTE_TYPE__ *)__haystack; __candidate < __hayend; ++__candidate) {
 			__BYTE_TYPE__ __b = *__candidate;
@@ -88,7 +84,7 @@ __got_candidate:
 		if ((__NAMESPACE_LOCAL_SYM __localdep_memcasecmp)(__candidate, __needle, __needlelen) == 0)
 			return (void *)__candidate;
 		++__candidate;
-		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;
+		__haystacklen = ((__BYTE_TYPE__ const *)__haystack + __haystacklen) - __candidate;
 		__haystack    = (void const *)__candidate;
 	}
 	return __NULLPTR;

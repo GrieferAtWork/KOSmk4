@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b19b1 */
+/* HASH CRC-32:0x9e4c38e2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,106 +34,6 @@
 
 DECL_BEGIN
 
-#include "../user/stdio.h"
-#ifndef __KERNEL__
-#include "../libc/errno.h"
-
-
-/* Variants for `__USE_MEMMEM_EMPTY_NEEDLE_NULL' */
-DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.locale.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memcasemem0_l)(void const *haystack, size_t haystacklen,
-                                         void const *needle, size_t needlelen,
-                                         locale_t locale) {
-	byte_t *candidate, marker;
-	byte_t *hayend;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = tolower_l(*(byte_t *)needle, locale);
-	hayend       = (byte_t *)haystack + haystacklen;
-	for (;;) {
-		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
-			byte_t b = *candidate;
-			if (b == marker || tolower_l(b, locale) == marker)
-				goto got_candidate;
-		}
-		break;
-got_candidate:
-		if (memcasecmp_l(candidate, needle, needlelen, locale) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memcasemem0, libc_memcasemem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.static.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
-                                       void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	byte_t *hayend;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)tolower(*(byte_t *)needle);
-	hayend       = (byte_t *)haystack + haystacklen;
-	for (;;) {
-		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
-			byte_t b = *candidate;
-			if (b == marker || (byte_t)tolower(b) == marker)
-				goto got_candidate;
-		}
-		break;
-got_candidate:
-		if (memcasecmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
-                                   void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
-	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (bcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
-		haystack    = (void const *)candidate;
-	}
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
-INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
-NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
-                                    void const *needle, size_t needlelen) {
-	byte_t *candidate, marker;
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-	haystacklen -= needlelen - 1;
-	marker = *(uint8_t const *)needle;
-	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (bcmp(candidate, needle, needlelen) == 0)
-			return (void *)candidate;
-		haystacklen = (size_t)(candidate - (byte_t *)haystack);
-	}
-	return NULL;
-}
-
-#endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMCPY
 #include <hybrid/typecore.h>
 /* >> memcpy(3)
@@ -657,33 +557,24 @@ NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
                                   size_t haystacklen,
                                   void const *needle,
                                   size_t needlelen) {
 	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (void *)haystack;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = *(byte_t *)needle;
+	marker = *(byte_t const *)needle;
 	while ((candidate = (byte_t *)libc_memchr(haystack, marker, haystacklen)) != NULL) {
 		if (libc_bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystacklen = ((byte_t const *)haystack + haystacklen) - candidate;
 		haystack    = (void const *)candidate;
 	}
 	return NULL;
@@ -5003,26 +4894,17 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrlen)(void const *__restrict haystack,
 /* >> memrmem(3)
  * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack,
                                    size_t haystacklen,
                                    void const *needle,
                                    size_t needlelen) {
 	byte_t *candidate, marker;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)libc_memrchr(haystack, marker, haystacklen)) != NULL) {
@@ -5124,30 +5006,22 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack,
                                       size_t haystacklen,
                                       void const *needle,
                                       size_t needlelen) {
 	byte_t *candidate, marker;
-	byte_t *hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	byte_t const *hayend;
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)libc_tolower(*(byte_t *)needle);
-	hayend       = (byte_t *)haystack + haystacklen;
+	marker = *(byte_t const *)needle;
+	marker = (byte_t)libc_tolower(marker);
+	hayend = (byte_t const *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
@@ -5159,7 +5033,7 @@ got_candidate:
 		if (libc_memcasecmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
-		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystacklen = ((byte_t const *)haystack + haystacklen) - candidate;
 		haystack    = (void const *)candidate;
 	}
 	return NULL;
@@ -5178,11 +5052,7 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1,
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comparisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally. */
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack,
                                         size_t haystacklen,
@@ -5191,18 +5061,13 @@ NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack,
                                         locale_t locale) {
 	byte_t *candidate, marker;
 	byte_t *hayend;
-#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
-	if unlikely(!needlelen || needlelen > haystacklen)
-		return NULL;
-#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
 	if unlikely(!needlelen)
 		return (byte_t *)haystack + haystacklen;
 	if unlikely(needlelen > haystacklen)
 		return NULL;
-#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = (byte_t)libc_tolower_l(*(byte_t *)needle, locale);
-	hayend       = (byte_t *)haystack + haystacklen;
+	marker = (byte_t)libc_tolower_l(*(byte_t *)needle, locale);
+	hayend = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
