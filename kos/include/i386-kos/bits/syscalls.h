@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replaces_include <bits/syscalls32.h>*/
+/*!replaces_include <bits/syscalls64.h>*/
 #ifndef _I386_KOS_BITS_SYSCALLS_H
 #define _I386_KOS_BITS_SYSCALLS_H 1
 

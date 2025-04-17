@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/f_owner_ex.h>*/
 #ifndef _BITS_OS_KOS_F_OWNER_EX_H
 #define _BITS_OS_KOS_F_OWNER_EX_H 1
 

@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/exec/asm/elf.h>*/
+/*!always_includes <kos/exec/bits/elf.h>*/
 #ifndef _KOS_EXEC_ELF_H
 #define _KOS_EXEC_ELF_H 1
 

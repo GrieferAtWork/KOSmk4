@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/itimerspec.h>*/
 #ifndef _I386_KOS_BITS_OS_GENERIC_ITIMERSPEC_H
 #define _I386_KOS_BITS_OS_GENERIC_ITIMERSPEC_H 1
 

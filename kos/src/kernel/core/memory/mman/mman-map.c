@@ -25,16 +25,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman.h>
-#include <kernel/mman/map.h>
-#include <kernel/mman/mfile.h>
-#include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart.h>
-
-#include <kos/except.h>
-
-#include <assert.h>
-#include <stdbool.h>
 #include <string.h>
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)

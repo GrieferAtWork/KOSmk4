@@ -26,7 +26,9 @@
 #include <bits/crt/io-file.h>
 #include <kos/io.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 
+#include <conio.h>
 #include <stdio.h>
 
 #include "../libc/globals.h"

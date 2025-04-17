@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <debugger/rt.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
@@ -33,16 +34,28 @@
 #include <kernel/mman/module.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/types.h>
+#include <sched/pertask.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <compat/config.h>
 #include <kos/anno.h>
 #include <kos/except.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
+#include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <libdebuginfo/api.h>
+#include <libunwind/api.h>
+#include <libunwind/cfi.h>
+#include <libunwind/eh_frame.h>
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <sched/task.h>

@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replaces_include <bits/va_list-struct32.h>*/
+/*!replaces_include <bits/va_list-struct64.h>*/
 #ifndef _I386_KOS_BITS_VA_LIST_STRUCT_H
 #define _I386_KOS_BITS_VA_LIST_STRUCT_H 1
 

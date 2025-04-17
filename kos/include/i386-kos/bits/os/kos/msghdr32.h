@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/msghdr.h>*/
 #ifndef _I386_KOS_BITS_OS_KOS_MSGHDR32_H
 #define _I386_KOS_BITS_OS_KOS_MSGHDR32_H 1
 

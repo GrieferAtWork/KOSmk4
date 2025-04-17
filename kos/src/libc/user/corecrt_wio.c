@@ -24,8 +24,7 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/minmax.h>
-
+#include <kos/types.h>
 #include <sys/stat.h>
 
 #include <dirent.h>
@@ -38,7 +37,6 @@
 #include <unicode.h>
 
 #include "../libc/compat.h"
-#include "../libc/errno.h"
 #include "corecrt_wio.h"
 
 DECL_BEGIN

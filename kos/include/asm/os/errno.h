@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <errno.h>*/
 #ifndef _ASM_OS_ERRNO_H
 #define _ASM_OS_ERRNO_H 1
 

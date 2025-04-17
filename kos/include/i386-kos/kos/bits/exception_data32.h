@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <kos/except.h>*/
 #ifndef _I386_KOS_KOS_BITS_EXCEPTION_DATA32_H
 #define _I386_KOS_KOS_BITS_EXCEPTION_DATA32_H 1
 

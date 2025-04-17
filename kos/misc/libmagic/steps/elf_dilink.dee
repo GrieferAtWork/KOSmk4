@@ -283,8 +283,8 @@ link_again_with_new_guesses:
 			}
 
 			/* Manually edit the ELF binary. */
-			print "diSectionsFileOffset:", diSectionsFileOffset.hex();
-			print "totalDebugSize:      ", totalDebugSize.hex();
+			//print "diSectionsFileOffset:", diSectionsFileOffset.hex();
+			//print    "totalDebugSize:      ",    totalDebugSize.hex();
 			with (local fp = File.open(linkAttemptOutput, "r+")) {
 				local e_ident = fp.read(EI_NIDENT);
 				local endian = e_ident[EI_DATA] == ELFDATA2LSB ? "little" : "big";

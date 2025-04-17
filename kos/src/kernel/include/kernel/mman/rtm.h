@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replaces_include <kernel/arch/mman/rtm.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_MMAN_RTM_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_MMAN_RTM_H 1
 

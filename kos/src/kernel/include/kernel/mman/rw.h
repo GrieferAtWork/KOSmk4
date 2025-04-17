@@ -22,11 +22,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/paging.h>
-#include <kernel/types.h>
+#include <kos/types.h>
 
 #ifdef __CC__
 DECL_BEGIN
+
+struct mman;
 
 /* Read/write  memory  to/form   the  address  space   of  a  given   mman
  * Note that these functions behave similar to memcpy_nopf(), in that they

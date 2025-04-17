@@ -86,6 +86,13 @@ function scanFileForEditorConfigTags(filename: string, includeFilename: string) 
 				cpp_include_cleanup_replacement_files[includeFilename] = comment;
 				cpp_include_cleanup_alternate_files.insert((comment, includeFilename));
 			}
+		} else if (comment.startswith("!replaces_include")) {
+			comment = comment[17:].lstrip();
+			if (comment.startswith("<") && comment.endswith(">")) {
+				comment = comment[1:-1].decode("utf-8");
+				cpp_include_cleanup_replacement_files[comment] = includeFilename;
+				cpp_include_cleanup_alternate_files.insert((includeFilename, comment));
+			}
 		} else if (comment == "!ignore_unnecessary_include") {
 			cpp_include_cleanup_excluded_files.insert(includeFilename);
 		}

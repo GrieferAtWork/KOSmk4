@@ -28,13 +28,15 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/rangelock.h>
-#include <sched/task.h>
+#include <kernel/paging.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/mcontext.h>*/
 #ifndef _I386_KOS_BITS_OS_CYGWIN_MCONTEXT64_H
 #define _I386_KOS_BITS_OS_CYGWIN_MCONTEXT64_H 1
 

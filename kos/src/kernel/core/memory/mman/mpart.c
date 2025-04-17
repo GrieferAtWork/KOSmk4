@@ -40,6 +40,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
+#include <kernel/types.h>
 #include <sched/sig.h>
 
 #include <hybrid/align.h>
@@ -58,6 +59,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <libvio/api.h>
 
 DECL_BEGIN
 

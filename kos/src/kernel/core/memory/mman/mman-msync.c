@@ -31,6 +31,7 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/types.h>
 
 #include <atomic.h>
 #include <stddef.h>

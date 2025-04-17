@@ -40,18 +40,20 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
+#include <hybrid/sequence/list.h>
+#include <misc/unlockinfo.h>
 
 DECL_BEGIN
 

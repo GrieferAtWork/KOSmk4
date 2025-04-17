@@ -27,12 +27,16 @@
 #include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
 
-#include <assert.h>
+#include <dlfcn.h>
+#include <errno.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <math.h>
 #include <pthread.h>
+#include <stddef.h>
 #include <uchar.h>
 
+#include <libcmdline/api.h>
 #include <libcmdline/encode.h>
 
 #include "../libc/dl.h"

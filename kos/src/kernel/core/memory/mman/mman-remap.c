@@ -39,14 +39,17 @@
 #include <kernel/mman/remap.h>
 #include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
-#include <sched/task.h>
+#include <kernel/paging.h>
+#include <sched/pertask.h>
 
-#include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
+#include <kos/types.h>
+#include <sys/mman.h> /* PROT_*, MAP_FAILED */
 
 #include <assert.h>
 #include <atomic.h>

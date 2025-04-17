@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/itimerval.h>*/
 #ifndef _BITS_OS_KOS_ITIMERVAL_H
 #define _BITS_OS_KOS_ITIMERVAL_H 1
 

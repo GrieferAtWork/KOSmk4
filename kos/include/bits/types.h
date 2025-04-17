@@ -22,6 +22,7 @@
 /*!included_by <kos/types.h>*/
 /*!included_by <sys/types.h>*/
 /*!always_includes <hybrid/typecore.h>*/
+/*!always_includes <bits/typesizes.h>*/
 #ifndef _BITS_TYPES_H
 #define _BITS_TYPES_H 1
 

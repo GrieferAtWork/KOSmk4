@@ -26,10 +26,8 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <sched/rpc.h>
 
 #include <kos/except.h>
-#include <kos/except/reason/inval.h>
 #include <sys/mman.h>
 
 #include <assert.h>

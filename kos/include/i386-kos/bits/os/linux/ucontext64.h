@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <bits/os/ucontext.h>*/
 #ifndef _I386_KOS_BITS_OS_LINUX_UCONTEXT64_H
 #define _I386_KOS_BITS_OS_LINUX_UCONTEXT64_H 1
 

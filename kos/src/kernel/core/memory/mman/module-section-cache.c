@@ -24,13 +24,13 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/lockop.h>
 

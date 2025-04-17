@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/exec/asm/rtld.h>*/
 #ifndef _KOS_EXEC_RTLD_H
 #define _KOS_EXEC_RTLD_H 1
 

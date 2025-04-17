@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <bits/os/sembuf.h>*/
 #ifndef _BITS_OS_KOS_SEMBUF_H
 #define _BITS_OS_KOS_SEMBUF_H 1
 

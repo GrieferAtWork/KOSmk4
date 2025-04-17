@@ -49,28 +49,37 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/ramfile.h> /* `struct mramfile' */
+#include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/types.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
 
 #include <compat/config.h>
+#include <kos/aref.h>
 #include <kos/except.h>
+#include <kos/exec/elf.h>
 #include <kos/exec/rtld.h>
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
 #include <dirent.h>
+#include <elf.h>
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
 
+#include <libansitty/ansitty.h>
 #include <libzlib/inflate.h>
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -689,7 +698,7 @@ NOTHROW(FCALL uem_nonodes)(struct userelf_module *__restrict self) {
 }
 
 
-INTERN WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
+PRIVATE WUNUSED NONNULL((1)) REF struct userelf_module_section *FCALL
 uem_locksection_index_impl(struct userelf_module *__restrict self,
                            UM_ElfW_Shdr *shdr, uint16_t section_index) {
 	REF struct userelf_module_section *result;

@@ -37,12 +37,15 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <sched/pertask.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
-#include <sched/userkern.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

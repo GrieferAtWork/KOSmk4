@@ -961,7 +961,7 @@
 #include "hybrid/typecore.h"
 #define __INTELLISENSE_SIZE_TYPE__ __SIZE_TYPE__
 #endif /* !__INTELLISENSE_SIZE_TYPE__ */
-#define __COMPILER_OFFSETAFTER(s, m) ((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
+#define __COMPILER_OFFSETAFTER(s, m) (__builtin_offsetof(s, m) + sizeof(((s *)0)->m))
 #if defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_builtin_types_compatible_p)
 /* Syntax highlighting for improper use of `container_of' (typeof(*ptr) != typeof(type::member))
  * Only  do this with intellisense, since GCC's VLA extension might try to turn int(*)[expr(-1)]

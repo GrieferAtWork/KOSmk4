@@ -36,9 +36,17 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/rtm.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <sched/pertask.h>
 
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/aref.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -47,6 +55,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include <libvio/api.h>
 
 /*[[[config CONFIG_HAVE_KERNEL_MNODE_MERGE = true]]]*/
 #ifdef CONFIG_NO_KERNEL_MNODE_MERGE

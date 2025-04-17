@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/kernel/asm/paging.h>*/
 #ifndef _KOS_KERNEL_PAGING_H
 #define _KOS_KERNEL_PAGING_H 1
 

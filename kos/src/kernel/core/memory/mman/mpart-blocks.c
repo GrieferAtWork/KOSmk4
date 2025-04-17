@@ -26,20 +26,27 @@
 
 #include <kernel/aio.h>
 #include <kernel/fs/notify.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
+#include <misc/unlockinfo.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
+#include <bits/os/timespec.h>
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

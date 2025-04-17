@@ -23,29 +23,32 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver-callbacks.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/event.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
-#include <sched/arch/userkern.h>
 #include <sched/cpu.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 #include <sched/userkern.h>
 
 #include <hybrid/minmax.h>
 #include <hybrid/sched/atomic-lock.h>
-#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

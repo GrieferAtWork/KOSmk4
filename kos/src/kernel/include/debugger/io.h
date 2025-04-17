@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <debugger/input.h>*/
+/*!always_includes <debugger/output.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_DEBUGGER_IO_H
 #define GUARD_KERNEL_INCLUDE_DEBUGGER_IO_H 1
 
