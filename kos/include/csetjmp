@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: MSVC      (/include/csetjmp) */
 /* (#) Portability: libstdc++ (/include/csetjmp) */
+/*!replace_with_include <setjmp.h>*/
 #ifndef _CXX_CSETJMP
 #define _CXX_CSETJMP 1
 #ifndef _SETJMP_H

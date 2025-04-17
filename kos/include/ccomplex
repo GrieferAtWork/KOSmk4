@@ -18,9 +18,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libstdc++ (/include/ccomplex) */
+/*!replace_with_include <complex.h>*/
 #ifndef _CXX_CCOMPLEX
 #define _CXX_CCOMPLEX 1
-
+#ifndef _COMPLEX_H
+#ifdef __CXX_SYSTEM_HEADER
 #include "complex.h"
-
+#else /* __CXX_SYSTEM_HEADER */
+#include "features.h"
+#ifndef __USE_BROKEN_CCOMPAT
+#define __CXX_SYSTEM_HEADER 1
+#endif /* !__USE_BROKEN_CCOMPAT */
+#include "complex.h"
+#undef __CXX_SYSTEM_HEADER
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* !_COMPLEX_H */
 #endif /* !_CXX_CCOMPLEX */

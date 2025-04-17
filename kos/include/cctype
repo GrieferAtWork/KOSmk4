@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/cctype) */
+/*!replace_with_include <ctype.h>*/
 #ifndef _CXX_CCTYPE
 #define _CXX_CCTYPE 1
 #ifndef _CTYPE_H

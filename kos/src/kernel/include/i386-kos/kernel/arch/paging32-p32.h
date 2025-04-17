@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <kernel/paging.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PAGING32_P32_H
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PAGING32_P32_H 1
 

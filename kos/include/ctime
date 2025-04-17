@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/ctime) */
+/*!replace_with_include <time.h>*/
 #ifndef _CXX_CTIME
 #define _CXX_CTIME 1
 #ifndef _TIME_H

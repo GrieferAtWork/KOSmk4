@@ -28,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/iso646.h) */
 /* (#) Portability: PDCLib        (/include/iso646.h) */
 /* (#) Portability: musl libc     (/include/iso646.h) */
+/*!ignore_unnecessary_include*/
 #ifndef _ISO646_H
 #define _ISO646_H 1
 

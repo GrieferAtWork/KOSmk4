@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <__stdinc.h>*/
 #define __builtin_expect(x, y) (x)
 #define __NO_builtin_expect
 #define __likely   /* Nothing */

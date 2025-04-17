@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/csignal) */
+/*!replace_with_include <signal.h>*/
 #ifndef _CXX_CSIGNAL
 #define _CXX_CSIGNAL 1
 #ifndef _SIGNAL_H

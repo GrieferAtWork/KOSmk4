@@ -281,39 +281,39 @@ DEFINE_DL_EXPORT_ALIAS(malloc_usable_size, dlmalloc_usable_size);
 #undef __libc_realloc
 #undef __libc_memalign
 #undef __libc_valloc
-DEFINE_DL_EXPORT_ALIAS(cfree, dlfree);
-DEFINE_DL_EXPORT_ALIAS(aligned_alloc, dlmemalign);
-DEFINE_DL_EXPORT_ALIAS(__libc_malloc, dlmalloc);
-DEFINE_DL_EXPORT_ALIAS(__builtin_delete, dlfree);
-DEFINE_DL_EXPORT_ALIAS(__libc_free, dlfree);
-DEFINE_DL_EXPORT_ALIAS(__libc_calloc, dlcalloc);
-DEFINE_DL_EXPORT_ALIAS(__libc_realloc, dlrealloc);
-DEFINE_DL_EXPORT_ALIAS(__libc_memalign, dlmemalign);
-DEFINE_DL_EXPORT_ALIAS(__libc_valloc, dlvalloc);
-DEFINE_DL_EXPORT_ALIAS(__libc_mallopt, dlmallopt);
-DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
-DEFINE_DL_EXPORT_ALIAS(_msize, dlmalloc_usable_size);
-DEFINE_DL_EXPORT_ALIAS(_msize_debug, dlmalloc_usable_size);
+DEFINE_PUBLIC_ALIAS(cfree, dlfree);
+DEFINE_PUBLIC_ALIAS(aligned_alloc, dlmemalign);
+DEFINE_PUBLIC_ALIAS(__libc_malloc, dlmalloc);
+DEFINE_PUBLIC_ALIAS(__builtin_delete, dlfree);
+DEFINE_PUBLIC_ALIAS(__libc_free, dlfree);
+DEFINE_PUBLIC_ALIAS(__libc_calloc, dlcalloc);
+DEFINE_PUBLIC_ALIAS(__libc_realloc, dlrealloc);
+DEFINE_PUBLIC_ALIAS(__libc_memalign, dlmemalign);
+DEFINE_PUBLIC_ALIAS(__libc_valloc, dlvalloc);
+DEFINE_PUBLIC_ALIAS(__libc_mallopt, dlmallopt);
+DEFINE_PUBLIC_ALIAS(__libc_pvalloc, dlpvalloc);
+DEFINE_PUBLIC_ALIAS(_msize, dlmalloc_usable_size);
+DEFINE_PUBLIC_ALIAS(_msize_debug, dlmalloc_usable_size);
 
-DEFINE_DL_EXPORT_ALIAS(_ZdaPv, dlfree); /* operator delete[](void*) */
-DEFINE_DL_EXPORT_ALIAS(_ZdlPv, dlfree); /* operator delete(void*) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPv, dlfree); /* operator delete[](void*) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPv, dlfree); /* operator delete(void*) */
 #ifdef __LIBCCALL_CALLER_CLEANUP
-DEFINE_DL_EXPORT_ALIAS(_ZdaPvRKSt9nothrow_t, dlfree);                /* operator delete[](void*, std::nothrow_t const&) */
-DEFINE_DL_EXPORT_ALIAS(_ZdlPvRKSt9nothrow_t, dlfree);                /* operator delete(void*, std::nothrow_t const&) */
-DEFINE_DL_EXPORT_ALIAS(_ZdaPvSt11align_val_t, dlfree);               /* operator delete[](void*, std::align_val_t) */
-DEFINE_DL_EXPORT_ALIAS(_ZdlPvSt11align_val_t, dlfree);               /* operator delete(void*, std::align_val_t) */
-DEFINE_DL_EXPORT_ALIAS(_ZdaPvmSt11align_val_t, dlfree);              /* operator delete[](void*, unsigned long, std::align_val_t) */
-DEFINE_DL_EXPORT_ALIAS(_ZdlPvmSt11align_val_t, dlfree);              /* operator delete(void*, unsigned long, std::align_val_t) */
-DEFINE_DL_EXPORT_ALIAS(_ZdaPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete[](void*, std::align_val_t, std::nothrow_t const&) */
-DEFINE_DL_EXPORT_ALIAS(_ZdlPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete(void*, std::align_val_t, std::nothrow_t const&) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvRKSt9nothrow_t, dlfree);                /* operator delete[](void*, std::nothrow_t const&) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvRKSt9nothrow_t, dlfree);                /* operator delete(void*, std::nothrow_t const&) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvSt11align_val_t, dlfree);               /* operator delete[](void*, std::align_val_t) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvSt11align_val_t, dlfree);               /* operator delete(void*, std::align_val_t) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvmSt11align_val_t, dlfree);              /* operator delete[](void*, unsigned long, std::align_val_t) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvmSt11align_val_t, dlfree);              /* operator delete(void*, unsigned long, std::align_val_t) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete[](void*, std::align_val_t, std::nothrow_t const&) */
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvSt11align_val_tRKSt9nothrow_t, dlfree); /* operator delete(void*, std::align_val_t, std::nothrow_t const&) */
 #endif /* __LIBCCALL_CALLER_CLEANUP */
 
 #ifdef _MALLINFO_MATCHES_MALLINFO2
-DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
-DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
+DEFINE_PUBLIC_ALIAS(__libc_mallinfo, dlmallinfo);
+DEFINE_PUBLIC_ALIAS(mallinfo, dlmallinfo);
 #else /* _MALLINFO_MATCHES_MALLINFO2 */
-DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, libc_mallinfo_int);
-DEFINE_DL_EXPORT_ALIAS(mallinfo, libc_mallinfo_int);
+DEFINE_PUBLIC_ALIAS(__libc_mallinfo, libc_mallinfo_int);
+DEFINE_PUBLIC_ALIAS(mallinfo, libc_mallinfo_int);
 #endif /* !_MALLINFO_MATCHES_MALLINFO2 */
 #endif /* __BUILDING_LIBC */
 #undef DEFINE_DL_EXPORT_ALIAS

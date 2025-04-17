@@ -1,0 +1,183 @@
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import posix;
+import * from deemon;
+
+/* To  generate a .editorconfig file for use with Visual Studio, we wan't a fully
+ * customized "cpp_include_cleanup_alternate_files" tag. For this, system headers
+ * that  shouldn't be included directly declare header(s) that should be included
+ * indead. This tag must appear as a comment before the first non-comment  token,
+ * and have the form of:
+ * >> //!included_by <stdio.h>
+ * >> / *!included_by <stdio.h>* /
+ */
+
+posix.chdir(posix.headof(__FILE__) + "/../../.."); /* $PROJPATH */
+
+global final ROOTDIR = posix.getcwd().replace("/", "\\").rstrip("\\");
+
+
+@@Set of stuff like @("stddef.h", "cstddef")
+global cpp_include_cleanup_alternate_files: {(string, string)...} = HashSet();
+global cpp_include_cleanup_replacement_files: {string: string} = Dict();
+global cpp_include_cleanup_excluded_files: {string...} = HashSet();
+
+function scanFileForEditorConfigTags(filename: string, includeFilename: string) {
+	print("Scanning ", repr filename, " (as: <", includeFilename, ">)");
+	local data = File.open(filename, "rb").read();
+	local i = 0, len = #data;
+	while (i < len) {
+		if (data.isspace(i)) {
+			++i;
+			continue;
+		}
+		local startOfComment;
+		local endOfComment;
+		if (data.startswith("//", i)) {
+			startOfComment = i + 2;
+			endOfComment = data.find("\n", startOfComment);
+			if (endOfComment < 0)
+				break;
+			i = endOfComment + 1;
+		} else if (data.startswith("/*", i)) {
+			startOfComment = i + 2;
+			endOfComment = data.find("*/", startOfComment);
+			if (endOfComment < 0)
+				break;
+			i = endOfComment + 2;
+		} else {
+			break;
+		}
+		local comment = data[startOfComment:endOfComment].strip();
+		if (comment.startswith("!included_by")) {
+			comment = comment[12:].lstrip();
+			if (comment.startswith("<") && comment.endswith(">")) {
+				comment = comment[1:-1].decode("utf-8");
+				cpp_include_cleanup_alternate_files.insert((comment, includeFilename));
+			}
+		} else if (comment.startswith("!always_includes")) {
+			comment = comment[16:].lstrip();
+			if (comment.startswith("<") && comment.endswith(">")) {
+				comment = comment[1:-1].decode("utf-8");
+				cpp_include_cleanup_alternate_files.insert((includeFilename, comment));
+			}
+		} else if (comment.startswith("!replace_with_include")) {
+			comment = comment[21:].lstrip();
+			if (comment.startswith("<") && comment.endswith(">")) {
+				comment = comment[1:-1].decode("utf-8");
+				cpp_include_cleanup_replacement_files[includeFilename] = comment;
+				cpp_include_cleanup_alternate_files.insert((comment, includeFilename));
+			}
+		} else if (comment == "!ignore_unnecessary_include") {
+			cpp_include_cleanup_excluded_files.insert(includeFilename);
+		}
+	}
+}
+
+function scanDirectoryForEditorConfigTags(path: string, relBase: string) {
+	for (local ent: posix.opendir(path, skipdots: true)) {
+		if (ent.d_type == posix.DT_DIR) {
+			scanDirectoryForEditorConfigTags(ent.d_fullname, f"{relBase}{ent.d_name}/");
+		} else if (ent.d_type == posix.DT_REG) {
+			local includeFilename = relBase + ent.d_name;
+			for (local prefix: {
+					"i386-kos/c++/12.1.0/i686-kos",
+					"i386-kos/c++/12.1.0/",
+					"i386-kos/",
+					"arm-kos/c++/12.1.0/i686-kos",
+					"arm-kos/c++/12.1.0/",
+					"arm-kos/",
+			}) {
+				if (includeFilename.startswith(prefix)) {
+					includeFilename = includeFilename[#prefix:];
+					break;
+				}
+			}
+			scanFileForEditorConfigTags(ent.d_fullname, includeFilename);
+		}
+	}
+}
+
+function createTransitiveIncludeRules() {
+	for (;;) {
+		local alwaysIncludeRules: {string: {string...}} = Dict();
+		for (local thisFile, alwaysIncludesThisFile: cpp_include_cleanup_alternate_files) {
+			alwaysIncludeRules.setdefault(thisFile, HashSet()).insert(alwaysIncludesThisFile);
+		}
+		local extraRules: {(string, string)...} = HashSet();
+		for (local thisFile, alwaysIncludesThisFile: cpp_include_cleanup_alternate_files) {
+			local transitiveIncludes = alwaysIncludeRules.get(alwaysIncludesThisFile);
+			if (transitiveIncludes !is none) {
+				for (local transitiveInclude: transitiveIncludes)
+					extraRules.insert((thisFile, transitiveInclude));
+			}
+		}
+		if (!extraRules)
+			break;
+		local didExpand = false;
+		for (local extraRule: extraRules) {
+			if (cpp_include_cleanup_alternate_files.insert(extraRule))
+				didExpand = true;
+		}
+		if (!didExpand)
+			break;
+	}
+}
+
+function main() {
+	scanDirectoryForEditorConfigTags(f"{ROOTDIR}/kos/include", "");
+	scanDirectoryForEditorConfigTags(f"{ROOTDIR}/kos/src/kernel/include", "");
+	createTransitiveIncludeRules();
+
+	print "Generating .editorconfig";
+	with (local out = File.open(f"{ROOTDIR}/kos/.editorconfig", "wb")) {
+		print out: ("# Generated file (by /kos/misc/build/editorconfig.dee) -- DO NOT EDIT");
+		print out: ("root = true");
+		print out: ("");
+		print out: ("[*]");
+		print out: ("cpp_sort_includes_error_tag_type = none");
+		print out: ("cpp_sort_includes_priority_case_sensitive = true");
+		print out: ("cpp_sort_includes_priority_style = quoted");
+		print out: ("cpp_includes_style = default");
+		print out: ("cpp_includes_use_forward_slash = true");
+		print out: ("cpp_include_cleanup_sort_after_edits = false");
+		print out: ("cpp_include_cleanup_add_missing_error_tag_type = suggestion");
+		print out: ("cpp_include_cleanup_remove_unused_error_tag_type = dimmed");
+		print out: ("cpp_include_cleanup_optimize_unused_error_tag_type = suggestion");
+		print out: ("cpp_include_cleanup_alternate_files = ", ",".join(
+			for (local useThis, insteadOf: cpp_include_cleanup_alternate_files.sorted())
+				f"{useThis}:{insteadOf}"
+		));
+		print out: ("cpp_include_cleanup_replacement_files = ", ",".join(
+			for (local replaceThis, withThis: cpp_include_cleanup_replacement_files.sorted())
+				f"{replaceThis}:{withThis}"
+		));
+		print out: ("cpp_include_cleanup_excluded_files = ", ",".join(
+			cpp_include_cleanup_excluded_files.sorted()
+		));
+	}
+	print "DONE";
+}
+
+
+#ifdef __MAIN__
+main();
+#endif /* __MAIN__ */

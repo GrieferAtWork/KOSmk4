@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* vvv Not actually, but prevent warnings from use of codes in THROWS annotations */
+/*!always_includes <kos/except/codes.h>*/
 #ifndef _KOS_ANNO_H
 #define _KOS_ANNO_H 1
 

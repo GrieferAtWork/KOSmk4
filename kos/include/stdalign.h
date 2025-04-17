@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/include/stdalign.h) */
 /* (#) Portability: PDCLib        (/include/stdalign.h) */
 /* (#) Portability: musl libc     (/include/stdalign.h) */
+/*!ignore_unnecessary_include*/
 #ifndef _STDALIGN_H
 #define _STDALIGN_H 1
 

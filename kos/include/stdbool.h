@@ -28,6 +28,7 @@
 /* (#) Portability: PDCLib        (/include/stdbool.h) */
 /* (#) Portability: diet libc     (/include/stdbool.h) */
 /* (#) Portability: musl libc     (/include/stdbool.h) */
+/*!ignore_unnecessary_include*/
 #ifndef _STDBOOL_H
 #define _STDBOOL_H 1
 

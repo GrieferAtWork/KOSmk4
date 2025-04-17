@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/include/stdnoreturn.h) */
 /* (#) Portability: PDCLib        (/include/stdnoreturn.h) */
 /* (#) Portability: musl libc     (/include/stdnoreturn.h) */
+/*!ignore_unnecessary_include*/
 #ifndef _STDNORETURN_H
 #define _STDNORETURN_H 1
 

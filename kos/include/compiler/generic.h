@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <__stdinc.h>*/
 #ifndef __PP_STR
 #include "pp-generic.h"
 #endif /* !__PP_STR */

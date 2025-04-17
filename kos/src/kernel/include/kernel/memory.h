@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/kernel/memory.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_MEMORY_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_MEMORY_H 1
 

@@ -29,10 +29,12 @@
 #include <kernel/mman/cc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
 
 #include <hybrid/align.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <string.h>

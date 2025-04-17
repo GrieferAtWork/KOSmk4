@@ -73,6 +73,17 @@
 }
 
 
+%(c_prefix){
+/*!always_includes <kos/anno.h>*/
+/*!always_includes <kos/bits/except.h>*/
+/*!always_includes <kos/bits/except-register-state.h>*/
+/*!always_includes <kos/bits/except-compiler.h>*/
+/*!always_includes <kos/bits/exception_data.h>*/
+/*!always_includes <kos/bits/exception_nest.h>*/
+/*!always_includes <kos/except/codes.h>*/
+/*!always_includes <kos/bits/fastexcept.h>*/
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%{

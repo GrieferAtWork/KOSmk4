@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: diet libc (/include/cwctype) */
 /* (#) Portability: libstdc++ (/include/cwctype) */
+/*!replace_with_include <wctype.h>*/
 #ifndef _CXX_CWCTYPE
 #define _CXX_CWCTYPE 1
 #ifndef _WCTYPE_H

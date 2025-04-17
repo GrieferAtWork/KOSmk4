@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <__stdinc.h>*/
+/*!always_includes <hybrid/compiler.h>*/
+/*!always_includes <kos/anno.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_COMPILER_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_COMPILER_H 1
 

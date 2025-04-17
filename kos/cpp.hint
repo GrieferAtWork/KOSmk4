@@ -2733,6 +2733,7 @@
 
 
 // Misc. local macros
+#define DEFINE_DL_EXPORT_ALIAS DEFINE_PUBLIC_ALIAS
 #define CASE(x) case x:
 #define FUNC(x) x
 #define FUNC0(x,...) x

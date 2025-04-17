@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/cfloat) */
+/*!replace_with_include <float.h>*/
 #ifndef _CXX_CFLOAT
 #define _CXX_CFLOAT 1
 #ifndef _FLOAT_H

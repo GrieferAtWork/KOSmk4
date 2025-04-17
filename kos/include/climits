@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: MSVC      (/include/climits) */
 /* (#) Portability: libstdc++ (/include/climits) */
+/*!replace_with_include <limits.h>*/
 #ifndef _LIMITS_H
 #include "limits.h"
 #endif /* !_LIMITS_H */

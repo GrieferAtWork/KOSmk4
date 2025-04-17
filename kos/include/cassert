@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: MSVC      (/include/cassert) */
 /* (#) Portability: libstdc++ (/include/cassert) */
+/*!replace_with_include <assert.h>*/
 #ifndef _CXX_CASSERT
 #define _CXX_CASSERT 1
 

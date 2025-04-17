@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!ignore_unnecessary_include*/
 
 /* NOTE: This implementation is derived from information found on Wikipedia:
  *       https://en.wikipedia.org/wiki/Red%E2%80%93black_tree

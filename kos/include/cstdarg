@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: MSVC      (/include/cstdarg) */
 /* (#) Portability: libstdc++ (/include/cstdarg) */
+/*!replace_with_include <stdarg.h>*/
 #ifndef _CXX_CSTDARG
 #define _CXX_CSTDARG 1
 #ifndef _STDARG_H

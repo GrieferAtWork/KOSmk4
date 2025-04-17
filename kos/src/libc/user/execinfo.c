@@ -31,6 +31,7 @@
 #include <atomic.h>
 #include <dlfcn.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>

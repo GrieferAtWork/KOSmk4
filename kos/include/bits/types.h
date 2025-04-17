@@ -19,6 +19,9 @@
  */
 /* (#) Portability: GNU C Library (/posix/bits/types.h) */
 /* (#) Portability: mintlib       (/include/bits/types.h) */
+/*!included_by <kos/types.h>*/
+/*!included_by <sys/types.h>*/
+/*!always_includes <hybrid/typecore.h>*/
 #ifndef _BITS_TYPES_H
 #define _BITS_TYPES_H 1
 

@@ -38,13 +38,18 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/paging.h>
 #include <kernel/swap.h>
+#include <sched/sig.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

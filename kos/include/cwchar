@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: diet libc (/include/cwchar) */
 /* (#) Portability: libstdc++ (/include/cwchar) */
+/*!replace_with_include <wchar.h>*/
 #ifndef _CXX_CWCHAR
 #define _CXX_CWCHAR 1
 #ifndef _WCHAR_H

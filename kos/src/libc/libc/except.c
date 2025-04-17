@@ -330,7 +330,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 			except_register_state_setpc(context->uc_state, landingpad + handler);
 			if (action != 0) {
 				except_register_state_set_unwind_exception(context->uc_state,
-				                                             (uintptr_t)libc_get_kos_unwind_exception());
+				                                           (uintptr_t)libc_get_kos_unwind_exception());
 			}
 			return _URC_INSTALL_CONTEXT;
 		}

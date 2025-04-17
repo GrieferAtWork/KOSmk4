@@ -30,8 +30,14 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <sched/sig.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
+#include <kos/lockop.h>
+#include <kos/aref.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -41,7 +47,7 @@
 DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
-#define DBG_memset memset
+#define DBG_memset(p, c, n) memset(p, c, n)
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */

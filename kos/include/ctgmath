@@ -18,9 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libstdc++ (/include/ctgmath) */
-#ifndef _CXX_CTGMATH
-#define _CXX_CTGMATH 1
-
+/*!replace_with_include <tgmath.h>*/
+#ifndef _TGMATH_H
 #include "tgmath.h"
-
-#endif /* !_CXX_CTGMATH */
+#endif /* !_TGMATH_H */

@@ -166,38 +166,38 @@ libc__ZnwmSt11align_val_tRKSt9nothrow_t(size_t num_bytes, size_t min_alignment, 
 
 
 #ifndef __LIBCCALL_CALLER_CLEANUP
-DEFINE_PUBLIC_ALIAS(_ZdaPvRKSt9nothrow_t, libc__ZdaPvRKSt9nothrow_t);
-DEFINE_PUBLIC_ALIAS(_ZdaPvSt11align_val_t, libc__ZdaPvSt11align_val_t);
-DEFINE_PUBLIC_ALIAS(_ZdaPvmSt11align_val_t, libc__ZdaPvmSt11align_val_t);
-DEFINE_PUBLIC_ALIAS(_ZdaPvSt11align_val_tRKSt9nothrow_t, libc__ZdaPvSt11align_val_tRKSt9nothrow_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvRKSt9nothrow_t, libc__ZdaPvRKSt9nothrow_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvSt11align_val_t, libc__ZdaPvSt11align_val_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvmSt11align_val_t, libc__ZdaPvmSt11align_val_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdaPvSt11align_val_tRKSt9nothrow_t, libc__ZdaPvSt11align_val_tRKSt9nothrow_t);
 DEFINE_INTERN_ALIAS(libc__ZdaPvRKSt9nothrow_t, libc__ZdlPvRKSt9nothrow_t);                               /* operator delete[](void*, std::nothrow_t const&) */
 DEFINE_INTERN_ALIAS(libc__ZdaPvSt11align_val_t, libc__ZdlPvSt11align_val_t);                             /* operator delete[](void*, std::align_val_t) */
 DEFINE_INTERN_ALIAS(libc__ZdaPvmSt11align_val_t, libc__ZdlPvmSt11align_val_t);                           /* operator delete[](void*, unsigned long, std::align_val_t) */
 DEFINE_INTERN_ALIAS(libc__ZdaPvSt11align_val_tRKSt9nothrow_t, libc__ZdlPvSt11align_val_tRKSt9nothrow_t); /* operator delete[](void*, std::align_val_t, std::nothrow_t const&) */
 
 /* operator delete(void*, std::nothrow_t const&) */
-DEFINE_PUBLIC_ALIAS(_ZdlPvRKSt9nothrow_t, libc__ZdlPvRKSt9nothrow_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvRKSt9nothrow_t, libc__ZdlPvRKSt9nothrow_t);
 INTERN ATTR_SECTION(".text.crt.compat.cxx.malloc") void
 libc__ZdlPvRKSt9nothrow_t(void *mallptr, void *) {
 	free(mallptr);
 }
 
 /* operator delete(void*, std::align_val_t) */
-DEFINE_PUBLIC_ALIAS(_ZdlPvSt11align_val_t, libc__ZdlPvSt11align_val_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvSt11align_val_t, libc__ZdlPvSt11align_val_t);
 INTERN ATTR_SECTION(".text.crt.compat.cxx.malloc") void
 libc__ZdlPvSt11align_val_t(void *mallptr, size_t) {
 	free(mallptr);
 }
 
 /* operator delete(void*, unsigned long, std::align_val_t) */
-DEFINE_PUBLIC_ALIAS(_ZdlPvmSt11align_val_t, libc__ZdlPvmSt11align_val_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvmSt11align_val_t, libc__ZdlPvmSt11align_val_t);
 INTERN ATTR_SECTION(".text.crt.compat.cxx.malloc") void
 libc__ZdlPvmSt11align_val_t(void *mallptr, size_t, size_t) {
 	free(mallptr);
 }
 
 /* operator delete(void*, std::align_val_t, std::nothrow_t const&) */
-DEFINE_PUBLIC_ALIAS(_ZdlPvSt11align_val_tRKSt9nothrow_t, libc__ZdlPvSt11align_val_tRKSt9nothrow_t);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZdlPvSt11align_val_tRKSt9nothrow_t, libc__ZdlPvSt11align_val_tRKSt9nothrow_t);
 INTERN ATTR_SECTION(".text.crt.compat.cxx.malloc") void
 libc__ZdlPvSt11align_val_tRKSt9nothrow_t(void *mallptr, size_t, void *) {
 	free(mallptr);

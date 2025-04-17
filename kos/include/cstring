@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/cstring) */
+/*!replace_with_include <string.h>*/
 #ifndef _CXX_CSTRING
 #define _CXX_CSTRING 1
 #ifndef _STRING_H

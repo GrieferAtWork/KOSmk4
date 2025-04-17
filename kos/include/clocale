@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: diet libc (/include/clocale) */
 /* (#) Portability: libstdc++ (/include/clocale) */
+/*!replace_with_include <locale.h>*/
 #ifndef _CXX_CLOCALE
 #define _CXX_CLOCALE 1
 #ifndef _LOCALE_H

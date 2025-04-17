@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2817aa5b */
+/* HASH CRC-32:0xfc8772af */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/anno.h>*/
+/*!always_includes <kos/bits/except.h>*/
+/*!always_includes <kos/bits/except-register-state.h>*/
+/*!always_includes <kos/bits/except-compiler.h>*/
+/*!always_includes <kos/bits/exception_data.h>*/
+/*!always_includes <kos/bits/exception_nest.h>*/
+/*!always_includes <kos/except/codes.h>*/
+/*!always_includes <kos/bits/fastexcept.h>*/
 #ifndef _KOS_EXCEPT_H
 #define _KOS_EXCEPT_H 1
 

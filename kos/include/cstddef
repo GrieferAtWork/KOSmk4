@@ -21,6 +21,7 @@
 /* (#) Portability: MSVC      (/include/cstddef) */
 /* (#) Portability: diet libc (/include/cstddef) */
 /* (#) Portability: libstdc++ (/include/cstddef) */
+/*!replace_with_include <stddef.h>*/
 #ifndef _CXX_CSTDDEF
 #define _CXX_CSTDDEF 1
 #ifndef _STDDEF_H

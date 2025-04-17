@@ -19,6 +19,7 @@
  */
 /* (>) Standard: ISO C++98 (ISO/IEC 14882:1998) */
 /* (#) Portability: libstdc++ (/include/cerrno) */
+/*!replace_with_include <errno.h>*/
 #ifndef _CXX_CERRNO
 #define _CXX_CERRNO 1
 #include "errno.h"

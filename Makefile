@@ -102,6 +102,10 @@ vs-proj:
 	"$(DEEMON)" kos/misc/build/make-vs-proj.dee
 .PHONY: vs-proj
 
+editorconfig:
+	"$(DEEMON)" kos/misc/build/editorconfig.dee
+.PHONY: editorconfig
+
 ifeq ($(MAKECMDGOALS),me a sandwich)
 .PHONY: $(MAKECMDGOALS)
 me a:

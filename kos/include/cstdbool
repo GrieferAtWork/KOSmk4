@@ -19,6 +19,7 @@
  */
 /* (#) Portability: MSVC      (/include/cstdbool) */
 /* (#) Portability: libstdc++ (/include/cstdbool) */
+/*!replace_with_include <stdbool.h>*/
 #ifndef _STDBOOL_H
 #include <stdbool.h>
 #endif /* !_STDBOOL_H */

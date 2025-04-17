@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!ignore_unnecessary_include*/
 #ifndef ___CRT_H
 #define ___CRT_H 1
 

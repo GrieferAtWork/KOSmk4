@@ -134,7 +134,8 @@
 #if !defined(__HYBRID_PP_VA_OVERLOAD) && defined(__HYBRID_PP_VA_NARGS)
 #define __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n) func##n
 #define __HYBRID_PP_PRIVATE_VA_OVERLOAD(func, n)  __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n)
-#if defined(_MSC_VER) || defined(__INTELLISENSE__)
+#if (defined(__GNUC__) ? (defined(_MSC_VER) && !defined(__INTELLISENSE__)) : \
+                         (defined(_MSC_VER) || defined(__INTELLISENSE__)))
 /* Special  handling required to  prevent MSVC from placing  all of the varargs
  * into the first argument of the varargs function. No idea why this is needed,
  * or why this works. - After noticing the issue, I've stumbled across this fix

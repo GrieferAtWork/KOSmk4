@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <__stdinc.h>*/
 
 #ifndef __has_GCC_warning
 #define __has_GCC_warning(x) __GCC_PRIVATE_W_IS_DEFINED(__GCC_HAS_WARNING_##x)
