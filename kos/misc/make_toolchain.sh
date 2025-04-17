@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Work around MSCV "P.A.B." code generation bug"
-DEEMON_VERSION="2a16c31b694680d04bb7177ccdd081d04e31a241"
+#     v -- "Fix badly configured `_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE`"
+DEEMON_VERSION="0dc15b82442559d5f47f37cb92217e878f32a794"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
