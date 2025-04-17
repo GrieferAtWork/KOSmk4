@@ -56,9 +56,9 @@
 DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
-#define DBG_memset memset
+#define DBG_memset(p, c, n) memset(p, c, n)
 #else /* !NDEBUG && !NDEBUG_FINI */
-#define DBG_memset(...) (void)0
+#define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Allocate physical memory for use with mem-parts created for `self'
