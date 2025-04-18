@@ -175,8 +175,10 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
 	byte_t *buf;
 	byte_t firstbyte;
 	assert(needle_length < CONFIG_MODGDBSERVER_PACKET_MAXLEN / 2);
-	if unlikely(!needle_length)
-		return false;
+	if unlikely(!needle_length) {
+		*presult = haystack;
+		return true;
+	}
 	buf = (byte_t *)GDBPacket_Start();
 	firstbyte = ((byte_t *)needle)[0];
 	for (;;) {
