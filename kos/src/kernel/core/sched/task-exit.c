@@ -27,18 +27,29 @@
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <sched/cpu.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc-internal.h>
-#include <sched/rpc.h>
 #include <sched/scheduler.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
+#include <hybrid/sequence/list.h>
+
+#include <kos/aref.h>
+#include <kos/bits/userprocmask.h>
+#include <kos/debugtrap.h>
 #include <kos/except.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/rpc.h>
+#include <kos/types.h>
 #include <sys/wait.h>
 
 #include <assert.h>

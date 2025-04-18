@@ -23,14 +23,17 @@
 #include <kernel/compiler.h>
 
 #ifndef CONFIG_NO_SMP
-#include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <sched/cpu.h>
+#include <sched/pertask.h>
 #include <sched/scheduler.h>
 #include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/sched/preemption.h>
+
+#include <kos/except.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <atomic.h>

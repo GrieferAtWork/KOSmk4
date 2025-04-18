@@ -29,18 +29,18 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/mman/unmapped.h>
-#include <kernel/rt/except-handler.h>
+#include <kernel/paging.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
@@ -51,14 +51,20 @@
 
 #include <hybrid/align.h>
 #include <hybrid/host.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/unaligned.h>
 
+#include <asm/os/sched.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
+#include <kos/rpc.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_KERNEL_BITS_GDB_CPU_STATE32_H
-#define _I386_KOS_KOS_KERNEL_BITS_GDB_CPU_STATE32_H 1
+/*!replace_with_include <kos/kernel/gdb-cpu-state.h>*/
+#ifndef _KOS_KERNEL_BITS_GDB_CPU_STATE_H
+#define _KOS_KERNEL_BITS_GDB_CPU_STATE_H 1
 
 #include <__stdinc.h>
 
@@ -38,4 +39,4 @@ struct gdb_cpustate {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_KOS_KERNEL_BITS_GDB_CPU_STATE32_H */
+#endif /* !_KOS_KERNEL_BITS_GDB_CPU_STATE_H */

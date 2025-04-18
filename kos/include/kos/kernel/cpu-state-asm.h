@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/kernel/bits/cpu-state-asm.h>*/
 #ifndef _KOS_KERNEL_CPU_STATE_ASM_H
 #define _KOS_KERNEL_CPU_STATE_ASM_H 1
 

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/kernel/cpu-state-compat.h>*/
 #ifndef _KOS_KERNEL_BITS_CPU_STATE_COMPAT_H
 #define _KOS_KERNEL_BITS_CPU_STATE_COMPAT_H 1
 

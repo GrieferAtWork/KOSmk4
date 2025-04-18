@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kos/bits/debugtrap.h>*/
 #ifndef _KOS_DEBUGTRAP_H
 #define _KOS_DEBUGTRAP_H 1
 

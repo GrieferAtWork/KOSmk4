@@ -23,9 +23,37 @@
 //#define DEFINE_task_clone_procpid
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/mman.h>
+#include <kernel/paging.h>
+#include <kernel/rt/except-syscall.h>
+#include <kernel/user.h>
+#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
+#include <sched/sig.h>
+#include <sched/sigmask.h>
+#include <sched/task-clone.h>
+#include <sched/task.h>
 #include <sched/timer.h>
 
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/aref.h>
+#include <kos/except.h>
 #include <kos/nopf.h>
+#include <kos/rpc.h>
+#include <kos/types.h>
+
+#include <atomic.h>
+#include <signal.h>
+#include <string.h>
 
 #if (defined(DEFINE_task_clone_thrdpid) + \
      defined(DEFINE_task_clone_procpid)) != 1

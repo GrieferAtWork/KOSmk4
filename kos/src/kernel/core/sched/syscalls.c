@@ -31,13 +31,18 @@
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/paging.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/pertask.h>
 #include <sched/sigaction.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/sched/atomic-rwlock.h>
+
+#include <bits/os/sysinfo.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 

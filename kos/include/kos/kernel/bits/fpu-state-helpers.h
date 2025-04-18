@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/kernel/fpu-state-helpers.h>*/
 #ifndef _KOS_KERNEL_BITS_FPU_STATE_HELPERS_H
 #define _KOS_KERNEL_BITS_FPU_STATE_HELPERS_H 1
 
