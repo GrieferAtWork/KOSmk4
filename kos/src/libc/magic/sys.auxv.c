@@ -23,6 +23,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
 /* (#) Portability: diet libc     (/include/sys/auxv.h) */
 /* (#) Portability: musl libc     (/include/sys/auxv.h) */
+/*!always_includes <elf.h>*/
 }
 
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]

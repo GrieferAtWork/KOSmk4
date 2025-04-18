@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ef604 */
+/* HASH CRC-32:0x54f73155 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/msg.h) */
 /* (#) Portability: musl libc     (/include/sys/msg.h) */
 /* (#) Portability: uClibc        (/include/sys/msg.h) */
+/*!always_includes <sys/ipc.h>*/
 #ifndef _SYS_MSG_H
 #define _SYS_MSG_H 1
 

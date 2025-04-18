@@ -19,6 +19,7 @@
  */
 /* (#) Portability: FreeBSD (/lib/libutil/libutil.h) */
 /* (#) Portability: libbsd  (/include/bsd/libutil.h) */
+/*!always_includes <util.h>*/
 #ifndef _LIBUTIL_H
 #define _LIBUTIL_H 1
 #include <util.h>

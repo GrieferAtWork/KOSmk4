@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/new.h) */
 /* (#) Portability: Windows Kits (/ucrt/new.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(locale_t = __locale_t)]

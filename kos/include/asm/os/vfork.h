@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <unistd.h>*/
+/*!included_by <vfork.h>*/
 #ifndef _ASM_OS_VFORK_H
 #define _ASM_OS_VFORK_H 1
 

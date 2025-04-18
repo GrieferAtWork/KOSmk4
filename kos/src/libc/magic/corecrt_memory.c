@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_memory.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/wait.h>*/
 #ifndef _ASM_OS_WAIT_H
 #define _ASM_OS_WAIT_H 1
 

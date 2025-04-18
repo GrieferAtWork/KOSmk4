@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1903fa9b */
+/* HASH CRC-32:0xe1fee46a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: GNU C Library (/mach/spin-lock.h) */
 /* (#) Portability: GNU Hurd      (/usr/include/spin-lock.h) */
+/*!always_includes <lock-intern.h>*/
 #ifndef _SPIN_LOCK_H
 #define _SPIN_LOCK_H 1
 

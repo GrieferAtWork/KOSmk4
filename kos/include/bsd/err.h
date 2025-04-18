@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x193fc991 */
+/* HASH CRC-32:0x4f4370b8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/err.h) */
+/*!always_includes <err.h>*/
 #ifndef _BSD_ERR_H
 #define _BSD_ERR_H 1
 

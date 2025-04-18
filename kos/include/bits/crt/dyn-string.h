@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <dyn-string.h>*/
 #ifndef _BITS_CRT_DYN_STRING_H
 #define _BITS_CRT_DYN_STRING_H 1
 

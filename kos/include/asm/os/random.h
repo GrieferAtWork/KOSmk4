@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/random.h>*/
 #ifndef _ASM_OS_RANDOM_H
 #define _ASM_OS_RANDOM_H 1
 

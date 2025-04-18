@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/poll.h) */
+/*!always_includes <asm/os/poll.h>*/
+/*!always_includes <bits/os/pollfd.h>*/
 #ifndef _ASM_POLL_H
 #define _ASM_POLL_H 1
 

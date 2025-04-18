@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <vis.h>*/
 #ifndef _ASM_CRT_VIS_H
 #define _ASM_CRT_VIS_H 1
 

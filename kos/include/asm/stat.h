@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/stat.h) */
+/*!always_includes <bits/os/stat.h>*/
 #ifndef _ASM_STAT_H
 #define _ASM_STAT_H 1
 

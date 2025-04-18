@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/signalfd.h>*/
 #ifndef _ASM_OS_SIGNALFD_H
 #define _ASM_OS_SIGNALFD_H 1
 

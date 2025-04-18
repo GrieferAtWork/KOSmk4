@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/timex.h>*/
 #ifndef _ASM_OS_TIMEX_H
 #define _ASM_OS_TIMEX_H 1
 

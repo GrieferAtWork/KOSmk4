@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt_startup.h) */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_startup.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[default:section(".text.crt.dos.application.init")]
@@ -34,14 +35,13 @@
 #include <bits/crt/dos/corecrt_startup.h>
 )]%[insert:prefix(
 #include <vcruntime_startup.h>
+)]%[insert:prefix(
+#include <crtdefs.h>
 )]%{
 
-#ifdef __USE_DOS
-#include <corecrt.h>
-#ifndef __USE_DOS_CLEAN
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
 #include <math.h>
-#endif /* !__USE_DOS_CLEAN */
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/times.h>*/
 #ifndef _BITS_OS_TMS_H
 #define _BITS_OS_TMS_H 1
 

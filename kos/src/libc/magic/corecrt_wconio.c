@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wconio.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[default:section(".text.crt.dos.wchar.conio")]
@@ -38,11 +39,9 @@
 #include <hybrid/typecore.h>
 )]%[insert:prefix(
 #include <asm/crt/stdio.h>
-)]%{
-
-#ifdef __USE_DOS
+)]%[insert:prefix(
 #include <crtdefs.h>
-#endif /* __USE_DOS */
+)]%{
 
 #if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF

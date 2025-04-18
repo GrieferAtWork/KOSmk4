@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb2b88d6 */
+/* HASH CRC-32:0x47baa930 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@
 /* (#) Portability: mintlib       (/include/resolv.h) */
 /* (#) Portability: musl libc     (/include/resolv.h) */
 /* (#) Portability: uClibc        (/include/resolv.h) */
+/*!always_includes <arpa/nameser.h>*/
+/*!always_includes <netinet/in.h>*/
 #ifndef _RESOLV_H
 #define _RESOLV_H 1
 
@@ -49,6 +51,8 @@
 
 #include <arpa/nameser.h>
 #include <netinet/in.h>
+
+/* TODO: Cleanup these includes (and only do them under __USE_GLIBC_BLOAT) */
 #include <sys/cdefs.h>
 #include <sys/param.h>
 #include <sys/types.h>

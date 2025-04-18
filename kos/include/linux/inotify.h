@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/linux/inotify.h) */
+/*!included_by <sys/inotify.h>*/
 #ifndef _LINUX_INOTIFY_H
 #define _LINUX_INOTIFY_H 1
 

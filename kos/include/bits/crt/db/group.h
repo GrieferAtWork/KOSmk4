@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <grp.h>*/
 #ifndef _BITS_CRT_DB_GROUP_H
 #define _BITS_CRT_DB_GROUP_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd456f87 */
+/* HASH CRC-32:0x6e407f47 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wio.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_WIO_H
 #define _CORECRT_WIO_H 1
 
@@ -34,6 +35,7 @@
 #include <bits/types.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
+#include <crtdefs.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

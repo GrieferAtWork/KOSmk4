@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <asm/os/ptrace.h>*/
 #ifndef _ASM_OS_KOS_PTRACE_H
 #define _ASM_OS_KOS_PTRACE_H 1
 

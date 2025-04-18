@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0984d80 */
+/* HASH CRC-32:0xdb369747 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/inttypes.h) */
+/*!always_includes <inttypes.h>*/
 #ifndef _BSD_INTTYPES_H
 #define _BSD_INTTYPES_H 1
 

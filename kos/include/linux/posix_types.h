@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/linux/posix_types.h) */
+/*!always_includes <linux/bits/posix_types.h>*/
 #ifndef _LINUX_POSIX_TYPES_H
 #define _LINUX_POSIX_TYPES_H 1
 

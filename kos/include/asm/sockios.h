@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/sockios.h) */
+/*!always_includes <asm/os/socket-ioctls.h>*/
 #ifndef _ASM_SOCKIOS_H
 #define _ASM_SOCKIOS_H 1
 

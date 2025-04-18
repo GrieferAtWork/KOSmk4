@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x962f9141 */
+/* HASH CRC-32:0x82986d8e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,9 @@ __NAMESPACE_STD_USING(localeconv)
 #include <features.h>
 #include <asm/crt/locale.h>
 #include <bits/crt/lconv.h>
+#ifdef __USE_DOS
 #include <bits/crt/tm.h>
+#endif /* __USE_DOS */
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */

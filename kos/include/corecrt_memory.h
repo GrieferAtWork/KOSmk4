@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76738581 */
+/* HASH CRC-32:0x2e22d9e8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_memory.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_MEMORY_H
 #define _CORECRT_MEMORY_H 1
 

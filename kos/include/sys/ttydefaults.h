@@ -25,6 +25,8 @@
 /* (#) Portability: mintlib       (/include/sys/ttydefaults.h) */
 /* (#) Portability: musl libc     (/include/sys/ttydefaults.h) */
 /* (#) Portability: uClibc        (/include/sys/ttydefaults.h) */
+/*!included_by <sys/ioctl.h>*/
+/*!included_by <termios.h>*/
 #ifndef _SYS_TTYDEFAULTS_H
 #define _SYS_TTYDEFAULTS_H 1
 

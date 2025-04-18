@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wtime.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
@@ -37,11 +38,11 @@
 #include <bits/crt/tm.h>
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
-)]%{
-
-#ifdef __USE_DOS
+)]%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%[insert:prefix(
 #include <crtdefs.h>
-#endif /* __USE_DOS */
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN

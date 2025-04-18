@@ -21,6 +21,7 @@
 %(c_prefix){
 /* (#) Portability: GNU C Library (/bits/posix_opt.h) */
 /* (#) Portability: mintlib       (/include/bits/posix_opt.h) */
+/*!included_by <unistd.h>*/
 }
 
 %{

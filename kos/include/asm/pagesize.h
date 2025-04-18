@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <unistd.h>*/
 #ifndef _ASM_PAGESIZE_H
 #define _ASM_PAGESIZE_H 1
 

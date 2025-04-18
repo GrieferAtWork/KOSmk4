@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/libutil.h) */
+/*!always_includes <libutil.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

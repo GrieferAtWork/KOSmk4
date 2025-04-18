@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <shadow.h>*/
 #ifndef _BITS_CRT_DB_SPWD_H
 #define _BITS_CRT_DB_SPWD_H 1
 

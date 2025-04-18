@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/acct.h>*/
 #ifndef _BITS_OS_ACCT_H
 #define _BITS_OS_ACCT_H 1
 

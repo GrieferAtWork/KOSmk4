@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/termios.h) */
+/*!always_includes <asm/ioctls.h>*/
+/*!always_includes <asm/os/tty.h>*/
+/*!always_includes <asm/termbits.h>*/
+/*!always_includes <bits/os/termio.h>*/
+/*!always_includes <bits/os/termios.h>*/
 #ifndef _ASM_TERMIOS_H
 #define _ASM_TERMIOS_H 1
 

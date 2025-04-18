@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <linux/bits/posix_types.h>*/
 #ifndef _I386_KOS_LINUX_BITS_POSIX_TYPES_32_H
 #define _I386_KOS_LINUX_BITS_POSIX_TYPES_32_H 1
 

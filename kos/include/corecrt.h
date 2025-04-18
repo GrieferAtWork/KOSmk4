@@ -19,6 +19,7 @@
  */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt.h) */
 /* (#) Portability: Windows Kits (/ucrt/corecrt.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_H
 #define _CORECRT_H 1
 

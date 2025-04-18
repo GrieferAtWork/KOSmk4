@@ -20,7 +20,6 @@
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 %[default:nodos]
 
-
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

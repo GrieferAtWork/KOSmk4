@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/linux/capability.h) */
+/*!included_by <sys/capability.h>*/
 #ifndef _LINUX_CAPABILITY_H
 #define _LINUX_CAPABILITY_H 1
 

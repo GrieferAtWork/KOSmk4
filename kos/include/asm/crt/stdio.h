@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <libio.h>*/
+/*!included_by <stdio.h>*/
+/*!included_by <wchar.h>*/
+/*!included_by <wctype.h>*/
 #ifndef _ASM_CRT_STDIO_H
 #define _ASM_CRT_STDIO_H 1
 

@@ -20,7 +20,7 @@
 #ifndef _ASM_PAGE_H
 #define _ASM_PAGE_H 1
 
-/* DO NOTE REMOVE THIS FILE!
+/* DO NOT REMOVE THIS FILE!
  *
  * It, and its contents are here for compatibility
  * with  older   versions  of   Glibc  on   linux!

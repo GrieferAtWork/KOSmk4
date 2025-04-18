@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: libbsd  (/include/bsd/unistd.h) */
 /* (#) Portability: libc4/5 (/include/bsd/unistd.h) */
+/*!always_includes <unistd.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

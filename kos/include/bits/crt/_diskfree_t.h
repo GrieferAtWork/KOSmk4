@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <direct.h>*/
+/*!included_by <dos.h>*/
 #ifndef _BITS_CRT__DISKFREE_T_H
 #define _BITS_CRT__DISKFREE_T_H 1
 

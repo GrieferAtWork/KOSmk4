@@ -70,9 +70,13 @@
 #include <asm/crt/locale.h>
 )]%[insert:prefix(
 #include <bits/crt/lconv.h>
-)]%[insert:prefix(
+)]
+%#ifdef __USE_DOS
+%[insert:prefix(
 #include <bits/crt/tm.h>
-)]%{
+)]
+%#endif /* __USE_DOS */
+%{
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */

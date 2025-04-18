@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wstdio.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -38,6 +39,8 @@
 #include <asm/crt/stdio.h>
 )]%[insert:prefix(
 #include <corecrt_stdio_config.h>
+)]%[insert:prefix(
+#include <crtdefs.h>
 )]%{
 
 #ifdef __CC__

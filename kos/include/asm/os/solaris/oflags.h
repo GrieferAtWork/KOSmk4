@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <asm/os/oflags.h>*/
 #ifndef _ASM_OS_SOLARIS_OFLAGS_H
 #define _ASM_OS_SOLARIS_OFLAGS_H 1
 

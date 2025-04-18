@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/rpc.h>*/
 #ifndef _KOS_BITS_SYSCALL_INFO_H
 #define _KOS_BITS_SYSCALL_INFO_H 1
 

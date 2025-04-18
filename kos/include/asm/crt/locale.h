@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <libintl.h>*/
+/*!included_by <locale.h>*/
 #ifndef _ASM_CRT_LOCALE_H
 #define _ASM_CRT_LOCALE_H 1
 

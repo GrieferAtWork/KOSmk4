@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b47096b */
+/* HASH CRC-32:0xc2ea3115 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/grp.h) */
+/*!always_includes <grp.h>*/
 #ifndef _BSD_GRP_H
 #define _BSD_GRP_H 1
 

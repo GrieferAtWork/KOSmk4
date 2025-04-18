@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/ioctls.h) */
+/*!always_includes <asm/os/tty.h>*/
+/*!always_includes <linux/ioctl.h>*/
 #ifndef _ASM_IOCTLS_H
 #define _ASM_IOCTLS_H 1
 

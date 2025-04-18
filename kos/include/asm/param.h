@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/param.h) */
+/*!always_includes <asm/os/limits.h>*/
+/*!always_includes <asm/pagesize.h>*/
 #ifndef _ASM_PARAM_H
 #define _ASM_PARAM_H 1
 

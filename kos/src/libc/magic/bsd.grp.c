@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/grp.h) */
+/*!always_includes <grp.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

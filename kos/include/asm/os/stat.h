@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fcntl.h>*/
+/*!included_by <sys/stat.h>*/
 #ifndef _ASM_OS_STAT_H
 #define _ASM_OS_STAT_H 1
 

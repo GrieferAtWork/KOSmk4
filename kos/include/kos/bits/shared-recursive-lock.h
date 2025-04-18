@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/sched/shared-recursive-lock.h>*/
 #ifndef _KOS_BITS_SHARED_RECURSIVE_LOCK_H
 #define _KOS_BITS_SHARED_RECURSIVE_LOCK_H 1
 

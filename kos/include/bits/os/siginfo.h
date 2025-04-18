@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <siginfo.h>*/
+/*!included_by <signal.h>*/
+/*!included_by <sys/wait.h>*/
 #ifndef _BITS_OS_SIGINFO_H
 #define _BITS_OS_SIGINFO_H 1
 

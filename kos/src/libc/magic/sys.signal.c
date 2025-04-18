@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/signal.h) */
 /* (#) Portability: musl libc     (/include/sys/signal.h) */
 /* (#) Portability: uClibc        (/include/sys/signal.h) */
+/*!always_includes <signal.h>*/
 }
 
 %[default:section(".text.crt{|.dos}.bsd.sched.signal")]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x756c7fbb */
+/* HASH CRC-32:0x4e115831 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/pwd.h) */
+/*!always_includes <pwd.h>*/
 #ifndef _BSD_PWD_H
 #define _BSD_PWD_H 1
 

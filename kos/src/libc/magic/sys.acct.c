@@ -29,13 +29,15 @@
 
 %[define_replacement(fd_t = __fd_t)]
 
-%{
+%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
-
+)]%[insert:prefix(
 #include <bits/os/acct.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>

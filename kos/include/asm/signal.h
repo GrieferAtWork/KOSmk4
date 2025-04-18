@@ -18,6 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/signal.h) */
+/*!always_includes <asm-generic/signal-defs.h>*/
+/*!always_includes <asm/bitsperlong.h>*/
+/*!always_includes <asm/os/signal.h>*/
+/*!always_includes <asm/os/sigset.h>*/
+/*!always_includes <bits/os/sigaction.h>*/
+/*!always_includes <bits/os/sigstack.h>*/
 #ifndef _ASM_SIGNAL_H
 #define _ASM_SIGNAL_H 1
 

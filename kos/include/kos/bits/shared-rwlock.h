@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/sched/shared-rwlock.h>*/
 #ifndef _KOS_BITS_SHARED_RWLOCK_H
 #define _KOS_BITS_SHARED_RWLOCK_H 1
 

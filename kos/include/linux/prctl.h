@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Linux     (/usr/include/linux/prctl.h) */
 /* (#) Portability: diet libc (/include/linux/prctl.h) */
+/*!included_by <sys/prctl.h>*/
 #ifndef _LINUX_PRCTL_H
 #define _LINUX_PRCTL_H 1
 

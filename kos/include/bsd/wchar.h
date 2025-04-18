@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5ee7519 */
+/* HASH CRC-32:0x5839eed5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/wchar.h) */
+/*!always_includes <wchar.h>*/
 #ifndef _BSD_WCHAR_H
 #define _BSD_WCHAR_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa7b8a70 */
+/* HASH CRC-32:0x91ff5a46 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_memcpy_s.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_MEMCPY_S_H
 #define _CORECRT_MEMCPY_S_H 1
 
@@ -31,7 +32,7 @@
 
 #include <features.h>
 #include <bits/types.h>
-#include <corecrt.h>
+#include <crtdefs.h>
 #include <errno.h>
 #include <vcruntime_string.h>
 

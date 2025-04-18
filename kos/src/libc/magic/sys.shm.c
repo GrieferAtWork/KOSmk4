@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/shm.h) */
 /* (#) Portability: musl libc     (/include/sys/shm.h) */
 /* (#) Portability: uClibc        (/include/sys/shm.h) */
+/*!always_includes <sys/ipc.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

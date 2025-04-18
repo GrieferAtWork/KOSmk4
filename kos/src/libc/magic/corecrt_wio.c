@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wio.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -34,6 +35,8 @@
 #include <asm/os/fcntl.h>
 )]%[insert:prefix(
 #include <asm/os/oflags.h>
+)]%[insert:prefix(
+#include <crtdefs.h>
 )]%{
 
 #ifdef __CC__

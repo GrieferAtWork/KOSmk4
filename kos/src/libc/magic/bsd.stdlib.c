@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: libbsd  (/include/bsd/stdlib.h) */
 /* (#) Portability: libc4/5 (/include/bsd/stdlib.h) */
+/*!always_includes <stdlib.h>*/
 }
 
 %[insert:prefix(

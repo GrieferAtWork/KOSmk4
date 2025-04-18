@@ -26,6 +26,8 @@
 /* (#) Portability: mintlib       (/include/pty.h) */
 /* (#) Portability: musl libc     (/include/pty.h) */
 /* (#) Portability: uClibc        (/include/pty.h) */
+/*!always_includes <sys/ioctl.h>*/
+/*!always_includes <termios.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

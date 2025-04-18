@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: GNU C Library (/mach/spin-lock.h) */
 /* (#) Portability: GNU Hurd      (/usr/include/spin-lock.h) */
+/*!always_includes <lock-intern.h>*/
 }
 
 %[default:section(".text.crt{|.dos}.compat.hurd.futex")]

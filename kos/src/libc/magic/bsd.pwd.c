@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/pwd.h) */
+/*!always_includes <pwd.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

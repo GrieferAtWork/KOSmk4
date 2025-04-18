@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <locale.h>*/
+/*!included_by <time.h>*/
+/*!included_by <wchar.h>*/
 #ifndef _BITS_CRT_TM_H
 #define _BITS_CRT_TM_H 1
 

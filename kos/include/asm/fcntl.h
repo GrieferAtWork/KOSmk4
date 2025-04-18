@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/fcntl.h) */
+/*!included_by <fcntl.h>*/
+/*!always_includes <asm/os/fcntl.h>*/
+/*!always_includes <asm/os/oflags.h>*/
+/*!always_includes <bits/os/f_owner_ex.h>*/
+/*!always_includes <bits/os/flock.h>*/
 #ifndef _ASM_FCNTL_H
 #define _ASM_FCNTL_H 1
 

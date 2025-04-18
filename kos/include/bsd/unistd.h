@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2731ee86 */
+/* HASH CRC-32:0x55f71f1d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: libbsd  (/include/bsd/unistd.h) */
 /* (#) Portability: libc4/5 (/include/bsd/unistd.h) */
+/*!always_includes <unistd.h>*/
 #ifndef _BSD_UNISTD_H
 #define _BSD_UNISTD_H 1
 

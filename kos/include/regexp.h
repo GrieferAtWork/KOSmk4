@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436c7dab */
+/* HASH CRC-32:0xbd31858f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 /* (#) Portability: libc6         (/include/regexp.h) */
 /* (#) Portability: mintlib       (/include/regexp.h) */
 /* (#) Portability: uClibc        (/include/regexp.h) */
+/*!always_includes <regex.h>*/
 #ifndef _REGEXP_H
 #define _REGEXP_H 1
 

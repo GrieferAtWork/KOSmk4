@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbefe78a */
+/* HASH CRC-32:0x567a37ae */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-
 #include <bits/types.h>
 #include <asm/os/stropts.h>
 #include <bits/os/stropts.h>
@@ -296,8 +295,6 @@ __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #ifndef __ioctl_defined
 #define __ioctl_defined
-#include <features.h>
-#include <bits/types.h>
 #if defined(__CRT_HAVE_ioctl) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> ioctl(2)
  * Perform the  I/O control  operation specified  by `request'  on  `fd'.

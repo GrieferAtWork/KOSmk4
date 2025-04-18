@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2ab0394 */
+/* HASH CRC-32:0x79d26b26 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wprocess.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_WPROCESS_H
 #define _CORECRT_WPROCESS_H 1
 
@@ -32,7 +33,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 #include <bits/types.h>
-#include <corecrt.h>
+#include <crtdefs.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

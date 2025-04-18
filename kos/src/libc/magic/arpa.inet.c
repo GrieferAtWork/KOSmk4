@@ -34,6 +34,7 @@
 /* (#) Portability: mintlib       (/include/arpa/inet.h) */
 /* (#) Portability: musl libc     (/include/arpa/inet.h) */
 /* (#) Portability: uClibc        (/include/arpa/inet.h) */
+/*!always_includes <netinet/in.h>*/
 }
 
 %[default:section(".text.crt{|.dos}.net.inet")]

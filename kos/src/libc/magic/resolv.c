@@ -33,6 +33,8 @@
 /* (#) Portability: mintlib       (/include/resolv.h) */
 /* (#) Portability: musl libc     (/include/resolv.h) */
 /* (#) Portability: uClibc        (/include/resolv.h) */
+/*!always_includes <arpa/nameser.h>*/
+/*!always_includes <netinet/in.h>*/
 }
 
 %[default:section(".text.crt{|.dos}.net.nameser")]
@@ -58,6 +60,8 @@
 
 #include <arpa/nameser.h>
 #include <netinet/in.h>
+
+/* TODO: Cleanup these includes (and only do them under __USE_GLIBC_BLOAT) */
 #include <sys/cdefs.h>
 #include <sys/param.h>
 #include <sys/types.h>

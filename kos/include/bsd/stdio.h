@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af40afe */
+/* HASH CRC-32:0xb32e91c8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/stdio.h) */
+/*!always_includes <stdio.h>*/
 #ifndef _BSD_STDIO_H
 #define _BSD_STDIO_H 1
 

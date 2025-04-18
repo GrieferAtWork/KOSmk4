@@ -21,6 +21,7 @@
 /* (#) Portability: MSVC         (/include/crtdbg.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/crtdbg.h) */
 /* (#) Portability: Windows Kits (/ucrt/crtdbg.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(size_t = __SIZE_TYPE__)]

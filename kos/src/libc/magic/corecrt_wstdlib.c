@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wstdlib.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -30,6 +31,8 @@
 #include <hybrid/typecore.h>
 )]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <crtdefs.h>
 )]%{
 
 #define _MAX_I64TOSTR_BASE16_COUNT (16 + 1)

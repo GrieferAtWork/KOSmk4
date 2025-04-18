@@ -21,6 +21,10 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 
+%(c_prefix){
+/*!always_includes <parts/uchar/process.h>*/
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%{

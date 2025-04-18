@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc57e87a */
+/* HASH CRC-32:0xd9b4b15a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libbsd (/include/bsd/libutil.h) */
+/*!always_includes <libutil.h>*/
 #ifndef _BSD_LIBUTIL_H
 #define _BSD_LIBUTIL_H 1
 

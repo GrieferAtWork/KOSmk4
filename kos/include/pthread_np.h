@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7512e02e */
+/* HASH CRC-32:0x2e962d4b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/pthread_np.h) */
 /* (#) Portability: FreeBSD       (/include/pthread_np.h) */
 /* (#) Portability: OpenBSD       (/include/pthread_np.h) */
+/*!always_includes <pthread.h>*/
 #ifndef _PTHREAD_NP_H
 #define _PTHREAD_NP_H 1
 

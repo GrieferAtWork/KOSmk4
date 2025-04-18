@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/ucontext.h) */
+/*!always_includes <bits/os/ucontext.h>*/
 #ifndef _ASM_UCONTEXT_H
 #define _ASM_UCONTEXT_H 1
 

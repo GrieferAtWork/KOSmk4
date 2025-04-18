@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <regex.h>*/
 #ifndef _BITS_CRT_REGEX_H
 #define _BITS_CRT_REGEX_H 1
 

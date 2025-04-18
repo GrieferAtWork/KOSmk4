@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/wchar.h) */
+/*!always_includes <wchar.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

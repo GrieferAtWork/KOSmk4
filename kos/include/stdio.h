@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9707fe4 */
+/* HASH CRC-32:0x546fa4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@
 /* (#) Portability: mintlib       (/include/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
+/*!always_includes <libio.h>*/
 #ifndef _STDIO_H
 #define _STDIO_H 1
 

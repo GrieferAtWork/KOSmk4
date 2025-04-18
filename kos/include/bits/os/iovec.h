@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fcntl.h>*/
+/*!included_by <sys/uio.h>*/
 #ifndef _BITS_OS_IOVEC_H
 #define _BITS_OS_IOVEC_H 1
 

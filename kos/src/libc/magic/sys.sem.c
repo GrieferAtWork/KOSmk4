@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/sem.h) */
 /* (#) Portability: musl libc     (/include/sys/sem.h) */
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
+/*!always_includes <sys/ipc.h>*/
 }
 
 %[define_decl_include("<bits/os/sembuf.h>": ["struct sembuf"])]

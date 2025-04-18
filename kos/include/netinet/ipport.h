@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <netinet/in.h>*/
 #ifndef _NETINET_IPPORT_H
 #define _NETINET_IPPORT_H 1
 

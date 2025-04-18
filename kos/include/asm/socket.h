@@ -19,6 +19,8 @@
  */
 /* (#) Portability: Cygwin (/winsup/cygwin/include/asm/socket.h) */
 /* (#) Portability: Linux  (/usr/include/[...]/asm/socket.h) */
+/*!always_includes <asm/os/socket.h>*/
+/*!always_includes <asm/sockios.h>*/
 #ifndef _ASM_SOCKET_H
 #define _ASM_SOCKET_H 1
 

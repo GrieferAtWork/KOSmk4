@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <attr/attributes.h>*/
 #ifndef _ATTR_ASM_ATTRIBUTES_H
 #define _ATTR_ASM_ATTRIBUTES_H 1
 

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <langinfo.h>*/
 #ifndef _ASM_CRT_LANGINFO_H
 #define _ASM_CRT_LANGINFO_H 1
 

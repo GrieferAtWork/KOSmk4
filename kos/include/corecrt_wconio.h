@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3331e04c */
+/* HASH CRC-32:0x436aa3e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wconio.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_WCONIO_H
 #define _CORECRT_WCONIO_H 1
 
@@ -33,10 +34,7 @@
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
-
-#ifdef __USE_DOS
 #include <crtdefs.h>
-#endif /* __USE_DOS */
 
 #if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF

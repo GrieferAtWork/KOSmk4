@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fcntl.h>*/
+/*!included_by <limits.h>*/
+/*!included_by <stdio.h>*/
+/*!included_by <sys/uio.h>*/
 #ifndef _ASM_OS_LIMITS_H
 #define _ASM_OS_LIMITS_H 1
 

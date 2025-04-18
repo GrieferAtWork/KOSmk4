@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <kos/except.h>*/
+/*!included_by <kos/except-handler.h>*/
 #ifndef _KOS_BITS_EXCEPT_REGISTER_STATE_H
 #define _KOS_BITS_EXCEPT_REGISTER_STATE_H 1
 

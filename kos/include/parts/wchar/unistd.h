@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d196ab4 */
+/* HASH CRC-32:0xa1aa9a56 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <parts/wchar/process.h>*/
 #ifndef _PARTS_WCHAR_UNISTD_H
 #define _PARTS_WCHAR_UNISTD_H 1
 

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fcntl.h>*/
+/*!included_by <libio.h>*/
+/*!included_by <stdio.h>*/
+/*!included_by <sys/file.h>*/
+/*!included_by <unistd.h>*/
 #ifndef _ASM_OS_STDIO_H
 #define _ASM_OS_STDIO_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafff4314 */
+/* HASH CRC-32:0xa819c723 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
+/*!always_includes <sys/isa_defs.h>*/
+/*!always_includes <sys/int_types.h>*/
 #ifndef _SYS_BYTEORDER_H
 #define _SYS_BYTEORDER_H 1
 

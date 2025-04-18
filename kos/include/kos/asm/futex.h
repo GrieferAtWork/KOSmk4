@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <kos/futex.h>*/
+/*!included_by <kos/futexexpr.h>*/
 #ifndef _KOS_ASM_FUTEX_H
 #define _KOS_ASM_FUTEX_H 1
 

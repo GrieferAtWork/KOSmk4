@@ -19,6 +19,8 @@
  */
 %(c_prefix){
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
+/*!always_includes <sys/isa_defs.h>*/
+/*!always_includes <sys/int_types.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

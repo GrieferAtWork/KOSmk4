@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Linux (/include/linux/close_range.h) */
+/*!included_by <unistd.h>*/
 }
 
 %[define_replacement(fd_t       = __fd_t)]

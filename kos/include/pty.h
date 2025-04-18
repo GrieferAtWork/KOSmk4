@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d29f920 */
+/* HASH CRC-32:0x60243bf4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 /* (#) Portability: mintlib       (/include/pty.h) */
 /* (#) Portability: musl libc     (/include/pty.h) */
 /* (#) Portability: uClibc        (/include/pty.h) */
+/*!always_includes <sys/ioctl.h>*/
+/*!always_includes <termios.h>*/
 #ifndef _PTY_H
 #define _PTY_H 1
 

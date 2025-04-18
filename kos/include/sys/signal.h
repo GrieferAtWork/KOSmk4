@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c4f2ac */
+/* HASH CRC-32:0xd7be817c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/signal.h) */
 /* (#) Portability: musl libc     (/include/sys/signal.h) */
 /* (#) Portability: uClibc        (/include/sys/signal.h) */
+/*!always_includes <signal.h>*/
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H 1
 

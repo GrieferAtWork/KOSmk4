@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/pthread_np.h) */
 /* (#) Portability: FreeBSD       (/include/pthread_np.h) */
 /* (#) Portability: OpenBSD       (/include/pthread_np.h) */
+/*!always_includes <pthread.h>*/
 }
 
 %[default:section(".text.crt{|.dos}.sched.pthread")]

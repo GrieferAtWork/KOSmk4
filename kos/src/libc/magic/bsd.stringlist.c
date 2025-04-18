@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/stringlist.h) */
+/*!always_includes <stringlist.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

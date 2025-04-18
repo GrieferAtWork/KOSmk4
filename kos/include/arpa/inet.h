@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64f83865 */
+/* HASH CRC-32:0x41567789 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 /* (#) Portability: mintlib       (/include/arpa/inet.h) */
 /* (#) Portability: musl libc     (/include/arpa/inet.h) */
 /* (#) Portability: uClibc        (/include/arpa/inet.h) */
+/*!always_includes <netinet/in.h>*/
 #ifndef _ARPA_INET_H
 #define _ARPA_INET_H 1
 

@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Linux     (/usr/include/[...]/asm/statfs.h) */
 /* (#) Portability: diet libc (/include/asm/statfs.h) */
+/*!always_includes <bits/os/statfs.h>*/
 #ifndef _ASM_STATFS_H
 #define _ASM_STATFS_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffdcff76 */
+/* HASH CRC-32:0xd5dc3d53 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
 /* (#) Portability: diet libc     (/include/sys/auxv.h) */
 /* (#) Portability: musl libc     (/include/sys/auxv.h) */
+/*!always_includes <elf.h>*/
 #ifndef _SYS_AUXV_H
 #define _SYS_AUXV_H 1
 

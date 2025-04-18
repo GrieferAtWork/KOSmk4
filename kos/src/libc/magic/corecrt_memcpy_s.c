@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_memcpy_s.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[insert:prefix(
@@ -26,7 +27,7 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
-#include <corecrt.h>
+#include <crtdefs.h>
 )]%[insert:prefix(
 #include <errno.h>
 )]%[insert:prefix(

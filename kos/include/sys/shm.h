@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48fbffa0 */
+/* HASH CRC-32:0x642ba841 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/shm.h) */
 /* (#) Portability: musl libc     (/include/sys/shm.h) */
 /* (#) Portability: uClibc        (/include/sys/shm.h) */
+/*!always_includes <sys/ipc.h>*/
 #ifndef _SYS_SHM_H
 #define _SYS_SHM_H 1
 

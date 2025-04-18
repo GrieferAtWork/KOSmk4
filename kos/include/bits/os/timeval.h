@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <sys/resource.h>*/
+/*!included_by <sys/select.h>*/
+/*!included_by <timeval-utils.h>*/
 #ifndef _BITS_OS_TIMEVAL_H
 #define _BITS_OS_TIMEVAL_H 1
 

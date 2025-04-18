@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/string.h) */
+/*!always_includes <string.h>*/
 }
 
 %[insert:prefix(

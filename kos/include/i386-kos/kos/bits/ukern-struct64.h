@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kos/bits/ukern-struct.h>*/
 #ifndef _I386_KOS_KOS_BITS_UKERN_STRUCT64_H
 #define _I386_KOS_KOS_BITS_UKERN_STRUCT64_H 1
 

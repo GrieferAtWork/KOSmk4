@@ -27,6 +27,7 @@
 /* (#) Portability: libc6         (/include/regexp.h) */
 /* (#) Portability: mintlib       (/include/regexp.h) */
 /* (#) Portability: uClibc        (/include/regexp.h) */
+/*!always_includes <regex.h>*/
 }
 
 %[define_replacement(regex_t = "struct re_pattern_buffer")]

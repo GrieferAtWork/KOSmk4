@@ -44,6 +44,7 @@
 /* (#) Portability: mintlib       (/include/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
+/*!always_includes <libio.h>*/
 }
 
 /* STDIO Sections:

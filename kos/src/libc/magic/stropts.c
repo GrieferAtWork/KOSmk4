@@ -27,12 +27,15 @@
 %[define_replacement(uid_t = __uid_t)]
 %[default:section(".text.crt{|.dos}.io.stropts")]
 
-%{
+%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <asm/os/stropts.h>
+)]%[insert:prefix(
 #include <bits/os/stropts.h>
+)]%{
 
 /* ioctl(2) request codes */
 #if !defined(I_NREAD) && defined(__I_NREAD)

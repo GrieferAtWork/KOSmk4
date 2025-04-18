@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75eadbb9 */
+/* HASH CRC-32:0x7013f309 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt_startup.h) */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_startup.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_STARTUP_H
 #define _CORECRT_STARTUP_H 1
 
@@ -34,13 +35,11 @@
 #include <bits/types.h>
 #include <bits/crt/dos/corecrt_startup.h>
 #include <vcruntime_startup.h>
+#include <crtdefs.h>
 
-#ifdef __USE_DOS
-#include <corecrt.h>
-#ifndef __USE_DOS_CLEAN
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
 #include <math.h>
-#endif /* !__USE_DOS_CLEAN */
-#endif /* !__USE_DOS */
+#endif /* !__USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

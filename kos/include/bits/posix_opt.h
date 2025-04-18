@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfae009a0 */
+/* HASH CRC-32:0x28859381 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: GNU C Library (/bits/posix_opt.h) */
 /* (#) Portability: mintlib       (/include/bits/posix_opt.h) */
+/*!included_by <unistd.h>*/
 #ifndef _BITS_POSIX_OPT_H
 #define _BITS_POSIX_OPT_H 1
 

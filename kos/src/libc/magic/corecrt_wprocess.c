@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wprocess.h) */
+/*!always_includes <crtdefs.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -31,7 +32,7 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
-#include <corecrt.h>
+#include <crtdefs.h>
 )]%{
 
 #ifdef __CC__

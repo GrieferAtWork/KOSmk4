@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x195d1e48 */
+/* HASH CRC-32:0x6d4ec8ae */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wstdlib.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _CORECRT_WSTDLIB_H
 #define _CORECRT_WSTDLIB_H 1
 
@@ -32,6 +33,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 #include <bits/types.h>
+#include <crtdefs.h>
 
 #define _MAX_I64TOSTR_BASE16_COUNT (16 + 1)
 #define _MAX_I64TOSTR_BASE10_COUNT (1 + 19 + 1)

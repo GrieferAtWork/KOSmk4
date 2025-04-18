@@ -32,7 +32,7 @@
 }%[insert:prefix(
 #include <linux/inotify.h>
 )]%[insert:prefix(
-#include <bits/types.h>   /* fd_t */
+#include <bits/types.h> /* fd_t */
 )]%{
 
 #ifdef __USE_GLIBC_BLOAT

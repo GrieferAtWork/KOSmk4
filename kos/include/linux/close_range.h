@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd97d3ed */
+/* HASH CRC-32:0xac842fa4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/include/linux/close_range.h) */
+/*!included_by <unistd.h>*/
 #ifndef _LINUX_CLOSE_RANGE_H
 #define _LINUX_CLOSE_RANGE_H 1
 

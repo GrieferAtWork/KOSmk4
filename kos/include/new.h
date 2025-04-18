@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c15120c */
+/* HASH CRC-32:0x66f67d99 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/new.h) */
 /* (#) Portability: Windows Kits (/ucrt/new.h) */
+/*!always_includes <crtdefs.h>*/
 #ifndef _NEW_H
 #define _NEW_H 1
 

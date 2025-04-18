@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/resource.h) */
+/*!always_includes <asm/os/resource.h>*/
 #ifndef _ASM_RESOURCE_H
 #define _ASM_RESOURCE_H 1
 

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fcntl.h>*/
+/*!included_by <io.h>*/
+/*!included_by <kos/fcntl.h>*/
+/*!included_by <stdio.h>*/
+/*!included_by <stdlib.h>*/
 #ifndef _ASM_OS_OFLAGS_H
 #define _ASM_OS_OFLAGS_H 1
 

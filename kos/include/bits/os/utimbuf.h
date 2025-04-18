@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <utime.h>*/
 #ifndef _BITS_OS_UTIMBUF_H
 #define _BITS_OS_UTIMBUF_H 1
 

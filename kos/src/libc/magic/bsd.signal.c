@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libc4/5 (/include/bsd/signal.h) */
+/*!always_includes <signal.h>*/
 }
 
 %[insert:prefix(

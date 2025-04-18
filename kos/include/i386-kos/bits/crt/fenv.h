@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <fenv.h>*/
 #ifndef _I386_KOS_BITS_FENV_H
 #define _I386_KOS_BITS_FENV_H 1
 

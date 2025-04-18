@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/mman.h) */
+/*!included_by <sys/mman.h>*/
+/*!always_includes <asm/os/mman.h>*/
 #ifndef _ASM_MMAN_H
 #define _ASM_MMAN_H 1
 

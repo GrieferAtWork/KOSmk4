@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd1a5a93 */
+/* HASH CRC-32:0x83698d3c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 /* (#) Portability: mintlib       (/include/sys/sem.h) */
 /* (#) Portability: musl libc     (/include/sys/sem.h) */
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
+/*!always_includes <sys/ipc.h>*/
 #ifndef _SYS_SEM_H
 #define _SYS_SEM_H 1
 

@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/errno.h) */
+/*!included_by <errno.h>*/
+/*!always_includes <asm/errno-base.h>*/
 #ifndef _ASM_ERRNO_H
 #define _ASM_ERRNO_H 1
 

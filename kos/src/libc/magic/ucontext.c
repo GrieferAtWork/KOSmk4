@@ -29,6 +29,7 @@
 /* (#) Portability: mintlib       (/include/ucontext.h) */
 /* (#) Portability: musl libc     (/include/ucontext.h) */
 /* (#) Portability: uClibc        (/include/ucontext.h) */
+/*!always_includes <sys/ucontext.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

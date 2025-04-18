@@ -25,12 +25,11 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
-#include <debugger/hook.h>
 #include <kernel/except.h>
 #include <kernel/fs/fs.h>
 #include <kernel/handman.h>
 #include <kernel/heap.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/execinfo.h>
@@ -40,23 +39,29 @@
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
-#include <kernel/panic.h>
+#include <kernel/paging.h>
 #include <kernel/syscall.h>
-#include <kernel/types.h>
 #include <sched/async.h>
 #include <sched/comm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
 #include <asm/defsym.h>
 #include <asm/farptr.h>
+#include <kos/except.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
+#include <linux/prctl.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -186,7 +191,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_arch)(void);
 
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL initialize_predefined_trampoline)(struct task *__restrict self,
-                                                   PAGEDIR_PAGEALIGNED void *addr) {
+                                                PAGEDIR_PAGEALIGNED void *addr) {
 	FORTASK(self, this_trampoline_node_).mn_minaddr = (byte_t *)addr;
 	FORTASK(self, this_trampoline_node_).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
 	/* Load the trampoline node into the kernel VM. */

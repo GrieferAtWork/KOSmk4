@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/siginfo.h) */
+/*!always_includes <asm/os/sigevent.h>*/
+/*!always_includes <asm/os/siginfo.h>*/
+/*!always_includes <bits/os/sigevent.h>*/
+/*!always_includes <bits/os/siginfo.h>*/
+/*!always_includes <bits/os/sigval.h>*/
 #ifndef _ASM_SIGINFO_H
 #define _ASM_SIGINFO_H 1
 

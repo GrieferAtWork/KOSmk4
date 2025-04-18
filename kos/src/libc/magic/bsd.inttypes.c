@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: libbsd (/include/bsd/inttypes.h) */
+/*!always_includes <inttypes.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

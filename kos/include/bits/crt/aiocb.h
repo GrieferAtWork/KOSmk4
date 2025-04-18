@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <aio.h>*/
 #ifndef _BITS_CRT_AIOCB_H
 #define _BITS_CRT_AIOCB_H 1
 

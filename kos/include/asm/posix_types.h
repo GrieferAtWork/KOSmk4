@@ -20,6 +20,7 @@
 /* (#) Portability: Cygwin    (/winsup/cygwin/include/asm/posix_types.h) */
 /* (#) Portability: Linux     (/usr/include/[...]/asm/posix_types.h) */
 /* (#) Portability: diet libc (/include/asm/posix_types.h) */
+/*!always_includes <linux/posix_types.h>*/
 #ifndef _ASM_POSIX_TYPES_H
 #define _ASM_POSIX_TYPES_H 1
 

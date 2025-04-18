@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <asm/os/file-ioctls.h>*/
 #ifndef _ASM_OS_SOLARIS_FILE_IOCTLS_H
 #define _ASM_OS_SOLARIS_FILE_IOCTLS_H 1
 

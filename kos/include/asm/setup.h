@@ -18,8 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/[...]/asm/setup.h) */
-#ifndef _ASM_RESOURCE_H
-#define _ASM_RESOURCE_H 1
+#ifndef _ASM_SETUP_H
+#define _ASM_SETUP_H 1
 
 #include <linux/types.h>
 
@@ -27,4 +27,4 @@
 #define COMMAND_LINE_SIZE 2048 /* ??? */
 #endif /* !COMMAND_LINE_SIZE */
 
-#endif /* !_ASM_RESOURCE_H */
+#endif /* !_ASM_SETUP_H */

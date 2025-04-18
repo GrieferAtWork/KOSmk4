@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a42df11 */
+/* HASH CRC-32:0x9eaa376c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 /* (#) Portability: mintlib       (/include/ucontext.h) */
 /* (#) Portability: musl libc     (/include/ucontext.h) */
 /* (#) Portability: uClibc        (/include/ucontext.h) */
+/*!always_includes <sys/ucontext.h>*/
 #ifndef _UCONTEXT_H
 #define _UCONTEXT_H 1
 

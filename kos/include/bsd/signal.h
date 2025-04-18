@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb51ed3ec */
+/* HASH CRC-32:0x37c08716 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: libc4/5 (/include/bsd/signal.h) */
+/*!always_includes <signal.h>*/
 #ifndef _BSD_SIGNAL_H
 #define _BSD_SIGNAL_H 1
 

@@ -17,6 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!included_by <aio.h>*/
+/*!included_by <fcntl.h>*/
+/*!included_by <kos/futex.h>*/
+/*!included_by <kos/futexexpr.h>*/
+/*!included_by <kos/sched/shared-lock.h>*/
+/*!included_by <kos/sched/shared-rwlock.h>*/
+/*!included_by <kos/sched/shared-recursive-lock.h>*/
+/*!included_by <kos/sched/shared-recursive-rwlock.h>*/
+/*!included_by <sched.h>*/
+/*!included_by <signal.h>*/
+/*!included_by <sys/select.h>*/
+/*!included_by <sys/socket.h>*/
+/*!included_by <sys/stat.h>*/
+/*!included_by <threads.h>*/
+/*!included_by <time.h>*/
 #ifndef _BITS_OS_TIMESPEC_H
 #define _BITS_OS_TIMESPEC_H 1
 

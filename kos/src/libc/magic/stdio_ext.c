@@ -28,6 +28,7 @@
 /* (#) Portability: libc6         (/include/stdio_ext.h) */
 /* (#) Portability: musl libc     (/include/stdio_ext.h) */
 /* (#) Portability: uClibc        (/include/stdio_ext.h) */
+/*!always_includes <stdio.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

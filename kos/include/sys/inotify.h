@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ba4a67 */
+/* HASH CRC-32:0xe240fc9b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 #include <features.h>
 
 #include <linux/inotify.h>
-#include <bits/types.h>   /* fd_t */
+#include <bits/types.h> /* fd_t */
 
 #ifdef __USE_GLIBC_BLOAT
 #include <stdint.h>
