@@ -980,6 +980,7 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 	REF struct task *child;
 	struct task_clone_args cargs;
 	bzero(&cargs, sizeof(cargs));
+	validate_readable(cl_args, size);
 	switch (size) {
 
 	case 88:
@@ -992,7 +993,6 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 	case 64: {
 		size_t stacksize;
 		NCX UNCHECKED void *stackbase;
-		validate_readable(cl_args, size);
 		cargs.tca_flags       = cl_args->ca_flags;
 		cargs.tca_pidfd       = cl_args->ca_pidfd;
 		cargs.tca_child_tid   = cl_args->ca_child_tid;
