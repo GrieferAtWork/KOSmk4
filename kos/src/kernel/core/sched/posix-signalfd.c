@@ -23,26 +23,30 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handman.h>
-#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/posix-signalfd.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/sigmask.h>
 
 #include <kos/except/reason/inval.h>
-#include <sys/poll.h>
+#include <kos/io.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/signalfd.h>
 
 #include <assert.h>
-#include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #undef sigmask

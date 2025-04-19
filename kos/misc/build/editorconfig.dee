@@ -106,15 +106,19 @@ function scanDirectoryForEditorConfigTags(path: string, relBase: string) {
 		} else if (ent.d_type == posix.DT_REG) {
 			local includeFilename = relBase + ent.d_name;
 			for (local prefix: {
-					"i386-kos/c++/12.1.0/i686-kos",
+					"i386-kos/c++/12.1.0/i686-kos/",
 					"i386-kos/c++/12.1.0/",
 					"i386-kos/",
-					"arm-kos/c++/12.1.0/i686-kos",
+					"arm-kos/c++/12.1.0/i686-kos/",
 					"arm-kos/c++/12.1.0/",
 					"arm-kos/",
 			}) {
 				if (includeFilename.startswith(prefix)) {
-					includeFilename = includeFilename[#prefix:];
+					local nonArchFilename = ent.d_fullname
+							.replace("\\", "/")
+							.replace(prefix, "");
+					if (posix.stat.isreg(nonArchFilename))
+						includeFilename = includeFilename[#prefix:];
 					break;
 				}
 			}
@@ -160,6 +164,10 @@ function main() {
 		print out: ("root = true");
 		print out: ("");
 		print out: ("[*]");
+
+		/* Strings that VS seems to read from .editorconfig */
+		// tab_size insert_tabs indent_braces indent_size align_parameters indentation_reference indent_case_contents preserve_parameter_indentation indent_case_braces indent_case_labels indent_preprocessor indent_goto_labels indent_namespace_contents indent_access_specifiers indent_lambda_braces preserve_comment_indentation newline_type_brace newline_namespace_brace newline_control_block_brace newline_function_brace newline_scope_brace newline_lambda_brace newline_empty_function_close_brace newline_empty_type_close_brace newline_keyword_else newline_keyword_catch space_before_function_parenthesis newline_keyword_while space_between_empty_function_parentheses space_within_function_parentheses space_within_control_block_parentheses space_before_control_block_parenthesis space_within_cast_parentheses space_before_lambda_parenthesis space_within_expression_parentheses space_after_cast_parenthesis space_between_empty_braces space_before_block_brace space_within_init_list_braces space_before_init_list_brace space_before_bracket preserve_init_list_space space_before_empty_bracket space_within_brackets group_brackets space_between_empty_brackets space_between_empty_lambda_brackets space_within_lambda_brackets space_after_comma space_before_comma space_before_inheritance_colon trim_space_around_scope remove_space_before_semicolon space_before_constructor_colon trim_space_unary_operator space_after_semicolon space_around_assignment_operator space_around_binary_operator space_around_conditional_operator pointer_alignment use_ue_macro_formatting preserve_block cpp_include_cleanup_remove_unused cpp_include_cleanup_add_missing cpp_include_cleanup_excluded_files cpp_include_cleanup_replacement_files cpp_include_cleanup_alternate_files cpp_include_cleanup_required_files cpp_includes_style cpp_includes_use_forward_slash cpp_include_cleanup_optimize_unused cpp_include_cleanup_sort_after_edits cpp_sort_includes_priority_style cpp_sort_includes_error_tag_type cpp_sort_includes_priority_matching_header cpp_sort_includes_priority_case_sensitive cpp_sort_includes_keep_groups
+
 		print out: ("cpp_sort_includes_error_tag_type = none");
 		print out: ("cpp_sort_includes_priority_case_sensitive = true");
 		print out: ("cpp_sort_includes_priority_style = quoted");

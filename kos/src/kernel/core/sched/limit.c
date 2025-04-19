@@ -26,21 +26,23 @@
 
 #include <kernel/handman.h>
 #include <kernel/syscall.h>
-#include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <bits/os/kos/rlimit.h>
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/types.h>
 #include <sys/resource.h>
 
 #include <atomic.h>
+#include <errno.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

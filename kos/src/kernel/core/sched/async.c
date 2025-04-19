@@ -25,15 +25,23 @@
 #include <kernel/compiler.h>
 
 #include <kernel/aio.h>
+#include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/types.h>
 #include <sched/async-intern.h>
 #include <sched/async.h>
+#include <sched/pertask.h>
+#include <sched/sig-completion.h>
 #include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/bsearch.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/aref.h>
+#include <kos/except.h>
 #include <kos/lockop.h>
 
 #include <assert.h>

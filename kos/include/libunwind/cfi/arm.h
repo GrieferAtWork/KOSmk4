@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <libunwind/cfi.h>*/
 #ifndef _LIBUNWIND_CFI_ARM_H
 #define _LIBUNWIND_CFI_ARM_H 1
 

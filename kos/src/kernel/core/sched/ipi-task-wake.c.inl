@@ -23,7 +23,17 @@
 //#define DEFINE_task_wake_as
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <sched/cpu.h>
+#include <sched/pertask.h>
+#include <sched/scheduler.h>
+#include <sched/task.h>
+
 #include <hybrid/sched/preemption.h>
+
+#include <atomic.h>
+#include <stdint.h>
 
 #if (defined(DEFINE_task_wake) + defined(DEFINE_task_wake_as)) != 1
 #error "Invalid configuration (must define exactly one of these macros)"

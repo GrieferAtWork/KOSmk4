@@ -24,12 +24,10 @@
 
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
-#include <kernel/handle.h>
 #include <kernel/handman.h>
-#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
-#include <kernel/types.h>
+#include <sched/atomic64.h>
 #include <sched/eventfd.h>
 #include <sched/sig.h>
 
@@ -38,9 +36,11 @@
 
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
 #include <sys/eventfd.h>
 
-#include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 
 DECL_BEGIN

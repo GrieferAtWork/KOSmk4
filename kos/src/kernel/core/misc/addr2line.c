@@ -24,23 +24,22 @@
 #include <kernel/compiler.h>
 
 #include <kernel/addr2line.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
-#include <kernel/types.h>
+#include <kernel/mman/module.h>
 #include <sched/sig.h>
 
 #include <kos/exec/module.h>
+#include <kos/types.h>
 
-#include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
-#include <libdebuginfo/debug_aranges.h>
-#include <libdebuginfo/debug_info.h>
-#include <libdebuginfo/debug_line.h>
+#include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/errno.h>
 
 DECL_BEGIN

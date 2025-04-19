@@ -28,16 +28,23 @@
 #include <kernel/malloc.h>
 #include <sched/async.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
 #include <sched/rpc-internal.h>
-#include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/timer.h>
 
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

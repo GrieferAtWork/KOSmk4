@@ -25,18 +25,22 @@
 
 #include <kernel/entropy.h>
 #include <kernel/printk.h>
+#include <kernel/types.h>
 #include <sched/cpu.h>
+#include <sched/pertask.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <time.h>
 
 DECL_BEGIN

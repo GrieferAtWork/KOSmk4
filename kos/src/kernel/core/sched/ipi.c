@@ -24,18 +24,21 @@
 #include <kernel/compiler.h>
 
 #include <kernel/debugtrap.h>
-#include <kernel/mman.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>
-#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/sched/preemption.h>
+
+#include <bits/types.h>
+#include <kos/debugtrap.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <atomic.h>

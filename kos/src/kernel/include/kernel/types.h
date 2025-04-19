@@ -19,6 +19,7 @@
  */
 /*!always_includes <hybrid/typecore.h>*/
 /*!always_includes <kos/kernel/types.h>*/
+/*!always_includes <bits/os/timespec.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_TYPES_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_TYPES_H 1
 

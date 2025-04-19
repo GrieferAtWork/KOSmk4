@@ -28,16 +28,20 @@
 
 #ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 #include <kernel/malloc.h>
+#include <sched/pertask.h>
 #include <sched/rpc-internal.h>
-#include <sched/rpc.h>
 #include <sched/sig.h>
 
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
+#include <kos/kernel/types.h>
+#include <kos/rpc.h>
+#include <linux/prctl.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

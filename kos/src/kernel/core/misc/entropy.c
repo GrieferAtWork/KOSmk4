@@ -28,12 +28,9 @@
 #include <kernel/entropy.h>
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
-#include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/sig.h>
 
-#include <hybrid/bit.h>
-#include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
@@ -41,19 +38,30 @@
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/param.h>
 #include <sys/random.h>
 
 #include <assert.h>
 #include <atomic.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifndef CONFIG_NO_SMP
 #include <hybrid/sched/atomic-lock.h>
 #endif /* !CONFIG_NO_SMP */
+
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
+#include <hybrid/bit.h>
+
+#include <inttypes.h>
+#include <stdint.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #define ENTROPY_BITS (CONFIG_KERNEL_ENTROPY_BUFFER_SIZE * NBBY)
 

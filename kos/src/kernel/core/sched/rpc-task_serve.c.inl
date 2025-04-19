@@ -24,9 +24,30 @@
 //#define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
 
-#include <sched/sigaction.h>
+#include <kernel/compiler.h>
 
+#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/rpc-internal.h>
+#include <sched/sigaction.h>
+#include <sched/sigmask.h>
+#include <sched/task.h>
+
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/except.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/rpc.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <atomic.h>
 #include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 #if (defined(DEFINE_task_serve_with_icpustate) +    \
      defined(DEFINE_task_serve_with_icpustate_nx) + \

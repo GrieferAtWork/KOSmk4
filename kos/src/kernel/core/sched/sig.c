@@ -30,7 +30,6 @@
 #include <kernel/printk.h>
 #include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/pertask.h>
-#include <sched/rpc.h>
 #include <sched/sig-completion.h>
 #include <sched/sig-select.h>
 #include <sched/sig.h>
@@ -41,6 +40,7 @@
 #include <hybrid/sched/preemption.h>
 
 #include <kos/nopf.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -53,8 +53,11 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/x86/segment.h>
 #endif /* __i386__ || __x86_64__ */
+#include <stdint.h>
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset(p, c, n) memset(p, c, n)

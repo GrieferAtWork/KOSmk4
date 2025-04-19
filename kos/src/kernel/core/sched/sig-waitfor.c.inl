@@ -26,6 +26,21 @@
 //#define DEFINE_task_waitfor_norpc_nx
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/types.h>
+#include <sched/rpc.h>
+#include <sched/sig.h>
+#include <sched/task.h>
+
+#include <hybrid/sched/preemption.h>
+
+#include <kos/except.h>
+
+#include <assert.h>
+#include <atomic.h>
+#include <stddef.h>
+
 #if (defined(DEFINE_task_waitfor) +              \
      defined(DEFINE_task_waitfor_with_sigmask) + \
      defined(DEFINE_task_waitfor_nx) +           \

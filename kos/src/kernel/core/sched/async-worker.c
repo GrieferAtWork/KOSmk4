@@ -25,10 +25,9 @@
 
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/types.h>
 #include <sched/async.h>
 #include <sched/task.h>
-
-#include <hybrid/sched/preemption.h>
 
 #include <kos/aref.h>
 #include <kos/except.h>
@@ -37,6 +36,7 @@
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifndef CONFIG_NO_SMP

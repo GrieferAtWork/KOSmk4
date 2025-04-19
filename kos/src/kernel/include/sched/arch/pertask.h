@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <sched/pertask.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_ARCH_PERTASK_H
 #define GUARD_KERNEL_INCLUDE_SCHED_ARCH_PERTASK_H 1
 

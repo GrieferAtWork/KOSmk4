@@ -17,16 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!replace_with_include <kos/coredump.h>*/
-#ifndef _I386_KOS_KOS_BITS_COREDUMP_H
-#define _I386_KOS_KOS_BITS_COREDUMP_H 1
-
-#include <hybrid/host.h>
-
-#ifdef __x86_64__
-#include "coredump64.h"
-#else /* __x86_64__ */
-#include "coredump32.h"
-#endif /* !__x86_64__ */
-
-#endif /* !_I386_KOS_KOS_BITS_COREDUMP_H */
+/*!replace_with_include <errno.h>*/
+#ifndef __errno_t_defined
+#include <bits/types.h>
+#ifndef __errno_t_defined
+#define __errno_t_defined
+#ifdef __CC__
+__DECL_BEGIN
+typedef __errno_t errno_t;
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__errno_t_defined */
+#endif /* !__errno_t_defined */

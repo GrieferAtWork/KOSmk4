@@ -33,12 +33,17 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <compat/config.h>
 #include <kos/except.h>
@@ -48,6 +53,7 @@
 #include <atomic.h>
 #include <errno.h>
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

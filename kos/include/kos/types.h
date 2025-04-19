@@ -31,6 +31,15 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/errno_t.h>   /* So VS suggests <errno.h> for errno_t */
+#include <bits/types/intN_t.h>    /* So VS suggests <stdint.h> for intN_t */
+#include <bits/types/intptr_t.h>  /* So VS suggests <stdint.h> for intptr_t */
+#include <bits/types/ptrdiff_t.h> /* So VS suggests <stddef.h> for ptrdiff_t */
+#include <bits/types/size_t.h>    /* So VS suggests <stddef.h> for size_t */
+#include <bits/types/uintN_t.h>   /* So VS suggests <stdint.h> for uintN_t */
+#include <bits/types/uintptr_t.h> /* So VS suggests <stdint.h> for uintptr_t */
+#endif /* __INTELLISENSE__ */
 
 __DECL_BEGIN
 

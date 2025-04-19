@@ -23,12 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h> /* CONFIG_HAVE_KERNEL_DEBUGGER */
+#include <kernel/paging.h>
 #include <sched/cpu.h>
-
-#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
-#include <debugger/rt.h> /* dbg_active */
-#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_BEGIN
 

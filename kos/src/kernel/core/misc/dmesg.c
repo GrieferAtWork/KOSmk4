@@ -32,13 +32,15 @@
 
 #include <debugger/hook.h>
 #include <kernel/dmesg.h>
+#include <kernel/syslog.h>
 #include <sched/task.h>
 
-#include <hybrid/sched/atomic-rwlock.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <atomic.h>
-#include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <time.h> /* NSEC_PER_SEC */
 

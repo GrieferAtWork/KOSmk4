@@ -31,6 +31,8 @@
 
 #include <hybrid/sequence/bsearch.h>
 
+#include <kos/aref.h>
+#include <kos/asm/rpc.h>
 #include <kos/except.h>
 
 #include <assert.h>

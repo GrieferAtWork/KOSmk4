@@ -1259,7 +1259,7 @@
 #define __DLFCN_DLTLSADDR2_CC
 #define DI_DEBUGINFO_CU_PARSER_EACHATTR(a,b) for(;;)
 #define ANSITTY_INTERNAL(x) x
-#define DEFINE_TEST(x) void test_##x(void)
+#define DEFINE_TEST(x) static void test_##x(void)
 #define PCI_FOREACH(...) for(;;)
 #define PCI_FOREACH_CLASS(...) for(;;)
 #define PCI_FOREACH_DEVICE_CLASS(...) for(;;)

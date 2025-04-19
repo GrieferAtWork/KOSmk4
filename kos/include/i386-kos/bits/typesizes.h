@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/bits/typesizes.h) */
+/*!replace_with_include <bits/types.h>*/
 #ifndef _I386_KOS_BITS_TYPESIZES_H
 #define _I386_KOS_BITS_TYPESIZES_H 1
 

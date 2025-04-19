@@ -20,6 +20,7 @@
 /*!always_includes <__stdinc.h>*/
 /*!always_includes <hybrid/compiler.h>*/
 /*!always_includes <kos/anno.h>*/
+/*!always_includes <kernel/compiler-branch-tracer.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_COMPILER_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_COMPILER_H 1
 

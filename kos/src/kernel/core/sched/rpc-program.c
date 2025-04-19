@@ -31,21 +31,23 @@
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/rw.h>
+#include <kernel/paging.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/atomic64.h>
 #include <sched/cred.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
 #include <sched/sigmask.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/signed-shift.h>
@@ -57,6 +59,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/nopf.h>
 #include <kos/rpc.h>
+#include <kos/types.h>
 #include <sys/param.h>
 
 #include <alloca.h>
@@ -67,8 +70,10 @@
 #include <signal.h>
 #include <stdalign.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
+#include <libunwind/api.h>
 #include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
 #include <libunwind/errno.h>
 #include <libunwind/register.h>
@@ -78,6 +83,7 @@
 #endif /* __x86_64__ */
 
 #if defined(__i386__) || defined(__x86_64__)
+#include <asm/cpu-flags.h>
 #include <sched/x86/eflags-mask.h>
 #endif /* __i386__ || __x86_64__ */
 

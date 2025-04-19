@@ -33,23 +33,30 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
+
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef DEFINE_compat_sys_rpc_schedule

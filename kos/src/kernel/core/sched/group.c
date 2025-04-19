@@ -29,19 +29,28 @@
 #include <dev/tty.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
 #include <sched/pid.h>
+#include <sched/sig.h>
 #include <sched/sigaction.h>
 #include <sched/task.h>
+
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
 
 #include <bits/os/rusage-convert.h>
 #include <bits/os/rusage.h>
 #include <compat/config.h>
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 #include <sys/wait.h>
 
 #include <assert.h>

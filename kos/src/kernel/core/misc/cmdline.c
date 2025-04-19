@@ -26,10 +26,12 @@
 #include <kernel/driver-param.h>
 #include <kernel/mman/driver.h>
 #include <kernel/panic.h>
-#include <kernel/types.h>
+
+#include <hybrid/typecore.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 

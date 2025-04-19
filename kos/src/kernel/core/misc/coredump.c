@@ -24,37 +24,43 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
+#include <debugger/debugger.h>
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
-#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 
+#include <bits/types.h>
 #include <kos/coredump.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
-#include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
 
 #include <libunwind/errno.h>
-#include <libunwind/unwind.h>
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
-#include <debugger/debugger.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
-#include <sched/group.h>
+#include <kernel/panic.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
+#include <asm/isa.h>
+#include <kos/types.h>
+
+#include <stdint.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 #include <libinstrlen/instrlen.h>
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 

@@ -25,8 +25,6 @@
 
 #include <kernel/except.h>
 #include <kernel/malloc.h>
-#include <kernel/panic.h>
-#include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/private.h>
 #include <sched/sig.h>
@@ -35,9 +33,13 @@
 #include <hybrid/align.h>
 #include <hybrid/sched/preemption.h>
 
+#include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
+
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

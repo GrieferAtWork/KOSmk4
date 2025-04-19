@@ -24,25 +24,19 @@
 #include <kernel/compiler.h>
 
 #include <debugger/rt.h> /* dbg_active */
-#include <kernel/except.h>
-#include <kernel/malloc.h>
-#include <kernel/mman.h>
 #include <kernel/panic.h>
-#include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/group.h>
+#include <sched/pertask.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
-#include <hybrid/overflow.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
 
-#include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
-#include <stddef.h>
-
 
 DECL_BEGIN
 

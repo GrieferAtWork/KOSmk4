@@ -23,11 +23,14 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/types.h>
 #include <sched/semaphore.h>
+#include <sched/sig.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

@@ -27,16 +27,21 @@
 #include <kernel/malloc.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
-#include <kernel/types.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -45,6 +50,7 @@
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libcpustate/apply.h>

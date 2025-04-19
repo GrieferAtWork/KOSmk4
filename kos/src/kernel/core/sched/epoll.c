@@ -35,6 +35,9 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/epoll.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
+#include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig-completion.h>
 #include <sched/sig.h>
@@ -42,11 +45,16 @@
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/sequence/list.h>
+
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/handle.h>
+#include <kos/lockop.h>
+#include <kos/sched/shared-lock.h>
 #include <sys/epoll.h>
 #include <sys/poll.h>
 
@@ -62,7 +70,6 @@
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 #include <kernel/compat.h> /* __ARCH_HAVE_COMPAT, syscall_iscompat() */
 #include <kernel/mman.h>
-#include <sched/group.h>
 #endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 #undef sigmask
@@ -2016,12 +2023,12 @@ DEFINE_SYSCALL4(ssize_t, epoll_wait,
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 sys_epoll_pwait_impl(struct icpustate *__restrict state,
                      struct rpc_syscall_info *__restrict sc_info) {
-	fd_t epfd                                 = (fd_t)sc_info->rsi_regs[0];
+	fd_t epfd                                = (fd_t)sc_info->rsi_regs[0];
 	NCX UNCHECKED struct epoll_event *events = (NCX UNCHECKED struct epoll_event *)sc_info->rsi_regs[1];
-	size_t maxevents                          = (size_t)sc_info->rsi_regs[2];
-	syscall_slong_t timeout                   = (syscall_slong_t)sc_info->rsi_regs[3];
+	size_t maxevents                         = (size_t)sc_info->rsi_regs[2];
+	syscall_slong_t timeout                  = (syscall_slong_t)sc_info->rsi_regs[3];
 	NCX UNCHECKED sigset_t const *sigmask    = (NCX UNCHECKED sigset_t const *)sc_info->rsi_regs[4];
-	size_t sigsetsize                         = (size_t)sc_info->rsi_regs[5];
+	size_t sigsetsize                        = (size_t)sc_info->rsi_regs[5];
 	if (sigmask) {
 		size_t result;
 		sigset_t these;
