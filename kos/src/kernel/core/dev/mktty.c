@@ -26,31 +26,34 @@
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
 #include <dev/mktty.h>
+#include <dev/tty.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/devfs.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
-#include <kernel/printk.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>
-#include <sched/rpc-internal.h>
-#include <sched/rpc.h>
-#include <sched/sig.h>
-#include <sched/task.h>
+#include <sched/pertask.h>
 
+#include <kos/aref.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
 #include <sys/ioctl.h>
 #include <sys/mkdev.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
-#include <termios.h>
+
+#include <libterm/api.h>
+#include <libterm/termio.h>
 
 DECL_BEGIN
 

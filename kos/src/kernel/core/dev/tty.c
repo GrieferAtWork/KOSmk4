@@ -26,22 +26,29 @@
 
 #include <dev/tty.h>
 #include <kernel/except.h>
+#include <kernel/fs/chrdev.h>
+#include <kernel/fs/devfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h> /* task_serve() */
+#include <sched/sig.h>
 #include <sched/sigaction.h>
 #include <sched/sigmask.h>
-#include <sched/task.h>
 
 #include <compat/config.h>
 #include <compat/kos/types.h>
+#include <kos/aref.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
+#include <kos/io.h>
 #include <kos/ioctl/tty.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -51,12 +58,17 @@
 #include <assert.h>
 #include <atomic.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <termios.h>
 
+#include <libbuffer/linebuffer.h>
+#include <libbuffer/ringbuffer.h>
+#include <libterm/api.h>
 #include <libterm/termio.h>
 
 DECL_BEGIN

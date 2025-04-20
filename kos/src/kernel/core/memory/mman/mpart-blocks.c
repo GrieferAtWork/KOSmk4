@@ -51,7 +51,8 @@
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
-#include <string.h>
+#include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

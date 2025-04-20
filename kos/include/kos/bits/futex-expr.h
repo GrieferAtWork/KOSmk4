@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <kos/futexexpr.h>*/
+/*!replace_with_include <kos/futexexpr.h>*/
 #ifndef _KOS_BITS_FUTEX_EXPR_H
 #define _KOS_BITS_FUTEX_EXPR_H 1
 

@@ -26,6 +26,7 @@
 #include <kernel/driver.h>
 #include <kernel/malloc.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
 
 #include <assert.h>

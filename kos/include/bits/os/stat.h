@@ -25,6 +25,7 @@
 #define _BITS_OS_STAT_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 /* When running as `__CRT_DOS_PRIMARY':
  *   `struct stat' is:

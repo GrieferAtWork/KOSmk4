@@ -23,18 +23,22 @@
 //#define DEFINE_mpart_mmap_force_p
 #endif /* __INTELLISENSE__ */
 
-#include <debugger/rt.h>
-#include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
+#include <hybrid/compiler.h>
+#include <kernel/compiler.h>
+
+#include <kernel/memory.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
+
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

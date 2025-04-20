@@ -26,9 +26,14 @@
 #include <kernel/compiler.h>
 
 #include <kernel/execabi.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/ramfile.h>
+#include <kernel/paging.h>
 
 #include <compat/config.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 
 #include <stddef.h>
 

@@ -43,7 +43,6 @@
 #include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
-#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 

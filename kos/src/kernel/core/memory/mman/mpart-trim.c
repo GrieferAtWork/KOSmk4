@@ -32,6 +32,7 @@
 #include <kernel/fs/path.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/mcoreheap.h>
@@ -42,23 +43,34 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
+#include <kernel/mman/rtm.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>
+#include <sched/pertask.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/task.h> /* _TASK_FDBGHEAPDMEM */
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 

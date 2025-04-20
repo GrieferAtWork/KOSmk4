@@ -40,7 +40,6 @@
 #include <hybrid/sequence/list.h>
 
 #include <compat/config.h>
-#include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/lockop.h>
 #include <kos/types.h>
@@ -50,6 +49,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libdebuginfo/api.h>

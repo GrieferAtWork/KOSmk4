@@ -27,20 +27,28 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mbuilder.h>
 #include <kernel/mman/mfile-map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
 #include <sched/rpc-internal.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/asm/rpc.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stddef.h>

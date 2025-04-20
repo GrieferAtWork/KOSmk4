@@ -77,6 +77,7 @@
 #include <elf.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libansitty/ansitty.h>

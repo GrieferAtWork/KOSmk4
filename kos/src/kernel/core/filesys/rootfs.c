@@ -25,20 +25,31 @@
 #include <kernel/compiler.h>
 
 #include <kernel/driver-param.h>
+#include <kernel/except.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/module.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 
+#include <hybrid/sequence/list.h>
+
+#include <kos/except.h>
+#include <kos/io.h>
+#include <kos/kernel/types.h>
+#include <kos/sched/shared-rwlock.h>
 #include <linux/fs.h>
 
 #include <assert.h>

@@ -35,17 +35,23 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
+#include <misc/unlockinfo.h>
+#include <sched/pertask.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
-#include <sched/userkern.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 #include <sys/wait.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

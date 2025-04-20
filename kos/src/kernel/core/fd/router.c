@@ -31,9 +31,9 @@
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/kernel/handle.h>
 
-#include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>

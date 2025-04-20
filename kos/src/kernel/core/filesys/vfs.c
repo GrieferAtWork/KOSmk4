@@ -27,8 +27,11 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/malloc.h>
-#include <sched/task.h>
+#include <kernel/mman/mfile.h>
+
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
 
 #include <assert.h>
 #include <stddef.h>

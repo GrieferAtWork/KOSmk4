@@ -53,8 +53,10 @@
 #endif /* __cplusplus */
 #define __DEPRECATED                       1
 #define __VERSION__                        "12.1.0"
+#ifndef __STDC_UTF_16__
 #define __STDC_UTF_16__                    1
 #define __STDC_UTF_32__                    1
+#endif /* !__STDC_UTF_16__ */
 #define __STDC__                           1
 #define __GNUC_STDC_INLINE__               1
 #define __HAVE_SPECULATION_SAFE_VALUE      1

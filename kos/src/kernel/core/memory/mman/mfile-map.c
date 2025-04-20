@@ -31,13 +31,18 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <sched/task.h>
+#include <kernel/paging.h>
+#include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

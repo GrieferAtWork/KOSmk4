@@ -25,21 +25,27 @@
 
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
+#include <dev/mktty.h>
 #include <kernel/except.h>
-#include <kernel/printk.h>
-#include <kernel/types.h>
+#include <kernel/fs/chrdev.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/user.h>
 
-#include <kos/except/reason/inval.h>
+#include <kos/aref.h>
 #include <kos/kernel/handle.h>
+#include <kos/types.h>
 #include <sys/ioctl.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <termios.h>
 
 #include <libansitty/ansitty.h>
+#include <libansitty/api.h>
+#include <libbuffer/ringbuffer.h>
+#include <libterm/termio.h>
 
 DECL_BEGIN
 

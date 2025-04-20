@@ -40,8 +40,10 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
@@ -51,9 +53,8 @@
 #include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-#include <hybrid/sequence/list.h>
-#include <misc/unlockinfo.h>
 
 DECL_BEGIN
 

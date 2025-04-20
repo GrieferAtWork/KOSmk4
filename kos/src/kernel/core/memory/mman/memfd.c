@@ -27,21 +27,25 @@
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
-#include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/memfd.h>
-#include <kernel/mman/mpart.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/paging.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/atomic64.h>
 #include <sched/tsc.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/kernel/handle.h>
+#include <kos/kernel/memory.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/mman.h>
 
-#include <dirent.h>
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>

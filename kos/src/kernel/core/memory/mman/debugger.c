@@ -43,22 +43,25 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/fs/super.h>
 #include <kernel/mman.h>
 #include <kernel/mman/enum.h>
-#include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/ramfile.h>
 #include <kernel/mman/unmapped.h>
-#include <kernel/printk.h>
+#include <kernel/paging.h>
 #include <sched/task.h>
 
 #include <compat/config.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/mkdev.h>
 
 #include <inttypes.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 #include <string.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/exec/rtld.h> /* COMPAT_RTLD_LIBDL */

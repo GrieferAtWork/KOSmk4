@@ -170,11 +170,11 @@ fdirenum_feedent_fast(NCX struct dirent *buf,
 /* Info descriptor for looking up directory entries by-name. */
 struct flookup_info {
 	NCX /*utf-8*/ char const *flu_name;    /* [?..flu_namelen] Name for the new file. */
-	uintptr_t                          flu_hash;    /* Hash for `mkf_name' (s.a. `fdirent_hash()') or
-	                                                 * `FLOOKUP_INFO_HASH_UNSET'  if  not calculated. */
-	u16                                flu_namelen; /* Length of `mkf_name' */
-	u16                               _flu_pad;     /* ... */
-	atflag_t                           flu_flags;   /* Set of `0 | AT_DOSPATH' (other flags are silently ignored) */
+	uintptr_t                 flu_hash;    /* Hash for `mkf_name' (s.a. `fdirent_hash()') or
+	                                        * `FLOOKUP_INFO_HASH_UNSET'  if  not calculated. */
+	u16                       flu_namelen; /* Length of `mkf_name' */
+	u16                      _flu_pad;     /* ... */
+	atflag_t                  flu_flags;   /* Set of `0 | AT_DOSPATH' (other flags are silently ignored) */
 };
 
 struct fcreatfile_info {
@@ -188,7 +188,7 @@ struct fcreatfile_info {
 		dev_t                  c_rdev;      /* [valid_if(S_ISDEV(mkf_fmode))][in] Referenced device. */
 		struct {
 			NCX /*utf-8*/ char const *s_text; /* [?..s_size][in] Symlink text. */
-			size_t                             s_size; /* [in] Symlink text length (in characters; excluding trailing \0). */
+			size_t                    s_size; /* [in] Symlink text length (in characters; excluding trailing \0). */
 		}                      c_symlink;   /* [valid_if(S_ISLNK(mkf_fmode))] Symlink text. */
 	};
 };
@@ -198,30 +198,30 @@ struct fmkfile_info {
 	union {
 		struct {
 			NCX /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
-			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
-			u16                                mkf_namelen; /* [in] Length of `mkf_name' */
-			u16                               _mkf_pad;     /* ... */
-			atflag_t                           mkf_flags;   /* [in] Set of `0 | AT_DOSPATH' */
+			uintptr_t                 mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
+			u16                       mkf_namelen; /* [in] Length of `mkf_name' */
+			u16                      _mkf_pad;     /* ... */
+			atflag_t                  mkf_flags;   /* [in] Set of `0 | AT_DOSPATH' */
 		};
-		struct flookup_info            mkf_lookup_info;     /* [in] Lookup info for the new file being created. */
+		struct flookup_info           mkf_lookup_info; /* [in] Lookup info for the new file being created. */
 	};
-	REF struct fdirent                *mkf_dent;    /* [1..1][out] Directory entry for the new file (s.a. `dno_lookup') */
-	mode_t                             mkf_fmode;   /* [in] File  type & access  permissions for the new  file-node. If a hard-
-	                                                 * link  should be created, this is field is set to ZERO. For this purpose,
-	                                                 * node that all S_IF*-file-type-flags are non-zero, meaning you can simply
-	                                                 * switch on this field and use `0' for hard-link. */
+	REF struct fdirent               *mkf_dent;    /* [1..1][out] Directory entry for the new file (s.a. `dno_lookup') */
+	mode_t                            mkf_fmode;   /* [in] File  type & access  permissions for the new  file-node. If a hard-
+	                                                * link  should be created, this is field is set to ZERO. For this purpose,
+	                                                * node that all S_IF*-file-type-flags are non-zero, meaning you can simply
+	                                                * switch on this field and use `0' for hard-link. */
 	union {
-		REF struct fnode              *mkf_rnode;   /* [1..1][out] The newly constructed file-node. */
-		REF struct fregnode           *mkf_rreg;    /* [1..1][out][valid_if(S_ISREG(mkf_fmode) || (mkf_fmode == 0 && fnode_isreg(mkf_hrdlnk.hl_node)))] */
-		REF struct fdirnode           *mkf_rdir;    /* [1..1][out][valid_if(S_ISDIR(mkf_fmode) || (mkf_fmode == 0 && fnode_isdir(mkf_hrdlnk.hl_node)))] */
-		REF struct flnknode           *mkf_rlnk;    /* [1..1][out][valid_if(S_ISLNK(mkf_fmode) || (mkf_fmode == 0 && fnode_islnk(mkf_hrdlnk.hl_node)))] */
-		REF struct ffifonode          *mkf_rfifo;   /* [1..1][out][valid_if(S_ISFIFO(mkf_fmode) || (mkf_fmode == 0 && fnode_isfifo(mkf_hrdlnk.hl_node)))] */
-		REF struct fsocknode          *mkf_rsock;   /* [1..1][out][valid_if(S_ISSOCK(mkf_fmode) || (mkf_fmode == 0 && fnode_issock(mkf_hrdlnk.hl_node)))] */
-		REF struct fdevnode           *mkf_rdev;    /* [1..1][out][valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdevnode(mkf_hrdlnk.hl_node)))] */
+		REF struct fnode             *mkf_rnode;   /* [1..1][out] The newly constructed file-node. */
+		REF struct fregnode          *mkf_rreg;    /* [1..1][out][valid_if(S_ISREG(mkf_fmode) || (mkf_fmode == 0 && fnode_isreg(mkf_hrdlnk.hl_node)))] */
+		REF struct fdirnode          *mkf_rdir;    /* [1..1][out][valid_if(S_ISDIR(mkf_fmode) || (mkf_fmode == 0 && fnode_isdir(mkf_hrdlnk.hl_node)))] */
+		REF struct flnknode          *mkf_rlnk;    /* [1..1][out][valid_if(S_ISLNK(mkf_fmode) || (mkf_fmode == 0 && fnode_islnk(mkf_hrdlnk.hl_node)))] */
+		REF struct ffifonode         *mkf_rfifo;   /* [1..1][out][valid_if(S_ISFIFO(mkf_fmode) || (mkf_fmode == 0 && fnode_isfifo(mkf_hrdlnk.hl_node)))] */
+		REF struct fsocknode         *mkf_rsock;   /* [1..1][out][valid_if(S_ISSOCK(mkf_fmode) || (mkf_fmode == 0 && fnode_issock(mkf_hrdlnk.hl_node)))] */
+		REF struct fdevnode          *mkf_rdev;    /* [1..1][out][valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdevnode(mkf_hrdlnk.hl_node)))] */
 	};
 	union {
 		struct {
-			struct fnode              *hl_node;     /* [1..1][in] The file to which to create a hard-link. */
+			struct fnode             *hl_node;     /* [1..1][in] The file to which to create a hard-link. */
 		}                      mkf_hrdlnk; /* [valid_if((mkf_fmode & S_IFMT) == 0)] Hardlink creation info. */
 		struct fcreatfile_info mkf_creat;  /* [valid_if((mkf_fmode & S_IFMT) != 0)] File creation info. */
 	};
@@ -232,25 +232,25 @@ struct frename_info {
 	union {
 		struct {
 			NCX /*utf-8*/ char const *frn_name;    /* [?..frn_namelen][in] Name for the new file. */
-			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
-			u16                                frn_namelen; /* [in] Length of `frn_name' */
-			u16                               _frn_pad;     /* ... */
-			atflag_t                           frn_flags;   /* [in] Set of `0 | AT_DOSPATH | AT_RENAME_EXCHANGE' */
+			uintptr_t                 frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') (or `FLOOKUP_INFO_HASH_UNSET') */
+			u16                       frn_namelen; /* [in] Length of `frn_name' */
+			u16                      _frn_pad;     /* ... */
+			atflag_t                  frn_flags;   /* [in] Set of `0 | AT_DOSPATH | AT_RENAME_EXCHANGE' */
 		};
-		struct flookup_info             frn_lookup_info;    /* [in] Lookup info for the new file being created. */
+		struct flookup_info           frn_lookup_info; /* [in] Lookup info for the new file being created. */
 	};
-	/*OUT_REF*/ struct fnode           *frn_repfile; /* [0..1][in] The existing file that should be replaced with `frn_file',
-	                                                  *            or `NULL' if no pre-existing file should be replaced,  and
-	                                                  *            only new files should be created (mandatory field when the
-	                                                  *            `AT_RENAME_EXCHANGE' flag was given).
-	                                                  * [0..1][out_if(FDIRNODE_RENAME_EXISTS)]. */
-	/*OUT_REF*/ struct fdirent         *frn_dent;    /* [0..1][out] New directory entry for the file (or `frn_repfile' for `FDIRNODE_RENAME_EXISTS') */
-	struct fnode                       *frn_file;    /* [1..1][in] The file that should be renamed. */
-	struct fdirent                     *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir'
-	                                                  * Under `AT_RENAME_EXCHANGE', this is [in|out]  REF. */
-	struct fdirnode                    *frn_olddir;  /* [1..1][in] Old containing directory. (Part of the same superblock!)
-	                                                  * NOTE: The new  directory  is  guarantied  not to  be  a  child  of  this
-	                                                  *       directory! (this must be asserted by the caller of `dno_rename()') */
+	/*OUT_REF*/ struct fnode         *frn_repfile; /* [0..1][in] The existing file that should be replaced with `frn_file',
+	                                                *            or `NULL' if no pre-existing file should be replaced,  and
+	                                                *            only new files should be created (mandatory field when the
+	                                                *            `AT_RENAME_EXCHANGE' flag was given).
+	                                                * [0..1][out_if(FDIRNODE_RENAME_EXISTS)]. */
+	/*OUT_REF*/ struct fdirent       *frn_dent;    /* [0..1][out] New directory entry for the file (or `frn_repfile' for `FDIRNODE_RENAME_EXISTS') */
+	struct fnode                     *frn_file;    /* [1..1][in] The file that should be renamed. */
+	struct fdirent                   *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir'
+	                                                * Under `AT_RENAME_EXCHANGE', this is [in|out]  REF. */
+	struct fdirnode                  *frn_olddir;  /* [1..1][in] Old containing directory. (Part of the same superblock!)
+	                                                * NOTE: The new  directory  is  guarantied  not to  be  a  child  of  this
+	                                                *       directory! (this must be asserted by the caller of `dno_rename()') */
 };
 
 

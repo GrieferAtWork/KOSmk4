@@ -34,7 +34,6 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/mman/driver.h>

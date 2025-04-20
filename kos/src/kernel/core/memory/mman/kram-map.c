@@ -26,17 +26,23 @@
 
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/cc.h>
-#include <kernel/mman/kram.h>
+#include <kernel/memory.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
+
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -85,6 +85,7 @@ DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PE
 #undef PERTASK_GET
 #undef PERTASK_SET
 #undef THIS_TASK
+#ifdef __cplusplus
 #define PERTASK     PERTASK
 #define PERTASK_GET PERTASK_GET
 #define PERTASK_SET PERTASK_SET
@@ -96,6 +97,13 @@ template<class T> T PERTASK_GET(T const &x);
 template<class T, class V, class = decltype(PERTASK_GET<T>(*(V *)0))> void PERTASK_SET(T &x, V value);
 extern struct task *THIS_TASK;
 } /* extern "C++" */
+#else /* __cplusplus */
+#define PERTASK(x)            x
+#define PERTASK_GET(x)        x
+#define PERTASK_SET(x, value) (void)((x) = (value))
+#define THIS_TASK             THIS_TASK
+extern struct task *THIS_TASK;
+#endif /* !__cplusplus */
 #endif /* !__INTELLISENSE__ */
 
 #ifndef PERCPU

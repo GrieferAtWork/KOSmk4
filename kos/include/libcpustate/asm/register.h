@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <libcpustate/register.h>*/
 #ifndef _LIBCPUSTATE_ASM_REGISTER_H
 #define _LIBCPUSTATE_ASM_REGISTER_H 1
 

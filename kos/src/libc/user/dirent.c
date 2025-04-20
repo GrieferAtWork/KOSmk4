@@ -707,7 +707,7 @@ NOTHROW_NCX(__FCALL dirent_glibc32_to_libc5)(struct glibc_dirent32 *__restrict s
 	/* Old versions of libc4/5 didn't have the `d_type' field.
 	 * Instead, their `struct dirent' matched `struct old_linux_direntx32',
 	 * which is identical to `struct glibc_dirent32', except that it  lacks
-	 * the `d_type' field (which becomes the first name-char instead) */
+	 * said `d_type' field (which becomes the first name-char instead) */
 	self = (struct glibc_dirent32 *)memmoveup((byte_t *)self + 1, self, 10);
 	return self;
 }

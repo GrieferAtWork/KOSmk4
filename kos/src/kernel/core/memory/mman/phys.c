@@ -26,6 +26,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/phys-access.h>
@@ -36,11 +37,13 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/defsym.h>
 #include <kos/except.h>
 #include <kos/nopf.h>
+#include <kos/types.h>
 #include <sys/io.h>
 
 #include <alloca.h>
@@ -48,6 +51,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifndef SIZEOF_POINTER

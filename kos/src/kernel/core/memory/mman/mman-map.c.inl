@@ -24,11 +24,14 @@
 //#define      DEFINE_mman_map_res
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile-map.h>
 #include <kernel/mman/mfile.h>
@@ -40,21 +43,21 @@
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <misc/unlockinfo.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include <libc/string.h>
+#include <string.h>
 
 DECL_BEGIN
 

@@ -46,7 +46,7 @@
 
 
 
- /* Special register constant that is always invalid */
+/* Special register constant that is always invalid */
 #ifndef CPU_REGISTER_NONE
 #define CPU_REGISTER_NONE 0
 #endif /* !CPU_REGISTER_NONE */

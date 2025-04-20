@@ -37,8 +37,15 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
+#include <sched/pertask.h>
+
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
 
 #include <stddef.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 
 DECL_BEGIN
 

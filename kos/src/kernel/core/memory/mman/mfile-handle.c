@@ -24,8 +24,10 @@
 #include <kernel/compiler.h>
 
 #include <dev/tty.h>
+#include <kernel/except.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
@@ -42,28 +44,34 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/task.h>
+#include <sched/pertask.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
-#include <asm/ioctl.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/ioctl/file.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <linux/fs.h>
 #include <sys/filio.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <ctime>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -420,7 +420,7 @@ typedef __UINT64_TYPE__ __u64;
 
 #ifndef ____le8_defined
 #define ____le8_defined
-#ifdef __INTELLISENSE__
+#if defined(__INTELLISENSE__) && defined(__cplusplus)
 typedef __intern::____intellisense_endianint<1234, __UINT8_TYPE__> __le8;
 typedef __intern::____intellisense_endianint<4321, __UINT8_TYPE__> __be8;
 typedef __intern::____intellisense_endianint<1234, __UINT16_TYPE__> __le16;

@@ -27,11 +27,10 @@
 #include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mpartmeta.h>
-#include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <sched/group.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 
 #include <bits/os/timespec.h>
@@ -39,12 +38,14 @@
 #include <kos/except/reason/inval.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
+#include <kos/types.h>
 #include <linux/futex.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/timespec.h>

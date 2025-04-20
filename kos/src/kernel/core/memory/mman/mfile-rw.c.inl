@@ -53,6 +53,8 @@
 //#define DEFINE_mfile_tailwritev_p
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/aio.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
@@ -63,19 +65,29 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
 #include <misc/unlockinfo.h>
+#include <sched/atomic64.h>
 #include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
+#include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
+#include <bits/types.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/kernel/memory.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libvio/api.h>

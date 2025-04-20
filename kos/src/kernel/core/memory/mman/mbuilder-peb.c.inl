@@ -28,6 +28,8 @@
 #endif
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -43,14 +45,18 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
 #include <kos/except.h>
 #include <kos/exec/peb.h>
 #include <kos/kernel/paging.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

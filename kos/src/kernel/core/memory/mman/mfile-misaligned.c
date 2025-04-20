@@ -32,14 +32,18 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <sched/task.h>
-#include <sched/tsc.h>
+#include <kernel/paging.h>
+#include <misc/unlockinfo.h>
+#include <sched/atomic64.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sched/__preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -48,7 +52,9 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 DECL_BEGIN
 

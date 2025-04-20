@@ -31,6 +31,8 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 
+#include <kos/aref.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>

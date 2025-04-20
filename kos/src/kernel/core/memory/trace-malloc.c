@@ -49,17 +49,19 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/syslog.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/group.h>
+#include <sched/pertask.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
@@ -67,19 +69,26 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
+#include <hybrid/typecore.h>
 
+#include <asm/isa.h>
 #include <kos/aref.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/param.h>
 
 #include <alloca.h>
 #include <assert.h>
+#include <elf.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -1344,6 +1353,7 @@ NOTHROW(TASK_ENUM_CC gc_reachable_thread_cb)(void *UNUSED(arg),
 }
 
 #if 0
+#include <kernel/printk.h>
 #define PRINT_LEAKS_SEARCH_PHASE(...) printk(KERN_INFO __VA_ARGS__)
 #else
 #define PRINT_LEAKS_SEARCH_PHASE(...) (void)0

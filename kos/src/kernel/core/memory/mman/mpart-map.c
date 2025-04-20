@@ -23,10 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman.h>
-#include <kernel/mman/mfile.h>
-#include <kernel/mman/mpart.h>
-
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset(p, c, n) memset(p, c, n)
 #else /* !NDEBUG && !NDEBUG_FINI */
@@ -38,10 +34,12 @@
 #include "mpart-map.c.inl"
 #define DEFINE_mpart_mmap_p
 #include "mpart-map.c.inl"
+
 #define DEFINE_mpart_mmap_node
 #include "mpart-map-node.c.inl"
 #define DEFINE_mpart_mmap_node_p
 #include "mpart-map-node.c.inl"
+
 #define DEFINE_mpart_mmap_force
 #include "mpart-map-force.c.inl"
 #define DEFINE_mpart_mmap_force_p

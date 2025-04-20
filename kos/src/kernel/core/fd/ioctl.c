@@ -32,12 +32,14 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/task.h>
+#include <sched/pertask.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
+#include <kos/ioctl/_openfd.h>
 #include <kos/ioctl/fd.h>
+#include <kos/kernel/handle.h>
 #include <linux/fs.h>
 #include <sys/fcntl.h>
 #include <sys/filio.h>
@@ -47,6 +49,7 @@
 #include <errno.h>
 #include <format-printer.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -23,7 +23,21 @@
 #define DEFINE_driver_do_apply_relocations_vector_addend
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/mman/driver.h>
+#include <kernel/printk.h>
+
 #include <kos/exec/elf-rel.h>
+#include <kos/exec/elf.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+
+#include <elf.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 DECL_BEGIN
 

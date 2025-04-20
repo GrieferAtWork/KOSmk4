@@ -25,9 +25,21 @@
 //#define DEFINE_fsuper_dev_wrsectors_chk
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/aio.h>
+#include <kernel/fs/super.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/phys.h>
+#include <sched/atomic64.h>
 
 #include <hybrid/overflow.h>
+
+#include <kos/except.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
+
+#include <stddef.h>
 
 #if (defined(DEFINE_fsuper_dev_rdsectors_async_chk) + \
      defined(DEFINE_fsuper_dev_wrsectors_async_chk) + \

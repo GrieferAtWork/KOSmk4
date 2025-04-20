@@ -27,7 +27,8 @@
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
-#include <kernel/user.h>
+#include <sched/pertask.h>
+#include <sched/sig.h>
 #include <sched/task.h> /* get_stack_avail() */
 
 #include <hybrid/overflow.h>
@@ -38,7 +39,10 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -46,6 +50,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 

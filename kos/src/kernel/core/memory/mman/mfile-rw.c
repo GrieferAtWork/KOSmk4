@@ -30,7 +30,9 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
 #include <kernel/refcountable.h>
+#include <misc/unlockinfo.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -38,13 +40,13 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/io.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-
-#include <libvio/api.h>
 
 DECL_BEGIN
 

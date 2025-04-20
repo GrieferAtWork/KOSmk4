@@ -32,17 +32,15 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
-#include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
 
 #include <hybrid/typecore.h>
 
-#include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state.h>
-
 #include <ctype.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 

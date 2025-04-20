@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Linux (/usr/include/linux/fcntl.h) */
+/*!replace_with_include <fcntl.h>*/
 #ifndef _LINUX_FCNTL_H
 #define _LINUX_FCNTL_H 1
 

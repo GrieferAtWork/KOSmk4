@@ -39,6 +39,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 
 #include <ctype.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

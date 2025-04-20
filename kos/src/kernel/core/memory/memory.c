@@ -29,24 +29,23 @@
 #include <debugger/io.h>
 #include <kernel/memory.h>
 #include <kernel/mman/cc.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
+#include <kernel/paging.h>
 #include <kernel/rand.h>
-#include <sched/group.h>
 
 #include <hybrid/bit.h>
-#include <hybrid/overflow.h>
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
-#include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
-#include <string.h>
+#include <stdint.h>
 
-/* These are only here for do_trace_external() */
-#include <kernel/arch/syslog.h> /* x86_syslog_write() */
-#include <stdio.h>
+#include <libansitty/ctl.h>
 
 DECL_BEGIN
 
@@ -54,6 +53,7 @@ DECL_BEGIN
 #define PAGES_PER_WORD  (BITS_PER_POINTER / PMEMZONE_BITSPERPAGE)
 
 #if !defined(NDEBUG) && 0
+#include <kernel/printk.h>
 #define PRINT_ALLOCATION(...) (printk(KERN_DEBUG "[memory] " __VA_ARGS__))
 #else /* !NDEBUG */
 #define PRINT_ALLOCATION(...) (void)0
@@ -61,6 +61,9 @@ DECL_BEGIN
 
 
 #if !defined(NDEBUG) && 0
+#include <kernel/arch/syslog.h> /* x86_syslog_write() */
+#include <stdio.h>
+
 LOCAL NOBLOCK void
 NOTHROW(KCALL do_trace_external)(char const *method,
                                  physpage_t min,

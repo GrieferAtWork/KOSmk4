@@ -28,6 +28,7 @@
 #include <kernel/fs/path.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
@@ -40,20 +41,25 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/swap.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #if 0

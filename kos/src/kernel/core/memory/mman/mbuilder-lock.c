@@ -25,20 +25,22 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
-#include <kernel/malloc.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/mbuilder.h>
 #include <kernel/mman/mfile-map.h>
-#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <misc/unlockinfo.h>
-#include <sched/task.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -22,14 +22,19 @@
 #define DEFINE_mfile_vioreadv
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
+
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stddef.h>
 
-#include <libvio/api.h>
 #include <libvio/access.h>
+#include <libvio/api.h>
+#include <libvio/vio.h>
 
 #ifdef LIBVIO_CONFIG_ENABLED
 DECL_BEGIN

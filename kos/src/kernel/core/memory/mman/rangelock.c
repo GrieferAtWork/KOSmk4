@@ -29,6 +29,8 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/rangelock.h>
 
+#include <hybrid/sequence/list.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>

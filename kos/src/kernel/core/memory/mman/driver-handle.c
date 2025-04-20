@@ -41,12 +41,18 @@
 
 #include <hybrid/overflow.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/mod.h>
+#include <kos/kernel/handle.h>
+#include <kos/types.h>
+#include <sys/ioctl.h>
 
 #include <atomic.h>
 #include <format-printer.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

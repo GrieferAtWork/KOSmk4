@@ -23,6 +23,26 @@
 #define DEFINE_mman_enum_ex
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <debugger/config.h>
+#include <debugger/rt.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
+#include <kernel/mman.h>
+#include <kernel/mman/enum.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
+
+#include <hybrid/overflow.h>
+
+#include <kos/types.h>
+
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #if (defined(DEFINE_mman_enum) + defined(DEFINE_mman_enum_ex)) != 1
 #error "Must #define exactly one of these macros"
 #endif /* ... */

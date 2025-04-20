@@ -40,15 +40,23 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
 
+#include <kos/aref.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+
 #include <alloca.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unicode.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/api.h>
 
 #undef DBG_LOGECHO
 #if defined(__i386__) || defined(__x86_64__)

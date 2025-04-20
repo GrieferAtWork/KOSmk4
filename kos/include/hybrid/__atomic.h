@@ -149,8 +149,8 @@ __DECL_BEGIN
 extern __UINT8_TYPE__ __hybrid_atomic_load8(__UINT8_TYPE__ const volatile *__ptr, int __order);
 extern void __hybrid_atomic_store8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
 extern __UINT8_TYPE__ __hybrid_atomic_xch8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__ __val, int __order);
-extern bool __hybrid_atomic_cmpxch8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
-extern bool __hybrid_atomic_cmpxch_weak8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch_weak8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
 extern __UINT8_TYPE__ __hybrid_atomic_cmpxch_val8(__UINT8_TYPE__ volatile *__p, __UINT8_TYPE__ __oldval, __UINT8_TYPE__ __newval, int __succ, int __fail);
 extern __UINT8_TYPE__ __hybrid_atomic_incfetch8(__UINT8_TYPE__ volatile *__ptr, int __order);
 extern __UINT8_TYPE__ __hybrid_atomic_decfetch8(__UINT8_TYPE__ volatile *__ptr, int __order);
@@ -210,8 +210,8 @@ extern void __hybrid_atomic_nand8(__UINT8_TYPE__ volatile *__ptr, __UINT8_TYPE__
 extern __UINT16_TYPE__ __hybrid_atomic_load16(__UINT16_TYPE__ const volatile *__ptr, int __order);
 extern void __hybrid_atomic_store16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
 extern __UINT16_TYPE__ __hybrid_atomic_xch16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYPE__ __val, int __order);
-extern bool __hybrid_atomic_cmpxch16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
-extern bool __hybrid_atomic_cmpxch_weak16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch_weak16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
 extern __UINT16_TYPE__ __hybrid_atomic_cmpxch_val16(__UINT16_TYPE__ volatile *__p, __UINT16_TYPE__ __oldval, __UINT16_TYPE__ __newval, int __succ, int __fail);
 extern __UINT16_TYPE__ __hybrid_atomic_incfetch16(__UINT16_TYPE__ volatile *__ptr, int __order);
 extern __UINT16_TYPE__ __hybrid_atomic_decfetch16(__UINT16_TYPE__ volatile *__ptr, int __order);
@@ -271,8 +271,8 @@ extern void __hybrid_atomic_nand16(__UINT16_TYPE__ volatile *__ptr, __UINT16_TYP
 extern __UINT32_TYPE__ __hybrid_atomic_load32(__UINT32_TYPE__ const volatile *__ptr, int __order);
 extern void __hybrid_atomic_store32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
 extern __UINT32_TYPE__ __hybrid_atomic_xch32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYPE__ __val, int __order);
-extern bool __hybrid_atomic_cmpxch32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
-extern bool __hybrid_atomic_cmpxch_weak32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch_weak32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
 extern __UINT32_TYPE__ __hybrid_atomic_cmpxch_val32(__UINT32_TYPE__ volatile *__p, __UINT32_TYPE__ __oldval, __UINT32_TYPE__ __newval, int __succ, int __fail);
 extern __UINT32_TYPE__ __hybrid_atomic_incfetch32(__UINT32_TYPE__ volatile *__ptr, int __order);
 extern __UINT32_TYPE__ __hybrid_atomic_decfetch32(__UINT32_TYPE__ volatile *__ptr, int __order);
@@ -333,8 +333,8 @@ extern void __hybrid_atomic_nand32(__UINT32_TYPE__ volatile *__ptr, __UINT32_TYP
 extern __UINT64_TYPE__ __hybrid_atomic_load64(__UINT64_TYPE__ const volatile *__ptr, int __order);
 extern void __hybrid_atomic_store64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
 extern __UINT64_TYPE__ __hybrid_atomic_xch64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYPE__ __val, int __order);
-extern bool __hybrid_atomic_cmpxch64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
-extern bool __hybrid_atomic_cmpxch_weak64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch_weak64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
 extern __UINT64_TYPE__ __hybrid_atomic_cmpxch_val64(__UINT64_TYPE__ volatile *__p, __UINT64_TYPE__ __oldval, __UINT64_TYPE__ __newval, int __succ, int __fail);
 extern __UINT64_TYPE__ __hybrid_atomic_incfetch64(__UINT64_TYPE__ volatile *__ptr, int __order);
 extern __UINT64_TYPE__ __hybrid_atomic_decfetch64(__UINT64_TYPE__ volatile *__ptr, int __order);
@@ -396,8 +396,8 @@ extern void __hybrid_atomic_nand64(__UINT64_TYPE__ volatile *__ptr, __UINT64_TYP
 extern __UINT128_TYPE__ __hybrid_atomic_load128(__UINT128_TYPE__ const volatile *__ptr, int __order);
 extern void __hybrid_atomic_store128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
 extern __UINT128_TYPE__ __hybrid_atomic_xch128(__UINT128_TYPE__ volatile *__ptr, __UINT128_TYPE__ __val, int __order);
-extern bool __hybrid_atomic_cmpxch128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
-extern bool __hybrid_atomic_cmpxch_weak128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
+extern __BOOL __hybrid_atomic_cmpxch_weak128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
 extern __UINT128_TYPE__ __hybrid_atomic_cmpxch_val128(__UINT128_TYPE__ volatile *__p, __UINT128_TYPE__ __oldval, __UINT128_TYPE__ __newval, int __succ, int __fail);
 extern __UINT128_TYPE__ __hybrid_atomic_incfetch128(__UINT128_TYPE__ volatile *__ptr, int __order);
 extern __UINT128_TYPE__ __hybrid_atomic_decfetch128(__UINT128_TYPE__ volatile *__ptr, int __order);

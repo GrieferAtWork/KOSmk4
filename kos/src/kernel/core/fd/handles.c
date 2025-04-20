@@ -39,17 +39,25 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/ioctl/_openfd.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+#include <linux/fcntl.h>
 
 #include <atomic.h>
 #include <fcntl.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

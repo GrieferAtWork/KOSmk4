@@ -1836,20 +1836,20 @@
 #define DEFINE_SYSCALL4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3)
 #define DEFINE_SYSCALL5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
 #define DEFINE_SYSCALL6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
-#define DEFINE_COMPAT_SYSCALL0(return_type,name)                                     return_type sys32_##name(void)
-#define DEFINE_COMPAT_SYSCALL1(return_type,name,T0,N0)                               return_type sys32_##name(T0 N0)
-#define DEFINE_COMPAT_SYSCALL2(return_type,name,T0,N0,T1,N1)                         return_type sys32_##name(T0 N0,T1 N1)
-#define DEFINE_COMPAT_SYSCALL3(return_type,name,T0,N0,T1,N1,T2,N2)                   return_type sys32_##name(T0 N0,T1 N1,T2 N2)
-#define DEFINE_COMPAT_SYSCALL4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3)
-#define DEFINE_COMPAT_SYSCALL5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
-#define DEFINE_COMPAT_SYSCALL6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
-#define DEFINE_SYSCALL32_0(return_type,name)                                     return_type sys32_##name(void)
-#define DEFINE_SYSCALL32_1(return_type,name,T0,N0)                               return_type sys32_##name(T0 N0)
-#define DEFINE_SYSCALL32_2(return_type,name,T0,N0,T1,N1)                         return_type sys32_##name(T0 N0,T1 N1)
-#define DEFINE_SYSCALL32_3(return_type,name,T0,N0,T1,N1,T2,N2)                   return_type sys32_##name(T0 N0,T1 N1,T2 N2)
-#define DEFINE_SYSCALL32_4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3)
-#define DEFINE_SYSCALL32_5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
-#define DEFINE_SYSCALL32_6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
+#define DEFINE_COMPAT_SYSCALL0(return_type,name)                                     static return_type sys32_##name(void)
+#define DEFINE_COMPAT_SYSCALL1(return_type,name,T0,N0)                               static return_type sys32_##name(T0 N0)
+#define DEFINE_COMPAT_SYSCALL2(return_type,name,T0,N0,T1,N1)                         static return_type sys32_##name(T0 N0,T1 N1)
+#define DEFINE_COMPAT_SYSCALL3(return_type,name,T0,N0,T1,N1,T2,N2)                   static return_type sys32_##name(T0 N0,T1 N1,T2 N2)
+#define DEFINE_COMPAT_SYSCALL4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3)
+#define DEFINE_COMPAT_SYSCALL5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
+#define DEFINE_COMPAT_SYSCALL6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
+#define DEFINE_SYSCALL32_0(return_type,name)                                     static return_type sys32_##name(void)
+#define DEFINE_SYSCALL32_1(return_type,name,T0,N0)                               static return_type sys32_##name(T0 N0)
+#define DEFINE_SYSCALL32_2(return_type,name,T0,N0,T1,N1)                         static return_type sys32_##name(T0 N0,T1 N1)
+#define DEFINE_SYSCALL32_3(return_type,name,T0,N0,T1,N1,T2,N2)                   static return_type sys32_##name(T0 N0,T1 N1,T2 N2)
+#define DEFINE_SYSCALL32_4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3)
+#define DEFINE_SYSCALL32_5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
+#define DEFINE_SYSCALL32_6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) static return_type sys32_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
 #define DEFINE_SYSCALL64_0(return_type,name)                                     return_type sys_##name(void)
 #define DEFINE_SYSCALL64_1(return_type,name,T0,N0)                               return_type sys_##name(T0 N0)
 #define DEFINE_SYSCALL64_2(return_type,name,T0,N0,T1,N1)                         return_type sys_##name(T0 N0,T1 N1)
@@ -1878,10 +1878,10 @@
 	void handle_##name##_weakdecref(void *restrict self){}
 
 #define DBG_CALL
-#define DBG_COMMAND(name,...)            intptr_t dbg_command_##name(size_t argc,char *argv[])
-#define DBG_COMMAND_AUTO(name,...)       intptr_t dbg_command_##name(size_t argc,char *argv[])
-#define DBG_NAMED_COMMAND(name,...)      intptr_t dbg_command_##name(size_t argc,char *argv[])
-#define DBG_NAMED_COMMAND_AUTO(name,...) intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_COMMAND(name,...)            static intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_COMMAND_AUTO(name,...)       static intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_NAMED_COMMAND(name,...)      static intptr_t dbg_command_##name(size_t argc,char *argv[])
+#define DBG_NAMED_COMMAND_AUTO(name,...) static intptr_t dbg_command_##name(size_t argc,char *argv[])
 #define DBG_INIT(func)  void dbg_init_##func(void)
 #define DBG_RESET(func) void dbg_reset_##func(void)
 #define DBG_FINI(func)  void dbg_fini_##func(void)
@@ -2797,10 +2797,10 @@
 #define DEFINE_PH_SLAB_KMALLOC_FUNCTIONS(sz,_) void*ph_slab_kmalloc##sz(gfp_t flags);void*ph_slab_kmalloc_nx##sz(gfp_t flags);
 #define DEFINE_PH_SLAB_KMALLOC_FUNCTIONS_IMPL(sz,_) void*ph_slab_kmalloc##sz(gfp_t flags){}void*ph_slab_kmalloc_nx##sz(gfp_t flags){}
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz,_) void*slab_malloc##sz(gfp_t flags);void*slab_kmalloc##sz(gfp_t flags);void*slab_kmalloc_nx##sz(gfp_t flags);
-#define DEFINE_UNARY_VIO_OPERATOR(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr){}
-#define DEFINE_BINARY_VIO_OPERATOR_VOID(n,bwlqx,T,opcode) void n(struct vioargs*args,vio_addr_t addr,T arg0){}
-#define DEFINE_BINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr,T arg0,bool atomic){}
-#define DEFINE_TRINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) T n(struct vioargs*args,vio_addr_t addr,T arg0,T arg1,bool atomic){}
+#define DEFINE_UNARY_VIO_OPERATOR(n,bwlqx,T,opcode) static T n(struct vioargs*args,vio_addr_t addr){}
+#define DEFINE_BINARY_VIO_OPERATOR_VOID(n,bwlqx,T,opcode) static void n(struct vioargs*args,vio_addr_t addr,T arg0){}
+#define DEFINE_BINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) static T n(struct vioargs*args,vio_addr_t addr,T arg0,bool atomic){}
+#define DEFINE_TRINARY_VIO_OPERATOR_ATOMIC(n,bwlqx,T,opcode) static T n(struct vioargs*args,vio_addr_t addr,T arg0,T arg1,bool atomic){}
 #define DEFINE_FIELD_SYMBOL(n,BASE,OFFSET,SIZEOF,T,field) ;int n(){};
 #define DEFINE_TIMESTRUCT_NOTE(n,T,note_time_value,a,b) ssize_t n(pformatprinter printer,void*arg,void const*pointer,unsigned int*pstatus){}
 #define _FDIRENT_FIELDS_WITHOUT_NAME refcnt_t fd_refcnt;struct fdirent_ops const*fd_ops;ino_t fd_ino;uintptr_t fd_hash;u16 fd_namelen;unsigned char fd_type;
@@ -2828,3 +2828,4 @@
 #define USER_EXCEPT(x)
 #define TARGET(...)
 #define XTARGET(...)
+#define UM_ElfW ElfW

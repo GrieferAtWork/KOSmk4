@@ -37,11 +37,14 @@
 #include <sched/comm.h>
 #include <sched/rpc.h> /* task_serve() */
 
+#include <kos/aref.h>
+#include <kos/debugtrap.h>
 #include <kos/except.h>
-#include <kos/except/reason/fs.h>
-#include <kos/except/reason/noexec.h>
+#include <kos/kernel/cpu-state.h>
+#include <linux/fcntl.h>
 
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 
 

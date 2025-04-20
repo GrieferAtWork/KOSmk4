@@ -38,12 +38,11 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/msync.h>
 #include <kernel/mman/remap.h>
+#include <kernel/paging.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
@@ -51,12 +50,15 @@
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/kernel/paging.h>
+#include <kos/types.h>
 #include <sys/mman.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

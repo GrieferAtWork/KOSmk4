@@ -32,7 +32,9 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/pertask.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/sigmask.h>
 #include <sched/tsc.h>
 
@@ -43,8 +45,9 @@
 #include <bits/os/timeval.h>
 #include <compat/config.h>
 #include <kos/except.h>
-#include <kos/except/reason/inval.h>
+#include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/types.h>
 #include <sys/poll.h>
 #include <sys/select.h>
@@ -52,6 +55,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

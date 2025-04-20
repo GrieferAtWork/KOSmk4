@@ -22,6 +22,28 @@
 #define SEGMENT_SIZE 4
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/paging.h>
+#include <kernel/slab.h>
+
+#include <hybrid/align.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
+
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <atomic.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
 DECL_BEGIN
 
 #ifndef DBG_memset

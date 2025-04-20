@@ -28,19 +28,28 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/handle.h>
+#include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/module.h>
+#include <kernel/paging.h>
 
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/io.h>
+#include <kos/kernel/types.h>
 #include <kos/lockop.h>
+#include <kos/sched/shared-rwlock.h>
+#include <kos/types.h>
 #include <sys/mount.h>
 
 #include <assert.h>
@@ -48,6 +57,7 @@
 #include <fcntl.h>
 #include <format-printer.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

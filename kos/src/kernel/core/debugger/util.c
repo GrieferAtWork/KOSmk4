@@ -37,15 +37,26 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <debugger/util.h>
 #include <kernel/addr2line.h>
+#include <kernel/mman/module.h>
 
+#include <asm/isa.h>
+#include <kos/kernel/types.h>
 #include <kos/keyboard.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
+#include <libansitty/ansitty.h>
+#include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/errno.h>
+#include <libinstrlen/api.h>
+#include <libinstrlen/instrlen.h>
+
 
 DECL_BEGIN
 

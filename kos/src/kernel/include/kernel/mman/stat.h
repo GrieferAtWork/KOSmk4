@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
+#include <stddef.h>
 
 #ifdef __CC__
 DECL_BEGIN

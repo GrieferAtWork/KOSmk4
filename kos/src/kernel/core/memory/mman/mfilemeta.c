@@ -25,13 +25,20 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/notify-config.h>
 #include <kernel/fs/notify.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mfilemeta.h>
+#include <sched/sig.h>
+
+#include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/sched/shared-rwlock.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -165,7 +172,7 @@ NOTHROW(FCALL mfilemeta_flock_rl_remkey)(struct mfilemeta *__restrict self,
 	_mfilemeta_flock_trim_rdkeys_and_unlock_klock(self, __hpsmp_pflag)
 PRIVATE WUNUSED NONNULL((1)) void
 NOTHROW(FCALL _mfilemeta_flock_trim_rdkeys_and_unlock_klock)(struct mfilemeta *__restrict self,
-                                                             __hybrid_preemption_flag_t __hpsmp_pflag) {
+                                                             preemption_flag_t __hpsmp_pflag) {
 	/* TODO */
 	mfile_flock_klock_release_br(&self->mfm_flock);
 }
@@ -205,7 +212,7 @@ NOTHROW(FCALL mfile_flock_rl_item_rehash)(struct mfile_flock_rl_item *__restrict
 PRIVATE WUNUSED NONNULL((1, 2)) bool FCALL
 _mfilemeta_flock_require_1_rdkey_or_unlock_klock(struct mfilemeta *__restrict self,
                                                  void **__restrict p_freeme,
-                                                 __hybrid_preemption_flag_t __hpsmp_pflag)
+                                                 preemption_flag_t __hpsmp_pflag)
 		THROWS(E_BADALLOC) {
 	bool result = true;
 again:

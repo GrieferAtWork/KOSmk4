@@ -28,14 +28,25 @@
 #error "Must #define exactly one of these"
 #endif /* ... */
 
+#include <kernel/compiler.h>
+
+#include <kernel/malloc.h>
+#include <kernel/mman.h>
+#include <kernel/mman/futexfd.h>
+#include <kernel/mman/mpartmeta.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
+#include <hybrid/typecore.h>
 
+#include <kos/asm/futex.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/futexexpr.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

@@ -45,7 +45,6 @@
 
 #include <kos/except.h>
 #include <kos/lockop.h>
-#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

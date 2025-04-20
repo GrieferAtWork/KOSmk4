@@ -23,11 +23,12 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/memory.h>
 #include <kernel/panic.h>
 #include <kernel/swap.h>
-#include <kernel/types.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 DECL_BEGIN
 

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <kernel/arch/driver-param.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_PARAM_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_PARAM_H 1
 

@@ -37,11 +37,13 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
+#include <misc/unlockinfo.h>
 #include <sched/sig.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/types.h>
@@ -50,9 +52,9 @@
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-#include <misc/unlockinfo.h>
-#include <hybrid/sequence/list.h>
 
 DECL_BEGIN
 

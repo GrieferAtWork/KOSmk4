@@ -25,30 +25,30 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/malloc-defs.h>
+#include <kernel/malloc.h>
 #if defined(CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS) || defined(__DEEMON__)
 
 #include <kernel/except.h>
 #include <kernel/heap.h>
-#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/printk.h>
 #include <kernel/slab.h>
 #include <kernel/types.h>
 
-#include <hybrid/align.h>
-#include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/kernel/paging.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

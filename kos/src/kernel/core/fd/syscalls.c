@@ -32,18 +32,23 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
 #include <sched/sigaction.h>
 #include <sched/task.h>
 
+#include <bits/os/dirent.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/types.h>
 #include <linux/close_range.h>
 #include <linux/kcmp.h>
 
 #include <atomic.h>
 #include <errno.h>
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 
@@ -58,7 +63,6 @@ DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 	return handles_install(hand);
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP */
-
 
 #ifdef __ARCH_WANT_SYSCALL_DUP2
 DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
@@ -172,9 +176,10 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
 	struct handle ohand;
 	decref(*handles_close(fd, &ohand));
-	return 0;
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOSE */
+
 #ifdef __ARCH_WANT_SYSCALL_CLOSE_RANGE
 DEFINE_SYSCALL3(errno_t, close_range,
                 unsigned int, minfd,
@@ -303,7 +308,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 			}
 		}
 	} else {
-		if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
+		if unlikely((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
 			      mode & READDIR_MODEMASK);
@@ -375,7 +380,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 			}
 		}
 	} else {
-		if ((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
+		if unlikely((mode & READDIR_MODEMASK) > READDIR_MODEMAX) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE,
 			      mode & READDIR_MODEMASK);

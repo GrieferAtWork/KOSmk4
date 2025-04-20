@@ -30,14 +30,18 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/atomic64.h>
 #include <sched/task.h>
 
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
 
 #include <alloca.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/types.h>

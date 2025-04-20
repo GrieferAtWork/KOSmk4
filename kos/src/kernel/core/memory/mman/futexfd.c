@@ -30,15 +30,18 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/phys.h>
-#include <sched/cred.h>
+#include <misc/unlockinfo.h>
 
 #include <compat/config.h>
 #include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
 #include <kos/except.h>
-#include <sys/poll.h>
+#include <kos/futexexpr.h>
+#include <kos/io.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/bits/futex-expr.h>
@@ -53,7 +56,8 @@ PUBLIC ATTR_READMOSTLY size_t mfutexfd_maxexpr = LFUTEXFD_DEFAULT_MAXEXPR;
 
 
 /* Destroy a given mem-futex-fd object. */
-PUBLIC NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutexfd_destroy)(struct mfutexfd *__restrict self) {
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfutexfd_destroy)(struct mfutexfd *__restrict self) {
 	decref(self->mfd_futex);
 	weakdecref(self->mfd_mman);
 	kfree(self);

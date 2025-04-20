@@ -22,12 +22,31 @@
 //#define DEFINE_COMPAT_FUTEX 1
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/handle.h>
+#include <kernel/compiler.h>
+
+#include <kernel/except.h>
 #include <kernel/handman.h>
+#include <kernel/mman.h>
 #include <kernel/mman/futexfd.h>
+#include <kernel/mman/mpartmeta.h>
+#include <kernel/syscall.h>
+#include <kernel/types.h>
+#include <kernel/user.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 
+#include <kos/except/reason/inval.h>
+#include <kos/futex.h>
+#include <kos/futexexpr.h>
+#include <kos/io.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <atomic.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef DEFINE_COMPAT_FUTEX

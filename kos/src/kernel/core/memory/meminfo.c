@@ -33,19 +33,24 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/types.h>
 
 #include <hybrid/align.h>
-#include <hybrid/bit.h>
 #include <hybrid/overflow.h>
+
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 #include <libjson/generator.h>
 #include <libjson/parser.h>
 

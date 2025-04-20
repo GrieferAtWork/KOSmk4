@@ -26,9 +26,13 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/stat.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 
-#include <assert.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/types.h>
+
 #include <atomic.h>
 #include <stddef.h>
 #include <string.h>

@@ -31,21 +31,24 @@
 //#define     DEFINE_mpart_writev_p
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/iovec.h>
+#include <kernel/compiler.h>
+
 #include <kernel/mman/fault.h> /* mman_prefault(), mman_prefaultv() */
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <misc/unlockinfo.h>
 
-#include <hybrid/align.h>
-#include <hybrid/overflow.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
-#include <libvio/access.h>
+#include <libvio/api.h>
 
 DECL_BEGIN
 

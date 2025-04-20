@@ -20,6 +20,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/[...]/sys/io.h) */
 /* (#) Portability: diet libc     (/include/sys/io.h) */
 /* (#) Portability: musl libc     (/include/sys/io.h) */
+/*!always_includes <sys/perm.h>*/
 #ifndef _I386_KOS_SYS_IO_H
 #define _I386_KOS_SYS_IO_H 1
 

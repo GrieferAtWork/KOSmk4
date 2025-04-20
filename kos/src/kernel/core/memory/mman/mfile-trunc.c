@@ -24,28 +24,22 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/node.h>
-#include <kernel/fs/super.h>
-#include <kernel/mman/fault.h>
-#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/mpartmeta.h>
-#include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
 #include <sched/sig.h>
-#include <sched/task.h>
 
-#include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

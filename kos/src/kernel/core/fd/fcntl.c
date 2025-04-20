@@ -25,24 +25,35 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/fs/dirhandle.h>
 #include <kernel/fs/dirhandlex.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/node.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/pipe.h>
 #include <kernel/syscall.h>
 #include <sched/pid.h>
 
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+
+#include <libbuffer/ringbuffer.h>
 
 /************************************************************************/
 /* fcntl(2)                                                             */

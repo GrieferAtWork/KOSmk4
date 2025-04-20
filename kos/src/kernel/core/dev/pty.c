@@ -24,18 +24,26 @@
 #include <kernel/compiler.h>
 
 #include <dev/pty.h>
+#include <dev/tty.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/fs/super.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/task.h>
+#include <sched/sig.h>
 
+#include <hybrid/sequence/list.h>
+
+#include <kos/aref.h>
+#include <kos/io.h>
 #include <sys/mkdev.h>
 #include <sys/stat.h>
 
@@ -47,6 +55,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <libbuffer/linebuffer.h>
+#include <libbuffer/ringbuffer.h>
+#include <libterm/api.h>
+#include <libterm/termio.h>
 
 DECL_BEGIN
 

@@ -23,24 +23,26 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/isr.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/isr.h>
+#include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
 #include <kernel/printk.h>
-#include <kernel/types.h>
 #include <sched/task.h>
 
-#include <hybrid/sched/preemption.h>
-
 #include <kos/aref.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef ISR_VECTOR_IS_VALID

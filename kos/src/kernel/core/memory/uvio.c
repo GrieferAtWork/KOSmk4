@@ -27,30 +27,38 @@
 
 #ifdef LIBVIO_CONFIG_ENABLED
 #include <kernel/except.h>
-#include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/uvio.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
-#include <sched/group.h>
+#include <sched/arch/atomic64.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
+
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libvio/userviofd.h>
+#include <libvio/vio.h>
 
 DECL_BEGIN
 

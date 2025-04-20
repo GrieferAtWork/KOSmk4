@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filehandle.h>
@@ -38,20 +39,30 @@
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/mman/module.h>
 #include <kernel/personality.h>
+#include <sched/arch/atomic64.h>
 #include <sched/cred.h>
 #include <sched/tsc.h>
 
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
 #include <kos/lockop.h>
+#include <kos/sched/shared-rwlock.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <malloca.h>
 #include <stddef.h>
 #include <stdint.h>

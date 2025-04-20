@@ -26,13 +26,18 @@
 
 #include <kernel/driver.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/types.h>
 #include <sched/async.h>
+#include <sched/sig-completion.h>
 #include <sched/sig.h>
 #include <sched/task.h>
 
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
+
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>

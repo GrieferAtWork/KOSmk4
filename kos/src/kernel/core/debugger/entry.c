@@ -33,6 +33,11 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 
+#include <kos/kernel/cpu-state.h>
+
+#include <stddef.h>
+#include <stdint.h>
+
 #include <libcpustate/apply.h>
 
 DECL_BEGIN

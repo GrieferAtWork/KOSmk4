@@ -38,6 +38,7 @@
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
@@ -50,27 +51,41 @@
 #include <kernel/mman/event.h>
 #include <kernel/mman/exec.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/atomic64.h>
 #include <sched/comm.h>
 #include <sched/cred.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/rpc.h>
+#include <sched/sig.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <bits/os/statfs-convert.h>
+#include <bits/os/statfs.h>
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
+#include <bits/os/utimbuf.h>
 #include <compat/config.h>
 #include <kos/compat/linux-stat-convert.h>
 #include <kos/compat/linux-stat.h>
+#include <kos/debugtrap.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/handle.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -83,6 +98,7 @@
 #include <malloca.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <utime.h>
 

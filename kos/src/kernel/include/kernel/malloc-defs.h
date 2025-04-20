@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kernel/malloc.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_MALLOC_DEFS_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_MALLOC_DEFS_H 1
 

@@ -22,16 +22,15 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/fs.h>
-#include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/mman/mfile.h>
 
 #include <kos/kernel/handle.h>
+#include <kos/types.h>
 
 #include <stddef.h>
 

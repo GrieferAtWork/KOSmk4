@@ -37,13 +37,18 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
 
 #include <hybrid/overflow.h>
 
 #include <asm/intrin.h> /* __flush_instruction_cache */
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

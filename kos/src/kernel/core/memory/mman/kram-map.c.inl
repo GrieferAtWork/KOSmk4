@@ -23,27 +23,38 @@
 #define DEFINE_mman_map_kram_nx
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
+#include <kernel/mman/cc.h>
 #include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mcoreheap.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
-#include <kernel/panic.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
+#include <bits/types.h>
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
 #include <kos/kernel/paging.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

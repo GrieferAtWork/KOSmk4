@@ -22,10 +22,32 @@
 #define DEFINE_HEAP_NX
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/driver.h>
-#include <kernel/rand.h>
+#include <kernel/compiler.h>
 
+#include <kernel/heap.h>
+#include <kernel/malloc-defs.h>
+#include <kernel/mman/flags.h>
+#include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
+#include <kernel/paging.h>
+#include <kernel/rand.h>
+#include <sched/task.h>
+
+#include <hybrid/align.h>
+#include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/except.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <atomic.h>
 #include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 #ifdef DEFINE_HEAP_NX
 #define LOCAL_IF_NX_ELSE(if_nx, if_x) if_nx

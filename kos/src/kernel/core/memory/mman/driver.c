@@ -42,8 +42,8 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/handle-proto.h>
 #include <kernel/heap.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
@@ -56,7 +56,6 @@
 #include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <kernel/mman/rw.h>
 #include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
@@ -64,6 +63,7 @@
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/vboxgdb.h>
+#include <sched/pertask.h>
 #include <sched/sig.h>
 
 #include <hybrid/align.h>
@@ -71,13 +71,25 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sequence/bsearch.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/typecore.h>
 
+#include <kos/aref.h>
+#include <kos/bits/lockop.h>
+#include <kos/debugtrap.h>
 #include <kos/except.h>
 #include <kos/except/reason/noexec.h>
+#include <kos/exec/elf.h>
+#include <kos/io.h>
+#include <kos/kernel/memory.h>
+#include <kos/kernel/types.h>
+#include <kos/lockop.h>
 #include <kos/nopf.h>
+#include <kos/types.h>
+#include <linux/fcntl.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -94,6 +106,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
 #include <libcmdline/decode.h>
 #include <libcmdline/encode.h>
 #include <libunwind/eh_frame.h>

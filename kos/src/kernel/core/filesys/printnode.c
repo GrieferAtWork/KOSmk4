@@ -25,17 +25,16 @@
 
 #include <kernel/fs/printnode.h>
 #include <kernel/iovec.h>
-#include <kernel/mman/phys-access.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/phys.h>
 
-#include <hybrid/overflow.h>
-
-#include <kos/io.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 #include <sys/stat.h>
 
 #include <assert.h>
 #include <format-printer.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -109,11 +108,11 @@ printnode_v_pread(struct mfile *__restrict self, NCX void *dst,
 
 
 struct vvprinter_data {
-	struct iov_buffer const  *vvpd_buf; /* [1..1][const] IOV buffer */
-	struct iov_entry          vvpd_ent; /* Current IOV entry. */
-	size_t                    vvpd_nxt; /* Index of next `vvpd_ent' to load from `vvpd_buf' */
-	size_t                    vvpd_siz; /* Remaining buffer space. */
-	pos_t                     vvpd_pos; /* # of leading bytes to skip. */
+	struct iov_buffer const *vvpd_buf; /* [1..1][const] IOV buffer */
+	struct iov_entry         vvpd_ent; /* Current IOV entry. */
+	size_t                   vvpd_nxt; /* Index of next `vvpd_ent' to load from `vvpd_buf' */
+	size_t                   vvpd_siz; /* Remaining buffer space. */
+	pos_t                    vvpd_pos; /* # of leading bytes to skip. */
 };
 
 PRIVATE NONNULL((1)) void FCALL

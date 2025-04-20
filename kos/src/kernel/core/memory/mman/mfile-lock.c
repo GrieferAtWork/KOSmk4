@@ -25,20 +25,22 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/ramfs.h>
-#include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <misc/unlockinfo.h>
 #include <sched/cred.h>
+#include <sched/sig.h>
 
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -28,29 +28,47 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/clnknode.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/devnode.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/dirnode.h>
+#include <kernel/fs/fifonode.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#include <kernel/fs/notify.h>
 #include <kernel/fs/ramfs.h>
+#include <kernel/fs/regnode.h>
+#include <kernel/fs/socknode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/paging.h>
 #include <kernel/user.h>
-#include <sched/task.h>
-#include <sched/tsc.h>
+#include <sched/atomic64.h>
 
+#include <hybrid/sequence/list.h>
+
+#include <kos/aref.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/kernel/memory.h>
+#include <kos/kernel/types.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 #include <linux/magic.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #undef RBTREE_LEFT_LEANING

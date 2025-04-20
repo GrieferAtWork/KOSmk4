@@ -28,17 +28,17 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
-#include <kernel/printk.h>
 #include <kernel/slab.h>
-#include <kernel/types.h>
 
 #include <hybrid/align.h>
-#include <hybrid/overflow.h>
+#include <hybrid/typecore.h>
+
+#include <kos/types.h>
 
 #include <assert.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 /**/
 #include "malloc.h"

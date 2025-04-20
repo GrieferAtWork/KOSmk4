@@ -30,14 +30,19 @@
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <sched/task.h>
+#include <kernel/mman/mpartmeta.h>
+#include <kernel/paging.h>
+#include <kernel/refcountable.h>
 
 #include <hybrid/align.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libvio/api.h>

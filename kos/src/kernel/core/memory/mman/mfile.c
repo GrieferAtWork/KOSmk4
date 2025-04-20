@@ -25,23 +25,22 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/dirent.h>
-#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-#include <kernel/fs/notify.h>
-#include <kernel/fs/null.h>
 #include <kernel/malloc.h>
-#include <kernel/mman.h>
+#include <kernel/memory.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mfilemeta.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <sched/task.h>
+#include <kernel/paging.h>
+#include <sched/sig.h>
 
 #include <hybrid/align.h>
-#include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
 #include <kos/except.h>
-#include <kos/lockop.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 #include <sys/param.h>
 
 #include <assert.h>
@@ -50,8 +49,8 @@
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-
 
 DECL_BEGIN
 

@@ -27,16 +27,21 @@
 //#define      DEFINE_mman_memset
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/mman.h>
 #include <kernel/mman/rw.h>
+#include <kernel/paging.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
 
 #include <kos/except.h>
 #include <kos/nopf.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

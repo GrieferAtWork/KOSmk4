@@ -25,9 +25,9 @@
 
 #include <dev/mouse.h>
 #include <kernel/except.h>
-#include <kernel/panic.h>
-#include <kernel/types.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/user.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -35,6 +35,10 @@
 #include <hybrid/sched/preemption.h>
 
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
+#include <kos/ioctl/mouse.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -751,7 +755,7 @@ mousedev_v_stat(struct mfile *__restrict self,
 	result->st_size    = (typeof(result->st_size))count * sizeof(mouse_packet_t);
 }
 
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1)) bool KCALL
 mouse_device_canread(struct mousedev *__restrict self) {
 	uintptr_half_t used;
 	used = atomic_read(&self->md_buf.mb_bufstate.bs_state.s_used);

@@ -26,14 +26,25 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
-#include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
+#include <kernel/mman/mfile.h>
+#include <kernel/paging.h>
 
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/io.h>
+#include <kos/kernel/types.h>
+#include <kos/sched/shared-rwlock.h>
+#include <kos/types.h>
 #include <linux/magic.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

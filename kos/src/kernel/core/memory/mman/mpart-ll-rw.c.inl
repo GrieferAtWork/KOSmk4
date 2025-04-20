@@ -23,7 +23,17 @@
 #define DEFINE_mpart_ll_bzeromemcc
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
+#include <kernel/paging.h>
+
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <stddef.h>
 
 DECL_BEGIN
 

@@ -32,22 +32,30 @@
 
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/printk.h>
-#include <sched/task.h>
+#include <sched/sig.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
+#include <linux/fs.h>
 #include <sys/statfs.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -24,22 +24,28 @@
 #include <kernel/compiler.h>
 
 #include <kernel/malloc.h>
-#include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
 #include <kernel/rand.h>
+#include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+
+#include <libvio/api.h>
 
 DECL_BEGIN
 

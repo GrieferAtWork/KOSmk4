@@ -25,6 +25,29 @@
 #define DEFINE_METHOD_kmemalign_offset
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/panic.h>
+#include <kernel/slab.h>
+#include <sched/pid.h>
+
+#include <hybrid/align.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+#include "trace-malloc.h"
+
 DECL_BEGIN
 
 #if (defined(DEFINE_METHOD_kmalloc) +          \

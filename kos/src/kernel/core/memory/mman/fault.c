@@ -25,7 +25,6 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
-#include <kernel/heap.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -36,18 +35,22 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
-#include <sched/task.h>
+#include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
-#include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+
+#include <libvio/api.h>
 
 DECL_BEGIN
 

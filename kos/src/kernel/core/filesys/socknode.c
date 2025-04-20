@@ -22,12 +22,14 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/node.h>
 #include <kernel/fs/socknode.h>
+#include <kernel/mman/mfile.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
-
-#include <assert.h>
+#include <kos/types.h>
+#include <network/unix-socket.h>
 
 DECL_BEGIN
 

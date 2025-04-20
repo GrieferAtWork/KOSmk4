@@ -24,7 +24,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/aio.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
@@ -39,6 +38,7 @@
 #include <atomic.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

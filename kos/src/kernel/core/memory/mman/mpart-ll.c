@@ -37,6 +37,7 @@
 #include <kos/types.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -22,13 +22,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
 #include <sched/sig.h>
 
-#include <hybrid/__atomic.h>
+#include <hybrid/__assert.h>
 
 #include <bits/os/ucred.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 #include <network/socket.h>
+
+#include <stddef.h>
 
 #include <libbuffer/packetbuffer.h>
 

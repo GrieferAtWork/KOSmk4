@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98cfa904 */
+/* HASH CRC-32:0xd105e264 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,10 @@
 
 #include <asm/os/errno.h>
 #include <bits/types.h>
+#ifdef __INTELLISENSE__
+#include <asm/errno-base.h> /* To work around buggy VS include detection */
+#include <asm/errno.h>      /* To work around buggy VS include detection */
+#endif /* __INTELLISENSE__ */
 
 /************************************************************************/
 /* System errno codes                                                   */

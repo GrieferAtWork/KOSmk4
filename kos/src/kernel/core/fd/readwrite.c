@@ -35,9 +35,12 @@
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/io.h>
 
 #include <errno.h>
 #include <malloca.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/iovec.h>

@@ -455,6 +455,10 @@ for (local contextName: printed_contexts) {
 
 
 %{
+#ifdef __INTELLISENSE__
+#include <asm/errno-base.h> /* To work around buggy VS include detection */
+#include <asm/errno.h>      /* To work around buggy VS include detection */
+#endif /* __INTELLISENSE__ */
 
 /************************************************************************/
 /* System errno codes                                                   */

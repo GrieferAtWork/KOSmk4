@@ -34,24 +34,28 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/allnodes.h>
-#include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
 #include <kernel/fs/super.h>
 #include <kernel/mman/mfile-misaligned.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
+#include <misc/unlockinfo.h>
+#include <sched/atomic64.h>
 #include <sched/sig-completion.h>
-#include <sched/task.h>
+#include <sched/sig.h>
 
 #include <hybrid/minmax.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

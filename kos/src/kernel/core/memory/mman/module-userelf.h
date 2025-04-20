@@ -34,6 +34,8 @@
 /*[[[end]]]*/
 
 #if (defined(CONFIG_HAVE_KERNEL_USERELF_MODULES) || !defined(BUILDING_KERNEL_CORE))
+#include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/module.h>
 
 #include <hybrid/sequence/list.h>
@@ -42,8 +44,11 @@
 #include <kos/aref.h>
 #include <kos/exec/elf.h> /* ELF_ARCH_CLASS */
 #include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <elf.h>
+#include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

@@ -24,28 +24,26 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
-#include <debugger/hook.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
-#include <kernel/memory.h>
 #include <kernel/mman.h>
-#include <kernel/mman/flags.h>
 #include <kernel/mman/kram.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 
 #include <asm/defsym.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
@@ -53,7 +51,7 @@
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 /* Define the ABI for the address tree used by heaps. */

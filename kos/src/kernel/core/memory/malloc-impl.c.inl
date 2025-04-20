@@ -22,6 +22,23 @@
 #define DEFINE_MALLOC_NX
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/slab.h>
+
+#include <hybrid/align.h>
+#include <hybrid/overflow.h>
+
+#include <kos/except.h>
+#include <kos/kernel/types.h>
+
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
 #ifdef DEFINE_MALLOC_NX
 #define LOCAL_IF_NX_ELSE(if_nx, if_x)    if_nx
 #define LOCAL_NOTHROW                    NOTHROW

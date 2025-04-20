@@ -151,6 +151,18 @@ function createTransitiveIncludeRules() {
 		if (!didExpand)
 			break;
 	}
+	for (;;) {
+		local overrides: {string: string} = Dict();
+		for (local replaceThis, withThis: cpp_include_cleanup_replacement_files) {
+			local recursiveReplace = cpp_include_cleanup_replacement_files.get(withThis);
+			if (recursiveReplace !is none)
+				overrides[replaceThis] = recursiveReplace;
+		}
+		if (!overrides)
+			break;
+		for (local replaceThis, withThis: overrides)
+			cpp_include_cleanup_replacement_files[replaceThis] = withThis;
+	}
 }
 
 function main() {

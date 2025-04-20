@@ -24,7 +24,16 @@
 #define ALLOC_MINMAX  1
 #endif /* !__INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/memory.h>
+
+#include <hybrid/bit.h>
+
+#include <assert.h>
 #include <atomic.h>
+#include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

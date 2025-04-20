@@ -23,6 +23,28 @@
 #define DEFINE_X_noexcept
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/heap.h>
+#include <kernel/malloc.h>
+#include <kernel/panic.h>
+#include <sched/pid.h>
+
+#include <hybrid/align.h>
+#include <hybrid/overflow.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+#include "trace-malloc.h"
+
 #if (defined(DEFINE_X_except) + defined(DEFINE_X_noexcept)) != 1
 #error "Must #define exactly one of `DEFINE_X_except' or `DEFINE_X_noexcept'"
 #endif /* DEFINE_X_[no]except... */

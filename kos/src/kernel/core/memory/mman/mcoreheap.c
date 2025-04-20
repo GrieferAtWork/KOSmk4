@@ -24,34 +24,35 @@
 #include <kernel/compiler.h>
 
 #include <kernel/heap.h>
-#include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/phys.h>
-#include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
 
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
+#include <kos/types.h>
 #include <sys/param.h>
 
 #include <assert.h>
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

@@ -23,25 +23,42 @@
 //#define DEFINE_compat_sys_maplibrary
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
+#include <kernel/except.h>
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/path.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
+#include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>
+#include <kernel/mman/map.h>
 #include <kernel/mman/mbuilder.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/phys-access.h>
+#include <kernel/mman/phys.h>
+#include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
+#include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/exec/elf.h>
+#include <kos/types.h>
+#include <sys/mman.h>
 
+#include <assert.h>
 #include <elf.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef DEFINE_compat_sys_maplibrary

@@ -33,6 +33,8 @@ gcc_opt.append("-fexceptions");
 #include <kos/keyboard.h>
 /**/
 
+#include <stdint.h>
+
 #include "at_scancodes.h"
 
 DECL_BEGIN

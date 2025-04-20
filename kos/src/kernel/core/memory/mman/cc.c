@@ -38,7 +38,6 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/driver.h>
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/dirhandle.h>
-#include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/fs.h>
@@ -46,32 +45,42 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/heap.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/pipe.h>
 #include <misc/unlockinfo.h>
 #include <sched/enum.h>
 #include <sched/epoll.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/except.h>
 #include <kos/kernel/handle.h>
+#include <kos/types.h>
 #include <network/socket.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+
+#include <libbuffer/linebuffer.h>
+#include <libbuffer/ringbuffer.h>
 
 /**/
 #include "module-userelf.h" /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
