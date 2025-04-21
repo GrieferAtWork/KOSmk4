@@ -4611,6 +4611,7 @@
 #define __CRT_HAVE_pthread_attr_getdetachstate
 #define __CRT_HAVE_pthread_attr_getguardsize
 #define __CRT_HAVE_pthread_attr_getinheritsched
+#define __CRT_HAVE_pthread_attr_getpidfdallocated_np
 #define __CRT_HAVE_pthread_attr_getschedparam
 #define __CRT_HAVE_pthread_attr_getschedpolicy
 #define __CRT_HAVE_pthread_attr_getscope
@@ -4622,6 +4623,7 @@
 #define __CRT_HAVE_pthread_attr_setdetachstate
 #define __CRT_HAVE_pthread_attr_setguardsize
 #define __CRT_HAVE_pthread_attr_setinheritsched
+#define __CRT_HAVE_pthread_attr_setpidfdallocated_np
 #define __CRT_HAVE_pthread_attr_setschedparam
 #define __CRT_HAVE_pthread_attr_setschedpolicy
 #define __CRT_HAVE_pthread_attr_setscope
@@ -4662,6 +4664,7 @@
 #define __CRT_HAVE_pthread_getconcurrency
 #define __CRT_HAVE_pthread_getcpuclockid
 #define __CRT_HAVE_pthread_getname_np
+#define __CRT_HAVE_pthread_getpidfd_np
 #define __CRT_HAVE_pthread_getresult_np
 #define __CRT_HAVE_pthread_getschedparam
 #define __CRT_HAVE_pthread_getspecific

@@ -808,7 +808,8 @@ do_clone_pid:
 			 *       because  if the SIGKILL was received after clone returned in the
 			 *       parent, then  they would  also die  with the  child pidfd  being
 			 *       shared with yet another process) */
-			handles_install_commit(&install, FORTASK(result, this_taskpid), IO_RDWR);
+			handles_install_commit(&install, FORTASK(result, this_taskpid),
+			                       IO_RDWR | IO_CLOEXEC);
 		} else if (clone_flags & CLONE_THREAD) {
 			task_clone_thrdpid(result, caller, clone_flags, args->tca_parent_tid);
 		} else {

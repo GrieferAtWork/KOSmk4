@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d7d3efb */
+/* HASH CRC-32:0x1f5164ae */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1126,6 +1126,33 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t _
  * @return: 0 : The given `self' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __self),(__self))
 #endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
+#if !defined(__pthread_getpidfd_np_defined) && defined(__CRT_HAVE_pthread_getpidfd_np)
+#define __pthread_getpidfd_np_defined
+/* >> pthread_getpidfd_np(3)
+ * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
+ * To  guaranty that a PIDfd is available for a given thread, you can make use of
+ * `pthread_attr_setpidfdallocated_np()' to have `pthread_create(3)' allocate the
+ * PIDfd for you.
+ * @return: EOK:    Success: the PIDfd of the given thread was stored in `*p_pidfd'
+ * @return: ESRCH:  The given `self' has already terminated (only when not already allocated)
+ * @return: EMFILE: Too many open files (process) (only when not already allocated)
+ * @return: ENFILE: Too many open files (system) (only when not already allocated)
+ * @return: ENOMEM: Insufficient memory (only when not already allocated) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,errno_t,__NOTHROW_NCX,pthread_getpidfd_np,(pthread_t __self, __fd_t *__restrict __p_pidfd),(__self,__p_pidfd))
+#endif /* !__pthread_getpidfd_np_defined && __CRT_HAVE_pthread_getpidfd_np */
+/* >> pthread_attr_setpidfdallocated_np(3)
+ * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
+ * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
+ * via `pthread_getpidfd_np(3)'
+ * @param: allocated: 0=no or 1=yes
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `allocated' */
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setpidfdallocated_np,(pthread_attr_t *__self, int __allocated),(__self,__allocated))
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
+ * automatically allocating a PIDfd descriptor for the newly spawned thread.
+ * @return: EOK: Success */
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getpidfdallocated_np,(pthread_attr_t const *__restrict __self, int *__restrict __allocated),(__self,__allocated))
 /* >> pthread_mainthread_np(3)
  * Obtain the identifier of the main thread
  * @return: * : Handle for the main thread */

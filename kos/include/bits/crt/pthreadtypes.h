@@ -74,11 +74,11 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 #define __OFFSET_PTHREAD_FLAGS     (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 5)
 
 #define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
-#define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
-                                   * and should not  be unmapped  automatically. */
-#define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
-                                   * the main thread, and  any thread created by  `clone()'). */
-#define PTHREAD_FTIDSET    0x8000 /* Internal flag: `set_tid_address(2)' has been called. */
+#define PTHREAD_FUSERSTACK 0x0001 /* [const] The thread's stack was provided by the
+                                   * user and should not be unmapped automatically. */
+#define PTHREAD_FNOSTACK   0x0002 /* [const] The thread's stack area is unknown (this is the case
+                                   * for the main thread, and  any thread created by  `clone()'). */
+#define PTHREAD_FTIDSET    0x8000 /* [lock(WRITE_ONCE)] Internal flag: `set_tid_address(2)' has been called. */
 
 /* The different kinds of errno codes known to libc */
 #define LIBC_ERRNO_KIND_KOS 0 /* E* */
@@ -120,7 +120,8 @@ struct pthread {
 	                                          *         (or NULL if not lazily initialized within the main() thread). */
 	void                    *pt_stackaddr;   /* [const] Thread stack address (or NULL if not lazily initialized within the main() thread) */
 	__size_t                 pt_stacksize;   /* [const] Thread stack size (or 0 if not lazily initialized within the main() thread) */
-	__uintptr_t              pt_flags;       /* [const] Flags (Set of `PTHREAD_F*') */
+	unsigned int             pt_flags;       /* [lock(...)] Flags (Set of `PTHREAD_F*') */
+	__fd_t                   pt_pidfd;       /* [lock(WRITE_ONCE)][valid_if(PTHREAD_FHASPIDFD)] Flags (Set of `PTHREAD_F*') */
 	/* TODO: Get rid of the following 2 members. - They're only used during `libc_pthread_main()'! */
 	struct __cpu_set_struct *pt_cpuset;      /* [0..pt_cpusetsize] Initial affinity cpuset. */
 	__size_t                 pt_cpusetsize;  /* Initial affinity cpuset size. */
@@ -151,6 +152,7 @@ typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
 #define PTHREAD_ATTR_FLAG_OLDATTR         0x0010 /* Don't `free(pa_cpuset)' */
 #define PTHREAD_ATTR_FLAG_SCHED_SET       0x0020 /* `pa_schedparam' is valid */
 #define PTHREAD_ATTR_FLAG_POLICY_SET      0x0040 /* `pa_schedpolicy' is valid */
+#define PTHREAD_ATTR_FLAG_WANT_PIDFD      0x1000 /* Allocate a PIDfd for the thread as part of its creation */
 
 #define __OFFSET_PTHREAD_ATTR_SCHEDPARAM  0
 #define __OFFSET_PTHREAD_ATTR_SCHEDPOLICY __SIZEOF_SCHED_PARAM

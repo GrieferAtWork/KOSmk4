@@ -22,6 +22,7 @@
 #define _KOS_KERNEL_SOURCE 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _LIBC_SOURCE 1 /* For "struct pthread" */
 
 #include "api.h"
 /**/
@@ -39,6 +40,7 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -258,7 +260,6 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
                     LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter,
                     DWORD dwCreationFlags, LPDWORD lpThreadId) {
 	HANDLE result;
-	pid_t tid;
 	pthread_t thread;
 	pthread_attr_t attr;
 	errno_t error;
@@ -279,6 +280,11 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	cookie->lpParameter     = lpParameter;
 	cookie->dwCreationFlags = dwCreationFlags;
 
+	/* Have libc automatically pre-allocate a pidfd descriptor here! */
+	error = pthread_attr_setpidfdallocated_np(&attr, 1);
+	if (error != EOK)
+		goto seterr_attr_cookie;
+
 	/* Use a custom stack size (if given) */
 	if (dwStackSize != 0) {
 		error = pthread_attr_setstacksize(&attr, dwStackSize);
@@ -293,19 +299,31 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 		goto seterr;
 
 	/* Construct a PIDFD descriptor for the thread. */
-	tid = pthread_gettid_np(thread);
 	if (lpThreadId)
-		*lpThreadId = tid;
-	result = libk32_OpenThread(0, FALSE, tid);
-	if (result == NULL)
-		(void)pthread_cancel(thread);
+		*lpThreadId = pthread_gettid_np(thread);
 
-	/* Detach the pthread object. */
-	(void)pthread_detach(thread);
+	/* Steal the thread's PIDfd descriptor by setting it to `-1'
+	 * within the pthread control structure. That way, once  the
+	 * pthread gets destroyed, it will not close its PIDfd.
+	 *
+	 * Also  note that  the thread  can't get  destroyed until we
+	 * call `pthread_detach(3)' below, so this is perfectly safe,
+	 * with the only exception being  that the thread is  already
+	 * running, and if it already called `pthread_getpidfd_np(3)'
+	 * before we got  here, then  it would have  read its  actual
+	 * thread file descriptor  (though since that  one is a  KOS-
+	 * specific function, we can safely assume that anything that
+	 * uses both that API and this one knows of this quirk). */
+	assert(thread->pt_pidfd != -1);
+	result = NTHANDLE_FROMFD(thread->pt_pidfd);
+	thread->pt_pidfd = -1;
 
 	if (dwCreationFlags & CREATE_SUSPENDED) {
 		/* TODO: Wait for the thread to suspend itself */
 	}
+
+	/* Detach the pthread object. */
+	(void)pthread_detach(thread);
 
 	/* Return a OS-level handle for the thread. */
 	return result;

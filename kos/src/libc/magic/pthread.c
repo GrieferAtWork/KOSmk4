@@ -1190,6 +1190,39 @@ $errno_t pthread_setname_np(pthread_t self,
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $pid_t pthread_gettid_np(pthread_t self);
 
+@@>> pthread_getpidfd_np(3)
+@@Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
+@@To  guaranty that a PIDfd is available for a given thread, you can make use of
+@@`pthread_attr_setpidfdallocated_np()' to have `pthread_create(3)' allocate the
+@@PIDfd for you.
+@@@return: EOK:    Success: the PIDfd of the given thread was stored in `*p_pidfd'
+@@@return: ESRCH:  The given `self' has already terminated (only when not already allocated)
+@@@return: EMFILE: Too many open files (process) (only when not already allocated)
+@@@return: ENFILE: Too many open files (system) (only when not already allocated)
+@@@return: ENOMEM: Insufficient memory (only when not already allocated)
+[[guard, pure, wunused]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+errno_t pthread_getpidfd_np(pthread_t self, $fd_t *__restrict p_pidfd);
+
+@@>> pthread_attr_setpidfdallocated_np(3)
+@@Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
+@@Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
+@@via `pthread_getpidfd_np(3)'
+@@@param: allocated: 0=no or 1=yes
+@@@return: EOK:    Success
+@@@return: EINVAL: Invalid/unsupported `allocated'
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_attr_setpidfdallocated_np([[inout]] pthread_attr_t *self, int allocated);
+
+@@>> pthread_attr_getpidfdallocated_np(3)
+@@Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
+@@automatically allocating a PIDfd descriptor for the newly spawned thread.
+@@@return: EOK: Success
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_attr_getpidfdallocated_np([[in]] pthread_attr_t const *__restrict self,
+                                           [[out]] int *__restrict allocated);
+
+
 @@>> pthread_mainthread_np(3)
 @@Obtain the identifier of the main thread
 @@@return: * : Handle for the main thread

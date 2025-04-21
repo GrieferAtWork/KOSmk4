@@ -32,6 +32,9 @@
 #include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
+#include <kos/io.h>
+#include <kos/ioctl/fd.h>
+#include <kos/kernel/handle.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
@@ -181,6 +184,10 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 		libc_fini_tlsglobals(self->pt_tglobals);
 		free(self->pt_tglobals);
 	}
+
+	/* Close the thread's PIDfd (if there is one) */
+	if (self->pt_pidfd >= 0)
+		(void)sys_close(self->pt_pidfd);
 
 	/* NOTE: This also invokes TLS finalizers! */
 	dltlsfreeseg(self->pt_tls);
@@ -402,7 +409,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	/* Initialize  the new thread's initial userprocmask structure,
 	 * such that it will lazily initialize it itself the first time
 	 * it performs a call to `sigprocmask(2)'. */
-	bzero(&pt->pt_pmask, offsetof(struct userprocmask, pm_pending));
+	bzero(&pt->pt_pmask, offsetof(struct libc_userprocmask, lpm_pmask.pm_pending));
 #if USERPROCMASK_FLAG_NORMAL != 0
 	pt->pt_pmask.lpm_pmask.pm_flags = USERPROCMASK_FLAG_NORMAL;
 #endif /* USERPROCMASK_FLAG_NORMAL != 0 */
@@ -415,6 +422,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt->pt_stacksize = attr->pa_stacksize;
 	pt->pt_cpuset    = NULL;
 	pt->pt_tls       = tls;
+	pt->pt_pidfd     = -1;
 
 	/* Copy affinity cpuset information. */
 	if (attr->pa_cpuset) {
@@ -450,11 +458,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	                         CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |
 	                         CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_CHILD_SETTID |
 	                         CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED;
+#if PTHREAD_ATTR_FLAG_WANT_PIDFD == CLONE_PIDFD
+	args.pca_args.ca_flags |= attr->pa_flags & PTHREAD_ATTR_FLAG_WANT_PIDFD;
+#else /* PTHREAD_ATTR_FLAG_WANT_PIDFD == CLONE_PIDFD */
+	if (attr->pa_flags & PTHREAD_ATTR_FLAG_WANT_PIDFD)
+		args.pca_args.ca_flags |= CLONE_PIDFD;
+#endif /* PTHREAD_ATTR_FLAG_WANT_PIDFD != CLONE_PIDFD */
 	args.pca_args.ca_stack      = pt->pt_stackaddr;
 	args.pca_args.ca_stack_size = pt->pt_stacksize;
 	args.pca_args.ca_tls        = pt->pt_tls;
-	args.pca_args.ca_parent_tid = &pt->pt_tid;
+	args.pca_args.ca_pidfd      = &pt->pt_pidfd;
 	args.pca_args.ca_child_tid  = &pt->pt_tid;
+	args.pca_args.ca_parent_tid = &pt->pt_tid;
 	args.pca_start              = start_routine;
 	pt->pt_retval               = arg;
 
@@ -821,6 +836,100 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 	return result;
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
+fd_t LIBCCALL pidfd_open(pid_t tid) {
+	fd_t pathfd;
+	struct fdcast cast;
+	syscall_slong_t cast_status;
+	char filename[lengthof("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
+	sprintf(filename, "/proc/%" PRIdN(__SIZEOF_PID_T__), tid);
+	pathfd = sys_open(filename, O_RDWR | O_DIRECTORY | O_CLOEXEC, 0);
+	if (E_ISERR(pathfd))
+		return pathfd;
+	bzero(&cast, sizeof(cast));
+	cast.fc_rqtyp          = HANDLE_TYPE_PIDFD;
+	cast.fc_resfd.of_mode  = OPENFD_MODE_AUTO;
+	cast.fc_resfd.of_flags = IO_CLOEXEC;
+	cast_status = sys_ioctl(pathfd, FD_IOC_CAST, &cast);
+	(void)sys_close(pathfd);
+	if (E_ISERR(cast_status))
+		return cast_status;
+	return cast.fc_resfd.of_hint;
+}
+
+/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x242b31a7]]]*/
+/* >> pthread_getpidfd_np(3)
+ * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
+ * To  guaranty that a PIDfd is available for a given thread, you can make use of
+ * `pthread_attr_setpidfdallocated_np()' to have `pthread_create(3)' allocate the
+ * PIDfd for you.
+ * @return: EOK:    Success: the PIDfd of the given thread was stored in `*p_pidfd'
+ * @return: ESRCH:  The given `self' has already terminated (only when not already allocated)
+ * @return: EMFILE: Too many open files (process) (only when not already allocated)
+ * @return: ENFILE: Too many open files (system) (only when not already allocated)
+ * @return: ENOMEM: Insufficient memory (only when not already allocated) */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
+                                               fd_t *__restrict p_pidfd)
+/*[[[body:libc_pthread_getpidfd_np]]]*/
+{
+	fd_t fd = self->pt_pidfd;
+	if unlikely(fd == -1) {
+		pid_t tid = self->pt_tid;
+		if unlikely(tid == 0)
+			return ESRCH;
+		fd = pidfd_open(tid);
+		if (!E_ISOK(fd))
+			return -fd;
+		if unlikely(!atomic_cmpxch(&self->pt_pidfd, -1, fd)) {
+			(void)sys_close(fd);
+			fd = atomic_read(&self->pt_pidfd);
+		}
+	}
+	*p_pidfd = fd;
+	return EOK;
+}
+/*[[[end:libc_pthread_getpidfd_np]]]*/
+
+/*[[[head:libc_pthread_attr_setpidfdallocated_np,hash:CRC-32=0x657574e8]]]*/
+/* >> pthread_attr_setpidfdallocated_np(3)
+ * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
+ * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
+ * via `pthread_getpidfd_np(3)'
+ * @param: allocated: 0=no or 1=yes
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `allocated' */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_setpidfdallocated_np)(pthread_attr_t *self,
+                                                             int allocated)
+/*[[[body:libc_pthread_attr_setpidfdallocated_np]]]*/
+{
+	if (allocated != 0 && allocated != 1)
+		return EINVAL;
+	if (allocated) {
+		self->pa_flags |= PTHREAD_ATTR_FLAG_WANT_PIDFD;
+	} else {
+		self->pa_flags &= ~PTHREAD_ATTR_FLAG_WANT_PIDFD;
+	}
+	return EOK;
+}
+/*[[[end:libc_pthread_attr_setpidfdallocated_np]]]*/
+
+/*[[[head:libc_pthread_attr_getpidfdallocated_np,hash:CRC-32=0x629a182d]]]*/
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
+ * automatically allocating a PIDfd descriptor for the newly spawned thread.
+ * @return: EOK: Success */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_getpidfdallocated_np)(pthread_attr_t const *__restrict self,
+                                                             int *__restrict allocated)
+/*[[[body:libc_pthread_attr_getpidfdallocated_np]]]*/
+{
+	*allocated = (self->pa_flags & PTHREAD_ATTR_FLAG_WANT_PIDFD) ? 1 : 0;
+	return EOK;
+}
+/*[[[end:libc_pthread_attr_getpidfdallocated_np]]]*/
 
 /*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xff77a072]]]*/
 /* >> pthread_mainthread_np(3)
@@ -4745,7 +4854,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa906b775]]]*/
+/*[[[start:exports,hash:CRC-32=0xb7c50141]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -4805,6 +4914,9 @@ DEFINE_PUBLIC_ALIAS_P(pthread_set_name_np,libc_pthread_setname_np,ATTR_IN(2),err
 DEFINE_PUBLIC_ALIAS_P(cthread_set_name,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
 DEFINE_PUBLIC_ALIAS_P(pthread_setname_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
 DEFINE_PUBLIC_ALIAS_P(pthread_gettid_np,libc_pthread_gettid_np,ATTR_PURE WUNUSED,pid_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_getpidfd_np,libc_pthread_getpidfd_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, fd_t *__restrict p_pidfd),(self,p_pidfd));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_setpidfdallocated_np,libc_pthread_attr_setpidfdallocated_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *self, int allocated),(self,allocated));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_getpidfdallocated_np,libc_pthread_attr_getpidfdallocated_np,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *__restrict self, int *__restrict allocated),(self,allocated));
 DEFINE_PUBLIC_ALIAS_P(pthread_mainthread_np,libc_pthread_mainthread_np,ATTR_CONST WUNUSED,pthread_t,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(pthread_rpc_exec,libc_pthread_rpc_exec,WUNUSED,errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie), void *cookie),(self,func,cookie));
 DEFINE_PUBLIC_ALIAS_P(thr_getconcurrency,libc_pthread_getconcurrency,ATTR_PURE,int,NOTHROW_NCX,LIBCCALL,(void),());

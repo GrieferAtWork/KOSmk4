@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d906bd */
+/* HASH CRC-32:0x5f0d3060 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -252,6 +252,30 @@ INTDEF ATTR_IN(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setname_np)(pthread_
  * @return: * : The TID of the given thread
  * @return: 0 : The given `self' has already terminated */
 INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_pthread_gettid_np)(pthread_t self);
+/* >> pthread_getpidfd_np(3)
+ * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
+ * To  guaranty that a PIDfd is available for a given thread, you can make use of
+ * `pthread_attr_setpidfdallocated_np()' to have `pthread_create(3)' allocate the
+ * PIDfd for you.
+ * @return: EOK:    Success: the PIDfd of the given thread was stored in `*p_pidfd'
+ * @return: ESRCH:  The given `self' has already terminated (only when not already allocated)
+ * @return: EMFILE: Too many open files (process) (only when not already allocated)
+ * @return: ENFILE: Too many open files (system) (only when not already allocated)
+ * @return: ENOMEM: Insufficient memory (only when not already allocated) */
+INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getpidfd_np)(pthread_t self, fd_t *__restrict p_pidfd);
+/* >> pthread_attr_setpidfdallocated_np(3)
+ * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
+ * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
+ * via `pthread_getpidfd_np(3)'
+ * @param: allocated: 0=no or 1=yes
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `allocated' */
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setpidfdallocated_np)(pthread_attr_t *self, int allocated);
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
+ * automatically allocating a PIDfd descriptor for the newly spawned thread.
+ * @return: EOK: Success */
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getpidfdallocated_np)(pthread_attr_t const *__restrict self, int *__restrict allocated);
 /* >> pthread_setconcurrency(3)
  * Set new concurrency level to `level'
  * @return: EOK:    Success

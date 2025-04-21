@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22d82b17 */
+/* HASH CRC-32:0x11947b13 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1759,6 +1759,9 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_set_name_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$cthread_set_name, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setname_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_gettid_np, libd_pthread_gettid_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_getpidfd_np, libd_pthread_getpidfd_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setpidfdallocated_np, libd_pthread_attr_setpidfdallocated_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getpidfdallocated_np, libd_pthread_attr_getpidfdallocated_np);
 DEFINE_PUBLIC_ALIAS(DOS$thr_setconcurrency, libd_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setconcurrency, libd_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setaffinity_np, libd_pthread_setaffinity_np);
