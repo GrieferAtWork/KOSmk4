@@ -1,6 +1,11 @@
 
 ### Missing functions (ABI)
 
+- STDC:
+	- <uchar.h>
+		- `c8rtomb` (c++20)
+		- `mbrtoc8` (c++20)
+
 - Glibc:
 	- Misc:
 		- `__register_atfork()`
@@ -107,6 +112,21 @@
 - Misc
 	- `walkcontext()`
 	- `int ungetchar(int ch)`     (same as `ungetc(ch, stdin)`)
+	- <dl.h>  (http://3kranger.com/HP3000/mpeix/en-hpux/B2355-90683/shl_load.3X.html)
+		- `shl_t shl_load(const char *path, int flags, long address);`
+		- `int shl_findsym(shl_t *handle, const char *sym, short type, void *value);`
+		- `int shl_definesym(const char *sym, short type, long value, int flags);`
+		- `int shl_getsymbols(shl_t handle, short type, int flags, void *(*memory) (), struct shl_symbol **symbols);`
+		- `int shl_unload(shl_t handle);`
+		- `int shl_get(int index, struct shl_descriptor **desc);`
+		- `int shl_gethandle(shl_t handle, struct shl_descriptor **desc);`
+		- `int shl_get_r(int index, struct shl_descriptor *desc);`
+		- `int shl_gethandle_r(shl_t handle, struct shl_descriptor *desc);`
+	- <dlfcn.h>  (http://3kranger.com/HP3000/mpeix/en-hpux/B2355-90683/dlgetname.3C.html)
+		- `char *dlgetname(struct load_module_desc *desc, size_t desc_size, void *(*read_tgt_mem)(void* buffer, unsigned long long ptr, size_t bufsiz, int ident), int ident_parm, unsigned long long load_map_parm);`
+		- `unsigned long dlmodinfo(unsigned long ip_value, struct load_module_desc *desc, size_t desc_size, void *(*read_tgt_mem)(void* buffer, unsigned long ptr, size_t bufsiz, int ident), int ident_parm, uint64_t load_map_parm);`
+		- `void *dlget(unsigned int index, struct load_module_desc *desc, size_t desc_size);`
+
 
 
 
