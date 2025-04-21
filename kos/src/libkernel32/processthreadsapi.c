@@ -272,7 +272,7 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 		goto seterr;
 	cookie = (struct k32_thread_start_data *)malloc(sizeof(struct k32_thread_start_data));
 	if (!cookie) {
-		pthread_attr_destroy(&attr);
+		(void)pthread_attr_destroy(&attr);
 		goto err;
 	}
 	cookie->lpStartAddress  = lpStartAddress;
@@ -288,7 +288,7 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 
 	/* Actually create the new thread. */
 	error = pthread_create(&thread, &attr, &k32_thread_start_routine, cookie);
-	pthread_attr_destroy(&attr);
+	(void)pthread_attr_destroy(&attr);
 	if (error != EOK)
 		goto seterr;
 
@@ -311,7 +311,7 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	return result;
 seterr_attr_cookie:
 	free(cookie);
-	pthread_attr_destroy(&attr);
+	(void)pthread_attr_destroy(&attr);
 seterr:
 	errno = error;
 err:

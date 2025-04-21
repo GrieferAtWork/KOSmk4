@@ -54,7 +54,7 @@ WINBASEAPI HANDLE WINAPI GetCurrentThread(VOID);
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
 /************************************************************************/
-typedef DWORD(WINAPI *PTHREAD_START_ROUTINE)(LPVOID lpThreadParameter);
+typedef DWORD (WINAPI *PTHREAD_START_ROUTINE)(LPVOID lpThreadParameter);
 typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #define CREATE_SUSPENDED 0x4
 WINBASEAPI HANDLE WINAPI CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId);

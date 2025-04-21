@@ -25,9 +25,11 @@
 
 #include <kos/syscalls.h>
 #include <nt/libloaderapi.h>
+#include <nt/processthreadsapi.h>
 #include <sys/wait.h>
 
 #include <malloc.h>
+#include <pthread.h>
 #include <sched.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,19 +70,15 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg),
                                         void *arg)
 /*[[[body:libc__beginthread]]]*/
 {
-	struct simple_thread_data *data;
 	uintptr_t result;
+	struct simple_thread_data *data;
 	data = (struct simple_thread_data *)malloc(sizeof(struct simple_thread_data));
 	if unlikely(!data)
 		return (uintptr_t)-1;
 	data->std_entry = entry;
 	data->std_arg   = arg;
-	result = _beginthreadex(NULL,
-	                        stacksz,
-	                        &simple_thread_entry,
-	                        data,
-	                        0,
-	                        NULL);
+	result = _beginthreadex(NULL, stacksz, &simple_thread_entry,
+	                        data, 0, NULL);
 	if unlikely(!result)
 		free(data);
 	return result;
@@ -88,21 +86,6 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg),
 /*[[[end:libc__beginthread]]]*/
 
 
-
-struct dos_thread_data {
-	u32 (_BEGINTHREADEX_CC *dtd_entry)(void *arg); /* [1..1] Entry callback. */
-	void                   *dtd_arg;               /* Entry argument. */
-};
-
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread")
-int LIBCCALL dos_thread_entry(void *arg) {
-	int result;
-	struct dos_thread_data data;
-	memcpy(&data, arg, sizeof(struct dos_thread_data));
-	free(arg);
-	result = (int)(*data.dtd_entry)(data.dtd_arg);
-	return result;
-}
 
 /*[[[head:libc__beginthreadex,hash:CRC-32=0x5f8be1b6]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.sched.thread") uintptr_t
@@ -114,29 +97,18 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
                                           u32 *threadaddr)
 /*[[[body:libc__beginthreadex]]]*/
 {
-	pid_t result;
-	struct dos_thread_data *data;
-	(void)sec;
-	(void)stacksz;
-	(void)flags;
-	data = (struct dos_thread_data *)malloc(sizeof(struct dos_thread_data));
-	if unlikely(!data)
-		return (uintptr_t)-1;
-	data->dtd_entry = entry;
-	data->dtd_arg   = arg;
-	/* TODO: Don't call clone() here -- Instead, use pthread_create()! */
-	result = clone(&dos_thread_entry,
-	               (void *)-1, /* TODO: CLONE_CHILDSTACK_AUTO isn't supported by KOSmk4! */
-	               CLONE_VM | CLONE_FS | CLONE_FILES |
-	               CLONE_SIGHAND | CLONE_THREAD,
-	               data);
-	if unlikely(result == -1) {
-		free(data);
-		result = 0;
-	}
-	if (threadaddr)
-		*threadaddr = (u32)result;
-	return result;
+	HANDLE hThread;
+	typedef HANDLE (WINAPI *LPCREATETHREAD)(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize,
+	                                        LPTHREAD_START_ROUTINE lpStartAddress,
+	                                        LPVOID lpParameter, DWORD dwCreationFlags,
+	                                        LPDWORD lpThreadId);
+	static LPCREATETHREAD pdyn_CreateThread = NULL;
+	if (!pdyn_CreateThread)
+		*(void **)&pdyn_CreateThread = libd_requirek32("CreateThread");
+	hThread = (*pdyn_CreateThread)((LPSECURITY_ATTRIBUTES)sec, (SIZE_T)stacksz,
+	                               (LPTHREAD_START_ROUTINE)entry, arg, flags,
+	                               (LPDWORD)threadaddr);
+	return (uintptr_t)hThread;
 }
 /*[[[end:libc__beginthreadex]]]*/
 
@@ -146,7 +118,12 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.thread") void
 NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 /*[[[body:libc__endthreadex]]]*/
 {
-	sys_exit((int)exitcode);
+	typedef DECLSPEC_NORETURN VOID (WINAPI *LPEXITTHREAD)(DWORD dwExitCode);
+	static LPEXITTHREAD pdyn_ExitThread = NULL;
+	if (!pdyn_ExitThread)
+		*(void **)&pdyn_ExitThread = libd_requirek32("ExitThread");
+	(*pdyn_ExitThread)((DWORD)exitcode);
+	__builtin_unreachable();
 }
 /*[[[end:libc__endthreadex]]]*/
 
