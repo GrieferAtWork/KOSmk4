@@ -40,7 +40,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct libc_tlsglobals mainthread_globals = {};
+INTERN ATTR_SECTION(".bss.crt.sched.pthread") struct libc_tlsglobals libc_mainthread_tlsglobals = {};
 
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED bool
 NOTHROW(LIBCCALL get_LIBC_TLS_GLOBALS_ALLOW_UNSAFE)(void) {
@@ -87,13 +87,13 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void) {
 
 	/* TLS globals haven't been allocated for the calling thread. */
 	if (pthread_main_np()) {
-		result = &mainthread_globals;
+		result = &libc_mainthread_tlsglobals;
 	} else {
 		result = (struct libc_tlsglobals *)calloc(sizeof(struct libc_tlsglobals));
 		if unlikely(!result) {
 			if (!get_LIBC_TLS_GLOBALS_ALLOW_UNSAFE())
 				abort_tls_globals_alloc_failed();
-			result = &mainthread_globals;
+			result = &libc_mainthread_tlsglobals;
 		}
 	}
 	current.pt_tglobals = result;

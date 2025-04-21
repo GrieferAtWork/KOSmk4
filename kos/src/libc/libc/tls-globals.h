@@ -75,6 +75,8 @@ NOTHROW(LIBCCALL libc_get_tlsglobals)(void);
 INTDEF NONNULL((1)) void
 NOTHROW(LIBCCALL libc_fini_tlsglobals)(struct libc_tlsglobals *__restrict self);
 
+INTDEF struct libc_tlsglobals libc_mainthread_tlsglobals;
+
 DECL_END
 #endif /* __CC__ */
 #endif /* !__KERNEL__ */

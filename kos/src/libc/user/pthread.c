@@ -177,7 +177,7 @@ INTERN ATTR_SECTION(".data.crt.sched.pthread") char libc___libc_single_threaded 
 LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	/* Destroy TLS globals (if used) */
-	if (self->pt_tglobals) {
+	if (self->pt_tglobals && likely(self->pt_tglobals != &libc_mainthread_tlsglobals)) {
 		libc_fini_tlsglobals(self->pt_tglobals);
 		free(self->pt_tglobals);
 	}
