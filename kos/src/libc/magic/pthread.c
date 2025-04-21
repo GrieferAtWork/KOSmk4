@@ -1202,7 +1202,7 @@ $pid_t pthread_gettid_np(pthread_t self);
 @@@return: ENOMEM: Insufficient memory (only when not already allocated)
 [[guard, pure, wunused]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-errno_t pthread_getpidfd_np(pthread_t self, $fd_t *__restrict p_pidfd);
+$errno_t pthread_getpidfd_np(pthread_t self, $fd_t *__restrict p_pidfd);
 
 @@>> pthread_attr_setpidfdallocated_np(3)
 @@Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.

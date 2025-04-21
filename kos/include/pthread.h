@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f5164ae */
+/* HASH CRC-32:0xc7fada1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1138,7 +1138,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(p
  * @return: EMFILE: Too many open files (process) (only when not already allocated)
  * @return: ENFILE: Too many open files (system) (only when not already allocated)
  * @return: ENOMEM: Insufficient memory (only when not already allocated) */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,errno_t,__NOTHROW_NCX,pthread_getpidfd_np,(pthread_t __self, __fd_t *__restrict __p_pidfd),(__self,__p_pidfd))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getpidfd_np,(pthread_t __self, __fd_t *__restrict __p_pidfd),(__self,__p_pidfd))
 #endif /* !__pthread_getpidfd_np_defined && __CRT_HAVE_pthread_getpidfd_np */
 /* >> pthread_attr_setpidfdallocated_np(3)
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
