@@ -399,9 +399,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		goto err_nomem_tls;
 
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-	/* Initialize the new thread's initial userprocmask structure,
-	 * such  that it will  lazily initialize it  the first time it
-	 * performs a call to `sigprocmask(2)'. */
+	/* Initialize  the new thread's initial userprocmask structure,
+	 * such that it will lazily initialize it itself the first time
+	 * it performs a call to `sigprocmask(2)'. */
 	bzero(&pt->pt_pmask, offsetof(struct userprocmask, pm_pending));
 #if USERPROCMASK_FLAG_NORMAL != 0
 	pt->pt_pmask.lpm_pmask.pm_flags = USERPROCMASK_FLAG_NORMAL;

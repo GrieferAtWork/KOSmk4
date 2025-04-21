@@ -637,14 +637,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       to make use of lockops  in heap structures for  the purpose of doing  new
 	 *       allocations needed for unmapping memory. */
 
-	/* TODO: mfile_truncate() needs some  kind of fs-level  operator for the  purpose
-	 *       of deallocating file data beyond a certain point within the file stream.
-	 * e.g.: On FAT, truncate the cluster chain to a certain length.
-	 * XXX:  I  think the  solution here would  be to override  streams-truncate on the
-	 *       fs-layer, acquire fs-specific locks (which already need to be non-atomic),
-	 *       prepare for  fs-specific  truncation,  do  `mfile_truncate',  do  the  fs-
-	 *       specific truncation, then release locks. */
-
 	/* TODO: The devfs root directory rename() operator should really be  re-written
 	 *       from scratch (and the ramfs one should be, too). Both don't really work
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were

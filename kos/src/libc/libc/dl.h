@@ -71,8 +71,8 @@ DECL_BEGIN
  * any additional relocations.
  * Using  this, all relocations  to libdl symbols  can (and are) removed
  * this way (except for `dlsym(3D)', as that one is actually required to
- * do the symbol lookups themself, meaning we'd had to do
- * `dlsym(RTLD_DEFAULT, "dlsym")' to get dlsym itself, which obviously
+ * do  the   symbol  lookups   themself,  meaning   we'd  have   to   do
+ * `dlsym(RTLD_DEFAULT, "dlsym")' to get  dlsym itself, which  obviously
  * wouldn't work)
  *
  * However, in practice there are still some other relocations that we
