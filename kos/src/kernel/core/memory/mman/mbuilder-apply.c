@@ -41,6 +41,7 @@
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/userkern.h>
 
 #include <hybrid/sequence/list.h>
 
