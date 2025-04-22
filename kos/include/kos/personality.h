@@ -43,7 +43,6 @@ enum {
 	                           * Affected programs:
 	                           *   - python: Whether intentional or not, python has problems updating its *.pyc
 	                           *             files when this personality is enabled. */
-	KP_PIDFD_OPEN_THREAD,     /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
 	KP_CHMOD_CHECK_MODE,      /* [default=0] The `chmod()' family of system calls will assert that
 	                           *             the `mode' argument can be masked by `07777' */
 	KP_MKDIR_CHECK_MODE,      /* [default=0] The `mkdir()' family of system calls will assert that
@@ -81,7 +80,6 @@ enum {
                                                            * Affected programs:
                                                            *   - python: Whether intentional or not, python has problems updating its *.pyc
                                                            *             files when this personality is enabled. */
-#define KP_PIDFD_OPEN_THREAD     KP_PIDFD_OPEN_THREAD     /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
 #define KP_CHMOD_CHECK_MODE      KP_CHMOD_CHECK_MODE      /* [default=0] The `chmod()' family of system calls will assert that
                                                            *             the `mode' argument can be masked by `07777' */
 #define KP_MKDIR_CHECK_MODE      KP_MKDIR_CHECK_MODE      /* [default=0] The `mkdir()' family of system calls will assert that
@@ -116,12 +114,11 @@ enum {
                                     * Affected programs:
                                     *   - python: Whether intentional or not, python has problems updating its *.pyc
                                     *             files when this personality is enabled. */
-#define KP_PIDFD_OPEN_THREAD     2 /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
-#define KP_CHMOD_CHECK_MODE      3 /* [default=0] The `chmod()' family of system calls will assert that
+#define KP_CHMOD_CHECK_MODE      2 /* [default=0] The `chmod()' family of system calls will assert that
                                     *             the `mode' argument can be masked by `07777' */
-#define KP_MKDIR_CHECK_MODE      4 /* [default=0] The `mkdir()' family of system calls will assert that
+#define KP_MKDIR_CHECK_MODE      3 /* [default=0] The `mkdir()' family of system calls will assert that
                                     *             the `mode' argument can be masked by `07777' */
-#define KP_EPOLL_DELETE_ONESHOT  5 /* [default=0] Instead of leaving `EPOLLONESHOT' monitors as dormant after they've
+#define KP_EPOLL_DELETE_ONESHOT  4 /* [default=0] Instead of leaving `EPOLLONESHOT' monitors as dormant after they've
                                     *             been triggered, remove  them from the  epoll-controller, meaning  that
                                     *             when  receiving an event registered `EPOLLONESHOT' from epoll_wait(2),
                                     *             the monitor of that event is automatically removed, just like it would
@@ -133,7 +130,7 @@ enum {
                                     *   - Programs that would already remove one-shot monitors from an epfd after
                                     *     the associated event has fired can enable this personality to have this
                                     *     be done automatically. */
-#define KP_COUNT                 6 /* # of different personality codes. */
+#define KP_COUNT                 5 /* # of different personality codes. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -837,27 +837,6 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
-fd_t LIBCCALL pidfd_open(pid_t tid) {
-	fd_t pathfd;
-	struct fdcast cast;
-	syscall_slong_t cast_status;
-	char filename[lengthof("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
-	sprintf(filename, "/proc/%" PRIdN(__SIZEOF_PID_T__), tid);
-	pathfd = sys_open(filename, O_RDWR | O_DIRECTORY | O_CLOEXEC, 0);
-	if (E_ISERR(pathfd))
-		return pathfd;
-	bzero(&cast, sizeof(cast));
-	cast.fc_rqtyp          = HANDLE_TYPE_PIDFD;
-	cast.fc_resfd.of_mode  = OPENFD_MODE_AUTO;
-	cast.fc_resfd.of_flags = IO_CLOEXEC;
-	cast_status = sys_ioctl(pathfd, FD_IOC_CAST, &cast);
-	(void)sys_close(pathfd);
-	if (E_ISERR(cast_status))
-		return cast_status;
-	return cast.fc_resfd.of_hint;
-}
-
 /*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x242b31a7]]]*/
 /* >> pthread_getpidfd_np(3)
  * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
@@ -876,12 +855,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
 {
 	fd_t fd = self->pt_pidfd;
 	if unlikely(fd == -1) {
-		pid_t tid = self->pt_tid;
+		pid_t tid = atomic_read(&self->pt_tid);
 		if unlikely(tid == 0)
 			return ESRCH;
-		fd = pidfd_open(tid);
-		if (!E_ISOK(fd))
+		fd = sys_pidfd_open(tid, 0);
+		if (E_ISERR(fd))
 			return -fd;
+		/* Verify that the thread still hasn't exited */
+		if unlikely(atomic_read(&self->pt_tid) == 0) {
+			(void)sys_close(fd);
+			return ESRCH;
+		}
 		if unlikely(!atomic_cmpxch(&self->pt_pidfd, -1, fd)) {
 			(void)sys_close(fd);
 			fd = atomic_read(&self->pt_pidfd);

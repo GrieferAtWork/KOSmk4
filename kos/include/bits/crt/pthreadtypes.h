@@ -121,7 +121,7 @@ struct pthread {
 	void                    *pt_stackaddr;   /* [const] Thread stack address (or NULL if not lazily initialized within the main() thread) */
 	__size_t                 pt_stacksize;   /* [const] Thread stack size (or 0 if not lazily initialized within the main() thread) */
 	unsigned int             pt_flags;       /* [lock(...)] Flags (Set of `PTHREAD_F*') */
-	__fd_t                   pt_pidfd;       /* [lock(WRITE_ONCE)][valid_if(PTHREAD_FHASPIDFD)] Flags (Set of `PTHREAD_F*') */
+	__fd_t                   pt_pidfd;       /* [lock(WRITE_ONCE)][valid_if(PTHREAD_FHASPIDFD)] Thread PID file descriptor (s.a. `CLONE_PIDFD', `sys_pidfd_open(2)') */
 	/* TODO: Get rid of the following 2 members. - They're only used during `libc_pthread_main()'! */
 	struct __cpu_set_struct *pt_cpuset;      /* [0..pt_cpusetsize] Initial affinity cpuset. */
 	__size_t                 pt_cpusetsize;  /* Initial affinity cpuset size. */

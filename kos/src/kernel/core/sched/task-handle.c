@@ -190,22 +190,6 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 	target = pidns_lookup_srch(mypid->tp_ns, pid);
 	FINALLY_DECREF_UNLIKELY(target);
 
-	/* Only allow pidfd_open() for process leaders
-	 * NOTE: Programs that don't want to rely on `KP_PIDFD_OPEN_THREAD' can do:
-	 *    >> char buf[lengthof("/proc/" PRIMAXd)];
-	 *    >> sprintf(buf, "/proc/%d", tid);
-	 *    >> temp = open(buf, O_RDONLY);
-	 *    >> struct fdcast cast;
-	 *    >> bzero(&cast, sizeof(cast));
-	 *    >> cast.fc_rqtyp         = HANDLE_TYPE_PIDFD;
-	 *    >> cast.fc_resfd.of_mode = OPENFD_MODE_AUTO;
-	 *    >> ioctl(temp, FD_IOC_CAST, &cast);
-	 *    >> close(temp);
-	 *    >> return cast.fc_resfd.of_hint;
-	 */
-	if (!taskpid_isaprocess(target) && !has_personality(KP_PIDFD_OPEN_THREAD))
-		THROW(E_PROCESS_EXITED, pid);
-
 	/* Verify that the caller can access `pid' */
 	require_pidfd_open(target);
 

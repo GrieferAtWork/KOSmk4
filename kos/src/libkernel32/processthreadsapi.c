@@ -22,7 +22,7 @@
 #define _KOS_KERNEL_SOURCE 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
-#define _LIBC_SOURCE 1 /* For "struct pthread" */
+#define _LIBC_SOURCE 1 /* For "typedef struct pthread *pthread_t" */
 
 #include "api.h"
 /**/
@@ -90,7 +90,7 @@ libk32_OpenProcess(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwProces
 	}
 	if (bInheritHandle) {
 		if (fcntl(result, F_SETFL, 0) != 0) {
-			close(result);
+			(void)sys_close(result);
 			return NULL;
 		}
 	}
@@ -125,36 +125,20 @@ DEFINE_INTERN_ALIAS(libk32_GetExitCodeThread, libk32_GetExitCodeProcess);
 INTERN HANDLE WINAPI
 libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
 	fd_t result;
-	char filename[lengthof("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
-	struct fdcast cast;
-	int status;
 	TRACE("OpenThread(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwThreadId);
 	(void)dwDesiredAccess;
-	/* NOTE: For linux compat, `sys_pidfd_open()' can't be used to open thread
-	 *       handles! - Instead, those can be opened via `open("/proc/[tid]")' */
-	sprintf(filename, "/proc/%" PRIdN(__SIZEOF_PID_T__), (pid_t)dwThreadId);
-	result = open(filename,
-	              bInheritHandle ? (O_RDWR | O_DIRECTORY)
-	                             : (O_RDWR | O_DIRECTORY | O_CLOEXEC));
-	if (result == -1)
+	result = sys_pidfd_open(dwThreadId, 0);
+	if (E_ISERR(result)) {
+		errno = -result;
 		return NULL;
-	/* Explicitly cast into a PIDFD handle. Most operations will already work
-	 * as expected when using the directory handle from procfs, but we  don't
-	 * want  to take any chances in that  regard, so by explicitly casting to
-	 * a PIDFD handle, we can guaranty that the correct object is returned.
-	 *
-	 * This is also required to ensure that kcmp(2) for multiple invocations
-	 * of  this function  returns indicative  of the  same underlying kernel
-	 * object. */
-	bzero(&cast, sizeof(cast));
-	cast.fc_rqtyp          = HANDLE_TYPE_PIDFD;
-	cast.fc_resfd.of_mode  = OPENFD_MODE_AUTO;
-	cast.fc_resfd.of_flags = IO_CLOEXEC;
-	status = ioctl(result, FD_IOC_CAST, &cast);
-	close(result);
-	if (status < 0)
-		return NULL;
-	return NTHANDLE_FROMFD(cast.fc_resfd.of_hint);
+	}
+	if (bInheritHandle) {
+		if (fcntl(result, F_SETFL, 0) != 0) {
+			(void)sys_close(result);
+			return NULL;
+		}
+	}
+	return NTHANDLE_FROMFD(result);
 }
 
 INTERN DWORD WINAPI
@@ -298,7 +282,7 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	if (error != EOK)
 		goto seterr;
 
-	/* Construct a PIDFD descriptor for the thread. */
+	/* Load the thread's TID for use as its NT "ThreadId" field. */
 	if (lpThreadId)
 		*lpThreadId = pthread_gettid_np(thread);
 
