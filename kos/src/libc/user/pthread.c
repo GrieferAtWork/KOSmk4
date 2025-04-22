@@ -927,7 +927,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
 
-/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x3d67f335]]]*/
+/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x7b1a3fd8]]]*/
 /* >> pthread_getpidfd_np(3)
  * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
  * To  guaranty that a PIDfd is available for a given thread, you can make use of
@@ -938,7 +938,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
  * @return: EMFILE: Too many open files (process) (only when not already allocated)
  * @return: ENFILE: Too many open files (system) (only when not already allocated)
  * @return: ENOMEM: Insufficient memory (only when not already allocated) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
                                                fd_t *__restrict p_pidfd)
 /*[[[body:libc_pthread_getpidfd_np]]]*/
@@ -2203,48 +2203,20 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t self,
 
 
 /************************************************************************/
-/* MISC PTHREAD FUNCTIONS                                               */
+/* PTHREAD SUSPEND API                                                  */
 /************************************************************************/
 
-/*[[[head:libc_pthread_atfork,hash:CRC-32=0xaf6eedad]]]*/
-/* >> pthread_atfork(3)
- * Install handlers to be called when a new process is created with  `fork(2)'.
- * The `prepare' handler is called in the parent process just before performing
- * `fork(2)'. The `parent' handler is called  in the parent process just  after
- * `fork(2)'.  The `child' handler is called in  the child process. Each of the
- * three  handlers can be `NULL', meaning that no handler needs to be called at
- * that point.
- * `pthread_atfork(3)' can be called several times, in which case the `prepare'
- * handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
- * first  called before `fork(2)'),  and the `parent'  and `child' handlers are
- * called in FIFO order (first added -> first called)
- * @return: EOK:    Success
- * @return: ENOMEM: Insufficient memory to register callbacks */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
-                                          void (LIBCCALL *parent)(void),
-                                          void (LIBCCALL *child)(void))
-/*[[[body:libc_pthread_atfork]]]*/
-/*AUTO*/{
-	(void)prepare;
-	(void)parent;
-	(void)child;
-	CRT_UNIMPLEMENTEDF("pthread_atfork(prepare: %p, parent: %p, child: %p)", prepare, parent, child); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc_pthread_atfork]]]*/
-
-/*[[[head:libc_pthread_attr_setstartsuspend_np,hash:CRC-32=0x5aef68f]]]*/
-/* >> pthread_attr_setstartsuspend_np(3)
+/*[[[head:libc_pthread_attr_setstartsuspended_np,hash:CRC-32=0x59f7ff81]]]*/
+/* >> pthread_attr_setstartsuspended_np(3)
  * Specify if `pthread_create(3)' should start the thread in a suspended state.
  * @param: start_suspended: 0=no (default) or 1=yes
  * @see pthread_resume_np, pthread_continue_np
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `start_suspended' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspend_np)(pthread_attr_t *__restrict self,
-                                                           int start_suspended)
-/*[[[body:libc_pthread_attr_setstartsuspend_np]]]*/
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspended_np)(pthread_attr_t *__restrict self,
+                                                             int start_suspended)
+/*[[[body:libc_pthread_attr_setstartsuspended_np]]]*/
 {
 	if (start_suspended != 0 && start_suspended != 1)
 		return EINVAL;
@@ -2255,23 +2227,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspend_np)(pthread_attr_t *__res
 	}
 	return EOK;
 }
-/*[[[end:libc_pthread_attr_setstartsuspend_np]]]*/
+/*[[[end:libc_pthread_attr_setstartsuspended_np]]]*/
 
-/*[[[head:libc_pthread_attr_getstartsuspend_np,hash:CRC-32=0xd0c9fc44]]]*/
+/*[[[head:libc_pthread_attr_getstartsuspended_np,hash:CRC-32=0xacfcf6d3]]]*/
 /* >> pthread_attr_getpidfdallocated_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN(1) ATTR_OUT(2) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstartsuspend_np)(pthread_attr_t const *__restrict self,
-                                                           int *start_suspended)
-/*[[[body:libc_pthread_attr_getstartsuspend_np]]]*/
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstartsuspended_np)(pthread_attr_t const *__restrict self,
+                                                             int *start_suspended)
+/*[[[body:libc_pthread_attr_getstartsuspended_np]]]*/
 {
 	*start_suspended = (self->pa_flags & PTHREAD_ATTR_FLAG_START_SUSPENDED) ? 1 : 0;
 	return EOK;
 }
-/*[[[end:libc_pthread_attr_getstartsuspend_np]]]*/
+/*[[[end:libc_pthread_attr_getstartsuspended_np]]]*/
 
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 pthread_suspended_rpc_cb(struct rpc_context *__restrict ctx, void *cookie) {
@@ -2358,12 +2330,12 @@ done:
 }
 /*[[[end:libc_pthread_suspend2_np]]]*/
 
-/*[[[head:libc_pthread_resume2_np,hash:CRC-32=0x8f149ad4]]]*/
+/*[[[head:libc_pthread_resume2_np,hash:CRC-32=0xd7d2bd84]]]*/
 /* >> pthread_resume2_np(3)
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1). The
  * counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
  * non-NULL).
  *
@@ -2400,12 +2372,12 @@ done:
 }
 /*[[[end:libc_pthread_resume2_np]]]*/
 
-/*[[[head:libc_pthread_continue_np,hash:CRC-32=0x1e7a0efb]]]*/
+/*[[[head:libc_pthread_continue_np,hash:CRC-32=0x71ae5472]]]*/
 /* >> pthread_continue_np(3), pthread_unsuspend_np(3)
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -2669,8 +2641,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_dlauxctrl_cb)(void *cookie, void *t
 	return NULL;
 }
 
-/*[[[head:libc_pthread_resume_all_np,hash:CRC-32=0x5522ef39]]]*/
-/* >> pthread_suspend_all_np(3)
+/*[[[head:libc_pthread_resume_all_np,hash:CRC-32=0xb06818ce]]]*/
+/* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void
@@ -2684,6 +2656,209 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_np)(void)
 	(void)pthread_mutex_unlock(&pthread_suspend_lock);
 }
 /*[[[end:libc_pthread_resume_all_np]]]*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* KOS PTHREAD (RE-)ATTACH API                                          */
+/************************************************************************/
+
+/*[[[head:libc_pthread_attach_np,hash:CRC-32=0x60f5b7c8]]]*/
+/* >> pthread_attach_np(3)
+ * Attach  to `self' for a second time. After a call to this function, `pthread_detach(3)'
+ * must be called one extra time before the thread descriptor `self' is actually destroyed */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void
+NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
+/*[[[body:libc_pthread_attach_np]]]*/
+{
+	atomic_inc(&self->pt_refcnt);
+}
+/*[[[end:libc_pthread_attach_np]]]*/
+
+/*[[[head:libc_pthread_enumthreads_np,hash:CRC-32=0x25e741e7]]]*/
+/* >> pthread_enumthreads_np(3)
+ * Enumerate all threads created by `pthread_create(3)' by invoking `cb' once for each of them.
+ * Only threads whose descriptors have yet to be destroyed are enumerated, and care is taken to
+ * ensure that the `thrd' passed  to `cb' cannot be destroyed  while inside of `cb'. Also  note
+ * that `cb' is allowed to call `pthread_attach_np(3)' to re-attach previously detached  thread
+ * descriptors (assuming that those descriptors haven't been destroyed, yet)
+ * @return: * :     A call to `cb' returned a value other than `EOK', and enumeration was halted
+ * @return: EOK:    All threads were enumerated by being passed to `cb'
+ * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_enumthreads_np)(errno_t (__LIBCCALL *cb)(void *cookie, pthread_t thrd),
+                                                  void *cookie)
+/*[[[body:libc_pthread_enumthreads_np]]]*/
+{
+	size_t i;
+	errno_t result = EOK;
+	struct threadlist *threads = threadlist_getall();
+	if unlikely(!threads)
+		return ENOMEM;
+	for (i = 0; i < threads->tl_cnt; ++i) {
+		result = (*cb)(cookie, threads->tl_vec[i]);
+		if (result != EOK)
+			break;
+	}
+	threadlist_destroy(threads);
+	return result;
+}
+/*[[[end:libc_pthread_enumthreads_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL libc_pthread_attachtid_dlauxctrl_cb)(void *cookie, void *tls_segment) {
+	pid_t tid = (pid_t)(uintptr_t)cookie;
+	struct pthread *thread = current_from_tls(tls_segment);
+	if (thread->pt_tid == tid && tryincref(thread))
+		return thread;
+	return NULL;
+}
+
+/*[[[head:libc_pthread_attachtid_np,hash:CRC-32=0xc82b4316]]]*/
+/* >> pthread_attachtid_np(3)
+ * Return a descriptor for a (potentially, previously detached) thread `tid'.
+ * This function cannot be used to attach threads created by means other than
+ * via `pthread_create(3)', and also won't work  for threads not part of  the
+ * calling process.
+ * Semantically, this function is equivalent to calling `pthread_enumthreads_np(3)'
+ * in  other  to  find the  correct  thread, then  using  `pthread_attach_np(3)' to
+ * (re-)attach a reference to its descriptor.
+ *
+ * @return: EOK:    Success. In this case, the caller must use `pthread_detach(3)'
+ *                  in  order  to   release  the  new   reference  to   `*result'.
+ * @return: EINVAL: Invalid `tid' (is `0' or negative)
+ * @return: ESRCH:  Descriptor for thread with `tid' has already been destroyed,
+ *                  or didn't exist  (within the calling  process) in the  first
+ *                  place. */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attachtid_np)(pid_t tid,
+                                                pthread_t *__restrict result)
+/*[[[body:libc_pthread_attachtid_np]]]*/
+{
+	struct pthread *thread;
+	if unlikely(tid <= 0)
+		return EINVAL;
+	thread = (struct pthread *)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
+	                                     &libc_pthread_attachtid_dlauxctrl_cb,
+	                                     (void *)(uintptr_t)tid);
+	if (thread) {
+		*result = thread;
+		return EOK;
+	}
+	return ESRCH;
+}
+/*[[[end:libc_pthread_attachtid_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_dlauxctrl_cb)(void *cookie, void *tls_segment) {
+	fd_t pidfd = (fd_t)(uintptr_t)cookie;
+	struct pthread *thread = current_from_tls(tls_segment);
+	if (thread->pt_pidfd == pidfd && tryincref(thread))
+		return thread;
+	return NULL;
+}
+
+/*[[[head:libc_pthread_attachpidfd_np,hash:CRC-32=0xe01e563]]]*/
+/* >> pthread_attachpidfd_np(3)
+ * Similar to `pthread_attachtid_np(3)', but search for a thread that has an
+ * allocated PIDfd descriptor (as returned by `pthread_getpidfd_np(3)'), and
+ * (re-)attach that thread's descriptor.  Only the original file  descriptor
+ * returned by `pthread_getpidfd_np(3)' is  understood by this function.  If
+ * you `dup(2)' that descriptor and try to pass the duplicate, this function
+ * will be unable to locate your descriptor.
+ *
+ * @return: EOK:    Success. In this case, the caller must use `pthread_detach(3)'
+ *                  in  order  to   release  the  new   reference  to   `*result'.
+ * @return: EINVAL: Invalid `pidfd' (is negative)
+ * @return: ESRCH:  Descriptor for thread with `pidfd' has already been  destroyed,
+ *                  or  didn't  exist (within  the  calling process)  in  the first
+ *                  place, or the given `pidfd' is not what was originally returned
+ *                  by  `pthread_getpidfd_np(3)'  (but is  the result  of `dup(2)') */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_np)(fd_t pidfd,
+                                                  pthread_t *__restrict result)
+/*[[[body:libc_pthread_attachpidfd_np]]]*/
+{
+	struct pthread *thread;
+	if unlikely(pidfd < 0)
+		return EINVAL;
+	thread = (struct pthread *)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
+	                                     &libc_pthread_attachpidfd_dlauxctrl_cb,
+	                                     (void *)(uintptr_t)pidfd);
+	if (thread) {
+		*result = thread;
+		return EOK;
+	}
+	return ESRCH;
+}
+/*[[[end:libc_pthread_attachpidfd_np]]]*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* MISC PTHREAD FUNCTIONS                                               */
+/************************************************************************/
+
+/*[[[head:libc_pthread_atfork,hash:CRC-32=0xaf6eedad]]]*/
+/* >> pthread_atfork(3)
+ * Install handlers to be called when a new process is created with  `fork(2)'.
+ * The `prepare' handler is called in the parent process just before performing
+ * `fork(2)'. The `parent' handler is called  in the parent process just  after
+ * `fork(2)'.  The `child' handler is called in  the child process. Each of the
+ * three  handlers can be `NULL', meaning that no handler needs to be called at
+ * that point.
+ * `pthread_atfork(3)' can be called several times, in which case the `prepare'
+ * handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
+ * first  called before `fork(2)'),  and the `parent'  and `child' handlers are
+ * called in FIFO order (first added -> first called)
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to register callbacks */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
+                                          void (LIBCCALL *parent)(void),
+                                          void (LIBCCALL *child)(void))
+/*[[[body:libc_pthread_atfork]]]*/
+/*AUTO*/{
+	(void)prepare;
+	(void)parent;
+	(void)child;
+	CRT_UNIMPLEMENTEDF("pthread_atfork(prepare: %p, parent: %p, child: %p)", prepare, parent, child); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc_pthread_atfork]]]*/
 
 /*[[[head:libc___pthread_register_cancel,hash:CRC-32=0xa8bf5df4]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute void
@@ -5379,7 +5554,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe6dc50d]]]*/
+/*[[[start:exports,hash:CRC-32=0x1bac55f1]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5439,7 +5614,7 @@ DEFINE_PUBLIC_ALIAS_P(pthread_set_name_np,libc_pthread_setname_np,ATTR_IN(2),err
 DEFINE_PUBLIC_ALIAS_P(cthread_set_name,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
 DEFINE_PUBLIC_ALIAS_P(pthread_setname_np,libc_pthread_setname_np,ATTR_IN(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, const char *name),(self,name));
 DEFINE_PUBLIC_ALIAS_P(pthread_gettid_np,libc_pthread_gettid_np,ATTR_PURE WUNUSED,pid_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
-DEFINE_PUBLIC_ALIAS_P(pthread_getpidfd_np,libc_pthread_getpidfd_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, fd_t *__restrict p_pidfd),(self,p_pidfd));
+DEFINE_PUBLIC_ALIAS_P(pthread_getpidfd_np,libc_pthread_getpidfd_np,ATTR_PURE WUNUSED ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, fd_t *__restrict p_pidfd),(self,p_pidfd));
 DEFINE_PUBLIC_ALIAS_P(pthread_attr_setpidfdallocated_np,libc_pthread_attr_setpidfdallocated_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *self, int allocated),(self,allocated));
 DEFINE_PUBLIC_ALIAS_P(pthread_attr_getpidfdallocated_np,libc_pthread_attr_getpidfdallocated_np,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *__restrict self, int *__restrict allocated),(self,allocated));
 DEFINE_PUBLIC_ALIAS_P(pthread_mainthread_np,libc_pthread_mainthread_np,ATTR_CONST WUNUSED,pthread_t,NOTHROW,LIBCCALL,(void),());
@@ -5584,10 +5759,14 @@ DEFINE_PUBLIC_ALIAS_P(pthread_getspecificptr_np,libc_pthread_getspecificptr_np,A
 DEFINE_PUBLIC_ALIAS_P(pthread_getcpuclockid,libc_pthread_getcpuclockid,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, clockid_t *clock_id),(self,clock_id));
 DEFINE_PUBLIC_ALIAS_P(__pthread_atfork,libc_pthread_atfork,,errno_t,NOTHROW_NCX,LIBCCALL,(void (LIBCCALL *prepare)(void), void (LIBCCALL *parent)(void), void (LIBCCALL *child)(void)),(prepare,parent,child));
 DEFINE_PUBLIC_ALIAS_P(pthread_atfork,libc_pthread_atfork,,errno_t,NOTHROW_NCX,LIBCCALL,(void (LIBCCALL *prepare)(void), void (LIBCCALL *parent)(void), void (LIBCCALL *child)(void)),(prepare,parent,child));
-DEFINE_PUBLIC_ALIAS_P(pthread_attr_setstartsuspend_np,libc_pthread_attr_setstartsuspend_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *__restrict self, int start_suspended),(self,start_suspended));
-DEFINE_PUBLIC_ALIAS_P(pthread_attr_getstartsuspend_np,libc_pthread_attr_getstartsuspend_np,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *__restrict self, int *start_suspended),(self,start_suspended));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_setstartsuspended_np,libc_pthread_attr_setstartsuspended_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *__restrict self, int start_suspended),(self,start_suspended));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_getstartsuspended_np,libc_pthread_attr_getstartsuspended_np,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *__restrict self, int *start_suspended),(self,start_suspended));
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend2_np,libc_pthread_suspend2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
 DEFINE_PUBLIC_ALIAS_P(pthread_resume2_np,libc_pthread_resume2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
+DEFINE_PUBLIC_ALIAS_P_VOID(pthread_attach_np,libc_pthread_attach_np,,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_enumthreads_np,libc_pthread_enumthreads_np,NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(errno_t (__LIBCCALL *cb)(void *cookie, pthread_t thrd), void *cookie),(cb,cookie));
+DEFINE_PUBLIC_ALIAS_P(pthread_attachtid_np,libc_pthread_attachtid_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pid_t tid, pthread_t *__restrict result),(tid,result));
+DEFINE_PUBLIC_ALIAS_P(pthread_attachpidfd_np,libc_pthread_attachpidfd_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(fd_t pidfd, pthread_t *__restrict result),(pidfd,result));
 DEFINE_PUBLIC_ALIAS_P(thr_continue,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_unsuspend_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_continue_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));

@@ -4606,6 +4606,9 @@
 #define __CRT_HAVE_psiginfo
 #define __CRT_HAVE_psignal
 #define __CRT_HAVE_pthread_atfork
+#define __CRT_HAVE_pthread_attach_np
+#define __CRT_HAVE_pthread_attachpidfd_np
+#define __CRT_HAVE_pthread_attachtid_np
 #define __CRT_HAVE_pthread_attr_destroy
 #define __CRT_HAVE_pthread_attr_getaffinity_np
 #define __CRT_HAVE_pthread_attr_getdetachstate
@@ -4618,7 +4621,7 @@
 #define __CRT_HAVE_pthread_attr_getstack
 #define __CRT_HAVE_pthread_attr_getstackaddr
 #define __CRT_HAVE_pthread_attr_getstacksize
-#define __CRT_HAVE_pthread_attr_getstartsuspend_np
+#define __CRT_HAVE_pthread_attr_getstartsuspended_np
 #define __CRT_HAVE_pthread_attr_init
 #define __CRT_HAVE_pthread_attr_setaffinity_np
 #define __CRT_HAVE_pthread_attr_setcreatesuspend_np
@@ -4632,7 +4635,7 @@
 #define __CRT_HAVE_pthread_attr_setstack
 #define __CRT_HAVE_pthread_attr_setstackaddr
 #define __CRT_HAVE_pthread_attr_setstacksize
-#define __CRT_HAVE_pthread_attr_setstartsuspend_np
+#define __CRT_HAVE_pthread_attr_setstartsuspended_np
 #define __CRT_HAVE_pthread_barrier_destroy
 #define __CRT_HAVE_pthread_barrier_init
 #define __CRT_HAVE_pthread_barrier_wait
@@ -4659,6 +4662,7 @@
 #define __CRT_HAVE_pthread_continue_np
 #define __CRT_HAVE_pthread_create
 #define __CRT_HAVE_pthread_detach
+#define __CRT_HAVE_pthread_enumthreads_np
 #define __CRT_HAVE_pthread_equal
 #define __CRT_HAVE_pthread_exit
 #define __CRT_HAVE_pthread_get_name_np

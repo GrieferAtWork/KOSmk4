@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefd7460a */
+/* HASH CRC-32:0x92f1a68e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1906,10 +1906,14 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_getcpuclockid, libd_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_atfork, libd_pthread_atfork);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_atfork, libd_pthread_atfork);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_set_num_processors_np, libd_pthread_set_num_processors_np);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setstartsuspend_np, libd_pthread_attr_setstartsuspend_np);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getstartsuspend_np, libd_pthread_attr_getstartsuspend_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setstartsuspended_np, libd_pthread_attr_setstartsuspended_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getstartsuspended_np, libd_pthread_attr_getstartsuspended_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_suspend2_np, libd_pthread_suspend2_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_resume2_np, libd_pthread_resume2_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attach_np, libd_pthread_attach_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_enumthreads_np, libd_pthread_enumthreads_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attachtid_np, libd_pthread_attachtid_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attachpidfd_np, libd_pthread_attachpidfd_np);
 DEFINE_PUBLIC_ALIAS(DOS$thr_continue, libd_pthread_continue_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_unsuspend_np, libd_pthread_continue_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_continue_np, libd_pthread_continue_np);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x370b4b4c */
+/* HASH CRC-32:0x3ed94761 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -355,11 +355,11 @@ NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
  *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
  *  - `pthread_resume_np(3)'
  *  - `pthread_resume_all_np(3)'
- * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self) {
-	return libc_pthread_attr_setstartsuspend_np(self, 1);
+	return libc_pthread_attr_setstartsuspended_np(self, 1);
 }
 /* >> pthread_suspend_np(3)
  * Increment the given thread's suspend-counter. If the counter was `0' before,
@@ -382,7 +382,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self) {
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success

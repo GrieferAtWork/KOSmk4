@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3aabca6 */
+/* HASH CRC-32:0xd4831239 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL thr_suspend)(t
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -238,7 +238,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_continue,(thread_t __thr),pthread_conti
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -249,7 +249,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_continue,(thread_t __thr),(__thr))
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success

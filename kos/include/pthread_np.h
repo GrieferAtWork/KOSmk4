@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x563e853b */
+/* HASH CRC-32:0xe53e4fed */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,10 +164,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_stackseg_np, __FORCELOCAL __ATTR_ARTIFIC
  *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
  *  - `pthread_resume_np(3)'
  *  - `pthread_resume_all_np(3)'
- * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
 __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setcreatesuspend_np,(pthread_attr_t *__restrict __self),(__self))
-#elif defined(__CRT_HAVE_pthread_attr_setstartsuspend_np)
+#elif defined(__CRT_HAVE_pthread_attr_setstartsuspended_np)
 #include <libc/local/pthread/pthread_attr_setcreatesuspend_np.h>
 /* >> pthread_attr_setcreatesuspend_np(3)
  * Setup `self' such that created threads start in a "suspended" state,
@@ -175,7 +175,7 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setcreatesuspend
  *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
  *  - `pthread_resume_np(3)'
  *  - `pthread_resume_all_np(3)'
- * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setcreatesuspend_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setcreatesuspend_np))(__self); })
 #else /* ... */
@@ -241,7 +241,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_suspend_np, __FORCELOCAL __ATTR_ARTIFICI
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success
@@ -253,7 +253,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_resume_np,(pthread_t __self),(__self
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success
@@ -270,7 +270,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_resume_np, __FORCELOCAL __ATTR_ARTIFICIA
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -281,7 +281,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),(__se
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -292,7 +292,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),thr_
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -309,7 +309,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),pthr
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -320,7 +320,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),pth
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -331,7 +331,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),thr
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -358,7 +358,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_suspend_all_np,(void),())
 #endif /* !__pthread_suspend_all_np_defined && __CRT_HAVE_pthread_suspend_all_np */
 #if !defined(__pthread_resume_all_np_defined) && defined(__CRT_HAVE_pthread_resume_all_np)
 #define __pthread_resume_all_np_defined
-/* >> pthread_suspend_all_np(3)
+/* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
 __CDECLARE_VOID(,__NOTHROW_NCX,pthread_resume_all_np,(void),())

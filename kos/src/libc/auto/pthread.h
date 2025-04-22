@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x654da1b9 */
+/* HASH CRC-32:0x80d6c23b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -262,7 +262,7 @@ INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_pthread_gettid_np)(pthr
  * @return: EMFILE: Too many open files (process) (only when not already allocated)
  * @return: ENFILE: Too many open files (system) (only when not already allocated)
  * @return: ENOMEM: Insufficient memory (only when not already allocated) */
-INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getpidfd_np)(pthread_t self, fd_t *__restrict p_pidfd);
+INTDEF ATTR_PURE WUNUSED ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getpidfd_np)(pthread_t self, fd_t *__restrict p_pidfd);
 /* >> pthread_attr_setpidfdallocated_np(3)
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
  * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
@@ -871,19 +871,19 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> pthread_attr_setstartsuspend_np(3)
+/* >> pthread_attr_setstartsuspended_np(3)
  * Specify if `pthread_create(3)' should start the thread in a suspended state.
  * @param: start_suspended: 0=no (default) or 1=yes
  * @see pthread_resume_np, pthread_continue_np
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `start_suspended' */
-INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstartsuspend_np)(pthread_attr_t *__restrict self, int start_suspended);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstartsuspended_np)(pthread_attr_t *__restrict self, int start_suspended);
 /* >> pthread_attr_getpidfdallocated_np(3)
  * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
  * starting  newly spawned thread  in a suspended  state (requiring the creator
  * to resume the thread at least once before execution actually starts)
  * @return: EOK: Success */
-INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getstartsuspend_np)(pthread_attr_t const *__restrict self, int *start_suspended);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getstartsuspended_np)(pthread_attr_t const *__restrict self, int *start_suspended);
 /* >> pthread_suspend2_np(3)
  * Increment the given thread's suspend-counter. If the counter was `0' before,
  * then the thread is suspended and this function only returns once the  thread
@@ -903,7 +903,7 @@ INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_suspend2_np)(pt
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1). The
  * counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
  * non-NULL).
  *
@@ -911,11 +911,57 @@ INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_suspend2_np)(pt
  * @return: EOK:   Success
  * @return: ESRCH: The thread has already been terminated */
 INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_resume2_np)(pthread_t self, uint32_t *p_old_suspend_counter);
+/* >> pthread_attach_np(3)
+ * Attach  to `self' for a second time. After a call to this function, `pthread_detach(3)'
+ * must be called one extra time before the thread descriptor `self' is actually destroyed */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_pthread_attach_np)(pthread_t self);
+/* >> pthread_enumthreads_np(3)
+ * Enumerate all threads created by `pthread_create(3)' by invoking `cb' once for each of them.
+ * Only threads whose descriptors have yet to be destroyed are enumerated, and care is taken to
+ * ensure that the `thrd' passed  to `cb' cannot be destroyed  while inside of `cb'. Also  note
+ * that `cb' is allowed to call `pthread_attach_np(3)' to re-attach previously detached  thread
+ * descriptors (assuming that those descriptors haven't been destroyed, yet)
+ * @return: * :     A call to `cb' returned a value other than `EOK', and enumeration was halted
+ * @return: EOK:    All threads were enumerated by being passed to `cb'
+ * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_enumthreads_np)(errno_t (__LIBDCALL *cb)(void *cookie, pthread_t thrd), void *cookie);
+/* >> pthread_attachtid_np(3)
+ * Return a descriptor for a (potentially, previously detached) thread `tid'.
+ * This function cannot be used to attach threads created by means other than
+ * via `pthread_create(3)', and also won't work  for threads not part of  the
+ * calling process.
+ * Semantically, this function is equivalent to calling `pthread_enumthreads_np(3)'
+ * in  other  to  find the  correct  thread, then  using  `pthread_attach_np(3)' to
+ * (re-)attach a reference to its descriptor.
+ *
+ * @return: EOK:    Success. In this case, the caller must use `pthread_detach(3)'
+ *                  in  order  to   release  the  new   reference  to   `*result'.
+ * @return: EINVAL: Invalid `tid' (is `0' or negative)
+ * @return: ESRCH:  Descriptor for thread with `tid' has already been destroyed,
+ *                  or didn't exist  (within the calling  process) in the  first
+ *                  place. */
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attachtid_np)(pid_t tid, pthread_t *__restrict result);
+/* >> pthread_attachpidfd_np(3)
+ * Similar to `pthread_attachtid_np(3)', but search for a thread that has an
+ * allocated PIDfd descriptor (as returned by `pthread_getpidfd_np(3)'), and
+ * (re-)attach that thread's descriptor.  Only the original file  descriptor
+ * returned by `pthread_getpidfd_np(3)' is  understood by this function.  If
+ * you `dup(2)' that descriptor and try to pass the duplicate, this function
+ * will be unable to locate your descriptor.
+ *
+ * @return: EOK:    Success. In this case, the caller must use `pthread_detach(3)'
+ *                  in  order  to   release  the  new   reference  to   `*result'.
+ * @return: EINVAL: Invalid `pidfd' (is negative)
+ * @return: ESRCH:  Descriptor for thread with `pidfd' has already been  destroyed,
+ *                  or  didn't  exist (within  the  calling process)  in  the first
+ *                  place, or the given `pidfd' is not what was originally returned
+ *                  by  `pthread_getpidfd_np(3)'  (but is  the result  of `dup(2)') */
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attachpidfd_np)(fd_t pidfd, pthread_t *__restrict result);
 /* >> pthread_continue_np(3), pthread_unsuspend_np(3)
  * Set the given thread's suspend-counter to `0'. If the counter was already `0',
  * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
  * allowed  to  continue (or  start for  the first  time in  case the  thread was
- * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
  * @return: EOK:   Success
@@ -927,7 +973,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_continue_np)(pthread_t self);
  *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
  *  - `pthread_resume_np(3)'
  *  - `pthread_resume_all_np(3)'
- * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -938,7 +984,7 @@ INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setcreatesus
  *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
  *  - `pthread_resume_np(3)'
  *  - `pthread_resume_all_np(3)'
- * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * Alias for `pthread_attr_setstartsuspended_np(self, 1)'
  * @return: EOK: Always returned */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self);
 #endif /* !__KERNEL__ */
@@ -979,7 +1025,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self);
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success
@@ -991,7 +1037,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_resume_np)(pthread_t self);
  * Decrement the given thread's suspend-counter. If the counter was already `0',
  * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
  * the thread is allowed to  continue (or start for the  first time in case  the
- * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ * thread was created with `pthread_attr_setstartsuspended_np(3)' set to 1).
  *
  * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
  * @return: EOK:   Success
