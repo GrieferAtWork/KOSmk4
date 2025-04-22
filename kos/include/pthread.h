@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7fada1 */
+/* HASH CRC-32:0xfd1d0473 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1144,7 +1144,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getpidfd_n
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
  * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
  * via `pthread_getpidfd_np(3)'
- * @param: allocated: 0=no or 1=yes
+ * @param: allocated: 0=no (default) or 1=yes
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `allocated' */
 __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setpidfdallocated_np,(pthread_attr_t *__self, int __allocated),(__self,__allocated))
@@ -3015,6 +3015,256 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !... */
 #endif /* !__pthread_main_np_defined */
 #endif /* __USE_BSD */
+#ifdef __USE_KOS
+/* >> pthread_attr_setstartsuspend_np(3)
+ * Specify if `pthread_create(3)' should start the thread in a suspended state.
+ * @param: start_suspended: 0=no (default) or 1=yes
+ * @see pthread_resume_np, pthread_continue_np
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `start_suspended' */
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstartsuspend_np,(pthread_attr_t *__restrict __self, int __start_suspended),(__self,__start_suspended))
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
+ * starting  newly spawned thread  in a suspended  state (requiring the creator
+ * to resume the thread at least once before execution actually starts)
+ * @return: EOK: Success */
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getstartsuspend_np,(pthread_attr_t const *__restrict __self, int *__start_suspended),(__self,__start_suspended))
+/* >> pthread_suspend2_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code. The counter's old value is optionally stored  in
+ * `p_old_suspend_counter' (when non-NULL)
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume2_np(3)')
+ *
+ * @see pthread_suspend_np, pthread_resume2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_suspend2_np,(pthread_t __self, __UINT32_TYPE__ *__p_old_suspend_counter),(__self,__p_old_suspend_counter))
+/* >> pthread_resume2_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+ * counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
+ * non-NULL).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_resume2_np,(pthread_t __self, __UINT32_TYPE__ *__p_old_suspend_counter),(__self,__p_old_suspend_counter))
+#ifndef __pthread_continue_np_defined
+#define __pthread_continue_np_defined
+#ifdef __CRT_HAVE_pthread_continue_np
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),(__self))
+#elif defined(__CRT_HAVE_thr_continue)
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),thr_continue,(__self))
+#elif defined(__CRT_HAVE_pthread_unsuspend_np)
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_continue_np,(pthread_t __self),pthread_unsuspend_np,(__self))
+#else /* ... */
+#undef __pthread_continue_np_defined
+#endif /* !... */
+#endif /* !__pthread_continue_np_defined */
+#ifndef __pthread_attr_setcreatesuspend_np_defined
+#define __pthread_attr_setcreatesuspend_np_defined
+#ifdef __CRT_HAVE_pthread_attr_setcreatesuspend_np
+/* >> pthread_attr_setcreatesuspend_np(3)
+ * Setup `self' such that created threads start in a "suspended" state,
+ * requiring a call to one of the following function to actually start:
+ *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+ *  - `pthread_resume_np(3)'
+ *  - `pthread_resume_all_np(3)'
+ * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * @return: EOK: Always returned */
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setcreatesuspend_np,(pthread_attr_t *__restrict __self),(__self))
+#elif defined(__CRT_HAVE_pthread_attr_setstartsuspend_np)
+#include <libc/local/pthread/pthread_attr_setcreatesuspend_np.h>
+/* >> pthread_attr_setcreatesuspend_np(3)
+ * Setup `self' such that created threads start in a "suspended" state,
+ * requiring a call to one of the following function to actually start:
+ *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+ *  - `pthread_resume_np(3)'
+ *  - `pthread_resume_all_np(3)'
+ * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * @return: EOK: Always returned */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setcreatesuspend_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setcreatesuspend_np))(__self); })
+#else /* ... */
+#undef __pthread_attr_setcreatesuspend_np_defined
+#endif /* !... */
+#endif /* !__pthread_attr_setcreatesuspend_np_defined */
+#ifndef __pthread_suspend_np_defined
+#define __pthread_suspend_np_defined
+#ifdef __CRT_HAVE_pthread_suspend_np
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_suspend_np,(pthread_t __self),(__self))
+#elif defined(__CRT_HAVE_thr_suspend)
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_suspend_np,(pthread_t __self),thr_suspend,(__self))
+#elif defined(__CRT_HAVE_pthread_suspend2_np)
+#include <libc/local/pthread/pthread_suspend_np.h>
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_suspend_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_suspend_np)(pthread_t __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_suspend_np))(__self); })
+#else /* ... */
+#undef __pthread_suspend_np_defined
+#endif /* !... */
+#endif /* !__pthread_suspend_np_defined */
+#ifndef __pthread_resume_np_defined
+#define __pthread_resume_np_defined
+#ifdef __CRT_HAVE_pthread_resume_np
+/* >> pthread_suspend_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_resume_np,(pthread_t __self),(__self))
+#elif defined(__CRT_HAVE_pthread_resume2_np)
+#include <libc/local/pthread/pthread_resume_np.h>
+/* >> pthread_suspend_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_resume_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_resume_np)(pthread_t __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_resume_np))(__self); })
+#else /* ... */
+#undef __pthread_resume_np_defined
+#endif /* !... */
+#endif /* !__pthread_resume_np_defined */
+#ifndef __pthread_unsuspend_np_defined
+#define __pthread_unsuspend_np_defined
+#ifdef __CRT_HAVE_pthread_continue_np
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),pthread_continue_np,(__self))
+#elif defined(__CRT_HAVE_thr_continue)
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),thr_continue,(__self))
+#elif defined(__CRT_HAVE_pthread_unsuspend_np)
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),(__self))
+#else /* ... */
+#undef __pthread_unsuspend_np_defined
+#endif /* !... */
+#endif /* !__pthread_unsuspend_np_defined */
+#if !defined(__pthread_suspend_all_np_defined) && defined(__CRT_HAVE_pthread_suspend_all_np)
+#define __pthread_suspend_all_np_defined
+/* >> pthread_suspend_all_np(3)
+ * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+ * After a call to this function, the calling thread is the only one running within
+ * the current process (at least of those created by `pthread_create(3)')
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume_all_np(3)')
+ *
+ * @return: EOK:       Success
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_suspend_all_np,(void),())
+#endif /* !__pthread_suspend_all_np_defined && __CRT_HAVE_pthread_suspend_all_np */
+#if !defined(__pthread_resume_all_np_defined) && defined(__CRT_HAVE_pthread_resume_all_np)
+#define __pthread_resume_all_np_defined
+/* >> pthread_suspend_all_np(3)
+ * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+ * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
+__CDECLARE_VOID(,__NOTHROW_NCX,pthread_resume_all_np,(void),())
+#endif /* !__pthread_resume_all_np_defined && __CRT_HAVE_pthread_resume_all_np */
+#endif /* __USE_KOS */
 #endif /* __CC__ */
 
 __SYSDECL_END

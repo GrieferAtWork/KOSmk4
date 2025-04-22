@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe71de44 */
+/* HASH CRC-32:0x370b4b4c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -349,6 +349,48 @@ NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
 
 
 }
+/* >> pthread_attr_setcreatesuspend_np(3)
+ * Setup `self' such that created threads start in a "suspended" state,
+ * requiring a call to one of the following function to actually start:
+ *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+ *  - `pthread_resume_np(3)'
+ *  - `pthread_resume_all_np(3)'
+ * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * @return: EOK: Always returned */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self) {
+	return libc_pthread_attr_setstartsuspend_np(self, 1);
+}
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self) {
+	return libc_pthread_suspend2_np(self, NULL);
+}
+/* >> pthread_suspend_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self) {
+	return libc_pthread_resume2_np(self, NULL);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -371,6 +413,10 @@ DEFINE_PUBLIC_ALIAS_P(pthread_num_processors_np,libc_pthread_num_processors_np,W
 DEFINE_PUBLIC_ALIAS_P(pthread_set_num_processors_np,libc_pthread_set_num_processors_np,,errno_t,NOTHROW_NCX,LIBCCALL,(int n),(n));
 DEFINE_PUBLIC_ALIAS_P(thr_main,libc_pthread_main_np,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(pthread_main_np,libc_pthread_main_np,ATTR_CONST WUNUSED,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_setcreatesuspend_np,libc_pthread_attr_setcreatesuspend_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *__restrict self),(self));
+DEFINE_PUBLIC_ALIAS_P(thr_suspend,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_suspend_np,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_resume_np,libc_pthread_resume_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

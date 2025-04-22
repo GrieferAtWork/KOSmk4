@@ -1187,6 +1187,7 @@ $errno_t pthread_setname_np(pthread_t self,
 @@@return: * : The TID of the given thread
 @@@return: 0 : The given `self' has already terminated
 [[guard, pure, wunused]]
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $pid_t pthread_gettid_np(pthread_t self);
 
@@ -1201,6 +1202,7 @@ $pid_t pthread_gettid_np(pthread_t self);
 @@@return: ENFILE: Too many open files (system) (only when not already allocated)
 @@@return: ENOMEM: Insufficient memory (only when not already allocated)
 [[guard, pure, wunused]]
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getpidfd_np(pthread_t self, $fd_t *__restrict p_pidfd);
 
@@ -1208,9 +1210,10 @@ $errno_t pthread_getpidfd_np(pthread_t self, $fd_t *__restrict p_pidfd);
 @@Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
 @@Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
 @@via `pthread_getpidfd_np(3)'
-@@@param: allocated: 0=no or 1=yes
+@@@param: allocated: 0=no (default) or 1=yes
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `allocated'
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_setpidfdallocated_np([[inout]] pthread_attr_t *self, int allocated);
 
@@ -1218,6 +1221,7 @@ $errno_t pthread_attr_setpidfdallocated_np([[inout]] pthread_attr_t *self, int a
 @@Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
 @@automatically allocating a PIDfd descriptor for the newly spawned thread.
 @@@return: EOK: Success
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getpidfdallocated_np([[in]] pthread_attr_t const *__restrict self,
                                            [[out]] int *__restrict allocated);
@@ -1226,6 +1230,7 @@ $errno_t pthread_attr_getpidfdallocated_np([[in]] pthread_attr_t const *__restri
 @@>> pthread_mainthread_np(3)
 @@Obtain the identifier of the main thread
 @@@return: * : Handle for the main thread
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[wunused, const, nothrow, decl_include("<bits/crt/pthreadtypes.h>")]]
 pthread_t pthread_mainthread_np(void);
 
@@ -1241,6 +1246,7 @@ pthread_t pthread_mainthread_np(void);
 @@@return: ENOMEM: Insufficient system memory
 @@@return: ESRCH:  The given thread `self' has already terminated
 [[cp, nodos, wunused]]
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rpc_exec(pthread_t self,
                           void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
@@ -1278,6 +1284,7 @@ $errno_t pthread_yield(void) = sched_yield;
 @@Limit specified thread `self' to run only on the processors represented in `cpuset'
 @@@return: EOK:   Success
 @@@return: ESRCH: `self' has already exited
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setaffinity_np(pthread_t self, size_t cpusetsize,
                                 [[in_opt]] cpu_set_t const *cpuset);
@@ -1286,6 +1293,7 @@ $errno_t pthread_setaffinity_np(pthread_t self, size_t cpusetsize,
 @@Get bit set in `cpuset' representing the processors `self' can run on
 @@@return: EOK:   Success
 @@@return: ESRCH: `self' has already exited
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getaffinity_np(pthread_t self, size_t cpusetsize,
                                 [[out_opt]] cpu_set_t *cpuset);
@@ -2942,6 +2950,150 @@ int pthread_main_np() {
 @@pp_endif@@
 }
 %#endif /* __USE_BSD */
+
+
+
+
+%#ifdef __USE_KOS
+@@>> pthread_attr_setstartsuspend_np(3)
+@@Specify if `pthread_create(3)' should start the thread in a suspended state.
+@@@param: start_suspended: 0=no (default) or 1=yes
+@@@see pthread_resume_np, pthread_continue_np
+@@@return: EOK:    Success
+@@@return: EINVAL: Invalid/unsupported `start_suspended'
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_attr_setstartsuspend_np([[inout]] pthread_attr_t *__restrict self,
+                                         int start_suspended);
+
+@@>> pthread_attr_getpidfdallocated_np(3)
+@@Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
+@@starting  newly spawned thread  in a suspended  state (requiring the creator
+@@to resume the thread at least once before execution actually starts)
+@@@return: EOK: Success
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_attr_getstartsuspend_np([[in]] pthread_attr_t const *__restrict self,
+                                         [[out]] int *start_suspended);
+
+
+@@>> pthread_suspend2_np(3)
+@@Increment the given thread's suspend-counter. If the counter was `0' before,
+@@then the thread is suspended and this function only returns once the  thread
+@@has stopped executing code. The counter's old value is optionally stored  in
+@@`p_old_suspend_counter' (when non-NULL)
+@@
+@@Signals directed at suspended thread will not be handled until that thread has
+@@been resumed (s.a. `pthread_resume2_np(3)')
+@@
+@@@see pthread_suspend_np, pthread_resume2_np, pthread_resume_np, pthread_continue_np
+@@@return: EOK:       Success
+@@@return: ESRCH:     The thread has already been terminated
+@@@return: ENOMEM:    Insufficient memory
+@@@return: EOVERFLOW: The suspension counter can't go any higher
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_suspend2_np(pthread_t self, [[out_opt]] $uint32_t *p_old_suspend_counter);
+
+@@>> pthread_resume2_np(3)
+@@Decrement the given thread's suspend-counter. If the counter was already `0',
+@@then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+@@the thread is allowed to  continue (or start for the  first time in case  the
+@@thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+@@counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
+@@non-NULL).
+@@
+@@@see pthread_suspend_np, pthread_suspend2_np, pthread_resume_np, pthread_continue_np
+@@@return: EOK:   Success
+@@@return: ESRCH: The thread has already been terminated
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_resume2_np(pthread_t self, [[out_opt]] $uint32_t *p_old_suspend_counter);
+
+
+@@>> pthread_continue_np(3), pthread_unsuspend_np(3)
+@@Set the given thread's suspend-counter to `0'. If the counter was already `0',
+@@then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+@@allowed  to  continue (or  start for  the first  time in  case the  thread was
+@@created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+@@
+@@@see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+@@@return: EOK:   Success
+@@@return: ESRCH: The thread has already been terminated
+[[guard, export_alias("thr_continue")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("pthread_unsuspend_np")]]
+$errno_t pthread_continue_np(pthread_t self);
+
+
+
+@@>> pthread_attr_setcreatesuspend_np(3)
+@@Setup `self' such that created threads start in a "suspended" state,
+@@requiring a call to one of the following function to actually start:
+@@ - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+@@ - `pthread_resume_np(3)'
+@@ - `pthread_resume_all_np(3)'
+@@Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+@@@return: EOK: Always returned
+[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[requires_function(pthread_attr_setstartsuspend_np)]]
+$errno_t pthread_attr_setcreatesuspend_np([[inout]] pthread_attr_t *__restrict self) {
+	return pthread_attr_setstartsuspend_np(self, 1);
+}
+
+@@>> pthread_suspend_np(3)
+@@Increment the given thread's suspend-counter. If the counter was `0' before,
+@@then the thread is suspended and this function only returns once the  thread
+@@has stopped executing code.
+@@
+@@Signals directed at suspended thread will not be handled until that thread has
+@@been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+@@
+@@@see pthread_suspend2_np
+@@@return: EOK:       Success
+@@@return: ESRCH:     The thread has already been terminated
+@@@return: ENOMEM:    Insufficient memory
+@@@return: EOVERFLOW: The suspension counter can't go any higher
+[[guard, export_alias("thr_suspend")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[requires_function(pthread_suspend2_np)]]
+$errno_t pthread_suspend_np(pthread_t self) {
+	return pthread_suspend2_np(self, NULL);
+}
+
+@@>> pthread_suspend_np(3)
+@@Decrement the given thread's suspend-counter. If the counter was already `0',
+@@then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+@@the thread is allowed to  continue (or start for the  first time in case  the
+@@thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+@@
+@@@see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+@@@return: EOK:   Success
+@@@return: ESRCH: The thread has already been terminated
+[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[requires_function(pthread_resume2_np)]]
+$errno_t pthread_resume_np(pthread_t self) {
+	return pthread_resume2_np(self, NULL);
+}
+
+%[insert:guarded_function(pthread_unsuspend_np = pthread_continue_np)]
+
+@@>> pthread_suspend_all_np(3)
+@@Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+@@After a call to this function, the calling thread is the only one running within
+@@the current process (at least of those created by `pthread_create(3)')
+@@
+@@Signals directed at suspended thread will not be handled until that thread has
+@@been resumed (s.a. `pthread_resume_all_np(3)')
+@@
+@@@return: EOK:       Success
+@@@return: ENOMEM:    Insufficient memory
+@@@return: EOVERFLOW: The suspension counter of some thread can't go any higher
+[[guard, decl_include("<bits/types.h>")]]
+$errno_t pthread_suspend_all_np();
+
+@@>> pthread_suspend_all_np(3)
+@@Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+@@This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)'
+[[guard]]
+void pthread_resume_all_np();
+%#endif /* __USE_KOS */
 
 
 

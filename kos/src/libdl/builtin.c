@@ -2913,6 +2913,23 @@ libdl_dlauxctrl(NCX DlModule *self, unsigned int cmd, ...)
 		return (void *)(uintptr_t)(isvalid ? 1 : 0);
 	}	break;
 
+	case DLAUXCTRL_FOREACH_TLSSEG: {
+		struct dltls_segment *iter;
+		typedef void *(__DLFCN_CC *ptlsenum_cb_t)(void *cookie, void *tls_segment);
+		ptlsenum_cb_t cb = va_arg(args, ptlsenum_cb_t);
+		void *cookie = va_arg(args, void *);
+		va_end(args);
+		result = NULL;
+		dlglobals_tls_segment_read(&dl_globals);
+		LIST_FOREACH (iter, &dl_globals.dg_tls_segment_list, ts_threads) {
+			result = (*cb)(cookie, iter);
+			if (result != NULL)
+				break;
+		}
+		dlglobals_tls_segment_endread(&dl_globals);
+		return result;
+	}	break;
+
 	default:
 		break;
 	}

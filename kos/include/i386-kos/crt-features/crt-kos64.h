@@ -4302,8 +4302,10 @@
 #define __CRT_HAVE_pthread_attr_getstack
 #define __CRT_HAVE_pthread_attr_getstackaddr
 #define __CRT_HAVE_pthread_attr_getstacksize
+#define __CRT_HAVE_pthread_attr_getstartsuspend_np
 #define __CRT_HAVE_pthread_attr_init
 #define __CRT_HAVE_pthread_attr_setaffinity_np
+#define __CRT_HAVE_pthread_attr_setcreatesuspend_np
 #define __CRT_HAVE_pthread_attr_setdetachstate
 #define __CRT_HAVE_pthread_attr_setguardsize
 #define __CRT_HAVE_pthread_attr_setinheritsched
@@ -4314,6 +4316,7 @@
 #define __CRT_HAVE_pthread_attr_setstack
 #define __CRT_HAVE_pthread_attr_setstackaddr
 #define __CRT_HAVE_pthread_attr_setstacksize
+#define __CRT_HAVE_pthread_attr_setstartsuspend_np
 #define __CRT_HAVE_pthread_barrier_destroy
 #define __CRT_HAVE_pthread_barrier_init
 #define __CRT_HAVE_pthread_barrier_wait
@@ -4335,6 +4338,7 @@
 #define __CRT_HAVE_pthread_condattr_init
 #define __CRT_HAVE_pthread_condattr_setclock
 #define __CRT_HAVE_pthread_condattr_setpshared
+#define __CRT_HAVE_pthread_continue_np
 #define __CRT_HAVE_pthread_create
 #define __CRT_HAVE_pthread_detach
 #define __CRT_HAVE_pthread_equal
@@ -4388,6 +4392,9 @@
 #define __CRT_HAVE_pthread_mutexattr_settype
 #define __CRT_HAVE_pthread_num_processors_np
 #define __CRT_HAVE_pthread_once
+#define __CRT_HAVE_pthread_resume2_np
+#define __CRT_HAVE_pthread_resume_all_np
+#define __CRT_HAVE_pthread_resume_np
 #define __CRT_HAVE_pthread_rpc_exec
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
@@ -4426,9 +4433,13 @@
 #define __CRT_HAVE_pthread_spin_trylock
 #define __CRT_HAVE_pthread_spin_unlock
 #define __CRT_HAVE_pthread_stackseg_np
+#define __CRT_HAVE_pthread_suspend2_np
+#define __CRT_HAVE_pthread_suspend_all_np
+#define __CRT_HAVE_pthread_suspend_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin_np
 #define __CRT_HAVE_pthread_tryjoin_np
+#define __CRT_HAVE_pthread_unsuspend_np
 #define __CRT_HAVE_pthread_yield
 #define __CRT_HAVE_ptrace
 #define __CRT_HAVE_ptsname
@@ -5974,6 +5985,7 @@
 #define __CRT_HAVE_tgammal
 #define __CRT_HAVE_tgkill
 #define __CRT_HAVE_tgsigqueueinfo
+#define __CRT_HAVE_thr_continue
 #define __CRT_HAVE_thr_create
 #define __CRT_HAVE_thr_exit
 #define __CRT_HAVE_thr_getconcurrency
@@ -5991,6 +6003,7 @@
 #define __CRT_HAVE_thr_setspecific
 #define __CRT_HAVE_thr_sigsetmask
 #define __CRT_HAVE_thr_stksegment
+#define __CRT_HAVE_thr_suspend
 #define __CRT_HAVE_thr_yield
 #define __CRT_HAVE_thrd_create
 #define __CRT_HAVE_thrd_current
@@ -10154,8 +10167,10 @@
 #define __CRT_HAVE_KOS$pthread_attr_getstack
 #define __CRT_HAVE_KOS$pthread_attr_getstackaddr
 #define __CRT_HAVE_KOS$pthread_attr_getstacksize
+#define __CRT_HAVE_KOS$pthread_attr_getstartsuspend_np
 #define __CRT_HAVE_KOS$pthread_attr_init
 #define __CRT_HAVE_KOS$pthread_attr_setaffinity_np
+#define __CRT_HAVE_KOS$pthread_attr_setcreatesuspend_np
 #define __CRT_HAVE_KOS$pthread_attr_setdetachstate
 #define __CRT_HAVE_KOS$pthread_attr_setguardsize
 #define __CRT_HAVE_KOS$pthread_attr_setinheritsched
@@ -10166,6 +10181,7 @@
 #define __CRT_HAVE_KOS$pthread_attr_setstack
 #define __CRT_HAVE_KOS$pthread_attr_setstackaddr
 #define __CRT_HAVE_KOS$pthread_attr_setstacksize
+#define __CRT_HAVE_KOS$pthread_attr_setstartsuspend_np
 #define __CRT_HAVE_KOS$pthread_barrier_destroy
 #define __CRT_HAVE_KOS$pthread_barrier_init
 #define __CRT_HAVE_KOS$pthread_barrier_wait
@@ -10187,6 +10203,7 @@
 #define __CRT_HAVE_KOS$pthread_condattr_init
 #define __CRT_HAVE_KOS$pthread_condattr_setclock
 #define __CRT_HAVE_KOS$pthread_condattr_setpshared
+#define __CRT_HAVE_KOS$pthread_continue_np
 #define __CRT_HAVE_KOS$pthread_create
 #define __CRT_HAVE_KOS$pthread_detach
 #define __CRT_HAVE_KOS$pthread_equal
@@ -10234,6 +10251,8 @@
 #define __CRT_HAVE_KOS$pthread_mutexattr_setrobust_np
 #define __CRT_HAVE_KOS$pthread_mutexattr_settype
 #define __CRT_HAVE_KOS$pthread_once
+#define __CRT_HAVE_KOS$pthread_resume2_np
+#define __CRT_HAVE_KOS$pthread_resume_np
 #define __CRT_HAVE_KOS$pthread_rwlock_destroy
 #define __CRT_HAVE_KOS$pthread_rwlock_init
 #define __CRT_HAVE_KOS$pthread_rwlock_rdlock
@@ -10270,8 +10289,11 @@
 #define __CRT_HAVE_KOS$pthread_spin_trylock
 #define __CRT_HAVE_KOS$pthread_spin_unlock
 #define __CRT_HAVE_KOS$pthread_stackseg_np
+#define __CRT_HAVE_KOS$pthread_suspend2_np
+#define __CRT_HAVE_KOS$pthread_suspend_np
 #define __CRT_HAVE_KOS$pthread_timedjoin_np
 #define __CRT_HAVE_KOS$pthread_tryjoin_np
+#define __CRT_HAVE_KOS$pthread_unsuspend_np
 #define __CRT_HAVE_KOS$ptrace
 #define __CRT_HAVE_KOS$ptsname
 #define __CRT_HAVE_KOS$ptsname_r
@@ -10909,6 +10931,7 @@
 #define __CRT_HAVE_KOS$tgammal
 #define __CRT_HAVE_KOS$tgkill
 #define __CRT_HAVE_KOS$tgsigqueueinfo
+#define __CRT_HAVE_KOS$thr_continue
 #define __CRT_HAVE_KOS$thr_create
 #define __CRT_HAVE_KOS$thr_exit
 #define __CRT_HAVE_KOS$thr_getprio
@@ -10920,6 +10943,7 @@
 #define __CRT_HAVE_KOS$thr_setspecific
 #define __CRT_HAVE_KOS$thr_sigsetmask
 #define __CRT_HAVE_KOS$thr_stksegment
+#define __CRT_HAVE_KOS$thr_suspend
 #define __CRT_HAVE_KOS$thrd_create
 #define __CRT_HAVE_KOS$thrd_detach
 #define __CRT_HAVE_KOS$thrd_equal
@@ -14991,8 +15015,10 @@
 #define __CRT_HAVE_DOS$pthread_attr_getstack
 #define __CRT_HAVE_DOS$pthread_attr_getstackaddr
 #define __CRT_HAVE_DOS$pthread_attr_getstacksize
+#define __CRT_HAVE_DOS$pthread_attr_getstartsuspend_np
 #define __CRT_HAVE_DOS$pthread_attr_init
 #define __CRT_HAVE_DOS$pthread_attr_setaffinity_np
+#define __CRT_HAVE_DOS$pthread_attr_setcreatesuspend_np
 #define __CRT_HAVE_DOS$pthread_attr_setdetachstate
 #define __CRT_HAVE_DOS$pthread_attr_setguardsize
 #define __CRT_HAVE_DOS$pthread_attr_setinheritsched
@@ -15003,6 +15029,7 @@
 #define __CRT_HAVE_DOS$pthread_attr_setstack
 #define __CRT_HAVE_DOS$pthread_attr_setstackaddr
 #define __CRT_HAVE_DOS$pthread_attr_setstacksize
+#define __CRT_HAVE_DOS$pthread_attr_setstartsuspend_np
 #define __CRT_HAVE_DOS$pthread_barrier_destroy
 #define __CRT_HAVE_DOS$pthread_barrier_init
 #define __CRT_HAVE_DOS$pthread_barrier_wait
@@ -15024,6 +15051,7 @@
 #define __CRT_HAVE_DOS$pthread_condattr_init
 #define __CRT_HAVE_DOS$pthread_condattr_setclock
 #define __CRT_HAVE_DOS$pthread_condattr_setpshared
+#define __CRT_HAVE_DOS$pthread_continue_np
 #define __CRT_HAVE_DOS$pthread_create
 #define __CRT_HAVE_DOS$pthread_detach
 #define __CRT_HAVE_DOS$pthread_equal
@@ -15071,6 +15099,8 @@
 #define __CRT_HAVE_DOS$pthread_mutexattr_setrobust_np
 #define __CRT_HAVE_DOS$pthread_mutexattr_settype
 #define __CRT_HAVE_DOS$pthread_once
+#define __CRT_HAVE_DOS$pthread_resume2_np
+#define __CRT_HAVE_DOS$pthread_resume_np
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy
 #define __CRT_HAVE_DOS$pthread_rwlock_init
 #define __CRT_HAVE_DOS$pthread_rwlock_rdlock
@@ -15107,8 +15137,11 @@
 #define __CRT_HAVE_DOS$pthread_spin_trylock
 #define __CRT_HAVE_DOS$pthread_spin_unlock
 #define __CRT_HAVE_DOS$pthread_stackseg_np
+#define __CRT_HAVE_DOS$pthread_suspend2_np
+#define __CRT_HAVE_DOS$pthread_suspend_np
 #define __CRT_HAVE_DOS$pthread_timedjoin_np
 #define __CRT_HAVE_DOS$pthread_tryjoin_np
+#define __CRT_HAVE_DOS$pthread_unsuspend_np
 #define __CRT_HAVE_DOS$ptrace
 #define __CRT_HAVE_DOS$ptsname
 #define __CRT_HAVE_DOS$ptsname_r
@@ -15746,6 +15779,7 @@
 #define __CRT_HAVE_DOS$tgammal
 #define __CRT_HAVE_DOS$tgkill
 #define __CRT_HAVE_DOS$tgsigqueueinfo
+#define __CRT_HAVE_DOS$thr_continue
 #define __CRT_HAVE_DOS$thr_create
 #define __CRT_HAVE_DOS$thr_exit
 #define __CRT_HAVE_DOS$thr_getprio
@@ -15757,6 +15791,7 @@
 #define __CRT_HAVE_DOS$thr_setspecific
 #define __CRT_HAVE_DOS$thr_sigsetmask
 #define __CRT_HAVE_DOS$thr_stksegment
+#define __CRT_HAVE_DOS$thr_suspend
 #define __CRT_HAVE_DOS$thrd_create
 #define __CRT_HAVE_DOS$thrd_detach
 #define __CRT_HAVE_DOS$thrd_equal

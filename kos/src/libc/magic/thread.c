@@ -205,8 +205,11 @@ thread_t thr_self() = pthread_self;
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t thr_kill(thread_t thr, $signo_t signo) = pthread_kill;
 
-// TODO: $errno_t thr_suspend(thread_t thr) = pthread_suspend_np;
-// TODO: $errno_t thr_continue(thread_t thr) = pthread_resume_np;
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t thr_suspend(thread_t thr) = pthread_suspend_np;
+
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t thr_continue(thread_t thr) = pthread_continue_np;
 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_setschedparam, pthread_getschedparam)]]

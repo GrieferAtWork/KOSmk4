@@ -84,6 +84,15 @@ $errno_t pthread_stackseg_np(pthread_t self, [[out]] stack_t *sinfo) {
 	return result;
 }
 
+
+%[insert:extern(pthread_attr_setcreatesuspend_np)]
+%[insert:extern(pthread_suspend_np)]
+%[insert:extern(pthread_resume_np)]
+%[insert:extern(pthread_continue_np)]
+%[insert:guarded_function(pthread_unsuspend_np = pthread_continue_np)]
+%[insert:extern(pthread_suspend_all_np)]
+%[insert:extern(pthread_resume_all_np)]
+
 %{
 
 __SYSDECL_END

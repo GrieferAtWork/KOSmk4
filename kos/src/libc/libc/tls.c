@@ -58,6 +58,7 @@ INTERN ATTR_THREAD struct pthread current = {
 	.pt_stacksize   = 0,
 	.pt_flags       = PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK,
 	.pt_pidfd       = -1,
+	.pt_suspended   = 0,
 	.pt_cpuset      = NULL,
 	.pt_cpusetsize  = 0,
 	.pt_except = {

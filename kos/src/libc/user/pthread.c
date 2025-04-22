@@ -199,6 +199,23 @@ NOTHROW(LIBCCALL decref)(struct pthread *__restrict self) {
 		destroy(self);
 }
 
+LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+NOTHROW(LIBCCALL tryincref)(struct pthread *__restrict self) {
+	refcnt_t refcnt;
+	do {
+		refcnt = atomic_read(&self->pt_refcnt);
+		if unlikely(refcnt == 0)
+			return false;
+	} while (!atomic_cmpxch_weak(&self->pt_refcnt, refcnt, refcnt + 1));
+	return true;
+}
+
+LOCAL WUNUSED ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+NOTHROW(LIBCCALL wasdestroyed)(struct pthread *__restrict self) {
+	refcnt_t refcnt = atomic_read(&self->pt_refcnt);
+	return refcnt == 0;
+}
+
 
 /* Attributes  used  by  `pthread_create()'  when  the  given  `ATTR'  is  NULL
  * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
@@ -383,6 +400,64 @@ struct pthread_clone_args {
 };
 
 
+struct pthread_start_suspended_data {
+	void *(LIBCCALL *pssd_start)(void *arg); /* [1..1] Real thread start function */
+	void            *pssd_arg;               /* [1..1] Real thread start argument */
+};
+
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread_ext")
+sigset_t const pthread_suspended_fullset = SIGSET_INIT_FULL;
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext")
+void LIBCCALL pthread_waitfor_suspended(void) {
+#ifndef __LIBC_CONFIG_HAVE_USERPROCMASK
+#error "TODO: Support for userprocmask is assumed and used to indicate thread suspension"
+#error "TODO: Add a secondary implementation that signals the is-suspended state in a way"
+#error "      different from 'current.pt_pmask.lpm_pmask.pm_sigmask == &pthread_suspended_fullset'"
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+	sigset_t *omask;
+	struct pthread *me = &current;
+	/* Setting the signal mask to this special one here has 2 effects:
+	 * #1: It prevents us from executing signal handlers while "suspended"
+	 * #2: It acts as an indicator for `pthread_suspend_np()' to know that
+	 *     we're finished entering our "suspended" state. */
+	omask = setsigmaskptr((sigset_t *)&pthread_suspended_fullset);
+	assert(omask != (sigset_t *)&pthread_suspended_fullset);
+
+	/* This futex wake right here is used to tell the thread that initiated
+	 * the  suspend that  our thread can  now be considered  as being fully
+	 * suspended! */
+	(void)sys_lfutex((uintptr_t *)&me->pt_pmask.lpm_pmask.pm_sigmask,
+	                 LFUTEX_WAKE, (uintptr_t)-1, NULL, 0);
+
+	for (;;) {
+		uint32_t suspend = atomic_read(&me->pt_suspended);
+		if (suspend == 0)
+			break;
+		(void)sys_futex((uint32_t *)&me->pt_suspended,
+		                FUTEX_WAIT, suspend,
+		                NULL, NULL, 0);
+	}
+
+	/* By restoring the original signal mask, our thread can be considered
+	 * to once again be running. */
+	(void)setsigmaskptr(omask);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *LIBCCALL
+pthread_start_suspended_cb(void *arg) {
+	struct pthread_start_suspended_data data;
+	struct pthread_start_suspended_data *pdata;
+	pdata = (struct pthread_start_suspended_data *)arg;
+	memcpy(&data, pdata, sizeof(struct pthread_start_suspended_data));
+	free(pdata);
+	/* Wait for the thread to no longer be suspended. */
+	pthread_waitfor_suspended();
+	return (*data.pssd_start)(data.pssd_arg);
+}
+
+
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
@@ -452,6 +527,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		pt->pt_flags |= PTHREAD_FUSERSTACK;
 	}
 
+	if unlikely(attr->pa_flags & PTHREAD_ATTR_FLAG_START_SUSPENDED) {
+		struct pthread_start_suspended_data *data;
+		data = (struct pthread_start_suspended_data *)malloc(sizeof(struct pthread_start_suspended_data));
+		if unlikely(!data)
+			goto err_nomem_tls_cpuset_stack;
+		data->pssd_start = start_routine;
+		data->pssd_arg   = arg;
+		start_routine    = &pthread_start_suspended_cb;
+		arg              = data;
+		pt->pt_suspended = 1;
+	}
+
 	/* Set-up clone arguments. */
 	bzero(&args, sizeof(args));
 	args.pca_args.ca_flags = CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE |
@@ -493,6 +580,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		libc_pthread_detach(pt);
 	*newthread = pt;
 	return EOK;
+err_nomem_tls_cpuset_stack:
+	if (!(attr->pa_flags & PTHREAD_ATTR_FLAG_STACKADDR))
+		(void)sys_munmap(pt->pt_stackaddr, PTHREAD_STACK_MIN);
 err_nomem_tls_cpuset:
 	if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 		free(pt->pt_cpuset);
@@ -821,13 +911,13 @@ NOTHROW(LIBCCALL libc_pthread_self)(void)
 }
 /*[[[end:libc_pthread_self]]]*/
 
-/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x663251f3]]]*/
+/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x259fbef2]]]*/
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `self'.
  * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
  * @return: 0 : The given `self' has already terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED pid_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 /*[[[body:libc_pthread_gettid_np]]]*/
 {
@@ -837,7 +927,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
 
-/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x242b31a7]]]*/
+/*[[[head:libc_pthread_getpidfd_np,hash:CRC-32=0x3d67f335]]]*/
 /* >> pthread_getpidfd_np(3)
  * Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
  * To  guaranty that a PIDfd is available for a given thread, you can make use of
@@ -848,7 +938,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t self)
  * @return: EMFILE: Too many open files (process) (only when not already allocated)
  * @return: ENFILE: Too many open files (system) (only when not already allocated)
  * @return: ENOMEM: Insufficient memory (only when not already allocated) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
                                                fd_t *__restrict p_pidfd)
 /*[[[body:libc_pthread_getpidfd_np]]]*/
@@ -876,15 +966,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
 }
 /*[[[end:libc_pthread_getpidfd_np]]]*/
 
-/*[[[head:libc_pthread_attr_setpidfdallocated_np,hash:CRC-32=0x657574e8]]]*/
+/*[[[head:libc_pthread_attr_setpidfdallocated_np,hash:CRC-32=0x4006fea]]]*/
 /* >> pthread_attr_setpidfdallocated_np(3)
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
  * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
  * via `pthread_getpidfd_np(3)'
- * @param: allocated: 0=no or 1=yes
+ * @param: allocated: 0=no (default) or 1=yes
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `allocated' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setpidfdallocated_np)(pthread_attr_t *self,
                                                              int allocated)
 /*[[[body:libc_pthread_attr_setpidfdallocated_np]]]*/
@@ -900,12 +990,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setpidfdallocated_np)(pthread_attr_t *sel
 }
 /*[[[end:libc_pthread_attr_setpidfdallocated_np]]]*/
 
-/*[[[head:libc_pthread_attr_getpidfdallocated_np,hash:CRC-32=0x629a182d]]]*/
+/*[[[head:libc_pthread_attr_getpidfdallocated_np,hash:CRC-32=0x439b2183]]]*/
 /* >> pthread_attr_getpidfdallocated_np(3)
  * Write 0=no or  1=yes to `*allocated',  indicative of  `pthread_create(3)'
  * automatically allocating a PIDfd descriptor for the newly spawned thread.
  * @return: EOK: Success */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN(1) ATTR_OUT(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getpidfdallocated_np)(pthread_attr_t const *__restrict self,
                                                              int *__restrict allocated)
 /*[[[body:libc_pthread_attr_getpidfdallocated_np]]]*/
@@ -915,11 +1005,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getpidfdallocated_np)(pthread_attr_t cons
 }
 /*[[[end:libc_pthread_attr_getpidfdallocated_np]]]*/
 
-/*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xff77a072]]]*/
+/*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xaf00cabf]]]*/
 /* >> pthread_mainthread_np(3)
  * Obtain the identifier of the main thread
  * @return: * : Handle for the main thread */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pthread_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST WUNUSED pthread_t
 NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void)
 /*[[[body:libc_pthread_mainthread_np]]]*/
 {
@@ -1854,12 +1944,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
 }
 /*[[[end:libc_pthread_setconcurrency]]]*/
 
-/*[[[head:libc_pthread_setaffinity_np,hash:CRC-32=0xaa2673c7]]]*/
+/*[[[head:libc_pthread_setaffinity_np,hash:CRC-32=0xd601eb4d]]]*/
 /* >> pthread_setaffinity_np(3)
  * Limit specified thread `self' to run only on the processors represented in `cpuset'
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_IN_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t self,
                                                   size_t cpusetsize,
                                                   cpu_set_t const *cpuset)
@@ -1924,12 +2014,12 @@ err:
 }
 /*[[[end:libc_pthread_setaffinity_np]]]*/
 
-/*[[[head:libc_pthread_getaffinity_np,hash:CRC-32=0x807b3d92]]]*/
+/*[[[head:libc_pthread_getaffinity_np,hash:CRC-32=0x6a957791]]]*/
 /* >> pthread_getaffinity_np(3)
  * Get bit set in `cpuset' representing the processors `self' can run on
  * @return: EOK:   Success
  * @return: ESRCH: `self' has already exited */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t self,
                                                   size_t cpusetsize,
                                                   cpu_set_t *cpuset)
@@ -2066,7 +2156,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
 
-/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x412dc627]]]*/
+/*[[[head:libc_pthread_rpc_exec,hash:CRC-32=0x7217b7e1]]]*/
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `self' to-be  executed the next time it  makes
  * a call to a cancellation-point system call (or interrupt an active
@@ -2076,7 +2166,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t self,
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient system memory
  * @return: ESRCH:  The given thread `self' has already terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rpc_exec)(pthread_t self,
                                             void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
                                             void *cookie)
@@ -2143,6 +2233,457 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_atfork]]]*/
+
+/*[[[head:libc_pthread_attr_setstartsuspend_np,hash:CRC-32=0x5aef68f]]]*/
+/* >> pthread_attr_setstartsuspend_np(3)
+ * Specify if `pthread_create(3)' should start the thread in a suspended state.
+ * @param: start_suspended: 0=no (default) or 1=yes
+ * @see pthread_resume_np, pthread_continue_np
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `start_suspended' */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_INOUT(1) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstartsuspend_np)(pthread_attr_t *__restrict self,
+                                                           int start_suspended)
+/*[[[body:libc_pthread_attr_setstartsuspend_np]]]*/
+{
+	if (start_suspended != 0 && start_suspended != 1)
+		return EINVAL;
+	if (start_suspended) {
+		self->pa_flags |= PTHREAD_ATTR_FLAG_START_SUSPENDED;
+	} else {
+		self->pa_flags &= ~PTHREAD_ATTR_FLAG_START_SUSPENDED;
+	}
+	return EOK;
+}
+/*[[[end:libc_pthread_attr_setstartsuspend_np]]]*/
+
+/*[[[head:libc_pthread_attr_getstartsuspend_np,hash:CRC-32=0xd0c9fc44]]]*/
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
+ * starting  newly spawned thread  in a suspended  state (requiring the creator
+ * to resume the thread at least once before execution actually starts)
+ * @return: EOK: Success */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_IN(1) ATTR_OUT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstartsuspend_np)(pthread_attr_t const *__restrict self,
+                                                           int *start_suspended)
+/*[[[body:libc_pthread_attr_getstartsuspend_np]]]*/
+{
+	*start_suspended = (self->pa_flags & PTHREAD_ATTR_FLAG_START_SUSPENDED) ? 1 : 0;
+	return EOK;
+}
+/*[[[end:libc_pthread_attr_getstartsuspend_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+pthread_suspended_rpc_cb(struct rpc_context *__restrict ctx, void *cookie) {
+	(void)ctx;
+	(void)cookie;
+	/* Wait for the thread to no longer be suspended. */
+	pthread_waitfor_suspended();
+}
+
+
+/* Global lock that needs to be held while suspending/resuming  threads.
+ * By  holding this lock,  it becomes impossible  for the race condition
+ * where 2 threads try to suspend each other. Because both threads would
+ * need to acquire this lock first, only one will be able to suspend the
+ * other,  and the other will only be able to suspend the first once the
+ * it gets resumed again. */
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread_ext")
+pthread_mutex_t pthread_suspend_lock = PTHREAD_MUTEX_INITIALIZER;
+
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_do_suspend)(pthread_t self) {
+	pid_t tid = atomic_read(&self->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* Use an RPC to interrupt the target thread and get it to suspend itself. */
+	if unlikely(rpc_exec(tid,
+	                     RPC_SYNCMODE_ASYNC | RPC_DOMAIN_THREAD |
+	                     RPC_JOIN_WAITFOR | RPC_SYSRESTART_RESTART,
+	                     &pthread_suspended_rpc_cb, NULL) != 0)
+		return libc_geterrno();
+	return EOK;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_do_resume)(pthread_t self) {
+	(void)sys_futex(&self->pt_suspended, FUTEX_WAKE,
+	                (uint32_t)-1, NULL, NULL, 0);
+	return likely(self->pt_tid) ? EOK : ESRCH;
+}
+
+/*[[[head:libc_pthread_suspend2_np,hash:CRC-32=0x16166dee]]]*/
+/* >> pthread_suspend2_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code. The counter's old value is optionally stored  in
+ * `p_old_suspend_counter' (when non-NULL)
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume2_np(3)')
+ *
+ * @see pthread_suspend_np, pthread_resume2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_suspend2_np)(pthread_t self,
+                                               uint32_t *p_old_suspend_counter)
+/*[[[body:libc_pthread_suspend2_np]]]*/
+{
+	uint32_t old_counter;
+	errno_t result = EOK;
+	(void)pthread_mutex_lock(&pthread_suspend_lock);
+	do {
+		old_counter = atomic_read(&self->pt_suspended);
+		if unlikely(old_counter == UINT32_MAX) {
+			result = EOVERFLOW;
+			goto done;
+		}
+	} while (!atomic_cmpxch_weak(&self->pt_suspended,
+	                             old_counter, old_counter + 1));
+	if (old_counter == 0) {
+		result = libc_pthread_do_suspend(self);
+		if unlikely(result != EOK)
+			atomic_dec(&self->pt_suspended);
+	}
+done:
+	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+	if (p_old_suspend_counter)
+		*p_old_suspend_counter = old_counter;
+	return result;
+}
+/*[[[end:libc_pthread_suspend2_np]]]*/
+
+/*[[[head:libc_pthread_resume2_np,hash:CRC-32=0x8f149ad4]]]*/
+/* >> pthread_resume2_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+ * counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
+ * non-NULL).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_OUT_OPT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_resume2_np)(pthread_t self,
+                                              uint32_t *p_old_suspend_counter)
+/*[[[body:libc_pthread_resume2_np]]]*/
+{
+	uint32_t old_counter;
+	errno_t result = EOK;
+	(void)pthread_mutex_lock(&pthread_suspend_lock);
+	do {
+		old_counter = atomic_read(&self->pt_suspended);
+		if unlikely(old_counter == 0) {
+			if (self->pt_tid == 0)
+				result = ESRCH;
+			goto done;
+		}
+	} while (!atomic_cmpxch_weak(&self->pt_suspended,
+	                             old_counter, old_counter - 1));
+	if (old_counter == 1) {
+		result = libc_pthread_do_resume(self);
+		if unlikely(result != EOK)
+			atomic_inc(&self->pt_suspended);
+	}
+done:
+	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+	if (p_old_suspend_counter)
+		*p_old_suspend_counter = old_counter;
+	return result;
+}
+/*[[[end:libc_pthread_resume2_np]]]*/
+
+/*[[[head:libc_pthread_continue_np,hash:CRC-32=0x1e7a0efb]]]*/
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_continue_np)(pthread_t self)
+/*[[[body:libc_pthread_continue_np]]]*/
+{
+	uint32_t old_counter;
+	errno_t result = EOK;
+	(void)pthread_mutex_lock(&pthread_suspend_lock);
+	old_counter = atomic_xch(&self->pt_suspended, 0);
+	if unlikely(old_counter == 0) {
+		if (self->pt_tid == 0)
+			result = ESRCH;
+		goto done;
+	}
+	result = libc_pthread_do_resume(self);
+done:
+	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+	return result;
+}
+/*[[[end:libc_pthread_continue_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext")
+errno_t LIBCCALL thread_suspend_for_suspendall(struct pthread *self) {
+	uint32_t old_counter;
+	errno_t result = EOK;
+	do {
+		old_counter = atomic_read(&self->pt_suspended);
+		if unlikely(old_counter == UINT32_MAX)
+			return EOVERFLOW;
+	} while (!atomic_cmpxch_weak(&self->pt_suspended,
+	                             old_counter, old_counter + 1));
+	if (old_counter == 0) {
+		result = libc_pthread_do_suspend(self);
+		if (result == ESRCH) /* Ignore thread-exited errors here! */
+			result = EOK;
+		if unlikely(result != EOK)
+			atomic_dec(&self->pt_suspended);
+	}
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext")
+void LIBCCALL thread_resume_for_resumeall(struct pthread *self) {
+	uint32_t old_counter;
+	do {
+		old_counter = atomic_read(&self->pt_suspended);
+		if unlikely(old_counter == 0)
+			return;
+	} while (!atomic_cmpxch_weak(&self->pt_suspended,
+	                             old_counter, old_counter - 1));
+	if (old_counter == 1)
+		(void)libc_pthread_do_resume(self);
+}
+
+
+struct threadlist {
+	size_t                                        tl_req;  /* Total # of threads */
+	size_t                                        tl_cnt;  /* Used thread count */
+	COMPILER_FLEXIBLE_ARRAY(REF struct pthread *, tl_vec); /* [1..1][lpsadd_threadcnt] Thread output buffer. */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL _threadlist_populate_dlauxctrl_cb)(void *cookie, void *tls_segment) {
+	struct threadlist *tl = (struct threadlist *)cookie;
+	struct pthread *thread = current_from_tls(tls_segment);
+	size_t allocated = malloc_usable_size(tl);
+	size_t avail = (allocated - offsetof(struct threadlist, tl_vec)) / sizeof(REF struct pthread *);
+	if likely(tl->tl_cnt < avail) {
+		if likely(tryincref(thread)) {
+			tl->tl_vec[tl->tl_cnt] = thread; /* Inherit reference */
+			++tl->tl_cnt;
+			++tl->tl_req;
+		}
+	} else {
+		if likely(!wasdestroyed(thread))
+			++tl->tl_req;
+	}
+	return NULL;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void LIBCCALL
+threadlist_fini(struct threadlist *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->tl_cnt; ++i)
+		(void)libc_pthread_detach(self->tl_vec[i]);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void LIBCCALL
+threadlist_destroy(struct threadlist *__restrict self) {
+	threadlist_fini(self);
+	free(self);
+}
+
+/* Capture a list of all threads */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext")
+struct threadlist *LIBCCALL threadlist_getall(void) {
+	size_t hint = (size_t)dlauxctrl(NULL, DLAUXCTRL_GET_TLSSEG_COUNT);
+	struct threadlist *result;
+	result = (struct threadlist *)malloc(offsetof(struct threadlist, tl_vec) +
+	                                     (hint * sizeof(REF struct pthread *)));
+	if unlikely(!result)
+		goto err;
+again_foreach:
+	result->tl_req = 0;
+	result->tl_cnt = 0;
+	(void)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
+	                &_threadlist_populate_dlauxctrl_cb,
+	                result);
+	assert(result->tl_req >= result->tl_cnt);
+	if unlikely(result->tl_req > result->tl_cnt) {
+		struct threadlist *new_result;
+		threadlist_fini(result);
+		new_result = (struct threadlist *)malloc(offsetof(struct threadlist, tl_vec) +
+		                                         (result->tl_req * sizeof(REF struct pthread *)));
+		if unlikely(!new_result)
+			goto err_r;
+		result = new_result;
+		goto again_foreach;
+	}
+	return result;
+err_r:
+	free(result);
+err:
+	return NULL;
+}
+
+/* Suspend all threads within `self'.
+ * Ignore errors resulting from threads already having terminated. */
+PRIVATE NONNULL((1, 2)) ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t LIBCCALL
+threadlist_suspendall(struct threadlist *__restrict self, struct pthread *exclude) {
+	errno_t result;
+	size_t i;
+	for (i = 0; i < self->tl_cnt; ++i) {
+		struct pthread *thread = self->tl_vec[i];
+		if (thread != exclude) {
+			result = thread_suspend_for_suspendall(thread);
+			if unlikely(result != EOK)
+				goto err_i;
+		}
+	}
+	return EOK;
+err_i:
+	while (i--) {
+		struct pthread *thread = self->tl_vec[i];
+		if (thread != exclude)
+			thread_resume_for_resumeall(thread);
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1, 2)) ATTR_SECTION(".text.crt.sched.pthread_ext") void LIBCCALL
+threadlist_resumeall(struct threadlist *__restrict self, struct pthread *exclude) {
+	size_t i = self->tl_cnt;
+	while (i--) {
+		struct pthread *thread = self->tl_vec[i];
+		if (thread != exclude)
+			thread_resume_for_resumeall(thread);
+	}
+}
+
+
+PRIVATE NONNULL((1, 2)) ATTR_SECTION(".text.crt.sched.pthread_ext") bool LIBCCALL
+threadlist_contains(struct threadlist *__restrict self,
+                    struct pthread *thread) {
+	size_t i;
+	assert(self->tl_req <= self->tl_cnt);
+	for (i = self->tl_req; i < self->tl_cnt; ++i) {
+		if (self->tl_vec[i] == thread) {
+foundit:
+			self->tl_req = i + 1;
+			return true;
+		}
+	}
+	for (i = 0; i < self->tl_req; ++i) {
+		if (self->tl_vec[i] == thread)
+			goto foundit;
+	}
+	return false;
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL libc_pthread_all_suspended_check_dlauxctrl_cb)(void *cookie, void *tls_segment) {
+	struct threadlist *threads = (struct threadlist *)cookie;
+	struct pthread *thread = current_from_tls(tls_segment);
+	if (!threadlist_contains(threads, thread))
+		return tls_segment; /* Missing thread that didn't get suspended */
+	return NULL;
+}
+
+
+/* @return: EAGAIN: Try again */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_trysuspend_all_np)(void) {
+	errno_t result;
+	void *not_suspended_tls_segment;
+	struct pthread *me = &current;
+	struct threadlist *threads = threadlist_getall();
+	if unlikely(!threads)
+		return ENOMEM;
+	(void)pthread_mutex_lock(&pthread_suspend_lock);
+
+	/* Suspend all threads */
+	result = threadlist_suspendall(threads, me);
+	if unlikely(result != EOK)
+		goto done_threads_unlock;
+
+	/* Re-check that no new threads got spawned in the meantime. */
+	threads->tl_req = 0; /* Re-used as index hint during contains-checking */
+	not_suspended_tls_segment = dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
+	                                      &libc_pthread_all_suspended_check_dlauxctrl_cb,
+	                                      threads);
+	if unlikely(not_suspended_tls_segment != NULL) {
+		/* Missed one --> resume threads and start over from scratch */
+		threadlist_resumeall(threads, me);
+		result = EAGAIN;
+	}
+done_threads_unlock:
+	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+/*done_threads:*/
+	threadlist_destroy(threads);
+/*done:*/
+	return result;
+}
+
+
+
+/*[[[head:libc_pthread_suspend_all_np,hash:CRC-32=0x860fb262]]]*/
+/* >> pthread_suspend_all_np(3)
+ * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+ * After a call to this function, the calling thread is the only one running within
+ * the current process (at least of those created by `pthread_create(3)')
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume_all_np(3)')
+ *
+ * @return: EOK:       Success
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_suspend_all_np)(void)
+/*[[[body:libc_pthread_suspend_all_np]]]*/
+{
+	errno_t result;
+	do {
+		result = libc_pthread_trysuspend_all_np();
+	} while (result == EAGAIN);
+	return result;
+}
+/*[[[end:libc_pthread_suspend_all_np]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_dlauxctrl_cb)(void *cookie, void *tls_segment) {
+	struct pthread *exclude = (struct pthread *)cookie;
+	struct pthread *thread = current_from_tls(tls_segment);
+	if (thread != exclude)
+		thread_resume_for_resumeall(thread);
+	return NULL;
+}
+
+/*[[[head:libc_pthread_resume_all_np,hash:CRC-32=0x5522ef39]]]*/
+/* >> pthread_suspend_all_np(3)
+ * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+ * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void
+NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_np)(void)
+/*[[[body:libc_pthread_resume_all_np]]]*/
+{
+	struct pthread *me = &current;
+	(void)pthread_mutex_lock(&pthread_suspend_lock);
+	(void)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
+	                &libc_pthread_resume_all_dlauxctrl_cb, me);
+	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+}
+/*[[[end:libc_pthread_resume_all_np]]]*/
 
 /*[[[head:libc___pthread_register_cancel,hash:CRC-32=0xa8bf5df4]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute void
@@ -4838,7 +5379,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb7c50141]]]*/
+/*[[[start:exports,hash:CRC-32=0xe6dc50d]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5043,6 +5584,15 @@ DEFINE_PUBLIC_ALIAS_P(pthread_getspecificptr_np,libc_pthread_getspecificptr_np,A
 DEFINE_PUBLIC_ALIAS_P(pthread_getcpuclockid,libc_pthread_getcpuclockid,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, clockid_t *clock_id),(self,clock_id));
 DEFINE_PUBLIC_ALIAS_P(__pthread_atfork,libc_pthread_atfork,,errno_t,NOTHROW_NCX,LIBCCALL,(void (LIBCCALL *prepare)(void), void (LIBCCALL *parent)(void), void (LIBCCALL *child)(void)),(prepare,parent,child));
 DEFINE_PUBLIC_ALIAS_P(pthread_atfork,libc_pthread_atfork,,errno_t,NOTHROW_NCX,LIBCCALL,(void (LIBCCALL *prepare)(void), void (LIBCCALL *parent)(void), void (LIBCCALL *child)(void)),(prepare,parent,child));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_setstartsuspend_np,libc_pthread_attr_setstartsuspend_np,ATTR_INOUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *__restrict self, int start_suspended),(self,start_suspended));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_getstartsuspend_np,libc_pthread_attr_getstartsuspend_np,ATTR_IN(1) ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *__restrict self, int *start_suspended),(self,start_suspended));
+DEFINE_PUBLIC_ALIAS_P(pthread_suspend2_np,libc_pthread_suspend2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
+DEFINE_PUBLIC_ALIAS_P(pthread_resume2_np,libc_pthread_resume2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
+DEFINE_PUBLIC_ALIAS_P(thr_continue,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_unsuspend_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_continue_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_suspend_all_np,libc_pthread_suspend_all_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P_VOID(pthread_resume_all_np,libc_pthread_resume_all_np,,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

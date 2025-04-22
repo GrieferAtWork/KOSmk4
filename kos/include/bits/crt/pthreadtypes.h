@@ -122,6 +122,7 @@ struct pthread {
 	__size_t                 pt_stacksize;   /* [const] Thread stack size (or 0 if not lazily initialized within the main() thread) */
 	unsigned int             pt_flags;       /* [lock(...)] Flags (Set of `PTHREAD_F*') */
 	__fd_t                   pt_pidfd;       /* [lock(WRITE_ONCE)][valid_if(PTHREAD_FHASPIDFD)] Thread PID file descriptor (s.a. `CLONE_PIDFD', `sys_pidfd_open(2)') */
+	__uint32_t               pt_suspended;   /* [lock(READ(ATOMIC), WRITE(ATOMIC && INTERN(:pthread_suspend_lock)))] Suspend recursion of this thread, (when this drops to 0, must futex-wake on this address) */
 	/* TODO: Get rid of the following 2 members. - They're only used during `libc_pthread_main()'! */
 	struct __cpu_set_struct *pt_cpuset;      /* [0..pt_cpusetsize] Initial affinity cpuset. */
 	__size_t                 pt_cpusetsize;  /* Initial affinity cpuset size. */
@@ -153,6 +154,7 @@ typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
 #define PTHREAD_ATTR_FLAG_SCHED_SET       0x0020 /* `pa_schedparam' is valid */
 #define PTHREAD_ATTR_FLAG_POLICY_SET      0x0040 /* `pa_schedpolicy' is valid */
 #define PTHREAD_ATTR_FLAG_WANT_PIDFD      0x1000 /* Allocate a PIDfd for the thread as part of its creation */
+#define PTHREAD_ATTR_FLAG_START_SUSPENDED 0x8000 /* The thread should start in a suspended state (requiring an initial call to `pthread_resume_np(3)'/`pthread_unsuspend_np(3)'/`pthread_continue_np(3)') */
 
 #define __OFFSET_PTHREAD_ATTR_SCHEDPARAM  0
 #define __OFFSET_PTHREAD_ATTR_SCHEDPOLICY __SIZEOF_SCHED_PARAM

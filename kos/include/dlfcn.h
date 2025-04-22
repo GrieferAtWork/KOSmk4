@@ -786,6 +786,19 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * given `handle' is ignored and there is no error-return-value. */
 #define DLAUXCTRL_GET_TLSSEG_COUNT   0xd182 /* Return the number of currently allocated TLS segments (usually the same as # of running threads). */
 #define DLAUXCTRL_GET_TLSSEG_VALID   0xd183 /* Return non-zero if `va_arg(void *)' is a valid TLS segment (Not to be confused with TLS handles, which are just regular DL handles). */
+#define DLAUXCTRL_FOREACH_TLSSEG     0xd184 /* Enumerate allocated TLS segments:
+                                             * >> callback = va_arg(void *(__DLFCN_CC *)(void *cookie, void *tls_segment));
+                                             * >> cookie   = va_arg(void *);
+                                             * CAUTION: The given `callback' is enumerated while an internal lock is held (this
+                                             *          is required to prevent the `tls_segment's passed from being deallocated
+                                             *          while the call is being made). As such, the callback must be careful as
+                                             *          to which function it calls, or face a deadlock.
+                                             * NOTE: The given `handle' is ignored and there is no error-return-value
+                                             * @return: * :   `callback' returned a non-NULL value (the return value) for the
+                                             *                last  enumerated `tls_segment', following which enumeration was
+                                             *                halted.
+                                             * @return: NULL: All TLS segments were enumerated and passed to `callback'
+                                             * @return: NULL: No TLS segments were enumerated, because none are allocated */
 #define DLAUXCTRL_REGISTER_EXTENSION 0xd201 /* Register an extension to libdl:
                                              * >> extension              = va_arg(struct dlmodule_format *);
                                              * >> sizeof_dlmodule_format = va_arg(size_t);

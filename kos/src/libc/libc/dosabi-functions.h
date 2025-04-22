@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44b7372a */
+/* HASH CRC-32:0x20efe645 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1843,13 +1843,13 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_getschedparam, libc_pthread_get
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setschedprio, libc_pthread_setschedprio, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TD)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_getname_np, libc_pthread_getname_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TP, TI)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setname_np, libc_pthread_setname_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_gettid_np, libc_pthread_gettid_np, TIn(__SIZEOF_PID_T__), 1, TIn(__SIZEOF_PTHREAD_T))
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_getpidfd_np, libc_pthread_getpidfd_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_attr_setpidfdallocated_np, libc_pthread_attr_setpidfdallocated_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_attr_getpidfdallocated_np, libc_pthread_attr_getpidfdallocated_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_gettid_np, libc_pthread_gettid_np, TIn(__SIZEOF_PID_T__), 1, TIn(__SIZEOF_PTHREAD_T))
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_getpidfd_np, libc_pthread_getpidfd_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_setpidfdallocated_np, libc_pthread_attr_setpidfdallocated_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_getpidfdallocated_np, libc_pthread_attr_getpidfdallocated_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setconcurrency, libc_pthread_setconcurrency, TIn(__SIZEOF_ERRNO_T__), 1, TD)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_setaffinity_np, libc_pthread_setaffinity_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TI, TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_getaffinity_np, libc_pthread_getaffinity_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TI, TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_setaffinity_np, libc_pthread_setaffinity_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TI, TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_getaffinity_np, libc_pthread_getaffinity_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TI, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_once, libc_pthread_once, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setcancelstate, libc_pthread_setcancelstate, TIn(__SIZEOF_ERRNO_T__), 2, TD, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_setcanceltype, libc_pthread_setcanceltype, TIn(__SIZEOF_ERRNO_T__), 2, TD, TP)
@@ -1939,6 +1939,14 @@ DFUN(".text.crt.dos.sched.pthread", libd_pthread_getspecificptr_np, libc_pthread
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_getcpuclockid, libc_pthread_getcpuclockid, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_atfork, libc_pthread_atfork, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_set_num_processors_np, libc_pthread_set_num_processors_np, TIn(__SIZEOF_ERRNO_T__), 1, TD)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_setstartsuspend_np, libc_pthread_attr_setstartsuspend_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_getstartsuspend_np, libc_pthread_attr_getstartsuspend_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_suspend2_np, libc_pthread_suspend2_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_resume2_np, libc_pthread_resume2_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_continue_np, libc_pthread_continue_np, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_T))
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_setcreatesuspend_np, libc_pthread_attr_setcreatesuspend_np, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_suspend_np, libc_pthread_suspend_np, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_T))
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_resume_np, libc_pthread_resume_np, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_T))
 
 /* pthread_np */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_stackseg_np, libc_pthread_stackseg_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)

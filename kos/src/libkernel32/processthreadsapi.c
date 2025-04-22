@@ -269,6 +269,15 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	if (error != EOK)
 		goto seterr_attr_cookie;
 
+#if 0 /* TODO: Use this, but then also need a  way to translate a thread handle  back
+       *       into its `pthread_t' for use by `ResumeThread()' and `SuspendThread()' */
+	if (dwCreationFlags & CREATE_SUSPENDED) {
+		error = pthread_attr_setcreatesuspend_np(&attr);
+		if (error != EOK)
+			goto seterr_attr_cookie;
+	}
+#endif
+
 	/* Use a custom stack size (if given) */
 	if (dwStackSize != 0) {
 		error = pthread_attr_setstacksize(&attr, dwStackSize);

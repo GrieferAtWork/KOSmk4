@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f0d3060 */
+/* HASH CRC-32:0x654da1b9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,7 +267,7 @@ INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getpidfd_np)(
  * Specify if `pthread_create(3)' should allocate a PIDfd for new  threads.
  * Said PIDfd can be retrieved (or lazily allocated when not pre-allocated)
  * via `pthread_getpidfd_np(3)'
- * @param: allocated: 0=no or 1=yes
+ * @param: allocated: 0=no (default) or 1=yes
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `allocated' */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setpidfdallocated_np)(pthread_attr_t *self, int allocated);
@@ -869,6 +869,134 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pthread_attr_setstartsuspend_np(3)
+ * Specify if `pthread_create(3)' should start the thread in a suspended state.
+ * @param: start_suspended: 0=no (default) or 1=yes
+ * @see pthread_resume_np, pthread_continue_np
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid/unsupported `start_suspended' */
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstartsuspend_np)(pthread_attr_t *__restrict self, int start_suspended);
+/* >> pthread_attr_getpidfdallocated_np(3)
+ * Write 0=no or 1=yes to `*start_suspended', indicative of `pthread_create(3)'
+ * starting  newly spawned thread  in a suspended  state (requiring the creator
+ * to resume the thread at least once before execution actually starts)
+ * @return: EOK: Success */
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getstartsuspend_np)(pthread_attr_t const *__restrict self, int *start_suspended);
+/* >> pthread_suspend2_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code. The counter's old value is optionally stored  in
+ * `p_old_suspend_counter' (when non-NULL)
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume2_np(3)')
+ *
+ * @see pthread_suspend_np, pthread_resume2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_suspend2_np)(pthread_t self, uint32_t *p_old_suspend_counter);
+/* >> pthread_resume2_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with  `pthread_attr_setstartsuspend_np(3)' set to 1).  The
+ * counter's old  value is  optionally stored  in `p_old_suspend_counter'  (when
+ * non-NULL).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_resume2_np)(pthread_t self, uint32_t *p_old_suspend_counter);
+/* >> pthread_continue_np(3), pthread_unsuspend_np(3)
+ * Set the given thread's suspend-counter to `0'. If the counter was already `0',
+ * then the calls is a no-op (and  `EOK'). Otherwise, execution of the thread  is
+ * allowed  to  continue (or  start for  the first  time in  case the  thread was
+ * created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_resume_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_continue_np)(pthread_t self);
+/* >> pthread_attr_setcreatesuspend_np(3)
+ * Setup `self' such that created threads start in a "suspended" state,
+ * requiring a call to one of the following function to actually start:
+ *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+ *  - `pthread_resume_np(3)'
+ *  - `pthread_resume_all_np(3)'
+ * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * @return: EOK: Always returned */
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pthread_attr_setcreatesuspend_np(3)
+ * Setup `self' such that created threads start in a "suspended" state,
+ * requiring a call to one of the following function to actually start:
+ *  - `pthread_continue_np(3)' (or `pthread_unsuspend_np(3)')
+ *  - `pthread_resume_np(3)'
+ *  - `pthread_resume_all_np(3)'
+ * Alias for `pthread_attr_setstartsuspend_np(self, 1)'
+ * @return: EOK: Always returned */
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setcreatesuspend_np)(pthread_attr_t *__restrict self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_suspend_np)(pthread_t self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pthread_suspend_np(3)
+ * Increment the given thread's suspend-counter. If the counter was `0' before,
+ * then the thread is suspended and this function only returns once the  thread
+ * has stopped executing code.
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been  resumed  (s.a.  `pthread_resume_np(3)'  and   `pthread_unsuspend_np(3)')
+ *
+ * @see pthread_suspend2_np
+ * @return: EOK:       Success
+ * @return: ESRCH:     The thread has already been terminated
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter can't go any higher */
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_suspend_np)(pthread_t self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pthread_suspend_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_resume_np)(pthread_t self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pthread_suspend_np(3)
+ * Decrement the given thread's suspend-counter. If the counter was already `0',
+ * then  the calls is a no-op (and `EOK').  If the counter was `1', execution of
+ * the thread is allowed to  continue (or start for the  first time in case  the
+ * thread was created with `pthread_attr_setstartsuspend_np(3)' set to 1).
+ *
+ * @see pthread_suspend_np, pthread_suspend2_np, pthread_resume2_np, pthread_continue_np
+ * @return: EOK:   Success
+ * @return: ESRCH: The thread has already been terminated */
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self);
 #endif /* !__KERNEL__ */
 
 DECL_END

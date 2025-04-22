@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63461814 */
+/* HASH CRC-32:0x725d2e23 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2780,8 +2780,10 @@
 #define __CRT_HAVE_DOS$pthread_attr_getstack
 #define __CRT_HAVE_DOS$pthread_attr_getstackaddr
 #define __CRT_HAVE_DOS$pthread_attr_getstacksize
+#define __CRT_HAVE_DOS$pthread_attr_getstartsuspend_np
 #define __CRT_HAVE_DOS$pthread_attr_init
 #define __CRT_HAVE_DOS$pthread_attr_setaffinity_np
+#define __CRT_HAVE_DOS$pthread_attr_setcreatesuspend_np
 #define __CRT_HAVE_DOS$pthread_attr_setdetachstate
 #define __CRT_HAVE_DOS$pthread_attr_setguardsize
 #define __CRT_HAVE_DOS$pthread_attr_setinheritsched
@@ -2792,6 +2794,7 @@
 #define __CRT_HAVE_DOS$pthread_attr_setstack
 #define __CRT_HAVE_DOS$pthread_attr_setstackaddr
 #define __CRT_HAVE_DOS$pthread_attr_setstacksize
+#define __CRT_HAVE_DOS$pthread_attr_setstartsuspend_np
 #define __CRT_HAVE_DOS$pthread_barrier_destroy
 #define __CRT_HAVE_DOS$pthread_barrier_init
 #define __CRT_HAVE_DOS$pthread_barrier_wait
@@ -2815,6 +2818,7 @@
 #define __CRT_HAVE_DOS$pthread_condattr_init
 #define __CRT_HAVE_DOS$pthread_condattr_setclock
 #define __CRT_HAVE_DOS$pthread_condattr_setpshared
+#define __CRT_HAVE_DOS$pthread_continue_np
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __LIBCCALL_IS_LIBDCALL
 #define __CRT_HAVE_DOS$pthread_create
@@ -2862,6 +2866,8 @@
 #define __CRT_HAVE_DOS$pthread_mutexattr_setrobust
 #define __CRT_HAVE_DOS$pthread_mutexattr_settype
 #define __CRT_HAVE_DOS$pthread_once
+#define __CRT_HAVE_DOS$pthread_resume2_np
+#define __CRT_HAVE_DOS$pthread_resume_np
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy
 #define __CRT_HAVE_DOS$pthread_rwlock_init
 #define __CRT_HAVE_DOS$pthread_rwlock_rdlock
@@ -2900,6 +2906,8 @@
 #define __CRT_HAVE_DOS$pthread_spin_trylock
 #define __CRT_HAVE_DOS$pthread_spin_unlock
 #define __CRT_HAVE_DOS$pthread_stackseg_np
+#define __CRT_HAVE_DOS$pthread_suspend2_np
+#define __CRT_HAVE_DOS$pthread_suspend_np
 #define __CRT_HAVE_DOS$pthread_timedjoin64_np
 #define __CRT_HAVE_DOS$pthread_timedjoin_np
 #define __CRT_HAVE_DOS$pthread_tryjoin_np
@@ -7266,8 +7274,10 @@
 #define __CRT_HAVE_pthread_attr_getstack
 #define __CRT_HAVE_pthread_attr_getstackaddr
 #define __CRT_HAVE_pthread_attr_getstacksize
+#define __CRT_HAVE_pthread_attr_getstartsuspend_np
 #define __CRT_HAVE_pthread_attr_init
 #define __CRT_HAVE_pthread_attr_setaffinity_np
+#define __CRT_HAVE_pthread_attr_setcreatesuspend_np
 #define __CRT_HAVE_pthread_attr_setdetachstate
 #define __CRT_HAVE_pthread_attr_setguardsize
 #define __CRT_HAVE_pthread_attr_setinheritsched
@@ -7278,6 +7288,7 @@
 #define __CRT_HAVE_pthread_attr_setstack
 #define __CRT_HAVE_pthread_attr_setstackaddr
 #define __CRT_HAVE_pthread_attr_setstacksize
+#define __CRT_HAVE_pthread_attr_setstartsuspend_np
 #define __CRT_HAVE_pthread_barrier_destroy
 #define __CRT_HAVE_pthread_barrier_init
 #define __CRT_HAVE_pthread_barrier_wait
@@ -7301,6 +7312,7 @@
 #define __CRT_HAVE_pthread_condattr_init
 #define __CRT_HAVE_pthread_condattr_setclock
 #define __CRT_HAVE_pthread_condattr_setpshared
+#define __CRT_HAVE_pthread_continue_np
 #define __CRT_HAVE_pthread_create
 #define __CRT_HAVE_pthread_detach
 #define __CRT_HAVE_pthread_equal
@@ -7350,6 +7362,9 @@
 #define __CRT_HAVE_pthread_mutexattr_settype
 #define __CRT_HAVE_pthread_num_processors_np
 #define __CRT_HAVE_pthread_once
+#define __CRT_HAVE_pthread_resume2_np
+#define __CRT_HAVE_pthread_resume_all_np
+#define __CRT_HAVE_pthread_resume_np
 #define __CRT_HAVE_pthread_rpc_exec
 #define __CRT_HAVE_pthread_rwlock_destroy
 #define __CRT_HAVE_pthread_rwlock_init
@@ -7390,6 +7405,9 @@
 #define __CRT_HAVE_pthread_spin_trylock
 #define __CRT_HAVE_pthread_spin_unlock
 #define __CRT_HAVE_pthread_stackseg_np
+#define __CRT_HAVE_pthread_suspend2_np
+#define __CRT_HAVE_pthread_suspend_all_np
+#define __CRT_HAVE_pthread_suspend_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin64_np
 #define __CRT_HAVE_pthread_timedjoin_np
