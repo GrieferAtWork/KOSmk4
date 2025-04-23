@@ -126,6 +126,8 @@
 		- `char *dlgetname(struct load_module_desc *desc, size_t desc_size, void *(*read_tgt_mem)(void* buffer, unsigned long long ptr, size_t bufsiz, int ident), int ident_parm, unsigned long long load_map_parm);`
 		- `unsigned long dlmodinfo(unsigned long ip_value, struct load_module_desc *desc, size_t desc_size, void *(*read_tgt_mem)(void* buffer, unsigned long ptr, size_t bufsiz, int ident), int ident_parm, uint64_t load_map_parm);`
 		- `void *dlget(unsigned int index, struct load_module_desc *desc, size_t desc_size);`
+	- <ucontext.h>
+		- `int signalcontext(ucontext_t *ucp, int sig, __sighandler_t *func);`
 
 
 

@@ -186,7 +186,7 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	}
 
 	/* Close the thread's PIDfd (if there is one) */
-	if (self->pt_pidfd >= 0)
+	if (self->pt_flags & PTHREAD_FFREEPIDFD)
 		(void)sys_close(self->pt_pidfd);
 
 	/* NOTE: This also invokes TLS finalizers! */
@@ -498,6 +498,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt->pt_cpuset    = NULL;
 	pt->pt_tls       = tls;
 	pt->pt_pidfd     = -1;
+#if PTHREAD_ATTR_FLAG_WANT_PIDFD == PTHREAD_FFREEPIDFD
+	pt->pt_flags |= attr->pa_flags & PTHREAD_ATTR_FLAG_WANT_PIDFD;
+#else /* PTHREAD_ATTR_FLAG_WANT_PIDFD == PTHREAD_FFREEPIDFD */
+	if (attr->pa_flags & PTHREAD_ATTR_FLAG_WANT_PIDFD)
+		pt->pt_flags |= PTHREAD_FFREEPIDFD;
+#endif /* PTHREAD_ATTR_FLAG_WANT_PIDFD != PTHREAD_FFREEPIDFD */
 
 	/* Copy affinity cpuset information. */
 	if (attr->pa_cpuset) {
@@ -959,6 +965,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getpidfd_np)(pthread_t self,
 		if unlikely(!atomic_cmpxch(&self->pt_pidfd, -1, fd)) {
 			(void)sys_close(fd);
 			fd = atomic_read(&self->pt_pidfd);
+		} else {
+			/* Set flag to have the pidfd be free'd when the thread exits. */
+			atomic_or(&self->pt_flags, PTHREAD_FFREEPIDFD);
 		}
 	}
 	*p_pidfd = fd;
@@ -2796,6 +2805,25 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attachpidfd_np)(fd_t pidfd,
 /*[[[body:libc_pthread_attachpidfd_np]]]*/
 {
 	struct pthread *thread;
+
+	/* Special handling for symbolic current-thread and
+	 * current-process (main thread) file  descriptors. */
+#ifdef AT_FDTHRD
+	if (pidfd == AT_FDTHRD) {
+		*result = pthread_self();
+		pthread_attach_np(*result);
+		return EOK;
+	}
+#endif /* AT_FDTHRD */
+#ifdef AT_FDPROC
+	if (pidfd == AT_FDPROC) {
+		*result = pthread_mainthread_np();
+		pthread_attach_np(*result);
+		return EOK;
+	}
+#endif /* AT_FDPROC */
+
+	/* All other negative values are illegal. */
 	if unlikely(pidfd < 0)
 		return EINVAL;
 	thread = (struct pthread *)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,

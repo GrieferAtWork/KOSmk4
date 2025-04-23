@@ -78,6 +78,7 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
                                    * user and should not be unmapped automatically. */
 #define PTHREAD_FNOSTACK   0x0002 /* [const] The thread's stack area is unknown (this is the case
                                    * for the main thread, and  any thread created by  `clone()'). */
+#define PTHREAD_FFREEPIDFD 0x1000 /* [lock(WRITE_ONCE)] Internal flag: `pt_pidfd' must be close(2)'d when the thread exits */
 #define PTHREAD_FTIDSET    0x8000 /* [lock(WRITE_ONCE)] Internal flag: `set_tid_address(2)' has been called. */
 
 /* The different kinds of errno codes known to libc */

@@ -41,6 +41,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -223,7 +224,6 @@ DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
 struct k32_thread_start_data {
 	LPTHREAD_START_ROUTINE lpStartAddress;
 	LPVOID                 lpParameter;
-	DWORD                  dwCreationFlags;
 };
 
 PRIVATE void *LIBCCALL
@@ -231,11 +231,6 @@ k32_thread_start_routine(void *arg) {
 	struct k32_thread_start_data info;
 	memcpy(&info, arg, sizeof(struct k32_thread_start_data));
 	free(arg);
-	if (info.dwCreationFlags & CREATE_SUSPENDED) {
-		/* XXX: Kernel-side of this is not fully implemented
-		 * -> Once it is, there should be ioctls to (recursively) suspend/resume threads */
-		pthread_kill(pthread_self(), SIGSTOP);
-	}
 	return (void *)(uintptr_t)(*info.lpStartAddress)(info.lpParameter);
 }
 
@@ -260,23 +255,19 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 		(void)pthread_attr_destroy(&attr);
 		goto err;
 	}
-	cookie->lpStartAddress  = lpStartAddress;
-	cookie->lpParameter     = lpParameter;
-	cookie->dwCreationFlags = dwCreationFlags;
+	cookie->lpStartAddress = lpStartAddress;
+	cookie->lpParameter    = lpParameter;
 
 	/* Have libc automatically pre-allocate a pidfd descriptor here! */
 	error = pthread_attr_setpidfdallocated_np(&attr, 1);
 	if (error != EOK)
 		goto seterr_attr_cookie;
 
-#if 0 /* TODO: Use this, but then also need a  way to translate a thread handle  back
-       *       into its `pthread_t' for use by `ResumeThread()' and `SuspendThread()' */
 	if (dwCreationFlags & CREATE_SUSPENDED) {
 		error = pthread_attr_setcreatesuspend_np(&attr);
 		if (error != EOK)
 			goto seterr_attr_cookie;
 	}
-#endif
 
 	/* Use a custom stack size (if given) */
 	if (dwStackSize != 0) {
@@ -295,9 +286,8 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	if (lpThreadId)
 		*lpThreadId = pthread_gettid_np(thread);
 
-	/* Steal the thread's PIDfd descriptor by setting it to `-1'
-	 * within the pthread control structure. That way, once  the
-	 * pthread gets destroyed, it will not close its PIDfd.
+	/* Steal the thread's PIDfd descriptor by clearing the flag
+	 * that would case it to  close(2) its descriptor on  exit.
 	 *
 	 * Also  note that  the thread  can't get  destroyed until we
 	 * call `pthread_detach(3)' below, so this is perfectly safe,
@@ -308,12 +298,9 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	 * specific function, we can safely assume that anything that
 	 * uses both that API and this one knows of this quirk). */
 	assert(thread->pt_pidfd != -1);
+	assert(thread->pt_flags & PTHREAD_FFREEPIDFD);
 	result = NTHANDLE_FROMFD(thread->pt_pidfd);
-	thread->pt_pidfd = -1;
-
-	if (dwCreationFlags & CREATE_SUSPENDED) {
-		/* TODO: Wait for the thread to suspend itself */
-	}
+	atomic_and(&thread->pt_flags, ~PTHREAD_FFREEPIDFD);
 
 	/* Detach the pthread object. */
 	(void)pthread_detach(thread);
@@ -460,17 +447,28 @@ libk32_QueueUserAPC(PAPCFUNC pfnAPC, HANDLE hThread, ULONG_PTR dwData) {
 INTERN DWORD WINAPI
 libk32_SuspendThread(HANDLE hThread) {
 	errno_t error;
+	pthread_t thread;
+	uint32_t old_suspend_count;
 	TRACE("SuspendThread(%p)", hThread);
 	if (!NTHANDLE_ISFD(hThread)) {
 		errno = EBADF;
 		goto err;
 	}
-	error = sys_pidfd_send_signal(NTHANDLE_ASFD(hThread), SIGSTOP, NULL, 0);
-	if (error != EOK) {
-		errno = -error;
-		goto err;
+	error = pthread_attachpidfd_np(NTHANDLE_ASFD(hThread), &thread);
+	if (error != EOK)
+		goto err_errno;
+	error = pthread_suspend2_np(thread, &old_suspend_count);
+	(void)pthread_detach(thread);
+	if (error != EOK)
+		goto err_errno;
+	if unlikely(old_suspend_count == (uint32_t)-1) {
+		(void)pthread_resume_np(thread);
+		error = EOVERFLOW;
+		goto err_errno;
 	}
-	return 0;
+	return (DWORD)old_suspend_count;
+err_errno:
+	errno = error;
 err:
 	return (DWORD)-1;
 }
@@ -478,17 +476,28 @@ err:
 INTERN DWORD WINAPI
 libk32_ResumeThread(HANDLE hThread) {
 	errno_t error;
+	pthread_t thread;
+	uint32_t old_suspend_count;
 	TRACE("ResumeThread(%p)", hThread);
 	if (!NTHANDLE_ISFD(hThread)) {
 		errno = EBADF;
 		goto err;
 	}
-	error = sys_pidfd_send_signal(NTHANDLE_ASFD(hThread), SIGCONT, NULL, 0);
-	if (error != EOK) {
-		errno = -error;
-		goto err;
+	error = pthread_attachpidfd_np(NTHANDLE_ASFD(hThread), &thread);
+	if (error != EOK)
+		goto err_errno;
+	error = pthread_resume2_np(thread, &old_suspend_count);
+	(void)pthread_detach(thread);
+	if (error != EOK)
+		goto err_errno;
+	if unlikely(old_suspend_count == (uint32_t)-1) {
+		(void)pthread_suspend_np(thread);
+		error = EOVERFLOW;
+		goto err_errno;
 	}
-	return 1;
+	return (DWORD)old_suspend_count;
+err_errno:
+	errno = error;
 err:
 	return (DWORD)-1;
 }
