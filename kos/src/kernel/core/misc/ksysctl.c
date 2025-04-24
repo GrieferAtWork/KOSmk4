@@ -535,6 +535,7 @@ again_get_oldpath:
 
 #ifdef CONFIG_HAVE_KERNEL_HACKY_REBOOT
 	case 0xcccc0001: {
+		require(CAP_SYS_ADMIN);
 		PREEMPTION_DISABLE();
 		printk(KERN_RAW "Reboot\n\n\n\n\n\n\n\n\n\n\n\n\n"
 		                "%{monitor:system_reset\n}\n");

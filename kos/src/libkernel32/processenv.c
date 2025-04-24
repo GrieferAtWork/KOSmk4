@@ -151,7 +151,7 @@ libk32_SetStdHandleEx(DWORD nStdHandle, HANDLE hHandle, PHANDLE phPrevValue) {
 			return FALSE;
 		result = dup2(NTHANDLE_ASFD(hHandle), fd);
 		if (result < 0) {
-			close(d);
+			(void)close(d);
 			return FALSE;
 		}
 		*phPrevValue = NTHANDLE_FROMFD(d);

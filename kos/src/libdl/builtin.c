@@ -2516,11 +2516,13 @@ NOTHROW_NCX(CC inflate_compressed_section)(NCX DlSection *sect,
 	ElfW(Chdr) *chdr;
 	void *result;
 	chdr = (ElfW(Chdr) *)section_data;
+
 	/* Verify the compressed-section header. */
 	if unlikely(section_size < sizeof(*chdr))
 		goto err_bad_section_size;
 	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
 		goto err_wrong_chdr_type;
+
 	/* Allocate memory for the compressed section. */
 	*psection_csize = atomic_read(&chdr->ch_size);
 	result = sys_mmap(NULL, *psection_csize,
@@ -2529,12 +2531,14 @@ NOTHROW_NCX(CC inflate_compressed_section)(NCX DlSection *sect,
 	                  -1, 0);
 	if unlikely(E_ISERR(result))
 		goto err_mmap_failed;
+
 	/* Lazily load libzlib.so */
 	if unlikely(!init_zlib())
 		goto err_munmap;
+
+	/* Decompress section data. */
 	{
 		unsigned int inflate_error;
-		/* Decompress section data. */
 		inflate_error = decompress_section_data(result, *psection_csize, chdr + 1,
 		                                        section_size - sizeof(*chdr));
 		if unlikely(inflate_error != ZLIB_ERROR_OK) {
@@ -2545,6 +2549,7 @@ NOTHROW_NCX(CC inflate_compressed_section)(NCX DlSection *sect,
 			goto err_munmap;
 		}
 	}
+
 	/* Success! */
 	return result;
 err_mmap_failed:
@@ -2599,11 +2604,13 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(NCX DlSection *sect,
 		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
+
 	/* Check for simple case: Was inflated data already loaded? */
 	if (sect->ds_cdata == (void *)-1) {
 		/* Verify that section data has been loaded. */
 		if unlikely(sect->ds_data == (void *)-1)
 			goto err_no_section_data;
+
 		/* Check for simple case: The section isn't actually compressed. */
 		if (!(sect->ds_elfflags & SHF_COMPRESSED)) {
 			sect->ds_csize = sect->ds_size;
@@ -2627,7 +2634,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(NCX DlSection *sect,
 				 * and now we've got the inflated  data twice. - Fix this  by
 				 * simply deleting our duplicate and using the version that's
 				 * already stored in the section descriptor. */
-				sys_munmap(cdata, csize);
+				(void)sys_munmap(cdata, csize);
 			}
 		}
 	}
@@ -2750,6 +2757,7 @@ again_lock_global:
 		}
 		dlglobals_all_endread(&dl_globals);
 	}
+
 	/* Also trim malloc memory from our heap implementation. */
 	if (malloc_trim(0))
 		result = 1;
@@ -2851,7 +2859,8 @@ PRIVATE ATTR_PURE WUNUSED size_t CC libdl_dltlssegcount(void) {
 }
 
 /* Return the # of allocated TLS segments. */
-PRIVATE ATTR_PURE WUNUSED bool CC libdl_dltlssegvalid(struct dltls_segment *seg) {
+PRIVATE ATTR_PURE WUNUSED bool CC
+libdl_dltlssegvalid(struct dltls_segment *seg) {
 	bool result = false;
 	if likely(seg) {
 		struct dltls_segment *iter;

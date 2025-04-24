@@ -434,6 +434,7 @@ again_acquire_pathlock_for_drive_cwd:
 						vfs_driveslock_waitread(myvfs);
 						goto again_acquire_pathlock_for_drive_cwd;
 					}
+
 					/* The old effective handle value was the drive root. */
 					ohand->h_data = myvfs->vf_drives[fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)];
 					if (!ohand->h_data) {
@@ -448,6 +449,7 @@ again_acquire_pathlock_for_drive_cwd:
 					incref((struct path *)ohand->h_data);
 					vfs_driveslock_endread(myvfs);
 				}
+
 				/* TODO: Check that `newpath' is a sub-directory of the drive root.
 				 *       -> If it isn't, must throw `E_FSERROR_CROSS_DEVICE_LINK' */
 				myfs->fs_dcwd[fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)] = newpath; /* Inherit reference */
@@ -679,7 +681,7 @@ handles_install_openfd(struct handle const *__restrict hand,
 	flags = data->of_flags;
 	hint  = data->of_hint;
 	COMPILER_READ_BARRIER();
-	if (flags & ~(IO_CLOEXEC | IO_CLOFORK)) {
+	if unlikely(flags & ~(IO_CLOEXEC | IO_CLOFORK)) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
 		      E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS,
 		      flags, ~(IO_CLOEXEC | IO_CLOFORK), 0);

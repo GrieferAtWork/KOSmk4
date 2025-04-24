@@ -87,7 +87,8 @@ libk32_MakeMessageW(DWORD dwFlags, LPCVOID lpSource, DWORD dwMessageId,
 
 INTERN DWORD WINAPI
 libk32_FormatMessageA(DWORD dwFlags, LPCVOID lpSource, DWORD dwMessageId,
-                      DWORD dwLanguageId, LPSTR lpBuffer, DWORD nSize, __NT_VA_LIST *Arguments) {
+                      DWORD dwLanguageId, LPSTR lpBuffer, DWORD nSize,
+                      __NT_VA_LIST *Arguments) {
 	char *msg;
 	DWORD len;
 	TRACE("FormatMessageA(%#x, %p, %#x, %#x, %p, %#x, %p)",

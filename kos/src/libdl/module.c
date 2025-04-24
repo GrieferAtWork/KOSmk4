@@ -127,6 +127,7 @@ DlModule_Destroy(NCX DlModule *self)
 	/* Skip finalizers if the library was never initialized. */
 	if unlikely(self->dm_flags & RTLD_NOINIT)
 		goto done_fini;
+
 	/* Support for formats other than ELF. */
 	if (self->dm_ops) {
 		if (self->dm_ops->df_run_finalizers)
@@ -159,9 +160,11 @@ DlModule_Destroy(NCX DlModule *self)
 			}
 		}
 done_dyntag:
+
 		/* Service fini-array functions in reverse order. */
 		while (fini_array_size--)
 			(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
+
 		/* Service a fini function, if one was specified. */
 		if (fini_func)
 			(*(void (*)(void))(fini_func + self->dm_loadaddr))();
@@ -171,6 +174,7 @@ done_fini:
 		(*self->dm_ops->df_fini)(self);
 	} else {
 		ElfW(Half) i;
+
 		/* Delete memory mappings of the module. */
 		COMPILER_BARRIER();
 		for (i = 0; i < self->dm_elf.de_phnum; ++i) {
@@ -266,12 +270,13 @@ INTDEF WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd);
 INTERN WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC DlModule_GetFd)(NCX DlModule *self)
 		THROWS(E_SEGFAULT) {
-	fd_t result = self->dm_file;
+	fd_t result = atomic_read(&self->dm_file);
 	if (result == -1) {
 		fd_t newresult;
 		result = sys_open(self->dm_filename, O_RDONLY | O_CLOEXEC, 0);
 		if unlikely(E_ISERR(result))
 			goto err;
+
 		/* Make sure to only use big file descriptor indices, so-as
 		 * to  prevent use of reserved file numbers, as used by the
 		 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */

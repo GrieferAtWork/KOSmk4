@@ -128,6 +128,12 @@
 		- `void *dlget(unsigned int index, struct load_module_desc *desc, size_t desc_size);`
 	- <ucontext.h>
 		- `int signalcontext(ucontext_t *ucp, int sig, __sighandler_t *func);`
+	- <unistd.h>
+		- #ifdef __USE_BSD: `int execvP(char const *file, char const *search_path, char *const argv[]);`
+		- #ifdef __USE_BSD: `int execvPe(char const *file, char const *search_path, char *const argv[], char *const envp[]);`
+	- <stdlib.h>
+		- #ifdef __USE_BSD: `char *fdevname($fd_t fd);` (partner to "devname")
+		- #ifdef __USE_BSD: `char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T bufsize);` (partner to "devname_r")
 
 
 

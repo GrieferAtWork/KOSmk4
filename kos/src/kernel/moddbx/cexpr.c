@@ -3376,6 +3376,7 @@ NOTHROW_NCX(FCALL cexpr_load_special_libdl_symbol)(NCX char const *name) {
 		result = cexpr_pop();
 		if unlikely(result != DBX_EOK)
 			goto done;
+
 		/* All of the special symbols somehow interact with "dl_globals",
 		 * which  should be an  INTERN-visibility symbol from `libdl.so'! */
 		result = cexpr_pushsymbol_byname("dl_globals", 10);
@@ -3456,6 +3457,7 @@ push_normal_dl_program_invocation_short_name:
 				result = cexpr_pop();
 				goto done;
 			}
+
 			/* Must lazily initialize `dl_program_invocation_short_name' */
 			result = cexpr_swap();
 			if unlikely(result != DBX_EOK)
@@ -3469,6 +3471,7 @@ push_normal_dl_program_invocation_short_name:
 			result = cexpr_deref();
 			if unlikely(result != DBX_EOK)
 				goto done;
+
 			/* Right now, the top of the stack points at `*dl_globals.dg_peb->pp_argv[0]', which
 			 * contains the address that we want to  write back to the program invocation  short
 			 * name symbol. */
@@ -3477,10 +3480,12 @@ push_normal_dl_program_invocation_short_name:
 				goto done;
 			if (!argv0 || !ADDR_ISUSER(argv0))
 				goto push_normal_dl_program_invocation_short_name;
+
 			/* Pop the dl_globals.dg_peb-based expression off of the stack! */
 			result = cexpr_pop();
 			if unlikely(result != DBX_EOK)
 				goto done;
+
 			/* Find the position of the last '/' in the `argv0' string.
 			 * Then, write-back the position 1 past that character back
 			 * to `*addrof_dl_program_invocation_short_name' */

@@ -129,7 +129,7 @@
 #endif /* __RTLD_NOLOAD */
 
 /* If the associated library uses a symbol that it itself also defines,
- * the the library will use its own symbol, rather than go through  the
+ * then the library will use its own symbol, rather than go through the
  * global scope to find the first (primary) definition of some symbol.
  * e.g.:
  *    - libfoo: (linked against `libc.so')
