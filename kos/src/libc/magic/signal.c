@@ -2017,7 +2017,7 @@ int sigwait([[in]] sigset_t const *__restrict set,
 @@Check if the given signal set is empty
 @@@return: != 0: Yes, it is empty
 @@@return: == 0: No, at least 1 signal is contained
-[[kernel, libc, pure, wunused, decl_include("<bits/os/sigset.h>")]]
+[[kernel, pure, wunused, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[in]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
@@ -2068,6 +2068,36 @@ int signandset([[out]] $sigset_t *set,
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & ~right->__val[i];
 	return 0;
+}
+
+@@>> sigisfullset(3)
+@@Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+@@@return: != 0: Yes, it is full
+@@@return: == 0: No, at least 1 signal isn't masked
+[[libc, pure, wunused, decl_include("<bits/os/sigset.h>")]]
+[[impl_include("<asm/os/signal.h>")]]
+int sigisfullset([[in]] $sigset_t const *__restrict set) {
+	size_t i;
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
+		if (set->__val[i] != (__ULONGPTR_TYPE__)-1) {
+@@pp_if defined(__SIGKILL) || defined(__SIGSTOP)@@
+			__ULONGPTR_TYPE__ word = set->__val[i];
+@@pp_ifdef __SIGKILL@@
+			if (i == __sigset_word(__SIGKILL))
+				word |= __sigset_mask(__SIGKILL);
+@@pp_endif@@
+@@pp_ifdef __SIGSTOP@@
+			if (i == __sigset_word(__SIGSTOP))
+				word |= __sigset_mask(__SIGSTOP);
+@@pp_endif@@
+			if (word != (__ULONGPTR_TYPE__)-1)
+@@pp_endif@@
+			{
+				return 0; /* Not full! */
+			}
+		}
+	}
+	return 1;
 }
 %#endif /* __USE_KOS */
 

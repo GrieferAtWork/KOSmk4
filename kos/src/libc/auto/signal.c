@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fb0b33e */
+/* HASH CRC-32:0xb91a2b04 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,6 +273,34 @@ NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set,
 	return 0;
 }
 #ifndef __KERNEL__
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_IN(1) int
+NOTHROW_NCX(LIBCCALL libc_sigisfullset)(sigset_t const *__restrict set) {
+	size_t i;
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
+		if (set->__val[i] != (__ULONGPTR_TYPE__)-1) {
+
+			__ULONGPTR_TYPE__ word = set->__val[i];
+
+			if (i == __sigset_word(__SIGKILL))
+				word |= __sigset_mask(__SIGKILL);
+
+
+			if (i == __sigset_word(__SIGSTOP))
+				word |= __sigset_mask(__SIGSTOP);
+
+			if (word != (__ULONGPTR_TYPE__)-1)
+
+			{
+				return 0; /* Not full! */
+			}
+		}
+	}
+	return 1;
+}
 /* >> killpg(3)
  * Alias for `kill(-pgrp, signo)'
  * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
@@ -1170,6 +1198,7 @@ DEFINE_PUBLIC_ALIAS_P(sigandset,libc_sigandset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1)
 DEFINE_PUBLIC_ALIAS_P(sigorset,libc_sigorset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, sigset_t const *left, sigset_t const *right),(set,left,right));
 DEFINE_PUBLIC_ALIAS_P(signandset,libc_signandset,ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t *set, sigset_t const *left, sigset_t const *right),(set,left,right));
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS_P(sigisfullset,libc_sigisfullset,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(sigset_t const *__restrict set),(set));
 DEFINE_PUBLIC_ALIAS_P(killpg,libc_killpg,,int,NOTHROW_NCX,LIBCCALL,(pid_t pgrp, signo_t signo),(pgrp,signo));
 DEFINE_PUBLIC_ALIAS_P_VOID(psignal,libc_psignal,,NOTHROW_CB_NCX,LIBCCALL,(signo_t signo, char const *s),(signo,s));
 DEFINE_PUBLIC_ALIAS_P_VOID(psiginfo,libc_psiginfo,ATTR_IN(1) ATTR_IN_OPT(2),NOTHROW_CB_NCX,LIBCCALL,(siginfo_t const *pinfo, char const *s),(pinfo,s));

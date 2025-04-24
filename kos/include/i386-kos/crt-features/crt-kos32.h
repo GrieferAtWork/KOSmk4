@@ -5204,6 +5204,7 @@
 #define __CRT_HAVE_sigignore
 #define __CRT_HAVE_siginterrupt
 #define __CRT_HAVE_sigisemptyset
+#define __CRT_HAVE_sigisfullset
 #define __CRT_HAVE_sigismember
 #define __CRT_HAVE_siglongjmp
 #define __CRT_HAVE_signal

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea073555 */
+/* HASH CRC-32:0xd12fb5e0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -278,6 +278,20 @@ INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_signandse
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
  * @return: 0: Always returns `0' */
 INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_sigisfullset)(sigset_t const *__restrict set);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_sigisfullset)(sigset_t const *__restrict set);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigwaitinfo(2)
  * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,

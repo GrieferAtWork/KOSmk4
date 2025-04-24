@@ -271,8 +271,8 @@ __DECL_END
 #define __hybrid_preemption_flag_t          struct __sigset_struct *
 #define __hybrid_preemption_pushoff(p_flag) (void)(*(p_flag) = __libc_setsigmaskfullptr())
 #define __hybrid_preemption_pop(p_flag)     (void)(__libc_setsigmaskptr(*(p_flag)))
-#define __hybrid_preemption_ison()          (!__libc_sigisemptyset(__libc_getsigmaskptr()))
-#define __hybrid_preemption_wason(p_flag)   (!__libc_sigisemptyset(*(p_flag)))
+#define __hybrid_preemption_ison()          (!__libc_sigisfullset(__libc_getsigmaskptr()))
+#define __hybrid_preemption_wason(p_flag)   (!__libc_sigisfullset(*(p_flag)))
 #else /* __libc_setsigmaskfullptr && __libc_setsigmaskptr */
 #include <libc/sys.signal.h>
 #if defined(__libc_sigblockall) && defined(__libc_sigunblockall)
@@ -286,7 +286,7 @@ __DECL_END
 #define __hybrid_preemption_flag_t struct __sigset_struct
 #define __hybrid_preemption_pop(p_flag) \
 	(void)__libc_sigprocmask(__SIG_SETMASK, p_flag, __NULLPTR)
-#define __hybrid_preemption_wason(p_flag) (!__libc_sigisemptyset(p_flag))
+#define __hybrid_preemption_wason(p_flag) (!__libc_sigisfullset(p_flag))
 #ifdef __NO_XBLOCK
 #define __hybrid_preemption_pushoff (__NAMESPACE_INT_SYM __hybrid_private_preemption_pushoff)
 #define __hybrid_preemption_ison    (__NAMESPACE_INT_SYM __hybrid_private_preemption_ison)
@@ -294,31 +294,31 @@ __DECL_BEGIN
 __NAMESPACE_INT_BEGIN
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
-	struct __sigset_struct __hpp_nss;
-	__libc_sigfillset(&__hpp_nss);
-	__libc_sigprocmask(__SIG_SETMASK, p_flag, &__hpp_nss);
+	struct __sigset_struct __hpp_oss;
+	__libc_sigfillset(&__hpp_oss);
+	__libc_sigprocmask(__SIG_SETMASK, &__hpp_oss, p_flag);
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
 	sigset_t __hpio_nss;
 	__libc_sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
-	return !__hybrid_sigisemptyset(&__hpio_nss)
+	return !__hybrid_sigisfullset(&__hpio_nss)
 }
 __NAMESPACE_INT_END
 __DECL_END
 #else /* __NO_XBLOCK */
 #define __hybrid_preemption_pushoff(p_flag)                    \
 	__XBLOCK({                                                 \
-		struct __sigset_struct __hpp_nss;                      \
-		__libc_sigfillset(&__hpp_nss);                         \
-		__libc_sigprocmask(__SIG_SETMASK, p_flag, &__hpp_nss); \
+		struct __sigset_struct __hpp_oss;                      \
+		__libc_sigfillset(&__hpp_oss);                         \
+		__libc_sigprocmask(__SIG_SETMASK, &__hpp_oss, p_flag); \
 	})
 #define __hybrid_preemption_ison()                                 \
 	__XBLOCK({                                                     \
 		struct __sigset_struct __hpio_nss;                         \
 		__libc_sigprocmask(__SIG_SETMASK, __NULLPTR, &__hpio_nss); \
-		__XRETURN !__libc_sigisemptyset(&__hpio_nss);              \
-	})
+		__XRETURN !__libc_sigisfullset(&__hpio_nss);               \
+	}) /* TODO: Shouldn't this be `!__libc_sigisfullset(&__hpio_nss)' */
 #endif /* !__NO_XBLOCK */
 #endif /* ... */
 #endif /* !__libc_setsigmaskfullptr || !__libc_setsigmaskptr */
@@ -356,25 +356,49 @@ __DECL_END
 #define __hybrid_sigfillset(set) __hybrid_memset(set, 0xff, sizeof(sigset_t))
 #endif /* !HAVE_SIGFILLSET && (!__USE_POSIX || NO_SIGFILLSET) */
 
-#if defined(HAVE_SIGISEMPTYSET) || (defined(__USE_GNU) && !defined(NO_SIGISEMPTYSET))
-#define __hybrid_sigisemptyset(set) sigisemptyset(set)
-#else /* HAVE_SIGISEMPTYSET || (__USE_GNU && !NO_SIGISEMPTYSET) */
 #include <hybrid/typecore.h>
-#define __hybrid_sigisemptyset (__NAMESPACE_INT_SYM __hybrid_private_sigisemptyset)
+#define __hybrid_sigisfullset (__NAMESPACE_INT_SYM __hybrid_private_sigisfullset)
 __DECL_BEGIN
 __NAMESPACE_INT_BEGIN
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
-__NOTHROW(__hybrid_private_sigisemptyset)(sigset_t const *__restrict __set) {
+__NOTHROW(__hybrid_private_sigisfullset)(sigset_t const *__restrict __set) {
 	__STATIC_IF ((sizeof(sigset_t) % __SIZEOF_POINTER__) == 0) {
 		__SIZE_TYPE__ __i;
 		for (__i = 0; __i < sizeof(sigset_t) / __SIZEOF_POINTER__; ++__i) {
-			if (((__UINTPTR_TYPE__ *)__set)[__i] != 0)
-				return 0;
+			if (((__UINTPTR_TYPE__ *)__set)[__i] != (__UINTPTR_TYPE__)-1) {
+#if defined(SIGKILL) || defined(SIGSTOP)
+				__UINTPTR_TYPE__ __word = ((__UINTPTR_TYPE__ *)__set)[__i];
+#ifdef __sigset_mask
+#define __hybrid_private_sigset_mask(sig) __sigset_mask(sig)
+#else /* __sigset_mask */
+#define __hybrid_private_sigset_mask(sig) ((__ULONGPTR_TYPE__)1 << (((sig)-1) % (8 * __SIZEOF_POINTER__)))
+#endif /* !__sigset_mask */
+#ifdef __sigset_word
+#define __hybrid_private_sigset_word(sig) __sigset_word(sig)
+#else /* __sigset_word */
+#define __hybrid_private_sigset_word(sig) (((__ULONGPTR_TYPE__)(sig)-1) / (8 * __SIZEOF_POINTER__))
+#endif /* !__sigset_word */
+#ifdef SIGKILL
+				if (__i == __hybrid_private_sigset_word(SIGKILL))
+					__word |= __hybrid_private_sigset_mask(SIGKILL);
+#endif /* SIGKILL */
+#ifdef SIGSTOP
+				if (__i == __hybrid_private_sigset_word(SIGSTOP))
+					__word |= __hybrid_private_sigset_mask(SIGSTOP);
+#endif /* SIGSTOP */
+#undef __hybrid_private_sigset_mask
+#undef __hybrid_private_sigset_word
+				if (__word != (__UINTPTR_TYPE__)-1)
+#endif /* SIGKILL || SIGSTOP */
+				{
+					return 0;
+				}
+			}
 		}
 	} __STATIC_ELSE ((sizeof(sigset_t) % __SIZEOF_POINTER__) == 0) {
 		__SIZE_TYPE__ __i;
 		for (__i = 0; __i < sizeof(sigset_t); ++__i) {
-			if (((__BYTE_TYPE__ *)__set)[__i] != 0)
+			if (((__BYTE_TYPE__ *)__set)[__i] != (__BYTE_TYPE__)-1)
 				return 0;
 		}
 	}
@@ -382,7 +406,6 @@ __NOTHROW(__hybrid_private_sigisemptyset)(sigset_t const *__restrict __set) {
 }
 __NAMESPACE_INT_END
 __DECL_END
-#endif /* !HAVE_SIGISEMPTYSET && (!__USE_GNU || NO_SIGISEMPTYSET) */
 
 #define __hybrid_preemption_flag_t sigset_t
 #ifdef __NO_XBLOCK
@@ -392,35 +415,35 @@ __DECL_BEGIN
 __NAMESPACE_INT_BEGIN
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
-	sigset_t __hpp_nss;
-	__hybrid_sigfillset(&__hpp_nss);
-	(void)sigprocmask(SIG_SETMASK, &__hpp_nss, __p_flag);
+	sigset_t __hpp_oss;
+	__hybrid_sigfillset(&__hpp_oss);
+	(void)sigprocmask(SIG_SETMASK, &__hpp_oss, __p_flag);
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
 	sigset_t __hpio_nss;
 	(void)sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
-	return !__hybrid_sigisemptyset(&__hpio_nss)
+	return !__hybrid_sigisfullset(&__hpio_nss)
 }
 __NAMESPACE_INT_END
 __DECL_END
 #else /* __NO_XBLOCK */
 #define __hybrid_preemption_pushoff(p_flag)                 \
 	__XBLOCK({                                              \
-		sigset_t __hpp_nss;                                 \
-		__hybrid_sigfillset(&__hpp_nss);                    \
-		(void)sigprocmask(SIG_SETMASK, &__hpp_nss, p_flag); \
+		sigset_t __hpp_oss;                                 \
+		__hybrid_sigfillset(&__hpp_oss);                    \
+		(void)sigprocmask(SIG_SETMASK, &__hpp_oss, p_flag); \
 	})
 #define __hybrid_preemption_ison()                              \
 	__XBLOCK({                                                  \
 		struct __sigset_struct __hpio_nss;                      \
 		(void)sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss); \
-		__XRETURN !__hybrid_sigisemptyset(&__hpio_nss);         \
+		__XRETURN !__hybrid_sigisfullset(&__hpio_nss);          \
 	})
 #endif /* !__NO_XBLOCK */
 
 #define __hybrid_preemption_pop(p_flag)   (void)sigprocmask(SIG_SETMASK, p_flag, __NULLPTR)
-#define __hybrid_preemption_wason(p_flag) (!__hybrid_sigisemptyset(p_flag))
+#define __hybrid_preemption_wason(p_flag) (!__hybrid_sigisfullset(p_flag))
 #endif /* SIG_SETMASK */
 #endif /* !__hybrid_preemption_flag_t */
 #endif /* !__hybrid_preemption_flag_t */

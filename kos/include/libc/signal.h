@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea193a5e */
+/* HASH CRC-32:0xdcfa31e6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,11 +52,11 @@
 #define ____libc_setsigmaskfullptr_defined
 #define __libc_setsigmaskfullptr __libc_core_setsigmaskfullptr
 #endif /* !____libc_setsigmaskfullptr_defined && ____libc_core_setsigmaskfullptr_defined */
-/* >> sigisemptyset(3)
- * Check if the given signal set is empty
- * @return: != 0: Yes, it is empty
- * @return: == 0: No, at least 1 signal is contained */
-#define __libc_sigisemptyset __libc_core_sigisemptyset
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+#define __libc_sigisfullset __libc_core_sigisfullset
 
 #endif /* __CC__ */
 

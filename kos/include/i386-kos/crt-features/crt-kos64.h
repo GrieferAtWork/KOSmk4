@@ -4860,6 +4860,7 @@
 #define __CRT_HAVE_sigignore
 #define __CRT_HAVE_siginterrupt
 #define __CRT_HAVE_sigisemptyset
+#define __CRT_HAVE_sigisfullset
 #define __CRT_HAVE_sigismember
 #define __CRT_HAVE_siglongjmp
 #define __CRT_HAVE_signal
@@ -10625,6 +10626,7 @@
 #define __CRT_HAVE_KOS$sigignore
 #define __CRT_HAVE_KOS$siginterrupt
 #define __CRT_HAVE_KOS$sigisemptyset
+#define __CRT_HAVE_KOS$sigisfullset
 #define __CRT_HAVE_KOS$sigismember
 #define __CRT_HAVE_KOS$signal
 #define __CRT_HAVE_KOS$signalfd
@@ -15477,6 +15479,7 @@
 #define __CRT_HAVE_DOS$sigignore
 #define __CRT_HAVE_DOS$siginterrupt
 #define __CRT_HAVE_DOS$sigisemptyset
+#define __CRT_HAVE_DOS$sigisfullset
 #define __CRT_HAVE_DOS$sigismember
 #define __CRT_HAVE_DOS$signal
 #define __CRT_HAVE_DOS$signalfd

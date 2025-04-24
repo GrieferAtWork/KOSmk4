@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e743e04 */
+/* HASH CRC-32:0xa90b5802 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2090,6 +2090,20 @@ __CDECLARE(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),int,__NOTHROW_NCX,signandset,
  * @return: 0: Always returns `0' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(signandset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL signandset)(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signandset))(__set, __left, __right); })
 #endif /* !__CRT_HAVE_signandset */
+#ifdef __CRT_HAVE_sigisfullset
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,sigisfullset,(struct __sigset_struct const *__restrict __set),(__set))
+#else /* __CRT_HAVE_sigisfullset */
+#include <libc/local/signal/sigisfullset.h>
+/* >> sigisfullset(3)
+ * Check if the given signal set is full (ignoring SIGKILL and SIGSTOP)
+ * @return: != 0: Yes, it is full
+ * @return: == 0: No, at least 1 signal isn't masked */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigisfullset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL sigisfullset)(struct __sigset_struct const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisfullset))(__set); })
+#endif /* !__CRT_HAVE_sigisfullset */
 #endif /* __USE_KOS */
 #ifdef __USE_POSIX199309
 #ifdef __CRT_HAVE_sigwaitinfo
