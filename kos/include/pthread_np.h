@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf84aca7d */
+/* HASH CRC-32:0xb14a2f22 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,18 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <bits/os/sigstack.h>
+#include <bits/os/cpu_set.h>
 #include <bits/types.h>
 #include <pthread.h>
 
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __cpu_set_t_defined
+#define __cpu_set_t_defined
+typedef struct __cpu_set_struct cpu_set_t;
+#endif /* !__cpu_set_t_defined */
 
 #ifndef __pthread_switch_routine_t_defined
 #define __pthread_switch_routine_t_defined

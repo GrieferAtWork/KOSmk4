@@ -35,6 +35,8 @@
 %[insert:prefix(
 #include <bits/os/sigstack.h>
 )]%[insert:prefix(
+#include <bits/os/cpu_set.h>
+)]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <pthread.h>
@@ -43,6 +45,11 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __cpu_set_t_defined
+#define __cpu_set_t_defined
+typedef struct __cpu_set_struct cpu_set_t;
+#endif /* !__cpu_set_t_defined */
 
 #ifndef __pthread_switch_routine_t_defined
 #define __pthread_switch_routine_t_defined
