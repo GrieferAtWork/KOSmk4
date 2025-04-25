@@ -116,9 +116,9 @@ __asm__("__cxa_rethrow = libc_except_rethrow");
 //__asm__("__gxx_personality_v0 = libc_gxx_personality_v0");
 //#endif /* !GUARD_LIBC_LIBC_EXCEPT_PERSONALITY_C */
 
-#ifndef GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_S
+#ifndef DONT_REDIRECT___ubsan_handle_builtin_unreachable
 __asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreachable");
-#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_S */
+#endif /* !DONT_REDIRECT___ubsan_handle_builtin_unreachable */
 #endif /* __CC__ */
 
 #include <__crt.h>

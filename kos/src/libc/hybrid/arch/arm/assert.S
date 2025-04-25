@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_ARM_ASSERT_S
 #define GUARD_LIBC_HYBRID_ARCH_ARM_ASSERT_S 1
+#define DONT_REDIRECT___ubsan_handle_builtin_unreachable
 #define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 

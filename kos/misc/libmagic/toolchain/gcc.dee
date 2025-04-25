@@ -36,6 +36,7 @@ local final GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
 	"-feliminate-unused-debug-symbols",
 	"-feliminate-unused-debug-types",
 	"-fdelete-null-pointer-checks",
+	"-fenforce-eh-specs",
 	"-fpermissive", "-fexceptions",
 	"-fanalyzer"
 };

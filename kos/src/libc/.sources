@@ -39,6 +39,8 @@ BEGIN
 		 * up with a non-conforming library... */
 		"-fno-delete-null-pointer-checks",
 
+		/* This here prevents g++ from generating calls to `std::terminate()' */
+		"-fno-enforce-eh-specs",
 	})
 
 	CC_FLAGS({

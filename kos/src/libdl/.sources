@@ -34,6 +34,9 @@ BEGIN
 		 * getting  compiler warnings for invalid internal usage, as
 		 * well as when compiling programs with invalid usage. */
 		"-fno-delete-null-pointer-checks",
+
+		/* This here prevents g++ from generating calls to `std::terminate()' */
+		"-fno-enforce-eh-specs",
 	})
 
 	if (TARGET_ARCH == "x86_64") {

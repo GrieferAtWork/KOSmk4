@@ -4,6 +4,7 @@
 options["COMPILE.language"] = "c";
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.remove("-fno-rtti");
+gcc_opt.remove("-fno-enforce-eh-specs");
 gcc_opt.append("-fexceptions");
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
