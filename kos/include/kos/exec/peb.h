@@ -45,8 +45,8 @@ __LIBC struct process_peb __peb;
 #endif /* __KOS__ && !__KERNEL__ */
 
 /* Helper functions to lookup an environment variable within a given PEB. */
-__LOCAL __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL process_peb_getenv)(struct process_peb *__restrict self,
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
+__NOTHROW_NCX(__LIBCCALL process_peb_getenv)(struct process_peb const *__restrict self,
                                              char const *__restrict varname) {
 	char **iter, *env;
 	__size_t varlen = __libc_strlen(varname);

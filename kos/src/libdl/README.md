@@ -36,7 +36,7 @@
 		- As such, changes made to `__peb.pp_envp` and/or `__peb.pp_envp[argi]` and/or `__peb.pp_envp[argi][chari]` may or may not affect later calls made to any of the RTLD functions exposed through `<dlfcn.h>` (with or without `defined(_KOS_SOURCE)`)
 - A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing a custom callback to initialize said data. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3D)`).
 	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols (whereas `STT_GNU_IFUNC` can only be used for function symbols), and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare data objects of `INTERN` or `PRIVATE` visibility.
-	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries without any additional relocations, such as for example:  
+	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries without any additional relocations or static initializers, such as for example:  
 
 	  ```c
 	  extern pid_t procpid;
@@ -76,14 +76,14 @@
 
 
 ### Changes to ELF specs (i386/x86_64)
-- Though not required, the KOS RLTD link driver (`libdl.so`) accepts the following relocation types in shared libraries and application binaries alike
+- Though not required, the KOS RTLD link driver (`libdl.so`) accepts the following relocation types in shared libraries and application binaries alike
 	- `R_386_8`, `R_X86_64_8` (unsigned 8-bit integer)
 	- `R_386_PC8`, `R_X86_64_PC8` (signed, relocation-relative 8-bit integer)
 	- `R_386_16`, `R_X86_64_16` (unsigned 16-bit integer)
 	- `R_386_PC16`, `R_X86_64_PC16` (signed, relocation-relative 16-bit integer)
-	- Whether or not the RLTD link driver considers it a fatal error for these relocations to over- or under-flow following zero-/sign-extension is undefined.
+	- Whether or not the RTLD link driver considers it a fatal error for these relocations to over- or under-flow following zero-/sign-extension is undefined.
 - The value written by relocations `R_386_TLS_DTPMOD32` and `R_X86_64_DTPMOD64` is equal to the value stored in `GOT[1]` (as used by lazy relocation). Additionally, such a value may be used as a `handle`-value normally returned by `dlopen(3D)`, and accepted by a number of functions such as `dlsym(3D)` or `dlmodulename(3D)` (a KOS-specific `<dlfcn.h>` extension)
 - i386 only:
 	- ...
 - x86_64 only:
-	- No code apart of the KOS RLTD link driver relies on the presence of the *red zone* (unlike other libraries such as `libc.so`), and can thus be used by code compiled with or without *red zone* support
+	- No code apart of the KOS RTLD link driver relies on the presence of the *red zone* (unlike other libraries such as `libc.so`), and can thus be used by code compiled with or without *red zone* support

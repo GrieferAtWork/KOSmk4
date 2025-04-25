@@ -353,100 +353,102 @@ global class GCCToolchain: Toolchain {
 						}
 						print log: l.rstrip();
 					}
-				} else for (local l: r) {
-					/* Format errors */
-					if (l.startswith("In file included from ")) {
-						try {
-							local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
-							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
-							print log: "(",;
-							print log: line.strip().rstrip(","),;
-							print log: "): In file included from here...";
-							continue;
-						} catch (...) {
-						}
-					} else if (l.startswith("                 from")) {
-						try {
-							local filename, line = l.scanf(" from %[^:]:%[^:]")...;
-							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
-							print log: "(",;
-							print log: line.rstrip().rstrip(",").rstrip(),;
-							print log: "): ... Which was included here";
-							continue;
-						} catch (...) {
-						}
-					} else if (l.startswith("    inlined from")) {
-						try {
-							local fundecl, filename, line, column;
+				} else {
+					for (local l: r) {
+						/* Format errors */
+						if (l.startswith("In file included from ")) {
 							try {
-								fundecl, filename, line, column =
-									l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:%[^:]:")...;
-								column = column.strip().rstrip(",").rstrip();
+								local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
+								print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+								print log: "(",;
+								print log: line.strip().rstrip(","),;
+								print log: "): In file included from here...";
+								continue;
 							} catch (...) {
-								fundecl, filename, line =
-									l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
-								column = none;
+							}
+						} else if (l.startswith("                 from")) {
+							try {
+								local filename, line = l.scanf(" from %[^:]:%[^:]")...;
+								print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+								print log: "(",;
+								print log: line.rstrip().rstrip(",").rstrip(),;
+								print log: "): ... Which was included here";
+								continue;
+							} catch (...) {
+							}
+						} else if (l.startswith("    inlined from")) {
+							try {
+								local fundecl, filename, line, column;
+								try {
+									fundecl, filename, line, column =
+										l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:%[^:]:")...;
+									column = column.strip().rstrip(",").rstrip();
+								} catch (...) {
+									fundecl, filename, line =
+										l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
+									column = none;
+								}
+								print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+								print log: "(",;
+								print log: line.strip(),;
+								if (column) {
+									print log: ",",;
+									print log: column,;
+								}
+								print log: "): inlined from '",;
+								print log: fundecl,;
+								print log: "':";
+								continue;
+							} catch (...) {
+							}
+						}
+						local col = l.find(":");
+						if (col >= 0 && !l.isanyspace(0, col)) {
+again_handle_col:
+							local filename = l[:col];
+							local line, column = none;
+							local col2 = l.find(":", col + 1);
+							if (col2 >= 0) {
+								line = l[col + 1:col2];
+								if (line.isdigit()) {
+									local col3 = l.find(":", col2 + 1);
+									if (col3 >= 0) {
+										column = l[col2 + 1:col3];
+										if (column.isdigit()) {
+											col2 = col3;
+										} else {
+											column = none;
+										}
+									}
+								} else if (
+										(line.startswith("/") ||
+										line.startswith("\\"))&&
+										!l.isanyspace(0, col2)) {
+									col = col2;
+									goto again_handle_col;
+								} else {
+									col2 = col;
+									line = none;
+								}
+							} else {
+								line = none;
+								col2 = col;
 							}
 							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
-							print log: "(",;
-							print log: line.strip(),;
-							if (column) {
-								print log: ",",;
-								print log: column,;
-							}
-							print log: "): inlined from '",;
-							print log: fundecl,;
-							print log: "':";
-							continue;
-						} catch (...) {
-						}
-					}
-					local col = l.find(":");
-					if (col >= 0 && !l.isanyspace(0, col)) {
-again_handle_col:
-						local filename = l[:col];
-						local line, column = none;
-						local col2 = l.find(":", col + 1);
-						if (col2 >= 0) {
-							line = l[col + 1:col2];
-							if (line.isdigit()) {
-								local col3 = l.find(":", col2 + 1);
-								if (col3 >= 0) {
-									column = l[col2 + 1:col3];
-									if (column.isdigit()) {
-										col2 = col3;
-									} else {
-										column = none;
-									}
+							if (line !is none) {
+								print log: "(",;
+								print log: line,;
+								if (column !is none) {
+									print log: ",",;
+									print log: column,;
 								}
-							} else if (
-									(line.startswith("/") ||
-									line.startswith("\\"))&&
-									!l.isanyspace(0, col2)) {
-								col = col2;
-								goto again_handle_col;
-							} else {
-								col2 = col;
-								line = none;
+								print log: ")",;
 							}
-						} else {
-							line = none;
-							col2 = col;
+							print log: l[col2:].rstrip();
+							continue;
 						}
-						print log: normalizeFilenameForLog(filename.decode("utf-8")),;
-						if (line !is none) {
-							print log: "(",;
-							print log: line,;
-							if (column !is none) {
-								print log: ",",;
-								print log: column,;
-							}
-							print log: ")",;
-						}
-						print log: l[col2:].rstrip();
-						continue;
+						print log: l.rstrip();
 					}
-					print log: l.rstrip();
 				}
 				r.close();
 			} catch (...) {

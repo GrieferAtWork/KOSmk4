@@ -1409,12 +1409,14 @@ INTERN NONNULL((1)) void
 NOTHROW_NCX(CC DlSection_Destroy)(NCX DlSection *self)
 		THROWS(E_SEGFAULT) {
 	DlModule *mod;
+
 	/* Unmap section data. */
 	if ((self->ds_flags & DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
-		sys_munmap(self->ds_data, self->ds_size);
+		(void)sys_munmap(self->ds_data, self->ds_size);
+
 	/* Unmap decompressed section data. */
 	if (self->ds_cdata != (void *)-1 && self->ds_cdata != self->ds_data)
-		sys_munmap(self->ds_cdata, self->ds_csize);
+		(void)sys_munmap(self->ds_cdata, self->ds_csize);
 again:
 	DlSection_ModuleWrite(self);
 	mod = self->ds_module;
@@ -1609,14 +1611,14 @@ struct aux_section_def {
 /* Auxiliary section detection rules. (sort by most-useful) */
 PRIVATE struct aux_section_def const aux_sections[] = {
 	/* clang-format off */
-	{ ".eh_frame_hdr", 0, 0,                                   PT_GNU_EH_FRAME },
+	{ ".eh_frame_hdr", 0,                  0,                  PT_GNU_EH_FRAME },
 	{ ".text",         PF_X | PF_W | PF_R, PF_X | PF_R,        PT_LOAD },
 	{ ".rodata",       PF_X | PF_W | PF_R, PF_R,               PT_LOAD },
 	{ ".data",         PF_X | PF_W | PF_R, PF_W | PF_R,        PT_LOAD },
-	{ ".dynamic",      0, 0,                                   PT_DYNAMIC },
-	{ ".interp",       0, 0,                                   PT_INTERP },
+	{ ".dynamic",      0,                  0,                  PT_DYNAMIC },
+	{ ".interp",       0,                  0,                  PT_INTERP },
 	{ ".tdata",        PF_X | PF_W | PF_R, PF_W | PF_R,        PT_TLS },
-	{ ".note",         0, 0,                                   PT_NOTE },
+	{ ".note",         0,                  0,                  PT_NOTE },
 	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
 	/* clang-format on */
 #define _AUX_SECTION_MIN      9
@@ -1830,6 +1832,7 @@ create_section_from_addr:
 		unsigned int prot;
 		if unlikely(modfd < 0)
 			goto err_r;
+
 		/* Manually mmap() this section. */
 		prot = PROT_READ;
 		if (result->ds_elfflags & SHF_WRITE)
@@ -1863,7 +1866,7 @@ PRIVATE WUNUSED NONNULL((1)) void
 NOTHROW(CC destroy_aux_section)(DlSection *__restrict self) {
 	/* Unmap section data. */
 	if ((self->ds_flags & DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
-		sys_munmap(self->ds_data, self->ds_size);
+		(void)sys_munmap(self->ds_data, self->ds_size);
 	free(self);
 }
 
@@ -2136,7 +2139,7 @@ again_read_section:
 				goto err;
 			}
 			if unlikely(!atomic_cmpxch(&result->ds_data, (void *)-1, base))
-				sys_munmap(base, info.dsi_size);
+				(void)sys_munmap(base, info.dsi_size);
 		}
 	} else {
 		size_t index;
@@ -2269,7 +2272,7 @@ again_read_elf_section:
 				goto err;
 			}
 			if unlikely(!atomic_cmpxch(&result->ds_data, (void *)-1, base))
-				sys_munmap(base, sect->sh_size);
+				(void)sys_munmap(base, sect->sh_size);
 		}
 	}
 	return result;
@@ -2569,7 +2572,7 @@ err_bad_section_size:
 	             libdl_dlsectionname(sect));
 	goto err;
 err_munmap:
-	sys_munmap(result, *psection_csize);
+	(void)sys_munmap(result, *psection_csize);
 err:
 	return (void *)-1;
 }

@@ -787,8 +787,6 @@ INTDEF WUNUSED char const *FCALL dl_strerrorname_np(errno_t error);
 INTDEF ATTR_RETNONNULL WUNUSED char const *FCALL
 dl_strerrorname_np_s(errno_t error, char fallback_buf[DL_STRERRORNAME_FALLBACK_LEN]);
 
-//			libdl_dlsym((DlModule *)RTLD_DEFAULT, "strerrorname_np");
-
 
 /* Set to true if the sys_debugtrap() system call is disabled. */
 INTDEF bool sys_debugtrap_disabled;

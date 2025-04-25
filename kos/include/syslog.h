@@ -29,9 +29,8 @@
 /* (#) Portability: mintlib       (/include/syslog.h) */
 /* (#) Portability: musl libc     (/include/syslog.h) */
 /* (#) Portability: uClibc        (/include/syslog.h) */
+/*!always_includes <sys/syslog.h>*/
 #ifndef _SYSLOG_H
 #define _SYSLOG_H 1
-
 #include <sys/syslog.h>
-
 #endif /* !_SYSLOG_H */

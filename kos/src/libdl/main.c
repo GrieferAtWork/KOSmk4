@@ -184,7 +184,7 @@ PRIVATE NONNULL((1)) void FCALL dl_loadenv(char **envp) {
 #ifdef HAVE_dl_trace_loaded_objects
 		if (ISENV("TRACE_LOADED_OBJECTS")) {
 			if (*value != '\0') {
-				/* We do this one really dirtily by modifying out own code (so we don't
+				/* We do this one really dirtily by modifying our own code (so we don't
 				 * need any sort of branch or check in order to dump the list of loaded
 				 * libraries instead of initializing any of them) */
 				sys_Xmprotect((void *)&DlModule_RunAllStaticInitializers,
