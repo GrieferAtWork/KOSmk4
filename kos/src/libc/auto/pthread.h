@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80d6c23b */
+/* HASH CRC-32:0xfe9fb9f0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include <pthread_np.h>
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_exit(3)
  * Terminate calling thread.
@@ -1043,6 +1044,16 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_resume_np)(pthread_t self);
  * @return: EOK:   Success
  * @return: ESRCH: The thread has already been terminated */
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getunique_np)(pthread_t self, pthread_id_np_t *ptid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self, pthread_id_np_t *ptid);
 #endif /* !__KERNEL__ */
 
 DECL_END

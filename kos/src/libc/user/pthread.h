@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cb0882 */
+/* HASH CRC-32:0xb35f1a3b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -887,7 +887,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_suspend_all_np)(void);
 /* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_np)(void);
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_multi_np)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

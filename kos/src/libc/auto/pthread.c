@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ed94761 */
+/* HASH CRC-32:0xa6108ffb */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,6 +392,24 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_np)(pthread_t self) {
 	return libc_pthread_resume2_np(self, NULL);
 }
 #endif /* !__KERNEL__ */
+#define crt_pthread_gettid_np libc_pthread_gettid_np
+#ifndef __KERNEL__
+#include <libc/errno.h>
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self,
+                                                pthread_id_np_t *ptid) {
+	if unlikely((*ptid = crt_pthread_gettid_np(self)) == 0) {
+
+		return ESRCH;
+
+
+
+	}
+	return EOK;
+}
+#endif /* !__KERNEL__ */
 
 DECL_END
 
@@ -417,6 +435,7 @@ DEFINE_PUBLIC_ALIAS_P(pthread_attr_setcreatesuspend_np,libc_pthread_attr_setcrea
 DEFINE_PUBLIC_ALIAS_P(thr_suspend,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend_np,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_resume_np,libc_pthread_resume_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_getunique_np,libc_pthread_getunique_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_id_np_t *ptid),(self,ptid));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

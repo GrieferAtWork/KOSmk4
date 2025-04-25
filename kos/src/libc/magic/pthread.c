@@ -80,6 +80,9 @@
 %[define_type_class(__pthread_key_t = "TIn(__SIZEOF_PTHREAD_KEY_T)")]
 %[define_type_class(__pthread_once_t = "TIn(__SIZEOF_PTHREAD_ONCE_T)")]
 
+%(auto_header){
+#include <pthread_np.h>
+}
 
 %[insert:prefix(
 #include <features.h>
@@ -752,6 +755,7 @@ $errno_t pthread_getresult_np(pthread_t self, [[out_opt]] void **thread_return);
 @@@return: EOK:   Success
 @@@return: EBUSY: The thread has yet to terminate
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("pthread_peekjoin_np")]] /* BSD-specific name */
 $errno_t pthread_tryjoin_np(pthread_t self, [[out_opt]] void **thread_return);
 
 %struct timespec;
@@ -762,7 +766,7 @@ $errno_t pthread_tryjoin_np(pthread_t self, [[out_opt]] void **thread_return);
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
-[[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[guard, cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin_np")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin64_np", "__pthread_timedjoin_np64")]]
 [[userimpl, requires($has_function(crt_pthread_timedjoin32_np) ||
@@ -794,7 +798,7 @@ $errno_t crt_pthread_timedjoin32_np(pthread_t self, [[out_opt]] void **thread_re
                                     [[in_opt]] struct timespec32 const *abstime);
 
 [[cp, preferred_time64_variant_of(pthread_timedjoin_np), doc_alias("pthread_timedjoin_np")]]
-[[time64_export_alias("__pthread_timedjoin_np64")]]
+[[guard, time64_export_alias("__pthread_timedjoin_np64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(crt_pthread_timedjoin32_np)]]
 $errno_t pthread_timedjoin64_np(pthread_t self, [[out_opt]] void **thread_return,
@@ -1088,6 +1092,7 @@ $errno_t pthread_attr_setstack([[inout]] pthread_attr_t *self,
 @@@return: EOK:    Success
 @@@return: EINVAL: The given set contains a non-existant CPU
 @@@return: ENOMEM: Insufficient memory
+[[guard]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("__pthread_attr_setaffinity_np")]]
 $errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *self, size_t cpusetsize,
@@ -1097,6 +1102,7 @@ $errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *self, size_t cpus
 @@Get cpuset on which the thread will be allowed to run
 @@@return: EOK:    Success
 @@@return: EINVAL: `cpusetsize' is too small
+[[guard]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getaffinity_np([[in]] pthread_attr_t const *self, size_t cpusetsize,
                                      [[out_opt]] cpu_set_t *cpuset);
@@ -1121,6 +1127,7 @@ $errno_t pthread_setattr_default_np([[in]] pthread_attr_t const *attr);
 @@and destroyed with `pthread_attr_destroy(3)' when no longer needed
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory
+[[export_alias("pthread_attr_get_np")]] /* BSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getattr_np(pthread_t self, [[out]] pthread_attr_t *attr);
 %#endif /* __USE_GNU */
@@ -1162,7 +1169,7 @@ $errno_t pthread_setschedprio(pthread_t self, int prio);
 @@Get thread name visible in the kernel and its interfaces
 @@@return: EOK:    Success
 @@@return: ERANGE: The given `buflen' is too small
-[[export_alias("pthread_get_name_np")]] /* OpenBSD-specific name */
+[[guard, export_alias("pthread_get_name_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getname_np(pthread_t self,
                             [[out(? <= buflen)]] char *buf,
@@ -1172,8 +1179,8 @@ $errno_t pthread_getname_np(pthread_t self,
 @@Set thread name visible in the kernel and its interfaces
 @@@return: EOK:    Success
 @@@return: ERANGE: The given `name' is too long
-[[export_alias("pthread_set_name_np")]] /* OpenBSD-specific name */
-[[export_alias("cthread_set_name")]]    /* Hurd compat */
+[[guard, export_alias("pthread_set_name_np")]] /* OpenBSD-specific name */
+[[export_alias("cthread_set_name")]]           /* Hurd compat */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setname_np(pthread_t self,
                             [[in]] const char *name);
@@ -1186,10 +1193,17 @@ $errno_t pthread_setname_np(pthread_t self,
 @@If `self' has already terminated, 0 is returned
 @@@return: * : The TID of the given thread
 @@@return: 0 : The given `self' has already terminated
-[[guard, pure, wunused]]
+[[userimpl, guard, pure, wunused]]
 [[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$pid_t pthread_gettid_np(pthread_t self);
+[[requires_function(pthread_getunique_np)]]
+[[impl_include("<libc/errno.h>")]]
+$pid_t pthread_gettid_np(pthread_t self) {
+	pid_t result;
+	if (pthread_getunique_np(self, &result) != EOK)
+		result = 0;
+	return result;
+}
 
 @@>> pthread_getpidfd_np(3)
 @@Return a PIDfd for `self'. If not already allocated, allocate a PIDfd  lazily.
@@ -1284,7 +1298,7 @@ $errno_t pthread_yield(void) = sched_yield;
 @@Limit specified thread `self' to run only on the processors represented in `cpuset'
 @@@return: EOK:   Success
 @@@return: ESRCH: `self' has already exited
-[[section(".text.crt{|.dos}.sched.pthread_ext")]]
+[[guard, section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setaffinity_np(pthread_t self, size_t cpusetsize,
                                 [[in_opt]] cpu_set_t const *cpuset);
@@ -1293,6 +1307,7 @@ $errno_t pthread_setaffinity_np(pthread_t self, size_t cpusetsize,
 @@Get bit set in `cpuset' representing the processors `self' can run on
 @@@return: EOK:   Success
 @@@return: ESRCH: `self' has already exited
+[[guard]]
 [[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getaffinity_np(pthread_t self, size_t cpusetsize,
@@ -3156,13 +3171,50 @@ $errno_t pthread_resume_np(pthread_t self) {
 @@@return: ENOMEM:    Insufficient memory
 @@@return: EOVERFLOW: The suspension counter of some thread can't go any higher
 [[guard, decl_include("<bits/types.h>")]]
+[[export_alias("pthread_single_np")]] /* BSD-specific name */
 $errno_t pthread_suspend_all_np();
+
+
 
 @@>> pthread_resume_all_np(3)
 @@Calls `pthread_continue_np(3)' once for every running thread but the calling one.
 @@This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)'
-[[guard]]
-void pthread_resume_all_np();
+[[hidden, decl_include("<bits/types.h>")]] /* Only exposed in <pthread_np.h> */
+[[preferred_export_alias("pthread_resume_all_np")]]
+$errno_t pthread_multi_np(); /* BSD-specific name */
+
+%[insert:guarded_function(pthread_resume_all_np = pthread_multi_np)]
+
+
+%[define_replacement(pthread_id_np_t = __pid_t)]
+
+[[ignore, nocrt, alias("pthread_gettid_np")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$pid_t crt_pthread_gettid_np(pthread_t self);
+%(auto_source){
+#define crt_pthread_gettid_np libc_pthread_gettid_np
+}
+
+
+@@>> pthread_getunique_np(3)
+@@Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms.
+[[hidden, pure, wunused]]
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<libc/errno.h>")]]
+[[requires_function(crt_pthread_gettid_np)]]
+$errno_t pthread_getunique_np(pthread_t self, pthread_id_np_t *ptid) {
+	if unlikely((*ptid = crt_pthread_gettid_np(self)) == 0) {
+@@pp_ifdef ESRCH@@
+		return ESRCH;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	return EOK;
+}
+
+
 %#endif /* __USE_KOS */
 
 

@@ -4610,6 +4610,7 @@
 #define __CRT_HAVE_pthread_attachpidfd_np
 #define __CRT_HAVE_pthread_attachtid_np
 #define __CRT_HAVE_pthread_attr_destroy
+#define __CRT_HAVE_pthread_attr_get_np
 #define __CRT_HAVE_pthread_attr_getaffinity_np
 #define __CRT_HAVE_pthread_attr_getdetachstate
 #define __CRT_HAVE_pthread_attr_getguardsize
@@ -4677,7 +4678,9 @@
 #define __CRT_HAVE_pthread_getschedparam
 #define __CRT_HAVE_pthread_getspecific
 #define __CRT_HAVE_pthread_getspecificptr_np
+#define __CRT_HAVE_pthread_getthreadid_np
 #define __CRT_HAVE_pthread_gettid_np
+#define __CRT_HAVE_pthread_getunique_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
 #define __CRT_HAVE_pthread_key_create_once_np
@@ -4685,6 +4688,7 @@
 #define __CRT_HAVE_pthread_kill
 #define __CRT_HAVE_pthread_main_np
 #define __CRT_HAVE_pthread_mainthread_np
+#define __CRT_HAVE_pthread_multi_np
 #define __CRT_HAVE_pthread_mutex_consistent
 #define __CRT_HAVE_pthread_mutex_consistent_np
 #define __CRT_HAVE_pthread_mutex_destroy
@@ -4716,6 +4720,7 @@
 #define __CRT_HAVE_pthread_mutexattr_settype
 #define __CRT_HAVE_pthread_num_processors_np
 #define __CRT_HAVE_pthread_once
+#define __CRT_HAVE_pthread_peekjoin_np
 #define __CRT_HAVE_pthread_resume2_np
 #define __CRT_HAVE_pthread_resume_all_np
 #define __CRT_HAVE_pthread_resume_np
@@ -4755,6 +4760,7 @@
 #define __CRT_HAVE_pthread_setspecific
 #define __CRT_HAVE_pthread_sigmask
 #define __CRT_HAVE_pthread_sigqueue
+#define __CRT_HAVE_pthread_single_np
 #define __CRT_HAVE_pthread_spin_destroy
 #define __CRT_HAVE_pthread_spin_init
 #define __CRT_HAVE_pthread_spin_lock

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96906bfe */
+/* HASH CRC-32:0x57e8d2b8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pthread_stackseg_np_defined
 #define __local_pthread_stackseg_np_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_getattr_np) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)))
+#if (defined(__CRT_HAVE_pthread_getattr_np) || defined(__CRT_HAVE_pthread_attr_get_np)) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)))
 #include <bits/os/sigstack.h>
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
@@ -51,7 +51,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_pthread_attr_getstack_defined */
 #ifndef __local___localdep_pthread_getattr_np_defined
 #define __local___localdep_pthread_getattr_np_defined
+#ifdef __CRT_HAVE_pthread_getattr_np
 __CREDIRECT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_getattr_np,(__pthread_t __self, __pthread_attr_t *__attr),pthread_getattr_np,(__self,__attr))
+#elif defined(__CRT_HAVE_pthread_attr_get_np)
+__CREDIRECT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_getattr_np,(__pthread_t __self, __pthread_attr_t *__attr),pthread_attr_get_np,(__self,__attr))
+#else /* ... */
+#undef __local___localdep_pthread_getattr_np_defined
+#endif /* !... */
 #endif /* !__local___localdep_pthread_getattr_np_defined */
 __LOCAL_LIBC(pthread_stackseg_np) __ATTR_OUT(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_stackseg_np))(__pthread_t __self, struct sigaltstack *__sinfo) {
@@ -78,7 +84,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pthread_stackseg_np_defined
 #define __localdep_pthread_stackseg_np __LIBC_LOCAL_NAME(pthread_stackseg_np)
 #endif /* !__local___localdep_pthread_stackseg_np_defined */
-#else /* __CRT_HAVE_pthread_getattr_np && (__CRT_HAVE_pthread_attr_getstack || (__CRT_HAVE_pthread_attr_getstackaddr && __CRT_HAVE_pthread_attr_getstacksize)) */
+#else /* (__CRT_HAVE_pthread_getattr_np || __CRT_HAVE_pthread_attr_get_np) && (__CRT_HAVE_pthread_attr_getstack || (__CRT_HAVE_pthread_attr_getstackaddr && __CRT_HAVE_pthread_attr_getstacksize)) */
 #undef __local_pthread_stackseg_np_defined
-#endif /* !__CRT_HAVE_pthread_getattr_np || (!__CRT_HAVE_pthread_attr_getstack && (!__CRT_HAVE_pthread_attr_getstackaddr || !__CRT_HAVE_pthread_attr_getstacksize)) */
+#endif /* (!__CRT_HAVE_pthread_getattr_np && !__CRT_HAVE_pthread_attr_get_np) || (!__CRT_HAVE_pthread_attr_getstack && (!__CRT_HAVE_pthread_attr_getstackaddr || !__CRT_HAVE_pthread_attr_getstacksize)) */
 #endif /* !__local_pthread_stackseg_np_defined */

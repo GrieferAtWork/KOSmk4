@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4831239 */
+/* HASH CRC-32:0x8c77867a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,7 +146,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,thr_main,(void),pthread_ma
  * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,thr_main,(void),())
-#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ) || defined(__CRT_HAVE_pthread_getthreadid_np)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> thr_main(3)
  * Another  one of these non-restricted, but solaris-specific functions:
@@ -497,7 +497,7 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,thr_sigse
 /* >> thr_stksegment(3)
  * Wrapper for `pthread_stackseg_np(pthread_self(), sinfo)' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_stksegment,(stack_t *__sinfo),(__sinfo))
-#elif (defined(__CRT_HAVE_pthread_stackseg_np) || (defined(__CRT_HAVE_pthread_getattr_np) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))))) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))
+#elif (defined(__CRT_HAVE_pthread_stackseg_np) || ((defined(__CRT_HAVE_pthread_getattr_np) || defined(__CRT_HAVE_pthread_attr_get_np)) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))))) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))
 #include <libc/local/thread/thr_stksegment.h>
 /* >> thr_stksegment(3)
  * Wrapper for `pthread_stackseg_np(pthread_self(), sinfo)' */

@@ -35,6 +35,8 @@
 %[insert:prefix(
 #include <bits/os/sigstack.h>
 )]%[insert:prefix(
+#include <bits/types.h>
+)]%[insert:prefix(
 #include <pthread.h>
 )]%{
 
@@ -52,13 +54,36 @@ typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
 typedef struct sigaltstack stack_t;
 #endif /* !__stack_t_defined */
 
+#ifndef __pthread_id_np_t_defined
+#define __pthread_id_np_t_defined
+typedef __pid_t pthread_id_np_t;
+#endif /* !__pthread_id_np_t_defined */
+
 }
+
+%[define_replacement(pthread_id_np_t = __pid_t)]
+
 
 %[insert:function(pthread_mutexattr_getkind_np = pthread_mutexattr_gettype)]
 %[insert:function(pthread_mutexattr_setkind_np = pthread_mutexattr_settype)]
 %[insert:function(pthread_get_name_np = pthread_getname_np)]
+%[insert:extern(pthread_getname_np)]
 %[insert:function(pthread_set_name_np = pthread_setname_np)]
+%[insert:extern(pthread_setname_np)]
+%[insert:function(pthread_attr_get_np = pthread_getattr_np)]
 %[insert:extern(pthread_main_np)]
+%[insert:extern(pthread_attr_getaffinity_np)]
+%[insert:extern(pthread_attr_setaffinity_np)]
+%[insert:extern(pthread_getaffinity_np)]
+%[insert:function(pthread_multi_np = pthread_multi_np)]
+%[insert:function(pthread_single_np = pthread_suspend_all_np)]
+%[insert:function(pthread_peekjoin_np = pthread_tryjoin_np)]
+%[insert:extern(pthread_setaffinity_np)]
+%[insert:extern(pthread_timedjoin_np)]
+%[insert:extern(pthread_timedjoin64_np)]
+
+[[decl_include("<bits/types.h>")]]
+pthread_id_np_t pthread_getthreadid_np() = gettid;
 
 @@>> pthread_stackseg_np(3)
 @@Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()'
@@ -91,7 +116,9 @@ $errno_t pthread_stackseg_np(pthread_t self, [[out]] stack_t *sinfo) {
 %[insert:extern(pthread_continue_np)]
 %[insert:guarded_function(pthread_unsuspend_np = pthread_continue_np)]
 %[insert:extern(pthread_suspend_all_np)]
-%[insert:extern(pthread_resume_all_np)]
+%[insert:guarded_function(pthread_resume_all_np = pthread_multi_np)]
+
+%[insert:function(pthread_getunique_np = pthread_getunique_np)]
 
 %{
 

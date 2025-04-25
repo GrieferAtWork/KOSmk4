@@ -607,6 +607,7 @@ $pid_t getpid();
 @@THIS_THREAD->PID
 [[guard, const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("__threadid", "?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ")]]
+[[export_alias("pthread_getthreadid_np")]]
 [[section(".text.crt{|.dos}.sched.thread")]]
 $pid_t gettid();
 %#endif /* __USE_KOS */

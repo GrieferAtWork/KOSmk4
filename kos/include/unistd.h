@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x265a24d6 */
+/* HASH CRC-32:0xc8412a1c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -659,6 +659,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),__thread
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ,())
+#elif defined(__CRT_HAVE_pthread_getthreadid_np)
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),pthread_getthreadid_np,())
 #else /* ... */
 #undef __gettid_defined
 #endif /* !... */

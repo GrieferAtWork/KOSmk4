@@ -133,9 +133,9 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 * >>    25b2b:	e9 a0 ff ff ff       	jmp    25ad0 <.plt>
 	 *
 	 * DL Initialization:
-	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x4) == MODULE
-	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x8) == &dl_load_lazy_relocation
-	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0xc) == 0x25b26 (Pointer to the `push   $0x20')
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x4)  == MODULE
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x8)  == &dl_load_lazy_relocation
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x1c) == module->dm_loadaddr + 0x25b26 (Pointer to the `push   $0x20')
 	 *
 	 * Lazy linkage procedure:
 	 *  - User-code calls `dlsym(3D)', which is compiled as `call dlsym@plt'

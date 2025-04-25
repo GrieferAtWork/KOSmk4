@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d137c89 */
+/* HASH CRC-32:0xd585016a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1712,6 +1712,7 @@ DEFINE_PUBLIC_ALIAS(DOS$cthread_exit, libd_pthread_exit);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_exit, libd_pthread_exit);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_join, libd_pthread_join);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getresult_np, libd_pthread_getresult_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_peekjoin_np, libd_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_tryjoin_np, libd_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_timedjoin_np, libd_pthread_timedjoin_np);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
@@ -1749,6 +1750,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setaffinity_np, libd_pthread_attr_setaffini
 DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_getaffinity_np, libd_pthread_attr_getaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getattr_default_np, libd_pthread_getattr_default_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setattr_default_np, libd_pthread_setattr_default_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_get_np, libd_pthread_getattr_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getattr_np, libd_pthread_getattr_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setschedparam, libd_pthread_setschedparam);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getschedparam, libd_pthread_getschedparam);
@@ -1921,6 +1923,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setcreatesuspend_np, libd_pthread_attr_setc
 DEFINE_PUBLIC_ALIAS(DOS$thr_suspend, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_suspend_np, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_resume_np, libd_pthread_resume_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_getunique_np, libd_pthread_getunique_np);
 
 /* pthread_np */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_stackseg_np, libd_pthread_stackseg_np);

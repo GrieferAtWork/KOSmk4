@@ -3488,7 +3488,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa1b15f9d]]]*/
+/*[[[start:exports,hash:CRC-32=0xe606fc3e]]]*/
 DEFINE_PUBLIC_ALIAS_P(DOS$_execve,libd_execve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict path, __TARGV, __TENVP),(path,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(DOS$__execve,libd_execve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict path, __TARGV, __TENVP),(path,___argv,___envp));
 DEFINE_PUBLIC_ALIAS_P(DOS$__libc_execve,libd_execve,ATTR_IN(1) ATTR_IN(2) ATTR_IN(3),int,NOTHROW_RPC,LIBDCALL,(char const *__restrict path, __TARGV, __TENVP),(path,___argv,___envp));
@@ -3502,6 +3502,7 @@ DEFINE_PUBLIC_ALIAS_P(__libc_getpid,libc_getpid,ATTR_CONST WUNUSED,pid_t,NOTHROW
 DEFINE_PUBLIC_ALIAS_P(getpid,libc_getpid,ATTR_CONST WUNUSED,pid_t,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(__threadid,libc_gettid,ATTR_CONST WUNUSED,pid_t,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P("?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ",libc_gettid,ATTR_CONST WUNUSED,pid_t,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_getthreadid_np,libc_gettid,ATTR_CONST WUNUSED,pid_t,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(gettid,libc_gettid,ATTR_CONST WUNUSED,pid_t,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(__pipe,libc_pipe,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(fd_t pipedes[2]),(pipedes));
 DEFINE_PUBLIC_ALIAS_P(__libc_pipe,libc_pipe,ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(fd_t pipedes[2]),(pipedes));

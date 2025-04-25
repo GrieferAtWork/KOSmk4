@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe53e4fed */
+/* HASH CRC-32:0xf84aca7d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <bits/os/sigstack.h>
+#include <bits/types.h>
 #include <pthread.h>
 
 
@@ -48,6 +49,11 @@ typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
 #define __stack_t_defined
 typedef struct sigaltstack stack_t;
 #endif /* !__stack_t_defined */
+
+#ifndef __pthread_id_np_t_defined
+#define __pthread_id_np_t_defined
+typedef __pid_t pthread_id_np_t;
+#endif /* !__pthread_id_np_t_defined */
 
 #ifdef __CRT_HAVE_pthread_mutexattr_gettype
 /* >> pthread_mutexattr_gettype(3)
@@ -95,6 +101,24 @@ __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_get_name_np,(pthre
  * @return: ERANGE: The given `buflen' is too small */
 __CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_get_name_np,(pthread_t __self, char *__buf, size_t __buflen),(__self,__buf,__buflen))
 #endif /* ... */
+#ifndef __pthread_getname_np_defined
+#define __pthread_getname_np_defined
+#ifdef __CRT_HAVE_pthread_getname_np
+/* >> pthread_getname_np(3)
+ * Get thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `buflen' is too small */
+__CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __self, char *__buf, size_t __buflen),(__self,__buf,__buflen))
+#elif defined(__CRT_HAVE_pthread_get_name_np)
+/* >> pthread_getname_np(3)
+ * Get thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `buflen' is too small */
+__CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __self, char *__buf, size_t __buflen),pthread_get_name_np,(__self,__buf,__buflen))
+#else /* ... */
+#undef __pthread_getname_np_defined
+#endif /* !... */
+#endif /* !__pthread_getname_np_defined */
 #ifdef __CRT_HAVE_pthread_setname_np
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
@@ -114,6 +138,47 @@ __CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t _
  * @return: ERANGE: The given `name' is too long */
 __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
 #endif /* ... */
+#ifndef __pthread_setname_np_defined
+#define __pthread_setname_np_defined
+#ifdef __CRT_HAVE_pthread_setname_np
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),(__self,__name))
+#elif defined(__CRT_HAVE_pthread_set_name_np)
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),pthread_set_name_np,(__self,__name))
+#elif defined(__CRT_HAVE_cthread_set_name)
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
+#else /* ... */
+#undef __pthread_setname_np_defined
+#endif /* !... */
+#endif /* !__pthread_setname_np_defined */
+#ifdef __CRT_HAVE_pthread_getattr_np
+/* >> pthread_getattr_np(3)
+ * Initialize thread attribute `*attr' with attributes corresponding to  the
+ * already running thread `self'. It shall be called on uninitialized `attr'
+ * and destroyed with `pthread_attr_destroy(3)' when no longer needed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory */
+__CREDIRECT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_get_np,(pthread_t __self, pthread_attr_t *__attr),pthread_getattr_np,(__self,__attr))
+#elif defined(__CRT_HAVE_pthread_attr_get_np)
+/* >> pthread_getattr_np(3)
+ * Initialize thread attribute `*attr' with attributes corresponding to  the
+ * already running thread `self'. It shall be called on uninitialized `attr'
+ * and destroyed with `pthread_attr_destroy(3)' when no longer needed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory */
+__CDECLARE(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_get_np,(pthread_t __self, pthread_attr_t *__attr),(__self,__attr))
+#endif /* ... */
 #ifndef __pthread_main_np_defined
 #define __pthread_main_np_defined
 #ifdef __CRT_HAVE_pthread_main_np
@@ -132,7 +197,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ) || defined(__CRT_HAVE_pthread_getthreadid_np)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the
@@ -145,11 +210,218 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #undef __pthread_main_np_defined
 #endif /* !... */
 #endif /* !__pthread_main_np_defined */
+#if !defined(__pthread_attr_getaffinity_np_defined) && defined(__CRT_HAVE_pthread_attr_getaffinity_np)
+#define __pthread_attr_getaffinity_np_defined
+/* >> pthread_attr_getaffinity_np(3)
+ * Get cpuset on which the thread will be allowed to run
+ * @return: EOK:    Success
+ * @return: EINVAL: `cpusetsize' is too small */
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_getaffinity_np,(pthread_attr_t const *__self, size_t __cpusetsize, cpu_set_t *__cpuset),(__self,__cpusetsize,__cpuset))
+#endif /* !__pthread_attr_getaffinity_np_defined && __CRT_HAVE_pthread_attr_getaffinity_np */
+#ifndef __pthread_attr_setaffinity_np_defined
+#define __pthread_attr_setaffinity_np_defined
+#ifdef __CRT_HAVE_pthread_attr_setaffinity_np
+/* >> pthread_attr_setaffinity_np(3)
+ * Set cpuset on which the thread will be allowed to run
+ * @return: EOK:    Success
+ * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: ENOMEM: Insufficient memory */
+__CDECLARE(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
+#elif defined(__CRT_HAVE___pthread_attr_setaffinity_np)
+/* >> pthread_attr_setaffinity_np(3)
+ * Set cpuset on which the thread will be allowed to run
+ * @return: EOK:    Success
+ * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: ENOMEM: Insufficient memory */
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),__pthread_attr_setaffinity_np,(__self,__cpusetsize,__cpuset))
+#else /* ... */
+#undef __pthread_attr_setaffinity_np_defined
+#endif /* !... */
+#endif /* !__pthread_attr_setaffinity_np_defined */
+#if !defined(__pthread_getaffinity_np_defined) && defined(__CRT_HAVE_pthread_getaffinity_np)
+#define __pthread_getaffinity_np_defined
+/* >> pthread_getaffinity_np(3)
+ * Get bit set in `cpuset' representing the processors `self' can run on
+ * @return: EOK:   Success
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE(__ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __self, size_t __cpusetsize, cpu_set_t *__cpuset),(__self,__cpusetsize,__cpuset))
+#endif /* !__pthread_getaffinity_np_defined && __CRT_HAVE_pthread_getaffinity_np */
+#ifdef __CRT_HAVE_pthread_resume_all_np
+/* >> pthread_resume_all_np(3)
+ * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+ * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_multi_np,(void),pthread_resume_all_np,())
+#elif defined(__CRT_HAVE_pthread_multi_np)
+/* >> pthread_resume_all_np(3)
+ * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+ * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_multi_np,(void),())
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_suspend_all_np
+/* >> pthread_suspend_all_np(3)
+ * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+ * After a call to this function, the calling thread is the only one running within
+ * the current process (at least of those created by `pthread_create(3)')
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume_all_np(3)')
+ *
+ * @return: EOK:       Success
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_single_np,(void),pthread_suspend_all_np,())
+#elif defined(__CRT_HAVE_pthread_single_np)
+/* >> pthread_suspend_all_np(3)
+ * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+ * After a call to this function, the calling thread is the only one running within
+ * the current process (at least of those created by `pthread_create(3)')
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume_all_np(3)')
+ *
+ * @return: EOK:       Success
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_single_np,(void),())
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_tryjoin_np
+/* >> pthread_tryjoin_np(3)
+ * Check whether thread  `self' has terminated.  If so return  the
+ * status of the thread in `*thread_return', if `thread_return' is
+ * not `NULL'.
+ * @return: EOK:   Success
+ * @return: EBUSY: The thread has yet to terminate */
+__CREDIRECT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_peekjoin_np,(pthread_t __self, void **__thread_return),pthread_tryjoin_np,(__self,__thread_return))
+#elif defined(__CRT_HAVE_pthread_peekjoin_np)
+/* >> pthread_tryjoin_np(3)
+ * Check whether thread  `self' has terminated.  If so return  the
+ * status of the thread in `*thread_return', if `thread_return' is
+ * not `NULL'.
+ * @return: EOK:   Success
+ * @return: EBUSY: The thread has yet to terminate */
+__CDECLARE(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_peekjoin_np,(pthread_t __self, void **__thread_return),(__self,__thread_return))
+#endif /* ... */
+#if !defined(__pthread_setaffinity_np_defined) && defined(__CRT_HAVE_pthread_setaffinity_np)
+#define __pthread_setaffinity_np_defined
+/* >> pthread_setaffinity_np(3)
+ * Limit specified thread `self' to run only on the processors represented in `cpuset'
+ * @return: EOK:   Success
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE(__ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_setaffinity_np,(pthread_t __self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
+#endif /* !__pthread_setaffinity_np_defined && __CRT_HAVE_pthread_setaffinity_np */
+#ifndef __pthread_timedjoin_np_defined
+#define __pthread_timedjoin_np_defined
+#include <features.h>
+#if defined(__CRT_HAVE_pthread_timedjoin_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE___pthread_timedjoin_np64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),__pthread_timedjoin_np64,(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE___pthread_timedjoin_np64) || defined(__CRT_HAVE_pthread_timedjoin_np)
+#include <libc/local/pthread/pthread_timedjoin_np.h>
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __self, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__self, __thread_return, __abstime); })
+#else /* ... */
+#undef __pthread_timedjoin_np_defined
+#endif /* !... */
+#endif /* !__pthread_timedjoin_np_defined */
+#ifndef __pthread_timedjoin64_np_defined
+#define __pthread_timedjoin64_np_defined
+#if defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin64_np)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE___pthread_timedjoin_np64)
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),__pthread_timedjoin_np64,(__self,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin_np)
+#include <libc/local/pthread/pthread_timedjoin64_np.h>
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread  wait for termination  of the thread  `self',
+ * but only until `timeout'. The exit status of the thread is stored
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__self, __thread_return, __abstime); })
+#else /* ... */
+#undef __pthread_timedjoin64_np_defined
+#endif /* !... */
+#endif /* !__pthread_timedjoin64_np_defined */
+#ifdef __CRT_HAVE_gettid
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CREDIRECT(,pthread_id_np_t,__NOTHROW_NCX,pthread_getthreadid_np,(void),gettid,())
+#elif defined(__CRT_HAVE___threadid)
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CREDIRECT(,pthread_id_np_t,__NOTHROW_NCX,pthread_getthreadid_np,(void),__threadid,())
+#elif defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CREDIRECT(,pthread_id_np_t,__NOTHROW_NCX,pthread_getthreadid_np,(void),?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ,())
+#elif defined(__CRT_HAVE_pthread_getthreadid_np)
+/* >> gettid(2)
+ * Return the TID of the calling thread
+ * THIS_THREAD->PID */
+__CDECLARE(,pthread_id_np_t,__NOTHROW_NCX,pthread_getthreadid_np,(void),())
+#endif /* ... */
 #ifdef __CRT_HAVE_pthread_stackseg_np
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
 __CDECLARE(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_stackseg_np,(pthread_t __self, stack_t *__sinfo),(__self,__sinfo))
-#elif defined(__CRT_HAVE_pthread_getattr_np) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)))
+#elif (defined(__CRT_HAVE_pthread_getattr_np) || defined(__CRT_HAVE_pthread_attr_get_np)) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)))
 #include <libc/local/pthread_np/pthread_stackseg_np.h>
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
@@ -341,8 +613,9 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),(__s
 #undef __pthread_unsuspend_np_defined
 #endif /* !... */
 #endif /* !__pthread_unsuspend_np_defined */
-#if !defined(__pthread_suspend_all_np_defined) && defined(__CRT_HAVE_pthread_suspend_all_np)
+#ifndef __pthread_suspend_all_np_defined
 #define __pthread_suspend_all_np_defined
+#ifdef __CRT_HAVE_pthread_suspend_all_np
 /* >> pthread_suspend_all_np(3)
  * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
  * After a call to this function, the calling thread is the only one running within
@@ -355,14 +628,49 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_unsuspend_np,(pthread_t __self),(__s
  * @return: ENOMEM:    Insufficient memory
  * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_suspend_all_np,(void),())
-#endif /* !__pthread_suspend_all_np_defined && __CRT_HAVE_pthread_suspend_all_np */
-#if !defined(__pthread_resume_all_np_defined) && defined(__CRT_HAVE_pthread_resume_all_np)
+#elif defined(__CRT_HAVE_pthread_single_np)
+/* >> pthread_suspend_all_np(3)
+ * Calls  `pthread_suspend_np(3)' once for every running thread but the calling one
+ * After a call to this function, the calling thread is the only one running within
+ * the current process (at least of those created by `pthread_create(3)')
+ *
+ * Signals directed at suspended thread will not be handled until that thread has
+ * been resumed (s.a. `pthread_resume_all_np(3)')
+ *
+ * @return: EOK:       Success
+ * @return: ENOMEM:    Insufficient memory
+ * @return: EOVERFLOW: The suspension counter of some thread can't go any higher */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_suspend_all_np,(void),pthread_single_np,())
+#else /* ... */
+#undef __pthread_suspend_all_np_defined
+#endif /* !... */
+#endif /* !__pthread_suspend_all_np_defined */
+#ifndef __pthread_resume_all_np_defined
 #define __pthread_resume_all_np_defined
+#ifdef __CRT_HAVE_pthread_resume_all_np
 /* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
-__CDECLARE_VOID(,__NOTHROW_NCX,pthread_resume_all_np,(void),())
-#endif /* !__pthread_resume_all_np_defined && __CRT_HAVE_pthread_resume_all_np */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_resume_all_np,(void),())
+#elif defined(__CRT_HAVE_pthread_multi_np)
+/* >> pthread_resume_all_np(3)
+ * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
+ * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_resume_all_np,(void),pthread_multi_np,())
+#else /* ... */
+#undef __pthread_resume_all_np_defined
+#endif /* !... */
+#endif /* !__pthread_resume_all_np_defined */
+#ifdef __CRT_HAVE_pthread_getunique_np
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getunique_np,(pthread_t __self, pthread_id_np_t *__ptid),(__self,__ptid))
+#elif defined(__CRT_HAVE_pthread_gettid_np)
+#include <libc/local/pthread/pthread_getunique_np.h>
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_getunique_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __errno_t __NOTHROW_NCX(__LIBCCALL pthread_getunique_np)(pthread_t __self, pthread_id_np_t *__ptid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_getunique_np))(__self, __ptid); })
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

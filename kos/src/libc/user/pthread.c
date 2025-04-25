@@ -2650,21 +2650,22 @@ NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_dlauxctrl_cb)(void *cookie, void *t
 	return NULL;
 }
 
-/*[[[head:libc_pthread_resume_all_np,hash:CRC-32=0xb06818ce]]]*/
+/*[[[head:libc_pthread_multi_np,hash:CRC-32=0xb344491b]]]*/
 /* >> pthread_resume_all_np(3)
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void
-NOTHROW_NCX(LIBCCALL libc_pthread_resume_all_np)(void)
-/*[[[body:libc_pthread_resume_all_np]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_multi_np)(void)
+/*[[[body:libc_pthread_multi_np]]]*/
 {
 	struct pthread *me = &current;
 	(void)pthread_mutex_lock(&pthread_suspend_lock);
 	(void)dlauxctrl(NULL, DLAUXCTRL_FOREACH_TLSSEG,
 	                &libc_pthread_resume_all_dlauxctrl_cb, me);
 	(void)pthread_mutex_unlock(&pthread_suspend_lock);
+	return EOK;
 }
-/*[[[end:libc_pthread_resume_all_np]]]*/
+/*[[[end:libc_pthread_multi_np]]]*/
 
 
 
@@ -5582,7 +5583,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1bac55f1]]]*/
+/*[[[start:exports,hash:CRC-32=0x99c2c2c5]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5592,6 +5593,7 @@ DEFINE_PUBLIC_ALIAS_P_VOID(cthread_exit,libc_pthread_exit,ATTR_NORETURN ATTR_ACC
 DEFINE_PUBLIC_ALIAS_P_VOID(pthread_exit,libc_pthread_exit,ATTR_NORETURN ATTR_ACCESS_NONE(1),,LIBCCALL,(void *retval),(retval));
 DEFINE_PUBLIC_ALIAS_P(pthread_join,libc_pthread_join,ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
 DEFINE_PUBLIC_ALIAS_P(pthread_getresult_np,libc_pthread_getresult_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
+DEFINE_PUBLIC_ALIAS_P(pthread_peekjoin_np,libc_pthread_tryjoin_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
 DEFINE_PUBLIC_ALIAS_P(pthread_tryjoin_np,libc_pthread_tryjoin_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, void **thread_return),(self,thread_return));
 DEFINE_PUBLIC_ALIAS_P(pthread_timedjoin_np,libc_pthread_timedjoin_np,ATTR_IN_OPT(3) ATTR_OUT_OPT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_t self, void **thread_return, struct timespec const *abstime),(self,thread_return,abstime));
 #include <bits/types.h>
@@ -5632,6 +5634,7 @@ DEFINE_PUBLIC_ALIAS_P(pthread_attr_setaffinity_np,libc_pthread_attr_setaffinity_
 DEFINE_PUBLIC_ALIAS_P(pthread_attr_getaffinity_np,libc_pthread_attr_getaffinity_np,ATTR_IN(1) ATTR_OUT_OPT(3),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *self, size_t cpusetsize, cpu_set_t *cpuset),(self,cpusetsize,cpuset));
 DEFINE_PUBLIC_ALIAS_P(pthread_getattr_default_np,libc_pthread_getattr_default_np,ATTR_OUT(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t *attr),(attr));
 DEFINE_PUBLIC_ALIAS_P(pthread_setattr_default_np,libc_pthread_setattr_default_np,ATTR_IN(1),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_attr_t const *attr),(attr));
+DEFINE_PUBLIC_ALIAS_P(pthread_attr_get_np,libc_pthread_getattr_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_attr_t *attr),(self,attr));
 DEFINE_PUBLIC_ALIAS_P(pthread_getattr_np,libc_pthread_getattr_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_attr_t *attr),(self,attr));
 DEFINE_PUBLIC_ALIAS_P(pthread_setschedparam,libc_pthread_setschedparam,ATTR_IN(3),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, int policy, struct sched_param const *param),(self,policy,param));
 DEFINE_PUBLIC_ALIAS_P(pthread_getschedparam,libc_pthread_getschedparam,ATTR_OUT(2) ATTR_OUT(3),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, int *__restrict policy, struct sched_param *__restrict param),(self,policy,param));
@@ -5798,8 +5801,10 @@ DEFINE_PUBLIC_ALIAS_P(pthread_attachpidfd_np,libc_pthread_attachpidfd_np,ATTR_OU
 DEFINE_PUBLIC_ALIAS_P(thr_continue,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_unsuspend_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_continue_np,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_single_np,libc_pthread_suspend_all_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend_all_np,libc_pthread_suspend_all_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
-DEFINE_PUBLIC_ALIAS_P_VOID(pthread_resume_all_np,libc_pthread_resume_all_np,,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_resume_all_np,libc_pthread_multi_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_multi_np,libc_pthread_multi_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
 /*[[[end:exports]]]*/
 
 DECL_END

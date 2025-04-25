@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45acdd18 */
+/* HASH CRC-32:0xd0fbf0bc */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1951,6 +1951,7 @@ DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_continue_np, libc_pthread_c
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_attr_setcreatesuspend_np, libc_pthread_attr_setcreatesuspend_np, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_suspend_np, libc_pthread_suspend_np, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_T))
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_resume_np, libc_pthread_resume_np, TIn(__SIZEOF_ERRNO_T__), 1, TIn(__SIZEOF_PTHREAD_T))
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_getunique_np, libc_pthread_getunique_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 
 /* pthread_np */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_stackseg_np, libc_pthread_stackseg_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
