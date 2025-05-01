@@ -52,7 +52,7 @@ __ASM_L(.ifc __ASM_ARG(\dst),%r12; __ASM_ARG(\func) __ASM_ARG(\src), %r12d; .els
 __ASM_L(.ifc __ASM_ARG(\dst),%r13; __ASM_ARG(\func) __ASM_ARG(\src), %r13d; .else)
 __ASM_L(.ifc __ASM_ARG(\dst),%r14; __ASM_ARG(\func) __ASM_ARG(\src), %r14d; .else)
 __ASM_L(.ifc __ASM_ARG(\dst),%r15; __ASM_ARG(\func) __ASM_ARG(\src), %r15d; .else)
-__ASM_L(.error "Expected a 64-bit register as first operand in `\func \src \dst`";)
+__ASM_L(.error "Expected a 64-bit register as first operand in `\func \src, \dst`";)
 __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(.endm)

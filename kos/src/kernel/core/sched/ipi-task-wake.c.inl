@@ -53,13 +53,13 @@ PUBLIC NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_wake)(struct task *__restrict thread,
                          unsigned int flags)
 #elif defined(DEFINE_task_wake_as)
-/* Wake `thread' while impersonating  `caller', where `caller' must  some
- * running  thread from the calling CPU. -  This function is used to wake
- * up waiting threads during task exit, where at the point where the exit
- * status is broadcast, the exiting  thread (THIS_TASK) can no longer  be
- * used to send signals (since `task_wake()'  has to look at things  such
- * as  the prev/next thread  within the scheduler  ring, which would have
- * already  become invalid at  that point, since  the true calling thread
+/* Wake `thread' while impersonating `caller', where `caller' must be some
+ * running thread from the  calling CPU. - This  function is used to  wake
+ * up waiting threads during task exit, where at the point where the  exit
+ * status  is broadcast, the  exiting thread (THIS_TASK)  can no longer be
+ * used  to send signals  (since `task_wake()' has to  look at things such
+ * as the prev/next  thread within  the scheduler ring,  which would  have
+ * already become invalid  at that  point, since the  true calling  thread
  * could no longer be considered apart of the scheduler ring)
  *
  * When calling this function, the caller must ensure that their current

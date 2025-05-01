@@ -193,6 +193,7 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 		*((byte_t *)&x86_fsgsbase_patch + 0) = 0xc3; /* ret */
 		return;
 	}
+
 	/* Patch all fsgsbase instructions within the kernel core. */
 	for (iter = __x86_fixup_fsgsbase_start;
 	     iter < __x86_fixup_fsgsbase_end; ++iter) {

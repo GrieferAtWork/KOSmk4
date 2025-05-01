@@ -318,13 +318,13 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_wake)(struct task *__restrict thread,
                          unsigned int flags DFL(TASK_WAKE_FNORMAL));
 
-/* Wake `thread' while impersonating  `caller', where `caller' must  some
- * running  thread from the calling CPU. -  This function is used to wake
- * up waiting threads during task exit, where at the point where the exit
- * status is broadcast, the exiting  thread (THIS_TASK) can no longer  be
- * used to send signals (since `task_wake()'  has to look at things  such
- * as  the prev/next thread  within the scheduler  ring, which would have
- * already  become invalid at  that point, since  the true calling thread
+/* Wake `thread' while impersonating `caller', where `caller' must be some
+ * running thread from the  calling CPU. - This  function is used to  wake
+ * up waiting threads during task exit, where at the point where the  exit
+ * status  is broadcast, the  exiting thread (THIS_TASK)  can no longer be
+ * used  to send signals  (since `task_wake()' has to  look at things such
+ * as the prev/next  thread within  the scheduler ring,  which would  have
+ * already become invalid  at that  point, since the  true calling  thread
  * could no longer be considered apart of the scheduler ring)
  *
  * When calling this function, the caller must ensure that their current
@@ -381,7 +381,7 @@ NOTHROW(FCALL process_exit)(union wait status) {
 #endif /* __cplusplus */
 
 
-/* Pause  execution for short  moment, allowing other CPU  cores to catch up.
+/* Pause execution for short a moment, allowing other CPU cores to catch  up.
  * This  function is similar  to `task_yield()', but intended  to be used for
  * helping synchronization between multiple cores. - If no such functionality
  * exists on the host system, this is a no-op. */
@@ -391,7 +391,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL task_pause)(void);
 #define task_pause() (void)0
 #endif /* CONFIG_NO_SMP */
 
-/* Try to yield execution in the calling thread, but never thrown an exception.
+/* Try to yield execution in the calling thread, but never throws an exception.
  * `task_tryyield_or_pause()' is exactly the same as `task_tryyield()', however
  * it may execute `task_pause()' when preemption is disabled, before returning. */
 #ifndef __task_tryyield_defined
@@ -401,13 +401,13 @@ FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyiel
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) unsigned int NOTHROW(KCALL task_tryyield_or_pause)(void);
 #endif /* __CC__ */
 #define TASK_TRYYIELD_SUCCESS             0x0000 /* Successfully yielded execution to another thread (guarantied to be ZERO(0)). */
-#define TASK_TRYYIELD_PREEMPTION_DISABLED 0x0001 /* Yielding   now   is   impossible   because   preemption   is   disabled.
-                                                  * When `task_tryyield_or_pause()' was used, and the kernel has  configured
-                                                  * itself for multiple cores, `task_pause()' will be executed in this case. */
-#define TASK_TRYYIELD_NO_SUCCESSOR        0x0002 /* There   is   no  other   task   to  which   one   could  yield.
-                                                  * If  the  kernel  has  configured  itself  for  multiple  cores,
-                                                  * `task_pause()'  instruction was called in this case (regardless
-                                                  * of `task_tryyield()' or `task_tryyield_or_pause()' being used). */
+#define TASK_TRYYIELD_PREEMPTION_DISABLED 0x0001 /* Yielding   now   is   impossible   because   preemption   is  disabled.
+                                                  * When `task_tryyield_or_pause()' was used, and the kernel has configured
+                                                  * itself for multiple  cores, `task_pause()' was  executed in this  case. */
+#define TASK_TRYYIELD_NO_SUCCESSOR        0x0002 /* There  is  no   other  task  to   which  one  could   yield.
+                                                  * If the  kernel has  configured  itself for  multiple  cores,
+                                                  * `task_pause()'  was  executed  in this  case  (regardless of
+                                                  * `task_tryyield()' or `task_tryyield_or_pause()' being used). */
 
 
 #ifdef __CC__
