@@ -1739,7 +1739,7 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 }
 
 
-/* Sever all (still-alive) connections that are active for `self'. Note that this  function
+/* Serve all (still-alive) connections that are active for `self'. Note that this  function
  * may not be called from inside of signal-completion-callbacks, or any other callback that
  * may  be executed in the context of holding an SMP-lock. (though you area allowed to call
  * this function from a `sig_postcompletion_t' callback) */
