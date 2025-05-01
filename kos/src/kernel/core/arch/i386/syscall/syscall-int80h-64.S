@@ -55,8 +55,8 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-	/* Because we can assume that we only get here from user-space with #IF enabled,
-	 * we don't have to swapgs  or sti conditionally, but  can simply always do  so. */
+	/* Because we can assume that we only get here from user-space with #IF disabled,
+	 * we don't have to  swapgs or sti  conditionally, but can  simply always do  so. */
 	swapgs
 	sti
 PUBLIC_FUNCTION(x86_syscall64_int80_after_swapgs)

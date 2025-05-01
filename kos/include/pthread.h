@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3ecf1b4 */
+/* HASH CRC-32:0x959aeb4f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3138,7 +3138,7 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,pthread_attach_np,(pthread_t __self),(__self)
  * @return: * :     A call to `cb' returned a value other than `EOK', and enumeration was halted
  * @return: EOK:    All threads were enumerated by being passed to `cb'
  * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_enumthreads_np,(__errno_t (__LIBCCALL *__cb)(void *__cookie, pthread_t __thrd), void *__cookie),(__cb,__cookie))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_enumthreads_np,(__errno_t (__LIBKCALL *__cb)(void *__cookie, pthread_t __thrd), void *__cookie),(__cb,__cookie))
 /* >> pthread_attachtid_np(3)
  * Return a descriptor for a (potentially, previously detached) thread `tid'.
  * This function cannot be used to attach threads created by means other than

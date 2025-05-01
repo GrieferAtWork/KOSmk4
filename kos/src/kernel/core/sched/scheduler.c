@@ -195,7 +195,7 @@ NOTHROW(FCALL _sched_assert_in_runqueue)(struct cpu *__restrict me,
                                          struct task *__restrict thread) {
 	do {
 		struct task *iter;
-		FOREACH_thiscpu_running(iter, me) {
+		FOREACH_thiscpu_running (iter, me) {
 			if (iter == thread)
 				return;
 		}
@@ -210,7 +210,7 @@ NOTHROW(FCALL _sched_assert_not_in_runqueue)(struct cpu *__restrict me,
                                              struct task *__restrict thread) {
 	struct task *iter;
 again:
-	FOREACH_thiscpu_running(iter, me) {
+	FOREACH_thiscpu_running (iter, me) {
 		if (iter == thread) {
 			if (!__assertion_checkf("thread !IN sched.s_running",
 			                        "Thread %p is apart of the run-queue of cpu #%u",
@@ -227,7 +227,7 @@ NOTHROW(FCALL _sched_assert_in_waitqueue)(struct cpu *__restrict me,
                                           struct task *__restrict thread) {
 	do {
 		struct task *iter;
-		FOREACH_thiscpu_waiting(iter, me) {
+		FOREACH_thiscpu_waiting (iter, me) {
 			if (iter == thread)
 				return;
 		}
@@ -242,7 +242,7 @@ NOTHROW(FCALL _sched_assert_not_in_waitqueue)(struct cpu *__restrict me,
                                              struct task *__restrict thread) {
 	struct task *iter;
 again:
-	FOREACH_thiscpu_waiting(iter, me) {
+	FOREACH_thiscpu_waiting (iter, me) {
 		if (iter == thread) {
 			if (!__assertion_checkf("thread !IN sched.s_waiting",
 			                        "Thread %p is apart of the wait-queue of cpu #%u",
@@ -628,7 +628,7 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 	assert(deadline >= now);
 
 	/* Check if we should cut the quantum short due to a sleeping thread. */
-	FOREACH_thiscpu_waiting(thread, me) {
+	FOREACH_thiscpu_waiting (thread, me) {
 		ktime_t distance;
 		ktime_t next_priorty_then;
 		ktime_t thrd_priorty_then;
@@ -1006,19 +1006,20 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
  *     actually an invariant, as your task may have been moved to a  different
  *     CPU after waking up, at which point `ktime()' may have a slight offset)
  * The proper way of using this function is as follows:
- * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
+ * >> while (GET_SHOULD_WAIT()) { // Test some condition for which to wait
  * >>     PREEMPTION_DISABLE();
  * >>     // Test again now that interrupts are disabled
  * >>     // This test is required to prevent a race condition
  * >>     // where the condition is signaled between it being
  * >>     // changed and interrupts being disabled.
  * >>     COMPILER_READ_BARRIER();
- * >>     if (!SHOULD_WAIT()) {
+ * >>     if (!GET_SHOULD_WAIT()) {
  * >>         PREEMPTION_ENABLE();
  * >>         break;
  * >>     }
  * >>     // Serve RPC functions (when TRUE is returned, preemption was re-enabled)
- * >>     if (task_serve()) continue;
+ * >>     if (task_serve())
+ * >>         continue;
  * >>     // Do the actual sleep.
  * >>     if (!task_sleep(TIMEOUT))
  * >>         return DID_TIME_OUT;
@@ -1037,7 +1038,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	ktime_t now, quantum_start, priority_boost;
 	tsc_t tsc_now;
 	caller = THIS_TASK;
-	PREEMPTION_DISABLE();
+	PREEMPTION_DISABLE(); /* Caller probably already disabled, but need to be sure */
 	me = caller->t_cpu;
 	sched_assert();
 	assert(caller->t_flags & TASK_FRUNNING);
@@ -1101,7 +1102,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	tsc_now = tsc_get(me);
 	now     = tsc_now_to_ktime(me, tsc_now);
 
-	/* Gift the remainder of `caller's quantum to `thread' */
+	/* Gift the remainder of `caller's quantum to `next' */
 	quantum_start = sched_stoptime(caller);
 	if unlikely(quantum_start > now)
 		quantum_start = now; /* Shouldn't happen... */
@@ -1110,10 +1111,10 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(ktime_t abs_timeout) {
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
 
-	/* If the caller only had a really short amount of time left for
-	 * their current quantum, and `thread' has already been  waiting
-	 * for a  really long  time, then  `thread' must  still get  its
-	 * priority boost! */
+	/* If the caller only had a really short amount of time left
+	 * for their current  quantum, and `next'  has already  been
+	 * waiting for a  really long time,  then `next' must  still
+	 * get its priority boost! */
 	if (OVERFLOW_USUB(now, sched_stoptime(next), &priority_boost))
 		priority_boost = 0;
 
@@ -1225,7 +1226,7 @@ again:
 	next_priority = sched_stoptime(next);
 
 	/* Check the timeouts of sleeping threads. */
-	FOREACH_thiscpu_waiting(thread, me) {
+	FOREACH_thiscpu_waiting (thread, me) {
 		assert(!(thread->t_flags & TASK_FRUNNING));
 
 		/* Must  compare  `<timeout> >= now' such  that `<timeout>=-1'
@@ -1284,7 +1285,7 @@ do_timeout_thread:
 	assert(deadline >= now);
 
 	/* Check if we should cut the quantum short due to a sleeping thread. */
-	FOREACH_thiscpu_waiting(thread, me) {
+	FOREACH_thiscpu_waiting (thread, me) {
 		ktime_t distance;
 		ktime_t next_priorty_then;
 		ktime_t thrd_priorty_then;
@@ -1545,7 +1546,7 @@ again:
 		 * any  sleeping threads with the TASK_FKEEPCORE flag
 		 * set, since we'll need to transfer sleeping threads
 		 * to another CPU before shutting down! */
-		FOREACH_thiscpu_waiting(thread, me) {
+		FOREACH_thiscpu_waiting (thread, me) {
 			if (thread->t_flags & (TASK_FKEEPCORE | TASK_FTERMINATING))
 				goto cannot_shut_down;
 		}

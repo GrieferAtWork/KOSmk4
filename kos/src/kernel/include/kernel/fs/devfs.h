@@ -179,7 +179,7 @@ DATDEF struct mfile_stream_ops const device_v_stream_ops;
 #define device_getname_lock_tryacquire   mfile_tslock_tryacquire
 
 /* Return a reference to the filename of `self' */
-FUNDEF NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct devdirent *
+FUNDEF NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *
 NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self);
 #define device_getfilename(self) (&device_getdevfsfilename(self)->dd_dirent)
 

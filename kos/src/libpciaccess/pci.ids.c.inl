@@ -551,17 +551,18 @@ NOTHROW(CC pci_devnameid_list_contains)(struct pci_devnameid_list const *__restr
 PRIVATE NONNULL((1)) void
 NOTHROW(CC pci_vennameid_list_insert)(struct pci_vennameid_list *__restrict self,
                                       uint16_t id) {
-	size_t index, lo, hi;
-	BSEARCH_EX (index, lo, hi, self->pvl_list, self->pvl_size, , id) {
+	size_t index;
+	BSEARCH (index, self->pvl_list, self->pvl_size, , id) {
 		/* Already defined. */
 		return;
 	}
+
 	/* Insert a new element at `lo' */
-	memmoveup(&self->pvl_list[lo + 1],
-	          &self->pvl_list[lo],
-	          self->pvl_size - lo,
+	memmoveup(&self->pvl_list[index + 1],
+	          &self->pvl_list[index],
+	          self->pvl_size - index,
 	          sizeof(self->pvl_list[0]));
-	self->pvl_list[lo] = id;
+	self->pvl_list[index] = id;
 	++self->pvl_size;
 }
 
@@ -569,17 +570,18 @@ NOTHROW(CC pci_vennameid_list_insert)(struct pci_vennameid_list *__restrict self
 PRIVATE NONNULL((1)) void
 NOTHROW(CC pci_devnameid_list_insert)(struct pci_devnameid_list *__restrict self,
                                       pci_devnameid_t id) {
-	size_t index, lo, hi;
-	BSEARCH_EX (index, lo, hi, self->pdl_list, self->pdl_size, , id) {
+	size_t index;
+	BSEARCH (index, self->pdl_list, self->pdl_size, , id) {
 		/* Already defined. */
 		return;
 	}
+
 	/* Insert a new element at `lo' */
-	memmoveup(&self->pdl_list[lo + 1],
-	          &self->pdl_list[lo],
-	          self->pdl_size - lo,
+	memmoveup(&self->pdl_list[index + 1],
+	          &self->pdl_list[index],
+	          self->pdl_size - index,
 	          sizeof(self->pdl_list[0]));
-	self->pdl_list[lo] = id;
+	self->pdl_list[index] = id;
 	++self->pdl_size;
 }
 

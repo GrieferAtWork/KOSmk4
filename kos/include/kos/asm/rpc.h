@@ -346,7 +346,7 @@
  *
  *  - RPC_SYNCMODE_F_USER:
  *  - RPC_PRIORITY_F_HIGH:
- *       These flags are accepted and operates as documented below
+ *       These flags are accepted and operate as documented below
  *
  *  - RPC_SYNCMODE_F_REQUIRE_SC:
  *       These flags are NOT allowed (but note that `RPC_SYNCMODE_F_USER' is,
@@ -366,7 +366,8 @@
 /* Flag for use WITHOUT `RPC_CONTEXT_KERN': the associated item is a posix signal. */
 #define RPC_CONTEXT_SIGNAL    0x00040000
 
-/* Internally used: RPC is currently inactive. */
+/* Internally used: RPC is currently marked "inactive".
+ * For  more documentation on this flag, see: ../rpc.md */
 #define _RPC_CONTEXT_INACTIVE 0x00020000
 
 /* Flag for use with `RPC_CONTEXT_KERN':
@@ -381,8 +382,8 @@
  *    a larger structure to pass more  than one cookie argument to  the
  *    RPC function.
  *  - When this flag  is set, no  fields of `struct pending_rpc'  beyond
- *    `pr_kern.k_func' are ever accessed, meaning that the struct's size
- *    becomes `offsetafter(struct pending_rpc, pr_kern.k_func)'. */
+ *    `pr_kern.k_func' are ever accessed, meaning that the struct's base
+ *    size becomes `offsetafter(struct pending_rpc, pr_kern.k_func)'. */
 #define _RPC_CONTEXT_DONTFREE 0x00010000
 /************************************************************************/
 #endif /* __KERNEL__ */

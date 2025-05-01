@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cb87dff */
+/* HASH CRC-32:0xb01eea4f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,6 +250,13 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBCCALL libc_fsetpos_unlocke
 INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
 INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBCCALL libc_ungetc_unlocked)(int ch, FILE *__restrict stream);
 INTDEF ATTR_INOUT(1) void NOTHROW_CB_NCX(LIBCCALL libc_rewind_unlocked)(FILE *__restrict stream);
+/* >> fisatty(2)
+ * Check if the a given file stream `stream' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+ * @return: 0: [errno=ENOTTY]      Not a tty
+ * @return: 0: [errno=<unchanged>] Not a tty
+ * @return: 0: [errno=*]           Not a tty */
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream);
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */

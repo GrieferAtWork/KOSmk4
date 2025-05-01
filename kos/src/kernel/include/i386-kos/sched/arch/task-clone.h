@@ -45,14 +45,14 @@ struct arch_task_clone_args {
 #define __arch_task_clone_args_inittls32(self, clone_flags, tls)     \
 	(void)((self)->atca_x86_fsbase = x86_get_user_fsbase(),          \
 	       (self)->atca_x86_gsbase = (uintptr_t)(tls),               \
-	       !((clone_flags)&CLONE_SETTLS)                             \
+	       !((clone_flags) & CLONE_SETTLS)                           \
 	       ? (void)((self)->atca_x86_gsbase = x86_get_user_gsbase()) \
 	       : (void)0)
 #ifdef __x86_64__
 #define __arch_task_clone_args_inittls64(self, clone_flags, tls)     \
 	(void)((self)->atca_x86_gsbase = x86_get_user_gsbase(),          \
 	       (self)->atca_x86_fsbase = (uintptr_t)(tls),               \
-	       !((clone_flags)&CLONE_SETTLS)                             \
+	       !((clone_flags) & CLONE_SETTLS)                           \
 	       ? (void)((self)->atca_x86_fsbase = x86_get_user_fsbase()) \
 	       : (void)0)
 #define arch_task_clone_args_inittls(self, clone_flags, tls)                       \

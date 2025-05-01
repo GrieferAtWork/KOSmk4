@@ -1371,7 +1371,7 @@ PUBLIC_CONST struct mfile_stream_ops const device_v_stream_ops = {
 
 
 /* Return a reference to the filename of `self' */
-PUBLIC NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED REF struct devdirent *
+PUBLIC NOBLOCK ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct devdirent *
 NOTHROW(FCALL device_getdevfsfilename)(struct device *__restrict self) {
 	REF struct devdirent *result;
 	device_getname_lock_acquire(self);
@@ -1583,6 +1583,7 @@ device_register(struct device *__restrict self)
 		self->fn_ino = devfs_devnode_makeino(self->fn_mode,
 		                                     self->dn_devno);
 	}
+
 	/* Add to the inode tree (for lookup by dev_t) */
 	fsuper_nodes_insert(&devfs, self);
 
@@ -2157,7 +2158,7 @@ do_dump_blkdev(struct blkdev *__restrict self,
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 dump_blkdev(struct fnode *__restrict self,
             size_t longest_device_name,
             size_t longest_driver_name) {
@@ -2187,7 +2188,7 @@ again:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1, 3, 4)) void KCALL
 gather_longest_name_lengths(struct fnode *__restrict self, mode_t mode,
                             size_t *__restrict pmax_device_namelen,
                             size_t *__restrict pmax_driver_namelen) {
@@ -2251,7 +2252,7 @@ DECL_END
 
 DECL_BEGIN
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 do_dump_chrdev(struct chrdev *__restrict self,
                size_t longest_device_name,
                size_t longest_driver_name) {
@@ -2290,7 +2291,7 @@ do_dump_chrdev(struct chrdev *__restrict self,
 	dbg_putc('\n');
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 dump_chrdev(struct fnode *__restrict self,
             size_t longest_device_name,
             size_t longest_driver_name) {

@@ -264,19 +264,20 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  *     actually an invariant, as your task may have been moved to a  different
  *     CPU after waking up, at which point `ktime()' may have a slight offset)
  * The proper way of using this function is as follows:
- * >> while (SHOULD_WAIT()) { // Test some condition for which to wait
+ * >> while (GET_SHOULD_WAIT()) { // Test some condition for which to wait
  * >>     PREEMPTION_DISABLE();
  * >>     // Test again now that interrupts are disabled
  * >>     // This test is required to prevent a race condition
  * >>     // where the condition is signaled between it being
  * >>     // changed and interrupts being disabled.
  * >>     COMPILER_READ_BARRIER();
- * >>     if (!SHOULD_WAIT()) {
+ * >>     if (!GET_SHOULD_WAIT()) {
  * >>         PREEMPTION_ENABLE();
  * >>         break;
  * >>     }
  * >>     // Serve RPC functions (when TRUE is returned, preemption was re-enabled)
- * >>     if (task_serve()) continue;
+ * >>     if (task_serve())
+ * >>         continue;
  * >>     // Do the actual sleep.
  * >>     if (!task_sleep(TIMEOUT))
  * >>         return DID_TIME_OUT;

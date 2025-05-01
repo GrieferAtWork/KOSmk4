@@ -78,7 +78,7 @@ NOTHROW(FCALL system_enum_threads_cpu_noipi_nb)(system_enum_threads_cb_t cb, voi
 		goto done;
 
 	/* Now walk the running-thread-loop */
-	FOREACH_thiscpu_threads(thread, LOCAL_cpu) {
+	FOREACH_thiscpu_threads (thread, LOCAL_cpu) {
 		if (thread != idle) {
 			temp = (*cb)(arg, thread);
 			if unlikely(temp < 0)
@@ -89,7 +89,7 @@ NOTHROW(FCALL system_enum_threads_cpu_noipi_nb)(system_enum_threads_cb_t cb, voi
 
 #ifndef CONFIG_NO_SMP
 	/* Now go through all of the pending threads. */
-	FOREACH_thiscpu_sched_pending(thread, LOCAL_cpu) {
+	FOREACH_thiscpu_sched_pending (thread, LOCAL_cpu) {
 		assert(thread != idle || kernel_poisoned());
 		temp = (*cb)(arg, thread);
 		if unlikely(temp < 0)

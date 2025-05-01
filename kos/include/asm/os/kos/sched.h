@@ -33,31 +33,31 @@
 /* KOS/LINUX                                                            */
 /************************************************************************/
 
-#define __CSIGNAL              0x000000ff /* Signal mask to be sent at exit. */
-#define __CLONE_VM             0x00000100 /* Set to share VM between processes. */
-#define __CLONE_FS             0x00000200 /* Set to share fs info between processes. */
-#define __CLONE_FILES          0x00000400 /* Set to share open files between processes. */
-#define __CLONE_SIGHAND        0x00000800 /* Set to share signal handlers. */
-#define __CLONE_PIDFD          0x00001000 /* Set to create+store pidfd at `*parent_tidptr' */
-#define __CLONE_PTRACE         0x00002000 /* Set if tracing continues on the child. */
-#define __CLONE_VFORK          0x00004000 /* Set if the parent wants the child to wake it up on `exec(2)' or `exit(2)'. */
-#define __CLONE_PARENT         0x00008000 /* Set if we want to have the same parent as the cloner. */
-#define __CLONE_THREAD         0x00010000 /* Set to add to same thread group. */
-#define __CLONE_NEWNS          0x00020000 /* Set to create new namespace. */
-#define __CLONE_SYSVSEM        0x00040000 /* Set to shared SVID SEM_UNDO semantics. */
-#define __CLONE_SETTLS         0x00080000 /* Set TLS info. */
-#define __CLONE_PARENT_SETTID  0x00100000 /* Store TID in userlevel buffer before MM copy. */
-#define __CLONE_CHILD_CLEARTID 0x00200000 /* Register exit futex and memory location to clear. */
-#define __CLONE_DETACHED       0x00400000 /* Create clone detached. */
-#define __CLONE_UNTRACED       0x00800000 /* Set if the tracing process can't force CLONE_PTRACE on this clone. */
-#define __CLONE_CHILD_SETTID   0x01000000 /* Store TID in userlevel buffer in the child. */
-#define __CLONE_NEWCGROUP      0x02000000 /* New cgroup namespace */
-#define __CLONE_NEWUTS         0x04000000 /* New utsname group. */
-#define __CLONE_NEWIPC         0x08000000 /* New ipcs. */
-#define __CLONE_NEWUSER        0x10000000 /* New user namespace. */
-#define __CLONE_NEWPID         0x20000000 /* New pid namespace. */
-#define __CLONE_NEWNET         0x40000000 /* New network namespace. */
-#define __CLONE_IO             0x80000000 /* Clone I/O context. */
+#define __CSIGNAL              __UINT32_C(0x000000ff) /* Signal mask to be sent at exit. */
+#define __CLONE_VM             __UINT32_C(0x00000100) /* Set to share VM between processes. */
+#define __CLONE_FS             __UINT32_C(0x00000200) /* Set to share fs info between processes. */
+#define __CLONE_FILES          __UINT32_C(0x00000400) /* Set to share open files between processes. */
+#define __CLONE_SIGHAND        __UINT32_C(0x00000800) /* Set to share signal handlers. */
+#define __CLONE_PIDFD          __UINT32_C(0x00001000) /* Set to create+store pidfd at `*parent_tidptr' */
+#define __CLONE_PTRACE         __UINT32_C(0x00002000) /* Set if tracing continues on the child. */
+#define __CLONE_VFORK          __UINT32_C(0x00004000) /* Set if the parent wants the child to wake it up on `exec(2)' or `exit(2)'. */
+#define __CLONE_PARENT         __UINT32_C(0x00008000) /* Set if we want to have the same parent as the cloner. */
+#define __CLONE_THREAD         __UINT32_C(0x00010000) /* Set to add to same thread group. */
+#define __CLONE_NEWNS          __UINT32_C(0x00020000) /* Set to create new namespace. */
+#define __CLONE_SYSVSEM        __UINT32_C(0x00040000) /* Set to shared SVID SEM_UNDO semantics. */
+#define __CLONE_SETTLS         __UINT32_C(0x00080000) /* Set TLS info. */
+#define __CLONE_PARENT_SETTID  __UINT32_C(0x00100000) /* Store TID in userlevel buffer before MM copy. */
+#define __CLONE_CHILD_CLEARTID __UINT32_C(0x00200000) /* Register exit futex and memory location to clear. */
+#define __CLONE_DETACHED       __UINT32_C(0x00400000) /* Create clone detached. */
+#define __CLONE_UNTRACED       __UINT32_C(0x00800000) /* Set if the tracing process can't force CLONE_PTRACE on this clone. */
+#define __CLONE_CHILD_SETTID   __UINT32_C(0x01000000) /* Store TID in userlevel buffer in the child. */
+#define __CLONE_NEWCGROUP      __UINT32_C(0x02000000) /* New cgroup namespace */
+#define __CLONE_NEWUTS         __UINT32_C(0x04000000) /* New utsname group. */
+#define __CLONE_NEWIPC         __UINT32_C(0x08000000) /* New ipcs. */
+#define __CLONE_NEWUSER        __UINT32_C(0x10000000) /* New user namespace. */
+#define __CLONE_NEWPID         __UINT32_C(0x20000000) /* New pid namespace. */
+#define __CLONE_NEWNET         __UINT32_C(0x40000000) /* New network namespace. */
+#define __CLONE_IO             __UINT32_C(0x80000000) /* Clone I/O context. */
 
 /* For `clone3(2)' */
 #define __CLONE_CLEAR_SIGHAND __UINT64_C(0x0000000100000000) /* Set all signal handlers to `SIG_DFL'. */

@@ -22,18 +22,22 @@
 
 #include "../typecore.h"
 
+#define __HYBRID_BSEARCH_LOADMID(result, a, b) \
+	(void)((result) = ((a) + (b)) / 2)
+
 /* Same as `BSEARCH()', but given an ascendingly sorted vector of
  * non-overlapping, inclusive ranges `vector[index] field_lo' ...
  * `vector[index] field_hi', find the one that contains `key' */
-#define BSEARCH_RANGE(index, vector, count, field_lo, field_hi, key)   \
-	for (__SIZE_TYPE__ _bs_lo = 0, _bs_hi = (count); _bs_lo < _bs_hi;) \
-		if (((index) = (_bs_lo + _bs_hi) / 2,                          \
-		     (key) < (vector)[index] field_lo))                        \
-			_bs_hi = (index);                                          \
-		else if ((key) > (vector)[index] field_hi)                     \
-			_bs_lo = (index) + 1;                                      \
-		else if ((_bs_lo = _bs_hi, 0))                                 \
-			; /* Found it! (element is in `vector[index]') */          \
+#define BSEARCH_RANGE(index, vector, count, field_lo, field_hi, key) \
+	for (__SIZE_TYPE__ _bs_lo = 0, _bs_hi = (count);                 \
+	     __HYBRID_BSEARCH_LOADMID(index, _bs_lo, _bs_hi),            \
+	     _bs_lo < _bs_hi;)                                           \
+		if ((key) < (vector)[index] field_lo)                        \
+			_bs_hi = (index);                                        \
+		else if ((key) > (vector)[index] field_hi)                   \
+			_bs_lo = (index) + 1;                                    \
+		else if ((_bs_lo = _bs_hi, 0))                               \
+			; /* Found it! (element is in `vector[index]') */        \
 		else
 
 /* >> BSEARCH (size_t &index, T vector[], size_t count,
@@ -62,29 +66,13 @@
  * Upon success, the statement immediately following this macro will be executed.
  * Upon  failure, that same  statement is skipped as  though pre-fixed by `if(0)'
  *
- * @param: index: [out] The matching vector index (on success; undefined on failure)
- * @param: vector: [in] The vector to-be searched
+ * @param: index: [out] The matching vector index (on success)
+ * @param: index: [out] The index where the element should go (on failure)
+ * @param: vector: [in] The vector to-be searched (must be sorted via field)
  * @param: count:  [in] # of elements in `vector'
  * @param: field:       An optional expression to narrow down a specific field of `vector'
  * @param: key:    [in] The key that's supposed to be found. */
 #define BSEARCH(index, vector, count, field, key) \
 	BSEARCH_RANGE(index, vector, count, field, field, key)
-
-
-/* Same  as `BSEARCH_RANGE()', but  on failure, the  index where the element
- * should have been placed into is stored in `lo' and `hi' (with `lo == hi') */
-#define BSEARCH_RANGE_EX(index, lo, hi, vector, count, field_lo, field_hi, key) \
-	for ((lo) = 0, (hi) = (count); (lo) < (hi);)                                \
-		if (((index) = ((lo) + (hi)) / 2,                                       \
-		     (key) < (vector)[index] field_lo))                                 \
-			(hi) = (index);                                                     \
-		else if ((key) > (vector)[index] field_hi)                              \
-			(lo) = (index) + 1;                                                 \
-		else if (((lo) = (hi), 0))                                              \
-			; /* Found it! (element is in `vector[index]') */                   \
-		else
-#define BSEARCH_EX(index, lo, hi, vector, count, field, key) \
-	BSEARCH_RANGE_EX (index, lo, hi, vector, count, field, field, key)
-
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_BSEARCH_H */

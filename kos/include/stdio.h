@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x546fa4 */
+/* HASH CRC-32:0x21cc92af */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4415,11 +4415,25 @@ __CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_CB_NCX,rewind_unlocked,(__FILE *__res
 __NAMESPACE_LOCAL_USING_OR_IMPL(rewind_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) void __NOTHROW_CB_NCX(__LIBCCALL rewind_unlocked)(__FILE *__restrict __stream) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rewind_unlocked))(__stream); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fisatty
+/* >> fisatty(2)
+ * Check if the a given file stream `stream' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+ * @return: 0: [errno=ENOTTY]      Not a tty
+ * @return: 0: [errno=<unchanged>] Not a tty
+ * @return: 0: [errno=*]           Not a tty */
 __CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,fisatty,(__FILE *__restrict __stream),(__stream))
 #else /* __CRT_HAVE_fisatty */
 #include <asm/os/tty.h>
 #if (defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE___isatty) || defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl) || defined(__CRT_HAVE___ioctl_time64)) && defined(__TCGETA))) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 #include <libc/local/stdio/fisatty.h>
+/* >> fisatty(2)
+ * Check if the a given file stream `stream' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+ * @return: 0: [errno=ENOTTY]      Not a tty
+ * @return: 0: [errno=<unchanged>] Not a tty
+ * @return: 0: [errno=*]           Not a tty */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fisatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL fisatty)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fisatty))(__stream); })
 #endif /* (__CRT_HAVE_isatty || __CRT_HAVE__isatty || __CRT_HAVE___isatty || __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl || __CRT_HAVE___ioctl_time64) && __TCGETA)) && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) */
 #endif /* !__CRT_HAVE_fisatty */

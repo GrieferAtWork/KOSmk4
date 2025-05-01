@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9fb9f0 */
+/* HASH CRC-32:0xa7425869 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -925,7 +925,7 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_pthread_attach_np)(pthread_t self);
  * @return: * :     A call to `cb' returned a value other than `EOK', and enumeration was halted
  * @return: EOK:    All threads were enumerated by being passed to `cb'
  * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_enumthreads_np)(errno_t (__LIBDCALL *cb)(void *cookie, pthread_t thrd), void *cookie);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_enumthreads_np)(errno_t (__LIBKCALL *cb)(void *cookie, pthread_t thrd), void *cookie);
 /* >> pthread_attachtid_np(3)
  * Return a descriptor for a (potentially, previously detached) thread `tid'.
  * This function cannot be used to attach threads created by means other than

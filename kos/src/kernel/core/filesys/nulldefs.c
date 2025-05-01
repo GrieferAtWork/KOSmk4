@@ -199,7 +199,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 }
 
 // Print static initialization symbols
-print("_SELECT_INO(", ",\n             ".join(
+print("_SELECT_INO(", ",\n            ".join(
 	for (local none, none, tree: byInoTrees)
 		f"DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, {tree.value.val.partition(".").first})"
 ), ");");
@@ -418,7 +418,7 @@ PRIVATE struct devdirent dirent_dev_tty = {
 	}
 };
 _SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port),
-             DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port));
+            DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port));
 DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
 INTDEF struct chrdev_ops const dev_mem_ops;
 INTDEF struct chrdev_ops const dev_kmem_ops;

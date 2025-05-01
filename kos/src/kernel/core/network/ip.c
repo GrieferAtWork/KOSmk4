@@ -74,13 +74,12 @@ NOTHROW(KCALL network_ip_datagrams_fini)(struct network_ip_datagrams *__restrict
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 3)) struct ip_datagram *
 NOTHROW(KCALL network_ip_datagrams_findentry)(struct network_ip_datagrams const *__restrict self,
                                               union ip_datagram_id id, size_t *__restrict pindex) {
-	size_t i, lo, hi;
-	BSEARCH_EX(i, lo, hi, self->nid_list, self->nid_size, .dg_id.dg_uid, id.dg_uid) {
+	size_t i;
+	BSEARCH (i, self->nid_list, self->nid_size, .dg_id.dg_uid, id.dg_uid) {
 		*pindex = i;
 		return &self->nid_list[i];
 	}
-	assert(lo == hi);
-	*pindex = lo;
+	*pindex = i;
 	return NULL;
 }
 

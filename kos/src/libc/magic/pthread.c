@@ -3041,7 +3041,7 @@ void pthread_attach_np(pthread_t self);
 @@@return: EOK:    All threads were enumerated by being passed to `cb'
 @@@return: ENOMEM: Insufficient memory to allocate a required, internal buffer
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_enumthreads_np([[nonnull]] $errno_t (__LIBCCALL *cb)(void *cookie, pthread_t thrd), void *cookie);
+$errno_t pthread_enumthreads_np([[nonnull]] $errno_t (__LIBKCALL *cb)(void *cookie, pthread_t thrd), void *cookie);
 
 
 @@>> pthread_attachtid_np(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b64cca0 */
+/* HASH CRC-32:0x187b6b4b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -743,6 +743,13 @@ INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t NOTHROW_CB_NCX(
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_INOUT(1) void NOTHROW_CB_NCX(LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream);
+/* >> fisatty(2)
+ * Check if the a given file stream `stream' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+ * @return: 0: [errno=ENOTTY]      Not a tty
+ * @return: 0: [errno=<unchanged>] Not a tty
+ * @return: 0: [errno=*]           Not a tty */
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_fisatty)(FILE *__restrict stream);
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */

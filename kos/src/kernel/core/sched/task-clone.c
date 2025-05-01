@@ -164,7 +164,7 @@ waitfor_vfork_completion(struct task *__restrict thread)
 		sigmask_prepare_sigsuspend();
 
 		/* The specs say that we should ignore (mask) all POSIX
-		 * signals until the  child indicate VFORK  completion.
+		 * signals  until the child indicates VFORK completion.
 		 *
 		 * We do  this by  simply doing  the wait  using  a
 		 * custom mask that has all signal bits set to `1'.

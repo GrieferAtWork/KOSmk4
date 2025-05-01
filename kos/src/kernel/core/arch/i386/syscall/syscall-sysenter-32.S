@@ -124,13 +124,13 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	movl   %ss:0(%esp), %esp
 	/* Construct an IRET tail. */
 	pushl  $(SEGMENT_USER_DATA_RPL) /* %ss */
-	pushl  %ebp                   /* %useresp */
-	pushfl
+	pushl  %ebp                     /* %useresp */
+	pushfl                          /* %eflags */
 	orl    $(EFLAGS_IF), %ss:(%esp)
 	.cfi_reg_offset %eflags, 0, %esp
 	pushl  $(SEGMENT_USER_CODE_RPL) /* %cs */
 	.cfi_reg_offset %eflags, 4, %esp
-	pushl  %edi                   /* %eip */
+	pushl  %edi                     /* %eip */
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
 	 * property enabled,  thus  allowing  for normal  system  call  return  behavior. */

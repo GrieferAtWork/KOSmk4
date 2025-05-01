@@ -71,20 +71,20 @@ NOTHROW(KCALL net_peeraddrs_destroy)(struct net_peeraddrs *__restrict self) {
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct net_peeraddr *KCALL
 nic_device_requireip(struct nicdev *__restrict self, be32 ip)
 		THROWS(E_BADALLOC) {
-	size_t i, lo, hi;
+	size_t i;
 	REF struct net_peeraddr *result;
 	REF struct net_peeraddrs *old_peers;
 	REF struct net_peeraddrs *new_peers;
 again:
 	old_peers = arref_get(&self->nd_net.n_peers);
-	BSEARCH_EX(i, lo, hi, old_peers->nps_addrs, old_peers->nps_count, ->_npa_hip, (u32)ip) {
+	BSEARCH (i, old_peers->nps_addrs, old_peers->nps_count, ->_npa_hip, (u32)ip) {
 		/* Already exists. */
 		result = incref(old_peers->nps_addrs[i]);
 		decref_unlikely(old_peers);
 		return result;
 	}
+
 	/* Allocate a new peer address vector. */
-	assert(lo == hi);
 	new_peers = net_peeraddrs_malloc(old_peers->nps_count + 1);
 	TRY {
 		result = net_peeraddr_malloc();
@@ -94,15 +94,17 @@ again:
 	}
 	new_peers->nps_refcnt = 1;
 	new_peers->nps_count  = old_peers->nps_count + 1;
-	memcpy(new_peers->nps_addrs, old_peers->nps_addrs, lo, sizeof(REF struct net_peeraddr *));
-	memcpy(new_peers->nps_addrs + lo + 1, old_peers->nps_addrs + lo,
-	       old_peers->nps_count - lo, sizeof(REF struct net_peeraddr *));
+	memcpy(new_peers->nps_addrs, old_peers->nps_addrs,
+	       i, sizeof(REF struct net_peeraddr *));
+	memcpy(new_peers->nps_addrs + i + 1, old_peers->nps_addrs + i,
+	       old_peers->nps_count - i, sizeof(REF struct net_peeraddr *));
+
 	/* Acquire references to existing peer descriptors. */
 	for (i = 0; i < old_peers->nps_count; ++i)
 		incref(old_peers->nps_addrs[i]);
 	decref_unlikely(old_peers);
 
-	result->npa_refcnt = 2; /* +1: result, +1: new_peers->nps_addrs[lo] */
+	result->npa_refcnt = 2; /* +1: result, +1: new_peers->nps_addrs[i] */
 	result->npa_ip     = ip;
 	result->npa_flags  = NET_PEERADDR_HAVE_NONE;
 
@@ -116,7 +118,8 @@ again:
 		memcpy(result->npa_hwmac, self->nd_addr.na_hwmac, ETH_ALEN);
 	}
 
-	new_peers->nps_addrs[lo] = result; /* Inherit reference */
+	new_peers->nps_addrs[i] = result; /* Inherit reference */
+
 	/* Try to install the new peers vector. */
 	if unlikely(!arref_cmpxch_inherit_new(&self->nd_net.n_peers, old_peers, new_peers)) {
 		assert(!wasdestroyed(new_peers));

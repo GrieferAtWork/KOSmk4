@@ -104,6 +104,8 @@
 #define __COMPILER_ASMNAME(x)
 #define UNUSED(...) __VA_ARGS__
 #define __UNUSED(...) __VA_ARGS__
+#define UNUSED2(...) __VA_ARGS__
+#define __UNUSED2(...) __VA_ARGS__
 #define static_assert(...)
 #define _Static_assert(...)
 #define STATIC_ASSERT(...)
@@ -928,9 +930,7 @@
 #define ____IMPL_DO_PDEP(...) {}
 #define ____IMPL_DO_PEXT(...) {}
 #define BSEARCH(...) for(;;)
-#define BSEARCH_EX(...) for(;;)
 #define BSEARCH_RANGE(...) for(;;)
-#define BSEARCH_RANGE_EX(...) for(;;)
 #define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
 #define ATOMIC_ONCE_RUN(self,...) __VA_ARGS__
 

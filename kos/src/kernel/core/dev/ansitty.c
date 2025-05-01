@@ -72,9 +72,11 @@ ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		struct winsize ws;
 		ansitty_coord_t sxy[2];
 		validate_writable(arg, sizeof(struct winsize));
+
 		/* These 2 operators are emulated by libansitty and should _always_ be present. */
 		assert(me->at_ansi.at_ops.ato_getcursor);
 		assert(me->at_ansi.at_ops.ato_setcursor);
+
 		/* Make use of the fact that the cursor position is clamped to the display bounds.
 		 * Note that libansitty makes use  of the same fact  to determine the window  size
 		 * whenever it needs to know that value. */
@@ -86,22 +88,26 @@ ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
 			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
 			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1], false);
+
 			/* Because the cursor coords are clamped to the max valid values, the
 			 * actual display size is described by the max valid coords +1  each. */
 			++sxy[0];
 			++sxy[1];
 		}
+
+		/* If we couldn't get anything useful, default to some sane values. */
 		if (sxy[0] <= 1 && sxy[1] <= 1) {
-			/* If we couldn't get anything useful, default to some sane values. */
 			sxy[0] = 80;
 			sxy[1] = 25;
 		}
 		ws.ws_col = sxy[0]; /* X */
 		ws.ws_row = sxy[1]; /* Y */
+
 		/* Set some sane values for pixel sizes. */
 		ws.ws_xpixel = ws.ws_col * 9;
 		ws.ws_ypixel = ws.ws_row * 16;
 		COMPILER_WRITE_BARRIER();
+
 		/* Copy collected data into user-space. */
 		memcpy(arg, &ws, sizeof(struct winsize));
 		return 0;
@@ -132,8 +138,8 @@ ansittydev_v_output(struct ansitty *__restrict self,
 		 * There is a  chance that  ANSI response  codes are  meant to  be
 		 * pre-processed before being passed to the actual input buffer...
 		 * (Although that wouldn't make much sense to me, since that would
-		 *  also mean that the response would be echoed on-screen when ECHO
-		 *  mode is enabled) */
+		 * also mean that the response would be echoed on-screen when ECHO
+		 * mode is enabled) */
 		ringbuffer_write(&output->t_term.t_ibuf, data, datalen);
 #else
 		terminal_iwrite(&output->t_term, data, datalen, IO_WRONLY);

@@ -191,8 +191,6 @@ ForEachMacros:
   - DLIST_FOREACH_SAFE
   - BSEARCH
   - BSEARCH_RANGE
-  - BSEARCH_RANGE_EX
-  - BSEARCH_EX
   - bitset_foreach
   - bitset_nforeach
   - bitset_nforeach_r
@@ -204,6 +202,10 @@ ForEachMacros:
   - __STATIC_IF
   - __STATIC_ELSE
   - bit_foreach
+  - FOREACH_thiscpu_waiting
+  - FOREACH_thiscpu_running
+  - FOREACH_thiscpu_threads
+  - FOREACH_thiscpu_sched_pending
 # By putting paren-attributes as IfMacros, we prevent clang-format
 # from screwing up (more often than it would otherwise).
 IfMacros:

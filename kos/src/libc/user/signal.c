@@ -742,19 +742,18 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 	struct pthread *me = &current;
 	/* Check previously pending signals became available */
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
-		sigset_t *sigmaskptr;
 		unsigned int i;
-		sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
+		sigset_t *sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
 		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
-			ulongptr_t newmask_word;
+			ulongptr_t curmask_word;
 			pending_word = atomic_read(&me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if likely(!pending_word)
 				continue; /* Nothing pending in here. */
 
 			/* Check if any of the pending signals are currently unmasked. */
-			newmask_word = sigmaskptr->__val[i];
-			if ((pending_word & ~newmask_word) != 0) {
+			curmask_word = sigmaskptr->__val[i];
+			if ((pending_word & ~curmask_word) != 0) {
 
 				/* Clear the set of pending signals (because the kernel won't do this)
 				 * Also  note that  there is no  guaranty that the  signal that became

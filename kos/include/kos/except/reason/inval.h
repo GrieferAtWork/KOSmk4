@@ -292,7 +292,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
 	E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE,          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
 
-	/* === BEGIN: BUILDING DEVICE IOCTLS === */
+	/* === BEGIN: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (tty) */
 	E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND = 0x1840, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCXONC)' isn't one of `TC(I|O)(ON|OFF)' */
@@ -320,7 +320,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS,        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 	E_INVALID_ARGUMENT_CONTEXT_MOD_IOC_GETSTRING_BADINDEX, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
 
-	/* === END: BUILDING DEVICE IOCTLS === */
+	/* === END: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (FATFS) */
 	E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR = 0x2000, /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:         The flags given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)' isn't a set of `FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS | FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH'.
@@ -579,7 +579,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
 #define E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
-/* === BEGIN: BUILDING DEVICE IOCTLS === */
+/* === BEGIN: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (tty) */
 #define E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND                   E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND                   /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCXONC)' isn't one of `TC(I|O)(ON|OFF)' */
@@ -602,7 +602,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
 #define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS              E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS              /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #define E_INVALID_ARGUMENT_CONTEXT_MOD_IOC_GETSTRING_BADINDEX       E_INVALID_ARGUMENT_CONTEXT_MOD_IOC_GETSTRING_BADINDEX       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
-/* === END: BUILDING DEVICE IOCTLS === */
+/* === END: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (FATFS) */
 #define E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR    E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:         The flags given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)' isn't a set of `FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS | FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH'.
@@ -853,7 +853,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     6145  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      6146  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
 #define E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    6147  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
-/* === BEGIN: BUILDING DEVICE IOCTLS === */
+/* === BEGIN: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (tty) */
 #define E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND                   6208  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' passed to `ioctl(fd,TCXONC)' isn't one of `TC(I|O)(ON|OFF)' */
@@ -876,7 +876,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                     7298  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
 #define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS              7299  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #define E_INVALID_ARGUMENT_CONTEXT_MOD_IOC_GETSTRING_BADINDEX       7300  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: String index for `MOD_IOC_GETSTRING' isn't one of `MOD_STR_*' */
-/* === END: BUILDING DEVICE IOCTLS === */
+/* === END: BUILTIN DEVICE IOCTLS === */
 
 	/* ioctl() (FATFS) */
 #define E_INVALID_ARGUMENT_CONTEXT_FAT_IOCTL_SET_ATTRIBUTES_ATTR    8192  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG:         The flags given to `ioctl(FAT_IOCTL_SET_ATTRIBUTES)' isn't a set of `FATATTR_RO | FATATTR_HIDDEN | FATATTR_SYS | FATATTR_VOLUME | FATATTR_DIR | FATATTR_ARCH'.

@@ -297,6 +297,7 @@ file_determine_isatty(FILE *__restrict self) {
 	uint32_t flags = self->if_flag;
 	if (!(flags & (IO_NOTATTY | IO_ISATTY))) {
 		if (flags & IO_HASVTAB) {
+			/* Files with custom operator tables aren't TTYs */
 			flags |= IO_NOTATTY;
 		} else {
 			int is_a_tty;
@@ -3007,13 +3008,22 @@ NOTHROW_CB_NCX(LIBCCALL libc_rewind_unlocked)(FILE *__restrict stream)
 /* fisatty(3)                                                           */
 /************************************************************************/
 
-/*[[[head:libc_fisatty,hash:CRC-32=0xedbae8bc]]]*/
+/*[[[head:libc_fisatty,hash:CRC-32=0x57316f96]]]*/
+/* >> fisatty(2)
+ * Check if the a given file stream `stream' refers to a TTY
+ * @return: 1: Is a tty
+ * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+ * @return: 0: [errno=ENOTTY]      Not a tty
+ * @return: 0: [errno=<unchanged>] Not a tty
+ * @return: 0: [errno=*]           Not a tty */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 /*[[[body:libc_fisatty]]]*/
 {
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
+	if unlikely(!stream) {
+		(void)libc_seterrno(EINVAL);
+		return 0;
+	}
 	stream = file_fromuser(stream);
 	file_determine_isatty(stream);
 	return (stream->if_flag & IO_ISATTY) != 0;

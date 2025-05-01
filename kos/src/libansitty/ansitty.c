@@ -1609,14 +1609,14 @@ ansi_request_presentation_state_report(struct ansitty *__restrict self, unsigned
 }
 
 
-#define ARGUMENT_CODE_FOREACH_BEGIN(code)                       \
-	{                                                           \
-		unsigned int code;                                      \
-		char *_args_iter, *_args_end;                           \
-		_args_iter = arg;                                       \
-		for (;;) {                                              \
-			code = strtoui(_args_iter, &_args_end, 10);         \
-			if (*_args_end != ';' && _args_end != arg + arglen) \
+#define ARGUMENT_CODE_FOREACH_BEGIN(code)                      \
+	{                                                          \
+		unsigned int code;                                     \
+		char *_args_iter, *_args_end;                          \
+		_args_iter = arg;                                      \
+		for (;;) {                                             \
+			code = strtoui(_args_iter, &_args_end, 10);        \
+			if (*_args_end != ';' && _args_end < arg + arglen) \
 				goto nope;
 #define ARGUMENT_CODE_FOREACH_END()        \
 			if (_args_end == arg + arglen) \
@@ -1633,31 +1633,31 @@ ansi_request_presentation_state_report(struct ansitty *__restrict self, unsigned
 	}                              \
 	ARGUMENT_CODE_FOREACH_END()
 
-#define ARGUMENT_CODE_QSWITCH_BEGIN()                               \
-	{                                                               \
-		unsigned int code;                                          \
-		char *_args_iter, *_args_end;                               \
-		_args_iter = arg;                                           \
-		for (;;) {                                                  \
-			if (*_args_iter == '?') {                               \
-				++_args_iter;                                       \
-				code = strtoui(_args_iter, &_args_end, 10);         \
-				if (*_args_end != ';' && _args_end != arg + arglen) \
-					goto nope;                                      \
+#define ARGUMENT_CODE_QSWITCH_BEGIN()                              \
+	{                                                              \
+		unsigned int code;                                         \
+		char *_args_iter, *_args_end;                              \
+		_args_iter = arg;                                          \
+		for (;;) {                                                 \
+			if (*_args_iter == '?') {                              \
+				++_args_iter;                                      \
+				code = strtoui(_args_iter, &_args_end, 10);        \
+				if (*_args_end != ';' && _args_end < arg + arglen) \
+					goto nope;                                     \
 				switch (code) {
-#define ARGUMENT_CODE_QSWITCH_ELSE()                                \
-				default: goto nope;                                 \
-				}                                                   \
-			} else {                                                \
-				code = strtoui(_args_iter, &_args_end, 10);         \
-				if (*_args_end != ';' && _args_end != arg + arglen) \
-					goto nope;                                      \
+#define ARGUMENT_CODE_QSWITCH_ELSE()                               \
+				default: goto nope;                                \
+				}                                                  \
+			} else {                                               \
+				code = strtoui(_args_iter, &_args_end, 10);        \
+				if (*_args_end != ';' && _args_end < arg + arglen) \
+					goto nope;                                     \
 				switch (code) {
 #define ARGUMENT_CODE_QSWITCH_END()        \
 				default: goto nope;        \
 				}                          \
 			}                              \
-			if (_args_end == arg + arglen) \
+			if (_args_end >= arg + arglen) \
 				break;                     \
 			_args_iter = _args_end + 1;    \
 		}                                  \
@@ -2721,7 +2721,7 @@ done_insert_ansitty_flag_hedit:
 				} else {
 					/*assert(color_mode == 5);*/
 					used_color_index = strtoui(_args_end, &_args_end, 10);
-					if (*_args_end != ';' && _args_end != arg + arglen)
+					if (*_args_end != ';' && _args_end < arg + arglen)
 						goto nope;
 				}
 				setcolor(self,

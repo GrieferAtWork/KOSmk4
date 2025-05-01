@@ -2701,7 +2701,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
 }
 /*[[[end:libc_pthread_attach_np]]]*/
 
-/*[[[head:libc_pthread_enumthreads_np,hash:CRC-32=0x25e741e7]]]*/
+/*[[[head:libc_pthread_enumthreads_np,hash:CRC-32=0x16a7501d]]]*/
 /* >> pthread_enumthreads_np(3)
  * Enumerate all threads created by `pthread_create(3)' by invoking `cb' once for each of them.
  * Only threads whose descriptors have yet to be destroyed are enumerated, and care is taken to
@@ -2712,7 +2712,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attach_np)(pthread_t self)
  * @return: EOK:    All threads were enumerated by being passed to `cb'
  * @return: ENOMEM: Insufficient memory to allocate a required, internal buffer */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") NONNULL((1)) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_enumthreads_np)(errno_t (__LIBCCALL *cb)(void *cookie, pthread_t thrd),
+NOTHROW_NCX(LIBCCALL libc_pthread_enumthreads_np)(errno_t (__LIBKCALL *cb)(void *cookie, pthread_t thrd),
                                                   void *cookie)
 /*[[[body:libc_pthread_enumthreads_np]]]*/
 {
@@ -5583,7 +5583,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x99c2c2c5]]]*/
+/*[[[start:exports,hash:CRC-32=0xdd4cef50]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5795,7 +5795,7 @@ DEFINE_PUBLIC_ALIAS_P(pthread_attr_getstartsuspended_np,libc_pthread_attr_getsta
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend2_np,libc_pthread_suspend2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
 DEFINE_PUBLIC_ALIAS_P(pthread_resume2_np,libc_pthread_resume2_np,ATTR_OUT_OPT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, uint32_t *p_old_suspend_counter),(self,p_old_suspend_counter));
 DEFINE_PUBLIC_ALIAS_P_VOID(pthread_attach_np,libc_pthread_attach_np,,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
-DEFINE_PUBLIC_ALIAS_P(pthread_enumthreads_np,libc_pthread_enumthreads_np,NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(errno_t (__LIBCCALL *cb)(void *cookie, pthread_t thrd), void *cookie),(cb,cookie));
+DEFINE_PUBLIC_ALIAS_P(pthread_enumthreads_np,libc_pthread_enumthreads_np,NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(errno_t (__LIBKCALL *cb)(void *cookie, pthread_t thrd), void *cookie),(cb,cookie));
 DEFINE_PUBLIC_ALIAS_P(pthread_attachtid_np,libc_pthread_attachtid_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(pid_t tid, pthread_t *__restrict result),(tid,result));
 DEFINE_PUBLIC_ALIAS_P(pthread_attachpidfd_np,libc_pthread_attachpidfd_np,ATTR_OUT(2),errno_t,NOTHROW_NCX,LIBCCALL,(fd_t pidfd, pthread_t *__restrict result),(pidfd,result));
 DEFINE_PUBLIC_ALIAS_P(thr_continue,libc_pthread_continue_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));

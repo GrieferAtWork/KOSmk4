@@ -3760,6 +3760,13 @@ void rewind_unlocked([[inout]] $FILE *__restrict stream) {
 	fsetpos_unlocked(stream, 0);
 }
 
+@@>> fisatty(2)
+@@Check if the a given file stream `stream' refers to a TTY
+@@@return: 1: Is a tty
+@@@return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
+@@@return: 0: [errno=ENOTTY]      Not a tty
+@@@return: 0: [errno=<unchanged>] Not a tty
+@@@return: 0: [errno=*]           Not a tty
 [[wunused]]
 [[userimpl, requires_function(isatty, fileno)]]
 [[section(".text.crt{|.dos}.io.tty")]]
