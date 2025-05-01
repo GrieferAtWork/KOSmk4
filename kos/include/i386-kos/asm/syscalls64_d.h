@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd59152dc */
+/* HASH CRC-32:0x66d46afc */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1489,7 +1489,7 @@
 #define __NR64RM_clone                    0
 #define __NR64RM_fork                     2
 #define __NR64RM_vfork                    2
-#define __NR64RM_execve                   0
+#define __NR64RM_execve                   2
 #define __NR64RM_exit                     2
 #define __NR64RM_wait4                    1
 #define __NR64RM_kill                     0
@@ -1752,7 +1752,7 @@
 #define __NR64RM_memfd_create             0
 #define __NR64RM_kexec_file_load          0
 #define __NR64RM_bpf                      0
-#define __NR64RM_execveat                 0
+#define __NR64RM_execveat                 2
 #define __NR64RM_userfaultfd              0
 #define __NR64RM_membarrier               0
 #define __NR64RM_mlock2                   0

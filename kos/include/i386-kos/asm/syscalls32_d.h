@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x365ec97 */
+/* HASH CRC-32:0x24aeafa */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1603,7 +1603,7 @@
 #define __NR32RM_creat                        0
 #define __NR32RM_link                         0
 #define __NR32RM_unlink                       0
-#define __NR32RM_execve                       0
+#define __NR32RM_execve                       2
 #define __NR32RM_chdir                        0
 #define __NR32RM_time                         0
 #define __NR32RM_mknod                        0
@@ -1946,7 +1946,7 @@
 #define __NR32RM_getrandom                    0
 #define __NR32RM_memfd_create                 0
 #define __NR32RM_bpf                          0
-#define __NR32RM_execveat                     0
+#define __NR32RM_execveat                     2
 #define __NR32RM_socket                       0
 #define __NR32RM_socketpair                   0
 #define __NR32RM_bind                         0

@@ -425,15 +425,15 @@ setns:(fd_t fd, [tostr(CLONE_FLAGS_SETNS)] syscall_ulong_t nstype) -> errno_t; /
 %[startgroup]
 @@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[cp]
+[cp][restart(must)]
 execve:([tostr(FILENAME)] char const *path,
         [tostr(STRING_VECTOR)] char const *const *argv,
         [tostr(STRING_VECTOR)] char const *const *envp) -> errno_t;
-[cp][doc_alias(execve)]
+[cp][restart(must)][doc_alias(execve)]
 execvex32:(char const *path,
            [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *argv,
            [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *envp) -> errno_t;
-[cp][doc_alias(execve)]
+[cp][restart(must)][doc_alias(execve)]
 execvex64:(char const *path,
            [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *argv,
            [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *envp) -> errno_t;
@@ -443,16 +443,16 @@ execvex64:(char const *path,
 @@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 @@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] execveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
+[cp][restart(must)] execveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
                [tostr(STRING_VECTOR)] char const *const *argv,
                [tostr(STRING_VECTOR)] char const *const *envp,
                [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(execveat)]
+[cp][restart(must)][doc_alias(execveat)]
 execveatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
              [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *argv,
              [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *envp,
              [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(execveat)]
+[cp][restart(must)][doc_alias(execveat)]
 execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
              [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *argv,
              [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *envp,

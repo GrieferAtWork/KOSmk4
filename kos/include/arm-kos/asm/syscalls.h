@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63d0f607 */
+/* HASH CRC-32:0x8d01d8a8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1601,7 +1601,7 @@
 #define __NRRM_creat                        0
 #define __NRRM_link                         0
 #define __NRRM_unlink                       0
-#define __NRRM_execve                       0
+#define __NRRM_execve                       2
 #define __NRRM_chdir                        0
 #define __NRRM_time                         0
 #define __NRRM_mknod                        0
@@ -1945,7 +1945,7 @@
 #define __NRRM_getrandom                    0
 #define __NRRM_memfd_create                 0
 #define __NRRM_bpf                          0
-#define __NRRM_execveat                     0
+#define __NRRM_execveat                     2
 #define __NRRM_userfaultfd                  0
 #define __NRRM_membarrier                   0
 #define __NRRM_mlock2                       0
