@@ -822,7 +822,7 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_safe)(struct icpustate *__restrict st
 	target = (REF struct task *)args[0];
 
 	/* Re-check that the target thread has yet to start terminating. */
-	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED | TASK_FKERNTHREAD)) {
 		decref(target);
 		return state;
 	}
@@ -916,8 +916,8 @@ NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
 #ifdef CONFIG_NO_SMP
 		preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
-		/* check if the thread has already terminated */
-		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+		/* check if the thread has already terminated, or is a kernel thread */
+		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED | TASK_FKERNTHREAD)) {
 			preemption_pop(&was);
 			return;
 		}
@@ -970,7 +970,7 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_and_marksignal_safe)(struct icpustate
 	target = (REF struct task *)args[0];
 
 	/* Re-check that the target thread has yet to start terminating. */
-	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+	if unlikely(atomic_read(&target->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED | TASK_FKERNTHREAD)) {
 		decref(target);
 		return state;
 	}
@@ -1059,8 +1059,8 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 		preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
 
-		/* check if the thread has already terminated */
-		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+		/* check if the thread has already terminated, or is a kernel thread */
+		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED | TASK_FKERNTHREAD)) {
 			preemption_pop(&was);
 			return;
 		}
