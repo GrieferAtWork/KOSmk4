@@ -52,11 +52,6 @@
 
 __DECL_BEGIN
 
-#ifdef __CC__
-typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_KEY_T) __pthread_key_t;
-typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
-#endif /* __CC__ */
-
 #ifdef __USE_PTHREAD_INTERNALS
 #ifdef __KOS__
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
@@ -677,6 +672,12 @@ typedef union __pthread_barrier {
 } __pthread_barrier_t;
 #endif /* __CC__ */
 #endif /* !__USE_PTHREAD_INTERNALS */
+
+#ifdef __CC__
+typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_KEY_T) __pthread_key_t;
+typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
+typedef void (__LIBKCALL *__pthread_switch_routine_t)(__pthread_t __othread, __pthread_t __nthread);
+#endif /* __CC__ */
 
 __DECL_END
 

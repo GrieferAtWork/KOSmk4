@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf42e8e48 */
+/* HASH CRC-32:0x4497fea5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,6 +68,7 @@
 #define __stub__free_locale
 #define __stub___get_current_locale
 #define __stub__get_current_locale
+#define __stub__get_invalid_parameter_handler
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
@@ -86,6 +87,7 @@
 #define __stub___set_app_type
 #define __stub__set_app_type
 #define __stub__set_error_mode
+#define __stub__set_invalid_parameter_handler
 #define __stub__set_new_handler
 #define __stub__set_new_mode
 #define __stub__set_output_format
@@ -461,6 +463,8 @@
 #define __stub_pthread_mutex_setprioceiling
 #define __stub_pthread_setcancelstate
 #define __stub_pthread_setcanceltype
+#define __stub_pthread_switch_add_np
+#define __stub_pthread_switch_delete_np
 #define __stub_ptsname_r
 #define __stub_putmsg
 #define __stub_putpmsg
@@ -599,6 +603,13 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#ifndef __LIBCCALL_IS_LIBDCALL
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __stub_DOS$_set_invalid_parameter_handler
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$_wcreate_locale
 #define __stub_DOS$_wsearchenv_s
 #define __stub_DOS$_wsetlocale
@@ -614,6 +625,14 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$open_wmemstream
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#ifndef __LIBCCALL_IS_LIBDCALL
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __stub_DOS$pthread_switch_add_np
+#define __stub_DOS$pthread_switch_delete_np
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$ptsname_r
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #ifndef __LIBCCALL_IS_LIBDCALL

@@ -51,11 +51,6 @@ __SYSDECL_BEGIN
 typedef struct __cpu_set_struct cpu_set_t;
 #endif /* !__cpu_set_t_defined */
 
-#ifndef __pthread_switch_routine_t_defined
-#define __pthread_switch_routine_t_defined
-typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
-#endif /* !__pthread_switch_routine_t_defined */
-
 #ifndef __stack_t_defined
 #define __stack_t_defined
 typedef struct sigaltstack stack_t;
@@ -66,9 +61,15 @@ typedef struct sigaltstack stack_t;
 typedef __pid_t pthread_id_np_t;
 #endif /* !__pthread_id_np_t_defined */
 
+#ifndef __pthread_switch_routine_t_defined
+#define __pthread_switch_routine_t_defined
+typedef __pthread_switch_routine_t pthread_switch_routine_t;
+#endif /* !__pthread_switch_routine_t_defined */
+
 }
 
 %[define_replacement(pthread_id_np_t = __pid_t)]
+%[define_replacement(pthread_switch_routine_t = __pthread_switch_routine_t)]
 
 
 %[insert:function(pthread_mutexattr_getkind_np = pthread_mutexattr_gettype)]
@@ -126,6 +127,9 @@ $errno_t pthread_stackseg_np(pthread_t self, [[out]] stack_t *sinfo) {
 %[insert:guarded_function(pthread_resume_all_np = pthread_multi_np)]
 
 %[insert:function(pthread_getunique_np = pthread_getunique_np)]
+%[insert:function(pthread_mutex_isowned_np = pthread_mutex_isowned_np)]
+%[insert:function(pthread_switch_add_np = pthread_switch_add_np)]
+%[insert:function(pthread_switch_delete_np = pthread_switch_delete_np)]
 
 %{
 

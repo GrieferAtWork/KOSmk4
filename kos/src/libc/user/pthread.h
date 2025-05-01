@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f81cd4e */
+/* HASH CRC-32:0xc684ad */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -888,6 +888,11 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_suspend_all_np)(void);
  * Calls `pthread_continue_np(3)' once for every running thread but the calling one.
  * This  function  essentially reverses  the effects  of `pthread_suspend_all_np(3)' */
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_multi_np)(void);
+/* >> pthread_mutex_isowned_np(3)
+ * Check if the calling thread is holding a lock to `mutex' (for use by assertions)
+ * @return: 1 : Yes, you are holding a lock to `mutex'
+ * @return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_isowned_np)(pthread_mutex_t __KOS_FIXED_CONST *mutex);
 #endif /* !__KERNEL__ */
 
 DECL_END

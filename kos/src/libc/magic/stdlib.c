@@ -4718,10 +4718,15 @@ typedef void (__LIBDCALL *_invalid_parameter_handler)(__WCHAR16_TYPE__ const *__
 
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
 [[section(".text.crt.dos.errno")]]
+/* Even  though  they're implemented,  indicate that  the "invalid_parameter_handler"
+ * system is a stub. -- Some 3rd party programs check for presence of these functions
+ * and think that when they're present, they're to configure themselves for  windows. */
+[[crt_stubimpl]]
 _invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler handler);
 
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
 [[section(".text.crt.dos.errno")]]
+[[crt_stubimpl]] /* See "_set_invalid_parameter_handler" as to why this is here. */
 _invalid_parameter_handler _get_invalid_parameter_handler();
 
 

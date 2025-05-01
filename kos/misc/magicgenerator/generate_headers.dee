@@ -32,6 +32,8 @@ import * from ..libgen.c.usersource;
 import Function from ..libgen.c.cheaders;
 import hash from hashlib;
 import fs;
+import posix;
+import time;
 
 File.stdout.setbuf("line");
 File.stderr.setbuf("line");
@@ -157,7 +159,7 @@ global final ppAssumeCrtKosKernelFeatures: PPAssume = createPPAssume({
 
 
 @@The max # of tasks that may be run in parallel
-global final MAX_RUNNING_TASKS = (cpu_count from posix)() * 2;
+global final MAX_RUNNING_TASKS = posix.cpu_count() * 2;
 
 class CriticalSection {
 
@@ -306,6 +308,22 @@ again:
 	return true;
 }
 
+@@Visual studio tends  to acquire  non-SHARED locks to  files att  random
+@@So when building from within VS, we tend to get EBUSY errors at random.
+@@Try to handle this by waiting a bit and then trying again.
+function openPossiblyBlockingFile(filename: string, mode: string): File {
+	for (none: [:3]) {
+		try {
+			return File.open(filename, mode);
+		} catch (FSError e) {
+			if ((try posix.EBUSY catch (...) none) != e.errno)
+				throw;
+		}
+		Thread.sleep(time.seconds(1));
+	}
+	return File.open(filename, mode);
+}
+
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
 	local fp: File = File.Writer();
@@ -316,11 +334,11 @@ function updateHashedFile(filename: string, cb: Callable with File) {
 	local newTextHash: int = hash(HASH_FUNCTION, newText);
 again:
 	try {
-		fp = File.open(filename, "rb+");
+		fp = openPossiblyBlockingFile(filename, "rb+");
 	} catch (FileNotFound) {
 again_create_new:
 		try {
-			fp = File.open(filename, "wbx");
+			fp = openPossiblyBlockingFile(filename, "wbx");
 		} catch (FileExists) {
 			goto again;
 		} catch (FileNotFound) {
@@ -790,7 +808,7 @@ function doPrint_src_libc_libc_tlsGlobalsC() {
 	data = data.encode("utf-8");
 	if (oldData != data) {
 		printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME}");
-		with (local fp = File.open(TLS_GLOBALS_FILENAME, "w"))
+		with (local fp = openPossiblyBlockingFile(TLS_GLOBALS_FILENAME, "w"))
 			fp.write(data);
 	}
 	printMessage(f"Updating tls-globals finalizers: {repr TLS_GLOBALS_FILENAME} (end)");
@@ -932,7 +950,7 @@ again_search_wildcard:
 	local newData = f"{data[:orderOutputStart]}{newMacroText}{data[orderOutputEnd:]}".encode("utf-8");
 	if (newData != oldData) {
 		printMessage(f"Updating crt-order: {repr ORDER_FILENAME}");
-		with (local fp = File.open(ORDER_FILENAME, "w"))
+		with (local fp = openPossiblyBlockingFile(ORDER_FILENAME, "w"))
 			fp.write(newData);
 	}
 	printMessage(f"Parsing crt-order: {repr ORDER_FILENAME} (end)");
@@ -1127,12 +1145,28 @@ function doPrint_src_libc_libc_dosabiExports(fp: File) {
 function doPrint_include_gnu_stubs(fp: File) {
 	fp << COPYRIGHT << "\n";
 	local cWriter = CWriter(fp, ppAssume: ppAssumeUserSourceFiles);
-	local stubsByName: {string: LibraryFunction} = Dict();
+	@@Mapping {functionName: (stubIfPPCond, libraryFunction)}
+	local stubsByName: {string: (string, LibraryFunction)} = Dict();
 	for (local f: stubUserFunctions)
-		stubsByName[f.name] = f;
+		stubsByName[f.name] = (f.implementationPpCond, f);
+	for (local none, header: allSystemHeaders) {
+		for (local parts: {
+			header.order_libcAutoHeader,
+			header.order_libcUserHeader
+		}) {
+			for (local part: parts) {
+				if (part !is LibraryFunction)
+					continue;
+				local stubIf = part.stubImplementationPpCond;
+				if (stubIf != "0")
+					stubsByName[part.name] = (stubIf, part);
+			}
+		}
+	}
+
 	for (local name: stubsByName.keys.sorted()) {
-		local f = stubsByName[name];
-		CWriter_ppIfEscaped(cWriter, f.implementationPpCond, ESCAPE_MODE_FULL);
+		local stubIf, f = stubsByName[name]...;
+		CWriter_ppIfEscaped(cWriter, stubIf, ESCAPE_MODE_FULL);
 		for (local ppCond, symbolName: f.exportSymbolNames) {
 			if (symbolName.startswith("?"))
 				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");

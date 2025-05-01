@@ -3409,6 +3409,9 @@ class LibraryFunction {
 	@@in  order  for this  library  function to  actually  be implemented.
 	public member ppCond: string | UserString;
 
+	@@Preprocessor condition that, when true, means that this function is implemented as a stub
+	public member isStubPpCond: string | UserString = "0";
+
 	@@Name  of the original  defining system header (may  differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
 	public member originalSystemHeaderName: string | UserString;
@@ -3462,6 +3465,22 @@ class LibraryFunction {
 			if (ppCond != "1")
 				bindingConditions = f"({ppCond})&&({bindingConditions})";
 			return bindingConditions;
+		}
+	}
+
+	@@Get the condition under which the function is implemented as a stub.
+	@@If  the function is  never implemented as a  stub, simply return "0"
+	public property stubImplementationPpCond: string = {
+		get(): string {
+			if (isStubPpCond != "0") {
+				local implementationPpCond = this.implementationPpCond;
+				if (implementationPpCond != "1") {
+					if (isStubPpCond == "1")
+						return implementationPpCond;
+					return f"({implementationPpCond})&&({isStubPpCond})";
+				}
+			}
+			return isStubPpCond;
 		}
 	}
 

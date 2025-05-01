@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7425869 */
+/* HASH CRC-32:0xa7d08585 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1054,6 +1054,23 @@ INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getunique_np)
 /* >> pthread_getunique_np(3)
  * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
 INTDEF ATTR_PURE WUNUSED errno_t NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self, pthread_id_np_t *ptid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> pthread_mutex_isowned_np(3)
+ * Check if the calling thread is holding a lock to `mutex' (for use by assertions)
+ * @return: 1 : Yes, you are holding a lock to `mutex'
+ * @return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_pthread_mutex_isowned_np)(pthread_mutex_t __KOS_FIXED_CONST *mutex);
+INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_switch_add_np)(pthread_switch_routine_t routine);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routine);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_switch_delete_np)(pthread_switch_routine_t routine);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_switch_delete_np)(pthread_switch_routine_t routine);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -4376,6 +4376,7 @@
 #define __CRT_HAVE_pthread_mutex_destroy
 #define __CRT_HAVE_pthread_mutex_getprioceiling
 #define __CRT_HAVE_pthread_mutex_init
+#define __CRT_HAVE_pthread_mutex_isowned_np
 #define __CRT_HAVE_pthread_mutex_lock
 #define __CRT_HAVE_pthread_mutex_reltimedlock_np
 #define __CRT_HAVE_pthread_mutex_setprioceiling
@@ -4446,6 +4447,8 @@
 #define __CRT_HAVE_pthread_suspend2_np
 #define __CRT_HAVE_pthread_suspend_all_np
 #define __CRT_HAVE_pthread_suspend_np
+#define __CRT_HAVE_pthread_switch_add_np
+#define __CRT_HAVE_pthread_switch_delete_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin_np
 #define __CRT_HAVE_pthread_tryjoin_np
@@ -10245,6 +10248,7 @@
 #define __CRT_HAVE_KOS$pthread_mutex_destroy
 #define __CRT_HAVE_KOS$pthread_mutex_getprioceiling
 #define __CRT_HAVE_KOS$pthread_mutex_init
+#define __CRT_HAVE_KOS$pthread_mutex_isowned_np
 #define __CRT_HAVE_KOS$pthread_mutex_lock
 #define __CRT_HAVE_KOS$pthread_mutex_reltimedlock_np
 #define __CRT_HAVE_KOS$pthread_mutex_setprioceiling
@@ -10309,6 +10313,8 @@
 #define __CRT_HAVE_KOS$pthread_stackseg_np
 #define __CRT_HAVE_KOS$pthread_suspend2_np
 #define __CRT_HAVE_KOS$pthread_suspend_np
+#define __CRT_HAVE_KOS$pthread_switch_add_np
+#define __CRT_HAVE_KOS$pthread_switch_delete_np
 #define __CRT_HAVE_KOS$pthread_timedjoin_np
 #define __CRT_HAVE_KOS$pthread_tryjoin_np
 #define __CRT_HAVE_KOS$pthread_unsuspend_np
@@ -15101,6 +15107,7 @@
 #define __CRT_HAVE_DOS$pthread_mutex_destroy
 #define __CRT_HAVE_DOS$pthread_mutex_getprioceiling
 #define __CRT_HAVE_DOS$pthread_mutex_init
+#define __CRT_HAVE_DOS$pthread_mutex_isowned_np
 #define __CRT_HAVE_DOS$pthread_mutex_lock
 #define __CRT_HAVE_DOS$pthread_mutex_reltimedlock_np
 #define __CRT_HAVE_DOS$pthread_mutex_setprioceiling
@@ -15165,6 +15172,8 @@
 #define __CRT_HAVE_DOS$pthread_stackseg_np
 #define __CRT_HAVE_DOS$pthread_suspend2_np
 #define __CRT_HAVE_DOS$pthread_suspend_np
+#define __CRT_HAVE_DOS$pthread_switch_add_np
+#define __CRT_HAVE_DOS$pthread_switch_delete_np
 #define __CRT_HAVE_DOS$pthread_timedjoin_np
 #define __CRT_HAVE_DOS$pthread_tryjoin_np
 #define __CRT_HAVE_DOS$pthread_unsuspend_np

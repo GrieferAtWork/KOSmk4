@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6108ffb */
+/* HASH CRC-32:0x59a53c26 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -409,6 +409,19 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self,
 	}
 	return EOK;
 }
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routine) {
+	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	(void)routine;
+
+	return ENOTSUP;
+
+
+
+
+
+}
+DEFINE_INTERN_ALIAS_P(libc_pthread_switch_delete_np,libc_pthread_switch_add_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -436,6 +449,8 @@ DEFINE_PUBLIC_ALIAS_P(thr_suspend,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,L
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend_np,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_resume_np,libc_pthread_resume_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_getunique_np,libc_pthread_getunique_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_id_np_t *ptid),(self,ptid));
+DEFINE_PUBLIC_ALIAS_P(pthread_switch_add_np,libc_pthread_switch_add_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
+DEFINE_PUBLIC_ALIAS_P(pthread_switch_delete_np,libc_pthread_switch_delete_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

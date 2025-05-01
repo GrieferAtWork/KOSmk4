@@ -4694,6 +4694,7 @@
 #define __CRT_HAVE_pthread_mutex_destroy
 #define __CRT_HAVE_pthread_mutex_getprioceiling
 #define __CRT_HAVE_pthread_mutex_init
+#define __CRT_HAVE_pthread_mutex_isowned_np
 #define __CRT_HAVE_pthread_mutex_lock
 #define __CRT_HAVE_pthread_mutex_reltimedlock64_np
 #define __CRT_HAVE_pthread_mutex_reltimedlock_np
@@ -4770,6 +4771,8 @@
 #define __CRT_HAVE_pthread_suspend2_np
 #define __CRT_HAVE_pthread_suspend_all_np
 #define __CRT_HAVE_pthread_suspend_np
+#define __CRT_HAVE_pthread_switch_add_np
+#define __CRT_HAVE_pthread_switch_delete_np
 #define __CRT_HAVE_pthread_testcancel
 #define __CRT_HAVE_pthread_timedjoin64_np
 #define __CRT_HAVE_pthread_timedjoin_np

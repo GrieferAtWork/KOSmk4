@@ -3809,6 +3809,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *self)
 }
 /*[[[end:libc_pthread_mutex_unlock]]]*/
 
+/*[[[head:libc_pthread_mutex_isowned_np,hash:CRC-32=0x6382533d]]]*/
+/* >> pthread_mutex_isowned_np(3)
+ * Check if the calling thread is holding a lock to `mutex' (for use by assertions)
+ * @return: 1 : Yes, you are holding a lock to `mutex'
+ * @return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_PURE WUNUSED ATTR_IN(1) int
+NOTHROW_NCX(LIBCCALL libc_pthread_mutex_isowned_np)(pthread_mutex_t __KOS_FIXED_CONST *mutex)
+/*[[[body:libc_pthread_mutex_isowned_np]]]*/
+{
+	pid_t mytid = gettid();
+	uint32_t lock = atomic_read(&mutex->m_lock);
+	if ((lock & FUTEX_TID_MASK) == (uint32_t)mytid)
+		return 1;
+	return 0; /* Lock not taken, or taken by another thread */
+}
+/*[[[end:libc_pthread_mutex_isowned_np]]]*/
+
 /*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0x1dcc0815]]]*/
 /* >> pthread_mutex_getprioceiling(3)
  * Get the priority ceiling of `self'
@@ -5583,7 +5600,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdd4cef50]]]*/
+/*[[[start:exports,hash:CRC-32=0x8e6d4872]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5805,6 +5822,7 @@ DEFINE_PUBLIC_ALIAS_P(pthread_single_np,libc_pthread_suspend_all_np,,errno_t,NOT
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend_all_np,libc_pthread_suspend_all_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(pthread_resume_all_np,libc_pthread_multi_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(pthread_multi_np,libc_pthread_multi_np,,errno_t,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_mutex_isowned_np,libc_pthread_mutex_isowned_np,ATTR_PURE WUNUSED ATTR_IN(1),int,NOTHROW_NCX,LIBCCALL,(pthread_mutex_t __KOS_FIXED_CONST *mutex),(mutex));
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -3215,6 +3215,47 @@ $errno_t pthread_getunique_np(pthread_t self, pthread_id_np_t *ptid) {
 }
 
 
+@@>> pthread_mutex_isowned_np(3)
+@@Check if the calling thread is holding a lock to `mutex' (for use by assertions)
+@@@return: 1 : Yes, you are holding a lock to `mutex'
+@@@return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock
+[[hidden, pure, wunused]]
+[[section(".text.crt{|.dos}.sched.pthread_ext")]]
+[[decl_include("<features.h>", "<bits/crt/pthreadtypes.h>")]]
+int pthread_mutex_isowned_np([[in]] pthread_mutex_t __KOS_FIXED_CONST *mutex);
+
+%[define_replacement(pthread_switch_routine_t = __pthread_switch_routine_t)]
+%[define_type_class(__pthread_switch_routine_t = "TP")]
+
+[[crt_stubimpl, hidden, wunused, section(".text.crt{|.dos}.sched.pthread_ext")]]
+[[decl_include("<bits/types.h>", "<libc/errno.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_switch_add_np([[nonnull]] pthread_switch_routine_t routine) {
+	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	(void)routine;
+@@pp_ifdef ENOTSUP@@
+	return ENOTSUP;
+@@pp_elif defined(EOPNOTSUPP)@@
+	return EOPNOTSUPP;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+
+[[crt_stubimpl, hidden, wunused, section(".text.crt{|.dos}.sched.pthread_ext")]]
+[[decl_include("<bits/types.h>", "<libc/errno.h>", "<bits/crt/pthreadtypes.h>")]]
+[[crt_intern_alias("pthread_switch_add_np")]]
+$errno_t pthread_switch_delete_np([[nonnull]] pthread_switch_routine_t routine) {
+	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	(void)routine;
+@@pp_ifdef ENOTSUP@@
+	return ENOTSUP;
+@@pp_elif defined(EOPNOTSUPP)@@
+	return EOPNOTSUPP;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+
 %#endif /* __USE_KOS */
 
 

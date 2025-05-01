@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd585016a */
+/* HASH CRC-32:0xbd20f4f9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1924,6 +1924,9 @@ DEFINE_PUBLIC_ALIAS(DOS$thr_suspend, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_suspend_np, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_resume_np, libd_pthread_resume_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getunique_np, libd_pthread_getunique_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_isowned_np, libd_pthread_mutex_isowned_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_switch_add_np, libd_pthread_switch_add_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_switch_delete_np, libd_pthread_switch_delete_np);
 
 /* pthread_np */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_stackseg_np, libd_pthread_stackseg_np);

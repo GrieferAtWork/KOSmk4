@@ -5213,6 +5213,29 @@ do_handle_alt_variant_of:
 					}
 					break;
 
+				case "crt_stubimpl":
+				case "crt_kos_stubimpl":
+				case "crt_dos_stubimpl": {
+					/* >> [[crt_stubimpl]]
+					 * >> errno_t pthread_switch_add_np(pthread_switch_routine_t routine);
+					 * Specify that a method is implemented as a stub within the CRT, even
+					 * if it has a body that does not include "CRT_UNIMPLEMENTED". */
+					self.next();
+					local newCond = currentConditions ?? "1";
+					if (tok != "crt_dos_stubimpl") {
+						if (currentKosLibraryFunction is none)
+							currentKosLibraryFunction = LibraryFunction();
+						currentKosLibraryFunction.isStubPpCond = newCond;
+					}
+					if (tok != "crt_kos_stubimpl") {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						if (tok == "crt_stubimpl")
+							newCond = f"!defined(__LIBCCALL_IS_LIBDCALL) && ({newCond})";
+						currentDosLibraryFunction.isStubPpCond = newCond;
+					}
+				}	break;
+
 				case "crt_impl_if":
 				case "crt_kos_impl_if":
 				case "crt_dos_impl_if": {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb14a2f22 */
+/* HASH CRC-32:0xff810642 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,11 +46,6 @@ __SYSDECL_BEGIN
 typedef struct __cpu_set_struct cpu_set_t;
 #endif /* !__cpu_set_t_defined */
 
-#ifndef __pthread_switch_routine_t_defined
-#define __pthread_switch_routine_t_defined
-typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
-#endif /* !__pthread_switch_routine_t_defined */
-
 #ifndef __stack_t_defined
 #define __stack_t_defined
 typedef struct sigaltstack stack_t;
@@ -60,6 +55,11 @@ typedef struct sigaltstack stack_t;
 #define __pthread_id_np_t_defined
 typedef __pid_t pthread_id_np_t;
 #endif /* !__pthread_id_np_t_defined */
+
+#ifndef __pthread_switch_routine_t_defined
+#define __pthread_switch_routine_t_defined
+typedef __pthread_switch_routine_t pthread_switch_routine_t;
+#endif /* !__pthread_switch_routine_t_defined */
 
 #ifdef __CRT_HAVE_pthread_mutexattr_gettype
 /* >> pthread_mutexattr_gettype(3)
@@ -677,6 +677,23 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getunique_
  * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_getunique_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __errno_t __NOTHROW_NCX(__LIBCCALL pthread_getunique_np)(pthread_t __self, pthread_id_np_t *__ptid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_getunique_np))(__self, __ptid); })
 #endif /* ... */
+/* >> pthread_mutex_isowned_np(3)
+ * Check if the calling thread is holding a lock to `mutex' (for use by assertions)
+ * @return: 1 : Yes, you are holding a lock to `mutex'
+ * @return: 0 : Either `mutex' isn't locked, or it isn't you that's holding the lock */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,pthread_mutex_isowned_np,(pthread_mutex_t __KOS_FIXED_CONST *__mutex),(__mutex))
+#ifdef __CRT_HAVE_pthread_switch_add_np
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_switch_add_np,(pthread_switch_routine_t __routine),(__routine))
+#else /* __CRT_HAVE_pthread_switch_add_np */
+#include <libc/local/pthread/pthread_switch_add_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_switch_add_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_switch_add_np)(pthread_switch_routine_t __routine) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_switch_add_np))(__routine); })
+#endif /* !__CRT_HAVE_pthread_switch_add_np */
+#ifdef __CRT_HAVE_pthread_switch_delete_np
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_switch_delete_np,(pthread_switch_routine_t __routine),(__routine))
+#else /* __CRT_HAVE_pthread_switch_delete_np */
+#include <libc/local/pthread/pthread_switch_delete_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_switch_delete_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_switch_delete_np)(pthread_switch_routine_t __routine) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_switch_delete_np))(__routine); })
+#endif /* !__CRT_HAVE_pthread_switch_delete_np */
 
 __SYSDECL_END
 #endif /* __CC__ */
