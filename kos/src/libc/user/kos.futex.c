@@ -48,7 +48,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 #define SPIN_WHILE(should_wait_if_this_expression_is_true) \
 	do {                                                   \
 		unsigned int _count;                               \
-		_count = atomic_read(&futex_spin_counter);          \
+		_count = atomic_read(&futex_spin_counter);         \
 		for (;;) {                                         \
 			if (!(should_wait_if_this_expression_is_true)) \
 				return 1; /* Didn't wait... */             \

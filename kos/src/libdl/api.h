@@ -53,6 +53,25 @@
  * (and breaking the visibility of us exporting that variable for real) */
 #define ____peb_defined
 
+#include <__stdinc.h>
+
+/* Delete NONNULL attribute  annotations because  "no-delete-null-pointer-checks"
+ * doesn't seem to work to disable removal of NULL-checks on "NONNULL" arguments,
+ * and "Wnonnull-compare"  doesn't document  how  to disable  this  optimization,
+ * either.
+ *
+ * TODO: Figure out how to disable this optimization:
+ * >> __attribute__((nonnull(1)))
+ * >> int getval(struct foo *v) {
+ * >>     if (!v) // This check gets optimized away :(
+ * >>         return 0;
+ * >>     return v->val;
+ * >> } */
+#ifdef __OPTIMIZE__
+#undef __ATTR_NONNULL
+#define __ATTR_NONNULL(ppars) /* nothing */
+#endif /* __OPTIMIZE__ */
+
 /* Commit our custom configuration by using it to setup CRT definitions. */
 #include <__crt.h>
 
