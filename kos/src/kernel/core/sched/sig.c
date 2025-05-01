@@ -694,6 +694,7 @@ again:
 	con = atomic_read(&self->s_con);
 #else /* CONFIG_NO_SMP */
 	ctl = atomic_read(&self->s_ctl);
+	assertf(sig_smplock_tst(ctl), "Caller must gift us this lock!");
 	con = sig_smplock_clr(ctl);
 #endif /* !CONFIG_NO_SMP */
 	if (!con) {
@@ -722,12 +723,14 @@ no_cons:
 		assert(!sig_smplock_tst(receiver->tc_signext));
 #endif /* !CONFIG_NO_SMP */
 
-		/* Unlink `receiver' from the pending chain. */
+		/* Unlink `receiver' from the pending chain.
+		 * IMPORTANT: During this operation, we must *retain* the SMP-lock to the signal,
+		 *            since  said lock  is needed  for the  *ENTIRE* broadcast operation. */
 #ifdef CONFIG_NO_SMP
-		if (!atomic_cmpxch_weak(&self->s_con, con, (uintptr_t)receiver->tc_signext))
+		if (!atomic_cmpxch_weak(&self->s_con, con, sig_smplock_set((uintptr_t)receiver->tc_signext)))
 			goto again;
 #else /* CONFIG_NO_SMP */
-		if (!atomic_cmpxch_weak(&self->s_ctl, ctl, (uintptr_t)receiver->tc_signext))
+		if (!atomic_cmpxch_weak(&self->s_ctl, ctl, sig_smplock_set((uintptr_t)receiver->tc_signext)))
 			goto again;
 #endif /* !CONFIG_NO_SMP */
 	} else {
