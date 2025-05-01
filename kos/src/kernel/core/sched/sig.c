@@ -2251,6 +2251,9 @@ again_read_cons:
 				REF struct task *thread;
 				if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 					/* Invoke a completion function. */
+					atomic_write(&receiver->tc_stat,
+					             TASK_CONNECTION_STAT_BROADCAST |
+					             TASK_CONNECTION_STAT_FLOCK_OPT);
 					task_connection_unlink_from_sig(self, receiver);
 					sig_completion_runsingle(self,
 					                         (struct sig_completion *)receiver,
