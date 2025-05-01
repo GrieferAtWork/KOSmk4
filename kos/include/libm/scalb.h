@@ -160,7 +160,7 @@ __LIBM_LOCAL_FUNC(scalbl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 	__ifn = (__int64_t)__fn;
 	if ((__IEEE854_LONG_DOUBLE_TYPE__)__ifn != __fn) {
 		if (__ieee854_rintl(__fn) != __fn) {
-			__libc_feraiseexcept(FE_INVALID);
+			__libc_feraiseexcept_FE_INVALID();
 			return __ieee854_nanl("");
 		}
 		if (__ifn > 65000l)

@@ -180,10 +180,7 @@ __LIBM_LOCAL_FUNC(tgammaf_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_
 		        __IEEE754_FLOAT_C(3.40282346638528859812e+38) /*FLT_MAX*/;
 		return __ret;
 	} else {
-		int __round;
-		__round = __libc_fegetround();
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(FE_TONEAREST);
+		__libc_fepushround_FE_TONEAREST();
 		if (__x > __IEEE754_FLOAT_C(0.0)) {
 			int __exp2_adj;
 			__IEEE754_FLOAT_TYPE__ __tret;
@@ -219,8 +216,7 @@ __LIBM_LOCAL_FUNC(tgammaf_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_
 				__ret = __ieee754_scalbnf(__tret, -__exp2_adj);
 			}
 		}
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(__round);
+		__libc_fepopround_FE_TONEAREST();
 	}
 	if (__ieee754_isinff(__ret) && __x != __IEEE754_FLOAT_C(0.0)) {
 		if (*__signgamp < 0) {
@@ -330,10 +326,8 @@ __LIBM_LOCAL_FUNC(gamma_product) __IEEE754_DOUBLE_TYPE__
                                      __IEEE754_DOUBLE_TYPE__ __x_eps, int __n,
                                      __IEEE754_DOUBLE_TYPE__ *__eps) {
 	__IEEE754_DOUBLE_TYPE__ __ret = __x;
-	int __i, __round;
-	__round = __libc_fegetround();
-	if (__round != FE_TONEAREST)
-		__libc_fesetround(FE_TONEAREST);
+	int __i;
+	__libc_fepushround_FE_TONEAREST();
 	*__eps = __x_eps / __x;
 	for (__i = 1; __i < __n; __i++) {
 		__IEEE754_DOUBLE_TYPE__ __lo;
@@ -343,18 +337,17 @@ __LIBM_LOCAL_FUNC(gamma_product) __IEEE754_DOUBLE_TYPE__
 		__tmp = __lo / __ret;
 		*__eps += __tmp;
 	}
-	if (__round != FE_TONEAREST)
-		__libc_fesetround(__round);
+	__libc_fepopround_FE_TONEAREST();
 	return __ret;
 }
 
 
-#ifndef FE_ROUNDING_MASK
-#define FE_ROUNDING_MASK (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
-#endif /* !FE_ROUNDING_MASK */
-#ifndef FE_PRECISION_MASK
-#define FE_PRECISION_MASK (_FPU_EXTENDED | _FPU_DOUBLE | _FPU_SINGLE)
-#endif /* !FE_PRECISION_MASK */
+#ifndef __FE_ROUNDING_MASK
+#define __FE_ROUNDING_MASK (__FE_TONEAREST | __FE_DOWNWARD | __FE_UPWARD | __FE_TOWARDZERO)
+#endif /* !__FE_ROUNDING_MASK */
+#ifndef __FE_PRECISION_MASK
+#define __FE_PRECISION_MASK (_FPU_EXTENDED | _FPU_DOUBLE | _FPU_SINGLE)
+#endif /* !__FE_PRECISION_MASK */
 
 #if defined(__i386__) || defined(__x86_64__)
 #define __LIBM_SET_ROUND_53BIT_FE_TONEAREST() \
@@ -363,8 +356,8 @@ __LIBM_LOCAL_FUNC(gamma_product) __IEEE754_DOUBLE_TYPE__
 	__ieee754_gamma_feholdexcept_setround_387_prec(__cw)
 __FORCELOCAL __ATTR_ARTIFICIAL void
 __ieee754_gamma_feholdexcept_setround_387_prec(fpu_control_t __cw) {
-	__cw &= ~(FE_ROUNDING_MASK | FE_PRECISION_MASK);
-	__cw |= FE_TONEAREST | _FPU_DOUBLE | 0x3f;
+	__cw &= ~(__FE_ROUNDING_MASK | __FE_PRECISION_MASK);
+	__cw |= __FE_TONEAREST | _FPU_DOUBLE | 0x3f;
 	_FPU_SETCW(__cw);
 }
 #define __LIBM_RESTORE_ROUND_PREC() \
@@ -376,22 +369,16 @@ __ieee754_gamma_feholdexcept_setround_387_prec(fpu_control_t __cw) {
 	__ieee754_gamma_feholdexcept_setround_68k_prec(__cw)
 __FORCELOCAL __ATTR_ARTIFICIAL void
 __ieee754_gamma_feholdexcept_setround_68k_prec(fpu_control_t __cw) {
-	__cw &= ~(FE_ROUNDING_MASK | FE_PRECISION_MASK);
-	__cw &= ~(FE_ALL_EXCEPT << 6);
-	__cw |= FE_TONEAREST | _FPU_DOUBLE;
+	__cw &= ~(__FE_ROUNDING_MASK | __FE_PRECISION_MASK);
+	__cw &= ~(__FE_ALL_EXCEPT << 6);
+	__cw |= __FE_TONEAREST | _FPU_DOUBLE;
 	_FPU_SETCW(__cw);
 }
 #define __LIBM_RESTORE_ROUND_PREC() \
 	_FPU_SETCW(__cw)
 #else /* ... */
-#define __LIBM_SET_ROUND_53BIT_FE_TONEAREST() \
-	int __round;                              \
-	__round = __libc_fegetround();            \
-	if (__round != FE_TONEAREST)              \
-		__libc_fesetround(FE_TONEAREST);
-#define __LIBM_RESTORE_ROUND_PREC() \
-	if (__round != FE_TONEAREST)    \
-		__libc_fesetround(__round);
+#define __LIBM_SET_ROUND_53BIT_FE_TONEAREST() __libc_fepushround_FE_TONEAREST()
+#define __LIBM_RESTORE_ROUND_PREC()           __libc_fepopround_FE_TONEAREST()
 #endif /* !... */
 
 __LIBM_LOCAL_FUNC(gamma_positive) __IEEE754_DOUBLE_TYPE__
@@ -486,10 +473,7 @@ __LIBM_LOCAL_FUNC(tgamma_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_
 		        (__IEEE754_DOUBLE_TYPE__)1.79769313486231570815e+308L /*DBL_MAX*/;
 		return __ret;
 	} else {
-		int __round;
-		__round = __libc_fegetround();
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(FE_TONEAREST);
+		__libc_fepushround_FE_TONEAREST();
 		if (__x > __IEEE754_DOUBLE_C(0.0)) {
 			int __exp2_adj;
 			__IEEE754_DOUBLE_TYPE__ __tret;
@@ -520,8 +504,7 @@ __LIBM_LOCAL_FUNC(tgamma_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_
 				__ret  = __ieee754_scalbn(__tret, -__exp2_adj);
 			}
 		}
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(__round);
+		__libc_fepopround_FE_TONEAREST();
 	}
 	if (__ieee754_isinf(__ret) && __x != 0.0) {
 		if (*__signgamp < 0) {
@@ -614,10 +597,8 @@ __LIBM_LOCAL_FUNC(gamma_productl) __IEEE854_LONG_DOUBLE_TYPE__
                                       __IEEE854_LONG_DOUBLE_TYPE__ __x_eps, int __n,
                                       __IEEE854_LONG_DOUBLE_TYPE__ *__eps) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __ret = __x;
-	int __i, __round;
-	__round = __libc_fegetround();
-	if (__round != FE_TONEAREST)
-		__libc_fesetround(FE_TONEAREST);
+	int __i;
+	__libc_fepushround_FE_TONEAREST();
 	*__eps = __x_eps / __x;
 	for (__i = 1; __i < __n; __i++) {
 		__IEEE854_LONG_DOUBLE_TYPE__ __lo;
@@ -625,8 +606,7 @@ __LIBM_LOCAL_FUNC(gamma_productl) __IEEE854_LONG_DOUBLE_TYPE__
 		__ieee854_gamma_mul_splitl(&__ret, &__lo, __ret, __x + __i);
 		*__eps += __lo / __ret;
 	}
-	if (__round != FE_TONEAREST)
-		__libc_fesetround(__round);
+	__libc_fepopround_FE_TONEAREST();
 	return __ret;
 }
 
@@ -715,10 +695,7 @@ __LIBM_LOCAL_FUNC(tgammal_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_D
 		return __IEEE854_LONG_DOUBLE_C(1.18973149535723176502e+4932) /*LDBL_MAX*/ *
 		       __IEEE854_LONG_DOUBLE_C(1.18973149535723176502e+4932) /*LDBL_MAX*/;
 	} else {
-		int __round;
-		__round = __libc_fegetround();
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(FE_TONEAREST);
+		__libc_fepushround_FE_TONEAREST();
 		if (__x > __IEEE854_LONG_DOUBLE_C(0.0)) {
 			int __exp2_adj;
 			*__signgamp = 0;
@@ -748,8 +725,7 @@ __LIBM_LOCAL_FUNC(tgammal_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_D
 				__ret    = __ieee854_scalbnl(__ret, -__exp2_adj);
 			}
 		}
-		if (__round != FE_TONEAREST)
-			__libc_fesetround(__round);
+		__libc_fepopround_FE_TONEAREST();
 	}
 	if (__ieee854_isinfl(__ret) && __x != __IEEE854_LONG_DOUBLE_C(0.0)) {
 		if (*__signgamp < 0) {

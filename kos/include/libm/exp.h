@@ -349,8 +349,7 @@ __LIBM_LOCAL_FUNC(expf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__IEEE754_DOUBLE_TYPE__ __ex2_u;
 		{
 			__int32_t __exponent;
-			int __old_round = __libc_fegetround();
-			__libc_fesetround(FE_TONEAREST);
+			__libc_fepushround_FE_TONEAREST();
 			/* Calculate n. */
 			__n = __x * __LIBM_LOCAL_VALUE(m_1_ln2f) + __LIBM_LOCAL_VALUE(THREEp22f);
 			__n -= __LIBM_LOCAL_VALUE(THREEp22f);
@@ -377,7 +376,7 @@ __LIBM_LOCAL_FUNC(expf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			         __IEEE754_DOUBLE_C(1.0000001192102037084)) *
 			        __dx +
 			        __delta;
-			__libc_fesetround(__old_round);
+			__libc_fepopround_FE_TONEAREST();
 		}
 		/* Return result. */
 		__result = __x22 * __ex2_u + __ex2_u;
@@ -389,7 +388,7 @@ __LIBM_LOCAL_FUNC(expf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			/* e^-inf == 0, with no error. */
 			return 0;
 		/* Underflow */
-		__libc_feraiseexcept(FE_UNDERFLOW);
+		__libc_feraiseexcept_FE_UNDERFLOW();
 		return 0;
 	}
 	/* Return x, if x is a NaN or Inf; or overflow, otherwise. */
@@ -397,7 +396,7 @@ __LIBM_LOCAL_FUNC(expf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		return __ieee754_inff();
 	if (__ieee754_isnanf(__x))
 		return __x;
-	__libc_feraiseexcept(FE_OVERFLOW);
+	__libc_feraiseexcept_FE_OVERFLOW();
 	return __ieee754_inff();
 }
 #endif /* !__ieee754_expf */
@@ -475,11 +474,11 @@ __LIBM_LOCAL_FUNC(exp) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			return (__xsb == 0) ? __x : 0.0; /* exp(+-inf) = {inf,0} */
 		}
 		if (__x > __LIBM_LOCAL_VALUE(o_threshold)) { /* overflow */
-			__libc_feraiseexcept(FE_OVERFLOW);
+			__libc_feraiseexcept_FE_OVERFLOW();
 			return __ieee754_inf();
 		}
 		if (__x < __LIBM_LOCAL_VALUE(u_threshold)) { /* underflow */
-			__libc_feraiseexcept(FE_UNDERFLOW);
+			__libc_feraiseexcept_FE_UNDERFLOW();
 			return 0;
 		}
 	}
@@ -562,11 +561,11 @@ __LIBM_LOCAL_FUNC(expl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 		              : __x; /* exp(+-inf) = {inf,0} */
 	}
 	if (__x > __LIBM_LOCAL_VALUE(o_thresholdl)) { /* overflow */
-		__libc_feraiseexcept(FE_OVERFLOW);
+		__libc_feraiseexcept_FE_OVERFLOW();
 		return __ieee854_infl();
 	}
 	if (__x < __LIBM_LOCAL_VALUE(u_thresholdl)) { /* underflow */
-		__libc_feraiseexcept(FE_UNDERFLOW);
+		__libc_feraiseexcept_FE_UNDERFLOW();
 		return 0;
 	}
 	__x *= __LIBM_LOCAL_VALUE(log2el);

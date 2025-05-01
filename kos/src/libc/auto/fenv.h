@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa50c0633 */
+/* HASH CRC-32:0x22de6d60 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,39 +30,55 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> feclearexcept(3)
- * @param: excepts: Set of `FE_*' */
-INTDEF int NOTHROW(LIBDCALL libd_feclearexcept)(int excepts);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> feclearexcept(3)
- * @param: excepts: Set of `FE_*' */
-INTDEF int NOTHROW(LIBCCALL libc_feclearexcept)(int excepts);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> feraiseexcept(3)
- * @param: excepts: Set of `FE_*' */
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were railed
+ * @return: != 0 : At least one exception of `excepts' could not be raised */
 INTDEF int (LIBDCALL libd_feraiseexcept)(int excepts) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> feraiseexcept(3)
- * @param: excepts: Set of `FE_*' */
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were railed
+ * @return: != 0 : At least one exception of `excepts' could not be raised */
 INTDEF int (LIBCCALL libc_feraiseexcept)(int excepts) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fegetexceptflag(3) */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were cleared
+ * @return: != 0 : At least one exception of `excepts' could not be cleared */
+INTDEF int NOTHROW(LIBDCALL libd_feclearexcept)(int excepts);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were cleared
+ * @return: != 0 : At least one exception of `excepts' could not be cleared */
+INTDEF int NOTHROW(LIBCCALL libc_feclearexcept)(int excepts);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> fegetexceptflag(3)
+ * @return: == 0 : Success
+ * @return: != 0 : Unspecified error */
 INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fegetexceptflag)(fexcept_t *flagp, int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> fegetexceptflag(3) */
+/* >> fegetexceptflag(3)
+ * @return: == 0 : Success
+ * @return: != 0 : Unspecified error */
 INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fesetexceptflag(3) */
+/* >> fesetexceptflag(3)
+ * @return: == 0 : Success
+ * @return: != 0 : Unspecified error */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_fesetexceptflag)(fexcept_t const *flagp, int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> fesetexceptflag(3) */
+/* >> fesetexceptflag(3)
+ * @return: == 0 : Success
+ * @return: != 0 : Unspecified error */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp, int excepts);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -134,29 +150,51 @@ INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_feupdateenv)(fenv_t const *envp)
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> feenableexcept(3) */
+/* >> feenableexcept(3)
+ * @return: * : The old set of enabled exceptions */
 INTDEF int NOTHROW(LIBDCALL libd_feenableexcept)(int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> feenableexcept(3) */
+/* >> feenableexcept(3)
+ * @return: * : The old set of enabled exceptions */
 INTDEF int NOTHROW(LIBCCALL libc_feenableexcept)(int excepts);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fedisableexcept(3) */
+/* >> fedisableexcept(3)
+ * @return: * : The old set of enabled exceptions */
 INTDEF int NOTHROW(LIBDCALL libd_fedisableexcept)(int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* >> fedisableexcept(3) */
+/* >> fedisableexcept(3)
+ * @return: * : The old set of enabled exceptions */
 INTDEF int NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts);
 /* >> fegetexcept(3) */
 INTDEF ATTR_PURE WUNUSED int NOTHROW(LIBCCALL libc_fegetexcept)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fesetexcept)(int excepts);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fetestexceptflag)(fexcept_t const *flagp, int excepts);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fegetmode)(femode_t *modep);
+INTDEF int NOTHROW(LIBDCALL libd_fesetexcept)(int excepts);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW(LIBCCALL libc_fesetexcept)(int excepts);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_fetestexceptflag)(fexcept_t const *flagp, int excepts);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_fetestexceptflag)(fexcept_t const *flagp, int excepts);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fegetmode)(femode_t *modep);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fegetmode)(femode_t *modep);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fesetmode)(femode_t const *modep);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_fesetmode)(femode_t const *modep);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

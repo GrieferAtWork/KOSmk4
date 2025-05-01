@@ -358,16 +358,17 @@ __SYSDECL_BEGIN
 @@Arc cosine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__acos")]]
 [[impl_include("<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
-[[impl_include("<libm/nan.h>", "<libm/acos.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<libm/nan.h>", "<libm/acos.h>", "<asm/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double acos(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0)) {
-		feraiseexcept(@FE_INVALID@); /* acos(|x|>1) */
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+		feraiseexcept(FE_INVALID); /* acos(|x|>1) */
+@@pp_endif@@
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ACOS);
 	}
 	return __LIBM_MATHFUN(@acos@, x);
@@ -377,16 +378,17 @@ double acos(double x) {
 @@Arc sine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__asin")]]
 [[impl_include("<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
-[[impl_include("<libm/nan.h>", "<libm/asin.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<libm/nan.h>", "<libm/asin.h>", "<asm/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double asin(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0)) {
-		feraiseexcept(@FE_INVALID@); /* asin(|x|>1) */
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+		feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+@@pp_endif@@
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ASIN);
 	}
 	return __LIBM_MATHFUN(@asin@, x);
@@ -670,19 +672,22 @@ double ldexp(double x, int exponent) {
 [[attribute("__DECL_SIMD_log"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
-[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[impl_include("<asm/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/log.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
 double log(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, -1.0)) {
 		if (x == -1.0) {
-			feraiseexcept(@FE_DIVBYZERO@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_DIVBYZERO)@@
+			feraiseexcept(FE_DIVBYZERO);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
 		} else {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -695,19 +700,22 @@ double log(double x) {
 @@Base-ten    logarithm    of   `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log10")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
-[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[impl_include("<asm/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/log10.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
 double log10(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, 0.0)) {
 		if (x == 0.0) {
-			feraiseexcept(@FE_DIVBYZERO@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_DIVBYZERO)@@
+			feraiseexcept(FE_DIVBYZERO);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG10_ZERO); /* log10(0) */
 		} else {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG10_MINUS); /* log10(x<0) */
 		}
 	}
@@ -771,19 +779,22 @@ double expm1(double x) {
 @@Return `log(1 + x)'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log1p")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
-[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[impl_include("<asm/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/log1p.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
 double log1p(double x) {
 	if (__LIBM_MATHFUNI2(@islessequal@, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		if (x == -1.0) {
-			feraiseexcept(@FE_DIVBYZERO@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_DIVBYZERO)@@
+			feraiseexcept(FE_DIVBYZERO);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
 		} else {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -823,10 +834,9 @@ logbf(*) %{generate(double2float("logb"))}
 @@Compute base-2 exponential of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp2")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 [[impl_include("<libm/exp2.h>", "<libm/matherr.h>")]]
 [[impl_include("<libm/finite.h>", "<libm/signbit.h>")]]
 double exp2(double x) {
@@ -844,20 +854,23 @@ double exp2(double x) {
 @@Compute base-2 logarithm of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log2")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
-[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[impl_include("<asm/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/log2.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
 double log2(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, 0.0)) {
 		if (x == 0.0) {
-			feraiseexcept(@FE_DIVBYZERO@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_DIVBYZERO)@@
+			feraiseexcept(FE_DIVBYZERO);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL,
 			                         __LIBM_KMATHERR_LOG2_ZERO); /* log2(0) */
 		} else {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""),
 			                         __LIBM_KMATHERR_LOG2_MINUS); /* log2(x<0) */
 		}
@@ -1864,13 +1877,15 @@ void sincos(double x, [[out]] double *psinx, [[out]] double *pcosx) {
 @@>> exp10f(3), exp10(3), exp10l(3)
 @@A function missing in all standards: compute exponent to base ten
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp10")]]
-[[requires_function(exp, feraiseexcept, __signbit)]]
-[[impl_include("<hybrid/floatcore.h>", "<bits/crt/fenv.h>")]]
+[[requires_function(exp, __signbit)]]
+[[impl_include("<hybrid/floatcore.h>", "<asm/crt/fenv.h>")]]
 [[impl_include("<libm/matherr.h>")]]
 double exp10(double x) {
 	double result;
 	if (finite(x) && x < __DBL_MIN_10_EXP__ - __DBL_DIG__ - 10) {
-		feraiseexcept(@FE_UNDERFLOW@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_UNDERFLOW)@@
+		feraiseexcept(FE_UNDERFLOW);
+@@pp_endif@@
 		return 0.0;
 	}
 	result = exp(M_LN10 * x);
@@ -1914,7 +1929,7 @@ void sincosf(float x, [[out]] float *psinx, [[out]] float *pcosx) {
 
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp10f")]]
 [[requires_function(exp, __signbitf), doc_alias("exp10")]]
-[[impl_include("<hybrid/floatcore.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<hybrid/floatcore.h>", "<asm/crt/fenv.h>")]]
 [[impl_include("<libm/matherr.h>")]]
 float exp10f(float x) {
 	float result;
@@ -1955,13 +1970,15 @@ void sincosl(__LONGDOUBLE x, [[out]] __LONGDOUBLE *psinx, [[out]] __LONGDOUBLE *
 }
 
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp10l")]]
-[[requires_function(feraiseexcept, expl, __signbitl), doc_alias("exp10")]]
-[[impl_include("<hybrid/floatcore.h>", "<bits/crt/fenv.h>")]]
+[[requires_function(expl, __signbitl), doc_alias("exp10")]]
+[[impl_include("<hybrid/floatcore.h>", "<asm/crt/fenv.h>")]]
 [[impl_include("<libm/matherr.h>")]]
 __LONGDOUBLE exp10l(__LONGDOUBLE x) {
 	__LONGDOUBLE result;
 	if (finitel(x) && x < __LDBL_MIN_10_EXP__ - __LDBL_DIG__ - 10) {
-		feraiseexcept(@FE_UNDERFLOW@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_UNDERFLOW)@@
+		feraiseexcept(FE_UNDERFLOW);
+@@pp_endif@@
 		return 0.0L;
 	}
 	result = expl(M_LN10l * x);
@@ -2142,18 +2159,19 @@ double jn(int n, double x) {
 @@>> y0f(3), y0(3), y0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_y0"), export_alias("__y0")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
-[[impl_include("<libm/matherr.h>", "<libm/y0.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/y0.h>", "<asm/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double y0(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2(@islessequal@, x, 0.0) ||
 	     __LIBM_MATHFUNI2(@isgreater@, x, @1.41484755040568800000e+16@ /*X_TLOSS*/))) {
 		if (x < 0.0) {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_ZERO);
@@ -2167,18 +2185,19 @@ double y0(double x) {
 @@>> y1f(3), y1(3), y1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_y1"), export_alias("__y1")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
-[[impl_include("<libm/matherr.h>", "<libm/y1.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/y1.h>", "<asm/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double y1(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2(@islessequal@, x, 0.0) ||
 	     __LIBM_MATHFUNI2(@isgreater@, x, @1.41484755040568800000e+16@ /*X_TLOSS*/))) {
 		if (x < 0.0) {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_ZERO);
@@ -2192,18 +2211,19 @@ double y1(double x) {
 @@>> ynf(3), yn(3), ynl(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_yn"), export_alias("__yn")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
-[[impl_include("<libm/matherr.h>", "<libm/yn.h>", "<bits/crt/fenv.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/yn.h>", "<asm/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
-[[requires($has_function(feraiseexcept) &&
-           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double yn(int n, double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2(@islessequal@, x, 0.0) ||
 	     __LIBM_MATHFUNI2(@isgreater@, x, @1.41484755040568800000e+16@ /*X_TLOSS*/))) {
 		if (x < 0.0) {
-			feraiseexcept(@FE_INVALID@);
+@@pp_if $has_function(feraiseexcept) && defined(FE_INVALID)@@
+			feraiseexcept(FE_INVALID);
+@@pp_endif@@
 			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_ZERO);

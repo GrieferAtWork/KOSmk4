@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4497fea5 */
+/* HASH CRC-32:0x8a39bfc5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@
 #define __stub____adjtimex64
 #define __stub_adjtimex64
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#define __stub___argp_parse
+#define __stub___argp_help
 #define __stub_argp_help
 #define __stub___argp_parse
 #define __stub_argp_parse
@@ -169,10 +169,6 @@
 #define __stub_erand48_r
 #define __stub_fattach
 #define __stub_fdetach
-#define __stub_fegetmode
-#define __stub_fesetexcept
-#define __stub_fesetmode
-#define __stub_fetestexceptflag
 #define __stub___fp_nquery
 #define __stub_fp_nquery
 #define __stub___fp_query

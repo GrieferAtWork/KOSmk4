@@ -421,12 +421,9 @@ __LIBM_LOCAL_FUNC(exp2f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__IEEE754_FLOAT_TYPE__ __rx, __x22, __result;
 		__IEEE754_FLOAT_TYPE__ __ex2_u, __scale_u;
 		__uint32_t __exp;
-		int __oldround;
 		if (__ieee754_fabsf(__x) < (__IEEE754_FLOAT_C(1.19209289550781250000e-7) /* FLT_EPSILON */ / __IEEE754_FLOAT_C(4.0)))
 			return __IEEE754_FLOAT_C(1.0) + __x;
-		__oldround = __libc_fegetround();
-		if (__oldround != FE_TONEAREST)
-			__libc_fesetround(FE_TONEAREST);
+		__libc_fepushround_FE_TONEAREST();
 		__rx = __x + __LIBM_LOCAL_VALUE(THREEp14f);
 		__rx -= __LIBM_LOCAL_VALUE(THREEp14f);
 		__x -= __rx; /* Compute x=x1. */
@@ -444,8 +441,7 @@ __LIBM_LOCAL_FUNC(exp2f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__x22 = (__IEEE754_FLOAT_C(0.24022656679) * __x +
 		         __IEEE754_FLOAT_C(0.69314736128)) *
 		        __ex2_u;
-		if (__oldround != FE_TONEAREST)
-			__libc_fesetround(__oldround);
+		__libc_fepopround_FE_TONEAREST();
 		__result = __x22 * __x + __ex2_u;
 		if (!__unsafe)
 			return __result;
@@ -1085,18 +1081,15 @@ __LIBM_LOCAL_FUNC(exp2) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		__IEEE754_DOUBLE_TYPE__ __rx, __x22, __result;
 		__IEEE754_DOUBLE_TYPE__ __ex2_u, __scale_u, __temp_x22;
 		__uint32_t __exp;
-		int __oldround;
 		if (!__ieee754_isgreaterequal(__x, __LIBM_LOCAL_VALUE(exp2_lomark))) {
 			if (__ieee754_isinf(__x)) /* e^-inf == 0, with no error.  */
 				return 0;
-			__libc_feraiseexcept(FE_UNDERFLOW);
+			__libc_feraiseexcept_FE_UNDERFLOW();
 			return 0;
 		}
 		if (__ieee754_fabs(__x) < (__CCAST(__IEEE754_DOUBLE_TYPE__)2.22044604925031308085e-16L /*DBL_EPSILON*/) / __IEEE754_DOUBLE_C(4.0))
 			return __IEEE754_DOUBLE_C(1.0) + __x;
-		__oldround = __libc_fegetround();
-		if (__oldround != FE_TONEAREST)
-			__libc_fesetround(FE_TONEAREST);
+		__libc_fepushround_FE_TONEAREST();
 		__rx = __x + __LIBM_LOCAL_VALUE(THREEp42);
 		__rx -= __LIBM_LOCAL_VALUE(THREEp42);
 		__x -= __rx; /* Compute x=x1. */
@@ -1121,8 +1114,7 @@ __LIBM_LOCAL_FUNC(exp2) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		        __ex2_u;
 		__libm_math_opt_barrier(__x22, __temp_x22);
 		__temp_x22 = __x22;
-		if (__oldround != FE_TONEAREST)
-			__libc_fesetround(__oldround);
+		__libc_fepopround_FE_TONEAREST();
 		__result = __x22 * __x + __ex2_u;
 		if (!__unsafe)
 			return __result;
@@ -1133,7 +1125,7 @@ __LIBM_LOCAL_FUNC(exp2) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		return __HUGE_VAL;
 	if (__ieee754_isnan(__x))
 		return __x;
-	__libc_feraiseexcept(FE_OVERFLOW);
+	__libc_feraiseexcept_FE_OVERFLOW();
 	return __HUGE_VAL;
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
@@ -1172,7 +1164,7 @@ __LIBM_LOCAL_FUNC(exp2l) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE_
 		/* Underflow or exact zero.  */
 		if (__ieee854_isinfl(__x))
 			return __IEEE854_LONG_DOUBLE_C(0.0);
-		__libc_feraiseexcept(FE_UNDERFLOW);
+		__libc_feraiseexcept_FE_UNDERFLOW();
 		return __IEEE854_LONG_DOUBLE_C(0.0);
 	}
 	/* Infinity, NaN or overflow.  */

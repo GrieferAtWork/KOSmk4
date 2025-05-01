@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59a53c26 */
+/* HASH CRC-32:0x4b38d249 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -412,6 +412,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getunique_np)(pthread_t self,
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routine) {
 	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	COMPILER_IMPURE();
 	(void)routine;
 
 	return ENOTSUP;

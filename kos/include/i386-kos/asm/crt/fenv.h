@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xa67fbd8b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_pthread_switch_delete_np_defined
-#define __local_pthread_switch_delete_np_defined
-#include <__crt.h>
-#include <bits/types.h>
-#include <libc/errno.h>
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_switch_delete_np) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_switch_delete_np))(__pthread_switch_routine_t __routine) {
-	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
-	__COMPILER_IMPURE();
-	(void)__routine;
-#ifdef __ENOTSUP
-	return __ENOTSUP;
-#elif defined(__EOPNOTSUPP)
-	return __EOPNOTSUPP;
-#else /* ... */
-	return 1;
-#endif /* !... */
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_pthread_switch_delete_np_defined
-#define __local___localdep_pthread_switch_delete_np_defined
-#define __localdep_pthread_switch_delete_np __LIBC_LOCAL_NAME(pthread_switch_delete_np)
-#endif /* !__local___localdep_pthread_switch_delete_np_defined */
-#endif /* !__local_pthread_switch_delete_np_defined */
+/*!replace_with_include <fenv.h>*/
+#ifndef _I386_KOS_ASM_CRT_FENV_H
+#define _I386_KOS_ASM_CRT_FENV_H 1
+
+/* Floating point exceptions... */
+#define __FE_INVALID   0x01 /* == FSW_IE */
+#define __FE_DENORM    0x02 /* == FSW_DE */
+#define __FE_DIVBYZERO 0x04 /* == FSW_ZE */
+#define __FE_OVERFLOW  0x08 /* == FSW_OE */
+#define __FE_UNDERFLOW 0x10 /* == FSW_UE */
+#define __FE_INEXACT   0x20 /* == FSW_PE */
+#define __FE_ALL_EXCEPT (__FE_INVALID | __FE_DIVBYZERO | __FE_OVERFLOW | __FE_UNDERFLOW | __FE_INEXACT)
+
+#define __FE_ALL_EXCEPT_X86 (__FE_ALL_EXCEPT | __FE_DENORM)
+
+/* Rounding modes... */
+#define __FE_TONEAREST  0x0000 /* round() (== FCW_RC_NEAREST) */
+#define __FE_DOWNWARD   0x0400 /* floor() (== FCW_RC_DOWN) */
+#define __FE_UPWARD     0x0800 /* ceil()  (== FCW_RC_UP) */
+#define __FE_TOWARDZERO 0x0c00 /* trunc() (== FCW_RC_TRUNC) */
+
+#endif /* !_I386_KOS_ASM_CRT_FENV_H */

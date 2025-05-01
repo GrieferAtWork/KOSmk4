@@ -158,6 +158,7 @@ incdir("");
 #include <asm/cfi.h>
 #include <asm/crt/aio.h>
 #include <asm/crt/confname.h>
+#include <asm/crt/fenv.h>
 #include <asm/crt/float.h>
 #include <asm/crt/fmtmsg.h>
 #include <asm/crt/fp_type.h>
@@ -348,7 +349,7 @@ incdir("");
 #include <bits/crt/dos/corecrt_startup.h>
 #include <bits/crt/dyn-string.h>
 #include <bits/crt/environments.h>
-#include <bits/crt/fenv-inline.h>
+#include <bits/crt/fenv-impl.h>
 #include <bits/crt/fenv.h>
 #include <bits/crt/format-printer.h>
 #include <bits/crt/fts.h>
@@ -479,14 +480,19 @@ incdir("");
 #include <bits/types/clock_t.h>
 #include <bits/types/clockid_t.h>
 #include <bits/types/cookie_io_functions_t.h>
+#include <bits/types/errno_t.h>
 #include <bits/types/error_t.h>
+#include <bits/types/intN_t.h>
+#include <bits/types/intptr_t.h>
 #include <bits/types/locale_t.h>
 #include <bits/types/mbstate_t.h>
+#include <bits/types/ptrdiff_t.h>
 #include <bits/types/sig_atomic_t.h>
 #include <bits/types/sigevent_t.h>
 #include <bits/types/siginfo_t.h>
 #include <bits/types/sigset_t.h>
 #include <bits/types/sigval_t.h>
+#include <bits/types/size_t.h>
 #include <bits/types/stack_t.h>
 #include <bits/types/struct_FILE.h>
 #include <bits/types/struct_iovec.h>
@@ -500,6 +506,8 @@ incdir("");
 #include <bits/types/struct_tm.h>
 #include <bits/types/time_t.h>
 #include <bits/types/timer_t.h>
+#include <bits/types/uintN_t.h>
+#include <bits/types/uintptr_t.h>
 #include <bits/types/wint_t.h>
 #include <bits/types.h>
 #include <bits/typesizes.h>
@@ -1308,7 +1316,6 @@ incdir("");
 #include <objalloc.h>
 #include <obstack.h>
 #include <optimized/error.h>
-#include <optimized/fenv.h>
 #include <optimized/ssp.string.h>
 #include <optimized/string.h>
 #include <optimized/unistd.h>

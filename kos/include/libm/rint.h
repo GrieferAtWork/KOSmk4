@@ -49,16 +49,16 @@ __LIBM_LOCAL_FUNC(rintf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
-	case FE_UPWARD:
+	case __FE_UPWARD:
 		return __ieee754_ceilf(__x);
 
-	case FE_DOWNWARD:
+	case __FE_DOWNWARD:
 		return __ieee754_floorf(__x);
 
-	case FE_TOWARDZERO:
+	case __FE_TOWARDZERO:
 		return __ieee754_truncf(__x);
 
-		/*	case FE_TONEAREST: */
+/*	case __FE_TONEAREST: */
 	default: break;
 	}
 	return __ieee754_roundevenf(__x);
@@ -86,15 +86,15 @@ __LIBM_LOCAL_FUNC(rint) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
-	case FE_UPWARD:
+	case __FE_UPWARD:
 		return __ieee754_ceil(__x);
 
-	case FE_DOWNWARD:
+	case __FE_DOWNWARD:
 		return __ieee754_floor(__x);
 
-	case FE_TOWARDZERO:
+	case __FE_TOWARDZERO:
 		return __ieee754_trunc(__x);
-/*	case FE_TONEAREST: */
+/*	case __FE_TONEAREST: */
 	default: break;
 	}
 	return __ieee754_roundeven(__x);
@@ -113,15 +113,15 @@ __LIBM_LOCAL_FUNC(rintl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE_
 	 * and  using   round-to-even  for   FE_TONEAREST */
 	switch (__libc_fegetround()) {
 
-	case FE_UPWARD:
+	case __FE_UPWARD:
 		return __ieee854_ceill(__x);
 
-	case FE_DOWNWARD:
+	case __FE_DOWNWARD:
 		return __ieee854_floorl(__x);
 
-	case FE_TOWARDZERO:
+	case __FE_TOWARDZERO:
 		return __ieee854_truncl(__x);
-/*	case FE_TONEAREST: */
+/*	case __FE_TONEAREST: */
 	default: break;
 	}
 	return __ieee854_roundevenl(__x);

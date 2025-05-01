@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd20f4f9 */
+/* HASH CRC-32:0x7984dd6f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ DEFINE_PUBLIC_ALIAS(DOS$getaliasbyname_r, libd_getaliasbyname_r);
 /* argp */
 DEFINE_PUBLIC_ALIAS(DOS$__argp_parse, libd_argp_parse);
 DEFINE_PUBLIC_ALIAS(DOS$argp_parse, libd_argp_parse);
-DEFINE_PUBLIC_ALIAS(DOS$__argp_parse, libd_argp_help);
+DEFINE_PUBLIC_ALIAS(DOS$__argp_help, libd_argp_help);
 DEFINE_PUBLIC_ALIAS(DOS$argp_help, libd_argp_help);
 DEFINE_PUBLIC_ALIAS(DOS$__argp_state_help, libd_argp_state_help);
 DEFINE_PUBLIC_ALIAS(DOS$argp_state_help, libd_argp_state_help);
@@ -474,8 +474,8 @@ DEFINE_PUBLIC_ALIAS(DOS$lockf64, libd_lockf64);
 DEFINE_PUBLIC_ALIAS(DOS$directio, libd_directio);
 
 /* fenv */
-DEFINE_PUBLIC_ALIAS(DOS$feclearexcept, libd_feclearexcept);
 DEFINE_PUBLIC_ALIAS(DOS$feraiseexcept, libd_feraiseexcept);
+DEFINE_PUBLIC_ALIAS(DOS$feclearexcept, libd_feclearexcept);
 DEFINE_PUBLIC_ALIAS(DOS$fegetexceptflag, libd_fegetexceptflag);
 DEFINE_PUBLIC_ALIAS(DOS$fesetexceptflag, libd_fesetexceptflag);
 DEFINE_PUBLIC_ALIAS(DOS$fetestexcept, libd_fetestexcept);

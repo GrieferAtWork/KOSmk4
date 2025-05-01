@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x336bdde7 */
+/* HASH CRC-32:0x7d2fb4c5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,17 +65,27 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_exp_defined */
 #ifndef __local___localdep_feraiseexcept_defined
 #define __local___localdep_feraiseexcept_defined
-#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <bits/crt/fenv-impl.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_feraiseexcept) && defined(__arch_feraiseexcept)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,{ return __arch_feraiseexcept(__excepts); })
+#elif defined(__CRT_HAVE_feraiseexcept)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
-#else /* __CRT_HAVE_feraiseexcept */
+#elif defined(__arch_feraiseexcept)
 __NAMESPACE_LOCAL_END
-#include <libc/local/fenv/feraiseexcept.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
-#endif /* !__CRT_HAVE_feraiseexcept */
+__LOCAL int (__LIBCCALL __localdep_feraiseexcept)(int __excepts) __THROWS(...) { return __arch_feraiseexcept(__excepts); }
+#else /* ... */
+#undef __local___localdep_feraiseexcept_defined
+#endif /* !... */
 #endif /* !__local___localdep_feraiseexcept_defined */
 #ifndef __local___localdep_finite_defined
 #define __local___localdep_finite_defined
@@ -103,14 +113,16 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_finite_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/floatcore.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(exp10) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10))(double __x) {
 	double __result;
 	if ((__NAMESPACE_LOCAL_SYM __localdep_finite)(__x) && __x < __DBL_MIN_10_EXP__ - __DBL_DIG__ - 10) {
-		(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_UNDERFLOW);
+#if (defined(__CRT_HAVE_feraiseexcept) || defined(__arch_feraiseexcept)) && defined(__FE_UNDERFLOW)
+		(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(__FE_UNDERFLOW);
+#endif /* (__CRT_HAVE_feraiseexcept || __arch_feraiseexcept) && __FE_UNDERFLOW */
 		return 0.0;
 	}
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_exp)(2.30258509299404568402 * __x);

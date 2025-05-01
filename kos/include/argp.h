@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5f9194f */
+/* HASH CRC-32:0x907b0ea1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,10 +246,10 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_INS(3, 2) __ATTR_OUT(5),error_t,__NOTHROW_NCX,ar
 /* >> argp_parse(3)
  * @param: flags: Set of `ARGP_HELP_*' */
 __CDECLARE_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),(__ap,__stream,__flags,__name))
-#elif defined(__CRT_HAVE___argp_parse)
+#elif defined(__CRT_HAVE___argp_help)
 /* >> argp_parse(3)
  * @param: flags: Set of `ARGP_HELP_*' */
-__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),__argp_parse,(__ap,__stream,__flags,__name))
+__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),__argp_help,(__ap,__stream,__flags,__name))
 #endif /* ... */
 #ifdef __CRT_HAVE_argp_state_help
 /* >> argp_state_help(3)
@@ -337,10 +337,10 @@ __CDECLARE(__ATTR_IN(1) __ATTR_INS(3, 2) __ATTR_OUT(5),error_t,__NOTHROW_NCX,__a
 /* >> argp_parse(3)
  * @param: flags: Set of `ARGP_HELP_*' */
 __CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,__argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),argp_help,(__ap,__stream,__flags,__name))
-#elif defined(__CRT_HAVE___argp_parse)
+#elif defined(__CRT_HAVE___argp_help)
 /* >> argp_parse(3)
  * @param: flags: Set of `ARGP_HELP_*' */
-__CREDIRECT_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,__argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),__argp_parse,(__ap,__stream,__flags,__name))
+__CDECLARE_VOID(__ATTR_IN(1) __ATTR_IN(4) __ATTR_INOUT(2),__NOTHROW_NCX,__argp_help,(struct argp const *__restrict __ap, __FILE *__restrict __stream, unsigned int __flags, char __KOS_FIXED_CONST *__restrict __name),(__ap,__stream,__flags,__name))
 #endif /* ... */
 #ifdef __CRT_HAVE_argp_state_help
 /* >> argp_state_help(3)

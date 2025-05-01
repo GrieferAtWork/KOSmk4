@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0348840 */
+/* HASH CRC-32:0x6b843246 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,18 +29,47 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __CRT_HAVE_feraiseexcept
+#ifndef ____libc_core_feraiseexcept_defined
+#define ____libc_core_feraiseexcept_defined
+#include <bits/crt/fenv-impl.h>
+#if defined(__CRT_HAVE_feraiseexcept) && defined(__arch_feraiseexcept)
 #include <kos/anno.h>
 /* >> feraiseexcept(3)
- * @param: excepts: Set of `FE_*' */
-__CREDIRECT(,int,__THROWING(...),__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
-#else /* __CRT_HAVE_feraiseexcept */
-#include <libc/local/fenv/feraiseexcept.h>
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were railed
+ * @return: != 0 : At least one exception of `excepts' could not be raised */
+__CEIREDIRECT(,int,__THROWING(...),__libc_core_feraiseexcept,(int __excepts),feraiseexcept,{ return __arch_feraiseexcept(__excepts); })
+#elif defined(__CRT_HAVE_feraiseexcept)
+#include <kos/anno.h>
 /* >> feraiseexcept(3)
- * @param: excepts: Set of `FE_*' */
-#define __libc_core_feraiseexcept __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept)
-#endif /* !__CRT_HAVE_feraiseexcept */
-#ifdef __CRT_HAVE_fegetround
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were railed
+ * @return: != 0 : At least one exception of `excepts' could not be raised */
+__CREDIRECT(,int,__THROWING(...),__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+#elif defined(__arch_feraiseexcept)
+#include <kos/anno.h>
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*'
+ * @return: == 0 : All exceptions indicated by `excepts' were railed
+ * @return: != 0 : At least one exception of `excepts' could not be raised */
+__LOCAL int (__LIBCCALL __libc_core_feraiseexcept)(int __excepts) __THROWS(...) { return __arch_feraiseexcept(__excepts); }
+#else /* ... */
+#undef ____libc_core_feraiseexcept_defined
+#endif /* !... */
+#endif /* !____libc_core_feraiseexcept_defined */
+#ifndef ____libc_core_fegetround_defined
+#define ____libc_core_fegetround_defined
+#include <bits/crt/fenv-impl.h>
+#if defined(__CRT_HAVE_fegetround) && defined(__arch_fegetround)
+/* >> fegetround(3)
+ * Get the current rounding direction
+ * @return: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,{ return __arch_fegetround(); })
+#elif defined(__CRT_HAVE_fegetround)
 /* >> fegetround(3)
  * Get the current rounding direction
  * @return: One of...
@@ -49,8 +78,7 @@ __CREDIRECT(,int,__THROWING(...),__libc_core_feraiseexcept,(int __excepts),ferai
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,())
-#else /* __CRT_HAVE_fegetround */
-#include <libc/local/fenv/fegetround.h>
+#elif defined(__arch_fegetround)
 /* >> fegetround(3)
  * Get the current rounding direction
  * @return: One of...
@@ -58,9 +86,24 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-#define __libc_core_fegetround __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround)
-#endif /* !__CRT_HAVE_fegetround */
-#ifdef __CRT_HAVE_fesetround
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_core_fegetround)(void) { return __arch_fegetround(); }
+#else /* ... */
+#undef ____libc_core_fegetround_defined
+#endif /* !... */
+#endif /* !____libc_core_fegetround_defined */
+#ifndef ____libc_core_fesetround_defined
+#define ____libc_core_fesetround_defined
+#include <bits/crt/fenv-impl.h>
+#if defined(__CRT_HAVE_fesetround) && defined(__arch_fesetround)
+/* >> fesetround(3)
+ * Set the current rounding direction
+ * @param: rounding_direction: One of...
+ *             ... `FE_TONEAREST':  round()
+ *             ... `FE_DOWNWARD':   floor()
+ *             ... `FE_UPWARD':     ceil()
+ *             ... `FE_TOWARDZERO': trunc() */
+__CEIREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fesetround,{ return __arch_fesetround(__rounding_direction); })
+#elif defined(__CRT_HAVE_fesetround)
 /* >> fesetround(3)
  * Set the current rounding direction
  * @param: rounding_direction: One of...
@@ -69,8 +112,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
 __CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fesetround,(__rounding_direction))
-#else /* __CRT_HAVE_fesetround */
-#include <libc/local/fenv/fesetround.h>
+#elif defined(__arch_fesetround)
 /* >> fesetround(3)
  * Set the current rounding direction
  * @param: rounding_direction: One of...
@@ -78,8 +120,11 @@ __CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fes
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-#define __libc_core_fesetround __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround)
-#endif /* !__CRT_HAVE_fesetround */
+__LOCAL int __NOTHROW(__LIBCCALL __libc_core_fesetround)(int __rounding_direction) { return __arch_fesetround(__rounding_direction); }
+#else /* ... */
+#undef ____libc_core_fesetround_defined
+#endif /* !... */
+#endif /* !____libc_core_fesetround_defined */
 
 __SYSDECL_END
 

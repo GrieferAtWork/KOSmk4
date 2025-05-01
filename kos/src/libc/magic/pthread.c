@@ -3231,6 +3231,7 @@ int pthread_mutex_isowned_np([[in]] pthread_mutex_t __KOS_FIXED_CONST *mutex);
 [[decl_include("<bits/types.h>", "<libc/errno.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_switch_add_np([[nonnull]] pthread_switch_routine_t routine) {
 	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	COMPILER_IMPURE();
 	(void)routine;
 @@pp_ifdef ENOTSUP@@
 	return ENOTSUP;
@@ -3246,6 +3247,7 @@ $errno_t pthread_switch_add_np([[nonnull]] pthread_switch_routine_t routine) {
 [[crt_intern_alias("pthread_switch_add_np")]]
 $errno_t pthread_switch_delete_np([[nonnull]] pthread_switch_routine_t routine) {
 	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	COMPILER_IMPURE();
 	(void)routine;
 @@pp_ifdef ENOTSUP@@
 	return ENOTSUP;

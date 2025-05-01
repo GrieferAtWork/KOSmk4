@@ -338,7 +338,7 @@ error_t argp_parse([[in]] struct argp const *__restrict ap,
 
 @@>> argp_parse(3)
 @@@param: flags: Set of `ARGP_HELP_*'
-[[export_alias("__argp_parse")]]
+[[export_alias("__argp_help")]]
 [[decl_include("<features.h>", "<bits/crt/argp.h>")]]
 void argp_help([[in]] struct argp const *__restrict ap,
                [[inout]] $FILE *__restrict stream, unsigned int flags,

@@ -406,6 +406,7 @@
 #define __CRT_HAVE___argc
 #define __CRT_HAVE___argp_error
 #define __CRT_HAVE___argp_failure
+#define __CRT_HAVE___argp_help
 #define __CRT_HAVE___argp_input
 #define __CRT_HAVE___argp_parse
 #define __CRT_HAVE___argp_state_help

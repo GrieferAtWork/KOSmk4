@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd423bf3 */
+/* HASH CRC-32:0x3d56005c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,27 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_feraiseexcept_defined
 #define __local___localdep_feraiseexcept_defined
-#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <bits/crt/fenv-impl.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_feraiseexcept) && defined(__arch_feraiseexcept)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,{ return __arch_feraiseexcept(__excepts); })
+#elif defined(__CRT_HAVE_feraiseexcept)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
-#else /* __CRT_HAVE_feraiseexcept */
+#elif defined(__arch_feraiseexcept)
 __NAMESPACE_LOCAL_END
-#include <libc/local/fenv/feraiseexcept.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
-#endif /* !__CRT_HAVE_feraiseexcept */
+__LOCAL int (__LIBCCALL __localdep_feraiseexcept)(int __excepts) __THROWS(...) { return __arch_feraiseexcept(__excepts); }
+#else /* ... */
+#undef __local___localdep_feraiseexcept_defined
+#endif /* !... */
 #endif /* !__local___localdep_feraiseexcept_defined */
 #ifndef __local___localdep_y1_defined
 #define __local___localdep_y1_defined
@@ -62,19 +72,20 @@ __NAMESPACE_LOCAL_END
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y1.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(y1l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y1l))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2L(islessequal, __x, 0.0L) ||
 	     __LIBM_MATHFUNI2L(isgreater, __x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (__x < 0.0L) {
-			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_INVALID);
+#if (defined(__CRT_HAVE_feraiseexcept) || defined(__arch_feraiseexcept)) && defined(__FE_INVALID)
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(__FE_INVALID);
+#endif /* (__CRT_HAVE_feraiseexcept || __arch_feraiseexcept) && __FE_INVALID */
 			return __kernel_standard_l(__x, __x, -__HUGE_VALL, __LIBM_KMATHERRL_Y1_MINUS);
 		} else if (__x == 0.0L) {
 			return __kernel_standard_l(__x, __x, -__HUGE_VALL, __LIBM_KMATHERRL_Y1_ZERO);

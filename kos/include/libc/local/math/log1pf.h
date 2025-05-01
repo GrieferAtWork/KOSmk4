@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9fe5fe5 */
+/* HASH CRC-32:0xd2e6bd36 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,27 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_feraiseexcept_defined
 #define __local___localdep_feraiseexcept_defined
-#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <bits/crt/fenv-impl.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_feraiseexcept) && defined(__arch_feraiseexcept)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,{ return __arch_feraiseexcept(__excepts); })
+#elif defined(__CRT_HAVE_feraiseexcept)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__THROWING(...),__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
-#else /* __CRT_HAVE_feraiseexcept */
+#elif defined(__arch_feraiseexcept)
 __NAMESPACE_LOCAL_END
-#include <libc/local/fenv/feraiseexcept.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
-#endif /* !__CRT_HAVE_feraiseexcept */
+__LOCAL int (__LIBCCALL __localdep_feraiseexcept)(int __excepts) __THROWS(...) { return __arch_feraiseexcept(__excepts); }
+#else /* ... */
+#undef __local___localdep_feraiseexcept_defined
+#endif /* !... */
 #endif /* !__local___localdep_feraiseexcept_defined */
 #ifndef __local___localdep_log1p_defined
 #define __local___localdep_log1p_defined
@@ -56,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_log1p_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log1p.h>
@@ -68,13 +78,16 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-
 	if (__LIBM_MATHFUNI2F(islessequal, __x, -1.0f) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		if (__x == -1.0f) {
-			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_DIVBYZERO);
+#if (defined(__CRT_HAVE_feraiseexcept) || defined(__arch_feraiseexcept)) && defined(__FE_DIVBYZERO)
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(__FE_DIVBYZERO);
+#endif /* (__CRT_HAVE_feraiseexcept || __arch_feraiseexcept) && __FE_DIVBYZERO */
 			return __kernel_standard_f(__x, __x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG_ZERO); /* log(0) */
 		} else {
-			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_INVALID);
+#if (defined(__CRT_HAVE_feraiseexcept) || defined(__arch_feraiseexcept)) && defined(__FE_INVALID)
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(__FE_INVALID);
+#endif /* (__CRT_HAVE_feraiseexcept || __arch_feraiseexcept) && __FE_INVALID */
 			return __kernel_standard_f(__x, __x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_LOG_MINUS); /* log(x<0) */
 		}
 	}

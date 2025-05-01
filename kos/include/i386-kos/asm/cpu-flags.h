@@ -221,26 +221,26 @@
 
 
 /* MXCSR bits. (for use with `__stmxcsr()' / `__ldmxcsr()') */
-#define MXCSR_IE  __UINT16_C(0x00000001) /* [bit(0)] Invalid Operation Flag (sticky, Exception) */
-#define MXCSR_DE  __UINT16_C(0x00000002) /* [bit(1)] Denormal Flag (sticky, Exception) */
-#define MXCSR_ZE  __UINT16_C(0x00000004) /* [bit(2)] Zero Divide Flag (sticky, Exception) */
-#define MXCSR_OE  __UINT16_C(0x00000008) /* [bit(3)] Overflow Flag (sticky, Exception) */
-#define MXCSR_UE  __UINT16_C(0x00000010) /* [bit(4)] Underflow Flag (sticky, Exception) */
-#define MXCSR_PE  __UINT16_C(0x00000020) /* [bit(5)] Precision Flag (sticky, Exception) */
-#define MXCSR_DAZ __UINT16_C(0x00000040) /* [bit(6)] Denormals Are Zeros */
-#define MXCSR_IM  __UINT16_C(0x00000080) /* [bit(7)] Invalid Operation (Exception mask) */
-#define MXCSR_DM  __UINT16_C(0x00000100) /* [bit(8)] Denormal operand (Exception mask) */
-#define MXCSR_ZM  __UINT16_C(0x00000200) /* [bit(9)] Zero divide (Exception mask) */
-#define MXCSR_OM  __UINT16_C(0x00000400) /* [bit(10)] Overflow (Exception mask) */
-#define MXCSR_UM  __UINT16_C(0x00000800) /* [bit(11)] Underflow (Exception mask) */
-#define MXCSR_PM  __UINT16_C(0x00001000) /* [bit(12)] Precision (Exception mask) */
-#define MXCSR_RC  __UINT16_C(0x00006000) /* [bit(13 - 14)] Rounding control. */
-#   define MXCSR_RC_NEAREST __UINT16_C(0x00000000) /* Result   is   closest  to   the  infinitely   precise  result.
+#define MXCSR_IE  __UINT32_C(0x00000001) /* [bit(0)] Invalid Operation Flag (sticky, Exception) */
+#define MXCSR_DE  __UINT32_C(0x00000002) /* [bit(1)] Denormal Flag (sticky, Exception) */
+#define MXCSR_ZE  __UINT32_C(0x00000004) /* [bit(2)] Zero Divide Flag (sticky, Exception) */
+#define MXCSR_OE  __UINT32_C(0x00000008) /* [bit(3)] Overflow Flag (sticky, Exception) */
+#define MXCSR_UE  __UINT32_C(0x00000010) /* [bit(4)] Underflow Flag (sticky, Exception) */
+#define MXCSR_PE  __UINT32_C(0x00000020) /* [bit(5)] Precision Flag (sticky, Exception) */
+#define MXCSR_DAZ __UINT32_C(0x00000040) /* [bit(6)] Denormals Are Zeros */
+#define MXCSR_IM  __UINT32_C(0x00000080) /* [bit(7)] Invalid Operation (Exception mask) */
+#define MXCSR_DM  __UINT32_C(0x00000100) /* [bit(8)] Denormal operand (Exception mask) */
+#define MXCSR_ZM  __UINT32_C(0x00000200) /* [bit(9)] Zero divide (Exception mask) */
+#define MXCSR_OM  __UINT32_C(0x00000400) /* [bit(10)] Overflow (Exception mask) */
+#define MXCSR_UM  __UINT32_C(0x00000800) /* [bit(11)] Underflow (Exception mask) */
+#define MXCSR_PM  __UINT32_C(0x00001000) /* [bit(12)] Precision (Exception mask) */
+#define MXCSR_RC  __UINT32_C(0x00006000) /* [bit(13 - 14)] Rounding control. */
+#   define MXCSR_RC_NEAREST __UINT32_C(0x00000000) /* Result   is   closest  to   the  infinitely   precise  result.
                                                     * If 2 values are equally close, the even one is used. (DEFAULT) */
-#   define MXCSR_RC_DOWN    __UINT16_C(0x00002000) /* Round towards -INF */
-#   define MXCSR_RC_UP      __UINT16_C(0x00004000) /* Round towards +INF */
-#   define MXCSR_RC_TRUNC   __UINT16_C(0x00006000) /* Truncate non-representable bits. */
-#define MXCSR_FZ  __UINT16_C(0x00008000) /* [bit(15)] Flush-to-zero. */
+#   define MXCSR_RC_DOWN    __UINT32_C(0x00002000) /* Round towards -INF */
+#   define MXCSR_RC_UP      __UINT32_C(0x00004000) /* Round towards +INF */
+#   define MXCSR_RC_TRUNC   __UINT32_C(0x00006000) /* Truncate non-representable bits. */
+#define MXCSR_FZ  __UINT32_C(0x00008000) /* [bit(15)] Flush-to-zero. */
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15d4efd2 */
+/* HASH CRC-32:0x8477ece3 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_switch_add_np) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_switch_add_np))(__pthread_switch_routine_t __routine) {
 	/* This right here also matches what FreeBSD current does (that is: returning "ENOTSUP") */
+	__COMPILER_IMPURE();
 	(void)__routine;
 #ifdef __ENOTSUP
 	return __ENOTSUP;

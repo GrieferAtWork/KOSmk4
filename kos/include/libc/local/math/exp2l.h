@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d08f87b */
+/* HASH CRC-32:0xca96c445 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,6 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(exp2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2l))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-
 
 
 	__LONGDOUBLE __result = __LIBM_MATHFUNL(exp2, __x);

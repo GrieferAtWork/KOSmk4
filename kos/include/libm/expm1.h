@@ -99,13 +99,13 @@ __LIBM_LOCAL_FUNC(expm1f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			if (__hx == __UINT32_C(0x7f800000))
 				return (__xsb == 0) ? __x : -__LIBM_LOCAL_VALUE(onef); /* exp(+-inf) = {inf, -1} */
 			if (__x > __LIBM_LOCAL_VALUE(o_thresholdf)) {
-				__libc_feraiseexcept(FE_OVERFLOW);
+				__libc_feraiseexcept_FE_OVERFLOW();
 				return __ieee754_inff(); /* overflow */
 			}
 		}
-		if (__xsb != 0) {                     /* x < -27 * ln2, return -1.0 with inexact */
-			__libc_feraiseexcept(FE_INEXACT); /* raise inexact */
-			return -__LIBM_LOCAL_VALUE(onef); /* return -1 */
+		if (__xsb != 0) {                      /* x < -27 * ln2, return -1.0 with inexact */
+			__libc_feraiseexcept_FE_INEXACT(); /* raise inexact */
+			return -__LIBM_LOCAL_VALUE(onef);  /* return -1 */
 		}
 	}
 
@@ -263,13 +263,13 @@ __LIBM_LOCAL_FUNC(expm1) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 				       : -__LIBM_LOCAL_VALUE(Q)[0];
 			}
 			if (__x > __LIBM_LOCAL_VALUE(o_threshold)) {
-				__libc_feraiseexcept(FE_OVERFLOW);
+				__libc_feraiseexcept_FE_OVERFLOW();
 				return __ieee754_inf(); /* overflow */
 			}
 		}
-		if (__xsb != 0) {                     /* x < -56 * ln2, return -1.0 with inexact */
-			__libc_feraiseexcept(FE_INEXACT); /* raise inexact */
-			return -__LIBM_LOCAL_VALUE(Q)[0]; /* return -1 */
+		if (__xsb != 0) {                      /* x < -56 * ln2, return -1.0 with inexact */
+			__libc_feraiseexcept_FE_INEXACT(); /* raise inexact */
+			return -__LIBM_LOCAL_VALUE(Q)[0];  /* return -1 */
 		}
 	}
 
@@ -426,7 +426,7 @@ __LIBM_LOCAL_FUNC(expm1l) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 		return __x;
 	/* Overflow.  */
 	if (__x > __LIBM_LOCAL_VALUE(maxlogl)) {
-		__libc_feraiseexcept(FE_OVERFLOW);
+		__libc_feraiseexcept_FE_OVERFLOW();
 		return __ieee854_infl();
 	}
 	/* Minimum value.  */

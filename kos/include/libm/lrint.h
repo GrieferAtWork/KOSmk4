@@ -57,14 +57,14 @@ __LIBM_LOCAL_FUNC(lrintf) __ATTR_WUNUSED __ATTR_CONST long int
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || __i0 != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && __i0 != 0)
 				return __sx ? -1 : 1;
 			return 0;
@@ -75,20 +75,20 @@ __LIBM_LOCAL_FUNC(lrintf) __ATTR_WUNUSED __ATTR_CONST long int
 		} else {
 			__uint32_t __i = __UINT32_C(0x007fffff) >> __j0;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				__i0 |= __UINT32_C(0x800000);
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x800000);
 				if (__sx && (__i0 & __i) != 0)
 					__i0 += __UINT32_C(0x00800000) >> __j0;
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				__i0 |= __UINT32_C(0x800000);
 				if (!__sx && (__i0 & __i) != 0)
 					__i0 += __UINT32_C(0x00800000) >> __j0;
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				__i0 |= __UINT32_C(0x800000);
 				if ((__i0 & (__i >> 1)) != 0 || (__i0 & (__UINT32_C(0x00800000) >> __j0))) {
@@ -102,7 +102,7 @@ __LIBM_LOCAL_FUNC(lrintf) __ATTR_WUNUSED __ATTR_CONST long int
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS)) {
 			/* inf or nan */
 			return __LONG_MIN__;
@@ -132,14 +132,14 @@ __LIBM_LOCAL_FUNC(llrintf) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || __i0 != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && __i0 != 0)
 				return __sx ? -1 : 1;
 			return 0;
@@ -150,20 +150,20 @@ __LIBM_LOCAL_FUNC(llrintf) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		} else {
 			__uint32_t __i = __UINT32_C(0x007fffff) >> __j0;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				__i0 |= __UINT32_C(0x800000);
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x800000);
 				if (__sx && (__i0 & __i) != 0)
 					__i0 += __UINT32_C(0x00800000) >> __j0;
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				__i0 |= __UINT32_C(0x800000);
 				if (!__sx && (__i0 & __i) != 0)
 					__i0 += __UINT32_C(0x00800000) >> __j0;
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				__i0 |= __UINT32_C(0x800000);
 				if ((__i0 & (__i >> 1)) != 0 || (__i0 & (__UINT32_C(0x00800000) >> __j0))) {
@@ -177,7 +177,7 @@ __LIBM_LOCAL_FUNC(llrintf) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS)) {
 			/* inf or nan */
 			return __LONG_LONG_MIN__;
@@ -213,35 +213,35 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || (__i0 | __i1) != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && (__i0 | __i1) != 0)
 				return __sx ? -1 : 1;
 			return 0;
 		}
 		switch (__rm) {
-		case FE_TOWARDZERO:
+		case __FE_TOWARDZERO:
 			__i0 |= __UINT32_C(0x100000);
 			break;
-		case FE_DOWNWARD:
+		case __FE_DOWNWARD:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
 			if (__sx && ((__i0 & __i) | __i1) != 0)
 				__i0 += __UINT32_C(0x00100000) >> __j0;
 			break;
-		case FE_UPWARD:
+		case __FE_UPWARD:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
 			if (!__sx && ((__i0 & __i) | __i1) != 0)
 				__i0 += __INT32_C(0x00100000) >> __j0;
 			break;
-		case FE_TONEAREST:
+		case __FE_TONEAREST:
 		default:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
@@ -265,10 +265,10 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 			__uint32_t __i = __UINT32_C(0xffffffff) >> (__j0 - IEEE754_DOUBLE_SHIFT);
 			__uint32_t __j;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				__i0 |= __UINT32_C(0x100000);
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (__sx && (__i1 & __i) != 0) {
 					if (__j0 == IEEE754_DOUBLE_SHIFT) {
@@ -281,7 +281,7 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 					}
 				}
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (!__sx && (__i1 & __i) != 0) {
 					if (__j0 == IEEE754_DOUBLE_SHIFT) {
@@ -294,7 +294,7 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 					}
 				}
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				__i0 |= __UINT32_C(0x100000);
 				if ((__i1 & (__i >> 1)) != 0 ||
@@ -318,7 +318,7 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS)) {
 			/* inf or nan */
 			return __LONG_MIN__;
@@ -349,35 +349,35 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || (__i0 | __i1) != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && (__i0 | __i1) != 0)
 				return __sx ? -1 : 1;
 			return 0;
 		}
 		switch (__rm) {
-		case FE_TOWARDZERO:
+		case __FE_TOWARDZERO:
 			__i0 |= __UINT32_C(0x100000);
 			break;
-		case FE_DOWNWARD:
+		case __FE_DOWNWARD:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
 			if (__sx && ((__i0 & __i) | __i1) != 0)
 				__i0 += __UINT32_C(0x00100000) >> __j0;
 			break;
-		case FE_UPWARD:
+		case __FE_UPWARD:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
 			if (!__sx && ((__i0 & __i) | __i1) != 0)
 				__i0 += __INT32_C(0x00100000) >> __j0;
 			break;
-		case FE_TONEAREST:
+		case __FE_TONEAREST:
 		default:
 			__i = __UINT32_C(0x000fffff) >> __j0;
 			__i0 |= __UINT32_C(0x100000);
@@ -401,10 +401,10 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			__uint32_t __i = __UINT32_C(0xffffffff) >> (__j0 - IEEE754_DOUBLE_SHIFT);
 			__uint32_t __j;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				__i0 |= __UINT32_C(0x100000);
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (__sx && (__i1 & __i) != 0) {
 					if (__j0 == IEEE754_DOUBLE_SHIFT) {
@@ -417,7 +417,7 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 					}
 				}
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (!__sx && (__i1 & __i) != 0) {
 					if (__j0 == IEEE754_DOUBLE_SHIFT) {
@@ -430,7 +430,7 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 					}
 				}
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				__i0 |= __UINT32_C(0x100000);
 				if ((__i1 & (__i >> 1)) != 0 ||
@@ -454,7 +454,7 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS)) {
 			/* inf or nan */
 			return __LONG_LONG_MIN__;
@@ -489,14 +489,14 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || ((__i0 & __INT32_C(0x7fffffff)) | __i1) != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && ((__i0 & __INT32_C(0x7fffffff)) | __i1) != 0)
 				return __sx ? -1 : 1;
 			return 0;
@@ -504,9 +504,9 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 		__i = __UINT32_C(0x7fffffff) >> __j0;
 		__j = __i0;
 		switch (__rm) {
-		case FE_TOWARDZERO:
+		case __FE_TOWARDZERO:
 			break;
-		case FE_DOWNWARD:
+		case __FE_DOWNWARD:
 			if (__sx && ((__i0 & __i) | __i1) != 0) {
 				__j += __UINT32_C(0x80000000) >> __j0;
 				if (__j < __i0) {
@@ -516,7 +516,7 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 				}
 			}
 			break;
-		case FE_UPWARD:
+		case __FE_UPWARD:
 			if (!__sx && ((__i0 & __i) | __i1) != 0) {
 				__j += __UINT32_C(0x80000000) >> __j0;
 				if (__j < __i0) {
@@ -526,7 +526,7 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 				}
 			}
 			break;
-		case FE_TONEAREST:
+		case __FE_TONEAREST:
 		default:
 			if ((__i0 & (__i >> 1)) != 0 || __i1 != 0 ||
 			    (__i0 & (__UINT32_C(0x80000000) >> __j0))) {
@@ -549,9 +549,9 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 			__uint32_t __i = __UINT32_C(0xffffffff) >> (__j0 - 31);
 			__uint32_t __j;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				if (__sx && (__i1 & __i) != 0) {
 					if (__j0 == 31) {
 						__i0 += 1;
@@ -568,7 +568,7 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 					}
 				}
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				if (!__sx && (__i1 & __i) != 0) {
 					if (__j0 == 31) {
 						__i0 += 1;
@@ -585,7 +585,7 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 					}
 				}
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				if ((__i1 & (__i >> 1)) != 0 ||
 				    (__j0 == 32 && (__i0 & 1)) ||
@@ -614,7 +614,7 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS)) {
 			/* inf or nan */
 			return __LONG_MIN__;
@@ -644,14 +644,14 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			return 0;
 		/* Raise inexact if x != 0. */
 		if (__j0 < 0 || ((__i0 & __INT32_C(0x7fffffff)) | __i1) != 0)
-			__libc_feraiseexcept(FE_INEXACT);
+			__libc_feraiseexcept_FE_INEXACT();
 		if (__j0 < 0) {
 			switch (__rm) {
-			case FE_TOWARDZERO: return 0;
-			case FE_DOWNWARD: return __sx ? -1 : 0;
-			case FE_UPWARD: return __sx ? 0 : 1;
+			case __FE_TOWARDZERO: return 0;
+			case __FE_DOWNWARD: return __sx ? -1 : 0;
+			case __FE_UPWARD: return __sx ? 0 : 1;
 			}
-			/* case FE_TONEAREST: */
+			/* case __FE_TONEAREST: */
 			if (__j0 == -1 && ((__i0 & __INT32_C(0x7fffffff)) | __i1) != 0)
 				return __sx ? -1 : 1;
 			return 0;
@@ -659,9 +659,9 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		__i = __UINT32_C(0x7fffffff) >> __j0;
 		__j = __i0;
 		switch (__rm) {
-		case FE_TOWARDZERO:
+		case __FE_TOWARDZERO:
 			break;
-		case FE_DOWNWARD:
+		case __FE_DOWNWARD:
 			if (__sx && ((__i0 & __i) | __i1) != 0) {
 				__j += __UINT32_C(0x80000000) >> __j0;
 				if (__j < __i0) {
@@ -671,7 +671,7 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 				}
 			}
 			break;
-		case FE_UPWARD:
+		case __FE_UPWARD:
 			if (!__sx && ((__i0 & __i) | __i1) != 0) {
 				__j += __UINT32_C(0x80000000) >> __j0;
 				if (__j < __i0) {
@@ -681,7 +681,7 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 				}
 			}
 			break;
-		case FE_TONEAREST:
+		case __FE_TONEAREST:
 		default:
 			if ((__i0 & (__i >> 1)) != 0 || __i1 != 0 ||
 			    (__i0 & (__UINT32_C(0x80000000) >> __j0))) {
@@ -704,9 +704,9 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			__uint32_t __i = __UINT32_C(0xffffffff) >> (__j0 - 31);
 			__uint32_t __j;
 			switch (__rm) {
-			case FE_TOWARDZERO:
+			case __FE_TOWARDZERO:
 				break;
-			case FE_DOWNWARD:
+			case __FE_DOWNWARD:
 				if (__sx && (__i1 & __i) != 0) {
 					if (__j0 == 31) {
 						__i0 += 1;
@@ -723,7 +723,7 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 					}
 				}
 				break;
-			case FE_UPWARD:
+			case __FE_UPWARD:
 				if (!__sx && (__i1 & __i) != 0) {
 					if (__j0 == 31) {
 						__i0 += 1;
@@ -740,7 +740,7 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 					}
 				}
 				break;
-			case FE_TONEAREST:
+			case __FE_TONEAREST:
 			default:
 				if ((__i1 & (__i >> 1)) != 0 ||
 				    (__j0 == 32 && (__i0 & 1)) ||
@@ -769,7 +769,7 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	} else {
 		/* The number is too large.
 		 * It is left implementation defined what happens. */
-		__libc_feraiseexcept(FE_INVALID | FE_INEXACT);
+		__libc_feraiseexcept_FE_INVALID_INEXACT();
 		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS)) {
 			/* inf or nan */
 			return __LONG_LONG_MIN__;

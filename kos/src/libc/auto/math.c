@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa00e1d4 */
+/* HASH CRC-32:0x6064002a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/math.h"
-#include "../user/fenv.h"
+#include "fenv.h"
 
 DECL_BEGIN
 
@@ -46,14 +46,16 @@ __pragma_GCC_diagnostic_ignored(Wstrict_overflow)
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/acos.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_acos)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* acos(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_ACOS);
 	}
 	return __LIBM_MATHFUN(acos, x);
@@ -63,14 +65,16 @@ NOTHROW(LIBCCALL libc_acos)(double x) {
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/asin.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_asin)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_ASIN);
 	}
 	return __LIBM_MATHFUN(asin, x);
@@ -147,7 +151,7 @@ NOTHROW(LIBCCALL libc_tan)(double x) {
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/acos.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -155,10 +159,11 @@ NOTHROW(LIBCCALL libc_acosf)(float x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* acos(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ACOS);
 	}
 	return __LIBM_MATHFUNF(acos, x);
@@ -171,7 +176,7 @@ NOTHROW(LIBCCALL libc_acosf)(float x) {
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/asin.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -179,10 +184,11 @@ NOTHROW(LIBCCALL libc_asinf)(float x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ASIN);
 	}
 	return __LIBM_MATHFUNF(asin, x);
@@ -296,7 +302,7 @@ DEFINE_INTERN_ALIAS_P(libc_acosl,libc_acos,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/acos.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -304,10 +310,11 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* acos(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ACOS);
 	}
 	return __LIBM_MATHFUNL(acos, x);
@@ -325,7 +332,7 @@ DEFINE_INTERN_ALIAS_P(libc_asinl,libc_asin,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/asin.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -333,10 +340,11 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L)) {
+#ifdef FE_INVALID
 		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+#endif /* FE_INVALID */
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ASIN);
 	}
 	return __LIBM_MATHFUNL(asin, x);
@@ -823,7 +831,7 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 
 	return result;
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log.h>
@@ -835,16 +843,20 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_log double
 NOTHROW(LIBCCALL libc_log)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, -1.0)) {
 		if (x == -1.0) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
 		}
 	}
 	return __LIBM_MATHFUN(log, x);
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log10.h>
@@ -856,10 +868,14 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log10)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, 0.0)) {
 		if (x == 0.0) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG10_ZERO); /* log10(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_LOG10_MINUS); /* log10(x<0) */
 		}
 	}
@@ -935,7 +951,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 
 
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log.h>
@@ -948,13 +964,16 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, -1.0f)) {
 		if (x == -1.0f) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -963,7 +982,7 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 
 
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log10.h>
@@ -976,13 +995,16 @@ NOTHROW(LIBCCALL libc_log10f)(float x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, 0.0f)) {
 		if (x == 0.0f) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG10_ZERO); /* log10(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_LOG10_MINUS); /* log10(x<0) */
 		}
 	}
@@ -1086,7 +1108,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS_P(libc_logl,libc_log,WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log.h>
@@ -1099,13 +1121,16 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, -1.0L)) {
 		if (x == -1.0L) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -1119,7 +1144,7 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS_P(libc_log10l,libc_log10,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log10.h>
@@ -1132,13 +1157,16 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, 0.0L)) {
 		if (x == 0.0L) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_LOG10_ZERO); /* log10(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_LOG10_MINUS); /* log10(x<0) */
 		}
 	}
@@ -1186,7 +1214,7 @@ NOTHROW(LIBCCALL libc_expm1)(double x) {
 	}
 	return result;
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log1p.h>
@@ -1198,10 +1226,14 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log1p)(double x) {
 	if (__LIBM_MATHFUNI2(islessequal, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		if (x == -1.0) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -1239,7 +1271,7 @@ NOTHROW(LIBCCALL libc_expm1f)(float x) {
 
 
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log1p.h>
@@ -1252,13 +1284,16 @@ NOTHROW(LIBCCALL libc_log1pf)(float x) {
 
 
 
-
 	if (__LIBM_MATHFUNI2F(islessequal, x, -1.0f) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		if (x == -1.0f) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -1314,7 +1349,7 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS_P(libc_log1pl,libc_log1p,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log1p.h>
@@ -1327,13 +1362,16 @@ NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_MATHFUNI2L(islessequal, x, -1.0L) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		if (x == -1.0L) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_LOG_ZERO); /* log(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_LOG_MINUS); /* log(x<0) */
 		}
 	}
@@ -1378,7 +1416,7 @@ NOTHROW(LIBCCALL libc_exp2)(double x) {
 	}
 	return result;
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log2.h>
@@ -1390,11 +1428,15 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log2)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, 0.0)) {
 		if (x == 0.0) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard(x, x, -__HUGE_VAL,
 			                         __LIBM_KMATHERR_LOG2_ZERO); /* log2(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""),
 			                         __LIBM_KMATHERR_LOG2_MINUS); /* log2(x<0) */
 		}
@@ -1412,7 +1454,6 @@ NOTHROW(LIBCCALL libc_exp2f)(float x) {
 
 
 
-
 	float result = __LIBM_MATHFUNF(exp2, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x)) {
 		return __kernel_standard_f(x, x, result,
@@ -1425,7 +1466,7 @@ NOTHROW(LIBCCALL libc_exp2f)(float x) {
 
 
 }
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log2.h>
@@ -1438,14 +1479,17 @@ NOTHROW(LIBCCALL libc_log2f)(float x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, 0.0f)) {
 		if (x == 0.0f) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_f(x, x, -__HUGE_VALF,
 			                         __LIBM_KMATHERRF_LOG2_ZERO); /* log2(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""),
 			                         __LIBM_KMATHERRF_LOG2_MINUS); /* log2(x<0) */
 		}
@@ -1470,7 +1514,6 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 
 
 
-
 	__LONGDOUBLE result = __LIBM_MATHFUNL(exp2, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x)) {
 		return __kernel_standard_l(x, x, result,
@@ -1488,7 +1531,7 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS_P(libc_log2l,libc_log2,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__LONGDOUBLE x),(x));
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
 #include <libm/log2.h>
@@ -1501,14 +1544,17 @@ NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, 0.0L)) {
 		if (x == 0.0L) {
+#ifdef FE_DIVBYZERO
 			libc_feraiseexcept(FE_DIVBYZERO);
+#endif /* FE_DIVBYZERO */
 			return __kernel_standard_l(x, x, -__HUGE_VALL,
 			                         __LIBM_KMATHERRL_LOG2_ZERO); /* log2(0) */
 		} else {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""),
 			                         __LIBM_KMATHERRL_LOG2_MINUS); /* log2(x<0) */
 		}
@@ -3202,7 +3248,7 @@ NOTHROW(LIBCCALL libc_sincos)(double x,
 
 }
 #include <hybrid/floatcore.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <libm/matherr.h>
 /* >> exp10f(3), exp10(3), exp10l(3)
  * A function missing in all standards: compute exponent to base ten */
@@ -3210,7 +3256,9 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_exp10)(double x) {
 	double result;
 	if (libc_finite(x) && x < __DBL_MIN_10_EXP__ - __DBL_DIG__ - 10) {
+#ifdef FE_UNDERFLOW
 		libc_feraiseexcept(FE_UNDERFLOW);
+#endif /* FE_UNDERFLOW */
 		return 0.0;
 	}
 	result = libc_exp(2.30258509299404568402 * x);
@@ -3248,7 +3296,7 @@ NOTHROW(LIBCCALL libc_sincosf)(float x,
 
 }
 #include <hybrid/floatcore.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <libm/matherr.h>
 /* >> exp10f(3), exp10(3), exp10l(3)
  * A function missing in all standards: compute exponent to base ten */
@@ -3294,7 +3342,7 @@ NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
 
 }
 #include <hybrid/floatcore.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <libm/matherr.h>
 /* >> exp10f(3), exp10(3), exp10l(3)
  * A function missing in all standards: compute exponent to base ten */
@@ -3302,7 +3350,9 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x) {
 	__LONGDOUBLE result;
 	if (libc_finitel(x) && x < __LDBL_MIN_10_EXP__ - __LDBL_DIG__ - 10) {
+#ifdef FE_UNDERFLOW
 		libc_feraiseexcept(FE_UNDERFLOW);
+#endif /* FE_UNDERFLOW */
 		return 0.0L;
 	}
 	result = libc_expl(2.302585092994045684017991454684364208L * x);
@@ -3556,7 +3606,7 @@ NOTHROW(LIBCCALL libc_jn)(int n,
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y0.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_y0)(double x) {
@@ -3564,7 +3614,9 @@ NOTHROW(LIBCCALL libc_y0)(double x) {
 	    (__LIBM_MATHFUNI2(islessequal, x, 0.0) ||
 	     __LIBM_MATHFUNI2(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_ZERO);
@@ -3578,7 +3630,7 @@ NOTHROW(LIBCCALL libc_y0)(double x) {
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y1.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_y1)(double x) {
@@ -3586,7 +3638,9 @@ NOTHROW(LIBCCALL libc_y1)(double x) {
 	    (__LIBM_MATHFUNI2(islessequal, x, 0.0) ||
 	     __LIBM_MATHFUNI2(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_ZERO);
@@ -3600,7 +3654,7 @@ NOTHROW(LIBCCALL libc_y1)(double x) {
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/yn.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_yn)(int n,
@@ -3609,7 +3663,9 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 	    (__LIBM_MATHFUNI2(islessequal, x, 0.0) ||
 	     __LIBM_MATHFUNI2(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_MINUS);
 		} else if (x == 0.0) {
 			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_ZERO);
@@ -3678,11 +3734,10 @@ NOTHROW(LIBCCALL libc_jnf)(int n,
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y0.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_y0f)(float x) {
-
 
 
 
@@ -3690,7 +3745,9 @@ NOTHROW(LIBCCALL libc_y0f)(float x) {
 	    (__LIBM_MATHFUNI2F(islessequal, x, 0.0f) ||
 	     __LIBM_MATHFUNI2F(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0f) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y0_MINUS);
 		} else if (x == 0.0f) {
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y0_ZERO);
@@ -3707,11 +3764,10 @@ NOTHROW(LIBCCALL libc_y0f)(float x) {
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y1.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_y1f)(float x) {
-
 
 
 
@@ -3719,7 +3775,9 @@ NOTHROW(LIBCCALL libc_y1f)(float x) {
 	    (__LIBM_MATHFUNI2F(islessequal, x, 0.0f) ||
 	     __LIBM_MATHFUNI2F(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0f) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y1_MINUS);
 		} else if (x == 0.0f) {
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y1_ZERO);
@@ -3736,7 +3794,7 @@ NOTHROW(LIBCCALL libc_y1f)(float x) {
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/yn.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_ynf)(int n,
@@ -3744,12 +3802,13 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2F(islessequal, x, 0.0f) ||
 	     __LIBM_MATHFUNI2F(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0f) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_f(n, x, -__HUGE_VALF, __LIBM_KMATHERRF_YN_MINUS);
 		} else if (x == 0.0f) {
 			return __kernel_standard_f(n, x, -__HUGE_VALF, __LIBM_KMATHERRF_YN_ZERO);
@@ -3840,11 +3899,10 @@ DEFINE_INTERN_ALIAS_P(libc_y0l,libc_y0,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y0.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
-
 
 
 
@@ -3852,7 +3910,9 @@ NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
 	    (__LIBM_MATHFUNI2L(islessequal, x, 0.0L) ||
 	     __LIBM_MATHFUNI2L(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0L) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y0_MINUS);
 		} else if (x == 0.0L) {
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y0_ZERO);
@@ -3874,11 +3934,10 @@ DEFINE_INTERN_ALIAS_P(libc_y1l,libc_y1,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(__
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/y1.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
-
 
 
 
@@ -3886,7 +3945,9 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 	    (__LIBM_MATHFUNI2L(islessequal, x, 0.0L) ||
 	     __LIBM_MATHFUNI2L(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0L) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y1_MINUS);
 		} else if (x == 0.0L) {
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y1_ZERO);
@@ -3908,7 +3969,7 @@ DEFINE_INTERN_ALIAS_P(libc_ynl,libc_yn,WUNUSED,__LONGDOUBLE,NOTHROW,LIBCCALL,(in
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/yn.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 /* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ynl)(int n,
@@ -3916,12 +3977,13 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 
 
 
-
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNI2L(islessequal, x, 0.0L) ||
 	     __LIBM_MATHFUNI2L(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
 		if (x < 0.0L) {
+#ifdef FE_INVALID
 			libc_feraiseexcept(FE_INVALID);
+#endif /* FE_INVALID */
 			return __kernel_standard_l(n, x, -__HUGE_VALL, __LIBM_KMATHERRL_YN_MINUS);
 		} else if (x == 0.0L) {
 			return __kernel_standard_l(n, x, -__HUGE_VALL, __LIBM_KMATHERRL_YN_ZERO);

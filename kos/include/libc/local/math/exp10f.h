@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x429634d9 */
+/* HASH CRC-32:0x40690cf0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_finitef_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/floatcore.h>
-#include <bits/crt/fenv.h>
+#include <asm/crt/fenv.h>
 #include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(exp10f) __ATTR_WUNUSED float

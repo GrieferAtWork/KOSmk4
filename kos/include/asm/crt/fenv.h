@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x3b210a8e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_FENV_H
-#define GUARD_LIBC_USER_FENV_H 1
+/*!replace_with_include <fenv.h>*/
+#ifndef _ASM_CRT_FENV_H
+#define _ASM_CRT_FENV_H 1
 
-#include "../api.h"
-#include "../auto/fenv.h"
+/* Floating point exceptions... */
+#define __FE_INVALID    0x01
+#define __FE_DIVBYZERO  0x02
+#define __FE_OVERFLOW   0x04
+#define __FE_UNDERFLOW  0x08
+#define __FE_INEXACT    0x10
+#define __FE_ALL_EXCEPT (__FE_INVALID | __FE_DIVBYZERO | __FE_OVERFLOW | __FE_UNDERFLOW | __FE_INEXACT)
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <fenv.h>
+/* Rounding modes... */
+#define __FE_TONEAREST  0 /* round() */
+#define __FE_DOWNWARD   1 /* floor() */
+#define __FE_UPWARD     2 /* ceil() */
+#define __FE_TOWARDZERO 3 /* trunc() */
 
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fesetexcept)(int excepts);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fetestexceptflag)(fexcept_t const *flagp, int excepts);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fegetmode)(femode_t *modep);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fesetmode)(femode_t const *modep);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_FENV_H */
+#endif /* !_ASM_CRT_FENV_H */
