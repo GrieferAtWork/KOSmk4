@@ -363,6 +363,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	do {
 		next = atomic_read(&target->s_con);
 		con->tc_signext = sig_smplock_clr(next);
+		assertf(con != sig_smplock_clr(next), "Duplicate connection?");
 		COMPILER_WRITE_BARRIER();
 	} while (!atomic_cmpxch_weak(&target->s_con, next,
 	                             sig_smplock_cpy(con, next)));
@@ -444,6 +445,7 @@ task_connect_for_poll(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	do {
 		next = atomic_read(&target->s_con);
 		con->tc_signext = sig_smplock_clr(next);
+		assertf(con != sig_smplock_clr(next), "Duplicate connection?");
 		COMPILER_WRITE_BARRIER();
 	} while (!atomic_cmpxch_weak(&target->s_con, next,
 	                             sig_smplock_cpy(con, next)));
@@ -734,7 +736,7 @@ no_cons:
 			goto again;
 #endif /* !CONFIG_NO_SMP */
 	} else {
-		/* Find another receiver. */
+		/* Find another receiver (the first one was reprimed). */
 		struct task_connection **preceiver;
 		preceiver = &con->tc_signext;
 		for (;;) {
@@ -742,10 +744,12 @@ no_cons:
 			if (!receiver)
 				goto no_cons;
 			if (!is_connection_in_chain(sc_pending, receiver))
-				break;
+				break; /* Found a receiver that isn't a completion callback, or wasn't reprimed */
 			preceiver = &receiver->tc_signext;
 		}
+
 		/* Unlink the receiver. */
+		assert(*preceiver == receiver);
 		*preceiver = receiver->tc_signext;
 	}
 #ifndef CONFIG_NO_SMP
@@ -776,8 +780,12 @@ again_read_target_cons:
 
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 		struct sig_completion *sc;
-		if (TASK_CONNECTION_STAT_ISDONE(target_cons))
+		if (TASK_CONNECTION_STAT_ISDONE(target_cons)) {
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
+			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 			goto again;
+		}
 		sc = (struct sig_completion *)receiver;
 		atomic_write(&sc->tc_stat, phase_one_state);
 
@@ -795,12 +803,16 @@ again_read_target_cons:
 		 * that's not entirely correct), so we can get rid of the connection. */
 		if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, sender)) {
 			/* Unlink the signal, and mark it as broadcast. */
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		} else {
 			REF struct task *thread;
 			/* Unlock the signal, and wake-up the thread attached to the connection */
 			thread = xincref(atomic_read(&target_cons->tcs_thread));
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 			if likely(thread) {
 				task_wake_as(thread, caller);
 				assert(thread->t_refcnt >= 1);
@@ -910,6 +922,7 @@ again_read_target_cons:
 		target_cons = atomic_read(&receiver->tc_cons);
 	}
 #endif /* !CONFIG_NO_SMP */
+
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 		struct sig_completion *sc;
 		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
@@ -971,7 +984,9 @@ again_read_target_cons:
 			thread = xincref(atomic_read(&target_cons->tcs_thread));
 
 		/* Unlock the connection. */
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		if (thread) {
 			task_wake_as(thread, caller);
 
@@ -998,16 +1013,19 @@ again_read_target_cons:
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		goto again;
 	}
+	sig_smplock_release_nopr(self);
 
 	/* The simple case:  We managed to  deliver the  signal,
 	 * and now we must wake-up the connected thread (if any) */
 	{
 		REF struct task *thread;
 		thread = xincref(atomic_read(&target_cons->tcs_thread));
-#ifndef CONFIG_NO_SMP
+		/* !!! Note that "received" is NOT removed from the signal's queue.
+		 *     The signal only gets removed once the receiver  disconnects,
+		 *     or the signal is broadcast. */
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
-#endif /* !CONFIG_NO_SMP */
-		sig_smplock_release_nopr(self);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 
 		/* Wake-up the thread. */
 		if likely(thread) {
@@ -1212,7 +1230,9 @@ no_cons:
 
 		/* Unlock the signal, and wake-up the thread attached to the connection */
 		thread = xincref(atomic_read(&target_cons->tcs_thread));
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		sig_smplock_release_nopr(self);
 		preemption_pop(&was);
 		if likely(thread) {
@@ -1287,6 +1307,7 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 		assert(sig_smplock_tst(next));
 #endif /* !CONFIG_NO_SMP */
 		self->tc_signext = sig_smplock_clr(next);
+		assertf(self != sig_smplock_clr(next), "Duplicate connection?");
 		COMPILER_WRITE_BARRIER();
 	} while (!atomic_cmpxch_weak(&signal->s_con, next,
 	                             sig_smplock_set(self)));
@@ -1310,6 +1331,7 @@ NOTHROW(FCALL sig_connect_completion)(struct sig *__restrict self,
 	do {
 		next = atomic_read(&self->s_con);
 		completion->tc_signext = sig_smplock_clr(next);
+		assertf(completion != sig_smplock_clr(next), "Duplicate connection?");
 		COMPILER_WRITE_BARRIER();
 	} while (!atomic_cmpxch_weak(&self->s_con, next,
 	                             sig_smplock_cpy(completion, next)));
@@ -1330,6 +1352,7 @@ NOTHROW(FCALL sig_connect_completion_for_poll)(struct sig *__restrict self,
 	do {
 		next = atomic_read(&self->s_con);
 		completion->tc_signext = sig_smplock_clr(next);
+		assertf(completion != sig_smplock_clr(next), "Duplicate connection?");
 		COMPILER_WRITE_BARRIER();
 	} while (!atomic_cmpxch_weak(&self->s_con, next,
 	                             sig_smplock_cpy(completion, next)));
@@ -1360,12 +1383,12 @@ NOTHROW(FCALL task_disconnect_connection)(struct task_connection *__restrict sel
 #else /* CONFIG_NO_SMP */
 again:
 	status = atomic_read(&self->tc_stat);
-	if (TASK_CONNECTION_STAT_ISDEAD(status))
-		goto done; /* Dead connection */
 	if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
 		task_pause();
 		goto again;
 	}
+	if (TASK_CONNECTION_STAT_ISDEAD(status))
+		goto done; /* Dead connection */
 	preemption_pushoff(&was);
 	if (!atomic_cmpxch_weak(&self->tc_stat, status,
 	                        status | TASK_CONNECTION_STAT_FLOCK)) {
@@ -1442,12 +1465,12 @@ NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self)
 #else /* CONFIG_NO_SMP */
 again:
 	status = atomic_read(&self->tc_stat);
-	if (TASK_CONNECTION_STAT_ISDONE(status))
-		return false; /* Dead connection */
 	if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
 		task_pause();
 		goto again;
 	}
+	if (TASK_CONNECTION_STAT_ISDONE(status))
+		return false; /* Dead connection */
 	assert(status == TASK_CONNECTION_STAT_COMPLETION ||
 	       status == TASK_CONNECTION_STAT_COMPLETION_FOR_POLL);
 	preemption_pushoff(&was);
@@ -1958,7 +1981,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 			if (TASK_CONNECTION_STAT_ISSPEC(status)) {
 				assertf(!TASK_CONNECTION_STAT_ISCOMP(status),
 				        "This should be a task connection, so why does "
-				        "its status indicate a completion function?\n"
+				        /**/ "its status indicate a completion function?\n"
 				        "status = %#" PRIxPTR,
 				        status);
 
@@ -2008,6 +2031,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 		do {
 			signext = atomic_read(&signal->s_con);
 			route->tc_signext = sig_smplock_clr(signext);
+			assertf(route != sig_smplock_clr(signext), "Duplicate connection?");
 			COMPILER_WRITE_BARRIER();
 		} while (!atomic_cmpxch_weak(&signal->s_con, signext,
 		                             sig_smplock_cpy(route, signext)));

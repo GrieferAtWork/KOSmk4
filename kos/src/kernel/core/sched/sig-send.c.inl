@@ -426,8 +426,12 @@ again_read_target_cons:
 
 	/* Deal with special connections. */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
-		if (TASK_CONNECTION_STAT_ISDONE(target_cons))
+		if (TASK_CONNECTION_STAT_ISDONE(target_cons)) {
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
+			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 			goto again;
+		}
 		if (!TASK_CONNECTION_STAT_ISPOLL(target_cons))
 			++result;
 
@@ -449,7 +453,9 @@ again_read_target_cons:
 
 	/* Try to set our signal as the one delivered to `target_cons'. */
 	if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		goto again;
 	}
 
@@ -461,7 +467,9 @@ again_read_target_cons:
 	{
 		REF struct task *thread;
 		thread = xincref(atomic_read(&target_cons->tcs_thread));
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		if likely(thread) {
 #ifdef CONFIG_NO_SMP
 			if (!next)
@@ -682,6 +690,9 @@ again_read_target_cons:
 	{
 		REF struct task *thread;
 		thread = xincref(atomic_read(&target_cons->tcs_thread));
+		/* !!! Note that "received" is NOT removed from the signal's queue.
+		 *     The signal only gets removed once the receiver  disconnects,
+		 *     or the signal is broadcast. */
 #if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
 #endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
