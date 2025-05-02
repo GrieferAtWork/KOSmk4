@@ -19,15 +19,15 @@
  */
 #ifdef __INTELLISENSE__
 #include "sig.c"
-//#define         DEFINE_sig_send
-//#define      DEFINE_sig_altsend
-//#define    DEFINE_sig_send_nopr
-//#define DEFINE_sig_altsend_nopr
-#define DEFINE_sig_sendto
-//#define                          DEFINE_sig_altsendto
-//#define                        DEFINE_sig_sendto_nopr
-//#define                     DEFINE_sig_altsendto_nopr
-//#define                          DEFINE_sig_broadcast
+//#define           DEFINE_sig_send
+//#define        DEFINE_sig_altsend
+//#define      DEFINE_sig_send_nopr
+//#define   DEFINE_sig_altsend_nopr
+//#define         DEFINE_sig_sendto
+//#define      DEFINE_sig_altsendto
+//#define    DEFINE_sig_sendto_nopr
+//#define DEFINE_sig_altsendto_nopr
+#define                          DEFINE_sig_broadcast
 //#define                       DEFINE_sig_altbroadcast
 //#define                     DEFINE_sig_broadcast_nopr
 //#define                  DEFINE_sig_altbroadcast_nopr

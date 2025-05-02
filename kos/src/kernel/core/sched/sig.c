@@ -459,6 +459,12 @@ NOTHROW(FCALL task_connection_unlink_from_sig)(struct sig *__restrict self,
 again:
 	assert(!sig_smplock_tst(con->tc_signext));
 	assert(!con->tc_signext || ADDR_ISKERN(con->tc_signext));
+	assert(!preemption_ison());
+#if TASK_CONNECTION_STAT_FLOCK != 0
+	assert(con->tc_stat & TASK_CONNECTION_STAT_FLOCK);
+#endif /* TASK_CONNECTION_STAT_FLOCK != 0 */
+	assert(con->tc_stat != (TASK_CONNECTION_STAT_COMPLETION | TASK_CONNECTION_STAT_FLOCK));
+	assert(con->tc_stat != (TASK_CONNECTION_STAT_COMPLETION_FOR_POLL | TASK_CONNECTION_STAT_FLOCK));
 	chain = atomic_read(&self->s_con);
 	if (sig_smplock_clr(chain) == con) {
 		/* The first entry already is the connection we're trying to unlink!

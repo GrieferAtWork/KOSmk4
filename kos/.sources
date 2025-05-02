@@ -103,7 +103,6 @@ CC_FLAGS({
 	"-Wall",
 	"-Wextra",
 	"-Wduplicated-cond",
-	"-Wno-nonnull-compare",
 	"-Wno-missing-field-initializers",
 	"-Wno-type-limits",
 

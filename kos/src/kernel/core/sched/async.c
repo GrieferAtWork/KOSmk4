@@ -275,12 +275,13 @@ NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeou
 	     p_next = LIST_PNEXT(next, a_tmolnk)) {
 		ktime_t next_timeout;
 
+		assertf(next != job, "Job already part of 'async_tmo_list'");
 		COMPILER_READ_BARRIER();
 		next_timeout = next->a_tmo;
 		COMPILER_READ_BARRIER();
 
-		/* Make sure that this is a valid entry, and that the
-		 * timeout  value   we've   read   is   valid,   too. */
+		/* Make sure that this is a valid entry, and that
+		 * the timeout value  we've read  is valid,  too. */
 		if (atomic_read(&next->a_stat) != _ASYNC_ST_READY_TMO)
 			continue;
 

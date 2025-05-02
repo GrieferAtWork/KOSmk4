@@ -91,10 +91,14 @@
  * >>         return 0;
  * >>     return v->val;
  * >> } */
-#ifdef __OPTIMIZE__
 #undef __ATTR_NONNULL
+#undef __ATTR_IN
+#undef __ATTR_OUT
+#undef __ATTR_INOUT
 #define __ATTR_NONNULL(ppars) /* nothing */
-#endif /* __OPTIMIZE__ */
+#define __ATTR_IN             __ATTR_IN_OPT
+#define __ATTR_OUT            __ATTR_OUT_OPT
+#define __ATTR_INOUT          __ATTR_INOUT_OPT
 
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
