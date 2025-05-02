@@ -28,147 +28,6 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-/*
- * KOS Signal explanation:
- *
- * - Signals themself are  low-level, state-less synchronization  primitives
- *   that can be used to implement arbitrarily complex higher-level objects,
- *   such as mutexes, semaphores, condition-variables, ..., _anything_
- * - Whatever state a signal may have in some arbitrary context, it only
- *   gains  this  state  indirectly by  being  used in  a  specific way.
- *
- * Basic example:
- * >> PRIVATE struct sig mysig = SIG_INIT;
- * >>
- * >> PRIVATE void connect(void) {
- * >>     task_connect(&mysig);
- * >> }
- * >>
- * >> PRIVATE void wait(void) {
- * >>     task_waitfor();
- * >> }
- * >>
- * >> PRIVATE void post(void) {
- * >>     sig_send(&mysig);
- * >> }
- *
- * Synchronization here happens as follows:
- *   - Whenever  a thread calls `connect()', it will become attached to `mysig',
- *     such that another thread sending that signal (as by `post()') will notify
- *     the original thread that called `connect()' of this condition.
- *   - For  this purpose, it  doesn't matter if the  original thread that called
- *     `connect()' has already called `wait()' (and began blocking), or is still
- *     busy doing other things, but is planning to call `wait()' eventually
- *   - The `task_waitfor()' function (when  eventually called) will then  cause
- *     the  calling thread to  suspend execution until one  of the signals that
- *     its  caller is connected to has been send (but note that if one of those
- *     signals is send before `task_waitfor()' is called, then `task_waitfor()'
- *     will never block to begin with, but return immediately)
- *   - The moment that `task_waitfor()' returns, _all_ connections that  the
- *     calling  thread had made  in the past will  have already been severed
- *     (to be even more precise: a connection is severed before `sig_send()'
- *     returns, with the  only exception being  signal completion  functions
- *     that call `sig_completion_reprime()')
- *
- * How to use `struct sig', and what `interlocked' means:
- *   - If you think of dos's  `InterlockedIncrement' functions, or similar, I'm  sorry
- *     to disappoint you, but that function should have been called `AtomicIncrement',
- *     as it has nothing to do with interlocked behavior.
- *   - Performing something interlocked means that  an operation happens in a  specific
- *     context where certain events can be monitored/handled, similar to how this would
- *     happen during a transaction (s.a. /kos/src/kernel/modrtm).
- *   - For simplicity, consider the following example:
- *     [ 1] PRIVATE bool       is_ready     = false;
- *     [ 2] PRIVATE struct sig became_ready = SIG_INIT;
- *     [ 3]
- *     [ 4] PRIVATE void wait_until_ready(void) {
- *     [ 5]     task_connect(&became_ready);
- *     [ 6]     if (atomic_read(&is_ready)) {
- *     [ 7]         task_disconnectall();
- *     [ 8]         return;
- *     [ 9]     }
- *     [10]     task_waitfor();
- *     [11] }
- *     [12]
- *     [13] PRIVATE void become_ready(void) {
- *     [14]     atomic_write(&is_ready, true);
- *     [15]     sig_broadcast(&became_ready);
- *     [16] }
- *     Here, the read from `is_ready' on line #6 is interlocked with the  async
- *     monitoring  of `became_ready'  that began on  line #5. As  such, line #6
- *     knows that when `is_ready' isn't `true' yet, the calling thread will get
- *     notified after it becomes so (s.a. line #15) As such, all possible  race
- *     conditions are handled here:
- *        case #1: `atomic_write(&is_ready, true);' happens before `task_connect(&became_ready)':
- *                  - `sig_broadcast(&became_ready)' has no-one to notify
- *                  - The caller of `wait_until_ready()' will notice this in line #6
- *                  - The `wait_until_ready()' function never starts blocking
- *                 Note that since this case is usually the most likely one, another test
- *                 of the `is_ready'  condition usually also  happens before the  initial
- *                 connect. Though since no connect()  will have happened at that  point,
- *                 such a test wouldn't be interlocked, and can only ever serve to  speed
- *                 up the case  where an object  is already ready  from the get-go.  Such
- *                 models are  referred  to  as test+connect+test,  whereas  the  minimal
- *                 requirement for race-less synchronization is connect+test.
- *        case #2: `atomic_write(&is_ready, true);' happens after `task_connect(&became_ready)',
- *                 but before `atomic_read(&is_ready)'.
- *                  - Line #6 will notice this, and disconnect from the `became_ready'
- *                    signal once again, and the waiting thread never starts blocking.
- *        case #3: `atomic_write(&is_ready, true);' happens after `if (atomic_read&(&is_ready))'
- *                  - In this case, the caller of `wait_until_ready()' will end up inside of
- *                    `task_waitfor()', which will return as soon as line #15 gets executed.
- *                  - Because by this point, the waiting thread has already been connected
- *                    to the `became_ready' signal, it doesn't matter if `sig_broadcast()'
- *                    is  called  before,  or  after  `task_waitfor();'.  In  both  cases,
- *                    `task_waitfor()'  will not return  before `sig_broadcast()' has been
- *                    called, but will return as soon as it has been called.
- */
-
-
-
-DECL_BEGIN
-
-/* Signal reception priority order:
- *
- * In order to improve performance, signals sent through `struct sig'
- * may not always reach all  waiting / some specific waiting  thread.
- *
- * sig_send():
- *    #1: Try to send a signal to the longest-living connection that
- *        wasn't established as a poll-connection, and return `true'
- *    #2: If no such connection exists, but there are still (alive)
- *        connections (iow: only poll-connections remain), randomly
- *        select one of the  poll-based connections and signal  it.
- *        (Note that  "random" here  may not  actually required  to
- *        be random at all, but, in  fact, is allowed to depend  to
- *        the  order  in  which  connections  had  been  enqueued).
- *        Continue with step #1
- *    #4: If no (alive) connections are left, return `false'
- *
- * sig_broadcast():
- *    #1: If there is any  (alive) connection (irregardless of  that
- *        connection  being non-poll-, or poll-based), simply signal
- *        that connection. If the connection was non-poll-based, the
- *        value  to-be returned by sig_broadcast() is incremented by
- *        one.
- *        Continue with step #1
- *    #2: If no (alive) connections are left, return the number of
- *        signaled non-poll connections.
- *
- * Normal (non-poll) connections:
- *   - task_connect()
- *   - sig_connect_completion()
- *   - sig_completion_reprime(for_poll: false)
- *
- * Poll connections:
- *   - task_connect_for_poll()
- *   - sig_connect_completion_for_poll()
- *   - sig_completion_reprime(for_poll: true)
- *
- */
-
-
-
 /*[[[config CONFIG_TASK_STATIC_CONNECTIONS! = 3
  * Max  number of signal  connections guarantied to not
  * invoke `kmalloc()' and potentially throw exceptions.
@@ -180,6 +39,20 @@ DECL_BEGIN
 
 
 
+/* Use a new `struct sig` implementation as per ./sig.md */
+#undef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#if 0
+#define CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#endif
+
+DECL_BEGIN
+
+
+
+
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+/* TODO */
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 /* `struct task_connection' offsets */
 #define OFFSET_TASK_CONNECTION_SIG     0
 #define OFFSET_TASK_CONNECTION_CONNEXT __SIZEOF_POINTER__
@@ -197,10 +70,56 @@ DECL_BEGIN
 #define OFFSET_TASK_CONNECTIONS_STATIC (__SIZEOF_POINTER__ * 4)
 #define SIZEOF_TASK_CONNECTIONS        ((__SIZEOF_POINTER__ * 4) + (SIZEOF_TASK_CONNECTION * CONFIG_TASK_STATIC_CONNECTIONS))
 #define ALIGNOF_TASK_CONNECTIONS       __ALIGNOF_POINTER__
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+
 
 
 #ifdef __CC__
 
+/* Cleanup function  which may  be scheduled  for invocation  before internal  resources
+ * are  released and  post-completion callbacks  defined by  signal completion functions
+ * are run.  This is  a  special mechanism  that is  required  to prevent  certain  race
+ * conditions,  and  should be  used  in situations  where  a signal  is  kept allocated
+ * through use  of an  SMP-lock which  must  be released  once the  `struct sig'  itself
+ * no longer needs to be used, but  before any possible extended callbacks are  invoked,
+ * as may be the result of decref()-ing woken threads (which may end up being destroyed,
+ * and  consequently destroying a  whole bunch of other  things, including open handles)
+ *
+ * An example of a race condition prevented by this is:
+ *      _asyncjob_main()
+ *      aio_handle_complete_nopr()          // The connect() operation has completed
+ *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
+ *      sig_broadcast()                     // !!! Wrong usage here
+ *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
+ *      task_destroy()
+ *      fini_this_handle_manager()
+ *      handman_destroy()
+ *      handle_socket_decref()
+ *      socket_destroy()
+ *          decref_likely(self->sk_ncon.axr_obj)
+ *      socket_connect_aio_destroy()
+ *          aio_handle_generic_fini()
+ *              aio_handle_fini()
+ *              >> Deadlock here, since aio_handle_fini() can only return once
+ *                 aio_handle_release()  has been called for the attached AIO.
+ * The solution is to invoke `aio_handle_release(self)' from inside `scc_cb'
+ *
+ * NOTE: The cleanup callback itself gets invoked immediately after all internal
+ *       SMP-lock have been  released (but before  preemption is re-enabled,  or
+ *       post-exec signal completion callbacks are invoked)
+ */
+struct sig_cleanup_callback;
+struct sig_cleanup_callback {
+	/* [1..1] Cleanup callback. */
+	NOBLOCK NOPREEMPT NONNULL_T((1)) void
+	NOTHROW_T(FCALL *scc_cb)(struct sig_cleanup_callback *self);
+	/* User-data goes here. */
+};
+
+
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+/* TODO */
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 struct sig;
 struct task;
 struct task_connection;
@@ -382,46 +301,6 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
                                               struct task *__restrict caller);
 
 
-/* Cleanup function  which may  be scheduled  for invocation  before internal  resources
- * are  released and  post-completion callbacks  defined by  signal completion functions
- * are run.  This is  a  special mechanism  that is  required  to prevent  certain  race
- * conditions,  and  should be  used  in situations  where  a signal  is  kept allocated
- * through use  of an  SMP-lock which  must  be released  once the  `struct sig'  itself
- * no longer needs to be used, but  before any possible extended callbacks are  invoked,
- * as may be the result of decref()-ing woken threads (which may end up being destroyed,
- * and  consequently destroying a  whole bunch of other  things, including open handles)
- *
- * An example of a race condition prevented by this is:
- *      _asyncjob_main()
- *      aio_handle_complete_nopr()          // The connect() operation has completed
- *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
- *      sig_broadcast()                     // !!! Wrong usage here
- *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
- *      task_destroy()
- *      fini_this_handle_manager()
- *      handman_destroy()
- *      handle_socket_decref()
- *      socket_destroy()
- *          decref_likely(self->sk_ncon.axr_obj)
- *      socket_connect_aio_destroy()
- *          aio_handle_generic_fini()
- *              aio_handle_fini()
- *              >> Deadlock here, since aio_handle_fini() can only return once
- *                 aio_handle_release()  has been called for the attached AIO.
- * The solution is to invoke `aio_handle_release(self)' from inside `scc_cb'
- *
- * NOTE: The cleanup callback itself gets invoked immediately after all internal
- *       SMP-lock have been  released (but before  preemption is re-enabled,  or
- *       post-exec signal completion callbacks are invoked)
- */
-struct sig_cleanup_callback;
-struct sig_cleanup_callback {
-	/* [1..1] Cleanup callback. */
-	NOBLOCK NOPREEMPT NONNULL_T((1)) void
-	NOTHROW_T(FCALL *scc_cb)(struct sig_cleanup_callback *self);
-	/* User-data goes here. */
-};
-
 /* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any  other
  * kind of cleanup, but after having released all internal SMP-locks. May be used to
  * release further SMP-locks  which may have  been used to  guard `self' from  being
@@ -536,6 +415,8 @@ struct task_connections {
 	                                      * allocated dynamically using `kmalloc()', and as such, must be
 	                                      * freed by `kfree()' */
 };
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+
 
 /* Root connections set. */
 DATDEF ATTR_PERTASK struct task_connections this_root_connections;
