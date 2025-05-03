@@ -24,13 +24,559 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/selftest.h>
+#include <sched/sig-completion.h>
+#include <sched/sig.h>
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
+
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset(p, c, n) memset(p, c, n)
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(p, c, n) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
+#if defined(CONFIG_EXPERIMENTAL_KERNEL_SIG_V2) || defined(__DEEMON__)
+#include <sched/task.h>
+#include <sched/task-clone.h>
+
+#include <hybrid/sched/preemption.h>
+
+#include <atomic.h>
+#include <alloca.h>
+
+DECL_BEGIN
+
+/* Extra flags for `task_wake()' from `SIG_XSEND_F_*' */
+#ifndef __DEEMON__
+#if (SIG_XSEND_F_WAKE_WAITFOR == TASK_WAKE_FWAITFOR && \
+     SIG_XSEND_F_WAKE_HIGHPRIO == TASK_WAKE_FHIGHPRIO)
+#define take_wake_flags__from__sig_xsend_flags(flags) \
+	((flags) & (SIG_XSEND_F_WAKE_WAITFOR | SIG_XSEND_F_WAKE_HIGHPRIO))
+#else /* ... */
+#define take_wake_flags__from__sig_xsend_flags(flags)                \
+	(((flags) & SIG_XSEND_F_WAKE_WAITFOR ? TASK_WAKE_FWAITFOR : 0) | \
+	 ((flags) & SIG_XSEND_F_WAKE_HIGHPRIO ? TASK_WAKE_FHIGHPRIO : 0))
+#endif /* !... */
+#endif /* !__DEEMON__ */
+
+
+/* Helpers for managing the ring formed by "struct sigcon" objects. */
+#define sigcon_link_self(self)       \
+	(void)((self)->sc_prev = (self), \
+	       (self)->sc_next = (self))
+#define sigcon_link_insert_before(self, successor)       \
+	sigcon_rlink_insert_before(self, self, successor)
+#define sigcon_rlink_insert_before(self_head, self_tail, successor) \
+	(void)((self_tail)->sc_next = (successor),                      \
+	       (self_head)->sc_prev = (successor)->sc_prev,             \
+	       (successor)->sc_prev = (self_tail),                      \
+	       (self_head)->sc_prev->sc_next = (self_head))
+
+/* Internal key used to chain threads that have to be destroyed. */
+#define sig_destroylater_next(thread) KEY_task__next(thread)
+
+#if defined(NDEBUG) || defined(NDEBUG_SIG) || 0
+#define sigcon_verify_ring_IS_NOOP
+#define sigcon_verify_ring(head) (void)0
+#else /* NDEBUG || NDEBUG_SIG */
+
+/* Check if [head,tail] references "item" */
+PRIVATE ATTR_PURE NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL ring_contains)(struct sigcon *head,
+                             struct sigcon *tail,
+                             struct sigcon *item) {
+	struct sigcon *iter = head;
+	for (;;) {
+		if (iter == item)
+			return true;
+		if (iter == tail)
+			break;
+		iter = iter->sc_next;
+	}
+	return false;
+}
+
+PRIVATE ATTR_PURE ATTR_NOINLINE NONNULL((1)) void
+NOTHROW(FCALL sigcon_verify_ring)(struct sigcon *__restrict head) {
+	struct sigcon *prev = NULL;
+	struct sigcon *iter = head;
+	do {
+		uintptr_t stat;
+		assertf(iter, "Unexpected NULL-pointer in sigcon ring (prev: %p)", prev);
+		assertf(iter->sc_prev->sc_next == iter,
+		        "Bad prev->next pointer: %p != %p",
+		        iter->sc_prev->sc_next, iter);
+		assertf(iter->sc_next->sc_prev == iter,
+		        "Bad next->prev pointer: %p != %p",
+		        iter->sc_next->sc_prev, iter);
+
+		stat = atomic_read_relaxed(&iter->sc_stat);
+		assertf(SIGCON_STAT_ISCONNECTED(stat),
+		        "sigcon %p has status %#Ix, which "
+		        /**/ "indicates that it isn't connected",
+		        iter, stat);
+
+		/* Assert that the ring doesn't contain sub-rings:
+		 *
+		 *  [A] -> [B] -> [C] -> [D]
+		 *                 ^      |
+		 *  This isn't >>> |      v
+		 *  allowed       [F] <- [E]
+		 *
+		 * If this fails:
+		 * - "iter" is the "C"-node
+		 * - "prev" is the "F"-node
+		 * - "head" is the "A"-node
+		 */
+		assertf(!prev || !ring_contains(head, prev, iter),
+		        "End of sigcon ring doesn't point back to head.\n"
+		        "iter: %p\n"
+		        "prev: %p\n"
+		        "head: %p",
+		        iter, prev, head);
+
+		prev = iter;
+	} while ((iter = iter->sc_next) != head);
+}
+#endif /* !NDEBUG && !NDEBUG_SIG */
+
+/* Debug sigcon ring verification hooks */
+#define sigcon_verify_ring_beforesend(head)   sigcon_verify_ring(head)
+#define sigcon_verify_ring_duringsend(head)   sigcon_verify_ring(head)
+#define sigcon_verify_ring_aftersend(head)    sigcon_verify_ring(head)
+#define sigcon_verify_ring_beforeinsert(head) sigcon_verify_ring(head)
+#define sigcon_verify_ring_afterinsert(head)  sigcon_verify_ring(head)
+#define sigcon_verify_ring_beforeremove(head) sigcon_verify_ring(head)
+#define sigcon_verify_ring_afterremove(head)  sigcon_verify_ring(head)
+
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL destroy_tasks)(struct task *destroy_later) {
+	while (destroy_later) {
+		struct task *next;
+		next = sig_destroylater_next(destroy_later);
+		destroy(destroy_later);
+		destroy_later = next;
+	}
+}
+
+
+struct sig_post_completion {
+	struct sig_post_completion     *spc_next; /* [0..1] Next post-completion descriptor. */
+	sig_postcompletion_t            spc_cb;   /* [1..1] Post-completion callback to-be invoked. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, spc_buf); /* Buffer to-be passed to `spc_cb' */
+};
+
+#define sig_post_completion_alloc(bufsize) \
+	((struct sig_post_completion *)alloca(offsetof(struct sig_post_completion, spc_buf) + (bufsize)))
+
+/* @param: struct sig_post_completion   **ppost_completion_chain: ...
+ * @param: struct sigcon_comp            *sc:                     ...
+ * @param: struct sig_completion_context *context:                ... */
+#define invoke_sig_completion(ppost_completion_chain, sc, context) \
+	do {                                                           \
+		size_t _pc_reqlen;                                         \
+		(context)->scc_post   = NULL;                              \
+		(context)->scc_status = SIG_COMPLETION__F_NORMAL;          \
+		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
+		if (_pc_reqlen != 0 || (context)->scc_post != NULL) {      \
+			struct sig_post_completion *_pc_ent;                   \
+			for (;;) {                                             \
+				size_t _pc_newlen;                                 \
+				_pc_ent = sig_post_completion_alloc(_pc_reqlen);   \
+				_pc_newlen = (*(sc)->sc_cb)(sc, context,           \
+				                            _pc_ent->spc_buf,      \
+				                            _pc_reqlen);           \
+				if unlikely(_pc_newlen > _pc_reqlen) {             \
+					_pc_reqlen = _pc_newlen;                       \
+					continue;                                      \
+				}                                                  \
+				if unlikely((context)->scc_post == NULL)           \
+					break;                                         \
+				/* Finish fill in `_pc_ent' and enqueue it. */     \
+				_pc_ent->spc_cb   = (context)->scc_post;           \
+				_pc_ent->spc_next = *(ppost_completion_chain);     \
+				*(ppost_completion_chain) = _pc_ent;               \
+				break;                                             \
+			}                                                      \
+		}                                                          \
+	}	__WHILE0
+
+
+
+
+/* Trigger phase #2 for pending signal-completion functions.
+ * NOTE: During this, the completion callback will clear the
+ *       SMP  lock  bit  of its  own  completion controller. */
+#define sig_run_phase_2(chain, context)                \
+	do {                                               \
+		for (; chain; chain = chain->spc_next)         \
+			(*chain->spc_cb)(context, chain->spc_buf); \
+	}	__WHILE0
+
+
+
+/* Combine 2 rings "remainder" and "reprime" by returning whichever ring
+ * is  non-NULL, or inserting  "reprime" at the  end of "remainder" when
+ * both are non-NULL. */
+PRIVATE WUNUSED struct sigcon *
+NOTHROW(FCALL combine_remainder_and_reprime)(struct sigcon *remainder,
+                                             struct sigcon *reprime) {
+	struct sigcon *reprime_head;
+	struct sigcon *reprime_tail;
+	if (remainder == NULL)
+		return reprime;
+	if (reprime == NULL)
+		return remainder;
+	reprime_head = reprime;
+	reprime_tail = reprime->sc_prev;
+	assert(reprime_head->sc_prev->sc_next == reprime_head);
+	assert(reprime_head->sc_next->sc_prev == reprime_head);
+	assert(reprime_tail->sc_prev->sc_next == reprime_tail);
+	assert(reprime_tail->sc_next->sc_prev == reprime_tail);
+	assert(remainder->sc_prev->sc_next == remainder);
+	assert(remainder->sc_next->sc_prev == remainder);
+
+	/* Insert "[reprime_head,reprime_tail]" before "reprime" */
+	sigcon_rlink_insert_before(reprime_head, reprime_tail, remainder);
+	return remainder;
+}
+
+
+
+/* This call does everything needed to (in order):
+ * - invoke phase#1 callback of "receiver"
+ *   - if the callback indicates that that it wants to be re-primed, do so.
+ *   - if the callback indicates that it can't receive the signal:
+ *     - if it also re-primed itself, add "receiver" to an internal list
+ *       of non-viable receivers that will always be skipped by the code
+ *       used to search for receivers, as seen above.
+ *     - Make use of a custom "sig_send" implementation that is skips
+ *       non-viable receivers,  and inherits  the caller's  SMP-lock,
+ *       preemption_flag_t, "caller", "cleanup", etc.. Once that call
+ *       has completed, and  released all relevant  locks and so  on,
+ *       return true/false indicative  of that  function having  been
+ *       able to send the signal.
+ * - If non-NULL, inject connections from "reprime" at the end of "self"
+ * - release the SMP-lock from "self" by assigning `remainder`
+ * - invoke "cleanup" callbacks (while preemption is still off)
+ * - restore preemption as per "was"
+ * - destroy receiver threads whose reference counters dropped to 0
+ * - invoke phase#2 callback of "receiver"
+ * - return true */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5)) bool KCALL
+sig_completion_invoke_and_unlock_and_preemption_pop(struct sig *self,
+                                                    struct sig *sender,
+                                                    struct sigcon_comp *receiver,
+                                                    struct sigcon *remainder,
+                                                    struct task *caller,
+                                                    struct sigcon *reprime,
+                                                    struct sig_cleanup_callback *cleanup,
+                                                    preemption_flag_t was,
+                                                    unsigned int flags) {
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
+	assert(SIGCON_STAT_ISCONNECTED(atomic_read_relaxed(&receiver->sc_stat)));
+	assert(SIGCON_STAT_ISCOMP(atomic_read_relaxed(&receiver->sc_stat)));
+
+	/* Signal completion callback. */
+	context.scc_sender = sender;
+	context.scc_caller = caller;
+	invoke_sig_completion(&phase2, receiver, &context);
+
+	if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+		/* Release out ownership of "receiver" (if it wasn't reprimed) */
+		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
+	} else {
+		/* Re-prime connection */
+		if (reprime == NULL) {
+			sigcon_link_self(receiver);
+			reprime = receiver;
+		} else {
+			sigcon_link_insert_before(receiver, reprime);
+		}
+	}
+
+	/* Deal with the case where the completion function didn't accept the signal. */
+	if (context.scc_status & SIG_COMPLETION__F_NONVIABLE) {
+		bool result;
+		flags |= SIG_XSEND_F_LOCKED;
+		flags &= ~SIG_XSEND_F_NOPR;
+		if (!preemption_wason(&was))
+			flags |= SIG_XSEND_F_NOPR;
+#if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
+		if (phase2 == NULL) /* So the compiler can generate a tail-call */
+			return sig_xsend(self, flags, sender, caller, NULL, cleanup, reprime);
+#endif /* __OPTIMIZE__ && !__OPTIMIZE_SIZE__ */
+		result = sig_xsend(self, flags, sender, caller, NULL, cleanup, reprime);
+		sig_run_phase_2(phase2, &context);
+		return result;
+	}
+
+	/* Write-back the finalized, new ring of connections and release lock. */
+	remainder = combine_remainder_and_reprime(remainder, reprime);
+	atomic_write(&self->s_con, remainder); /* Release SMP-lock */
+	if (cleanup)
+		(*cleanup->scc_cb)(cleanup);
+	preemption_pop(&was);
+	sig_run_phase_2(phase2, &context);
+	return true;
+}
+
+/* This call does everything needed to (in order):
+ * - invoke phase#1 callback of "receiver"
+ * - Resume a broadcast on "self" using the specified options
+ * - invoke phase#2 callback of "receiver"
+ * - return the number of non-poll receivers that were notified
+ */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5, 6, 8)) size_t KCALL
+sig_completion_invoke_and_continue_broadcast(struct sig *self,
+                                             struct sig *sender,
+                                             struct sigcon_comp *receiver,
+                                             struct sigcon *remainder_head,
+                                             struct sigcon *remainder_tail,
+                                             struct sigcon *sigctl,
+                                             size_t maxcount,
+                                             struct task *caller,
+                                             struct sigcon *reprime,
+                                             struct sig_cleanup_callback *cleanup,
+                                             preemption_flag_t was,
+                                             unsigned int flags) {
+	size_t result = 0;
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
+	uintptr_t stat = atomic_read_relaxed(&receiver->sc_stat);
+	assert(SIGCON_STAT_ISCONNECTED(stat));
+	assert(SIGCON_STAT_ISCOMP(stat));
+	assert(maxcount > 0);
+	assert(remainder_head == receiver->sc_next);
+
+	/* Signal completion callback. */
+	context.scc_sender = sender;
+	context.scc_caller = caller;
+	invoke_sig_completion(&phase2, receiver, &context);
+
+	if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+		/* Release out ownership of "receiver" (if it wasn't reprimed) */
+		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
+	} else {
+		/* Re-prime connection */
+		if (reprime == NULL) {
+			sigcon_link_self(receiver);
+			reprime = receiver;
+		} else {
+			sigcon_link_insert_before(receiver, reprime);
+		}
+	}
+
+	/* Deal with the case where the completion function didn't accept the signal. */
+	if (!(context.scc_status & SIG_COMPLETION__F_NONVIABLE) &&
+	    !(stat & SIGCON_STAT_F_POLL))
+		++result;
+
+	if unlikely(remainder_head == sigctl) {
+		/* Special case: the completion-callback was the last receiver
+		 * -> nothing left to do but unlock the signal and exit. */
+restore_reprime_and_unlock:
+		atomic_write(&self->s_con, reprime);
+		if (cleanup)
+			(*cleanup->scc_cb)(cleanup);
+		preemption_pop(&was);
+		goto done;
+	}
+
+	/* Form a ring from the remainder and "reprime" connections. */
+	remainder_tail->sc_next = remainder_head;
+	remainder_head->sc_prev = remainder_tail;
+	reprime = combine_remainder_and_reprime(remainder_head, reprime);
+
+	/* Check for special case: we're supposed to stop now. */
+	if unlikely(result >= maxcount)
+		goto restore_reprime_and_unlock;
+
+	/* Write-back remaining connections to the signal, and resume
+	 * the  broadcast whilst having `sig_xsendmany()' inherit our
+	 * lock-state. */
+#ifdef SIG_SMPLOCK
+	atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)remainder_head | SIG_SMPLOCK));
+#else /* SIG_SMPLOCK */
+	atomic_write(&self->s_con, remainder_head);
+#endif /* !SIG_SMPLOCK */
+
+#if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
+	if (result == 0 && phase2 == NULL) {
+		/* So the compiler can generate a tail-call */
+		return sig_xsendmany(self, maxcount, flags, sender,
+		                     caller, cleanup, reprime, NULL);
+	}
+#endif /* __OPTIMIZE__ && !__OPTIMIZE_SIZE__ */
+	maxcount -= result;
+	result += sig_xsendmany(self, maxcount, flags, sender,
+	                        caller, cleanup, reprime, NULL);
+done:
+	sig_run_phase_2(phase2, &context);
+	return result;
+}
+
+#ifndef __INTELLISENSE__
+DECL_END
+/*[[[deemon (printSigCIncludes from "...include.sched.sig-config")();]]]*/
+#define DEFINE_sig_xsend
+#include "sig-send.c.inl"
+#define DEFINE_sig_xsendmany
+#include "sig-send.c.inl"
+#ifndef __OPTIMIZE_SIZE__
+#define DEFINE_sig_send
+#include "sig-send.c.inl"
+#define DEFINE_sig_send_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_sendmany
+#include "sig-send.c.inl"
+#define DEFINE_sig_sendmany_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_altbroadcast
+#include "sig-send.c.inl"
+#define DEFINE_sig_altbroadcast_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_cleanup_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_for_fini
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_for_fini_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_altbroadcast_for_fini
+#include "sig-send.c.inl"
+#define DEFINE_sig_altbroadcast_for_fini_nopr
+#include "sig-send.c.inl"
+#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
+#include "sig-send.c.inl"
+#else /* !__OPTIMIZE_SIZE__ */
+DECL_BEGIN
+PUBLIC NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL sig_send)(struct sig *__restrict self) {
+	return sig_xsend(self, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self) {
+	return sig_xsend(self, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self, size_t maxcount) {
+	return sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_FINI, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI, NULL, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self, struct sig *sender) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER, sender, THIS_TASK, NULL, NULL, NULL);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup) {
+	return sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CLEANUP, NULL, THIS_TASK, cleanup, NULL, NULL);
+}
+DECL_END
+#endif /* __OPTIMIZE_SIZE__ */
+/*[[[end]]]*/
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
+
+
+
+/* Assert offsets */
+static_assert(offsetof(struct sigcon, sc_sig) == OFFSET_SIGCON_SIG);
+static_assert(offsetof(struct sigcon, sc_prev) == OFFSET_SIGCON_PREV);
+static_assert(offsetof(struct sigcon, sc_next) == OFFSET_SIGCON_NEXT);
+static_assert(offsetof(struct sigcon, sc_cons) == OFFSET_SIGCON_CONS);
+static_assert(offsetof(struct sigcon, sc_stat) == OFFSET_SIGCON_STAT);
+static_assert(sizeof(struct sigcon) == SIZEOF_SIGCON);
+static_assert(alignof(struct sigcon) == ALIGNOF_SIGCON);
+static_assert(offsetof(struct sigcon_task, sct_next) == OFFSET_SIGCON_TASK_NEXT);
+static_assert(sizeof(struct sigcon_task) == SIZEOF_SIGCON_TASK);
+static_assert(alignof(struct sigcon_task) == ALIGNOF_SIGCON_TASK);
+static_assert(offsetof(struct taskcons, tcs_deliver) == OFFSET_TASKCONS_DELIVER);
+static_assert(offsetof(struct taskcons, tcs_thread) == OFFSET_TASKCONS_THREAD);
+static_assert(offsetof(struct taskcons, tcs_prev) == OFFSET_TASKCONS_PREV);
+static_assert(offsetof(struct taskcons, tcs_con) == OFFSET_TASKCONS_CON);
+static_assert(offsetof(struct taskcons, tcs_static) == OFFSET_TASKCONS_STATIC);
+static_assert(sizeof(struct taskcons) == SIZEOF_TASKCONS);
+static_assert(alignof(struct taskcons) == ALIGNOF_TASKCONS_TASK);
+
+/* Root connections set. */
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons) this_rootcons = {
+	.tcs_deliver = NULL,
+	.tcs_thread  = NULL,
+	.tcs_prev    = NULL,
+	.tcs_con     = NULL,
+	.tcs_static  = {}
+};
+
+/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use  connections.
+ * Most of the time, this will simply point to `PERTASK(this_rootcons)' */
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons *) this_cons = &this_rootcons;
+
+/* Define relocations */
+DEFINE_PERTASK_RELOCATION(this_rootcons + OFFSET_TASKCONS_THREAD);
+DEFINE_PERTASK_RELOCATION(this_cons);
+
+
+
+
+/* Internal, low-level API for adding/removing a signal connection */
+static_assert(__SIG_REMCON_F_NORMAL == _SIGCON_DISCONNECT_F_NORMAL);
+static_assert(__SIG_REMCON_F_FORWARD == _SIGCON_DISCONNECT_F_FORWARD);
+
+#ifndef __INTELLISENSE__
+DECL_END
+#define DEFINE___sig_addcon
+#include "sig-addcon.c.inl"
+#define DEFINE___sig_addcon_nopr
+#include "sig-addcon.c.inl"
+#define DEFINE___sig_remcon
+#include "sig-remcon.c.inl"
+#define DEFINE___sig_remcon_nopr
+#include "sig-remcon.c.inl"
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
+
+
+
+
+
+DECL_END
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/pertask.h>
-#include <sched/sig-completion.h>
 #include <sched/sig-select.h>
 #include <sched/sig.h>
 #include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
@@ -43,13 +589,9 @@
 #include <kos/types.h>
 
 #include <alloca.h>
-#include <assert.h>
 #include <atomic.h>
 #include <inttypes.h>
 #include <stdalign.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <string.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin.h>
@@ -58,12 +600,6 @@
 #include <kos/kernel/x86/segment.h>
 #endif /* __i386__ || __x86_64__ */
 #include <stdint.h>
-
-#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
-#define DBG_memset(p, c, n) memset(p, c, n)
-#else /* !NDEBUG && !NDEBUG_FINI */
-#define DBG_memset(p, c, n) (void)0
-#endif /* NDEBUG || NDEBUG_FINI */
 
 /* Internal key used to chain threads that have to be destroyed. */
 #define sig_destroylater_next(thread) KEY_task__next(thread)
@@ -2353,6 +2889,59 @@ NOTHROW(FCALL sig_send_select)(struct sig *__restrict self,
 }
 
 
+#ifndef __INTELLISENSE__
+DECL_END
+#define DEFINE_sig_send
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_send_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altsend
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altsend_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_sendto
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_sendto_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altsendto
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altsendto_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altbroadcast
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altbroadcast_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_as_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_cleanup_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_as_cleanup_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_for_fini
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_for_fini_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altbroadcast_for_fini
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_altbroadcast_for_fini_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_as_for_fini_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
+#include "sig-send-old.c.inl"
+#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
+#include "sig-send-old.c.inl"
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
+
+DECL_END
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+
+
 
 
 
@@ -2367,6 +2956,9 @@ NOTHROW(FCALL sig_send_select)(struct sig *__restrict self,
 
 
 #ifdef DEFINE_TEST
+DECL_BEGIN
+
+
 DEFINE_TEST(recursive_signals) {
 	struct task_connections cons;
 	struct sig s = SIG_INIT;
@@ -2449,90 +3041,20 @@ DEFINE_TEST(pushpop_connections) {
 	assert(!sig_iswaiting(&a) && sig_numwaiting(&a) == 0);
 	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
 }
-#endif /* DEFINE_TEST */
 
 
 DECL_END
+#endif /* DEFINE_TEST */
 
 #ifndef __INTELLISENSE__
-#define DEFINE_sig_send
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_send_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altsend
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altsend_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_sendto
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_sendto_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altsendto
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altsendto_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altbroadcast
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altbroadcast_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_as_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_cleanup_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_as_cleanup_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_for_fini
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_for_fini_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altbroadcast_for_fini
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_altbroadcast_for_fini_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_as_for_fini_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
-#include "sig-send.c.inl"
-
-#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
-#include "sig-send.c.inl"
-
 #define DEFINE_task_waitfor
 #include "sig-waitfor.c.inl"
-
 #define DEFINE_task_waitfor_with_sigmask
 #include "sig-waitfor.c.inl"
-
 #define DEFINE_task_waitfor_norpc
 #include "sig-waitfor.c.inl"
-
 #define DEFINE_task_waitfor_nx
 #include "sig-waitfor.c.inl"
-
 #define DEFINE_task_waitfor_norpc_nx
 #include "sig-waitfor.c.inl"
 #endif /* !__INTELLISENSE__ */

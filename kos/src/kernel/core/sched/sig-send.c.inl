@@ -17,738 +17,1285 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __INTELLISENSE__
+#if defined(__INTELLISENSE__) || defined(__DEEMON__)
 #include "sig.c"
-//#define           DEFINE_sig_send
-//#define        DEFINE_sig_altsend
-//#define      DEFINE_sig_send_nopr
-//#define   DEFINE_sig_altsend_nopr
-//#define         DEFINE_sig_sendto
-//#define      DEFINE_sig_altsendto
-//#define    DEFINE_sig_sendto_nopr
+
+/*[[[deemon (printSigSendCInlOptions from "...include.sched.sig-config")();]]]*/
+//#define DEFINE_sig_xsend
+#define DEFINE_sig_xsendmany
+//#define DEFINE_sig_send
+//#define DEFINE_sig_altsend
+//#define DEFINE_sig_send_nopr
+//#define DEFINE_sig_altsend_nopr
+//#define DEFINE_sig_send_cleanup_nopr
+//#define DEFINE_sig_altsend_cleanup_nopr
+//#define DEFINE_sig_sendas
+//#define DEFINE_sig_altsendas
+//#define DEFINE_sig_sendas_nopr
+//#define DEFINE_sig_altsendas_nopr
+//#define DEFINE_sig_sendas_cleanup_nopr
+//#define DEFINE_sig_altsendas_cleanup_nopr
+//#define DEFINE_sig_sendto
+//#define DEFINE_sig_altsendto
+//#define DEFINE_sig_sendto_nopr
 //#define DEFINE_sig_altsendto_nopr
-#define                          DEFINE_sig_broadcast
-//#define                       DEFINE_sig_altbroadcast
-//#define                     DEFINE_sig_broadcast_nopr
-//#define                  DEFINE_sig_altbroadcast_nopr
-//#define                  DEFINE_sig_broadcast_as_nopr
-//#define             DEFINE_sig_broadcast_cleanup_nopr
-//#define          DEFINE_sig_broadcast_as_cleanup_nopr
-//#define                 DEFINE_sig_broadcast_for_fini
-//#define              DEFINE_sig_altbroadcast_for_fini
-//#define            DEFINE_sig_broadcast_for_fini_nopr
-//#define         DEFINE_sig_altbroadcast_for_fini_nopr
-//#define         DEFINE_sig_broadcast_as_for_fini_nopr
-//#define    DEFINE_sig_broadcast_for_fini_cleanup_nopr
-//#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
+//#define DEFINE_sig_sendto_cleanup_nopr
+//#define DEFINE_sig_altsendto_cleanup_nopr
+//#define DEFINE_sig_sendasto
+//#define DEFINE_sig_altsendasto
+//#define DEFINE_sig_sendasto_nopr
+//#define DEFINE_sig_altsendasto_nopr
+//#define DEFINE_sig_sendasto_cleanup_nopr
+//#define DEFINE_sig_altsendasto_cleanup_nopr
+//#define DEFINE_sig_sendmany
+//#define DEFINE_sig_altsendmany
+//#define DEFINE_sig_sendmany_nopr
+//#define DEFINE_sig_altsendmany_nopr
+//#define DEFINE_sig_sendmany_cleanup_nopr
+//#define DEFINE_sig_altsendmany_cleanup_nopr
+//#define DEFINE_sig_sendmanyas
+//#define DEFINE_sig_altsendmanyas
+//#define DEFINE_sig_sendmanyas_nopr
+//#define DEFINE_sig_altsendmanyas_nopr
+//#define DEFINE_sig_sendmanyas_cleanup_nopr
+//#define DEFINE_sig_altsendmanyas_cleanup_nopr
+//#define DEFINE_sig_broadcast
+//#define DEFINE_sig_altbroadcast
+//#define DEFINE_sig_broadcast_nopr
+//#define DEFINE_sig_altbroadcast_nopr
+//#define DEFINE_sig_broadcast_for_fini
+//#define DEFINE_sig_altbroadcast_for_fini
+//#define DEFINE_sig_broadcast_for_fini_nopr
+//#define DEFINE_sig_altbroadcast_for_fini_nopr
+//#define DEFINE_sig_broadcast_cleanup_nopr
+//#define DEFINE_sig_altbroadcast_cleanup_nopr
+//#define DEFINE_sig_broadcast_for_fini_cleanup_nopr
+//#define DEFINE_sig_altbroadcast_for_fini_cleanup_nopr
+//#define DEFINE_sig_broadcastas
+//#define DEFINE_sig_altbroadcastas
+//#define DEFINE_sig_broadcastas_nopr
+//#define DEFINE_sig_altbroadcastas_nopr
+//#define DEFINE_sig_broadcastas_cleanup_nopr
+//#define DEFINE_sig_altbroadcastas_cleanup_nopr
+//#define DEFINE_sig_broadcastas_for_fini
+//#define DEFINE_sig_altbroadcastas_for_fini
+//#define DEFINE_sig_broadcastas_for_fini_nopr
+//#define DEFINE_sig_altbroadcastas_for_fini_nopr
+//#define DEFINE_sig_broadcastas_for_fini_cleanup_nopr
+//#define DEFINE_sig_altbroadcastas_for_fini_cleanup_nopr
+/*[[[end]]]*/
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE_sig_send) +                            \
-     defined(DEFINE_sig_send_nopr) +                       \
-     defined(DEFINE_sig_altsend) +                         \
-     defined(DEFINE_sig_altsend_nopr) +                    \
-     defined(DEFINE_sig_sendto) +                          \
-     defined(DEFINE_sig_sendto_nopr) +                     \
-     defined(DEFINE_sig_altsendto) +                       \
-     defined(DEFINE_sig_altsendto_nopr) +                  \
-     defined(DEFINE_sig_broadcast) +                       \
-     defined(DEFINE_sig_broadcast_nopr) +                  \
-     defined(DEFINE_sig_altbroadcast) +                    \
-     defined(DEFINE_sig_altbroadcast_nopr) +               \
-     defined(DEFINE_sig_broadcast_as_nopr) +               \
-     defined(DEFINE_sig_broadcast_cleanup_nopr) +          \
-     defined(DEFINE_sig_broadcast_as_cleanup_nopr) +       \
-     defined(DEFINE_sig_broadcast_for_fini) +              \
-     defined(DEFINE_sig_broadcast_for_fini_nopr) +         \
-     defined(DEFINE_sig_altbroadcast_for_fini) +           \
-     defined(DEFINE_sig_altbroadcast_for_fini_nopr) +      \
-     defined(DEFINE_sig_broadcast_as_for_fini_nopr) +      \
-     defined(DEFINE_sig_broadcast_for_fini_cleanup_nopr) + \
-     defined(DEFINE_sig_broadcast_as_for_fini_cleanup_nopr)) != 1
+/*[[[deemon (printSigSendCInlHead from "...include.sched.sig-config")();]]]*/
+#if (defined(DEFINE_sig_xsend) +                              \
+     defined(DEFINE_sig_xsendmany) +                          \
+     defined(DEFINE_sig_send) +                               \
+     defined(DEFINE_sig_altsend) +                            \
+     defined(DEFINE_sig_send_nopr) +                          \
+     defined(DEFINE_sig_altsend_nopr) +                       \
+     defined(DEFINE_sig_send_cleanup_nopr) +                  \
+     defined(DEFINE_sig_altsend_cleanup_nopr) +               \
+     defined(DEFINE_sig_sendas) +                             \
+     defined(DEFINE_sig_altsendas) +                          \
+     defined(DEFINE_sig_sendas_nopr) +                        \
+     defined(DEFINE_sig_altsendas_nopr) +                     \
+     defined(DEFINE_sig_sendas_cleanup_nopr) +                \
+     defined(DEFINE_sig_altsendas_cleanup_nopr) +             \
+     defined(DEFINE_sig_sendto) +                             \
+     defined(DEFINE_sig_altsendto) +                          \
+     defined(DEFINE_sig_sendto_nopr) +                        \
+     defined(DEFINE_sig_altsendto_nopr) +                     \
+     defined(DEFINE_sig_sendto_cleanup_nopr) +                \
+     defined(DEFINE_sig_altsendto_cleanup_nopr) +             \
+     defined(DEFINE_sig_sendasto) +                           \
+     defined(DEFINE_sig_altsendasto) +                        \
+     defined(DEFINE_sig_sendasto_nopr) +                      \
+     defined(DEFINE_sig_altsendasto_nopr) +                   \
+     defined(DEFINE_sig_sendasto_cleanup_nopr) +              \
+     defined(DEFINE_sig_altsendasto_cleanup_nopr) +           \
+     defined(DEFINE_sig_sendmany) +                           \
+     defined(DEFINE_sig_altsendmany) +                        \
+     defined(DEFINE_sig_sendmany_nopr) +                      \
+     defined(DEFINE_sig_altsendmany_nopr) +                   \
+     defined(DEFINE_sig_sendmany_cleanup_nopr) +              \
+     defined(DEFINE_sig_altsendmany_cleanup_nopr) +           \
+     defined(DEFINE_sig_sendmanyas) +                         \
+     defined(DEFINE_sig_altsendmanyas) +                      \
+     defined(DEFINE_sig_sendmanyas_nopr) +                    \
+     defined(DEFINE_sig_altsendmanyas_nopr) +                 \
+     defined(DEFINE_sig_sendmanyas_cleanup_nopr) +            \
+     defined(DEFINE_sig_altsendmanyas_cleanup_nopr) +         \
+     defined(DEFINE_sig_broadcast) +                          \
+     defined(DEFINE_sig_altbroadcast) +                       \
+     defined(DEFINE_sig_broadcast_nopr) +                     \
+     defined(DEFINE_sig_altbroadcast_nopr) +                  \
+     defined(DEFINE_sig_broadcast_for_fini) +                 \
+     defined(DEFINE_sig_altbroadcast_for_fini) +              \
+     defined(DEFINE_sig_broadcast_for_fini_nopr) +            \
+     defined(DEFINE_sig_altbroadcast_for_fini_nopr) +         \
+     defined(DEFINE_sig_broadcast_cleanup_nopr) +             \
+     defined(DEFINE_sig_altbroadcast_cleanup_nopr) +          \
+     defined(DEFINE_sig_broadcast_for_fini_cleanup_nopr) +    \
+     defined(DEFINE_sig_altbroadcast_for_fini_cleanup_nopr) + \
+     defined(DEFINE_sig_broadcastas) +                        \
+     defined(DEFINE_sig_altbroadcastas) +                     \
+     defined(DEFINE_sig_broadcastas_nopr) +                   \
+     defined(DEFINE_sig_altbroadcastas_nopr) +                \
+     defined(DEFINE_sig_broadcastas_cleanup_nopr) +           \
+     defined(DEFINE_sig_altbroadcastas_cleanup_nopr) +        \
+     defined(DEFINE_sig_broadcastas_for_fini) +               \
+     defined(DEFINE_sig_altbroadcastas_for_fini) +            \
+     defined(DEFINE_sig_broadcastas_for_fini_nopr) +          \
+     defined(DEFINE_sig_altbroadcastas_for_fini_nopr) +       \
+     defined(DEFINE_sig_broadcastas_for_fini_cleanup_nopr) +  \
+     defined(DEFINE_sig_altbroadcastas_for_fini_cleanup_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
+#ifdef DEFINE_sig_xsend
+#define LOCAL_sig_send sig_xsend
+#define LOCAL_IS_XSEND
+#define LOCAL_IS_SEND
+#define LOCAL_flags flags
+#define LOCAL_HAVE_flags
+#define LOCAL_HAVE_sender  /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_caller  /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_target  /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_cleanup /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_reprime
+#elif defined(DEFINE_sig_xsendmany)
+#define LOCAL_sig_send sig_xsendmany
+#define LOCAL_IS_XSEND
+#define LOCAL_IS_BROADCAST
+#define LOCAL_flags flags
+#define LOCAL_HAVE_maxcount
+#define LOCAL_HAVE_flags
+#define LOCAL_HAVE_sender  /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_caller  /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_cleanup /* Potentially; depends on `flags' */
+#define LOCAL_HAVE_reprime
+#define LOCAL_HAVE_destroy_later
+#elif defined(DEFINE_sig_send)
+#define LOCAL_sig_send sig_send
+#define LOCAL_IS_SEND
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altsend)
+#define LOCAL_sig_send sig_altsend
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_sender
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_send_nopr)
+#define LOCAL_sig_send sig_send_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altsend_nopr)
+#define LOCAL_sig_send sig_altsend_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_send_cleanup_nopr)
+#define LOCAL_sig_send sig_send_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsend_cleanup_nopr)
+#define LOCAL_sig_send sig_altsend_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_sendas)
+#define LOCAL_sig_send sig_sendas
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altsendas)
+#define LOCAL_sig_send sig_altsendas
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_sendas_nopr)
+#define LOCAL_sig_send sig_sendas_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altsendas_nopr)
+#define LOCAL_sig_send sig_altsendas_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_sendas_cleanup_nopr)
+#define LOCAL_sig_send sig_sendas_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsendas_cleanup_nopr)
+#define LOCAL_sig_send sig_altsendas_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_sendto)
+#define LOCAL_sig_send sig_sendto
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_target
+#define LOCAL_flags SIG_XSEND_F_TARGET
+#elif defined(DEFINE_sig_altsendto)
+#define LOCAL_sig_send sig_altsendto
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_sendto_nopr)
+#define LOCAL_sig_send sig_sendto_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_altsendto_nopr)
+#define LOCAL_sig_send sig_altsendto_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_sendto_cleanup_nopr)
+#define LOCAL_sig_send sig_sendto_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_target
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsendto_cleanup_nopr)
+#define LOCAL_sig_send sig_altsendto_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_target
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_sendasto)
+#define LOCAL_sig_send sig_sendasto
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_flags SIG_XSEND_F_TARGET
+#elif defined(DEFINE_sig_altsendasto)
+#define LOCAL_sig_send sig_altsendasto
+#define LOCAL_IS_SEND
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_sendasto_nopr)
+#define LOCAL_sig_send sig_sendasto_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_altsendasto_nopr)
+#define LOCAL_sig_send sig_altsendasto_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET)
+#elif defined(DEFINE_sig_sendasto_cleanup_nopr)
+#define LOCAL_sig_send sig_sendasto_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsendasto_cleanup_nopr)
+#define LOCAL_sig_send sig_altsendasto_cleanup_nopr
+#define LOCAL_IS_SEND
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_target
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_sendmany)
+#define LOCAL_sig_send sig_sendmany
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altsendmany)
+#define LOCAL_sig_send sig_altsendmany
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_sendmany_nopr)
+#define LOCAL_sig_send sig_sendmany_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altsendmany_nopr)
+#define LOCAL_sig_send sig_altsendmany_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_sendmany_cleanup_nopr)
+#define LOCAL_sig_send sig_sendmany_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_cleanup
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsendmany_cleanup_nopr)
+#define LOCAL_sig_send sig_altsendmany_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_cleanup
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_sendmanyas)
+#define LOCAL_sig_send sig_sendmanyas
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altsendmanyas)
+#define LOCAL_sig_send sig_altsendmanyas
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_sendmanyas_nopr)
+#define LOCAL_sig_send sig_sendmanyas_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altsendmanyas_nopr)
+#define LOCAL_sig_send sig_altsendmanyas_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_sendmanyas_cleanup_nopr)
+#define LOCAL_sig_send sig_sendmanyas_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altsendmanyas_cleanup_nopr)
+#define LOCAL_sig_send sig_altsendmanyas_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_HAVE_maxcount
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_broadcast)
+#define LOCAL_sig_send sig_broadcast
+#define LOCAL_IS_BROADCAST
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altbroadcast)
+#define LOCAL_sig_send sig_altbroadcast
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_sender
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_broadcast_nopr)
+#define LOCAL_sig_send sig_broadcast_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altbroadcast_nopr)
+#define LOCAL_sig_send sig_altbroadcast_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcast_for_fini)
+#define LOCAL_sig_send sig_broadcast_for_fini
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_FINI
+#define LOCAL_flags SIG_XSEND_F_FINI
+#elif defined(DEFINE_sig_altbroadcast_for_fini)
+#define LOCAL_sig_send sig_altbroadcast_for_fini
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_flags (SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcast_for_fini_nopr)
+#define LOCAL_sig_send sig_broadcast_for_fini_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI)
+#elif defined(DEFINE_sig_altbroadcast_for_fini_nopr)
+#define LOCAL_sig_send sig_altbroadcast_for_fini_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcast_cleanup_nopr)
+#define LOCAL_sig_send sig_broadcast_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altbroadcast_cleanup_nopr)
+#define LOCAL_sig_send sig_altbroadcast_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_broadcast_for_fini_cleanup_nopr)
+#define LOCAL_sig_send sig_broadcast_for_fini_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altbroadcast_for_fini_cleanup_nopr)
+#define LOCAL_sig_send sig_altbroadcast_for_fini_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_broadcastas)
+#define LOCAL_sig_send sig_broadcastas
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_NORMAL
+#elif defined(DEFINE_sig_altbroadcastas)
+#define LOCAL_sig_send sig_altbroadcastas
+#define LOCAL_IS_BROADCAST
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_SENDER
+#elif defined(DEFINE_sig_broadcastas_nopr)
+#define LOCAL_sig_send sig_broadcastas_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_NOPR
+#elif defined(DEFINE_sig_altbroadcastas_nopr)
+#define LOCAL_sig_send sig_altbroadcastas_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcastas_cleanup_nopr)
+#define LOCAL_sig_send sig_broadcastas_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altbroadcastas_cleanup_nopr)
+#define LOCAL_sig_send sig_altbroadcastas_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_broadcastas_for_fini)
+#define LOCAL_sig_send sig_broadcastas_for_fini
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_caller
+#define LOCAL_flags SIG_XSEND_F_FINI
+#elif defined(DEFINE_sig_altbroadcastas_for_fini)
+#define LOCAL_sig_send sig_altbroadcastas_for_fini
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags (SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcastas_for_fini_nopr)
+#define LOCAL_sig_send sig_broadcastas_for_fini_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_caller
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI)
+#elif defined(DEFINE_sig_altbroadcastas_for_fini_nopr)
+#define LOCAL_sig_send sig_altbroadcastas_for_fini_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER)
+#elif defined(DEFINE_sig_broadcastas_for_fini_cleanup_nopr)
+#define LOCAL_sig_send sig_broadcastas_for_fini_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CLEANUP)
+#elif defined(DEFINE_sig_altbroadcastas_for_fini_cleanup_nopr)
+#define LOCAL_sig_send sig_altbroadcastas_for_fini_cleanup_nopr
+#define LOCAL_IS_BROADCAST
+#define LOCAL_IS_NOPR
+#define LOCAL_IS_FINI
+#define LOCAL_HAVE_sender
+#define LOCAL_HAVE_caller
+#define LOCAL_HAVE_cleanup
+#define LOCAL_flags (SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP)
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+/*[[[end]]]*/
+
+#include <kernel/compiler.h>
+
+#include <kernel/panic.h>
+#include <sched/task.h>
+
+#include <hybrid/sched/preemption.h>
+
+#include <atomic.h>
+#include <stdbool.h>
+#include <stddef.h>
+
 DECL_BEGIN
 
-#ifdef DEFINE_sig_send
-/* Send signal `self' to exactly 1 connected thread
- *  - The receiver is the thread who's connection has been pending the longest.
- *  - Note the special interaction of this function with poll-based connections.
- *    For  more  information  on  this  subject,  see `task_connect_for_poll()'.
- * @return: true:  A waiting thread was signaled.
- * @return: false: The given signal didn't have any active connections. */
-PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL sig_send)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altsend)
-#define LOCAL_HAVE_SENDER
-PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL sig_altsend)(struct sig *self,
-                           struct sig *sender)
-#elif defined(DEFINE_sig_send_nopr)
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
-NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altsend_nopr)
-#define LOCAL_HAVE_SENDER
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
-NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
-                                struct sig *sender)
-#elif defined(DEFINE_sig_sendto)
-#define LOCAL_HAVE_TARGET_THREAD
-/* Send signal `self' to the given thread `target'
- *  - Behaves  the same as `sig_send()', however signal completion
- *    callbacks  and task_connection's that point to threads other
- *    than `target' are silently skipped, and the function behaves
- *    as  though anything other  than true thread-connections made
- *    by `target' didn't exist.
- * @return: true:  The specified `target' was connected, and the signal
- *                 was delivered as expected.
- * @return: false: The specified `target' wasn't connected to `self'. */
-FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
-                          struct task *__restrict target)
-#elif defined(DEFINE_sig_altsendto)
-#define LOCAL_HAVE_TARGET_THREAD
-#define LOCAL_HAVE_SENDER
-FUNDEF NOBLOCK NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL sig_altsendto)(struct sig *self,
-                             struct task *__restrict target,
-                             struct sig *sender)
-#elif defined(DEFINE_sig_sendto_nopr)
-#define LOCAL_HAVE_TARGET_THREAD
-#define LOCAL_HAVE_NOPREEMPT
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) bool
-NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self,
-                               struct task *__restrict target)
-#elif defined(DEFINE_sig_altsendto_nopr)
-#define LOCAL_HAVE_TARGET_THREAD
-#define LOCAL_HAVE_SENDER
-#define LOCAL_HAVE_NOPREEMPT
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self,
-                                  struct task *__restrict target,
-                                  struct sig *sender)
-#elif defined(DEFINE_sig_broadcast)
-#define LOCAL_HAVE_BROADCAST
-/* Send signal to all connected threads.
- * @return: * : The actual number of threads notified,
- *              not  counting  poll-based connections. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altbroadcast)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_SENDER
-PUBLIC NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
-                                struct sig *sender)
-#elif defined(DEFINE_sig_broadcast_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altbroadcast_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_NOPREEMPT
-#define LOCAL_HAVE_SENDER
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
-                                     struct sig *sender)
-#elif defined(DEFINE_sig_broadcast_as_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_SENDER_THREAD
-#define LOCAL_HAVE_NOPREEMPT
-/* Same as `sig_broadcast()', but impersonate `caller', and
- * wake up thread through use of `task_wake_as()'. The same
- * rules apply, meaning that the (true) caller must  ensure
- * that their CPU won't change,  and that `caller' is  also
- * running as part of their CPU. */
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
-                                     struct task *__restrict caller)
-#elif defined(DEFINE_sig_broadcast_cleanup_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_CLEANUP
-#define LOCAL_HAVE_NOPREEMPT
-/* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any  other
- * kind of cleanup, but after having released all internal SMP-locks. May be used to
- * release further SMP-locks  which may have  been used to  guard `self' from  being
- * destroyed (such  as calling  `aio_handle_release()' when  sending a  signal  from
- * inside of an AIO completion function)
- * Note that all of these functions guaranty that `callback' is invoked exactly once. */
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self,
-                                          struct sig_cleanup_callback *__restrict cleanup)
-#elif defined(DEFINE_sig_broadcast_as_cleanup_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_CLEANUP
-#define LOCAL_HAVE_SENDER_THREAD
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
-                                             struct task *__restrict caller,
-                                             struct sig_cleanup_callback *__restrict cleanup)
-#elif defined(DEFINE_sig_broadcast_for_fini)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-/* Same  as the regular `sig_broadcast' function, but must be used if
- * `self'  is being broadcast one last time prior to being destroyed.
- * When these functions are used, signal completion callbacks are not
- * allowed to make  use of  `sig_completion_reprime()', but  instead,
- * that function will return `false' and do nothing.
- * @return: * : The actual number of threads notified,
- *              not  counting  poll-based connections. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altbroadcast_for_fini)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_SENDER
-PUBLIC NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self,
-                                         struct sig *sender)
-#elif defined(DEFINE_sig_broadcast_for_fini_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self)
-#elif defined(DEFINE_sig_altbroadcast_for_fini_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_NOPREEMPT
-#define LOCAL_HAVE_SENDER
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
-                                              struct sig *sender)
-#elif defined(DEFINE_sig_broadcast_as_for_fini_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_SENDER_THREAD
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
-                                              struct task *__restrict caller)
-#elif defined(DEFINE_sig_broadcast_for_fini_cleanup_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_CLEANUP
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self,
-                                                   struct sig_cleanup_callback *__restrict cleanup)
-#elif defined(DEFINE_sig_broadcast_as_for_fini_cleanup_nopr)
-#define LOCAL_HAVE_BROADCAST
-#define LOCAL_HAVE_FOR_FINI
-#define LOCAL_HAVE_CLEANUP
-#define LOCAL_HAVE_SENDER_THREAD
-#define LOCAL_HAVE_NOPREEMPT
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict self,
-                                                      struct task *__restrict caller,
-                                                      struct sig_cleanup_callback *__restrict cleanup)
-#endif /* ... */
-{
-	struct task_connection *con;
-	struct task_connection *receiver;
-	struct task_connections *target_cons;
-#ifdef LOCAL_HAVE_BROADCAST
-	/* FIXME: Broadcasting to a large number other threads running on another CPU
-	 *        can lead to  a (not-really?) soft-lock  scenario that can  randomly
-	 *        resolve itself after an arbitrary amount of time.
-	 * The problem is that  the condition which our  caller is broadcasting may  have
-	 * gone  away before we've  finished broadcasting to  all listening threads. When
-	 * this happens, it can be that other  threads which we've already send a  signal
-	 * to re-add themself to the signal queue before we're done, at which point we'll
-	 * end up broadcasting to them once again.
-	 * Solution: Instead of implementing sig_broadcast() as
-	 *           `while (try_broadcast_one()) ++result',
-	 *           implement it as this instead:
-	 *           recv = atomic_xch(&self->s_con, SMP_LOCK);
-	 *           while (recv) { next = ...; broadcast_to(...); ++result; recv = next; }
-	 */
-	struct task_connection *next;
+#ifdef LOCAL_IS_BROADCAST
+#define LOCAL_return_t size_t
+#else /* ... */
+#define LOCAL_return_t bool
+#endif /* !... */
+
+#ifdef LOCAL_HAVE_sender
+#define LOCAL_sig_restrict /* nothing */
+#else /* ... */
+#define LOCAL_sig_restrict __restrict
+#endif /* !... */
+
+#if defined(LOCAL_HAVE_flags) || (defined(LOCAL_HAVE_caller) && defined(LOCAL_HAVE_target))
+#define LOCAL_task_restrict /* nothing */
+#else /* ... */
+#define LOCAL_task_restrict __restrict
+#endif /* !... */
+
+#ifdef LOCAL_HAVE_flags
+#define LOCAL_cleanup_restrict /* nothing */
+#else /* ... */
+#define LOCAL_cleanup_restrict __restrict
+#endif /* !... */
+
+
+
+#ifdef LOCAL_IS_NOPR
+#define LOCAL_task_yield() task_pause()
+#else /* LOCAL_IS_NOPR */
+#define LOCAL_task_yield() task_tryyield_or_pause()
+#endif /* !LOCAL_IS_NOPR */
+
+
+
+#if defined(LOCAL_HAVE_caller) && defined(LOCAL_HAVE_flags)
+#define LOCAL_task_wake(thread)                                                          \
+	((LOCAL_flags & SIG_XSEND_F_CALLER)                                                  \
+	 ? task_wake_as(thread, caller, take_wake_flags__from__sig_xsend_flags(LOCAL_flags)) \
+	 : task_wake(thread, take_wake_flags__from__sig_xsend_flags(LOCAL_flags)))
+#elif defined(LOCAL_HAVE_caller)
+#define LOCAL_task_wake(thread) \
+	task_wake_as(thread, caller, take_wake_flags__from__sig_xsend_flags(LOCAL_flags))
+#else /* LOCAL_HAVE_caller */
+#define LOCAL_task_wake(thread) task_wake(thread, take_wake_flags__from__sig_xsend_flags(LOCAL_flags))
+#endif /* !LOCAL_HAVE_caller */
+
+
+
+
+PUBLIC NOBLOCK LOCAL_return_t
+NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
+#ifdef LOCAL_HAVE_maxcount
+                              , size_t maxcount
+#define LOCAL_maxcount_MINUS_result() (maxcount - result)
+#else /* LOCAL_HAVE_maxcount */
+#define LOCAL_maxcount_MINUS_result() ((size_t)-1)
+#endif /* !LOCAL_HAVE_maxcount */
+#ifdef LOCAL_HAVE_flags
+                              , unsigned int flags
+#endif /* LOCAL_HAVE_flags */
+#ifdef LOCAL_HAVE_sender
+                              , struct sig *sender
+#define LOCAL_sender_OPT sender
+#define LOCAL_sender     sender
+#else /* LOCAL_HAVE_sender */
+#define LOCAL_sender_OPT NULL
+#define LOCAL_sender     self
+#endif /* !LOCAL_HAVE_sender */
+#ifdef LOCAL_HAVE_caller
+                              , struct task *LOCAL_task_restrict caller
+#define LOCAL_caller caller
+#else /* LOCAL_HAVE_caller */
+#define LOCAL_caller THIS_TASK
+#endif /* LOCAL_HAVE_caller */
+#ifdef LOCAL_HAVE_target
+                              , struct task *LOCAL_task_restrict target
+#endif /* LOCAL_HAVE_target */
+#ifdef LOCAL_HAVE_cleanup
+                              , struct sig_cleanup_callback *LOCAL_cleanup_restrict cleanup
+#define LOCAL_cleanup_OPT cleanup
+#ifdef LOCAL_HAVE_flags
+#define LOCAL_cleanup      ((flags & SIG_XSEND_F_CLEANUP) ? cleanup : NULL)
+#define LOCAL_runcleanup() ((LOCAL_flags & SIG_XSEND_F_CLEANUP) ? (*cleanup->scc_cb)(cleanup) : (void)0)
+#else /* LOCAL_HAVE_flags */
+#define LOCAL_cleanup      cleanup
+#define LOCAL_runcleanup() (*cleanup->scc_cb)(cleanup)
+#endif /* !LOCAL_HAVE_flags */
+#else /* LOCAL_HAVE_cleanup */
+#define LOCAL_cleanup_OPT  NULL
+#define LOCAL_cleanup      NULL
+#define LOCAL_runcleanup() (void)0
+#endif /* !LOCAL_HAVE_cleanup */
+#ifdef LOCAL_HAVE_reprime
+                              , struct sigcon *reprime
+#define LOCAL_reprime reprime
+#else /* LOCAL_HAVE_reprime */
+#define LOCAL_reprime NULL
+#endif /* LOCAL_HAVE_reprime */
+#ifdef LOCAL_HAVE_destroy_later
+                              , struct task *destroy_later
+#define LOCAL_destroy_later destroy_later
+#else /* LOCAL_HAVE_destroy_later */
+#define LOCAL_destroy_later NULL
+#endif /* LOCAL_HAVE_destroy_later */
+                              ) {
+	struct sigcon *sigctl;
+	struct sigcon *receiver;
+	struct taskcons *tcs;
+#ifdef LOCAL_IS_BROADCAST
 	size_t result = 0;
-#endif /* LOCAL_HAVE_BROADCAST */
-#ifdef LOCAL_HAVE_SENDER
-#define LOCAL_sender sender
-	assert(sender);
-#else /* LOCAL_HAVE_SENDER */
-#define LOCAL_sender self
-#endif /* !LOCAL_HAVE_SENDER */
-#ifdef LOCAL_HAVE_NOPREEMPT
-	assert(!preemption_ison());
-#define LOCAL_preemption_pushoff() (void)0
-#define LOCAL_preemption_pop()     (void)0
-#define LOCAL_was                  PREEMPTION_OFF_VALUE
-#else /* LOCAL_HAVE_NOPREEMPT */
+#if defined(LOCAL_HAVE_maxcount) || !defined(LOCAL_HAVE_flags)
+	struct sigcon *lastcon;
+#endif /* LOCAL_HAVE_maxcount || LOCAL_HAVE_flags */
+#else /* LOCAL_IS_BROADCAST */
+	struct sigcon *remainder;
+#endif /* !LOCAL_IS_BROADCAST */
+#ifdef LOCAL_IS_NOPR
+#define LOCAL_was PREEMPTION_OFF_VALUE
+#define LOCAL_preemption_wason() 0
+#else /* !LOCAL_IS_NOPR */
 	preemption_flag_t was;
-#define LOCAL_preemption_pushoff() preemption_pushoff(&was)
-#define LOCAL_preemption_pop()     preemption_pop(&was)
-#define LOCAL_was                  was
-#endif /* !LOCAL_HAVE_NOPREEMPT */
-#ifdef LOCAL_HAVE_SENDER_THREAD
-#define LOCAL_caller            caller
-#define LOCAL_task_wake(thread) task_wake_as(thread, caller)
-#else /* LOCAL_HAVE_SENDER_THREAD */
-#define LOCAL_caller            THIS_TASK
-#define LOCAL_task_wake(thread) task_wake(thread)
-#endif /* !LOCAL_HAVE_SENDER_THREAD */
-#ifdef LOCAL_HAVE_CLEANUP
-#define LOCAL_exec_cleanup() (*cleanup->scc_cb)(cleanup)
-#define LOCAL_cleanup        cleanup
-#else /* LOCAL_HAVE_CLEANUP */
-#define LOCAL_exec_cleanup() (void)0
-#define LOCAL_cleanup        NULL
-#endif /* !LOCAL_HAVE_CLEANUP */
-#ifdef LOCAL_HAVE_FOR_FINI
-#define LOCAL_TASK_CONNECTION_STAT_FFINI TASK_CONNECTION_STAT_FFINI
-#else /* LOCAL_HAVE_FOR_FINI */
-#define LOCAL_TASK_CONNECTION_STAT_FFINI 0
-#endif /* !LOCAL_HAVE_FOR_FINI */
-#ifndef CONFIG_NO_SMP
-again_disable_preemption:
-#endif /* !CONFIG_NO_SMP */
+#define LOCAL_was was
+#define LOCAL_preemption_wason() preemption_wason(&was)
+#endif /* LOCAL_IS_NOPR */
+#ifdef LOCAL_HAVE_flags
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
+	if (!(flags & SIG_XSEND_F_SENDER))
+		sender = self;
+#endif /* LOCAL_HAVE_flags */
 
-	/* Optimization:
-	 * If nothing is connected to the signal, we don't have to disable
-	 * preemption (though the extra check after preemption was  turned
-	 * off is still  required so that  the connections-exist check  is
-	 * interlocked with preemption being off). */
-#if !defined(__OPTIMIZE_SIZE__) && !defined(LOCAL_HAVE_NOPREEMPT)
-	if (!atomic_read(&self->s_con)) {
-		LOCAL_exec_cleanup();
-#ifdef LOCAL_HAVE_BROADCAST
-		return result;
-#else /* LOCAL_HAVE_BROADCAST */
-		return false;
-#endif /* !LOCAL_HAVE_BROADCAST */
-	}
-#endif /* !__OPTIMIZE_SIZE__ && !LOCAL_HAVE_NOPREEMPT */
 
-	/* Make sure that preemption is disabled. */
-	LOCAL_preemption_pushoff();
-#ifdef CONFIG_NO_SMP
-again:
-#endif /* CONFIG_NO_SMP */
-	con = atomic_read(&self->s_con);
-	if (!con) {
-#if !defined(CONFIG_NO_SMP) || defined(LOCAL_HAVE_TARGET_THREAD)
-done_exec_cleanup:
-#endif /* !CONFIG_NO_SMP || LOCAL_HAVE_TARGET_THREAD */
-		LOCAL_exec_cleanup();
-		LOCAL_preemption_pop();
-#ifdef LOCAL_HAVE_BROADCAST
-		return result;
-#else /* LOCAL_HAVE_BROADCAST */
-		return false;
-#endif /* !LOCAL_HAVE_BROADCAST */
-	}
-
-	/* Wait if the SMP lock isn't available at the moment. */
-#ifndef CONFIG_NO_SMP
-	if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
-		LOCAL_preemption_pop();
-		task_tryyield_or_pause();
-		goto again_disable_preemption;
-	}
-	/* Acquire the SMP-lock and validate that `con' is still correct. */
-	if (!atomic_cmpxch_weak(&self->s_con, con,
-	                        sig_smplock_set(con)))
-		goto again_disable_preemption;
-	con = sig_smplock_set(con);
-	__IF0 {
-again:
-		con = atomic_read(&self->s_con);
-		assert(sig_smplock_tst(con));
-		if (!sig_smplock_clr(con)) {
-			if (!atomic_cmpxch_weak(&self->s_con, con, 0))
-				goto again;
-			goto done_exec_cleanup;
+	/* Check for special case: not allowed to send *any* signals */
+#ifdef LOCAL_HAVE_maxcount
+	if unlikely(!maxcount) {
+#ifdef LOCAL_HAVE_flags
+		if (flags & SIG_XSEND_F_LOCKED) {
+			/* Inherit lock from caller */
+			atomic_and((uintptr_t *)&self->s_con, ~SIG_SMPLOCK);
+			assert(!preemption_ison() || kernel_poisoned());
+			LOCAL_runcleanup(); /* for sig_send_cleanup */
+			if (!(flags & SIG_XSEND_F_NOPR))
+				PREEMPTION_ENABLE();
+		} else
+#endif /* LOCAL_HAVE_flags */
+		{
+			LOCAL_runcleanup(); /* for sig_send_cleanup */
 		}
+		return 0;
 	}
-#endif /* !CONFIG_NO_SMP */
+#endif /* LOCAL_HAVE_maxcount */
 
 
-#ifdef LOCAL_HAVE_BROADCAST
-again_select_receiver:
-	/* Find a suitable candidate:
-	 *    During broadcast:
-	 *       #1: Just use the first connection */
-	receiver = sig_smplock_clr(con);
-	assert(receiver);
+#if defined(SIG_SMPLOCK) || !defined(LOCAL_IS_NOPR)
+again:
+#endif /* SIG_SMPLOCK || !LOCAL_IS_NOPR */
 
-	/* Unlink `receiver' from the connection chain, but keep ahold of the signal lock.
-	 * The later must be done  to ensure that the  signal isn't broadcast again  until
-	 * we're done, so-as to ensure that auto-re-prime completion callbacks are invoked
-	 * for every time they are selected as signal targets. */
-	if (!atomic_cmpxch_weak(&self->s_con, con,
-	                        sig_smplock_set(receiver->tc_signext))) {
-		con = atomic_read(&self->s_con);
-		assert(sig_smplock_tst(con));
-		assert(sig_smplock_clr(con) != NULL);
-		goto again_select_receiver;
-	}
-
-	/* Acquire a lock to `receiver' */
-#ifndef CONFIG_NO_SMP
-again_read_target_cons:
-	target_cons = atomic_read(&receiver->tc_cons);
-
-	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to  (and required to)  acquire connection  locks
-	 *       without having to release the associated signal-lock.
-	 * Doing  this doesn't result  in a race condition,  since the other end
-	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it  fails to acquire the signal  lock,
-	 * which it will because we're already holding that one! */
-	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
-		task_pause();
-		target_cons = atomic_read(&receiver->tc_cons);
-	}
-
-	/* Mark the receiver for broadcast, and acquire a lock to it. */
-	if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
-	                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
-	                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
-		goto again_read_target_cons;
-#else /* !CONFIG_NO_SMP */
-	target_cons = atomic_xch(&receiver->tc_cons,
-	                         (struct task_connections *)TASK_CONNECTION_STAT_BROADCAST);
-#endif /* CONFIG_NO_SMP */
-
-	/* Unlink `receiver' from our chain and unlock `self' */
-	next = receiver->tc_signext;
-#ifndef CONFIG_NO_SMP
-	assert(!sig_smplock_tst(next));
-#endif /* !CONFIG_NO_SMP */
-	atomic_write(&self->s_con, sig_smplock_set(next));
-
-	/* Deal with special connections. */
-	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
-		if (TASK_CONNECTION_STAT_ISDONE(target_cons)) {
-#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
-			goto again;
-		}
-		if (!TASK_CONNECTION_STAT_ISPOLL(target_cons))
-			++result;
-
-		/* Special case: broadcast includes completion callbacks.
-		 * Do this in a separate function so-as to keep the additional overhead outside of this function. */
-		result += sig_intern_broadcast(self,
-		                               LOCAL_sender,
-		                               LOCAL_caller,
-		                               (struct sig_completion *)receiver,
-		                               NULL,
-		                               LOCAL_cleanup,
-		                               TASK_CONNECTION_STAT_BROADCAST |
-		                               TASK_CONNECTION_STAT_FLOCK_OPT |
-		                               LOCAL_TASK_CONNECTION_STAT_FFINI,
-		                               LOCAL_was);
-		return result;
-	}
-	target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
-
-	/* Try to set our signal as the one delivered to `target_cons'. */
-	if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
-#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
-		goto again;
-	}
-
-	/* Suitable receiver. */
-	if (!TASK_CONNECTION_STAT_ISPOLL(target_cons))
-		++result;
-
-	/* Wake-up the thread attached to the connection */
+	sigctl = atomic_read(&self->s_con);
+#ifdef SIG_SMPLOCK
+	assertf((uintptr_t)sigctl != (0 | SIG_SMPLOCK),
+	        "SIG_SMPLOCK must not appear without connections");
+#endif /* SIG_SMPLOCK */
+#ifdef LOCAL_HAVE_flags
+	if (flags & SIG_XSEND_F_LOCKED) {
+		/* Inherit lock from caller */
+#ifdef SIG_SMPLOCK
+		assertf((uintptr_t)sigctl & SIG_SMPLOCK,
+		        "SIG_SMPLOCK should have been set by the caller!");
+		sigctl = (struct sigcon *)((uintptr_t)sigctl & ~SIG_SMPLOCK);
+#endif /* SIG_SMPLOCK */
+		assert(!preemption_ison() || kernel_poisoned());
+		was = PREEMPTION_ON_VALUE;
+		if (flags & SIG_XSEND_F_NOPR)
+			was = PREEMPTION_OFF_VALUE;
+	} else
+#endif /* LOCAL_HAVE_flags */
 	{
-		REF struct task *thread;
-		thread = xincref(atomic_read(&target_cons->tcs_thread));
-#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
-		if likely(thread) {
-#ifdef CONFIG_NO_SMP
-			if (!next)
-#else /* CONFIG_NO_SMP */
-			if (!next && atomic_cmpxch(&self->s_ctl, SIG_CONTROL_SMPLOCK, 0))
-#endif /* !CONFIG_NO_SMP */
-			{
-				/* Special  case: No other  remaining signals. - In  this case, do the
-				 * wake-up  of `thread' while no longer holding the SMP-lock to `self'
-				 * We do this because `task_wake()' can be a bit smarter when it comes
-				 * to scheduling if preemption is enabled (since in that case, it  can
-				 * do direct context switches, possibly even over to `thread'  itself) */
-				LOCAL_exec_cleanup();
-				LOCAL_preemption_pop();
-				LOCAL_task_wake(thread);
-				decref_unlikely(thread);
-				return result;
-			}
-			LOCAL_task_wake(thread);
-
-			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
-			assert(thread->t_refcnt >= 1);
-			if unlikely(atomic_fetchdec(&thread->t_refcnt) == 1) {
-				sig_destroylater_next(thread) = NULL;
-				result += sig_intern_broadcast(self,
-				                               LOCAL_sender,
-				                               LOCAL_caller,
-				                               NULL,
-				                               thread,
-				                               LOCAL_cleanup,
-				                               TASK_CONNECTION_STAT_BROADCAST |
-				                               TASK_CONNECTION_STAT_FLOCK_OPT |
-				                               LOCAL_TASK_CONNECTION_STAT_FFINI,
-				                               LOCAL_was);
-				return result;
-			}
+		if ((uintptr_t)sigctl == 0) {
+			/* Special case: no-one is connected */
+			LOCAL_runcleanup(); /* for sig_send_cleanup */
+			return 0;
 		}
-	}
-	goto again;
-#else /* LOCAL_HAVE_BROADCAST */
-	receiver = sig_smplock_clr(con);
 
-#ifdef LOCAL_HAVE_TARGET_THREAD
-	/* Find a suitable receiver: Just pick the first true-task  connection
-	 *                           that points to the caller-given `target'.
-	 * NOTE: Assuming that `target' isn't connected more than once, we don't
-	 *       actually search for  the oldest connection  that qualifies  for
-	 *       what we're looking  for, since there  really shouldn't be  more
-	 *       than a single connection  matching those requirements to  begin
-	 *       with! */
-again_read_target_cons:
-	target_cons = atomic_read(&receiver->tc_cons);
-#ifndef CONFIG_NO_SMP
-	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
-		task_pause();
-		target_cons = atomic_read(&receiver->tc_cons);
-	}
-#endif /* !CONFIG_NO_SMP */
-	if (TASK_CONNECTION_STAT_ISSPEC(target_cons) ||
-	    atomic_read(&TASK_CONNECTION_STAT_ASCONS(target_cons)->tcs_thread) != target) {
-		receiver = receiver->tc_signext;
-		if (!receiver)
-			goto done_exec_cleanup; /* No receiver found... */
-		goto again_read_target_cons;
-	}
-#else /* LOCAL_HAVE_TARGET_THREAD */
-
-	/* Find a suitable candidate:
-	 *    During send:
-	 *       #1: Use the last-in-chain, non-poll connection
-	 *       #2: Broadcast all poll connections (but stop if
-	 *           a non-poll connection shows up before we're
-	 *           down)
-	 *       #3: If no non-poll connection could be found,
-	 *           return `false' */
-	if (!receiver->tc_signext) {
-		/* Special case: Only one connection to choose from... */
-	} else {
-		struct task_connection *iter;
-		iter = receiver;
-		if (TASK_CONNECTION_STAT_ISPOLL(receiver->tc_stat))
-			receiver = NULL;
-
-		/* Find the last non-poll connection. */
-		do {
-			if (!TASK_CONNECTION_STAT_ISPOLL(iter->tc_stat))
-				receiver = iter;
-		} while ((iter = iter->tc_signext) != NULL);
-		if (!receiver) {
-			/* No non-poll connections found.
-			 * Just use the last connection in-chain. */
-			receiver = sig_smplock_clr(con);
-			while (receiver->tc_signext)
-				receiver = receiver->tc_signext;
-		}
-	}
-
-	/* Acquire a lock to `receiver' */
-again_read_target_cons:
-	target_cons = atomic_read(&receiver->tc_cons);
-
-#ifndef CONFIG_NO_SMP
-	/* NOTE: Waiting until we can lock the connection here is allowed, since
-	 *       you're allowed to  (and required to)  acquire connection  locks
-	 *       without having to release the associated signal-lock.
-	 * Doing  this doesn't result  in a race condition,  since the other end
-	 * of this syncing mechanism (which is `task_disconnect()') will release
-	 * its initial connection-lock if it  fails to acquire the signal  lock,
-	 * which it will because we're already holding that one! */
-	while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
-		task_pause();
-		target_cons = atomic_read(&receiver->tc_cons);
-	}
-#endif /* !CONFIG_NO_SMP */
-
-	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
-		struct sig_completion *sc;
-		assert(!TASK_CONNECTION_STAT_ISDEAD(target_cons));
-		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
-			/* The target is already dead. (change it to broadcast) */
-			if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
-			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
-			                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
-				goto again_read_target_cons;
-			task_connection_unlink_from_sig(self, receiver);
-#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-			atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
+#ifdef SIG_SMPLOCK
+		if ((uintptr_t)sigctl & SIG_SMPLOCK) {
+			LOCAL_task_yield();
 			goto again;
 		}
-		/* Signal completion callback. */
-		if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
-		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
-		                                                    LOCAL_TASK_CONNECTION_STAT_FFINI |
-		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
-			goto again_read_target_cons;
-		task_connection_unlink_from_sig(self, receiver);
-		sc = (struct sig_completion *)receiver;
-		if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
-			/* Special case: Deal with poll-based connections receiver. */
-			return sig_intern_send(self,
-			                       LOCAL_sender,
-			                       LOCAL_caller,
-			                       sc,
-			                       NULL,
-			                       LOCAL_cleanup,
-			                       LOCAL_was);
+#endif /* SIG_SMPLOCK */
+
+#ifndef LOCAL_IS_NOPR
+#ifdef LOCAL_HAVE_flags
+		if (LOCAL_flags & SIG_XSEND_F_NOPR)
+			assert(!preemption_ison() || kernel_poisoned());
+#endif /* LOCAL_HAVE_flags */
+		preemption_pushoff(&was);
+#else /* !LOCAL_IS_NOPR */
+		assert(!preemption_ison() || kernel_poisoned());
+#endif /* LOCAL_IS_NOPR */
+
+		/* Acquire SMP-lock */
+#ifdef SIG_SMPLOCK
+		if (!atomic_cmpxch_weak(&self->s_con, sigctl,
+		                        (struct sigcon *)((uintptr_t)sigctl | SIG_SMPLOCK))) {
+#ifndef LOCAL_IS_NOPR
+			preemption_pop(&was);
+#endif /* !LOCAL_IS_NOPR */
+			goto again;
+		}
+#endif /* SIG_SMPLOCK */
+	}
+
+	/* Debug assertions hook to verify integrity of the connection ring. */
+	sigcon_verify_ring_beforesend(sigctl);
+
+#ifdef LOCAL_IS_BROADCAST
+	/* Enumerate all receivers and signal each of them. */
+	receiver = sigctl;
+#if defined(LOCAL_HAVE_maxcount) || !defined(LOCAL_HAVE_flags)
+	lastcon = sigctl->sc_prev;
+#endif /* LOCAL_HAVE_maxcount || !LOCAL_HAVE_flags */
+	do {
+		bool bcast_ok;
+		uintptr_t stat = atomic_read(&receiver->sc_stat);
+		struct sigcon *next = receiver->sc_next;
+		assert(SIGCON_STAT_ISCONNECTED(stat));
+//		assert(receiver->sc_prev->sc_next  ==  receiver);  /*  Cannot  be  asserted  because  we  might  no  longer  own  "receiver->sc_prev".  Also:  we  destroy  these  links  via  DBG_memset */
+//		assert(receiver->sc_next->sc_prev == receiver); /* Cannot be asserted because we might no longer own "receiver->sc_next" (if it is "sigctl"). Also: we destroy these links via DBG_memset */
+		DBG_memset(&receiver->sc_prev, 0xcc, sizeof(receiver->sc_prev));
+		DBG_memset(&receiver->sc_next, 0xcc, sizeof(receiver->sc_next));
+
+		if (SIGCON_STAT_ISCOMP(stat)) {
+			struct sigcon_comp *sc = (struct sigcon_comp *)receiver;
+#ifdef LOCAL_HAVE_flags
+			context.scc_sender = sender;
+			context.scc_caller = caller;
+			invoke_sig_completion(&phase2, sc, &context);
+			if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+				/* This releases our ownership of "receiver" */
+				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST);
+			} else {
+				/* Insert into "reprime" queue (at the end, such that order is maintained)
+				 * Note that  repriming isn't  allowed during  `sig_broadcast_for_fini()`! */
+				if (reprime == NULL) {
+					sigcon_link_self(sc);
+					reprime = sc;
+				} else {
+					sigcon_link_insert_before(sc, reprime);
+				}
+				sigcon_verify_ring_afterinsert(reprime);
+			}
+
+			bcast_ok = (context.scc_status & SIG_COMPLETION__F_NONVIABLE) == 0;
+#else /* LOCAL_HAVE_flags */
+#define LOCAL_sig_completion_invoke_and_continue_broadcast()                            \
+			sig_completion_invoke_and_continue_broadcast(self,                          \
+			                                             LOCAL_sender,                  \
+			                                             sc,                            \
+			                                             next,                          \
+			                                             lastcon,                       \
+			                                             sigctl,                        \
+			                                             LOCAL_maxcount_MINUS_result(), \
+			                                             LOCAL_caller,                  \
+			                                             LOCAL_reprime,  /* XXX: This should always be "NULL" */ \
+			                                             LOCAL_cleanup,                 \
+			                                             LOCAL_was,                     \
+			                                             LOCAL_flags)
+#if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
+			if (result == 0) /* So the compiler can generate a tail-call */
+				return LOCAL_sig_completion_invoke_and_continue_broadcast();
+#endif /* __OPTIMIZE__ && !__OPTIMIZE_SIZE__ */
+			result += LOCAL_sig_completion_invoke_and_continue_broadcast();
+			return result;
+#undef LOCAL_sig_completion_invoke_and_continue_broadcast
+#endif /* !LOCAL_HAVE_flags */
 		} else {
-			/* Invoke this completion function as the only thing we do. */
-			sig_completion_runsingle(self,
-			                         sc,
-			                         LOCAL_caller,
-			                         LOCAL_sender,
-			                         LOCAL_cleanup,
-			                         LOCAL_was);
-		}
-		return true;
-	}
-#endif /* !LOCAL_HAVE_TARGET_THREAD */
-
-	if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
-		REF struct task *thread;
-
-		/* Special case: poll-based connections don't (really) count.
-		 * Instead, those get marked for broadcast. */
-		if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
-		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
-		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
-			goto again_read_target_cons;
-
-		task_connection_unlink_from_sig(self, receiver);
-		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
-		thread      = NULL;
-
-		/* Set the delivered signal, and capture
-		 * the thread  thread, if  there is  one */
-		if (atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender))
-			thread = xincref(atomic_read(&target_cons->tcs_thread));
-
-		/* Unlock the connection. */
-		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-		if (thread) {
-			LOCAL_task_wake(thread);
-
-			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
-			assert(thread->t_refcnt >= 1);
-			if unlikely(atomic_fetchdec(&thread->t_refcnt) == 1) {
-				sig_destroylater_next(thread) = NULL;
-				return sig_intern_send(self,
-				                       LOCAL_sender,
-				                       LOCAL_caller,
-				                       NULL,
-				                       thread,
-				                       LOCAL_cleanup,
-				                       LOCAL_was);
+			tcs = (struct taskcons *)(stat & ~SIGCON_STAT_F_POLL);
+			bcast_ok = atomic_cmpxch(&tcs->tcs_deliver, NULL, self);
+			if (bcast_ok) {
+				/* First signal delivered -> must wake the thread after locks were released. */
+				REF struct task *thread = xincref(atomic_read(&tcs->tcs_thread));
+				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
+				if (thread) {
+					LOCAL_task_wake(thread);
+					if unlikely(atomic_decfetch(&thread->t_refcnt) == 0) {
+#ifdef LOCAL_HAVE_destroy_later
+						sig_destroylater_next(thread) = destroy_later;
+						destroy_later = thread;
+#else /* LOCAL_HAVE_destroy_later */
+						unsigned int rest_flags = (LOCAL_flags & ~SIG_XSEND_F_NOPR) | SIG_XSEND_F_LOCKED |
+						                          (LOCAL_preemption_wason() ? 0 : SIG_XSEND_F_NOPR);
+						sig_destroylater_next(thread) = NULL;
+#define LOCAL_sig_xsendmany()                                                     \
+						sig_xsendmany(self, LOCAL_maxcount_MINUS_result(),        \
+						              rest_flags, LOCAL_sender_OPT, LOCAL_caller, \
+						              LOCAL_cleanup_OPT, NULL, thread)
+#if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
+						if (result == 0) /* So the compiler can generate a tail-call */
+							return LOCAL_sig_xsendmany();
+#endif /* __OPTIMIZE__ && !__OPTIMIZE_SIZE__ */
+						result += LOCAL_sig_xsendmany();
+						return result;
+#undef LOCAL_sig_xsendmany
+#endif /* !LOCAL_HAVE_destroy_later */
+					}
+				}
+			} else {
+				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
 			}
 		}
-		goto again;
+
+		/* Keep track of the # of successful non-poll broadcasts */
+		if (bcast_ok && !(stat & SIGCON_STAT_F_POLL)) {
+			++result;
+#ifdef LOCAL_HAVE_maxcount
+			if (result >= maxcount) {
+				/* Stop prematurely */
+				assert((receiver == lastcon) == (next == sigctl));
+				if unlikely(next == sigctl)
+					break; /* No connections remain -> can use the normal branch below. */
+
+				/* Must write-back to "self" a ring (with a head at "next"):
+				 * [next] ---------...---------> [lastcon]
+				 *   ^                               |
+				 *   |                               v
+				 * [reprime->sc_prev] <---...--- [reprime]
+				 */
+				lastcon->sc_next = next;
+				next->sc_prev = lastcon;
+#ifdef LOCAL_HAVE_reprime
+				next = combine_remainder_and_reprime(next, reprime);
+#endif /* LOCAL_HAVE_reprime */
+
+				sigcon_verify_ring_aftersend(next);
+				atomic_write(&self->s_con, next);
+				goto done_sig_unlocked;
+			}
+#endif /* LOCAL_HAVE_maxcount */
+		}
+
+		/* Move on to the next receiver */
+		receiver = next;
+	} while (receiver != sigctl);
+
+	/* Release SMP-lock; only reprimed connections remain */
+#if defined(LOCAL_HAVE_reprime) && !defined(sigcon_verify_ring_IS_NOOP)
+	if (LOCAL_reprime)
+		sigcon_verify_ring_aftersend(LOCAL_reprime);
+#endif /* LOCAL_HAVE_reprime && !sigcon_verify_ring_IS_NOOP */
+	atomic_write(&self->s_con, LOCAL_reprime);
+
+#ifdef LOCAL_HAVE_maxcount
+done_sig_unlocked:
+#endif /* LOCAL_HAVE_maxcount */
+
+	/* for sig_broadcast_cleanup */
+	LOCAL_runcleanup();
+
+	/* Restore preemption stat */
+#ifndef LOCAL_IS_NOPR
+	preemption_pop(&was);
+#endif /* !LOCAL_IS_NOPR */
+
+	/* Finish destruction of dead threads */
+#ifdef LOCAL_HAVE_destroy_later
+	destroy_tasks(destroy_later);
+#endif /* LOCAL_HAVE_destroy_later */
+
+	/* Run phase#2 signal completion callbacks */
+#ifdef LOCAL_HAVE_flags
+	sig_run_phase_2(phase2, &context);
+#endif /* LOCAL_HAVE_flags */
+	return result;
+#else /* LOCAL_IS_BROADCAST */
+again_find_receiver:
+	receiver = sigctl;
+	assert(receiver->sc_sig == self);
+
+#ifdef LOCAL_HAVE_flags
+	if (flags & SIG_XSEND_F_TARGET)
+#endif /* LOCAL_HAVE_flags */
+#if defined(LOCAL_HAVE_flags) || defined(LOCAL_HAVE_target)
+	{
+		/* Send to specific thread */
+		for (;;) {
+			tcs = atomic_read_relaxed(&receiver->sc_cons);
+			assert(SIGCON_STAT_ISCONNECTED((uintptr_t)tcs));
+			if (SIGCON_STAT_ISTHREAD((uintptr_t)tcs)) {
+				struct task *thread = atomic_read(&tcs->tcs_thread);
+				if (thread == target)
+					break; /* Found our target! */
+			}
+			receiver = receiver->sc_next;
+			if (receiver == sigctl) {
+				sigcon_verify_ring_aftersend(sigctl);
+				atomic_write(&self->s_con, sigctl); /* Release SMP-lock */
+				LOCAL_runcleanup();                 /* for sig_send_cleanup */
+#ifndef LOCAL_IS_NOPR
+				preemption_pop(&was);
+#endif /* !LOCAL_IS_NOPR */
+				return false;
+			}
+		}
+
+		/* Figure out what's going to the queue's new head. */
+		remainder = sigctl;
+		if unlikely(remainder == receiver) {
+			remainder = receiver->sc_next;
+			if unlikely(remainder == receiver)
+				remainder = NULL; /* Special case: last connection goes away */
+		}
+	}
+#endif /* LOCAL_HAVE_flags || LOCAL_HAVE_target */
+#ifdef LOCAL_HAVE_flags
+	else
+#endif /* LOCAL_HAVE_flags */
+#if defined(LOCAL_HAVE_flags) || !defined(LOCAL_HAVE_target)
+	{
+		/* Default target selection algorithm */
+		if (atomic_read_relaxed(&receiver->sc_stat) & SIGCON_STAT_F_POLL) {
+			/* Try  to find a  non-polling receiver, and if  we manage to find
+			 * one, shove all of the poll-based ones to the back of the queue. */
+			struct sigcon *poll_head;
+			struct sigcon *poll_tail;
+			do {
+				assert(receiver->sc_prev->sc_next == receiver);
+				assert(receiver->sc_next->sc_prev == receiver);
+				assert((receiver->sc_next != receiver) || (receiver->sc_next == sigctl));
+				receiver = receiver->sc_next;
+				if (receiver == sigctl) {
+					/* All  remaining   connections  are   poll-based.
+					 * Essentially the same as "sig_broadcast()", but:
+					 * - Allowed to assume that the wait queue is non-empty
+					 * - Inherits the SMP-lock to "self"
+					 * - Inherits the preemption state in "was"
+					 * For more info, see description of `sig_broadcast()` */
+
+					unsigned int bcast_flags = (LOCAL_flags & ~SIG_XSEND_F_NOPR) | SIG_XSEND_F_LOCKED |
+					                           (LOCAL_preemption_wason() ? 0 : SIG_XSEND_F_NOPR);
+#ifdef LOCAL_HAVE_flags
+					if (phase2) {
+						sig_xbroadcast(self, bcast_flags, LOCAL_sender_OPT,
+						               LOCAL_caller, LOCAL_cleanup_OPT,
+						               LOCAL_reprime, LOCAL_destroy_later);
+						sig_run_phase_2(phase2, &context);
+						return false;
+					}
+#endif /* LOCAL_HAVE_flags */
+
+					/* NOTE: This call should always return "0" */
+					return sig_xbroadcast(self, bcast_flags, LOCAL_sender_OPT,
+					                      LOCAL_caller, LOCAL_cleanup_OPT,
+					                      LOCAL_reprime, LOCAL_destroy_later);
+				}
+			} while (atomic_read_relaxed(&receiver->sc_stat) & SIGCON_STAT_F_POLL);
+
+			/* Shove the chain of poll-based receivers to the back of the queue. */
+			poll_head = sigctl;
+			poll_tail = receiver->sc_prev;
+			assert(poll_tail != receiver);
+			assert(poll_tail->sc_next == receiver);
+
+			/* Unlink poll-based connections from queue */
+			poll_head->sc_prev->sc_next = receiver;
+			receiver->sc_prev = poll_head->sc_prev;
+
+			remainder = receiver->sc_next;
+			assert(remainder != receiver);
+
+			/* Re-insert poll-based connections before "remainder" (which will become the queue's
+			 * new head, meaning that anything that appears before it will actually appear at the
+			 * end of the queue) */
+			poll_head->sc_prev = remainder->sc_prev;
+			poll_head->sc_prev->sc_next = poll_head;
+			poll_tail->sc_next = remainder;
+			remainder->sc_prev = poll_tail;
+		} else {
+			remainder = receiver->sc_next;
+			if unlikely(remainder == receiver)
+				remainder = NULL; /* Special case: last connection goes away */
+		}
+	}
+#endif /* LOCAL_HAVE_flags || !LOCAL_HAVE_target */
+
+	/* Remove "receiver" from the wait queue. */
+	assert(receiver != remainder);
+	assert(receiver->sc_prev->sc_next == receiver);
+	assert(receiver->sc_next->sc_prev == receiver);
+	receiver->sc_prev->sc_next = receiver->sc_next;
+	receiver->sc_next->sc_prev = receiver->sc_prev;
+
+	/* Load the status/task word of "receiver" */
+	tcs = atomic_read_relaxed(&receiver->sc_cons);
+	assert(SIGCON_STAT_ISCONNECTED((uintptr_t)tcs));
+
+	/* Deal with completion-callbacks */
+#if defined(LOCAL_HAVE_flags) || !defined(LOCAL_HAVE_target)
+	if unlikely(SIGCON_STAT_ISCOMP((uintptr_t)tcs)) {
+#ifdef LOCAL_HAVE_flags
+		/* Signal completion callback. */
+		context.scc_sender = sender;
+		context.scc_caller = caller;
+		invoke_sig_completion(&phase2, (struct sigcon_comp *)receiver, &context);
+
+		if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+			/* Release out ownership of "receiver" (if it wasn't reprimed) */
+			atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
+		} else {
+			/* Re-prime connection */
+			if (reprime == NULL) {
+				sigcon_link_self(receiver);
+				reprime = receiver;
+			} else {
+				sigcon_link_insert_before(receiver, reprime);
+			}
+			sigcon_verify_ring_afterinsert(reprime);
+		}
+
+		/* Deal with the case where the completion function didn't accept the signal. */
+		if (context.scc_status & SIG_COMPLETION__F_NONVIABLE)
+			goto handle_non_viable_receiver;
+#else /* LOCAL_HAVE_flags */
+#ifdef LOCAL_HAVE_destroy_later
+#error "Invalid configuration"
+#endif /* LOCAL_HAVE_destroy_later */
+		return sig_completion_invoke_and_unlock_and_preemption_pop(self,
+		                                                           LOCAL_sender,
+		                                                           (struct sigcon_comp *)receiver,
+		                                                           remainder,
+		                                                           LOCAL_caller,
+		                                                           LOCAL_reprime, /* XXX: This should always be "NULL" */
+		                                                           LOCAL_cleanup,
+		                                                           LOCAL_was,
+		                                                           LOCAL_flags);
+#endif /* !LOCAL_HAVE_flags */
+	} else
+#endif /* LOCAL_HAVE_flags || !LOCAL_HAVE_target */
+	{
+		tcs = (struct taskcons *)((uintptr_t)tcs & ~SIGCON_STAT_F_POLL);
+		assert(SIGCON_STAT_ISTHREAD((uintptr_t)tcs));
+
+		/* Try to set out signal as the sender. "sig_altsend"
+		 * sets the given  signal here,  rather than  "self". */
+		if (!atomic_cmpxch(&tcs->tcs_deliver, NULL, LOCAL_sender)) {
+			/* Failed to deliver signal :(
+			 * - Mark the receiver for broadcast
+			 * - Jump back to find another receiver (this one we already removed from the queue) */
+			atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
+
+#ifdef LOCAL_HAVE_flags
+handle_non_viable_receiver:
+#endif /* LOCAL_HAVE_flags */
+			/* Check for special case: no other connections remain. */
+			if (!remainder) {
+#if defined(LOCAL_HAVE_reprime) && !defined(sigcon_verify_ring_IS_NOOP)
+				if (LOCAL_reprime)
+					sigcon_verify_ring_aftersend(LOCAL_reprime);
+#endif /* LOCAL_HAVE_reprime && !sigcon_verify_ring_IS_NOOP */
+				atomic_write(&self->s_con, LOCAL_reprime);
+				LOCAL_runcleanup();
+#ifndef LOCAL_IS_NOPR
+				preemption_pop(&was);
+#endif /* !LOCAL_IS_NOPR */
+#ifdef LOCAL_HAVE_flags
+				sig_run_phase_2(phase2, &context);
+#endif /* LOCAL_HAVE_flags */
+				return false;
+			}
+
+			/* vvv this write  isn't necessary,  because "self->s_con"  isn't anywhere  after
+			 *     the "again_find_receiver" label (because there is no jump back to "again",
+			 *     which is the only place where such a read happens) */
+			sigcon_verify_ring_duringsend(remainder);
+//			atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)remainder | SIG_SMPLOCK)); /* Keep SMP-lock */
+			sigctl = remainder;
+			goto again_find_receiver;
+		}
 	}
 
-	/* Mark the receiver as sent, and acquire a lock to it. */
-	if (!atomic_cmpxch_weak(&receiver->tc_cons, target_cons,
-	                        (struct task_connections *)(TASK_CONNECTION_STAT_SENT |
-	                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
-		goto again_read_target_cons;
+	/* Merge remaining connections with those that ought to be re-primed. */
+#ifdef LOCAL_HAVE_reprime
+	remainder = combine_remainder_and_reprime(remainder, reprime);
+#endif /* LOCAL_HAVE_reprime */
 
-	/* Set the signal sender as being delivered for the target connection set. */
-	if (!atomic_cmpxch(&target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
-		/* Unlink the signal, and mark it as broadcast. */
-		task_connection_unlink_from_sig(self, receiver);
-		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
-		goto again;
-	}
-	sig_smplock_release_nopr(self);
-
-	/* The simple case:  We managed to  deliver the  signal,
-	 * and now we must wake-up the connected thread (if any) */
+	/* First signal delivered -> must wake the thread after locks were released. */
 	{
 		REF struct task *thread;
-		thread = xincref(atomic_read(&target_cons->tcs_thread));
-		/* !!! Note that "received" is NOT removed from the signal's queue.
-		 *     The signal only gets removed once the receiver  disconnects,
-		 *     or the signal is broadcast. */
-#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
-		atomic_write(&receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
-#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
-		LOCAL_exec_cleanup();
-		LOCAL_preemption_pop();
-
-		/* Wake-up the thread. */
-		if likely(thread) {
+		thread = xincref(atomic_read(&tcs->tcs_thread));
+		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT); /* This releases our ownership of "receiver" */
+#ifndef sigcon_verify_ring_IS_NOOP
+		if (remainder)
+			sigcon_verify_ring_aftersend(remainder);
+#endif /* !sigcon_verify_ring_IS_NOOP */
+		atomic_write(&self->s_con, remainder);                    /* Release SMP-lock */
+		LOCAL_runcleanup();                                       /* for sig_send_cleanup */
+#ifndef LOCAL_IS_NOPR
+		preemption_pop(&was);
+#endif /* !LOCAL_IS_NOPR */
+		if (thread) {
 			LOCAL_task_wake(thread);
 			decref_unlikely(thread);
 		}
 	}
+#ifdef LOCAL_HAVE_flags
+	sig_run_phase_2(phase2, &context);
+#endif /* LOCAL_HAVE_flags */
 	return true;
-#endif /* !LOCAL_HAVE_BROADCAST */
-#undef LOCAL_TASK_CONNECTION_STAT_FFINI
-#undef LOCAL_exec_cleanup
+#endif /* !LOCAL_IS_BROADCAST */
+#undef LOCAL_cleanup_OPT
+#undef LOCAL_sender_OPT
+#undef LOCAL_destroy_later
+#undef LOCAL_reprime
+#undef LOCAL_runcleanup
 #undef LOCAL_cleanup
-#undef LOCAL_was
-#undef LOCAL_preemption_pushoff
-#undef LOCAL_preemption_pop
-#undef LOCAL_caller
-#undef LOCAL_task_wake
-#undef LOCAL_decref_task
 #undef LOCAL_sender
+#undef LOCAL_caller
+#undef LOCAL_was
+#undef LOCAL_preemption_wason
+#undef LOCAL_maxcount_MINUS_result
 }
 
-#undef LOCAL_HAVE_SENDER_THREAD
-#undef LOCAL_HAVE_TARGET_THREAD
-#undef LOCAL_HAVE_CLEANUP
-#undef LOCAL_HAVE_BROADCAST
-#undef LOCAL_HAVE_FOR_FINI
-#undef LOCAL_HAVE_SENDER
-#undef LOCAL_HAVE_NOPREEMPT
+#undef LOCAL_task_yield
+#undef LOCAL_task_wake
 
+#undef LOCAL_cleanup_restrict
+#undef LOCAL_task_restrict
+#undef LOCAL_sig_restrict
+#undef LOCAL_return_t
 
 DECL_END
 
-#undef DEFINE_sig_send
-#undef DEFINE_sig_send_nopr
-#undef DEFINE_sig_altsend
-#undef DEFINE_sig_altsend_nopr
-#undef DEFINE_sig_sendto
-#undef DEFINE_sig_sendto_nopr
-#undef DEFINE_sig_altsendto
-#undef DEFINE_sig_altsendto_nopr
-#undef DEFINE_sig_broadcast
-#undef DEFINE_sig_broadcast_nopr
-#undef DEFINE_sig_altbroadcast
-#undef DEFINE_sig_altbroadcast_nopr
-#undef DEFINE_sig_broadcast_as_nopr
+/*[[[deemon (printSigSendCInlTail from "...include.sched.sig-config")();]]]*/
+#undef LOCAL_sig_send
+#undef LOCAL_IS_BROADCAST
+#undef LOCAL_IS_XSEND
+#undef LOCAL_IS_NOPR
+#undef LOCAL_IS_FINI
+#undef LOCAL_HAVE_maxcount
+#undef LOCAL_HAVE_flags
+#undef LOCAL_HAVE_sender
+#undef LOCAL_HAVE_caller
+#undef LOCAL_HAVE_target
+#undef LOCAL_HAVE_cleanup
+#undef LOCAL_HAVE_reprime
+#undef LOCAL_HAVE_destroy_later
+#undef LOCAL_flags
+
+#undef DEFINE_sig_altbroadcastas_for_fini_cleanup_nopr
+#undef DEFINE_sig_broadcastas_for_fini_cleanup_nopr
+#undef DEFINE_sig_altbroadcastas_for_fini_nopr
+#undef DEFINE_sig_broadcastas_for_fini_nopr
+#undef DEFINE_sig_altbroadcastas_for_fini
+#undef DEFINE_sig_broadcastas_for_fini
+#undef DEFINE_sig_altbroadcastas_cleanup_nopr
+#undef DEFINE_sig_broadcastas_cleanup_nopr
+#undef DEFINE_sig_altbroadcastas_nopr
+#undef DEFINE_sig_broadcastas_nopr
+#undef DEFINE_sig_altbroadcastas
+#undef DEFINE_sig_broadcastas
+#undef DEFINE_sig_altbroadcast_for_fini_cleanup_nopr
+#undef DEFINE_sig_broadcast_for_fini_cleanup_nopr
+#undef DEFINE_sig_altbroadcast_cleanup_nopr
 #undef DEFINE_sig_broadcast_cleanup_nopr
-#undef DEFINE_sig_broadcast_as_cleanup_nopr
-#undef DEFINE_sig_broadcast_for_fini
+#undef DEFINE_sig_altbroadcast_for_fini_nopr
 #undef DEFINE_sig_broadcast_for_fini_nopr
 #undef DEFINE_sig_altbroadcast_for_fini
-#undef DEFINE_sig_altbroadcast_for_fini_nopr
-#undef DEFINE_sig_broadcast_as_for_fini_nopr
-#undef DEFINE_sig_broadcast_for_fini_cleanup_nopr
-#undef DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
+#undef DEFINE_sig_broadcast_for_fini
+#undef DEFINE_sig_altbroadcast_nopr
+#undef DEFINE_sig_broadcast_nopr
+#undef DEFINE_sig_altbroadcast
+#undef DEFINE_sig_broadcast
+#undef DEFINE_sig_altsendmanyas_cleanup_nopr
+#undef DEFINE_sig_sendmanyas_cleanup_nopr
+#undef DEFINE_sig_altsendmanyas_nopr
+#undef DEFINE_sig_sendmanyas_nopr
+#undef DEFINE_sig_altsendmanyas
+#undef DEFINE_sig_sendmanyas
+#undef DEFINE_sig_altsendmany_cleanup_nopr
+#undef DEFINE_sig_sendmany_cleanup_nopr
+#undef DEFINE_sig_altsendmany_nopr
+#undef DEFINE_sig_sendmany_nopr
+#undef DEFINE_sig_altsendmany
+#undef DEFINE_sig_sendmany
+#undef DEFINE_sig_altsendasto_cleanup_nopr
+#undef DEFINE_sig_sendasto_cleanup_nopr
+#undef DEFINE_sig_altsendasto_nopr
+#undef DEFINE_sig_sendasto_nopr
+#undef DEFINE_sig_altsendasto
+#undef DEFINE_sig_sendasto
+#undef DEFINE_sig_altsendto_cleanup_nopr
+#undef DEFINE_sig_sendto_cleanup_nopr
+#undef DEFINE_sig_altsendto_nopr
+#undef DEFINE_sig_sendto_nopr
+#undef DEFINE_sig_altsendto
+#undef DEFINE_sig_sendto
+#undef DEFINE_sig_altsendas_cleanup_nopr
+#undef DEFINE_sig_sendas_cleanup_nopr
+#undef DEFINE_sig_altsendas_nopr
+#undef DEFINE_sig_sendas_nopr
+#undef DEFINE_sig_altsendas
+#undef DEFINE_sig_sendas
+#undef DEFINE_sig_altsend_cleanup_nopr
+#undef DEFINE_sig_send_cleanup_nopr
+#undef DEFINE_sig_altsend_nopr
+#undef DEFINE_sig_send_nopr
+#undef DEFINE_sig_altsend
+#undef DEFINE_sig_send
+#undef DEFINE_sig_xsendmany
+#undef DEFINE_sig_xsend
+/*[[[end]]]*/

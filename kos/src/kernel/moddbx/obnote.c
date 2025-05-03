@@ -1447,6 +1447,13 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
 				return print_path_with_prefix(printer, arg, p, pstatus, prefixstr);
 			}	break;
 
+			case AT_FDTHRD:
+			case AT_FDPROC:
+			case AT_FDPARPROC:
+			case AT_FDCTTY:
+			case AT_FDSYSRTLD:
+				/* TODO */
+
 			default:
 				break;
 			}

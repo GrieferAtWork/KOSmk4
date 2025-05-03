@@ -25,6 +25,7 @@
 #include <kernel/types.h>
 #include <sched/sig.h>
 
+#ifndef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #ifdef __CC__
 DECL_BEGIN
 
@@ -89,10 +90,8 @@ NOTHROW(FCALL sig_send_select)(struct sig *__restrict self,
                                     * which already had a  signal delivered to it  in
                                     * the past. */
 
-
-
 DECL_END
 #endif /* __CC__ */
-
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIG_SELECT_H */

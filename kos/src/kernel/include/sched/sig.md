@@ -161,15 +161,16 @@ struct sig {
 	                       *     if (s_con != NULL): !PREEMPTION_ENABLED() && SIG_SMPLOCK
 	                       * ))]
 	                       * Oldest (next-to-wake) connection; Lowest bit is `SIG_SMPLOCK'
-	                       * All connections in this list are guarantied to be connected.
+	                       * All connections in this list are guarantied to be  connected.
 	                       * iow: `SIGCON_STAT_ISCONNECTED(sc_stat) == true` is an invariant.
 	                       * NOTE: `SIG_SMPLOCK' is NEVER set when there are no connections.
-	                       *       iow: `(uintptr_t)s_con == SIG_SMPLOCK` is invalid, and `SIG_SMPLOCK`
-	                       *       must *ALWAYS* be or'd with a non-NULL sigcon. */
+	                       *       iow: `(uintptr_t)s_con  ==  SIG_SMPLOCK`  is  invalid,  and
+	                       *       `SIG_SMPLOCK` must *ALWAYS* be or'd with a non-NULL sigcon. */
 };
 
+/* Possible values for `struct sigcon::sc_stat' */
 #define SIGCON_STAT_F_POLL      0x0001 /* [valid_if(SIGCON_STAT_ISCONNECTED(.))] FLAG: This is a poll-based connection */
-#define SIGCON_STAT_ST_THRBCAST 0x0000 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was broadcast
+#define SIGCON_STAT_ST_THRBCAST 0x0000 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was broadcast */
 #define SIGCON_STAT_ST_THRSENT  0x0001 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was sent */
 #define SIGCON_STAT_TP_COMP     0x0002 /* [valid_if(!SIGCON_STAT_ISTHREAD(.))] Type code: this is a completion callback (and not a thread) */
 #define SIGCON_STAT_ISCONNECTED(st) ((st) >= 0x0002) /* Is this connection still connected (iow: is it owned by `sc_sig' and its lock?) */
@@ -214,16 +215,17 @@ struct taskcons {
 	struct sig  *tcs_deliver; /* [0..1][lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
 	                           * The first signal that was delivered, or NULL if none were, yet. */
 	struct task *tcs_thread;  /* [0..1][lock(READ(ATOMIC), WRITE(ATOMIC && THIS_TASK))]
-	                           * The thread that is listening for this signal (which is
-	                           * always the thread that owns this controller), or NULL
+	                           * The thread that is listening  for this signal (which  is
+	                           * always the thread  that owns this  controller), or  NULL
 	                           * if this is not the currently-active controller, in which
-	                           * case signals can still be received, but the thread will
+	                           * case signals can still be received, but the thread  will
 	                           * not receive any wake-ups. */
+
 	// ...
 
 	/* More fields here that implement allocation of `struct sigcon_task`
-	 * for the owning thread. However, all of these fields will be
-	 * [lock(THIS_TASK)] (iow: thread-local), and so aren't relevant to
+	 * for  the  owning  thread. However,  all  of these  fields  will be
+	 * "[lock(THIS_TASK)]" (iow: thread-local), and so aren't relevant to
 	 * the cross-thread part of the signal system. */
 };
 
@@ -405,7 +407,7 @@ To send a signal, `sig_send` (and its derivatives) are used and implemented as f
 bool sig_send(struct sig *self) {
 	struct sigcon *sigctl;
 	struct sigcon *receiver;
-	struct sigcon *next;
+	struct sigcon *remainder;
 	struct taskcons *tcs;
 	preemption_flag_t was;
 
@@ -438,7 +440,7 @@ again_find_receiver:
 #if SIG_SENDTO
 	/* ... (Custom code to find connections made by the given thread) */
 #else /* SIG_SENDTO */
-	if (receiver->sc_stat & SIGCON_STAT_F_POLL) {
+	if (atomic_read_relaxed(&receiver->sc_stat) & SIGCON_STAT_F_POLL) {
 		/* Try to find a non-polling receiver, and if we manage to find
 		 * one, shove all of the poll-based ones to the back of the queue. */
 		struct sigcon *poll_head;
@@ -465,7 +467,7 @@ again_find_receiver:
 				);
 				return false;
 			}
-		} while (receiver->sc_stat & SIGCON_STAT_F_POLL);
+		} while (atomic_read_relaxed(&receiver->sc_stat) & SIGCON_STAT_F_POLL);
 
 		/* Shove the chain of poll-based receivers to the back of the queue. */
 		poll_head = sigctl;
@@ -477,34 +479,35 @@ again_find_receiver:
 		poll_head->sc_prev->sc_next = receiver;
 		receiver->sc_prev = poll_head->sc_prev;
 
-		next = receiver->sc_next;
-		assert(next != receiver);
+		remainder = receiver->sc_next;
+		assert(remainder != receiver);
 
-		/* Re-insert poll-based connections before "next" (which will become the queue's
-		 * new head, meaning that anything that appears before it will actually appear at
-		 * the end of the queue) */
-		poll_head->sc_prev = next->sc_prev;
+		/* Re-insert poll-based connections before "remainder" (which will become the queue's
+		 * new head, meaning that anything that appears before it will actually appear at the
+		 * end of the queue) */
+		poll_head->sc_prev = remainder->sc_prev;
 		poll_head->sc_prev->sc_next = poll_head;
-		poll_tail->sc_next = next;
-		next->sc_prev = poll_tail;
+		poll_tail->sc_next = remainder;
+		remainder->sc_prev = poll_tail;
 	} else {
-		next = receiver->sc_next;
-		if unlikely(next == receiver)
-			next = NULL; /* Special case: last connection goes away */
+		remainder = receiver->sc_next;
+		if unlikely(remainder == receiver)
+			remainder = NULL; /* Special case: last connection goes away */
 	}
 #endif /* !SIG_SENDTO */
 
 	/* Remove "receiver" from the wait queue. */
-	assert(receiver != next);
+	assert(receiver != remainder);
 	assert(receiver->sc_prev->sc_next == receiver);
 	assert(receiver->sc_next->sc_prev == receiver);
 	receiver->sc_prev->sc_next = receiver->sc_next;
 	receiver->sc_next->sc_prev = receiver->sc_prev;
 
-	assert(SIGCON_STAT_ISCONNECTED(receiver));
+	/* Load the status/task word of "receiver" */
+	tcs = atomic_read_relaxed(&receiver->sc_cons);
+	assert(SIGCON_STAT_ISCONNECTED((uintptr_t)tcs));
 
 	/* Deal with completion-callbacks */
-	tcs = atomic_read(&receiver->sc_cons);
 #if !SIG_SENDTO
 	if unlikely(SIGCON_STAT_ISCOMP((uintptr_t)tcs)) {
 		/* This call does everything needed to (in order):
@@ -520,7 +523,7 @@ again_find_receiver:
 		 *       has completed, and released all relevant locks and so on,
 		 *       return true/false indicative of that function having been
 		 *       able to send the signal.
-		 * - release the SMP-lock from "self" by assigning `next`
+		 * - release the SMP-lock from "self" by assigning `remainder`
 		 * - invoke "cleanup" callbacks (while preemption is still off)
 		 * - restore preemption as per "was"
 		 * - destroy receiver threads whose reference counters dropped to 0
@@ -528,13 +531,13 @@ again_find_receiver:
 		 * - return true
 		 */
 		return sig_completion_invoke_and_unlock_and_preemption_pop(
-				/* struct sig                  *self     */ self,
-				/* struct sig                  *sender   */ self,
-				/* struct sigcon_comp          *receiver */ (struct sigcon_comp *)receiver,
-				/* struct sigcon               *next     */ next,
-				/* struct task                 *caller   */ THIS_TASK, /* For: `sig_sendas` */
-				/* struct sig_cleanup_callback *cleanup  */ NULL,      /* For: `sig_send_cleanup`; s.a. `HANDLE_CLEANUP_IF_PRESENT()` */
-				/* preemption_flag_t            was      */ was
+				/* struct sig                  *self      */ self,
+				/* struct sig                  *sender    */ self,
+				/* struct sigcon_comp          *receiver  */ (struct sigcon_comp *)receiver,
+				/* struct sigcon               *remainder */ remainder,
+				/* struct task                 *caller    */ THIS_TASK, /* For: `sig_sendas` */
+				/* struct sig_cleanup_callback *cleanup   */ NULL,      /* For: `sig_send_cleanup`; s.a. `HANDLE_CLEANUP_IF_PRESENT()` */
+				/* preemption_flag_t            was       */ was
 		);
 	} else
 #endif /* !SIG_SENDTO */
@@ -554,15 +557,15 @@ again_find_receiver:
 			/* vvv this write isn't necessary, because "self->s_con" isn't anywhere after
 			 *     the "again_find_receiver" label (because there is no jump back to "again",
 			 *     which is the only place where such a read happens) */
-//			atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)next | SIG_SMPLOCK)); /* Keep SMP-lock */
-			sigctl = next;
+//			atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)remainder | SIG_SMPLOCK)); /* Keep SMP-lock */
+			sigctl = remainder;
 			goto again_find_receiver;
 		}
 
 		/* First signal delivered -> must wake the thread after locks were released. */
 		thread = xincref(atomic_read(&tcs->tcs_thread));
 		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT); /* This releases our ownership of "receiver" */
-		atomic_write(&self->s_con, next); /* Release SMP-lock */
+		atomic_write(&self->s_con, remainder); /* Release SMP-lock */
 		HANDLE_CLEANUP_IF_PRESENT(); /* for sig_send_cleanup */
 		preemption_pop(&was);
 		if (thread) {
@@ -685,7 +688,7 @@ again:
 			{
 				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
 			}
-			bcast_ok = (status & SIG_COMPLETION__F_VIABLE) != 0;
+			bcast_ok = (status & SIG_COMPLETION__F_NONVIABLE) == 0;
 		} else {
 			struct taskcons *tcs = (struct taskcons *)(stat & ~SIGCON_STAT_F_POLL);
 			bcast_ok = atomic_cmpxch(&tcs->tcs_deliver, NULL, self);

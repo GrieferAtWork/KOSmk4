@@ -139,7 +139,7 @@
 #endif /* !_KOS_KERNEL_SOURCE && (!__KOS__ || !__KERNEL__ || __USE_ISOC_PURE) */
 
 /* Certain KOS extensions may alter the prototyping or invocation behavior
- * or functions or data structures.  By default, this behavior is  enabled
+ * of functions or data structures.  By default, this behavior is  enabled
  * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but  must
  * be enabled explicitly for user-space.
  * Alterations include:

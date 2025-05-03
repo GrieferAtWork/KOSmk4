@@ -41,7 +41,7 @@
 
 /* Use a new `struct sig` implementation as per ./sig.md */
 #undef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#if 0
+#if 1
 #define CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #endif
 
@@ -51,7 +51,28 @@ DECL_BEGIN
 
 
 #ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-/* TODO */
+/* `struct sigcon' offsets */
+#define OFFSET_SIGCON_SIG  0
+#define OFFSET_SIGCON_PREV __SIZEOF_POINTER__
+#define OFFSET_SIGCON_NEXT (__SIZEOF_POINTER__ * 2)
+#define OFFSET_SIGCON_CONS (__SIZEOF_POINTER__ * 3)
+#define OFFSET_SIGCON_STAT (__SIZEOF_POINTER__ * 3)
+#define SIZEOF_SIGCON      (__SIZEOF_POINTER__ * 4)
+#define ALIGNOF_SIGCON     __ALIGNOF_POINTER__
+
+/* `struct sigcon_task' offsets */
+#define OFFSET_SIGCON_TASK_NEXT SIZEOF_SIGCON
+#define SIZEOF_SIGCON_TASK      (SIZEOF_SIGCON + __SIZEOF_POINTER__)
+#define ALIGNOF_SIGCON_TASK     __ALIGNOF_POINTER__
+
+/* `struct taskcons' offsets */
+#define OFFSET_TASKCONS_DELIVER 0
+#define OFFSET_TASKCONS_THREAD  __SIZEOF_POINTER__
+#define OFFSET_TASKCONS_PREV    (__SIZEOF_POINTER__ * 2)
+#define OFFSET_TASKCONS_CON     (__SIZEOF_POINTER__ * 3)
+#define OFFSET_TASKCONS_STATIC  (__SIZEOF_POINTER__ * 4)
+#define SIZEOF_TASKCONS         (OFFSET_TASKCONS_STATIC + (SIZEOF_SIGCON_TASK * CONFIG_TASK_STATIC_CONNECTIONS))
+#define ALIGNOF_TASKCONS_TASK   __ALIGNOF_POINTER__
 #else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 /* `struct task_connection' offsets */
 #define OFFSET_TASK_CONNECTION_SIG     0
@@ -118,7 +139,442 @@ struct sig_cleanup_callback {
 
 
 #ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-/* TODO */
+struct task;
+struct sig;
+struct sigcon;
+struct sigcon_task;
+struct sigcon_comp;
+struct taskcons;
+
+/* BEGIN: Deprecated aliases */
+#define task_connection       sigcon
+#define task_connections      taskcons
+#define sig_completion        sigcon_comp
+#define tcs_dlvr              tcs_deliver
+#define THIS_ROOT_CONNECTIONS THIS_ROOTCONS
+#define this_root_connections this_rootcons
+#define this_connections      this_cons
+#define THIS_CONNECTIONS      THIS_CONS
+/* END: Deprecated aliases */
+
+
+#ifndef CONFIG_NO_SMP
+#define SIG_SMPLOCK 0x0001 /* SMP lock bit for `(uintptr_t)struct sig::s_con' */
+#endif /* !CONFIG_NO_SMP */
+
+struct sig {
+	struct sigcon *s_con; /* [0..1]
+	                       * [lock(READ(ATOMIC), WRITE(ATOMIC &&
+	                       *     if (s_con == NULL): ATOMIC
+	                       *     if (s_con != NULL): !PREEMPTION_ENABLED() && SIG_SMPLOCK
+	                       * ))]
+	                       * Oldest (next-to-wake) connection; Lowest bit is `SIG_SMPLOCK'
+	                       * All connections in this list are guarantied to be  connected.
+	                       * iow: `SIGCON_STAT_ISCONNECTED(sc_stat) == true` is an invariant.
+	                       * NOTE: `SIG_SMPLOCK' is NEVER set when there are no connections.
+	                       *       iow: `(uintptr_t)s_con  ==  SIG_SMPLOCK`  is  invalid,  and
+	                       *       `SIG_SMPLOCK` must *ALWAYS* be or'd with a non-NULL sigcon. */
+};
+
+
+/* Possible values for `struct sigcon::sc_stat' */
+#define SIGCON_STAT_F_POLL      0x0001 /* [valid_if(SIGCON_STAT_ISCONNECTED(.))] FLAG: This is a poll-based connection */
+#define SIGCON_STAT_ST_THRBCAST 0x0000 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was broadcast */
+#define SIGCON_STAT_ST_THRSENT  0x0001 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was sent */
+#define SIGCON_STAT_TP_COMP     0x0002 /* [valid_if(!SIGCON_STAT_ISTHREAD(.))] Type code: this is a completion callback (and not a thread) */
+#define SIGCON_STAT_ISCONNECTED(st) ((st) >= 0x0002) /* Is this connection still connected (iow: is it owned by `sc_sig' and its lock?) */
+#define SIGCON_STAT_ISTHREAD(st)    ((st) >= 0x0004) /* Is this a `struct sigcon_task'? */
+#define SIGCON_STAT_ISCOMP(st)      ((st) <= 0x0003) /* Assuming "SIGCON_STAT_ISCONNECTED() == true": Is this a `struct sigcon_comp'? */
+#define SIGCON_STAT_ISDEAD(st)      ((st) <= 0x0001) /* True if the connection was sent/broadcast */
+
+struct sigcon {
+	/* Signal connection.
+	 * OWNER:
+	 * - if (SIGCON_STAT_ISCONNECTED(sc_stat)): sc_sig
+	 * - if (SIGCON_STAT_ISDEAD(sc_stat)):      OWNER_OF(<sigcon_task>/<sigcon_comp>)
+	 */
+	struct sig    *sc_sig;  /* [1..1][const] Signal of this connection */
+	struct sigcon *sc_prev; /* [1..1][valid_if(SIGCON_STAT_ISCONNECTED(sc_stat))]
+	                         * [lock(!PREEMPTION_ENABLED() && ((uintptr_t)sc_sig->s_con & SIG_SMPLOCK))] */
+	struct sigcon *sc_next; /* [1..1][valid_if(SIGCON_STAT_ISCONNECTED(sc_stat))]
+	                         * [lock(!PREEMPTION_ENABLED() && ((uintptr_t)sc_sig->s_con & SIG_SMPLOCK))] */
+	union {
+		struct taskcons *sc_cons; /* [1..1][const][valid_if(SIGCON_STAT_ISTHREAD(sc_stat))] Thread connections controller. */
+		uintptr_t        sc_stat; /* [lock(READ(ATOMIC), WRITE(ATOMIC &&
+		                           *  if (SIGCON_STAT_ISDEAD(sc_stat)):      CALLER IS OWNER_OF(<sigcon_task>/<sigcon_comp>)
+		                           *  if (SIGCON_STAT_ISCONNECTED(sc_stat)): !PREEMPTION_ENABLED() && ((uintptr_t)sc_sig->s_con & SIG_SMPLOCK)
+		                           * ))] */
+	};
+};
+
+struct sigcon_task
+#if defined(__cplusplus) && !defined(__WANT_SIGCON_TASK_INIT)
+    : sigcon              /* The underlying connection */
+#define _sigcon_task_con_ /* nothing */
+#endif /* __cplusplus && !__WANT_SIGCON_TASK_INIT */
+{
+#if !defined(__cplusplus) || defined(__WANT_SIGCON_TASK_INIT)
+	struct sigcon sct_con; /* The underlying connection */
+#define _sigcon_task_con_ sct_con.
+#endif /* !__cplusplus || __WANT_SIGCON_TASK_INIT */
+
+	/* More fields here that may be used by `struct taskcons` to  track
+	 * allocated task connections. However, all of these fields will be
+	 * [lock(THIS_TASK)] (iow: thread-local), and so aren't relevant to
+	 * the cross-thread part of the signal system. */
+	struct sigcon_task *sct_next; /* [0..1][lock(THIS_TASK)] Next connection within the thread. */
+};
+
+struct taskcons {
+	struct sig  *tcs_deliver; /* [0..1][lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
+	                           * The first signal that was delivered, or NULL if none were, yet. */
+	struct task *tcs_thread;  /* [0..1][lock(READ(ATOMIC), WRITE(ATOMIC && THIS_TASK))]
+	                           * The thread that is listening  for this signal (which  is
+	                           * always the thread  that owns this  controller), or  NULL
+	                           * if this is not the currently-active controller, in which
+	                           * case signals can still be received, but the thread  will
+	                           * not receive any wake-ups. */
+
+	/* More fields here that implement allocation of `struct sigcon_task`
+	 * for  the  owning  thread. However,  all  of these  fields  will be
+	 * "[lock(THIS_TASK)]" (iow: thread-local), and so aren't relevant to
+	 * the cross-thread part of the signal system. */
+	struct taskcons    *tcs_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
+	                                 * [(!= NULL) == (this == &this_root_connections)]
+	                                 * Previous set of active connections. */
+	struct sigcon_task *tcs_con;    /* [0..1][chain(->tc_connext)][lock(PRIVATE(THIS_TASK))]
+	                                 * Chain of allocated connections. */
+	struct sigcon_task  tcs_static[CONFIG_TASK_STATIC_CONNECTIONS];
+	                                /* [*.in_use_if(.tc_sig != NULL)][lock(PRIVATE(THIS_TASK))]
+	                                 * Statically allocated connections. Any connection that belongs
+	                                 * to  this connections set, but points outside of this array is
+	                                 * allocated dynamically using `kmalloc()', and as such, must be
+	                                 * freed by `kfree()' */
+};
+
+
+
+#define SIG_INIT       { __NULLPTR }
+#define sig_init(x)    (void)((x)->s_con = __NULLPTR)
+#define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)
+#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
+
+
+#ifdef __OPTIMIZE_SIZE__
+#define _sig_deliver_unlikely(self, expr) expr
+#else /* __OPTIMIZE_SIZE__ */
+#define _sig_deliver_unlikely(self, expr) (likely(sig_isempty(self)) ? 0 : expr)
+#endif /* !__OPTIMIZE_SIZE__ */
+
+
+/* Possible flags for `__sig_remcon' */
+#define __SIG_REMCON_F_NORMAL  0x0000 /* Normal flags */
+#define __SIG_REMCON_F_FORWARD 0x0001 /* If the "sigcon" has status "SIGCON_STAT_ST_THRSENT", try to forward the signal to another receiver. */
+
+/* Internal, low-level API for adding/removing a signal connection */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __sig_addcon)(struct sigcon *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL __sig_addcon_nopr)(struct sigcon *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __sig_remcon)(struct sigcon *__restrict self, unsigned int flags);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL __sig_remcon_nopr)(struct sigcon *__restrict self, unsigned int flags);
+
+
+
+
+/* Possible flags for `_sigcon_disconnect' */
+#define _SIGCON_DISCONNECT_F_NORMAL  __SIG_REMCON_F_NORMAL  /* Normal flags */
+#define _SIGCON_DISCONNECT_F_FORWARD __SIG_REMCON_F_FORWARD /* Try to forward a delivered, but unused signal to another receiver. */
+
+#ifdef __INTELLISENSE__
+/* Connect a given signal-connection `self' to a signal `to'
+ * The caller must have already initialized:
+ * - `self->sc_cons' / `self->sc_stat' as:
+ *   - When `self' is `struct sigcon_task':
+ *     - `&<<associated_taskcons>>'
+ *     - `&<<associated_taskcons>> | SIGCON_STAT_F_POLL'
+ *   - When `self' is `struct sigcon_comp':
+ *     - `SIGCON_STAT_TP_COMP'
+ *     - `SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL'
+ * These functions will then transfer ownership of `self' to `to',
+ * until `to' delivers a signal to `self' (that doesn't see `self'
+ * re-prime itself), or until `self' is manually disconnected,  as
+ * done via `_sigcon_disconnect()'
+ *
+ * Behavior is undefined when `self' was already connected and no
+ * call to `_sigcon_disconnect()' has yet  to be done, even  when
+ * `to' has delivered a signal to `self' in the mean-time. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL _sigcon_connect)(struct sigcon *__restrict self,
+                               struct sig *__restrict to);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL _sigcon_connect_nopr)(struct sigcon *__restrict self,
+                                    struct sig *__restrict to);
+
+/* Disconnect `self' from its associated signal. Behavior is  undefined
+ * when `self' wasn't connected (via `_sigcon_connect()'), or when this
+ * function is called multiple times.
+ * @param: flags: Set of `_SIGCON_DISCONNECT_F_*' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _sigcon_disconnect)(struct sigcon *__restrict self,
+                                  unsigned int flags);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL _sigcon_disconnect_nopr)(struct sigcon *__restrict self,
+                                       unsigned int flags);
+#else /* __INTELLISENSE__ */
+#define _sigcon_connect(self, to)            ((self)->sc_sig = (to), __sig_addcon(self))
+#define _sigcon_connect_nopr(self, to)       ((self)->sc_sig = (to), __sig_addcon_nopr(self))
+#define _sigcon_disconnect(self, flags)      __sig_remcon(self, flags)
+#define _sigcon_disconnect_nopr(self, flags) __sig_remcon_nopr(self, flags)
+#endif /* !__INTELLISENSE__ */
+
+
+
+
+
+/* Possible values for `sig_xsend()::flags' / `sig_xsendmany()::flags' */
+#define SIG_XSEND_F_NORMAL        0x0000 /* Normal flags */
+#define SIG_XSEND_F_NOPR          0x0001 /* Caller guaranties that preemption is already disabled */
+#define SIG_XSEND_F_FINI          0x0002 /* Disallow re-priming of signal completion callbacks */
+#define SIG_XSEND_F_SENDER        0x0004 /* The "sender" argument is valid (when not set, use "self" instead) */
+#define SIG_XSEND_F_CALLER        0x0008 /* The "caller" argument may differ from "THIS_TASK" */
+#define SIG_XSEND_F_TARGET        0x0010 /* The "target" argument is valid */
+#define SIG_XSEND_F_CLEANUP       0x0020 /* The "cleanup" argument is valid */
+#define SIG_XSEND_F_LOCKED        0x0040 /* Inherit the SMP-lock to "self". May only be set when preemption is  disabled.
+                                          * When this flag is set, "SIG_XSEND_F_NOPR" specifies the preemption state that
+                                          * will be restored upon return:
+                                          * - (flags & SIG_XSEND_F_NOPR) != 0 -> keep off on return
+                                          * - (flags & SIG_XSEND_F_NOPR) == 0 -> turn on upon return */
+#define SIG_XSEND_F_WAKE_WAITFOR  0x1000 /* s.a. `TASK_WAKE_FWAITFOR' */
+#define SIG_XSEND_F_WAKE_HIGHPRIO 0x4000 /* s.a. `TASK_WAKE_FHIGHPRIO' */
+
+/* Multi-purpose, generic signal sending (featuring all available options)
+ * You probably shouldn't be using  these, since they're much slower  than
+ * the special-purpose versions below. */
+FUNDEF NOBLOCK /*NOPREEMPT_IF(flags & SIG_XSEND_F_NOPR)*/ NONNULL((1, 4)) __BOOL
+NOTHROW(FCALL sig_xsend)(struct sig *self,
+                         unsigned int flags,                   /* Set of `SIG_XSEND_F_*' */
+                         struct sig *sender,                   /* For sig_altsend */
+                         struct task *caller,                  /* For sig_sendas */
+                         struct task *target,                  /* For sig_sendto */
+                         struct sig_cleanup_callback *cleanup, /* For sig_send_cleanup */
+                         struct sigcon *reprime);              /* Ring of extra connections to reprime (nullable) */
+FUNDEF NOBLOCK /*NOPREEMPT_IF(flags & SIG_XSEND_F_NOPR)*/ NONNULL((1, 5)) size_t
+NOTHROW(FCALL sig_xsendmany)(struct sig *self,
+                             size_t maxcount,
+                             unsigned int flags,                   /* Set of `SIG_XSEND_F_*' */
+                             struct sig *sender,                   /* For sig_altsend */
+                             struct task *caller,                  /* For sig_sendas */
+                             struct sig_cleanup_callback *cleanup, /* For sig_send_cleanup */
+                             struct sigcon *reprime,               /* Ring of extra connections to reprime (nullable) */
+                             struct task *destroy_later);          /* Linked list of dead threads to-be destroyed later (linked via `sig_destroylater_next()') */
+#define sig_xbroadcast(self, flags, sender, caller, cleanup, reprime, destroy_later) \
+	sig_xsendmany(self, (size_t)-1, flags, sender, caller, cleanup, reprime, destroy_later)
+
+
+/* Special-purpose signal sending function:
+ * - *_nopr*:      The caller guaranties that preemption is disabled.
+ * - *alt*:        Cause ther receiving thread to return a custom value from `task_waitfor()'.
+ * - *sendto*:     Target a specific thread (ignoring all completion-receivers, and receivers for different threads).
+ * - *as*:         Send while impersonating a specific thread
+ * - *_cleanup*:   Invoke a given `cleanup' prior to doing any other kind of cleanup, but after having
+ *                 released all internal SMP-locks. May be used to release further SMP-locks which may
+ *                 have  been used to guard `self' from being destroyed (e.g. this can be used to call
+ *                 `aio_handle_release()' when  sending a  signal from  an AIO  completion  function).
+ *                 It is guarantied that `callback' is invoked exactly once.
+ * - *_unlikely*:  Hint that it is unlikely that anyone is connected to the signal.
+ * - *_for_fini*:  Disallow re-priming of signal completion callbacks
+ *
+ * @return: * : Indicative of the # of non-polling threads that received the signal (true==1, false==0)
+ */
+/*[[[deemon (printPrototypes from ".sig-config")();]]]*/
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL sig_send)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self, size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+#ifdef __INTELLISENSE__
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend_nopr)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_send_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsend_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendas)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendas)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendas_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendto)(struct sig *__restrict self, struct task *__restrict target);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendto)(struct sig *self, struct sig *sender, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendto_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendasto)(struct sig *__restrict self, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendasto)(struct sig *self, struct sig *sender, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendasto_nopr)(struct sig *__restrict self, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendasto_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_sendasto_cleanup_nopr)(struct sig *__restrict self, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4, 5)) __BOOL NOTHROW(FCALL sig_altsendasto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany)(struct sig *self, struct sig *sender, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self, struct sig *sender, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmany_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmany_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas_nopr)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_sendmanyas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altsendmanyas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+#else /* __INTELLISENSE__ */
+#define sig_altsend(self, sender)                                               sig_xsend(self, SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsend_nopr(self, sender)                                          sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_send_cleanup_nopr(self, cleanup)                                    sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, __NULLPTR, THIS_TASK, __NULLPTR, cleanup, __NULLPTR)
+#define sig_altsend_cleanup_nopr(self, sender, cleanup)                         sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, __NULLPTR, cleanup, __NULLPTR)
+#define sig_sendas(self, caller)                                                sig_xsend(self, SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsendas(self, sender, caller)                                     sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_sendas_nopr(self, caller)                                           sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsendas_nopr(self, sender, caller)                                sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_sendas_cleanup_nopr(self, caller, cleanup)                          sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, __NULLPTR, cleanup, __NULLPTR)
+#define sig_altsendas_cleanup_nopr(self, sender, caller, cleanup)               sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, __NULLPTR, cleanup, __NULLPTR)
+#define sig_sendto(self, target)                                                sig_xsend(self, SIG_XSEND_F_TARGET, __NULLPTR, THIS_TASK, target, __NULLPTR, __NULLPTR)
+#define sig_altsendto(self, sender, target)                                     sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET, sender, THIS_TASK, target, __NULLPTR, __NULLPTR)
+#define sig_sendto_nopr(self, target)                                           sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET, __NULLPTR, THIS_TASK, target, __NULLPTR, __NULLPTR)
+#define sig_altsendto_nopr(self, sender, target)                                sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET, sender, THIS_TASK, target, __NULLPTR, __NULLPTR)
+#define sig_sendto_cleanup_nopr(self, target, cleanup)                          sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, __NULLPTR, THIS_TASK, target, cleanup, __NULLPTR)
+#define sig_altsendto_cleanup_nopr(self, sender, target, cleanup)               sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, target, cleanup, __NULLPTR)
+#define sig_sendasto(self, caller, target)                                      sig_xsend(self, SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, __NULLPTR, caller, target, __NULLPTR, __NULLPTR)
+#define sig_altsendasto(self, sender, caller, target)                           sig_xsend(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, sender, caller, target, __NULLPTR, __NULLPTR)
+#define sig_sendasto_nopr(self, caller, target)                                 sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, __NULLPTR, caller, target, __NULLPTR, __NULLPTR)
+#define sig_altsendasto_nopr(self, sender, caller, target)                      sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET, sender, caller, target, __NULLPTR, __NULLPTR)
+#define sig_sendasto_cleanup_nopr(self, caller, target, cleanup)                sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, target, cleanup, __NULLPTR)
+#define sig_altsendasto_cleanup_nopr(self, sender, caller, target, cleanup)     sig_xsend(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_TARGET | SIG_XSEND_F_CLEANUP, sender, caller, target, cleanup, __NULLPTR)
+#define sig_altsendmany(self, sender, maxcount)                                 sig_xsendmany(self, maxcount, SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsendmany_nopr(self, sender, maxcount)                            sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER, sender, THIS_TASK, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_sendmany_cleanup_nopr(self, cleanup, maxcount)                      sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CLEANUP, __NULLPTR, THIS_TASK, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altsendmany_cleanup_nopr(self, sender, cleanup, maxcount)           sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, __NULLPTR, __NULLPTR)
+#define sig_sendmanyas(self, caller, maxcount)                                  sig_xsendmany(self, maxcount, SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsendmanyas(self, sender, caller, maxcount)                       sig_xsendmany(self, maxcount, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_sendmanyas_nopr(self, caller, maxcount)                             sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altsendmanyas_nopr(self, sender, caller, maxcount)                  sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_sendmanyas_cleanup_nopr(self, caller, cleanup, maxcount)            sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altsendmanyas_cleanup_nopr(self, sender, caller, cleanup, maxcount) sig_xsendmany(self, maxcount, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altbroadcast_cleanup_nopr(self, sender, cleanup)                    sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altbroadcast_for_fini_cleanup_nopr(self, sender, cleanup)           sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CLEANUP, sender, THIS_TASK, cleanup, __NULLPTR, __NULLPTR)
+#define sig_broadcastas(self, caller)                                           sig_xbroadcast(self, SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas(self, sender, caller)                                sig_xbroadcast(self, SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_broadcastas_nopr(self, caller)                                      sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas_nopr(self, sender, caller)                           sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_broadcastas_cleanup_nopr(self, caller, cleanup)                     sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas_cleanup_nopr(self, sender, caller, cleanup)          sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, __NULLPTR, __NULLPTR)
+#define sig_broadcastas_for_fini(self, caller)                                  sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas_for_fini(self, sender, caller)                       sig_xbroadcast(self, SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_broadcastas_for_fini_nopr(self, caller)                             sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER, __NULLPTR, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas_for_fini_nopr(self, sender, caller)                  sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER, sender, caller, __NULLPTR, __NULLPTR, __NULLPTR)
+#define sig_broadcastas_for_fini_cleanup_nopr(self, caller, cleanup)            sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, __NULLPTR, caller, cleanup, __NULLPTR, __NULLPTR)
+#define sig_altbroadcastas_for_fini_cleanup_nopr(self, sender, caller, cleanup) sig_xbroadcast(self, SIG_XSEND_F_NOPR | SIG_XSEND_F_FINI | SIG_XSEND_F_SENDER | SIG_XSEND_F_CALLER | SIG_XSEND_F_CLEANUP, sender, caller, cleanup, __NULLPTR, __NULLPTR)
+#endif /* !__INTELLISENSE__ */
+#define sig_send_unlikely(self)                                                          _sig_deliver_unlikely(self, sig_send(self))
+#define sig_altsend_unlikely(self, sender)                                               _sig_deliver_unlikely(self, sig_altsend(self, sender))
+#define sig_send_nopr_unlikely(self)                                                     _sig_deliver_unlikely(self, sig_send_nopr(self))
+#define sig_altsend_nopr_unlikely(self, sender)                                          _sig_deliver_unlikely(self, sig_altsend_nopr(self, sender))
+#define sig_send_cleanup_nopr_unlikely(self, cleanup)                                    _sig_deliver_unlikely(self, sig_send_cleanup_nopr(self, cleanup))
+#define sig_altsend_cleanup_nopr_unlikely(self, sender, cleanup)                         _sig_deliver_unlikely(self, sig_altsend_cleanup_nopr(self, sender, cleanup))
+#define sig_sendas_unlikely(self, caller)                                                _sig_deliver_unlikely(self, sig_sendas(self, caller))
+#define sig_altsendas_unlikely(self, sender, caller)                                     _sig_deliver_unlikely(self, sig_altsendas(self, sender, caller))
+#define sig_sendas_nopr_unlikely(self, caller)                                           _sig_deliver_unlikely(self, sig_sendas_nopr(self, caller))
+#define sig_altsendas_nopr_unlikely(self, sender, caller)                                _sig_deliver_unlikely(self, sig_altsendas_nopr(self, sender, caller))
+#define sig_sendas_cleanup_nopr_unlikely(self, caller, cleanup)                          _sig_deliver_unlikely(self, sig_sendas_cleanup_nopr(self, caller, cleanup))
+#define sig_altsendas_cleanup_nopr_unlikely(self, sender, caller, cleanup)               _sig_deliver_unlikely(self, sig_altsendas_cleanup_nopr(self, sender, caller, cleanup))
+#define sig_sendto_unlikely(self, target)                                                _sig_deliver_unlikely(self, sig_sendto(self, target))
+#define sig_altsendto_unlikely(self, sender, target)                                     _sig_deliver_unlikely(self, sig_altsendto(self, sender, target))
+#define sig_sendto_nopr_unlikely(self, target)                                           _sig_deliver_unlikely(self, sig_sendto_nopr(self, target))
+#define sig_altsendto_nopr_unlikely(self, sender, target)                                _sig_deliver_unlikely(self, sig_altsendto_nopr(self, sender, target))
+#define sig_sendto_cleanup_nopr_unlikely(self, target, cleanup)                          _sig_deliver_unlikely(self, sig_sendto_cleanup_nopr(self, target, cleanup))
+#define sig_altsendto_cleanup_nopr_unlikely(self, sender, target, cleanup)               _sig_deliver_unlikely(self, sig_altsendto_cleanup_nopr(self, sender, target, cleanup))
+#define sig_sendasto_unlikely(self, caller, target)                                      _sig_deliver_unlikely(self, sig_sendasto(self, caller, target))
+#define sig_altsendasto_unlikely(self, sender, caller, target)                           _sig_deliver_unlikely(self, sig_altsendasto(self, sender, caller, target))
+#define sig_sendasto_nopr_unlikely(self, caller, target)                                 _sig_deliver_unlikely(self, sig_sendasto_nopr(self, caller, target))
+#define sig_altsendasto_nopr_unlikely(self, sender, caller, target)                      _sig_deliver_unlikely(self, sig_altsendasto_nopr(self, sender, caller, target))
+#define sig_sendasto_cleanup_nopr_unlikely(self, caller, target, cleanup)                _sig_deliver_unlikely(self, sig_sendasto_cleanup_nopr(self, caller, target, cleanup))
+#define sig_altsendasto_cleanup_nopr_unlikely(self, sender, caller, target, cleanup)     _sig_deliver_unlikely(self, sig_altsendasto_cleanup_nopr(self, sender, caller, target, cleanup))
+#define sig_sendmany_unlikely(self, maxcount)                                            _sig_deliver_unlikely(self, sig_sendmany(self, maxcount))
+#define sig_altsendmany_unlikely(self, sender, maxcount)                                 _sig_deliver_unlikely(self, sig_altsendmany(self, sender, maxcount))
+#define sig_sendmany_nopr_unlikely(self, maxcount)                                       _sig_deliver_unlikely(self, sig_sendmany_nopr(self, maxcount))
+#define sig_altsendmany_nopr_unlikely(self, sender, maxcount)                            _sig_deliver_unlikely(self, sig_altsendmany_nopr(self, sender, maxcount))
+#define sig_sendmany_cleanup_nopr_unlikely(self, cleanup, maxcount)                      _sig_deliver_unlikely(self, sig_sendmany_cleanup_nopr(self, cleanup, maxcount))
+#define sig_altsendmany_cleanup_nopr_unlikely(self, sender, cleanup, maxcount)           _sig_deliver_unlikely(self, sig_altsendmany_cleanup_nopr(self, sender, cleanup, maxcount))
+#define sig_sendmanyas_unlikely(self, caller, maxcount)                                  _sig_deliver_unlikely(self, sig_sendmanyas(self, caller, maxcount))
+#define sig_altsendmanyas_unlikely(self, sender, caller, maxcount)                       _sig_deliver_unlikely(self, sig_altsendmanyas(self, sender, caller, maxcount))
+#define sig_sendmanyas_nopr_unlikely(self, caller, maxcount)                             _sig_deliver_unlikely(self, sig_sendmanyas_nopr(self, caller, maxcount))
+#define sig_altsendmanyas_nopr_unlikely(self, sender, caller, maxcount)                  _sig_deliver_unlikely(self, sig_altsendmanyas_nopr(self, sender, caller, maxcount))
+#define sig_sendmanyas_cleanup_nopr_unlikely(self, caller, cleanup, maxcount)            _sig_deliver_unlikely(self, sig_sendmanyas_cleanup_nopr(self, caller, cleanup, maxcount))
+#define sig_altsendmanyas_cleanup_nopr_unlikely(self, sender, caller, cleanup, maxcount) _sig_deliver_unlikely(self, sig_altsendmanyas_cleanup_nopr(self, sender, caller, cleanup, maxcount))
+#define sig_broadcast_unlikely(self)                                                     _sig_deliver_unlikely(self, sig_broadcast(self))
+#define sig_altbroadcast_unlikely(self, sender)                                          _sig_deliver_unlikely(self, sig_altbroadcast(self, sender))
+#define sig_broadcast_nopr_unlikely(self)                                                _sig_deliver_unlikely(self, sig_broadcast_nopr(self))
+#define sig_altbroadcast_nopr_unlikely(self, sender)                                     _sig_deliver_unlikely(self, sig_altbroadcast_nopr(self, sender))
+#define sig_broadcast_for_fini_unlikely(self)                                            _sig_deliver_unlikely(self, sig_broadcast_for_fini(self))
+#define sig_altbroadcast_for_fini_unlikely(self, sender)                                 _sig_deliver_unlikely(self, sig_altbroadcast_for_fini(self, sender))
+#define sig_broadcast_for_fini_nopr_unlikely(self)                                       _sig_deliver_unlikely(self, sig_broadcast_for_fini_nopr(self))
+#define sig_altbroadcast_for_fini_nopr_unlikely(self, sender)                            _sig_deliver_unlikely(self, sig_altbroadcast_for_fini_nopr(self, sender))
+#define sig_broadcast_cleanup_nopr_unlikely(self, cleanup)                               _sig_deliver_unlikely(self, sig_broadcast_cleanup_nopr(self, cleanup))
+#define sig_altbroadcast_cleanup_nopr_unlikely(self, sender, cleanup)                    _sig_deliver_unlikely(self, sig_altbroadcast_cleanup_nopr(self, sender, cleanup))
+#define sig_broadcast_for_fini_cleanup_nopr_unlikely(self, cleanup)                      _sig_deliver_unlikely(self, sig_broadcast_for_fini_cleanup_nopr(self, cleanup))
+#define sig_altbroadcast_for_fini_cleanup_nopr_unlikely(self, sender, cleanup)           _sig_deliver_unlikely(self, sig_altbroadcast_for_fini_cleanup_nopr(self, sender, cleanup))
+#define sig_broadcastas_unlikely(self, caller)                                           _sig_deliver_unlikely(self, sig_broadcastas(self, caller))
+#define sig_altbroadcastas_unlikely(self, sender, caller)                                _sig_deliver_unlikely(self, sig_altbroadcastas(self, sender, caller))
+#define sig_broadcastas_nopr_unlikely(self, caller)                                      _sig_deliver_unlikely(self, sig_broadcastas_nopr(self, caller))
+#define sig_altbroadcastas_nopr_unlikely(self, sender, caller)                           _sig_deliver_unlikely(self, sig_altbroadcastas_nopr(self, sender, caller))
+#define sig_broadcastas_cleanup_nopr_unlikely(self, caller, cleanup)                     _sig_deliver_unlikely(self, sig_broadcastas_cleanup_nopr(self, caller, cleanup))
+#define sig_altbroadcastas_cleanup_nopr_unlikely(self, sender, caller, cleanup)          _sig_deliver_unlikely(self, sig_altbroadcastas_cleanup_nopr(self, sender, caller, cleanup))
+#define sig_broadcastas_for_fini_unlikely(self, caller)                                  _sig_deliver_unlikely(self, sig_broadcastas_for_fini(self, caller))
+#define sig_altbroadcastas_for_fini_unlikely(self, sender, caller)                       _sig_deliver_unlikely(self, sig_altbroadcastas_for_fini(self, sender, caller))
+#define sig_broadcastas_for_fini_nopr_unlikely(self, caller)                             _sig_deliver_unlikely(self, sig_broadcastas_for_fini_nopr(self, caller))
+#define sig_altbroadcastas_for_fini_nopr_unlikely(self, sender, caller)                  _sig_deliver_unlikely(self, sig_altbroadcastas_for_fini_nopr(self, sender, caller))
+#define sig_broadcastas_for_fini_cleanup_nopr_unlikely(self, caller, cleanup)            _sig_deliver_unlikely(self, sig_broadcastas_for_fini_cleanup_nopr(self, caller, cleanup))
+#define sig_altbroadcastas_for_fini_cleanup_nopr_unlikely(self, sender, caller, cleanup) _sig_deliver_unlikely(self, sig_altbroadcastas_for_fini_cleanup_nopr(self, sender, caller, cleanup))
+/*[[[end]]]*/
+
+
+/* Check if the given signal has viable recipients (including poll-based connections) */
+#define sig_iswaiting(self) (!sig_isempty(self))
+
+/* Count the # of viable recipients of the given signal (including poll-based connections) */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
+
+
+/* Root connections set. */
+DATDEF ATTR_PERTASK struct taskcons this_rootcons;
+#define THIS_ROOTCONS (&PERTASK(this_rootcons))
+
+/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use  connections.
+ * Most of the time, this will simply point to `PERTASK(this_rootcons)' */
+DATDEF ATTR_PERTASK struct taskcons *this_cons;
+#define THIS_CONS PERTASK_GET(this_cons)
+
 #else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 struct sig;
 struct task;
@@ -415,7 +871,6 @@ struct task_connections {
 	                                      * allocated dynamically using `kmalloc()', and as such, must be
 	                                      * freed by `kfree()' */
 };
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 /* Root connections set. */
@@ -426,6 +881,7 @@ DATDEF ATTR_PERTASK struct task_connections this_root_connections;
  * Most of the time, this will simply point to `PERTASK(this_root_connections)' */
 DATDEF ATTR_PERTASK struct task_connections *this_connections;
 #define THIS_CONNECTIONS PERTASK_GET(this_connections)
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 /* Push/pop the active  set of  connections:

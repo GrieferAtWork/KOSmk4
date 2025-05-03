@@ -1,0 +1,353 @@
+/* Copyright (c) 2019-2025 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2025 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+
+/* NOTE: After making changes to the configurations in this file, you must run:
+ * >> deemon -D__CC__ -Wno-user -F kos/src/kernel/include/sched/sig.h kos/src/kernel/core/sched/sig.c kos/src/kernel/core/sched/sig-send.c.inl
+ */
+
+
+@@Mapping from <function-name> to <function-prototype>
+global final FUNCTIONS: {string: string} = r"
+FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL sig_send)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_altsend_nopr)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_send_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsend_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendas)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendas)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendas_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendto)(struct sig *__restrict self, struct task *__restrict target);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendto)(struct sig *self, struct sig *sender, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL NOTHROW(FCALL sig_sendto_nopr)(struct sig *__restrict self, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_altsendto_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendto_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict target, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendasto)(struct sig *__restrict self, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendasto)(struct sig *self, struct sig *sender, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) __BOOL NOTHROW(FCALL sig_sendasto_nopr)(struct sig *__restrict self, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_altsendasto_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) __BOOL NOTHROW(FCALL sig_sendasto_cleanup_nopr)(struct sig *__restrict self, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4, 5)) __BOOL NOTHROW(FCALL sig_altsendasto_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *caller, struct task *target, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self, size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany)(struct sig *self, struct sig *sender, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self, struct sig *sender, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmany_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmany_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_sendmanyas_nopr)(struct sig *__restrict self, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altsendmanyas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_sendmanyas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altsendmanyas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup, size_t maxcount);
+
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self, struct sig *sender);
+
+FUNDEF NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self, struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self, struct sig *sender);
+
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcast_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_nopr)(struct sig *__restrict self, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t NOTHROW(FCALL sig_broadcastas_for_fini_cleanup_nopr)(struct sig *__restrict self, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 4)) size_t NOTHROW(FCALL sig_altbroadcastas_for_fini_cleanup_nopr)(struct sig *self, struct sig *sender, struct task *__restrict caller, struct sig_cleanup_callback *__restrict cleanup);
+".striplines()
+	.splitlines(false)
+	.map(e -> e.strip())
+	.filter(e -> e)
+	.map(e -> (
+		e.rescanf(r".*FCALL\s+(\w+)").first,
+		e
+	))
+	.asmap
+	.frozen;
+
+
+@@Set of functions that are actually defined (all others are macro wrappers around `sig_xsend*`)
+global final DEFINED_FUNCTIONS = {
+	"sig_send",
+	"sig_send_nopr",
+	"sig_sendmany",
+	"sig_sendmany_nopr",
+	"sig_broadcast",
+	"sig_broadcast_nopr",
+	"sig_altbroadcast",
+	"sig_altbroadcast_nopr",
+	"sig_broadcast_cleanup_nopr",
+	"sig_broadcast_for_fini",
+	"sig_broadcast_for_fini_nopr",
+	"sig_altbroadcast_for_fini",
+	"sig_altbroadcast_for_fini_nopr",
+	"sig_broadcast_for_fini_cleanup_nopr",
+};
+
+function getArgNamesFromPrototype(proto: string): {string...} {
+	local params = proto.rescanf(r".*FCALL\s+\w+\s*\)\s*\(([^)]*)\)").first;
+	return params.split(",").map(e -> {
+		e = e.strip();
+		return e[e.rfindany("* ") + 1:];
+	}).frozen;
+}
+
+function getSubstitutionCallExpr(name: string, args: {string...} | none = none): string {
+	local decl: string = FUNCTIONS[name];
+	if (args is none)
+		args = getArgNamesFromPrototype(decl);
+	local isAlt = "sender" in args;
+	local isAs = "caller" in args;
+	local isTo = "target" in args;
+	local isCleanup = "cleanup" in args;
+	local isNoPr = "nopr" in name;
+	local isFini = "for_fini" in name;
+	local flags = "SIG_XSEND_F_NORMAL";
+	if (isNoPr)
+		flags = f"{flags} | SIG_XSEND_F_NOPR";
+	if (isFini)
+		flags = f"{flags} | SIG_XSEND_F_FINI";
+	if (isAlt)
+		flags = f"{flags} | SIG_XSEND_F_SENDER";
+	if (isAs)
+		flags = f"{flags} | SIG_XSEND_F_CALLER";
+	if (isTo)
+		flags = f"{flags} | SIG_XSEND_F_TARGET";
+	if (isCleanup)
+		flags = f"{flags} | SIG_XSEND_F_CLEANUP";
+	flags = flags.lsstrip("SIG_XSEND_F_NORMAL | ");
+	if ("broadcast" in name) {
+		return f"sig_xbroadcast(self, {flags}, {
+			isAlt ? "sender" : "__NULLPTR"}, {
+			isAs ? "caller" : "THIS_TASK"}, {
+			isCleanup ? "cleanup" : "__NULLPTR"}, __NULLPTR, __NULLPTR)";
+	} else if ("sendmany" in name) {
+		return f"sig_xsendmany(self, maxcount, {flags}, {
+			isAlt ? "sender" : "__NULLPTR"}, {
+			isAs ? "caller" : "THIS_TASK"}, {
+			isCleanup ? "cleanup" : "__NULLPTR"}, __NULLPTR, __NULLPTR)";
+	} else {
+		return f"sig_xsend(self, {flags}, {
+			isAlt ? "sender" : "__NULLPTR"}, {
+			isAs ? "caller" : "THIS_TASK"}, {
+			isTo ? "target" : "__NULLPTR"}, {
+			isCleanup ? "cleanup" : "__NULLPTR"}, __NULLPTR)";
+	}
+}
+
+
+function printPrototypes() {
+	for (local fun: DEFINED_FUNCTIONS)
+		print(FUNCTIONS[fun]);
+	local argsByFun: {string: {string...}} = Dict(
+		for (local name, decl: FUNCTIONS)
+			(name, getArgNamesFromPrototype(decl))
+	);
+	print("#ifdef __INTELLISENSE__");
+	for (local name, decl: FUNCTIONS) {
+		if (name !in DEFINED_FUNCTIONS)
+			print(decl);
+	}
+	print("#else /* __INTELLISENSE__ */");
+	local longestUndefinedDeclLen = ((
+		for (local functionName: FUNCTIONS.keys - DEFINED_FUNCTIONS) ({
+			local args = argsByFun[functionName];
+			(args.map(e -> #e).sum() + (#args - 1) * 2) + #functionName + 2;
+		})
+	) > ...) + 1;
+	for (local name, decl: FUNCTIONS) {
+		if (name !in DEFINED_FUNCTIONS) {
+			local args = getArgNamesFromPrototype(decl);
+			print("#define ", f"{name}({", ".join(args)})".ljust(longestUndefinedDeclLen)),;
+			print(getSubstitutionCallExpr(name, args));
+		}
+	}
+	print("#endif /* !__INTELLISENSE__ */");
+
+	local longestDeclLen = ((
+		for (local functionName, args: argsByFun)
+			(args.map(e -> #e).sum() + (#args - 1) * 2) + #functionName + 2
+	) > ...) + 1;
+	for (local name, decl: FUNCTIONS) {
+		local args = argsByFun[name];
+		print("#define ", f"{name}_unlikely({", ".join(args)})".ljust(longestDeclLen + 9)),;
+		print(f"_sig_deliver_unlikely(self, {name}({", ".join(args)}))");
+	}
+}
+
+
+function printSigCIncludes() {
+	print('#define DEFINE_sig_xsend');
+	print('#include "sig-send.c.inl"');
+	print('#define DEFINE_sig_xsendmany');
+	print('#include "sig-send.c.inl"');
+	print('#ifndef __OPTIMIZE_SIZE__');
+	for (local name: DEFINED_FUNCTIONS) {
+		print('#define DEFINE_', name);
+		print('#include "sig-send.c.inl"');
+	}
+	print('#else /* !__OPTIMIZE_SIZE__ */');
+	print('DECL_BEGIN');
+	for (local name: DEFINED_FUNCTIONS) {
+		local proto = FUNCTIONS[name].rereplace(r"\bFUNDEF\b", "PUBLIC").rstrip(";");
+		print(proto, " {");
+		print("	return ", getSubstitutionCallExpr(name).rereplace(r"\b__NULLPTR\b", "NULL"), ";");
+		print("}");
+	}
+	print('DECL_END');
+	print('#endif /* __OPTIMIZE_SIZE__ */');
+}
+
+function printSigSendCInlOptions() {
+	print('//#define DEFINE_sig_xsend');
+	print('#define DEFINE_sig_xsendmany');
+	for (local name, none: FUNCTIONS) {
+		print('//#define DEFINE_', name);
+	}
+}
+
+function printSigSendCInlHead() {
+	local longestNameLen = FUNCTIONS.keys.each.length > ...;
+	print("#if (", "\\\n     ".join(
+			({ "sig_xsend", "sig_xsendmany" } + FUNCTIONS.keys).map(e -> f"defined(DEFINE_{e}) +".ljust(longestNameLen + 17))
+	).rstrip("+ "), ") != 1");
+	print('#error "Must #define exactly one of these macros!"');
+	print("#endif /* ... */");
+	print();
+	print("#ifdef DEFINE_sig_xsend");
+	print("#define LOCAL_sig_send sig_xsend");
+	print("#define LOCAL_IS_XSEND");
+	print("#define LOCAL_IS_SEND");
+	print("#define LOCAL_flags flags");
+	print("#define LOCAL_HAVE_flags");
+	print("#define LOCAL_HAVE_sender  /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_caller  /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_target  /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_cleanup /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_reprime");
+	print("#elif defined(DEFINE_sig_xsendmany)");
+	print("#define LOCAL_sig_send sig_xsendmany");
+	print("#define LOCAL_IS_XSEND");
+	print("#define LOCAL_IS_BROADCAST");
+	print("#define LOCAL_flags flags");
+	print("#define LOCAL_HAVE_maxcount");
+	print("#define LOCAL_HAVE_flags");
+	print("#define LOCAL_HAVE_sender  /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_caller  /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_cleanup /* Potentially; depends on `flags' */");
+	print("#define LOCAL_HAVE_reprime");
+	print("#define LOCAL_HAVE_destroy_later");
+	for (local name, decl: FUNCTIONS) {
+		print(f"#elif defined(DEFINE_{name})");
+		print("#define LOCAL_sig_send ", name);
+		if ("broadcast" in name || "sendmany" in name) {
+			print("#define LOCAL_IS_BROADCAST");
+		} else {
+			print("#define LOCAL_IS_SEND");
+		}
+		local args = getArgNamesFromPrototype(decl);
+		local isAlt = "sender" in args;
+		local isAs = "caller" in args;
+		local isTo = "target" in args;
+		local isCleanup = "cleanup" in args;
+		local isNoPr = "nopr" in name;
+		local isFini = "for_fini" in name;
+		local flags = "SIG_XSEND_F_NORMAL";
+		if (isNoPr) {
+			flags = f"{flags} | SIG_XSEND_F_NOPR";
+			print("#define LOCAL_IS_NOPR");
+		}
+		if (isFini) {
+			flags = f"{flags} | SIG_XSEND_F_FINI";
+			print("#define LOCAL_IS_FINI");
+		}
+		if (isAlt) {
+			flags = f"{flags} | SIG_XSEND_F_SENDER";
+			print("#define LOCAL_HAVE_sender");
+		}
+		if (isAs)
+			print("#define LOCAL_HAVE_caller");
+		if (isTo) {
+			flags = f"{flags} | SIG_XSEND_F_TARGET";
+			print("#define LOCAL_HAVE_target");
+		}
+		if (isCleanup) {
+			flags = f"{flags} | SIG_XSEND_F_CLEANUP";
+			print("#define LOCAL_HAVE_cleanup");
+		}
+		if ("maxcount" in args)
+			print("#define LOCAL_HAVE_maxcount");
+		flags = flags.lsstrip("SIG_XSEND_F_NORMAL | ");
+		if ("|" in flags)
+			flags = f"({flags})";
+		print("#define LOCAL_flags ", flags);
+	}
+	print("#else /* ... */");
+	print('#error "Invalid configuration"');
+	print("#endif /* !... */");
+}
+
+function printSigSendCInlTail() {
+	print("#undef LOCAL_sig_send");
+	print("#undef LOCAL_IS_BROADCAST");
+	print("#undef LOCAL_IS_XSEND");
+	print("#undef LOCAL_IS_NOPR");
+	print("#undef LOCAL_IS_FINI");
+	print("#undef LOCAL_HAVE_maxcount");
+	print("#undef LOCAL_HAVE_flags");
+	print("#undef LOCAL_HAVE_sender");
+	print("#undef LOCAL_HAVE_caller");
+	print("#undef LOCAL_HAVE_target");
+	print("#undef LOCAL_HAVE_cleanup");
+	print("#undef LOCAL_HAVE_reprime");
+	print("#undef LOCAL_HAVE_destroy_later");
+	print("#undef LOCAL_flags");
+	print();
+	for (local name, none: FUNCTIONS.reversed()) {
+		print('#undef DEFINE_', name);
+	}
+	print('#undef DEFINE_sig_xsendmany');
+	print('#undef DEFINE_sig_xsend');
+}

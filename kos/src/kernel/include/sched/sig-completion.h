@@ -70,6 +70,13 @@ struct sig_completion_context {
 	                                  * stage callback pointed to by this  field. For an example of  this,
 	                                  * take a look at  the `struct rising_edge_detector' example code  at
 	                                  * the bottom of this file. */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#define SIG_COMPLETION__F_NORMAL    0x0000 /* Normal status (don't reprime + signal accepted) */
+#define SIG_COMPLETION__F_REPRIME   0x0001 /* Re-prime the connection, allowing for uninterrupted monitoring of signals being sent. */
+#define SIG_COMPLETION__F_NONVIABLE 0x0002 /* Signal could not be received. (in the case of `sig_send()', search for another receiver) */
+	unsigned int         scc_status; /* [out] Signal completion status (set of `SIG_COMPLETION__F_*'; defaults to 0)
+	                                  * NOTE: This field may only be accessed during phase-1 callbacks. */
+#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 };
 
 
@@ -98,6 +105,8 @@ NOTHROW_T(FCALL *sig_completion_t)(struct sig_completion *__restrict self,
                                    struct sig_completion_context *__restrict context,
                                    void *buf, size_t bufsize);
 
+
+#ifndef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 /* Re-prime  the completion callback to be invoked once again the next time that the
  * attached signal is delivered. This function is a no-op if the caller's completion
  * function was invoked from `sig_broadcast_for_fini()'.
@@ -113,6 +122,7 @@ NOTHROW_T(FCALL *sig_completion_t)(struct sig_completion *__restrict self,
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       __BOOL for_poll);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 
@@ -219,7 +229,7 @@ struct _sig_multicompletion_route
  * can  easily  be done  by  only invoking  this  function from
  * callbacks registered by
  *   - `sig_multicompletion_alloc()' or
- *   - `sig_multicompletion_connect()' */
+ *   - `sig_multicompletion_connect_from_task()' */
 #define sig_multicompletion_controller(sc) \
 	(((struct _sig_multicompletion_route *)(sc))->mr_con)
 
@@ -239,8 +249,13 @@ struct sig_multicompletion {
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict self) {
 	unsigned int i;
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat = SIGCON_STAT_ST_THRBCAST;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
 		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	self->sm_set.sms_next = __NULLPTR;
 }
 
@@ -252,11 +267,20 @@ LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+#if SIGCON_STAT_ST_THRBCAST != 0
+		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat = SIGCON_STAT_ST_THRBCAST;
+#else /* SIGCON_STAT_ST_THRBCAST != 0 */
+		__hybrid_assert(self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat == 0);
+#endif /* SIGCON_STAT_ST_THRBCAST == 0 */
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #if TASK_CONNECTION_STAT_BROADCAST != 0
 		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 #else /* TASK_CONNECTION_STAT_BROADCAST != 0 */
 		__hybrid_assert(self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat == 0);
 #endif /* TASK_CONNECTION_STAT_BROADCAST == 0 */
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	}
 }
 #else /* TASK_CONNECTION_STAT_BROADCAST != 0 || !NDEBUG */
