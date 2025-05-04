@@ -41,7 +41,7 @@
 
 /* Use a new `struct sig` implementation as per ./sig.md */
 #undef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#if 1
+#if 0
 #define CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #endif
 
@@ -60,7 +60,7 @@ DECL_BEGIN
 #define SIZEOF_SIGCON      (__SIZEOF_POINTER__ * 4)
 #define ALIGNOF_SIGCON     __ALIGNOF_POINTER__
 
-/* `struct sigcon_task' offsets */
+/* `struct sigtaskcon' offsets */
 #define OFFSET_SIGCON_TASK_THRNEXT SIZEOF_SIGCON
 #define SIZEOF_SIGCON_TASK         (SIZEOF_SIGCON + __SIZEOF_POINTER__)
 #define ALIGNOF_SIGCON_TASK        __ALIGNOF_POINTER__
@@ -87,8 +87,8 @@ DECL_BEGIN
 #define SIGCON_STAT_TP_COMP     0x0002 /* [valid_if(!SIGCON_STAT_ISTHREAD(.))] Type code: this is a completion callback (and not a thread) */
 /*efine SIGCON_STAT_TP_...      0x0004  * [valid_if(!SIGCON_STAT_ISTHREAD(.))] Type code: ... */
 #define SIGCON_STAT_ISCONNECTED(st) ((st) >= 0x0002) /* Is this connection still connected (iow: is it owned by `sc_sig' and its lock?) */
-#define SIGCON_STAT_ISTHREAD(st)    ((st) >= 0x0004) /* Is this a `struct sigcon_task'? */
-#define SIGCON_STAT_ISCOMP(st)      ((st) <= 0x0003) /* Assuming "SIGCON_STAT_ISCONNECTED() == true": Is this a `struct sigcon_comp'? */
+#define SIGCON_STAT_ISTHREAD(st)    ((st) >= 0x0004) /* Is this a `struct sigtaskcon'? */
+#define SIGCON_STAT_ISCOMP(st)      ((st) <= 0x0003) /* Assuming "SIGCON_STAT_ISCONNECTED() == true": Is this a `struct sigcompcon'? */
 #define SIGCON_STAT_ISDEAD(st)      ((st) <= 0x0001) /* True if the connection was sent/broadcast */
 #define SIGCON_CONS_MINALIGN    2 /* Minimal alignment required of `struct taskcons' */
 
@@ -168,8 +168,8 @@ struct sig_cleanup_callback {
 struct task;
 struct sig;
 struct sigcon;
-struct sigcon_task;
-struct sigcon_comp;
+struct sigtaskcon;
+struct sigcompcon;
 struct taskcons;
 
 struct sig {
@@ -186,12 +186,26 @@ struct sig {
 	                       *       `SIG_SMPLOCK` must *ALWAYS* be or'd with a non-NULL sigcon. */
 };
 
+#define SIG_INIT_EX(c) { c }
+#define SIG_INIT       { __NULLPTR }
+#define sig_init(x)    (void)((x)->s_con = __NULLPTR)
+#define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)
+#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
+
+
+#ifdef __OPTIMIZE_SIZE__
+#define _sig_deliver_unlikely(self, expr) expr
+#else /* __OPTIMIZE_SIZE__ */
+#define _sig_deliver_unlikely(self, expr) (likely(sig_isempty(self)) ? 0 : expr)
+#endif /* !__OPTIMIZE_SIZE__ */
+
+
 
 struct sigcon {
 	/* Signal connection.
 	 * OWNER:
 	 * - if (SIGCON_STAT_ISCONNECTED(sc_stat)): sc_sig
-	 * - if (SIGCON_STAT_ISDEAD(sc_stat)):      OWNER_OF(<sigcon_task>/<sigcon_comp>)
+	 * - if (SIGCON_STAT_ISDEAD(sc_stat)):      OWNER_OF(<sigtaskcon>/<sigcompcon>)
 	 */
 	struct sig    *sc_sig;  /* [1..1][const] Signal of this connection */
 	struct sigcon *sc_prev; /* [1..1][valid_if(SIGCON_STAT_ISCONNECTED(sc_stat))]
@@ -201,36 +215,53 @@ struct sigcon {
 	union {
 		struct taskcons *sc_cons; /* [1..1][const][valid_if(SIGCON_STAT_ISTHREAD(sc_stat))] Thread connections controller. */
 		uintptr_t        sc_stat; /* [lock(READ(ATOMIC), WRITE(ATOMIC &&
-		                           *  if (SIGCON_STAT_ISDEAD(sc_stat)):      CALLER IS OWNER_OF(<sigcon_task>/<sigcon_comp>)
+		                           *  if (SIGCON_STAT_ISDEAD(sc_stat)):      CALLER IS OWNER_OF(<sigtaskcon>/<sigcompcon>)
 		                           *  if (SIGCON_STAT_ISCONNECTED(sc_stat)): !PREEMPTION_ENABLED() && ((uintptr_t)sc_sig->s_con & SIG_SMPLOCK)
 		                           * ))] */
 	};
 };
 
-struct sigcon_task;
-struct sigcon_task_slist { /* SLIST_HEAD(sigcon_task_slist, sigcon_task) */
-	struct sigcon_task *slh_first; /* [0..1] List head */
+#define SIGCON_INIT(s, prev, next, cons) \
+	{                                    \
+		/* .sc_sig  = */ s,              \
+		/* .sc_prev = */ prev,           \
+		/* .sc_next = */ next,           \
+		{ /* .sc_cons = */ cons }        \
+	}
+
+
+struct sigtaskcon;
+struct sigtaskcon_slist { /* SLIST_HEAD(sigtaskcon_slist, sigtaskcon) */
+	struct sigtaskcon *slh_first; /* [0..1] List head */
 };
 
-struct sigcon_task
-#if defined(__cplusplus) && !defined(__WANT_SIGCON_TASK_INIT)
-    : sigcon              /* The underlying connection */
-#define _sigcon_task_con_ /* nothing */
-#endif /* __cplusplus && !__WANT_SIGCON_TASK_INIT */
+struct sigtaskcon
+#if defined(__cplusplus) && !defined(__WANT_SIGTASKCON_INIT)
+    : sigcon /* The underlying connection */
+#define _sigtaskcon_con_ /* nothing */
+#endif /* __cplusplus && !__WANT_SIGTASKCON_INIT */
 {
-#if !defined(__cplusplus) || defined(__WANT_SIGCON_TASK_INIT)
+#if !defined(__cplusplus) || defined(__WANT_SIGTASKCON_INIT)
 	struct sigcon sct_con; /* The underlying connection */
-#define _sigcon_task_con_ sct_con.
-#endif /* !__cplusplus || __WANT_SIGCON_TASK_INIT */
+#define _sigtaskcon_con_ sct_con.
+#endif /* !__cplusplus || __WANT_SIGTASKCON_INIT */
 
 	/* More fields here that may be used by `struct taskcons` to  track
 	 * allocated task connections. However, all of these fields will be
 	 * [lock(THIS_TASK)] (iow: thread-local), and so aren't relevant to
 	 * the cross-thread part of the signal system. */
-	struct { /* SLIST_ENTRY(sigcon_task) */
-		struct sigcon_task *sle_next; /* [0..1] Next-link */
+	struct { /* SLIST_ENTRY(sigtaskcon) */
+		struct sigtaskcon *sle_next; /* [0..1] Next-link */
 	} sct_thrnext; /* [0..1][lock(THIS_TASK)] Next connection within the thread. */
 };
+
+#ifdef __WANT_SIGTASKCON_INIT
+#define SIGTASKCON_INIT(s, prev, next, cons, thrnext)          \
+	{                                                          \
+		/* .sct_con     = */ SIGCON_INIT(s, prev, next, cons), \
+		/* .sct_thrnext = */ { thrnext }                       \
+	}
+#endif /* __WANT_SIGTASKCON_INIT */
 
 
 #if ALIGNOF_TASKCONS_TASK > _ALIGNOF_TASKCONS_TASK
@@ -249,36 +280,23 @@ struct taskcons
 	                           * case signals can still be received, but the thread  will
 	                           * not receive any wake-ups. */
 
-	/* More fields here that implement allocation of `struct sigcon_task`
+	/* More fields here that implement allocation of `struct  sigtaskcon`
 	 * for  the  owning  thread. However,  all  of these  fields  will be
 	 * "[lock(THIS_TASK)]" (iow: thread-local), and so aren't relevant to
 	 * the cross-thread part of the signal system. */
-	struct taskcons         *tcs_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
-	                                      * [(!= NULL) == (this == &this_root_connections)]
-	                                      * Previous set of active connections. */
-	struct sigcon_task_slist tcs_cons;   /* [0..1][chain(->sct_thrnext)][lock(PRIVATE(THIS_TASK))]
-	                                      * Chain of allocated connections. */
-	struct sigcon_task       tcs_static[CONFIG_TASK_STATIC_CONNECTIONS];
-	                                     /* [*.in_use_if(.sc_sig != NULL)][lock(PRIVATE(THIS_TASK))]
-	                                      * Statically allocated connections. Any connection that belongs
-	                                      * to  this connections set, but points outside of this array is
-	                                      * allocated dynamically using `kmalloc()', and as such, must be
-	                                      * freed by `kfree()' */
+	struct taskcons        *tcs_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
+	                                     * [(!= NULL) == (this == &this_root_connections)]
+	                                     * Previous set of active connections. */
+	struct sigtaskcon_slist tcs_cons;   /* [0..1][chain(->sct_thrnext)][lock(PRIVATE(THIS_TASK))]
+	                                     * Chain of allocated connections. */
+	struct sigtaskcon       tcs_static[CONFIG_TASK_STATIC_CONNECTIONS];
+	                                    /* [*.in_use_if(.sc_sig != NULL)][lock(PRIVATE(THIS_TASK))]
+	                                     * Statically allocated connections. Any connection that belongs
+	                                     * to  this connections set, but points outside of this array is
+	                                     * allocated dynamically using `kmalloc()', and as such, must be
+	                                     * freed by `kfree()' */
 };
 
-
-
-#define SIG_INIT       { __NULLPTR }
-#define sig_init(x)    (void)((x)->s_con = __NULLPTR)
-#define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)
-#define sig_isempty(x) (__hybrid_atomic_load(&(x)->s_con, __ATOMIC_ACQUIRE) == __NULLPTR)
-
-
-#ifdef __OPTIMIZE_SIZE__
-#define _sig_deliver_unlikely(self, expr) expr
-#else /* __OPTIMIZE_SIZE__ */
-#define _sig_deliver_unlikely(self, expr) (likely(sig_isempty(self)) ? 0 : expr)
-#endif /* !__OPTIMIZE_SIZE__ */
 
 
 /* Possible flags for `__sig_remcon' */
@@ -302,10 +320,10 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL __sig_remcon_nopr)(stru
 /* Connect a given signal-connection `self' to a signal `to'
  * The caller must have already initialized:
  * - `self->sc_cons' / `self->sc_stat' as:
- *   - When `self' is `struct sigcon_task':
+ *   - When `self' is `struct sigtaskcon':
  *     - `&<<associated_taskcons>>'
  *     - `&<<associated_taskcons>> | SIGCON_STAT_F_POLL'
- *   - When `self' is `struct sigcon_comp':
+ *   - When `self' is `struct sigcompcon':
  *     - `SIGCON_STAT_TP_COMP'
  *     - `SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL'
  * These functions will then transfer ownership of `self' to `to',
@@ -718,7 +736,7 @@ task_connect_for_poll(struct sig *__restrict target)
  * - When connected to the same signal multiple times, this
  *   will return one at random.
  * - When `target' is an invalid pointer, return "NULL" */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct sigcon_task **
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct sigtaskcon **
 NOTHROW(FCALL task_findcon_p)(struct sig const *target);
 
 
@@ -863,7 +881,6 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
 /* BEGIN: Deprecated aliases */
 #define task_connection       sigcon
 #define task_connections      taskcons
-#define sig_completion        sigcon_comp
 #define tcs_dlvr              tcs_deliver
 #define tc_sig                sc_sig
 #define THIS_ROOT_CONNECTIONS THIS_ROOTCONS
@@ -916,9 +933,11 @@ struct sig {
 #endif /* !CONFIG_NO_SMP */
 
 #ifdef CONFIG_NO_SMP
-#define SIG_INIT       { __NULLPTR }
+#define SIG_INIT_EX(c) { c }
+#define SIG_INIT        { __NULLPTR }
 #else /* CONFIG_NO_SMP */
-#define SIG_INIT       { { __NULLPTR } }
+#define SIG_INIT_EX(c) { { c } }
+#define SIG_INIT        { { __NULLPTR } }
 #endif /* !CONFIG_NO_SMP */
 #define sig_init(x)    (void)((x)->s_con = __NULLPTR)
 #define sig_cinit(x)   __hybrid_assert((x)->s_con == __NULLPTR)

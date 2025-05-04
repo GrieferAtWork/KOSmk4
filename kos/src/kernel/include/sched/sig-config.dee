@@ -231,9 +231,15 @@ function printSigCIncludes() {
 	print('#else /* !__OPTIMIZE_SIZE__ */');
 	print('DECL_BEGIN');
 	for (local name: DEFINED_FUNCTIONS) {
-		local proto = FUNCTIONS[name].rereplace(r"\bFUNDEF\b", "PUBLIC").rstrip(";");
+		local proto = FUNCTIONS[name]
+			.rereplace(r"\bFUNDEF\b", "PUBLIC")
+			.rereplace(r"\b__BOOL\b", "bool")
+			.rstrip(";");
 		print(proto, " {");
-		print("	return ", getSubstitutionCallExpr(name).rereplace(r"\b__NULLPTR\b", "NULL"), ";");
+		print("	return ",
+			getSubstitutionCallExpr(name)
+				.rereplace(r"\b__NULLPTR\b", "NULL"),
+			";");
 		print("}");
 	}
 	print('DECL_END');

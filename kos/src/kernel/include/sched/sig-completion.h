@@ -20,14 +20,43 @@
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H
 #define GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H 1
 
+#include <sched/sig.h>
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#include "sigcomp.h"
+
+/* BEGIN: Deprecated aliases */
+#define sig_completion                                       sigcompcon
+#define sig_completion_context                               sigcompctx
+#define sig_postcompletion_t                                 sigcomp_postcb_t
+#define sig_completion_t                                     sigcomp_cb_t
+#define sig_completion_init                                  sigcompcon_init
+#define sig_connect_completion(self, completion)             sigcompcon_connect(completion, self)
+#define sig_connect_completion_for_poll(self, completion)    sigcompcon_connect_for_poll(completion, self)
+#define sig_completion_disconnect(self)                      sigcompcon_disconnect(self)
+#define _sig_multicompletion_route                           _sigmulticompcon
+#define sig_multicompletion_controller                       sigmulticomp_fromcon
+#define _sig_multicompletion_set                             _sigmulticomp_xtra
+#define sig_multicompletion                                  sigmulticomp
+#define sig_multicompletion_init                             sigmulticomp_init
+#define sig_multicompletion_cinit                            sigmulticomp_cinit
+#define sig_multicompletion_fini                             sigmulticomp_fini
+#define sig_multicompletion_disconnectall                    sigmulticomp_disconnectall
+#define sig_multicompletion_wasconnected                     sigmulticomp_isconnected
+#define sig_multicompletion_alloc                            sigmulticomp_alloccon
+#define sig_multicompletion_alloc_nx                         sigmulticomp_alloccon_nx
+#define sig_connect_multicompletion(self, completion, cb)    sigmulticomp_connect(completion, self, cb)
+#define sig_connect_multicompletion_nx(self, completion, cb) sigmulticomp_connect_nx(completion, self, cb)
+#define sig_multicompletion_connect_from_task(completion, cb, for_poll) \
+	sigmulticomp_connect_from_task(completion, cb, 0, (for_poll) ? SIGCOMPCON_CONNECT_F_POLL : SIGCOMPCON_CONNECT_F_NORMAL)
+/* END: Deprecated aliases */
+
+
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/sig.h>
 
-#if TASK_CONNECTION_STAT_BROADCAST == 0 && !defined(NDEBUG)
 #include <hybrid/__assert.h>
-#endif /* TASK_CONNECTION_STAT_BROADCAST == 0 && !NDEBUG */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -70,13 +99,6 @@ struct sig_completion_context {
 	                                  * stage callback pointed to by this  field. For an example of  this,
 	                                  * take a look at  the `struct rising_edge_detector' example code  at
 	                                  * the bottom of this file. */
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#define SIG_COMPLETION__F_NORMAL    0x0000 /* Normal status (don't reprime + signal accepted) */
-#define SIG_COMPLETION__F_REPRIME   0x0001 /* Re-prime the connection, allowing for uninterrupted monitoring of signals being sent. */
-#define SIG_COMPLETION__F_NONVIABLE 0x0002 /* Signal could not be received. (in the case of `sig_send()', search for another receiver) */
-	unsigned int         scc_status; /* [out] Signal completion status (set of `SIG_COMPLETION__F_*'; defaults to 0)
-	                                  * NOTE: This field may only be accessed during phase-1 callbacks. */
-#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 };
 
 
@@ -106,7 +128,6 @@ NOTHROW_T(FCALL *sig_completion_t)(struct sig_completion *__restrict self,
                                    void *buf, size_t bufsize);
 
 
-#ifndef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 /* Re-prime  the completion callback to be invoked once again the next time that the
  * attached signal is delivered. This function is a no-op if the caller's completion
  * function was invoked from `sig_broadcast_for_fini()'.
@@ -122,7 +143,6 @@ NOTHROW_T(FCALL *sig_completion_t)(struct sig_completion *__restrict self,
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       __BOOL for_poll);
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 
@@ -249,13 +269,8 @@ struct sig_multicompletion {
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict self) {
 	unsigned int i;
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
-		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat = SIGCON_STAT_ST_THRBCAST;
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
 		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	self->sm_set.sms_next = __NULLPTR;
 }
 
@@ -267,20 +282,11 @@ LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i) {
-#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
-#if SIGCON_STAT_ST_THRBCAST != 0
-		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat = SIGCON_STAT_ST_THRBCAST;
-#else /* SIGCON_STAT_ST_THRBCAST != 0 */
-		__hybrid_assert(self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ sc_stat == 0);
-#endif /* SIGCON_STAT_ST_THRBCAST == 0 */
-#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #if TASK_CONNECTION_STAT_BROADCAST != 0
 		self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 #else /* TASK_CONNECTION_STAT_BROADCAST != 0 */
 		__hybrid_assert(self->sm_set.sms_routes[i].__sig_multicompletion_route_com_ _sig_completion_con_ tc_stat == 0);
 #endif /* TASK_CONNECTION_STAT_BROADCAST == 0 */
-#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	}
 }
 #else /* TASK_CONNECTION_STAT_BROADCAST != 0 || !NDEBUG */
@@ -383,6 +389,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 
 
 
+
 #if 0 /* Signal completion usage example */
 /* `struct rising_edge_detector'   can  be  used  for  implementing  an  asynchronous
  * connection to a signal (i.e. do the equivalent of `task_connect()' asynchronously,
@@ -480,6 +487,6 @@ PRIVATE void demo(void) {
 
 DECL_END
 #endif /* __CC__ */
-
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H */

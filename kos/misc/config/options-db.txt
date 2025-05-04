@@ -71,6 +71,9 @@ kos/src/kernel/core/sched/atomic64.c
 kos/src/kernel/core/sched/epoll.c
 	CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK!:int=7
 
+kos/src/kernel/core/sched/sig.c
+	CONFIG_SIGMULTICOMP_XTRA_STARTSIZE!:int=4
+
 kos/src/kernel/include/debugger/config.h
 	CONFIG_HAVE_KERNEL_DEBUGGER:bool=true
 
@@ -159,6 +162,9 @@ kos/src/kernel/include/sched/epoll.h
 kos/src/kernel/include/sched/sig.h
 	CONFIG_TASK_STATIC_CONNECTIONS!:int=3
 	CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT:int=4
+
+kos/src/kernel/include/sched/sigcomp.h
+	CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS!:int=1
 
 kos/src/kernel/include/sched/task.h
 	CONFIG_HAVE_KERNEL_STACK_GUARD:bool=!defined(NDEBUG)

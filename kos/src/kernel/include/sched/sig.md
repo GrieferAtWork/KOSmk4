@@ -1,4 +1,3 @@
-
 # Signal: mid-level, Kernel Synchronization Primitive
 
 ## Synopsis
@@ -122,7 +121,7 @@ Signals are a mid-level concept:
 	- These API-level then wraps arch-specific IPI mechanisms, as well as the system scheduler (both of which could be considered as *0. super-low-level* for our purposes)
 2. Mid-level: Kernel Signals
 	- `task_connect()`
-		- (Establishes a `struct sigcon_task` between the calling thread and some `struct sig`)
+		- (Establishes a `struct sigtaskcon` between the calling thread and some `struct sig`)
 	- `task_waitfor()`
 		- Wait until at least one of the signals the calling thread is connected to has been delivered. If at least one signal was already delivered at the time this function is called, the thread never starts sleeping and the call returns immediately. This call is the mid-level wrapper around `task_sleep()`
 	- `sig_send()`, `sig_boardcast()`
@@ -174,15 +173,15 @@ struct sig {
 #define SIGCON_STAT_ST_THRSENT  0x0001 /* [valid_if(!SIGCON_STAT_ISCONNECTED(.))] Status: connection was sent */
 #define SIGCON_STAT_TP_COMP     0x0002 /* [valid_if(!SIGCON_STAT_ISTHREAD(.))] Type code: this is a completion callback (and not a thread) */
 #define SIGCON_STAT_ISCONNECTED(st) ((st) >= 0x0002) /* Is this connection still connected (iow: is it owned by `sc_sig' and its lock?) */
-#define SIGCON_STAT_ISTHREAD(st)    ((st) >= 0x0004) /* Is this a `struct sigcon_task'? */
-#define SIGCON_STAT_ISCOMP(st)      ((st) <= 0x0003) /* Assuming "SIGCON_STAT_ISCONNECTED() == true": Is this a `struct sigcon_comp'? */
+#define SIGCON_STAT_ISTHREAD(st)    ((st) >= 0x0004) /* Is this a `struct sigtaskcon'? */
+#define SIGCON_STAT_ISCOMP(st)      ((st) <= 0x0003) /* Assuming "SIGCON_STAT_ISCONNECTED() == true": Is this a `struct sigcompcon'? */
 #define SIGCON_STAT_ISDEAD(st)      ((st) <= 0x0001) /* True if the connection was sent/broadcast */
 
 struct sigcon {
 	/* Signal connection.
 	 * OWNER:
 	 * - if (SIGCON_STAT_ISCONNECTED(sc_stat)): sc_sig
-	 * - if (SIGCON_STAT_ISDEAD(sc_stat)):      OWNER_OF(<sigcon_task>/<sigcon_comp>)
+	 * - if (SIGCON_STAT_ISDEAD(sc_stat)):      OWNER_OF(<sigtaskcon>/<sigcompcon>)
 	 */
 	struct sig    *sc_sig;  /* [1..1][const] Signal of this connection */
 	struct sigcon *sc_prev; /* [1..1][valid_if(SIGCON_STAT_ISCONNECTED(sc_stat))]
@@ -192,13 +191,13 @@ struct sigcon {
 	union {
 		struct taskcons *sc_cons; /* [1..1][const][valid_if(SIGCON_STAT_ISTHREAD(sc_stat))] Thread connections controller. */
 		uintptr_t        sc_stat; /* [lock(READ(ATOMIC), WRITE(ATOMIC &&
-		                           *  if (SIGCON_STAT_ISDEAD(sc_stat)):      CALLER IS OWNER_OF(<sigcon_task>/<sigcon_comp>)
+		                           *  if (SIGCON_STAT_ISDEAD(sc_stat)):      CALLER IS OWNER_OF(<sigtaskcon>/<sigcompcon>)
 		                           *  if (SIGCON_STAT_ISCONNECTED(sc_stat)): !PREEMPTION_ENABLED() && ((uintptr_t)sc_sig->s_con & SIG_SMPLOCK)
 		                           * ))] */
 	};
 };
 
-struct sigcon_task: sigcon {
+struct sigtaskcon: sigcon {
 	// ...
 
 	/* More fields here that may be used by `struct taskcons` to track
@@ -207,7 +206,7 @@ struct sigcon_task: sigcon {
 	 * the cross-thread part of the signal system. */
 };
 
-struct sigcon_comp: sigcon {
+struct sigcompcon: sigcon {
 	sig_completion_t sc_cb;  /* [1..1][const] Completion callback. */
 };
 
@@ -223,7 +222,7 @@ struct taskcons {
 
 	// ...
 
-	/* More fields here that implement allocation of `struct sigcon_task`
+	/* More fields here that implement allocation of `struct sigtaskcon`
 	 * for  the  owning  thread. However,  all  of these  fields  will be
 	 * "[lock(THIS_TASK)]" (iow: thread-local), and so aren't relevant to
 	 * the cross-thread part of the signal system. */
@@ -533,7 +532,7 @@ again_find_receiver:
 		return sig_completion_invoke_and_unlock_and_preemption_pop(
 				/* struct sig                  *self      */ self,
 				/* struct sig                  *sender    */ self,
-				/* struct sigcon_comp          *receiver  */ (struct sigcon_comp *)receiver,
+				/* struct sigcompcon          *receiver  */ (struct sigcompcon *)receiver,
 				/* struct sigcon               *remainder */ remainder,
 				/* struct task                 *caller    */ THIS_TASK, /* For: `sig_sendas` */
 				/* struct sig_cleanup_callback *cleanup   */ NULL,      /* For: `sig_send_cleanup`; s.a. `HANDLE_CLEANUP_IF_PRESENT()` */
@@ -585,7 +584,7 @@ again_find_receiver:
 
 Broadcasting a signal works similar to sending one, however rather than focusing on only a single receiver, all receivers receive a signal (*once*; re-priming completion callbacks are also only invoked once, even when indicating that they aren't viable):
 
-- Nothing happens when `tcs_thread` of a `struct sigcon_task` connection was already assigned
+- Nothing happens when `tcs_thread` of a `struct sigtaskcon` connection was already assigned
 - poll-based connections are neither skipped, nor moved to the back, but treated like any other
 - Semantically (*almost*) identical to:
 
@@ -620,7 +619,7 @@ Broadcasting a signal works similar to sending one, however rather than focusing
 size_t sig_broadcast(struct sig *self) {
 	size_t result;
 	struct task_slist destroy_later;
-	struct sigcon_comp *reprimed;
+	struct sigcompcon *reprimed;
 	struct sig_post_completion *phase2;
 
 	struct sigcon *sigctl;
@@ -667,10 +666,10 @@ again:
 		DBG_memset(&receiver->sc_next, 0xcc, sizeof(receiver->sc_next));
 
 		if (SIGCON_STAT_ISCOMP(stat)) {
-			struct sigcon_comp *sc = (struct sigcon_comp *)receiver;
+			struct sigcompcon *sc = (struct sigcompcon *)receiver;
 			int status = invoke_sig_completion(&phase2, sc, ...); // "context" not documented here
 #if !IS_BROADCAST_FOR_FINI
-			if (status & SIG_COMPLETION__F_REPRIME) {
+			if (status & SIGCOMP_MODE_F_REPRIME) {
 				/* Insert into "reprimed" queue (at the end, such that order is maintained)
 				 * Note that repriming isn't allowed during `sig_broadcast_for_fini()`! */
 				if (reprimed == NULL) {
@@ -688,7 +687,7 @@ again:
 			{
 				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
 			}
-			bcast_ok = (status & SIG_COMPLETION__F_NONVIABLE) == 0;
+			bcast_ok = (status & SIGCOMP_MODE_F_NONVIABLE) == 0;
 		} else {
 			struct taskcons *tcs = (struct taskcons *)(stat & ~SIGCON_STAT_F_POLL);
 			bcast_ok = atomic_cmpxch(&tcs->tcs_deliver, NULL, self);

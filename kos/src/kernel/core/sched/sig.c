@@ -19,13 +19,12 @@
  */
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_SIG_C
 #define GUARD_KERNEL_INCLUDE_SCHED_SIG_C 1
-#define __SIG_INTERNAL_EXPOSE_CONTROL_WORD 1
+#define CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS 0
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/selftest.h>
-#include <sched/sig-completion.h>
 #include <sched/sig.h>
 
 #include <assert.h>
@@ -43,7 +42,8 @@
 #include <kernel/malloc.h>
 #include <kernel/paging.h>
 #include <sched/pertask.h>
-#include <sched/task-clone.h>
+#include <sched/sigcomp.h>
+#include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -189,32 +189,32 @@ NOTHROW(FCALL destroy_tasks)(struct task *destroy_later) {
 }
 
 
-struct sig_post_completion {
-	struct sig_post_completion     *spc_next; /* [0..1] Next post-completion descriptor. */
-	sig_postcompletion_t            spc_cb;   /* [1..1] Post-completion callback to-be invoked. */
+struct sigpostcomp {
+	struct sigpostcomp             *spc_next; /* [0..1] Next post-completion descriptor. */
+	sigcomp_postcb_t                spc_cb;   /* [1..1] Post-completion callback to-be invoked. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, spc_buf); /* Buffer to-be passed to `spc_cb' */
 };
 
-#define sig_post_completion_alloc(bufsize) \
-	((struct sig_post_completion *)alloca(offsetof(struct sig_post_completion, spc_buf) + (bufsize)))
+#define sigpostcomp_alloc(bufsize) \
+	((struct sigpostcomp *)alloca(offsetof(struct sigpostcomp, spc_buf) + (bufsize)))
 
-/* @param: struct sig_post_completion   **ppost_completion_chain: ...
- * @param: struct sigcon_comp            *sc:                     ...
- * @param: struct sig_completion_context *context:                ... */
-#define invoke_sig_completion(ppost_completion_chain, sc, context) \
+/* @param: struct sigpostcomp           **ppost_completion_chain: ...
+ * @param: struct sigcompcon             *sc:                     ...
+ * @param: struct sigcompctx *context:                ... */
+#define sigcomp_invoke(ppost_completion_chain, sc, context)        \
 	do {                                                           \
 		size_t _pc_reqlen;                                         \
 		(context)->scc_post   = NULL;                              \
-		(context)->scc_status = SIG_COMPLETION__F_NORMAL;          \
-		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
+		(context)->scc_mode = SIGCOMP_MODE_F_NORMAL;               \
+		_pc_reqlen = (*(sc)->scc_cb)(sc, context, NULL, 0);        \
 		if (_pc_reqlen != 0 || (context)->scc_post != NULL) {      \
-			struct sig_post_completion *_pc_ent;                   \
+			struct sigpostcomp *_pc_ent;                           \
 			for (;;) {                                             \
 				size_t _pc_newlen;                                 \
-				_pc_ent = sig_post_completion_alloc(_pc_reqlen);   \
-				_pc_newlen = (*(sc)->sc_cb)(sc, context,           \
-				                            _pc_ent->spc_buf,      \
-				                            _pc_reqlen);           \
+				_pc_ent = sigpostcomp_alloc(_pc_reqlen);           \
+				_pc_newlen = (*(sc)->scc_cb)(sc, context,          \
+				                             _pc_ent->spc_buf,     \
+				                             _pc_reqlen);          \
 				if unlikely(_pc_newlen > _pc_reqlen) {             \
 					_pc_reqlen = _pc_newlen;                       \
 					continue;                                      \
@@ -295,24 +295,24 @@ NOTHROW(FCALL combine_remainder_and_reprime)(struct sigcon *remainder,
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5)) bool KCALL
 sig_completion_invoke_and_unlock_and_preemption_pop(struct sig *self,
                                                     struct sig *sender,
-                                                    struct sigcon_comp *receiver,
+                                                    struct sigcompcon *receiver,
                                                     struct sigcon *remainder,
                                                     struct task *caller,
                                                     struct sigcon *reprime,
                                                     struct sig_cleanup_callback *cleanup,
                                                     preemption_flag_t was,
                                                     unsigned int flags) {
-	struct sig_post_completion *phase2 = NULL;
-	struct sig_completion_context context;
+	struct sigpostcomp *phase2 = NULL;
+	struct sigcompctx context;
 	assert(SIGCON_STAT_ISCONNECTED(atomic_read_relaxed(&receiver->sc_stat)));
 	assert(SIGCON_STAT_ISCOMP(atomic_read_relaxed(&receiver->sc_stat)));
 
 	/* Signal completion callback. */
 	context.scc_sender = sender;
 	context.scc_caller = caller;
-	invoke_sig_completion(&phase2, receiver, &context);
+	sigcomp_invoke(&phase2, receiver, &context);
 
-	if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+	if (!(context.scc_mode & SIGCOMP_MODE_F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
 		/* Release out ownership of "receiver" (if it wasn't reprimed) */
 		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
 	} else {
@@ -326,7 +326,7 @@ sig_completion_invoke_and_unlock_and_preemption_pop(struct sig *self,
 	}
 
 	/* Deal with the case where the completion function didn't accept the signal. */
-	if (context.scc_status & SIG_COMPLETION__F_NONVIABLE) {
+	if (context.scc_mode & SIGCOMP_MODE_F_NONVIABLE) {
 		bool result;
 		flags |= SIG_XSEND_F_LOCKED;
 		flags &= ~SIG_XSEND_F_NOPR;
@@ -360,7 +360,7 @@ sig_completion_invoke_and_unlock_and_preemption_pop(struct sig *self,
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5, 6, 8)) size_t KCALL
 sig_completion_invoke_and_continue_broadcast(struct sig *self,
                                              struct sig *sender,
-                                             struct sigcon_comp *receiver,
+                                             struct sigcompcon *receiver,
                                              struct sigcon *remainder_head,
                                              struct sigcon *remainder_tail,
                                              struct sigcon *sigctl,
@@ -372,8 +372,8 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
                                              preemption_flag_t was,
                                              unsigned int flags) {
 	size_t result = 0;
-	struct sig_post_completion *phase2 = NULL;
-	struct sig_completion_context context;
+	struct sigpostcomp *phase2 = NULL;
+	struct sigcompctx context;
 	uintptr_t stat = atomic_read_relaxed(&receiver->sc_stat);
 	assert(SIGCON_STAT_ISCONNECTED(stat));
 	assert(SIGCON_STAT_ISCOMP(stat));
@@ -383,9 +383,9 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 	/* Signal completion callback. */
 	context.scc_sender = sender;
 	context.scc_caller = caller;
-	invoke_sig_completion(&phase2, receiver, &context);
+	sigcomp_invoke(&phase2, receiver, &context);
 
-	if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+	if (!(context.scc_mode & SIGCOMP_MODE_F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
 		/* Release out ownership of "receiver" (if it wasn't reprimed) */
 		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
 	} else {
@@ -399,7 +399,7 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 	}
 
 	/* Deal with the case where the completion function didn't accept the signal. */
-	if (!(context.scc_status & SIG_COMPLETION__F_NONVIABLE) &&
+	if (!(context.scc_mode & SIGCOMP_MODE_F_NONVIABLE) &&
 	    !(stat & SIGCON_STAT_F_POLL))
 		++result;
 
@@ -485,10 +485,10 @@ DECL_END
 #include "sig-send.c.inl"
 #else /* !__OPTIMIZE_SIZE__ */
 DECL_BEGIN
-PUBLIC NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL sig_send)(struct sig *__restrict self) {
+PUBLIC NOBLOCK NONNULL((1)) bool NOTHROW(FCALL sig_send)(struct sig *__restrict self) {
 	return sig_xsend(self, SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL);
 }
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self) {
 	return sig_xsend(self, SIG_XSEND_F_NOPR, NULL, THIS_TASK, NULL, NULL, NULL);
 }
 PUBLIC NOBLOCK NONNULL((1)) size_t NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self, size_t maxcount) {
@@ -566,9 +566,9 @@ static_assert(offsetof(struct sigcon, sc_cons) == OFFSET_SIGCON_CONS);
 static_assert(offsetof(struct sigcon, sc_stat) == OFFSET_SIGCON_STAT);
 static_assert(sizeof(struct sigcon) == SIZEOF_SIGCON);
 static_assert(alignof(struct sigcon) == ALIGNOF_SIGCON);
-static_assert(offsetof(struct sigcon_task, sct_thrnext) == OFFSET_SIGCON_TASK_THRNEXT);
-static_assert(sizeof(struct sigcon_task) == SIZEOF_SIGCON_TASK);
-static_assert(alignof(struct sigcon_task) == ALIGNOF_SIGCON_TASK);
+static_assert(offsetof(struct sigtaskcon, sct_thrnext) == OFFSET_SIGCON_TASK_THRNEXT);
+static_assert(sizeof(struct sigtaskcon) == SIZEOF_SIGCON_TASK);
+static_assert(alignof(struct sigtaskcon) == ALIGNOF_SIGCON_TASK);
 static_assert(offsetof(struct taskcons, tcs_deliver) == OFFSET_TASKCONS_DELIVER);
 static_assert(offsetof(struct taskcons, tcs_thread) == OFFSET_TASKCONS_THREAD);
 static_assert(offsetof(struct taskcons, tcs_prev) == OFFSET_TASKCONS_PREV);
@@ -730,10 +730,10 @@ NOTHROW(FCALL task_popcons)(void) {
 
 
 /* Allocate a new task connection. */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sigcon_task *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sigtaskcon *FCALL
 taskcons_alloccon(struct taskcons *__restrict self) THROWS(E_BADALLOC) {
 	unsigned int i;
-	struct sigcon_task *result;
+	struct sigtaskcon *result;
 
 	/* Check if one of the static slots is available. */
 	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i) {
@@ -743,7 +743,7 @@ taskcons_alloccon(struct taskcons *__restrict self) THROWS(E_BADALLOC) {
 	}
 
 	/* Must dynamically allocate a new slot. */
-	result = (struct sigcon_task *)kmalloc(sizeof(struct sigcon_task),
+	result = (struct sigtaskcon *)kmalloc(sizeof(struct sigtaskcon),
 	                                       GFP_LOCKED | GFP_PREFLT);
 done:
 	return result;
@@ -752,7 +752,7 @@ done:
 /* Free a given task connection. */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL taskcons_freecon)(struct taskcons *__restrict self,
-                                struct sigcon_task *__restrict con) {
+                                struct sigtaskcon *__restrict con) {
 	if (con >= self->tcs_static &&
 	    con < COMPILER_ENDOF(self->tcs_static)) {
 		/* Free a static connection. */
@@ -771,7 +771,7 @@ LOCAL NONNULL((1)) void FCALL
 task_connect_impl(struct sig *__restrict target, uintptr_t flags)
 		THROWS(E_BADALLOC) {
 	struct taskcons *cons = THIS_CONS;
-	struct sigcon_task *con;
+	struct sigtaskcon *con;
 	assert(IS_ALIGNED((uintptr_t)cons, SIGCON_CONS_MINALIGN));
 
 	/* When a signal was already delivered, `task_connect()'
@@ -885,9 +885,9 @@ task_connect_for_poll(struct sig *__restrict target)
  * - When connected to the same signal multiple times, this
  *   will return one at random.
  * - When `target' is an invalid pointer, return "NULL" */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED struct sigcon_task **
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct sigtaskcon **
 NOTHROW(FCALL task_findcon_p)(struct sig const *target) {
-	struct sigcon_task **con_p;
+	struct sigtaskcon **con_p;
 	struct taskcons *cons = THIS_CONS;
 	SLIST_P_FOREACH (con_p, &cons->tcs_cons, sct_thrnext) {
 		if ((*con_p)->sc_sig == target)
@@ -914,7 +914,7 @@ NOTHROW(FCALL task_findcon_p)(struct sig const *target) {
  *                 first connection made. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
-	struct sigcon_task **con_p, *con;
+	struct sigtaskcon **con_p, *con;
 	con_p = task_findcon_p(target);
 	if (!con_p)
 		return false;
@@ -930,7 +930,7 @@ NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL taskcons_disconnectall)(struct taskcons *__restrict cons,
                                       unsigned int flags) {
-	struct sigcon_task *con;
+	struct sigtaskcon *con;
 	SLIST_FOREACH_SAFE (con, &cons->tcs_cons, sct_thrnext) {
 		_sigcon_disconnect(con, flags);
 		taskcons_freecon(THIS_CONS, con);
@@ -1021,6 +1021,517 @@ NOTHROW(FCALL task_trywait)(void) {
 
 
 
+/************************************************************************/
+/* SIGNAL MULTI-COMPLETION API                                          */
+/************************************************************************/
+
+#define _sigmulticomp_xtra_GFP (GFP_LOCKED | GFP_PREFLT)
+#define _sigmulticomp_xtra_sizeof(n)                  \
+	(offsetof(struct _sigmulticomp_xtra, smcx_cons) + \
+	 ((n) * sizeof(struct _sigmulticompcon)))
+#define _sigmulticomp_xtra_alloc(n) \
+	(struct _sigmulticomp_xtra *)kmalloc(_sigmulticomp_xtra_sizeof(n), _sigmulticomp_xtra_GFP)
+#define _sigmulticomp_xtra_alloc_nx(n) \
+	(struct _sigmulticomp_xtra *)kmalloc_nx(_sigmulticomp_xtra_sizeof(n), _sigmulticomp_xtra_GFP)
+#define _sigmulticomp_xtra_free(self) kfree(self)
+#define _sigmulticomp_xtra_setusable(self)                                         \
+	(void)((self)->smcx_alloc = (kmalloc_usable_size(self) -                       \
+	                             offsetof(struct _sigmulticomp_xtra, smcx_cons)) / \
+	                            sizeof(struct _sigmulticompcon))
+
+
+
+/* Finalize a given signal multi-completion controller.
+ * WARNING: This  function will _not_  disconnect any remaining signals.
+ *          If active connections could possibly remain, it is up to the
+ *          caller to call `sigmulticomp_disconnectall()' first! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sigmulticomp_fini)(struct sigmulticomp *__restrict self) {
+	/* Free all extended connection sets. */
+	struct _sigmulticomp_xtra *xtra = self->smc_xtra;
+	DBG_memset(&self->smc_xtra, 0xcc, sizeof(self->smc_xtra));
+	while (xtra) {
+		struct _sigmulticomp_xtra *next;
+		next = xtra->smcx_next;
+		_sigmulticomp_xtra_free(xtra);
+		xtra = next;
+	}
+}
+
+PRIVATE NOBLOCK ATTR_INOUTS(1, 2) void
+NOTHROW(FCALL _sigmulticompcon_v_disconnectall)(struct _sigmulticompcon *v, size_t c) {
+	size_t i;
+	for (i = 0; i < c; ++i)
+		sigcompcon_disconnect(&v[i]);
+}
+
+PRIVATE NOBLOCK NOPREEMPT ATTR_INOUTS(1, 2) void
+NOTHROW(FCALL _sigmulticompcon_v_disconnectall_nopr)(struct _sigmulticompcon *v, size_t c) {
+	size_t i;
+	for (i = 0; i < c; ++i)
+		sigcompcon_disconnect_nopr(&v[i]);
+}
+
+PRIVATE ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct _sigmulticomp_xtra *
+NOTHROW(FCALL _sigmulticomp_xtra_maybe_shrink_after_disconnect)(struct _sigmulticomp_xtra *__restrict self) {
+	/* If more than half the connection slots are unused, shrink-to-fit */
+	if (self->smcx_used < (self->smcx_alloc >> 1)) {
+		struct _sigmulticomp_xtra *newbuf;
+		size_t req = _sigmulticomp_xtra_sizeof(self->smcx_used);
+		newbuf = (struct _sigmulticomp_xtra *)krealloc_nx(self, req, GFP_ATOMIC | _sigmulticomp_xtra_GFP);
+		if (newbuf) {
+			self = newbuf;
+			_sigmulticomp_xtra_setusable(self);
+		}
+	}
+	return self;
+}
+
+#define X_sigmulticomp_xtra_disconnectall(self) \
+	(unlikely(*(self)) ? (void)(*(self) = _sigmulticomp_xtra_disconnectall(*(self))) : (void)0)
+PRIVATE ATTR_RETNONNULL ATTR_NOINLINE NOBLOCK NONNULL((1)) struct _sigmulticomp_xtra *
+NOTHROW(FCALL _sigmulticomp_xtra_disconnectall)(struct _sigmulticomp_xtra *__restrict self) {
+	_sigmulticompcon_v_disconnectall(self->smcx_cons, self->smcx_used);
+	if (self->smcx_next) {
+		struct _sigmulticomp_xtra *next;
+		next = self->smcx_next;
+		self->smcx_next = NULL; /* Only keep the first (presumably largest) extension table. */
+		if unlikely(next) {
+			self = next;
+			do {
+				next = self->smcx_next;
+				_sigmulticompcon_v_disconnectall(self->smcx_cons, self->smcx_used);
+				_sigmulticomp_xtra_free(self);
+			} while ((self = next) != NULL);
+		} else {
+			self = _sigmulticomp_xtra_maybe_shrink_after_disconnect(self);
+		}
+	}
+	self->smcx_used = 0;
+	return self;
+}
+
+#define X_sigmulticomp_xtra_disconnectall_nopr(self) \
+	(unlikely(*(self)) ? (void)(*(self) = _sigmulticomp_xtra_disconnectall_nopr(*(self))) : (void)0)
+PRIVATE ATTR_RETNONNULL ATTR_NOINLINE NOBLOCK NOPREEMPT NONNULL((1)) struct _sigmulticomp_xtra *
+NOTHROW(FCALL _sigmulticomp_xtra_disconnectall_nopr)(struct _sigmulticomp_xtra *__restrict self) {
+	_sigmulticompcon_v_disconnectall_nopr(self->smcx_cons, self->smcx_used);
+	if (self->smcx_next) {
+		struct _sigmulticomp_xtra *next;
+		next = self->smcx_next;
+		self->smcx_next = NULL; /* Only keep the first (presumably largest) extension table. */
+		if unlikely(next) {
+			self = next;
+			do {
+				next = self->smcx_next;
+				_sigmulticompcon_v_disconnectall_nopr(self->smcx_cons, self->smcx_used);
+				_sigmulticomp_xtra_free(self);
+			} while ((self = next) != NULL);
+		} else {
+			self = _sigmulticomp_xtra_maybe_shrink_after_disconnect(self);
+		}
+	}
+	self->smcx_used = 0;
+	return self;
+}
+
+/* Serve all (still-alive) connections that are active for `self'. Note that this  function
+ * may not be called from inside of signal-completion-callbacks, or any other callback that
+ * may  be executed in the context of holding an SMP-lock. (though you area allowed to call
+ * this function from a `sigcomp_postcb_t' callback) */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _sigmulticomp_disconnectallN)(struct sigmulticomp *__restrict self,
+                                            size_t n_static) {
+	size_t i;
+	for (i = 0; i < n_static; ++i) {
+		struct _sigmulticompcon *con = &self->smc_cons[i];
+		if (__sigmulticompcon_smc_cons_inuse(con)) {
+			sigcompcon_disconnect(con);
+			__sigmulticompcon_smc_cons_setunused(con);
+		} else {
+			/* Allocation  happens  0->N, so  the  first unused
+			 * slot means everything thereafter is also unused! */
+			break;
+		}
+	}
+	X_sigmulticomp_xtra_disconnectall(&self->smc_xtra);
+}
+
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL _sigmulticomp_disconnectall_noprN)(struct sigmulticomp *__restrict self,
+                                                 size_t n_static) {
+	size_t i;
+	for (i = 0; i < n_static; ++i) {
+		struct _sigmulticompcon *con = &self->smc_cons[i];
+		if (__sigmulticompcon_smc_cons_inuse(con)) {
+			sigcompcon_disconnect_nopr(con);
+			__sigmulticompcon_smc_cons_setunused(con);
+		} else {
+			/* Allocation  happens  0->N, so  the  first unused
+			 * slot means everything thereafter is also unused! */
+			break;
+		}
+	}
+	X_sigmulticomp_xtra_disconnectall_nopr(&self->smc_xtra);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _sigmulticomp_disconnectall1)(struct sigmulticomp *__restrict self) {
+#ifdef __OPTIMIZE_SIZE__
+	_sigmulticomp_disconnectallN(self, 1);
+#else /* __OPTIMIZE_SIZE__ */
+	if (__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0])) {
+		sigcompcon_disconnect(&self->smc_cons[0]);
+		__sigmulticompcon_smc_cons_setunused(&self->smc_cons[0]);
+	}
+	X_sigmulticomp_xtra_disconnectall(&self->smc_xtra);
+#endif /* !__OPTIMIZE_SIZE__ */
+}
+
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL _sigmulticomp_disconnectall_nopr1)(struct sigmulticomp *__restrict self) {
+#ifdef __OPTIMIZE_SIZE__
+	_sigmulticomp_disconnectall_noprN(self, 1);
+#else /* __OPTIMIZE_SIZE__ */
+	if (__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0])) {
+		sigcompcon_disconnect_nopr(&self->smc_cons[0]);
+		__sigmulticompcon_smc_cons_setunused(&self->smc_cons[0]);
+	}
+	X_sigmulticomp_xtra_disconnectall_nopr(&self->smc_xtra);
+#endif /* !__OPTIMIZE_SIZE__ */
+}
+
+
+
+
+#define X_sigmulticomp_xtra_isconnected(self) \
+	(unlikely(self) ? _sigmulticomp_xtra_isconnected(self) : false)
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL _sigmulticomp_xtra_isconnected)(struct _sigmulticomp_xtra *__restrict self) {
+#if 1
+	/* Because disconnecting always frees all  but the first extension  table,
+	 * we  also know that all but the first  must be fully in-use. As such, we
+	 * can assume that in the presence of a second extension table, that table
+	 * *must* contain at least 1 connection! */
+	if (self->smcx_next)
+		return true;
+	return self->smcx_used > 0;
+#else
+	do {
+		if (self->smcx_used > 0)
+			return true;
+	} while ((self = self->smcx_next) != NULL);
+	return false;
+#endif
+}
+
+/* Check if the given signal multi-completion controller `self'
+ * is connected to  any signal  (iow: if there  are any  in-use
+ * connections present). */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL _sigmulticomp_isconnectedM)(struct sigmulticomp const *__restrict self, size_t n_static) {
+	size_t i;
+	for (i = 0; i < n_static; ++i) {
+		if (__sigmulticompcon_smc_cons_inuse(&self->smc_cons[i]))
+			return true;
+	}
+	return X_sigmulticomp_xtra_isconnected(self->smc_xtra);
+}
+
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL _sigmulticomp_isconnected1)(struct sigmulticomp const *__restrict self) {
+#ifdef __OPTIMIZE_SIZE__
+	return _sigmulticomp_isconnectedM(self, 1);
+#else /* __OPTIMIZE_SIZE__ */
+	if (__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0]))
+		return true;
+	return X_sigmulticomp_xtra_isconnected(self->smc_xtra);
+#endif /* !__OPTIMIZE_SIZE__ */
+}
+
+
+
+/*[[[config CONFIG_SIGMULTICOMP_XTRA_STARTSIZE! = 4
+ * Initial # of dynamically allocated connections the first
+ * time a `struct _sigmulticomp_xtra' is allocated.
+ * ]]]*/
+#ifndef CONFIG_SIGMULTICOMP_XTRA_STARTSIZE
+#define CONFIG_SIGMULTICOMP_XTRA_STARTSIZE 4
+#endif /* !CONFIG_SIGMULTICOMP_XTRA_STARTSIZE */
+/*[[[end]]]*/
+
+
+/* Allocate+initialize a new signal completion descriptor that is
+ * attached to the signal multi-completion controller `self', and
+ * will invoke `cb' when triggered. The returned pointer is owned
+ * by `self', meaning that the caller doesn't have to bother with
+ * ownership  themself. The returned connection must be connected
+ * to a signal using `sigcompcon_connect()'.
+ *
+ * If all of that sounds too complicated for you, then just use
+ * `sigmulticomp_connect',  which  encapsulates   the  job   of
+ * allocating+connecting to a signal for you. */
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) struct sigcompcon *FCALL
+sigmulticomp_alloccon_xtra(struct sigmulticomp *__restrict self,
+                           sigcomp_cb_t cb, bool nx)
+		THROWS(E_BADALLOC) {
+	struct _sigmulticompcon *result;
+	struct _sigmulticomp_xtra *xtra = self->smc_xtra;
+	if unlikely(!xtra) {
+		xtra = _sigmulticomp_xtra_alloc_nx(CONFIG_SIGMULTICOMP_XTRA_STARTSIZE);
+		if unlikely(!xtra) {
+			xtra = _sigmulticomp_xtra_alloc_nx(1);
+			if unlikely(!xtra) {
+				if (nx)
+					return NULL;
+				xtra = _sigmulticomp_xtra_alloc(1);
+			}
+		}
+		_sigmulticomp_xtra_setusable(xtra);
+		assert(xtra->smcx_alloc >= 1);
+		xtra->smcx_used = 0;
+		xtra->smcx_next = NULL;
+		self->smc_xtra = xtra;
+	} else if unlikely(xtra->smcx_used >= xtra->smcx_alloc) {
+		/* Allocate another table. */
+		struct _sigmulticomp_xtra *next;
+		size_t next_sz = xtra->smcx_used << 1;
+		assert(next_sz > xtra->smcx_used);
+		next = _sigmulticomp_xtra_alloc_nx(next_sz);
+		if unlikely(!next) {
+			next_sz = xtra->smcx_used + 1;
+			next = _sigmulticomp_xtra_alloc_nx(next_sz);
+			if unlikely(!next) {
+				if (nx)
+					return NULL;
+				next = _sigmulticomp_xtra_alloc(1);
+			}
+		}
+		_sigmulticomp_xtra_setusable(next);
+		assert(next->smcx_alloc >= 1);
+		next->smcx_used = 0;
+		next->smcx_next = xtra;
+		self->smc_xtra = xtra = next;
+	}
+	assert(xtra->smcx_used < xtra->smcx_alloc);
+	result = &xtra->smcx_cons[xtra->smcx_used];
+	++xtra->smcx_used;
+	_sigmulticompcon_init(result, self, cb);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct sigcompcon *FCALL
+_sigmulticomp_allocconN(struct sigmulticomp *__restrict self,
+                        sigcomp_cb_t cb, size_t n_static)
+		THROWS(E_BADALLOC) {
+	size_t i;
+	for (i = 0; i < n_static; ++i) {
+		struct _sigmulticompcon *con = &self->smc_cons[i];
+		if (!__sigmulticompcon_smc_cons_inuse(con)) {
+			_sigmulticompcon_init(con, self, cb);
+			return con;
+		}
+	}
+	return sigmulticomp_alloccon_xtra(self, cb, false);
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) struct sigcompcon *
+NOTHROW(FCALL _sigmulticomp_alloccon_nxN)(struct sigmulticomp *__restrict self,
+                                          sigcomp_cb_t cb, size_t n_static) {
+	size_t i;
+	for (i = 0; i < n_static; ++i) {
+		struct _sigmulticompcon *con = &self->smc_cons[i];
+		if (!__sigmulticompcon_smc_cons_inuse(con)) {
+			_sigmulticompcon_init(con, self, cb);
+			return con;
+		}
+	}
+	return sigmulticomp_alloccon_xtra(self, cb, true);
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct sigcompcon *FCALL
+_sigmulticomp_alloccon1(struct sigmulticomp *__restrict self, sigcomp_cb_t cb)
+		THROWS(E_BADALLOC) {
+#ifdef __OPTIMIZE_SIZE__
+	return _sigmulticomp_allocconN(self, cb, 1);
+#else /* __OPTIMIZE_SIZE__ */
+	if (!__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0])) {
+		_sigmulticompcon_init(&self->smc_cons[0], self, cb);
+		return &self->smc_cons[0];
+	}
+	return sigmulticomp_alloccon_xtra(self, cb, false);
+#endif /* !__OPTIMIZE_SIZE__ */
+}
+
+PUBLIC WUNUSED NONNULL((1, 2)) struct sigcompcon *
+NOTHROW(FCALL _sigmulticomp_alloccon_nx1)(struct sigmulticomp *__restrict self,
+                                          sigcomp_cb_t cb) {
+#ifdef __OPTIMIZE_SIZE__
+	return _sigmulticomp_alloccon_nxN(self, cb, 1);
+#else /* __OPTIMIZE_SIZE__ */
+	if (!__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0])) {
+		_sigmulticompcon_init(&self->smc_cons[0], self, cb);
+		return &self->smc_cons[0];
+	}
+	return sigmulticomp_alloccon_xtra(self, cb, true);
+#endif /* !__OPTIMIZE_SIZE__ */
+}
+
+
+
+/* Combination of `sigmulticomp_alloccon()' + `sigcompcon_connect()' */
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void FCALL
+_sigmulticomp_connect_ex1(struct sigmulticomp *__restrict self,
+                          struct sig *__restrict target, sigcomp_cb_t cb,
+                          uintptr_t flags)
+		THROWS(E_BADALLOC) {
+	struct sigcompcon *con = sigmulticomp_alloccon(self, cb);
+	sigcompcon_connect_ex(con, target, flags);
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL _sigmulticomp_connect_nx_ex1)(struct sigmulticomp *__restrict self,
+                                            struct sig *__restrict target, sigcomp_cb_t cb,
+                                            uintptr_t flags) {
+	struct sigcompcon *con = sigmulticomp_alloccon_nx(self, cb);
+	if unlikely(!con)
+		return false;
+	sigcompcon_connect_ex(con, target, flags);
+	return true;
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void FCALL
+_sigmulticomp_connect_exN(struct sigmulticomp *__restrict self,
+                          struct sig *__restrict target, sigcomp_cb_t cb,
+                          uintptr_t flags, size_t n_static)
+		THROWS(E_BADALLOC) {
+	struct sigcompcon *con = _sigmulticomp_allocconN(self, cb, n_static);
+	sigcompcon_connect_ex(con, target, flags);
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL _sigmulticomp_connect_nx_exN)(struct sigmulticomp *__restrict self,
+                                            struct sig *__restrict target, sigcomp_cb_t cb,
+                                            uintptr_t flags, size_t n_static) {
+	struct sigcompcon *con = _sigmulticomp_alloccon_nxN(self, cb, n_static);
+	if unlikely(!con)
+		return false;
+	sigcompcon_connect_ex(con, target, flags);
+	return true;
+}
+
+
+
+/* Connect `self' to all signals currently connected to by the calling  thread.
+ * In other words: all signals the caller is connected to via `task_connect()'.
+ *
+ * Note that for this purpose,  only signals from the  currently active set of  task
+ * connections will  be connected.  Connections established  outside the  bounds  of
+ * the current `task_pushconnections()...task_popconnections()'  pair will _NOT_  be
+ * connected. If one of  the signals which  the calling thread  is connected to  has
+ * already been  sent (i.e.  `task_waitfor()' wouldn't  block), then  this  function
+ * will return early, and the exact (if  any) signals that were connected to  `self'
+ * are left undefined (meaning that the caller can really only handle this happening
+ * by using `sigmulticomp_disconnectall()', but also meaning that `cb' may still get
+ * invoked  in case the caller was connected to  more than one signal, and more than
+ * one of those gets triggered before connections of `self' get disconnected).
+ *
+ * As such, the safe way to use this function is as follows
+ * (exception  handling   not   displayed   for   brevity):
+ * >> task_connect(&foo);
+ * >> task_connect(&bar);
+ * >> task_connect(&foobar);
+ * >> ...
+ * >> struct sigmulticomp smc;
+ * >> sigmulticomp_init(&smc);
+ * >> sigmulticomp_connect_from_task(&smc, &my_callback);
+ * >> if (task_receiveall()) {  // Or `task_trywait()' if per-task
+ * >>                           // connections should remain
+ * >>     sigmulticomp_disconnectall(&smc);
+ * >>     // Error:   One of the caller's signals may have already
+ * >>     //          been delivered before `smc' could connect to
+ * >>     //          all of them.
+ * >> } else {
+ * >>     // Success: Connections established (calling thread is no longer connected)
+ * >> }
+ *
+ * This function is used to implement epoll objects using the regular,
+ * old poll-api already exposed via `handle_poll()', without the  need
+ * of complicating that existing ABI.
+ *
+ * @param: flags_mask: Set of `SIGCOMPCON_CONNECT_F_*' specifying which (if any)
+ *                     mode flags to inherit from the original task  connections
+ * @param: flags_set:  Set of `SIGCOMPCON_CONNECT_F_*' specifying which (if any)
+ *                     mode flags to  add to the  `sigcompcon'-s being  created.
+ */
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+_sigmulticomp_connect_from_taskN(struct sigmulticomp *__restrict self,
+                                 sigcomp_cb_t cb,
+                                 uintptr_t flags_mask,
+                                 uintptr_t flags_set,
+                                 size_t n_static)
+		THROWS(E_BADALLOC) {
+	struct sigtaskcon *iter;
+	struct taskcons *cons = THIS_CONS;
+	assert(flags_mask == SIGCOMPCON_CONNECT_F_NORMAL ||
+	       flags_mask == SIGCOMPCON_CONNECT_F_POLL);
+	assert(flags_set == SIGCOMPCON_CONNECT_F_NORMAL ||
+	       flags_set == SIGCOMPCON_CONNECT_F_POLL);
+#ifndef __OPTIMIZE_SIZE__
+	if likely(flags_mask == 0) {
+		/* Don't have to read "sc_stat" of every connection and cause bus contention */
+		SLIST_FOREACH (iter, &cons->tcs_cons, sct_thrnext) {
+			if unlikely(atomic_read(&cons->tcs_deliver) != NULL)
+				break;
+			sigmulticomp_connect_ex(self, iter->sc_sig, cb, flags_set);
+		}
+		return;
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
+	SLIST_FOREACH (iter, &cons->tcs_cons, sct_thrnext) {
+		uintptr_t flags;
+#ifndef __OPTIMIZE_SIZE__
+		if unlikely(atomic_read(&cons->tcs_deliver) != NULL)
+			break; /* Connections will be incomplete anyways, so just stop prematurely. */
+#endif /* !__OPTIMIZE_SIZE__ */
+		flags = (atomic_read(&iter->sc_stat) & flags_mask) | flags_set;
+		assert(flags == SIGCOMPCON_CONNECT_F_NORMAL ||
+		       flags == SIGCOMPCON_CONNECT_F_POLL);
+		sigmulticomp_connect_ex(self, iter->sc_sig, cb, flags);
+	}
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+_sigmulticomp_connect_from_task1(struct sigmulticomp *__restrict self,
+                                 sigcomp_cb_t cb,
+                                 uintptr_t flags_mask,
+                                 uintptr_t flags_set)
+		THROWS(E_BADALLOC) {
+#ifndef __OPTIMIZE_SIZE__
+	if likely(!__sigmulticompcon_smc_cons_inuse(&self->smc_cons[0])) {
+		struct taskcons *cons = THIS_CONS;
+		struct sigtaskcon *first = SLIST_FIRST(&cons->tcs_cons);
+		if unlikely(!first)
+			return;
+		if (SLIST_NEXT(first, sct_thrnext) == NULL) {
+			/* Simple case: thread only has 1 connection, and the singular,
+			 * statically allocated slot of "self" isn't in use. -> Just do
+			 * a regular connect! */
+			uintptr_t flags = flags_mask ? ((atomic_read(&first->sc_stat) & flags_mask) | flags_set)
+			                             : flags_set;
+			assert(flags == SIGCOMPCON_CONNECT_F_NORMAL ||
+			       flags == SIGCOMPCON_CONNECT_F_POLL);
+			_sigmulticompcon_init(&self->smc_cons[0], self, cb);
+			sigcompcon_connect_ex(&self->smc_cons[0], first->sc_sig, flags);
+			return;
+		}
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
+	_sigmulticomp_connect_from_taskN(self, cb, flags_mask, flags_set, 1);
+}
+
+
 DECL_END
 #else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #include <kernel/except.h>
@@ -1028,6 +1539,7 @@ DECL_END
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <sched/pertask.h>
+#include <sched/sig-completion.h>
 #include <sched/sig-select.h>
 #include <sched/sig.h>
 #include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */

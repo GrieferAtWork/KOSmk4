@@ -87,7 +87,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #ifdef DEFINE_task_wake_as
 	assertf(!PREEMPTION_ENABLED() || PERTASK_TESTMASK(this_task.t_flags, TASK_FKEEPCORE),
 	        "You must ensure that you're core won't change before calling `task_wake_as()'");
-	assertf(caller && caller->t_cpu == THIS_CPU,
+	assertf(caller->t_cpu == THIS_CPU,
 	        "You may only impersonate other threads from your own CPU");
 #endif /* DEFINE_task_wake_as */
 	/* Now we're responsible to see to it that the thread either gets

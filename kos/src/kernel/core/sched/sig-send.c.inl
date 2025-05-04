@@ -718,8 +718,8 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 #define LOCAL_preemption_wason() preemption_wason(&was)
 #endif /* LOCAL_IS_NOPR */
 #ifdef LOCAL_HAVE_flags
-	struct sig_post_completion *phase2 = NULL;
-	struct sig_completion_context context;
+	struct sigpostcomp *phase2 = NULL;
+	struct sigcompctx context;
 	if (!(flags & SIG_XSEND_F_SENDER))
 		sender = self;
 #endif /* LOCAL_HAVE_flags */
@@ -831,12 +831,12 @@ again:
 		DBG_memset(&receiver->sc_next, 0xcc, sizeof(receiver->sc_next));
 
 		if (SIGCON_STAT_ISCOMP(stat)) {
-			struct sigcon_comp *sc = (struct sigcon_comp *)receiver;
+			struct sigcompcon *sc = (struct sigcompcon *)receiver;
 #ifdef LOCAL_HAVE_flags
 			context.scc_sender = sender;
 			context.scc_caller = caller;
-			invoke_sig_completion(&phase2, sc, &context);
-			if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+			sigcomp_invoke(&phase2, sc, &context);
+			if (!(context.scc_mode & SIGCOMP_MODE_F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
 				/* This releases our ownership of "receiver" */
 				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST);
 			} else {
@@ -851,7 +851,7 @@ again:
 				sigcon_verify_ring_afterinsert(reprime);
 			}
 
-			bcast_ok = (context.scc_status & SIG_COMPLETION__F_NONVIABLE) == 0;
+			bcast_ok = (context.scc_mode & SIGCOMP_MODE_F_NONVIABLE) == 0;
 #else /* LOCAL_HAVE_flags */
 #define LOCAL_sig_completion_invoke_and_continue_broadcast()                            \
 			sig_completion_invoke_and_continue_broadcast(self,                          \
@@ -1102,9 +1102,9 @@ again_find_receiver:
 		/* Signal completion callback. */
 		context.scc_sender = sender;
 		context.scc_caller = caller;
-		invoke_sig_completion(&phase2, (struct sigcon_comp *)receiver, &context);
+		sigcomp_invoke(&phase2, (struct sigcompcon *)receiver, &context);
 
-		if (!(context.scc_status & SIG_COMPLETION__F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
+		if (!(context.scc_mode & SIGCOMP_MODE_F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
 			/* Release out ownership of "receiver" (if it wasn't reprimed) */
 			atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
 		} else {
@@ -1119,7 +1119,7 @@ again_find_receiver:
 		}
 
 		/* Deal with the case where the completion function didn't accept the signal. */
-		if (context.scc_status & SIG_COMPLETION__F_NONVIABLE)
+		if (context.scc_mode & SIGCOMP_MODE_F_NONVIABLE)
 			goto handle_non_viable_receiver;
 #else /* LOCAL_HAVE_flags */
 #ifdef LOCAL_HAVE_destroy_later
@@ -1127,7 +1127,7 @@ again_find_receiver:
 #endif /* LOCAL_HAVE_destroy_later */
 		return sig_completion_invoke_and_unlock_and_preemption_pop(self,
 		                                                           LOCAL_sender,
-		                                                           (struct sigcon_comp *)receiver,
+		                                                           (struct sigcompcon *)receiver,
 		                                                           remainder,
 		                                                           LOCAL_caller,
 		                                                           LOCAL_reprime, /* XXX: This should always be "NULL" */

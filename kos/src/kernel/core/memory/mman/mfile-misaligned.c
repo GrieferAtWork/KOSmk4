@@ -646,7 +646,7 @@ again_check_incore:
 #undef LOCAL_unlock_all
 }
 
-PRIVATE BLOCKING NONNULL((1, 2, 3)) bool FCALL
+PRIVATE BLOCKING NONNULL((1, 2)) bool FCALL
 misaligned_mfile_part_makeanon_or_unlock(struct misaligned_mfile *__restrict msalign,
                                          struct mpart *__restrict self,
                                          struct unlockinfo *unlock)
