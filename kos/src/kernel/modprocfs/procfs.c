@@ -643,23 +643,33 @@ NOTHROW(FCALL procfs_root_delproc_postcompletion)(struct sig_completion_context 
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL procfs_root_addproc_completion)(struct sig_completion *__restrict self,
-                                              struct sig_completion_context *__restrict context,
+                                              struct sig_completion_context *__restrict ctx,
                                               void *buf, size_t bufsize) {
+	(void)self;
 	(void)buf;
 	(void)bufsize;
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	sig_completion_reprime(self, true);
-	context->scc_post = &procfs_root_addproc_postcompletion;
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+	ctx->scc_post = &procfs_root_addproc_postcompletion;
 	return 0;
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL procfs_root_delproc_completion)(struct sig_completion *__restrict self,
-                                              struct sig_completion_context *__restrict context,
+                                              struct sig_completion_context *__restrict ctx,
                                               void *buf, size_t bufsize) {
+	(void)self;
 	(void)buf;
 	(void)bufsize;
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	sig_completion_reprime(self, true);
-	context->scc_post = &procfs_root_delproc_postcompletion;
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+	ctx->scc_post = &procfs_root_delproc_postcompletion;
 	return 0;
 }
 

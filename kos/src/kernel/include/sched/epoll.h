@@ -134,10 +134,17 @@ struct epoll_handle_monitor {
 
 /* Get/set  the mask of raised, pollable data channels. The field accessed
  * by these macros is only valid for monitors from the `ec_pending' chain. */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#define epoll_handle_monitor_getwtest(self) \
+	((uint32_t)(uintptr_t)(self)->ehm_comp.smc_cons[0].sc_next)
+#define epoll_handle_monitor_setwtest(self, value) \
+	(void)((self)->ehm_comp.smc_cons[0].sc_next = (struct sigcon *)(uintptr_t)(uint32_t)(value))
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 #define epoll_handle_monitor_getwtest(self) \
 	((uint32_t)(uintptr_t)(self)->ehm_comp.sm_set.sms_routes[0].tc_signext)
 #define epoll_handle_monitor_setwtest(self, value) \
-	((self)->ehm_comp.sm_set.sms_routes[0].tc_signext = (struct task_connection *)(uintptr_t)(uint32_t)(value))
+	(void)((self)->ehm_comp.sm_set.sms_routes[0].tc_signext = (struct task_connection *)(uintptr_t)(uint32_t)(value))
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 /* Check if a given monitor is an RPC event (as opposed to a pollable event) */
 #ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC

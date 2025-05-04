@@ -19,19 +19,19 @@
  */
 #ifdef __INTELLISENSE__
 #include "sig.c"
-//#define DEFINE___sig_numcon
-#define DEFINE___sig_numcon_nopr
+//#define DEFINE_sig_numcon
+#define DEFINE_sig_numcon_nopr
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE___sig_numcon) + \
-     defined(DEFINE___sig_numcon_nopr)) != 1
+#if (defined(DEFINE_sig_numcon) + \
+     defined(DEFINE_sig_numcon_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
-#ifdef DEFINE___sig_numcon
-#define LOCAL___sig_numcon __sig_numcon
-#elif defined(DEFINE___sig_numcon_nopr)
-#define LOCAL___sig_numcon __sig_numcon_nopr
+#ifdef DEFINE_sig_numcon
+#define LOCAL_sig_numcon sig_numcon
+#elif defined(DEFINE_sig_numcon_nopr)
+#define LOCAL_sig_numcon sig_numcon_nopr
 #define LOCAL_IS_NOPR
 #else /* ... */
 #error "Invalid configuration"
@@ -66,7 +66,7 @@ DECL_BEGIN
 
 
 PUBLIC NOBLOCK LOCAL_NOPREEMPT WUNUSED NONNULL((1)) size_t
-NOTHROW(FCALL LOCAL___sig_numcon)(struct sig *__restrict self) {
+NOTHROW(FCALL LOCAL_sig_numcon)(struct sig *__restrict self) {
 	size_t result = 0;
 	struct sigcon *sigctl;
 	struct sigcon *iter;
@@ -131,8 +131,8 @@ again:
 
 DECL_END
 
-#undef LOCAL___sig_numcon
+#undef LOCAL_sig_numcon
 #undef LOCAL_IS_NOPR
 
-#undef DEFINE___sig_numcon_nopr
-#undef DEFINE___sig_numcon
+#undef DEFINE_sig_numcon_nopr
+#undef DEFINE_sig_numcon

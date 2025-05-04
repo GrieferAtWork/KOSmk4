@@ -41,6 +41,7 @@
 #if defined(CONFIG_EXPERIMENTAL_KERNEL_SIG_V2) || defined(__DEEMON__)
 #include <kernel/malloc.h>
 #include <kernel/paging.h>
+#include <kernel/panic.h>
 #include <sched/pertask.h>
 #include <sched/sigcomp.h>
 #include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
@@ -378,7 +379,9 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 	assert(SIGCON_STAT_ISCONNECTED(stat));
 	assert(SIGCON_STAT_ISCOMP(stat));
 	assert(maxcount > 0);
-	assert(remainder_head == receiver->sc_next);
+	assert(remainder_head == receiver->sc_next || /* Remainder must start after "receiver" */
+	       remainder_head == sigctl ||            /* ... except when "receiver" was the last connection */
+	       kernel_poisoned());
 
 	/* Signal completion callback. */
 	context.scc_sender = sender;
@@ -549,9 +552,9 @@ DECL_END
 #include "sig-remcon.c.inl"
 #define DEFINE___sig_remcon_nopr
 #include "sig-remcon.c.inl"
-#define DEFINE___sig_numcon
+#define DEFINE_sig_numcon
 #include "sig-numcon.c.inl"
-#define DEFINE___sig_numcon_nopr
+#define DEFINE_sig_numcon_nopr
 #include "sig-numcon.c.inl"
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
@@ -686,7 +689,7 @@ NOTHROW(FCALL task_pushcons)(struct taskcons *__restrict cons) {
 	 * Really, though: This should always just be `THIS_TASK' */
 	cons->tcs_thread  = atomic_xch(&oldcons->tcs_thread, NULL);
 	SLIST_INIT(&cons->tcs_cons); /* No connections in use (yet) */
-	cons->tcs_deliver = NULL;   /* Nothing was delivered (yet) */
+	cons->tcs_deliver = NULL;    /* Nothing was delivered (yet) */
 	DBG_memset(cons->tcs_static, 0xcc, sizeof(cons->tcs_static));
 
 	/* Set-up statically allocated connections. */
@@ -918,9 +921,9 @@ NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
 	con_p = task_findcon_p(target);
 	if (!con_p)
 		return false;
-	SLIST_P_REMOVE(con_p, sct_thrnext);
 	con = *con_p;
 	_sigcon_disconnect(con, _SIGCON_DISCONNECT_F_FORWARD);
+	SLIST_P_REMOVE(con_p, sct_thrnext);
 	taskcons_freecon(THIS_CONS, con);
 	return true;
 }
@@ -935,7 +938,7 @@ NOTHROW(FCALL taskcons_disconnectall)(struct taskcons *__restrict cons,
 		_sigcon_disconnect(con, flags);
 		taskcons_freecon(THIS_CONS, con);
 	}
-	SLIST_INIT(&cons->tcs_cons);
+	SLIST_CLEAR(&cons->tcs_cons);
 }
 
 
@@ -1484,7 +1487,7 @@ _sigmulticomp_connect_from_taskN(struct sigmulticomp *__restrict self,
 		SLIST_FOREACH (iter, &cons->tcs_cons, sct_thrnext) {
 			if unlikely(atomic_read(&cons->tcs_deliver) != NULL)
 				break;
-			sigmulticomp_connect_ex(self, iter->sc_sig, cb, flags_set);
+			_sigmulticomp_connect_exN(self, iter->sc_sig, cb, flags_set, n_static);
 		}
 		return;
 	}
@@ -1498,7 +1501,7 @@ _sigmulticomp_connect_from_taskN(struct sigmulticomp *__restrict self,
 		flags = (atomic_read(&iter->sc_stat) & flags_mask) | flags_set;
 		assert(flags == SIGCOMPCON_CONNECT_F_NORMAL ||
 		       flags == SIGCOMPCON_CONNECT_F_POLL);
-		sigmulticomp_connect_ex(self, iter->sc_sig, cb, flags);
+		_sigmulticomp_connect_exN(self, iter->sc_sig, cb, flags, n_static);
 	}
 }
 

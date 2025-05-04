@@ -41,7 +41,7 @@
 
 /* Use a new `struct sig` implementation as per ./sig.md */
 #undef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
-#if 0
+#if 1
 #define CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
 #endif
 
@@ -879,20 +879,30 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
 
 
 /* BEGIN: Deprecated aliases */
-#define task_connection       sigcon
-#define task_connections      taskcons
-#define tcs_dlvr              tcs_deliver
-#define tc_sig                sc_sig
-#define THIS_ROOT_CONNECTIONS THIS_ROOTCONS
-#define this_root_connections this_rootcons
-#define this_connections      this_cons
-#define THIS_CONNECTIONS      THIS_CONS
-#define task_pushconnections  task_pushcons
-#define task_popconnections   task_popcons
-#define task_wasconnected     task_isconnected
-#define task_wasconnected_to  task_isconnectedto
-#define sig_iswaiting         sig_hascon
-#define sig_numwaiting        sig_numcon
+#define task_connection                         sigtaskcon
+#define task_connections                        taskcons
+#define tcs_dlvr                                tcs_deliver
+#define tcs_con                                 tcs_cons.slh_first
+#define tc_sig                                  sc_sig
+#define tc_connext                              sct_thrnext.sle_next
+#define THIS_ROOT_CONNECTIONS                   THIS_ROOTCONS
+#define this_root_connections                   this_rootcons
+#define this_connections                        this_cons
+#define THIS_CONNECTIONS                        THIS_CONS
+#define task_pushconnections                    task_pushcons
+#define task_popconnections                     task_popcons
+#define task_wasconnected                       task_isconnected
+#define task_wasconnected_to                    task_isconnectedto
+#define sig_iswaiting                           sig_hascon
+#define sig_numwaiting                          sig_numcon
+#define sig_broadcast_as_nopr                   sig_broadcastas_nopr
+#define sig_broadcast_unlikely_nopr             sig_broadcast_nopr_unlikely
+#define sig_altbroadcast_unlikely_nopr          sig_altbroadcast_nopr_unlikely
+#define sig_broadcast_for_fini_unlikely_nopr    sig_broadcast_for_fini_nopr_unlikely
+#define sig_altbroadcast_for_fini_unlikely_nopr sig_altbroadcast_for_fini_nopr_unlikely
+#define sig_broadcast_as_for_fini_nopr          sig_broadcastas_for_fini_nopr
+#define sig_broadcast_as_cleanup_nopr           sig_broadcastas_cleanup_nopr
+#define sig_broadcast_as_for_fini_cleanup_nopr  sig_broadcastas_for_fini_cleanup_nopr
 /* END: Deprecated aliases */
 
 #else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */

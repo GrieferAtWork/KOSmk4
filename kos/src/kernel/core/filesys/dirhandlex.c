@@ -94,7 +94,7 @@ NOTHROW(FCALL dirhandlex_SIGIO_notify_p)(struct sig_completion_context *__restri
 /* Called in order to trigger SIGIO */
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL dirhandlex_SIGIO_notify)(struct sig_completion *__restrict self,
-                                       struct sig_completion_context *__restrict context,
+                                       struct sig_completion_context *__restrict ctx,
                                        void *buf, size_t bufsize) {
 	struct dirhandlex_hdr *hdr;
 	struct dirhandlex *dir;
@@ -108,17 +108,25 @@ NOTHROW(FCALL dirhandlex_SIGIO_notify)(struct sig_completion *__restrict self,
 	dir = dirhandlex_fromhdr(hdr);
 
 	/* Need to get a reference to the associated dirhandle! */
-	if (!tryincref(dir))
+	if (!tryincref(dir)) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
+#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0; /* Can't send SIGIO like that! */
+	}
 
 	/* Re-prime our function so we get re-invoked on the next event! */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	sig_completion_reprime(self, true);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 	/* Setup a post-completion callback (our current context doesn't
 	 * allow us to actually send signals, so we have to do the  rest
 	 * of the work from a post-completion callback) */
 	shared->dsnd_dir  = dir; /* Inherit reference. */
-	context->scc_post = &dirhandlex_SIGIO_notify_p;
+	ctx->scc_post = &dirhandlex_SIGIO_notify_p;
 	return sizeof(struct dirhandlex_SIGIO_notify_data);
 }
 

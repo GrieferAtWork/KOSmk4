@@ -470,14 +470,18 @@ NOTHROW(FCALL mfile_zerotrunc_completion2_cb)(struct sig_completion_context *__r
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict self,
-                                             struct sig_completion_context *__restrict context,
+                                             struct sig_completion_context *__restrict ctx,
                                              void *buf, size_t bufsize) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_compl);
 
 	/* Check if the trunc-lock has been released... */
 	if (atomic_read(&me->mf_trunclock) != 0) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME | SIGCOMP_MODE_F_NONVIABLE;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		sig_completion_reprime(self, true);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0;
 	}
 
@@ -487,7 +491,7 @@ NOTHROW(FCALL mfile_zerotrunc_completion_cb)(struct sig_completion *__restrict s
 	if (bufsize < sizeof(REF struct mfile *))
 		return sizeof(REF struct mfile *);
 	*(REF struct mfile **)buf = me; /* Inherited by `mfile_zerotrunc_completion2_cb()' */
-	context->scc_post = &mfile_zerotrunc_completion2_cb;
+	ctx->scc_post = &mfile_zerotrunc_completion2_cb;
 	return sizeof(REF struct mfile *);
 }
 

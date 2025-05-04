@@ -19,7 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C 1
-#define __WANT_SIG_COMPLETION_INIT
+#define __WANT_SIG_COMPLETION_INIT /* TODO: Remove after "CONFIG_EXPERIMENTAL_KERNEL_SIG_V2" */
+#define __WANT_SIGCOMPCON_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -177,9 +178,15 @@ PRIVATE struct async_ops const mpart_ajob_ops = {
 
 
 INTDEF struct mpart_ajob mpart_ajob_fallback_worker;
+
 /* Signal broadcast when something gets added to `mpart_ajob_fallback_list' */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+PRIVATE struct sig mpart_ajob_fallback_sig =
+SIG_INIT_EX(&mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con);
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 PRIVATE struct sig mpart_ajob_fallback_sig =
 SIG_INIT_EX(&mpart_ajob_fallback_worker.mpaj_async.a_comp.sm_set.sms_routes[0].mr_com.sc_con);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 /* [0..n][lock(ATOMIC)] Fallback list of mem-parts with pending async jobs. */
@@ -322,6 +329,18 @@ INTERN struct mpart_ajob mpart_ajob_fallback_worker = {
 		.a_stat   = _ASYNC_ST_READY,
 		.a_ops    = &mpart_ajob_fallback_ops,
 		.a_comp   = {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+			.smc_xtra = NULL,
+			.smc_cons = {
+				[0] = {
+					.mr_com = SIGCOMPCON_INIT_EX(&mpart_ajob_fallback_sig,
+					                             &mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con,
+					                             &mpart_ajob_fallback_worker.mpaj_async.a_comp.smc_cons[0].mr_com.scc_con,
+					                             0, &async_completion),
+					.mr_multcon = &mpart_ajob_fallback_worker.mpaj_async.a_comp,
+				}
+			},
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 			.sm_set = {
 				.sms_next   = NULL,
 				.sms_routes = {
@@ -364,6 +383,7 @@ INTERN struct mpart_ajob mpart_ajob_fallback_worker = {
 #endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 2 */
 				},
 			},
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		},
 		.a_all = {
 			.le_next = NULL,

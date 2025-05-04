@@ -2404,22 +2404,31 @@ NOTHROW(FCALL procfs_perproc_fd_hand_postcompletion)(struct sig_completion_conte
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL procfs_perproc_fd_hand_completion)(struct sig_completion *__restrict self,
-                                                 struct sig_completion_context *__restrict context,
+                                                 struct sig_completion_context *__restrict ctx,
                                                  struct procfs_perproc_fd_notify_controller *__restrict controller,
                                                  void *buf, size_t bufsize, uint16_t mask) {
 	struct procfs_perproc_fd_event *e = (struct procfs_perproc_fd_event *)buf;
 	if (bufsize < sizeof(struct procfs_perproc_fd_event))
 		return sizeof(struct procfs_perproc_fd_event);
+	(void)self;
 
 	/* Load the mfile of the `/proc/[pid]/fd' directory. */
 	e->pfppfde_file = awref_get(&controller->pfppfdnc_procfd_folder);
-	if unlikely(e->pfppfde_file == NULL)
+	if unlikely(e->pfppfde_file == NULL) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
+#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0; /* Special case: /fd directory was unloaded (stop monitoring) */
+	}
 	e->pfppfde_mask = mask;
-	context->scc_post = &procfs_perproc_fd_hand_postcompletion;
+	ctx->scc_post = &procfs_perproc_fd_hand_postcompletion;
 
 	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	sig_completion_reprime(self, true);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	return sizeof(struct procfs_perproc_fd_event);
 }
 
@@ -3638,27 +3647,40 @@ NOTHROW(FCALL procfs_perproc_task_hand_postcompletion)(struct sig_completion_con
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL procfs_perproc_task_hand_completion)(struct sig_completion *__restrict self,
-                                                   struct sig_completion_context *__restrict context,
+                                                   struct sig_completion_context *__restrict ctx,
                                                    struct procfs_perproc_task_notify_controller *__restrict controller,
                                                    void *buf, size_t bufsize, uint16_t mask) {
-	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(context->scc_sender);
+	struct taskpid *tpid = PIDNS_PROCSIG_DECODE(ctx->scc_sender);
 	struct procfs_perproc_task_event *e = (struct procfs_perproc_task_event *)buf;
 	if (taskpid_getprocpid(tpid) != controller->pfpptnc_proc) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME | SIGCOMP_MODE_F_NONVIABLE;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		sig_completion_reprime(self, true);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0; /* Thread belongs to some other process (but not ours) */
 	}
 	if (bufsize < sizeof(struct procfs_perproc_task_event))
 		return sizeof(struct procfs_perproc_task_event);
+	(void)self;
 
 	/* Load the mfile of the `/proc/[pid]/task' directory. */
 	e->pfppfde_file = awref_get(&controller->pfpptnc_task_folder);
-	if unlikely(e->pfppfde_file == NULL)
+	if unlikely(e->pfppfde_file == NULL) {
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		ctx->scc_mode |= SIGCOMP_MODE_F_NONVIABLE;
+#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		return 0; /* Special case: /task directory was unloaded (stop monitoring) */
+	}
 	e->pfppfde_mask = mask;
-	context->scc_post = &procfs_perproc_task_hand_postcompletion;
+	ctx->scc_post = &procfs_perproc_task_hand_postcompletion;
 
 	/* Re-prime the signal completion handler so we keep monitoring *all* events. */
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+	ctx->scc_mode |= SIGCOMP_MODE_F_REPRIME;
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	sig_completion_reprime(self, true);
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 	return sizeof(struct procfs_perproc_task_event);
 }
 
