@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /*!included_by <unistd.h>*/
+/*!included_by <errno.h>*/
 }
 
 %[define_replacement(errno_t = __errno_t)]

@@ -19,19 +19,19 @@
  */
 #ifdef __INTELLISENSE__
 #include "sig.c"
-//#define DEFINE___sig_addcon
-#define DEFINE___sig_addcon_nopr
+//#define DEFINE___sig_numcon
+#define DEFINE___sig_numcon_nopr
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE___sig_addcon) + \
-     defined(DEFINE___sig_addcon_nopr)) != 1
+#if (defined(DEFINE___sig_numcon) + \
+     defined(DEFINE___sig_numcon_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
-#ifdef DEFINE___sig_addcon
-#define LOCAL___sig_addcon __sig_addcon
-#elif defined(DEFINE___sig_addcon_nopr)
-#define LOCAL___sig_addcon __sig_addcon_nopr
+#ifdef DEFINE___sig_numcon
+#define LOCAL___sig_numcon __sig_numcon
+#elif defined(DEFINE___sig_numcon_nopr)
+#define LOCAL___sig_numcon __sig_numcon_nopr
 #define LOCAL_IS_NOPR
 #else /* ... */
 #error "Invalid configuration"
@@ -65,10 +65,11 @@ DECL_BEGIN
 #endif /* !LOCAL_IS_NOPR */
 
 
-PUBLIC NOBLOCK LOCAL_NOPREEMPT NONNULL((1)) void
-NOTHROW(FCALL LOCAL___sig_addcon)(struct sigcon *__restrict self) {
+PUBLIC NOBLOCK LOCAL_NOPREEMPT WUNUSED NONNULL((1)) size_t
+NOTHROW(FCALL LOCAL___sig_numcon)(struct sig *__restrict self) {
+	size_t result = 0;
 	struct sigcon *sigctl;
-	struct sig *to = self->sc_sig;
+	struct sigcon *iter;
 #ifndef LOCAL_IS_NOPR
 	preemption_flag_t was;
 #else /* !LOCAL_IS_NOPR */
@@ -78,19 +79,13 @@ NOTHROW(FCALL LOCAL___sig_addcon)(struct sigcon *__restrict self) {
 again:
 #endif /* SIG_SMPLOCK */
 
-	sigctl = atomic_read(&to->s_con);
+	sigctl = atomic_read(&self->s_con);
 #ifdef SIG_SMPLOCK
 	assertf((uintptr_t)sigctl != (0 | SIG_SMPLOCK),
 	        "SIG_SMPLOCK must not appear without connections");
 #endif /* SIG_SMPLOCK */
-	if ((uintptr_t)sigctl == 0) {
-		/* Special case: first connection (can be set-up completely atomically) */
-		sigcon_link_self(self);
-		sigcon_verify_ring_afterinsert(self);
-		if (!atomic_cmpxch_weak(&to->s_con, NULL, self))
-			goto again;
-		return;
-	}
+	if ((uintptr_t)sigctl == 0)
+		return 0; /* Special case: no connections */
 
 #ifdef SIG_SMPLOCK
 	if ((uintptr_t)sigctl & SIG_SMPLOCK) {
@@ -105,7 +100,7 @@ again:
 
 	/* Acquire SMP-lock */
 #ifdef SIG_SMPLOCK
-	if unlikely(!atomic_cmpxch_weak(&to->s_con, sigctl,
+	if unlikely(!atomic_cmpxch_weak(&self->s_con, sigctl,
 	                                (struct sigcon *)((uintptr_t)sigctl | SIG_SMPLOCK))) {
 #ifndef LOCAL_IS_NOPR
 		preemption_pop(&was);
@@ -115,14 +110,20 @@ again:
 #endif /* SIG_SMPLOCK */
 
 	/* Insert "self" before "sigctl" in the ring (thus placing it at the end of the queue) */
-	sigcon_verify_ring_beforeinsert(sigctl);
-	sigcon_link_insert_before(self, sigctl);
-	sigcon_verify_ring_afterinsert(sigctl);
-	atomic_write(&to->s_con, sigctl); /* Release SMP-lock */
+	sigcon_verify_ring_beforecount(sigctl);
+	iter = sigctl;
+	do {
+		++result;
+	} while ((iter = iter->sc_next) != sigctl);
+
+#ifdef SIG_SMPLOCK
+	atomic_write(&self->s_con, sigctl); /* Release SMP-lock */
+#endif /* SIG_SMPLOCK */
 
 #ifndef LOCAL_IS_NOPR
 	preemption_pop(&was);
 #endif /* !LOCAL_IS_NOPR */
+	return result;
 }
 
 #undef LOCAL_task_yield
@@ -130,8 +131,8 @@ again:
 
 DECL_END
 
-#undef LOCAL___sig_addcon
+#undef LOCAL___sig_numcon
 #undef LOCAL_IS_NOPR
 
-#undef DEFINE___sig_addcon_nopr
-#undef DEFINE___sig_addcon
+#undef DEFINE___sig_numcon_nopr
+#undef DEFINE___sig_numcon

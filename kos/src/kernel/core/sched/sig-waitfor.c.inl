@@ -102,9 +102,14 @@ NOTHROW(FCALL task_waitfor_norpc_nx)(ktime_t abs_timeout)
 again:
 	result = atomic_read(&self->tcs_dlvr);
 	if (result) {
+		COMPILER_READ_BARRIER();
 got_result:
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+		taskcons_disconnectall(self, _SIGCON_DISCONNECT_F_NORMAL);
+#else /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 		task_connection_disconnect_all(self, false);
-		COMPILER_BARRIER();
+#endif /* !CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
+		COMPILER_WRITE_BARRIER();
 		assert(result == self->tcs_dlvr);
 		self->tcs_dlvr = NULL;
 	} else {

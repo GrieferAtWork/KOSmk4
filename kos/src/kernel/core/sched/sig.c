@@ -40,15 +40,38 @@
 #endif /* NDEBUG || NDEBUG_FINI */
 
 #if defined(CONFIG_EXPERIMENTAL_KERNEL_SIG_V2) || defined(__DEEMON__)
-#include <sched/task.h>
+#include <kernel/malloc.h>
+#include <kernel/paging.h>
+#include <sched/pertask.h>
 #include <sched/task-clone.h>
+#include <sched/task.h>
 
+#include <hybrid/align.h>
+#include <hybrid/host.h>
 #include <hybrid/sched/preemption.h>
+#include <hybrid/sequence/list.h>
 
-#include <atomic.h>
+#include <kos/nopf.h>
+#include <kos/types.h>
+
 #include <alloca.h>
+#include <atomic.h>
+#include <stdint.h>
+
+#if defined(__i386__) || defined(__x86_64__)
+#include <asm/intrin.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
+#endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN
+
+/* Assert that alignof of `struct taskcons' is working out. */
+static_assert(alignof(struct taskcons) == ALIGNOF_TASKCONS_TASK);
+static_assert(alignof(struct taskcons) >= SIGCON_CONS_MINALIGN);
+static_assert(SIGCON_CONS_MINALIGN > (SIGCON_STAT_F_POLL));
+
 
 /* Extra flags for `task_wake()' from `SIG_XSEND_F_*' */
 #ifndef __DEEMON__
@@ -152,6 +175,7 @@ NOTHROW(FCALL sigcon_verify_ring)(struct sigcon *__restrict head) {
 #define sigcon_verify_ring_afterinsert(head)  sigcon_verify_ring(head)
 #define sigcon_verify_ring_beforeremove(head) sigcon_verify_ring(head)
 #define sigcon_verify_ring_afterremove(head)  sigcon_verify_ring(head)
+#define sigcon_verify_ring_beforecount(head)  sigcon_verify_ring(head)
 
 
 LOCAL NOBLOCK void
@@ -344,6 +368,7 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
                                              struct task *caller,
                                              struct sigcon *reprime,
                                              struct sig_cleanup_callback *cleanup,
+                                             struct task *destroy_later,
                                              preemption_flag_t was,
                                              unsigned int flags) {
 	size_t result = 0;
@@ -411,12 +436,12 @@ restore_reprime_and_unlock:
 	if (result == 0 && phase2 == NULL) {
 		/* So the compiler can generate a tail-call */
 		return sig_xsendmany(self, maxcount, flags, sender,
-		                     caller, cleanup, reprime, NULL);
+		                     caller, cleanup, reprime, destroy_later);
 	}
 #endif /* __OPTIMIZE__ && !__OPTIMIZE_SIZE__ */
 	maxcount -= result;
 	result += sig_xsendmany(self, maxcount, flags, sender,
-	                        caller, cleanup, reprime, NULL);
+	                        caller, cleanup, reprime, destroy_later);
 done:
 	sig_run_phase_2(phase2, &context);
 	return result;
@@ -510,45 +535,6 @@ DECL_BEGIN
 
 
 
-/* Assert offsets */
-static_assert(offsetof(struct sigcon, sc_sig) == OFFSET_SIGCON_SIG);
-static_assert(offsetof(struct sigcon, sc_prev) == OFFSET_SIGCON_PREV);
-static_assert(offsetof(struct sigcon, sc_next) == OFFSET_SIGCON_NEXT);
-static_assert(offsetof(struct sigcon, sc_cons) == OFFSET_SIGCON_CONS);
-static_assert(offsetof(struct sigcon, sc_stat) == OFFSET_SIGCON_STAT);
-static_assert(sizeof(struct sigcon) == SIZEOF_SIGCON);
-static_assert(alignof(struct sigcon) == ALIGNOF_SIGCON);
-static_assert(offsetof(struct sigcon_task, sct_next) == OFFSET_SIGCON_TASK_NEXT);
-static_assert(sizeof(struct sigcon_task) == SIZEOF_SIGCON_TASK);
-static_assert(alignof(struct sigcon_task) == ALIGNOF_SIGCON_TASK);
-static_assert(offsetof(struct taskcons, tcs_deliver) == OFFSET_TASKCONS_DELIVER);
-static_assert(offsetof(struct taskcons, tcs_thread) == OFFSET_TASKCONS_THREAD);
-static_assert(offsetof(struct taskcons, tcs_prev) == OFFSET_TASKCONS_PREV);
-static_assert(offsetof(struct taskcons, tcs_con) == OFFSET_TASKCONS_CON);
-static_assert(offsetof(struct taskcons, tcs_static) == OFFSET_TASKCONS_STATIC);
-static_assert(sizeof(struct taskcons) == SIZEOF_TASKCONS);
-static_assert(alignof(struct taskcons) == ALIGNOF_TASKCONS_TASK);
-
-/* Root connections set. */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons) this_rootcons = {
-	.tcs_deliver = NULL,
-	.tcs_thread  = NULL,
-	.tcs_prev    = NULL,
-	.tcs_con     = NULL,
-	.tcs_static  = {}
-};
-
-/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use  connections.
- * Most of the time, this will simply point to `PERTASK(this_rootcons)' */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons *) this_cons = &this_rootcons;
-
-/* Define relocations */
-DEFINE_PERTASK_RELOCATION(this_rootcons + OFFSET_TASKCONS_THREAD);
-DEFINE_PERTASK_RELOCATION(this_cons);
-
-
-
-
 /* Internal, low-level API for adding/removing a signal connection */
 static_assert(__SIG_REMCON_F_NORMAL == _SIGCON_DISCONNECT_F_NORMAL);
 static_assert(__SIG_REMCON_F_FORWARD == _SIGCON_DISCONNECT_F_FORWARD);
@@ -563,9 +549,474 @@ DECL_END
 #include "sig-remcon.c.inl"
 #define DEFINE___sig_remcon_nopr
 #include "sig-remcon.c.inl"
+#define DEFINE___sig_numcon
+#include "sig-numcon.c.inl"
+#define DEFINE___sig_numcon_nopr
+#include "sig-numcon.c.inl"
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
+
+
+/* Assert offsets */
+static_assert(offsetof(struct sigcon, sc_sig) == OFFSET_SIGCON_SIG);
+static_assert(offsetof(struct sigcon, sc_prev) == OFFSET_SIGCON_PREV);
+static_assert(offsetof(struct sigcon, sc_next) == OFFSET_SIGCON_NEXT);
+static_assert(offsetof(struct sigcon, sc_cons) == OFFSET_SIGCON_CONS);
+static_assert(offsetof(struct sigcon, sc_stat) == OFFSET_SIGCON_STAT);
+static_assert(sizeof(struct sigcon) == SIZEOF_SIGCON);
+static_assert(alignof(struct sigcon) == ALIGNOF_SIGCON);
+static_assert(offsetof(struct sigcon_task, sct_thrnext) == OFFSET_SIGCON_TASK_THRNEXT);
+static_assert(sizeof(struct sigcon_task) == SIZEOF_SIGCON_TASK);
+static_assert(alignof(struct sigcon_task) == ALIGNOF_SIGCON_TASK);
+static_assert(offsetof(struct taskcons, tcs_deliver) == OFFSET_TASKCONS_DELIVER);
+static_assert(offsetof(struct taskcons, tcs_thread) == OFFSET_TASKCONS_THREAD);
+static_assert(offsetof(struct taskcons, tcs_prev) == OFFSET_TASKCONS_PREV);
+static_assert(offsetof(struct taskcons, tcs_cons) == OFFSET_TASKCONS_CONS);
+static_assert(offsetof(struct taskcons, tcs_static) == OFFSET_TASKCONS_STATIC);
+static_assert(sizeof(struct taskcons) == SIZEOF_TASKCONS);
+static_assert(alignof(struct taskcons) == ALIGNOF_TASKCONS_TASK);
+
+/* Root connections set. */
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons) this_rootcons = {
+	.tcs_deliver = NULL,
+	.tcs_thread  = NULL,
+	.tcs_prev    = NULL,
+	.tcs_cons    = SLIST_HEAD_INITIALIZER(this_rootcons.tcs_cons),
+	.tcs_static  = {}
+};
+
+/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use  connections.
+ * Most of the time, this will simply point to `PERTASK(this_rootcons)' */
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct taskcons *) this_cons = &this_rootcons;
+
+/* Define relocations */
+DEFINE_PERTASK_RELOCATION(this_rootcons + OFFSET_TASKCONS_THREAD);
+DEFINE_PERTASK_RELOCATION(this_cons);
+
+
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self) {
+	struct task *active_thread;
+	struct taskcons *self_connections;
+	self_connections = FORTASK(self, this_cons);
+	if (!ADDR_ISKERN(self_connections))
+		goto fixit;
+	if (!IS_ALIGNED((uintptr_t)self_connections, alignof(struct taskcons)))
+		goto fixit;
+	if (memcpy_nopf(&active_thread, &self_connections->tcs_thread, sizeof(struct task *)) != 0)
+		goto fixit;
+	if (active_thread != self)
+		goto fixit;
+	return;
+fixit:
+	FORTASK(self, this_cons) = &FORTASK(self, this_rootcons);
+	bzero(&FORTASK(self, this_rootcons), sizeof(struct taskcons));
+	FORTASK(self, this_rootcons.tcs_thread) = self;
+}
+
+
+#if defined(__x86_64__) || defined(__i386__)
+INTERN NOBLOCK ATTR_RETNONNULL struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state)(void);
+#endif /* __x86_64__ || __i386__ */
+
+/* Push/pop the active  set of  connections:
+ * >> struct sig a = SIG_INIT, b = SIG_INIT;
+ * >> struct taskcons cons;
+ * >> task_connect(&a);
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_pushcons(&cons);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_connect(&b);
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(task_wasconnected(&b));
+ * >>
+ * >> task_disconnectall();
+ * >> assert(!task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b));
+ * >>
+ * >> task_popcons();
+ * >> assert(task_wasconnected(&a));
+ * >> assert(!task_wasconnected(&b)); */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL task_pushcons)(struct taskcons *__restrict cons) {
+	struct taskcons *oldcons;
+	unsigned int i;
+#ifdef NDEBUG
+	oldcons = THIS_CONS;
+#elif defined(__i386__) || defined(__x86_64__)
+	struct task *mythread;
+#ifdef __x86_64__
+	mythread = (struct task *)__rdgsbaseq();
+#else /* __x86_64__ */
+	mythread = NULL;
+	if likely(__rdfs() == SEGMENT_KERNEL_FSBASE) {
+		struct desctab gdt;
+		__sgdt(&gdt);
+		if likely(gdt.dt_limit > SEGMENT_KERNEL_FSBASE) {
+			struct segment *fsseg;
+			fsseg    = (struct segment *)(gdt.dt_base + SEGMENT_KERNEL_FSBASE);
+			mythread = (struct task *)segment_rdbaseX(fsseg);
+		}
+	}
+#endif /* !__x86_64__ */
+	if unlikely(!read_nopf(&FORTASK(mythread, this_cons), &oldcons)) {
+		assertf(read_nopf(&FORTASK(mythread, this_cons), &oldcons),
+		        "Corrupt TLS base pointer: mythread = %p", mythread);
+		/* Allow the user to IGNORE the assertion check, in which case we'll
+		 * try to repair the damage... */
+		mythread = x86_repair_broken_tls_state();
+		oldcons  = FORTASK(mythread, this_cons);
+	}
+#else /* ... */
+	oldcons = THIS_CONS;
+#endif /* !... */
+	assertf(cons != oldcons,
+	        "Connections set %p has already been pushed",
+	        cons);
+	cons->tcs_prev = oldcons;
+
+	/* Disable async notifications for the old set of connections,
+	 * and use the receiver thread for the new set of connections.
+	 * Really, though: This should always just be `THIS_TASK' */
+	cons->tcs_thread  = atomic_xch(&oldcons->tcs_thread, NULL);
+	SLIST_INIT(&cons->tcs_cons); /* No connections in use (yet) */
+	cons->tcs_deliver = NULL;   /* Nothing was delivered (yet) */
+	DBG_memset(cons->tcs_static, 0xcc, sizeof(cons->tcs_static));
+
+	/* Set-up statically allocated connections. */
+	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i)
+		cons->tcs_static[i].sc_sig = NULL; /* Available for use. */
+
+	/* Finally, set the active connection set to `cons' */
+	PERTASK_SET(this_cons, cons);
+}
+
+PUBLIC NOBLOCK ATTR_RETNONNULL struct taskcons *
+NOTHROW(FCALL task_popcons)(void) {
+	struct taskcons *oldcons;
+	struct taskcons *cons = THIS_CONS;
+	assert((cons->tcs_prev == NULL) == (cons == THIS_ROOTCONS));
+	assertf(cons != THIS_ROOTCONS,
+	        "Cannot pop connections: Root connection set %p is already active",
+	        cons);
+
+	/* Make sure that no connections are left active. */
+	assertf(SLIST_EMPTY(&cons->tcs_cons),
+	        "Cannot call `task_popconnections()' when you've still "
+	        "got connections that haven't been disconnected, yet\n"
+	        "call `task_disconnectall()' first!");
+
+	/* Set the TLS pointer for the current set of connection to the old set. */
+	oldcons = cons->tcs_prev;
+	PERTASK_SET(this_cons, oldcons);
+
+	/* Re-enable asynchronous notifications as the result of `sig_send()' / `sig_broadcast()' */
+	atomic_write(&oldcons->tcs_thread, THIS_TASK);
+
+	/* Make bad usage consistent by filling memory with garbage. */
+	DBG_memset(cons, 0xcc, sizeof(*cons));
+
+	return cons;
+}
+
+
+
+
+
+/* Allocate a new task connection. */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sigcon_task *FCALL
+taskcons_alloccon(struct taskcons *__restrict self) THROWS(E_BADALLOC) {
+	unsigned int i;
+	struct sigcon_task *result;
+
+	/* Check if one of the static slots is available. */
+	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i) {
+		result = &self->tcs_static[i];
+		if (!result->sc_sig)
+			goto done;
+	}
+
+	/* Must dynamically allocate a new slot. */
+	result = (struct sigcon_task *)kmalloc(sizeof(struct sigcon_task),
+	                                       GFP_LOCKED | GFP_PREFLT);
+done:
+	return result;
+}
+
+/* Free a given task connection. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL taskcons_freecon)(struct taskcons *__restrict self,
+                                struct sigcon_task *__restrict con) {
+	if (con >= self->tcs_static &&
+	    con < COMPILER_ENDOF(self->tcs_static)) {
+		/* Free a static connection. */
+		DBG_memset(con, 0xaa, sizeof(con)); /* Not-allocated */
+		con->sc_sig = NULL;
+	} else {
+		/* Free a dynamically allocated connection. */
+		kfree(con);
+	}
+}
+
+
+
+/* @param: flags: Set of `0 | SIGCON_STAT_F_POLL' */
+LOCAL NONNULL((1)) void FCALL
+task_connect_impl(struct sig *__restrict target, uintptr_t flags)
+		THROWS(E_BADALLOC) {
+	struct taskcons *cons = THIS_CONS;
+	struct sigcon_task *con;
+	assert(IS_ALIGNED((uintptr_t)cons, SIGCON_CONS_MINALIGN));
+
+	/* When a signal was already delivered, `task_connect()'
+	 * no  longer needs to  do anything and  can be a no-op. */
+	if (atomic_read(&cons->tcs_deliver) != NULL)
+		return;
+
+	/* Allocate a new connection for `cons' */
+	con = taskcons_alloccon(cons);
+	con->sc_cons = (struct taskcons *)((uintptr_t)cons | flags);
+	_sigcon_connect(con, target);
+
+	/* Add connection to per-thread list. */
+	SLIST_INSERT(&cons->tcs_cons, con, sct_thrnext);
+}
+
+
+/* Connect the calling thread to a given signal.
+ * NOTE: If  the caller was already connected to `target', a second connection
+ *       will be established, and `task_disconnect()' must be called more than
+ *       once. However, aside  from this, having  multiple connections to  the
+ *       same signal has no other adverse side-effects.
+ * NOTE: When  the signal  test expression is  able to throw  an exception, the
+ *       caller of this function is  responsible to disconnect from the  signal
+ *       afterwards. However, exceptions that may be thrown by `task_waitfor()'
+ *       always guaranty that _all_ established connections have been  removed.
+ * >> if (test())
+ * >>     return true;
+ * >> task_connect(s);
+ * >> TRY {
+ * >>     if (test()) {
+ * >>         task_disconnectall();
+ * >>         return true;
+ * >>     }
+ * >> } EXCEPT {
+ * >>     task_disconnectall();
+ * >>     RETHROW();
+ * >> }
+ * >> task_waitfor();
+ *
+ * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
+ *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
+PUBLIC NONNULL((1)) void FCALL
+task_connect(struct sig *__restrict target)
+		THROWS(E_BADALLOC) {
+	return task_connect_impl(target, 0);
+}
+
+/* Exactly the same as `task_connect()', however must be used when the connection
+ * is  made for a poll-based operation that only wishes to wait for some event to
+ * be  triggered, but does not wish to act upon this event by acquiring some kind
+ * of lock with the intend to release  it eventually, where the act of  releasing
+ * said lock includes a call to `sig_send()'.
+ *
+ * This connect() function is only required for signals that may be delivered  via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place.  If in this scenario,  the recipient thread (i.e  the
+ * thread  that called `task_connect()')  then decides not to  act upon the signal
+ * in question, but rather do something else, the original intent of  `sig_send()'
+ * will  become lost, that intent being for some (single) thread to try to acquire
+ * an accompanying lock (for example: `<kos/sched/shared-lock.h>')
+ *
+ * As  far as semantics go, a signal  connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if  encountered
+ * during  its search for  a recipient (such that  by default, poll-connections will
+ * only  be  acted upon  when  `sig_broadcast()' is  used).  However, if  a  call to
+ * `sig_send()'  is unable to  find any non-poll-based  connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling threads, though will
+ * still  end up  returning `false', indicative  of not having  woken any (non-poll)
+ * waiting thread.
+ *
+ * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
+ * low-priority task connection, that will only be triggered after other connections
+ * have already been served, and  will only be woken  by `sig_send()' when no  other
+ * connections exist.
+ *
+ * In practice, this function must be used whenever it is unknown what will eventually
+ * happen  after `task_waitfor()', or  if what happens  afterwards doesn't include the
+ * acquisition  of some kind of lock, whose  release includes the sending of `target'.
+ *
+ * Note  however that `task_connect()' may still be used even if it is followed by
+ * a call to `task_disconnect()' (or similar). If in this scenario the signal  had
+ * already been send to the calling thread with `sig_send()' being the origin, the
+ * signal is forwarded to  the next waiting  thread the same  way another call  to
+ * `sig_send()'  would.  The only  slight problem  in this  situation is  that the
+ * original call to `sig_send()' had already  returned `true', and if this  second
+ * internal  call fails due to a lack of recipients, the initial true return value
+ * was  incorrect since no thread ended up  actually receiving the signal. This is
+ * not  something that can be fixed and as such should be kept in mind when making
+ * decisions based on the return value of `sig_send()'.
+ *
+ * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
+PUBLIC NONNULL((1)) void FCALL
+task_connect_for_poll(struct sig *__restrict target)
+		THROWS(E_BADALLOC) {
+	return task_connect_impl(target, SIGCON_STAT_F_POLL);
+}
+
+
+
+/* Find and return a self-pointer to your thread's  connection
+ * to `target'. If you are  not connected (or made an  attempt
+ * to connect *after* having already received another signal),
+ * this function returns `NULL'.
+ * - Only searches the currently active set of connections,
+ *   meaning this won't  find a signal  connected before  a
+ *   call to `task_pushcons()'
+ * - Only  connections that haven't been disconnected (via
+ *   use of `task_disconnect()' or `task_disconnectall()')
+ *   are returned.
+ * - When connected to the same signal multiple times, this
+ *   will return one at random.
+ * - When `target' is an invalid pointer, return "NULL" */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct sigcon_task **
+NOTHROW(FCALL task_findcon_p)(struct sig const *target) {
+	struct sigcon_task **con_p;
+	struct taskcons *cons = THIS_CONS;
+	SLIST_P_FOREACH (con_p, &cons->tcs_cons, sct_thrnext) {
+		if ((*con_p)->sc_sig == target)
+			return con_p;
+	}
+	return NULL;
+}
+
+
+/* Disconnect from a specific signal `target'
+ * WARNING: If `target' was already  send to the calling  thread
+ *          before it could  be disconnected  by this  function,
+ *          the calling  thread will  continue  to remain  in  a
+ *          signaled state, such  that the next  call to one  of
+ *          the signal receive functions (e.g. `task_waitfor()')
+ *          will not block.
+ * WARNING: Removing a specific signal is an O(N) operation, and
+ *          in most cases you probably wans `task_disconnectall'
+ * @return: true:  Disconnected from `target'
+ * @return: false: You weren't actually  connected to  `target'.
+ *                 Note that when a signal was already received,
+ *                 `task_connect()'  becomes  a  no-op,  so  the
+ *                 return value here can only be trusted for the
+ *                 first connection made. */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
+	struct sigcon_task **con_p, *con;
+	con_p = task_findcon_p(target);
+	if (!con_p)
+		return false;
+	SLIST_P_REMOVE(con_p, sct_thrnext);
+	con = *con_p;
+	_sigcon_disconnect(con, _SIGCON_DISCONNECT_F_FORWARD);
+	taskcons_freecon(THIS_CONS, con);
+	return true;
+}
+
+/* Remove all established connections, but don't do anything beyond that.
+ * @param: flags: Set of `_SIGCON_DISCONNECT_F_*' */
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskcons_disconnectall)(struct taskcons *__restrict cons,
+                                      unsigned int flags) {
+	struct sigcon_task *con;
+	SLIST_FOREACH_SAFE (con, &cons->tcs_cons, sct_thrnext) {
+		_sigcon_disconnect(con, flags);
+		taskcons_freecon(THIS_CONS, con);
+	}
+	SLIST_INIT(&cons->tcs_cons);
+}
+
+
+/* Disconnect from all connected signals.
+ * Signals with a state of `SIGCON_STAT_ST_THRSENT' will be forwarded. */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL task_disconnectall)(void) {
+	struct taskcons *cons = THIS_CONS;
+	taskcons_disconnectall(cons, _SIGCON_DISCONNECT_F_FORWARD);
+	COMPILER_WRITE_BARRIER(); /* "tcs_deliver" must be written *after* disconnecting */
+	cons->tcs_deliver = NULL;
+}
+
+/* Same as `task_disconnectall()', but don't forward signals with
+ * a `SIGCON_STAT_ST_THRSENT'-state, but rather return the sender
+ * of the signal that was received.
+ * As such, the caller must properly pass on information about the
+ * fact that a signal may have been received, as well as act  upon
+ * this fact.
+ *
+ * As such, this function is more closely related to `task_trywait()'
+ * than  `task_disconnectall()',  and implemented  to  atomically do:
+ * >> struct sig *result;
+ * >> result = task_trywait();
+ * >> if (result == NULL)
+ * >>     task_disconnectall(); // Nothing received --> still disconnect
+ * >> return result;
+ * @return: NULL: No signal was sent yet, and all connections were severed.
+ * @return: * :   The received signal (for `sig_altsend', the "sender" argument) */
+PUBLIC NOBLOCK WUNUSED struct sig *
+NOTHROW(FCALL task_receiveall)(void) {
+	struct sig *result;
+	struct taskcons *cons = THIS_CONS;
+	taskcons_disconnectall(cons, _SIGCON_DISCONNECT_F_NORMAL);
+	COMPILER_BARRIER(); /* "tcs_deliver" must be read *after* disconnecting */
+	result = cons->tcs_deliver;
+	cons->tcs_deliver = NULL;
+	return result;
+}
+
+
+/* Check if the calling thread was connected to any  signal.
+ * For this purpose, it doesn't matter if a connected signal
+ * has  already been sent  or not (iow:  both alive and dead
+ * connections will cause this function to return `true')
+ *
+ * As far as this function is concerned, a connection is only fully
+ * released  once the calling thread has done one of the following:
+ *  - Called `task_disconnect()' on every connected signal
+ *  - Called `task_disconnectall()'
+ *  - Called `task_receiveall()'
+ *  - Called `task_trywait()'          (with a non-NULL return value)
+ *  - Called `task_waitfor()'          (with a non-NULL return value)
+ *  - Called `task_waitfor_nx()'       (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc()'    (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc_nx()' (with a non-NULL return value) */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(FCALL task_isconnected)(void) {
+	struct taskcons *cons = THIS_CONS;
+	return !SLIST_EMPTY(&cons->tcs_cons);
+}
+
+
+/* Check if there is a signal that was delivered,
+ * disconnecting all other  connected signals  if
+ * this was the case.
+ * @return: NULL: No signal is available.
+ * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
+PUBLIC NOBLOCK WUNUSED struct sig *
+NOTHROW(FCALL task_trywait)(void) {
+	struct taskcons *cons = THIS_CONS;
+	struct sig *result = atomic_read(&cons->tcs_deliver);
+	if (result) {
+		COMPILER_READ_BARRIER();
+		taskcons_disconnectall(cons, _SIGCON_DISCONNECT_F_NORMAL);
+		COMPILER_WRITE_BARRIER();
+		assert(result == cons->tcs_deliver);
+		cons->tcs_deliver = NULL;
+	}
+	return result;
+}
 
 
 

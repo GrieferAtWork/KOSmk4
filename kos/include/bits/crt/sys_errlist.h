@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d60282e */
+/* HASH CRC-32:0x42cdf2a2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /*!included_by <unistd.h>*/
+/*!included_by <errno.h>*/
 #ifndef _BITS_CRT_SYS_ERRLIST_H
 #define _BITS_CRT_SYS_ERRLIST_H 1
 

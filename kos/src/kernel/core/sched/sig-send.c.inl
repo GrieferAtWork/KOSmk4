@@ -579,13 +579,17 @@
 #include <kernel/compiler.h>
 
 #include <kernel/panic.h>
+#include <sched/sig-completion.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/sched/preemption.h>
 
+#include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 
@@ -737,6 +741,9 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 		{
 			LOCAL_runcleanup(); /* for sig_send_cleanup */
 		}
+#ifdef LOCAL_HAVE_destroy_later
+		destroy_tasks(destroy_later);
+#endif /* LOCAL_HAVE_destroy_later */
 		return 0;
 	}
 #endif /* LOCAL_HAVE_maxcount */
@@ -769,6 +776,9 @@ again:
 		if ((uintptr_t)sigctl == 0) {
 			/* Special case: no-one is connected */
 			LOCAL_runcleanup(); /* for sig_send_cleanup */
+#ifdef LOCAL_HAVE_destroy_later
+			destroy_tasks(destroy_later);
+#endif /* LOCAL_HAVE_destroy_later */
 			return 0;
 		}
 
@@ -854,6 +864,7 @@ again:
 			                                             LOCAL_caller,                  \
 			                                             LOCAL_reprime,  /* XXX: This should always be "NULL" */ \
 			                                             LOCAL_cleanup,                 \
+			                                             LOCAL_destroy_later,           \
 			                                             LOCAL_was,                     \
 			                                             LOCAL_flags)
 #if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
@@ -1152,6 +1163,9 @@ handle_non_viable_receiver:
 #ifndef LOCAL_IS_NOPR
 				preemption_pop(&was);
 #endif /* !LOCAL_IS_NOPR */
+#ifdef LOCAL_HAVE_destroy_later
+				destroy_tasks(destroy_later);
+#endif /* LOCAL_HAVE_destroy_later */
 #ifdef LOCAL_HAVE_flags
 				sig_run_phase_2(phase2, &context);
 #endif /* LOCAL_HAVE_flags */
@@ -1192,6 +1206,9 @@ handle_non_viable_receiver:
 			decref_unlikely(thread);
 		}
 	}
+#ifdef LOCAL_HAVE_destroy_later
+	destroy_tasks(destroy_later);
+#endif /* LOCAL_HAVE_destroy_later */
 #ifdef LOCAL_HAVE_flags
 	sig_run_phase_2(phase2, &context);
 #endif /* LOCAL_HAVE_flags */

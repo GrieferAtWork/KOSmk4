@@ -1288,7 +1288,7 @@ print("}");
 
 
 
-/* Define some errno code aliases, or not already defined. */
+/* Define some errno code aliases, if not already defined. */
 #if !defined(EWOULDBLOCK) && defined(EAGAIN)
 #define EWOULDBLOCK EAGAIN /* Operation would block */
 #endif /* !EWOULDBLOCK && EAGAIN */

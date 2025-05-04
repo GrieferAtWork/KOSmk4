@@ -42,11 +42,14 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/sig.h>
+#include <sched/task.h>
 
 #include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 
