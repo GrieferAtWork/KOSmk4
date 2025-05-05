@@ -22,7 +22,7 @@
 
 /*[[[deemon (printSigSendCInlOptions from "...include.sched.sig-config")();]]]*/
 //#define DEFINE_sig_xsend
-#define DEFINE_sig_xsendmany
+//#define DEFINE_sig_xsendmany
 //#define DEFINE_sig_send
 //#define DEFINE_sig_altsend
 //#define DEFINE_sig_send_nopr
@@ -59,7 +59,7 @@
 //#define DEFINE_sig_altsendmanyas_nopr
 //#define DEFINE_sig_sendmanyas_cleanup_nopr
 //#define DEFINE_sig_altsendmanyas_cleanup_nopr
-//#define DEFINE_sig_broadcast
+#define DEFINE_sig_broadcast
 //#define DEFINE_sig_altbroadcast
 //#define DEFINE_sig_broadcast_nopr
 //#define DEFINE_sig_altbroadcast_nopr
@@ -731,7 +731,21 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 #ifdef LOCAL_HAVE_flags
 		if (flags & SIG_XSEND_F_LOCKED) {
 			/* Inherit lock from caller */
-			atomic_and((uintptr_t *)&self->s_con, ~SIG_SMPLOCK);
+#ifdef LOCAL_HAVE_reprime
+			if (reprime) {
+				sigctl = self->s_con;
+#ifdef SIG_SMPLOCK
+				sigctl = (struct sigcon *)((uintptr_t)sigctl & ~SIG_SMPLOCK);
+#endif /* SIG_SMPLOCK */
+				reprime = combine_remainder_and_reprime(sigctl, reprime);
+				atomic_write(&self->s_con, reprime);
+			} else
+#endif /* LOCAL_HAVE_reprime */
+			{
+#ifdef SIG_SMPLOCK
+				atomic_and((uintptr_t *)&self->s_con, ~SIG_SMPLOCK);
+#endif /* SIG_SMPLOCK */
+			}
 			assert(!preemption_ison() || kernel_poisoned());
 			LOCAL_runcleanup(); /* for sig_send_cleanup */
 			if (!(flags & SIG_XSEND_F_NOPR))
@@ -1055,6 +1069,7 @@ again_find_receiver:
 					                      LOCAL_reprime, LOCAL_destroy_later);
 				}
 			} while (atomic_read_relaxed(&receiver->sc_stat) & SIGCON_STAT_F_POLL);
+			remainder = receiver->sc_next;
 
 			/* Shove the chain of poll-based receivers to the back of the queue. */
 			poll_head = sigctl;
@@ -1066,16 +1081,20 @@ again_find_receiver:
 			poll_head->sc_prev->sc_next = receiver;
 			receiver->sc_prev = poll_head->sc_prev;
 
-			remainder = receiver->sc_next;
-			assert(remainder != receiver);
-
 			/* Re-insert poll-based connections before "remainder" (which will become the queue's
 			 * new head, meaning that anything that appears before it will actually appear at the
 			 * end of the queue) */
-			poll_head->sc_prev = remainder->sc_prev;
-			poll_head->sc_prev->sc_next = poll_head;
-			poll_tail->sc_next = remainder;
-			remainder->sc_prev = poll_tail;
+			if (remainder == sigctl) {
+				/* Special case: there are no "remainder" connections */
+				poll_head->sc_prev = poll_tail;
+				poll_tail->sc_next = poll_head;
+				remainder = poll_head;
+			} else {
+				poll_head->sc_prev = remainder->sc_prev;
+				poll_head->sc_prev->sc_next = poll_head;
+				poll_tail->sc_next = remainder;
+				remainder->sc_prev = poll_tail;
+			}
 		} else {
 			remainder = receiver->sc_next;
 			if unlikely(remainder == receiver)

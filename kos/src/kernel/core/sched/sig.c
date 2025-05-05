@@ -344,6 +344,10 @@ sig_completion_invoke_and_unlock_and_preemption_pop(struct sig *self,
 
 	/* Write-back the finalized, new ring of connections and release lock. */
 	remainder = combine_remainder_and_reprime(remainder, reprime);
+#ifndef sigcon_verify_ring_IS_NOOP
+	if (remainder)
+		sigcon_verify_ring_afterremove(remainder);
+#endif /* !sigcon_verify_ring_IS_NOOP */
 	atomic_write(&self->s_con, remainder); /* Release SMP-lock */
 	if (cleanup)
 		(*cleanup->scc_cb)(cleanup);
@@ -379,9 +383,6 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 	assert(SIGCON_STAT_ISCONNECTED(stat));
 	assert(SIGCON_STAT_ISCOMP(stat));
 	assert(maxcount > 0);
-	assert(remainder_head == receiver->sc_next || /* Remainder must start after "receiver" */
-	       remainder_head == sigctl ||            /* ... except when "receiver" was the last connection */
-	       kernel_poisoned());
 
 	/* Signal completion callback. */
 	context.scc_sender = sender;
@@ -390,7 +391,7 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 
 	if (!(context.scc_mode & SIGCOMP_MODE_F_REPRIME) || (flags & SIG_XSEND_F_FINI)) {
 		/* Release out ownership of "receiver" (if it wasn't reprimed) */
-		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRSENT);
+		atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST);
 	} else {
 		/* Re-prime connection */
 		if (reprime == NULL) {
@@ -410,6 +411,10 @@ sig_completion_invoke_and_continue_broadcast(struct sig *self,
 		/* Special case: the completion-callback was the last receiver
 		 * -> nothing left to do but unlock the signal and exit. */
 restore_reprime_and_unlock:
+#ifndef sigcon_verify_ring_IS_NOOP
+		if (reprime)
+			sigcon_verify_ring_afterremove(reprime);
+#endif /* !sigcon_verify_ring_IS_NOOP */
 		atomic_write(&self->s_con, reprime);
 		if (cleanup)
 			(*cleanup->scc_cb)(cleanup);
@@ -417,24 +422,32 @@ restore_reprime_and_unlock:
 		goto done;
 	}
 
-	/* Form a ring from the remainder and "reprime" connections. */
+	/* Form a ring from the remainder. */
 	remainder_tail->sc_next = remainder_head;
 	remainder_head->sc_prev = remainder_tail;
-	reprime = combine_remainder_and_reprime(remainder_head, reprime);
 
 	/* Check for special case: we're supposed to stop now. */
-	if unlikely(result >= maxcount)
+#ifndef __OPTIMIZE_SIZE__
+	if unlikely(result >= maxcount) {
+		reprime = combine_remainder_and_reprime(remainder_head, reprime);
 		goto restore_reprime_and_unlock;
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
 
 	/* Write-back remaining connections to the signal, and resume
 	 * the  broadcast whilst having `sig_xsendmany()' inherit our
 	 * lock-state. */
+	sigcon_verify_ring_afterremove(remainder_head);
 #ifdef SIG_SMPLOCK
 	atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)remainder_head | SIG_SMPLOCK));
 #else /* SIG_SMPLOCK */
 	atomic_write(&self->s_con, remainder_head);
 #endif /* !SIG_SMPLOCK */
 
+	flags |= SIG_XSEND_F_LOCKED;
+	flags &= ~SIG_XSEND_F_NOPR;
+	if (!preemption_wason(&was))
+		flags |= SIG_XSEND_F_NOPR;
 #if defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)
 	if (result == 0 && phase2 == NULL) {
 		/* So the compiler can generate a tail-call */
@@ -936,7 +949,7 @@ NOTHROW(FCALL taskcons_disconnectall)(struct taskcons *__restrict cons,
 	struct sigtaskcon *con;
 	SLIST_FOREACH_SAFE (con, &cons->tcs_cons, sct_thrnext) {
 		_sigcon_disconnect(con, flags);
-		taskcons_freecon(THIS_CONS, con);
+		taskcons_freecon(cons, con);
 	}
 	SLIST_CLEAR(&cons->tcs_cons);
 }
@@ -1394,7 +1407,7 @@ _sigmulticomp_connect_ex1(struct sigmulticomp *__restrict self,
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL _sigmulticomp_connect_nx_ex1)(struct sigmulticomp *__restrict self,
+NOTHROW(FCALL _sigmulticomp_connect_ex_nx1)(struct sigmulticomp *__restrict self,
                                             struct sig *__restrict target, sigcomp_cb_t cb,
                                             uintptr_t flags) {
 	struct sigcompcon *con = sigmulticomp_alloccon_nx(self, cb);
@@ -1414,7 +1427,7 @@ _sigmulticomp_connect_exN(struct sigmulticomp *__restrict self,
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL _sigmulticomp_connect_nx_exN)(struct sigmulticomp *__restrict self,
+NOTHROW(FCALL _sigmulticomp_connect_ex_nxN)(struct sigmulticomp *__restrict self,
                                             struct sig *__restrict target, sigcomp_cb_t cb,
                                             uintptr_t flags, size_t n_static) {
 	struct sigcompcon *con = _sigmulticomp_alloccon_nxN(self, cb, n_static);
@@ -4007,6 +4020,270 @@ DEFINE_TEST(pushpop_connections) {
 	assert(!sig_iswaiting(&a) && sig_numwaiting(&a) == 0);
 	assert(!sig_iswaiting(&b) && sig_numwaiting(&b) == 0);
 }
+
+#ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL_T((1, 2)) size_t
+NOTHROW(FCALL noop_sigcomp_cb)(struct sigcompcon *__restrict self,
+                               struct sigcompctx *__restrict ctx,
+                               void *buf, size_t bufsize) {
+	(void)self;
+	(void)ctx;
+	(void)buf;
+	(void)bufsize;
+	return 0;
+}
+
+DEFINE_TEST(sig_send_to_poll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	sigcompcon_connect_for_poll(&scc, &s);
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(scc.sc_sig == &s);
+
+	assert(s.s_con == &scc);
+	assert(!sig_send(&s));
+	assert(s.s_con == NULL);
+
+	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(scc.sc_sig == &s);
+}
+
+DEFINE_TEST(sig_send_to_npoll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	sigcompcon_connect(&scc, &s);
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_stat == SIGCON_STAT_TP_COMP);
+	assert(scc.sc_sig == &s);
+
+	assert(s.s_con == &scc);
+	assert(sig_send(&s));
+	assert(s.s_con == NULL);
+
+	assert(scc.sc_stat == SIGCON_STAT_ST_THRSENT);
+	assert(scc.sc_sig == &s);
+}
+
+
+DEFINE_TEST(sig_send_to_taskpoll) {
+	struct sig s = SIG_INIT;
+	struct taskcons *cons = THIS_CONS;
+	task_connect_for_poll(&s);
+	assert(cons->tcs_static[0].sc_prev == &cons->tcs_static[0]);
+	assert(cons->tcs_static[0].sc_next == &cons->tcs_static[0]);
+	assert(cons->tcs_static[0].sc_stat & SIGCON_STAT_F_POLL);
+	assert((struct taskcons *)(cons->tcs_static[0].sc_stat & ~SIGCON_STAT_F_POLL) == cons);
+	assert(cons->tcs_static[0].sc_sig == &s);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(!sig_send(&s));
+	assert(s.s_con == NULL);
+
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(task_isconnected());
+	task_disconnectall();
+	assert(!task_isconnected());
+}
+
+DEFINE_TEST(sig_send_to_tasknpoll) {
+	struct sig s = SIG_INIT;
+	struct taskcons *cons = THIS_CONS;
+	task_connect(&s);
+	assert(cons->tcs_static[0].sc_prev == &cons->tcs_static[0]);
+	assert(cons->tcs_static[0].sc_next == &cons->tcs_static[0]);
+	assert(cons->tcs_static[0].sc_cons == cons);
+	assert(cons->tcs_static[0].sc_sig == &s);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(sig_send(&s));
+	assert(s.s_con == NULL);
+
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(task_isconnected());
+	task_disconnectall();
+	assert(!task_isconnected());
+}
+
+
+DEFINE_TEST(sig_send_to_poll_with_npoll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	sigcompcon_connect_for_poll(&scc, &s);
+	task_connect(&s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &scc);
+	assert(sig_send(&s));
+	assert(s.s_con == &scc);
+
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_sig == &s);
+	assert(task_isconnected());
+	assert(task_receiveall() == &s);
+	assert(!task_isconnected());
+}
+
+DEFINE_TEST(sig_send_to_npoll_with_poll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	task_connect(&s);
+	sigcompcon_connect_for_poll(&scc, &s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(sig_send(&s));
+	assert(s.s_con == &scc);
+
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_sig == &s);
+	assert(task_isconnected());
+	assert(task_receiveall() == &s);
+	assert(!task_isconnected());
+}
+
+DEFINE_TEST(sig_broadcast_to_poll_with_npoll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	sigcompcon_connect_for_poll(&scc, &s);
+	task_connect(&s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &scc);
+	assert(sig_broadcast(&s));
+	assert(s.s_con == NULL);
+
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(task_isconnected());
+	assert(task_receiveall() == &s);
+	assert(!task_isconnected());
+}
+
+DEFINE_TEST(sig_broadcast_to_npoll_with_poll) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	task_connect(&s);
+	sigcompcon_connect_for_poll(&scc, &s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(sig_broadcast(&s));
+	assert(s.s_con == NULL);
+
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
+	assert(task_isconnected());
+	assert(task_receiveall() == &s);
+	assert(!task_isconnected());
+}
+
+DEFINE_TEST(sig_disconnect_via_receiveall) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	task_connect(&s);
+	sigcompcon_connect_for_poll(&scc, &s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(task_isconnected());
+	assert(task_receiveall() == NULL);
+	assert(!task_isconnected());
+	assert(s.s_con == &scc);
+
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+}
+
+DEFINE_TEST(sig_disconnect_via_receiveall_after_send) {
+	struct sig s = SIG_INIT;
+	struct sigcompcon scc;
+	struct taskcons *cons = THIS_CONS;
+	sigcompcon_init(&scc, &noop_sigcomp_cb);
+	task_connect(&s);
+	sigcompcon_connect_for_poll(&scc, &s);
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &cons->tcs_static[0]);
+	assert(scc.sc_next == &cons->tcs_static[0]);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+	assert(cons->tcs_static[0].sc_sig == &s);
+	assert(cons->tcs_static[0].sc_prev == &scc);
+	assert(cons->tcs_static[0].sc_next == &scc);
+
+	assert(s.s_con == &cons->tcs_static[0]);
+	assert(sig_send(&s));
+	assert(task_isconnected());
+	assert(task_receiveall() == &s);
+	assert(!task_isconnected());
+	assert(s.s_con == &scc);
+
+	assert(scc.sc_sig == &s);
+	assert(scc.sc_prev == &scc);
+	assert(scc.sc_next == &scc);
+	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
+}
+#endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
 DECL_END

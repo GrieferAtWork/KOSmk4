@@ -26,6 +26,7 @@
 #include <sched/sig.h>
 
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 
 /*[[[config CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS! = 1
  * # of statically pre-allocated connections available
@@ -58,33 +59,34 @@ struct sigcompctx {
 	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig'
 	                                  * when the signal is being sent through something like `sig_altsend()') */
 	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the  signal.
-	                                  * In  order to support functions like `sig_broadcast_as_nopr()', the
+	                                  * In  order to support  functions like `sig_broadcastas_nopr()', the
 	                                  * sig-post-completion callback should not make use of THIS_TASK, but
 	                                  * instead assume that `scc_caller' is the caller's thread. */
-	sigcomp_postcb_t     scc_post;   /* [0..1][out]  When   non-NULL  upon   return  of   `sigcomp_cb_t()',
-	                                  * this callback will be enqueued to-be executed with the buffer given
-	                                  * to   `sigcomp_cb_t()'  once  all   SMP-locks  have  been  released.
+	sigcomp_postcb_t     scc_post;   /* [0..1][out] When non-NULL upon return of `sigcomp_cb_t()', this
+	                                  * callback will be enqueued to-be executed with the buffer  given
+	                                  * to `sigcomp_cb_t()' once all SMP-locks have been released.
+	                                  *
 	                                  * Using this  mechanism, a  signal completion  callback can  schedule
 	                                  * further operations, which may not necessarily be SMP-lock friendly,
 	                                  * to-be performed  at a  later point,  once all  SMP-locks have  been
 	                                  * released.
-	                                  * Note that even NOBLOCK functions may not always be  SMP-lock-safe,
-	                                  * which  includes further calls to `sig_send()' / `sig_broadcast()'.
-	                                  * When using  this mechanism,  you must  also make  sure to  account
-	                                  * for the  possibility  that  either the  associated  signal  and/or
-	                                  * used `sigcompcon'  descriptor  gets  destroyed  before/while  this
-	                                  * callback will eventually be executed.  As such, it is  recommended
-	                                  * to use  the normal  signal completion  function as  a  first-stage
-	                                  * callback to construct references to objects which are then written
-	                                  * back to the  shared buffer  and eventually inherited  by a  second
-	                                  * stage callback pointed to by this  field. For an example of  this,
-	                                  * take a look at  the `struct rising_edge_detector' example code  at
-	                                  * the bottom of this file. */
+	                                  *
+	                                  * Note that even NOBLOCK functions may not always be SMP-lock-safe,
+	                                  * which includes further calls to `sig_send()' / `sig_broadcast()'.
+	                                  * When using this  mechanism, you  must also make  sure to  account
+	                                  * for the possibility that either the associated signal and/or used
+	                                  * `sigcompcon' descriptor gets destroyed before/while this callback
+	                                  * will  eventually be executed.  As such, it  is recommended to use
+	                                  * the normal signal completion  function as a first-stage  callback
+	                                  * to construct references to objects which are then written back to
+	                                  * the shared  buffer and  eventually inherited  by a  second  stage
+	                                  * callback pointed to by this field. For an example of this, take a
+	                                  * look at `struct rising_edge_detector' in ./sigcomp.md */
 #define SIGCOMP_MODE_F_NORMAL    0x0000 /* Normal status (don't reprime + signal accepted) */
 #define SIGCOMP_MODE_F_REPRIME   0x0001 /* Re-prime the connection, allowing for uninterrupted monitoring of signals being sent. */
 #define SIGCOMP_MODE_F_NONVIABLE 0x0002 /* Signal could not be received. (in the case of `sig_send()', search for another receiver) */
-	unsigned int         scc_mode; /* [out] Signal completion status (set of `SIGCOMP_MODE_F_*'; defaults to 0)
-	                                * NOTE: This field may only be accessed during phase-1 callbacks. */
+	unsigned int         scc_mode;   /* [out] Signal completion status (set of `SIGCOMP_MODE_F_*'; defaults to 0)
+	                                  * NOTE: This field may only be accessed during phase-1 callbacks. */
 };
 
 
@@ -421,8 +423,8 @@ NOTHROW(FCALL _sigmulticomp_alloccon_nxN)(struct sigmulticomp *__restrict self,
 /* Combination of `sigmulticomp_alloccon()' + `sigcompcon_connect()' */
 #define sigmulticomp_connect(self, target, cb)             sigmulticomp_connect_ex(self, target, cb, SIGCOMPCON_CONNECT_F_NORMAL)
 #define sigmulticomp_connect_for_poll(self, target, cb)    sigmulticomp_connect_ex(self, target, cb, SIGCOMPCON_CONNECT_F_POLL)
-#define sigmulticomp_connect_nx(self, target, cb)          sigmulticomp_connect_nx_ex(self, target, cb, SIGCOMPCON_CONNECT_F_NORMAL)
-#define sigmulticomp_connect_for_poll_nx(self, target, cb) sigmulticomp_connect_nx_ex(self, target, cb, SIGCOMPCON_CONNECT_F_POLL)
+#define sigmulticomp_connect_nx(self, target, cb)          sigmulticomp_connect_ex_nx(self, target, cb, SIGCOMPCON_CONNECT_F_NORMAL)
+#define sigmulticomp_connect_for_poll_nx(self, target, cb) sigmulticomp_connect_ex_nx(self, target, cb, SIGCOMPCON_CONNECT_F_POLL)
 #if CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS == 1
 __COMPILER_EIREDIRECT(NOBLOCK NONNULL((1, 2, 3)),void,,FCALL,
 sigmulticomp_connect_ex,(struct sigmulticomp *__restrict self,
@@ -432,9 +434,9 @@ sigmulticomp_connect_ex,(struct sigmulticomp *__restrict self,
 	sigcompcon_connect_ex(con, target, flags);
 });
 __COMPILER_EIREDIRECT(NOBLOCK WUNUSED NONNULL((1, 2, 3)),__BOOL,NOTHROW,FCALL,
-sigmulticomp_connect_nx_ex,(struct sigmulticomp *__restrict self,
+sigmulticomp_connect_ex_nx,(struct sigmulticomp *__restrict self,
                             struct sig *__restrict target, sigcomp_cb_t cb,
-                            uintptr_t flags), _sigmulticomp_connect_nx_ex1, {
+                            uintptr_t flags), _sigmulticomp_connect_ex_nx1, {
 	struct sigcompcon *con = sigmulticomp_alloccon_nx(self, cb);
 	if unlikely(!con)
 		return 0;
@@ -450,7 +452,7 @@ _sigmulticomp_connect_exN,(struct sigmulticomp *__restrict self,
 	sigcompcon_connect_ex(con, target, flags);
 });
 __COMPILER_EIDECLARE(NOBLOCK WUNUSED NONNULL((1, 2, 3)),__BOOL,NOTHROW,FCALL,
-_sigmulticomp_connect_nx_exN,(struct sigmulticomp *__restrict self,
+_sigmulticomp_connect_ex_nxN,(struct sigmulticomp *__restrict self,
                               struct sig *__restrict target, sigcomp_cb_t cb,
                               uintptr_t flags, size_t n_static), {
 	struct sigcompcon *con = _sigmulticomp_alloccon_nxN(self, cb, n_static);
@@ -461,8 +463,8 @@ _sigmulticomp_connect_nx_exN,(struct sigmulticomp *__restrict self,
 });
 #define sigmulticomp_connect_ex(self, target, cb, flags) \
 	_sigmulticomp_connect_exN(self, target, cb, flags, CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS)
-#define sigmulticomp_connect_nx_ex(self, target, cb, flags) \
-	_sigmulticomp_connect_nx_exN(self, target, cb, flags, CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS)
+#define sigmulticomp_connect_ex_nx(self, target, cb, flags) \
+	_sigmulticomp_connect_ex_nxN(self, target, cb, flags, CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS)
 #endif /* CONFIG_SIGMULTICOMP_STATIC_CONNECTIONS != 1 */
 
 
