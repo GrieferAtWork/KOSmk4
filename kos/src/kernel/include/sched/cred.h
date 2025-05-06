@@ -38,7 +38,7 @@
  * - r/e/s-uid/gid ???
  * - caps.permitted     -- Capabilities that can be acquired by anyone, at any time
  * - caps.inheritable   -- Capabilities that ~can~ be inherited by privileged programs during exec()
- * - caps.effective     -- Capabilities current in effect
+ * - caps.effective     -- Capabilities currently in effect
  * - caps.bounding      -- - Caps that can be made permitted by privileged programs
  *                         - Caps that can be added to `caps.inheritable' by `capset()'
  * - caps.ambient       -- Capabilities that always become permitted in privileged programs during exec()

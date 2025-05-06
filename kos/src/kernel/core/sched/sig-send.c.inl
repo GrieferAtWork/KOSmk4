@@ -693,9 +693,11 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 #endif /* LOCAL_HAVE_reprime */
 #ifdef LOCAL_HAVE_destroy_later
                               , struct task *destroy_later
-#define LOCAL_destroy_later destroy_later
+#define LOCAL_destroy_later                  destroy_later
+#define LOCAL_destroy_tasks__destroy_later() destroy_tasks(destroy_later)
 #else /* LOCAL_HAVE_destroy_later */
-#define LOCAL_destroy_later NULL
+#define LOCAL_destroy_later                  NULL
+#define LOCAL_destroy_tasks__destroy_later() (void)0
 #endif /* LOCAL_HAVE_destroy_later */
                               ) {
 	struct sigcon *sigctl;
@@ -712,10 +714,12 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 #ifdef LOCAL_IS_NOPR
 #define LOCAL_was PREEMPTION_OFF_VALUE
 #define LOCAL_preemption_wason() 0
+#define LOCAL_preemption_pop()   (void)0
 #else /* !LOCAL_IS_NOPR */
 	preemption_flag_t was;
 #define LOCAL_was was
 #define LOCAL_preemption_wason() preemption_wason(&was)
+#define LOCAL_preemption_pop()   preemption_pop(&was)
 #endif /* LOCAL_IS_NOPR */
 #ifdef LOCAL_HAVE_flags
 	struct sigpostcomp *phase2 = NULL;
@@ -755,9 +759,7 @@ NOTHROW(FCALL LOCAL_sig_send)(struct sig *LOCAL_sig_restrict self
 		{
 			LOCAL_runcleanup(); /* for sig_send_cleanup */
 		}
-#ifdef LOCAL_HAVE_destroy_later
-		destroy_tasks(destroy_later);
-#endif /* LOCAL_HAVE_destroy_later */
+		LOCAL_destroy_tasks__destroy_later();
 		return 0;
 	}
 #endif /* LOCAL_HAVE_maxcount */
@@ -790,14 +792,12 @@ again:
 		if ((uintptr_t)sigctl == 0) {
 			/* Special case: no-one is connected */
 			LOCAL_runcleanup(); /* for sig_send_cleanup */
-#ifdef LOCAL_HAVE_destroy_later
-			destroy_tasks(destroy_later);
-#endif /* LOCAL_HAVE_destroy_later */
+			LOCAL_destroy_tasks__destroy_later();
 			return 0;
 		}
 
 #ifdef SIG_SMPLOCK
-		if ((uintptr_t)sigctl & SIG_SMPLOCK) {
+		if unlikely((uintptr_t)sigctl & SIG_SMPLOCK) {
 			LOCAL_task_yield();
 			goto again;
 		}
@@ -815,11 +815,9 @@ again:
 
 		/* Acquire SMP-lock */
 #ifdef SIG_SMPLOCK
-		if (!atomic_cmpxch_weak(&self->s_con, sigctl,
-		                        (struct sigcon *)((uintptr_t)sigctl | SIG_SMPLOCK))) {
-#ifndef LOCAL_IS_NOPR
-			preemption_pop(&was);
-#endif /* !LOCAL_IS_NOPR */
+		if unlikely(!atomic_cmpxch_weak(&self->s_con, sigctl,
+		                                (struct sigcon *)((uintptr_t)sigctl | SIG_SMPLOCK))) {
+			LOCAL_preemption_pop();
 			goto again;
 		}
 #endif /* SIG_SMPLOCK */
@@ -844,7 +842,7 @@ again:
 		DBG_memset(&receiver->sc_prev, 0xcc, sizeof(receiver->sc_prev));
 		DBG_memset(&receiver->sc_next, 0xcc, sizeof(receiver->sc_next));
 
-		if (SIGCON_STAT_ISCOMP(stat)) {
+		if unlikely(SIGCON_STAT_ISCOMP(stat)) {
 			struct sigcompcon *sc = (struct sigcompcon *)receiver;
 #ifdef LOCAL_HAVE_flags
 			context.scc_sender = sender;
@@ -896,7 +894,7 @@ again:
 				/* First signal delivered -> must wake the thread after locks were released. */
 				REF struct task *thread = xincref(atomic_read(&tcs->tcs_thread));
 				atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
-				if (thread) {
+				if likely(thread) {
 					LOCAL_task_wake(thread);
 					if unlikely(atomic_decfetch(&thread->t_refcnt) == 0) {
 #ifdef LOCAL_HAVE_destroy_later
@@ -929,7 +927,7 @@ again:
 		if (bcast_ok && !(stat & SIGCON_STAT_F_POLL)) {
 			++result;
 #ifdef LOCAL_HAVE_maxcount
-			if (result >= maxcount) {
+			if unlikely(result >= maxcount) {
 				/* Stop prematurely */
 				assert((receiver == lastcon) == (next == sigctl));
 				if unlikely(next == sigctl)
@@ -973,14 +971,10 @@ done_sig_unlocked:
 	LOCAL_runcleanup();
 
 	/* Restore preemption stat */
-#ifndef LOCAL_IS_NOPR
-	preemption_pop(&was);
-#endif /* !LOCAL_IS_NOPR */
+	LOCAL_preemption_pop();
 
 	/* Finish destruction of dead threads */
-#ifdef LOCAL_HAVE_destroy_later
-	destroy_tasks(destroy_later);
-#endif /* LOCAL_HAVE_destroy_later */
+	LOCAL_destroy_tasks__destroy_later();
 
 	/* Run phase#2 signal completion callbacks */
 #ifdef LOCAL_HAVE_flags
@@ -993,7 +987,7 @@ again_find_receiver:
 	assert(receiver->sc_sig == self);
 
 #ifdef LOCAL_HAVE_flags
-	if (flags & SIG_XSEND_F_TARGET)
+	if unlikely(flags & SIG_XSEND_F_TARGET)
 #endif /* LOCAL_HAVE_flags */
 #if defined(LOCAL_HAVE_flags) || defined(LOCAL_HAVE_target)
 	{
@@ -1011,9 +1005,7 @@ again_find_receiver:
 				sigcon_verify_ring_aftersend(sigctl);
 				atomic_write(&self->s_con, sigctl); /* Release SMP-lock */
 				LOCAL_runcleanup();                 /* for sig_send_cleanup */
-#ifndef LOCAL_IS_NOPR
-				preemption_pop(&was);
-#endif /* !LOCAL_IS_NOPR */
+				LOCAL_preemption_pop();
 				return false;
 			}
 		}
@@ -1054,7 +1046,7 @@ again_find_receiver:
 					unsigned int bcast_flags = (LOCAL_flags & ~SIG_XSEND_F_NOPR) | SIG_XSEND_F_LOCKED |
 					                           (LOCAL_preemption_wason() ? 0 : SIG_XSEND_F_NOPR);
 #ifdef LOCAL_HAVE_flags
-					if (phase2) {
+					if unlikely(phase2) {
 						sig_xbroadcast(self, bcast_flags, LOCAL_sender_OPT,
 						               LOCAL_caller, LOCAL_cleanup_OPT,
 						               LOCAL_reprime, LOCAL_destroy_later);
@@ -1109,6 +1101,8 @@ again_find_receiver:
 	assert(receiver->sc_next->sc_prev == receiver);
 	receiver->sc_prev->sc_next = receiver->sc_next;
 	receiver->sc_next->sc_prev = receiver->sc_prev;
+	DBG_memset(&receiver->sc_prev, 0xcc, sizeof(receiver->sc_prev));
+	DBG_memset(&receiver->sc_next, 0xcc, sizeof(receiver->sc_next));
 
 	/* Load the status/task word of "receiver" */
 	tcs = atomic_read_relaxed(&receiver->sc_cons);
@@ -1140,6 +1134,23 @@ again_find_receiver:
 		/* Deal with the case where the completion function didn't accept the signal. */
 		if (context.scc_mode & SIGCOMP_MODE_F_NONVIABLE)
 			goto handle_non_viable_receiver;
+
+		/* Merge remaining connections with those that ought to be re-primed. */
+#ifdef LOCAL_HAVE_reprime
+		remainder = combine_remainder_and_reprime(remainder, reprime);
+#endif /* LOCAL_HAVE_reprime */
+#ifndef sigcon_verify_ring_IS_NOOP
+		if (remainder)
+			sigcon_verify_ring_aftersend(remainder);
+#endif /* !sigcon_verify_ring_IS_NOOP */
+		atomic_write(&self->s_con, remainder);                    /* Release SMP-lock */
+		LOCAL_runcleanup();                                       /* for sig_send_cleanup */
+		LOCAL_preemption_pop();
+		LOCAL_destroy_tasks__destroy_later();
+#ifdef LOCAL_HAVE_flags
+		sig_run_phase_2(phase2, &context);
+#endif /* LOCAL_HAVE_flags */
+		return true;
 #else /* LOCAL_HAVE_flags */
 #ifdef LOCAL_HAVE_destroy_later
 #error "Invalid configuration"
@@ -1179,12 +1190,8 @@ handle_non_viable_receiver:
 #endif /* LOCAL_HAVE_reprime && !sigcon_verify_ring_IS_NOOP */
 				atomic_write(&self->s_con, LOCAL_reprime);
 				LOCAL_runcleanup();
-#ifndef LOCAL_IS_NOPR
-				preemption_pop(&was);
-#endif /* !LOCAL_IS_NOPR */
-#ifdef LOCAL_HAVE_destroy_later
-				destroy_tasks(destroy_later);
-#endif /* LOCAL_HAVE_destroy_later */
+				LOCAL_preemption_pop();
+				LOCAL_destroy_tasks__destroy_later();
 #ifdef LOCAL_HAVE_flags
 				sig_run_phase_2(phase2, &context);
 #endif /* LOCAL_HAVE_flags */
@@ -1217,17 +1224,13 @@ handle_non_viable_receiver:
 #endif /* !sigcon_verify_ring_IS_NOOP */
 		atomic_write(&self->s_con, remainder);                    /* Release SMP-lock */
 		LOCAL_runcleanup();                                       /* for sig_send_cleanup */
-#ifndef LOCAL_IS_NOPR
-		preemption_pop(&was);
-#endif /* !LOCAL_IS_NOPR */
+		LOCAL_preemption_pop();
 		if (thread) {
 			LOCAL_task_wake(thread);
 			decref_unlikely(thread);
 		}
 	}
-#ifdef LOCAL_HAVE_destroy_later
-	destroy_tasks(destroy_later);
-#endif /* LOCAL_HAVE_destroy_later */
+	LOCAL_destroy_tasks__destroy_later();
 #ifdef LOCAL_HAVE_flags
 	sig_run_phase_2(phase2, &context);
 #endif /* LOCAL_HAVE_flags */
@@ -1236,12 +1239,14 @@ handle_non_viable_receiver:
 #undef LOCAL_cleanup_OPT
 #undef LOCAL_sender_OPT
 #undef LOCAL_destroy_later
+#undef LOCAL_destroy_tasks__destroy_later
 #undef LOCAL_reprime
 #undef LOCAL_runcleanup
 #undef LOCAL_cleanup
 #undef LOCAL_sender
 #undef LOCAL_caller
 #undef LOCAL_was
+#undef LOCAL_preemption_pop
 #undef LOCAL_preemption_wason
 #undef LOCAL_maxcount_MINUS_result
 }

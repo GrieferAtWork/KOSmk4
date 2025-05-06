@@ -772,7 +772,7 @@ NOTHROW(FCALL taskcons_freecon)(struct taskcons *__restrict self,
 	if (con >= self->tcs_static &&
 	    con < COMPILER_ENDOF(self->tcs_static)) {
 		/* Free a static connection. */
-		DBG_memset(con, 0xaa, sizeof(con)); /* Not-allocated */
+		DBG_memset(con, 0xaa, sizeof(*con)); /* Not-allocated */
 		con->sc_sig = NULL;
 	} else {
 		/* Free a dynamically allocated connection. */
@@ -4022,11 +4022,155 @@ DEFINE_TEST(pushpop_connections) {
 }
 
 #ifdef CONFIG_EXPERIMENTAL_KERNEL_SIG_V2
+#if CONFIG_TASK_STATIC_CONNECTIONS >= 3
+#include <parts/assert-failed.h>
+#include <kernel/printk.h>
+#include <stdio.h>
 
-PRIVATE NOBLOCK NOPREEMPT NONNULL_T((1, 2)) size_t
-NOTHROW(FCALL noop_sigcomp_cb)(struct sigcompcon *__restrict self,
-                               struct sigcompctx *__restrict ctx,
-                               void *buf, size_t bufsize) {
+
+#define FAIL(line, expr, ...) __NAMESPACE_INT_SYM __afailf(expr, __FILE__, line, NULL, __VA_ARGS__)
+
+#define RST_LO 0
+#define RST_HI 2
+#define RST_N  3 /* # of task/comp connections to make available during testing */
+static_assert(RST_LO == 0);
+static_assert(RST_HI == RST_N - 1);
+static_assert(RST_N <= CONFIG_TASK_STATIC_CONNECTIONS);
+
+typedef unsigned int rst_opcode_t;
+#define RST_DONE                     0
+#define RST_SIG_SEND_TRUE            1
+#define RST_SIG_SEND_FALSE           2
+#define RST_TASK_DISCONNECT          3
+#define RST_TASK_DISCONNECTALL       4
+#define RST_TASK_RECEIVEALL          5
+#define RST_TASK_CONNECT             6
+#define RST_TASK_CONNECT_FOR_POLL    7
+#define RST_RING_START               8
+#define _RST_SETLINE                 9
+#define    RST_RING_END              0
+#define    RST_RING_COMP(i)          (1 + (RST_N * 0) + (i))
+#define    RST_RING_TASK(i)          (1 + (RST_N * 1) + (i))
+
+#define RST_COMP_CONNECT(i)          (16 + (RST_N * 0) + (i))
+#define RST_COMP_CONNECT_FOR_POLL(i) (16 + (RST_N * 1) + (i))
+#define RST_COMP_DISCONNECT(i)       (16 + (RST_N * 2) + (i))
+#define RST_COMP_ISSENT(i)           (16 + (RST_N * 3) + (i))
+#define RST_COMP_ISBCST(i)           (16 + (RST_N * 4) + (i))
+#define RST_TASK_ISSENT(i)           (16 + (RST_N * 5) + (i))
+#define RST_TASK_ISBCST(i)           (16 + (RST_N * 6) + (i))
+#define RST_SIG_BROADCAST(n)         (16 + (RST_N * 7) + (n))
+#define RST_SIG_SENDMANY(max, n)     (16 + (RST_N * 9) + ((max) * ((RST_N + 1) * 2)) + (n))
+
+PRIVATE ATTR_FREETEXT char const *KCALL
+nameof_rst_ring(rst_opcode_t id) {
+	static ATTR_FREEDATA char buf[256];
+	static ATTR_FREEDATA char *unused_start = buf;
+	char *result = unused_start;
+	if (id >= RST_RING_COMP(RST_LO) && id <= RST_RING_COMP(RST_HI)) {
+		unused_start += sprintf(result, "comp%u", (unsigned int)(id - RST_RING_COMP(RST_LO)));
+	} else if (id >= RST_RING_TASK(RST_LO) && id <= RST_RING_TASK(RST_HI)) {
+		unused_start += sprintf(result, "task%u", (unsigned int)(id - RST_RING_TASK(RST_LO)));
+	} else {
+		unused_start += sprintf(result, "{?:%u}", (unsigned int)id);
+	}
+	++unused_start;
+	return result;
+}
+
+PRIVATE ATTR_FREETEXT char const *KCALL
+nameof_rst_ptr(struct sigcompcon *comp_cons, struct sigcon *ptr) {
+	static ATTR_FREEDATA char buf[256];
+	static ATTR_FREEDATA char *unused_start = buf;
+	struct taskcons *cons = THIS_CONS;
+	char *result = unused_start;
+	if (ptr == NULL)
+		return "NULL";
+	if (ptr >= cons->tcs_static && ptr < COMPILER_ENDOF(cons->tcs_static)) {
+		unused_start += sprintf(result, "task%u", (unsigned int)((struct sigtaskcon *)ptr - cons->tcs_static));
+	} else if (ptr >= comp_cons && ptr < (comp_cons + RST_N)) {
+		unused_start += sprintf(result, "comp%u", (unsigned int)((struct sigcompcon *)ptr - comp_cons));
+	} else {
+		unused_start += sprintf(result, "{?:%p}", ptr);
+	}
+	++unused_start;
+	return result;
+}
+
+
+PRIVATE ATTR_FREETEXT void KCALL
+assert_sig_cons(struct sig *s, size_t n,
+                struct sigcon *const *scv,
+                rst_opcode_t const *scv_names, int line,
+                struct sigcompcon *comp_cons) {
+#define NAMEOF_RING_ITEM(i) nameof_rst_ring(scv_names[i])
+	size_t i;
+	struct sigcon *start, *prev, *iter;
+	if (n == 0) {
+		if (s->s_con != NULL) {
+			FAIL(line, NULL, "SIGNAL->s_con == NULL (is: %s)",
+			     nameof_rst_ptr(comp_cons, s->s_con));
+		}
+		return;
+	}
+	start = prev = scv[0];
+	if (s->s_con != start) {
+		FAIL(line, NULL, "SIGNAL->s_con == %s (is: %s)",
+		     NAMEOF_RING_ITEM(0), nameof_rst_ptr(comp_cons, s->s_con));
+	}
+	if (start->sc_sig != s) {
+		FAIL(line, NULL, "%s->sc_sig == SIGNAL (%p != %p)",
+		     NAMEOF_RING_ITEM(0), start->sc_sig, s);
+	}
+	if (!SIGCON_STAT_ISCONNECTED(start->sc_stat)) {
+		FAIL(line, NULL, "SIGCON_STAT_ISCONNECTED(%s->sc_stat) (is: %#Ix)",
+		     NAMEOF_RING_ITEM(0), start->sc_stat);
+	}
+
+	for (i = 1; i < n; ++i) {
+		iter = scv[i];
+		if (prev->sc_next != iter) {
+			FAIL(line, NULL, "%s->sc_next == %s (%s != %s)",
+			     NAMEOF_RING_ITEM(i - 1), NAMEOF_RING_ITEM(i),
+			     nameof_rst_ptr(comp_cons, prev->sc_next),
+			     nameof_rst_ptr(comp_cons, iter));
+		}
+		if (iter->sc_prev != prev) {
+			FAIL(line, NULL, "%s->sc_prev == %s (%s != %s)",
+			     NAMEOF_RING_ITEM(i), NAMEOF_RING_ITEM(i - 1),
+			     nameof_rst_ptr(comp_cons, iter->sc_prev),
+			     nameof_rst_ptr(comp_cons, prev));
+		}
+		if (iter->sc_sig != s) {
+			FAIL(line, NULL, "%s->sc_sig == SIGNAL (%p != %p)",
+			     NAMEOF_RING_ITEM(i), iter->sc_sig, s);
+		}
+		if (!SIGCON_STAT_ISCONNECTED(iter->sc_stat)) {
+			FAIL(line, NULL, "SIGCON_STAT_ISCONNECTED(%s->sc_stat) (is: %#Ix)",
+			     NAMEOF_RING_ITEM(i), iter->sc_stat);
+		}
+		prev = iter;
+	}
+	if (prev->sc_next != start) {
+		FAIL(line, NULL, "%s->sc_next == %s (%s != %s)",
+		     NAMEOF_RING_ITEM(n - 1), NAMEOF_RING_ITEM(0),
+		     nameof_rst_ptr(comp_cons, prev->sc_next),
+		     nameof_rst_ptr(comp_cons, start));
+	}
+	if (start->sc_prev != prev) {
+		FAIL(line, NULL, "%s->sc_prev == %s (%s != %s)",
+		     NAMEOF_RING_ITEM(0), NAMEOF_RING_ITEM(i - 1),
+		     nameof_rst_ptr(comp_cons, start->sc_prev),
+		     nameof_rst_ptr(comp_cons, prev));
+	}
+#undef NAMEOF_RING_ITEM
+}
+
+
+PRIVATE ATTR_FREETEXT NOBLOCK NOPREEMPT NONNULL_T((1, 2)) size_t
+NOTHROW(FCALL test_noop_sigcomp_cb)(struct sigcompcon *__restrict self,
+                                    struct sigcompctx *__restrict ctx,
+                                    void *buf, size_t bufsize) {
 	(void)self;
 	(void)ctx;
 	(void)buf;
@@ -4034,255 +4178,573 @@ NOTHROW(FCALL noop_sigcomp_cb)(struct sigcompcon *__restrict self,
 	return 0;
 }
 
-DEFINE_TEST(sig_send_to_poll) {
+#define RST_F_NORMAL 0x00
+#define RST_F_NOPR   0x01 /* Test no-preemption code paths */
+#define RST_F_XSEND  0x02 /* Use slower, but more generic sig_x* functions */
+PRIVATE ATTR_FREETEXT void KCALL
+run_signal_test(rst_opcode_t const *test, int line, unsigned int flags) {
+#define L_sigcompcon_connect(x, y)          ((flags & RST_F_NOPR) ? sigcompcon_connect_nopr(x, y) : sigcompcon_connect(x, y))
+#define L_sigcompcon_connect_for_poll(x, y) ((flags & RST_F_NOPR) ? sigcompcon_connect_for_poll_nopr(x, y) : sigcompcon_connect_for_poll(x, y))
+#define L_sigcompcon_disconnect(x)          ((flags & RST_F_NOPR) ? sigcompcon_disconnect_nopr(x) : sigcompcon_disconnect(x))
+#define _L_sig_send(x)                      ((flags & RST_F_NOPR) ? sig_send_nopr(x) : sig_send(x))
+#define _L_sig_xsend(x)                     sig_xsend(x, (flags & RST_F_NOPR) ? SIG_XSEND_F_NOPR : SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL)
+#define L_sig_send(x)                       ((flags & RST_F_XSEND) ? _L_sig_xsend(x) : _L_sig_send(x))
+#define _L_sig_sendmany(x, n)               ((flags & RST_F_NOPR) ? sig_sendmany_nopr(x, n) : sig_sendmany(x, n))
+#define _L_sig_xsendmany(x, n)              sig_xsendmany(x, n, (flags & RST_F_NOPR) ? SIG_XSEND_F_NOPR : SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL)
+#define L_sig_sendmany(x, n)                ((flags & RST_F_XSEND) ? _L_sig_xsendmany(x, n) : _L_sig_sendmany(x, n))
+#define _L_sig_broadcast(x)                 ((flags & RST_F_NOPR) ? sig_broadcast_nopr(x) : sig_broadcast(x))
+#define _L_sig_xbroadcast(x)                sig_xbroadcast(x, (flags & RST_F_NOPR) ? SIG_XSEND_F_NOPR : SIG_XSEND_F_NORMAL, NULL, THIS_TASK, NULL, NULL, NULL)
+#define L_sig_broadcast(x)                  ((flags & RST_F_XSEND) ? _L_sig_xbroadcast(x) : _L_sig_broadcast(x))
+	rst_opcode_t opcode;
 	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	sigcompcon_connect_for_poll(&scc, &s);
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(scc.sc_sig == &s);
-
-	assert(s.s_con == &scc);
-	assert(!sig_send(&s));
-	assert(s.s_con == NULL);
-
-	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(scc.sc_sig == &s);
-}
-
-DEFINE_TEST(sig_send_to_npoll) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	sigcompcon_connect(&scc, &s);
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_stat == SIGCON_STAT_TP_COMP);
-	assert(scc.sc_sig == &s);
-
-	assert(s.s_con == &scc);
-	assert(sig_send(&s));
-	assert(s.s_con == NULL);
-
-	assert(scc.sc_stat == SIGCON_STAT_ST_THRSENT);
-	assert(scc.sc_sig == &s);
-}
-
-
-DEFINE_TEST(sig_send_to_taskpoll) {
-	struct sig s = SIG_INIT;
+	struct sigcompcon comps[RST_N];
 	struct taskcons *cons = THIS_CONS;
-	task_connect_for_poll(&s);
-	assert(cons->tcs_static[0].sc_prev == &cons->tcs_static[0]);
-	assert(cons->tcs_static[0].sc_next == &cons->tcs_static[0]);
-	assert(cons->tcs_static[0].sc_stat & SIGCON_STAT_F_POLL);
-	assert((struct taskcons *)(cons->tcs_static[0].sc_stat & ~SIGCON_STAT_F_POLL) == cons);
-	assert(cons->tcs_static[0].sc_sig == &s);
+	{
+		size_t i;
+		for (i = 0; i < RST_N; ++i)
+			sigcompcon_init(&comps[i], &test_noop_sigcomp_cb);
+	}
 
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(!sig_send(&s));
-	assert(s.s_con == NULL);
+	while ((opcode = *test++) != RST_DONE) {
+		if ((flags & RST_F_NOPR) && PREEMPTION_ENABLED())
+			FAIL(line, "!PREEMPTION_ENABLED()", NULL);
+		switch (opcode) {
+		case RST_SIG_SEND_TRUE:
+			if (!L_sig_send(&s))
+				FAIL(line, "sig_send()", NULL);
+			break;
+		case RST_SIG_SEND_FALSE:
+			if (L_sig_send(&s))
+				FAIL(line, "!sig_send()", NULL);
+			break;
+		case RST_TASK_DISCONNECT:
+			if (!task_disconnect(&s))
+				FAIL(line, "task_disconnect()", NULL);
+			break;
+		case RST_TASK_DISCONNECTALL:
+			task_disconnectall();
+			break;
+		case RST_TASK_RECEIVEALL: {
+			struct sig *rcv = task_receiveall();
+			if (rcv != &s)
+				FAIL(line, "task_receiveall() == SIGNAL", "task_receiveall%p", rcv);
+		}	break;
+		case RST_TASK_CONNECT:
+			task_connect(&s);
+			break;
+		case RST_TASK_CONNECT_FOR_POLL:
+			task_connect_for_poll(&s);
+			break;
+		case RST_RING_START: {
+			rst_opcode_t const *name_start = test;
+			struct sigcon *ass_cons[RST_N * 2];
+			size_t n = 0;
+			while ((opcode = *test++) != RST_RING_END) {
+				assert(n < COMPILER_LENOF(ass_cons));
+				switch (opcode) {
+				case RST_RING_COMP(RST_LO) ... RST_RING_COMP(RST_HI):
+					ass_cons[n++] = &comps[opcode - RST_RING_COMP(RST_LO)];
+					break;
+				case RST_RING_TASK(RST_LO) ... RST_RING_TASK(RST_HI):
+					ass_cons[n++] = &cons->tcs_static[opcode - RST_RING_TASK(RST_LO)];
+					break;
+				default: FAIL(line, NULL, "Unknown opcode: %#I8x", opcode);
+				}
+			}
+			assert_sig_cons(&s, n, ass_cons, name_start, line, comps);
+		}	break;
 
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(task_isconnected());
-	task_disconnectall();
-	assert(!task_isconnected());
+		case _RST_SETLINE:
+			line = *test++;
+			printk(KERN_RAW "%s(%d): run_signal_test\n", __FILE__, line);
+			break;
+
+		case RST_COMP_CONNECT(RST_LO) ... RST_COMP_CONNECT(RST_HI):
+			L_sigcompcon_connect(&comps[opcode - RST_COMP_CONNECT(RST_LO)], &s);
+			break;
+		case RST_COMP_CONNECT_FOR_POLL(RST_LO) ... RST_COMP_CONNECT_FOR_POLL(RST_HI):
+			L_sigcompcon_connect_for_poll(&comps[opcode - RST_COMP_CONNECT_FOR_POLL(RST_LO)], &s);
+			break;
+		case RST_COMP_DISCONNECT(RST_LO) ... RST_COMP_DISCONNECT(RST_HI):
+			L_sigcompcon_disconnect(&comps[opcode - RST_COMP_DISCONNECT(RST_LO)]);
+			break;
+		case RST_SIG_BROADCAST(RST_LO) ... RST_SIG_BROADCAST(RST_N * 2 - 1): {
+			size_t want_n = opcode - RST_SIG_BROADCAST(RST_LO);
+			size_t real_n = L_sig_broadcast(&s);
+			if (want_n != real_n)
+				FAIL(line, "sig_broadcast()", "sig_broadcast() == %Iu (is: %Iu)", want_n, real_n);
+		}	break;
+		case RST_SIG_SENDMANY(RST_LO, RST_LO) ... RST_SIG_SENDMANY((RST_N + 1) * 2, (RST_N + 1) * 2): {
+			size_t oparg = opcode - RST_SIG_SENDMANY(RST_LO, RST_LO);
+			size_t want_n = oparg % ((RST_N + 1) * 2);
+			size_t send_n = oparg / ((RST_N + 1) * 2);
+			size_t real_n = L_sig_sendmany(&s, send_n);
+			if (want_n != real_n)
+				FAIL(line, "sig_sendmany()", "sig_sendmany(%Iu) == %Iu (is: %Iu)", send_n, want_n, real_n);
+		}	break;
+		case RST_COMP_ISSENT(RST_LO) ... RST_COMP_ISSENT(RST_HI): {
+			struct sigcompcon *c = &comps[opcode - RST_COMP_ISSENT(RST_LO)];
+			if (c->sc_stat != SIGCON_STAT_ST_THRSENT) {
+				FAIL(line, NULL, "%s->sc_stat == SIGCON_STAT_ST_THRSENT (is: %#Ix)",
+				     nameof_rst_ring(RST_RING_COMP(opcode - RST_COMP_ISSENT(RST_LO))),
+				     c->sc_stat);
+			}
+		}	break;
+		case RST_COMP_ISBCST(RST_LO) ... RST_COMP_ISBCST(RST_HI): {
+			struct sigcompcon *c = &comps[opcode - RST_COMP_ISBCST(RST_LO)];
+			if (c->sc_stat != SIGCON_STAT_ST_THRBCAST) {
+				FAIL(line, NULL, "%s->sc_stat == SIGCON_STAT_ST_THRBCAST (is: %#Ix)",
+				     nameof_rst_ring(RST_RING_COMP(opcode - RST_COMP_ISBCST(RST_LO))),
+				     c->sc_stat);
+			}
+		}	break;
+		case RST_TASK_ISSENT(RST_LO) ... RST_TASK_ISSENT(RST_HI): {
+			struct sigtaskcon *c = &cons->tcs_static[opcode - RST_TASK_ISSENT(RST_LO)];
+			if (c->sc_stat != SIGCON_STAT_ST_THRSENT) {
+				FAIL(line, NULL, "%s->sc_stat == SIGCON_STAT_ST_THRSENT (is: %#Ix)",
+				     nameof_rst_ring(RST_RING_TASK(opcode - RST_TASK_ISSENT(RST_LO))),
+				     c->sc_stat);
+			}
+		}	break;
+		case RST_TASK_ISBCST(RST_LO) ... RST_TASK_ISBCST(RST_HI): {
+			struct sigtaskcon *c = &cons->tcs_static[opcode - RST_TASK_ISBCST(RST_LO)];
+			if (c->sc_stat != SIGCON_STAT_ST_THRBCAST) {
+				FAIL(line, NULL, "%s->sc_stat == SIGCON_STAT_ST_THRBCAST (is: %#Ix)",
+				     nameof_rst_ring(RST_RING_TASK(opcode - RST_TASK_ISBCST(RST_LO))),
+				     c->sc_stat);
+			}
+		}	break;
+
+		default: FAIL(line, NULL, "Unknown opcode: %#I8x", opcode);
+		}
+#undef _line
+	}
+#undef L_sigcompcon_connect
+#undef L_sigcompcon_connect_for_poll
+#undef L_sigcompcon_disconnect
+#undef _L_sig_send
+#undef _L_sig_xsend
+#undef L_sig_send
+#undef _L_sig_sendmany
+#undef _L_sig_xsendmany
+#undef L_sig_sendmany
+#undef _L_sig_broadcast
+#undef _L_sig_xbroadcast
+#undef L_sig_broadcast
 }
 
-DEFINE_TEST(sig_send_to_tasknpoll) {
-	struct sig s = SIG_INIT;
-	struct taskcons *cons = THIS_CONS;
-	task_connect(&s);
-	assert(cons->tcs_static[0].sc_prev == &cons->tcs_static[0]);
-	assert(cons->tcs_static[0].sc_next == &cons->tcs_static[0]);
-	assert(cons->tcs_static[0].sc_cons == cons);
-	assert(cons->tcs_static[0].sc_sig == &s);
-
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(sig_send(&s));
-	assert(s.s_con == NULL);
-
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(task_isconnected());
-	task_disconnectall();
-	assert(!task_isconnected());
+PRIVATE ATTR_FREETEXT void KCALL
+do_run_signal_test(rst_opcode_t const *test, int line) {
+	run_signal_test(test, line, RST_F_NORMAL);
+	run_signal_test(test, line, RST_F_XSEND);
+	PREEMPTION_DISABLE();
+	run_signal_test(test, line, RST_F_NOPR);
+	run_signal_test(test, line, RST_F_XSEND | RST_F_NOPR);
+	PREEMPTION_ENABLE();
 }
 
+#define RST_BEGIN                      \
+	do {                               \
+		int _xtest_lno = __LINE__ + 1; \
+		static ATTR_FREERODATA rst_opcode_t const _xtest_dat[] = {
+#define L _RST_SETLINE, __LINE__,
+#define RST_END                                     \
+			RST_DONE                                \
+		};                                          \
+		do_run_signal_test(_xtest_dat, _xtest_lno); \
+	}	__WHILE0
 
-DEFINE_TEST(sig_send_to_poll_with_npoll) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	sigcompcon_connect_for_poll(&scc, &s);
-	task_connect(&s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
+#define C0 RST_RING_COMP(0)
+#define C1 RST_RING_COMP(1)
+#define C2 RST_RING_COMP(2)
+#define T0 RST_RING_TASK(0)
+#define T1 RST_RING_TASK(1)
+#define T2 RST_RING_TASK(2)
 
-	assert(s.s_con == &scc);
-	assert(sig_send(&s));
-	assert(s.s_con == &scc);
+DEFINE_TEST(sig_test_generic) {
+	RST_BEGIN
+		L /**/ RST_RING_START, RST_RING_END,
 
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_sig == &s);
-	assert(task_isconnected());
-	assert(task_receiveall() == &s);
-	assert(!task_isconnected());
+		/* Send on empty signal */
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Sendmany on empty signal */
+		L /**/ RST_SIG_SENDMANY(RST_HI, 0),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Broadcast on empty signal */
+		L /**/ RST_SIG_BROADCAST(0),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Send to task connection */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_ISSENT(0),
+		L /**/ RST_TASK_RECEIVEALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Send to task connection (poll) */
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_ISBCST(0),
+		L /**/ RST_TASK_RECEIVEALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Send to comp connection */
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(0),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Send to comp connection (poll) */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Disconnect task (single) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECT,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, T2, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECT,
+		L /**/ RST_TASK_DISCONNECT,
+		L /**/ RST_TASK_DISCONNECT,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Disconnect task (all) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, T2, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Signal forwarding during disconnect (task -> comp) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_RING_START, T0, C0, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECT,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+		L /**/ RST_COMP_ISSENT(0),
+
+		/* Signal forwarding during disconnect (comp -> task) */
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, C0, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(0),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send to poll+npoll */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(1),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(1),
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(0),
+
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Send to npoll+poll */
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C1, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(0),
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C1, RST_RING_END,
+		L /**/ RST_COMP_ISSENT(0),
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(1),
+
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, T1, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, T1, RST_RING_END,
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Broadcast to poll+npoll */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_BROADCAST(1),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_ISBCST(1),
+
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		/* This is actually "0" instead of "1" because the poll-connection is received first,
+		 * but  that one doesn't count to the total, and the second connection isn't received
+		 * because at that point the thread already has a signal. */
+		L /**/ RST_SIG_BROADCAST(0),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Broadcast to npoll+poll */
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_SIG_BROADCAST(1),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_ISBCST(1),
+
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_RING_START, T0, T1, RST_RING_END,
+		L /**/ RST_SIG_BROADCAST(1),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send signal to poll+poll+poll+poll */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(2),
+		L /**/ RST_TASK_CONNECT_FOR_POLL,
+		L /**/ RST_RING_START, C0, C1, C2, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_FALSE,
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_ISBCST(1),
+		L /**/ RST_COMP_ISBCST(2),
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send signal to norm+poll+poll+poll */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(2),
+		L /**/ RST_RING_START, T0, C0, C1, C2, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, C1, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, C1, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send signal to poll+poll+norm+poll */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT_FOR_POLL(2),
+		L /**/ RST_RING_START, C0, C1, T0, C2, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C2, C0, C1, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, C2, C0, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send signal to poll+poll+poll+norm */
+		L /**/ RST_COMP_CONNECT_FOR_POLL(0),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(1),
+		L /**/ RST_COMP_CONNECT_FOR_POLL(2),
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, C0, C1, C2, T0, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, C1, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, C0, C1, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_RECEIVEALL,
+
+		/* Send signal to norm+norm+norm+norm (w/ forwarding) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_COMP_CONNECT(2),
+		L /**/ RST_RING_START, T0, C0, C1, C2, RST_RING_END,
+		L /**/ RST_SIG_SEND_TRUE,
+		L /**/ RST_RING_START, C0, C1, C2, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_COMP_ISSENT(0),
+		L /**/ RST_RING_START, C1, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_COMP_ISSENT(1),
+		L /**/ RST_RING_START, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_COMP_ISSENT(2),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+
+		/* Broadcast signal to norm+norm+norm+norm (w/ forwarding) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_COMP_CONNECT(2),
+		L /**/ RST_RING_START, T0, C0, C1, C2, RST_RING_END,
+		L /**/ RST_SIG_BROADCAST(4),
+		L /**/ RST_RING_START, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_ISBCST(1),
+		L /**/ RST_COMP_ISBCST(2),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_COMP_DISCONNECT(2),
+
+		/* Sendmany signal to norm+norm+norm+norm (w/ forwarding) */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_COMP_CONNECT(2),
+		L /**/ RST_RING_START, T0, C0, C1, C2, RST_RING_END,
+		L /**/ RST_SIG_SENDMANY(3, 3),
+		L /**/ RST_RING_START, C2, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_COMP_ISBCST(0),
+		L /**/ RST_COMP_ISBCST(1),
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, C2, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, RST_RING_END,
+
+		/* Disconnect with multiple other signals */
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_COMP_CONNECT(2),
+		L /**/ RST_RING_START, T0, C0, C1, C2, RST_RING_END,
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, C0, C1, C2, RST_RING_END,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, C0, C1, C2, T0, RST_RING_END,
+
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, C1, C2, T0, RST_RING_END,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_RING_START, C1, C2, T0, C0, RST_RING_END,
+
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, C1, T0, C0, RST_RING_END,
+		L /**/ RST_COMP_CONNECT(2),
+		L /**/ RST_RING_START, C1, T0, C0, C2, RST_RING_END,
+
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, C1, T0, C2, RST_RING_END,
+		L /**/ RST_COMP_CONNECT(0),
+		L /**/ RST_RING_START, C1, T0, C2, C0, RST_RING_END,
+
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, C1, C2, C0, RST_RING_END,
+		L /**/ RST_TASK_CONNECT,
+		L /**/ RST_RING_START, C1, C2, C0, T0, RST_RING_END,
+
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, C2, C0, T0, RST_RING_END,
+		L /**/ RST_COMP_CONNECT(1),
+		L /**/ RST_RING_START, C2, C0, T0, C1, RST_RING_END,
+
+		L /**/ RST_TASK_DISCONNECTALL,
+		L /**/ RST_RING_START, C2, C0, C1, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(1),
+		L /**/ RST_RING_START, C2, C0, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(2),
+		L /**/ RST_RING_START, C0, RST_RING_END,
+		L /**/ RST_COMP_DISCONNECT(0),
+		L /**/ RST_RING_START, RST_RING_END,
+	RST_END;
 }
 
-DEFINE_TEST(sig_send_to_npoll_with_poll) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	task_connect(&s);
-	sigcompcon_connect_for_poll(&scc, &s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
+#undef RST_BEGIN
+#undef L
+#undef RST_END
+#undef C0
+#undef C1
+#undef C2
+#undef T0
+#undef T1
+#undef T2
 
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(sig_send(&s));
-	assert(s.s_con == &scc);
-
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRSENT);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_sig == &s);
-	assert(task_isconnected());
-	assert(task_receiveall() == &s);
-	assert(!task_isconnected());
-}
-
-DEFINE_TEST(sig_broadcast_to_poll_with_npoll) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	sigcompcon_connect_for_poll(&scc, &s);
-	task_connect(&s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
-
-	assert(s.s_con == &scc);
-	assert(sig_broadcast(&s));
-	assert(s.s_con == NULL);
-
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(task_isconnected());
-	assert(task_receiveall() == &s);
-	assert(!task_isconnected());
-}
-
-DEFINE_TEST(sig_broadcast_to_npoll_with_poll) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	task_connect(&s);
-	sigcompcon_connect_for_poll(&scc, &s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
-
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(sig_broadcast(&s));
-	assert(s.s_con == NULL);
-
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_stat == SIGCON_STAT_ST_THRBCAST);
-	assert(task_isconnected());
-	assert(task_receiveall() == &s);
-	assert(!task_isconnected());
-}
-
-DEFINE_TEST(sig_disconnect_via_receiveall) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	task_connect(&s);
-	sigcompcon_connect_for_poll(&scc, &s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
-
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(task_isconnected());
-	assert(task_receiveall() == NULL);
-	assert(!task_isconnected());
-	assert(s.s_con == &scc);
-
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-}
-
-DEFINE_TEST(sig_disconnect_via_receiveall_after_send) {
-	struct sig s = SIG_INIT;
-	struct sigcompcon scc;
-	struct taskcons *cons = THIS_CONS;
-	sigcompcon_init(&scc, &noop_sigcomp_cb);
-	task_connect(&s);
-	sigcompcon_connect_for_poll(&scc, &s);
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &cons->tcs_static[0]);
-	assert(scc.sc_next == &cons->tcs_static[0]);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-	assert(cons->tcs_static[0].sc_sig == &s);
-	assert(cons->tcs_static[0].sc_prev == &scc);
-	assert(cons->tcs_static[0].sc_next == &scc);
-
-	assert(s.s_con == &cons->tcs_static[0]);
-	assert(sig_send(&s));
-	assert(task_isconnected());
-	assert(task_receiveall() == &s);
-	assert(!task_isconnected());
-	assert(s.s_con == &scc);
-
-	assert(scc.sc_sig == &s);
-	assert(scc.sc_prev == &scc);
-	assert(scc.sc_next == &scc);
-	assert(scc.sc_stat == (SIGCON_STAT_TP_COMP | SIGCON_STAT_F_POLL));
-}
+#endif /* CONFIG_TASK_STATIC_CONNECTIONS >= 3 */
 #endif /* CONFIG_EXPERIMENTAL_KERNEL_SIG_V2 */
 
 
