@@ -27,6 +27,7 @@
 #include <hybrid/minmax.h>
 
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <sys/stat.h>
 
 #include <alloca.h>
@@ -35,6 +36,7 @@
 #include <io.h>
 #include <malloc.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

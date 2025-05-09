@@ -284,7 +284,7 @@ typedef __UINT32_TYPE__ gfp_t;
                                              *          locks (i.e. locks that use `task_waitfor()') are currently
                                              *          being held. Note that it  is usually not possible to  know
                                              *          if such locks are held, and the only place where you can
-                                             *          *truely* know is if your implementing a system call. */
+                                             *          *truely* know is if you're implementing a system call. */
 /*      GFP_         __UINT32_C(0x00040000)  * Reserved for `GFP_MAP_NOSPLIT' */
 /*      GFP_         __UINT32_C(0x00080000)  * Reserved for `GFP_MAP_NOMERGE' */
 /*efine GFP_         __UINT32_C(0x00100000)  * ... */
