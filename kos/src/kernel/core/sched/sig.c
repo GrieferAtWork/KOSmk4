@@ -103,7 +103,7 @@ static_assert(SIGCON_CONS_MINALIGN > (SIGCON_STAT_F_POLL));
 /* Internal key used to chain threads that have to be destroyed. */
 #define sig_destroylater_next(thread) KEY_task__next(thread)
 
-#if defined(NDEBUG) || defined(NDEBUG_SIG) || 0
+#if defined(NDEBUG) || defined(NDEBUG_SIG) || 1
 #define sigcon_verify_ring_IS_NOOP
 #define sigcon_verify_ring(head) (void)0
 #else /* NDEBUG || NDEBUG_SIG */
@@ -4256,7 +4256,9 @@ run_signal_test(rst_opcode_t const *test, int line, unsigned int flags) {
 
 		case _RST_SETLINE:
 			line = *test++;
+#ifndef sigcon_verify_ring_IS_NOOP
 			printk(KERN_RAW "%s(%d): run_signal_test\n", __FILE__, line);
+#endif /* !sigcon_verify_ring_IS_NOOP */
 			break;
 
 		case RST_COMP_CONNECT(RST_LO) ... RST_COMP_CONNECT(RST_HI):
