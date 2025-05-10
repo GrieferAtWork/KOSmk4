@@ -466,8 +466,35 @@ no:
 
 
 
+/* Don't do anything special here. This is only used to rethrow  exceptions
+ * caused by the system itself, rather than the user that caused the #PF to
+ * happen in the first place.
+ *
+ * If we were to change the register state here, we might trash a user-space
+ * register state (or similar) if a thread  receives an RPC while it was  in
+ * the process of handling a #PF
+ *
+ * In practice, this revealed itself as sporadic failures of the "timerfd"
+ * system-test, which was occasionally handling a harmless (lazy-load) #PF
+ * from within libdl.so, where it was loading a page from ".dynstr". Then,
+ * while it was doing so, the thread received the RPC set-up to trigger on
+ * completion of the timerfd, which then interrupted the #PF handler.
+ *
+ * This then resulted in the  instructing that was reading from  ".dynstr"
+ * getting skipped upon return from the test's "myrpc" handler, which then
+ * lead to the test failing with:
+ * >> "DL: Unresolved symbol 'futex_waitwhile' in 'system-test'"
+ *
+ * Since the actual fault happened in "strcmp()", it then skipped the instr
+ * that did the load from not-yet-loaded memory, causing it to compare  one
+ * properly  loaded char with  whatever random garbage  was in the register
+ * prior to the skipped load.
+ */
+#if 1
+#define rethrow_system_exception_from_pf_handler(state, pc) RETHROW()
+#else
 PRIVATE ATTR_NORETURN void FCALL
-rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc)
+rethrow_system_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc)
 		THROWS(...) {
 	/* Use the regular `instruction_trysucc()' since we're actually inside
 	 * of a CATCH-block right now, meaning that it will already do all  of
@@ -477,6 +504,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 	icpustate_setpc(state, pc);
 	RETHROW();
 }
+#endif
 
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
@@ -1139,7 +1167,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		task_popconnections();
 
 		/* Always make the state point to the instruction _after_ the one causing the problem. */
-		rethrow_exception_from_pf_handler(state, pc);
+		rethrow_system_exception_from_pf_handler(state, pc);
 	}
 
 	/* Re-map the freshly faulted memory. */
@@ -1247,7 +1275,7 @@ pop_connections_and_throw_segfault:
 			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
-				rethrow_exception_from_pf_handler(state, pc);
+				rethrow_system_exception_from_pf_handler(state, pc);
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
@@ -1278,7 +1306,7 @@ pop_connections_and_throw_segfault:
 				callsite_pc = call_instr;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
-				rethrow_exception_from_pf_handler(state, pc);
+				rethrow_system_exception_from_pf_handler(state, pc);
 			/* Discard read-from-callsite_pc exception... */
 		}
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);

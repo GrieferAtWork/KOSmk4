@@ -32,6 +32,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/rw.h>
 #include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
@@ -124,6 +125,36 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+
+#if defined(__i386__) && !defined(__x86_64__) && 0
+#define DBG_trace_cpustate(when, state)                                               \
+	printk(KERN_DEBUG                                                                 \
+	       "RPC: %s: "                                                                \
+	       "{eax:%#Ix,ecx:%#Ix,edx:%#Ix,ebx:%#Ix,esp:%#Ix,ebp:%#Ix,esi:%#Ix,edi:%#Ix" \
+	       ",ds:%#I16x,es:%#I16x,fs:%#I16x,gs:%#I16x,cs:%#I16x,ss:%#I16x"             \
+	       ",eflags:%#Ix,eip:%#Ix}\n",                                                \
+	       when,                                                                      \
+	       (state)->ics_gpregs.gp_eax,                                                \
+	       (state)->ics_gpregs.gp_ecx,                                                \
+	       (state)->ics_gpregs.gp_edx,                                                \
+	       (state)->ics_gpregs.gp_ebx,                                                \
+	       icpustate_getpsp(state),                                                   \
+	       (state)->ics_gpregs.gp_ebp,                                                \
+	       (state)->ics_gpregs.gp_esi,                                                \
+	       (state)->ics_gpregs.gp_edi,                                                \
+	       icpustate_getds(state),                                                    \
+	       icpustate_getes(state),                                                    \
+	       icpustate_getfs(state),                                                    \
+	       icpustate_getgs(state),                                                    \
+	       icpustate_getcs(state),                                                    \
+	       icpustate_getss(state),                                                    \
+	       icpustate_getpflags(state),                                                \
+	       icpustate_getpip(state))
+#else /* ... */
+#define DBG_trace_cpustate(when, state) (void)0
+#endif /* !... */
+
 
 
 /* Destroy a "!RPC_CONTEXT_KERN && !RPC_CONTEXT_SIGNAL"-rpc once `self->pr_user.pur_refcnt == 0' */
@@ -1956,6 +1987,8 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		goto done_nofini;
 	}
 
+	DBG_trace_cpustate("IN", state);
+
 	/* Initialize the RPC program VM */
 	rpc_mem_init(&vm.rv_mem);
 #ifdef ICPUSTATE_IS_UCPUSTATE
@@ -2146,6 +2179,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		icpustate_setpflags(state, ucpustate_getpflags(&vm.rv_cpu));
 		icpustate_setpip(state, ucpustate_getpip(&vm.rv_cpu));
 		icpustate_setuserpsp(state, ucpustate_getpsp(&vm.rv_cpu));
+
 #elif defined(__arm__)
 		cpustate_verify_apsr(icpustate_getcpsr(state),
 		                     ucpustate_getcpsr(&vm.rv_cpu));
@@ -2201,6 +2235,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 #error "Unsupported arch"
 #endif /* !... */
 
+		DBG_trace_cpustate("OUT", state);
 	} EXCEPT {
 		struct exception_info *tls = except_info();
 		rpc_vm_fini(&vm);

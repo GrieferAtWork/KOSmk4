@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
@@ -41,6 +42,15 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#if 0
+#define DBG_trace_injection(thread_iret)                                        \
+	printk(KERN_DEBUG "[sysret:%d,%s] Inject {Pip:%#Ix,cs:%#Ix,Pflags:%#Ix}\n", \
+	       (thread_iret)->ir_eip, (thread_iret)->ir_cs, (thread_iret)->ir_eflags)
+#else
+#define DBG_trace_injection(thread_iret) (void)0
+#endif
+
 
 /* The following offsets are currently being hard-coded in `rpc.S' */
 static_assert(offsetof(struct rpc_context, rc_context) == 0);
@@ -193,6 +203,7 @@ NOTHROW(FCALL userexcept_sysret_inject_with_state_nopr)(struct icpustate *__rest
 	assert(&state->ics_irregs_u == x86_get_irregs(me));
 	if (state->ics_irregs_u.ir_eip == (uintptr_t)&x86_userexcept_sysret)
 		return state; /* Already redirected. */
+	DBG_trace_injection(&state->ics_irregs_u);
 	FORTASK(me, this_x86_sysret_iret).ir_eip    = state->ics_irregs_u.ir_eip;
 	FORTASK(me, this_x86_sysret_iret).ir_cs     = state->ics_irregs_u.ir_cs;
 	FORTASK(me, this_x86_sysret_iret).ir_eflags = state->ics_irregs_u.ir_eflags;
@@ -270,6 +281,7 @@ NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread) {
 	thread_iret = x86_get_irregs(thread);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_userexcept_sysret)
 		return; /* Already redirected. */
+	DBG_trace_injection(thread_iret);
 	FORTASK(thread, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
 	FORTASK(thread, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
 	FORTASK(thread, this_x86_sysret_iret).ir_eflags = thread_iret->ir_eflags;
@@ -339,6 +351,7 @@ PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
 	thread_iret = x86_get_irregs(thread);
 	preemption_pushoff(&was);
 	if (thread_iret->ir_eip != (uintptr_t)&x86_userexcept_sysret) {
+		DBG_trace_injection(thread_iret);
 		FORTASK(thread, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
 		FORTASK(thread, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
 		FORTASK(thread, this_x86_sysret_iret).ir_eflags = thread_iret->ir_eflags;
