@@ -352,7 +352,7 @@ vga_setmode_common(struct vga_chipset *__restrict self,
 
 INTERN NONNULL((1, 2)) void CC
 vga_v_setmode(struct svga_chipset *__restrict self,
-              struct svga_modeinfo const *__restrict mode) {
+              struct svga_modeinfo *__restrict mode) {
 	struct vga_chipset *me = (struct vga_chipset *)self;
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {
@@ -387,7 +387,7 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 ega_v_setmode(struct svga_chipset *__restrict self,
-              struct svga_modeinfo const *__restrict mode) {
+              struct svga_modeinfo *__restrict mode) {
 	struct vga_chipset *me = (struct vga_chipset *)self;
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {

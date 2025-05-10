@@ -38,12 +38,16 @@
 #include "cs-bochsvbe.h"
 #include "cs-vesa.h"
 #include "cs-vga.h"
+#include "cs-vmware.h"
 
 DECL_BEGIN
 
 
 /* List of supported drivers. - Keep sorted most-specific to most-generic. */
 PRIVATE struct svga_chipset_driver svga_drivers[] = {
+#ifdef SVGA_CHIPSET_DRIVER_INIT_VMWARE
+	SVGA_CHIPSET_DRIVER_INIT_VMWARE,
+#endif /* SVGA_CHIPSET_DRIVER_INIT_VMWARE */
 #ifdef SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE
 	SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE,
 #endif /* SVGA_CHIPSET_DRIVER_INIT_BOCHSVBE */

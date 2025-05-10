@@ -101,8 +101,8 @@
 #define VBE_DISPI_LFB_PHYSICAL_ADDRESS __UINT32_C(0xE0000000)
 
 /* Bochs-VBE PCI IDs. (s.a. `/include/libpciaccess/pciaccess.h') */
-#define VBE_DISPI_PCI_VENDOR_ID 0x1234 /* `struct pci_device::pd_vendor_id' */
-#define VBE_DISPI_PCI_DEVICE_ID 0x1111 /* `struct pci_device::pd_device_id' */
+#define VBE_PCI_VENDOR_ID 0x1234 /* `struct pci_device::pd_vendor_id' */
+#define VBE_PCI_DEVICE_ID 0x1111 /* `struct pci_device::pd_device_id' */
 
 
 /* Get/Set BGA (BochsGraphicsAdapter) registers. */

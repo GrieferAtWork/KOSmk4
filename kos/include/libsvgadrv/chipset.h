@@ -58,6 +58,7 @@ __DECL_BEGIN
                                        *    This is a 16-color mode, with each plane holding exactly 1 bit of the final palette index
                                        *  - smi_bits_per_pixel == 2 && smi_colorbits == 8:
                                        *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index */
+#define SVGA_MODEINFO_F_ONSET  0x8000 /* Certain mode infos may only get initialized after the mode is set. */
 
 
 struct svga_modeinfo {
@@ -124,14 +125,24 @@ struct svga_chipset_ops {
 			__THROWS(E_IOERROR);
 
 	/* [1..1][const][lock(EXTERNAL)]
-	 * - Set a given video mode to `mode'
+	 * - Set a given video  mode to `mode'. When  `SVGA_MODEINFO_F_ONSET'
+	 *   is set, may also possibly alter/initialize the following fields:
+	 *   - mode->smi_lfb
+	 *   - mode->smi_scanline  (previously: always initialized to the max possible value)
+	 *   - mode->smi_rshift
+	 *   - mode->smi_rbits
+	 *   - mode->smi_gshift
+	 *   - mode->smi_gbits
+	 *   - mode->smi_bshift
+	 *   - mode->smi_bbits
+	 *   - mode->smi_colorbits
 	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
 	 * - Prior to this function being called for the first time, any  function
 	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
 	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]' */
 	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
-	                             struct svga_modeinfo const *__restrict mode);
+	                             struct svga_modeinfo *__restrict mode);
 
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
@@ -177,7 +188,7 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
-	/* [1..1][lock(EXTERNAL)]
+	/* [0..1][lock(EXTERNAL)]
 	 * - Set  display start offset  to `offset' pixels from
 	 *   `CURRENT_VIDEO_MODE.smi_lfb' or the start of video
 	 *   memory
@@ -188,6 +199,7 @@ struct svga_chipset_ops {
 	 *   function after changing the logical display width.
 	 * - Set `self->sc_displaystart = offset;'
 	 * - Not available in text-mode video modes.
+	 * - Set to "NULL" if never supported
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(offset <= self->sc_vmemsize * 8 / CURRENT_VIDEO_MODE.smi_bits_per_pixel);
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
@@ -195,7 +207,7 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
-	/* [1..1][lock(EXTERNAL)]
+	/* [0..1][lock(EXTERNAL)]
 	 * - Set  logical screen width  to `width' pixels and
 	 *   write the new value into `self->sc_logicalwidth'
 	 * - The logical screen  width is the  # of pixels  the
@@ -204,6 +216,7 @@ struct svga_chipset_ops {
 	 * - The value must be aligned by `self->sc_logicalwidth_align'
 	 * - The default value is `smi_scanline'
 	 * - Not available in text-mode video modes.
+	 * - Set to "NULL" if never supported
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(IS_ALIGNED(width, self->sc_logicalwidth_align));
 	 * @assume(width <= sc_logicalwidth_max);
@@ -216,21 +229,21 @@ struct svga_chipset_ops {
 struct svga_chipset {
 	struct svga_chipset_ops sc_ops;                /* [const] Chipset operators. */
 	__size_t                sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode))]
+	__size_t                sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                * Current display window for reads. */
-	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode))]
+	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                * Current display window for writes. */
-	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))]
-	                                                * Current display start (pixels from `CURRENT_VIDEO_MODE.smi_lfb', or the start
-	                                                * of  video memory, to  the beginning of the  screen; usually top-left corner). */
-	__uint32_t              sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))]
-	                                                * Current logical screen width (in pixels; updated by `sco_setlogicalwidth')
-	                                                * This  is the # of pixel between the  start of two lines, commonly known as
-	                                                * the scanline, only this time expressed in pixels, rather than bytes.  Also
-	                                                * note that because scanlines always have to start on whole bytes, there  is
+	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setdisplaystart != NULL)]
+	                                                * Current display  start (pixels  from  `CURRENT_VIDEO_MODE.smi_lfb', or  the  start
+	                                                * of video memory, to the beginning of the screen; usually top-left corner). */
+	__uint32_t              sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)]
+	                                                * Current  logical  screen  width  (in  pixels;  updated  by  `sco_setlogicalwidth')
+	                                                * This  is  the  # of  pixel  between the  start  of  two lines,  commonly  known as
+	                                                * the scanline,  only  this  time  expressed in  pixels,  rather  than  bytes.  Also
+	                                                * note that  because  scanlines  always have  to  start  on whole  bytes,  there  is
 	                                                * a alignment requirement of `sc_logicalwidth_align' pixels. */
-	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))] Max value allowed for `sc_logicalwidth' */
-	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode))] Alignment requirements of `sc_logicalwidth' */
+	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
+	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
 	/* Chipset-specific data goes here. */
 };
 

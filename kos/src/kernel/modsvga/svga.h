@@ -75,9 +75,9 @@ struct svgatty;
 /* SVGA tty accessor descriptor.
  * Used for encoding TTY display mode info and the like. */
 struct svga_ttyaccess: vidttyaccess {
-	struct svga_modeinfo const *sta_mode; /* [1..1][const] Associated SVGA mode. */
-	struct mnode                sta_vmem; /* [const] Video memory mapping.  (prepared+mapped)
-	                                       * Only access when `VIDTTYACCESS_F_ACTIVE' is set! */
+	struct svga_modeinfo *sta_mode; /* [1..1][const] Associated SVGA mode. */
+	struct mnode          sta_vmem; /* [const] Video memory mapping.  (prepared+mapped)
+	                                 * Only access when `VIDTTYACCESS_F_ACTIVE' is set! */
 };
 
 INTDEF NOBLOCK NONNULL((1)) void
@@ -148,7 +148,7 @@ struct svgatty: vidtty { };
 
 
 struct svgalck: vidlck {
-	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(vlc_dev->vd_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
+	struct svga_modeinfo           *slc_mode;   /* [0..1][lock(vlc_dev->vd_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
 	struct vga_regs                 slc_vregs;  /* [lock(vlc_dev->vd_lock)] Standard VGA registers to restore upon release. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(vlc_dev->vd_lock)][0..vlc_dev->svd_chipset.sco_regsize]
 	                                             * Extended registers (restored with `sul_screen.sty_dev->svd_chipset.sco_setregs') */
@@ -173,7 +173,7 @@ struct svgadev: viddev {
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
 	size_t                            svd_supmodec; /* [!0][const] # of supported video modes. */
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
-	struct svga_modeinfo const       *svd_defmode;  /* [1..1][lock(ATOMIC)] Default video mode. (points into `svd_supmodev') */
+	struct svga_modeinfo             *svd_defmode;  /* [1..1][lock(ATOMIC)] Default video mode. (points into `svd_supmodev') */
 	struct svga_chipset_driver const *svd_csdriver; /* [1..1][const] SVGA driver. */
 	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
 };
@@ -192,20 +192,20 @@ INTDEF struct viddev_ops const svgadev_ops; /* Operators for `struct svgadev' */
 #define svga_active_islck(self) ((self)->mf_ops == &svgalck_ops.vlo_file)
 #define svga_active_istty(self) ((self)->mf_ops != &svgalck_ops.vlo_file)
 
-/* Return a `struct svga_modeinfo const *' for the i'th supported video mode if `self' */
+/* Return a `struct svga_modeinfo *' for the i'th supported video mode if `self' */
 #define svgadev_supmode(self, i) \
-	((struct svga_modeinfo const *)((self)->svd_supmodev + ((i) * (self)->svd_supmodeS)))
+	((struct svga_modeinfo *)((self)->svd_supmodev + ((i) * (self)->svd_supmodeS)))
 
 
 /* Create a TTY access object for the given `mode' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess *FCALL
 svgadev_makettyaccess(struct svgadev *__restrict self,
-                      struct svga_modeinfo const *__restrict mode);
+                      struct svga_modeinfo *__restrict mode);
 
 /* Set the SVGA video mode to `mode' */
 INTDEF NONNULL((1, 2)) void FCALL
 svgadev_setmode(struct svgadev *__restrict self,
-                struct svga_modeinfo const *__restrict mode)
+                struct svga_modeinfo *__restrict mode)
 		THROWS(E_IOERROR);
 
 
@@ -213,12 +213,12 @@ svgadev_setmode(struct svgadev *__restrict self,
  * Note that the tty has yet to be made active! */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *FCALL
 svgadev_vnewttyf(struct svgadev *__restrict self,
-                 struct svga_modeinfo const *__restrict mode, dev_t devno,
+                 struct svga_modeinfo *__restrict mode, dev_t devno,
                  char const *__restrict format, __builtin_va_list args)
 		THROWS(E_WOULDBLOCK);
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *VCALL
 svgadev_newttyf(struct svgadev *__restrict self,
-                struct svga_modeinfo const *__restrict mode, dev_t devno,
+                struct svga_modeinfo *__restrict mode, dev_t devno,
                 char const *__restrict format, ...)
 		THROWS(E_WOULDBLOCK);
 

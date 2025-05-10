@@ -78,12 +78,12 @@ DECL_BEGIN
 /************************************************************************/
 
 /* Return a pointer to the internal mode descriptor matching `mode' */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo *FCALL
 svgadev_findmode(struct svgadev *__restrict self,
                  NCX struct svga_modeinfo const *mode)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
-	struct svga_modeinfo const *result;
 	size_t i;
+	struct svga_modeinfo *result;
 	for (i = 0; i < self->svd_supmodec; ++i) {
 		result = svgadev_supmode(self, i);
 		if (bcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
@@ -266,7 +266,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case SVGA_IOC_SETMODE: {
 		struct svgadev *dv = viddev_assvga(me->vlc_dev);
-		struct svga_modeinfo const *newmode;
+		struct svga_modeinfo *newmode;
 		validate_readable(arg, sizeof(struct svga_modeinfo));
 		newmode = svgadev_findmode(viddev_assvga(me->vlc_dev), (NCX struct svga_modeinfo *)arg);
 		viddev_acquire(dv);
@@ -539,7 +539,7 @@ PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_ioctl_setmode(struct svgatty *__restrict self,
                       NCX UNCHECKED struct svga_modeinfo const *modeinfo) {
 	REF struct svga_ttyaccess *newtty;
-	struct svga_modeinfo const *newmode;
+	struct svga_modeinfo *newmode;
 	validate_readable(modeinfo, sizeof(*modeinfo));
 
 	/* New special permissions to set the video mode.
@@ -617,7 +617,7 @@ INTERN_CONST struct vidtty_ops const svgatty_ops = {{{{{{
 /* Set the SVGA video mode to `mode' */
 INTERN NONNULL((1, 2)) void FCALL
 svgadev_setmode(struct svgadev *__restrict self,
-                struct svga_modeinfo const *__restrict mode)
+                struct svga_modeinfo *__restrict mode)
 		THROWS(E_IOERROR) {
 
 	/* Set the video mode requested by `tty' */
@@ -695,7 +695,7 @@ svgadev_setmode(struct svgadev *__restrict self,
  * Note that the tty has yet to be made active! */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *FCALL
 svgadev_vnewttyf(struct svgadev *__restrict self,
-                 struct svga_modeinfo const *__restrict mode, dev_t devno,
+                 struct svga_modeinfo *__restrict mode, dev_t devno,
                  char const *__restrict format, __builtin_va_list args)
 		THROWS(E_WOULDBLOCK) {
 	REF struct svgatty *result;
@@ -741,7 +741,7 @@ svgadev_vnewttyf(struct svgadev *__restrict self,
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *VCALL
 svgadev_newttyf(struct svgadev *__restrict self,
-                struct svga_modeinfo const *__restrict mode, dev_t devno,
+                struct svga_modeinfo *__restrict mode, dev_t devno,
                 char const *__restrict format, ...)
 		THROWS(E_WOULDBLOCK) {
 	REF struct svgatty *result;
@@ -901,15 +901,15 @@ NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mod
 }
 
 /* Select and return the video mode that should be used for the builtin debugger. */
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE NONNULL((1)) struct svga_modeinfo *
 NOTHROW(FCALL svgadev_dbg_selectmode)(struct svgadev *__restrict self) {
 	size_t i;
 	uint64_t winner_cost;
-	struct svga_modeinfo const *winner;
+	struct svga_modeinfo *winner;
 	winner      = svgadev_supmode(self, 0);
 	winner_cost = calculate_dbgmode_cost(winner);
 	for (i = 1; i < self->svd_supmodec; ++i) {
-		struct svga_modeinfo const *mode;
+		struct svga_modeinfo *mode;
 		uint64_t cost;
 		mode = svgadev_supmode(self, i);
 		cost = calculate_dbgmode_cost(mode);
@@ -924,7 +924,7 @@ NOTHROW(FCALL svgadev_dbg_selectmode)(struct svgadev *__restrict self) {
 /* SVGA device debugger integration. */
 INTERN ATTR_FREETEXT NONNULL((1)) void FCALL
 svgadev_dbg_init(struct svgadev *__restrict self) {
-	struct svga_modeinfo const *mode;
+	struct svga_modeinfo *mode;
 	size_t dregsize;
 
 	/* Select the video mode that will be used in the builtin debugger.

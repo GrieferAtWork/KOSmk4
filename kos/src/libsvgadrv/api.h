@@ -35,7 +35,23 @@
 #define NOTHROW_KERNEL __NOTHROW_KERNEL
 #endif /* !NOTHROW_KERNEL */
 
+
+/* vvv Breaks in modsvga because changes rules regarding initialization
+ *     of "struct svga_modeinfo" (only  initialized in  `sco_setmode'). */
+#define CONFIG_NO_LIBSVGADRV_CHIPSET_VMWARE
+
 /* Configure supported chipsets. */
+/*[[[config CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE = true]]]*/
+#ifdef CONFIG_NO_LIBSVGADRV_CHIPSET_VMWARE
+#undef CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE
+#elif !defined(CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE)
+#define CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE
+#elif (-CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE - 1) == -1
+#undef CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE
+#define CONFIG_NO_LIBSVGADRV_CHIPSET_VMWARE
+#endif /* ... */
+/*[[[end]]]*/
+
 /*[[[config CONFIG_HAVE_LIBSVGADRV_CHIPSET_BOCHSVBE = true]]]*/
 #ifdef CONFIG_NO_LIBSVGADRV_CHIPSET_BOCHSVBE
 #undef CONFIG_HAVE_LIBSVGADRV_CHIPSET_BOCHSVBE

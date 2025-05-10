@@ -221,6 +221,7 @@ did_update_x86_64_kernel:
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
 //		"-d", "int",
 		"-vga", "std",
+//		"-vga", "vmware", /* TODO: CONFIG_HAVE_LIBSVGADRV_CHIPSET_VMWARE */
 		/* Enable the VM-based RTC clock, which pauses when the kernel is paused. */
 		"-rtc", "base=utc,clock=vm"
 	});

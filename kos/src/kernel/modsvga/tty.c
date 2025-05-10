@@ -708,7 +708,7 @@ notsup:
 /* Create a TTY access object for the given `mode' */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess *FCALL
 svgadev_makettyaccess(struct svgadev *__restrict self,
-                      struct svga_modeinfo const *__restrict mode) {
+                      struct svga_modeinfo *__restrict mode) {
 	REF struct svga_ttyaccess *result;
 	/* Support both hardware text-mode, as well as
 	 * software emulation for higher  resolutions! */

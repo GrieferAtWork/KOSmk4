@@ -101,16 +101,16 @@ NOTHROW(FCALL calculate_mode_cost)(struct svga_modeinfo const *__restrict mode,
 	return result;
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo *
 NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
                                          uint32_t xres, uint32_t yres, uint8_t bpp) {
 	size_t i;
 	uint64_t winner_cost;
-	struct svga_modeinfo const *winner;
+	struct svga_modeinfo *winner;
 	winner      = svgadev_supmode(self, 0);
 	winner_cost = calculate_mode_cost(winner, xres, yres, bpp);
 	for (i = 1; i < self->svd_supmodec; ++i) {
-		struct svga_modeinfo const *mode;
+		struct svga_modeinfo *mode;
 		uint64_t cost;
 		mode = svgadev_supmode(self, i);
 		cost = calculate_mode_cost(mode, xres, yres, bpp);
@@ -122,7 +122,7 @@ NOTHROW(FCALL select_closest_video_mode)(struct svgadev *__restrict self,
 	return winner;
 }
 
-PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo const *
+PRIVATE NOBLOCK ATTR_FREETEXT ATTR_RETNONNULL ATTR_PURE WUNUSED NONNULL((1)) struct svga_modeinfo *
 NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
 	return select_closest_video_mode(self, default_resx, default_resy, default_bpp);
 }

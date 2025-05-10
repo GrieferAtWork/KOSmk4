@@ -86,7 +86,7 @@ vga_v_getmode(struct svga_chipset *__restrict UNUSED(self),
 		THROWS(E_IOERROR);
 INTDEF NONNULL((1, 2)) void CC
 vga_v_setmode(struct svga_chipset *__restrict self,
-              struct svga_modeinfo const *__restrict mode);
+              struct svga_modeinfo *__restrict mode);
 
 
 /* Probe for VGA support.
