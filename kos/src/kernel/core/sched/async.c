@@ -223,29 +223,7 @@ again:
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
-                                    void *buf) {
-	REF struct async *me;
-	unsigned int st;
-	me = *(REF struct async **)buf;
-again:
-	st = atomic_read(&me->a_stat);
-	if unlikely(st != _ASYNC_ST_READY &&
-	            st != _ASYNC_ST_READY_TMO) {
-		/* Can happen if the job  was cancel'd in the mean  time,
-		 * or if more than one of the job's connected signals was
-		 * delivered before we could get here. */
-		decref(me);
-		return;
-	}
-
-	/* Mark the job as having been triggered. */
-	if (!async_stat__cmpxch_weak(me, st, _ASYNC_ST_TRIGGERED))
-		goto again;
-
-	/* Add the job to the list of ready jobs. */
-	async_ready_insert(me); /* Inherit reference */
-	sig_send(&async_ready_sig);
-}
+                                    void *buf);
 
 
 /* Must be INTERN because used in the static init of `mpart_ajob_fallback_worker' */
@@ -316,9 +294,22 @@ PRIVATE struct lockop_slist /*  */ async_tmo_lops; /* Pending lock operations fo
 #define async_tmo_waitfor_nx() atomic_lock_waitfor_nx(&async_tmo_lock)
 
 
+#ifdef async_stat__trace_IS_NOOP
+#define async_tmo_remove(job) LIST_REMOVE(job, a_tmolnk)
+#else /* async_stat__trace_IS_NOOP */
+#define async_tmo_remove(job)                                                      \
+	(printk(KERN_TRACE "[async %p, line %d] async_tmo_remove()\n", job, __LINE__), \
+	 LIST_REMOVE(job, a_tmolnk))
+#endif /* !async_stat__trace_IS_NOOP */
+
 /* Insert the given `job' into the async-timeout list, inheriting a reference */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeout) {
+#ifndef async_stat__trace_IS_NOOP
+#define async_tmo_insert(job, timeout)                                             \
+	(printk(KERN_TRACE "[async %p, line %d] async_tmo_insert()\n", job, __LINE__), \
+	 async_tmo_insert(job, timeout))
+#endif /* !async_stat__trace_IS_NOOP */
 	struct async **p_next, *next;
 	for (p_next = LIST_PFIRST(&async_tmo_list); (next = *p_next) != NULL;
 	     p_next = LIST_PNEXT(next, a_tmolnk)) {
@@ -342,6 +333,58 @@ NOTHROW(FCALL async_tmo_insert)(REF struct async *__restrict job, ktime_t timeou
 	LIST_P_INSERT_BEFORE(p_next, job, a_tmolnk);
 }
 
+
+
+PRIVATE NOBLOCK NONNULL((1)) struct postlockop *
+NOTHROW(FCALL async_deltmo_lop)(struct lockop *__restrict self);
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_postcompletion)(struct sig_completion_context *__restrict UNUSED(context),
+                                    void *buf) {
+	REF struct async *me;
+	unsigned int st;
+	me = *(REF struct async **)buf;
+again:
+	st = atomic_read(&me->a_stat);
+	if unlikely(st != _ASYNC_ST_READY &&
+	            st != _ASYNC_ST_READY_TMO) {
+		/* Can happen if the job  was cancel'd in the mean  time,
+		 * or if more than one of the job's connected signals was
+		 * delivered before we could get here. */
+		decref(me);
+		return;
+	}
+
+	/* Mark the job as having been triggered. */
+	if (st == _ASYNC_ST_READY) {
+		if (!async_stat__cmpxch_weak(me, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED))
+			goto again;
+add_to_ready:
+		/* Add the job to the list of ready jobs. */
+		async_ready_insert(me); /* Inherit reference */
+		sig_send(&async_ready_sig);
+		return;
+	}
+
+	/* Must go the long way 'round and first remove from the timeout handler. */
+	if (async_tmo_tryacquire()) {
+		if (!async_stat__cmpxch_weak(me, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED)) {
+			async_tmo_release();
+			goto again;
+		}
+		async_tmo_remove(me); /* Inherit reference */
+		async_tmo_release();
+		decref_nokill(me); /* Inherited from "async_tmo_remove" */
+		goto add_to_ready;
+	}
+	if (!async_stat__cmpxch_weak(me, _ASYNC_ST_READY, _ASYNC_ST_DELTMO_STRT))
+		goto again;
+
+	/* Enqueue a lock-operation to remove `self' from the timeout list. */
+	me->_a_tmolockop.lo_func = &async_deltmo_lop;
+	SLIST_ATOMIC_INSERT(&async_tmo_lops, &me->_a_tmolockop, lo_link);
+	_async_tmo_reap();
+}
 
 
 /* Find the given `thread' within the given async-thread-controller. */
@@ -411,7 +454,7 @@ again_pop_job:
 
 				/* Remove `job' from the list of timeout jobs, thus
 				 * claiming it for ourselves. */
-				LIST_REMOVE(job, a_tmolnk);
+				async_tmo_remove(job);
 				async_tmo_release();
 				COMPILER_READ_BARRIER();
 				timeout = job->a_tmo;
@@ -534,8 +577,15 @@ do_handle_timeout:
 				async_tmo_release();
 
 				/* The job's status no longer indicates SLEEPING.
-				 * This can happen if the job was canceled in the mean time. */
-				goto again_rd_stat;
+				 *
+				 * This can happen  if the  job was  canceled in  the mean  time.
+				 * When the happens, it's current state will be "TRIGGERED_STOP",
+				 * and `async_cancel()' will have already  added it to the  ready
+				 * queue.
+				 *
+				 * As such, drop our reference and load more jobs. */
+				decref_unlikely(job);
+				goto again;
 			} /* LIST_FOREACH (job, &async_tmo_list, a_tmolnk) */
 			async_tmo_release();
 
@@ -994,7 +1044,7 @@ NOTHROW(FCALL async_deltmo_lop)(struct lockop *__restrict self) {
 	me = container_of(self, struct async, _a_tmolockop);
 
 	/* Actually remove from the timeout list! */
-	LIST_REMOVE(me, a_tmolnk); /* Inherit reference */
+	async_tmo_remove(me); /* Inherit reference */
 	decref_nokill(me); /* The caller already gave us a reference, drop the new one. */
 
 again_rd_stat:
@@ -1096,7 +1146,7 @@ do_async_cancel:
 					}
 					async_all_remove(self); /* Remove from the all-list */
 					async_all_release_f();
-					LIST_REMOVE(self, a_tmolnk); /* Remove from the timeout list */
+					async_tmo_remove(self); /* Remove from the timeout list */
 					_async_tmo_release();
 					async_all_reap();
 					async_tmo_reap();
@@ -1111,7 +1161,7 @@ do_async_cancel:
 				async_tmo_release();
 				goto again;
 			}
-			LIST_REMOVE(self, a_tmolnk); /* Inherit reference */
+			async_tmo_remove(self); /* Inherit reference */
 			async_tmo_release();
 			async_ready_insert(self); /* Inherit reference */
 			sig_send(&async_ready_sig);

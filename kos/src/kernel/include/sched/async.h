@@ -155,6 +155,7 @@ struct async_ops {
  *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED_STOP  // ao_work:return!=ASYNC_RESUME or async_cancel()
  *   _ASYNC_ST_READY          ->  _ASYNC_ST_READY_TMO       // ao_connect:return!=KTIME_INFINITE
  *
+ *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_DELTMO_STRT     // Signal-completion-callback
  *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_SLEEPING        // worker-waits-for-timeout
  *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_DELTMO          // async_cancel()
  *
