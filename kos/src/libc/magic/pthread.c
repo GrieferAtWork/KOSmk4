@@ -1090,7 +1090,7 @@ $errno_t pthread_attr_setstack([[inout]] pthread_attr_t *self,
 @@>> pthread_attr_setaffinity_np(3)
 @@Set cpuset on which the thread will be allowed to run
 @@@return: EOK:    Success
-@@@return: EINVAL: The given set contains a non-existant CPU
+@@@return: EINVAL: The given set contains a non-existent CPU
 @@@return: ENOMEM: Insufficient memory
 [[guard]]
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]

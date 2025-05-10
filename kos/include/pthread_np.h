@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff810642 */
+/* HASH CRC-32:0x96301c0f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -230,14 +230,14 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_g
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
- * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: EINVAL: The given set contains a non-existent CPU
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
 #elif defined(__CRT_HAVE___pthread_attr_setaffinity_np)
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
- * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: EINVAL: The given set contains a non-existent CPU
  * @return: ENOMEM: Insufficient memory */
 __CREDIRECT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),__pthread_attr_setaffinity_np,(__self,__cpusetsize,__cpuset))
 #else /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x307c32df */
+/* HASH CRC-32:0x898a7610 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,11 +208,11 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBCCALL libc_re_set_registers
  * @return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
 /* >> regexec(3)
- * Execute a compiled regular expression `pattern' on the priveded string.
+ * Execute a compiled regular expression `pattern' on the provided string.
  * - This function searches for the FIRST position in `string' at which `self' can be matched.
  * - When `nmatch > 0' (and `REG_NOSUB' wasn't set), the matched address-range is stored in `pmatch[0]'
  * - When `nmatch > 1' (and `REG_NOSUB' wasn't set), the start/end-offsets of "(...)"-groups are stored
- *   here for up to the  first `nmatch - 1' groups. Non-existant groups  are assigned `-1' in  offsets.
+ *   here for up to the  first `nmatch - 1' groups. Non-existent groups  are assigned `-1' in  offsets.
  * - When nothing was matched, and `nmatch > 0' (and `REG_NOSUB' wasn't set), the offsets of all elements
  *   of `pmatch' are set to `-1' (thus indicating a lack of any sort of match).
  * @param: self:   The compiled regex pattern.
@@ -269,7 +269,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_regerrordesc_np)(int
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> re_comp(3)
- * Compare the given `pattern' and assign it to an internal regex buffer which can
+ * Compile the given `pattern' and assign it to an internal regex buffer which can
  * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
  * this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
  * the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.

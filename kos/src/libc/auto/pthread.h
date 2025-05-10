@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7d08585 */
+/* HASH CRC-32:0xd4f456b0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -193,7 +193,7 @@ INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstack)(pt
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
- * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: EINVAL: The given set contains a non-existent CPU
  * @return: ENOMEM: Insufficient memory */
 INTDEF ATTR_INOUT(1) ATTR_IN_OPT(3) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setaffinity_np)(pthread_attr_t *self, size_t cpusetsize, cpu_set_t const *cpuset);
 /* >> pthread_attr_getaffinity_np(3)

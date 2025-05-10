@@ -725,13 +725,13 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 }
 /*[[[end:libc_regcomp]]]*/
 
-/*[[[head:libc_regexec,hash:CRC-32=0x28fdbea2]]]*/
+/*[[[head:libc_regexec,hash:CRC-32=0xdd3e875e]]]*/
 /* >> regexec(3)
- * Execute a compiled regular expression `pattern' on the priveded string.
+ * Execute a compiled regular expression `pattern' on the provided string.
  * - This function searches for the FIRST position in `string' at which `self' can be matched.
  * - When `nmatch > 0' (and `REG_NOSUB' wasn't set), the matched address-range is stored in `pmatch[0]'
  * - When `nmatch > 1' (and `REG_NOSUB' wasn't set), the start/end-offsets of "(...)"-groups are stored
- *   here for up to the  first `nmatch - 1' groups. Non-existant groups  are assigned `-1' in  offsets.
+ *   here for up to the  first `nmatch - 1' groups. Non-existent groups  are assigned `-1' in  offsets.
  * - When nothing was matched, and `nmatch > 0' (and `REG_NOSUB' wasn't set), the offsets of all elements
  *   of `pmatch' are set to `-1' (thus indicating a lack of any sort of match).
  * @param: self:   The compiled regex pattern.
@@ -816,9 +816,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.regex")
 char const libc_re_comp_no_pattern_errmsg[] = "No previous regular expression";
 
 
-/*[[[head:libc_re_comp,hash:CRC-32=0xf99796c9]]]*/
+/*[[[head:libc_re_comp,hash:CRC-32=0xb0839450]]]*/
 /* >> re_comp(3)
- * Compare the given `pattern' and assign it to an internal regex buffer which can
+ * Compile the given `pattern' and assign it to an internal regex buffer which can
  * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
  * this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
  * the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.

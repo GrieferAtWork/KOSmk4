@@ -1389,11 +1389,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *self,
 }
 /*[[[end:libc_pthread_attr_setstack]]]*/
 
-/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0xe894946a]]]*/
+/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0xef941d67]]]*/
 /* >> pthread_attr_setaffinity_np(3)
  * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
- * @return: EINVAL: The given set contains a non-existant CPU
+ * @return: EINVAL: The given set contains a non-existent CPU
  * @return: ENOMEM: Insufficient memory */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) ATTR_IN_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *self,
