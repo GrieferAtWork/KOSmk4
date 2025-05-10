@@ -51,7 +51,7 @@
 
 DECL_BEGIN
 
-#if 1
+#if 0
 #define async_st_name(x) ((x) < COMPILER_LENOF(async_st_names) ? async_st_names[x] : "?")
 PRIVATE char const async_st_names[][16] = {
 	[_ASYNC_ST_INIT]           = "INIT",
