@@ -331,21 +331,27 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 	try {
 		_reopenhandle = import("._reopenhandle");
 		win32 = import("win32");
-		hGDB = _reopenhandle.FindProcessByImageName(processName);
 	} catch (...) {
 		return none;
 	}
-	/* XXX: Verify that `hGDB' is the correct instance of GDB? */
-	try {
-		local hGDBStdout = _reopenhandle.GetProcessStdHandles(hGDB)[1];
-		local hMyGDBStdout = win32.DuplicateHandle(
-			hGDB, hGDBStdout, win32.GetCurrentProcess());
+
+	function obtain_GDB_stdout_writer(nth: int = 0): Callable {
+		print f"FindProcessByImageName({repr processName}, {repr nth})";
+		local hGDB = _reopenhandle.FindProcessByImageName(processName, nth);
 		try {
-			/* Overwrite the write-to-stdout callback to
-			 * instead perform writes to `hMyGDBStdout'! */
-			local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
-			return (data: string | Bytes) -> {
-				local final MAX_PACKET_SIZE = 512;
+			/* XXX: Verify that `hGDB' is the correct instance of GDB? */
+			local hGDBStdout = _reopenhandle.GetProcessStdHandles(hGDB)[1];
+			local hMyGDBStdout = win32.DuplicateHandle(hGDB, hGDBStdout, win32.GetCurrentProcess());
+			return File.System(hMyGDBStdout, inherit: true).write;
+		} finally {
+			win32.CloseHandle(hGDB);
+		}
+	}
+
+	local write2gdb = Cell(obtain_GDB_stdout_writer(0));
+	local nth = Cell(1);
+	return (data: string | Bytes) -> {
+		local final MAX_PACKET_SIZE = 512;
 #if 1 /* Technically, this is incorrect. GDB documents that the  ~-stream
        * should be used for "[...] the textual responses to CLI commands"
        * https://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stream-Records.html
@@ -355,30 +361,38 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
        * though  it does understand  (and accept at any  point in time), messages
        * received  via  the  ~-stream  (which  it  displays  without  any further
        * processing  of  the output,  and  is exactly  what  we want  to achieve) */
-				local final FORMAT = "~{!r}\n";
+		local final FORMAT = "~{!r}\n";
 #else
-				local final FORMAT = "@{!r}\n";
+		local final FORMAT = "@{!r}\n";
 #endif
-				if (data !is string) {
-					if (data is Bytes) {
-						data = data.decode("utf-8", "ignore");
-					} else {
-						data = str(data);
-					}
-				}
-				while (#data > MAX_PACKET_SIZE) {
-					write2gdb(FORMAT.format({ data[:MAX_PACKET_SIZE] }));
-					data = data[MAX_PACKET_SIZE:];
-				}
-				write2gdb(FORMAT.format({ data }));
-			};
-		} catch (...) {
-			win32.CloseHandle(hMyGDBStdout);
-			throw;
+		if (data !is string) {
+			if (data is Bytes) {
+				data = data.decode("utf-8", "ignore");
+			} else {
+				data = str(data);
+			}
 		}
-	} finally {
-		win32.CloseHandle(hGDB);
-	}
+again_write:
+		try {
+			local writer = write2gdb.value;
+			while (#data > MAX_PACKET_SIZE) {
+				writer(FORMAT.format({ data[:MAX_PACKET_SIZE] }));
+				data = data[MAX_PACKET_SIZE:];
+			}
+			writer(FORMAT.format({ data }));
+			return;
+		} catch (SystemError from errors) {
+		}
+
+		/* Visual studio (for whatever reason) sometimes tends to leave old instances of  "gdb"
+		 * behind, but with their STDOUT already closed (and thus being a broken pipe). We deal
+		 * with  this by catching the EPIPE when trying to write to those pipes, and proceed by
+		 * checking if we can find another running instance of GDB, and if so: use that one. */
+		local nextNth = nth.value;
+		write2gdb.value = obtain_GDB_stdout_writer(nextNth);
+		nth.value = nextNth + 1;
+		goto again_write;
+	};
 }
 
 function processKosDebugOutput(
@@ -387,7 +401,8 @@ function processKosDebugOutput(
 		config: Config,
 		monitorCommandPipe: File | none = none,
 		options: {string: string} | none = none) {
-	writeStdout = File.stddbg.write;
+	local defaultWriteStdout = File.stddbg.write;
+	writeStdout = defaultWriteStdout;
 	local processName = options.get("redirect.stdout");
 	if (processName !is none) {
 		/* Setup the writeStdout function to re-direct itself to inject
@@ -400,9 +415,18 @@ function processKosDebugOutput(
 				print File.stderr: (
 					"[redirect.stdout] Failed to hi-jack stdout of process ",
 					repr(processName));
-				writeStdout = File.stddbg.write;
+				writeStdout = defaultWriteStdout;
 			}
-			writeStdout(data);
+			try {
+				writeStdout(data);
+			} catch (...) {
+				/* Fallback: unable to write  to (possibly injected)  stdout.
+				 * So instead: switch back to our default logger if possible. */
+				if (writeStdout === defaultWriteStdout)
+					throw;
+				writeStdout = defaultWriteStdout;
+				writeStdout(data);
+			}
 		};
 	}
 #undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT

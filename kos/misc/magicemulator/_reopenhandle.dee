@@ -21,7 +21,7 @@
 import * from deemon;
 import fs, ctypes, win32;
 
-function FindProcessByImageName(name: string): win32.HANDLE {
+function FindProcessByImageName(name: string, nth: int = 0): win32.HANDLE {
 	local myPid = win32.GetCurrentProcessId();
 	for (local pid: win32.EnumProcesses()) {
 		local hProcess;
@@ -44,12 +44,16 @@ function FindProcessByImageName(name: string): win32.HANDLE {
 		}
 		try {
 			filename = fs.tailof(filename);
-			if (filename == name)
-				return hProcess;
+			if (filename == name) {
+				if (nth == 0)
+					return hProcess;
+				--nth;
+			}
 		} catch (...) {
 			win32.CloseHandle(hProcess);
 			throw;
 		}
+		win32.CloseHandle(hProcess);
 	}
 	throw Error("Process not found: " + repr(name));
 }
