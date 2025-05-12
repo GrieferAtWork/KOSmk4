@@ -85,7 +85,18 @@ again_read_flags:
 	}
 	return kbdbuf_putkey_nopr(&self->kd_buf, key);
 }
-#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL kbddev_putkey)(struct kbddev *__restrict self, u16 key) {
+	return kbdbuf_putkey(&self->kd_buf, key);
+}
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
+NOTHROW(FCALL kbddev_putkey_nopr)(struct kbddev *__restrict self, u16 key) {
+	return kbdbuf_putkey_nopr(&self->kd_buf, key);
+}
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
+
+
 
 /* Add a given key to the keyboard user-input buffer.
  * NOTE: The caller must not pass `KEY_NONE' for `key'

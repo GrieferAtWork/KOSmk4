@@ -737,6 +737,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 #ifdef RTM_STARTED
 #define HAVE_MAIN_RTM
 int main_rtm(int argc, char *argv[], char *envp[]) {
+	/* TODO: this playground causes an assert check within the kernel */
 	static volatile int a, b, c;
 	rtm_status_t status;
 	(void)argc, (void)argv, (void)envp;
