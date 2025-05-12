@@ -364,7 +364,7 @@ NOTHROW(FCALL rpc_mem_fini)(struct rpc_mem *__restrict self) {
 /* Returns the futex control word for `addr'. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct rpc_futex *FCALL
 rpc_mem_getfutex(struct rpc_mem *__restrict self, NCX UNCHECKED void *addr) {
-	size_t reqalloc, i = 0;
+	size_t reqalloc, i;
 	struct rpc_futex *result;
 	BSEARCH (i, self->rm_futxv, self->rm_futxc, .rf_addr, addr) {
 		return &self->rm_futxv[i];
@@ -454,7 +454,6 @@ rpc_mem_readwrite(struct rpc_mem *__restrict self,
 	struct rpc_membank *pred, *succ;
 	validate_readwrite(addr, num_bytes);
 again:
-	i = 0;
 	BSEARCH_RANGE (i, self->rm_bankv, self->rm_bankc,
 	                                  ->rmb_addrlo,
 	                                  ->rmb_addrhi,
@@ -463,76 +462,75 @@ again:
 		bank = self->rm_bankv[i];
 		goto rw_bank;
 	}
-	{
-		pred = succ = NULL;
-		if (i != 0)
-			pred = self->rm_bankv[i - 1];
-		if (i < self->rm_bankc)
-			succ = self->rm_bankv[i];
-		if (pred) {
-			/* Try to expand the predecessor back */
-			size_t distance, num_insert;
-			distance = (size_t)(addr - (pred->rmb_addrhi + 1));
-			if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
-				num_insert = num_bytes;
-				if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
-					num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
-				if (succ) {
-					size_t max = (size_t)(succ->rmb_addrlo - addr);
-					if (num_insert > max)
-						num_insert = max;
-				}
-				num_insert += distance;
-				pred = rpc_membank_insert_back(pred, num_insert);
-				self->rm_bankv[i - 1] = pred;
-				if (succ && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo) {
-					/* Re-join with successor bank. */
-					size_t missing;
+
+	pred = succ = NULL;
+	if (i > 0)
+		pred = self->rm_bankv[i - 1];
+	if (i < self->rm_bankc)
+		succ = self->rm_bankv[i];
+	if (pred) {
+		/* Try to expand the predecessor back */
+		size_t distance, num_insert;
+		distance = (size_t)(addr - (pred->rmb_addrhi + 1));
+		if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
+			num_insert = num_bytes;
+			if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
+				num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
+			if (succ) {
+				size_t max = (size_t)(succ->rmb_addrlo - addr);
+				if (num_insert > max)
+					num_insert = max;
+			}
+			num_insert += distance;
+			pred = rpc_membank_insert_back(pred, num_insert);
+			self->rm_bankv[i - 1] = pred;
+			if (succ && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo) {
+				/* Re-join with successor bank. */
+				size_t missing;
 join_pred_succ:
-					missing = (size_t)(succ->rmb_addrlo - (pred->rmb_addrhi + 1));
-					if (missing != 0) {
-						pred = rpc_membank_insert_back(pred, missing);
-						self->rm_bankv[i - 1] = pred;
-					}
-					pred = rpc_membank_join(pred, succ);
-					--self->rm_bankc;
-					memmovedown(&self->rm_bankv[i - 1],
-					            &self->rm_bankv[i],
-					            self->rm_bankc - i,
-					            sizeof(struct rpc_membank *));
+				missing = (size_t)(succ->rmb_addrlo - (pred->rmb_addrhi + 1));
+				if (missing != 0) {
+					pred = rpc_membank_insert_back(pred, missing);
 					self->rm_bankv[i - 1] = pred;
 				}
-				bank = pred;
-				goto rw_bank;
+				pred = rpc_membank_join(pred, succ);
+				--self->rm_bankc;
+				memmovedown(&self->rm_bankv[i - 1],
+				            &self->rm_bankv[i],
+				            self->rm_bankc - i,
+				            sizeof(struct rpc_membank *));
+				self->rm_bankv[i - 1] = pred;
 			}
+			bank = pred;
+			goto rw_bank;
 		}
-		if (succ) {
-			/* Try to expand the successor bank */
-			size_t distance;
-			if (OVERFLOW_USUB((uintptr_t)succ->rmb_addrlo,
-			                  (uintptr_t)(addr + num_bytes),
-			                  &distance))
-				distance = 0;
-			if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
-				size_t num_insert;
-				num_insert = (size_t)(succ->rmb_addrlo - addr);
-				if (num_insert > num_bytes)
-					num_insert = num_bytes;
-				if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
-					num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
-				num_insert += distance;
-				if (pred) {
-					size_t max_insert = (size_t)(succ->rmb_addrlo - (pred->rmb_addrhi + 1));
-					if (num_insert > max_insert)
-						num_insert = max_insert;
-				}
-				succ = rpc_membank_insert_front(succ, num_insert);
-				self->rm_bankv[i] = succ;
-				if (pred && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo)
-					goto join_pred_succ;
-				bank = succ;
-				goto rw_bank;
+	}
+	if (succ) {
+		/* Try to expand the successor bank */
+		size_t distance;
+		if (OVERFLOW_USUB((uintptr_t)succ->rmb_addrlo,
+		                  (uintptr_t)(addr + num_bytes),
+		                  &distance))
+			distance = 0;
+		if (distance <= RPC_MEMBANK_JOIN_THRESHOLD) {
+			size_t num_insert;
+			num_insert = (size_t)(succ->rmb_addrlo - addr);
+			if (num_insert > num_bytes)
+				num_insert = num_bytes;
+			if (num_insert < RPC_MEMBANK_EXPAND_OVERCACHE)
+				num_insert = RPC_MEMBANK_EXPAND_OVERCACHE;
+			num_insert += distance;
+			if (pred) {
+				size_t max_insert = (size_t)(succ->rmb_addrlo - (pred->rmb_addrhi + 1));
+				if (num_insert > max_insert)
+					num_insert = max_insert;
 			}
+			succ = rpc_membank_insert_front(succ, num_insert);
+			self->rm_bankv[i] = succ;
+			if (pred && pred->rmb_addrhi + 1 + RPC_MEMBANK_JOIN_THRESHOLD >= succ->rmb_addrlo)
+				goto join_pred_succ;
+			bank = succ;
+			goto rw_bank;
 		}
 	}
 

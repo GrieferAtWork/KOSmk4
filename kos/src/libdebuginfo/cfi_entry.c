@@ -289,7 +289,7 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 	self = (struct cfientry *)arg;
 
 	/* Check if the register can be found as part of unwind information. */
-	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
+	BSEARCH (i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
 		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
@@ -868,7 +868,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	/* First up: Check if the register can be found as part of unwind information.
 	 *           It  it can, then pretty much all  of the hard work's already been
 	 *           done and we can just read from there. */
-	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
+	BSEARCH (i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
 		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));

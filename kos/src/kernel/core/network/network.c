@@ -50,7 +50,7 @@ PUBLIC struct net_peeraddrs net_peeraddrs_empty = {
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct net_peeraddr *
 NOTHROW(KCALL net_peeraddrs_lookup_ip)(struct net_peeraddrs *__restrict self, be32 ip) {
 	size_t index;
-	BSEARCH(index, self->nps_addrs, self->nps_count, ->_npa_hip, (u32)ip) {
+	BSEARCH (index, self->nps_addrs, self->nps_count, ->_npa_hip, (u32)ip) {
 		return self->nps_addrs[index];
 	}
 	return NULL;
@@ -71,7 +71,7 @@ NOTHROW(KCALL net_peeraddrs_destroy)(struct net_peeraddrs *__restrict self) {
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct net_peeraddr *KCALL
 nic_device_requireip(struct nicdev *__restrict self, be32 ip)
 		THROWS(E_BADALLOC) {
-	size_t i;
+	size_t i, j;
 	REF struct net_peeraddr *result;
 	REF struct net_peeraddrs *old_peers;
 	REF struct net_peeraddrs *new_peers;
@@ -100,8 +100,8 @@ again:
 	       old_peers->nps_count - i, sizeof(REF struct net_peeraddr *));
 
 	/* Acquire references to existing peer descriptors. */
-	for (i = 0; i < old_peers->nps_count; ++i)
-		incref(old_peers->nps_addrs[i]);
+	for (j = 0; j < old_peers->nps_count; ++j)
+		incref(old_peers->nps_addrs[j]);
 	decref_unlikely(old_peers);
 
 	result->npa_refcnt = 2; /* +1: result, +1: new_peers->nps_addrs[i] */
