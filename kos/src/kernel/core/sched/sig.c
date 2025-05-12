@@ -4028,7 +4028,7 @@ DEFINE_TEST(pushpop_connections) {
 #include <stdio.h>
 
 
-#define FAIL(line, expr, ...) __NAMESPACE_INT_SYM __afailf(expr, __FILE__, line, NULL, __VA_ARGS__)
+#define FAIL(line, expr, ...) __assertion_failedf_at(expr, __FILE__, line, NULL, __VA_ARGS__)
 
 #define RST_LO 0
 #define RST_HI 2

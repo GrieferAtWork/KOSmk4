@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8331519 */
+/* HASH CRC-32:0x5cbbc89a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,10 @@
 #define __CRT_HAVE___acheckf
 #define __CRT_HAVE___afail
 #define __CRT_HAVE___afailf
+#define __CRT_HAVE___apcheck
+#define __CRT_HAVE___apcheckf
+#define __CRT_HAVE___apfail
+#define __CRT_HAVE___apfailf
 #define __CRT_HAVE___ctype_C_flags
 #define __CRT_HAVE___ctype_C_tolower
 #define __CRT_HAVE___ctype_C_toupper

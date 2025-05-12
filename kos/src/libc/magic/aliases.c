@@ -29,12 +29,14 @@
  *  - /kos/src/kernel/core/... */
 
 /* /kos/src/libc/hybrid/arch/[...]/assert[...].S */
-%[declare_kernel_export("__stack_chk_fail", "abort", "__ubsan_handle_builtin_unreachable")]
-%[declare_kernel_export("__afail", "__afailf", "__stack_chk_guard")]
+%[declare_kernel_export("__stack_chk_fail", "__stack_chk_guard")]
+%[declare_kernel_export("abort", "__ubsan_handle_builtin_unreachable")]
 %[declare_kernel_only_export("__acheck", "__acheckf")]
+%[declare_kernel_only_export("__apcheck", "__apcheckf")]
 
 /* Indicate that we have support for all of the different assert functions. */
 %[declare_kernel_export("__afail", "__afailf")]
+%[declare_kernel_export("__apfail", "__apfailf")]
 %[declare_user_export("__assert", "__assert_fail", "__assert_func")]
 %[declare_user_export("__assertfail", "_assert", "_ZSt9terminatev", "terminate")]
 

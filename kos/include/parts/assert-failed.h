@@ -39,6 +39,56 @@ __NAMESPACE_INT_BEGIN
 extern void (__check_assertion)(__BOOL __expr);
 extern void (__check_assertionf)(__BOOL __expr, char const *__restrict __format, ...);
 #endif /* __INTELLISENSE__ */
+
+#if !defined(__NO_XBLOCK) && (defined(__CRT_HAVE___apfail) || defined(__CRT_HAVE___apfailf) || \
+                              defined(__CRT_HAVE___apcheck) || defined(__CRT_HAVE___apcheckf))
+#ifndef __UINTPTR_TYPE__
+__NAMESPACE_INT_END
+#include <hybrid/typecore.h>
+__NAMESPACE_INT_BEGIN
+#endif /* !__UINTPTR_TYPE__ */
+struct __apfail_struct {
+	char const      *__afs_expr;
+	char const      *__afs_file;
+	__UINTPTR_TYPE__ __afs_line;
+	char const      *__afs_func;
+};
+#define __APFAIL_STRUCT_INIT_AT(expr_str, file, line, func) { expr_str, file, line, func }
+#ifdef __NO_builtin_FUNCTION
+#define __APFAIL_STRUCT_INIT(expr_str) { expr_str, __FILE__, __LINE__, __NULLPTR }
+#else /* __NO_builtin_FUNCTION */
+#define __APFAIL_STRUCT_INIT(expr_str) { expr_str, __FILE__, __LINE__, __builtin_FUNCTION() }
+#endif /* !__NO_builtin_FUNCTION */
+
+#define __APFAIL_STRUCT_SYM           __PP_CAT2(__apfail_specs, __LINE__)
+#define __APFAIL_STRUCT_DEF(expr_str) static struct __NAMESPACE_INT_SYM __apfail_struct const __APFAIL_STRUCT_SYM = __APFAIL_STRUCT_INIT(expr_str)
+
+#ifdef __CRT_HAVE___apfail
+__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__apfail,(struct __apfail_struct const *__specs),(__specs))
+#define __assertion_packed_failed(expr_str) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); (__NAMESPACE_INT_SYM __apfail)(&__APFAIL_STRUCT_SYM); })
+#endif /* __CRT_HAVE___apfail */
+#ifdef __CRT_HAVE___apfailf
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __apfailf)(struct __apfail_struct const *__specs, char const *__format, ...) __CASMNAME_SAME("__apfailf");
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertion_packed_failedf(expr_str, ...) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); (__NAMESPACE_INT_SYM __apfailf)(&__APFAIL_STRUCT_SYM, __VA_ARGS__); })
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_packed_failedf(expr_str, format...) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); (__NAMESPACE_INT_SYM __apfailf)(&__APFAIL_STRUCT_SYM, format); })
+#endif /* ... */
+#endif /* __CRT_HAVE___apfailf */
+#ifdef __CRT_HAVE___apcheck
+__LIBC __ATTR_COLD __BOOL (__VLIBCCALL __apcheck)(struct __apfail_struct const *__specs) __CASMNAME_SAME("__apcheck");
+#define __assertion_packed_check(expr_str) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); __XRETURN (__NAMESPACE_INT_SYM __apcheck)(&__APFAIL_STRUCT_SYM); })
+#endif /* __CRT_HAVE___apcheck */
+#ifdef __CRT_HAVE___apcheckf
+__LIBC __ATTR_COLD __BOOL (__VLIBCCALL __apcheckf)(struct __apfail_struct const *__specs, char const *__format, ...) __CASMNAME_SAME("__apcheckf");
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertion_packed_checkf(expr_str, ...) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); (__NAMESPACE_INT_SYM __apcheckf)(&__APFAIL_STRUCT_SYM, __VA_ARGS__); })
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_packed_checkf(expr_str, format...) __XBLOCK({ __APFAIL_STRUCT_DEF(expr_str); (__NAMESPACE_INT_SYM __apcheckf)(&__APFAIL_STRUCT_SYM, format); })
+#endif /* ... */
+#endif /* __CRT_HAVE___apcheckf */
+#endif /* ... */
+
 #if defined(__CRT_HAVE___afail) && !defined(__NO_builtin_FUNCTION)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__afail,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
 #define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
@@ -97,6 +147,25 @@ void (__LIBCCALL __fallback_assert_fail)(void) {
 }
 #endif /* !... */
 
+#ifdef __CRT_HAVE___afailf
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__afailf");
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertion_failedf(expr_str, ...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
+#define __assertion_failedf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_failedf(expr_str, format...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
+#define __assertion_failedf_at(expr_str, file, line, func, format...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, format)
+#endif /* ... */
+#else /* __CRT_HAVE___afailf */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertion_failedf(expr_str, ...)                      __assertion_failed(expr_str)
+#define __assertion_failedf_at(expr_str, file, line, func, ...) __assertion_failed_at(expr_str, file, line, func)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_failedf(expr_str, format...)                      __assertion_failed(expr_str)
+#define __assertion_failedf_at(expr_str, file, line, func, format...) __assertion_failed_at(expr_str, file, line, func)
+#endif /* ... */
+#endif /* !__CRT_HAVE___afailf */
+
 #ifdef __CRT_HAVE___acheck
 /* __acheck() needs to be declared as CDECL rather than STDCALL within  kernel-space.
  * This is required because otherwise we'd end up with an inconsistency in regards to
@@ -140,24 +209,40 @@ __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheckf)(char const *__expr, char const
 #endif /* ... */
 #endif /* __CRT_HAVE___acheckf */
 
-#ifdef __CRT_HAVE___afailf
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__afailf");
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_failedf(expr_str, ...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
-#define __assertion_failedf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, __VA_ARGS__)
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __assertion_failedf(expr_str, format...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
-#define __assertion_failedf_at(expr_str, file, line, func, format...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, format)
+
+/* >> #define __LIBC_ASSERT_USE_PACKED 0/1
+ * The user can define this macro to override the automatic selection of packed assertions.
+ * By  default, we only enable them when  NOT compiling as position-independent code (since
+ * using them in position-independent code would require a bunch of startup relocations) */
+#ifdef __LIBC_ASSERT_USE_PACKED
+#if (-__LIBC_ASSERT_USE_PACKED - 1) == -1 /* #define __LIBC_ASSERT_USE_PACKED 0 */
+#undef __LIBC_ASSERT_USE_PACKED
 #endif /* ... */
-#else /* __CRT_HAVE___afailf */
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_failedf(expr_str, ...)                      __assertion_failed(expr_str)
-#define __assertion_failedf_at(expr_str, file, line, func, ...) __assertion_failed_at(expr_str, file, line, func)
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __assertion_failedf(expr_str, format...)                      __assertion_failed(expr_str)
-#define __assertion_failedf_at(expr_str, file, line, func, format...) __assertion_failed_at(expr_str, file, line, func)
-#endif /* ... */
-#endif /* !__CRT_HAVE___afailf */
+#else /* __LIBC_ASSERT_USE_PACKED */
+#include <hybrid/host.h>
+#ifndef __pic__
+#define __LIBC_ASSERT_USE_PACKED
+#endif /* !__pic__ */
+#endif /* !__LIBC_ASSERT_USE_PACKED */
+
+#ifdef __LIBC_ASSERT_USE_PACKED
+#ifdef __assertion_packed_failed
+#undef __assertion_failed
+#define __assertion_failed __assertion_packed_failed
+#endif /* __assertion_packed_failed */
+#ifdef __assertion_packed_failedf
+#undef __assertion_failedf
+#define __assertion_failedf __assertion_packed_failedf
+#endif /* __assertion_packed_failedf */
+#ifdef __assertion_packed_check
+#undef __assertion_check
+#define __assertion_check __assertion_packed_check
+#endif /* __assertion_packed_check */
+#ifdef __assertion_packed_checkf
+#undef __assertion_checkf
+#define __assertion_checkf __assertion_packed_checkf
+#endif /* __assertion_packed_checkf */
+#endif /* __LIBC_ASSERT_USE_PACKED */
 
 __NAMESPACE_INT_END
 __SYSDECL_END

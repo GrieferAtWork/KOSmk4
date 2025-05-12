@@ -399,6 +399,8 @@
 #define __CRT_HAVE___afailf
 #define __CRT_HAVE___after_morecore_hook
 #define __CRT_HAVE___alarm
+#define __CRT_HAVE___apfail
+#define __CRT_HAVE___apfailf
 #define __CRT_HAVE___argc
 #define __CRT_HAVE___argp_error
 #define __CRT_HAVE___argp_failure
