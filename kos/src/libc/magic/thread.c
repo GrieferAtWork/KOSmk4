@@ -45,6 +45,10 @@
 #include <kos/anno.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_SOLARIS
 #include <bits/os/sigset.h>
 #include <bits/os/sigstack.h>

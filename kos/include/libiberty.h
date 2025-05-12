@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27c74e5 */
+/* HASH CRC-32:0xca617098 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,11 @@
 #include <stdio.h>
 #include <libc/string.h>
 #include <hybrid/__alloca.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>

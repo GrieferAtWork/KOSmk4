@@ -17,6 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <bits/types/ssize_t.h>*/
+/*!always_includes <bits/types/socklen_t.h>*/
+/*!always_includes <bits/types/time_t.h>*/
+/*!always_includes <bits/types/time64_t.h>*/
+/*!always_includes <bits/types/dev_t.h>*/
+/*!always_includes <bits/types/off_t.h>*/
+/*!always_includes <bits/types/off64_t.h>*/
+/*!always_includes <bits/types/ino_t.h>*/
+/*!always_includes <bits/types/ino64_t.h>*/
+/*!always_includes <bits/types/mode_t.h>*/
+/*!always_includes <bits/types/nlink_t.h>*/
+/*!always_includes <bits/types/uid_t.h>*/
+/*!always_includes <bits/types/gid_t.h>*/
+/*!always_includes <bits/types/wint_t.h>*/
+/*!always_includes <bits/types/errno_t.h>*/
+/*!always_includes <bits/types/pid_t.h>*/
+/*!always_includes <bits/types/useconds_t.h>*/
+/*!always_includes <bits/types/suseconds_t.h>*/
+/*!always_includes <bits/types/clockid_t.h>*/
+/*!always_includes <bits/types/clock_t.h>*/
+/*!always_includes <bits/types/blkcnt_t.h>*/
+/*!always_includes <bits/types/blksize_t.h>*/
+/*!always_includes <bits/types/timer_t.h>*/
 #ifndef _KOS_TYPES_H
 #define _KOS_TYPES_H 1
 

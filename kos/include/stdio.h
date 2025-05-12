@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21cc92af */
+/* HASH CRC-32:0x17cf5bc0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,11 @@
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 /*!always_includes <libio.h>*/
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_FILE.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/FILE.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 #ifndef _STDIO_H
 #define _STDIO_H 1
 
@@ -259,6 +264,21 @@ __NAMESPACE_STD_USING(snprintf)
 #include <kos/anno.h>
 
 #include <libio.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_XOPEN2K8
+#include <bits/types/ssize_t.h>
+#include <bits/types/off_t.h>
+#ifdef __USE_LARGEFILE64
+#include <bits/types/off64_t.h>
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_KOS
 #include <bits/crt/format-printer.h>
@@ -5266,6 +5286,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2_64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifndef _CRT_PERROR_DEFINED
 #define _CRT_PERROR_DEFINED 1
 #endif /* !_CRT_PERROR_DEFINED */
+
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/errno_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __CC__
 #ifndef __errno_t_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7013f309 */
+/* HASH CRC-32:0x842e100f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,11 @@
 #include <bits/crt/dos/corecrt_startup.h>
 #include <vcruntime_startup.h>
 #include <crtdefs.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/errno_t.h>
+#endif /* __INTELLISENSE__ */
 
 #if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
 #include <math.h>

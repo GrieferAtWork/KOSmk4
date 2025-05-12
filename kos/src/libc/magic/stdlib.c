@@ -44,6 +44,9 @@
 /* (#) Portability: mintlib       (/include/stdlib.h) */
 /* (#) Portability: musl libc     (/include/stdlib.h) */
 /* (#) Portability: uClibc        (/include/stdlib.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 }
 
 %[define_decl_include("<bits/crt/random-data.h>": [
@@ -128,6 +131,18 @@
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_NETBSD
+#include <bits/types/dev_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __USE_NETBSD */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_MISC
 #include <alloca.h>

@@ -35,6 +35,10 @@
 #include <crtdefs.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

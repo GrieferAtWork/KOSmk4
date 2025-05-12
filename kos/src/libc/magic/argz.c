@@ -39,6 +39,10 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 /*
  * Note  that the KOS implementations of these functions was written entirely
  * from scratch, only using Glibc's implementation as a reference (which also

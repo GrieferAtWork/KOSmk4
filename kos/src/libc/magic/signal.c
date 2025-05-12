@@ -41,6 +41,10 @@
 /* (#) Portability: mintlib       (/include/signal.h) */
 /* (#) Portability: musl libc     (/include/signal.h) */
 /* (#) Portability: uClibc        (/include/signal.h) */
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/std_sig_atomic_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/sig_atomic_t.h>*/
 }
 
 %[define_decl_include_implication("<bits/os/sigevent.h>" => ["<hybrid/typecore.h>"])]
@@ -222,6 +226,19 @@
 )]%[insert:prefix(
 #include <libc/errno.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/std_size_t.h>
+#include <bits/types/size_t.h>
+#ifdef __USE_POSIX
+#include <bits/types/sigset_t.h>
+#endif /* __USE_POSIX */
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
+#include <bits/types/sigset_t.h>
+#include <bits/types/pid_t.h>
+#include <bits/types/uid_t.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>

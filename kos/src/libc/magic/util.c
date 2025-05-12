@@ -44,6 +44,10 @@
 #include <termios.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 __SYSDECL_BEGIN
 

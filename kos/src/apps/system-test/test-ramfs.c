@@ -26,7 +26,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/ksysctl.h>
 #include <kos/types.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
@@ -34,6 +33,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stddef.h>
 #include <unistd.h>
 
 DECL_BEGIN

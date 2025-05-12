@@ -36,8 +36,9 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <syslog.h>
+#include <unistd.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <cfi.h>

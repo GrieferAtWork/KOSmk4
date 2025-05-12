@@ -53,6 +53,12 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/off_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __INTELLISENSE__ */
+
 
 /* Data cannot be accessed. */
 #if !defined(PROT_NONE) && defined(__PROT_NONE)

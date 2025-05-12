@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <signal.h>*/
 #ifndef __sig_atomic_t_defined
 #include <hybrid/typecore.h>
 #ifndef __sig_atomic_t_defined

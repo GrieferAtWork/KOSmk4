@@ -44,6 +44,10 @@
 #include <bits/crt/wordexp.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 /* Flags for `wordexp(3)' */
 #if !defined(WRDE_DOOFFS) && defined(__WRDE_DOOFFS)
 #define WRDE_DOOFFS  __WRDE_DOOFFS /* [valid_if(!WRDE_APPEND)] Insert `IN:we_offs' leading NULL entries before `we_wordv'.

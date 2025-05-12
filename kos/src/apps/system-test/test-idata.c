@@ -38,10 +38,8 @@
 #define sys_nerr    DONT_DEFINE_sys_nerr
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <errno.h>
 #include <string.h>
 #include <dlfcn.h>
 #include <signal.h>

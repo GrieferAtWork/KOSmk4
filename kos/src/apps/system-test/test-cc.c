@@ -31,12 +31,8 @@
 #include <sys/stat.h>
 #include <system-test/ctest.h>
 
-#include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <unistd.h>
 
 DECL_BEGIN

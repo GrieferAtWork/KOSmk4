@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54f73155 */
+/* HASH CRC-32:0x628161e1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,11 @@
 
 #include <features.h>
 #include <bits/os/msq.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */
 
 #ifdef __USE_GNU

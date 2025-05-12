@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a30926d */
+/* HASH CRC-32:0xa3b72d2a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,10 @@
 
 #include <features.h>
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>

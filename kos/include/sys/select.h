@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe38fb0f */
+/* HASH CRC-32:0xfffb8491 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,12 @@
 #include <bits/os/timespec.h> /* struct timespec */
 #include <bits/os/timeval.h>  /* struct timeval */
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/sigset_t.h>
+#include <bits/types/suseconds_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifndef __INTELLISENSE__
 #include <libc/string.h> /* __libc_bzero */

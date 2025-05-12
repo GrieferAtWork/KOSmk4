@@ -56,6 +56,9 @@
 #include <crtdefs.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#endif /* __INTELLISENSE__ */
 
 #ifndef NULL
 #define NULL __NULLPTR

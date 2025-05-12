@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6563d985 */
+/* HASH CRC-32:0x63908e1f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,14 @@
 #include <bits/crt/db/group.h>
 #include <bits/types.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
+#include <bits/types/gid_t.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K */
+#endif /* __INTELLISENSE__ */
+
 #if defined(__USE_POSIX) && defined(__USE_MISC)
 #define NSS_BUFLEN_GROUP 1024
 #endif /* __USE_POSIX && __USE_MISC */
@@ -71,19 +79,10 @@ typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
-#ifndef __std_FILE_defined
-#define __std_FILE_defined
-__NAMESPACE_STD_BEGIN
-typedef __FILE FILE;
-__NAMESPACE_STD_END
-#endif /* !__std_FILE_defined */
-
-#ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined
-__NAMESPACE_STD_USING(FILE)
+typedef __FILE FILE;
 #endif /* !__FILE_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __CRT_HAVE_getgrgid
 /* >> getgrgid(3), getgrgid_r(3) */

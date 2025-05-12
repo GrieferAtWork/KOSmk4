@@ -51,6 +51,11 @@
 )]%[insert:prefix(
 #include <bits/os/shm.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/time_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <sys/ipc.h> /* [n4217.pdf:12556] #include mandated by POSIX */
 
 /* Permission flag for use with `shmget()'. */

@@ -44,6 +44,9 @@
 /* (#) Portability: mintlib       (/include/string.h) */
 /* (#) Portability: musl libc     (/include/string.h) */
 /* (#) Portability: uClibc        (/include/string.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 }
 
 %[define_ccompat_header("cstring")]
@@ -407,6 +410,13 @@ for (local f: funcs) {
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __INTELLISENSE__ */
 #ifdef __USE_KOS
 #include <parts/malloca.h>
 #endif /* __USE_KOS */

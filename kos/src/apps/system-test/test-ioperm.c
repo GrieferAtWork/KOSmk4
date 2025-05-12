@@ -29,14 +29,15 @@
 #include <kos/except.h>
 #include <kos/types.h>
 #include <sys/perm.h>
+#include <sys/wait.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wait.h>
 
 DECL_BEGIN
 

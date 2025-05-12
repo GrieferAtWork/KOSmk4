@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2099e089 */
+/* HASH CRC-32:0xe7d7df52 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,10 @@
 #include <asm/crt/malloc.h>
 #include <bits/crt/mallinfo.h>
 #include <bits/types.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus

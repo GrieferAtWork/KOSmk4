@@ -33,7 +33,6 @@
 #include <asm/intrin-tbm.h>
 #include <asm/intrin.h>
 #include <kos/except.h>
-#include <kos/kernel/paging.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/types.h>

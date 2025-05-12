@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b8c1aa6 */
+/* HASH CRC-32:0xf058cb1c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,9 @@
 /* (#) Portability: mintlib       (/include/stdlib.h) */
 /* (#) Portability: musl libc     (/include/stdlib.h) */
 /* (#) Portability: uClibc        (/include/stdlib.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 #ifndef _STDLIB_H
 #define _STDLIB_H 1
 
@@ -196,6 +199,18 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #include <bits/crt/div.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_NETBSD
+#include <bits/types/dev_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __USE_NETBSD */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_MISC
 #include <alloca.h>

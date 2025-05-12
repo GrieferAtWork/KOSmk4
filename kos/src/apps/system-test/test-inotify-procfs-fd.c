@@ -26,12 +26,9 @@
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
-#include <kos/unistd.h>
 #include <sys/inotify.h>
-#include <sys/wait.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stddef.h>

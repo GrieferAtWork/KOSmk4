@@ -27,7 +27,6 @@
 #include <hybrid/bit.h>
 
 #include <kos/kernel/types.h>
-#include <kos/types.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>

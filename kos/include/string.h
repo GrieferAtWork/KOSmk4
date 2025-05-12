@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f6f778e */
+/* HASH CRC-32:0x30f08d3e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,9 @@
 /* (#) Portability: mintlib       (/include/string.h) */
 /* (#) Portability: musl libc     (/include/string.h) */
 /* (#) Portability: uClibc        (/include/string.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 #ifndef _STRING_H
 #define _STRING_H 1
 
@@ -94,6 +97,13 @@ __NAMESPACE_STD_USING(strerror)
 #include <features.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __INTELLISENSE__ */
 #ifdef __USE_KOS
 #include <parts/malloca.h>
 #endif /* __USE_KOS */

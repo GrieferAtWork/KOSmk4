@@ -38,11 +38,25 @@
 /* (#) Portability: mintlib       (/include/sys/types.h) */
 /* (#) Portability: musl libc     (/include/sys/types.h) */
 /* (#) Portability: uClibc        (/include/sys/types.h) */
+/*!always_includes <bits/types/clock_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/time_t.h>*/
+/*!always_includes <bits/types/intN_t.h>*/
+/*!always_includes <bits/types/uintN_t.h>*/
+/*!always_includes <bits/types/ino_t.h>*/
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H 1
 
 #include <__stdinc.h>
 #include <features.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/clock_t.h>
+#include <bits/types/intN_t.h>
+#include <bits/types/size_t.h>
+#include <bits/types/time_t.h>
+#include <bits/types/uintN_t.h>
+#endif /* __INTELLISENSE__ */
 
 #include <bits/types.h>
 

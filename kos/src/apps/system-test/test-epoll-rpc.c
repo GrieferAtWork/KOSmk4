@@ -29,9 +29,6 @@
 #include <sys/epoll.h>
 #include <system-test/ctest.h>
 
-#include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>

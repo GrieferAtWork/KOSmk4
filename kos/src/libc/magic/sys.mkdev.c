@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/mkdev.h) */
+/*!always_includes <bits/types/dev_t.h>*/
 }
 
 %[define_replacement(major_t = __major_t)]
@@ -35,6 +36,10 @@
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/dev_t.h>
+#endif /* __INTELLISENSE__ */
 
 
 /* Bad/invalid device number */

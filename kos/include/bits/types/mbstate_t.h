@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <wchar.h>*/
+#ifndef __mbstate_t_defined
+#include <__crt.h>
 #ifndef __mbstate_t_defined
 #ifdef __std_mbstate_t_defined
 #ifdef __CC__
@@ -34,4 +37,5 @@ __DECL_END
 #endif /* __CC__ */
 #endif /* !__mbstate_t_defined */
 #endif /* !__std_mbstate_t_defined */
+#endif /* !__mbstate_t_defined */
 #endif /* !__mbstate_t_defined */

@@ -44,6 +44,11 @@
 )]%[insert:prefix(
 #include <bits/os/msq.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */
 
 #ifdef __USE_GNU

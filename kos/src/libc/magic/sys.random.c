@@ -41,6 +41,10 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #endif /* __USE_GLIBC_BLOAT */

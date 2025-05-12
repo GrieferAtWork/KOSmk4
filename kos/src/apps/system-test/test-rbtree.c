@@ -26,7 +26,7 @@
 
 #include <hybrid/sequence/rbtree.h>
 
-#include <kos/types.h>
+#include <system-test/ctest.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -61,9 +61,6 @@ DECL_END
 
 #include <hybrid/sequence/rbtree-abi.h>
 /**/
-
-#include <stddef.h>
-#include <system-test/ctest.h>
 
 DECL_BEGIN
 

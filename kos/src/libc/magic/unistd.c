@@ -40,6 +40,9 @@
 /* (#) Portability: mintlib       (/include/unistd.h) */
 /* (#) Portability: musl libc     (/include/unistd.h) */
 /* (#) Portability: uClibc        (/include/unistd.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/ssize_t.h>*/
 }
 
 %[define_replacement(fd_t       = __fd_t)]
@@ -102,6 +105,28 @@
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/size_t.h>
+#include <bits/types/ssize_t.h>
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#include <bits/types/off_t.h>
+#include <bits/types/useconds_t.h>
+#include <bits/types/pid_t.h>
+#ifdef __USE_LARGEFILE64
+#include <bits/types/off64_t.h>
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_XOPEN || __USE_XOPEN2K */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
+#include <bits/types/intptr_t.h>
+#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
+#if defined(__USE_MISC) || defined(__USE_XOPEN)
+#include <bits/types/socklen_t.h>
+#endif /* __USE_MISC || __USE_XOPEN */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_GNU
 #include <linux/close_range.h>
@@ -235,6 +260,10 @@
 #endif /* !L_XTND && __SEEK_END */
 #endif /* __USE_MISC */
 
+#ifndef NULL
+#define NULL __NULLPTR
+#endif /* !NULL */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
@@ -247,10 +276,6 @@ typedef __ssize_t ssize_t;
 #define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
-
-#ifndef NULL
-#define NULL __NULLPTR
-#endif /* !NULL */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __gid_t_defined

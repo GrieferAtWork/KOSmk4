@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadca2ed3 */
+/* HASH CRC-32:0xe7259d9b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,8 @@
 /* (#) Portability: mintlib       (/include/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
+/*!always_includes <bits/types/time_t.h>*/
+/*!always_includes <bits/types/suseconds_t.h>*/
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H 1
 
@@ -52,6 +54,11 @@
 #include <bits/types.h>
 #include <bits/os/itimerval.h>
 #include <sys/select.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/suseconds_t.h>
+#endif /* __INTELLISENSE__ */
 
 __SYSDECL_BEGIN
 

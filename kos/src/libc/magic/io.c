@@ -42,6 +42,11 @@
 #include <asm/os/oflags.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/errno_t.h>
+#include <bits/types/intptr_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifndef _A_NORMAL
 #define _A_NORMAL 0x00

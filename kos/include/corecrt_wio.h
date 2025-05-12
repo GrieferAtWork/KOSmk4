@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e407f47 */
+/* HASH CRC-32:0xc667a63d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,12 @@
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
 #include <crtdefs.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/errno_t.h>
+#include <bits/types/intptr_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

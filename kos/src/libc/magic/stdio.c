@@ -45,6 +45,11 @@
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 /*!always_includes <libio.h>*/
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_FILE.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/FILE.h>*/
+/*!always_includes <bits/types/size_t.h>*/
 }
 
 /* STDIO Sections:
@@ -148,6 +153,21 @@
 }%[insert:prefix(
 #include <libio.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_XOPEN2K8
+#include <bits/types/ssize_t.h>
+#include <bits/types/off_t.h>
+#ifdef __USE_LARGEFILE64
+#include <bits/types/off64_t.h>
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_KOS
 #include <bits/crt/format-printer.h>
@@ -4986,6 +5006,12 @@ $FILE *funopen2_64(void const *cookie,
 #ifndef _CRT_PERROR_DEFINED
 #define _CRT_PERROR_DEFINED 1
 #endif /* !_CRT_PERROR_DEFINED */
+
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/errno_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 }
 %#ifdef __CC__

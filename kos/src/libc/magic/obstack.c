@@ -48,6 +48,10 @@
 #include <libc/string.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
 #include <string.h>

@@ -30,11 +30,9 @@
 #include <sys/epoll.h>
 #include <system-test/ctest.h>
 
-#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <inttypes.h>
-#include <string.h>
+#include <stddef.h>
 #include <unistd.h>
 
 DECL_BEGIN

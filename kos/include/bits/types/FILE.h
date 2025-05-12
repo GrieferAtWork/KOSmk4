@@ -17,14 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <stdio.h>*/
 #ifndef __FILE_defined
 #include <__crt.h>
 #ifndef __FILE_defined
 #define __FILE_defined
 #ifdef __CC__
-__DECL_BEGIN
+#ifdef __std_FILE_defined
+__NAMESPACE_STD_USING(FILE)
+#else /* __std_FILE_defined */
 typedef __FILE FILE;
-__DECL_END
+#endif /* !__std_FILE_defined */
 #endif /* __CC__ */
 #endif /* !__FILE_defined */
 #endif /* !__FILE_defined */

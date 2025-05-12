@@ -39,6 +39,8 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <malloc.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 

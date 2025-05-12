@@ -25,15 +25,11 @@
 #include <hybrid/compiler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
+#include <sys/syscall.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
-#include <inttypes.h>
-#include <syscall.h>
-#include <threads.h>
 #include <unistd.h>
 
 DECL_BEGIN

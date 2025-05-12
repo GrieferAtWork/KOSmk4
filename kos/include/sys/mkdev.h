@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e71c98a */
+/* HASH CRC-32:0xa60335e0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/mkdev.h) */
+/*!always_includes <bits/types/dev_t.h>*/
 #ifndef _SYS_MKDEV_H
 #define _SYS_MKDEV_H 1
 
@@ -33,6 +34,10 @@
 #include <bits/types.h>
 #include <asm/os/mkdev.h>
 #include <hybrid/typecore.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/dev_t.h>
+#endif /* __INTELLISENSE__ */
 
 
 /* Bad/invalid device number */

@@ -25,7 +25,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/rpc.h>
 #include <kos/types.h>
@@ -36,15 +35,15 @@
 #include <sys/timerfd.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <atomic.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <syslog.h>
 #include <time.h>
 #include <unistd.h>
-
 
 DECL_BEGIN
 

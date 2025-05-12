@@ -51,6 +51,11 @@
 )]%[insert:prefix(
 #include <bits/os/sembuf.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/time_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <sys/ipc.h> /* [n4217.pdf:12514] #include mandated by POSIX */
 
 #ifdef __USE_GNU

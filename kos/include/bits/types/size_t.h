@@ -19,12 +19,12 @@
  */
 /*!replace_with_include <stddef.h>*/
 #ifndef __size_t_defined
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #ifndef __size_t_defined
 #define __size_t_defined
 #ifdef __CC__
 __DECL_BEGIN
-typedef __size_t size_t;
+typedef __SIZE_TYPE__ size_t;
 __DECL_END
 #endif /* __CC__ */
 #endif /* !__size_t_defined */

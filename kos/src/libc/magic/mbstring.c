@@ -36,6 +36,11 @@
 #include <hybrid/typecore.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/errno_t.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_DOS
 #include <crtdefs.h>
 #endif /* __USE_DOS */

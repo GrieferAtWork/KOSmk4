@@ -26,9 +26,9 @@
 
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <malloc.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

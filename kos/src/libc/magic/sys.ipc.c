@@ -51,6 +51,11 @@
 #include <bits/os/ipc.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __INTELLISENSE__ */
 
 /* Mode flags for `msgget()', `semget()', and `shmget()'. */
 #if !defined(IPC_CREAT) && defined(__IPC_CREAT)

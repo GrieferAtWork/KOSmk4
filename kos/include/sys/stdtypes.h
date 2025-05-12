@@ -18,11 +18,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: OpenSolaris (/usr/src/lib/libbc/inc/include/sys/stdtypes.h) */
+/*!always_includes <bits/types/clock_t.h>*/
+/*!always_includes <bits/types/mode_t.h>*/
+/*!always_includes <bits/types/nlink_t.h>*/
+/*!always_includes <bits/types/pid_t.h>*/
+/*!always_includes <bits/types/ptrdiff_t.h>*/
+/*!always_includes <bits/types/sigset_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/time_t.h>*/
 #ifndef _SYS_STDTYPES_H
 #define _SYS_STDTYPES_H 1
 
 #include <__stdinc.h>
 #include <features.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/clock_t.h>
+#include <bits/types/mode_t.h>
+#include <bits/types/nlink_t.h>
+#include <bits/types/pid_t.h>
+#include <bits/types/ptrdiff_t.h>
+#include <bits/types/sigset_t.h>
+#include <bits/types/size_t.h>
+#include <bits/types/time_t.h>
+#endif /* __INTELLISENSE__ */
 
 #include <hybrid/typecore.h>
 

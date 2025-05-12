@@ -40,6 +40,15 @@
 /* (#) Portability: mintlib       (/include/wchar.h) */
 /* (#) Portability: musl libc     (/include/wchar.h) */
 /* (#) Portability: uClibc        (/include/wchar.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/std_FILE.h>*/
+/*!always_includes <bits/types/std_wint_t.h>*/
+/*!always_includes <bits/types/std_mbstate_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/FILE.h>*/
+/*!always_includes <bits/types/wint_t.h>*/
+/*!always_includes <bits/types/mbstate_t.h>*/
 }
 
 %[define_ccompat_header("cwchar")]
@@ -106,6 +115,16 @@ typedef size_t rsize_t;
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#include <bits/types/std_size_t.h>
+#include <bits/types/std_FILE.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#include <bits/types/FILE.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_KOS
 #include <bits/crt/wformat-printer.h>

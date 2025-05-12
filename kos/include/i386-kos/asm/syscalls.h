@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replaces_include <asm/syscalls32.h>*/
+/*!replaces_include <asm/syscalls64.h>*/
 
 #include <hybrid/host.h>
 #ifdef __x86_64__

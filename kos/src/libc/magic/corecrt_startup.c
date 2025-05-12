@@ -39,6 +39,11 @@
 #include <crtdefs.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/errno_t.h>
+#endif /* __INTELLISENSE__ */
+
 #if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
 #include <math.h>
 #endif /* !__USE_DOS && !__USE_DOS_CLEAN */

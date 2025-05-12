@@ -35,6 +35,10 @@
 #include <hybrid/typecore.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 
 /* Flags for use with `readpassphrase(3)::flags' */
 #if !defined(RPP_ECHO_OFF) && defined(__RPP_ECHO_OFF)

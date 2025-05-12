@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56f2fbd9 */
+/* HASH CRC-32:0xc4281116 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,11 @@
 #include <asm/os/ipc.h>
 #include <bits/os/ipc.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __INTELLISENSE__ */
 
 /* Mode flags for `msgget()', `semget()', and `shmget()'. */
 #if !defined(IPC_CREAT) && defined(__IPC_CREAT)

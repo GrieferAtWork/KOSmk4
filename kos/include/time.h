@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa39f898 */
+/* HASH CRC-32:0xd0b46723 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,13 @@
 /* (#) Portability: mintlib       (/include/time.h) */
 /* (#) Portability: musl libc     (/include/time.h) */
 /* (#) Portability: uClibc        (/include/time.h) */
+/*!always_includes <bits/types/NULL.h>*/
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/std_time_t.h>*/
+/*!always_includes <bits/types/std_clock_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/time_t.h>*/
+/*!always_includes <bits/types/clock_t.h>*/
 #ifndef _TIME_H
 #define _TIME_H 1
 
@@ -117,6 +124,17 @@ __NAMESPACE_STD_USING(timespec_getres)
 #include <asm/os/clock.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#ifdef __USE_XOPEN2K
+#include <bits/types/pid_t.h>
+#endif /* __USE_XOPEN2K */
+#ifdef __USE_POSIX199309
+#include <bits/types/clockid_t.h>
+#include <bits/types/timer_t.h>
+#endif /* __USE_POSIX199309 */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>

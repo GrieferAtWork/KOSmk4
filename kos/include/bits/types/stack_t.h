@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <signal.h>*/
 #ifndef __stack_t_defined
 #include <bits/os/sigstack.h>
 #ifndef __stack_t_defined

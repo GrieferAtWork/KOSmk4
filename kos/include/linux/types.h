@@ -28,6 +28,10 @@
 
 #include <bits/types.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include "posix_types.h"
 
 #ifdef __CC__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfdb025f */
+/* HASH CRC-32:0x759a6eb4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,9 @@
 
 #include <crtdefs.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#endif /* __INTELLISENSE__ */
 
 #ifndef NULL
 #define NULL __NULLPTR

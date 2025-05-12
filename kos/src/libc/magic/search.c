@@ -45,9 +45,15 @@
 %[define_replacement(pid_t = __pid_t)]
 %[default:section(".text.crt{|.dos}.utility.search")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 /* Documentation taken from Glibc /usr/include/search.h */
 /* Declarations for System V style searching functions.

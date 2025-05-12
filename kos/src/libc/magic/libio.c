@@ -34,6 +34,14 @@
 #include <asm/crt/stdio.h>
 )]%{
 
+#ifndef _STDIO_H
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#ifndef __USE_ISOC_PURE
+#include <bits/types/wint_t.h>
+#endif /* !__USE_ISOC_PURE */
+#endif /* __INTELLISENSE__ */
+
 #if !defined(EOF) && defined(__EOF)
 #define EOF __EOF
 #endif /* !EOF && __EOF */
@@ -41,6 +49,7 @@
 #ifndef NULL
 #define NULL __NULLPTR
 #endif /* !NULL */
+#endif /* !_STDIO_H */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

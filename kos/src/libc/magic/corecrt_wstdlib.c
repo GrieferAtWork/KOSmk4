@@ -35,6 +35,11 @@
 #include <crtdefs.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/errno_t.h>
+#endif /* __INTELLISENSE__ */
+
 #define _MAX_I64TOSTR_BASE16_COUNT (16 + 1)
 #define _MAX_I64TOSTR_BASE10_COUNT (1 + 19 + 1)
 #define _MAX_I64TOSTR_BASE8_COUNT  (22 + 1)

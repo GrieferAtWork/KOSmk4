@@ -18,8 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /*!included_by <locale.h>*/
-/*!included_by <time.h>*/
 /*!included_by <wchar.h>*/
+/*!replace_with_include <time.h>*/
 #ifndef _BITS_CRT_TM_H
 #define _BITS_CRT_TM_H 1
 

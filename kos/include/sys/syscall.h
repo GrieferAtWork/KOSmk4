@@ -28,6 +28,8 @@
 /* (#) Portability: mintlib       (/include/sys/syscall.h) */
 /* (#) Portability: musl libc     (/include/sys/syscall.h) */
 /* (#) Portability: uClibc        (/include/sys/syscall.h) */
+/*!always_includes <asm/unistd.h>*/
+/*!always_includes <bits/syscalls.h>*/
 #ifndef _SYS_SYSCALL_H
 #define _SYS_SYSCALL_H 1
 

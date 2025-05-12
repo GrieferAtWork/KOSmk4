@@ -268,6 +268,10 @@
 #include <sys/uio.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_GNU
 #include <bits/os/mmsghdr.h>
 #include <bits/os/sigset.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x567a37ae */
+/* HASH CRC-32:0x74ac008c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,11 @@
 #include <bits/types.h>
 #include <asm/os/stropts.h>
 #include <bits/os/stropts.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#endif /* __INTELLISENSE__ */
 
 /* ioctl(2) request codes */
 #if !defined(I_NREAD) && defined(__I_NREAD)

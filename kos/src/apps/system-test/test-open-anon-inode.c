@@ -28,15 +28,15 @@
 #include <kos/ioctl/fd.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
 #include <system-test/ctest.h>
 
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN

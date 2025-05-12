@@ -37,6 +37,8 @@
 /* (#) Portability: mintlib       (/include/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
+/*!always_includes <bits/types/time_t.h>*/
+/*!always_includes <bits/types/suseconds_t.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -62,6 +64,11 @@
 )]%[insert:prefix(
 #include <sys/select.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/suseconds_t.h>
+#endif /* __INTELLISENSE__ */
 
 __SYSDECL_BEGIN
 

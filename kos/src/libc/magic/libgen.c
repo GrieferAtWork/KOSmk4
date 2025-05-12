@@ -46,6 +46,14 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#ifdef __USE_SOLARIS
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#include <bits/types/mode_t.h>
+#endif /* __USE_SOLARIS */
+#endif /* __INTELLISENSE__ */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

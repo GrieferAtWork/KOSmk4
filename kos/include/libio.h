@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b4e92c8 */
+/* HASH CRC-32:0x8920fc43 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,14 @@
 #include <asm/os/stdio.h>
 #include <asm/crt/stdio.h>
 
+#ifndef _STDIO_H
+#ifdef __INTELLISENSE__
+#include <bits/types/NULL.h>
+#ifndef __USE_ISOC_PURE
+#include <bits/types/wint_t.h>
+#endif /* !__USE_ISOC_PURE */
+#endif /* __INTELLISENSE__ */
+
 #if !defined(EOF) && defined(__EOF)
 #define EOF __EOF
 #endif /* !EOF && __EOF */
@@ -42,6 +50,7 @@
 #ifndef NULL
 #define NULL __NULLPTR
 #endif /* !NULL */
+#endif /* !_STDIO_H */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

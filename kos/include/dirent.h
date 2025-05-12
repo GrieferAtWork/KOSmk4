@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f207f4e */
+/* HASH CRC-32:0x40e9441d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,16 @@
 #include <asm/os/dirent.h>
 #include <bits/os/dirent.h>
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#ifdef __USE_XOPEN
+#include <bits/types/ino_t.h>
+#ifdef __USE_LARGEFILE64
+#include <bits/types/ino64_t.h>
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_XOPEN */
+#endif /* __INTELLISENSE__ */
 
 __SYSDECL_BEGIN
 

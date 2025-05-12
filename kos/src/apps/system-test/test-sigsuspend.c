@@ -27,12 +27,12 @@
 
 #include <kos/syscalls.h>
 #include <kos/types.h>
+#include <sys/syscall.h>
 #include <system-test/ctest.h>
 
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
-#include <syscall.h>
 
 DECL_BEGIN
 

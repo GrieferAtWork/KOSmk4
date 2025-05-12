@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd2bfa28 */
+/* HASH CRC-32:0xd75e7f93 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,10 @@
 #include <features.h>
 #include <bits/types.h>
 #include <bits/crt/wordexp.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 /* Flags for `wordexp(3)' */
 #if !defined(WRDE_DOOFFS) && defined(__WRDE_DOOFFS)

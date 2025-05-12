@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c739305 */
+/* HASH CRC-32:0xc0cd80d1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,10 @@
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <libc/string.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>

@@ -44,6 +44,12 @@
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%{
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#ifdef __USE_NETBSD
+#include <bits/types/NULL.h>
+#endif /* __USE_NETBSD */
+#endif /* __INTELLISENSE__ */
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */

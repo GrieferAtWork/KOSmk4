@@ -24,15 +24,12 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/host.h>
-#include <hybrid/wordbits.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/mman.h>
-#include <sys/types.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
@@ -40,10 +37,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <libvio/api.h>
 #include <libvio/vio.h>
 
 #ifdef LIBVIO_CONFIG_ENABLED

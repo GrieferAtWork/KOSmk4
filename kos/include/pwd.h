@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cce5a53 */
+/* HASH CRC-32:0x868ce102 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,15 @@
 #include <bits/crt/db/passwd.h>
 #include <kos/anno.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K */
+#endif /* __INTELLISENSE__ */
+
 __SYSDECL_BEGIN
 
 #if defined(__USE_POSIX) && defined(__USE_MISC)
@@ -84,19 +93,10 @@ typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
-#ifndef __std_FILE_defined
-#define __std_FILE_defined
-__NAMESPACE_STD_BEGIN
-typedef __FILE FILE;
-__NAMESPACE_STD_END
-#endif /* !__std_FILE_defined */
-
-#ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined
-__NAMESPACE_STD_USING(FILE)
+typedef __FILE FILE;
 #endif /* !__FILE_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 /* >> setpwent(3)

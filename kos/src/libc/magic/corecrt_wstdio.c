@@ -43,6 +43,13 @@
 #include <crtdefs.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/errno_t.h>
+#include <bits/types/size_t.h>
+#include <bits/types/wint_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
@@ -75,15 +82,9 @@ typedef __SIZE_TYPE__ rsize_t;
 #define WEOF __WEOF
 #endif /* !WEOF */
 
-#ifndef __std_FILE_defined
-#define __std_FILE_defined
-__NAMESPACE_STD_BEGIN
-typedef __FILE FILE;
-__NAMESPACE_STD_END
-#endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
 #define __FILE_defined
-__NAMESPACE_STD_USING(FILE)
+typedef __FILE FILE;
 #endif /* !__FILE_defined */
 
 }

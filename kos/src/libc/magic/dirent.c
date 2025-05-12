@@ -70,6 +70,16 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#ifdef __USE_XOPEN
+#include <bits/types/ino_t.h>
+#ifdef __USE_LARGEFILE64
+#include <bits/types/ino64_t.h>
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_XOPEN */
+#endif /* __INTELLISENSE__ */
+
 __SYSDECL_BEGIN
 
 #ifdef __USE_MISC

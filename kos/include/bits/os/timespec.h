@@ -31,7 +31,7 @@
 /*!included_by <sys/socket.h>*/
 /*!included_by <sys/stat.h>*/
 /*!included_by <threads.h>*/
-/*!included_by <time.h>*/
+/*!replace_with_include <time.h>*/
 #ifndef _BITS_OS_TIMESPEC_H
 #define _BITS_OS_TIMESPEC_H 1
 

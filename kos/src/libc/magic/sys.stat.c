@@ -142,6 +142,22 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
+#include <bits/types/dev_t.h>
+#include <bits/types/gid_t.h>
+#include <bits/types/ino_t.h>
+#include <bits/types/mode_t.h>
+#include <bits/types/nlink_t.h>
+#include <bits/types/off_t.h>
+#include <bits/types/uid_t.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K */
+#ifdef __USE_UNIX98
+#include <bits/types/blkcnt_t.h>
+#include <bits/types/blksize_t.h>
+#endif /* __USE_UNIX98 */
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_DOS
 #ifdef _BITS_OS_DOS_STAT_H
 #ifdef __CC__

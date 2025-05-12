@@ -26,6 +26,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
+#include <kos/unistd.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
 #include <system-test/ctest.h>
@@ -35,6 +36,7 @@
 #include <signal.h>
 #include <stdalign.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -49,8 +51,8 @@ PRIVATE byte_t _inotify_buf[offsetof(struct inotify_event, name) +
 PRIVATE void
 assert_inotify_event(fd_t notify_fd, watchfd_t wd,
                      uint32_t mask, char const *name) {
-	ssize_t size, exp_size;
-	size     = read(notify_fd, inotify_buf, INOTIFY_BUFSIZE);
+	size_t size, exp_size;
+	size     = Read(notify_fd, inotify_buf, INOTIFY_BUFSIZE);
 	exp_size = offsetof(struct inotify_event, name);
 	if (name)
 		exp_size += (strlen(name) + 1) * sizeof(char);
@@ -186,7 +188,6 @@ DEFINE_TEST(dnotify) {
 	NE(SIG_ERR, signal(SIGUSR1, ohand));
 	EQ(4, sigio); /* <no event> */
 }
-
 
 DECL_END
 

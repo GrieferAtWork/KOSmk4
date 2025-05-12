@@ -26,18 +26,14 @@
 
 #include <kos/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <system-test/ctest.h>
 
-#include <err.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
 #include <pty.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-#include <wait.h>
 
 DECL_BEGIN
 

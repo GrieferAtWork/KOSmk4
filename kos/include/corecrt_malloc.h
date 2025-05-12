@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72c36602 */
+/* HASH CRC-32:0xe3d61a5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,10 @@
 #include <features.h>
 #include <bits/types.h>
 #include <crtdefs.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

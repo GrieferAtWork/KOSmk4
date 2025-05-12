@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <hybrid/__debug-alignment.h>*/
 #ifndef __GUARD_HYBRID_DEBUG_ALIGNMENT_H
 #define __GUARD_HYBRID_DEBUG_ALIGNMENT_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x599c6625 */
+/* HASH CRC-32:0x89a82ece */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,10 @@
 /* (#) Portability: libc6         (/include/uchar.h) */
 /* (#) Portability: musl libc     (/include/uchar.h) */
 /* (#) Portability: uClibc        (/include/uchar.h) */
+/*!always_includes <bits/types/std_size_t.h>*/
+/*!always_includes <bits/types/std_mbstate_t.h>*/
+/*!always_includes <bits/types/size_t.h>*/
+/*!always_includes <bits/types/mbstate_t.h>*/
 #ifndef _UCHAR_H
 #define _UCHAR_H 1
 
@@ -62,6 +66,14 @@ __NAMESPACE_STD_USING(c32rtomb)
 #include <hybrid/typecore.h>
 #include <bits/crt/mbstate.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/std_size_t.h>
+#include <bits/types/std_mbstate_t.h>
+#ifndef __CXX_SYSTEM_HEADER
+#include <bits/types/size_t.h>
+#include <bits/types/mbstate_t.h>
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __INTELLISENSE__ */
 
 #ifdef __USE_KOS
 /* Static initializer for `mbstate_t':

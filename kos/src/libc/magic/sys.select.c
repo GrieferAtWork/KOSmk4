@@ -75,6 +75,12 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/sigset_t.h>
+#include <bits/types/suseconds_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifndef __INTELLISENSE__
 #include <libc/string.h> /* __libc_bzero */
 #endif /* !__INTELLISENSE__ */

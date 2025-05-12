@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d91c16e */
+/* HASH CRC-32:0xbd2690f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,9 @@
 #include <kos/anno.h>
 #include <bits/crt/db/mntent.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#endif /* __INTELLISENSE__ */
 
 /* Filename for the mounting-point table (/etc/fstab) */
 #define MNTTAB _PATH_MNTTAB /* Deprecated alias. */

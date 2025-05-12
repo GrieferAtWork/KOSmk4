@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83698d3c */
+/* HASH CRC-32:0xbf01a51a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,11 @@
 #include <asm/os/sem.h>
 #include <bits/os/sem.h>
 #include <bits/os/sembuf.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/time_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <sys/ipc.h> /* [n4217.pdf:12514] #include mandated by POSIX */
 
 #ifdef __USE_GNU

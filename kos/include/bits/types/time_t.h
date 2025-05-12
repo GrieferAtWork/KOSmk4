@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <time.h>*/
 #ifndef __time_t_defined
 #include <bits/types.h>
 #ifndef __time_t_defined

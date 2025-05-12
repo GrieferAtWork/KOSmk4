@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7abda076 */
+/* HASH CRC-32:0x53745e1b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,10 @@
 #include <features.h>
 
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 /*
  * Note  that the KOS implementations of these functions was written entirely

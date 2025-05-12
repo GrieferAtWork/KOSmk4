@@ -24,7 +24,6 @@
 #include <hybrid/compiler.h>
 
 #include <kos/ksysctl.h>
-#include <kos/types.h>
 #include <sys/syslog.h>
 #include <system-test/ctest.h>
 
@@ -32,6 +31,8 @@
 #include <format-printer.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

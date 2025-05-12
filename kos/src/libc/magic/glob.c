@@ -55,6 +55,10 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 /* Flags accepted by the `flags' argument of `glob(3)' */
 #if !defined(GLOB_ERR) && defined(__GLOB_ERR)
 #define GLOB_ERR         __GLOB_ERR         /* ??? */

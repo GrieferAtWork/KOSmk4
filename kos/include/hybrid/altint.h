@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!always_includes <hybrid/__altint.h>*/
 #ifndef __GUARD_HYBRID_ALTINT_H
 #define __GUARD_HYBRID_ALTINT_H 1
 

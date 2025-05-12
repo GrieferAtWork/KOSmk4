@@ -31,14 +31,10 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <system-test/ctest.h>
 
-#include <errno.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <stddef.h>
-#include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN

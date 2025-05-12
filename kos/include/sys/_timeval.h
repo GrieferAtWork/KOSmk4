@@ -28,6 +28,11 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/time_t.h>
+#include <bits/types/suseconds_t.h>
+#endif /* __INTELLISENSE__ */
+
 #include <bits/os/timeval.h>
 #include <bits/types.h>
 #include <sys/_types.h>

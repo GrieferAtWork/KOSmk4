@@ -37,6 +37,11 @@
 #include <bits/os/stropts.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/gid_t.h>
+#include <bits/types/uid_t.h>
+#endif /* __INTELLISENSE__ */
+
 /* ioctl(2) request codes */
 #if !defined(I_NREAD) && defined(__I_NREAD)
 #define I_NREAD    __I_NREAD    /* [int *arg] ??? */

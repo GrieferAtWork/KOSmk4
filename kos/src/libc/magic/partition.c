@@ -31,6 +31,10 @@
 #include <bits/crt/partition.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

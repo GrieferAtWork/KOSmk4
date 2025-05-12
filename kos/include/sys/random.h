@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0c0c3e6 */
+/* HASH CRC-32:0xffd5af50 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,10 @@
 
 #include <asm/os/random.h>
 #include <bits/types.h>
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #endif /* __USE_GLIBC_BLOAT */

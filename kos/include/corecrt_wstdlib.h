@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d4ec8ae */
+/* HASH CRC-32:0xda8b408b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,11 @@
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 #include <crtdefs.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#include <bits/types/errno_t.h>
+#endif /* __INTELLISENSE__ */
 
 #define _MAX_I64TOSTR_BASE16_COUNT (16 + 1)
 #define _MAX_I64TOSTR_BASE10_COUNT (1 + 19 + 1)

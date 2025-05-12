@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16a74f6f */
+/* HASH CRC-32:0xd2f68d1a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,10 @@
 
 #include <features.h>
 #include <bits/crt/partition.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#endif /* __INTELLISENSE__ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

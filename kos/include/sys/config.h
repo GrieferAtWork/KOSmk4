@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3f9493e */
+/* HASH CRC-32:0xa41b7684 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,10 @@
 #include <hybrid/typecore.h>
 #include <asm/os/limits.h>
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 #undef STDC_HEADERS
 #define STDC_HEADERS 1

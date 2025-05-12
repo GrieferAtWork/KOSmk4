@@ -24,8 +24,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/except.h>
-#include <kos/types.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>

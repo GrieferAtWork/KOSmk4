@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f78e457 */
+/* HASH CRC-32:0x98b589d2 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,10 @@
 #include <kos/anno.h>
 #include <asm/crt/stdio_ext.h>
 #include <bits/types.h>
+
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
 
 /************************************************************************/
 /* Possible values for `__fsetlocking(3)'                               */

@@ -45,6 +45,10 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #undef STDC_HEADERS
 #define STDC_HEADERS 1
 

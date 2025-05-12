@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13597e3e */
+/* HASH CRC-32:0xb872b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,11 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/printf_info.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/FILE.h>
+#include <bits/types/size_t.h>
+#endif /* __INTELLISENSE__ */
+
 #ifdef __USE_GLIBC_BLOAT
 #include <stdarg.h>
 #endif /* __USE_GLIBC_BLOAT */
@@ -57,19 +62,10 @@ typedef __SIZE_TYPE__ size_t;
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
-#ifndef __std_FILE_defined
-#define __std_FILE_defined
-__NAMESPACE_STD_BEGIN
-typedef __FILE FILE;
-__NAMESPACE_STD_END
-#endif /* !__std_FILE_defined */
-
-#ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined
-__NAMESPACE_STD_USING(FILE)
+typedef __FILE FILE;
 #endif /* !__FILE_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
 
 /* Function types (NOT POINTERS) from `<bits/crt/printf_info.h>' */
 typedef __printf_function printf_function;
