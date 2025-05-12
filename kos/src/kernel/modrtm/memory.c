@@ -734,7 +734,6 @@ rtm_memory_readwrite(struct rtm_memory *__restrict self, NCX void *addr,
 	if (!num_bytes)
 		return; /* Nothing to do here! */
 again:
-	i = 0;
 	BSEARCH_RANGE (i, self->rm_regionv, self->rm_regionc,
 	                                    ->mr_addrlo,
 	                                    ->mr_addrhi,
@@ -959,44 +958,26 @@ again_lock_effective_mman:
 			access_bytes = num_bytes;
 		/* Check for some additional region with which the  given
 		 * address range may overlap at some later point in time.
-		 * HINT: `i'  is  still left  initialized by  the `BSEARCH_RANGE()'
-		 *       above, and currently points at where the region for `addr'
-		 *       would have been (if it  existed), or at the region  before
-		 *       that index. */
-		if (i >= self->rm_regionc) {
-			assertf(i == 0,
-			        "i                = %" PRIuSIZ "\n"
-			        "self->rm_regionc = %" PRIuSIZ "\n",
-			        i, self->rm_regionc);
-		} else {
+		 * HINT: `i' is still left initialized by the `BSEARCH_RANGE()'
+		 *       above, and currently  points at where  the region  for
+		 *       `addr' is supposed to go. */
+		if (i < self->rm_regionc) {
+			size_t distance_to_next_region;
 			struct rtm_memory_region *next_region;
 			next_region = self->rm_regionv[i];
-			if (next_region->mr_addrhi < addr) {
-				/* `i' points before the should-be index. */
-				++i;
-				/* And now `i' points at the should-be index. */
-				if (i < self->rm_regionc) {
-#ifndef NDEBUG
-					next_region = self->rm_regionv[i];
-#endif /* !NDEBUG */
-					goto verify_access_range;
-				}
-			} else {
-				size_t distance_to_next_region;
-verify_access_range:
-				assertf(next_region->mr_addrlo > addr,
-				        "addr                   = %p\n"
-				        "next_region->mr_addrlo = %p\n"
-				        "next_region->mr_addrhi = %p\n",
-				        addr,
-				        next_region->mr_addrlo,
-				        next_region->mr_addrhi);
-				distance_to_next_region = (size_t)((byte_t *)next_region->mr_addrlo -
-				                                   (byte_t *)addr);
-				if (access_bytes > distance_to_next_region)
-					access_bytes = distance_to_next_region;
-			}
+			assertf(next_region->mr_addrlo > addr,
+			        "addr                   = %p\n"
+			        "next_region->mr_addrlo = %p\n"
+			        "next_region->mr_addrhi = %p\n",
+			        addr,
+			        next_region->mr_addrlo,
+			        next_region->mr_addrhi);
+			distance_to_next_region = (size_t)((byte_t *)next_region->mr_addrlo -
+			                                   (byte_t *)addr);
+			if (access_bytes > distance_to_next_region)
+				access_bytes = distance_to_next_region;
 		}
+
 		/* Access  permissions have been  confirmed, and we  now know that we're
 		 * really dealing with a proper memory mapping that is able to represent
 		 * actual memory. (rather than some other kind of mapping)
