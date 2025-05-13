@@ -19,12 +19,12 @@
  */
 #ifndef GUARD_LIBKERNEL32_WINCON_C
 #define GUARD_LIBKERNEL32_WINCON_C 1
-
 #define _KOS_SOURCE 1
 #define _UTF_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include "api.h"
+/**/
 
 #include <kos/except.h>
 #include <kos/ioctl/video.h>

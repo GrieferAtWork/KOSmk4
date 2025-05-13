@@ -34,7 +34,6 @@
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
 #include <kos/dosfs.h>
-#include <kos/except.h>
 #include <kos/fcntl.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
@@ -43,60 +42,53 @@
 #include <kos/sys/mman.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
-#include <kos/ukern.h>
 #include <kos/unistd.h>
-#include <linux/if_ether.h>
 #include <linux/msdos_fs.h>
-#include <netinet/if_ether.h>
 #include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/udp.h>
 #include <sys/auxv.h>
-#include <sys/io.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <sys/mmio.h>
-#include <sys/poll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
-#include <sys/syscall-proto.h>
-#include <sys/syscall.h>
+#include <sys/syslog.h>
 #include <sys/time.h>
-#include <sys/un.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 #include <assert.h>
 #include <ctype.h>
 #include <dlfcn.h>
+#include <elf.h>
 #include <err.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <format-printer.h>
 #include <intrin.h>
 #include <inttypes.h>
 #include <malloc.h>
-#include <math.h>
 #include <pthread.h>
 #include <pty.h>
-#include <sched.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 #include <termios.h>
 #include <ttyent.h>
 #include <unistd.h>
 
 #include <libansitty/ctl.h>
+#include <libdebuginfo/api.h>
 #include <libdebuginfo/repr.h>
 #include <libiberty.h>
+#include <libvio/api.h>
 #include <libvio/vio.h>
 
 DECL_BEGIN
 
 /************************************************************************/
-int main_rawterm(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_rawterm(int argc, char *argv[], char *envp[]) {
 #define PRINTSTR(s) write(STDOUT_FILENO, s, sizeof(s) - sizeof(char))
 	struct termios oios, nios;
 	char buf[8];
@@ -178,7 +170,7 @@ int main_rawterm(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_color(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_color(int argc, char *argv[], char *envp[]) {
 	/* Foreground codes */
 	unsigned int f, b;
 	static unsigned int const f_codes[] = {
@@ -230,7 +222,7 @@ int main_color(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_FPU
-int main_fpu(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_fpu(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("mxcsr=%#.8I32x\n", __stmxcsr());
 	printf("fcw=%#.4I16x\n", __fnstcw());
@@ -254,7 +246,7 @@ int main_fpu(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_fork(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_fork(int argc, char *argv[], char *envp[]) {
 	unsigned int depth = 0;
 	unsigned int max_depth = 1;
 	bool in_child = false;
@@ -311,7 +303,7 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_forkbomb(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_forkbomb(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Just your traditional fork-bomb
 	 * Use CTRL+C to kill all of the created processes at once.
@@ -333,7 +325,7 @@ int main_forkbomb(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_environ(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_environ(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("$PATH: %q\n", getenv("PATH"));
 	printf("envp: %p\n", envp);
@@ -351,7 +343,7 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_args(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_args(int argc, char *argv[], char *envp[]) {
 	int i;
 	(void)argv, (void)envp;
 	printf("argc = %d\n", argc);
@@ -366,7 +358,7 @@ int main_args(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_prognam(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_prognam(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("program_invocation_name       = %q\n", program_invocation_name);
 	printf("program_invocation_short_name = %q\n", program_invocation_short_name);
@@ -381,7 +373,7 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_logtime(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_logtime(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	struct timeval prev = { 0, 0 };
 	for (;;) {
@@ -418,7 +410,7 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_sleep(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_sleep(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	for (;;) {
 		char buf[26];
@@ -443,7 +435,7 @@ int main_sleep(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 static int my_static = 0;
-int main_dl(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_dl(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("stdout    @ %p\n", &stdout);
 	printf("my_static @ %p\n", &my_static);
@@ -458,7 +450,7 @@ int main_dl(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_ustring(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_ustring(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	{
 		char const *s8 = "8-bit string";
@@ -479,7 +471,7 @@ int main_ustring(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_float(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_float(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("1/1 = %f\n", 1.0 / 1.0);
 	printf("1/2 = %f\n", 1.0 / 2.0);
@@ -493,7 +485,7 @@ int main_float(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_sock(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_sock(int argc, char *argv[], char *envp[]) {
 	/* NOTE: For this test-program, you need to:
 	 * - have `deemon kos/misc/scripts/udpecho.dee' running (on your host machine)
 	 * - Add to `qemu.conf':
@@ -537,7 +529,7 @@ int main_sock(int argc, char *argv[], char *envp[]) {
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_SYSENTER 1
 /************************************************************************/
-int main_sysenter(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_sysenter(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	__asm__(".byte 0x0f, 0x34\n");
 	return 0;
@@ -552,7 +544,7 @@ int main_sysenter(int argc, char *argv[], char *envp[]) {
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_SGBASE 1
 /************************************************************************/
-int main_sgbase(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_sgbase(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("%%fs.base = %p\n", __rdfsbase());
 	printf("%%gs.base = %p\n", __rdgsbase());
@@ -568,7 +560,7 @@ int main_sgbase(int argc, char *argv[], char *envp[]) {
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_INT3 1
 /************************************************************************/
-int main_int3(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_int3(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	__asm__ __volatile__("int3");
 	return 0;
@@ -592,7 +584,7 @@ debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 	return (ssize_t)r.dtr_signo;
 }
 
-int main_dprint(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_dprint(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* XXX: While this ~does~ work to do  exactly what it's supposed to  do,
 	 *      Visual Studio's MIEngine doesn't seem to understand the protocol
@@ -652,7 +644,7 @@ PRIVATE void *main_yield_thread(void *UNUSED(arg)) {
 		pthread_yield();
 }
 
-int main_yield(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_yield(int argc, char *argv[], char *envp[]) {
 	pthread_t pt;
 	(void)argc, (void)argv, (void)envp;
 	pthread_create(&pt, NULL, &main_yield_thread, NULL);
@@ -679,7 +671,7 @@ PRIVATE struct vio_ops const myvio_ops = {
 	/* .vo_read = */ VIO_CALLBACK_INIT_READ(NULL, NULL, &myvio_readl, NULL),
 };
 
-int main_vio(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_vio(int argc, char *argv[], char *envp[]) {
 	void *libvio;
 	PVIO_CREATE vio_create;
 	PVIO_DESTROY vio_destroy;
@@ -736,7 +728,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 #ifdef RTM_STARTED
 #define HAVE_MAIN_RTM
-int main_rtm(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_rtm(int argc, char *argv[], char *envp[]) {
 	static volatile int a, b, c;
 	rtm_status_t status;
 	(void)argc, (void)argv, (void)envp;
@@ -768,7 +760,7 @@ int main_rtm(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_fault(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_fault(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Just a simple program that will cause a SIGSEGV */
 	*(int volatile *)0x123 = 321;
@@ -779,7 +771,7 @@ int main_fault(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_leak(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_leak(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Just check for leaks in kernel-space. */
 	size_t count;
@@ -793,7 +785,7 @@ int main_leak(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_vfork(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_vfork(int argc, char *argv[], char *envp[]) {
 	int status;
 	pid_t pid;
 	errno_t errno_after_vfork;
@@ -840,7 +832,7 @@ PRIVATE void *sigbounce_threadmain(void *) {
 	return NULL;
 }
 
-int main_sigbounce(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_sigbounce(int argc, char *argv[], char *envp[]) {
 	pthread_t pt;
 	(void)argc, (void)argv, (void)envp;
 
@@ -872,7 +864,7 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_bigfile(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_bigfile(int argc, char *argv[], char *envp[]) {
 	fd_t fd;
 	byte_t *data;
 	size_t i, len;
@@ -894,7 +886,7 @@ int main_bigfile(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_pass(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_pass(int argc, char *argv[], char *envp[]) {
 	char *user, *pass;
 	(void)argc, (void)argv, (void)envp;
 	printf("===FAKE LOGIN===\n");
@@ -920,7 +912,7 @@ int main_pass(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_assert(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_assert(int argc, char *argv[], char *envp[]) {
 	volatile int x;
 	(void)argc, (void)argv, (void)envp;
 	/* Demo for what happens when a user-space assert fails. */
@@ -933,7 +925,7 @@ int main_assert(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_cc(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_cc(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Clear system caches. */
 	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
@@ -944,7 +936,7 @@ int main_cc(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_fg(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_fg(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("Before fork: %d\n", getpid());
 	printf("	tcgetpgrp(0) = %d\n", tcgetpgrp(0));
@@ -971,7 +963,7 @@ int main_fg(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_fatls(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_fatls(int argc, char *argv[], char *envp[]) {
 	static char *default_args[] = { (char *)"." };
 	(void)envp;
 	--argc;
@@ -1009,7 +1001,7 @@ int main_fatls(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_charmap(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_charmap(int argc, char *argv[], char *envp[]) {
 	char const *cpvga[] = { /* s.a. /src/libvgastate/vgastate.c */
 		"\uFFFD\u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C",
 		"\u25BA\u25C4\u2195\u203C\u00B6\u00A7\u25AC\u21A8\u2191\u2193\u2192\u2190\u221F\u2194\u25B2\u25BC",
@@ -1043,7 +1035,7 @@ int main_charmap(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_dumpdebug(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 	void *libdebuginfo;
 	void *dlmod;
 	PDEBUG_REPR_DUMP debug_repr_dump;
@@ -1096,7 +1088,7 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_leakmon(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_leakmon(int argc, char *argv[], char *envp[]) {
 	size_t loop;
 	static char const reset[] = AC_ED("") AC_CUP0;
 	char **volatile used_argv = argv; /* Prevents warnings about "returns_twice" and vfork()... */
@@ -1138,7 +1130,7 @@ int main_leakmon(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_dosenv(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_dosenv(int argc, char *argv[], char *envp[]) {
 	int (__LIBDCALL *dos_setenv)(char const *varname, char const *val, int replace);
 	char ***p_dos_environ, **dos_environ;
 	(void)argc, (void)argv, (void)envp;
@@ -1172,7 +1164,7 @@ int main_dosenv(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_stackend(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_stackend(int argc, char *argv[], char *envp[]) {
 	void **p_stackend;
 	(void)argc, (void)argv, (void)envp;
 	p_stackend = (void **)dlsym(RTLD_DEFAULT, "__libc_stack_end");
@@ -1188,7 +1180,7 @@ int main_stackend(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_ttys(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_ttys(int argc, char *argv[], char *envp[]) {
 	struct ttyent *ent;
 	(void)argc, (void)argv, (void)envp;
 	if (!setttyent())
@@ -1208,7 +1200,7 @@ int main_ttys(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_abort(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_abort(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	abort();
 	return 0;
@@ -1218,7 +1210,7 @@ int main_abort(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_abortf(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_abortf(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	abortf("Abort with %s", "format string message");
 	return 0;
@@ -1228,7 +1220,7 @@ int main_abortf(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_abortf2(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_abortf2(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	abortf("[tag1] Abort with %s\n"
 	       "[tag2] Second %s",
@@ -1241,7 +1233,7 @@ int main_abortf2(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-int main_lread(int argc, char *argv[], char *envp[]) {
+PRIVATE int main_lread(int argc, char *argv[], char *envp[]) {
 	enum{ SIZE = 64 * 1024 };
 	void *compare;
 	void *buf;

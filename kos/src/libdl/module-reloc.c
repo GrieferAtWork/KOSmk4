@@ -23,24 +23,35 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
 #include "dl.h"
 /**/
 
-#include <hybrid/typecore.h>
+#include <hybrid/compiler.h>
 
-#include <kos/exec/peb.h> /* struct process_peb */
+#include <hybrid/sequence/list.h>
+
+#include <kos/anno.h>
+#include <kos/exec/elf-rel.h>
+#include <kos/exec/elf.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <sys/ioctl.h>
 
 #include <assert.h>
+#include <dlfcn.h>
 #include <elf.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 #undef LAZY_TRACE
 #if 1

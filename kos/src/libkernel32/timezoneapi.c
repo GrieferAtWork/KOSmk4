@@ -25,7 +25,11 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
+#include <nt/__stdinc.h>
 #include <nt/timezoneapi.h>
+#include <nt/types.h>
 #include <sys/time.h>
 
 #include <string.h>

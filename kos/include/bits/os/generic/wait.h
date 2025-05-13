@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!replace_with_include <bits/os/wait.h>*/
+/*!replace_with_include <sys/wait.h>*/
 #ifndef _BITS_OS_GENERIC_WAIT_H
 #define _BITS_OS_GENERIC_WAIT_H 1
 

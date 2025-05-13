@@ -26,14 +26,19 @@
 #include "api.h"
 /**/
 
-#include <kos/types.h>
-#include <nt/messages.h>
+#include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+#include <nt/__stdinc.h>
+#include <nt/messages.h>
+#include <nt/types.h>
+
+#include <errno.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <string.h>
 #include <uchar.h>
-#include <wchar.h>
 
 DECL_BEGIN
 

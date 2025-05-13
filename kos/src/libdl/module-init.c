@@ -23,21 +23,35 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
+
 #include "dl.h"
 /**/
 
+#include <hybrid/compiler.h>
+
+#include <hybrid/sequence/list.h>
+
+#include <kos/anno.h>
 #include <kos/debugtrap.h>
+#include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 #include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
+#include <assert.h>
 #include <atomic.h>
+#include <dlfcn.h>
+#include <elf.h>
 #include <errno.h>
 #include <malloc.h>
 #include <signal.h>
-#include <syslog.h>
+#include <stddef.h>
+#include <stdint.h>
 
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 DECL_BEGIN
 

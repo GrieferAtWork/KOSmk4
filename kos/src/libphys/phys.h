@@ -24,7 +24,11 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include <libphys/phys.h>
 

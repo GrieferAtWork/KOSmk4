@@ -26,7 +26,7 @@
 /* (#) Portability: mintlib       (/include/wait.h) */
 /* (#) Portability: musl libc     (/include/wait.h) */
 /* (#) Portability: uClibc        (/include/wait.h) */
-/*!always_includes <sys/wait.h>*/
+/*!replace_with_include <sys/wait.h>*/
 #ifndef _WAIT_H
 #define _WAIT_H 1
 #include <sys/wait.h>

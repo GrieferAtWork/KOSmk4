@@ -26,12 +26,16 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <hybrid/minmax.h>
 
 #include <kos/ioctl/pipe.h>
 #include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/handleapi.h>
 #include <nt/namedpipeapi.h>
+#include <nt/types.h>
 #include <sys/ioctl.h>
 
 #include <errno.h>

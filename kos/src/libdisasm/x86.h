@@ -27,7 +27,7 @@
 
 #include <hybrid/host.h>
 
-#include "common.h"
+#include <libdisasm/disassembler.h>
 
 DECL_BEGIN
 

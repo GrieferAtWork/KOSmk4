@@ -23,12 +23,17 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
+#include <kos/anno.h>
 #include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/errhandlingapi.h>
+#include <nt/types.h>
+#include <sys/syslog.h>
 
 #include <errno.h>
 #include <stddef.h>
-#include <syslog.h>
 
 DECL_BEGIN
 

@@ -29,20 +29,12 @@
 
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
-#include <hybrid/unaligned.h>
 
 #include <kos/kernel/types.h>
-#include <kos/types.h>
 
-#include <inttypes.h> /* PRI* */
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "_binstr.h"
-#include "x86.h"
 
 DECL_BEGIN
 

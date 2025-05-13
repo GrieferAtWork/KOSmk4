@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <sys/wait.h>*/
+/*!replace_with_include <sys/wait.h>*/
 #ifndef _PARTS_WAITMACROS_H
 #define _PARTS_WAITMACROS_H 1
 

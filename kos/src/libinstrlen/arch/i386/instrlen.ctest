@@ -24,15 +24,15 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/except.h>
+#include <asm/isa.h>
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
 #include <dlfcn.h>
 #include <inttypes.h>
-#include <stdlib.h>
 
+#include <libinstrlen/api.h>
 #include <libinstrlen/instrlen.h>
 
 DECL_BEGIN

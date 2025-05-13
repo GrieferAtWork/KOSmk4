@@ -25,15 +25,18 @@
 #include "api.h"
 /**/
 
-#include <asm/intrin.h>
-#include <kos/types.h>
-#include <nt/debugapi.h>
+#include <hybrid/compiler.h>
 
+#include <asm/intrin.h>
+#include <nt/__stdinc.h>
+#include <nt/debugapi.h>
+#include <nt/types.h>
+#include <parts/uchar/string.h>
+#include <sys/syslog.h>
+
+#include <stddef.h>
 #include <string.h>
-#include <syslog.h>
-#include <uchar.h>
 #include <unicode.h>
-#include <wchar.h>
 
 DECL_BEGIN
 

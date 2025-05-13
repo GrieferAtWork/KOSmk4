@@ -26,6 +26,20 @@
 #include "__stdinc.h"
 /**/
 
+#ifdef __INTELLISENSE__
+#ifndef __USE_DOS_CLEAN
+#include <bits/types/size_t.h>
+#include <bits/types/intptr_t.h>
+#include <bits/types/uintptr_t.h>
+#include <bits/types/ptrdiff_t.h>
+#include <bits/types/wint_t.h>
+#include <bits/types/wctype_t.h>
+#include <bits/types/va_list.h>
+#include <bits/types/errno_t.h>
+#include <bits/types/time_t.h>
+#endif /* !__USE_DOS_CLEAN */
+#endif /* __INTELLISENSE__ */
+
 #include <features.h>
 
 #include <hybrid/typecore.h>
@@ -449,19 +463,7 @@ typedef __builtin_va_list va_list;
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 #endif /* !_ERRNO_T_DEFINED */
-#endif /* !__USE_DOS_CLEAN */
 
-#ifndef _TIME32_T_DEFINED
-#define _TIME32_T_DEFINED 1
-/* Defined in <bits/types.h> */
-#endif /* !_TIME32_T_DEFINED */
-
-#ifndef _TIME64_T_DEFINED
-#define _TIME64_T_DEFINED 1
-/* Defined in <bits/types.h> */
-#endif /* !_TIME64_T_DEFINED */
-
-#ifndef __USE_DOS_CLEAN
 #undef _USE_32BIT_TIME_T
 #ifndef __USE_TIME_BITS64
 #define _USE_32BIT_TIME_T 1
@@ -479,6 +481,16 @@ typedef __time64_t time_t;
 #endif /* !__time_t_defined */
 #endif /* !_TIME_T_DEFINED */
 #endif /* !__USE_DOS_CLEAN */
+
+#ifndef _TIME32_T_DEFINED
+#define _TIME32_T_DEFINED 1
+/* Defined in <bits/types.h> */
+#endif /* !_TIME32_T_DEFINED */
+
+#ifndef _TIME64_T_DEFINED
+#define _TIME64_T_DEFINED 1
+/* Defined in <bits/types.h> */
+#endif /* !_TIME64_T_DEFINED */
 
 #ifdef _DEBUG
 #ifdef __CRT_HAVE__invalid_parameter

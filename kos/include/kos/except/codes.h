@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <kos/except.h>*/
+/*!replace_with_include <kos/except.h>*/
 /*!always_includes <kos/except/asm/codes.h>*/
 #ifndef _KOS_EXCEPT_CODES_H
 #define _KOS_EXCEPT_CODES_H 1

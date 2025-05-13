@@ -29,26 +29,19 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
-#include <hybrid/sched/atomic-rwlock.h>
-#include <hybrid/sequence/list.h>
 
 #include <asm/redirect.h>
 #include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
 #include <kos/exec/elf.h>
-#include <kos/kernel/types.h>
-#include <kos/thread.h>
 #include <kos/types.h>
 
-#include <assert.h>
 #include <dlfcn.h>
-#include <elf.h>
 #include <inttypes.h>
 #include <link.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
 
 #include <libdl/extension.h>
 #include <libdl/module.h>

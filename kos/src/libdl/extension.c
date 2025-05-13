@@ -26,7 +26,13 @@
 #include "dl.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <atomic.h>
+#include <stddef.h>
+
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 DECL_BEGIN
 

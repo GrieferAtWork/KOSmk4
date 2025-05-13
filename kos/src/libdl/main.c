@@ -25,26 +25,41 @@
 
 /* Keep this one the first */
 #include "dl.h"
+#include "api.h"
 /**/
 
-#include <asm/intrin.h>
+#include <hybrid/compiler.h>
+
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
 #include <asm/pagesize.h>
-#include <kos/debugtrap.h>
+#include <asm/redirect.h>
+#include <kos/anno.h>
+#include <kos/bits/thread.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <linux/prctl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include <malloc.h>
+#include <assert.h>
+#include <dlfcn.h>
+#include <elf.h>
 #include <pty.h>
-#include <signal.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <termios.h>
 #include <unistd.h>
+
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 #include "builtin.h"
 

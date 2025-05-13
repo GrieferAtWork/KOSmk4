@@ -21,10 +21,18 @@
 #define GUARD_LIBKEYMAP_KEYMAP_H 1
 
 #include "api.h"
+/**/
+
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <sys/types.h>
+
+#include <format-printer.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include <libkeymap/keymap.h>
-#include <kos/types.h>
-#include <format-printer.h>
 
 DECL_BEGIN
 

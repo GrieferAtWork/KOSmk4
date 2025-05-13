@@ -21,6 +21,10 @@
 #define GUARD_LIBKEYMAP_EN_US_H 1
 
 #include "api.h"
+/**/
+
+#include <hybrid/compiler.h>
+
 #include <libkeymap/keymap.h>
 
 DECL_BEGIN
@@ -30,7 +34,6 @@ DECL_BEGIN
  * desired keyboard layout, as ~any~ mapping is still better than no mapping at all. */
 INTDEF NONNULL((1)) void
 NOTHROW_NCX(CC libkeymap_init_en_US)(struct keymap *__restrict self);
-
 
 DECL_END
 

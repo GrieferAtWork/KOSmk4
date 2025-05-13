@@ -29,22 +29,21 @@
 #include <kos/types.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
-#include <sys/mman.h>
 #include <sys/wait.h>
 
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <termios.h>
 #include <time.h>
 #include <unicode.h>
 #include <unistd.h>
 
+#include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>

@@ -37,14 +37,17 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include "arm.h"
 /**/
 
+#include "api.h"
+
 #include <hybrid/compiler.h>
 
-#include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 
-#include <kos/types.h>
 #include <inttypes.h>
+#include <stdint.h>
+
+#include <libdisasm/format.h>
 
 DECL_BEGIN
 

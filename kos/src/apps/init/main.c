@@ -35,8 +35,11 @@
 #include <kos/syscalls.h>  /* sys_Xmktty() */
 #include <kos/types.h>     /* fd_t */
 #include <kos/unistd.h>    /* Dup2() */
+#include <sys/ioctl.h>     /* TIOCSPGRP */
 #include <sys/mount.h>     /* mount() */
+#include <sys/stat.h>      /* mkdir */
 #include <sys/syslog.h>    /* syslog() */
+#include <sys/types.h>     /* pid_t */
 #include <sys/wait.h>      /* waitpid() */
 
 #include <errno.h>   /* errno */
@@ -46,13 +49,12 @@
 #include <signal.h>  /* signal() */
 #include <stddef.h>  /* NULL */
 #include <stdio.h>   /* dprintf() */
+#include <stdlib.h>  /* _Exit() */
 #include <string.h>  /* strerror() */
 #include <termios.h> /* struct termios */
 #include <unistd.h>  /* sync() */
 
-#include <libansitty/ansitty.h>
 #include <libansitty/ctl.h>
-
 
 DECL_BEGIN
 

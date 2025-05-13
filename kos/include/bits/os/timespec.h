@@ -32,6 +32,8 @@
 /*!included_by <sys/stat.h>*/
 /*!included_by <threads.h>*/
 /*!replace_with_include <time.h>*/
+/*!always_includes <bits/os/timespec32.h>*/
+/*!always_includes <bits/os/timespec64.h>*/
 #ifndef _BITS_OS_TIMESPEC_H
 #define _BITS_OS_TIMESPEC_H 1
 

@@ -26,6 +26,7 @@
 #include <err.h>
 #include <inttypes.h>
 #include <pciaccess.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

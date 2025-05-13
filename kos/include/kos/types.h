@@ -56,10 +56,16 @@
 #include <bits/types.h>
 #ifdef __INTELLISENSE__
 #include <bits/types/errno_t.h>   /* So VS suggests <errno.h> for errno_t */
+#include <bits/types/ino_t.h>     /* So VS suggests <sys/types.h> for ino_t */
 #include <bits/types/intN_t.h>    /* So VS suggests <stdint.h> for intN_t */
 #include <bits/types/intptr_t.h>  /* So VS suggests <stdint.h> for intptr_t */
+#include <bits/types/off_t.h>     /* So VS suggests <sys/types.h> for off_t */
+#include <bits/types/pid_t.h>     /* So VS suggests <sys/types.h> for pid_t */
 #include <bits/types/ptrdiff_t.h> /* So VS suggests <stddef.h> for ptrdiff_t */
 #include <bits/types/size_t.h>    /* So VS suggests <stddef.h> for size_t */
+#include <bits/types/socklen_t.h> /* So VS suggests <sys/socket.h> for socklen_t */
+#include <bits/types/ssize_t.h>   /* So VS suggests <sys/types.h> for ssize_t */
+#include <bits/types/time_t.h>    /* So VS suggests <time.h> for time_t */
 #include <bits/types/uintN_t.h>   /* So VS suggests <stdint.h> for uintN_t */
 #include <bits/types/uintptr_t.h> /* So VS suggests <stdint.h> for uintptr_t */
 #endif /* __INTELLISENSE__ */

@@ -22,16 +22,19 @@
 #define _UTF_SOURCE 1
 
 #include "api.h"
+/**/
+
+#include <hybrid/compiler.h>
 
 #include <kos/except.h>
-#include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/stringapiset.h>
+#include <nt/types.h>
+#include <sys/syslog.h>
 
+#include <stddef.h>
 #include <string.h>
-#include <syslog.h>
 #include <uchar.h>
-#include <wchar.h>
-
 
 DECL_BEGIN
 

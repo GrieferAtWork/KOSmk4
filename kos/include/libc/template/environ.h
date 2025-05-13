@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <unistd.h>*/
 #ifndef __LOCAL_environ
 #include <__crt.h>
 #ifndef __LOCAL_environ

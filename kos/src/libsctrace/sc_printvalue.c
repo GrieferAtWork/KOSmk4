@@ -47,10 +47,10 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <asm/ioctl.h>
 #include <bits/os/itimerspec.h>
 #include <bits/os/itimerval.h>
-#include <bits/os/timespec.h>
-#include <bits/os/timeval.h>
 #include <bits/os/termios.h>
 #include <bits/os/termiox.h>
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
 #include <kos/anno.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
@@ -58,6 +58,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <kos/io.h>
 #include <kos/kernel/types.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <linux/close_range.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
@@ -73,9 +74,11 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/poll.h>
+#include <sys/select.h>
 #include <sys/signalfd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/termiox.h>
 #include <sys/time.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
@@ -88,9 +91,13 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <sched.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+#include <termios.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <libsctrace/sctrace.h>
 
 #include "sctrace.h"
 

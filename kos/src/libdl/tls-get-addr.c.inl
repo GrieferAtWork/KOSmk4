@@ -19,7 +19,39 @@
  */
 #ifdef __INTELLISENSE__
 #include "tls.c"
+#define FAIL_ON_ERROR
 #endif /* __INTELLISENSE__ */
+
+/* Keep this one the first */
+#include "api.h"
+#include "dl.h"
+/**/
+
+#include <hybrid/compiler.h>
+
+#include <kos/anno.h>
+#include <kos/except.h>
+#include <kos/exec/elf.h>
+#include <kos/syscalls.h>
+#include <kos/thread.h>
+#include <kos/types.h>
+#include <sys/syslog.h>
+#include <sys/types.h>
+
+#include <atomic.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <malloc.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <libdl/asm/dlfcn.h>
+#include <libdl/extension.h>
+#include <libdl/module.h>
+#include <libdl/tls.h>
 
 DECL_BEGIN
 

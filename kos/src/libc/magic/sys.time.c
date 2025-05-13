@@ -39,6 +39,7 @@
 /* (#) Portability: uClibc        (/include/sys/time.h) */
 /*!always_includes <bits/types/time_t.h>*/
 /*!always_includes <bits/types/suseconds_t.h>*/
+/*!always_includes <bits/os/itimerval.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]

@@ -33,6 +33,7 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
 
 #include <hybrid/align.h>
 #include <hybrid/bit.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -43,16 +44,19 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
 #include <kos/types.h>
 #include <sys/io.h>
 #include <sys/param.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <pciaccess.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <libpciaccess/api.h>
 #include <libpciaccess/pciaccess.h>
 #include <libphys/phys.h>
 

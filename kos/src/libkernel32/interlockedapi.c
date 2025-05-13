@@ -23,9 +23,14 @@
 #include "api.h"
 /**/
 
-#include <nt/interlockedapi.h>
+#include <hybrid/compiler.h>
 
-#include <syslog.h>
+#include <nt/__stdinc.h>
+#include <nt/interlockedapi.h>
+#include <nt/types.h>
+#include <sys/syslog.h>
+
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

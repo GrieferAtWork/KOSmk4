@@ -163,7 +163,6 @@
 
 #include <kos/anno.h>
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
-#include <kos/types.h>
 
 #include <libdl/api.h>
 

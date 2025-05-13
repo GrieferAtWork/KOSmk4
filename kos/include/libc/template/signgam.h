@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <math.h>*/
 #ifndef __LOCAL_signgam
 #include <__crt.h>
 #ifndef __LOCAL_signgam

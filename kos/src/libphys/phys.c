@@ -25,17 +25,24 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
+#include <kos/anno.h>
+#include <kos/types.h>
 #include <kos/unistd.h>
 #include <sys/mman.h>
 
 #include <alloca.h>
 #include <atomic.h>
 #include <fcntl.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "phys.h"
+#include <libphys/phys.h>
 
+#include "phys.h"
 
 DECL_BEGIN
 

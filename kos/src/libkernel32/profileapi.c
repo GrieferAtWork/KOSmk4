@@ -21,13 +21,17 @@
 #define GUARD_LIBKERNEL32_PROFILEAPI_C 1
 
 #include "api.h"
+/**/
 
-#include <kos/types.h>
+#include <hybrid/compiler.h>
+
+#include <nt/__stdinc.h>
 #include <nt/profileapi.h>
 #include <nt/types.h>
 #include <sys/time.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

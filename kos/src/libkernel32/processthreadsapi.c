@@ -27,17 +27,20 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <asm/intrin.h>
-#include <kos/io.h>
-#include <kos/ioctl/fd.h>
 #include <kos/ioctl/pidfd.h>
-#include <kos/kernel/handle.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/handleapi.h>
 #include <nt/processthreadsapi.h>
+#include <nt/types.h>
 #include <sys/ioctl.h>
+#include <sys/syslog.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -51,9 +54,9 @@
 #include <sched.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <syslog.h>
 #include <unistd.h>
 
 DECL_BEGIN

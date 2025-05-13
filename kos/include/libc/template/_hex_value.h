@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <libiberty.h>*/
 #ifndef __LOCAL__hex_value
 #ifdef _hex_value
 #define __LOCAL__hex_value _hex_value

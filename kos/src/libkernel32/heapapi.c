@@ -25,13 +25,18 @@
 #include "api.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <kos/except.h>
 #include <kos/malloc.h>
 #include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/heapapi.h>
+#include <nt/types.h>
 
 #include <errno.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

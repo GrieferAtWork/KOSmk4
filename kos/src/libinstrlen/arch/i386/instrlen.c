@@ -38,13 +38,16 @@
 
 #include <hybrid/compiler.h>
 
+#include <asm/isa.h>
 #include <kos/types.h>
 
 #include <assert.h>
 #include <atomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
+#include <libemu86/api.h>
 #include <libemu86/emu86.h>
 
 #include "../../instrlen.h"

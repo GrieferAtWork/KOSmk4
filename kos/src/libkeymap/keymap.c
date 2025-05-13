@@ -21,9 +21,10 @@
 #define GUARD_LIBKEYMAP_KEYMAP_C 1
 #define _KOS_SOURCE 1 /* strend() */
 
-#include "keymap.h"
-
 #include "api.h"
+/**/
+
+#include <hybrid/compiler.h>
 
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
@@ -32,15 +33,19 @@
 #include <kos/kernel/types.h>
 #include <kos/keyboard.h>
 #include <kos/types.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <unicode.h>
 
 #include <libkeymap/keymap.h>
+
+#include "keymap.h"
 
 #if !defined(NDEBUG) && !defined(__KERNEL__) && 0
 #include <sys/syslog.h>

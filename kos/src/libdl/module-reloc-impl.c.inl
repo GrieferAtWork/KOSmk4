@@ -19,10 +19,31 @@
  */
 #ifdef __INTELLISENSE__
 #include "module-reloc.c"
-
 #define DEFINE_DlModule_ApplyRelocations
 //#define DEFINE_DlModule_ApplyRelocationsWithAddend
 #endif /* __INTELLISENSE__ */
+
+/* Keep this one the first */
+#include "api.h"
+#include "dl.h"
+/**/
+
+#include <hybrid/compiler.h>
+
+#include <kos/anno.h>
+#include <kos/exec/elf-rel.h>
+#include <kos/exec/elf.h>
+#include <kos/kernel/types.h>
+#include <kos/types.h>
+#include <sys/syslog.h>
+
+#include <elf.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+#include <libdl/extension.h>
 
 DECL_BEGIN
 

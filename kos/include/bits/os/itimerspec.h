@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /*!replace_with_include <time.h>*/
+/*!always_includes <bits/os/timerspec.h>*/
+/*!always_includes <bits/os/timerspec32.h>*/
+/*!always_includes <bits/os/timerspec64.h>*/
+/*!always_includes <bits/os/itimerspec32.h>*/
+/*!always_includes <bits/os/itimerspec64.h>*/
 #ifndef _BITS_OS_ITIMERSPEC_H
 #define _BITS_OS_ITIMERSPEC_H 1
 

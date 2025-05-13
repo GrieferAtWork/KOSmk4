@@ -26,7 +26,11 @@
 #include "dl.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <kos/exec/peb.h>
+
+#include <stddef.h>
 
 DECL_BEGIN
 

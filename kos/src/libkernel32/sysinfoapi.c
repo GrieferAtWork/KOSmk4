@@ -22,13 +22,18 @@
 #define _GNU_SOURCE 1
 
 #include "api.h"
+/**/
+
+#include <hybrid/compiler.h>
 
 #include <kos/kernel/paging.h>
-#include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/sysinfoapi.h>
+#include <nt/types.h>
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 
+#include <stddef.h>
 #include <time.h>
 #include <unistd.h>
 

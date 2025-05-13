@@ -17,61 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBKERNEL32_WINNLS_C
-#define GUARD_LIBKERNEL32_WINNLS_C 1
-
-#include "api.h"
-/**/
-
-#include <nt/winnls.h>
-
-DECL_BEGIN
-
-/************************************************************************/
-INTERN WINBOOL WINAPI
-libk32_IsValidCodePage(UINT uCodePage) {
-	TRACE("IsValidCodePage(%u)", uCodePage);
-	COMPILER_IMPURE();
-	(void)uCodePage;
-	return TRUE;
-}
-
-INTERN UINT WINAPI
-libk32_GetACP(void) {
-	TRACE("GetACP()");
-	COMPILER_IMPURE();
-	return CP_UTF8;
-}
-
-INTERN UINT WINAPI
-libk32_GetOEMCP(void) {
-	TRACE("GetOEMCP()");
-	COMPILER_IMPURE();
-	return CP_UTF8;
-}
-
-INTERN WINBOOL WINAPI
-libk32_IsDBCSLeadByte(BYTE bTestChar) {
-	TRACE("IsDBCSLeadByte(%#x)", bTestChar);
-	COMPILER_IMPURE();
-	return bTestChar >= 0x80;
-}
-
-INTERN WINBOOL WINAPI
-libk32_IsDBCSLeadByteEx(UINT uCodePage, BYTE bTestChar) {
-	TRACE("IsDBCSLeadByteEx(%u, %#x)", uCodePage, bTestChar);
-	(void)uCodePage;
-	COMPILER_IMPURE();
-	return libk32_IsDBCSLeadByte(bTestChar);
-}
-
-DEFINE_PUBLIC_ALIAS(IsValidCodePage, libk32_IsValidCodePage);
-DEFINE_PUBLIC_ALIAS(GetACP, libk32_GetACP);
-DEFINE_PUBLIC_ALIAS(GetOEMCP, libk32_GetOEMCP);
-DEFINE_PUBLIC_ALIAS(IsDBCSLeadByte, libk32_IsDBCSLeadByte);
-DEFINE_PUBLIC_ALIAS(IsDBCSLeadByteEx, libk32_IsDBCSLeadByteEx);
-/************************************************************************/
-
-DECL_END
-
-#endif /* !GUARD_LIBKERNEL32_WINNLS_C */
+/*!replace_with_include <stdarg.h>*/
+#ifndef __va_list_defined
+#include <__stdinc.h>
+#ifndef __va_list_defined
+#define __va_list_defined
+#ifdef __CC__
+__DECL_BEGIN
+typedef __builtin_va_list va_list;
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__va_list_defined */
+#endif /* !__va_list_defined */

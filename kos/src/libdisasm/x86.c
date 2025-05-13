@@ -24,15 +24,14 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
  */
 #ifndef GUARD_LIBDISASM_X86_C
 #define GUARD_LIBDISASM_X86_C 1
-
 #define DISABLE_BRANCH_PROFILING
-#define _GNU_SOURCE                1
-#define _KOS_SOURCE                1
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 #define LIBEMU86_CONFIG_WANT_16BIT 1
 #define LIBEMU86_CONFIG_WANT_32BIT 1
 #define LIBEMU86_CONFIG_WANT_64BIT 1
-#define LIBEMU86_WANT_PROTOTYPES   1
-#define __LIBEMU86_STATIC          1
+#define LIBEMU86_WANT_PROTOTYPES 1
+#define __LIBEMU86_STATIC 1
 
 #include <libdisasm/disassembler.h>
 /**/
@@ -43,6 +42,8 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
      DISASSEMBLER_TARGET_SUPPORTED(DISASSEMBLER_TARGET_X86_64))
 #include "x86.h"
 /**/
+
+#include "api.h"
 
 #include <hybrid/compiler.h>
 
@@ -60,9 +61,10 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <stdlib.h>
 #include <string.h>
 
+#include <libdisasm/format.h>
 #include <libemu86/emu86.h>
 
-#include "_binstr.h"
+#include "common.h"
 #include "x86-db.h"
 
 DECL_BEGIN
@@ -646,7 +648,7 @@ is_compare_instruction(u32 opcode, u8 reg) {
 	return false;
 }
 
-INTERN NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void CC
 libda_select_jcc(struct disassembler *__restrict self,
                  unsigned int which) {
 	char const *repr;

@@ -27,10 +27,12 @@
 
 #include <hybrid/compiler.h>
 
+#include <asm/isa.h>
 #include <kos/except.h>
 #include <kos/types.h>
 
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>

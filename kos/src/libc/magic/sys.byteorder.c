@@ -21,6 +21,7 @@
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
 /*!always_includes <sys/isa_defs.h>*/
 /*!always_includes <sys/int_types.h>*/
+/*!always_includes <hybrid/byteorder.h>*/
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -38,6 +39,18 @@
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%{
+
+#ifdef __INTELLISENSE__
+/* These includes are here so VC will suggest transitive
+ * includes to <stdint.h> instead of  <sys/int_types.h>. */
+#include <bits/types/intN_t.h>
+#include <bits/types/int_fastN_t.h>
+#include <bits/types/int_leastN_t.h>
+#include <bits/types/intmax_t.h>
+#include <bits/types/intptr_t.h>
+#include <bits/types/uintN_t.h>
+#include <bits/types/uintptr_t.h>
+#endif /* __INTELLISENSE__ */
 
 #include <sys/isa_defs.h>  /* Mandatory dependency (for OpenSolaris compat) */
 #include <sys/int_types.h> /* Mandatory dependency (for OpenSolaris compat) */

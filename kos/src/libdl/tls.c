@@ -23,26 +23,36 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
 #include "dl.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <hybrid/minmax.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sequence/rbtree.h>
 
+#include <kos/anno.h>
+#include <kos/bits/thread.h>
+#include <kos/except/asm/codes.h>
+#include <kos/exec/elf.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
-#include <assert.h>
 #include <atomic.h>
+#include <dlfcn.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
-#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
-#include <syslog.h>
-#include <unistd.h>
 
+#include <libdl/asm/dlfcn.h>
+#include <libdl/extension.h>
+#include <libdl/module.h>
 #include <libdl/tls.h>
 
 #define RBTREE_LEFT_LEANING /* Use left-leaning trees */

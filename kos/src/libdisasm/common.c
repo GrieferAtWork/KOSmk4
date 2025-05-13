@@ -36,14 +36,22 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 
 #include <kos/except.h>
 #include <kos/exec/module.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
 #include <atomic.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libdebuginfo/addr2line.h>
+#include <libdebuginfo/api.h>
+#include <libdebuginfo/errno.h>
+#include <libdisasm/api.h>
+#include <libdisasm/disassembler.h>
+#include <libdisasm/format.h>
 
 #include "common.h"
 
@@ -238,13 +246,13 @@ again:
 	return result;
 }
 
-PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
-PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK   pdyn_debug_addr2line_sections_lock   = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK pdyn_debug_addr2line_sections_unlock = NULL;
 PRIVATE PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
 
-#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
-#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
-#define debug_addr2line (*pdyn_debug_addr2line)
+#define debug_addr2line_sections_lock   (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line                 (*pdyn_debug_addr2line)
 
 PRIVATE ATTR_NOINLINE WUNUSED bool CC init_libdebuginfo(void) {
 	void *lib;
@@ -252,18 +260,20 @@ PRIVATE ATTR_NOINLINE WUNUSED bool CC init_libdebuginfo(void) {
 		return true;
 	lib = get_libdebuginfo();
 	if (!lib)
-		return false;
+		goto fail;
 	*(void **)&pdyn_debug_addr2line = dlsym(lib, "debug_addr2line");
 	if unlikely(!pdyn_debug_addr2line)
-		return false;
+		goto fail;
 	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(lib, "debug_addr2line_sections_unlock");
 	if unlikely(!pdyn_debug_addr2line_sections_unlock)
-		return false;
+		goto fail;
 	COMPILER_WRITE_BARRIER();
 	*(void **)&pdyn_debug_addr2line_sections_lock = dlsym(lib, "debug_addr2line_sections_lock");
 	if unlikely(!pdyn_debug_addr2line_sections_lock)
-		return false;
+		goto fail;
 	return true;
+fail:
+	return false;
 }
 
 

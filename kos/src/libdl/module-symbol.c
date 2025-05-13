@@ -23,16 +23,24 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
 #include "dl.h"
 /**/
 
-#include <hybrid/typecore.h>
+#include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+#include <kos/except.h>
 #include <kos/exec/elf.h>
+#include <kos/kernel/types.h>
 
 #include <elf.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 #include <syslog.h>
+
+#include <libdl/extension.h>
 
 DECL_BEGIN
 

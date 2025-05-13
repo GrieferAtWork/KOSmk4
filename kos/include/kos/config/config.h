@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!ignore_unnecessary_include*/
 #ifndef _KOS_CONFIG_CONFIG_H
 #define _KOS_CONFIG_CONFIG_H 1
 
@@ -33,7 +34,7 @@
  * program is being compiled.
  *
  * For more information on KOS system configurations
- * see: `configurations/readme.md'.
+ * see: configurations/readme.md
  */
 
 #ifdef __KOS__

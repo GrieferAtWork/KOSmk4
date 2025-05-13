@@ -29,15 +29,20 @@
 #include <kos/sys/mman.h>
 #include <kos/sys/stat.h>
 #include <kos/types.h>
-#include <kos/unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
 #include <dlfcn.h>
-#include <string.h>
+#include <fcntl.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <unistd.h>
 
+#include <libkeymap/api.h>
 #include <libkeymap/keymap.h>
-
 
 DECL_BEGIN
 

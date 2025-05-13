@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replaces_include <kos/config/_toolchain.h>*/
+/*!replaces_include <kos/config/_toolchain32.h>*/
+/*!replaces_include <kos/config/_toolchain64.h>*/
 #ifndef _KOS_CONFIG_TOOLCHAIN_H
 #define _KOS_CONFIG_TOOLCHAIN_H 1
 

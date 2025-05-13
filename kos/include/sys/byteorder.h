@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa819c723 */
+/* HASH CRC-32:0xbbc0824f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/byteorder.h) */
 /*!always_includes <sys/isa_defs.h>*/
 /*!always_includes <sys/int_types.h>*/
+/*!always_includes <hybrid/byteorder.h>*/
 #ifndef _SYS_BYTEORDER_H
 #define _SYS_BYTEORDER_H 1
 
@@ -37,6 +38,18 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>
+
+#ifdef __INTELLISENSE__
+/* These includes are here so VC will suggest transitive
+ * includes to <stdint.h> instead of  <sys/int_types.h>. */
+#include <bits/types/intN_t.h>
+#include <bits/types/int_fastN_t.h>
+#include <bits/types/int_leastN_t.h>
+#include <bits/types/intmax_t.h>
+#include <bits/types/intptr_t.h>
+#include <bits/types/uintN_t.h>
+#include <bits/types/uintptr_t.h>
+#endif /* __INTELLISENSE__ */
 
 #include <sys/isa_defs.h>  /* Mandatory dependency (for OpenSolaris compat) */
 #include <sys/int_types.h> /* Mandatory dependency (for OpenSolaris compat) */

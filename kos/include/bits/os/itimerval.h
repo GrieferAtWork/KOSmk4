@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /*!included_by <sys/time.h>*/
+/*!always_includes <bits/os/timeval.h>*/
+/*!always_includes <bits/os/timeval32.h>*/
+/*!always_includes <bits/os/timeval64.h>*/
+/*!always_includes <bits/os/itimerval32.h>*/
+/*!always_includes <bits/os/itimerval64.h>*/
 #ifndef _BITS_OS_ITIMERVAL_H
 #define _BITS_OS_ITIMERVAL_H 1
 

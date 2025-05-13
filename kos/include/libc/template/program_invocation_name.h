@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <errno.h>*/
 #ifndef __local_program_invocation_name_defined
 #define __local_program_invocation_name_defined
 #include <__crt.h>

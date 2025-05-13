@@ -23,7 +23,9 @@
 #include "../../api.h"
 /**/
 
-#include <kos/types.h>
+#include <hybrid/compiler.h>
+
+#include <stdint.h>
 
 DECL_BEGIN
 

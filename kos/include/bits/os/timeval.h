@@ -20,6 +20,8 @@
 /*!included_by <sys/resource.h>*/
 /*!included_by <sys/select.h>*/
 /*!included_by <timeval-utils.h>*/
+/*!always_includes <bits/os/timeval32.h>*/
+/*!always_includes <bits/os/timeval64.h>*/
 #ifndef _BITS_OS_TIMEVAL_H
 #define _BITS_OS_TIMEVAL_H 1
 

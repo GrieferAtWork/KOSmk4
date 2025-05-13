@@ -19,16 +19,22 @@
  */
 /*!replace_with_include <stdint.h>*/
 #ifndef __int8_t_defined
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #ifndef __int8_t_defined
 #define __int8_t_defined
 #ifdef __CC__
 __DECL_BEGIN
-typedef __int8_t int8_t;
-typedef __int16_t int16_t;
-typedef __int32_t int32_t;
+#ifdef __INT8_TYPE__
+typedef __INT8_TYPE__ int8_t;
+#endif /* __INT8_TYPE__ */
+#ifdef __INT16_TYPE__
+typedef __INT16_TYPE__ int16_t;
+#endif /* __INT16_TYPE__ */
+#ifdef __INT32_TYPE__
+typedef __INT32_TYPE__ int32_t;
+#endif /* __INT32_TYPE__ */
 #ifdef __INT64_TYPE__
-typedef __int64_t int64_t;
+typedef __INT64_TYPE__ int64_t;
 #endif /* __INT64_TYPE__ */
 __DECL_END
 #endif /* __CC__ */

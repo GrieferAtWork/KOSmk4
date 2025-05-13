@@ -33,22 +33,21 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 
+#include <kos/anno.h>
+
 #include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
 #include <dlfcn.h>
-#include <errno.h>
 #include <inttypes.h>
+#include <pciaccess.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 
 #include <libpciaccess/paths.h>
-
-/**/
-#include "pciaccess.h"
 
 DECL_BEGIN
 

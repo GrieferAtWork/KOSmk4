@@ -31,13 +31,14 @@ gcc_opt.append("-fexceptions");
 #include "api.h"
 /**/
 
-#include <kos/keyboard.h>
-#include <kos/types.h>
+#include <hybrid/compiler.h>
 
+#include <kos/keyboard.h>
+
+#include <stddef.h>
 #include <string.h>
 
 #include <libkeymap/keymap.h>
-
 
 DECL_BEGIN
 

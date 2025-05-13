@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7259d9b */
+/* HASH CRC-32:0xc467840a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@
 /* (#) Portability: uClibc        (/include/sys/time.h) */
 /*!always_includes <bits/types/time_t.h>*/
 /*!always_includes <bits/types/suseconds_t.h>*/
+/*!always_includes <bits/os/itimerval.h>*/
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H 1
 

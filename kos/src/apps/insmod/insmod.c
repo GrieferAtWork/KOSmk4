@@ -26,6 +26,8 @@
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
 
+#include <malloc.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -22,11 +22,15 @@
 #define _KOS_SOURCE 1
 
 #include "api.h"
+/**/
 
+#include <hybrid/compiler.h>
+
+#include <nt/__stdinc.h>
 #include <nt/handleapi.h>
 #include <nt/startup.h>
+#include <nt/types.h>
 
-#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 

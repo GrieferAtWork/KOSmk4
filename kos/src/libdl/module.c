@@ -24,14 +24,28 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
 #include "dl.h"
 /**/
 
+#include <hybrid/compiler.h>
+
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/anno.h>
 #include <kos/debugtrap.h>
+#include <kos/except.h>
+#include <kos/except/asm/codes.h>
+#include <kos/exec/elf.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>
+#include <dlfcn.h>
+#include <elf.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -39,8 +53,11 @@
 #include <malloc.h>
 #include <signal.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-#include <unistd.h>
+
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 DECL_BEGIN
 

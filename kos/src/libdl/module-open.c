@@ -24,21 +24,35 @@
 #define _ALL_LIMITS_SOURCE 1
 
 /* Keep this one the first */
+#include "api.h"
+
 #include "dl.h"
 /**/
 
-#include <hybrid/minmax.h>
+#include <hybrid/compiler.h>
 
+#include <hybrid/minmax.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+
+#include <kos/anno.h>
+#include <kos/except/asm/codes.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/rtld.h>
 #include <kos/io.h>
 #include <kos/ioctl/fd.h>
 #include <kos/syscalls.h>
+#include <kos/types.h>
 #include <linux/prctl.h>
 #include <sys/param.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
+#include <assert.h>
 #include <atomic.h>
 #include <ctype.h>
+#include <dlfcn.h>
+#include <elf.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -46,10 +60,16 @@
 #include <malloc.h>
 #include <malloca.h>
 #include <stddef.h>
-#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include <libdl/api.h>
+#include <libdl/extension.h>
+#include <libdl/module.h>
+#include <libservice/api.h>
+
 
 /*[[[config CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE = true
  * Enable support for libservice modules

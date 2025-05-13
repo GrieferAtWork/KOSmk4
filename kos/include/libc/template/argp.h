@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <argp.h>*/
 #ifndef _LIBC_TEMPLATE_ARGP_H
 #define _LIBC_TEMPLATE_ARGP_H
 

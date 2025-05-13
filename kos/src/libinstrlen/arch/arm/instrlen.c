@@ -29,6 +29,9 @@
 #include <kos/except.h>
 #include <kos/types.h>
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include <libinstrlen/instrlen.h>
 
 #include "../../instrlen.h"
