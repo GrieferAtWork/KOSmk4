@@ -712,6 +712,7 @@ char *strtrns([[in]] char const *string,
               [[in]] char const *find_map,
               [[in]] char const *repl_map,
               [[out]] char *result) {
+@@pp_ifdef __OPTIMIZE_SIZE__@@
 	char *dst = result;
 	for (;;) {
 		char ch = *string++;
@@ -725,6 +726,23 @@ char *strtrns([[in]] char const *string,
 	}
 	*dst++ = '\0';
 	return result;
+@@pp_else@@
+	char map[256], ch, *dst = result;
+	unsigned int i;
+	for (i = 0; i < 256; ++i)
+		map[i] = (char)(unsigned char)i;
+	for (; *find_map; ++find_map, ++repl_map) {
+		char find = *find_map;
+		char repl = *repl_map;
+		map[(unsigned char)find] = repl;
+	}
+	do {
+		ch = *string++;
+		ch = map[(unsigned char)ch];
+		*dst++ = ch;
+	} while (ch);
+	return result;
+@@pp_endif@@
 }
 
 

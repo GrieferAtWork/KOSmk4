@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcf6115a */
+/* HASH CRC-32:0xba03f30b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -813,6 +813,7 @@ NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string,
                                    char const *find_map,
                                    char const *repl_map,
                                    char *result) {
+#ifdef __OPTIMIZE_SIZE__
 	char *dst = result;
 	for (;;) {
 		char ch = *string++;
@@ -826,6 +827,23 @@ NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string,
 	}
 	*dst++ = '\0';
 	return result;
+#else /* __OPTIMIZE_SIZE__ */
+	char map[256], ch, *dst = result;
+	unsigned int i;
+	for (i = 0; i < 256; ++i)
+		map[i] = (char)(unsigned char)i;
+	for (; *find_map; ++find_map, ++repl_map) {
+		char find = *find_map;
+		char repl = *repl_map;
+		map[(unsigned char)find] = repl;
+	}
+	do {
+		ch = *string++;
+		ch = map[(unsigned char)ch];
+		*dst++ = ch;
+	} while (ch);
+	return result;
+#endif /* !__OPTIMIZE_SIZE__ */
 }
 #endif /* !__KERNEL__ */
 

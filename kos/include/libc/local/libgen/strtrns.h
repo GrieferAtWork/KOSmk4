@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a8f1fdb */
+/* HASH CRC-32:0x5ba9a69a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtrns) __ATTR_RETNONNULL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(4) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtrns))(char const *__string, char const *__find_map, char const *__repl_map, char *__result) {
+#ifdef __OPTIMIZE_SIZE__
 	char *__dst = __result;
 	for (;;) {
 		char __ch = *__string++;
@@ -57,6 +58,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtrns))(char const *__string, char 
 	}
 	*__dst++ = '\0';
 	return __result;
+#else /* __OPTIMIZE_SIZE__ */
+	char __map[256], __ch, *__dst = __result;
+	unsigned int __i;
+	for (__i = 0; __i < 256; ++__i)
+		__map[__i] = (char)(unsigned char)__i;
+	for (; *__find_map; ++__find_map, ++__repl_map) {
+		char __find = *__find_map;
+		char __repl = *__repl_map;
+		__map[(unsigned char)__find] = __repl;
+	}
+	do {
+		__ch = *__string++;
+		__ch = __map[(unsigned char)__ch];
+		*__dst++ = __ch;
+	} while (__ch);
+	return __result;
+#endif /* !__OPTIMIZE_SIZE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtrns_defined
