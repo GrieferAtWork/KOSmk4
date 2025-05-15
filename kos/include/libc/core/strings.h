@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c470720 */
+/* HASH CRC-32:0x5775b1cb */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_bzero
-#include <hybrid/typecore.h>
 /* >> explicit_bzero(3)
  * Same  as  `bzero(dst, n_bytes)', however  compilers will  not optimize
  * away uses of this function when they (think) that clearing the  memory
@@ -38,7 +37,6 @@ __SYSDECL_BEGIN
  * may be a security-conscious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
-#include <hybrid/typecore.h>
 /* >> explicit_bzero(3)
  * Same  as  `bzero(dst, n_bytes)', however  compilers will  not optimize
  * away uses of this function when they (think) that clearing the  memory
@@ -46,7 +44,6 @@ __CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(voi
  * may be a security-conscious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
-#include <hybrid/typecore.h>
 /* >> explicit_bzero(3)
  * Same  as  `bzero(dst, n_bytes)', however  compilers will  not optimize
  * away uses of this function when they (think) that clearing the  memory

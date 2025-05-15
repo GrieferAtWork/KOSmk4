@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b66d65d */
+/* HASH CRC-32:0x6c47e5ff */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_format_vprintf
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
-#include <__crt.h>
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -64,8 +62,6 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TY
 #endif /* !__CRT_HAVE_format_vprintf */
 #ifdef __CRT_HAVE_format_printf
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
-#include <__crt.h>
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put

@@ -3843,6 +3843,9 @@ class SystemHeader {
 		}
 		fp << "#include \"core/" << name << ".h\"\n"
 			"\n";
+		fp._rememberPrefixAlreadyPrinted("#include <__stdinc.h>");
+		fp._rememberPrefixAlreadyPrinted("#include <__crt.h>");
+		fp._rememberPrefixAlreadyPrinted("#include <hybrid/typecore.h>"); /* Always included by "core/foo.h" */
 		for (local part: order_libcHeader) {
 			if (part !is Function) {
 				fp << part;
@@ -3917,6 +3920,9 @@ class SystemHeader {
 			"\n"
 			"__SYSDECL_BEGIN\n"
 			"\n";
+		fp._rememberPrefixAlreadyPrinted("#include <__stdinc.h>");
+		fp._rememberPrefixAlreadyPrinted("#include <__crt.h>");
+		fp._rememberPrefixAlreadyPrinted("#include <hybrid/typecore.h>");
 		for (local part: order_libcHeader) {
 			if (part !is Function)
 				continue;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3d727de */
+/* HASH CRC-32:0xb1957211 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_unicode_readutf8
-#include <hybrid/typecore.h>
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string
  * If  you only want  to advance to  the next character, do:
@@ -45,7 +44,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_
 #define __libc_core_unicode_readutf8 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8)
 #endif /* !__CRT_HAVE_unicode_readutf8 */
 #ifdef __CRT_HAVE_unicode_readutf8_rev
-#include <hybrid/typecore.h>
 /* >> unicode_readutf8_rev(3)
  * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
@@ -60,7 +58,6 @@ __CREDIRECT(__ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_re
 #define __libc_core_unicode_readutf8_rev __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev)
 #endif /* !__CRT_HAVE_unicode_readutf8_rev */
 #ifdef __CRT_HAVE_unicode_readutf8_n
-#include <hybrid/typecore.h>
 /* >> unicode_readutf8_n(3)
  * Same as `unicode_readutf8()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
@@ -71,7 +68,6 @@ __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__
 #define __libc_core_unicode_readutf8_n __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #ifdef __CRT_HAVE_unicode_readutf8_rev_n
-#include <hybrid/typecore.h>
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
@@ -82,7 +78,6 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_co
 #define __libc_core_unicode_readutf8_rev_n __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_rev_n */
 #ifdef __CRT_HAVE_unicode_readutf16
-#include <hybrid/typecore.h>
 /* >> unicode_readutf16(3)
  * Read a single Unicode character from a given UTF-16 string */
 __CREDIRECT(__ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16,(__ptext))
@@ -93,7 +88,6 @@ __CREDIRECT(__ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_re
 #define __libc_core_unicode_readutf16 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16)
 #endif /* !__CRT_HAVE_unicode_readutf16 */
 #ifdef __CRT_HAVE_unicode_readutf16_n
-#include <hybrid/typecore.h>
 /* >> unicode_readutf16_n(3)
  * Same as `unicode_readutf16()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
@@ -104,7 +98,6 @@ __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__
 #define __libc_core_unicode_readutf16_n __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_n)
 #endif /* !__CRT_HAVE_unicode_readutf16_n */
 #ifdef __CRT_HAVE_unicode_readutf16_rev
-#include <hybrid/typecore.h>
 /* >> unicode_readutf16_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
@@ -119,7 +112,6 @@ __CREDIRECT(__ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_re
 #define __libc_core_unicode_readutf16_rev __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_rev)
 #endif /* !__CRT_HAVE_unicode_readutf16_rev */
 #ifdef __CRT_HAVE_unicode_readutf16_rev_n
-#include <hybrid/typecore.h>
 /* >> unicode_readutf16_rev_n(3)
  * Same as `unicode_readutf16_rev()', but don't read ahead of `text_start' */
 __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_rev_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_start),unicode_readutf16_rev_n,(__ptext,__text_start))
@@ -130,7 +122,6 @@ __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__
 #define __libc_core_unicode_readutf16_rev_n __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_rev_n)
 #endif /* !__CRT_HAVE_unicode_readutf16_rev_n */
 #ifdef __CRT_HAVE_unicode_writeutf8
-#include <hybrid/typecore.h>
 /* >> unicode_writeutf8(3)
  * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
  * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
@@ -143,7 +134,6 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(1),char *,__NOTHROW_NCX,__libc_core_uni
 #define __libc_core_unicode_writeutf8 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8)
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #ifdef __CRT_HAVE_unicode_writeutf16
-#include <hybrid/typecore.h>
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
  * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
@@ -158,7 +148,6 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__li
 #if !defined(____libc_core___unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
 #define ____libc_core___unicode_descriptor_defined
 #include <bits/crt/unicode.h>
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor(3)
  * Return the internal descriptor for the given `ch'
  * This is the main accessor function for the unicode database, but
@@ -170,7 +159,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,
 #endif /* !____libc_core___unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #if !defined(____libc_core___unicode_descriptor_digit_defined) && defined(__CRT_HAVE___unicode_descriptor_digit)
 #define ____libc_core___unicode_descriptor_digit_defined
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -179,7 +167,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__libc_core___u
 #endif /* !____libc_core___unicode_descriptor_digit_defined && __CRT_HAVE___unicode_descriptor_digit */
 #if !defined(____libc_core___unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
 #define ____libc_core___unicode_descriptor_digit64_defined
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
  * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
@@ -188,7 +175,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__libc_core___
 #endif /* !____libc_core___unicode_descriptor_digit64_defined && __CRT_HAVE___unicode_descriptor_digit64 */
 #if !defined(____libc_core___unicode_descriptor_digitd_defined) && defined(__CRT_HAVE___unicode_descriptor_digitd)
 #define ____libc_core___unicode_descriptor_digitd_defined
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
@@ -198,14 +184,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__libc_core___unicode_d
 #ifndef ____libc_core___unicode_descriptor_digitld_defined
 #define ____libc_core___unicode_descriptor_digitld_defined
 #ifdef __CRT_HAVE___unicode_descriptor_digitld
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitld,(__digit_idx))
 #elif defined(__CRT_HAVE___unicode_descriptor_digitd) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-#include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
@@ -216,7 +200,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___uni
 #endif /* !... */
 #endif /* !____libc_core___unicode_descriptor_digitld_defined */
 #ifdef __CRT_HAVE_unicode_fold
-#include <hybrid/typecore.h>
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch'
  * @param: ch:  The unicode character to case-fold
@@ -224,7 +207,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___uni
  * @return: * : A pointer into `buf' to 1 past the last-written character */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]),unicode_fold,(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
-#include <hybrid/typecore.h>
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch'
  * @param: ch:  The unicode character to case-fold
