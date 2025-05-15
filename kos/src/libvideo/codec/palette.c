@@ -39,14 +39,15 @@
 
 DECL_BEGIN
 
-LOCAL size_t CC diff(uint8_t a, uint8_t b) {
+LOCAL ATTR_CONST size_t CC
+diff(uint8_t a, uint8_t b) {
 	if (a > b) {
 		return a - b;
 	}
 	return b - a;
 }
 
-LOCAL size_t CC
+LOCAL ATTR_CONST size_t CC
 color_delta(uint8_t r1, uint8_t g1, uint8_t b1,
             uint8_t r2, uint8_t g2, uint8_t b2) {
 	size_t result;

@@ -35,10 +35,37 @@
 #endif /* !__x86_64__ */
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/compiler.h>
+
 #include <kernel/execabi.h>
+#include <kernel/mman.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/flags.h>
+#include <kernel/mman/map.h>
+#include <kernel/mman/mbuilder.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/mman/ramfile.h>
+#include <kernel/paging.h>
+
+#include <hybrid/align.h>
+#include <hybrid/pointer.h>
+#include <hybrid/typecore.h>
+
+#include <compat/kos/exec/elf.h>
+#include <kos/anno.h>
+#include <kos/except.h>
+#include <kos/except/reason/noexec.h>
+#include <kos/exec/elf.h>
+#include <kos/kernel/paging.h>
+#include <kos/types.h>
+
+#include <assert.h>
+#include <elf.h>
+#include <malloca.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include "elf.h"
 
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #define LOCAL_STRINGARRAY_TYPE NCX void const *

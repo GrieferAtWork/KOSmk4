@@ -29,6 +29,7 @@
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
+#include <debugger/rt.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
@@ -36,37 +37,46 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/sequence/list.h>
 
+#include <kos/exec/module.h>
+#include <kos/kernel/memory.h>
+#include <kos/types.h>
 #include <sys/param.h>
+#include <sys/types.h>
 
-#include <assert.h>
-#include <ctype.h>
 #include <format-printer.h>
 #include <int128.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 
 #include <libdebuginfo/addr2line.h>
+#include <libdebuginfo/debug_info.h>
+#include <libdebuginfo/errno.h>
 
 /**/
+#include "include/cmodule.h"
 #include "include/cprinter.h"
 #include "include/ctype.h"
-#include "include/malloc.h"
+#include "include/error.h"
 #include "include/obnote.h"
 
 /* Support for `x86_phys2virt64_node' */
 #undef HAVE_X86_PHYS2VIRT64_NODE
 #if defined(__i386__) || defined(__x86_64__)
-#include <kernel/x86/phys2virt64.h> /* x86_phys2virt64_node */
 #ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 #define HAVE_X86_PHYS2VIRT64_NODE
 #endif /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */

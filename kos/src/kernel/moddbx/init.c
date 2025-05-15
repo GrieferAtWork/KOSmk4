@@ -28,17 +28,28 @@
 #include <debugger/debugger.h>
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
+#include <hybrid/sequence/list.h>
+
+#include <kos/types.h>
+#include <sys/types.h>
+
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <libansitty/ansitty.h>
+#include <libansitty/ctl.h>
+#include <libdebuginfo/api.h>
+#include <libdebuginfo/debug_info.h>
 
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
 #include "include/cmodule.h"
+#include "include/cparser.h"
 #include "include/cprinter.h"
 #include "include/ctype.h"
-#include "include/malloc.h"
+#include "include/error.h"
 
 DECL_BEGIN
 

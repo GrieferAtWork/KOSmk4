@@ -37,25 +37,36 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <debugger/rt.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/module.h>
+#include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/types.h>
+#include <sched/pertask.h>
 #include <sched/task.h>
 
+#include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <asm/isa.h>
+#include <asm/registers.h>
 #include <compat/config.h>
 #include <kos/except.h>
+#include <kos/exec/module.h>
 #include <kos/exec/rtld.h>
+#include <kos/types.h>
 
 #include <alloca.h>
 #include <assert.h>
-#include <inttypes.h>
+#include <elf.h>
+#include <ieee754.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libcpustate/register.h>
+#include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 #include <libunwind/errno.h>
@@ -253,6 +264,7 @@ DECL_END
 #undef ELFV_HAVE_32
 #undef ELFV_HAVE_64
 #if (defined(_MODULE_HAVE_SIZEOF_POINTER) && \
+     defined(COMPAT_ELF_ARCH_CLASS) &&       \
      COMPAT_ELF_ARCH_CLASS != ELF_ARCH_CLASS)
 #if COMPAT_ELF_ARCH_CLASS == ELFCLASS32
 #define ELFV_HAVE_32

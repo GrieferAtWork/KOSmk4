@@ -38,11 +38,16 @@
 #include <sched/task.h>
 
 #include <hybrid/overflow.h>
-#include <hybrid/sequence/bsearch.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/unaligned.h>
+
+#include <kos/exec/module.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <ctype.h>
+#include <elf.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -52,9 +57,12 @@
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
 #include <libdebuginfo/errno.h>
+#include <libunwind/cfi.h>
+#include <libunwind/dwarf.h>
 
 /**/
 #include "include/cmodule.h"
+#include "include/error.h"
 #include "include/malloc.h"
 
 DECL_BEGIN

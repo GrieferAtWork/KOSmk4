@@ -29,6 +29,7 @@
 #include <kos/types.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 #include <err.h>

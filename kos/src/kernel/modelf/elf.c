@@ -23,30 +23,17 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
-#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
-#include <kernel/mman/mbuilder.h>
-#include <kernel/mman/mnode.h>
-#include <kernel/mman/mpart.h>
-#include <kernel/mman/phys.h>
-
-#include <hybrid/align.h>
-#include <hybrid/pointer.h>
 
 #include <compat/config.h>
-#include <kos/except/reason/fs.h>
 #include <kos/except/reason/noexec.h>
 #include <kos/exec/elf.h>
-#include <kos/exec/peb.h>
 
-#include <assert.h>
 #include <elf.h>
-#include <malloca.h>
-#include <signal.h> /* SIGTRAP */
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

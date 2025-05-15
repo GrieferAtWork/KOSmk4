@@ -34,21 +34,34 @@ opt.removeif(e -> e.startswith("-O"));
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
+#include <debugger/rt.h>
 #include <kernel/mman.h>
+#include <kernel/paging.h>
+#include <sched/pertask.h>
 
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 
 #include <kos/except.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/types.h>
 
 #include <cfi.h>
 #include <intrin.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libcpustate/apply.h>
 
+/**/
 #include "include/cexpr.h"
+#include "include/ctype.h"
+#include "include/error.h"
+
+#if defined(__x86_64__) || defined(__i386__)
+#include <kos/kernel/x86/gdt.h>
+#endif /* __x86_64__ || __i386__ */
 
 DECL_BEGIN
 

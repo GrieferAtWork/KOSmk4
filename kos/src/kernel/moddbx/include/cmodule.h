@@ -94,7 +94,7 @@ DECL_BEGIN
 
 
 
-/* Internal structures for used by `kernel_symbol_table' (from `/kos/kernel/core/fs/driver.c') */
+/* Internal structures used by `kernel_symbol_table' (from `/kos/kernel/core/fs/driver.c') */
 struct kernel_syment {
 	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
 	void       *ks_addr; /* Symbol address */
@@ -126,7 +126,7 @@ struct cmodsym {
 	 *  - The first and most important table is the module-global table. This table
 	 *    contains the first found instance of any symbol, given its name, with the
 	 *    guaranty that any symbol name only exists once within the table.
-	 *  - Note that collisions between symbols form differing namespaces  (s.a.
+	 *  - Note that collisions between symbols from differing namespaces  (s.a.
 	 *    `CMODSYM_DIP_NSMASK') are allowed and simply ignored, such that these
 	 *    symbols will simply co-exist within the same sorted vector.
 	 *  - The  other N vectors exist on a  per-CU basis, and contain _only_ those
@@ -479,8 +479,8 @@ NOTHROW_NCX(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict se
 /* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
  * that can be  used to  reference and store  arbitrary debug-info  objects. */
 struct cmoduledip {
-	REF struct cmodule   *cd_mod; /* [1..1] CModule. */
-	NCX byte_t const *cd_dip; /* [1..1] DIP pointer. */
+	REF struct cmodule *cd_mod; /* [1..1] CModule. */
+	NCX byte_t const   *cd_dip; /* [1..1] DIP pointer. */
 };
 #define cmoduledip_fini(self)           decref((self)->cd_mod)
 #define cmoduledip_parser(self, result) cmodule_parser_from_dip((self)->cd_mod, result, (self)->cd_dip)
@@ -513,10 +513,10 @@ struct cmodsyminfo {
 				};
 				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
 			};
-			NCX byte_t const *v_typeinfo;    /* [0..1] Type information. */
-			NCX void         *v_objaddr;     /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
-			bool              v_gotaddr;     /* Set to true if `v_gotaddr' is valid. */
-		} s_var;                             /* [!cmodsyminfo_istype] Variable or parameter. */
+			NCX byte_t const *v_typeinfo;      /* [0..1] Type information. */
+			NCX void         *v_objaddr;       /* [?..?] Object address (or `NULL' when `!v_gotaddr') */
+			bool              v_gotaddr;       /* Set to true if `v_gotaddr' is valid. */
+		} s_var;                               /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)

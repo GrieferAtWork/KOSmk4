@@ -54,44 +54,52 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <hybrid/byteorder.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/types.h>
 #include <sys/param.h>
+#include <sys/types.h>
 
 #include <ieee754.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 
+#include <libcpustate/api.h>
+#include <libcpustate/register.h>
+#include <libdebuginfo/debug_info.h>
+
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
+#include "include/error.h"
 #include "include/cmodule.h"
 #include "include/cparser.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
-#define strto854l   strtold
+#define DBX_FLOAT_T             __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtold(nptr, endptr)
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
-#define strto854l   strtod
+#define DBX_FLOAT_T             __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtod(nptr, endptr)
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
-#define strto854l   strtof
+#define DBX_FLOAT_T             __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtof(nptr, endptr)
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE__)
-#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
-#define strto854l   (__IEEE854_LONG_DOUBLE_TYPE__)strtold
+#define DBX_FLOAT_T             __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) (__IEEE854_LONG_DOUBLE_TYPE__)strtold(nptr, endptr)
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
-#define strto854l   strtold
+#define DBX_FLOAT_T             __IEEE754_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtold(nptr, endptr)
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
-#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
-#define strto854l   strtod
+#define DBX_FLOAT_T             __IEEE754_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtod(nptr, endptr)
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
-#define strto854l   strtof
+#define DBX_FLOAT_T             __IEEE754_DOUBLE_TYPE__
+#define strto854l(nptr, endptr) strtof(nptr, endptr)
 #endif /* ... */
 
 

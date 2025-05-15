@@ -19,6 +19,10 @@
  */
 /* (#) Portability: MSVC  (/include/intrin.h) */
 /* (#) Portability: MinGW (/mingw-w64-headers/crt/intrin.h) */
+/*!always_includes <asm/intrin.h>*/
+/*!always_includes <asm/intrin-arith.h>*/
+/*!always_includes <asm/intrin-lock.h>*/
+/*!always_includes <asm/intrin-segarith.h>*/
 #ifndef _INTRIN_H
 #define _INTRIN_H 1
 

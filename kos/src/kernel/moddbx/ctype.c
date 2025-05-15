@@ -36,10 +36,12 @@
 #include <hybrid/typecore.h>
 
 #include <compat/config.h>
-#include <kos/exec/module.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libcpustate/register.h>
@@ -49,6 +51,7 @@
 /**/
 #include "include/cmodule.h"
 #include "include/ctype.h"
+#include "include/error.h"
 #include "include/malloc.h"
 
 #if defined(__x86_64__) || defined(__i386__)

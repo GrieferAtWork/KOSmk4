@@ -154,8 +154,8 @@ PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_font_ops *CC libvideo_tlft_getops(void) {
 	if unlikely(!libvideo_tlft_ops.vfo_destroy) {
-		libvideo_tlft_ops.vfo_drawglyph    = &libvideo_tlft_drawglyph;
-		libvideo_tlft_ops.vfo_glyphsize    = &libvideo_tlft_glyphsize;
+		libvideo_tlft_ops.vfo_drawglyph = &libvideo_tlft_drawglyph;
+		libvideo_tlft_ops.vfo_glyphsize = &libvideo_tlft_glyphsize;
 		COMPILER_WRITE_BARRIER();
 		libvideo_tlft_ops.vfo_destroy = &libvideo_tlft_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -175,6 +175,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 	hdr = (TLFT_Hdr *)base;
 	if unlikely(size < sizeof(TLFT_Hdr))
 		goto err_inval;
+
 	/* Verify the magic header. */
 	if (hdr->h_ident[TI_MAG0] != TLFTMAG0)
 		goto err_inval;
@@ -186,6 +187,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 		goto err_inval;
 	if (hdr->h_ident[TI_MAG4] != TLFTMAG4)
 		goto err_inval;
+
 	/* Verify the version number. */
 	if (hdr->h_ident[TI_VERS] != TLFTVERSION)
 		goto err_inval;
@@ -193,6 +195,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 		goto err_inval;
 	if (hdr->h_nchars > 0xffa1) /* Too many characters */
 		goto err_inval;
+
 	/* Allocate the font descriptor. */
 	result = (__REF struct tlft_font *)malloc(sizeof(struct tlft_font));
 	if unlikely(!result)
@@ -212,6 +215,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 	                  (uintptr_t)95 << hdr->h_log2chsize,
 	                  (uintptr_t *)&result->tf_chars))
 		goto err_inval_r;
+
 	/* Make sure that unicode character bitmaps don't overflow the actual file size. */
 	if (OVERFLOW_UADD((uintptr_t)result->tf_chars,
 	                  (uintptr_t)hdr->h_nchars << hdr->h_log2chsize,
@@ -219,8 +223,10 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 		goto err_inval_r;
 	if unlikely(chend > ((uintptr_t)base + size))
 		goto err_inval_r;
+
 	/* Pre-calculate some values. */
 	result->tf_bestheight = (((uintptr_t)1 << hdr->h_log2chsize) * 8) / hdr->h_chwidth;
+
 	/* All right! everything seems to be ok. -> Fill in V-table and refcnt. */
 	result->vf_refcnt = 1;
 	result->vf_ops    = libvideo_tlft_getops();

@@ -490,8 +490,8 @@ libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
 
 
 
-PRIVATE struct video_buffer_ops rambuffer_ops;
-PRIVATE struct video_buffer_ops rambuffer_ops_munmap;
+PRIVATE struct video_buffer_ops rambuffer_ops = {};
+PRIVATE struct video_buffer_ops rambuffer_ops_munmap = {};
 
 INTERN NONNULL((1)) void CC
 rambuffer_destroy(struct video_buffer *__restrict self) {
@@ -605,10 +605,10 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
 
-	result->vx_buffer                             = self;
-	result->vx_blend                              = blendmode;
-	result->vx_flags                              = flags;
-	result->vx_colorkey                           = colorkey;
+	result->vx_buffer   = self;
+	result->vx_blend    = blendmode;
+	result->vx_flags    = flags;
+	result->vx_colorkey = colorkey;
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_DATA]   = me->vb_data;
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
 	if (clip) {
@@ -663,6 +663,7 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	} else {
 		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
+
 	/* Select the best-fitting GFX operations table. */
 	rambuffer_gfx_select_gfxops(result);
 	return;
@@ -741,16 +742,16 @@ struct video_buffer_ops *CC rambuffer_getops(void) {
 
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
-	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_lock    = &rambuffer_lock;
-		rambuffer_ops.vi_unlock  = &rambuffer_unlock;
-		rambuffer_ops.vi_getgfx  = &rambuffer_getgfx;
-		rambuffer_ops.vi_clipgfx = &rambuffer_clipgfx;
+	if unlikely(!rambuffer_ops_munmap.vi_destroy) {
+		rambuffer_ops_munmap.vi_lock    = &rambuffer_lock;
+		rambuffer_ops_munmap.vi_unlock  = &rambuffer_unlock;
+		rambuffer_ops_munmap.vi_getgfx  = &rambuffer_getgfx;
+		rambuffer_ops_munmap.vi_clipgfx = &rambuffer_clipgfx;
 		COMPILER_WRITE_BARRIER();
-		rambuffer_ops.vi_destroy = &rambuffer_destroy_munmap;
+		rambuffer_ops_munmap.vi_destroy = &rambuffer_destroy_munmap;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &rambuffer_ops;
+	return &rambuffer_ops_munmap;
 }
 
 

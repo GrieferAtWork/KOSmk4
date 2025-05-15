@@ -22,8 +22,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver.h>
 #include <kernel/execabi.h>
-#include <kernel/types.h>
 
 #include <hybrid/host.h>
 
@@ -31,6 +31,7 @@
 #include <kos/exec/elf.h>
 
 #include <elf.h>
+#include <stddef.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include "arch/i386/elf.h"

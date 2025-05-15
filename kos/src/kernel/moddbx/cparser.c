@@ -27,16 +27,16 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <kernel/types.h>
 
 #include <alloca.h>
 #include <assert.h>
-#include <ctype.h>
+#include <stddef.h>
 #include <string.h>
 #include <unicode.h>
 
 /**/
 #include "include/cparser.h"
+#include "include/error.h"
 #include "include/malloc.h"
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER

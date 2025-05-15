@@ -124,17 +124,20 @@ libvideo_buffer_screen(void) {
 		goto err;
 	if (ioctl(driver, VIDEOIO_GETFORMAT, &format) < 0)
 		goto err;
+
 	/* Allocate the video buffer. */
 	result = (struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
 	result->vb_format.vf_pal = NULL;
+
 	/* Lookup the video format described by the codec. */
 	result->vb_format.vf_codec = video_codec_lookup(format.vdf_codec);
 	if unlikely(!result->vb_format.vf_codec) {
 		errno = ENOTSUP;
 		goto err_r;
 	}
+
 	/* Construct a palette (if necessary) */
 	if (VIDEO_CODEC_HASPAL(format.vdf_codec)) {
 		struct video_palette *pal;

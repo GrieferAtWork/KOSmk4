@@ -30,6 +30,7 @@
 
 #include <debugger/hook.h>
 #include <debugger/output.h>
+#include <kernel/heap.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
@@ -40,15 +41,21 @@
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
+
+#include <kos/kernel/types.h>
+#include <kos/types.h>
 
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
+#include <libansitty/ctl.h>
+
 /**/
 #include "include/cmodule.h"
-#include "include/error.h"
 #include "include/malloc.h"
 
 DECL_BEGIN
@@ -348,7 +355,7 @@ nope:
 	return heapptr_make(NULL, 0);
 }
 
-/* Try  to allocate at least `num_bytes' at `addr',
+/* Try to allocate  exactly `num_bytes' at  `addr',
  * and return the actual amount that was allocated. */
 PUBLIC WUNUSED size_t
 NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
@@ -658,10 +665,6 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 	           (size_t)(frag_percent % 100000));
 	return 0;
 }
-
-
-
-
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

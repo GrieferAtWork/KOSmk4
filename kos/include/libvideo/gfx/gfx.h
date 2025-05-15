@@ -167,7 +167,7 @@ struct video_gfx_ops {
 	                             __intptr_t __x, __intptr_t __y,
 	                             __size_t __length, video_color_t __color);
 
-	/* Fill an area with a solid __color. */
+	/* Fill an area with a solid color. */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_fill)(struct video_gfx *__restrict __self,
 	                            __intptr_t __x, __intptr_t __y,

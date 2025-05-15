@@ -73,6 +73,7 @@ libvideo_font_openfd(fd_t fd) {
 		goto err_unmap;
 	if (result != (__REF struct video_font *)-1)
 		return result; /* Success */
+
 	/* Add other file formats here! */
 	/* ... */
 	errno = EINVAL; /* Bad file format. */
@@ -164,6 +165,7 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
 	size_t i;
 	struct video_fontprinter_data *context;
 	context = (struct video_fontprinter_data *)arg;
+
 	/* Print the string one character at a time. */
 	for (i = 0; i < datalen; ++i) {
 		libvideo_fontprintch(context, data[i]);
@@ -203,6 +205,7 @@ again_do_render:
 				self->vfp_cury += self->vfp_height;
 			}
 		}
+
 		/* Can just render text without worrying about anything! */
 		result = self->vfp_font->drawglyph(self->vfp_gfx,
 		                                   self->vfp_curx,
@@ -224,7 +227,6 @@ again_do_render:
 	}
 	return result;
 }
-
 
 DEFINE_PUBLIC_ALIAS(video_font_lookup, libvideo_font_lookup);
 DEFINE_PUBLIC_ALIAS(video_fontprinter, libvideo_fontprinter);

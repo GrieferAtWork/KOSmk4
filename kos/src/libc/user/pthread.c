@@ -1586,11 +1586,11 @@ get_mapping_from_pointer(void *pointer, void **p_minaddr, void **p_endaddr) {
 			continue;
 		if (pointer >= *p_minaddr && pointer < *p_endaddr) {
 			/* Found it! */
-			fclose(fp);
+			(void)fclose(fp);
 			return 0;
 		}
 	}
-	fclose(fp);
+	(void)fclose(fp);
 err:
 	return -1;
 }
@@ -1627,7 +1627,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t self,
 			void *pointer_to_main_stack;
 			void *stack_min, *stack_end;
 			/* If `self' is the main thread:
-			 * #1: Check if caller if main thread. - If so, use address of some stack variable. Else,
+			 * #1: Check if caller is main thread. - If so, use address of some stack variable. Else,
 			 *     send  an RPC whose sole purpose is to retrieve the address of some stack variable.
 			 * #2: With a stack pointer on hand, use /proc/self/maps to figure out the memory
 			 *     mapping that pointer is part of.
@@ -1651,8 +1651,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t self,
 				while (atomic_read(&pointer_to_main_stack) == (void *)-1)
 					sched_yield();
 			}
+
 			/* Use /proc/self/maps to figure out the mapping containing `pointer_to_main_stack' */
-			if unlikely(get_mapping_from_pointer(pointer_to_main_stack, &stack_min, &stack_end) != 0)
+			if unlikely(get_mapping_from_pointer(pointer_to_main_stack,
+			                                      &stack_min,
+			                                      &stack_end) != 0)
 				goto done_stack;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			attr->pa_stackaddr = stack_end;

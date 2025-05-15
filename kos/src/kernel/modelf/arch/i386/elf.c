@@ -27,8 +27,10 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/path.h>
+#include <kernel/mman/mfile.h>
 #include <kernel/types.h>
 #include <kernel/x86/gdt.h>
+#include <sched/atomic64.h>
 #include <sched/x86/eflags-mask.h>
 
 #include <hybrid/host.h>
@@ -39,9 +41,11 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/x86/gdt.h>
+#include <kos/types.h>
 
 #include <elf.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -90,7 +94,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER2 */
 	icpustate_setpc(user_state, entry_pc);
-	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
+	icpustate_setusersp(user_state, (byte_t *)ustack_base + ustack_size);
 	{
 		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
@@ -181,8 +185,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	}
 	user_state_sp -= buflen;
 	dl_data = (NCX struct elfexec_info64 *)(user_state_sp -
-	                                         ((phdr_cnt * sizeof(Elf64_Phdr)) +
-	                                          offsetof(struct elfexec_info64, ei_phdr)));
+	                                        ((phdr_cnt * sizeof(Elf64_Phdr)) +
+	                                         offsetof(struct elfexec_info64, ei_phdr)));
 	memcpy(dl_data->ei_phdr, phdr_vec, phdr_cnt, sizeof(Elf64_Phdr));
 	dl_data->ei_rtldaddr = (u64)(uintptr_t)linker_loadaddr;
 	dl_data->ei_pnum     = phdr_cnt;
@@ -269,7 +273,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	}
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
 	icpustate_setpc(user_state, entry_pc);
-	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
+	icpustate_setusersp(user_state, (byte_t *)ustack_base + ustack_size);
 	{
 		union x86_user_eflags_mask_union mask;
 		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
