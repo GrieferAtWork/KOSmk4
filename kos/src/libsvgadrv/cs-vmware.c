@@ -31,11 +31,11 @@
 #include <hybrid/bit.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/unaligned.h>
 
 #include <hw/bus/pci.h>
 #include <hw/video/vmware.h>
 #include <kos/except.h>
-#include <kos/except/reason/io.h>
 #include <kos/kernel/printk.h>
 
 #include <assert.h>
@@ -382,16 +382,53 @@ PRIVATE NONNULL((1, 2)) void CC
 vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_regs *reginfo = (struct vmware_regs *)regbuf;
-	/* TODO */
-	reginfo->vmr_index = vm_getindex(me);
+	UNALIGNED_SET32(&reginfo->vmr_INDEX_PORT, vm_getindex(me));
+	UNALIGNED_SET32(&reginfo->vmr_REG_ID, vm_getreg(me, SVGA_REG_ID));
+	UNALIGNED_SET32(&reginfo->vmr_REG_ENABLE, vm_getreg(me, SVGA_REG_ENABLE));
+	UNALIGNED_SET32(&reginfo->vmr_REG_WIDTH, vm_getreg(me, SVGA_REG_WIDTH));
+	UNALIGNED_SET32(&reginfo->vmr_REG_HEIGHT, vm_getreg(me, SVGA_REG_HEIGHT));
+	UNALIGNED_SET32(&reginfo->vmr_REG_DEPTH, vm_getreg(me, SVGA_REG_DEPTH));
+	UNALIGNED_SET32(&reginfo->vmr_REG_BPP, vm_getreg(me, SVGA_REG_BPP));
+	UNALIGNED_SET32(&reginfo->vmr_REG_CONFIG_DONE, vm_getreg(me, SVGA_REG_CONFIG_DONE));
+	UNALIGNED_SET32(&reginfo->vmr_REG_SYNC, vm_getreg(me, SVGA_REG_SYNC));
+	UNALIGNED_SET32(&reginfo->vmr_REG_GUEST_ID, vm_getreg(me, SVGA_REG_GUEST_ID));
+	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_ID, vm_getreg(me, SVGA_REG_CURSOR_ID));
+	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_X, vm_getreg(me, SVGA_REG_CURSOR_X));
+	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_Y, vm_getreg(me, SVGA_REG_CURSOR_Y));
+	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_ON, vm_getreg(me, SVGA_REG_CURSOR_ON));
+	UNALIGNED_SET32(&reginfo->vmr_REG_PITCHLOCK, vm_getreg(me, SVGA_REG_PITCHLOCK));
+	vm_setindex(me, UNALIGNED_GET32(&reginfo->vmr_INDEX_PORT));
 }
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setregs(struct svga_chipset *__restrict self, byte_t const regbuf[]) {
+	uint32_t cursor_on;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_regs const *reginfo = (struct vmware_regs const *)regbuf;
-	/* TODO */
-	vm_setindex(me, reginfo->vmr_index);
+	vm_setreg(me, SVGA_REG_ID, UNALIGNED_GET32(&reginfo->vmr_REG_ID));
+	vm_setreg(me, SVGA_REG_CONFIG_DONE, 0);
+	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_DISABLE);
+	vm_setreg(me, SVGA_REG_GUEST_ID, UNALIGNED_GET32(&reginfo->vmr_REG_GUEST_ID));
+
+	vm_setreg(me, SVGA_REG_WIDTH, UNALIGNED_GET32(&reginfo->vmr_REG_WIDTH));
+	vm_setreg(me, SVGA_REG_HEIGHT, UNALIGNED_GET32(&reginfo->vmr_REG_HEIGHT));
+	vm_setreg(me, SVGA_REG_DEPTH, UNALIGNED_GET32(&reginfo->vmr_REG_DEPTH));
+	vm_setreg(me, SVGA_REG_BPP, UNALIGNED_GET32(&reginfo->vmr_REG_BPP));
+
+	vm_setreg(me, SVGA_REG_ENABLE, UNALIGNED_GET32(&reginfo->vmr_REG_ENABLE));
+	vm_setreg(me, SVGA_REG_CONFIG_DONE, UNALIGNED_GET32(&reginfo->vmr_REG_CONFIG_DONE));
+
+	vm_setreg(me, SVGA_REG_SYNC, UNALIGNED_GET32(&reginfo->vmr_REG_SYNC));
+	cursor_on = UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_ON);
+	if (cursor_on) {
+		vm_setreg(me, SVGA_REG_CURSOR_ID, UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_ID));
+		vm_setreg(me, SVGA_REG_CURSOR_X, UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_X));
+		vm_setreg(me, SVGA_REG_CURSOR_Y, UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_Y));
+		vm_setreg(me, SVGA_REG_CURSOR_ON, cursor_on);
+	}
+	vm_setreg(me, SVGA_REG_PITCHLOCK, UNALIGNED_GET32(&reginfo->vmr_REG_PITCHLOCK));
+
+	vm_setindex(me, UNALIGNED_GET32(&reginfo->vmr_INDEX_PORT));
 }
 
 PRIVATE NONNULL((1, 2)) ssize_t CC

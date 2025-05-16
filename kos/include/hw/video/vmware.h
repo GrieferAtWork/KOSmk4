@@ -149,8 +149,8 @@
 #   define SVGA_CURSOR_ON_RESTORE_TO_FB  0x3 /* Put the cursor back in the framebuffer so the user can see it */
 #define SVGA_REG_HOST_BITS_PER_PIXEL 28 /* [ro] */
 #define SVGA_REG_SCRATCH_SIZE        29 /* [ro] */
-#define SVGA_REG_MEM_REGS            30 /* [rw] ??? (Always reads as "0" in QEMU) */
-#define SVGA_REG_NUM_DISPLAYS        31 /* [rw] ??? (Always reads as "0" in QEMU) */
+#define SVGA_REG_MEM_REGS            30 /* [ro] ??? (Always reads as "0" in QEMU) */
+#define SVGA_REG_NUM_DISPLAYS        31 /* [ro] ??? (Always reads as "0" in QEMU) */
 #define SVGA_REG_PITCHLOCK           32 /* [rw] ??? (Always reads as "0" in QEMU) */
 
 #define SVGA_PALETTE_BASE 1024 /* [rw] Base of SVGA color map (Always reads as "0" in QEMU) */

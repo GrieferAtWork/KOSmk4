@@ -39,8 +39,21 @@ DECL_BEGIN
 struct pci_device;
 
 struct vmware_regs {
-	uint32_t vmr_index; /* SVGA_INDEX */
-	uint32_t vmr_regs[1]; /* TODO */
+	uint32_t vmr_INDEX_PORT; /* SVGA_INDEX_PORT */
+	uint32_t vmr_REG_ID;
+	uint32_t vmr_REG_ENABLE;
+	uint32_t vmr_REG_WIDTH;
+	uint32_t vmr_REG_HEIGHT;
+	uint32_t vmr_REG_DEPTH;
+	uint32_t vmr_REG_BPP;
+	uint32_t vmr_REG_CONFIG_DONE;
+	uint32_t vmr_REG_SYNC;
+	uint32_t vmr_REG_GUEST_ID;
+	uint32_t vmr_REG_CURSOR_ID;
+	uint32_t vmr_REG_CURSOR_X;
+	uint32_t vmr_REG_CURSOR_Y;
+	uint32_t vmr_REG_CURSOR_ON;
+	uint32_t vmr_REG_PITCHLOCK;
 };
 
 struct vmware_modeinfo: svga_modeinfo {
@@ -51,7 +64,7 @@ struct vmware_modeinfo: svga_modeinfo {
 #define VMWARE_MAX_FIFO_COMMAND_WORDS 8
 
 struct vmware_chipset: svga_chipset {
-	uint32_t           vw_index;        /* Last-accessed register number (value of "SVGA_INDEX") */
+	uint32_t           vw_index;        /* Last-accessed register number (value of "SVGA_INDEX_PORT") */
 	uint32_t           vw_caps;         /* [const] SVGA_REG_CAPABILITIES */
 	uint32_t           vw_hbpp;         /* [const] SVGA_REG_HOST_BITS_PER_PIXEL */
 	PHYS uint32_t      vw_fbstart;      /* [const] SVGA_REG_FB_START */
