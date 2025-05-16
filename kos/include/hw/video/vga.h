@@ -357,7 +357,6 @@ struct __ATTR_PACKED vga_regs {
 	__uint8_t       vr_seq_index; /* VGA_SEQ_I. */
 	__uint8_t       vr_gfx_index; /* VGA_GFX_I. */
 	__uint8_t       vr_att_index; /* VGA_ATT_IW. */
-
 };
 
 #endif /* __CC__ */

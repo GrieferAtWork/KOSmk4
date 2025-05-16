@@ -335,7 +335,7 @@ FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_scrollregion(struct ansitty *__
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_output(struct ansitty *__restrict self, void const *data, size_t datalen) ASMNAME("ansittydev_v_output");
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_setled(struct ansitty *__restrict self, uint8_t mask, uint8_t flag) ASMNAME("ansittydev_v_setled");
 FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC _vidtty_v_termios(struct ansitty *__restrict self, struct termios *__restrict oldios, struct termios const *newios) ASMNAME("ansittydev_v_termios");
-FUNDEF NONNULL((1)) size_t LIBANSITTY_CC _vidtty_v_puts_ascii(struct ansitty *__restrict self, NCX char const *utf8_string, size_t n_chars) ASMNAME("vidtty_v_puts_ascii");
+FUNDEF WUNUSED NONNULL((1)) size_t LIBANSITTY_CC _vidtty_v_puts_ascii(struct ansitty *__restrict self, NCX char const *utf8_string, size_t n_chars) ASMNAME("vidtty_v_puts_ascii");
 
 
 /* Initialize common+basic fields. The caller must still initialize:

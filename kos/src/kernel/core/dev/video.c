@@ -596,7 +596,7 @@ after_clear_eol_nocursor:
 	atomic_lock_release(&me->vta_lock);
 }
 
-PUBLIC NONNULL((1)) size_t LIBANSITTY_CC
+PUBLIC WUNUSED NONNULL((1)) size_t LIBANSITTY_CC
 vidtty_v_puts_ascii(struct ansitty *__restrict self,
                     NCX uint8_t const *utf8_string,
                     size_t n_chars) {

@@ -361,6 +361,7 @@ vesa_v_setwindow_wr_1(struct svga_chipset *__restrict self, size_t window) {
 	self->sc_wrwindow = window;
 }
 
+#ifdef SVGA_HAVE_HW_SCROLL
 PRIVATE NONNULL((1)) void CC
 vesa_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset) {
 	struct vesa_chipset *me = (struct vesa_chipset *)self;
@@ -410,6 +411,7 @@ vesa_getlogicalwidth_max(struct svga_chipset *__restrict self) {
 		THROW(E_IOERROR);
 	return me->vc_emu.b86e_vm.vr_regs.vr_bx;
 }
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -433,15 +435,17 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 
 	/* Remember current mode. */
 	memcpy(&me->vc_mode, &mode->vm_vesa, sizeof(struct vbe_modeinfo));
-	me->sc_displaystart       = vesa_getdisplaystart(me);
-	me->sc_logicalwidth_max   = vesa_getlogicalwidth_max(me);
-	me->sc_logicalwidth_align = 1;
+#ifdef SVGA_HAVE_HW_SCROLL
+	me->sc_displaystart     = vesa_getdisplaystart(me);
+	me->sc_logicalwidth_max = vesa_getlogicalwidth_max(me);
 	if (mode->smi_bits_per_pixel <= 1) {
 		me->sc_logicalwidth_align = 8;
 	} else if (mode->smi_bits_per_pixel <= 2) {
 		me->sc_logicalwidth_align = 4;
 	} if (mode->smi_bits_per_pixel <= 4) {
 		me->sc_logicalwidth_align = 2;
+	} else {
+		me->sc_logicalwidth_align = 1;
 	}
 
 	/* Technically, we should read from BIOS, but if this were to
@@ -457,6 +461,7 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 	/* Set operators. */
 	me->sc_ops.sco_setdisplaystart = &vesa_v_setdisplaystart;
 	me->sc_ops.sco_setlogicalwidth = &vesa_v_setlogicalwidth;
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 	/* Load extended attributes only needed when there is no LFB */
 	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB)) {
@@ -635,8 +640,10 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		/* Initialize current-mode-related fields to indicate that no mode is selected. */
 		DBG_memset(&me->sc_rdwindow, 0xcc, sizeof(me->sc_rdwindow));
 		DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
+#ifdef SVGA_HAVE_HW_SCROLL
 		DBG_memset(&me->sc_displaystart, 0xcc, sizeof(me->sc_displaystart));
 		DBG_memset(&me->sc_logicalwidth, 0xcc, sizeof(me->sc_logicalwidth));
+#endif /* SVGA_HAVE_HW_SCROLL */
 		DBG_memset(&me->vc_mode, 0xcc, sizeof(me->vc_mode));
 		me->sc_vmemsize = bi->vbi_vmemsize * 64 * 1024;
 

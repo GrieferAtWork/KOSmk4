@@ -209,7 +209,9 @@ next:
 PRIVATE NONNULL((1, 2)) void CC
 bochs_v_setmode(struct svga_chipset *__restrict self,
                 struct svga_modeinfo const *__restrict _mode) {
+#ifdef SVGA_HAVE_HW_SCROLL
 	struct bochs_chipset *me = (struct bochs_chipset *)self;
+#endif /* SVGA_HAVE_HW_SCROLL */
 	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
 	struct bga_mode const *bm;
 
@@ -236,6 +238,7 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 	            VBE_DISPI_LFB_ENABLED);
 
 	/* Read additional information. */
+#ifdef SVGA_HAVE_HW_SCROLL
 	me->sc_logicalwidth = dispi_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH);
 	me->sc_displaystart = dispi_rdreg(VBE_DISPI_INDEX_X_OFFSET) +
 	                      dispi_rdreg(VBE_DISPI_INDEX_Y_OFFSET) *
@@ -248,6 +251,7 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 	} if (bm->bm_bpp <= 4) {
 		me->sc_logicalwidth_align = 2;
 	}
+#endif /* SVGA_HAVE_HW_SCROLL */
 }
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -291,6 +295,7 @@ bochs_v_setregs(struct svga_chipset *__restrict UNUSED(self), byte_t const regbu
 	outw(VBE_DISPI_IOPORT_INDEX, UNALIGNED_GET16(&reginfo->be_index));
 }
 
+#ifdef SVGA_HAVE_HW_SCROLL
 PRIVATE NONNULL((1)) void CC
 bochs_v_setdisplaystart(struct svga_chipset *__restrict self, size_t offset)
 		THROWS(E_IOERROR) {
@@ -308,6 +313,7 @@ bochs_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t width)
 	dispi_wrreg(VBE_DISPI_INDEX_VIRT_WIDTH, width);
 	me->sc_logicalwidth = width;
 }
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 PRIVATE NONNULL((1, 2)) ssize_t CC
 bochs_v_strings(struct svga_chipset *__restrict self,
@@ -480,21 +486,22 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 		       (size_t)CEILDIV(me->sc_vmemsize, 1024 * 1024));
 
 		/* Fill in operators and the like... */
-		me->sc_logicalwidth_max        = me->bc_maxresx;
-		me->sc_ops.sco_fini            = &bochs_v_fini;
-		me->sc_ops.sco_modeinfosize    = sizeof(struct bochs_modeinfo);
-		me->sc_ops.sco_strings         = &bochs_v_strings;
-		me->sc_ops.sco_getmode         = &bochs_v_getmode;
-		me->sc_ops.sco_setmode         = &bochs_v_setmode;
-		me->sc_ops.sco_getregs         = &bochs_v_getregs;
-		me->sc_ops.sco_setregs         = &bochs_v_setregs;
-		me->sc_ops.sco_regsize         = sizeof(struct bochs_regs);
+		me->sc_ops.sco_fini         = &bochs_v_fini;
+		me->sc_ops.sco_modeinfosize = sizeof(struct bochs_modeinfo);
+		me->sc_ops.sco_strings      = &bochs_v_strings;
+		me->sc_ops.sco_getmode      = &bochs_v_getmode;
+		me->sc_ops.sco_setmode      = &bochs_v_setmode;
+		me->sc_ops.sco_getregs      = &bochs_v_getregs;
+		me->sc_ops.sco_setregs      = &bochs_v_setregs;
+		me->sc_ops.sco_regsize      = sizeof(struct bochs_regs);
+#ifdef SVGA_HAVE_HW_SCROLL
 		me->sc_ops.sco_setdisplaystart = &bochs_v_setdisplaystart;
 		me->sc_ops.sco_setlogicalwidth = &bochs_v_setlogicalwidth;
+		me->sc_logicalwidth_max        = me->bc_maxresx;
+#endif /* SVGA_HAVE_HW_SCROLL */
 		return true;
 	}
 #ifndef __KERNEL__
-#undef pci_devices
 	EXCEPT {
 		if (me->bc_libpciaccess)
 			dlclose(me->bc_libpciaccess);

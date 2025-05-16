@@ -244,6 +244,7 @@ INTERN_CONST struct vga_known_mode const ega_modelist[CS_EGAMODE_COUNT] = {
 
 
 
+#ifdef SVGA_HAVE_HW_SCROLL
 PRIVATE NONNULL((1)) void CC /* For use when `smi_bits_per_pixel == 8' */
 vga_v_setdisplaystart_linear(struct svga_chipset *__restrict self, size_t offset) {
 	struct vga_chipset *me = (struct vga_chipset *)self;
@@ -293,6 +294,7 @@ vga_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t offset) {
 	vga_wcrt(me->gcs_crt_icX, VGA_CRTC_OFFSET, (uint8_t)(offset >> 3));
 	self->sc_logicalwidth = offset;
 }
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 
 /* Raw VGA doesn't need to save any additional registers.
@@ -366,6 +368,7 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
 
 	/* Define mode-specific operators. */
+#ifdef SVGA_HAVE_HW_SCROLL
 	switch (mode->smi_bits_per_pixel) {
 	case 1: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_16; break;
 	case 2: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_256; break;
@@ -376,13 +379,16 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	self->sc_ops.sco_setlogicalwidth = &vga_v_setlogicalwidth;
 	me->sc_displaystart = 0;
 	me->sc_logicalwidth = 0;
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 	/* NOTE: We don't define the setwindow operators because
 	 *       standard EGA/VGA don't  have multiple  windows! */
-	self->sc_rdwindow           = 0;
-	self->sc_wrwindow           = 0;
+	self->sc_rdwindow = 0;
+	self->sc_wrwindow = 0;
+#ifdef SVGA_HAVE_HW_SCROLL
 	self->sc_logicalwidth_max   = 2040; /* s.a. `vga_v_setlogicalwidth' */
 	self->sc_logicalwidth_align = 8;    /* s.a. `vga_v_setlogicalwidth' */
+#endif /* SVGA_HAVE_HW_SCROLL */
 }
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -401,9 +407,11 @@ ega_v_setmode(struct svga_chipset *__restrict self,
 	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
 
 	/* Define mode-specific operators. */
+#ifdef SVGA_HAVE_HW_SCROLL
 	me->sc_ops.sco_setdisplaystart = &ega_v_setdisplaystart;
 	me->sc_displaystart            = 0;
 	me->sc_logicalwidth            = 0;
+#endif /* SVGA_HAVE_HW_SCROLL */
 }
 
 

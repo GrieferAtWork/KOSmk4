@@ -69,15 +69,15 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-PRIVATE NONNULL((1)) void CC
-vmware_fifo_handle_full(struct vmware_chipset *__restrict self) {
-	(void)self;
 #ifdef __KERNEL__
-	task_tryyield_or_pause();
+#define yield() task_tryyield_or_pause()
 #else /* __KERNEL__ */
-	pthread_yield();
+#define yield() pthread_yield()
 #endif /* !__KERNEL__ */
-}
+
+
+#define vmware_fifo_handle_full(self) \
+	yield()
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *CC
 vmware_fifo_reserve(struct vmware_chipset *__restrict self, size_t n_bytes) {
@@ -266,7 +266,7 @@ next:
 	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_DISABLE);
 	vm_setreg(me, SVGA_REG_WIDTH, vm->vm_resx);
 	vm_setreg(me, SVGA_REG_HEIGHT, vm->vm_resy);
-	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
+	if (vm_svga_hascap(me, SVGA_CAP_8BIT_EMULATION))
 		vm_setreg(me, SVGA_REG_BPP, me->vw_hbpp);
 
 	result->smi_lfb = me->vw_fbstart + vm_getreg(me, SVGA_REG_FB_OFFSET);
@@ -283,7 +283,7 @@ next:
 	result->smi_bbits  = POPCOUNT(bmask);
 
 	/* Restore old registers */
-	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
+	if (vm_svga_hascap(me, SVGA_CAP_8BIT_EMULATION))
 		vm_setreg(me, SVGA_REG_BPP, old_bpp);
 	vm_setreg(me, SVGA_REG_HEIGHT, old_height);
 	vm_setreg(me, SVGA_REG_WIDTH, old_width);
@@ -312,7 +312,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 0);
 	vm_setreg(me, SVGA_REG_WIDTH, mode->smi_resx);
 	vm_setreg(me, SVGA_REG_HEIGHT, mode->smi_resy);
-	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
+	if (vm_svga_hascap(me, SVGA_CAP_8BIT_EMULATION))
 		vm_setreg(me, SVGA_REG_BPP, mode->smi_bits_per_pixel);
 
 	/* Read scanline config and verify it. */
@@ -338,7 +338,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 
 	/* Initialize the command FIFO */
 	me->vw_fifo_caps = SVGA_FIFO_CAP_NONE;
-	if (me->vw_caps & SVGA_CAP_EXTENDED_FIFO) {
+	if (vm_svga_hascap(me, SVGA_CAP_EXTENDED_FIFO)) {
 		me->vm_fifo[SVGA_FIFO_MIN] = SVGA_FIFO_NUM_REGS;
 		me->vw_fifo_rfsz = me->vm_fifo[SVGA_FIFO_MIN];
 		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
@@ -366,15 +366,79 @@ NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
                                            struct svga_rect const *__restrict rect) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	uint32_t *packet;
-	printk(KERN_DEBUG "[vmware] updaterect(x: %" PRIu16 ", y: %" PRIu16 ", sx: %" PRIu16 ", sy: %" PRIu16 ")\n",
-	       rect->svr_x, rect->svr_y, rect->svr_sx, rect->svr_sy);
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_UPDATE(x: %" PRIu16 ", y: %" PRIu16 ", w: %" PRIu16 ", h: %" PRIu16 ")\n",
+	       rect->svr_x, rect->svr_y, rect->svr_w, rect->svr_h);
 	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_UPDATE, 4);
 	*packet++ = rect->svr_x;
 	*packet++ = rect->svr_y;
-	*packet++ = rect->svr_sx;
-	*packet++ = rect->svr_sy;
+	*packet++ = rect->svr_w;
+	*packet++ = rect->svr_h;
 	vmware_fifo_commit_cmd(me, 4);
 }
+
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+PRIVATE NONNULL((1)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_waitfor)(struct svga_chipset *__restrict self) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	if unlikely(me->vm_hw_render_started) {
+		vm_setreg(me, SVGA_REG_SYNC, 1);
+		while (vm_getreg(me, SVGA_REG_BUSY) != 0)
+			yield();
+		me->vm_hw_render_started = false;
+	}
+}
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_copyrect)(struct svga_chipset *__restrict self,
+                                                  struct svga_copyrect const *__restrict rect) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_COPY("
+	                  "sx: %" PRIu16 ", sy: %" PRIu16 ", "
+	                  "dx: %" PRIu16 ", dy: %" PRIu16 ", "
+	                  "w: %" PRIu16 ", h: %" PRIu16 ")\n",
+	       rect->svcr_sx, rect->svcr_sy,
+	       rect->svcr_dx, rect->svcr_dy,
+	       rect->svcr_w, rect->svcr_h);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_COPY, 6);
+	*packet++ = rect->svcr_sx;
+	*packet++ = rect->svcr_sy;
+	*packet++ = rect->svcr_dx;
+	*packet++ = rect->svcr_dy;
+	*packet++ = rect->svcr_w;
+	*packet++ = rect->svcr_h;
+	vmware_fifo_commit_cmd(me, 6);
+	me->vm_hw_render_started = true;
+}
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_fillrect)(struct svga_chipset *__restrict self,
+                                                  struct svga_rect const *__restrict rect,
+                                                  uint32_t color) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_FILL("
+	                  "x: %" PRIu16 ", y: %" PRIu16 ", "
+	                  "w: %" PRIu16 ", h: %" PRIu16 ", "
+	                  "color: %#" PRIx32 ")\n",
+	       rect->svr_x, rect->svr_y,
+	       rect->svr_w, rect->svr_h,
+	       color);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_FILL, 5);
+	*packet++ = color;
+	*packet++ = rect->svr_x;
+	*packet++ = rect->svr_y;
+	*packet++ = rect->svr_w;
+	*packet++ = rect->svr_h;
+	vmware_fifo_commit_cmd(me, 5);
+	me->vm_hw_render_started = true;
+}
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+
 
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -396,7 +460,7 @@ vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_X, vm_getreg(me, SVGA_REG_CURSOR_X));
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_Y, vm_getreg(me, SVGA_REG_CURSOR_Y));
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_ON, vm_getreg(me, SVGA_REG_CURSOR_ON));
-	if (me->vw_caps & SVGA_CAP_PITCHLOCK)
+	if (vm_svga_hascap(me, SVGA_CAP_PITCHLOCK))
 		UNALIGNED_SET32(&reginfo->vmr_REG_PITCHLOCK, vm_getreg(me, SVGA_REG_PITCHLOCK));
 	for (i = 0; i < me->vw_nscratch; ++i)
 		UNALIGNED_SET32(&reginfo->vmr_REG_SCRATCH[i], vm_getreg(me, SVGA_SCRATCH_BASE + i));
@@ -432,7 +496,7 @@ vmware_v_setregs(struct svga_chipset *__restrict self, byte_t const regbuf[]) {
 		vm_setreg(me, SVGA_REG_CURSOR_Y, UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_Y));
 		vm_setreg(me, SVGA_REG_CURSOR_ON, cursor_on);
 	}
-	if (me->vw_caps & SVGA_CAP_PITCHLOCK)
+	if (vm_svga_hascap(me, SVGA_CAP_PITCHLOCK))
 		vm_setreg(me, SVGA_REG_PITCHLOCK, UNALIGNED_GET32(&reginfo->vmr_REG_PITCHLOCK));
 	for (i = 0; i < COMPILER_LENOF(reginfo->vmr_REG_PALETTE); ++i)
 		vm_setreg(me, SVGA_PALETTE_BASE + i, UNALIGNED_GET32(&reginfo->vmr_REG_PALETTE[i]));
@@ -585,9 +649,6 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 
 		/* Fill in operators and the like... */
 		DBG_memset(&me->sc_ops, 0xcc, sizeof(me->sc_ops));
-		me->sc_logicalwidth_max = UINT32_MAX; /* Max value that can physically be written */
-		if (me->sc_logicalwidth_max > self->sc_vmemsize)
-			me->sc_logicalwidth_max = self->sc_vmemsize;
 		me->sc_ops.sco_fini         = &vmware_v_fini;
 		me->sc_ops.sco_modeinfosize = sizeof(struct vmware_modeinfo);
 		me->sc_ops.sco_strings      = &vmware_v_strings;
@@ -597,6 +658,22 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_setregs      = &vmware_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
 		me->sc_ops.sco_updaterect   = &vmware_v_updaterect;
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+		if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
+			me->sc_ops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+		if (vm_svga_hascap(me, SVGA_CAP_RECT_FILL))
+			me->sc_ops.sco_hw_async_fillrect = &vmware_v_hw_async_fillrect;
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+		me->sc_ops.sco_hw_async_waitfor = &vmware_v_hw_async_waitfor;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+		/* Misc. runtime fields. */
+		me->vw_fifo_caps = 0;
+		me->vm_fifo_debounce_inuse = false;
+		me->vm_hw_render_started = false;
 
 		/* Map the FIFO into memory. */
 #ifdef __KERNEL__
@@ -620,14 +697,9 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		if unlikely(me->vm_fifo == (uint32_t *)MAP_FAILED)
 			goto err_initfailed_late;
 #endif /* !__KERNEL__ */
-
-		/* Misc. runtime fields. */
-		me->vw_fifo_caps = 0;
-		me->vm_fifo_debounce_inuse = false;
 		return true;
 	}
 #ifndef __KERNEL__
-#undef pci_devices
 	EXCEPT {
 		if (me->vw_libphys)
 			dlclose(me->vw_libphys);

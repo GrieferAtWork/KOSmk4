@@ -263,7 +263,7 @@ struct ansitty_operators {
 	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
 	 *        CURSOR+dst_offset (added together  such that values  beyond
 	 *        the left/right border of the screen will wrap around to the
-	 *        end/start of the prev/next line).
+	 *        end/start of the prev/next line(s)).
 	 *        The  number of  cells to-be  copied is  given by `count'
 	 *        When `count' would overflow past the end of the display,
 	 *        it must be clamped before being used. */
@@ -274,8 +274,8 @@ struct ansitty_operators {
 
 	/* [0..1] Print the given character `ch' (which is always a graphical
 	 *        character, rather than a control character) up to `count'
-	 *        times, without ever scrolling, and stopping if the end of
-	 *        the display is reached.
+	 *        times, without ever scrolling, stopping if the end of the
+	 *        display is reached first.
 	 *        The actual cursor position remains unchanged. */
 	__ATTR_NONNULL_T((1)) void
 	(LIBANSITTY_CC *ato_fillcell)(struct ansitty *__restrict self,
@@ -385,8 +385,12 @@ struct ansitty_operators {
 	 * Don't call this operator directly; it is automatically used by
 	 * `libansitty_printer()' when possible.
 	 *
+	 * When implementing this operator, if you want to be safe and only handle
+	 * characters that are printable, you should restrict yourself to the byte
+	 * range: [0x20,0x7e]
+	 *
 	 * @return: * : The # of bytes that could be printed as ASCII. */
-	__ATTR_NONNULL_T((1)) size_t
+	__ATTR_WUNUSED __ATTR_NONNULL_T((1)) size_t
 	(LIBANSITTY_CC *ato_puts_ascii)(struct ansitty *__restrict self,
 	                                __NCX char const *utf8_string,
 		                            size_t n_chars);

@@ -69,8 +69,8 @@ struct vidttycelldata {
 	union {
 		__byte_t   *vcd_dat;   /* [vcd_w * vcd_h * vti_cellsize] Cell data  buffer.
 		                        * Format is device-specific, but using this you can
-		                        * easily preserve+restore specific areas of display
-		                        * memory. */
+		                        * easily preserve+restore specific areas of a TTY's
+		                        * display buffer. */
 		__uint64_t _vcd_aldat; /* ... */
 	};
 };

@@ -83,12 +83,14 @@ struct vmware_chipset: svga_chipset {
 	uint32_t volatile *vm_fifo;         /* [1..1][const][owned] Memory mapping of "vw_fifoaddr" */
 	uint32_t           vw_fifo_caps;    /* [lock(EXTERN)] SVGA_FIFO_CAPABILITIES */
 	uint32_t           vw_fifo_rfsz;    /* [lock(EXTERN)] Size of the FIFO register file */
+#define vm_svga_hascap(self, cap)   ((self)->vw_caps & (cap))
 #define vw_fifo_min    vw_fifo_rfsz     /* SVGA_FIFO_MIN */
 #define vw_fifo_max    vw_fifosize      /* SVGA_FIFO_MAX */
 #define vm_fifo_hascap(self, cap)   ((self)->vw_fifo_caps & (cap))
 #define vm_fifo_hasreg(self, regno) (((regno) * 4) < (self)->vw_fifo_rfsz)
 	uint32_t vm_fifo_debounce[VMWARE_MAX_FIFO_COMMAND_WORDS]; /* [lock(EXTERN)] Debounce buffer for fifo */
 	bool     vm_fifo_debounce_inuse;    /* [lock(EXTERN)] Is `vm_fifo_debounce' being used? */
+	bool     vm_hw_render_started;      /* [lock(EXTERN)] Set to true after a HW render was started */
 #ifdef __KERNEL__
 	void              *vm_fifo_unmap_cookie; /* [1..1][owned] Unmap cookie for `vm_fifo' */
 #else /* __KERNEL__ */

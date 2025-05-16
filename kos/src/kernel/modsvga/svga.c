@@ -128,6 +128,15 @@ NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
 }
 
 
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+PRIVATE NONNULL((1)) void
+NOTHROW(LIBSVGADRV_CC svga_v_hw_async_waitfor_noop)(struct svga_chipset *__restrict self) {
+	(void)self;
+	COMPILER_IMPURE();
+}
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+
 #ifdef BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_svga_driver(void)
 #else /* BUILDING_KERNEL_CORE */
@@ -165,12 +174,43 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 
 			/* The probe function isn't required to initialize these... */
 			DBG_memset(&self->svd_chipset, 0xcc, sizeof(self->svd_chipset));
+#ifdef SVGA_HAVE_HW_SCROLL
 			self->svd_chipset.sc_ops.sco_setdisplaystart = NULL;
 			self->svd_chipset.sc_ops.sco_setlogicalwidth = NULL;
-			self->svd_chipset.sc_ops.sco_updaterect      = NULL;
+#endif /* SVGA_HAVE_HW_SCROLL */
+
+			self->svd_chipset.sc_ops.sco_updaterect = NULL;
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+			self->svd_chipset.sc_ops.sco_hw_async_waitfor = NULL;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+			self->svd_chipset.sc_ops.sco_hw_async_copyrect = NULL;
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+			self->svd_chipset.sc_ops.sco_hw_async_fillrect = NULL;
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
 			if ((*drivers[i].scd_probe)(&self->svd_chipset))
 				break; /* Found one! */
 		}
+
+		/* Optimize hardware render operators: if no HW render is
+		 * supported, then we'll never  need any HW waitfor  ops! */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+		if (true &&
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+		    self->svd_chipset.sc_ops.sco_hw_async_copyrect == NULL &&
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+		    self->svd_chipset.sc_ops.sco_hw_async_fillrect == NULL &&
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+		    true)
+			self->svd_chipset.sc_ops.sco_hw_async_waitfor = NULL;
+
+		/* Substitute a no-op HW render waitfor operator. */
+		if (self->svd_chipset.sc_ops.sco_hw_async_waitfor == NULL)
+			self->svd_chipset.sc_ops.sco_hw_async_waitfor = &svga_v_hw_async_waitfor_noop;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
 		TRY {
 			byte_t *modev;
 			size_t modec;

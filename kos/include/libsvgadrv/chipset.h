@@ -26,9 +26,52 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
+#include <stdint.h>
+
 #ifndef SVGA_CSNAMELEN
 #define SVGA_CSNAMELEN 16
 #endif /* !SVGA_CSNAMELEN */
+
+
+/* Build feature flags: enable support for certain
+ * hardware-accelerated  2D  rendering techniques.
+ *
+ * Note that not  every chipset is  able to  support
+ * all/any of these operations (as a matter of fact:
+ * no chipset is actually  able to support *all*  of
+ * these)
+ *
+ * NOTES:
+ * - Generally, "SVGA_HAVE_HW_SCROLL" is only supported
+ *   by *old* chipsets (like basic VGA/EGA), and can be
+ *   used to change the VRAM base address+scanline from
+ *   which the graphics cards reads display data.
+ *   - By assigning a larger "sco_setlogicalwidth", you
+ *     are then able  to have an  off-screen buffer  of
+ *     graphics data, which you can scroll into view by
+ *     changing "sco_setdisplaystart".  The  same  also
+ *     goes for vertical scrolling.
+ *
+ * - "SVGA_HAVE_HW_ASYNC_*" are features supported by
+ *   more  modern graphics cards, and are represent a
+ *   set  of operations the graphics card can perform
+ *   to manipulate VRAM while the CPU isn't looking.
+ */
+#undef SVGA_HAVE_HW_SCROLL         /* sco_setdisplaystart + sco_setlogicalwidth */
+#undef SVGA_HAVE_HW_ASYNC_COPYRECT /* sco_hw_async_copyrect */
+#undef SVGA_HAVE_HW_ASYNC_FILLRECT /* sco_hw_async_fillrect */
+#ifndef __KERNEL__
+#define SVGA_HAVE_HW_SCROLL /* Unused by modsvga, and therefor not enabled here */
+#endif /* !__KERNEL__ */
+#define SVGA_HAVE_HW_ASYNC_COPYRECT
+#define SVGA_HAVE_HW_ASYNC_FILLRECT
+
+
+#undef SVGA_HAVE_HW_ASYNC_WAITFOR
+#if (defined(SVGA_HAVE_HW_ASYNC_COPYRECT) || \
+     defined(SVGA_HAVE_HW_ASYNC_FILLRECT))
+#define SVGA_HAVE_HW_ASYNC_WAITFOR
+#endif /* SVGA_HAVE_HWRENDER_* */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -81,11 +124,27 @@ struct svga_modeinfo {
 
 
 struct svga_rect {
-	svga_res_t svr_x;  /* X pixel coord (offset from screen left) */
-	svga_res_t svr_y;  /* Y pixel coord (offset from screen top) */
-	svga_res_t svr_sx; /* Width (in pixels) */
-	svga_res_t svr_sy; /* Height (in pixels) */
+	svga_res_t svr_x; /* X pixel coord (offset from screen left) */
+	svga_res_t svr_y; /* Y pixel coord (offset from screen top) */
+	svga_res_t svr_w; /* Width (in pixels) */
+	svga_res_t svr_h; /* Height (in pixels) */
 };
+
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+struct svga_copyrect {
+	svga_res_t svcr_sx; /* Source X pixel coord (offset from screen left) */
+	svga_res_t svcr_sy; /* Source Y pixel coord (offset from screen top) */
+	union {
+		struct {
+			svga_res_t svcr_dx; /* Destination X pixel coord (offset from screen left) */
+			svga_res_t svcr_dy; /* Destination Y pixel coord (offset from screen top) */
+			svga_res_t svcr_w;  /* Width (in pixels) */
+			svga_res_t svcr_h;  /* Height (in pixels) */
+		};
+		struct svga_rect svcr_dest; /* Destination rect */
+	};
+};
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
 
 
 struct svga_chipset;
@@ -186,6 +245,7 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
+#ifdef SVGA_HAVE_HW_SCROLL
 	/* [0..1][lock(EXTERNAL)]
 	 * - Set  display start offset  to `offset' pixels from
 	 *   `CURRENT_VIDEO_MODE.smi_lfb' or the start of video
@@ -222,6 +282,7 @@ struct svga_chipset_ops {
 	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t width)
 			__THROWS(E_IOERROR);
+#endif /* SVGA_HAVE_HW_SCROLL */
 
 	/* [0..1][lock(EXTERNAL)]
 	 * Indicate to the chipset that a rect of pixels may have been modified.
@@ -229,6 +290,32 @@ struct svga_chipset_ops {
 	__ATTR_NONNULL_T((1, 2)) void
 	NOTHROW_T(LIBSVGADRV_CC *sco_updaterect)(struct svga_chipset *__restrict self,
 	                                         struct svga_rect const *__restrict rect);
+
+	/* [0..1][lock(EXTERNAL)]
+	 * Optional hardware rendering support APIs.
+	 * - sco_hw_async_waitfor:  Wait  for HW rendering to be finished.
+	 *                          This must be done to prevent artifacts
+	 *                          when wanting to access the framebuffer
+	 *                          directly.
+	 * - sco_hw_async_copyrect: Perform a hardware-accelerated copy of pixels
+	 * - sco_hw_async_fillrect: Perform a hardware-accelerated fill of pixels
+	 */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+	__ATTR_NONNULL_T((1)) void
+	NOTHROW_T(LIBSVGADRV_CC *sco_hw_async_waitfor)(struct svga_chipset *__restrict self);
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+	__ATTR_NONNULL_T((1, 2)) void
+	NOTHROW_T(LIBSVGADRV_CC *sco_hw_async_copyrect)(struct svga_chipset *__restrict self,
+	                                                struct svga_copyrect const *__restrict rect);
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+	/* @param: color: Fill-color (set-up as per `smi_*shift' / `smi_*bits' from `svga_modeinfo') */
+	__ATTR_NONNULL_T((1, 2)) void
+	NOTHROW_T(LIBSVGADRV_CC *sco_hw_async_fillrect)(struct svga_chipset *__restrict self,
+	                                                struct svga_rect const *__restrict rect,
+	                                                uint32_t color);
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
 };
 
 struct svga_chipset {
@@ -238,6 +325,7 @@ struct svga_chipset {
 	                                                * Current display window for reads. */
 	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                * Current display window for writes. */
+#ifdef SVGA_HAVE_HW_SCROLL
 	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setdisplaystart != NULL)]
 	                                                * Current display  start (pixels  from  `CURRENT_VIDEO_MODE.smi_lfb', or  the  start
 	                                                * of video memory, to the beginning of the screen; usually top-left corner). */
@@ -249,6 +337,7 @@ struct svga_chipset {
 	                                                * a alignment requirement of `sc_logicalwidth_align' pixels. */
 	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
 	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
+#endif /* SVGA_HAVE_HW_SCROLL */
 	/* Chipset-specific data goes here. */
 };
 

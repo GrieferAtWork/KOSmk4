@@ -69,14 +69,14 @@ PRIVATE char const *init_envp[] = {
 /* Set the calling process as foreground process for /dev/console */
 PRIVATE void console_set_fgproc(void) {
 	pid_t me = 0; /* `0' is an alias for `getpid()' here. */
-	Ioctl(STDIN_FILENO, TIOCSPGRP, &me);
+	(void)Ioctl(STDIN_FILENO, TIOCSPGRP, &me);
 }
 
 /* Reset the termios of /dev/console to sane values */
 PRIVATE void console_sane_ios(void) {
 	struct termios ios;
 	cfmakesane(&ios);
-	tcsetattr(STDIN_FILENO, TCSADRAIN, &ios);
+	(void)tcsetattr(STDIN_FILENO, TCSADRAIN, &ios);
 }
 
 
@@ -86,6 +86,7 @@ PRIVATE void console_sane_ios(void) {
  *       the `TASK_FCRITICAL' flag, meaning that if this program ever dies,
  *       then the kernel will (intentionally) PANIC! */
 int main(int argc, char *argv[], char *envp[]) {
+	/* "volatile" so guarantied shared with VFork() child process */
 	volatile int have_fortune;
 
 	(void)argc;
@@ -94,10 +95,10 @@ int main(int argc, char *argv[], char *envp[]) {
 	syslog(LOG_NOTICE, "[init] Init started\n");
 
 	/* Try to load the debugger extensions drivers. */
-	ksysctl_insmod("dbx", NULL);
+	(void)ksysctl_insmod("dbx", NULL);
 
 	/* Enable system call tracing by loading the sctrace driver. */
-	ksysctl_insmod("sctrace", NULL);
+	(void)ksysctl_insmod("sctrace", NULL);
 
 	/* Mount the /dev filesystem. */
 	if (mount(NULL, "/dev", "devfs", 0, NULL) < 0) {
@@ -115,13 +116,13 @@ done_devfs:
 	if (ksysctl_insmod("procfs", NULL) >= 0) {
 		if (mount(NULL, "/proc", "procfs", 0, NULL) < 0) {
 			if (errno == ENOENT) {
-				mkdir("/proc", 0755);
+				(void)mkdir("/proc", 0755);
 				sync();
 				if (mount(NULL, "/proc", "procfs", 0, NULL) >= 0)
 					goto done_procfs;
 			}
 			syslog(LOG_ERR, "[init] Failed to mount procfs: %m\n");
-			ksysctl_delmod("procfs");
+			(void)ksysctl_delmod("procfs");
 		}
 	}
 done_procfs:
@@ -129,7 +130,7 @@ done_procfs:
 	/* Also mount a ramfs filesystem under /tmp */
 	if (mount(NULL, "/tmp", "ramfs", 0, NULL) < 0) {
 		if (errno == ENOENT) {
-			mkdir("/tmp", 0755);
+			(void)mkdir("/tmp", 0755);
 			sync();
 			if (mount(NULL, "/tmp", "ramfs", 0, NULL) >= 0)
 				goto done_tmpfs;
@@ -151,73 +152,89 @@ done_tmpfs:
 //	ksysctl_insmod("usb", NULL);
 
 	/* Setup a couple of signals to-be ignored */
-	signal(SIGHUP, SIG_IGN);
-	signal(SIGINT, SIG_IGN);
-	signal(SIGTTIN, SIG_IGN);
-	signal(SIGTTOU, SIG_IGN);
+	(void)signal(SIGHUP, SIG_IGN);
+	(void)signal(SIGINT, SIG_IGN);
+	(void)signal(SIGTTIN, SIG_IGN);
+	(void)signal(SIGTTOU, SIG_IGN);
 
-	/* Construct /dev/console from the VGA display, and a keyboard. */
+	/* Construct /dev/console from an SVGA-based TTY, and some keyboard. */
 	{
 		struct svga_maketty tty;
-		fd_t i, console, display, keyboard;
+		fd_t i, console, svga1, svga, keyboard;
+
+		/* Find a keyboard to use */
 		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC);
 		if (keyboard < 0)
 			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC);
 		if (keyboard < 0)
 			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC);
-		display = Open("/dev/svga", O_WRONLY | O_CLOEXEC);
 
-		/* Construct ansitty device /dev/svga1 */
+		/* Gain access to the SVGA controller driver */
+		svga = Open("/dev/svga", O_WRONLY | O_CLOEXEC);
+
+		/* Construct an SVGA ansitty device "/dev/svga1" */
 		bzero(&tty, sizeof(tty));
 #if OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by bzero() */
 		tty.smt_res.of_mode = OPENFD_MODE_AUTO;
 #endif /* OPENFD_MODE_AUTO != 0 */
 		tty.smt_res.of_flags = IO_CLOEXEC;
-		Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
-		tty.smt_name = "svga1";
-		Ioctl(display, SVGA_IOC_MAKETTY, &tty);
-		close(display);
-		display = tty.smt_res.of_hint;
-		Ioctl(display, SVGA_IOC_ACTIVATE);
 
-		console = sys_Xmktty("console", keyboard, display, 0);
-		close(keyboard);
-		close(display);
+		/* Ask  SVGA about its  default video mode (which  will be the preferred
+		 * video mode specified via the kernel commandline, or some other means) */
+		(void)Ioctl(svga, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
+
+		/* Actually create a new SVGA TTY and name it "/dev/svga1" */
+		tty.smt_name = "svga1";
+		(void)Ioctl(svga, SVGA_IOC_MAKETTY, &tty);
+		(void)close(svga);
+
+		/* Active the newly created TTY, making it claim ownership of the physical screen */
+		svga1 = tty.smt_res.of_hint;
+		(void)Ioctl(svga1, SVGA_IOC_ACTIVATE);
+
+		/* Create a proper system TTY by combining our ANSI/SVGA TTY with the keyboard
+		 * from earlier. The result then  becomes "console" (i.e.: the default  system
+		 * console) */
+		console = sys_Xmktty("console", keyboard, svga1, 0);
+		(void)close(keyboard);
+		(void)close(svga1);
+
+		/* Link "console" as an alias for "/dev/tty0" (the first TTY) */
 		Symlink("console", "/dev/tty0");
 
-		/* Set /dev/console as the controlling TTY of the our process. */
-		Ioctl(console, TIOCSCTTY, NULL);
+		/* Set /dev/console as the controlling TTY of the our process (/bin/init). */
+		(void)Ioctl(console, TIOCSCTTY, NULL);
 
 		{
 			/* Set our process as the foreground process
-			 * group    controlled    by   /dev/console. */
+			 * group   controlled   by   `/dev/console'. */
 			pid_t me = 0; /* `0' is an alias for `getpid()' here. */
-			Ioctl(console, TIOCSPGRP, &me);
+			(void)Ioctl(console, TIOCSPGRP, &me);
 		}
 
 		/* Open the first 3 handles as copies of the console. */
 		for (i = 0; i < 3; ++i) {
 			if (console != i)
-				Dup2(console, i);
+				(void)Dup2(console, i);
 		}
 		if (console >= 3)
-			close(console);
+			(void)close(console);
 	}
 
 	/* Construct  the  recommended  symlinks  for   devfs.
 	 * Don't do any  error checking,  since their  absence
 	 * shouldn't hinder minimal operability of the system. */
-	symlink("/proc/self/fd", "/dev/fd");
-	symlink("/proc/self/fd/0", "/dev/stdin");
-	symlink("/proc/self/fd/1", "/dev/stdout");
-	symlink("/proc/self/fd/2", "/dev/stderr");
+	(void)symlink("/proc/self/fd", "/dev/fd");
+	(void)symlink("/proc/self/fd/0", "/dev/stdin");
+	(void)symlink("/proc/self/fd/1", "/dev/stdout");
+	(void)symlink("/proc/self/fd/2", "/dev/stderr");
 
 	/* Setup dos drives. */
 	{
 		fd_t rfd = open("/", O_RDONLY | O_DIRECTORY); /* NOLINT */
 		if (rfd >= 0) {
-			dup2(rfd, AT_FDDRIVE_ROOT('C'));
-			close(rfd);
+			(void)dup2(rfd, AT_FDDRIVE_ROOT('C'));
+			(void)close(rfd);
 		}
 	}
 
@@ -230,25 +247,25 @@ done_tmpfs:
 			cpid = VFork();
 			if (cpid == 0) {
 				console_set_fgproc();
-				signal(SIGHUP, SIG_DFL);
-				signal(SIGINT, SIG_DFL);
-				signal(SIGTTIN, SIG_DFL);
-				signal(SIGTTOU, SIG_DFL);
-				execle("/bin/system-test32", "system-test32", (char *)NULL, init_envp);
+				(void)signal(SIGHUP, SIG_DFL);
+				(void)signal(SIGINT, SIG_DFL);
+				(void)signal(SIGTTIN, SIG_DFL);
+				(void)signal(SIGTTOU, SIG_DFL);
+				(void)execle("/bin/system-test32", "system-test32", (char *)NULL, init_envp);
 			}
 			/* Wait for the system-test to finish. */
 			while (waitpid(cpid, &stat, 0) < 0)
-				sched_yield();
+				(void)sched_yield();
 			if (!WIFEXITED(stat) || WEXITSTATUS(stat) != 0) {
 				syslog(LOG_ERR, "system-test exited with %u\n",
 					   WEXITSTATUS(stat));
 				for (;;)
-					pause();
+					(void)pause();
 			}
 		}
 		ksysctl(0xcccc0001); /* reboot (requires `CONFIG_HAVE_KERNEL_HACKY_REBOOT') */
 		for (;;)
-			pause();
+			(void)pause();
 	}
 #endif
 
@@ -258,19 +275,20 @@ done_tmpfs:
 	for (;;) {
 		pid_t cpid;
 		/* Do some cleanup on the console. */
-		dprintf(STDOUT_FILENO,
-		        AC_CAN    /* Cancel any in-progress escape sequence */
-		        AC_CUP0   /* Place cursor at 0,0 */
-		        AC_RIS    /* Reset all terminal settings (except for cursor position and screen contents) */
-		        AC_ED("") /* Clear screen */
-		        "");
+		(void)dprintf(STDOUT_FILENO,
+		              ""
+		              AC_CAN /* Cancel any in-progress escape sequence */
+		              AC_CUP0   /* Place cursor at 0,0 */
+		              AC_RIS    /* Reset all terminal settings (except for cursor position and screen contents) */
+		              AC_ED("") /* Clear screen */
+		              "");
 
 		/* If you've got bsdgames installed, I'll tell you your fortune */
 		if ((have_fortune == 0) && (VFork() == 0)) {
-			signal(SIGHUP, SIG_DFL);
-			signal(SIGINT, SIG_DFL);
-			signal(SIGTTIN, SIG_DFL);
-			signal(SIGTTOU, SIG_DFL);
+			(void)signal(SIGHUP, SIG_DFL);
+			(void)signal(SIGINT, SIG_DFL);
+			(void)signal(SIGTTIN, SIG_DFL);
+			(void)signal(SIGTTOU, SIG_DFL);
 			execle("/usr/bin/fortune", "fortune", (char *)NULL, init_envp);
 			have_fortune = -1; /* VFork() means we share VM, so this writes to parent process! */
 			_Exit(127);
@@ -286,37 +304,37 @@ done_tmpfs:
 			console_set_fgproc();
 
 			/* Restore default signal dispositions */
-			signal(SIGHUP, SIG_DFL);
-			signal(SIGINT, SIG_DFL);
-			signal(SIGTTIN, SIG_DFL);
-			signal(SIGTTOU, SIG_DFL);
+			(void)signal(SIGHUP, SIG_DFL);
+			(void)signal(SIGINT, SIG_DFL);
+			(void)signal(SIGTTIN, SIG_DFL);
+			(void)signal(SIGTTOU, SIG_DFL);
 
 			/* Try stuff from `/etc/shells' */
 			{
 				char *shell;
 				setusershell();
 				while ((shell = getusershell()) != NULL) {
-					execle(shell, strrchrnul(shell, '/') + 1,
-					       (char *)NULL, init_envp);
+					(void)execle(shell, strrchrnul(shell, '/') + 1,
+					             (char *)NULL, init_envp);
 				}
 			}
 
 			/* Try some fallback paths. */
-			execle("/bin/sh", "sh", (char *)NULL, init_envp);
-			execle("/bin/csh", "csh", (char *)NULL, init_envp);
-			execle("/bin/bash", "bash", (char *)NULL, init_envp);
-			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
+			(void)execle("/bin/sh", "sh", (char *)NULL, init_envp);
+			(void)execle("/bin/csh", "csh", (char *)NULL, init_envp);
+			(void)execle("/bin/bash", "bash", (char *)NULL, init_envp);
+			(void)execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 
 			/* Display an error if we were unable to launch a shell. */
-			dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");
+			(void)dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");
 			if (errno == ENOENT) {
-				dprintf(STDOUT_FILENO,
-				        "Did you remember to install:\n"
-				        "\t" AC_WHITE("bash kos/misc/make_utility.sh " KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH " busybox") "\n");
+				(void)dprintf(STDOUT_FILENO,
+				              "Did you remember to install:\n"
+				              "\t" AC_WHITE("bash kos/misc/make_utility.sh " KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH " busybox") "\n");
 			}
 			for (;;) {
 				char buf[1];
-				read(STDIN_FILENO, buf, sizeof(buf));
+				(void)read(STDIN_FILENO, buf, sizeof(buf));
 			}
 		}
 
@@ -331,7 +349,7 @@ done_tmpfs:
 					syslog(LOG_ERR, "init: wait(2) failed with %s\n",
 					       strerrorname_np(errno));
 				}
-				sched_yield();
+				(void)sched_yield();
 				continue;
 			}
 			if (wpid == cpid)
@@ -355,7 +373,7 @@ done_tmpfs:
 		 *       for the insmod() and mount() to fail), meaning we need to use
 		 *       a  custom (probably sysctl()-based) function for checking how
 		 *       many user-space threads are running on the system */
-		kill(-1, SIGKILL);
+		(void)kill(-1, SIGKILL);
 
 		/* Become the foreground process of /dev/console
 		 * In theory  this shouldn't  be necessary,  since the  kill()  before

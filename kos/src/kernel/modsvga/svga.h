@@ -116,32 +116,49 @@ struct svga_gfxcell {
 };
 struct svga_ttyrect {
 	/* Starting address is: `sttr_x + (sttr_y * vta_resx)' */
-	uintptr_half_t sttr_x;  /* [<= :vta_resx - sttr_sx] Starting cell X coord */
-	uintptr_half_t sttr_y;  /* [<= :vta_resy - sttr_sy] Starting cell Y coord */
-	uintptr_half_t sttr_sx; /* [> 0] Rect width (in cells) */
-	uintptr_half_t sttr_sy; /* [> 0] Rect height (in cells) */
+	uintptr_half_t sttr_x; /* [<= :vta_resx - sttr_w] Starting cell X coord */
+	uintptr_half_t sttr_y; /* [<= :vta_resy - sttr_h] Starting cell Y coord */
+	uintptr_half_t sttr_w; /* [> 0] Rect width (in cells) */
+	uintptr_half_t sttr_h; /* [> 0] Rect height (in cells) */
 };
 
 struct svga_ttyaccess_gfx: svga_ttyaccess {
 	/* [1..1][lock(vta_lock)] Redraw the cell at `address' (index into `stx_display')
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set.
 	 * NOTE: This operator will **NOT** invoke `sco_updaterect' on the chipset!
-	 *       Doing so is the responsibility of the caller! */
+	 *       Doing so is the responsibility of the caller!
+	 * NOTE: Before calling this operator, the caller must ensure that no HW
+	 *       render operation is still in progress, which can be done using:
+	 *        - stx_chipset->sc_ops.sco_hw_async_waitfor */
 	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
 	                                  uintptr_t address);
+
 	/* [1..1][lock(vta_lock)] Draw a cursor at `stx_swcur'
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set.
 	 * NOTE: This operator will **NOT** invoke `sco_updaterect' on the chipset!
 	 *       Doing so is the responsibility of the caller! */
 	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(FCALL *stx_redraw_cursor)(struct svga_ttyaccess_gfx *__restrict self);
-	/* [1..1][lock(vta_lock)] Hardware update callbacks. */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+#define svga_ttyaccess_gfx_hw_async_waitfor(self) \
+	(*(self)->stx_chipset->sc_ops.sco_hw_async_waitfor)((self)->stx_chipset)
+#else /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+#define svga_ttyaccess_gfx_hw_async_waitfor(self) (void)0
+#endif /* !SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+	/* [1..1][lock(vta_lock)] Hardware-update a single cell */
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *stx_hw_updatecell)(struct svga_ttyaccess_gfx *__restrict self,
+	                                    uintptr_t address);
+	/* [1..1][lock(vta_lock)] Perform hardware-update operations for cells specified by [start,num_cells) */
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *stx_hw_updateline)(struct svga_ttyaccess_gfx *__restrict self,
+	                                    uintptr_t address, size_t num_cells);
+	/* [1..1][lock(vta_lock)] Hardware-update the pixels of a specified cell-rect */
 	NOBLOCK NONNULL_T((1, 2)) void
 	NOTHROW_T(FCALL *stx_hw_updaterect)(struct svga_ttyaccess_gfx *__restrict self,
 	                                    struct svga_ttyrect const *__restrict rect);
-	NOBLOCK NONNULL_T((1)) void
-	NOTHROW_T(FCALL *stx_hw_updatecell)(struct svga_ttyaccess_gfx *__restrict self, uintptr_t address);
 	struct svga_chipset                         *stx_chipset;    /* [const][1..1] Underlying chipset (only here for `sco_updaterect') */
 	uint32_t                                     stx_ccolor;     /* [lock(vta_lock)] Cursor color. */
 	union vidtty_cursor                          stx_swcur;      /* [valid_if(_SVGA_TTYACCESS_F_SWCURON)][lock(vta_lock)]
