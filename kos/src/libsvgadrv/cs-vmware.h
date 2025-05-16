@@ -47,6 +47,9 @@ struct vmware_modeinfo: svga_modeinfo {
 	uint8_t vmi_modeid; /* VMWare mode ID, or (uint8_t)-1 if this is a VGA mode */
 };
 
+/* Max # of words that can be allocated for fifo operations */
+#define VMWARE_MAX_FIFO_COMMAND_WORDS 8
+
 struct vmware_chipset: svga_chipset {
 	uint32_t           vw_index;        /* Last-accessed register number (value of "SVGA_INDEX") */
 	uint32_t           vw_caps;         /* [const] SVGA_REG_CAPABILITIES */
@@ -59,7 +62,15 @@ struct vmware_chipset: svga_chipset {
 	uint32_t           vw_maxresy;      /* [const] SVGA_REG_MAX_HEIGHT */
 	uint16_t           vw_iobase;       /* [const] I/O-port base address. */
 	struct pci_device *vw_pci;          /* [1..1][const] Associated PCI device. */
-	uint32_t          *vm_fifo;         /* [1..1][const][owned] Memory mapping of "vw_fifoaddr" */
+	uint32_t volatile *vm_fifo;         /* [1..1][const][owned] Memory mapping of "vw_fifoaddr" */
+	uint32_t           vw_fifo_caps;    /* [lock(EXTERN)] SVGA_FIFO_CAPABILITIES */
+	uint32_t           vw_fifo_rfsz;    /* [lock(EXTERN)] Size of the FIFO register file */
+#define vw_fifo_min    vw_fifo_rfsz     /* SVGA_FIFO_MIN */
+#define vw_fifo_max    vw_fifosize      /* SVGA_FIFO_MAX */
+#define vm_fifo_hascap(self, cap)   ((self)->vw_fifo_caps & (cap))
+#define vm_fifo_hasreg(self, regno) (((regno) * 4) < (self)->vw_fifo_rfsz)
+	uint32_t vm_fifo_debounce[VMWARE_MAX_FIFO_COMMAND_WORDS]; /* [lock(EXTERN)] Debounce buffer for fifo */
+	bool     vm_fifo_debounce_inuse;    /* [lock(EXTERN)] Is `vm_fifo_debounce' being used? */
 #ifdef __KERNEL__
 	void              *vm_fifo_unmap_cookie; /* [1..1][owned] Unmap cookie for `vm_fifo' */
 #else /* __KERNEL__ */

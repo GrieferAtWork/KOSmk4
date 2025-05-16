@@ -165,11 +165,91 @@
 
 /* Block 1 (basic registers): The originally defined FIFO registers.
  * These exist and are valid for all versions of the FIFO  protocol. */
-#define SVGA_FIFO_MIN      0
-#define SVGA_FIFO_MAX      1 /* The distance from MIN to MAX must be at least 10K */
-#define SVGA_FIFO_NEXT_CMD 2
-#define SVGA_FIFO_STOP     3
+#define SVGA_FIFO_MIN          0
+#define SVGA_FIFO_MAX          1 /* The distance from MIN to MAX must be at least 10K */
+#define SVGA_FIFO_NEXT_CMD     2
+#define SVGA_FIFO_STOP         3
 
+#define SVGA_FIFO_CAPABILITIES 4 /* [valid_if(SVGA_CAP_EXTENDED_FIFO)] Fifo caps */
+#   define SVGA_FIFO_CAP_NONE                 0x00000000
+#   define SVGA_FIFO_CAP_FENCE                0x00000001
+#   define SVGA_FIFO_CAP_ACCELFRONT           0x00000002
+#   define SVGA_FIFO_CAP_PITCHLOCK            0x00000004
+#   define SVGA_FIFO_CAP_VIDEO                0x00000008
+#   define SVGA_FIFO_CAP_CURSOR_BYPASS_3      0x00000010
+#   define SVGA_FIFO_CAP_ESCAPE               0x00000020
+#   define SVGA_FIFO_CAP_RESERVE              0x00000040
+#   define SVGA_FIFO_CAP_SCREEN_OBJECT        0x00000080
+#   define SVGA_FIFO_CAP_GMR2                 0x00000100
+#   define SVGA_FIFO_CAP_3D_HWVERSION_REVISED SVGA_FIFO_CAP_GMR2
+#   define SVGA_FIFO_CAP_SCREEN_OBJECT_2      0x00000200
+#   define SVGA_FIFO_CAP_DEAD                 0x00000400
+#define SVGA_FIFO_FLAGS                5
+#define SVGA_FIFO_FENCE                6   /* [valid_if(SVGA_FIFO_CAP_FENCE)] */
+#define SVGA_FIFO_3D_HWVERSION         7
+#define SVGA_FIFO_PITCHLOCK            8   /* [valid_if(SVGA_FIFO_CAP_PITCHLOCK)] */
+#define SVGA_FIFO_CURSOR_ON            9   /* [valid_if(SVGA_FIFO_CAP_CURSOR_BYPASS_3)] Cursor bypass 3 show/hide register */
+#define SVGA_FIFO_CURSOR_X             10  /* [valid_if(SVGA_FIFO_CAP_CURSOR_BYPASS_3)] Cursor bypass 3 x register */
+#define SVGA_FIFO_CURSOR_Y             11  /* [valid_if(SVGA_FIFO_CAP_CURSOR_BYPASS_3)] Cursor bypass 3 y register */
+#define SVGA_FIFO_CURSOR_COUNT         12  /* [valid_if(SVGA_FIFO_CAP_CURSOR_BYPASS_3)] Incremented when any of the other 3 change */
+#define SVGA_FIFO_CURSOR_LAST_UPDATED  13  /* [valid_if(SVGA_FIFO_CAP_CURSOR_BYPASS_3)] Last time the host updated the cursor */
+#define SVGA_FIFO_RESERVED             14  /* [valid_if(SVGA_FIFO_CAP_RESERVE)] Bytes past NEXT_CMD with real contents */
+#define SVGA_FIFO_CURSOR_SCREEN_ID     15  /* [valid_if(SVGA_FIFO_CAP_SCREEN_OBJECT || SVGA_FIFO_CAP_SCREEN_OBJECT_2)] */
+#define SVGA_FIFO_DEAD                 16  /* [valid_if(SVGA_FIFO_CAP_DEAD)] */
+#define SVGA_FIFO_3D_HWVERSION_REVISED 17  /* [valid_if(SVGA_FIFO_CAP_3D_HWVERSION_REVISED)] */
+#define SVGA_FIFO_3D_CAPS              32  /* [valid_if(SVGA_FIFO_3D_HWVERSION >= SVGA3D_HWVERSION_WS6_B1)] */
+#define SVGA_FIFO_3D_CAPS_LAST         287 /* [valid_if(SVGA_FIFO_3D_HWVERSION >= SVGA3D_HWVERSION_WS6_B1)] */
+
+// Valid if register exists:
+#define SVGA_FIFO_GUEST_3D_HWVERSION 288 /* Guest driver's 3D version */
+#define SVGA_FIFO_FENCE_GOAL         289 /* Matching target for SVGA_IRQFLAG_FENCE_GOAL */
+#define SVGA_FIFO_BUSY               290 /* See "FIFO Synchronization Registers" */
+
+/*
+    * Always keep this last.  This defines the maximum number of
+    * registers we know about.  At power-on, this value is placed in
+    * the SVGA_REG_MEM_REGS register, and we expect the guest driver
+    * to allocate this much space in FIFO memory for registers.
+    */
+#define SVGA_FIFO_NUM_REGS 291
+
+
+
+/* FIFO Opcodes.
+ *
+ * FIFO commands are sequences of 32-bit data-words,  the first of which is one  of
+ * the following, with the remainder being the operands for the respective command. */
+#define SVGA_CMD_INVALID_CMD            0
+#define SVGA_CMD_UPDATE                 1 /* [QEMU][x, y, width, height] Update a rect of on-screen pixels */
+#define SVGA_CMD_RECT_FILL              2 /* [QEMU][color, x, y, width, height] Fill rect with color */
+#define SVGA_CMD_RECT_COPY              3 /* [QEMU][sx, sy, dx, dy, width, height] Move rect of pixels to other on-screen loc */
+#define SVGA_CMD_DEFINE_BITMAP          4
+#define SVGA_CMD_DEFINE_BITMAP_SCANLINE 5
+#define SVGA_CMD_DEFINE_PIXMAP          6
+#define SVGA_CMD_DEFINE_PIXMAP_SCANLINE 7
+#define SVGA_CMD_RECT_BITMAP_FILL       8
+#define SVGA_CMD_RECT_PIXMAP_FILL       9
+#define SVGA_CMD_RECT_BITMAP_COPY       10
+#define SVGA_CMD_RECT_PIXMAP_COPY       11
+#define SVGA_CMD_FREE_OBJECT            12
+#define SVGA_CMD_RECT_ROP_FILL          13
+#define SVGA_CMD_RECT_ROP_COPY          14
+#define SVGA_CMD_RECT_ROP_BITMAP_FILL   15
+#define SVGA_CMD_RECT_ROP_PIXMAP_FILL   16
+#define SVGA_CMD_RECT_ROP_BITMAP_COPY   17
+#define SVGA_CMD_RECT_ROP_PIXMAP_COPY   18
+#define SVGA_CMD_DEFINE_CURSOR          19 /* [QEMU][id, hot_x, hot_y, width, height, ???, bpp] */
+#define SVGA_CMD_DISPLAY_CURSOR         20
+#define SVGA_CMD_MOVE_CURSOR            21
+#define SVGA_CMD_DEFINE_ALPHA_CURSOR    22
+#define SVGA_CMD_DRAW_GLYPH             23
+#define SVGA_CMD_DRAW_GLYPH_CLIPPED     24
+#define SVGA_CMD_UPDATE_VERBOSE         25 /* [QEMU][x, y, width, height] like `SVGA_CMD_UPDATE' */
+#define SVGA_CMD_SURFACE_FILL           26
+#define SVGA_CMD_SURFACE_COPY           27
+#define SVGA_CMD_SURFACE_ALPHA_BLEND    28
+#define SVGA_CMD_FRONT_ROP_FILL         29
+#define SVGA_CMD_FENCE                  30
 
 
 #endif /* !_HW_VIDEO_VMWARE_H */

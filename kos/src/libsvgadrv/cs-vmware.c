@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBSVGADRV_CS_VMWARE_C
 #define GUARD_LIBSVGADRV_CS_VMWARE_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define _KOS_ALTERATIONS_SOURCE 1
 
@@ -37,6 +38,7 @@
 #include <kos/except/reason/io.h>
 #include <kos/kernel/printk.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -53,8 +55,10 @@
 #include <kernel/mman.h>      /* mman_kernel */
 #include <kernel/mman/kram.h> /* mman_unmap_kram_and_kfree */
 #include <kernel/mman/map.h>  /* mman_map */
+#include <sched/task.h>
 #else /* __KERNEL__ */
 #include <dlfcn.h>
+#include <pthread.h>
 #endif /* !__KERNEL__ */
 
 DECL_BEGIN
@@ -65,15 +69,121 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+PRIVATE NONNULL((1)) void CC
+vmware_fifo_handle_full(struct vmware_chipset *__restrict self) {
+	(void)self;
+#ifdef __KERNEL__
+	task_tryyield_or_pause();
+#else /* __KERNEL__ */
+	pthread_yield();
+#endif /* !__KERNEL__ */
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *CC
+vmware_fifo_reserve(struct vmware_chipset *__restrict self, size_t n_bytes) {
+	/* Derived from reference impl of "SVGA_FIFOReserve" */
+	uint32_t max = self->vw_fifo_max;
+	uint32_t min = self->vw_fifo_min;
+	uint32_t next_cmd = self->vm_fifo[SVGA_FIFO_NEXT_CMD];
+	assert((n_bytes & 3) == 0);
+	assert(n_bytes <= (VMWARE_MAX_FIFO_COMMAND_WORDS * 4));
+	for (;;) {
+		uint32_t stop = self->vm_fifo[SVGA_FIFO_STOP];
+		if (next_cmd >= stop) {
+			if (next_cmd + n_bytes < max ||
+			    (next_cmd + n_bytes == max && stop > min)) {
+do_reserveInPlace:
+				if (n_bytes <= 4)
+					goto do_return_next_cmd;
+				if (vm_fifo_hascap(self, SVGA_FIFO_CAP_RESERVE)) {
+					self->vm_fifo_debounce_inuse      = false;
+					self->vm_fifo[SVGA_FIFO_RESERVED] = n_bytes;
+do_return_next_cmd:
+					return (uint32_t *)((uint8_t *)self->vm_fifo + next_cmd);
+				}
+do_needBounce:
+				self->vm_fifo_debounce_inuse = true;
+				return self->vm_fifo_debounce;
+			} else if ((max - next_cmd) + (stop - min) <= n_bytes) {
+				vmware_fifo_handle_full(self);
+			} else {
+				goto do_needBounce;
+			}
+		} else {
+			if (next_cmd + n_bytes < stop) {
+				goto do_reserveInPlace;
+			} else {
+				vmware_fifo_handle_full(self);
+			}
+		}
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
+vmware_fifo_commit(struct vmware_chipset *__restrict self, size_t n_bytes) {
+	/* Derived from reference impl of "SVGA_FIFOCommit" */
+	uint32_t next_cmd = self->vm_fifo[SVGA_FIFO_NEXT_CMD];
+	uint32_t max = self->vw_fifo_max;
+	uint32_t min = self->vw_fifo_min;
+	assert((n_bytes & 3) == 0);
+	assert(n_bytes <= (VMWARE_MAX_FIFO_COMMAND_WORDS * 4));
+	if (self->vm_fifo_debounce_inuse) {
+		uint32_t *buffer = self->vm_fifo_debounce;
+		if (vm_fifo_hascap(self, SVGA_FIFO_CAP_RESERVE)) {
+			uint32_t chunk_bytes = MIN(n_bytes, max - next_cmd);
+			self->vm_fifo[SVGA_FIFO_RESERVED] = n_bytes;
+			memcpyl((uint8_t *)self->vm_fifo + next_cmd, buffer, chunk_bytes / 4);
+			memcpyl((uint8_t *)self->vm_fifo + min, buffer + chunk_bytes, (n_bytes - chunk_bytes) / 4);
+		} else {
+			while (n_bytes > 0) {
+				self->vm_fifo[next_cmd / 4] = *buffer++;
+				next_cmd += 4;
+				if (next_cmd == max) {
+					next_cmd = min;
+				}
+				self->vm_fifo[SVGA_FIFO_NEXT_CMD] = next_cmd;
+				n_bytes -= 4;
+			}
+		}
+	}
+	if (!self->vm_fifo_debounce_inuse || vm_fifo_hascap(self, SVGA_FIFO_CAP_RESERVE)) {
+		next_cmd += n_bytes;
+		if (next_cmd >= max)
+			next_cmd -= max - min;
+		self->vm_fifo[SVGA_FIFO_NEXT_CMD] = next_cmd;
+	}
+	if (vm_fifo_hascap(self, SVGA_FIFO_CAP_RESERVE))
+		self->vm_fifo[SVGA_FIFO_RESERVED] = 0;
+}
+
+
+#define vmware_fifo_commit_cmd(self, n_words) \
+	vmware_fifo_commit(self, 4 + ((n_words) * 4))
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *CC
+vmware_fifo_reserve_cmd(struct vmware_chipset *__restrict self,
+                        uint32_t cmd, size_t n_words) {
+	uint32_t *result = vmware_fifo_reserve(self, 4 + (n_words * 4));
+	*result++ = cmd;
+	return result;
+}
+
+
+
+
+
+
+
+
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC vmware_v_fini)(struct svga_chipset *__restrict self) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	(void)me;
 #ifdef __KERNEL__
-	mman_unmap_kram_and_kfree(me->vm_fifo, me->vw_fifosize,
+	mman_unmap_kram_and_kfree((void *)me->vm_fifo, me->vw_fifosize,
 	                          me->vm_fifo_unmap_cookie);
 #else /* __KERNEL__ */
-	(*me->vw_munmapphys)(me->vm_fifo, me->vw_fifosize);
+	(*me->vw_munmapphys)((void *)me->vm_fifo, me->vw_fifosize);
 	if (me->vw_libpciaccess)
 		dlclose(me->vw_libpciaccess);
 #endif /* !__KERNEL__ */
@@ -227,14 +337,26 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	if (bmask != want_bmask)
 		printk(KERN_ERR "[vmware] Final bmask=%#.8" PRIx32 " differs from cached bmask=%#.8" PRIx32 "\n", bmask, want_bmask);
 
+	/* Initialize the command FIFO */
+	me->vw_fifo_caps = SVGA_FIFO_CAP_NONE;
+	if (me->vw_caps & SVGA_CAP_EXTENDED_FIFO) {
+		me->vm_fifo[SVGA_FIFO_MIN] = SVGA_FIFO_NUM_REGS;
+		me->vw_fifo_rfsz = me->vm_fifo[SVGA_FIFO_MIN];
+		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
+		me->vm_fifo[SVGA_FIFO_NEXT_CMD] = me->vw_fifo_min;
+		me->vm_fifo[SVGA_FIFO_STOP]     = me->vw_fifo_min;
+		if (vm_fifo_hasreg(me, SVGA_FIFO_CAPABILITIES))
+			me->vw_fifo_caps = me->vm_fifo[SVGA_FIFO_CAPABILITIES];
+	} else {
+		me->vm_fifo[SVGA_FIFO_MIN]      = 16;
+		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
+		me->vm_fifo[SVGA_FIFO_NEXT_CMD] = 16;
+		me->vm_fifo[SVGA_FIFO_STOP]     = 16;
+		me->vw_fifo_rfsz                = 16;
+	}
+
 	/* Enable SVGA */
 	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_ENABLE);
-
-	/* Initialize the command FIFO */
-	me->vm_fifo[SVGA_FIFO_MIN]      = 16;
-	me->vm_fifo[SVGA_FIFO_MAX]      = 16 + (10 * 1024);
-	me->vm_fifo[SVGA_FIFO_NEXT_CMD] = 16;
-	me->vm_fifo[SVGA_FIFO_STOP]     = 16;
 
 	/* Enable the command FIFO */
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 1);
@@ -243,8 +365,16 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
                                            struct svga_rect const *__restrict rect) {
-	printk(KERN_DEBUG "[vmware] TODO: updaterect(x: %" PRIu16 ", y: %" PRIu16 ", sx: %" PRIu16 ", sy: %" PRIu16 ")\n",
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] updaterect(x: %" PRIu16 ", y: %" PRIu16 ", sx: %" PRIu16 ", sy: %" PRIu16 ")\n",
 	       rect->svr_x, rect->svr_y, rect->svr_sx, rect->svr_sy);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_UPDATE, 4);
+	*packet++ = rect->svr_x;
+	*packet++ = rect->svr_y;
+	*packet++ = rect->svr_sx;
+	*packet++ = rect->svr_sy;
+	vmware_fifo_commit_cmd(me, 4);
 }
 
 
@@ -421,24 +551,28 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 #ifdef __KERNEL__
 		me->vm_fifo_unmap_cookie = mman_unmap_kram_cookie_alloc();
 		TRY {
-			me->vm_fifo = (uint32_t *)mman_map(/* self:        */ &mman_kernel,
-			                                   /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
-			                                   /* num_bytes:   */ me->vw_fifosize,
-			                                   /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
-			                                   /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
-			                                   /* file:        */ &mfile_phys,
-			                                   /* file_fspath: */ NULL,
-			                                   /* file_fsname: */ NULL,
-			                                   /* file_pos:    */ (pos_t)me->vw_fifoaddr);
+			me->vm_fifo = (uint32_t volatile *)mman_map(/* self:        */ &mman_kernel,
+			                                            /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
+			                                            /* num_bytes:   */ me->vw_fifosize,
+			                                            /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+			                                            /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
+			                                            /* file:        */ &mfile_phys,
+			                                            /* file_fspath: */ NULL,
+			                                            /* file_fsname: */ NULL,
+			                                            /* file_pos:    */ (pos_t)me->vw_fifoaddr);
 		} EXCEPT {
 			mman_unmap_kram_cookie_free(me->vm_fifo_unmap_cookie);
 			RETHROW();
 		}
 #else /* __KERNEL__ */
-		me->vm_fifo = (uint32_t *)(*mmapphys)(me->vw_fifoaddr, me->vw_fifosize);
+		me->vm_fifo = (uint32_t volatile *)(*mmapphys)(me->vw_fifoaddr, me->vw_fifosize);
 		if unlikely(me->vm_fifo == (uint32_t *)MAP_FAILED)
 			goto err_initfailed_late;
 #endif /* !__KERNEL__ */
+
+		/* Misc. runtime fields. */
+		me->vw_fifo_caps = 0;
+		me->vm_fifo_debounce_inuse = false;
 		return true;
 	}
 #ifndef __KERNEL__
