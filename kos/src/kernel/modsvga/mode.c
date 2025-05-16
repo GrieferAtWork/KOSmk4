@@ -78,12 +78,12 @@ DECL_BEGIN
 /************************************************************************/
 
 /* Return a pointer to the internal mode descriptor matching `mode' */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo *FCALL
-svgadev_findmode(struct svgadev *__restrict self,
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct svga_modeinfo const *FCALL
+svgadev_findmode(struct svgadev const *__restrict self,
                  NCX struct svga_modeinfo const *mode)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE) {
 	size_t i;
-	struct svga_modeinfo *result;
+	struct svga_modeinfo const *result;
 	for (i = 0; i < self->svd_supmodec; ++i) {
 		result = svgadev_supmode(self, i);
 		if (bcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
@@ -266,7 +266,7 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case SVGA_IOC_SETMODE: {
 		struct svgadev *dv = viddev_assvga(me->vlc_dev);
-		struct svga_modeinfo *newmode;
+		struct svga_modeinfo const *newmode;
 		validate_readable(arg, sizeof(struct svga_modeinfo));
 		newmode = svgadev_findmode(viddev_assvga(me->vlc_dev), (NCX struct svga_modeinfo *)arg);
 		viddev_acquire(dv);
@@ -539,7 +539,7 @@ PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_ioctl_setmode(struct svgatty *__restrict self,
                       NCX UNCHECKED struct svga_modeinfo const *modeinfo) {
 	REF struct svga_ttyaccess *newtty;
-	struct svga_modeinfo *newmode;
+	struct svga_modeinfo const *newmode;
 	validate_readable(modeinfo, sizeof(*modeinfo));
 
 	/* New special permissions to set the video mode.
@@ -617,7 +617,7 @@ INTERN_CONST struct vidtty_ops const svgatty_ops = {{{{{{
 /* Set the SVGA video mode to `mode' */
 INTERN NONNULL((1, 2)) void FCALL
 svgadev_setmode(struct svgadev *__restrict self,
-                struct svga_modeinfo *__restrict mode)
+                struct svga_modeinfo const *__restrict mode)
 		THROWS(E_IOERROR) {
 
 	/* Set the video mode requested by `tty' */
@@ -695,7 +695,7 @@ svgadev_setmode(struct svgadev *__restrict self,
  * Note that the tty has yet to be made active! */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *FCALL
 svgadev_vnewttyf(struct svgadev *__restrict self,
-                 struct svga_modeinfo *__restrict mode, dev_t devno,
+                 struct svga_modeinfo const *__restrict mode, dev_t devno,
                  char const *__restrict format, __builtin_va_list args)
 		THROWS(E_WOULDBLOCK) {
 	REF struct svgatty *result;
@@ -741,7 +741,7 @@ svgadev_vnewttyf(struct svgadev *__restrict self,
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svgatty *VCALL
 svgadev_newttyf(struct svgadev *__restrict self,
-                struct svga_modeinfo *__restrict mode, dev_t devno,
+                struct svga_modeinfo const *__restrict mode, dev_t devno,
                 char const *__restrict format, ...)
 		THROWS(E_WOULDBLOCK) {
 	REF struct svgatty *result;
@@ -825,7 +825,7 @@ PRIVATE BLOCKING NONNULL((1, 2)) void FCALL
 svgadev_v_setttyvideomode(struct viddev *__restrict self,
                           struct vidttyaccess const *__restrict tty)
 		THROWS(E_IOERROR) {
-	struct svgadev *me       = viddev_assvga(self);
+	struct svgadev *me        = viddev_assvga(self);
 	struct svga_ttyaccess *ty = vidttyaccess_assvga(tty);
 	svgadev_setmode(me, ty->sta_mode);
 }

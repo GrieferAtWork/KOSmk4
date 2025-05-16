@@ -107,6 +107,9 @@ vmware_v_getmode(struct svga_chipset *__restrict self,
                  struct svga_modeinfo *__restrict _result,
                  uintptr_t *__restrict p_index)
 		THROWS(E_IOERROR) {
+	uint32_t old_enable, old_config_done;
+	uint32_t old_width, old_height, old_bpp;
+	uint32_t rmask, gmask, bmask;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_modeinfo *result = (struct vmware_modeinfo *)_result;
 	struct vmware_videomode const *vm;
@@ -129,15 +132,46 @@ next:
 	if (vm->vm_resy > me->vw_maxresy)
 		goto next;
 
-	bzero(result, sizeof(*result));
 	result->vmi_modeid         = *p_index;
-	result->smi_flags          = SVGA_MODEINFO_F_LFB | SVGA_MODEINFO_F_ONSET;
+	result->smi_flags          = SVGA_MODEINFO_F_LFB;
 	result->smi_resx           = vm->vm_resx;
 	result->smi_resy           = vm->vm_resy;
 	result->smi_bits_per_pixel = me->vw_hbpp;
 	result->smi_scanline       = CEIL_ALIGN(vm->vm_resx * 4, 64);
 
-	/* Everything else only gets initialized once the mode is set. */
+	/* Figure out scanline and such... */
+	old_enable      = vm_getreg(me, SVGA_REG_ENABLE);
+	old_config_done = vm_getreg(me, SVGA_REG_CONFIG_DONE);
+	old_width       = vm_getreg(me, SVGA_REG_WIDTH);
+	old_height      = vm_getreg(me, SVGA_REG_HEIGHT);
+	old_bpp         = vm_getreg(me, SVGA_REG_BPP);
+	vm_setreg(me, SVGA_REG_CONFIG_DONE, 0);
+	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_DISABLE);
+	vm_setreg(me, SVGA_REG_WIDTH, vm->vm_resx);
+	vm_setreg(me, SVGA_REG_HEIGHT, vm->vm_resy);
+	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
+		vm_setreg(me, SVGA_REG_BPP, me->vw_hbpp);
+
+	result->smi_lfb = me->vw_fbstart + vm_getreg(me, SVGA_REG_FB_OFFSET);
+	result->smi_scanline = vm_getreg(me, SVGA_REG_BYTES_PER_LINE);
+	result->smi_colorbits = vm_getreg(me, SVGA_REG_DEPTH);
+	rmask = vm_getreg(me, SVGA_REG_RED_MASK);
+	gmask = vm_getreg(me, SVGA_REG_GREEN_MASK);
+	bmask = vm_getreg(me, SVGA_REG_BLUE_MASK);
+	result->smi_rshift = rmask ? CLZ(rmask) : 0;
+	result->smi_rbits  = POPCOUNT(rmask);
+	result->smi_gshift = gmask ? CLZ(gmask) : 0;
+	result->smi_gbits  = POPCOUNT(gmask);
+	result->smi_bshift = bmask ? CLZ(bmask) : 0;
+	result->smi_bbits  = POPCOUNT(bmask);
+
+	/* Restore old registers */
+	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
+		vm_setreg(me, SVGA_REG_BPP, old_bpp);
+	vm_setreg(me, SVGA_REG_HEIGHT, old_height);
+	vm_setreg(me, SVGA_REG_WIDTH, old_width);
+	vm_setreg(me, SVGA_REG_ENABLE, old_enable);
+	vm_setreg(me, SVGA_REG_CONFIG_DONE, old_config_done);
 	return true;
 }
 
@@ -150,11 +184,11 @@ PRIVATE uint32_t const vmware_noop_fifo_config[] = {
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setmode(struct svga_chipset *__restrict self,
-                 struct svga_modeinfo *__restrict _mode) {
-	uint32_t rmask, gmask, bmask, final_scanline;
+                 struct svga_modeinfo const *__restrict _mode) {
+	uint32_t final_scanline;
 	uint32_t old_resx, old_resy, old_bpp, old_cdone;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	struct vmware_modeinfo *mode = (struct vmware_modeinfo *)_mode;
+	struct vmware_modeinfo const *mode = (struct vmware_modeinfo const *)_mode;
 
 	/* Support for standard VGA modes. */
 	if (mode->vmi_modeid >= lengthof(vmware_videomodes)) {
@@ -182,33 +216,17 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
 		vm_setreg(me, SVGA_REG_BPP, mode->smi_bits_per_pixel);
 
-	/* TODO: All of the following doesn't work (yet) with modsvga, which
-	 *       assumes that all of this gets pre-initialized correctly  by
-	 *       `vmware_v_getmode()' (which isn't the case). */
-	mode->smi_lfb  = me->vw_fbstart + vm_getreg(me, SVGA_REG_FB_OFFSET);
 	final_scanline = vm_getreg(me, SVGA_REG_BYTES_PER_LINE);
-	if unlikely(final_scanline > mode->smi_scanline) {
+	if unlikely(final_scanline != mode->smi_scanline) {
 		vm_setreg(me, SVGA_REG_WIDTH, old_resx);
 		vm_setreg(me, SVGA_REG_HEIGHT, old_resy);
 		if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
 			vm_setreg(me, SVGA_REG_BPP, old_bpp);
 		vm_setreg(me, SVGA_REG_CONFIG_DONE, old_cdone);
 		THROW(E_IOERROR, E_IOERROR_SUBSYSTEM_VIDEO,
-		      E_IOERROR_REASON_VIDEO_VMWARE_STRIDE_TOO_LARGE,
+		      E_IOERROR_REASON_VIDEO_VMWARE_STRIDE_CHANGED,
 		      final_scanline, mode->smi_scanline);
 	}
-	mode->smi_scanline = final_scanline;
-
-	mode->smi_colorbits = vm_getreg(me, SVGA_REG_DEPTH);
-	rmask = vm_getreg(me, SVGA_REG_RED_MASK);
-	gmask = vm_getreg(me, SVGA_REG_GREEN_MASK);
-	bmask = vm_getreg(me, SVGA_REG_BLUE_MASK);
-	mode->smi_rshift = rmask ? CLZ(rmask) : 0;
-	mode->smi_rbits  = POPCOUNT(rmask);
-	mode->smi_gshift = gmask ? CLZ(gmask) : 0;
-	mode->smi_gbits  = POPCOUNT(gmask);
-	mode->smi_bshift = bmask ? CLZ(bmask) : 0;
-	mode->smi_bbits  = POPCOUNT(bmask);
 
 	/* Enable SVGA */
 	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_ENABLE);
@@ -219,9 +237,6 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 
 	/* Enable the command FIFO */
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 1);
-
-	/* Indicate that the mode is now fully initialized. */
-	mode->smi_flags &= ~SVGA_MODEINFO_F_ONSET;
 }
 
 PRIVATE NONNULL((1, 2)) void CC

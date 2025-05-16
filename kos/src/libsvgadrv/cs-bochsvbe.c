@@ -208,9 +208,9 @@ next:
 
 PRIVATE NONNULL((1, 2)) void CC
 bochs_v_setmode(struct svga_chipset *__restrict self,
-                struct svga_modeinfo *__restrict _mode) {
-	struct bochs_chipset *me    = (struct bochs_chipset *)self;
-	struct bochs_modeinfo *mode = (struct bochs_modeinfo *)_mode;
+                struct svga_modeinfo const *__restrict _mode) {
+	struct bochs_chipset *me = (struct bochs_chipset *)self;
+	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
 	struct bga_mode const *bm;
 
 	/* Disable Bochs VBE */

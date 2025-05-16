@@ -58,7 +58,6 @@ __DECL_BEGIN
                                        *    This is a 16-color mode, with each plane holding exactly 1 bit of the final palette index
                                        *  - smi_bits_per_pixel == 2 && smi_colorbits == 8:
                                        *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index */
-#define SVGA_MODEINFO_F_ONSET  0x8000 /* Certain mode infos may only get initialized after the mode is set. */
 
 
 struct svga_modeinfo {
@@ -125,24 +124,14 @@ struct svga_chipset_ops {
 			__THROWS(E_IOERROR);
 
 	/* [1..1][const][lock(EXTERNAL)]
-	 * - Set a given video  mode to `mode'. When  `SVGA_MODEINFO_F_ONSET'
-	 *   is set, may also possibly alter/initialize the following fields:
-	 *   - mode->smi_lfb
-	 *   - mode->smi_scanline  (previously: always initialized to the max possible value)
-	 *   - mode->smi_rshift
-	 *   - mode->smi_rbits
-	 *   - mode->smi_gshift
-	 *   - mode->smi_gbits
-	 *   - mode->smi_bshift
-	 *   - mode->smi_bbits
-	 *   - mode->smi_colorbits
+	 * - Set a given video  mode to `mode'.
 	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
 	 * - Prior to this function being called for the first time, any  function
 	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
 	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]' */
 	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
-	                             struct svga_modeinfo *__restrict mode);
+	                             struct svga_modeinfo const *__restrict mode);
 
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'

@@ -414,10 +414,10 @@ vesa_getlogicalwidth_max(struct svga_chipset *__restrict self) {
 
 PRIVATE NONNULL((1, 2)) void CC
 vesa_v_setmode(struct svga_chipset *__restrict self,
-               struct svga_modeinfo *__restrict mode_) {
+               struct svga_modeinfo const *__restrict mode_) {
 	uint16_t modeword;
-	struct vesa_modeinfo *mode = (struct vesa_modeinfo *)mode_;
-	struct vesa_chipset *me    = (struct vesa_chipset *)self;
+	struct vesa_modeinfo const *mode = (struct vesa_modeinfo const *)mode_;
+	struct vesa_chipset *me = (struct vesa_chipset *)self;
 
 	modeword = mode->vm_modeid;
 	modeword |= 0x8000; /* Don't clear display memory */
