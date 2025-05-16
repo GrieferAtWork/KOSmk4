@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98ebd4eb */
+/* HASH CRC-32:0x88f18d85 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@
 /* (#) Portability: mintlib       (/include/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
+/*!always_includes <stdint.h>*/
 #ifndef _INTTYPES_H
 #define _INTTYPES_H 1
 

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <stdlib.h>*/
 #ifndef __LOCAL_MB_CUR_MAX
 #include <__crt.h>
 #ifndef __LOCAL_MB_CUR_MAX

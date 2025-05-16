@@ -42,6 +42,7 @@
 /* (#) Portability: mintlib       (/include/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
+/*!always_includes <stdint.h>*/
 }
 
 %[define_ccompat_header("cinttypes")]

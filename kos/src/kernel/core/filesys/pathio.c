@@ -1792,7 +1792,7 @@ path_mount(struct path *__restrict self,
 	/* Fill in fields of the new mounting point. */
 	result->p_refcnt = 2; /* +1: return, +1: `path_cldlist_insert(parent, result);' / `pathvfs->vf_root' */
 	result->p_flags  = PATH_F_ISMOUNT;
-	result->p_dir    = dir;          /* incref'd later */
+	result->p_dir    = dir; /* incref'd later */
 	TAILQ_ENTRY_UNBOUND_INIT(&result->p_recent);
 	shared_rwlock_init(&result->p_cldlock);
 	SLIST_INIT(&result->p_cldlops);
@@ -2058,6 +2058,7 @@ path_print(struct path *__restrict self, pformatprinter printer,
 			return temp;
 		result += temp;
 	}
+
 	/* Print a trailing slash (if needed). */
 	if (atflags & AT_PATHPRINT_INCTRAIL) {
 		ssize_t temp;
