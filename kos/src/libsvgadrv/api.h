@@ -40,8 +40,7 @@
  *     drivers to manually indicate when they want the screen to refresh, which  is
  *     something that libsvgadrv has no way of expressing (yet). As such, while KOS
  *     *does* boot, the only way to see the screen refresh is to ALT+TAB in-and-out
- *     of   QEMU   (since   that  happens   to   cause  the   screen   to  refresh)
- * Also: for some reason everything is yellow instead of white... */
+ *     of   QEMU   (since   that  happens   to   cause  the   screen   to  refresh) */
 #define CONFIG_NO_LIBSVGADRV_CHIPSET_VMWARE
 
 /* Configure supported chipsets. */

@@ -158,11 +158,11 @@ next:
 	rmask = vm_getreg(me, SVGA_REG_RED_MASK);
 	gmask = vm_getreg(me, SVGA_REG_GREEN_MASK);
 	bmask = vm_getreg(me, SVGA_REG_BLUE_MASK);
-	result->smi_rshift = rmask ? CLZ(rmask) : 0;
+	result->smi_rshift = rmask ? CTZ(rmask) : 0;
 	result->smi_rbits  = POPCOUNT(rmask);
-	result->smi_gshift = gmask ? CLZ(gmask) : 0;
+	result->smi_gshift = gmask ? CTZ(gmask) : 0;
 	result->smi_gbits  = POPCOUNT(gmask);
-	result->smi_bshift = bmask ? CLZ(bmask) : 0;
+	result->smi_bshift = bmask ? CTZ(bmask) : 0;
 	result->smi_bbits  = POPCOUNT(bmask);
 
 	/* Restore old registers */
@@ -186,7 +186,8 @@ PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setmode(struct svga_chipset *__restrict self,
                  struct svga_modeinfo const *__restrict _mode) {
 	uint32_t final_scanline;
-	uint32_t old_resx, old_resy, old_bpp, old_cdone;
+	uint32_t rmask, gmask, bmask;
+	uint32_t want_rmask, want_gmask, want_bmask;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_modeinfo const *mode = (struct vmware_modeinfo const *)_mode;
 
@@ -197,36 +198,33 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 		return;
 	}
 
-	/* Check if this mode is supported. */
-	if (mode->smi_resx > me->vw_maxresx ||
-	    mode->smi_resy > me->vw_maxresy ||
-	    mode->smi_bits_per_pixel != me->vw_hbpp) {
-		THROW(E_IOERROR, E_IOERROR_SUBSYSTEM_VIDEO,
-		      E_IOERROR_REASON_VIDEO_VMWARE_BAD_VIDEO_MODE);
-	}
-
 	/* SetMode */
-	old_cdone = vm_getreg(me, SVGA_REG_CONFIG_DONE);
-	old_resx  = vm_getreg(me, SVGA_REG_WIDTH);
-	old_resy  = vm_getreg(me, SVGA_REG_HEIGHT);
-	old_bpp   = (me->vw_caps & SVGA_CAP_8BIT_EMULATION) ? vm_getreg(me, SVGA_REG_BPP) : 32;
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 0);
 	vm_setreg(me, SVGA_REG_WIDTH, mode->smi_resx);
 	vm_setreg(me, SVGA_REG_HEIGHT, mode->smi_resy);
 	if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
 		vm_setreg(me, SVGA_REG_BPP, mode->smi_bits_per_pixel);
 
+	/* Read scanline config and verify it. */
 	final_scanline = vm_getreg(me, SVGA_REG_BYTES_PER_LINE);
 	if unlikely(final_scanline != mode->smi_scanline) {
-		vm_setreg(me, SVGA_REG_WIDTH, old_resx);
-		vm_setreg(me, SVGA_REG_HEIGHT, old_resy);
-		if (me->vw_caps & SVGA_CAP_8BIT_EMULATION)
-			vm_setreg(me, SVGA_REG_BPP, old_bpp);
-		vm_setreg(me, SVGA_REG_CONFIG_DONE, old_cdone);
-		THROW(E_IOERROR, E_IOERROR_SUBSYSTEM_VIDEO,
-		      E_IOERROR_REASON_VIDEO_VMWARE_STRIDE_CHANGED,
-		      final_scanline, mode->smi_scanline);
+		printk(KERN_ERR "[vmware] Final scanline=%" PRIu32 " differs from cached scanline=%" PRIu32 "\n",
+		       final_scanline, mode->smi_scanline);
 	}
+
+	/* Read color mask config and verify it. */
+	rmask = vm_getreg(me, SVGA_REG_RED_MASK);
+	gmask = vm_getreg(me, SVGA_REG_GREEN_MASK);
+	bmask = vm_getreg(me, SVGA_REG_BLUE_MASK);
+	want_rmask = (((uint32_t)1 << mode->smi_rbits) - 1) << mode->smi_rshift;
+	want_gmask = (((uint32_t)1 << mode->smi_gbits) - 1) << mode->smi_gshift;
+	want_bmask = (((uint32_t)1 << mode->smi_bbits) - 1) << mode->smi_bshift;
+	if (rmask != want_rmask)
+		printk(KERN_ERR "[vmware] Final rmask=%#.8" PRIx32 " differs from cached rmask=%#.8" PRIx32 "\n", rmask, want_rmask);
+	if (gmask != want_gmask)
+		printk(KERN_ERR "[vmware] Final gmask=%#.8" PRIx32 " differs from cached gmask=%#.8" PRIx32 "\n", gmask, want_gmask);
+	if (bmask != want_bmask)
+		printk(KERN_ERR "[vmware] Final bmask=%#.8" PRIx32 " differs from cached bmask=%#.8" PRIx32 "\n", bmask, want_bmask);
 
 	/* Enable SVGA */
 	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_ENABLE);
