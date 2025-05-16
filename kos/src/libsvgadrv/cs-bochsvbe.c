@@ -480,7 +480,6 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 		       (size_t)CEILDIV(me->sc_vmemsize, 1024 * 1024));
 
 		/* Fill in operators and the like... */
-		DBG_memset(&me->sc_ops, 0xcc, sizeof(me->sc_ops));
 		me->sc_logicalwidth_max        = me->bc_maxresx;
 		me->sc_ops.sco_fini            = &bochs_v_fini;
 		me->sc_ops.sco_modeinfosize    = sizeof(struct bochs_modeinfo);

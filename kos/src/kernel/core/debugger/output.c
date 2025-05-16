@@ -270,24 +270,23 @@ NOTHROW(FCALL dbgtty_hidescrollpos)(void) {
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL dbgtty_showscrollpos)(void) {
-	size_t textlen;
-	uintptr_t i, txtaddr;
+	size_t txtsize;
+	uintptr_t txtaddr;
 	uint8_t saved_color;
 	char text[lengthof(PRIMAXu16 "/" PRIMAXu16)];
-	textlen = sprintf(text, "%" PRIu16 "/%" PRIu16,
+	txtsize = sprintf(text, "%" PRIu16 "/%" PRIu16,
 	                  dbgtty_scrolllen - dbgtty_scrollpos,
 	                  dbgtty_scrolllen);
 	/* Check if our backup area is large enough. */
-	if (textlen * dbg_screen_cellsize > sizeof(dbgtty_scrollpos_backup))
+	if (txtsize * dbg_screen_cellsize > sizeof(dbgtty_scrollpos_backup))
 		return; /* Can't render this :( */
-	txtaddr = dbgtty_scrollpos_dispaddr(textlen);
-	dbgtty_getcells(txtaddr, dbgtty_scrollpos_backup, textlen);
+	txtaddr = dbgtty_scrollpos_dispaddr(txtsize);
+	dbgtty_getcells(txtaddr, dbgtty_scrollpos_backup, txtsize);
 	saved_color      = dbg_tty.at_color;
 	dbg_tty.at_color = ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_DARK_GRAY);
-	for (i = 0; i < textlen; ++i)
-		(*dbg_vtty->vta_setcell)(dbg_vtty, &dbg_tty, txtaddr + i, text[i]);
+	(*dbg_vtty->vta_setcells_ascii)(dbg_vtty, &dbg_tty, txtaddr, text, txtsize);
 	dbg_tty.at_color      = saved_color;
-	dbgtty_scrollpos_tlen = textlen;
+	dbgtty_scrollpos_tlen = txtsize;
 }
 
 
@@ -1068,7 +1067,7 @@ NOTHROW(KCALL dbg_finalize_tty)(void) {
 /* Internal reset (called when resetting the debugger) */
 INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_reset_tty)(void) {
-	uintptr_half_t x, y;
+	uintptr_half_t y;
 
 	/* Make sure we're not in show-screen mode from before. */
 	dbg_endshowscreen();
@@ -1089,10 +1088,8 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 
 	/* Clear display buffer. */
 	for (y = 0; y < dbg_vtty->vta_resy; ++y) {
-		for (x = 0; x < dbg_vtty->vta_resx; ++x) {
-			uintptr_t addr = x + y * dbg_vtty->vta_scan;
-			(*dbg_vtty->vta_setcell)(dbg_vtty, &dbg_tty, addr, ' ');
-		}
+		uintptr_t addr = y * dbg_vtty->vta_scan;
+		(*dbg_vtty->vta_fillcells)(dbg_vtty, &dbg_tty, addr, ' ', dbg_vtty->vta_resx);
 	}
 }
 

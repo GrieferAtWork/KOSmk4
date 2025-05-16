@@ -162,6 +162,12 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
 				kfree(self);
 				return;
 			}
+
+			/* The probe function isn't required to initialize these... */
+			DBG_memset(&self->svd_chipset, 0xcc, sizeof(self->svd_chipset));
+			self->svd_chipset.sc_ops.sco_setdisplaystart = NULL;
+			self->svd_chipset.sc_ops.sco_setlogicalwidth = NULL;
+			self->svd_chipset.sc_ops.sco_updaterect      = NULL;
 			if ((*drivers[i].scd_probe)(&self->svd_chipset))
 				break; /* Found one! */
 		}

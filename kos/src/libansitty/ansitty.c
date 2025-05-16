@@ -3965,13 +3965,40 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
 INTERN NONNULL((1)) ssize_t FORMATPRINTER_CC
-libansitty_printer(void *arg, char const *data, size_t datalen) {
-	size_t i;
-	struct ansitty *self;
-	self = (struct ansitty *)arg;
-	for (i = 0; i < datalen; ++i) {
-		libansitty_putc(self, data[i]);
+libansitty_printer(void *arg, NCX char const *data, size_t datalen) {
+	struct ansitty *self = (struct ansitty *)arg;
+	if (datalen > 1 && self->at_ops.ato_puts_ascii) {
+		/* Optimizations */
+		size_t count, remaining = datalen;
+		do {
+			char non_ascii;
+			/* Can only fast-forward streamed ASCII-data while in UTF-8 mode. */
+			while (self->at_state != STATE_TEXT_UTF8) {
+				non_ascii = *data++;
+				--remaining;
+				libansitty_putc(self, non_ascii);
+				if (remaining <= 1) {
+					if (remaining)
+						libansitty_putc(self, *data);
+					goto done;
+				}
+			}
+			count = (*self->at_ops.ato_puts_ascii)(self, data, remaining);
+			assert(count <= remaining);
+			remaining -= count;
+			if (remaining <= 0)
+				break;
+			data += count;
+			non_ascii = *data++;
+			--remaining;
+			libansitty_putc(self, non_ascii);
+		} while (remaining > 0);
+	} else {
+		size_t i;
+		for (i = 0; i < datalen; ++i)
+			libansitty_putc(self, data[i]);
 	}
+done:
 	return (ssize_t)datalen;
 }
 

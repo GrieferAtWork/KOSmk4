@@ -38,6 +38,7 @@
 #include <kos/except.h>
 #include <kos/ioctl/_openfd.h>
 #include <kos/ioctl/video.h>
+#include <kos/nopf.h>
 #include <sys/ioctl.h>
 
 #include <alloca.h>
@@ -47,6 +48,23 @@
 #include <string.h>
 
 DECL_BEGIN
+
+/************************************************************************/
+/* VIDEO TTY ACCESSOR                                                   */
+/************************************************************************/
+
+PUBLIC NONNULL_T((1, 2)) void
+NOTHROW(FCALL vidttyaccess_v_setcells_ascii)(struct vidttyaccess *__restrict self,
+                                             struct ansitty *__restrict tty, uintptr_t address,
+                                             char const *ascii_string, size_t num_cells) {
+	size_t i;
+	for (i = 0; i < num_cells; ++i) {
+		char32_t ch = (char32_t)ascii_string[i];
+		(*self->vta_setcell)(self, tty, address + i, ch);
+	}
+}
+
+
 
 /************************************************************************/
 /* VIDEO TTY                                                            */
@@ -578,6 +596,93 @@ after_clear_eol_nocursor:
 	atomic_lock_release(&me->vta_lock);
 }
 
+PUBLIC NONNULL((1)) size_t LIBANSITTY_CC
+vidtty_v_puts_ascii(struct ansitty *__restrict self,
+                    NCX uint8_t const *utf8_string,
+                    size_t n_chars) {
+	char buf[256];
+	size_t avail_cells;
+	size_t result;
+	REF struct vidttyaccess *me;
+
+	/* Read data into a temporary buffer since the caller-given one is "NCX",
+	 * meaning it could be  a faulty user-space pointer,  or be part of  VIO. */
+	if (n_chars > COMPILER_LENOF(buf))
+		n_chars = COMPILER_LENOF(buf);
+
+	/* Count the # of leading, non-control (printable) ASCII characters. */
+	for (result = 0; result < n_chars; ++result) {
+		if (!readb_nopf((NCX uint8_t const *)&utf8_string[result], (uint8_t *)&buf[result]))
+			break;
+		/* TODO: Handle consecutive \r\n, etc, thereby further
+		 *       reducing  the  # of  necessary  render calls. */
+		if ((unsigned char)buf[result] <= 0x1f ||
+		    (unsigned char)buf[result] >= 0x7f)
+			break; /* Non-printable, or non-ASCII */
+	}
+
+	/* Check  if there is  a point in  doing a batched render.
+	 * If there is less than 1 viable character, then we might
+	 * as well let the caller print 1-character-at-a-time. */
+	if (result <= 1)
+		return 0;
+
+	me = ansitty_getvidttyaccess(self);
+	FINALLY_DECREF_UNLIKELY(me);
+	atomic_lock_acquire(&me->vta_lock);
+
+	/* Check if we need to scroll. */
+	if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
+		me->vta_cursor.vtc_celly = me->_vta_scrl_ymax;
+		vidtty_scrollone(me, self);
+	}
+
+	/* Figure out how many consecutive cells can be filled. */
+	avail_cells = me->vta_resx - me->vta_cursor.vtc_cellx;
+	if (me->vta_scan == me->vta_resx) {
+		size_t whole_rows = (me->vta_scroll_yend - 1) - me->vta_cursor.vtc_celly;
+		avail_cells += whole_rows * me->vta_scan;
+	}
+	if (result > avail_cells)
+		result = avail_cells;
+
+	/* Transfer data from "buf" into cells. */
+	(*me->vta_setcells_ascii)(me, self,
+	                          me->vta_cursor.vtc_cellx +
+	                          me->vta_cursor.vtc_celly *
+	                          me->vta_scan,
+	                          buf, result);
+
+	/* Advance the cursor. */
+	me->vta_cursor.vtc_cellx += result;
+	if (me->vta_cursor.vtc_cellx >= me->vta_resx) {
+		me->vta_cursor.vtc_celly += me->vta_cursor.vtc_cellx / me->vta_resx;
+		me->vta_cursor.vtc_cellx = me->vta_cursor.vtc_cellx % me->vta_resx;
+
+		/* Set the EOL flag after an implicit line-feed */
+		if (me->vta_cursor.vtc_cellx == 0)
+			me->vta_flags |= VIDTTYACCESS_F_EOL;
+		if (me->vta_cursor.vtc_celly >= me->vta_resy) {
+			/* Hide the hardware cursor (if it was visible before) */
+			if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
+			    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+				(*me->vta_hidecursor)(me);
+			goto after_clear_eol_nocursor;
+		}
+		goto after_clear_eol;
+	}
+
+	/* Clear the EOL flag. */
+	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
+after_clear_eol:
+	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+		(*me->vta_showcursor)(me); /* Update hardware cursor. */
+after_clear_eol_nocursor:
+	atomic_lock_release(&me->vta_lock);
+	return result;
+}
+
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
 vidtty_v_setcursor(struct ansitty *__restrict self,
                    ansitty_coord_t x, ansitty_coord_t y,
@@ -765,17 +870,18 @@ vidtty_v_scrollregion(struct ansitty *__restrict self) {
 }
 
 PUBLIC_CONST struct ansitty_operators const vidtty_ansitty_ops = {
-	.ato_putc         = &vidtty_v_putc,
-	.ato_setcursor    = &vidtty_v_setcursor,
-	.ato_getcursor    = &vidtty_v_getcursor,
-	.ato_getsize      = &vidtty_v_getsize,
-	.ato_copycell     = &vidtty_v_copycell,
-	.ato_fillcell     = &vidtty_v_fillcell,
-	.ato_setttymode   = &vidtty_v_setttymode,
-	.ato_scrollregion = &vidtty_v_scrollregion,
+	.ato_putc         = &_vidtty_v_putc,
+	.ato_setcursor    = &_vidtty_v_setcursor,
+	.ato_getcursor    = &_vidtty_v_getcursor,
+	.ato_getsize      = &_vidtty_v_getsize,
+	.ato_copycell     = &_vidtty_v_copycell,
+	.ato_fillcell     = &_vidtty_v_fillcell,
+	.ato_setttymode   = &_vidtty_v_setttymode,
+	.ato_scrollregion = &_vidtty_v_scrollregion,
 	.ato_output       = &_vidtty_v_output,
 	.ato_setled       = &_vidtty_v_setled,
 	.ato_termios      = &_vidtty_v_termios,
+	.ato_puts_ascii   = &_vidtty_v_puts_ascii,
 };
 
 

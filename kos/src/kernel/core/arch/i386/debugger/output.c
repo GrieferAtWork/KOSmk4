@@ -284,27 +284,28 @@ NOTHROW(FCALL vgatty_v_setcelldata)(struct vidttyaccess *__restrict UNUSED(self)
 
 
 PRIVATE ATTR_DBGDATA struct vidttyaccess vgatty = {
-	.vta_refcnt        = 1,
-	.vta_lock          = ATOMIC_LOCK_INIT,
-	.vta_flags         = VIDTTYACCESS_F_ACTIVE,
-	.vta_cellw         = 9,
-	.vta_cellh         = 16,
-	.vta_resx          = 80,
-	.vta_resy          = 25,
-	.vta_scan          = 80,
-	.vta_cellsize      = 2,
-	.vta_scroll_ystart = 0,     /* Reset by `dbg_reset_tty()' */
-	.vta_scroll_yend   = 0,     /* Reset by `dbg_reset_tty()' */
-	.vta_cursor        = { 0 }, /* Reset by `dbg_reset_tty()' */
-	.vta_destroy       = (typeof_field(struct vidttyaccess, vta_destroy))(void *)-1,
-	.vta_setcell       = &vgatty_v_setcell,
-	.vta_hidecursor    = &vgatty_v_hidecursor,
-	.vta_showcursor    = &vgatty_v_showcursor,
-	.vta_copycell      = &vgatty_v_copycell,
-	.vta_fillcells     = &vgatty_v_fillcells,
-	.vta_activate      = &vgatty_v_activate,
-	.vta_getcelldata   = &vgatty_v_getcelldata,
-	.vta_setcelldata   = &vgatty_v_setcelldata,
+	.vta_refcnt         = 1,
+	.vta_lock           = ATOMIC_LOCK_INIT,
+	.vta_flags          = VIDTTYACCESS_F_ACTIVE,
+	.vta_cellw          = 9,
+	.vta_cellh          = 16,
+	.vta_resx           = 80,
+	.vta_resy           = 25,
+	.vta_scan           = 80,
+	.vta_cellsize       = 2,
+	.vta_scroll_ystart  = 0,     /* Reset by `dbg_reset_tty()' */
+	.vta_scroll_yend    = 0,     /* Reset by `dbg_reset_tty()' */
+	.vta_cursor         = { 0 }, /* Reset by `dbg_reset_tty()' */
+	.vta_destroy        = (typeof_field(struct vidttyaccess, vta_destroy))(void *)-1,
+	.vta_setcell        = &vgatty_v_setcell,
+	.vta_hidecursor     = &vgatty_v_hidecursor,
+	.vta_showcursor     = &vgatty_v_showcursor,
+	.vta_copycell       = &vgatty_v_copycell,
+	.vta_fillcells      = &vgatty_v_fillcells,
+	.vta_activate       = &vgatty_v_activate,
+	.vta_getcelldata    = &vgatty_v_getcelldata,
+	.vta_setcelldata    = &vgatty_v_setcelldata,
+	.vta_setcells_ascii = &vidttyaccess_v_setcells_ascii,
 };
 
 

@@ -415,7 +415,6 @@ INTERN WUNUSED NONNULL((1)) bool CC
 cs_vga_probe(struct svga_chipset *__restrict self) {
 
 	/* Initialize the VGA chipset controller. */
-	DBG_memset(self, 0xcc, sizeof(struct vga_chipset));
 	self->sc_ops.sco_fini = &vga_v_fini;
 
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {

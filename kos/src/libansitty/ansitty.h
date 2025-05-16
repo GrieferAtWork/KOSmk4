@@ -51,7 +51,7 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch);
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
 INTDEF NONNULL((1)) ssize_t FORMATPRINTER_CC
-libansitty_printer(void *arg, char const *data, size_t datalen);
+libansitty_printer(void *arg, NCX char const *data, size_t datalen);
 
 /* Translate a given unicode input character `ch' (which should originate form
  * the  keyboard) into the sequence of bytes mandated by the code page that is

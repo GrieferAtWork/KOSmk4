@@ -641,7 +641,6 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		me->sc_vmemsize = bi->vbi_vmemsize * 64 * 1024;
 
 		/* Initialize operators. */
-		DBG_memset(&me->sc_ops, 0xcc, sizeof(me->sc_ops));
 		me->sc_ops.sco_fini         = &vesa_v_fini;
 		me->sc_ops.sco_strings      = &vesa_v_strings;
 		me->sc_ops.sco_modeinfosize = sizeof(struct vesa_modeinfo);

@@ -375,6 +375,21 @@ struct ansitty_operators {
 	(LIBANSITTY_CC *ato_termios)(struct ansitty *__restrict self,
 	                             struct termios *__restrict oldios,
 	                             struct termios const *newios);
+
+	/* [0..1] Print a series of simple, ascii, !PRINTABLE! characters, such
+	 * that each byte from `utf8_string'  will be displayed on-screen as  a
+	 * single cell, and cause the cursor to advance by exactly **1**.  Stop
+	 * printing  when a non-printable,  or non-ASCII byte  is read from the
+	 * provided buffer.
+	 *
+	 * Don't call this operator directly; it is automatically used by
+	 * `libansitty_printer()' when possible.
+	 *
+	 * @return: * : The # of bytes that could be printed as ASCII. */
+	__ATTR_NONNULL_T((1)) size_t
+	(LIBANSITTY_CC *ato_puts_ascii)(struct ansitty *__restrict self,
+	                                __NCX char const *utf8_string,
+		                            size_t n_chars);
 };
 
 #ifdef LIBANSITTY_EXPOSE_INTERNALS
@@ -442,10 +457,10 @@ ansitty_putuni(struct ansitty *__restrict self, __CHAR32_TYPE__ ch);
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
-(__FORMATPRINTER_CC *PANSITTY_PRINTER)(void *arg, char const *data, __size_t datalen);
+(__FORMATPRINTER_CC *PANSITTY_PRINTER)(void *arg, __NCX char const *data, __size_t datalen);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) __ssize_t __FORMATPRINTER_CC
-ansitty_printer(void *arg, char const *data, __size_t datalen);
+ansitty_printer(void *arg, __NCX char const *data, __size_t datalen);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 

@@ -59,14 +59,14 @@ struct vmware_chipset: svga_chipset {
 	uint32_t           vw_maxresy;      /* [const] SVGA_REG_MAX_HEIGHT */
 	uint16_t           vw_iobase;       /* [const] I/O-port base address. */
 	struct pci_device *vw_pci;          /* [1..1][const] Associated PCI device. */
-#ifndef __KERNEL__
+	uint32_t          *vm_fifo;         /* [1..1][const][owned] Memory mapping of "vw_fifoaddr" */
+#ifdef __KERNEL__
+	void              *vm_fifo_unmap_cookie; /* [1..1][owned] Unmap cookie for `vm_fifo' */
+#else /* __KERNEL__ */
 	void              *vw_libpciaccess; /* [1..1][const] dlopen(3D) handle for libpciaccess. */
 	void              *vw_libphys;      /* [1..1][const] dlopen(3D) handle for libphys. */
-	PCOPYTOPHYS        vw_copytophys;   /* [1..1][const] copy2phys callback. */
-#define vm_copytophys(self, dst, src, num_bytes) (*(self)->vw_copytophys)(dst, src, num_bytes)
-#else /* !__KERNEL__ */
-#define vm_copytophys(self, dst, src, num_bytes) copytophys(dst, src, num_bytes)
-#endif /* __KERNEL__ */
+	PMUNMAPPHYS        vw_munmapphys;   /* [1..1][const] munmapphys. */
+#endif /* !__KERNEL__ */
 };
 
 /* @param: portno: SVGA_INDEX_PORT, SVGA_VALUE_PORT, ... */

@@ -60,13 +60,14 @@ __DECL_BEGIN
                                        *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index */
 
 
+typedef __uint16_t svga_res_t; /* Video resolution */
 struct svga_modeinfo {
 	__physaddr_t smi_lfb;                /* [valid_if(SVGA_MODEINFO_F_LFB)] Linear frame buffer base address (if available) */
 	__uint32_t   smi_flags;              /* Mode flags (set of `SVGA_MODEINFO_F_*') */
 	__uint32_t   smi_scanline;           /* [!0] Scanline size (in bytes; aligned by `sc_logicalwidth_align')
 	                                      *      Usually is `>= CEIL_ALIGN(smi_resy, sc_logicalwidth_align)' */
-	__uint16_t   smi_resx;               /* [!0] Resolution in X (when `SVGA_MODEINFO_F_TXT': # of character cells in X) */
-	__uint16_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
+	svga_res_t   smi_resx;               /* [!0] Resolution in X (when `SVGA_MODEINFO_F_TXT': # of character cells in X) */
+	svga_res_t   smi_resy;               /* [!0] Resolution in Y (when `SVGA_MODEINFO_F_TXT': # of character cells in Y) */
 	__shift_t    smi_bits_per_pixel;     /* [!0] Bits per pixel (when `SVGA_MODEINFO_F_TXT': 16)
 	                                      * Usually one of `1', `2', `4', `8', `16', `24', `32'. */
 	__shift_t    smi_colorbits;          /* [!0][valid_if(!SVGA_MODEINFO_F_TXT)]
@@ -76,6 +77,14 @@ struct svga_modeinfo {
 	__shift_t    smi_gshift, smi_gbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Green color shift/bits */
 	__shift_t    smi_bshift, smi_bbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Blue color shift/bits */
 	/* Chipset-specific data (a total of `sco_modeinfosize - sizeof(struct svga_modeinfo)' bytes) goes here. */
+};
+
+
+struct svga_rect {
+	svga_res_t svr_x;  /* X pixel coord (offset from screen left) */
+	svga_res_t svr_y;  /* Y pixel coord (offset from screen top) */
+	svga_res_t svr_sx; /* Width (in pixels) */
+	svga_res_t svr_sy; /* Height (in pixels) */
 };
 
 
@@ -213,6 +222,13 @@ struct svga_chipset_ops {
 	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t width)
 			__THROWS(E_IOERROR);
+
+	/* [0..1][lock(EXTERNAL)]
+	 * Indicate to the chipset that a rect of pixels may have been modified.
+	 * Caller must ensure that the rect does not exceed the set  resolution. */
+	__ATTR_NONNULL_T((1, 2)) void
+	NOTHROW_T(LIBSVGADRV_CC *sco_updaterect)(struct svga_chipset *__restrict self,
+	                                         struct svga_rect const *__restrict rect);
 };
 
 struct svga_chipset {
@@ -242,6 +258,13 @@ struct svga_chipset_driver {
 
 	/* [1..1] Probe for the presence of this chipset and initialize `self'
 	 *        For this, `self' must point to a `scd_cssize'-byte long buffer.
+	 * NOTE: This function may not necessarily initialize the following fields,
+	 *       and  is allowed to assume that the caller has pre-initialized them
+	 *       to NULL/0 (all the optional chipset operator):
+	 * - self->sc_ops.sco_setdisplaystart
+	 * - self->sc_ops.sco_setlogicalwidth
+	 * - self->sc_ops.sco_updaterect_push
+	 * - self->sc_ops.sco_updaterect_commit
 	 * @return: true:  Chipset found.
 	 * @return: false: Chipset isn't present. */
 	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __BOOL

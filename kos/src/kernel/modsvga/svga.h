@@ -114,16 +114,35 @@ struct svga_gfxcell {
 	uint8_t sgc_lines[16]; /* Bitmasks to select fg/bg colors for each pixel. */
 	uint8_t sgc_color;     /* fg/bg color for this cell. */
 };
+struct svga_ttyrect {
+	/* Starting address is: `sttr_x + (sttr_y * vta_resx)' */
+	uintptr_half_t sttr_x;  /* [<= :vta_resx - sttr_sx] Starting cell X coord */
+	uintptr_half_t sttr_y;  /* [<= :vta_resy - sttr_sy] Starting cell Y coord */
+	uintptr_half_t sttr_sx; /* [> 0] Rect width (in cells) */
+	uintptr_half_t sttr_sy; /* [> 0] Rect height (in cells) */
+};
+
 struct svga_ttyaccess_gfx: svga_ttyaccess {
 	/* [1..1][lock(vta_lock)] Redraw the cell at `address' (index into `stx_display')
-	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
+	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set.
+	 * NOTE: This operator will **NOT** invoke `sco_updaterect' on the chipset!
+	 *       Doing so is the responsibility of the caller! */
 	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
 	                                  uintptr_t address);
 	/* [1..1][lock(vta_lock)] Draw a cursor at `stx_swcur'
-	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
+	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set.
+	 * NOTE: This operator will **NOT** invoke `sco_updaterect' on the chipset!
+	 *       Doing so is the responsibility of the caller! */
 	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(FCALL *stx_redraw_cursor)(struct svga_ttyaccess_gfx *__restrict self);
+	/* [1..1][lock(vta_lock)] Hardware update callbacks. */
+	NOBLOCK NONNULL_T((1, 2)) void
+	NOTHROW_T(FCALL *stx_hw_updaterect)(struct svga_ttyaccess_gfx *__restrict self,
+	                                    struct svga_ttyrect const *__restrict rect);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *stx_hw_updatecell)(struct svga_ttyaccess_gfx *__restrict self, uintptr_t address);
+	struct svga_chipset                         *stx_chipset;    /* [const][1..1] Underlying chipset (only here for `sco_updaterect') */
 	uint32_t                                     stx_ccolor;     /* [lock(vta_lock)] Cursor color. */
 	union vidtty_cursor                          stx_swcur;      /* [valid_if(_SVGA_TTYACCESS_F_SWCURON)][lock(vta_lock)]
 	                                                              * Current software cursor position. */
@@ -175,7 +194,7 @@ struct svgadev: viddev {
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
 	struct svga_modeinfo             *svd_defmode;  /* [1..1][lock(ATOMIC)] Default video mode. (points into `svd_supmodev') */
 	struct svga_chipset_driver const *svd_csdriver; /* [1..1][const] SVGA driver. */
-	struct svga_chipset               svd_chipset;  /* SVGA Chipset driver. */
+	struct svga_chipset               svd_chipset;  /* [lock(vd_lock)] SVGA Chipset driver. */
 };
 #define viddev_assvga(self)     ((struct svgadev *)(self))
 #define chrdev_assvgadev(self)  viddev_assvga(chrdev_asviddev(self))
@@ -197,7 +216,8 @@ INTDEF struct viddev_ops const svgadev_ops; /* Operators for `struct svgadev' */
 	((struct svga_modeinfo *)((self)->svd_supmodev + ((i) * (self)->svd_supmodeS)))
 
 
-/* Create a TTY access object for the given `mode' */
+/* Create  a  TTY  access  object  for  the  given   `mode'.
+ * The caller must ensure that `return' dies *BEFORE* `self' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess *FCALL
 svgadev_makettyaccess(struct svgadev *__restrict self,
                       struct svga_modeinfo const *__restrict mode);

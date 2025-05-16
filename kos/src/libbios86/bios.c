@@ -114,7 +114,7 @@ NOTHROW(CC libbios86_init)(struct bios86 *__restrict self)
 	if (mmap(self->b86_biosbase + 0x01000, 0x80000 - 0x01000,
 	         PROT_READ | PROT_WRITE | PROT_EXEC,
 	         MAP_PRIVATE | MAP_ANON, -1, 0) == MAP_FAILED) {
-		munmap(self->b86_biosbase, BIOS86_SIZE);
+		munmapphys(self->b86_biosbase, BIOS86_SIZE);
 		return -1;
 	}
 #endif /* !__KERNEL__ */
@@ -132,7 +132,7 @@ NOTHROW(CC libbios86_fini)(struct bios86 *__restrict self) {
 	mman_unmap_kram_and_kfree(self->b86_biosbase, BIOS86_SIZE,
 	                          self->_b86_unmapcookie);
 #else /* __KERNEL__ */
-	munmap(self->b86_biosbase, BIOS86_SIZE);
+	munmapphys(self->b86_biosbase, BIOS86_SIZE);
 #endif /* !__KERNEL__ */
 	self->b86_biosbase = (byte_t *)MAP_FAILED;
 }

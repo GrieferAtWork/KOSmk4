@@ -49,7 +49,11 @@
 #include "cs-vga.h"
 #include "cs-vmware.h"
 
-#ifndef __KERNEL__
+#ifdef __KERNEL__
+#include <kernel/mman.h>      /* mman_kernel */
+#include <kernel/mman/kram.h> /* mman_unmap_kram_and_kfree */
+#include <kernel/mman/map.h>  /* mman_map */
+#else /* __KERNEL__ */
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
 
@@ -65,7 +69,11 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC vmware_v_fini)(struct svga_chipset *__restrict self) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	(void)me;
-#ifndef __KERNEL__
+#ifdef __KERNEL__
+	mman_unmap_kram_and_kfree(me->vm_fifo, me->vw_fifosize,
+	                          me->vm_fifo_unmap_cookie);
+#else /* __KERNEL__ */
+	(*me->vw_munmapphys)(me->vm_fifo, me->vw_fifosize);
 	if (me->vw_libpciaccess)
 		dlclose(me->vw_libpciaccess);
 #endif /* !__KERNEL__ */
@@ -175,13 +183,6 @@ next:
 	return true;
 }
 
-PRIVATE uint32_t const vmware_noop_fifo_config[] = {
-	[SVGA_FIFO_MIN]      = 16,
-	[SVGA_FIFO_MAX]      = 16 + (10 * 1024),
-	[SVGA_FIFO_NEXT_CMD] = 16,
-	[SVGA_FIFO_STOP]     = 16,
-};
-
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setmode(struct svga_chipset *__restrict self,
                  struct svga_modeinfo const *__restrict _mode) {
@@ -230,12 +231,22 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_ENABLE);
 
 	/* Initialize the command FIFO */
-	vm_copytophys(me, me->vw_fifoaddr, vmware_noop_fifo_config,
-	              sizeof(vmware_noop_fifo_config));
+	me->vm_fifo[SVGA_FIFO_MIN]      = 16;
+	me->vm_fifo[SVGA_FIFO_MAX]      = 16 + (10 * 1024);
+	me->vm_fifo[SVGA_FIFO_NEXT_CMD] = 16;
+	me->vm_fifo[SVGA_FIFO_STOP]     = 16;
 
 	/* Enable the command FIFO */
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 1);
 }
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
+                                           struct svga_rect const *__restrict rect) {
+	printk(KERN_DEBUG "[vmware] TODO: updaterect(x: %" PRIu16 ", y: %" PRIu16 ", sx: %" PRIu16 ", sy: %" PRIu16 ")\n",
+	       rect->svr_x, rect->svr_y, rect->svr_sx, rect->svr_sy);
+}
+
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
@@ -302,6 +313,7 @@ INTERN WUNUSED NONNULL((1)) bool CC
 cs_vmware_probe(struct svga_chipset *__restrict self) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 #ifndef __KERNEL__
+	PMMAPPHYS mmapphys;
 	me->vw_libpciaccess = NULL;
 	me->vw_libphys = NULL;
 	TRY
@@ -315,8 +327,11 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->vw_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
 		if unlikely(!me->vw_libphys)
 			goto err_initfailed;
-		*(void **)&me->vw_copytophys = dlsym(me->vw_libphys, "copytophys");
-		if unlikely(!me->vw_copytophys)
+		*(void **)&me->vw_munmapphys = dlsym(me->vw_libphys, "munmapphys");
+		if unlikely(!me->vw_munmapphys)
+			goto err_initfailed;
+		*(void **)&mmapphys = dlsym(me->vw_libphys, "mmapphys");
+		if unlikely(!mmapphys)
 			goto err_initfailed;
 
 		/* Load+initialize libpciaccess. */
@@ -364,7 +379,7 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		{
 			uint32_t ver = vm_getreg(me, SVGA_REG_ID);
 			if (ver != SVGA_ID_2) {
-				printk(KERN_WARNING "[vmware] Unsupported verison %#" PRIx32 " "
+				printk(KERN_WARNING "[vmware] Unsupported version %#" PRIx32 " "
 				                    "reported (expected: %#" PRIx32 ")\n",
 				       ver, SVGA_ID_2);
 				goto err_initfailed_late;
@@ -392,16 +407,38 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_logicalwidth_max = UINT32_MAX; /* Max value that can physically be written */
 		if (me->sc_logicalwidth_max > self->sc_vmemsize)
 			me->sc_logicalwidth_max = self->sc_vmemsize;
-		me->sc_ops.sco_fini            = &vmware_v_fini;
-		me->sc_ops.sco_modeinfosize    = sizeof(struct vmware_modeinfo);
-		me->sc_ops.sco_strings         = &vmware_v_strings;
-		me->sc_ops.sco_getmode         = &vmware_v_getmode;
-		me->sc_ops.sco_setmode         = &vmware_v_setmode;
-		me->sc_ops.sco_getregs         = &vmware_v_getregs;
-		me->sc_ops.sco_setregs         = &vmware_v_setregs;
-		me->sc_ops.sco_regsize         = sizeof(struct vmware_regs);
-		me->sc_ops.sco_setdisplaystart = NULL; /* Not supported */
-		me->sc_ops.sco_setlogicalwidth = NULL; /* Not supported */
+		me->sc_ops.sco_fini         = &vmware_v_fini;
+		me->sc_ops.sco_modeinfosize = sizeof(struct vmware_modeinfo);
+		me->sc_ops.sco_strings      = &vmware_v_strings;
+		me->sc_ops.sco_getmode      = &vmware_v_getmode;
+		me->sc_ops.sco_setmode      = &vmware_v_setmode;
+		me->sc_ops.sco_getregs      = &vmware_v_getregs;
+		me->sc_ops.sco_setregs      = &vmware_v_setregs;
+		me->sc_ops.sco_regsize      = sizeof(struct vmware_regs);
+		me->sc_ops.sco_updaterect   = &vmware_v_updaterect;
+
+		/* Map the FIFO into memory. */
+#ifdef __KERNEL__
+		me->vm_fifo_unmap_cookie = mman_unmap_kram_cookie_alloc();
+		TRY {
+			me->vm_fifo = (uint32_t *)mman_map(/* self:        */ &mman_kernel,
+			                                   /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_DEVICE),
+			                                   /* num_bytes:   */ me->vw_fifosize,
+			                                   /* prot:        */ PROT_READ | PROT_WRITE | PROT_SHARED,
+			                                   /* flags:       */ MHINT_GETMODE(KERNEL_MHINT_DEVICE),
+			                                   /* file:        */ &mfile_phys,
+			                                   /* file_fspath: */ NULL,
+			                                   /* file_fsname: */ NULL,
+			                                   /* file_pos:    */ (pos_t)me->vw_fifoaddr);
+		} EXCEPT {
+			mman_unmap_kram_cookie_free(me->vm_fifo_unmap_cookie);
+			RETHROW();
+		}
+#else /* __KERNEL__ */
+		me->vm_fifo = (uint32_t *)(*mmapphys)(me->vw_fifoaddr, me->vw_fifosize);
+		if unlikely(me->vm_fifo == (uint32_t *)MAP_FAILED)
+			goto err_initfailed_late;
+#endif /* !__KERNEL__ */
 		return true;
 	}
 #ifndef __KERNEL__

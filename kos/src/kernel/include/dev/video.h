@@ -190,10 +190,30 @@ struct vidttyaccess {
 	NOBLOCK NONNULL_T((1, 3)) void
 	NOTHROW_T(FCALL *vta_setcelldata)(struct vidttyaccess *__restrict self,
 	                                  uintptr_t address, byte_t const buf[]);
+
+	/* The following are optional operators that have provided defaults. */
+
+	/* [1..1][lock(vta_lock)] Set the contents of a multiple, consecutive cells. (attributes are taken from `tty->at_ansi')
+	 * NOTE: This operator may assume that `address...+=num_cells-1' is visible on-screen
+	 * Perfectly identical to:
+	 * >> size_t i;
+	 * >> for (i = 0; i < num_cells; ++i)
+	 * >>     (*self->vta_setcell)(self, tty, address + i, ascii_string[i]);
+	 * @param: address: == CELL_X + CELL_Y * vta_scan */
+	NONNULL_T((1, 2)) void
+	NOTHROW_T(FCALL *vta_setcells_ascii)(struct vidttyaccess *__restrict self,
+	                                     struct ansitty *__restrict tty, uintptr_t address,
+	                                     char const *ascii_string, size_t num_cells);
 };
 
 #define vidttyaccess_destroy(self) (*(self)->vta_destroy)(self)
 DEFINE_REFCNT_FUNCTIONS(struct vidttyaccess, vta_refcnt, vidttyaccess_destroy)
+
+FUNDEF NONNULL_T((1, 2)) void
+NOTHROW(FCALL vidttyaccess_v_setcells_ascii)(struct vidttyaccess *__restrict self,
+                                             struct ansitty *__restrict tty, uintptr_t address,
+                                             char const *ascii_string, size_t num_cells);
+
 
 #ifndef __vidttyaccess_arref_defined
 #define __vidttyaccess_arref_defined
@@ -310,11 +330,12 @@ FUNDEF NONNULL((1, 2)) void LIBANSITTY_CC _vidtty_v_getcursor(struct ansitty *__
 FUNDEF NONNULL((1, 2)) void LIBANSITTY_CC _vidtty_v_getsize(struct ansitty *__restrict self, ansitty_coord_t psize[2]) ASMNAME("vidtty_v_getsize");
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_copycell(struct ansitty *__restrict self, ansitty_offset_t dst_offset, ansitty_coord_t count) ASMNAME("vidtty_v_copycell");
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_fillcell(struct ansitty *__restrict self, char32_t ch, ansitty_coord_t count) ASMNAME("vidtty_v_fillcell");
-FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_setttymode(struct ansitty *__restrict self, uint16_t new_ttymode) ASMNAME("vidtty_v_setttymode");
-FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_scrollregion(struct ansitty *__restrict self, ansitty_coord_t start_line, ansitty_coord_t end_line) ASMNAME("vidtty_v_scrollregion");
+FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_setttymode(struct ansitty *__restrict self) ASMNAME("vidtty_v_setttymode");
+FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_scrollregion(struct ansitty *__restrict self) ASMNAME("vidtty_v_scrollregion");
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_output(struct ansitty *__restrict self, void const *data, size_t datalen) ASMNAME("ansittydev_v_output");
 FUNDEF NONNULL((1)) void LIBANSITTY_CC _vidtty_v_setled(struct ansitty *__restrict self, uint8_t mask, uint8_t flag) ASMNAME("ansittydev_v_setled");
 FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC _vidtty_v_termios(struct ansitty *__restrict self, struct termios *__restrict oldios, struct termios const *newios) ASMNAME("ansittydev_v_termios");
+FUNDEF NONNULL((1)) size_t LIBANSITTY_CC _vidtty_v_puts_ascii(struct ansitty *__restrict self, NCX char const *utf8_string, size_t n_chars) ASMNAME("vidtty_v_puts_ascii");
 
 
 /* Initialize common+basic fields. The caller must still initialize:
