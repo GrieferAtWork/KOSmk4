@@ -2643,11 +2643,11 @@ positional_arg_again_load_arginfo_handler:
 
 #if (!defined(__NO_PRINTF_FLOATING_POINT) && !defined(__NO_FPU))
 							case 8: /* NOLINT */
-								__p_args[__posi].__p_unsigned = __builtin_va_arg(__FORMAT_ARGS, double);
+								__p_args[__posi].__p_double = __builtin_va_arg(__FORMAT_ARGS, double);
 								break;
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 							case 9:
-								__p_args[__posi].__p_unsigned = __builtin_va_arg(__FORMAT_ARGS, __LONGDOUBLE);
+								__p_args[__posi].__p___LONGDOUBLE = __builtin_va_arg(__FORMAT_ARGS, __LONGDOUBLE);
 								break;
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_PRINTF_FLOATING_POINT && !__NO_FPU) */
