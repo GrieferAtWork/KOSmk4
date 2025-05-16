@@ -848,7 +848,7 @@ notsup:
 			struct vga_palcolor col;
 			uint32_t dcl; /* DirectCoLor */
 			col = basevga_defaultpal[i];
-#define sixbit2eight(x) ((((x) + 1) << 2) - 1)
+#define sixbit2eight(x) ((x) ? ((((x) + 1) << 2) - 1) : 0)
 			dcl = ((sixbit2eight(col.vpc_r) >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
 			      ((sixbit2eight(col.vpc_g) >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
 			      ((sixbit2eight(col.vpc_b) >> (8 - mode->smi_bbits)) << mode->smi_bshift);
