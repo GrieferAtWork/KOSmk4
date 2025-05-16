@@ -54,6 +54,10 @@ struct vmware_regs {
 	uint32_t vmr_REG_CURSOR_Y;
 	uint32_t vmr_REG_CURSOR_ON;
 	uint32_t vmr_REG_PITCHLOCK;
+	uint32_t vmr_REG_PALETTE[(SVGA_PALETTE_END + 1) - SVGA_PALETTE_BASE];
+	COMPILER_FLEXIBLE_ARRAY(uint32_t, vmr_REG_SCRATCH);
+#define sizeof__vmware_regs(nscratch) \
+	(offsetof(struct vmware_regs, vmr_REG_SCRATCH) + (nscratch) * 4)
 };
 
 struct vmware_modeinfo: svga_modeinfo {
@@ -67,6 +71,7 @@ struct vmware_chipset: svga_chipset {
 	uint32_t           vw_index;        /* Last-accessed register number (value of "SVGA_INDEX_PORT") */
 	uint32_t           vw_caps;         /* [const] SVGA_REG_CAPABILITIES */
 	uint32_t           vw_hbpp;         /* [const] SVGA_REG_HOST_BITS_PER_PIXEL */
+	uint32_t           vw_nscratch;     /* [const] SVGA_REG_SCRATCH_SIZE */
 	PHYS uint32_t      vw_fbstart;      /* [const] SVGA_REG_FB_START */
 	uint32_t           vw_fbsize;       /* [const] SVGA_REG_FB_SIZE */
 	PHYS uint32_t      vw_fifoaddr;     /* [const] SVGA_REG_MEM_START */

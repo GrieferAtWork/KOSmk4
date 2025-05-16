@@ -97,36 +97,36 @@
 #define SVGA_REG_FB_SIZE             16 /* [ro] size of the frame buffer */
 #define SVGA_REG_CAPABILITIES        17 /* [ro] device capabilities */
 #   define SVGA_CAP_NONE             0x00000000
-#   define SVGA_CAP_RECT_FILL        0x00000001 /* QEMU */
-#   define SVGA_CAP_RECT_COPY        0x00000002 /* QEMU */
-#   define SVGA_CAP_RECT_PAT_FILL    0x00000004
-#   define SVGA_CAP_LEGACY_OFFSCREEN 0x00000008
-#   define SVGA_CAP_RASTER_OP        0x00000010
+#   define SVGA_CAP_RECT_FILL        0x00000001 /* [QEMU] Is `SVGA_CMD_RECT_FILL' supported? */
+#   define SVGA_CAP_RECT_COPY        0x00000002 /* [QEMU] Is `SVGA_CMD_RECT_COPY' supported? */
+#   define SVGA_CAP_RECT_PAT_FILL    0x00000004 /* ??? */
+#   define SVGA_CAP_LEGACY_OFFSCREEN 0x00000008 /* ??? */
+#   define SVGA_CAP_RASTER_OP        0x00000010 /* ??? */
 #   define SVGA_CAP_CURSOR           0x00000020 /* QEMU */
 #   define SVGA_CAP_CURSOR_BYPASS    0x00000040 /* QEMU -- Legacy (Use Cursor Bypass 3 instead) */
 #   define SVGA_CAP_CURSOR_BYPASS_2  0x00000080 /* QEMU -- Legacy (Use Cursor Bypass 3 instead) */
-#   define SVGA_CAP_8BIT_EMULATION   0x00000100
-#   define SVGA_CAP_ALPHA_CURSOR     0x00000200
-#   define SVGA_CAP_GLYPH            0x00000400
-#   define SVGA_CAP_GLYPH_CLIPPING   0x00000800
-#   define SVGA_CAP_OFFSCREEN_1      0x00001000
-#   define SVGA_CAP_ALPHA_BLEND      0x00002000
-#   define SVGA_CAP_3D               0x00004000
-#   define SVGA_CAP_EXTENDED_FIFO    0x00008000
+#   define SVGA_CAP_8BIT_EMULATION   0x00000100 /* ??? */
+#   define SVGA_CAP_ALPHA_CURSOR     0x00000200 /* ??? */
+#   define SVGA_CAP_GLYPH            0x00000400 /* ??? */
+#   define SVGA_CAP_GLYPH_CLIPPING   0x00000800 /* ??? */
+#   define SVGA_CAP_OFFSCREEN_1      0x00001000 /* ??? */
+#   define SVGA_CAP_ALPHA_BLEND      0x00002000 /* ??? */
+#   define SVGA_CAP_3D               0x00004000 /* ??? */
+#   define SVGA_CAP_EXTENDED_FIFO    0x00008000 /* Do FIFO registers `> SVGA_FIFO_STOP' exist? */
 #   define SVGA_CAP_MULTIMON         0x00010000 /* Legacy multi-monitor support */
-#   define SVGA_CAP_PITCHLOCK        0x00020000
-#   define SVGA_CAP_IRQMASK          0x00040000
+#   define SVGA_CAP_PITCHLOCK        0x00020000 /* Does the `SVGA_REG_PITCHLOCK' register exist? */
+#   define SVGA_CAP_IRQMASK          0x00040000 /* ??? */
 #   define SVGA_CAP_DISPLAY_TOPOLOGY 0x00080000 /* Legacy multi-monitor support */
-#   define SVGA_CAP_GMR              0x00100000
-#   define SVGA_CAP_TRACES           0x00200000
-#   define SVGA_CAP_GMR2             0x00400000
-#   define SVGA_CAP_SCREEN_OBJECT_2  0x00800000
+#   define SVGA_CAP_GMR              0x00100000 /* ??? */
+#   define SVGA_CAP_TRACES           0x00200000 /* ??? */
+#   define SVGA_CAP_GMR2             0x00400000 /* ??? */
+#   define SVGA_CAP_SCREEN_OBJECT_2  0x00800000 /* ??? */
 #define SVGA_REG_MEM_START           18 /* [ro] Address in system memory of the FIFO */
 #define SVGA_REG_MEM_SIZE            19 /* [ro] FIFO size (in bytes) */
 #define SVGA_REG_CONFIG_DONE         20 /* [rw] flag to enable FIFO operation (0/1) */
 #define SVGA_REG_SYNC                21 /* [rw] flag set by the driver to flush FIFO changes */
 #define SVGA_REG_BUSY                22 /* [ro] flag set by the FIFO when it's processed */
-#define SVGA_REG_GUEST_ID            23 /* [rw] */
+#define SVGA_REG_GUEST_ID            23 /* [rw] Hint as to which operating system we are */
 #   define SVGA_REG_GUEST_DOS          0x00
 #   define SVGA_REG_GUEST_WINDOWS_3_1  0x01
 #   define SVGA_REG_GUEST_WINDOWS_95   0x02
@@ -139,23 +139,23 @@
 #   define SVGA_REG_GUEST_BSD          0x0a
 #   define SVGA_REG_GUEST_WHISTLER     0x0b
 #   define SVGA_REG_GUEST_WINDOWS_2003 0x15
-#define SVGA_REG_CURSOR_ID           24 /* [rw] */
-#define SVGA_REG_CURSOR_X            25 /* [rw] */
-#define SVGA_REG_CURSOR_Y            26 /* [rw] */
-#define SVGA_REG_CURSOR_ON           27 /* [rw] */
+#define SVGA_REG_CURSOR_ID           24 /* [rw] ??? */
+#define SVGA_REG_CURSOR_X            25 /* [rw] ??? */
+#define SVGA_REG_CURSOR_Y            26 /* [rw] ??? */
+#define SVGA_REG_CURSOR_ON           27 /* [rw] ??? */
 #   define SVGA_CURSOR_ON_HIDE           0x0 /* Must be 0 to maintain backward compatibility */
 #   define SVGA_CURSOR_ON_SHOW           0x1 /* Must be 1 to maintain backward compatibility */
 #   define SVGA_CURSOR_ON_REMOVE_FROM_FB 0x2 /* Remove the cursor from the framebuffer because we need to see what's under it */
 #   define SVGA_CURSOR_ON_RESTORE_TO_FB  0x3 /* Put the cursor back in the framebuffer so the user can see it */
-#define SVGA_REG_HOST_BITS_PER_PIXEL 28 /* [ro] */
-#define SVGA_REG_SCRATCH_SIZE        29 /* [ro] */
+#define SVGA_REG_HOST_BITS_PER_PIXEL 28 /* [ro] Bits-per-pixel of the host machine (preferred value for `SVGA_REG_BPP') */
+#define SVGA_REG_SCRATCH_SIZE        29 /* [ro] # of registers starting at `SVGA_SCRATCH_BASE' */
 #define SVGA_REG_MEM_REGS            30 /* [ro] ??? (Always reads as "0" in QEMU) */
 #define SVGA_REG_NUM_DISPLAYS        31 /* [ro] ??? (Always reads as "0" in QEMU) */
 #define SVGA_REG_PITCHLOCK           32 /* [rw] ??? (Always reads as "0" in QEMU) */
 
 #define SVGA_PALETTE_BASE 1024 /* [rw] Base of SVGA color map (Always reads as "0" in QEMU) */
 #define SVGA_PALETTE_END  (SVGA_PALETTE_BASE + 767)
-#define SVGA_SCRATCH_BASE (SVGA_PALETTE_BASE + 768) /* [rw] # of registers is `SVGA_REG_SCRATCH_SIZE' */
+#define SVGA_SCRATCH_BASE (SVGA_PALETTE_BASE + 768) /* [rw] # of registers is `SVGA_REG_SCRATCH_SIZE' (doesn't look like anything uses these...) */
 
 
 
@@ -204,14 +204,7 @@
 #define SVGA_FIFO_GUEST_3D_HWVERSION 288 /* Guest driver's 3D version */
 #define SVGA_FIFO_FENCE_GOAL         289 /* Matching target for SVGA_IRQFLAG_FENCE_GOAL */
 #define SVGA_FIFO_BUSY               290 /* See "FIFO Synchronization Registers" */
-
-/*
-    * Always keep this last.  This defines the maximum number of
-    * registers we know about.  At power-on, this value is placed in
-    * the SVGA_REG_MEM_REGS register, and we expect the guest driver
-    * to allocate this much space in FIFO memory for registers.
-    */
-#define SVGA_FIFO_NUM_REGS 291
+#define SVGA_FIFO_NUM_REGS           291
 
 
 

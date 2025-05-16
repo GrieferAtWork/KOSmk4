@@ -138,9 +138,8 @@ vmware_fifo_commit(struct vmware_chipset *__restrict self, size_t n_bytes) {
 			while (n_bytes > 0) {
 				self->vm_fifo[next_cmd / 4] = *buffer++;
 				next_cmd += 4;
-				if (next_cmd == max) {
+				if (next_cmd >= max)
 					next_cmd = min;
-				}
 				self->vm_fifo[SVGA_FIFO_NEXT_CMD] = next_cmd;
 				n_bytes -= 4;
 			}
@@ -380,6 +379,7 @@ NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
+	size_t i;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_regs *reginfo = (struct vmware_regs *)regbuf;
 	UNALIGNED_SET32(&reginfo->vmr_INDEX_PORT, vm_getindex(me));
@@ -396,12 +396,18 @@ vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_X, vm_getreg(me, SVGA_REG_CURSOR_X));
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_Y, vm_getreg(me, SVGA_REG_CURSOR_Y));
 	UNALIGNED_SET32(&reginfo->vmr_REG_CURSOR_ON, vm_getreg(me, SVGA_REG_CURSOR_ON));
-	UNALIGNED_SET32(&reginfo->vmr_REG_PITCHLOCK, vm_getreg(me, SVGA_REG_PITCHLOCK));
+	if (me->vw_caps & SVGA_CAP_PITCHLOCK)
+		UNALIGNED_SET32(&reginfo->vmr_REG_PITCHLOCK, vm_getreg(me, SVGA_REG_PITCHLOCK));
+	for (i = 0; i < me->vw_nscratch; ++i)
+		UNALIGNED_SET32(&reginfo->vmr_REG_SCRATCH[i], vm_getreg(me, SVGA_SCRATCH_BASE + i));
+	for (i = 0; i < COMPILER_LENOF(reginfo->vmr_REG_PALETTE); ++i)
+		UNALIGNED_SET32(&reginfo->vmr_REG_PALETTE[i], vm_getreg(me, SVGA_PALETTE_BASE + i));
 	vm_setindex(me, UNALIGNED_GET32(&reginfo->vmr_INDEX_PORT));
 }
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setregs(struct svga_chipset *__restrict self, byte_t const regbuf[]) {
+	size_t i;
 	uint32_t cursor_on;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	struct vmware_regs const *reginfo = (struct vmware_regs const *)regbuf;
@@ -426,8 +432,12 @@ vmware_v_setregs(struct svga_chipset *__restrict self, byte_t const regbuf[]) {
 		vm_setreg(me, SVGA_REG_CURSOR_Y, UNALIGNED_GET32(&reginfo->vmr_REG_CURSOR_Y));
 		vm_setreg(me, SVGA_REG_CURSOR_ON, cursor_on);
 	}
-	vm_setreg(me, SVGA_REG_PITCHLOCK, UNALIGNED_GET32(&reginfo->vmr_REG_PITCHLOCK));
-
+	if (me->vw_caps & SVGA_CAP_PITCHLOCK)
+		vm_setreg(me, SVGA_REG_PITCHLOCK, UNALIGNED_GET32(&reginfo->vmr_REG_PITCHLOCK));
+	for (i = 0; i < COMPILER_LENOF(reginfo->vmr_REG_PALETTE); ++i)
+		vm_setreg(me, SVGA_PALETTE_BASE + i, UNALIGNED_GET32(&reginfo->vmr_REG_PALETTE[i]));
+	for (i = 0; i < me->vw_nscratch; ++i)
+		vm_setreg(me, SVGA_SCRATCH_BASE + i, UNALIGNED_GET32(&reginfo->vmr_REG_SCRATCH[i]));
 	vm_setindex(me, UNALIGNED_GET32(&reginfo->vmr_INDEX_PORT));
 }
 
@@ -453,14 +463,15 @@ vmware_v_strings(struct svga_chipset *__restrict self,
 	}	__WHILE0
 	REPORT("vmware.iobase", "%#" PRIx32, me->vw_iobase);
 	REPORT("vmware.reg.CAPABILITIES", "%#" PRIx32, me->vw_caps);
-	REPORT("vmware.reg.HOST_BITS_PER_PIXEL", "%#" PRIu32, me->vw_hbpp);
+	REPORT("vmware.reg.HOST_BITS_PER_PIXEL", "%" PRIu32, me->vw_hbpp);
 	REPORT("vmware.reg.FB", "%#" PRIx32 "-%#" PRIx32, me->vw_fbstart, me->vw_fbstart + me->vw_fbsize - 1);
 	REPORT("vmware.reg.MEM", "%#" PRIx32 "-%#" PRIx32, me->vw_fifoaddr, me->vw_fifoaddr + me->vw_fifosize - 1);
-	REPORT("vmware.reg.MAX_WIDTH", "%#" PRIu32, me->vw_maxresx);
-	REPORT("vmware.reg.MAX_HEIGHT", "%#" PRIu32, me->vw_maxresy);
+	REPORT("vmware.reg.MAX_WIDTH", "%" PRIu32, me->vw_maxresx);
+	REPORT("vmware.reg.MAX_HEIGHT", "%" PRIu32, me->vw_maxresy);
+	REPORT("vmware.reg.SCRATCH_SIZE", "%" PRIu32, me->vw_nscratch);
 	REPORT("vmware.fifo.CAPABILITIES", "%#" PRIx32, me->vw_fifo_caps);
-	REPORT("vmware.fifo.MIN", "%#" PRIu32, me->vw_fifo_min);
-	REPORT("vmware.fifo.MAX", "%#" PRIu32, me->vw_fifo_max);
+	REPORT("vmware.fifo.MIN", "%" PRIu32, me->vw_fifo_min);
+	REPORT("vmware.fifo.MAX", "%" PRIu32, me->vw_fifo_max);
 	REPORT("pci.addr", "%#" PRIx32, me->vw_pci->pd_addr);
 	REPORT("pci.vendor", "%#.4" PRIx16 ".%#.4" PRIx16, me->vw_pci->pd_vendor_id, me->vw_pci->pd_subvendor_id);
 	REPORT("pci.device", "%#.4" PRIx16 ".%#.4" PRIx16, me->vw_pci->pd_device_id, me->vw_pci->pd_subdevice_id);
@@ -567,6 +578,7 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->vw_maxresx  = vm_getreg(me, SVGA_REG_MAX_WIDTH);
 		me->vw_maxresy  = vm_getreg(me, SVGA_REG_MAX_HEIGHT);
 		me->vw_hbpp     = vm_getreg(me, SVGA_REG_HOST_BITS_PER_PIXEL);
+		me->vw_nscratch = vm_getreg(me, SVGA_REG_SCRATCH_SIZE);
 
 		/* Advertise our OS (we like to act like we're linux) */
 		vm_setreg(me, SVGA_REG_GUEST_ID, SVGA_REG_GUEST_LINUX);
@@ -583,7 +595,7 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_setmode      = &vmware_v_setmode;
 		me->sc_ops.sco_getregs      = &vmware_v_getregs;
 		me->sc_ops.sco_setregs      = &vmware_v_setregs;
-		me->sc_ops.sco_regsize      = sizeof(struct vmware_regs);
+		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
 		me->sc_ops.sco_updaterect   = &vmware_v_updaterect;
 
 		/* Map the FIFO into memory. */
