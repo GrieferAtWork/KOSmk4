@@ -448,7 +448,8 @@ NOTHROW(FCALL svga_makettyaccess_updaterect_cells_gfx)(struct svga_ttyaccess_gfx
 		rect.sttr_x  = 0;
 		rect.sttr_y  = start_y;
 		rect.sttr_sx = end_x;
-		rect.sttr_sy = end_y - start_y;
+		rect.sttr_sy = (end_y - start_y) + 1;
+		(*self->stx_hw_updaterect)(self, &rect);
 	} else {
 		/* Complicated case:
 		 * ......................XXXXXXXX
@@ -480,7 +481,7 @@ NOTHROW(FCALL svga_makettyaccess_updaterect_cells_gfx)(struct svga_ttyaccess_gfx
 			rect.sttr_x  = 0;
 			rect.sttr_y  = start_y;
 			rect.sttr_sx = self->vta_resx;
-			rect.sttr_sy = end_y - start_y;
+			rect.sttr_sy = (end_y - start_y) + 1;
 			(*self->stx_hw_updaterect)(self, &rect);
 		}
 	}

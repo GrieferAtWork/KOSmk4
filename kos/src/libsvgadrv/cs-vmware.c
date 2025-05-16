@@ -399,8 +399,9 @@ vmware_v_strings(struct svga_chipset *__restrict self,
                 svga_chipset_enumstring_t cb, void *arg) {
 	ssize_t temp, result = 0;
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	char valbuf[MAX_C(lengthof(PRIMAXx16),
-	                  lengthof(PRIMAXx32),
+	char valbuf[MAX_C(lengthof("0x" PRIMAXx16),
+	                  lengthof("0x" PRIMAXx32),
+	                  lengthof("0x" PRIMAXx32 "-" "0x" PRIMAXx32),
 	                  lengthof(PRIMAXu32),
 	                  lengthof("0x" PRIMAXx16 ".0x" PRIMAXx16),
 	                  lengthof("0x" PRIMAXx8 ".0x" PRIMAXx8 "."
@@ -416,12 +417,13 @@ vmware_v_strings(struct svga_chipset *__restrict self,
 	REPORT("vmware.iobase", "%#" PRIx32, me->vw_iobase);
 	REPORT("vmware.reg.CAPABILITIES", "%#" PRIx32, me->vw_caps);
 	REPORT("vmware.reg.HOST_BITS_PER_PIXEL", "%#" PRIu32, me->vw_hbpp);
-	REPORT("vmware.reg.FB_START", "%#" PRIx32, me->vw_fbstart);
-	REPORT("vmware.reg.FB_SIZE", "%#" PRIx32, me->vw_fbsize);
-	REPORT("vmware.reg.FIFO_START", "%#" PRIx32, me->vw_fifoaddr);
-	REPORT("vmware.reg.FIFO_SIZE", "%#" PRIx32, me->vw_fifosize);
+	REPORT("vmware.reg.FB", "%#" PRIx32 "-%#" PRIx32, me->vw_fbstart, me->vw_fbstart + me->vw_fbsize - 1);
+	REPORT("vmware.reg.MEM", "%#" PRIx32 "-%#" PRIx32, me->vw_fifoaddr, me->vw_fifoaddr + me->vw_fifosize - 1);
 	REPORT("vmware.reg.MAX_WIDTH", "%#" PRIu32, me->vw_maxresx);
 	REPORT("vmware.reg.MAX_HEIGHT", "%#" PRIu32, me->vw_maxresy);
+	REPORT("vmware.fifo.CAPABILITIES", "%#" PRIx32, me->vw_fifo_caps);
+	REPORT("vmware.fifo.MIN", "%#" PRIu32, me->vw_fifo_min);
+	REPORT("vmware.fifo.MAX", "%#" PRIu32, me->vw_fifo_max);
 	REPORT("pci.addr", "%#" PRIx32, me->vw_pci->pd_addr);
 	REPORT("pci.vendor", "%#.4" PRIx16 ".%#.4" PRIx16, me->vw_pci->pd_vendor_id, me->vw_pci->pd_subvendor_id);
 	REPORT("pci.device", "%#.4" PRIx16 ".%#.4" PRIx16, me->vw_pci->pd_device_id, me->vw_pci->pd_subdevice_id);

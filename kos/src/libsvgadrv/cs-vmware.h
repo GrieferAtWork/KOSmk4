@@ -56,8 +56,8 @@ struct vmware_chipset: svga_chipset {
 	uint32_t           vw_hbpp;         /* [const] SVGA_REG_HOST_BITS_PER_PIXEL */
 	PHYS uint32_t      vw_fbstart;      /* [const] SVGA_REG_FB_START */
 	uint32_t           vw_fbsize;       /* [const] SVGA_REG_FB_SIZE */
-	PHYS uint32_t      vw_fifoaddr;     /* [const] SVGA_REG_FIFO_START */
-	uint32_t           vw_fifosize;     /* [const] SVGA_REG_FIFO_SIZE */
+	PHYS uint32_t      vw_fifoaddr;     /* [const] SVGA_REG_MEM_START */
+	uint32_t           vw_fifosize;     /* [const] SVGA_REG_MEM_SIZE */
 	uint32_t           vw_maxresx;      /* [const] SVGA_REG_MAX_WIDTH */
 	uint32_t           vw_maxresy;      /* [const] SVGA_REG_MAX_HEIGHT */
 	uint16_t           vw_iobase;       /* [const] I/O-port base address. */
