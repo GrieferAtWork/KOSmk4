@@ -65,6 +65,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <linux/futex.h>
 #include <linux/hdreg.h>
 #include <linux/kd.h>
+#include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
 #include <sys/filio.h>
@@ -3544,7 +3545,7 @@ NOTHROW_CB_NCX(CC print_sockaddr)(pformatprinter printer, void *arg,
 
 	case AF_INET: {
 		/* struct sockaddr_in */
-		char buf[INET_NTOA_R_MAXLEN];
+		char buf[INET_ADDRSTRLEN];
 		NCX struct sockaddr_in const *sin;
 		if unlikely(len < offsetafter(struct sockaddr_in, sin_addr))
 			goto fallback;

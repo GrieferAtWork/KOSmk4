@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc97e5c53 */
+/* HASH CRC-32:0xbd877062 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -338,6 +338,11 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__h_err
 #endif /* __USE_MISC || !__USE_XOPEN2K8 */
 
 #ifdef __USE_MISC
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
+
 /* >> herror(3)
  * Same as `perror(3)' for `errno(3)', print `message' (if non-null),
  * alongside   the  value  of  `hstrerror(h_errno)'  to  `stderr(3)'. */

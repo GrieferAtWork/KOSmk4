@@ -330,6 +330,9 @@ err:
 #endif /* DEFINE_MALLOC_NX */
 }
 
+/* No, "LOCAL_untraced_krealign" can't be marked as "malloc" since it may re-return "ptr" */
+__pragma_GCC_diagnostic_push_ignored(Wsuggest_attribute_malloc)
+
 INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign)(VIRT void *ptr, size_t min_alignment,
                                              size_t n_bytes, gfp_t flags) {
@@ -417,6 +420,8 @@ err:
 	return NULL;
 #endif /* DEFINE_MALLOC_NX */
 }
+
+__pragma_GCC_diagnostic_pop_ignored(Wsuggest_attribute_malloc)
 
 INTERN ATTR_BLOCKLIKE_GFP(flags) VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign_offset)(VIRT void *ptr, size_t min_alignment,

@@ -412,6 +412,14 @@ struct protoent *getprotobynumber(int proto);
 
 %
 %#ifdef __USE_MISC
+%{
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
+
+}
+
 @@>> herror(3)
 @@Same as `perror(3)' for `errno(3)', print `message' (if non-null),
 @@alongside   the  value  of  `hstrerror(h_errno)'  to  `stderr(3)'.

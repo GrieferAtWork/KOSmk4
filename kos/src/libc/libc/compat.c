@@ -53,6 +53,7 @@ if (gcc_opt.removeif(x -> x.startswith("-O")))
 #include <nt/synchapi.h>
 #include <nt/sysinfoapi.h>
 #include <nt/types.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>
