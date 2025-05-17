@@ -59,9 +59,30 @@
 #include <parts/waitmacros.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/pid_t.h>
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+#include <bits/types/siginfo_t.h>
+#include <bits/types/id_t.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
+#endif /* __INTELLISENSE__ */
+
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/os/siginfo.h> /* `struct __siginfo_struct' */
+#include <bits/os/sigval.h>  /* `union sigval' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
+
+/* susv4-2018: Inclusion of the <sys/wait.h> header may also
+ *             make visible  all  symbols  from  <signal.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <signal.h>
+/* susv4-2018: Issue 7: The requirement  for <sys/wait.h>  to  define the  rusage  structure
+ *                      as described  in <sys/resource.h>  is removed,  and <sys/wait.h>  is
+ *                      no longer allowed to make visible all symbols from <sys/resource.h>. */
+#ifndef __USE_XOPEN2K8
+#include <sys/resource.h>
+#endif /* "__USE_XOPEN2K8 */
+#endif /* __USE_POSIX_BLOAT */
 
 
 /* Macros for constructing wait status values. */
@@ -90,6 +111,11 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __pid_t_defined
+#define __pid_t_defined
+typedef __pid_t pid_t;
+#endif /* !__pid_t_defined */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __siginfo_t_defined

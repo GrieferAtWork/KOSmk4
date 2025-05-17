@@ -35,6 +35,8 @@
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H 1
 
+#include <__stdinc.h>
+
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -59,7 +61,7 @@
 
 #include <bits/types.h>
 #include <net/bits/types.h>
-#include <netinet/bits/in.h>
+#include <netinet/bits/in_addr.h>
 
 #ifdef __USE_GLIBC_BLOAT
 #include <netinet/in.h>

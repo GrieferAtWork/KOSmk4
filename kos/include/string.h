@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f08d3e */
+/* HASH CRC-32:0x26814432 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,6 +123,12 @@ __NAMESPACE_STD_USING(strerror)
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+
+/* susv4-2018: Inclusion of the <string.h> header may also
+ *             make visible all  symbols from  <stddef.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

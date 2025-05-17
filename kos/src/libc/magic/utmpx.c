@@ -42,10 +42,16 @@
 }%[insert:prefix(
 #include <bits/crt/db/utmpx.h>
 )]%[insert:prefix(
+#include <bits/os/timeval.h>
+)]%[insert:prefix(
 #include <bits/types.h>
 )]%{
 
+/* susv4-2018: Inclusion  of the <utmpx.h> header may also
+ *             make visible all symbols from <sys/time.h>. */
+#ifdef __USE_POSIX_BLOAT
 #include <sys/time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 
 #ifdef __USE_GNU

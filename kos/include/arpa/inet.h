@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x193c068f */
+/* HASH CRC-32:0x9995f0aa */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,6 @@
 /* (#) Portability: mintlib       (/include/arpa/inet.h) */
 /* (#) Portability: musl libc     (/include/arpa/inet.h) */
 /* (#) Portability: uClibc        (/include/arpa/inet.h) */
-/*!always_includes <netinet/in.h>*/
 #ifndef _ARPA_INET_H
 #define _ARPA_INET_H 1
 
@@ -58,7 +57,9 @@
 /* susv4-2018: Inclusion  of  the  <arpa/inet.h>  header  may  also make
  *             visible all symbols from <netinet/in.h> and <inttypes.h>. */
 #ifdef __USE_POSIX_BLOAT
+#ifndef _NETINET_IN_H
 #include <netinet/in.h>
+#endif /* !_NETINET_IN_H */
 #include <inttypes.h>
 #endif /* __USE_POSIX_BLOAT */
 
@@ -81,6 +82,11 @@ typedef __socklen_t socklen_t;
 #define __in_port_t_defined
 typedef __in_port_t in_port_t; /* Type to represent a port. */
 #endif /* !__in_port_t_defined */
+
+#ifndef __in_addr_t_defined
+#define __in_addr_t_defined
+typedef __in_addr_t in_addr_t;
+#endif /* !__in_addr_t_defined */
 
 /* Only uint32_t+uint16_t! */
 #ifndef __uint8_t_defined

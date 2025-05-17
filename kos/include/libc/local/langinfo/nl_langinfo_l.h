@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3048f13d */
+/* HASH CRC-32:0x49d0bdbd */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,12 @@
 #ifndef __local_nl_langinfo_l_defined
 #define __local_nl_langinfo_l_defined
 #include <__crt.h>
-#include <features.h>
+#include <bits/crt/langinfo.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nl_langinfo_defined
 #define __local___localdep_nl_langinfo_defined
 #ifdef __CRT_HAVE_nl_langinfo
-__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,__localdep_nl_langinfo,(__STDC_INT_AS_UINT_T __item),nl_langinfo,(__item))
+__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,__localdep_nl_langinfo,(__nl_item __item),nl_langinfo,(__item))
 #else /* __CRT_HAVE_nl_langinfo */
 __NAMESPACE_LOCAL_END
 #include <libc/local/langinfo/nl_langinfo.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_nl_langinfo */
 #endif /* !__local___localdep_nl_langinfo_defined */
 __LOCAL_LIBC(nl_langinfo_l) __ATTR_RETNONNULL char __KOS_FIXED_CONST *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nl_langinfo_l))(__STDC_INT_AS_UINT_T __item, __locale_t __locale) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nl_langinfo_l))(__nl_item __item, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_nl_langinfo)(__item);
 }

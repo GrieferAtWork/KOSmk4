@@ -18,21 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /*!included_by <netinet/in.h>*/
-#ifndef _NETINET_BITS_IN_ADDR_H
-#define _NETINET_BITS_IN_ADDR_H 1
-
-#include <__stdinc.h>
-#include <netinet/bits/in_addr_t.h>
-
-/* Internet address. */
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-struct in_addr {
-	__in_addr_t s_addr;
-};
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-#endif /* !_NETINET_BITS_IN_ADDR_H */
+#ifndef __in_addr_t
+#include <net/bits/types.h>
+#define __in_port_t __u_net16_t /* Type to represent a port. */
+#define __in_addr_t __u_net32_t
+#endif /* !__in_addr_t */

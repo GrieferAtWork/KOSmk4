@@ -41,7 +41,8 @@
 %[define_replacement(fd_t = __fd_t)]
 
 %[define_decl_include_implication("<bits/crt/resolv.h>" => [
-	"<bits/types.h>", "<netinet/bits/in.h>", "<netinet/in.h>",
+	"<bits/types.h>", "<netinet/bits/in.h>",
+	"<netinet/bits/in_addr.h>", "<netinet/bits/sockaddr_in.h>"
 ])]
 
 %[define_decl_include("<bits/crt/resolv.h>": [

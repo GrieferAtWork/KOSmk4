@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0526e84 */
+/* HASH CRC-32:0x6167f01d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/crt/langinfo.h>
 
 #define NL_SETD 1
 #define NL_CAT_LOCALE 1
@@ -51,7 +52,11 @@
 __SYSDECL_BEGIN
 
 typedef void *nl_catd;
-typedef int nl_item;
+
+#ifndef __nl_item_defined
+#define __nl_item_defined
+typedef __nl_item nl_item;
+#endif /* !__nl_item_defined */
 
 __CDECLARE_OPT(__ATTR_IN(1),nl_catd,__NOTHROW_RPC,catopen,(char const *__cat_name, int __flag),(__cat_name,__flag))
 __CDECLARE_OPT(__ATTR_INOUT(1),char *,__NOTHROW_NCX,catgets,(nl_catd __catalog, int __set, int __number, char const *__string),(__catalog,__set,__number,__string))

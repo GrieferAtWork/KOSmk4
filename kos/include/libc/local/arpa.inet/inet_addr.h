@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f9b29f4 */
+/* HASH CRC-32:0x8cee5915 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,11 +41,11 @@ __NAMESPACE_LOCAL_END
 #include <netinet/bits/in_addr.h>
 #include <netinet/asm/in.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(inet_addr) __ATTR_PURE __ATTR_IN(1) __u_net32_t
+__LOCAL_LIBC(inet_addr) __ATTR_PURE __ATTR_IN(1) __in_addr_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_addr))(char const *__restrict __cp) {
 	struct in_addr __addr;
 	if (!(__NAMESPACE_LOCAL_SYM __localdep_inet_paton)((char const **)&__cp, &__addr, 0) || *__cp)
-		return (__u_net32_t)__INADDR_NONE;
+		return (__in_addr_t)__INADDR_NONE;
 	return __addr.s_addr;
 }
 __NAMESPACE_LOCAL_END

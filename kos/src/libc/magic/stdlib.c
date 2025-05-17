@@ -182,6 +182,15 @@
 #endif /* !__cplusplus */
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
+/* susv4-2018: Inclusion  of the  <stdlib.h> header  may also  make visible all
+ *             symbols from <stddef.h>, <limits.h>, <math.h>, and <sys/wait.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#include <limits.h>
+#include <math.h>
+#include <sys/wait.h>
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
 #ifdef __RAND_MAX

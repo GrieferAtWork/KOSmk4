@@ -439,6 +439,12 @@ for (local f: funcs) {
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 )]%{
 
+/* susv4-2018: Inclusion of the <string.h> header may also
+ *             make visible all  symbols from  <stddef.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
 #ifdef __CC__

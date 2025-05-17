@@ -257,6 +257,8 @@
 )]%[insert:prefix(
 #include <bits/os/sockaddr.h>
 )]%[insert:prefix(
+#include <bits/os/iovec.h>
+)]%[insert:prefix(
 #include <bits/os/sockaddr_storage.h>
 )]%[insert:prefix(
 #include <bits/os/timespec.h>
@@ -264,12 +266,9 @@
 #include <bits/types.h>
 )]%{
 
-}%[insert:prefix(
-#include <sys/uio.h>
-)]%{
-
 #ifdef __INTELLISENSE__
 #include <bits/types/size_t.h>
+#include <bits/types/ssize_t.h>
 #endif /* __INTELLISENSE__ */
 
 #ifdef __USE_GNU
@@ -285,6 +284,15 @@
 #ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #endif /* __USE_GLIBC_BLOAT */
+
+/* susv4-2018: Inclusion of <sys/socket.h> may also make
+ *             visible  all  symbols  from  <sys/uio.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/uio.h>
+#endif /* __USE_POSIX_BLOAT */
+
+
+
 
 #if !defined(FIOSETOWN) && defined(__FIOSETOWN)
 #define FIOSETOWN  __FIOSETOWN  /* ... */
@@ -1015,6 +1023,11 @@ __SYSDECL_BEGIN
 #define __size_t_defined
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __ssize_t_defined
+#define __ssize_t_defined
+typedef __SSIZE_TYPE__ ssize_t;
+#endif /* !__ssize_t_defined */
 
 #ifndef __sa_family_t_defined
 #define __sa_family_t_defined

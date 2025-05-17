@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x206172b8 */
+/* HASH CRC-32:0x2b128b6f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,15 @@
 #include <bits/os/timeval.h> /* struct timeval */
 #include <bits/types.h>
 
+#ifdef __INTELLISENSE__
+#include <bits/types/id_t.h>
+#endif /* __INTELLISENSE__ */
+
+/* susv4-2018: Inclusion of  the  <sys/resource.h>  header  may
+ *             also make visible all symbols from <sys/time.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

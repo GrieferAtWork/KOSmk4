@@ -182,6 +182,12 @@
 #include <sys/reent.h>
 #endif /* __CRT_CYG_PRIMARY */
 
+/* susv4-2018: Inclusion of the <stdio.h> header may also
+ *             make visible all symbols from  <stddef.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
 /* The possibilities for the third argument to `setvbuf()'. */

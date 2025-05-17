@@ -58,6 +58,15 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __INTELLISENSE__
+#include <bits/types/id_t.h>
+#endif /* __INTELLISENSE__ */
+
+/* susv4-2018: Inclusion of  the  <sys/resource.h>  header  may
+ *             also make visible all symbols from <sys/time.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

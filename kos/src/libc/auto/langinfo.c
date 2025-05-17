@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54bbcb50 */
+/* HASH CRC-32:0x41189233 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_RETNONNULL char __KOS_FIXED_CONST *
-NOTHROW_NCX(LIBCCALL libc_nl_langinfo)(__STDC_INT_AS_UINT_T item) {
+NOTHROW_NCX(LIBCCALL libc_nl_langinfo)(nl_item item) {
 	char const *result = "";
 	unsigned int idx = _NL_ITEM_INDEX(item);
 /*[[[deemon
@@ -864,7 +864,7 @@ print("	}");
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_RETNONNULL char __KOS_FIXED_CONST *
-NOTHROW_NCX(LIBCCALL libc_nl_langinfo_l)(__STDC_INT_AS_UINT_T item,
+NOTHROW_NCX(LIBCCALL libc_nl_langinfo_l)(nl_item item,
                                          locale_t locale) {
 	(void)locale;
 	return libc_nl_langinfo(item);
@@ -874,9 +874,9 @@ NOTHROW_NCX(LIBCCALL libc_nl_langinfo_l)(__STDC_INT_AS_UINT_T item,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS_P(nl_langinfo,libc_nl_langinfo,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T item),(item));
-DEFINE_PUBLIC_ALIAS_P(__nl_langinfo_l,libc_nl_langinfo_l,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T item, locale_t locale),(item,locale));
-DEFINE_PUBLIC_ALIAS_P(nl_langinfo_l,libc_nl_langinfo_l,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T item, locale_t locale),(item,locale));
+DEFINE_PUBLIC_ALIAS_P(nl_langinfo,libc_nl_langinfo,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(nl_item item),(item));
+DEFINE_PUBLIC_ALIAS_P(__nl_langinfo_l,libc_nl_langinfo_l,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(nl_item item, locale_t locale),(item,locale));
+DEFINE_PUBLIC_ALIAS_P(nl_langinfo_l,libc_nl_langinfo_l,ATTR_RETNONNULL,char __KOS_FIXED_CONST *,NOTHROW_NCX,LIBCCALL,(nl_item item, locale_t locale),(item,locale));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LANGINFO_C */

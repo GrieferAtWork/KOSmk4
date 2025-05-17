@@ -25,8 +25,9 @@
 #include <__stdinc.h>
 
 #include <asm/crt/locale.h>
+#include <bits/crt/langinfo.h>
 
-#define _NL_ITEM(category, index) (((category) << 16) | (index))
+#define _NL_ITEM(category, index) __CCAST(__nl_item)(((category) << 16) | (index))
 #define _NL_ITEM_CATEGORY(item)   (__CCAST(int)(item) >> 16)
 #define _NL_ITEM_INDEX(item)      (__CCAST(int)(item) & 0xffff)
 

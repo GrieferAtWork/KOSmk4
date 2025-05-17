@@ -58,7 +58,7 @@
 
 #include <bits/types.h>
 #include <net/bits/types.h>
-#include <netinet/bits/in.h>
+#include <netinet/bits/in_addr.h>
 
 #ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>

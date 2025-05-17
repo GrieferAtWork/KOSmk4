@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab6c6004 */
+/* HASH CRC-32:0x8b4bff21 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,9 +43,14 @@
 #include <features.h>
 
 #include <bits/crt/db/utmpx.h>
+#include <bits/os/timeval.h>
 #include <bits/types.h>
 
+/* susv4-2018: Inclusion  of the <utmpx.h> header may also
+ *             make visible all symbols from <sys/time.h>. */
+#ifdef __USE_POSIX_BLOAT
 #include <sys/time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 
 #ifdef __USE_GNU

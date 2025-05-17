@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17cf5bc0 */
+/* HASH CRC-32:0x87d42c63 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -292,6 +292,12 @@ __NAMESPACE_STD_USING(snprintf)
 #ifdef __CRT_CYG_PRIMARY
 #include <sys/reent.h>
 #endif /* __CRT_CYG_PRIMARY */
+
+/* susv4-2018: Inclusion of the <stdio.h> header may also
+ *             make visible all symbols from  <stddef.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

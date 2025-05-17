@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54da9797 */
+/* HASH CRC-32:0xc97e5c53 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,14 +46,17 @@
 
 #include <features.h>
 
-#include <asm/crt/netdb.h>
-#include <bits/crt/db/netdb.h>
 #include <bits/types.h>
-#include <netinet/in.h>
-#include <bits/crt/db/hostent.h>
-#include <bits/crt/db/servent.h>
-#include <bits/crt/db/protoent.h>
+#include <asm/crt/netdb.h>
+#include <bits/crt/db/netdb.h> /* struct netent */
+#include <bits/crt/db/hostent.h> /* struct hostent */
+#include <bits/crt/db/servent.h> /* struct servent */
+#include <bits/crt/db/protoent.h> /* struct protoent */
+#include <netinet/bits/in_addr_t.h> /* __in_addr_t, __in_port_t */
 
+#if defined(__USE_XOPEN2K) || defined(__USE_XOPEN_EXTENDED)
+#include <netinet/asm/ipport.h> /* __IPPORT_RESERVED */
+#endif /* __USE_XOPEN2K || __USE_XOPEN_EXTENDED */
 #ifdef __USE_XOPEN2K
 #include <bits/crt/addrinfo.h>
 #ifdef __USE_GNU
@@ -70,9 +73,13 @@
 #include <bits/os/timespec.h> /* struct timespec */
 #endif /* __USE_GNU */
 
-#ifdef __USE_GLIBC_BLOAT
-#include <stdint.h>
-#endif /* __USE_GLIBC_BLOAT */
+/* susv4-2018: Inclusion of the  <netdb.h> header may  also make visible  all
+ *             symbols from <netinet/in.h>, <sys/socket.h>, and <inttypes.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <inttypes.h>
+#endif /* __USE_POSIX_BLOAT */
 
 /* Paths for network configuration files. */
 #if !defined(_PATH_HEQUIV) && defined(__PATH_HEQUIV)
@@ -124,9 +131,9 @@
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN2K) || defined(__USE_XOPEN_EXTENDED)
-#ifndef IPPORT_RESERVED
-#define IPPORT_RESERVED 1024 /* Greatest reserved port */
-#endif /* !IPPORT_RESERVED */
+#if !defined(IPPORT_RESERVED) && defined(__IPPORT_RESERVED)
+#define IPPORT_RESERVED     __IPPORT_RESERVED     /* Ports less than this value are reserved for privileged processes. */
+#endif /* !IPPORT_RESERVED && __IPPORT_RESERVED */
 #endif /* __USE_XOPEN2K || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_GNU
@@ -283,6 +290,21 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __in_port_t_defined
+#define __in_port_t_defined
+typedef __in_port_t in_port_t; /* Type to represent a port. */
+#endif /* !__in_port_t_defined */
+
+#ifndef __in_addr_t_defined
+#define __in_addr_t_defined
+typedef __in_addr_t in_addr_t;
+#endif /* !__in_addr_t_defined */
+
+#ifndef __socklen_t_defined
+#define __socklen_t_defined
+typedef __socklen_t socklen_t;
+#endif /* !__socklen_t_defined */
 
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,sethostent,(int __stay_open),(__stay_open))
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endhostent,(void),())

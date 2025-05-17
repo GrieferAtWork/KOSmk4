@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <resolv.h>*/
+/*!replace_with_include <resolv.h>*/
 #ifndef _BITS_CRT_RESOLV_H
 #define _BITS_CRT_RESOLV_H 1
 
@@ -28,8 +28,8 @@
 
 #include <asm/crt/resolv.h>
 #include <bits/types.h>
-#include <netinet/bits/in.h>
-#include <netinet/in.h>
+#include <netinet/bits/in_addr.h>
+#include <netinet/bits/sockaddr_in.h>
 
 #ifdef __CC__
 __DECL_BEGIN

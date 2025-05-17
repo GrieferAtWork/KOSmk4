@@ -232,6 +232,13 @@
 #endif /* __USE_BSD */
 #endif /* __USE_NEWLIB */
 
+/* susv4-2018: Inclusion  of  the  <fcntl.h>  header  may  also make
+ *             visible all symbols from <sys/stat.h> and <unistd.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/stat.h>
+#include <unistd.h>
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
 /* Mask for `O_RDONLY | O_WRONLY | O_RDWR' */
@@ -1571,6 +1578,21 @@ typedef struct flock flock_t;
 typedef struct flock64 flock64_t;
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_SOLARIS */
+
+#ifndef __mode_t_defined
+#define __mode_t_defined
+typedef __mode_t mode_t;
+#endif /* !__mode_t_defined */
+
+#ifndef __off_t_defined
+#define __off_t_defined
+typedef __off_t off_t;
+#endif /* !__off_t_defined */
+
+#ifndef __pid_t_defined
+#define __pid_t_defined
+typedef __pid_t pid_t;
+#endif /* !__pid_t_defined */
 
 }
 

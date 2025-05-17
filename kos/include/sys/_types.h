@@ -28,6 +28,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <bits/crt/langinfo.h> /* __nl_item */
 #include <bits/types.h>
 #include <machine/_types.h>
 #include <sys/config.h>
@@ -164,7 +165,6 @@ typedef void *_iconv_t;
 #define __machine_socklen_t_defined
 #endif /* !__machine_socklen_t_defined */
 
-typedef int __nl_item;
 #ifndef ____va_list_defined
 #define ____va_list_defined
 typedef __builtin_va_list __va_list;

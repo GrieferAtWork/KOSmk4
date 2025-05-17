@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <netinet/in.h>*/
 #ifndef _NETINET_ASM_IN_H
 #define _NETINET_ASM_IN_H 1
 
@@ -214,7 +215,7 @@
 
 
 #define __INET_ADDRSTRLEN  16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
-#define __INET6_ADDRSTRLEN 46
+#define __INET6_ADDRSTRLEN 46 /* Length of the string form for IPv6. */
 
 
 #endif /* !_NETINET_ASM_IN_H */

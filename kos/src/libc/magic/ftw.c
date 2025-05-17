@@ -53,8 +53,15 @@
 #include <bits/os/stat.h>
 )]%{
 
-#include <sys/stat.h>
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
+#endif /* __USE_GLIBC_BLOAT */
+
+/* susv4-2018: Inclusion of  the <ftw.h>  header may  also
+ *             make visible all symbols from <sys/stat.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/stat.h>
+#endif /* __USE_POSIX_BLOAT */
 
 
 /* Values for `typeflag', as passed to ftw-callbacks */

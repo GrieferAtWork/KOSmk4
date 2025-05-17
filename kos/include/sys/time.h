@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4782a9a */
+/* HASH CRC-32:0xabc3a17d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,9 +113,9 @@ typedef enum __itimer_which {
 /*[[[end]]]*/
 #endif /* ... */
 
-#ifndef FD_SETSIZE
+#if !defined(FD_SETSIZE) && defined(__FD_SETSIZE)
 #define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
-#endif /* FD_SETSIZE */
+#endif /* !FD_SETSIZE && __FD_SETSIZE */
 
 #ifdef __CC__
 

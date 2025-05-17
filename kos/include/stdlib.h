@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf058cb1c */
+/* HASH CRC-32:0x50df26da */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -249,6 +249,15 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
+
+/* susv4-2018: Inclusion  of the  <stdlib.h> header  may also  make visible all
+ *             symbols from <stddef.h>, <limits.h>, <math.h>, and <sys/wait.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#include <limits.h>
+#include <math.h>
+#include <sys/wait.h>
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

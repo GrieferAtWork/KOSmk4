@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd45170b */
+/* HASH CRC-32:0xafc0385f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_langinfo)(__STDC_INT_AS_UINT_T item);
+INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_langinfo)(nl_item item);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> nl_langinfo(3), nl_langinfo_l(3)
@@ -45,7 +45,7 @@ INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_lang
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_nl_langinfo)(__STDC_INT_AS_UINT_T item);
+INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_nl_langinfo)(nl_item item);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> nl_langinfo(3), nl_langinfo_l(3)
@@ -54,7 +54,7 @@ INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_nl_lang
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_langinfo_l)(__STDC_INT_AS_UINT_T item, locale_t locale);
+INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_langinfo_l)(nl_item item, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> nl_langinfo(3), nl_langinfo_l(3)
@@ -63,7 +63,7 @@ INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_nl_lang
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_nl_langinfo_l)(__STDC_INT_AS_UINT_T item, locale_t locale);
+INTDEF ATTR_RETNONNULL char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_nl_langinfo_l)(nl_item item, locale_t locale);
 #endif /* !__KERNEL__ */
 
 DECL_END

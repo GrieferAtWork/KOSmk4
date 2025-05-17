@@ -61,7 +61,7 @@
 #ifdef __USE_MISC
 #include <bits/types.h>
 #include <net/bits/types.h>
-#include <netinet/bits/in.h>
+#include <netinet/bits/in_addr.h>
 
 __SYSDECL_BEGIN
 

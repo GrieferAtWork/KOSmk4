@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f2d3ff */
+/* HASH CRC-32:0xf2d5f30d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_nl_langinfo_defined
 #ifdef __CRT_HAVE_nl_langinfo
 __NAMESPACE_LOCAL_END
-#include <features.h>
+#include <bits/crt/langinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,__localdep_nl_langinfo,(__STDC_INT_AS_UINT_T __item),nl_langinfo,(__item))
+__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,__localdep_nl_langinfo,(__nl_item __item),nl_langinfo,(__item))
 #else /* __CRT_HAVE_nl_langinfo */
 __NAMESPACE_LOCAL_END
 #include <libc/local/langinfo/nl_langinfo.h>

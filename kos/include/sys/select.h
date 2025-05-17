@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22b76401 */
+/* HASH CRC-32:0x64ac17c9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,16 +62,16 @@
 #include <libc/string.h> /* __libc_bzero */
 #endif /* !__INTELLISENSE__ */
 
-#ifndef FD_SETSIZE
-#define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
-#endif /* FD_SETSIZE */
-
 /* susv4-2018: Inclusion of the <sys/select.h> header may make visible
  *             all  symbols from the  headers <signal.h> and <time.h>. */
 #ifdef __USE_POSIX_BLOAT
 #include <signal.h>
 #include <time.h>
 #endif /* __USE_POSIX_BLOAT */
+
+#if !defined(FD_SETSIZE) && defined(__FD_SETSIZE)
+#define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
+#endif /* !FD_SETSIZE && __FD_SETSIZE */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

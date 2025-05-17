@@ -17,22 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <netinet/in.h>*/
-#ifndef _NETINET_BITS_IN_ADDR_H
-#define _NETINET_BITS_IN_ADDR_H 1
-
-#include <__stdinc.h>
-#include <netinet/bits/in_addr_t.h>
-
-/* Internet address. */
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-struct in_addr {
-	__in_addr_t s_addr;
-};
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-#endif /* !_NETINET_BITS_IN_ADDR_H */
+/*!replace_with_include <langinfo.h>*/
+#ifndef __nl_item
+#include <features.h>
+#ifndef __nl_item
+#define __nl_item __STDC_INT_AS_UINT_T
+#endif /* !__nl_item */
+#endif /* !__nl_item */

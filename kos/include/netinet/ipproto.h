@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <netinet/in.h>*/
 #ifndef _NETINET_IPPROTO_H
 #define _NETINET_IPPROTO_H 1
 
 #include <__stdinc.h>
+
+#include <netinet/asm/ipproto.h>
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h and
  * https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers */
@@ -44,151 +45,441 @@
 
 
 /* Standard well-defined IP protocols. */
-#define IPPROTO_IP       0   /* Dummy protocol for TCP. */
-#define IPPROTO_HOPOPTS  0   /* IPv6 Hop-by-Hop options. */
-#define IPPROTO_ICMP     1   /* Internet Control Message Protocol. */
-#define IPPROTO_IGMP     2   /* Internet Group Management Protocol. */
-#define IPPROTO_GGP      3   /* Gateway - to - Gateway Protocol RFC 823 */
-#define IPPROTO_IPIP     4   /* IPIP tunnels (older KA9Q tunnels use 94). */
-#define IPPROTO_ST       5   /* Internet Stream Protocol RFC 1190, RFC 1819 */
-#define IPPROTO_TCP      6   /* Transmission Control Protocol. */
-#define IPPROTO_CBT      7   /* Core - based trees RFC 2189 */
-#define IPPROTO_EGP      8   /* Exterior Gateway Protocol. */
-#define IPPROTO_IGP      9   /* Interior Gateway Protocol (any private interior gateway (used by Cisco for their IGRP)) */
-#define IPPROTO_BBN_RCC_MON 10 /* BBN RCC Monitoring */
-#define IPPROTO_NVP_II   11  /* Network Voice Protocol RFC 741 */
-#define IPPROTO_PUP      12  /* PUP protocol. */
-#define IPPROTO_ARGUS    13  /* ARGUS */
-#define IPPROTO_EMCON    14  /* EMCON */
-#define IPPROTO_XNET     15  /* Cross Net Debugger IEN 158 */
-#define IPPROTO_CHAOS    16  /* Chaos */
-#define IPPROTO_UDP      17  /* User Datagram Protocol. */
-#define IPPROTO_MUX      18  /* Multiplexing IEN 90 */
-#define IPPROTO_DCN_MEAS 19  /* DCN Measurement Subsystems */
-#define IPPROTO_HMP      20  /* Host Monitoring Protocol RFC 869 */
-#define IPPROTO_PRM      21  /* Packet Radio Measurement */
-#define IPPROTO_IDP      22  /* XNS IDP protocol. */
-#define IPPROTO_TRUNK1   23  /* Trunk-1 */
-#define IPPROTO_TRUNK2   24  /* Trunk-2 */
-#define IPPROTO_LEAF1    25  /* Leaf-1 */
-#define IPPROTO_LEAF2    26  /* Leaf-2 */
-#define IPPROTO_RDP      27  /* Reliable Data Protocol RFC 908 */
-#define IPPROTO_IRTP     28  /* Internet Reliable Transaction Protocol RFC 938 */
-#define IPPROTO_TP       29  /* SO Transport Protocol Class 4. */
-#define IPPROTO_NETBLT   30  /* Bulk Data Transfer Protocol RFC 998 */
-#define IPPROTO_MFE_NSP  31  /* MFE Network Services Protocol */
-#define IPPROTO_MERIT_INP 32 /* MERIT Internodal Protocol */
-#define IPPROTO_DCCP     33  /* Datagram Congestion Control Protocol. */
-#define IPPROTO_3PC      34  /* Third Party Connect Protocol */
-#define IPPROTO_IDPR     35  /* Inter-Domain Policy Routing Protocol RFC 1479 */
-#define IPPROTO_XTP      36  /* Xpress Transport Protocol */
-#define IPPROTO_DDP      37  /* Datagram Delivery Protocol */
-#define IPPROTO_IDPR_CMTP 38 /* IDPR Control Message Transport Protocol */
-#define IPPROTO_TPPP     39  /* TP++ Transport Protocol */
-#define IPPROTO_IL       40  /* IL Transport Protocol */
-#define IPPROTO_IPV6     41  /* [IPv6] IPv6 header. */
-#define IPPROTO_SDRP     42  /* Source Demand Routing Protocol RFC 1940 */
-#define IPPROTO_ROUTING  43  /* [IPv6] IPv6 routing header. */
-#define IPPROTO_FRAGMENT 44  /* [IPv6] IPv6 fragmentation header. */
-#define IPPROTO_IDRP     45  /* Inter-Domain Routing Protocol */
-#define IPPROTO_RSVP     46  /* Reservation Protocol. */
-#define IPPROTO_GRE      47  /* General Routing Encapsulation. */
-#define IPPROTO_DSR      48  /* Dynamic Source Routing Protocol RFC 4728 */
-#define IPPROTO_BNA      49  /* Burroughs Network Architecture */
-#define IPPROTO_ESP      50  /* encapsulating security payload. */
-#define IPPROTO_AH       51  /* authentication header. */
-#define IPPROTO_I_NLSP   52  /* Integrated Net Layer Security Protocol TUBA */
-#define IPPROTO_SWIPE    53  /* SwIPe RFC 5237 */
-#define IPPROTO_NARP     54  /* NBMA Address Resolution Protocol RFC 1735 */
-#define IPPROTO_MOBILE   55  /* IP Mobility (Min Encap) RFC 2004 */
-#define IPPROTO_TLSP     56  /* Transport Layer Security Protocol (using Kryptonet key management) */
-#define IPPROTO_SKIP     57  /* Simple Key-Management for Internet Protocol RFC 2356 */
-#define IPPROTO_ICMPV6   58  /* [IPv6] ICMPv6. */
-#define IPPROTO_NONE     59  /* [IPv6] IPv6 no next header. */
-#define IPPROTO_DSTOPTS  60  /* [IPv6] IPv6 destination options. */
-#define IPPROTO_CFTP     62  /* CFTP */
-#define IPPROTO_SAT_EXPAK 64 /* SATNET and Backroom EXPAK */
-#define IPPROTO_KRYPTOLAN 65 /* KRYPTOLAN Kryptolan */
-#define IPPROTO_RVD      66  /* MIT Remote Virtual Disk Protocol */
-#define IPPROTO_IPPC     67  /* Internet Pluribus Packet Core */
-#define IPPROTO_SAT_MON  69  /* SATNET Monitoring */
-#define IPPROTO_VISA     70  /* VISA Protocol */
-#define IPPROTO_IPCU     71  /* Internet Packet Core Utility */
-#define IPPROTO_CPNX     72  /* Computer Protocol Network Executive */
-#define IPPROTO_CPHB     73  /* Computer Protocol Heart Beat */
-#define IPPROTO_WSN      74  /* Wang Span Network */
-#define IPPROTO_PVP      75  /* Packet Video Protocol */
-#define IPPROTO_BR_SAT_MON 76 /*  Backroom SATNET Monitoring */
-#define IPPROTO_SUN_ND   77  /* SUN ND PROTOCOL-Temporary */
-#define IPPROTO_WB_MON   78  /* WIDEBAND Monitoring */
-#define IPPROTO_WB_EXPAK 79  /* WIDEBAND EXPAK */
-#define IPPROTO_ISO_IP   80  /* International Organization for Standardization Internet Protocol */
-#define IPPROTO_VMTP     81  /* Versatile Message Transaction Protocol RFC 1045 */
-#define IPPROTO_SECURE_VMTP 82 /* Secure Versatile Message Transaction Protocol RFC 1045 */
-#define IPPROTO_VINES    83  /* VINES */
-#define IPPROTO_TTP      84  /* TTP */
-#define IPPROTO_IPTM     84  /* Internet Protocol Traffic Manager */
-#define IPPROTO_NSFNET_IGP 85 /* NSFNET-IGP */
-#define IPPROTO_DGP      86  /* Dissimilar Gateway Protocol */
-#define IPPROTO_TCF      87  /* TCF */
-#define IPPROTO_EIGRP    88  /* EIGRP Informational RFC 7868 */
-#define IPPROTO_OSPF     89  /* Open Shortest Path First RFC 2328 */
-#define IPPROTO_SPRITE_RPC 90 /* Sprite-RPC Sprite RPC Protocol */
-#define IPPROTO_LARP     91  /* Locus Address Resolution Protocol */
-#define IPPROTO_MTP      92  /* Multicast Transport Protocol. */
-#define IPPROTO_AX25     93  /* AX.25 */
-#define IPPROTO_BEETPH   94  /* IP option pseudo header for BEET. */
-#define IPPROTO_MICP     95  /* Mobile Internetworking Control Protocol */
-#define IPPROTO_SCC_SP   96  /* Semaphore Communications Sec. Pro */
-#define IPPROTO_ETHERIP  97  /* Ethernet-within-IP Encapsulation RFC 3378 */
-#define IPPROTO_ENCAP    98  /* Encapsulation Header. */
-#define IPPROTO_GMTP     100 /* GMTP */
-#define IPPROTO_IFMP     101 /* Ipsilon Flow Management Protocol */
-#define IPPROTO_PNNI     102 /* PNNI over IP */
-#define IPPROTO_PIM      103 /* Protocol Independent Multicast. */
-#define IPPROTO_ARIS     104 /* IBM's ARIS (Aggregate Route IP Switching) Protocol */
-#define IPPROTO_SCPS     105 /* SCPS (Space Communications Protocol Standards) SCPS-TP */
-#define IPPROTO_QNX      106 /* QNX */
-#define IPPROTO_AN       107 /* A/N Active Networks */
-#define IPPROTO_COMP     108 /* Compression Header Protocol. */
-#define IPPROTO_SNP      109 /* Sitara Networks Protocol */
-#define IPPROTO_COMPAQ_PEER 110 /* Compaq Peer Protocol */
-#define IPPROTO_IPXIP    111 /* IPX in IP */
-#define IPPROTO_VRRP     112 /* Virtual Router Redundancy Protocol, Common Address Redundancy Protocol (not IANA assigned) VRRP:RFC 3768 */
-#define IPPROTO_PGM      113 /* PGM Reliable Transport Protocol RFC 3208 */
-#define IPPROTO_ANY0HOP  114 /* Any 0-hop protocol */
-#define IPPROTO_L2TP     115 /* Layer Two Tunneling Protocol Version 3 RFC 3931 */
-#define IPPROTO_DDX      116 /* D-II Data Exchange (DDX) */
-#define IPPROTO_IATP     117 /* Interactive Agent Transfer Protocol */
-#define IPPROTO_STP      118 /* Schedule Transfer Protocol */
-#define IPPROTO_SRP      119 /* SpectraLink Radio Protocol */
-#define IPPROTO_UTI      120 /* Universal Transport Interface Protocol */
-#define IPPROTO_SMP      121 /* Simple Message Protocol */
-#define IPPROTO_SM       122 /* Simple Multicast Protocol draft-perlman-simple-multicast-03 */
-#define IPPROTO_PTP      123 /* Performance Transparency Protocol */
-#define IPPROTO_IS2IS4   124 /* Intermediate System to Intermediate System (IS-IS) Protocol over IPv4 RFC 1142 and RFC 1195 */
-#define IPPROTO_FIRE     125 /* Flexible Intra-AS Routing Environment */
-#define IPPROTO_CRTP     126 /* Combat Radio Transport Protocol */
-#define IPPROTO_CRUDP    127 /* Combat Radio User Datagram */
-#define IPPROTO_SSCOPMCE 128 /* Service-Specific Connection-Oriented Protocol in a Multilink and Connectionless Environment ITU-T Q.2111 (1999) */
-#define IPPROTO_IPLT     129 /* IPLT */
-#define IPPROTO_SPS      130 /* Secure Packet Shield */
-#define IPPROTO_PIPE     131 /* Private IP Encapsulation within IP Expired I-D draft-petri-mobileip-pipe-00.txt */
-#define IPPROTO_SCTP     132 /* Stream Control Transmission Protocol. */
-#define IPPROTO_FC       133 /* Fibre Channel */
-#define IPPROTO_RSVP_E2E_IGNORE 134 /* Reservation Protocol (RSVP) End-to-End Ignore RFC 3175 */
-#define IPPROTO_MH       135 /* [IPv6] IPv6 mobility header. */
-#define IPPROTO_UDPLITE  136 /* UDP-Lite protocol. */
-#define IPPROTO_MPLS     137 /* MPLS in IP. */
-#define IPPROTO_MANET    138 /* MANET Protocols RFC 5498 */
-#define IPPROTO_HIP      139 /* Host Identity Protocol RFC 5201 */
-#define IPPROTO_SHIM6    140 /* Site Multihoming by IPv6 Intermediation RFC 5533 */
-#define IPPROTO_WESP     141 /* Wrapped Encapsulating Security Payload RFC 5840 */
-#define IPPROTO_ROHC     142 /* Robust Header Compression RFC 5856 */
-#define IPPROTO_LOUSER   253 /* Use for experimentation and testing RFC 3692 */
-#define IPPROTO_HIUSER   254 /* Use for experimentation and testing RFC 3692 */
-#define IPPROTO_RAW      255 /* Raw IP packets. */
-#define IPPROTO_MAX      256 /* WARNING: This  is  actually 1+  the max  possible IPPROTO!
-                              * The protocol-field of IP is 1-byte, so the max is 0xff=255 */
+#if !defined(IPPROTO_IP) && defined(__IPPROTO_IP)
+#define IPPROTO_IP              __IPPROTO_IP              /* Dummy protocol for TCP. */
+#endif /* !IPPROTO_IP && __IPPROTO_IP */
+#if !defined(IPPROTO_HOPOPTS) && defined(__IPPROTO_HOPOPTS)
+#define IPPROTO_HOPOPTS         __IPPROTO_HOPOPTS         /* IPv6 Hop-by-Hop options. */
+#endif /* !IPPROTO_HOPOPTS && __IPPROTO_HOPOPTS */
+#if !defined(IPPROTO_ICMP) && defined(__IPPROTO_ICMP)
+#define IPPROTO_ICMP            __IPPROTO_ICMP            /* Internet Control Message Protocol. */
+#endif /* !IPPROTO_ICMP && __IPPROTO_ICMP */
+#if !defined(IPPROTO_IGMP) && defined(__IPPROTO_IGMP)
+#define IPPROTO_IGMP            __IPPROTO_IGMP            /* Internet Group Management Protocol. */
+#endif /* !IPPROTO_IGMP && __IPPROTO_IGMP */
+#if !defined(IPPROTO_GGP) && defined(__IPPROTO_GGP)
+#define IPPROTO_GGP             __IPPROTO_GGP             /* Gateway - to - Gateway Protocol RFC 823 */
+#endif /* !IPPROTO_GGP && __IPPROTO_GGP */
+#if !defined(IPPROTO_IPIP) && defined(__IPPROTO_IPIP)
+#define IPPROTO_IPIP            __IPPROTO_IPIP            /* IPIP tunnels (older KA9Q tunnels use 94). */
+#endif /* !IPPROTO_IPIP && __IPPROTO_IPIP */
+#if !defined(IPPROTO_ST) && defined(__IPPROTO_ST)
+#define IPPROTO_ST              __IPPROTO_ST              /* Internet Stream Protocol RFC 1190, RFC 1819 */
+#endif /* !IPPROTO_ST && __IPPROTO_ST */
+#if !defined(IPPROTO_TCP) && defined(__IPPROTO_TCP)
+#define IPPROTO_TCP             __IPPROTO_TCP             /* Transmission Control Protocol. */
+#endif /* !IPPROTO_TCP && __IPPROTO_TCP */
+#if !defined(IPPROTO_CBT) && defined(__IPPROTO_CBT)
+#define IPPROTO_CBT             __IPPROTO_CBT             /* Core - based trees RFC 2189 */
+#endif /* !IPPROTO_CBT && __IPPROTO_CBT */
+#if !defined(IPPROTO_EGP) && defined(__IPPROTO_EGP)
+#define IPPROTO_EGP             __IPPROTO_EGP             /* Exterior Gateway Protocol. */
+#endif /* !IPPROTO_EGP && __IPPROTO_EGP */
+#if !defined(IPPROTO_IGP) && defined(__IPPROTO_IGP)
+#define IPPROTO_IGP             __IPPROTO_IGP             /* Interior Gateway Protocol (any private interior gateway (used by Cisco for their IGRP)) */
+#endif /* !IPPROTO_IGP && __IPPROTO_IGP */
+#if !defined(IPPROTO_BBN_RCC_MON) && defined(__IPPROTO_BBN_RCC_MON)
+#define IPPROTO_BBN_RCC_MON     __IPPROTO_BBN_RCC_MON     /* BBN RCC Monitoring */
+#endif /* !IPPROTO_BBN_RCC_MON && __IPPROTO_BBN_RCC_MON */
+#if !defined(IPPROTO_NVP_II) && defined(__IPPROTO_NVP_II)
+#define IPPROTO_NVP_II          __IPPROTO_NVP_II          /* Network Voice Protocol RFC 741 */
+#endif /* !IPPROTO_NVP_II && __IPPROTO_NVP_II */
+#if !defined(IPPROTO_PUP) && defined(__IPPROTO_PUP)
+#define IPPROTO_PUP             __IPPROTO_PUP             /* PUP protocol. */
+#endif /* !IPPROTO_PUP && __IPPROTO_PUP */
+#if !defined(IPPROTO_ARGUS) && defined(__IPPROTO_ARGUS)
+#define IPPROTO_ARGUS           __IPPROTO_ARGUS           /* ARGUS */
+#endif /* !IPPROTO_ARGUS && __IPPROTO_ARGUS */
+#if !defined(IPPROTO_EMCON) && defined(__IPPROTO_EMCON)
+#define IPPROTO_EMCON           __IPPROTO_EMCON           /* EMCON */
+#endif /* !IPPROTO_EMCON && __IPPROTO_EMCON */
+#if !defined(IPPROTO_XNET) && defined(__IPPROTO_XNET)
+#define IPPROTO_XNET            __IPPROTO_XNET            /* Cross Net Debugger IEN 158 */
+#endif /* !IPPROTO_XNET && __IPPROTO_XNET */
+#if !defined(IPPROTO_CHAOS) && defined(__IPPROTO_CHAOS)
+#define IPPROTO_CHAOS           __IPPROTO_CHAOS           /* Chaos */
+#endif /* !IPPROTO_CHAOS && __IPPROTO_CHAOS */
+#if !defined(IPPROTO_UDP) && defined(__IPPROTO_UDP)
+#define IPPROTO_UDP             __IPPROTO_UDP             /* User Datagram Protocol. */
+#endif /* !IPPROTO_UDP && __IPPROTO_UDP */
+#if !defined(IPPROTO_MUX) && defined(__IPPROTO_MUX)
+#define IPPROTO_MUX             __IPPROTO_MUX             /* Multiplexing IEN 90 */
+#endif /* !IPPROTO_MUX && __IPPROTO_MUX */
+#if !defined(IPPROTO_DCN_MEAS) && defined(__IPPROTO_DCN_MEAS)
+#define IPPROTO_DCN_MEAS        __IPPROTO_DCN_MEAS        /* DCN Measurement Subsystems */
+#endif /* !IPPROTO_DCN_MEAS && __IPPROTO_DCN_MEAS */
+#if !defined(IPPROTO_HMP) && defined(__IPPROTO_HMP)
+#define IPPROTO_HMP             __IPPROTO_HMP             /* Host Monitoring Protocol RFC 869 */
+#endif /* !IPPROTO_HMP && __IPPROTO_HMP */
+#if !defined(IPPROTO_PRM) && defined(__IPPROTO_PRM)
+#define IPPROTO_PRM             __IPPROTO_PRM             /* Packet Radio Measurement */
+#endif /* !IPPROTO_PRM && __IPPROTO_PRM */
+#if !defined(IPPROTO_IDP) && defined(__IPPROTO_IDP)
+#define IPPROTO_IDP             __IPPROTO_IDP             /* XNS IDP protocol. */
+#endif /* !IPPROTO_IDP && __IPPROTO_IDP */
+#if !defined(IPPROTO_TRUNK1) && defined(__IPPROTO_TRUNK1)
+#define IPPROTO_TRUNK1          __IPPROTO_TRUNK1          /* Trunk-1 */
+#endif /* !IPPROTO_TRUNK1 && __IPPROTO_TRUNK1 */
+#if !defined(IPPROTO_TRUNK2) && defined(__IPPROTO_TRUNK2)
+#define IPPROTO_TRUNK2          __IPPROTO_TRUNK2          /* Trunk-2 */
+#endif /* !IPPROTO_TRUNK2 && __IPPROTO_TRUNK2 */
+#if !defined(IPPROTO_LEAF1) && defined(__IPPROTO_LEAF1)
+#define IPPROTO_LEAF1           __IPPROTO_LEAF1           /* Leaf-1 */
+#endif /* !IPPROTO_LEAF1 && __IPPROTO_LEAF1 */
+#if !defined(IPPROTO_LEAF2) && defined(__IPPROTO_LEAF2)
+#define IPPROTO_LEAF2           __IPPROTO_LEAF2           /* Leaf-2 */
+#endif /* !IPPROTO_LEAF2 && __IPPROTO_LEAF2 */
+#if !defined(IPPROTO_RDP) && defined(__IPPROTO_RDP)
+#define IPPROTO_RDP             __IPPROTO_RDP             /* Reliable Data Protocol RFC 908 */
+#endif /* !IPPROTO_RDP && __IPPROTO_RDP */
+#if !defined(IPPROTO_IRTP) && defined(__IPPROTO_IRTP)
+#define IPPROTO_IRTP            __IPPROTO_IRTP            /* Internet Reliable Transaction Protocol RFC 938 */
+#endif /* !IPPROTO_IRTP && __IPPROTO_IRTP */
+#if !defined(IPPROTO_TP) && defined(__IPPROTO_TP)
+#define IPPROTO_TP              __IPPROTO_TP              /* SO Transport Protocol Class 4. */
+#endif /* !IPPROTO_TP && __IPPROTO_TP */
+#if !defined(IPPROTO_NETBLT) && defined(__IPPROTO_NETBLT)
+#define IPPROTO_NETBLT          __IPPROTO_NETBLT          /* Bulk Data Transfer Protocol RFC 998 */
+#endif /* !IPPROTO_NETBLT && __IPPROTO_NETBLT */
+#if !defined(IPPROTO_MFE_NSP) && defined(__IPPROTO_MFE_NSP)
+#define IPPROTO_MFE_NSP         __IPPROTO_MFE_NSP         /* MFE Network Services Protocol */
+#endif /* !IPPROTO_MFE_NSP && __IPPROTO_MFE_NSP */
+#if !defined(IPPROTO_MERIT_INP) && defined(__IPPROTO_MERIT_INP)
+#define IPPROTO_MERIT_INP       __IPPROTO_MERIT_INP       /* MERIT Internodal Protocol */
+#endif /* !IPPROTO_MERIT_INP && __IPPROTO_MERIT_INP */
+#if !defined(IPPROTO_DCCP) && defined(__IPPROTO_DCCP)
+#define IPPROTO_DCCP            __IPPROTO_DCCP            /* Datagram Congestion Control Protocol. */
+#endif /* !IPPROTO_DCCP && __IPPROTO_DCCP */
+#if !defined(IPPROTO_3PC) && defined(__IPPROTO_3PC)
+#define IPPROTO_3PC             __IPPROTO_3PC             /* Third Party Connect Protocol */
+#endif /* !IPPROTO_3PC && __IPPROTO_3PC */
+#if !defined(IPPROTO_IDPR) && defined(__IPPROTO_IDPR)
+#define IPPROTO_IDPR            __IPPROTO_IDPR            /* Inter-Domain Policy Routing Protocol RFC 1479 */
+#endif /* !IPPROTO_IDPR && __IPPROTO_IDPR */
+#if !defined(IPPROTO_XTP) && defined(__IPPROTO_XTP)
+#define IPPROTO_XTP             __IPPROTO_XTP             /* Xpress Transport Protocol */
+#endif /* !IPPROTO_XTP && __IPPROTO_XTP */
+#if !defined(IPPROTO_DDP) && defined(__IPPROTO_DDP)
+#define IPPROTO_DDP             __IPPROTO_DDP             /* Datagram Delivery Protocol */
+#endif /* !IPPROTO_DDP && __IPPROTO_DDP */
+#if !defined(IPPROTO_IDPR_CMTP) && defined(__IPPROTO_IDPR_CMTP)
+#define IPPROTO_IDPR_CMTP       __IPPROTO_IDPR_CMTP       /* IDPR Control Message Transport Protocol */
+#endif /* !IPPROTO_IDPR_CMTP && __IPPROTO_IDPR_CMTP */
+#if !defined(IPPROTO_TPPP) && defined(__IPPROTO_TPPP)
+#define IPPROTO_TPPP            __IPPROTO_TPPP            /* TP++ Transport Protocol */
+#endif /* !IPPROTO_TPPP && __IPPROTO_TPPP */
+#if !defined(IPPROTO_IL) && defined(__IPPROTO_IL)
+#define IPPROTO_IL              __IPPROTO_IL              /* IL Transport Protocol */
+#endif /* !IPPROTO_IL && __IPPROTO_IL */
+#if !defined(IPPROTO_IPV6) && defined(__IPPROTO_IPV6)
+#define IPPROTO_IPV6            __IPPROTO_IPV6            /* [IPv6] IPv6 header. */
+#endif /* !IPPROTO_IPV6 && __IPPROTO_IPV6 */
+#if !defined(IPPROTO_SDRP) && defined(__IPPROTO_SDRP)
+#define IPPROTO_SDRP            __IPPROTO_SDRP            /* Source Demand Routing Protocol RFC 1940 */
+#endif /* !IPPROTO_SDRP && __IPPROTO_SDRP */
+#if !defined(IPPROTO_ROUTING) && defined(__IPPROTO_ROUTING)
+#define IPPROTO_ROUTING         __IPPROTO_ROUTING         /* [IPv6] IPv6 routing header. */
+#endif /* !IPPROTO_ROUTING && __IPPROTO_ROUTING */
+#if !defined(IPPROTO_FRAGMENT) && defined(__IPPROTO_FRAGMENT)
+#define IPPROTO_FRAGMENT        __IPPROTO_FRAGMENT        /* [IPv6] IPv6 fragmentation header. */
+#endif /* !IPPROTO_FRAGMENT && __IPPROTO_FRAGMENT */
+#if !defined(IPPROTO_IDRP) && defined(__IPPROTO_IDRP)
+#define IPPROTO_IDRP            __IPPROTO_IDRP            /* Inter-Domain Routing Protocol */
+#endif /* !IPPROTO_IDRP && __IPPROTO_IDRP */
+#if !defined(IPPROTO_RSVP) && defined(__IPPROTO_RSVP)
+#define IPPROTO_RSVP            __IPPROTO_RSVP            /* Reservation Protocol. */
+#endif /* !IPPROTO_RSVP && __IPPROTO_RSVP */
+#if !defined(IPPROTO_GRE) && defined(__IPPROTO_GRE)
+#define IPPROTO_GRE             __IPPROTO_GRE             /* General Routing Encapsulation. */
+#endif /* !IPPROTO_GRE && __IPPROTO_GRE */
+#if !defined(IPPROTO_DSR) && defined(__IPPROTO_DSR)
+#define IPPROTO_DSR             __IPPROTO_DSR             /* Dynamic Source Routing Protocol RFC 4728 */
+#endif /* !IPPROTO_DSR && __IPPROTO_DSR */
+#if !defined(IPPROTO_BNA) && defined(__IPPROTO_BNA)
+#define IPPROTO_BNA             __IPPROTO_BNA             /* Burroughs Network Architecture */
+#endif /* !IPPROTO_BNA && __IPPROTO_BNA */
+#if !defined(IPPROTO_ESP) && defined(__IPPROTO_ESP)
+#define IPPROTO_ESP             __IPPROTO_ESP             /* encapsulating security payload. */
+#endif /* !IPPROTO_ESP && __IPPROTO_ESP */
+#if !defined(IPPROTO_AH) && defined(__IPPROTO_AH)
+#define IPPROTO_AH              __IPPROTO_AH              /* authentication header. */
+#endif /* !IPPROTO_AH && __IPPROTO_AH */
+#if !defined(IPPROTO_I_NLSP) && defined(__IPPROTO_I_NLSP)
+#define IPPROTO_I_NLSP          __IPPROTO_I_NLSP          /* Integrated Net Layer Security Protocol TUBA */
+#endif /* !IPPROTO_I_NLSP && __IPPROTO_I_NLSP */
+#if !defined(IPPROTO_SWIPE) && defined(__IPPROTO_SWIPE)
+#define IPPROTO_SWIPE           __IPPROTO_SWIPE           /* SwIPe RFC 5237 */
+#endif /* !IPPROTO_SWIPE && __IPPROTO_SWIPE */
+#if !defined(IPPROTO_NARP) && defined(__IPPROTO_NARP)
+#define IPPROTO_NARP            __IPPROTO_NARP            /* NBMA Address Resolution Protocol RFC 1735 */
+#endif /* !IPPROTO_NARP && __IPPROTO_NARP */
+#if !defined(IPPROTO_MOBILE) && defined(__IPPROTO_MOBILE)
+#define IPPROTO_MOBILE          __IPPROTO_MOBILE          /* IP Mobility (Min Encap) RFC 2004 */
+#endif /* !IPPROTO_MOBILE && __IPPROTO_MOBILE */
+#if !defined(IPPROTO_TLSP) && defined(__IPPROTO_TLSP)
+#define IPPROTO_TLSP            __IPPROTO_TLSP            /* Transport Layer Security Protocol (using Kryptonet key management) */
+#endif /* !IPPROTO_TLSP && __IPPROTO_TLSP */
+#if !defined(IPPROTO_SKIP) && defined(__IPPROTO_SKIP)
+#define IPPROTO_SKIP            __IPPROTO_SKIP            /* Simple Key-Management for Internet Protocol RFC 2356 */
+#endif /* !IPPROTO_SKIP && __IPPROTO_SKIP */
+#if !defined(IPPROTO_ICMPV6) && defined(__IPPROTO_ICMPV6)
+#define IPPROTO_ICMPV6          __IPPROTO_ICMPV6          /* [IPv6] ICMPv6. */
+#endif /* !IPPROTO_ICMPV6 && __IPPROTO_ICMPV6 */
+#if !defined(IPPROTO_NONE) && defined(__IPPROTO_NONE)
+#define IPPROTO_NONE            __IPPROTO_NONE            /* [IPv6] IPv6 no next header. */
+#endif /* !IPPROTO_NONE && __IPPROTO_NONE */
+#if !defined(IPPROTO_DSTOPTS) && defined(__IPPROTO_DSTOPTS)
+#define IPPROTO_DSTOPTS         __IPPROTO_DSTOPTS         /* [IPv6] IPv6 destination options. */
+#endif /* !IPPROTO_DSTOPTS && __IPPROTO_DSTOPTS */
+#if !defined(IPPROTO_CFTP) && defined(__IPPROTO_CFTP)
+#define IPPROTO_CFTP            __IPPROTO_CFTP            /* CFTP */
+#endif /* !IPPROTO_CFTP && __IPPROTO_CFTP */
+#if !defined(IPPROTO_SAT_EXPAK) && defined(__IPPROTO_SAT_EXPAK)
+#define IPPROTO_SAT_EXPAK       __IPPROTO_SAT_EXPAK       /* SATNET and Backroom EXPAK */
+#endif /* !IPPROTO_SAT_EXPAK && __IPPROTO_SAT_EXPAK */
+#if !defined(IPPROTO_KRYPTOLAN) && defined(__IPPROTO_KRYPTOLAN)
+#define IPPROTO_KRYPTOLAN       __IPPROTO_KRYPTOLAN       /* KRYPTOLAN Kryptolan */
+#endif /* !IPPROTO_KRYPTOLAN && __IPPROTO_KRYPTOLAN */
+#if !defined(IPPROTO_RVD) && defined(__IPPROTO_RVD)
+#define IPPROTO_RVD             __IPPROTO_RVD             /* MIT Remote Virtual Disk Protocol */
+#endif /* !IPPROTO_RVD && __IPPROTO_RVD */
+#if !defined(IPPROTO_IPPC) && defined(__IPPROTO_IPPC)
+#define IPPROTO_IPPC            __IPPROTO_IPPC            /* Internet Pluribus Packet Core */
+#endif /* !IPPROTO_IPPC && __IPPROTO_IPPC */
+#if !defined(IPPROTO_SAT_MON) && defined(__IPPROTO_SAT_MON)
+#define IPPROTO_SAT_MON         __IPPROTO_SAT_MON         /* SATNET Monitoring */
+#endif /* !IPPROTO_SAT_MON && __IPPROTO_SAT_MON */
+#if !defined(IPPROTO_VISA) && defined(__IPPROTO_VISA)
+#define IPPROTO_VISA            __IPPROTO_VISA            /* VISA Protocol */
+#endif /* !IPPROTO_VISA && __IPPROTO_VISA */
+#if !defined(IPPROTO_IPCU) && defined(__IPPROTO_IPCU)
+#define IPPROTO_IPCU            __IPPROTO_IPCU            /* Internet Packet Core Utility */
+#endif /* !IPPROTO_IPCU && __IPPROTO_IPCU */
+#if !defined(IPPROTO_CPNX) && defined(__IPPROTO_CPNX)
+#define IPPROTO_CPNX            __IPPROTO_CPNX            /* Computer Protocol Network Executive */
+#endif /* !IPPROTO_CPNX && __IPPROTO_CPNX */
+#if !defined(IPPROTO_CPHB) && defined(__IPPROTO_CPHB)
+#define IPPROTO_CPHB            __IPPROTO_CPHB            /* Computer Protocol Heart Beat */
+#endif /* !IPPROTO_CPHB && __IPPROTO_CPHB */
+#if !defined(IPPROTO_WSN) && defined(__IPPROTO_WSN)
+#define IPPROTO_WSN             __IPPROTO_WSN             /* Wang Span Network */
+#endif /* !IPPROTO_WSN && __IPPROTO_WSN */
+#if !defined(IPPROTO_PVP) && defined(__IPPROTO_PVP)
+#define IPPROTO_PVP             __IPPROTO_PVP             /* Packet Video Protocol */
+#endif /* !IPPROTO_PVP && __IPPROTO_PVP */
+#if !defined(IPPROTO_BR_SAT_MON) && defined(__IPPROTO_BR_SAT_MON)
+#define IPPROTO_BR_SAT_MON      __IPPROTO_BR_SAT_MON      /*  Backroom SATNET Monitoring */
+#endif /* !IPPROTO_BR_SAT_MON && __IPPROTO_BR_SAT_MON */
+#if !defined(IPPROTO_SUN_ND) && defined(__IPPROTO_SUN_ND)
+#define IPPROTO_SUN_ND          __IPPROTO_SUN_ND          /* SUN ND PROTOCOL-Temporary */
+#endif /* !IPPROTO_SUN_ND && __IPPROTO_SUN_ND */
+#if !defined(IPPROTO_WB_MON) && defined(__IPPROTO_WB_MON)
+#define IPPROTO_WB_MON          __IPPROTO_WB_MON          /* WIDEBAND Monitoring */
+#endif /* !IPPROTO_WB_MON && __IPPROTO_WB_MON */
+#if !defined(IPPROTO_WB_EXPAK) && defined(__IPPROTO_WB_EXPAK)
+#define IPPROTO_WB_EXPAK        __IPPROTO_WB_EXPAK        /* WIDEBAND EXPAK */
+#endif /* !IPPROTO_WB_EXPAK && __IPPROTO_WB_EXPAK */
+#if !defined(IPPROTO_ISO_IP) && defined(__IPPROTO_ISO_IP)
+#define IPPROTO_ISO_IP          __IPPROTO_ISO_IP          /* International Organization for Standardization Internet Protocol */
+#endif /* !IPPROTO_ISO_IP && __IPPROTO_ISO_IP */
+#if !defined(IPPROTO_VMTP) && defined(__IPPROTO_VMTP)
+#define IPPROTO_VMTP            __IPPROTO_VMTP            /* Versatile Message Transaction Protocol RFC 1045 */
+#endif /* !IPPROTO_VMTP && __IPPROTO_VMTP */
+#if !defined(IPPROTO_SECURE_VMTP) && defined(__IPPROTO_SECURE_VMTP)
+#define IPPROTO_SECURE_VMTP     __IPPROTO_SECURE_VMTP     /* Secure Versatile Message Transaction Protocol RFC 1045 */
+#endif /* !IPPROTO_SECURE_VMTP && __IPPROTO_SECURE_VMTP */
+#if !defined(IPPROTO_VINES) && defined(__IPPROTO_VINES)
+#define IPPROTO_VINES           __IPPROTO_VINES           /* VINES */
+#endif /* !IPPROTO_VINES && __IPPROTO_VINES */
+#if !defined(IPPROTO_TTP) && defined(__IPPROTO_TTP)
+#define IPPROTO_TTP             __IPPROTO_TTP             /* TTP */
+#endif /* !IPPROTO_TTP && __IPPROTO_TTP */
+#if !defined(IPPROTO_IPTM) && defined(__IPPROTO_IPTM)
+#define IPPROTO_IPTM            __IPPROTO_IPTM            /* Internet Protocol Traffic Manager */
+#endif /* !IPPROTO_IPTM && __IPPROTO_IPTM */
+#if !defined(IPPROTO_NSFNET_IGP) && defined(__IPPROTO_NSFNET_IGP)
+#define IPPROTO_NSFNET_IGP      __IPPROTO_NSFNET_IGP      /* NSFNET-IGP */
+#endif /* !IPPROTO_NSFNET_IGP && __IPPROTO_NSFNET_IGP */
+#if !defined(IPPROTO_DGP) && defined(__IPPROTO_DGP)
+#define IPPROTO_DGP             __IPPROTO_DGP             /* Dissimilar Gateway Protocol */
+#endif /* !IPPROTO_DGP && __IPPROTO_DGP */
+#if !defined(IPPROTO_TCF) && defined(__IPPROTO_TCF)
+#define IPPROTO_TCF             __IPPROTO_TCF             /* TCF */
+#endif /* !IPPROTO_TCF && __IPPROTO_TCF */
+#if !defined(IPPROTO_EIGRP) && defined(__IPPROTO_EIGRP)
+#define IPPROTO_EIGRP           __IPPROTO_EIGRP           /* EIGRP Informational RFC 7868 */
+#endif /* !IPPROTO_EIGRP && __IPPROTO_EIGRP */
+#if !defined(IPPROTO_OSPF) && defined(__IPPROTO_OSPF)
+#define IPPROTO_OSPF            __IPPROTO_OSPF            /* Open Shortest Path First RFC 2328 */
+#endif /* !IPPROTO_OSPF && __IPPROTO_OSPF */
+#if !defined(IPPROTO_SPRITE_RPC) && defined(__IPPROTO_SPRITE_RPC)
+#define IPPROTO_SPRITE_RPC      __IPPROTO_SPRITE_RPC      /* Sprite-RPC Sprite RPC Protocol */
+#endif /* !IPPROTO_SPRITE_RPC && __IPPROTO_SPRITE_RPC */
+#if !defined(IPPROTO_LARP) && defined(__IPPROTO_LARP)
+#define IPPROTO_LARP            __IPPROTO_LARP            /* Locus Address Resolution Protocol */
+#endif /* !IPPROTO_LARP && __IPPROTO_LARP */
+#if !defined(IPPROTO_MTP) && defined(__IPPROTO_MTP)
+#define IPPROTO_MTP             __IPPROTO_MTP             /* Multicast Transport Protocol. */
+#endif /* !IPPROTO_MTP && __IPPROTO_MTP */
+#if !defined(IPPROTO_AX25) && defined(__IPPROTO_AX25)
+#define IPPROTO_AX25            __IPPROTO_AX25            /* AX.25 */
+#endif /* !IPPROTO_AX25 && __IPPROTO_AX25 */
+#if !defined(IPPROTO_BEETPH) && defined(__IPPROTO_BEETPH)
+#define IPPROTO_BEETPH          __IPPROTO_BEETPH          /* IP option pseudo header for BEET. */
+#endif /* !IPPROTO_BEETPH && __IPPROTO_BEETPH */
+#if !defined(IPPROTO_MICP) && defined(__IPPROTO_MICP)
+#define IPPROTO_MICP            __IPPROTO_MICP            /* Mobile Internetworking Control Protocol */
+#endif /* !IPPROTO_MICP && __IPPROTO_MICP */
+#if !defined(IPPROTO_SCC_SP) && defined(__IPPROTO_SCC_SP)
+#define IPPROTO_SCC_SP          __IPPROTO_SCC_SP          /* Semaphore Communications Sec. Pro */
+#endif /* !IPPROTO_SCC_SP && __IPPROTO_SCC_SP */
+#if !defined(IPPROTO_ETHERIP) && defined(__IPPROTO_ETHERIP)
+#define IPPROTO_ETHERIP         __IPPROTO_ETHERIP         /* Ethernet-within-IP Encapsulation RFC 3378 */
+#endif /* !IPPROTO_ETHERIP && __IPPROTO_ETHERIP */
+#if !defined(IPPROTO_ENCAP) && defined(__IPPROTO_ENCAP)
+#define IPPROTO_ENCAP           __IPPROTO_ENCAP           /* Encapsulation Header. */
+#endif /* !IPPROTO_ENCAP && __IPPROTO_ENCAP */
+#if !defined(IPPROTO_GMTP) && defined(__IPPROTO_GMTP)
+#define IPPROTO_GMTP            __IPPROTO_GMTP            /* GMTP */
+#endif /* !IPPROTO_GMTP && __IPPROTO_GMTP */
+#if !defined(IPPROTO_IFMP) && defined(__IPPROTO_IFMP)
+#define IPPROTO_IFMP            __IPPROTO_IFMP            /* Ipsilon Flow Management Protocol */
+#endif /* !IPPROTO_IFMP && __IPPROTO_IFMP */
+#if !defined(IPPROTO_PNNI) && defined(__IPPROTO_PNNI)
+#define IPPROTO_PNNI            __IPPROTO_PNNI            /* PNNI over IP */
+#endif /* !IPPROTO_PNNI && __IPPROTO_PNNI */
+#if !defined(IPPROTO_PIM) && defined(__IPPROTO_PIM)
+#define IPPROTO_PIM             __IPPROTO_PIM             /* Protocol Independent Multicast. */
+#endif /* !IPPROTO_PIM && __IPPROTO_PIM */
+#if !defined(IPPROTO_ARIS) && defined(__IPPROTO_ARIS)
+#define IPPROTO_ARIS            __IPPROTO_ARIS            /* IBM's ARIS (Aggregate Route IP Switching) Protocol */
+#endif /* !IPPROTO_ARIS && __IPPROTO_ARIS */
+#if !defined(IPPROTO_SCPS) && defined(__IPPROTO_SCPS)
+#define IPPROTO_SCPS            __IPPROTO_SCPS            /* SCPS (Space Communications Protocol Standards) SCPS-TP */
+#endif /* !IPPROTO_SCPS && __IPPROTO_SCPS */
+#if !defined(IPPROTO_QNX) && defined(__IPPROTO_QNX)
+#define IPPROTO_QNX             __IPPROTO_QNX             /* QNX */
+#endif /* !IPPROTO_QNX && __IPPROTO_QNX */
+#if !defined(IPPROTO_AN) && defined(__IPPROTO_AN)
+#define IPPROTO_AN              __IPPROTO_AN              /* A/N Active Networks */
+#endif /* !IPPROTO_AN && __IPPROTO_AN */
+#if !defined(IPPROTO_COMP) && defined(__IPPROTO_COMP)
+#define IPPROTO_COMP            __IPPROTO_COMP            /* Compression Header Protocol. */
+#endif /* !IPPROTO_COMP && __IPPROTO_COMP */
+#if !defined(IPPROTO_SNP) && defined(__IPPROTO_SNP)
+#define IPPROTO_SNP             __IPPROTO_SNP             /* Sitara Networks Protocol */
+#endif /* !IPPROTO_SNP && __IPPROTO_SNP */
+#if !defined(IPPROTO_COMPAQ_PEER) && defined(__IPPROTO_COMPAQ_PEER)
+#define IPPROTO_COMPAQ_PEER     __IPPROTO_COMPAQ_PEER     /* Compaq Peer Protocol */
+#endif /* !IPPROTO_COMPAQ_PEER && __IPPROTO_COMPAQ_PEER */
+#if !defined(IPPROTO_IPXIP) && defined(__IPPROTO_IPXIP)
+#define IPPROTO_IPXIP           __IPPROTO_IPXIP           /* IPX in IP */
+#endif /* !IPPROTO_IPXIP && __IPPROTO_IPXIP */
+#if !defined(IPPROTO_VRRP) && defined(__IPPROTO_VRRP)
+#define IPPROTO_VRRP            __IPPROTO_VRRP            /* Virtual Router Redundancy Protocol, Common Address Redundancy Protocol (not IANA assigned) VRRP:RFC 3768 */
+#endif /* !IPPROTO_VRRP && __IPPROTO_VRRP */
+#if !defined(IPPROTO_PGM) && defined(__IPPROTO_PGM)
+#define IPPROTO_PGM             __IPPROTO_PGM             /* PGM Reliable Transport Protocol RFC 3208 */
+#endif /* !IPPROTO_PGM && __IPPROTO_PGM */
+#if !defined(IPPROTO_ANY0HOP) && defined(__IPPROTO_ANY0HOP)
+#define IPPROTO_ANY0HOP         __IPPROTO_ANY0HOP         /* Any 0-hop protocol */
+#endif /* !IPPROTO_ANY0HOP && __IPPROTO_ANY0HOP */
+#if !defined(IPPROTO_L2TP) && defined(__IPPROTO_L2TP)
+#define IPPROTO_L2TP            __IPPROTO_L2TP            /* Layer Two Tunneling Protocol Version 3 RFC 3931 */
+#endif /* !IPPROTO_L2TP && __IPPROTO_L2TP */
+#if !defined(IPPROTO_DDX) && defined(__IPPROTO_DDX)
+#define IPPROTO_DDX             __IPPROTO_DDX             /* D-II Data Exchange (DDX) */
+#endif /* !IPPROTO_DDX && __IPPROTO_DDX */
+#if !defined(IPPROTO_IATP) && defined(__IPPROTO_IATP)
+#define IPPROTO_IATP            __IPPROTO_IATP            /* Interactive Agent Transfer Protocol */
+#endif /* !IPPROTO_IATP && __IPPROTO_IATP */
+#if !defined(IPPROTO_STP) && defined(__IPPROTO_STP)
+#define IPPROTO_STP             __IPPROTO_STP             /* Schedule Transfer Protocol */
+#endif /* !IPPROTO_STP && __IPPROTO_STP */
+#if !defined(IPPROTO_SRP) && defined(__IPPROTO_SRP)
+#define IPPROTO_SRP             __IPPROTO_SRP             /* SpectraLink Radio Protocol */
+#endif /* !IPPROTO_SRP && __IPPROTO_SRP */
+#if !defined(IPPROTO_UTI) && defined(__IPPROTO_UTI)
+#define IPPROTO_UTI             __IPPROTO_UTI             /* Universal Transport Interface Protocol */
+#endif /* !IPPROTO_UTI && __IPPROTO_UTI */
+#if !defined(IPPROTO_SMP) && defined(__IPPROTO_SMP)
+#define IPPROTO_SMP             __IPPROTO_SMP             /* Simple Message Protocol */
+#endif /* !IPPROTO_SMP && __IPPROTO_SMP */
+#if !defined(IPPROTO_SM) && defined(__IPPROTO_SM)
+#define IPPROTO_SM              __IPPROTO_SM              /* Simple Multicast Protocol draft-perlman-simple-multicast-03 */
+#endif /* !IPPROTO_SM && __IPPROTO_SM */
+#if !defined(IPPROTO_PTP) && defined(__IPPROTO_PTP)
+#define IPPROTO_PTP             __IPPROTO_PTP             /* Performance Transparency Protocol */
+#endif /* !IPPROTO_PTP && __IPPROTO_PTP */
+#if !defined(IPPROTO_IS2IS4) && defined(__IPPROTO_IS2IS4)
+#define IPPROTO_IS2IS4          __IPPROTO_IS2IS4          /* Intermediate System to Intermediate System (IS-IS) Protocol over IPv4 RFC 1142 and RFC 1195 */
+#endif /* !IPPROTO_IS2IS4 && __IPPROTO_IS2IS4 */
+#if !defined(IPPROTO_FIRE) && defined(__IPPROTO_FIRE)
+#define IPPROTO_FIRE            __IPPROTO_FIRE            /* Flexible Intra-AS Routing Environment */
+#endif /* !IPPROTO_FIRE && __IPPROTO_FIRE */
+#if !defined(IPPROTO_CRTP) && defined(__IPPROTO_CRTP)
+#define IPPROTO_CRTP            __IPPROTO_CRTP            /* Combat Radio Transport Protocol */
+#endif /* !IPPROTO_CRTP && __IPPROTO_CRTP */
+#if !defined(IPPROTO_CRUDP) && defined(__IPPROTO_CRUDP)
+#define IPPROTO_CRUDP           __IPPROTO_CRUDP           /* Combat Radio User Datagram */
+#endif /* !IPPROTO_CRUDP && __IPPROTO_CRUDP */
+#if !defined(IPPROTO_SSCOPMCE) && defined(__IPPROTO_SSCOPMCE)
+#define IPPROTO_SSCOPMCE        __IPPROTO_SSCOPMCE        /* Service-Specific Connection-Oriented Protocol in a Multilink and Connectionless Environment ITU-T Q.2111 (1999) */
+#endif /* !IPPROTO_SSCOPMCE && __IPPROTO_SSCOPMCE */
+#if !defined(IPPROTO_IPLT) && defined(__IPPROTO_IPLT)
+#define IPPROTO_IPLT            __IPPROTO_IPLT            /* IPLT */
+#endif /* !IPPROTO_IPLT && __IPPROTO_IPLT */
+#if !defined(IPPROTO_SPS) && defined(__IPPROTO_SPS)
+#define IPPROTO_SPS             __IPPROTO_SPS             /* Secure Packet Shield */
+#endif /* !IPPROTO_SPS && __IPPROTO_SPS */
+#if !defined(IPPROTO_PIPE) && defined(__IPPROTO_PIPE)
+#define IPPROTO_PIPE            __IPPROTO_PIPE            /* Private IP Encapsulation within IP Expired I-D draft-petri-mobileip-pipe-00.txt */
+#endif /* !IPPROTO_PIPE && __IPPROTO_PIPE */
+#if !defined(IPPROTO_SCTP) && defined(__IPPROTO_SCTP)
+#define IPPROTO_SCTP            __IPPROTO_SCTP            /* Stream Control Transmission Protocol. */
+#endif /* !IPPROTO_SCTP && __IPPROTO_SCTP */
+#if !defined(IPPROTO_FC) && defined(__IPPROTO_FC)
+#define IPPROTO_FC              __IPPROTO_FC              /* Fibre Channel */
+#endif /* !IPPROTO_FC && __IPPROTO_FC */
+#if !defined(IPPROTO_RSVP_E2E_IGNORE) && defined(__IPPROTO_RSVP_E2E_IGNORE)
+#define IPPROTO_RSVP_E2E_IGNORE __IPPROTO_RSVP_E2E_IGNORE /* Reservation Protocol (RSVP) End-to-End Ignore RFC 3175 */
+#endif /* !IPPROTO_RSVP_E2E_IGNORE && __IPPROTO_RSVP_E2E_IGNORE */
+#if !defined(IPPROTO_MH) && defined(__IPPROTO_MH)
+#define IPPROTO_MH              __IPPROTO_MH              /* [IPv6] IPv6 mobility header. */
+#endif /* !IPPROTO_MH && __IPPROTO_MH */
+#if !defined(IPPROTO_UDPLITE) && defined(__IPPROTO_UDPLITE)
+#define IPPROTO_UDPLITE         __IPPROTO_UDPLITE         /* UDP-Lite protocol. */
+#endif /* !IPPROTO_UDPLITE && __IPPROTO_UDPLITE */
+#if !defined(IPPROTO_MPLS) && defined(__IPPROTO_MPLS)
+#define IPPROTO_MPLS            __IPPROTO_MPLS            /* MPLS in IP. */
+#endif /* !IPPROTO_MPLS && __IPPROTO_MPLS */
+#if !defined(IPPROTO_MANET) && defined(__IPPROTO_MANET)
+#define IPPROTO_MANET           __IPPROTO_MANET           /* MANET Protocols RFC 5498 */
+#endif /* !IPPROTO_MANET && __IPPROTO_MANET */
+#if !defined(IPPROTO_HIP) && defined(__IPPROTO_HIP)
+#define IPPROTO_HIP             __IPPROTO_HIP             /* Host Identity Protocol RFC 5201 */
+#endif /* !IPPROTO_HIP && __IPPROTO_HIP */
+#if !defined(IPPROTO_SHIM6) && defined(__IPPROTO_SHIM6)
+#define IPPROTO_SHIM6           __IPPROTO_SHIM6           /* Site Multihoming by IPv6 Intermediation RFC 5533 */
+#endif /* !IPPROTO_SHIM6 && __IPPROTO_SHIM6 */
+#if !defined(IPPROTO_WESP) && defined(__IPPROTO_WESP)
+#define IPPROTO_WESP            __IPPROTO_WESP            /* Wrapped Encapsulating Security Payload RFC 5840 */
+#endif /* !IPPROTO_WESP && __IPPROTO_WESP */
+#if !defined(IPPROTO_ROHC) && defined(__IPPROTO_ROHC)
+#define IPPROTO_ROHC            __IPPROTO_ROHC            /* Robust Header Compression RFC 5856 */
+#endif /* !IPPROTO_ROHC && __IPPROTO_ROHC */
+#if !defined(IPPROTO_LOUSER) && defined(__IPPROTO_LOUSER)
+#define IPPROTO_LOUSER          __IPPROTO_LOUSER          /* Use for experimentation and testing RFC 3692 */
+#endif /* !IPPROTO_LOUSER && __IPPROTO_LOUSER */
+#if !defined(IPPROTO_HIUSER) && defined(__IPPROTO_HIUSER)
+#define IPPROTO_HIUSER          __IPPROTO_HIUSER          /* Use for experimentation and testing RFC 3692 */
+#endif /* !IPPROTO_HIUSER && __IPPROTO_HIUSER */
+#if !defined(IPPROTO_RAW) && defined(__IPPROTO_RAW)
+#define IPPROTO_RAW             __IPPROTO_RAW             /* Raw IP packets. */
+#endif /* !IPPROTO_RAW && __IPPROTO_RAW */
+#if !defined(IPPROTO_MAX) && defined(__IPPROTO_MAX)
+#define IPPROTO_MAX             __IPPROTO_MAX             /* WARNING: This  is  actually 1+  the max  possible IPPROTO!
+                                                           * The protocol-field of IP is 1-byte, so the max is 0xff=255 */
+#endif /* !IPPROTO_MAX && __IPPROTO_MAX */
 
 #endif /* !_NETINET_IPPROTO_H */

@@ -41,16 +41,29 @@
 )]%[insert:prefix(
 #include <asm/crt/langinfo.h>
 )]%[insert:prefix(
+#include <bits/crt/langinfo.h>
+)]%[insert:prefix(
 #include <nl_types.h>
 )]%{
 #ifdef __USE_XOPEN2K8
-#include <xlocale.h>
+#include <xlocale.h> /* locale_t */
 #endif /* __USE_XOPEN2K8 */
+
+/* susv4-2018: Inclusion of the <langinfo.h> header may also
+ *             make visible all  symbols from  <nl_types.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <nl_types.h>
+#endif /* __USE_POSIX_BLOAT */
 
 }
 %#ifdef __CC__
 %{
 __SYSDECL_BEGIN
+
+#ifndef __nl_item_defined
+#define __nl_item_defined
+typedef __nl_item nl_item;
+#endif /* !__nl_item_defined */
 
 /* Construct an index for use with `nl_langinfo(3)' or `nl_langinfo_l(3)',
  * that will return the name of the locale currently used for  `category'.
@@ -259,6 +272,8 @@ __SYSDECL_BEGIN
 }
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
+%[define_replacement(nl_item = "__nl_item")]
+%[define_type_class(__nl_item = "TD")]
 
 @@>> nl_langinfo(3), nl_langinfo_l(3)
 @@Return the name of the given `item' (one of the macros above)
@@ -266,10 +281,10 @@ __SYSDECL_BEGIN
 @@This function never returns `NULL',  but may return an  empty
 @@string when `item' is invalid.
 @@@param: item: One of the macros from <langinfo.h>, or one of `_NL_*'
-[[nonnull, decl_include("<features.h>")]]
+[[nonnull, decl_include("<bits/crt/langinfo.h>")]]
 [[impl_include("<asm/crt/langinfo.h>", "<asm/crt/locale.h>")]]
 [[impl_include("<hybrid/byteorder.h>", "<hybrid/typecore.h>")]]
-char __KOS_FIXED_CONST *nl_langinfo(__STDC_INT_AS_UINT_T item) {
+char __KOS_FIXED_CONST *nl_langinfo(nl_item item) {
 	char const *result = "";
 	unsigned int idx = @_NL_ITEM_INDEX@(item);
 /*[[[deemon
@@ -1091,8 +1106,8 @@ print("	}");
 %
 %#ifdef __USE_XOPEN2K
 [[doc_alias("nl_langinfo"), export_alias("__nl_langinfo_l")]]
-[[nonnull, requires_function(nl_langinfo), decl_include("<features.h>")]]
-char __KOS_FIXED_CONST *nl_langinfo_l(__STDC_INT_AS_UINT_T item, $locale_t locale) {
+[[nonnull, requires_function(nl_langinfo), decl_include("<bits/crt/langinfo.h>")]]
+char __KOS_FIXED_CONST *nl_langinfo_l(nl_item item, $locale_t locale) {
 	(void)locale;
 	return nl_langinfo(item);
 }

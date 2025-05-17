@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61d687bd */
+/* HASH CRC-32:0xa573f846 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,14 @@
 #ifndef __local_nl_langinfo_defined
 #define __local_nl_langinfo_defined
 #include <__crt.h>
-#include <features.h>
+#include <bits/crt/langinfo.h>
 #include <asm/crt/langinfo.h>
 #include <asm/crt/locale.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nl_langinfo) __ATTR_RETNONNULL char __KOS_FIXED_CONST *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nl_langinfo))(__STDC_INT_AS_UINT_T __item) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nl_langinfo))(__nl_item __item) {
 	char const *__result = "";
 	unsigned int __idx = _NL_ITEM_INDEX(__item);
 /*[[[deemon

@@ -39,6 +39,8 @@
 
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <bits/crt/langinfo.h>
 )]%{
 
 #define NL_SETD 1
@@ -48,12 +50,17 @@
 __SYSDECL_BEGIN
 
 typedef void *nl_catd;
-typedef int nl_item;
+
+#ifndef __nl_item_defined
+#define __nl_item_defined
+typedef __nl_item nl_item;
+#endif /* !__nl_item_defined */
 
 }
 
 %[define_replacement(nl_catd = "void *")]
-%[define_replacement(nl_item = "int")]
+%[define_replacement(nl_item = "__nl_item")]
+%[define_type_class(__nl_item = "TD")]
 
 [[cp]] nl_catd catopen([[in]] char const *cat_name, int flag);
 char *catgets([[inout]] nl_catd catalog, int set, int number, char const *string);

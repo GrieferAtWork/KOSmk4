@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2b3d8b0 */
+/* HASH CRC-32:0x9b8a72a0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,25 @@
 
 #include <features.h>
 #include <asm/crt/langinfo.h>
+#include <bits/crt/langinfo.h>
 #include <nl_types.h>
 #ifdef __USE_XOPEN2K8
-#include <xlocale.h>
+#include <xlocale.h> /* locale_t */
 #endif /* __USE_XOPEN2K8 */
+
+/* susv4-2018: Inclusion of the <langinfo.h> header may also
+ *             make visible all  symbols from  <nl_types.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <nl_types.h>
+#endif /* __USE_POSIX_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __nl_item_defined
+#define __nl_item_defined
+typedef __nl_item nl_item;
+#endif /* !__nl_item_defined */
 
 /* Construct an index for use with `nl_langinfo(3)' or `nl_langinfo_l(3)',
  * that will return the name of the locale currently used for  `category'.
@@ -263,7 +275,7 @@ __SYSDECL_BEGIN
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-__CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo,(__STDC_INT_AS_UINT_T __item),(__item))
+__CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo,(nl_item __item),(__item))
 #else /* __CRT_HAVE_nl_langinfo */
 #include <libc/local/langinfo/nl_langinfo.h>
 /* >> nl_langinfo(3), nl_langinfo_l(3)
@@ -272,7 +284,7 @@ __CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo,
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char __KOS_FIXED_CONST *__NOTHROW_NCX(__LIBCCALL nl_langinfo)(__STDC_INT_AS_UINT_T __item) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nl_langinfo))(__item); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char __KOS_FIXED_CONST *__NOTHROW_NCX(__LIBCCALL nl_langinfo)(nl_item __item) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nl_langinfo))(__item); })
 #endif /* !__CRT_HAVE_nl_langinfo */
 
 #ifdef __USE_XOPEN2K
@@ -283,7 +295,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-__CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(__STDC_INT_AS_UINT_T __item, __locale_t __locale),(__item,__locale))
+__CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(nl_item __item, __locale_t __locale),(__item,__locale))
 #elif defined(__CRT_HAVE___nl_langinfo_l)
 /* >> nl_langinfo(3), nl_langinfo_l(3)
  * Return the name of the given `item' (one of the macros above)
@@ -291,7 +303,7 @@ __CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(__STDC_INT_AS_UINT_T __item, __locale_t __locale),__nl_langinfo_l,(__item,__locale))
+__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(nl_item __item, __locale_t __locale),__nl_langinfo_l,(__item,__locale))
 #else /* ... */
 #include <libc/local/langinfo/nl_langinfo_l.h>
 /* >> nl_langinfo(3), nl_langinfo_l(3)
@@ -300,7 +312,7 @@ __CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo
  * This function never returns `NULL',  but may return an  empty
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char __KOS_FIXED_CONST *__NOTHROW_NCX(__LIBCCALL nl_langinfo_l)(__STDC_INT_AS_UINT_T __item, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nl_langinfo_l))(__item, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char __KOS_FIXED_CONST *__NOTHROW_NCX(__LIBCCALL nl_langinfo_l)(nl_item __item, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nl_langinfo_l))(__item, __locale); })
 #endif /* !... */
 #endif /* __USE_XOPEN2K */
 

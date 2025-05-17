@@ -38,6 +38,11 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(socklen_t = __socklen_t)]
+%[define_replacement(in_port_t = __in_port_t)]
+%[define_replacement(in_addr_t = __in_addr_t)]
+%[define_type_class(__in_port_t = "TI16")]
+%[define_type_class(__in_addr_t = "TI32")]
 
 %[define_decl_include("<bits/os/sockaddr.h>": ["struct sockaddr"])]
 %[define_decl_include("<bits/os/sockaddr_storage.h>": ["struct sockaddr_storage"])]
@@ -67,6 +72,8 @@
 )]%[insert:prefix(
 #include <netinet/asm/in.h> /* Macro constants... */
 )]%[insert:prefix(
+#include <netinet/bits/in_addr_t.h> /* __in_port_t, __in_addr_t */
+)]%[insert:prefix(
 #include <netinet/bits/in_addr.h> /* struct in_addr */
 )]%[insert:prefix(
 #include <netinet/bits/sockaddr_in.h> /* struct sockaddr_in */
@@ -74,10 +81,9 @@
 #include <netinet/bits/sockaddr_in6.h> /* struct sockaddr_in6 */
 )]%[insert:prefix(
 #include <netinet/bits/ipv6_mreq.h> /* struct ipv6_mreq */
+)]%[insert:prefix(
+#include <netinet/asm/ipproto.h> /* __IPPROTO_* */
 )]%{
-
-#include <netinet/ipport.h>  /* IPPORT_* */
-#include <netinet/ipproto.h> /* IPPROTO_* */
 
 #ifdef __USE_MISC
 #include <netinet/bits/group_req.h>   /* struct group_req, struct group_source_req */
@@ -89,6 +95,8 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_GNU
+#include <netinet/ipproto.h> /* IPPROTO_* */
+#include <netinet/ipport.h>  /* IPPORT_* */
 #include <netinet/bits/in6_pktinfo.h>
 #include <netinet/bits/ip6_mtuinfo.h>
 #endif /* __USE_GNU */
@@ -98,13 +106,20 @@
 #endif /* __INTELLISENSE__ */
 
 #ifdef __USE_GLIBC_BLOAT
+#include <netinet/ipproto.h> /* IPPROTO_* */
+#include <netinet/ipport.h>  /* IPPORT_* */
 #include <endian.h>
 #include <stdint.h>
 #endif /* __USE_GLIBC_BLOAT */
 
+/* susv4-2018: Inclusion of the <netinet/in.h> header may also
+ *             make  visible  all symbols  from <arpa/inet.h>. */
 /* susv4-2018: Inclusion  of  the  <netinet/in.h> header  may  also make
  *             visible all symbols from <inttypes.h> and <sys/socket.h>. */
 #ifdef __USE_POSIX_BLOAT
+#ifndef _ARPA_INET_H
+#include <arpa/inet.h>
+#endif /* !_ARPA_INET_H */
 #include <sys/socket.h>
 #include <inttypes.h>
 #endif /* __USE_POSIX_BLOAT */
@@ -199,6 +214,28 @@
 #if !defined(INADDR_MAX_LOCAL_GROUP) && defined(__INADDR_MAX_LOCAL_GROUP)
 #define INADDR_MAX_LOCAL_GROUP __INADDR_MAX_LOCAL_GROUP /* 224.0.0.255 */
 #endif /* !INADDR_MAX_LOCAL_GROUP && __INADDR_MAX_LOCAL_GROUP */
+
+
+/* IPPROTO_* options mandated by posix: */
+#if !defined(IPPROTO_IP) && defined(__IPPROTO_IP)
+#define IPPROTO_IP   __IPPROTO_IP   /* Dummy protocol for TCP. */
+#endif /* !IPPROTO_IP && __IPPROTO_IP */
+#if !defined(IPPROTO_IPV6) && defined(__IPPROTO_IPV6)
+#define IPPROTO_IPV6 __IPPROTO_IPV6 /* [IPv6] IPv6 header. */
+#endif /* !IPPROTO_IPV6 && __IPPROTO_IPV6 */
+#if !defined(IPPROTO_ICMP) && defined(__IPPROTO_ICMP)
+#define IPPROTO_ICMP __IPPROTO_ICMP /* Internet Control Message Protocol. */
+#endif /* !IPPROTO_ICMP && __IPPROTO_ICMP */
+#if !defined(IPPROTO_RAW) && defined(__IPPROTO_RAW)
+#define IPPROTO_RAW  __IPPROTO_RAW  /* Raw IP packets. */
+#endif /* !IPPROTO_RAW && __IPPROTO_RAW */
+#if !defined(IPPROTO_TCP) && defined(__IPPROTO_TCP)
+#define IPPROTO_TCP  __IPPROTO_TCP  /* Transmission Control Protocol. */
+#endif /* !IPPROTO_TCP && __IPPROTO_TCP */
+#if !defined(IPPROTO_UDP) && defined(__IPPROTO_UDP)
+#define IPPROTO_UDP  __IPPROTO_UDP  /* User Datagram Protocol. */
+#endif /* !IPPROTO_UDP && __IPPROTO_UDP */
+
 
 
 /* Comments taken from GLibc. See the following copyright notice: */
@@ -597,10 +634,10 @@
 
 
 #if !defined(INET_ADDRSTRLEN) && defined(__INET_ADDRSTRLEN)
-#define INET_ADDRSTRLEN  __INET_ADDRSTRLEN /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
+#define INET_ADDRSTRLEN  __INET_ADDRSTRLEN  /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
 #endif /* !INET_ADDRSTRLEN && __INET_ADDRSTRLEN */
 #if !defined(INET6_ADDRSTRLEN) && defined(__INET6_ADDRSTRLEN)
-#define INET6_ADDRSTRLEN __INET6_ADDRSTRLEN
+#define INET6_ADDRSTRLEN __INET6_ADDRSTRLEN /* Length of the string form for IPv6. */
 #endif /* !INET6_ADDRSTRLEN && __INET6_ADDRSTRLEN */
 
 
@@ -631,6 +668,11 @@ typedef __socklen_t socklen_t;
 #define __in_port_t_defined
 typedef __in_port_t in_port_t; /* Type to represent a port. */
 #endif /* !__in_port_t_defined */
+
+#ifndef __in_addr_t_defined
+#define __in_addr_t_defined
+typedef __in_addr_t in_addr_t;
+#endif /* !__in_addr_t_defined */
 
 /* Only uint32_t+uint8_t! */
 #ifndef __uint8_t_defined

@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/*!included_by <netinet/in.h>*/
 #ifndef _NETINET_IPPORT_H
 #define _NETINET_IPPORT_H 1
 
 #include <__stdinc.h>
+
+#include <netinet/asm/ipport.h>
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -43,33 +44,89 @@
 
 
 /* Standard well-known ports. */
-#define IPPORT_ECHO         7    /* Echo service. */
-#define IPPORT_DISCARD      9    /* Discard transmissions service. */
-#define IPPORT_SYSTAT       11   /* System status service. */
-#define IPPORT_DAYTIME      13   /* Time of day service. */
-#define IPPORT_NETSTAT      15   /* Network status service. */
-#define IPPORT_FTP          21   /* File Transfer Protocol. */
-#define IPPORT_TELNET       23   /* Telnet protocol. */
-#define IPPORT_SMTP         25   /* Simple Mail Transfer Protocol. */
-#define IPPORT_TIMESERVER   37   /* Timeserver service. */
-#define IPPORT_NAMESERVER   42   /* Domain Name Service. */
-#define IPPORT_WHOIS        43   /* Internet Whois service. */
-#define IPPORT_MTP          57
-#define IPPORT_TFTP         69   /* Trivial File Transfer Protocol. */
-#define IPPORT_RJE          77
-#define IPPORT_FINGER       79   /* Finger service. */
-#define IPPORT_HTTP         80   /* Hypertext Transfer Protocol */
-#define IPPORT_TTYLINK      87
-#define IPPORT_SUPDUP       95   /* SUPDUP protocol. */
-#define IPPORT_HTTPS        443  /* Hypertext Transfer Protocol Secure */
-#define IPPORT_EXECSERVER   512  /* execd service. */
-#define IPPORT_LOGINSERVER  513  /* rlogind service. */
-#define IPPORT_CMDSERVER    514
-#define IPPORT_EFSSERVER    520
-#define IPPORT_BIFFUDP      512  /* UDP ports. */
-#define IPPORT_WHOSERVER    513  /* ... */
-#define IPPORT_ROUTESERVER  520  /* ... */
-#define IPPORT_RESERVED     1024 /* Ports less than this value are reserved for privileged processes. */
-#define IPPORT_USERRESERVED 5000 /* Ports greater this value are reserved for (non-privileged) servers. */
+#if !defined(IPPORT_ECHO) && defined(__IPPORT_ECHO)
+#define IPPORT_ECHO         __IPPORT_ECHO       /* Echo service. */
+#endif /* !IPPORT_ECHO && __IPPORT_ECHO */
+#if !defined(IPPORT_DISCARD) && defined(__IPPORT_DISCARD)
+#define IPPORT_DISCARD      __IPPORT_DISCARD    /* Discard transmissions service. */
+#endif /* !IPPORT_DISCARD && __IPPORT_DISCARD */
+#if !defined(IPPORT_SYSTAT) && defined(__IPPORT_SYSTAT)
+#define IPPORT_SYSTAT       __IPPORT_SYSTAT     /* System status service. */
+#endif /* !IPPORT_SYSTAT && __IPPORT_SYSTAT */
+#if !defined(IPPORT_DAYTIME) && defined(__IPPORT_DAYTIME)
+#define IPPORT_DAYTIME      __IPPORT_DAYTIME    /* Time of day service. */
+#endif /* !IPPORT_DAYTIME && __IPPORT_DAYTIME */
+#if !defined(IPPORT_NETSTAT) && defined(__IPPORT_NETSTAT)
+#define IPPORT_NETSTAT      __IPPORT_NETSTAT    /* Network status service. */
+#endif /* !IPPORT_NETSTAT && __IPPORT_NETSTAT */
+#if !defined(IPPORT_FTP) && defined(__IPPORT_FTP)
+#define IPPORT_FTP          __IPPORT_FTP        /* File Transfer Protocol. */
+#endif /* !IPPORT_FTP && __IPPORT_FTP */
+#if !defined(IPPORT_TELNET) && defined(__IPPORT_TELNET)
+#define IPPORT_TELNET       __IPPORT_TELNET     /* Telnet protocol. */
+#endif /* !IPPORT_TELNET && __IPPORT_TELNET */
+#if !defined(IPPORT_SMTP) && defined(__IPPORT_SMTP)
+#define IPPORT_SMTP         __IPPORT_SMTP       /* Simple Mail Transfer Protocol. */
+#endif /* !IPPORT_SMTP && __IPPORT_SMTP */
+#if !defined(IPPORT_TIMESERVER) && defined(__IPPORT_TIMESERVER)
+#define IPPORT_TIMESERVER   __IPPORT_TIMESERVER /* Timeserver service. */
+#endif /* !IPPORT_TIMESERVER && __IPPORT_TIMESERVER */
+#if !defined(IPPORT_NAMESERVER) && defined(__IPPORT_NAMESERVER)
+#define IPPORT_NAMESERVER   __IPPORT_NAMESERVER /* Domain Name Service. */
+#endif /* !IPPORT_NAMESERVER && __IPPORT_NAMESERVER */
+#if !defined(IPPORT_WHOIS) && defined(__IPPORT_WHOIS)
+#define IPPORT_WHOIS        __IPPORT_WHOIS      /* Internet Whois service. */
+#endif /* !IPPORT_WHOIS && __IPPORT_WHOIS */
+#if !defined(IPPORT_MTP) && defined(__IPPORT_MTP)
+#define IPPORT_MTP          __IPPORT_MTP
+#endif /* !IPPORT_MTP && __IPPORT_MTP */
+#if !defined(IPPORT_TFTP) && defined(__IPPORT_TFTP)
+#define IPPORT_TFTP         __IPPORT_TFTP /* Trivial File Transfer Protocol. */
+#endif /* !IPPORT_TFTP && __IPPORT_TFTP */
+#if !defined(IPPORT_RJE) && defined(__IPPORT_RJE)
+#define IPPORT_RJE          __IPPORT_RJE
+#endif /* !IPPORT_RJE && __IPPORT_RJE */
+#if !defined(IPPORT_FINGER) && defined(__IPPORT_FINGER)
+#define IPPORT_FINGER       __IPPORT_FINGER /* Finger service. */
+#endif /* !IPPORT_FINGER && __IPPORT_FINGER */
+#if !defined(IPPORT_HTTP) && defined(__IPPORT_HTTP)
+#define IPPORT_HTTP         __IPPORT_HTTP   /* Hypertext Transfer Protocol */
+#endif /* !IPPORT_HTTP && __IPPORT_HTTP */
+#if !defined(IPPORT_TTYLINK) && defined(__IPPORT_TTYLINK)
+#define IPPORT_TTYLINK      __IPPORT_TTYLINK
+#endif /* !IPPORT_TTYLINK && __IPPORT_TTYLINK */
+#if !defined(IPPORT_SUPDUP) && defined(__IPPORT_SUPDUP)
+#define IPPORT_SUPDUP       __IPPORT_SUPDUP      /* SUPDUP protocol. */
+#endif /* !IPPORT_SUPDUP && __IPPORT_SUPDUP */
+#if !defined(IPPORT_HTTPS) && defined(__IPPORT_HTTPS)
+#define IPPORT_HTTPS        __IPPORT_HTTPS       /* Hypertext Transfer Protocol Secure */
+#endif /* !IPPORT_HTTPS && __IPPORT_HTTPS */
+#if !defined(IPPORT_EXECSERVER) && defined(__IPPORT_EXECSERVER)
+#define IPPORT_EXECSERVER   __IPPORT_EXECSERVER  /* execd service. */
+#endif /* !IPPORT_EXECSERVER && __IPPORT_EXECSERVER */
+#if !defined(IPPORT_LOGINSERVER) && defined(__IPPORT_LOGINSERVER)
+#define IPPORT_LOGINSERVER  __IPPORT_LOGINSERVER /* rlogind service. */
+#endif /* !IPPORT_LOGINSERVER && __IPPORT_LOGINSERVER */
+#if !defined(IPPORT_CMDSERVER) && defined(__IPPORT_CMDSERVER)
+#define IPPORT_CMDSERVER    __IPPORT_CMDSERVER
+#endif /* !IPPORT_CMDSERVER && __IPPORT_CMDSERVER */
+#if !defined(IPPORT_EFSSERVER) && defined(__IPPORT_EFSSERVER)
+#define IPPORT_EFSSERVER    __IPPORT_EFSSERVER
+#endif /* !IPPORT_EFSSERVER && __IPPORT_EFSSERVER */
+#if !defined(IPPORT_BIFFUDP) && defined(__IPPORT_BIFFUDP)
+#define IPPORT_BIFFUDP      __IPPORT_BIFFUDP      /* UDP ports. */
+#endif /* !IPPORT_BIFFUDP && __IPPORT_BIFFUDP */
+#if !defined(IPPORT_WHOSERVER) && defined(__IPPORT_WHOSERVER)
+#define IPPORT_WHOSERVER    __IPPORT_WHOSERVER    /* ... */
+#endif /* !IPPORT_WHOSERVER && __IPPORT_WHOSERVER */
+#if !defined(IPPORT_ROUTESERVER) && defined(__IPPORT_ROUTESERVER)
+#define IPPORT_ROUTESERVER  __IPPORT_ROUTESERVER  /* ... */
+#endif /* !IPPORT_ROUTESERVER && __IPPORT_ROUTESERVER */
+#if !defined(IPPORT_RESERVED) && defined(__IPPORT_RESERVED)
+#define IPPORT_RESERVED     __IPPORT_RESERVED     /* Ports less than this value are reserved for privileged processes. */
+#endif /* !IPPORT_RESERVED && __IPPORT_RESERVED */
+#if !defined(IPPORT_USERRESERVED) && defined(__IPPORT_USERRESERVED)
+#define IPPORT_USERRESERVED __IPPORT_USERRESERVED /* Ports greater this value are reserved for (non-privileged) servers. */
+#endif /* !IPPORT_USERRESERVED && __IPPORT_USERRESERVED */
 
 #endif /* !_NETINET_IPPORT_H */
