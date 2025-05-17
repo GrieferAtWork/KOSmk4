@@ -28,11 +28,14 @@
 /* (#) Portability: libc6         (/include/tgmath.h) */
 /* (#) Portability: musl libc     (/include/tgmath.h) */
 /* (#) Portability: uClibc        (/include/tgmath.h) */
+/*!always_includes <complex.h>*/
+/*!always_includes <math.h>*/
 #ifndef _TGMATH_H
 #define _TGMATH_H 1
 
 #include <__stdinc.h>
 
+/* susv4: The <tgmath.h> header shall include the headers <math.h> and <complex.h> [...] */
 #ifdef _Complex_I
 #include <complex.h>
 #endif /* _Complex_I */

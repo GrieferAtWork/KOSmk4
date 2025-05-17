@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0b46723 */
+/* HASH CRC-32:0x4b049906 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,6 +144,15 @@ __NAMESPACE_STD_USING(timespec_getres)
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+
+
+/* susv4-2018: Inclusion  of  the  <time.h>  header  may  make
+ *             visible all symbols from the <signal.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#ifndef _SIGNAL_H
+#include <signal.h>
+#endif /* !_SIGNAL_H */
+#endif /* __USE_POSIX_BLOAT */
 
 #ifdef __USE_GNU
 #include <asm/os/timex.h>

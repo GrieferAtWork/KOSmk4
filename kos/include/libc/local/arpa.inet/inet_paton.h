@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf02ad3d9 */
+/* HASH CRC-32:0x30c98fb8 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_inet_paton_defined
 #define __local_inet_paton_defined
 #include <__crt.h>
-#include <netinet/bits/in.h>
+#include <netinet/bits/in_addr.h>
 #include <hybrid/__byteswap.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN

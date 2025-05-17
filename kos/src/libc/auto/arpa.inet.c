@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff6f339d */
+/* HASH CRC-32:0xee7afbfc */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ NOTHROW(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 		return addr & IN_CLASSC_HOST;
 	}
 }
-#include <netinet/in.h>
+#include <netinet/asm/in.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_makeaddr(3)
  * Construct  an  Internet-host-address in  network byte  order from
@@ -73,19 +73,20 @@ NOTHROW(LIBCCALL libc_inet_makeaddr)(uint32_t net,
                                      uint32_t host) {
 	struct in_addr result;
 	uint32_t result_addr;
-	if (net < IN_CLASSA_MAX) {
-		result_addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
-	} else if (net < IN_CLASSB_MAX) {
-		result_addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
-	} else if (net < IN_CLASSC_MAX) {
-		result_addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
+	if (net < __IN_CLASSA_MAX) {
+		result_addr = (net << __IN_CLASSA_NSHIFT) | (host & __IN_CLASSA_HOST);
+	} else if (net < __IN_CLASSB_MAX) {
+		result_addr = (net << __IN_CLASSB_NSHIFT) | (host & __IN_CLASSB_HOST);
+	} else if (net < __IN_CLASSC_MAX) {
+		result_addr = (net << __IN_CLASSC_NSHIFT) | (host & __IN_CLASSC_HOST);
 	} else {
 		result_addr = net | host;
 	}
 	result.s_addr = __hybrid_htobe32(result_addr);
 	return result;
 }
-#include <netinet/in.h>
+#include <netinet/bits/in_addr.h>
+#include <netinet/asm/in.h>
 /* >> inet_addr(3)
  * Convert an  Internet host  address  `CP' from  its  numbers-and-dots
  * notational form into its binary representation in network byte order
@@ -102,9 +103,10 @@ INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_IN(1) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	struct in_addr addr;
 	if (!libc_inet_paton((char const **)&cp, &addr, 0) || *cp)
-		return (in_addr_t)INADDR_NONE;
+		return (in_addr_t)__INADDR_NONE;
 	return addr.s_addr;
 }
+#include <netinet/asm/in.h>
 #include "../libc/tls-globals.h"
 /* >> inet_ntoa(3)
  * Return   the   conventional  numbers-and-dots   representation   of  a
@@ -113,18 +115,18 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
-	char (*const _p_inet_ntoa_buf)[16] = &libc_get_tlsglobals()->ltg_inet_ntoa_buf;
+	char (*const _p_inet_ntoa_buf)[__INET_ADDRSTRLEN] = &libc_get_tlsglobals()->ltg_inet_ntoa_buf;
 #define inet_ntoa_buf (*_p_inet_ntoa_buf)
 	return libc_inet_ntoa_r(inaddr, inet_ntoa_buf);
 }
 #undef inet_ntoa_buf
-#include <netinet/in.h>
+#include <netinet/bits/in_addr.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
-                                       char buf[16]) {
+                                       char buf[__INET_ADDRSTRLEN]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	libc_sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
@@ -133,7 +135,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
 	        (unsigned int)(u8)((addr & __UINT32_C(0x000000ff))));
 	return buf;
 }
-#include <netinet/in.h>
+#include <netinet/asm/in.h>
+#include <netinet/bits/in_addr.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
@@ -142,7 +145,7 @@ INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_IN(1) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 	struct in_addr addr;
 	if (!libc_inet_paton((char const **)&cp, &addr, 1) || *cp)
-		return INADDR_NONE;
+		return __INADDR_NONE;
 	return addr.s_addr;
 }
 /* >> inet_aton(3)
@@ -380,7 +383,7 @@ DEFINE_PUBLIC_ALIAS_P(inet_lnaof,libc_inet_lnaof,ATTR_CONST WUNUSED,uint32_t,NOT
 DEFINE_PUBLIC_ALIAS_P(inet_makeaddr,libc_inet_makeaddr,ATTR_CONST WUNUSED,struct in_addr,NOTHROW,LIBCCALL,(uint32_t net, uint32_t host),(net,host));
 DEFINE_PUBLIC_ALIAS_P(inet_addr,libc_inet_addr,ATTR_PURE ATTR_IN(1),in_addr_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp),(cp));
 DEFINE_PUBLIC_ALIAS_P(inet_ntoa,libc_inet_ntoa,ATTR_RETNONNULL WUNUSED,char *,NOTHROW_NCX,LIBCCALL,(struct in_addr inaddr),(inaddr));
-DEFINE_PUBLIC_ALIAS_P(inet_ntoa_r,libc_inet_ntoa_r,ATTR_RETNONNULL ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct in_addr inaddr, char buf[16]),(inaddr,buf));
+DEFINE_PUBLIC_ALIAS_P(inet_ntoa_r,libc_inet_ntoa_r,ATTR_RETNONNULL ATTR_OUT(2),char *,NOTHROW_NCX,LIBCCALL,(struct in_addr inaddr, char buf[__INET_ADDRSTRLEN]),(inaddr,buf));
 DEFINE_PUBLIC_ALIAS_P(inet_network,libc_inet_network,ATTR_PURE ATTR_IN(1),uint32_t,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp),(cp));
 DEFINE_PUBLIC_ALIAS_P(inet_aton,libc_inet_aton,ATTR_IN(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const *__restrict cp, struct in_addr *__restrict inp),(cp,inp));
 DEFINE_PUBLIC_ALIAS_P(inet_paton,libc_inet_paton,WUNUSED ATTR_INOUT(1) ATTR_OUT(2),int,NOTHROW_NCX,LIBCCALL,(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr),(pcp,inp,network_addr));

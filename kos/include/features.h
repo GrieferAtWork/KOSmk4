@@ -637,7 +637,23 @@
 #ifdef _GLIBC_BLOAT_SOURCE
 #undef __USE_GLIBC_BLOAT
 #define __USE_GLIBC_BLOAT 1
+#undef __USE_POSIX_BLOAT
+#define __USE_POSIX_BLOAT 1
 #endif /* _GLIBC_BLOAT_SOURCE */
+
+/* Similar to "_GLIBC_BLOAT_SOURCE": any time the posix specs say that:
+ * - "Inclusion of the [<foo.h>] header may make visible all symbols from the headers"
+ * - "Inclusion of the [<foo.h>] header may also make visible all symbols from"
+ * - ...
+ * this feature macro causes that implicit include to happen.
+ * Posix specs were grep'd for:
+ * - "may make visible all symbols"
+ * - "may also make visible all symbols"
+ */
+#ifdef _POSIX_BLOAT_SOURCE
+#undef __USE_POSIX_BLOAT
+#define __USE_POSIX_BLOAT 1
+#endif /* _POSIX_BLOAT_SOURCE */
 
 
 /* Some system headers  may define secondary  variants of  certain

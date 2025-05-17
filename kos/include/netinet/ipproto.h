@@ -191,5 +191,4 @@
 #define IPPROTO_MAX      256 /* WARNING: This  is  actually 1+  the max  possible IPPROTO!
                               * The protocol-field of IP is 1-byte, so the max is 0xff=255 */
 
-
 #endif /* !_NETINET_IPPROTO_H */

@@ -21,14 +21,17 @@
 #ifndef __assertion_failed
 #include "../__stdinc.h"
 #ifndef __CC__
-#define __assertion_failed(expr_str)                            /* nothing */
-#define __assertion_failed_at(expr_str, file, line, func)       /* nothing */
+#define __assertion_failed(expr_str)                      /* nothing */
+#define __assertion_failed_at(expr_str, file, line, func) /* nothing */
+#define __assertion_npcked_failed(expr_str)               /* nothing */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertion_failedf(expr_str, ...)                      /* nothing */
 #define __assertion_failedf_at(expr_str, file, line, func, ...) /* nothing */
+#define __assertion_npcked_failedf(expr_str, ...)               /* nothing */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __assertion_failedf(expr_str, format...)                      /* nothing */
 #define __assertion_failedf_at(expr_str, file, line, func, format...) /* nothing */
+#define __assertion_npcked_failedf(expr_str, format...)               /* nothing */
 #endif /* ... */
 #else /* !__CC__ */
 #include "../features.h"
@@ -91,48 +94,48 @@ __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __apcheckf)(struct __apfail_struct const 
 
 #if defined(__CRT_HAVE___afail) && !defined(__NO_builtin_FUNCTION)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__afail,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __afail)(expr_str, file, line, func)
 #elif defined(__CRT_HAVE___assert_fail) && !defined(__NO_builtin_FUNCTION)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_fail,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, file, line, func)
 #elif defined(__CRT_HAVE___assert_func) && !defined(__NO_builtin_FUNCTION)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_func,(char const *__file, unsigned int __line, char const *__func, char const *__expr),(__file,__line,__func,__expr))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __builtin_FUNCTION(), expr_str)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __builtin_FUNCTION(), expr_str)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_func)(file, line, func, expr_str)
 #elif defined(__CRT_HAVE___assertfail) && !defined(__NO_builtin_FUNCTION)
 #include <hybrid/typecore.h>
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assertfail,(char const *__expr, char const *__file, unsigned int __line, char const *__func, __SIZE_TYPE__ __charsize),(__expr,__file,__line,__func,__charsize))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), sizeof(char))
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), sizeof(char))
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assertfail)(expr_str, file, line, func, sizeof(char))
 #elif defined(__CRT_HAVE__assert)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,_assert,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line),(__expr,__file,__line))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM _assert)(expr_str, __FILE__, __LINE__)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM _assert)(expr_str, __FILE__, __LINE__)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM _assert)(expr_str, file, line)
 #elif defined(__CRT_HAVE___assert)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert,(char const *__restrict __file, unsigned int __line, char const *__restrict __expr),(__file,__line,__expr))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assert)(__FILE__, __LINE__, expr_str)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assert)(__FILE__, __LINE__, expr_str)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert)(file, line, expr_str)
 #elif defined(__CRT_HAVE___afail)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__afail,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __NULLPTR)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __NULLPTR)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __afail)(expr_str, file, line, func)
 #elif defined(__CRT_HAVE___assert_fail)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_fail,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __NULLPTR)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __NULLPTR)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, file, line, func)
 #elif defined(__CRT_HAVE___assert_func)
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_func,(char const *__file, unsigned int __line, char const *__func, char const *__expr),(__file,__line,__func,__expr))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __NULLPTR, expr_str)
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __NULLPTR, expr_str)
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_func)(file, line, func, func, expr_str)
 #elif defined(__CRT_HAVE___assertfail)
 #include <hybrid/typecore.h>
 __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assertfail,(char const *__expr, char const *__file, unsigned int __line, char const *__func, __SIZE_TYPE__ __charsize),(__expr,__file,__line,__func,__charsize))
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __NULLPTR, sizeof(char))
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __NULLPTR, sizeof(char))
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assertfail)(expr_str, file, line, func, sizeof(char))
 #else /* ... */
-#define __assertion_failed(expr_str)                      (__NAMESPACE_INT_SYM __fallback_assert_fail)()
+#define __assertion_npcked_failed(expr_str)               (__NAMESPACE_INT_SYM __fallback_assert_fail)()
 #define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __fallback_assert_fail)()
 __LOCAL_LIBC(__fallback_assert_fail) __ATTR_COLD __ATTR_NORETURN
 void (__LIBCCALL __fallback_assert_fail)(void) {
@@ -150,7 +153,7 @@ void (__LIBCCALL __fallback_assert_fail)(void) {
 #ifdef __CRT_HAVE___afailf
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__afailf");
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_failedf(expr_str, ...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
+#define __assertion_npcked_failedf(expr_str, ...)               (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
 #define __assertion_failedf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, __VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define __assertion_failedf(expr_str, format...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
@@ -158,10 +161,10 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__exp
 #endif /* ... */
 #else /* __CRT_HAVE___afailf */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_failedf(expr_str, ...)                      __assertion_failed(expr_str)
+#define __assertion_npcked_failedf(expr_str, ...)               __assertion_npcked_failed(expr_str)
 #define __assertion_failedf_at(expr_str, file, line, func, ...) __assertion_failed_at(expr_str, file, line, func)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __assertion_failedf(expr_str, format...)                      __assertion_failed(expr_str)
+#define __assertion_npcked_failedf(expr_str, format...)               __assertion_npcked_failed(expr_str)
 #define __assertion_failedf_at(expr_str, file, line, func, format...) __assertion_failed_at(expr_str, file, line, func)
 #endif /* ... */
 #endif /* !__CRT_HAVE___afailf */
@@ -186,25 +189,25 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__exp
  */
 /*__CDECLARE(__ATTR_COLD,__BOOL,,__acheck,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))*/
 __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheck)(char const *__expr, char const *__file, unsigned int __line, char const *__func) __CASMNAME_SAME("__acheck");
-#define __assertion_check(expr_str)                      (__NAMESPACE_INT_SYM __acheck)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
+#define __assertion_npcked_check(expr_str)               (__NAMESPACE_INT_SYM __acheck)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION())
 #define __assertion_check_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __acheck)(expr_str, file, line, func)
 #endif /* __CRT_HAVE___acheck */
 
 #ifdef __CRT_HAVE___acheckf
 __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheckf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__acheckf");
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_checkf(expr_str, ...)                      (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
+#define __assertion_npcked_checkf(expr_str, ...)               (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
 #define __assertion_checkf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, file, line, func, __VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __assertion_checkf(expr_str, format...)                      (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
+#define __assertion_npcked_checkf(expr_str, format...)               (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
 #define __assertion_checkf_at(expr_str, file, line, func, format...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, file, line, func, format)
 #endif /* ... */
 #elif defined(__assertion_check)
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __assertion_checkf(expr_str, ...)                      __assertion_check(expr_str)
+#define __assertion_npcked_checkf(expr_str, ...)               __assertion_npcked_check(expr_str)
 #define __assertion_checkf_at(expr_str, file, line, func, ...) __assertion_check_at(expr_str, file, line, func)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __assertion_checkf(expr_str, format...)                      __assertion_check(expr_str)
+#define __assertion_npcked_checkf(expr_str, format...)               __assertion_npcked_check(expr_str)
 #define __assertion_checkf_at(expr_str, file, line, func, format...) __assertion_check_at(expr_str, file, line, func)
 #endif /* ... */
 #endif /* __CRT_HAVE___acheckf */
@@ -227,22 +230,31 @@ __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheckf)(char const *__expr, char const
 
 #ifdef __LIBC_ASSERT_USE_PACKED
 #ifdef __assertion_packed_failed
-#undef __assertion_failed
 #define __assertion_failed __assertion_packed_failed
 #endif /* __assertion_packed_failed */
 #ifdef __assertion_packed_failedf
-#undef __assertion_failedf
 #define __assertion_failedf __assertion_packed_failedf
 #endif /* __assertion_packed_failedf */
 #ifdef __assertion_packed_check
-#undef __assertion_check
 #define __assertion_check __assertion_packed_check
 #endif /* __assertion_packed_check */
 #ifdef __assertion_packed_checkf
-#undef __assertion_checkf
 #define __assertion_checkf __assertion_packed_checkf
 #endif /* __assertion_packed_checkf */
 #endif /* __LIBC_ASSERT_USE_PACKED */
+
+#if !defined(__assertion_failed) && defined(__assertion_npcked_failed)
+#define __assertion_failed __assertion_npcked_failed
+#endif /* !__assertion_failed && __assertion_npcked_failed */
+#if !defined(__assertion_failedf) && defined(__assertion_npcked_failedf)
+#define __assertion_failedf __assertion_npcked_failedf
+#endif /* !__assertion_failedf && __assertion_npcked_failedf */
+#if !defined(__assertion_check) && defined(__assertion_npcked_check)
+#define __assertion_check __assertion_npcked_check
+#endif /* !__assertion_check && __assertion_npcked_check */
+#if !defined(__assertion_checkf) && defined(__assertion_npcked_checkf)
+#define __assertion_checkf __assertion_npcked_checkf
+#endif /* !__assertion_checkf && __assertion_npcked_checkf */
 
 __NAMESPACE_INT_END
 __SYSDECL_END

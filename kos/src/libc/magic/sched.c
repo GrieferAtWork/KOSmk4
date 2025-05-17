@@ -62,6 +62,12 @@
 #include <asm/os/signal.h> /* __SIGCHLD */
 #endif /* __USE_KOS */
 
+/* susv4-2018: Inclusion of  the <sched.h>  header may  make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
+
 /* Scheduler policies (for `sched_setscheduler(2)') */
 #if !defined(SCHED_OTHER) && defined(__SCHED_OTHER)
 #define SCHED_OTHER         __SCHED_OTHER         /* ... */

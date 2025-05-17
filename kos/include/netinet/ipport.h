@@ -72,5 +72,4 @@
 #define IPPORT_RESERVED     1024 /* Ports less than this value are reserved for privileged processes. */
 #define IPPORT_USERRESERVED 5000 /* Ports greater this value are reserved for (non-privileged) servers. */
 
-
 #endif /* !_NETINET_IPPORT_H */

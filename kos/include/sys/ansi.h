@@ -24,6 +24,7 @@
 #include <__stdinc.h>
 
 #include <bits/crt/mbstate.h>
+#include <netinet/bits/in_addr.h> /* __in_addr_t, __in_port_t */
 #include <bits/crt/wctype.h> /* __wctype_t, __wctrans_t */
 #include <bits/types.h>
 #include <machine/_types.h>
@@ -37,8 +38,6 @@ __DECL_BEGIN
 typedef __off64_t __off_t;
 #endif /* !__off_t */
 
-typedef __u_net32_t __in_addr_t;
-typedef __u_net16_t __in_port_t;
 #ifndef __machine_fsblkcnt_t_defined
 #define __machine_fsblkcnt_t_defined
 #endif /* !__machine_fsblkcnt_t_defined */

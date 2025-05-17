@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41567789 */
+/* HASH CRC-32:0x193c068f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,26 @@
 #include <features.h>
 
 #include <bits/types.h>
+#include <netinet/asm/in.h>
+#include <netinet/bits/in_addr.h> /* in_addr_t, struct in_addr */
+
+#ifdef __INTELLISENSE__
+#include <bits/types/uintN_t.h> /* Only uint32_t+uint16_t! */
+#endif /* __INTELLISENSE__ */
+
+/* susv4-2018: Inclusion  of  the  <arpa/inet.h>  header  may  also make
+ *             visible all symbols from <netinet/in.h> and <inttypes.h>. */
+#ifdef __USE_POSIX_BLOAT
 #include <netinet/in.h>
+#include <inttypes.h>
+#endif /* __USE_POSIX_BLOAT */
+
+#if !defined(INET_ADDRSTRLEN) && defined(__INET_ADDRSTRLEN)
+#define INET_ADDRSTRLEN  __INET_ADDRSTRLEN /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
+#endif /* !INET_ADDRSTRLEN && __INET_ADDRSTRLEN */
+#if !defined(INET6_ADDRSTRLEN) && defined(__INET6_ADDRSTRLEN)
+#define INET6_ADDRSTRLEN __INET6_ADDRSTRLEN
+#endif /* !INET6_ADDRSTRLEN && __INET6_ADDRSTRLEN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -57,6 +76,32 @@ __SYSDECL_BEGIN
 #define __socklen_t_defined
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
+
+#ifndef __in_port_t_defined
+#define __in_port_t_defined
+typedef __in_port_t in_port_t; /* Type to represent a port. */
+#endif /* !__in_port_t_defined */
+
+/* Only uint32_t+uint16_t! */
+#ifndef __uint8_t_defined
+#define __uint8_t_defined
+#ifdef __CC__
+__DECL_BEGIN
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ uint8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
+typedef __UINT16_TYPE__ uint16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
+typedef __UINT32_TYPE__ uint32_t;
+#endif /* __UINT32_TYPE__ */
+#ifdef __UINT64_TYPE__
+typedef __UINT64_TYPE__ uint64_t;
+#endif /* __UINT64_TYPE__ */
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__uint8_t_defined */
 
 #ifdef __CRT_HAVE_inet_netof
 /* >> inet_netof(3)
@@ -141,16 +186,15 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,inet_ntoa,(stru
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL inet_ntoa)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_ntoa */
 #ifdef __USE_KOS
-#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
 #ifdef __CRT_HAVE_inet_ntoa_r
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_OUT(2),char *,__NOTHROW_NCX,inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),(__inaddr,__buf))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_OUT(2),char *,__NOTHROW_NCX,inet_ntoa_r,(struct in_addr __inaddr, char __buf[__INET_ADDRSTRLEN]),(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
 #include <libc/local/arpa.inet/inet_ntoa_r.h>
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_OUT(2) char *__NOTHROW_NCX(__LIBCCALL inet_ntoa_r)(struct in_addr __inaddr, char __buf[16]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa_r))(__inaddr, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_OUT(2) char *__NOTHROW_NCX(__LIBCCALL inet_ntoa_r)(struct in_addr __inaddr, char __buf[__INET_ADDRSTRLEN]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa_r))(__inaddr, __buf); })
 #endif /* !__CRT_HAVE_inet_ntoa_r */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_inet_network
@@ -283,6 +327,110 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet_pton,(int __af, char const *__restric
 /* >> inet_ntop(3)
  * TODO: Implement & document */
 __CDECLARE_OPT(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, socklen_t __len),(__af,__cp,__buf,__len))
+#ifndef __htonl_defined
+#define __htonl_defined
+#ifdef __CRT_HAVE_htonl
+#include <hybrid/__byteswap.h>
+__CEIDECLARE(__ATTR_CONST,uint32_t,__NOTHROW,htonl,(uint32_t __hostlong),{ return (uint32_t)__hybrid_htobe32(__hostlong); })
+#elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,htonl,(uint32_t __hostlong),ntohl,{ return (uint32_t)__hybrid_htobe32(__hostlong); })
+#elif defined(__CRT_HAVE___htonl)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,htonl,(uint32_t __hostlong),__htonl,{ return (uint32_t)__hybrid_htobe32(__hostlong); })
+#elif defined(__CRT_HAVE___ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,htonl,(uint32_t __hostlong),__ntohl,{ return (uint32_t)__hybrid_htobe32(__hostlong); })
+#else /* ... */
+#include <hybrid/__byteswap.h>
+__LOCAL __ATTR_CONST uint32_t __NOTHROW(__LIBCCALL htonl)(uint32_t __hostlong) { return (uint32_t)__hybrid_htobe32(__hostlong); }
+#endif /* !... */
+#endif /* !__htonl_defined */
+#ifndef __htons_defined
+#define __htons_defined
+#ifdef __CRT_HAVE_htons
+#include <hybrid/__byteswap.h>
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#elif defined(__CRT_HAVE___htons)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),__htons,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#elif defined(__CRT_HAVE___ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,htons,(__UINT16_TYPE__ __hostword),__ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
+#else /* ... */
+#include <hybrid/__byteswap.h>
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); }
+#endif /* !... */
+#endif /* !__htons_defined */
+#ifndef __ntohl_defined
+#define __ntohl_defined
+#ifdef __CRT_HAVE_ntohl
+#include <hybrid/__byteswap.h>
+__CEIDECLARE(__ATTR_CONST,uint32_t,__NOTHROW,ntohl,(uint32_t __netlong),{ return (uint32_t)__hybrid_betoh32(__netlong); })
+#elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,ntohl,(uint32_t __netlong),htonl,{ return (uint32_t)__hybrid_betoh32(__netlong); })
+#elif defined(__CRT_HAVE___ntohl)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,ntohl,(uint32_t __netlong),__ntohl,{ return (uint32_t)__hybrid_betoh32(__netlong); })
+#elif defined(__CRT_HAVE___htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW,ntohl,(uint32_t __netlong),__htonl,{ return (uint32_t)__hybrid_betoh32(__netlong); })
+#else /* ... */
+#include <hybrid/__byteswap.h>
+__LOCAL __ATTR_CONST uint32_t __NOTHROW(__LIBCCALL ntohl)(uint32_t __netlong) { return (uint32_t)__hybrid_betoh32(__netlong); }
+#endif /* !... */
+#endif /* !__ntohl_defined */
+#ifndef __ntohs_defined
+#define __ntohs_defined
+#ifdef __CRT_HAVE_ntohs
+#include <hybrid/__byteswap.h>
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#elif defined(__CRT_HAVE___ntohs)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),__ntohs,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#elif defined(__CRT_HAVE___htons) && defined(__HYBRID_HTOBE_IS_BETOH)
+#include <hybrid/__byteswap.h>
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW,ntohs,(__UINT16_TYPE__ __netshort),__htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
+#else /* ... */
+#include <hybrid/__byteswap.h>
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); }
+#endif /* !... */
+#endif /* !__ntohs_defined */
+
+#ifdef __USE_KOS_ALTERATIONS
+#ifndef htons
+#define htons(x) __hybrid_htobe16(x)
+#endif /* !htons */
+#ifndef ntohs
+#define ntohs(x) __hybrid_betoh16(x)
+#endif /* !ntohs */
+#ifndef htonl
+#define htonl(x) __hybrid_htobe32(x)
+#endif /* !htonl */
+#ifndef ntohl
+#define ntohl(x) __hybrid_betoh32(x)
+#endif /* !ntohl */
+#else /* __USE_KOS_ALTERATIONS */
+#ifndef htons
+#define htons(x) __CCAST(__uint16_t)__hybrid_htobe16(x)
+#endif /* !htons */
+#ifndef ntohs
+#define ntohs(x) __CCAST(__uint16_t)__hybrid_betoh16(x)
+#endif /* !ntohs */
+#ifndef htonl
+#define htonl(x) __CCAST(__uint32_t)__hybrid_htobe32(x)
+#endif /* !htonl */
+#ifndef ntohl
+#define ntohl(x) __CCAST(__uint32_t)__hybrid_betoh32(x)
+#endif /* !ntohl */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 __SYSDECL_END
 #endif /* __CC__ */

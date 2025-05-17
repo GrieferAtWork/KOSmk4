@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bd465ce */
+/* HASH CRC-32:0x192eb176 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,6 +112,14 @@
 #ifdef __USE_KOS
 #include <bits/crt/format-printer.h> /* __FORMATPRINTER_CC */
 #endif /* __USE_KOS */
+
+/* susv4-2018: Inclusion  of  the  <unistd.h>  header  may  make  visible  all
+ *             symbols from the headers <stddef.h>, <stdint.h>, and <stdio.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#endif /* __USE_POSIX_BLOAT */
 
 #ifdef __USE_SOLARIS
 #define GF_PATH "/etc/group"

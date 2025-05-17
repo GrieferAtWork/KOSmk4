@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1212f08b */
+/* HASH CRC-32:0x747bd479 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,15 @@
 #ifndef __local_inet_ntoa_defined
 #define __local_inet_ntoa_defined
 #include <__crt.h>
+#include <netinet/bits/in_addr.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_ntoa_r_defined
 #define __local___localdep_inet_ntoa_r_defined
 #ifdef __CRT_HAVE_inet_ntoa_r
 __NAMESPACE_LOCAL_END
-#include <netinet/bits/in.h>
+#include <netinet/asm/in.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),inet_ntoa_r,(__inaddr,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[__INET_ADDRSTRLEN]),inet_ntoa_r,(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/arpa.inet/inet_ntoa_r.h>
@@ -36,9 +37,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_inet_ntoa_r __LIBC_LOCAL_NAME(inet_ntoa_r)
 #endif /* !__CRT_HAVE_inet_ntoa_r */
 #endif /* !__local___localdep_inet_ntoa_r_defined */
+__NAMESPACE_LOCAL_END
+#include <netinet/asm/in.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa))(struct in_addr __inaddr) {
-	static char __inet_ntoa_buf[16] = {0};
+	static char __inet_ntoa_buf[__INET_ADDRSTRLEN] = {0};
 	return (__NAMESPACE_LOCAL_SYM __localdep_inet_ntoa_r)(__inaddr, __inet_ntoa_buf);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5045f5f */
+/* HASH CRC-32:0x1c41607b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -359,6 +359,19 @@ __NAMESPACE_STD_USING(wmempmove)
 #include <libc/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
+
+/* susv4-2018: Inclusion of the <wchar.h> header may make visible all  symbols
+ *             from the headers <ctype.h>, <string.h>, <stdarg.h>, <stddef.h>,
+ *             <stdio.h>, <stdlib.h>, and <time.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <ctype.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 
 /* Define `NULL' */

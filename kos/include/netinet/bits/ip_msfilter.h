@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xf58ea4d1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +17,46 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_inet_netof_defined
-#define __local_inet_netof_defined
-#include <__crt.h>
-#include <hybrid/typecore.h>
+/*!included_by <netinet/in.h>*/
+#ifndef _NETINET_BITS_IP_MSFILTER_H
+#define _NETINET_BITS_IP_MSFILTER_H 1
+
+#include <__stdinc.h>
+#include <features.h>
+
+#include <bits/os/sockaddr_storage.h>
+#include <bits/types.h>
 #include <netinet/bits/in_addr.h>
-#include <netinet/in.h>
-#include <hybrid/__byteswap.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(inet_netof) __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr) {
-	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
-	if (IN_CLASSA(__addr)) {
-		return (__addr & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
-	} else if (IN_CLASSB(__addr)) {
-		return (__addr & IN_CLASSB_NET) >> IN_CLASSB_NSHIFT;
-	} else {
-		return (__addr & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
-	}
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_inet_netof_defined
-#define __local___localdep_inet_netof_defined
-#define __localdep_inet_netof __LIBC_LOCAL_NAME(inet_netof)
-#endif /* !__local___localdep_inet_netof_defined */
-#endif /* !__local_inet_netof_defined */
+
+#ifdef __CC__
+__SYSDECL_BEGIN
+
+/* Full-state filter operations. */
+struct ip_msfilter {
+	struct in_addr imsf_multiaddr; /* IP multicast address of group. */
+	struct in_addr imsf_interface; /* Local IP address of interface. */
+	__uint32_t     imsf_fmode;     /* Filter mode. */
+	__uint32_t     imsf_numsrc;    /* Number of source addresses. */
+	struct in_addr imsf_slist[1];  /* Source addresses. */
+};
+#define __IP_MSFILTER_SIZE(numsrc) \
+	(sizeof(struct ip_msfilter) -  \
+	 sizeof(struct in_addr) +      \
+	 ((numsrc) * sizeof(struct in_addr)))
+
+struct group_filter {
+	__uint32_t              gf_interface; /* Interface index. */
+	struct sockaddr_storage gf_group;     /* Group address. */
+	__uint32_t              gf_fmode;     /* Filter mode. */
+	__uint32_t              gf_numsrc;    /* Number of source addresses. */
+	struct sockaddr_storage gf_slist[1];  /* Source addresses. */
+};
+#define __GROUP_FILTER_SIZE(numsrc)    \
+	(sizeof(struct group_filter) -     \
+	 sizeof(struct sockaddr_storage) + \
+	 ((numsrc) * sizeof(struct sockaddr_storage)))
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+#endif /* !_NETINET_BITS_IP_MSFILTER_H */

@@ -165,6 +165,20 @@
 #endif /* __USE_GLIBC_BLOAT */
 
 
+/* susv4-2018: Inclusion of the <wctype.h> header may make visible all symbols
+ *             from  the headers <ctype.h>, <stdarg.h>, <stddef.h>, <stdio.h>,
+ *             <stdlib.h>, <string.h>, <time.h>, and <wchar.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <ctype.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <wchar.h>
+#endif /* __USE_POSIX_BLOAT */
+
 #if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF
 #endif /* !WEOF && __WEOF */

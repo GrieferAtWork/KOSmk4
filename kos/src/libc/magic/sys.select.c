@@ -89,6 +89,13 @@
 #define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
 #endif /* FD_SETSIZE */
 
+/* susv4-2018: Inclusion of the <sys/select.h> header may make visible
+ *             all  symbols from the  headers <signal.h> and <time.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <signal.h>
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
@@ -107,13 +114,17 @@ typedef struct __sigset_struct sigset_t;
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
+#ifndef __fd_set_defined
+#define __fd_set_defined
 typedef struct __fd_set_struct fd_set;
+#endif /* !__fd_set_defined */
 #ifdef __USE_MISC
 typedef __fd_mask fd_mask;
 #define NFDBITS __NFDBITS
 #endif /* __USE_MISC */
 
 }
+%#ifndef FD_SET
 %#ifdef __INTELLISENSE__
 %{
 __ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
@@ -124,10 +135,6 @@ __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 #define FD_CLR   FD_CLR
 #define FD_ISSET FD_ISSET
 #define FD_ZERO  FD_ZERO
-#ifdef __USE_NETBSD
-__ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
-#define FD_COPY  FD_COPY
-#endif /* __USE_NETBSD */
 }
 %#else /* __INTELLISENSE__ */
 %{
@@ -173,14 +180,22 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used 
 #define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
 #define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)
 #define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(fdsetp), __SIZEOF_FD_SET)
-#ifdef __USE_NETBSD
-#define FD_COPY(src, dst) (void)__libc_memcpy(dst, src, __SIZEOF_FD_SET)
-#endif /* __USE_NETBSD */
 }
 %#endif /* !__INTELLISENSE__ */
-%{
+%#endif /* !FD_SET */
 
-}
+%
+%#ifdef __USE_NETBSD
+%#ifndef FD_COPY
+%#ifdef __INTELLISENSE__
+%__ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
+%#define FD_COPY FD_COPY
+%#else /* __INTELLISENSE__ */
+%#define FD_COPY(src, dst) (void)__libc_memcpy(dst, src, __SIZEOF_FD_SET)
+%#endif /* !__INTELLISENSE__ */
+%#endif /* !FD_COPY */
+%#endif /* __USE_NETBSD */
+%
 
 [[decl_include("<features.h>", "<bits/os/timeval.h>")]]
 [[decl_include("<bits/os/fd_set.h>")]]

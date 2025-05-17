@@ -27,7 +27,8 @@
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 
-#include <bits/crt/tm.h>
+#include <bits/crt/tm.h>    /* struct tm */
+#include <netinet/asm/in.h> /* __INET_ADDRSTRLEN */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -57,12 +58,12 @@ struct libc_tlsglobals {
 	struct tm   ltg_tmbuf;
 	byte_t      ltg_ether_aton_addr[6];
 	char        ltg_l64a_buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
-	char        ltg_inet_ntoa_buf[16];
 	char        ltg_ctime_buf[26];
 	char        ltg_qcvt_buf[32];
 	char        ltg_strerror_buf[64];
 	char        ltg_strsignal_buf[64];
 	char        ltg_ctermid_buf[9];
+	char        ltg_inet_ntoa_buf[__INET_ADDRSTRLEN];
 /*[[[end:libc_tlsglobals]]]*/
 };
 /* clang-format on */

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xf58ea4d1 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +17,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_inet_netof_defined
-#define __local_inet_netof_defined
-#include <__crt.h>
-#include <hybrid/typecore.h>
+/*!included_by <netinet/in.h>*/
+#ifndef _NETINET_BITS_SOCKADDR_IN_H
+#define _NETINET_BITS_SOCKADDR_IN_H 1
+
+#include <__stdinc.h>
+
+#include <bits/os/sockaddr-common.h>
+#include <bits/os/sockaddr.h>
 #include <netinet/bits/in_addr.h>
-#include <netinet/in.h>
-#include <hybrid/__byteswap.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(inet_netof) __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr) {
-	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
-	if (IN_CLASSA(__addr)) {
-		return (__addr & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
-	} else if (IN_CLASSB(__addr)) {
-		return (__addr & IN_CLASSB_NET) >> IN_CLASSB_NSHIFT;
-	} else {
-		return (__addr & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
-	}
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_inet_netof_defined
-#define __local___localdep_inet_netof_defined
-#define __localdep_inet_netof __LIBC_LOCAL_NAME(inet_netof)
-#endif /* !__local___localdep_inet_netof_defined */
-#endif /* !__local_inet_netof_defined */
+
+/* Internet address. */
+#ifdef __CC__
+__SYSDECL_BEGIN
+
+/* AF_INET: Socket address */
+struct sockaddr_in {
+	__SOCKADDR_COMMON(sin_);
+	__in_port_t    sin_port; /* Port number. */
+	struct in_addr sin_addr; /* Internet address. */
+	/* Pad to match `sizeof(struct sockaddr)'. */
+	unsigned char  sin_zero[sizeof(struct sockaddr) -
+	                        (__SOCKADDR_COMMON_SIZE +
+	                         sizeof(__in_port_t) +
+	                         sizeof(struct in_addr))];
+};
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+#endif /* !_NETINET_BITS_SOCKADDR_IN_H */

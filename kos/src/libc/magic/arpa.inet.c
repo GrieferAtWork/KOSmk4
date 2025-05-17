@@ -50,8 +50,28 @@
 }%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
-#include <netinet/in.h>
+#include <netinet/asm/in.h>
+)]%[insert:prefix(
+#include <netinet/bits/in_addr.h> /* in_addr_t, struct in_addr */
 )]%{
+
+#ifdef __INTELLISENSE__
+#include <bits/types/uintN_t.h> /* Only uint32_t+uint16_t! */
+#endif /* __INTELLISENSE__ */
+
+/* susv4-2018: Inclusion  of  the  <arpa/inet.h>  header  may  also make
+ *             visible all symbols from <netinet/in.h> and <inttypes.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <netinet/in.h>
+#include <inttypes.h>
+#endif /* __USE_POSIX_BLOAT */
+
+#if !defined(INET_ADDRSTRLEN) && defined(__INET_ADDRSTRLEN)
+#define INET_ADDRSTRLEN  __INET_ADDRSTRLEN /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
+#endif /* !INET_ADDRSTRLEN && __INET_ADDRSTRLEN */
+#if !defined(INET6_ADDRSTRLEN) && defined(__INET6_ADDRSTRLEN)
+#define INET6_ADDRSTRLEN __INET6_ADDRSTRLEN
+#endif /* !INET6_ADDRSTRLEN && __INET6_ADDRSTRLEN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -61,12 +81,38 @@ __SYSDECL_BEGIN
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
 
+#ifndef __in_port_t_defined
+#define __in_port_t_defined
+typedef __in_port_t in_port_t; /* Type to represent a port. */
+#endif /* !__in_port_t_defined */
+
+/* Only uint32_t+uint16_t! */
+#ifndef __uint8_t_defined
+#define __uint8_t_defined
+#ifdef __CC__
+__DECL_BEGIN
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ uint8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
+typedef __UINT16_TYPE__ uint16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
+typedef __UINT32_TYPE__ uint32_t;
+#endif /* __UINT32_TYPE__ */
+#ifdef __UINT64_TYPE__
+typedef __UINT64_TYPE__ uint64_t;
+#endif /* __UINT64_TYPE__ */
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__uint8_t_defined */
+
 }
 
 @@>> inet_netof(3)
 @@Return the network-number-part of the Internet address `INADDR'
 [[const, wunused, nothrow]]
-[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in_addr.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_netof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -82,7 +128,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 @@>> inet_lnaof(3)
 @@Return the local-host-address-part of the Internet address `INADDR'
 [[const, wunused, nothrow]]
-[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in_addr.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_lnaof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -101,17 +147,17 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 @@The `net' and `host' arguments  can later be re-extracted by  use
 @@of `inet_netof(3)' and `inet_lnaof(3)'
 [[const, wunused, nothrow]]
-[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
-[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in_addr.h>")]]
+[[impl_include("<netinet/asm/in.h>", "<hybrid/__byteswap.h>")]]
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	struct @in_addr@ result;
 	uint32_t result_addr;
-	if (net < @IN_CLASSA_MAX@) {
-		result_addr = (net << @IN_CLASSA_NSHIFT@) | (host & @IN_CLASSA_HOST@);
-	} else if (net < @IN_CLASSB_MAX@) {
-		result_addr = (net << @IN_CLASSB_NSHIFT@) | (host & @IN_CLASSB_HOST@);
-	} else if (net < @IN_CLASSC_MAX@) {
-		result_addr = (net << @IN_CLASSC_NSHIFT@) | (host & @IN_CLASSC_HOST@);
+	if (net < __IN_CLASSA_MAX) {
+		result_addr = (net << __IN_CLASSA_NSHIFT) | (host & __IN_CLASSA_HOST);
+	} else if (net < __IN_CLASSB_MAX) {
+		result_addr = (net << __IN_CLASSB_NSHIFT) | (host & __IN_CLASSB_HOST);
+	} else if (net < __IN_CLASSC_MAX) {
+		result_addr = (net << __IN_CLASSC_NSHIFT) | (host & __IN_CLASSC_HOST);
 	} else {
 		result_addr = net | host;
 	}
@@ -131,11 +177,13 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 @@    123      (decimal)
 @@    0x123 (hex)
 @@    0123  (oct)
-[[pure, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
+[[pure, decl_include("<net/bits/types.h>")]]
+[[impl_include("<netinet/bits/in_addr.h>")]]
+[[impl_include("<netinet/asm/in.h>")]]
 in_addr_t inet_addr([[in]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
-		return (in_addr_t)@INADDR_NONE@;
+		return (in_addr_t)__INADDR_NONE;
 	return addr.@s_addr@;
 }
 
@@ -145,20 +193,21 @@ in_addr_t inet_addr([[in]] char const *__restrict cp) {
 @@apart of a static buffer and  may change in subsequence (or  parallel)
 @@calls. For a re-entrant version of this function, see `inet_ntoa_r(3)'
 [[wunused, nonnull]]
+[[decl_include("<netinet/bits/in_addr.h>")]]
+[[impl_include("<netinet/asm/in.h>")]] /* __INET_ADDRSTRLEN */
 char *inet_ntoa(struct in_addr inaddr) {
-	@@static char inet_ntoa_buf[16] = {0}@@
+	@@static char inet_ntoa_buf[__INET_ADDRSTRLEN] = {0}@@
 	return inet_ntoa_r(inaddr, inet_ntoa_buf);
 }
 
 %#ifdef __USE_KOS
-%#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
 
 @@>> inet_ntoa_r(3)
 @@Re-entrant version of `inet_ntoa()'
-[[decl_include("<netinet/bits/in.h>")]]
-[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
-[[nonnull]]
-char *inet_ntoa_r(struct in_addr inaddr, [[out]] char buf[16]) {
+[[decl_include("<netinet/asm/in.h>")]] /* __INET_ADDRSTRLEN */
+[[decl_include("<netinet/bits/in_addr.h>")]]
+[[impl_include("<netinet/bits/in_addr.h>", "<hybrid/__byteswap.h>")]]
+[[nonnull]] char *inet_ntoa_r(struct in_addr inaddr, [[out]] char buf[__INET_ADDRSTRLEN]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
@@ -172,12 +221,13 @@ char *inet_ntoa_r(struct in_addr inaddr, [[out]] char buf[16]) {
 @@>> inet_network(3)
 @@This function is  the same as  `inet_addr()', except  that
 @@the return value is in host-endian, rather than net-endian
-[[decl_include("<hybrid/typecore.h>")]]
-[[pure, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+[[pure, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<netinet/asm/in.h>")]]
+[[impl_include("<netinet/bits/in_addr.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_network([[in]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
-		return @INADDR_NONE@;
+		return __INADDR_NONE;
 	return addr.@s_addr@;
 }
 
@@ -200,7 +250,7 @@ $uint32_t inet_network([[in]] char const *__restrict cp) {
 @@    0123  (oct)
 @@@return: 0: Bad input format
 @@@return: 1: Success
-[[decl_include("<netinet/bits/in.h>")]]
+[[decl_include("<netinet/bits/in_addr.h>")]]
 int inet_aton([[in]] char const *__restrict cp,
               [[out]] struct in_addr *__restrict inp) {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
@@ -222,7 +272,7 @@ int inet_aton([[in]] char const *__restrict cp,
 @@@return: 0: Bad input format
 @@@return: 1: Success
 [[wunused]]
-[[decl_include("<netinet/bits/in.h>")]]
+[[decl_include("<netinet/bits/in_addr.h>")]]
 [[impl_include("<hybrid/__byteswap.h>", "<libc/template/hex.h>")]]
 int inet_paton([[inout]] char const **__restrict pcp,
                [[out]] struct in_addr *__restrict inp,
@@ -447,7 +497,41 @@ char const *inet_ntop(int af, void const *__restrict cp,
                       char *__restrict buf, socklen_t len);
 
 
+
+%[insert:extern(htonl)]
+%[insert:extern(htons)]
+%[insert:extern(ntohl)]
+%[insert:extern(ntohs)]
+
 %{
+
+#ifdef __USE_KOS_ALTERATIONS
+#ifndef htons
+#define htons(x) __hybrid_htobe16(x)
+#endif /* !htons */
+#ifndef ntohs
+#define ntohs(x) __hybrid_betoh16(x)
+#endif /* !ntohs */
+#ifndef htonl
+#define htonl(x) __hybrid_htobe32(x)
+#endif /* !htonl */
+#ifndef ntohl
+#define ntohl(x) __hybrid_betoh32(x)
+#endif /* !ntohl */
+#else /* __USE_KOS_ALTERATIONS */
+#ifndef htons
+#define htons(x) __CCAST(__uint16_t)__hybrid_htobe16(x)
+#endif /* !htons */
+#ifndef ntohs
+#define ntohs(x) __CCAST(__uint16_t)__hybrid_betoh16(x)
+#endif /* !ntohs */
+#ifndef htonl
+#define htonl(x) __CCAST(__uint32_t)__hybrid_htobe32(x)
+#endif /* !htonl */
+#ifndef ntohl
+#define ntohl(x) __CCAST(__uint32_t)__hybrid_betoh32(x)
+#endif /* !ntohl */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 __SYSDECL_END
 #endif /* __CC__ */

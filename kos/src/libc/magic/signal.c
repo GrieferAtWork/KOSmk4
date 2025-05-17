@@ -277,6 +277,14 @@
 #include <bits/os/sigval.h>   /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
+/* susv4-2018: Inclusion of the  <signal.h> header may  make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#ifndef _TIME_H
+#include <time.h>
+#endif /* !_TIME_H */
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
 /* Fake signal functions. */

@@ -114,6 +114,15 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
+
+/* susv4-2018: Inclusion  of  the  <time.h>  header  may  make
+ *             visible all symbols from the <signal.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#ifndef _SIGNAL_H
+#include <signal.h>
+#endif /* !_SIGNAL_H */
+#endif /* __USE_POSIX_BLOAT */
+
 #ifdef __USE_GNU
 #include <asm/os/timex.h>
 #include <bits/os/timex.h>

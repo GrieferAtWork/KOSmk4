@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c5061ea */
+/* HASH CRC-32:0xd73c6974 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,12 +114,12 @@ INTDEF ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
+INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_inet_ntoa_r)(struct in_addr inaddr, char buf[__INET_ADDRSTRLEN]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
+INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[__INET_ADDRSTRLEN]);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_network(3)

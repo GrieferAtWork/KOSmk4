@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fca7067 */
+/* HASH CRC-32:0x52753075 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,20 @@
 #define __local_inet_makeaddr_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
-#include <netinet/bits/in.h>
-#include <netinet/in.h>
+#include <netinet/bits/in_addr.h>
+#include <netinet/asm/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_makeaddr) __ATTR_CONST __ATTR_WUNUSED struct in_addr
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
 	struct in_addr __result;
 	__UINT32_TYPE__ __result_addr;
-	if (__net < IN_CLASSA_MAX) {
-		__result_addr = (__net << IN_CLASSA_NSHIFT) | (__host & IN_CLASSA_HOST);
-	} else if (__net < IN_CLASSB_MAX) {
-		__result_addr = (__net << IN_CLASSB_NSHIFT) | (__host & IN_CLASSB_HOST);
-	} else if (__net < IN_CLASSC_MAX) {
-		__result_addr = (__net << IN_CLASSC_NSHIFT) | (__host & IN_CLASSC_HOST);
+	if (__net < __IN_CLASSA_MAX) {
+		__result_addr = (__net << __IN_CLASSA_NSHIFT) | (__host & __IN_CLASSA_HOST);
+	} else if (__net < __IN_CLASSB_MAX) {
+		__result_addr = (__net << __IN_CLASSB_NSHIFT) | (__host & __IN_CLASSB_HOST);
+	} else if (__net < __IN_CLASSC_MAX) {
+		__result_addr = (__net << __IN_CLASSC_NSHIFT) | (__host & __IN_CLASSC_HOST);
 	} else {
 		__result_addr = __net | __host;
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4e51990 */
+/* HASH CRC-32:0x18d32ee0 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,6 +137,14 @@ __NAMESPACE_STD_USING(signal)
 #include <bits/os/siginfo.h>  /* struct __siginfo_struct */
 #include <bits/os/sigval.h>   /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
+
+/* susv4-2018: Inclusion of the  <signal.h> header may  make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#ifndef _TIME_H
+#include <time.h>
+#endif /* !_TIME_H */
+#endif /* __USE_POSIX_BLOAT */
 
 __SYSDECL_BEGIN
 

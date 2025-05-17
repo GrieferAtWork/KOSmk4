@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc467840a */
+/* HASH CRC-32:0xd4782a9a */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,11 @@
 /* (#) Portability: mintlib       (/include/sys/time.h) */
 /* (#) Portability: musl libc     (/include/sys/time.h) */
 /* (#) Portability: uClibc        (/include/sys/time.h) */
+/*!always_includes <asm/os/itimer.h>*/
+/*!always_includes <bits/os/fd_set.h>*/
+/*!always_includes <bits/os/itimerval.h>*/
 /*!always_includes <bits/types/time_t.h>*/
 /*!always_includes <bits/types/suseconds_t.h>*/
-/*!always_includes <bits/os/itimerval.h>*/
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H 1
 
@@ -52,18 +54,24 @@
 
 #include <features.h>
 #include <asm/os/itimer.h>
+#include <bits/os/fd_set.h> /* struct __fd_set_struct, __NFDBITS, __fd_mask, __FD_ELT, __FD_MASK, __SIZEOF_FD_SET */
 #include <bits/types.h>
 #include <bits/os/itimerval.h>
-#include <sys/select.h>
 
 #ifdef __INTELLISENSE__
 #include <bits/types/time_t.h>
 #include <bits/types/suseconds_t.h>
 #endif /* __INTELLISENSE__ */
 
+/* susv4-2018: Inclusion  of  the  <sys/time.h>  header  may  make
+ *             visible all symbols from the <sys/select.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#include <sys/select.h>
+#endif /* __USE_POSIX_BLOAT */
+
 __SYSDECL_BEGIN
 
-#if ((!defined(ITIMER_REAL) && defined(__ITIMER_REAL)) ||    \
+#if ((!defined(ITIMER_REAL) && defined(__ITIMER_REAL)) ||       \
      (!defined(ITIMER_VIRTUAL) && defined(__ITIMER_VIRTUAL)) || \
      (!defined(ITIMER_PROF) && defined(__ITIMER_PROF)))
 /*[[[enum]]]*/
@@ -105,6 +113,10 @@ typedef enum __itimer_which {
 /*[[[end]]]*/
 #endif /* ... */
 
+#ifndef FD_SETSIZE
+#define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
+#endif /* FD_SETSIZE */
+
 #ifdef __CC__
 
 #ifndef __time_t_defined
@@ -116,6 +128,11 @@ typedef __time_t time_t;
 #define __suseconds_t_defined
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
+
+#ifndef __fd_set_defined
+#define __fd_set_defined
+typedef struct __fd_set_struct fd_set;
+#endif /* !__fd_set_defined */
 
 #ifdef __USE_GNU
 #ifndef TIMEVAL_TO_TIMESPEC
@@ -152,6 +169,54 @@ typedef void *__restrict __timezone_ptr_t;
 #endif /* !__USE_MISC */
 #endif /* !____timezone_ptr_t_defined */
 
+#ifndef FD_SET
+#ifdef __INTELLISENSE__
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_FDARG(1) __ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
+__ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
+#define FD_SET   FD_SET
+#define FD_CLR   FD_CLR
+#define FD_ISSET FD_ISSET
+#define FD_ZERO  FD_ZERO
+#else /* __INTELLISENSE__ */
+#if (!defined(NDEBUG) && !defined(NDEBUG_BOUNDS) && \
+     !defined(NDEBUG_FDELT) && !defined(__OPTIMIZE_SIZE__))
+#ifdef __CRT_HAVE___fdelt_chk
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW,__fdelt_chk,(__LONGPTR_TYPE__ __fd),(__fd))
+#elif defined(__CRT_HAVE___fdelt_warn)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW,__fdelt_chk,(__LONGPTR_TYPE__ __fd),__fdelt_warn,(__fd))
+#else /* ... */
+#include <libc/local/sys.select/__fdelt_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fdelt_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGPTR_TYPE__ __NOTHROW(__LIBCCALL __fdelt_chk)(__LONGPTR_TYPE__ __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fdelt_chk))(__fd); })
+#endif /* !... */
+
+/* Override `__FD_ELT()' with an argument-checking variant. */
+#undef __FD_ELT
+#ifdef __NO_builtin_constant_p
+#define __FD_ELT __fdelt_chk
+#elif !defined(__NO_ATTR_WARNING) && (defined(__CRT_HAVE___fdelt_chk) || defined(__CRT_HAVE___fdelt_warn))
+#ifdef __CRT_HAVE___fdelt_chk
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
+#else /* __CRT_HAVE___fdelt_chk */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
+#endif /* !__CRT_HAVE___fdelt_chk */
+#define __FD_ELT(fd)                                                      \
+	(__builtin_constant_p(fd)                                             \
+	 ? ((__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE ? (fd) : __fdelt_warn(fd)) \
+	 : __fdelt_chk(fd))
+#else /* __NO_builtin_constant_p */
+#define __FD_ELT(fd) \
+	((__builtin_constant_p(fd) && (__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE) ? (fd) : __fdelt_chk(fd))
+#endif /* !__NO_builtin_constant_p */
+#endif /* !NDEBUG && !NDEBUG_BOUNDS && !NDEBUG_FDELT && !__OPTIMIZE_SIZE__ */
+
+#define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] |= __FD_MASK(fd))
+#define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
+#define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)
+#define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(fdsetp), __SIZEOF_FD_SET)
+#endif /* !__INTELLISENSE__ */
+#endif /* !FD_SET */
 #if defined(__CRT_HAVE_gettimeofday) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> gettimeofday(2), gettimeofday64(2) */
 __CDECLARE(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),(__tv,__tz))

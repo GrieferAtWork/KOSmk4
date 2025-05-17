@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90d7773f */
+/* HASH CRC-32:0x156a771c */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,12 @@
 #include <hybrid/host.h>
 #include <asm/os/signal.h> /* __SIGCHLD */
 #endif /* __USE_KOS */
+
+/* susv4-2018: Inclusion of  the <sched.h>  header may  make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 /* Scheduler policies (for `sched_setscheduler(2)') */
 #if !defined(SCHED_OTHER) && defined(__SCHED_OTHER)

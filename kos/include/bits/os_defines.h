@@ -34,11 +34,23 @@
 #define _GLIBCXX_END_EXTERN_C   __DECL_END
 
 
-#include <hybrid/__assert.h>
 #undef __glibcxx_assert
 #undef __glibcxx_assert_impl
+#include <parts/assert-failed.h>
+#ifdef __assertion_npcked_failed
+/* Always  try to use the non-packed variant  here, since these assertions also appear
+ * in constexpr functions, and GCC raises a compiler error when it encounters a static
+ * variable within a constexpr function. (the non-packed check handler doesn't contain
+ * a static variable) */
+#define __glibcxx_assert(expr) (void)(__builtin_expect(!!(expr), 1) || (__assertion_npcked_failed(#expr), 0))
+#define __glibcxx_assert_impl  __glibcxx_assert
+#endif /* __assertion_npcked_failed */
+
+#ifndef __glibcxx_assert
+#include <hybrid/__assert.h>
 #define __glibcxx_assert      __hybrid_assert
 #define __glibcxx_assert_impl __hybrid_assert
+#endif /* !__glibcxx_assert */
 
 #undef _GLIBCXX_DEPRECATED
 #if defined(__DEPRECATED) && (__cplusplus >= 201103L)

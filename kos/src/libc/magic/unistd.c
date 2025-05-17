@@ -153,6 +153,14 @@
 #include <bits/crt/format-printer.h> /* __FORMATPRINTER_CC */
 #endif /* __USE_KOS */
 
+/* susv4-2018: Inclusion  of  the  <unistd.h>  header  may  make  visible  all
+ *             symbols from the headers <stddef.h>, <stdint.h>, and <stdio.h>. */
+#ifdef __USE_POSIX_BLOAT
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#endif /* __USE_POSIX_BLOAT */
+
 #ifdef __USE_SOLARIS
 #define GF_PATH "/etc/group"
 #define PF_PATH "/etc/passwd"

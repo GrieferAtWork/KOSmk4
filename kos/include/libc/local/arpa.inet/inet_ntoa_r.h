@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x491cdce1 */
+/* HASH CRC-32:0x2b2efca3 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_inet_ntoa_r_defined
 #define __local_inet_ntoa_r_defined
 #include <__crt.h>
-#include <netinet/bits/in.h>
+#include <netinet/asm/in.h>
+#include <netinet/bits/in_addr.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined
@@ -48,11 +49,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 __NAMESPACE_LOCAL_END
-#include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_ntoa_r) __ATTR_RETNONNULL __ATTR_OUT(2) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa_r))(struct in_addr __inaddr, char __buf[16]) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa_r))(struct in_addr __inaddr, char __buf[__INET_ADDRSTRLEN]) {
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
 	(__NAMESPACE_LOCAL_SYM __localdep_sprintf)(__buf, "%u.%u.%u.%u",
 	        (unsigned int)(__UINT8_TYPE__)((__addr & __UINT32_C(0xff000000)) >> 24),

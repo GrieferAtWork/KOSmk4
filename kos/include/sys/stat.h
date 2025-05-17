@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7d6b55b */
+/* HASH CRC-32:0x1f07017e */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,6 +98,12 @@ __DECL_END
 #define UTIME_OMIT __UTIME_OMIT /* for utimensat(): Set `times[0|1].tv_nsec' to this to not modify that timestamp. */
 #endif /* !UTIME_OMIT && __UTIME_OMIT */
 #endif /* __USE_ATFILE */
+
+/* susv4-2018: Inclusion of the <sys/stat.h> header may make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -187,6 +187,12 @@ __DECL_END
 #endif /* !UTIME_OMIT && __UTIME_OMIT */
 #endif /* __USE_ATFILE */
 
+/* susv4-2018: Inclusion of the <sys/stat.h> header may make
+ *             visible all symbols from the <time.h> header. */
+#ifdef __USE_POSIX_BLOAT
+#include <time.h>
+#endif /* __USE_POSIX_BLOAT */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
