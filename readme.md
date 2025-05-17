@@ -71,7 +71,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [BSDGames](https://github.com/vattam/BSDGames/)
 - Libraries
 	- [libncurses-6.1](https://www.gnu.org/software/ncurses/)
-	- [libzlib-1.2.11](https://www.zlib.net/)
+	- [libzlib-1.3.1](https://www.zlib.net/)
 	- [libstdc++-9.1.0](https://gcc.gnu.org/onlinedocs/libstdc++/)
 	- [libffi-3.3](https://github.com/libffi/libffi)
 	- [libpng-1.6.35](https://github.com/glennrp/libpng)

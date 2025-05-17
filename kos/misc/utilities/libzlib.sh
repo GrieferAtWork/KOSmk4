@@ -19,7 +19,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 ZLIB_VERSION_MAJOR="1"
-ZLIB_VERSION="$ZLIB_VERSION_MAJOR.2.11"
+ZLIB_VERSION="$ZLIB_VERSION_MAJOR.3.1"
 SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERSION"
 OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/zlib-$ZLIB_VERSION"
 
