@@ -123,8 +123,10 @@ bsd_games_cfg_use_dot_so=.so
 bsd_games_cfg_gzip_manpages=n
 bsd_games_cfg_cc="${CROSS_PREFIX}gcc"
 bsd_games_cfg_cxx="${CROSS_PREFIX}g++"
-bsd_games_cfg_optimize_flags="-g -O2"
-bsd_games_cfg_warning_flags="-Wall -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-align -Wcast-qual -Wwrite-strings"
+# Enable "_GLIBC_BLOAT_SOURCE" because "hunt/huntd/hunt.h" assumes that
+# "<netinet/in.h>" includes "<sys/socket.h>" (which it isn't required to)
+bsd_games_cfg_optimize_flags="-g -O2 -D_GLIBC_BLOAT_SOURCE"
+bsd_games_cfg_warning_flags="-Wall -Wno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-align -Wcast-qual -Wwrite-strings"
 bsd_games_cfg_ncurses_lib="-lncurses"
 bsd_games_cfg_use_libcrypto=y
 bsd_games_cfg_openssl_lib="-lcrypto"

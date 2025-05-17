@@ -247,9 +247,9 @@ struct __pthread_internal_slist {
 
 #ifdef __USE_GLIBC_BLOAT
 #ifdef __PTHREAD_MUTEX_HAVE_PREV
-struct __pthread_internal_list __pthread_list_t;
+typedef struct __pthread_internal_list __pthread_list_t;
 #else /* __PTHREAD_MUTEX_HAVE_PREV */
-struct __pthread_internal_slist __pthread_slist_t;
+typedef struct __pthread_internal_slist __pthread_slist_t;
 #endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 #endif /* __USE_GLIBC_BLOAT */
 #endif /* __CC__ */

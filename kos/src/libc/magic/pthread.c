@@ -46,8 +46,6 @@
 	"__pthread_t",
 	"__pthread_attr_t",
 	"__pthread_mutexattr_t",
-	"__pthread_list_t",
-	"__pthread_slist_t",
 	"__pthread_mutex_t", "struct __pthread_mutex_s",
 	"__pthread_condattr_t",
 	"__pthread_cond_t", "struct __pthread_cond_s",
