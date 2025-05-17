@@ -360,6 +360,7 @@ svga_makettyaccess_txt(struct svgadev *__restrict UNUSED(self),
 	dispsz = mode->smi_resy * mode->smi_scanline * sizeof(uint16_t);
 	result = (REF struct svga_ttyaccess_txt *)kmalloc(offsetof(struct svga_ttyaccess_txt, stt_display) +
 	                                                  dispsz, GFP_LOCKED | GFP_PREFLT);
+
 	/* Initialize common fields. */
 	TRY {
 		svga_ttyaccess_initvmem(result, mode);
@@ -543,8 +544,9 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 		 * we can use hardware acceleration (e.g. SVGA's SVGA_CMD_RECT_FILL) to do
 		 * the fill for us. */
 #ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-		if (me->stx_chipset->sc_ops.sco_hw_async_fillrect) {
-			/* Flood-fill for ' ' and '█' */
+		if (me->stx_chipset->sc_ops.sco_hw_async_fillrect &&
+		    num_cells > 32) { /* Random threshold so we don't do this for small fills */
+			/* Rect-fill for ' ' and '█' */
 			uint8_t line0 = src->sgc_lines[0];
 			uintptr_t end;
 			uintptr_half_t src_x1;
@@ -683,7 +685,7 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_gfx)(struct vidttyaccess *__restrict sel
 				if (me->stx_chipset->sc_ops.sco_updaterect)
 					(*me->stx_chipset->sc_ops.sco_updaterect)(me->stx_chipset, &rect.svcr_dest);
 				if (must_hide_cusor) {
-					svga_ttyaccess_gfx_hw_async_waitfor(me);
+					svga_ttyaccess_gfx_hw_async_waitfor(me); /* TODO: Not needed if `svga_ttyaccess_v_redraw_cursor_hwgfx' is used */
 					(*me->stx_redraw_cursor)(me);
 				}
 				return;
@@ -999,6 +1001,12 @@ notsup:
 		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
 		break;
 	}
+
+	/* If available, use hardware-acceleration to draw the cursor overlay. */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+//	if (self->svd_chipset.sc_ops.sco_hw_async_fillrect)
+//		result->stx_redraw_cursor = &svga_ttyaccess_v_redraw_cursor_hwgfx; /* TODO */
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
 
 	/* Precalculate palette colors. */
 	if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {

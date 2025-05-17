@@ -308,8 +308,7 @@ again_load_mode:
 				_viddev_init(self, &svgadev_ops);
 
 				/* Fill in remaining fields. */
-				self->fn_mode   = S_IFCHR | 0600;
-				self->dv_driver = incref(&drv_self);
+				self->fn_mode = S_IFCHR | 0600;
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 				/* Allocate+initialize a tty for the builtin debugger. */
@@ -318,6 +317,7 @@ again_load_mode:
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 				{
 					/* Register the device. */
+					self->dv_driver = incref(&drv_self);
 					TRY {
 						device_registerf(self,
 						                 makedev(MKDEV_MAJOR_AUTO, 0),
