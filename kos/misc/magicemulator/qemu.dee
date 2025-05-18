@@ -220,9 +220,9 @@ did_update_x86_64_kernel:
 		"-display", "gtk",
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
 //		"-d",   "int",
-		"-vga", "std",
+//		"-vga", "std",
 
-//		"-vga", "vmware",
+		"-vga", "vmware",
 		/* Enable the VM-based RTC clock, which pauses when the kernel is paused. */
 		"-rtc", "base=utc,clock=vm"
 	});

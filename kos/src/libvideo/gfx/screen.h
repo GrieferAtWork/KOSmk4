@@ -30,10 +30,12 @@
 
 DECL_BEGIN
 
-/* Creates+returns a video buffer for the entire screen (or return NULL and set
- * errno  on error). Note that screen buffer access is only granted to ROOT and
- * the window server */
-INTDEF WUNUSED REF struct video_buffer *CC libvideo_buffer_screen(void);
+/* Creates+returns  a video buffer for the entire  screen (or return NULL and set
+ * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
+ * only  a single screen buffer can ever exist system-wide. If an attempt is made
+ * to create a second screen buffer, this function will block until the first one
+ * is destroyed, or the processing owning it exits. */
+INTDEF WUNUSED REF struct screen_buffer *CC libvideo_screen_buffer_create(void);
 
 DECL_END
 

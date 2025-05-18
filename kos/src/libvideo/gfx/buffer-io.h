@@ -68,7 +68,7 @@ libvideo_buffer_fsave(struct video_buffer *self, char const *format,
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_fdsave(struct video_buffer *self, char const *format,
                        fd_t fd, char const *options);
-INTDEF WUNUSED NONNULL((1, 2)) int CC
+INTDEF /*WUNUSED*/ NONNULL((1, 2)) int CC
 libvideo_buffer_save(struct video_buffer *self, char const *filename,
                      char const *options);
 

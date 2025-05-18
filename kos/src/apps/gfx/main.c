@@ -27,24 +27,25 @@
 
 #include <kos/refptr.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #include <err.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <stddef.h>
-#include <sys/wait.h>
-#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <termios.h>
 #include <time.h>
 #include <unicode.h>
-#include <termios.h>
 #include <unistd.h>
 
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/screen.h>
 
 DECL_BEGIN
 
@@ -72,7 +73,7 @@ PRIVATE void enable_rawtty_mode(void) {
 
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
-	kos::refptr<struct video_buffer> screen;
+	kos::refptr<struct screen_buffer> screen;
 	kos::refptr<struct video_font> font;
 	struct video_fontprinter_data fontprinter_data;
 	struct video_gfx gfx;
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
 
 	/* Bind the screen buffer. */
-	screen = kos::inherit(video_buffer_screen());
+	screen = kos::inherit(screen_buffer_create());
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->gfx(gfx,
@@ -97,7 +98,7 @@ int main(int argc, char *argv[]) {
 	            0,
 	            NULL);
 
-	fontprinter_data.vfp_height  = 32;
+	fontprinter_data.vfp_height  = 16;
 	fontprinter_data.vfp_font    = font;
 	fontprinter_data.vfp_lnstart = 0;
 	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
@@ -147,6 +148,7 @@ again_font:
 
 	for (;;) {
 		char buf[1];
+		screen->updaterect();
 		if (read(STDIN_FILENO, buf, 1) < 1)
 			break;
 		if (buf[0] == '+') {
@@ -183,6 +185,7 @@ again_font:
 		ssize_t error;
 		char buf[1];
 		video_color_t color;
+		screen->updaterect();
 		error = read(STDIN_FILENO, buf, 1);
 		if (error == 1) {
 			switch (buf[0]) {

@@ -591,7 +591,7 @@ libvideo_buffer_fdsave(struct video_buffer *self, char const *format,
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_save, libvideo_buffer_save);
-INTERN WUNUSED NONNULL((1, 2)) int CC
+INTERN /*WUNUSED*/ NONNULL((1, 2)) int CC
 libvideo_buffer_save(struct video_buffer *self,
                      char const *filename,
                      char const *options) {

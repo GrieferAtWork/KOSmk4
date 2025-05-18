@@ -67,6 +67,11 @@ struct video_buffer_ops {
 	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
 	/* Lock the video buffer into memory.
+	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
+	 *          a  lock to video  memory may block and/or  be much slower until
+	 *          said lock is released! The reason for this is that it is unsafe
+	 *          to use hardware accelerated 2D operations while a video lock is
+	 *          being held!
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_NONNULL_T((1, 2)) int
@@ -148,6 +153,11 @@ public:
 #undef gfx
 
 	/* Lock the video buffer into memory.
+	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
+	 *          a  lock to video  memory may block and/or  be much slower until
+	 *          said lock is released! The reason for this is that it is unsafe
+	 *          to use hardware accelerated 2D operations while a video lock is
+	 *          being held!
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
@@ -342,7 +352,7 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FDSAVE)(struct video_buffer *__self, char const *__format,
                                         __fd_t __fd, char const *__options);
-typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
+typedef /*__ATTR_WUNUSED_T*/ __ATTR_NONNULL_T((1, 2)) int
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SAVE)(struct video_buffer *__self, char const *__filename,
                                       char const *__options);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
@@ -352,7 +362,7 @@ video_buffer_fsave(struct video_buffer *__self, char const *__format,
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
 video_buffer_fdsave(struct video_buffer *__self, char const *__format,
                     __fd_t __fd, char const *__options);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
 video_buffer_save(struct video_buffer *__self, char const *__filename,
                   char const *__options);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
@@ -367,21 +377,7 @@ typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *(LIBVIDE
 LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-
-
-/* Creates+returns  a video buffer for the entire  screen (or return NULL and set
- * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
- * only  a single screen buffer can ever exist system-wide. If an attempt is made
- * to create a second screen buffer, this function will block until the first one
- * is destroyed, or the processing owning it exits. */
-typedef __ATTR_WUNUSED_T __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
 #endif /* __CC__ */
-
-
 
 __DECL_END
 

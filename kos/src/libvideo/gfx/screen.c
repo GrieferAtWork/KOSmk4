@@ -25,9 +25,12 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/overflow.h>
+
 #include <kos/anno.h>
 #include <kos/io.h>
 #include <kos/ioctl/svga.h>
+#include <kos/sched/shared-lock.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -55,6 +58,7 @@
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/screen.h>
 /**/
 
 #include "ram-buffer.h"
@@ -62,51 +66,109 @@
 
 DECL_BEGIN
 
-struct svga_screen_buffer: video_rambuffer {
-	REF struct video_codec_handle    *ssb_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
-	fd_t                              ssb_vdlck;         /* [const] Video lock file */
-	void                             *ssb_libphys;       /* [1..1][const] Handle for libphys */
-	PMMAPPHYS                         ssb_libphys_map;   /* [1..1][const] Helper to map physical memory */
-	PMUNMAPPHYS                       ssb_libphys_unmap; /* [1..1][const] Helper to unmap physical memory */
-	void                             *ssb_libsvgadrv;    /* [1..1][const] Handle for libsvgadrv */
-	struct svga_chipset_driver const *ssb_drv;           /* [1..1][const] SVGA driver */
-	struct svga_chipset               ssb_cs;            /* [1..1][const] SVGA chipset */
+struct svga_screen: video_rambuffer {
+	struct screen_buffer_ops          ss_ops;           /* [const] Screen buffer operators. */
+	REF struct video_codec_handle    *ss_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
+	fd_t                              ss_vdlck;         /* [const] Video lock file */
+	void                             *ss_libphys;       /* [1..1][const] Handle for libphys */
+	PMMAPPHYS                         ss_libphys_map;   /* [1..1][const] Helper to map physical memory */
+	PMUNMAPPHYS                       ss_libphys_unmap; /* [1..1][const] Helper to unmap physical memory */
+	void                             *ss_libsvgadrv;    /* [1..1][const] Handle for libsvgadrv */
+	struct svga_chipset_driver const *ss_drv;           /* [1..1][const] SVGA driver */
+	struct shared_lock                ss_cslock;        /* Lock for interfacing with `ss_cs' */
+	struct svga_chipset               ss_cs;            /* [1..1][const] SVGA chipset */
 };
 
-PRIVATE struct video_buffer_ops svga_screen_ops = {};
+#define _svga_screen_cs_reap(self)      (void)0
+#define svga_screen_cs_reap(self)       (void)0
+#define svga_screen_cs_mustreap(self)   0
+#define svga_screen_cs_tryacquire(self) shared_lock_tryacquire(&(self)->ss_cslock)
+#define svga_screen_cs_acquire(self)    shared_lock_acquire(&(self)->ss_cslock)
+#define svga_screen_cs_acquire_nx(self) shared_lock_acquire_nx(&(self)->ss_cslock)
+#define _svga_screen_cs_release(self)   shared_lock_release(&(self)->ss_cslock)
+#define svga_screen_cs_release(self)    (shared_lock_release(&(self)->ss_cslock), svga_screen_cs_reap(self))
+#define svga_screen_cs_acquired(self)   shared_lock_acquired(&(self)->ss_cslock)
+#define svga_screen_cs_available(self)  shared_lock_available(&(self)->ss_cslock)
+
+
+PRIVATE NONNULL((1, 2)) void CC
+svga_screen_updaterect_noop(struct screen_buffer *__restrict self,
+                            struct video_buffer_rect const *__restrict rect) {
+	(void)self;
+	(void)rect;
+	COMPILER_IMPURE();
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+svga_screen_updaterects_noop(struct screen_buffer *__restrict self,
+                             struct video_buffer_rect const *__restrict rects,
+                             size_t n_rects) {
+	(void)self;
+	(void)rects;
+	(void)n_rects;
+	COMPILER_IMPURE();
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
+                          struct video_buffer_rect const *__restrict rect) {
+	struct svga_screen *me = (struct svga_screen *)self;
+	struct svga_rect cs_rect;
+	if unlikely(rect->vbr_startx <= 0) {
+		cs_rect.svr_x = 0;
+		if (OVERFLOW_USUB(rect->vbr_sizex, -rect->vbr_sizex, &cs_rect.svr_w) ||
+		    cs_rect.svr_w > self->vb_size_x)
+			cs_rect.svr_w = self->vb_size_x;
+	} else {
+		if (OVERFLOW_UCAST((uintptr_t)rect->vbr_startx, &cs_rect.svr_x) ||
+		    cs_rect.svr_x >= self->vb_size_x)
+			return;
+		if (OVERFLOW_USUB(self->vb_size_x, cs_rect.svr_x, &cs_rect.svr_w))
+			return;
+	}
+	if unlikely(rect->vbr_starty <= 0) {
+		cs_rect.svr_y = 0;
+		if (OVERFLOW_USUB(rect->vbr_sizey, -rect->vbr_sizey, &cs_rect.svr_h) ||
+		    cs_rect.svr_h > self->vb_size_y)
+			cs_rect.svr_h = self->vb_size_y;
+	} else {
+		if (OVERFLOW_UCAST((uintptr_t)rect->vbr_starty, &cs_rect.svr_y) ||
+		    cs_rect.svr_y >= self->vb_size_y)
+			return;
+		if (OVERFLOW_USUB(self->vb_size_y, cs_rect.svr_y, &cs_rect.svr_h))
+			return;
+	}
+	svga_screen_cs_acquire(me);
+	(*me->ss_cs.sc_ops.sco_updaterect)(&me->ss_cs, &cs_rect);
+	svga_screen_cs_release(me);
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+svga_screen_updaterects_cs(struct screen_buffer *__restrict self,
+                           struct video_buffer_rect const *__restrict rects,
+                           size_t n_rects) {
+	size_t i;
+	for (i = 0; i < n_rects; ++i)
+		svga_screen_updaterect_cs(self, &rects[i]);
+}
+
+
 
 PRIVATE NONNULL((1)) void CC
 svga_screen_destroy(struct video_buffer *__restrict self) {
-	struct svga_screen_buffer *me = (struct svga_screen_buffer *)self;
-	assert(me->vb_ops == &svga_screen_ops);
+	struct svga_screen *me = (struct svga_screen *)self;
+	assert(me->vb_ops == &me->ss_ops.sbo_video);
 	/* Finalize */
-	(*me->ssb_cs.sc_ops.sco_fini)(&me->ssb_cs);
-	(*me->ssb_libphys_unmap)(me->vb_data, me->vb_total);
-	(void)dlclose(me->ssb_libsvgadrv);
-	(void)dlclose(me->ssb_libphys);
-	(void)close(me->ssb_vdlck);
+	(*me->ss_cs.sc_ops.sco_fini)(&me->ss_cs);
+	(*me->ss_libphys_unmap)(me->vb_data, me->vb_total);
+	(void)dlclose(me->ss_libsvgadrv);
+	(void)dlclose(me->ss_libphys);
+	(void)close(me->ss_vdlck);
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
-	video_codec_handle_decref(me->ssb_codec_handle);
+	video_codec_handle_decref(me->ss_codec_handle);
 	(void)free(me);
 }
-
-PRIVATE ATTR_RETNONNULL WUNUSED
-struct video_buffer_ops *CC get_svga_screen_ops(void) {
-	if (!svga_screen_ops.vi_destroy) {
-		/* TODO: Need custom lock function here that prevents use of HW-accelerated
-		 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
-		svga_screen_ops.vi_lock    = &rambuffer_lock;
-		svga_screen_ops.vi_unlock  = &rambuffer_unlock;
-		svga_screen_ops.vi_getgfx  = &rambuffer_getgfx;
-		svga_screen_ops.vi_clipgfx = &rambuffer_clipgfx;
-		COMPILER_WRITE_BARRIER();
-		svga_screen_ops.vi_destroy = &svga_screen_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &svga_screen_ops;
-}
-
 
 #define LOGERR(format, ...) \
 	syslog(LOG_ERR, "[libvideo][screen:%d] " format, __LINE__, ##__VA_ARGS__)
@@ -217,7 +279,7 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 	result->vcs_amask = 0;
 }
 
-PRIVATE WUNUSED REF struct svga_screen_buffer *CC
+PRIVATE WUNUSED REF struct svga_screen *CC
 svga_newscreen(void) {
 	fd_t svga;
 	void *libsvgadrv;
@@ -227,7 +289,7 @@ svga_newscreen(void) {
 	struct video_format format;
 	REF struct video_codec_handle *codec_handle;
 	struct video_codec_specs codec_specs;
-	REF struct svga_screen_buffer *result;
+	REF struct svga_screen *result;
 	struct svga_chipset_driver const *driver;
 	char csname[SVGA_CSNAMELEN];
 
@@ -353,9 +415,9 @@ svga_newscreen(void) {
 	/* Allocate the screen buffer control structure, and include
 	 * space needed  to embed  libsvgadrv's chipset  controller. */
 	{
-		size_t bufsz = offsetof(struct svga_screen_buffer, ssb_cs) +
+		size_t bufsz = offsetof(struct svga_screen, ss_cs) +
 		               driver->scd_cssize;
-		result = (REF struct svga_screen_buffer *)malloc(bufsz);
+		result = (REF struct svga_screen *)malloc(bufsz);
 		if unlikely(!result)
 			goto err_svga_vdlck_codec_format_libsvgadrv;
 	}
@@ -363,24 +425,24 @@ svga_newscreen(void) {
 	/* Initialize the chipset for user-space. */
 	/* TODO: Add a second  function "driver->scd_open"  that's allowed to  assume that  the
 	 *       chipset is correct, meaning it won't have to probe for the driver's existance. */
-	if (!(*driver->scd_probe)(&result->ssb_cs)) {
+	if (!(*driver->scd_probe)(&result->ss_cs)) {
 		syslog(LOG_ERR, "[libvideo] Failed to init chipset %q\n", csname);
 		goto err_svga_vdlck_codec_format_libsvgadrv_r;
 	}
 
 	/* Load physical memory mapping functions. */
-	result->ssb_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
-	if unlikely(!result->ssb_libphys) {
+	result->ss_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
+	if unlikely(!result->ss_libphys) {
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs;
 	}
-	*(void **)&result->ssb_libphys_map = dlsym(result->ssb_libphys, "mmapphys");
-	if unlikely(!result->ssb_libphys_map) {
+	*(void **)&result->ss_libphys_map = dlsym(result->ss_libphys, "mmapphys");
+	if unlikely(!result->ss_libphys_map) {
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
-	*(void **)&result->ssb_libphys_unmap = dlsym(result->ssb_libphys, "munmapphys");
-	if unlikely(!result->ssb_libphys_unmap) {
+	*(void **)&result->ss_libphys_unmap = dlsym(result->ss_libphys, "munmapphys");
+	if unlikely(!result->ss_libphys_unmap) {
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
@@ -393,7 +455,7 @@ svga_newscreen(void) {
 	/* Map screen memory into a physical buffer. */
 	result->vb_stride = mode.smi_scanline;
 	result->vb_total  = mode.smi_scanline * mode.smi_resy;
-	result->vb_data   = (byte_t *)(*result->ssb_libphys_map)(mode.smi_lfb, result->vb_total);
+	result->vb_data   = (byte_t *)(*result->ss_libphys_map)(mode.smi_lfb, result->vb_total);
 	if unlikely((void *)result->vb_data == MAP_FAILED) {
 		LOGERR("Failed to map LFB: %m\n");
 		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
@@ -401,15 +463,33 @@ svga_newscreen(void) {
 
 	/* Fill in remaining fields of "result" */
 	result->vb_refcnt          = 1;
-	result->vb_ops             = get_svga_screen_ops();
+	result->vb_ops             = &result->ss_ops.sbo_video;
 	result->vb_format.vf_codec = format.vf_codec;
 	result->vb_format.vf_pal   = format.vf_pal;
 	result->vb_size_x          = mode.smi_resx;
 	result->vb_size_y          = mode.smi_resy;
-	result->ssb_codec_handle   = codec_handle;
-	result->ssb_vdlck          = vdlck.of_hint;
-	result->ssb_libsvgadrv     = libsvgadrv;
-	result->ssb_drv            = driver;
+	result->ss_codec_handle   = codec_handle;
+	result->ss_vdlck          = vdlck.of_hint;
+	result->ss_libsvgadrv     = libsvgadrv;
+	result->ss_drv            = driver;
+
+	/* TODO: Need custom lock function here that prevents use of HW-accelerated
+	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
+	result->ss_ops.sbo_video.vi_lock    = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_unlock  = &rambuffer_unlock;
+	result->ss_ops.sbo_video.vi_getgfx  = &rambuffer_getgfx;
+	result->ss_ops.sbo_video.vi_clipgfx = &rambuffer_clipgfx;
+	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
+	shared_lock_init(&result->ss_cslock);
+
+	/* Define the updaterects operators if needed by the chipset */
+	if (result->ss_cs.sc_ops.sco_updaterect) {
+		result->ss_ops.sbo_updaterect  = &svga_screen_updaterect_cs;
+		result->ss_ops.sbo_updaterects = &svga_screen_updaterects_cs;
+	} else {
+		result->ss_ops.sbo_updaterect  = &svga_screen_updaterect_noop;
+		result->ss_ops.sbo_updaterects = &svga_screen_updaterects_noop;
+	}
 
 	/* Close our handle to the SVGA base driver */
 	(void)close(svga);
@@ -417,11 +497,11 @@ svga_newscreen(void) {
 	/* And we're done! */
 	return result;
 /*err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys_data:
-	(*result->ssb_libphys_unmap)(result->vb_data, result->vb_total);*/
+	(*result->ss_libphys_unmap)(result->vb_data, result->vb_total);*/
 err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys:
-	(void)dlclose(result->ssb_libphys);
+	(void)dlclose(result->ss_libphys);
 err_svga_vdlck_codec_format_libsvgadrv_r_cs:
-	(*result->ssb_cs.sc_ops.sco_fini)(&result->ssb_cs);
+	(*result->ss_cs.sc_ops.sco_fini)(&result->ss_cs);
 err_svga_vdlck_codec_format_libsvgadrv_r:
 	free(result);
 err_svga_vdlck_codec_format_libsvgadrv:
@@ -440,15 +520,18 @@ err:
 }
 
 
-/* Creates+returns a video buffer for the entire screen (or return NULL and set
- * errno  on error). Note that screen buffer access is only granted to ROOT and
- * the window server */
-DEFINE_PUBLIC_ALIAS(video_buffer_screen, libvideo_buffer_screen);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_screen(void) {
+/* Creates+returns  a video buffer for the entire  screen (or return NULL and set
+ * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
+ * only  a single screen buffer can ever exist system-wide. If an attempt is made
+ * to create a second screen buffer, this function will block until the first one
+ * is destroyed, or the processing owning it exits. */
+INTERN WUNUSED REF struct screen_buffer *CC
+libvideo_screen_buffer_create(void) {
 	/* XXX: Support for other video drivers would go here... */
-	return svga_newscreen();
+	return (REF struct screen_buffer *)svga_newscreen();
 }
+
+DEFINE_PUBLIC_ALIAS(screen_buffer_create, libvideo_screen_buffer_create);
 
 DECL_END
 
