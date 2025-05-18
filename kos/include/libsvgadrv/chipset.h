@@ -228,11 +228,11 @@ struct svga_chipset_ops {
 	 * - In most cases, this will simply read/write the core VGA palette */
 	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_getpal)(struct svga_chipset *__restrict self,
-	                            __uint8_t base, __uint8_t count,
+	                            __uint8_t base, __uint16_t count,
 	                            __NCX struct svga_palette_color *buf);
 	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setpal)(struct svga_chipset *__restrict self,
-	                            __uint8_t base, __uint8_t count,
+	                            __uint8_t base, __uint16_t count,
 	                            __NCX struct svga_palette_color const *buf);
 
 	/* NOTE: Operators below may be altered by chipset drivers during `sco_setmode()'

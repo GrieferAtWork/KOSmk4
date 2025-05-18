@@ -386,7 +386,7 @@ basevga_setmode(struct vga_mode const *__restrict mode) {
  * @param: count: # of color rgb-triples to read/write */
 INTERN void CC
 cs_basevga_rdpal(struct svga_chipset *__restrict UNUSED(ignored), uint8_t base,
-                 uint8_t count, NCX struct svga_palette_color *__restrict buf) {
+                 uint16_t count, NCX struct svga_palette_color *__restrict buf) {
 	vga_w(VGA_PEL_IR, base);
 	while (count--) {
 		uint8_t r, g, b;
@@ -405,7 +405,7 @@ cs_basevga_rdpal(struct svga_chipset *__restrict UNUSED(ignored), uint8_t base,
 
 INTERN void CC
 cs_basevga_wrpal(struct svga_chipset *__restrict UNUSED(ignored), uint8_t base,
-                 uint8_t count, NCX struct svga_palette_color const *__restrict buf) {
+                 uint16_t count, NCX struct svga_palette_color const *__restrict buf) {
 	vga_w(VGA_PEL_IW, base);
 	while (count--) {
 		uint8_t r, g, b;

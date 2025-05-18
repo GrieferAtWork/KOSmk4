@@ -159,8 +159,8 @@ svgadev_ioctl_getpal(struct svgadev *__restrict self,
 		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	struct svga_palette pal;
 	memcpy(&pal, validate_readwrite(upal, sizeof(pal)), sizeof(pal));
-	if (((uint16_t)pal.svp_base + pal.svp_size) > 0x100) {
-		pal.svp_size   = (uint8_t)(0x100 - pal.svp_base);
+	if (((uint32_t)pal.svp_base + pal.svp_size) > 0x100) {
+		pal.svp_size   = (uint16_t)(0x100 - pal.svp_base);
 		upal->svp_size = pal.svp_size;
 		COMPILER_WRITE_BARRIER();
 	}
@@ -179,8 +179,8 @@ svgadev_ioctl_setpal(struct svgadev *__restrict self,
 	struct svga_palette pal;
 	require(CAP_SYS_RAWIO);
 	memcpy(&pal, validate_readwrite(upal, sizeof(pal)), sizeof(pal));
-	if (((uint16_t)pal.svp_base + pal.svp_size) > 0x100) {
-		pal.svp_size   = (uint8_t)(0x100 - pal.svp_base);
+	if (((uint32_t)pal.svp_base + pal.svp_size) > 0x100) {
+		pal.svp_size   = (uint16_t)(0x100 - pal.svp_base);
 		upal->svp_size = pal.svp_size;
 		COMPILER_WRITE_BARRIER();
 	}

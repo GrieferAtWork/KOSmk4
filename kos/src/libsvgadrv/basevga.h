@@ -69,8 +69,8 @@ struct svga_palette_color;
 /* Read/write to/from the current color palette.
  * @param: base:  Starting palette color index.
  * @param: count: # of color rgb-triples to read/write */
-INTDEF void CC cs_basevga_rdpal(struct svga_chipset *__restrict ignored, uint8_t base, uint8_t count, NCX struct svga_palette_color *__restrict buf);
-INTDEF void CC cs_basevga_wrpal(struct svga_chipset *__restrict ignored, uint8_t base, uint8_t count, NCX struct svga_palette_color const *__restrict buf);
+INTDEF void CC cs_basevga_rdpal(struct svga_chipset *__restrict ignored, uint8_t base, uint16_t count, NCX struct svga_palette_color *__restrict buf);
+INTDEF void CC cs_basevga_wrpal(struct svga_chipset *__restrict ignored, uint8_t base, uint16_t count, NCX struct svga_palette_color const *__restrict buf);
 
 
 /* Direct access  to the  standard 256K  of VGA  video  memory.

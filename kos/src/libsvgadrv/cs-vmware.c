@@ -445,7 +445,7 @@ NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_fillrect)(struct svga_chipset *__restric
 
 PRIVATE NONNULL((1)) void LIBSVGADRV_CC
 vmware_v_getpal(struct svga_chipset *__restrict self,
-                uint8_t base, uint8_t count,
+                uint8_t base, uint16_t count,
                 NCX struct svga_palette_color *buf) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	if (me->vm_vga_mode) {
@@ -462,7 +462,7 @@ vmware_v_getpal(struct svga_chipset *__restrict self,
 
 PRIVATE NONNULL((1)) void LIBSVGADRV_CC
 vmware_v_setpal(struct svga_chipset *__restrict self,
-                uint8_t base, uint8_t count,
+                uint8_t base, uint16_t count,
                 NCX struct svga_palette_color const *buf) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 	if (me->vm_vga_mode) {

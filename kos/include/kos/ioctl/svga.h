@@ -141,14 +141,14 @@ struct svga_strings {
 
 struct svga_palette_color;
 struct svga_palette {
-	__uint8_t                      svp_base;   /* [in] Color base index */
-	__uint8_t                      svp_size;   /* [in] # of colors to read/write
-	                                            * [out] # of actually read colors (clamped
-	                                            * when trying to read past end of palette) */
-	__uint8_t                     _svp_pad[6]; /* ... */
+	__uint16_t                     svp_base;  /* [in] Color base index */
+	__uint16_t                     svp_size;  /* [in] # of colors to read/write
+	                                           * [out] # of actually read colors (clamped
+	                                           * when trying to read past end of palette) */
+	__uint32_t                    _svp_pad;   /* ... */
 	union {
-		struct svga_palette_color *svp_pal;    /* [0..svp_size] Palette color I/O data */
-		__uint64_t                _svp_alpal;  /* Align... */
+		struct svga_palette_color *svp_pal;   /* [0..svp_size] Palette color I/O data */
+		__uint64_t                _svp_alpal; /* Align... */
 	};
 };
 

@@ -161,6 +161,8 @@ again_font:
 			            gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT,
 			            0,
 			            NULL);
+		} else if (buf[0] == 'p') {
+			video_buffer_save(screen, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
 			break;
 		}
@@ -210,6 +212,10 @@ again_font:
 			case '0' ... '9':
 				action = buf[0] - '0';
 				goto step;
+
+			case 'p':
+				video_buffer_save(screen, "/var/screen.png", NULL);
+				break;
 
 			default: break;
 			}

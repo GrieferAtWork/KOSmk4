@@ -39,18 +39,26 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <malloc.h>
+#include <malloca.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <libphys/api.h>
 #include <libphys/phys.h>
+#include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
+#include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
+#include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
-#include <libvideo/gfx/gfx.h>
+/**/
 
 #include "ram-buffer.h"
+#include "screen.h"
 
 DECL_BEGIN
 
@@ -110,9 +118,16 @@ svga_find_first_gfx_mode(fd_t fd, struct svga_modeinfo *__restrict mode) {
 	return -1;
 }
 
+PRIVATE NONNULL((1)) void
+NOTHROW(LIBVIDEO_CODEC_CC svga_palette_destroy)(struct video_palette *__restrict self) {
+	free(self->vp_cache);
+	free(self);
+}
+
+
 PRIVATE WUNUSED NONNULL((1, 2)) bool CC
 svga_get_format(struct svga_modeinfo const *__restrict mode,
-                struct video_format *__restrict result) {
+                struct video_format *__restrict result, fd_t vdlck) {
 	video_codec_t codec;
 	syslog(LOG_DEBUG,
 	       "Video mode:\n"
@@ -135,14 +150,12 @@ svga_get_format(struct svga_modeinfo const *__restrict mode,
 	       (unsigned int)mode->smi_gbits,
 	       (unsigned int)mode->smi_bshift,
 	       (unsigned int)mode->smi_bbits);
+
+	result->vf_pal = NULL;
 	if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
 		goto nope; /* TODO: Linear frame buffer emulation */
 	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
 		goto nope;
-	if (mode->smi_flags & SVGA_MODEINFO_F_PAL)
-		goto nope; /* TODO: palette support */
-	result->vf_pal = NULL;
-
 	codec = VIDEO_CODEC_NONE;
 	if (mode->smi_flags & SVGA_MODEINFO_F_BW) {
 		switch (mode->smi_colorbits) {
@@ -152,6 +165,51 @@ svga_get_format(struct svga_modeinfo const *__restrict mode,
 		case 8: codec = VIDEO_CODEC_GRAY256; break;
 		default: goto nope;
 		}
+	} else if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {
+		size_t i, palsize = (size_t)1 << mode->smi_colorbits;
+		struct video_palette *pal;
+		struct svga_palette_color *colors;
+		struct svga_palette buf;
+		switch (mode->smi_colorbits) {
+		case 1: codec = VIDEO_CODEC_PAL2_LSB; break;
+		case 2: codec = VIDEO_CODEC_PAL4_LSB; break;
+		case 4: codec = VIDEO_CODEC_PAL16_LSB; break;
+		case 8: codec = VIDEO_CODEC_PAL256; break;
+		default: goto nope;
+		}
+
+		colors = (struct svga_palette_color *)malloca(palsize, sizeof(struct svga_palette_color));
+		if unlikely(!colors) {
+			LOGERR("Failed to allocate palette color buffer: %m\n");
+			goto nope;
+		}
+		buf.svp_base = 0;
+		buf.svp_size = palsize;
+		buf.svp_pal  = colors;
+		if (ioctl(vdlck, SVGA_IOC_GETPAL_RGBX, &buf) < 0) {
+			LOGERR("Failed to query palette: %m\n");
+			freea(colors);
+			goto nope;
+		}
+
+		pal = (struct video_palette *)malloc(offsetof(struct video_palette, vp_pal) +
+		                                     (buf.svp_size * sizeof(video_color_t)));
+		if unlikely(!pal) {
+			LOGERR("Failed to allocate palette controller: %m\n");
+			freea(colors);
+			goto nope;
+		}
+		result->vf_pal  = pal;
+		pal->vp_destroy = &svga_palette_destroy;
+		pal->vp_refcnt  = 1;
+		pal->vp_cache   = NULL;
+		pal->vp_cnt     = buf.svp_size;
+		for (i = 0; i < pal->vp_cnt; ++i) {
+			struct svga_palette_color color = colors[i];
+			video_color_t vcolor = VIDEO_COLOR_RGB(color.spc_r, color.spc_g, color.spc_b);
+			pal->vp_pal[i] = vcolor;
+		}
+		freea(colors);
 	} else {
 		switch (mode->smi_bits_per_pixel) {
 
@@ -219,6 +277,8 @@ svga_get_format(struct svga_modeinfo const *__restrict mode,
 		goto nope;
 	return true;
 nope:
+	if unlikely(result->vf_pal)
+		video_palette_decref(result->vf_pal);
 	return false;
 }
 
@@ -267,7 +327,7 @@ svga_newscreen(void) {
 	}
 
 	/* Load codec to-be used for video mode. */
-	if (!svga_get_format(&mode, &format)) {
+	if (!svga_get_format(&mode, &format, vdlck.of_hint)) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
 		goto err_svga_vdlck;
@@ -399,80 +459,8 @@ err:
 DEFINE_PUBLIC_ALIAS(video_buffer_screen, libvideo_buffer_screen);
 INTERN WUNUSED REF struct video_buffer *CC
 libvideo_buffer_screen(void) {
-#if 1
+	/* XXX: Support for other video drivers would go here... */
 	return svga_newscreen();
-#else
-	fd_t driver;
-	struct video_rambuffer *result;
-	struct vd_format format;
-	result = screen_buffer; /* TODO: This needs a lock! */
-	if likely(result) {
-		incref(result);
-		return result;
-	}
-	driver = libvideo_driver();
-	if unlikely(driver < 0)
-		goto err;
-	if (ioctl(driver, VIDEOIO_GETFORMAT, &format) < 0)
-		goto err;
-
-	/* Allocate the video buffer. */
-	result = (struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
-	if unlikely(!result)
-		goto err;
-	result->vb_format.vf_pal = NULL;
-
-	/* Lookup the video format described by the codec. */
-	result->vb_format.vf_codec = video_codec_lookup(format.vdf_codec);
-	if unlikely(!result->vb_format.vf_codec) {
-		errno = ENOTSUP;
-		goto err_r;
-	}
-
-	/* Construct a palette (if necessary) */
-	if (VIDEO_CODEC_HASPAL(format.vdf_codec)) {
-		struct video_palette *pal;
-		struct vd_pal_struct getpal;
-		size_t count = VIDEO_CODEC_PALSIZ(format.vdf_codec);
-		pal = (struct video_palette *)malloc(offsetof(struct video_palette, vp_pal.vdp_pal) +
-		                                     (count * sizeof(vd_color_t)));
-		if unlikely(!pal)
-			goto err_r;
-		result->vb_format.vf_pal = pal;
-		pal->vp_destroy = &screen_pal_destroy;
-		pal->vp_refcnt  = 1;
-		pal->vp_cache   = NULL;
-		pal->vp_cnt = count;
-		/* Load the current palette. */
-		getpal.vp_codec = format.vdf_codec;
-		getpal.vp_pal   = &pal->vp_pal;
-		if (ioctl(driver, VIDEOIO_GETPAL, &getpal) < 0)
-			goto err;
-	}
-	result->vb_stride = format.vdf_scan;
-	result->vb_refcnt = 1;
-	result->vb_ops    = rambuffer_getops_munmap();
-	result->vb_size_x = format.vdf_resx;
-	result->vb_size_y = format.vdf_resy;
-	result->vb_total  = format.vdf_scan * format.vdf_resy;
-	result->vb_data = (byte_t *)mmap(NULL, result->vb_total,
-	                                 PROT_READ | PROT_WRITE,
-	                                 MAP_PRIVATE | MAP_FILE,
-	                                 driver, 0);
-	if (result->vb_data == (byte_t *)MAP_FAILED)
-		goto err_r;
-	if (!atomic_cmpxch(&screen_buffer, NULL, result)) { /* TODO: This needs a lock! */
-		(*result->vb_ops->vi_destroy)(result);
-		result = screen_buffer;
-	}
-	incref(result);
-	return result;
-err_r:
-	free(result->vb_format.vf_pal);
-	free(result);
-err:
-	return NULL;
-#endif
 }
 
 DECL_END
