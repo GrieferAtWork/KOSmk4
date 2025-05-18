@@ -3262,6 +3262,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 			result->ft_dat_start = LETOH16(disk->bpb.bpb_reserved_sectors);
 			result->ft_dat_start += fat_size;
 			result->ft_dat_start += root_sectors;
+
 			/* Calculate the total number of data sectors. */
 			if (disk->bpb.bpb_shortsectorc) {
 				data_sectors = LETOH16(disk->bpb.bpb_shortsectorc);
@@ -3274,6 +3275,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 			if (OVERFLOW_USUB(data_sectors, root_sectors, &data_sectors))
 				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
+
 			/* Calculate the total number of data clusters. */
 			total_clusters = data_sectors / disk->bpb.bpb_sectors_per_cluster;
 			if (total_clusters > FAT16_MAXCLUSTERS) {
@@ -3295,6 +3297,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 			result->ft_sec4fat            = LETOH32(disk->fat32.f32_sectors_per_fat);
 			result->ft_cluster_eof        = (result->ft_sec4fat << result->ft_sectorshift) / 4;
 			result->ft_cluster_eof_marker = 0xffffffff;
+
 			/* Must lookup the cluster of the root directory. */
 			shared_rwlock_init(&result->ft_fdat.fn_lock);
 			result->ft_fdat.fn_clusterc    = 1;
@@ -3325,6 +3328,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 			result->ft_fdat.fn16_root.r16_rootsiz = (u32)LETOH16(disk->bpb.bpb_maxrootsize);
 			result->ft_fdat.fn16_root.r16_rootsiz *= sizeof(struct fat_dirent);
 			result->ft_cluster_eof = (result->ft_sec4fat << result->ft_sectorshift) / 2;
+
 			/* It is possible  to create  a FAT16 filesystem  with 0x10000  sectors.
 			 * This is a special case since sector 0xffff still needs to be reserved
 			 * as the special sector used for marking file EOF.
@@ -3336,6 +3340,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 			result->ft_features |= FAT_FEATURE_ARB; /* 16-bit clusters --> high 16 bits are the ARB mask. */
 		if (result->ft_cluster_eof_marker < result->ft_cluster_eof)
 			result->ft_cluster_eof_marker = result->ft_cluster_eof;
+
 		/* XXX: Detect `FAT_FEATURE_UGID' */
 
 		memcpy(&result->ft_oem, disk->bpb.bpb_oem, sizeof(disk->bpb.bpb_oem));
@@ -3465,7 +3470,6 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	/* Fill in fields relating to `flatsuper' */
 	result->ft_super.ffs_features = FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO;
 	flatdirdata_init(&result->ft_super.ffs_rootdata);
-
 
 	printk(KERN_INFO "[fat] Loaded FAT%u-filesystem "
 	                 "[oem=%q] [label=%q] [sysname=%q]\n",

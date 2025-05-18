@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#include <__crt.h> /* __FILE */
 #include <__stdinc.h>
 #include <features.h>
 
@@ -257,6 +258,102 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
                     struct video_codec const *__codec, struct video_palette *__palette);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+/* Create a video buffer that interfaces with a pre-existing buffer whose
+ * base address is located at `mem' (which consists of  `stride * size_y'
+ * bytes). When  non-NULL,  `(*release_mem)(release_mem_cookie, mem)'  is
+ * called when the final reference for the returned buffer is dropped.
+ *
+ * This function can be used to wrap a memory-resident graphics buffer
+ * in-place,    without   needing   to    copy   it   anywhere   else.
+ * @param: mem:     Base address  of  the  pre-loaded  memory  buffer.
+ *                  If this location isn't writable, attempts to write
+ *                  pixel  data of the  returned buffer will SEGFAULT.
+ * @param: size_x:  Width of returned buffer
+ * @param: size_y:  Height of returned buffer
+ * @param: stride:  Scanline width in `mem'
+ * @param: codec:   The video codec that describes how `mem' is encoded.
+ * @param: palette: The palette to use (only needed if used by `codec')
+ * @param: release_mem: Optional callback invoked when the returned buffer is destroyed
+ * @param: release_mem_cookie: Cookie argument for `release_mem'
+ * @return: * :   The newly created video buffer
+ * @return: NULL: [errno=EINVAL] Given `stride' is too small for `codec' and `size_y'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((5)) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORMEM)(void *__mem, __size_t __size_x, __size_t __size_y, __size_t __stride,
+                                        struct video_codec const *__codec, struct video_palette *__palette,
+                                        void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
+                                        void *__release_mem_cookie);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((5)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_formem(void *__mem, __size_t __size_x, __size_t __size_y, __size_t __stride,
+                    struct video_codec const *__codec, struct video_palette *__palette,
+                    void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
+                    void *__release_mem_cookie);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+/* Various functions  for opening  a file/stream/blob  as an  image  file.
+ * The actual file format is  auto-detected, and supported formats  depend
+ * on installed 3rd party libraries. By default, BMP and PNG is supported. */
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_MOPEN)(void const *__blob, __size_t __blob_size);
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FOPEN)(__FILE *__restrict __fp);
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FDOPEN)(__fd_t __fd);
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_OPEN)(char const *__filename);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_mopen(void const *__blob, __size_t __blob_size);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_fopen(__FILE *__restrict __fp);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_fdopen(__fd_t __fd);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_open(char const *__filename);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+/* Do the inverse of `video_buffer_*open' and save the contents of a video buffer
+ * into  a file/memory/stream. The same set of  file formats is supported as also
+ * supported by `video_buffer_*open', and the intended file format is  determined
+ * by the given `format' argument, which should be the case-insensitive extension
+ * (without a leading ".") of the format (e.g. "png" for PNG files).
+ * @param: self:     The video buffer to save to a file.
+ * @param: format:   The format to use for the output file written.
+ * @param: fp/fd:    Output file descriptor / stdio-stream
+ * @param: filename: Output filename ("format" is detected from file extension)
+ * @param: options:  ","-separated string of format-specific encoding  options.
+ *                   Available options are not explicitly document here, so you
+ *                   need  to look at  the source to see  what's there. You may
+ *                   simply pass `NULL' to use defaults for everything.
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOTSUP] Unsupported `format'
+ * @return: -1: [errno=ENOTSUP] Unsupported parameter in `options'
+ * @return: -1: Error (s.a. `errno') */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FSAVE)(struct video_buffer *__self, char const *__format,
+                                       __FILE *__restrict __fp, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FDSAVE)(struct video_buffer *__self, char const *__format,
+                                        __fd_t __fd, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SAVE)(struct video_buffer *__self, char const *__filename,
+                                      char const *__options);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
+video_buffer_fsave(struct video_buffer *__self, char const *__format,
+                   __FILE *__restrict __fp, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
+video_buffer_fdsave(struct video_buffer *__self, char const *__format,
+                    __fd_t __fd, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int LIBVIDEO_GFX_CC
+video_buffer_save(struct video_buffer *__self, char const *__filename,
+                  char const *__options);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */

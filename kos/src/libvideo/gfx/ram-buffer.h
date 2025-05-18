@@ -68,6 +68,31 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec const *__restrict codec,
                           struct video_palette *palette);
 
+/* Create a video buffer that interfaces with a pre-existing buffer whose
+ * base address is located at `mem' (which consists of  `stride * size_y'
+ * bytes). When  non-NULL,  `(*release_mem)(release_mem_cookie, mem)'  is
+ * called when the final reference for the returned buffer is dropped.
+ *
+ * This function can be used to wrap a memory-resident graphics buffer
+ * in-place,    without   needing   to    copy   it   anywhere   else.
+ * @param: mem:     Base address  of  the  pre-loaded  memory  buffer.
+ *                  If this location isn't writable, attempts to write
+ *                  pixel  data of the  returned buffer will SEGFAULT.
+ * @param: size_x:  Width of returned buffer
+ * @param: size_y:  Height of returned buffer
+ * @param: stride:  Scanline width in `mem'
+ * @param: codec:   The video codec that describes how `mem' is encoded.
+ * @param: palette: The palette to use (only needed if used by `codec')
+ * @param: release_mem: Optional callback invoked when the returned buffer is destroyed
+ * @param: release_mem_cookie: Cookie argument for `release_mem'
+ * @return: * :   The newly created video buffer
+ * @return: NULL: Error (s.a. `errno') */
+INTDEF WUNUSED NONNULL((5)) REF struct video_buffer *CC
+libvideo_buffer_formem(void *mem, size_t size_x, size_t size_y, size_t stride,
+                       struct video_codec const *codec, struct video_palette *palette,
+                       void (CC *release_mem)(void *cookie, void *mem),
+                       void *release_mem_cookie);
+
 /* Return the preferred video format.
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some

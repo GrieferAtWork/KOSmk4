@@ -90,21 +90,23 @@ __DECL_BEGIN
 
 /* Normal codec flags. */
 #define VIDEO_CODEC_FLAG_NORMAL 0x0000
+#define VIDEO_CODEC_FLAG_ALPHA  0x0001 /* Does this codec have an alpha-channel? */
 
 #ifdef __CC__
 typedef __uint16_t video_codec_t; /* One of `VIDEO_CODEC_*' */
 
 struct video_rambuffer_requirements {
 	__size_t vbs_bufsize; /* Minimal buffer size (in bytes) */
-	__size_t vbs_stride;  /* Required scanline stride (in bytes) */
+	__size_t vbs_stride;  /* Minimal scanline stride (in bytes) */
 };
 
 struct video_format;
 struct video_codec {
 	/* Video format operations. */
-	video_codec_t vc_codec; /* [const] Video format codec (One of `VIDEO_FORMAT_*') */
-	__uint16_t   _vc_flags; /* [const] Video format flags (Set of `VIDEO_CODEC_FLAG_*') */
-	__uint32_t    vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
+	video_codec_t             vc_codec; /* [const] Video format codec (One of `VIDEO_FORMAT_*') */
+	__uint16_t               _vc_flags; /* [const] Video format flags (Set of `VIDEO_CODEC_FLAG_*') */
+	__uint32_t                vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
+	struct video_codec const *vc_nalgn; /* [1..1][const] Codec identical to this one, except with `vc_align == 1' */
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.

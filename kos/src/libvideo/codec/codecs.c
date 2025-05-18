@@ -27,6 +27,8 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/__bitfield.h>
+#include <hybrid/host.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -298,6 +300,22 @@ setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	((u16 *)line)[x] = (u16)pixel;
 }
 
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_getpixel16 getpixel16
+#define unaligned_setpixel16 setpixel16
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+unaligned_getpixel16(byte_t const *__restrict line, uintptr_t x) {
+	return UNALIGNED_GET16(&((u16 const *)line)[x]);
+}
+
+PRIVATE NONNULL((1)) void CC
+unaligned_setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+	UNALIGNED_SET16(&((u16 *)line)[x], (u16)pixel);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel24(byte_t const *__restrict line, uintptr_t x) {
 	union pixel24 result;
@@ -328,6 +346,23 @@ setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	((u32 *)line)[x] = (u32)pixel;
 }
 
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_getpixel32 getpixel32
+#define unaligned_setpixel32 setpixel32
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+unaligned_getpixel32(byte_t const *__restrict line, uintptr_t x) {
+	return UNALIGNED_GET32(&((u32 const *)line)[x]);
+}
+
+PRIVATE NONNULL((1)) void CC
+unaligned_setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+	UNALIGNED_SET32(&((u32 *)line)[x], (u32)pixel);
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+
+
 
 
 PRIVATE void CC
@@ -336,7 +371,7 @@ linecopy8(byte_t *__restrict dst_line, uintptr_t dst_x,
           size_t num_pixels) {
 	memcpyb((u8 *)dst_line + dst_x,
 	        (u8 *)src_line + src_x,
-	         num_pixels);
+	        num_pixels);
 }
 
 PRIVATE void CC
@@ -345,7 +380,7 @@ linecopy16(byte_t *__restrict dst_line, uintptr_t dst_x,
            size_t num_pixels) {
 	memcpyw((u16 *)dst_line + dst_x,
 	        (u16 *)src_line + src_x,
-	         num_pixels);
+	        num_pixels);
 }
 
 PRIVATE void CC
@@ -354,7 +389,7 @@ linecopy24(byte_t *__restrict dst_line, uintptr_t dst_x,
            size_t num_pixels) {
 	memcpy((u8 *)dst_line + dst_x * 3,
 	       (u8 *)src_line + src_x * 3,
-	        num_pixels, 3);
+	       num_pixels, 3);
 }
 
 PRIVATE void CC
@@ -363,8 +398,32 @@ linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
            size_t num_pixels) {
 	memcpyl((u32 *)dst_line + dst_x,
 	        (u32 *)src_line + src_x,
-	         num_pixels);
+	        num_pixels);
 }
+
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_linecopy16 linecopy16
+#define unaligned_linecopy32 linecopy32
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE void CC
+unaligned_linecopy16(byte_t *__restrict dst_line, uintptr_t dst_x,
+                     byte_t const *__restrict src_line, uintptr_t src_x,
+                     size_t num_pixels) {
+	memcpy(dst_line + dst_x * 2,
+	       src_line + src_x * 2,
+	       num_pixels * 2);
+}
+
+PRIVATE void CC
+unaligned_linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
+                     byte_t const *__restrict src_line, uintptr_t src_x,
+                     size_t num_pixels) {
+	memcpy(dst_line + dst_x * 4,
+	       src_line + src_x * 4,
+	       num_pixels * 4);
+}
+
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 
 
@@ -402,6 +461,59 @@ linefill32(byte_t *__restrict dst_line, uintptr_t dst_x,
 	memsetl((u32 *)dst_line + dst_x, (u32)pixel, num_pixels);
 }
 
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define unaligned_linefill16 linefill16
+#define unaligned_linefill32 linefill32
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+PRIVATE void CC
+unaligned_linefill16(byte_t *__restrict dst_line, uintptr_t dst_x,
+                     video_pixel_t pixel, size_t num_pixels) {
+#ifndef __OPTIMIZE_SIZE__
+	if (((uintptr_t)dst_line & 1) == 0) {
+		linefill16(dst_line, dst_x, pixel, num_pixels);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		size_t i;
+		union {
+			u8 bytes[2];
+			u16 pixel;
+		} data;
+		data.pixel = (u16)pixel;
+		dst_line += dst_x * 2;
+		for (i = 0; i < num_pixels; ++i) {
+			*dst_line++ = data.bytes[0];
+			*dst_line++ = data.bytes[1];
+		}
+	}
+}
+
+PRIVATE void CC
+unaligned_linefill32(byte_t *__restrict dst_line, uintptr_t dst_x,
+                     video_pixel_t pixel, size_t num_pixels) {
+#ifndef __OPTIMIZE_SIZE__
+	if (((uintptr_t)dst_line & 3) == 0) {
+		linefill32(dst_line, dst_x, pixel, num_pixels);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		size_t i;
+		union {
+			u8 bytes[4];
+			u32 pixel;
+		} data;
+		data.pixel = (u32)pixel;
+		dst_line += dst_x * 4;
+		for (i = 0; i < num_pixels; ++i) {
+			*dst_line++ = data.bytes[0];
+			*dst_line++ = data.bytes[1];
+			*dst_line++ = data.bytes[2];
+			*dst_line++ = data.bytes[3];
+		}
+	}
+}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
 
 
 
@@ -426,7 +538,7 @@ rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
                    video_pixel_t pixel) {
 	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
 }
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define rgb888_color2pixel  colorpixel_identity
@@ -436,7 +548,7 @@ rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
                    video_color_t color) {
 	return color >> 8;
 }
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 
 
@@ -1315,17 +1427,15 @@ buffer1_requirements(size_t size_x, size_t size_y,
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
 INTERN ATTR_CONST WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec) {
-	struct video_codec const *result;
-	switch (codec) {
-#if defined(__KERNEL__) || (!defined(__PIC__) && !defined(__PIE__) && !defined(__pic__) && !defined(__pie__))
-#define DEFINE_CODEC(codec, align, rambuffer_requirements,              \
-                     getpixel, setpixel, linecopy, linefill,            \
-                     pixel2color, color2pixel)                          \
-	case codec: {                                                       \
-		PRIVATE struct video_codec const _codec_##codec = {             \
+#if defined(__KERNEL__) || !defined(__pic__)
+#define _DEFINE_CODEC_AL1(name, codec, flags, rambuffer_requirements,   \
+                          getpixel, setpixel, linecopy, linefill,       \
+                          pixel2color, color2pixel)                     \
+		PRIVATE struct video_codec const name = {                       \
 			/* .vc_codec                  = */ codec,                   \
-			/* ._vc_flags                 = */ VIDEO_CODEC_FLAG_NORMAL, \
-			/* .vc_align                  = */ align,                   \
+			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_align                  = */ 1,                       \
+			/* .vc_nalgn                  = */ &name,                   \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
 			/* .vc_getpixel               = */ &getpixel,               \
 			/* .vc_setpixel               = */ &setpixel,               \
@@ -1333,91 +1443,188 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_linefill               = */ &linefill,               \
 			/* .vc_pixel2color            = */ &pixel2color,            \
 			/* .vc_color2pixel            = */ &color2pixel,            \
+		}
+#define _DEFINE_CODEC_ALX(name, codec, flags,                           \
+                          align, rambuffer_requirements,                \
+                          getpixel, setpixel, linecopy, linefill,       \
+                          unaligned_getpixel, unaligned_setpixel,       \
+                          unaligned_linecopy, unaligned_linefill,       \
+                          pixel2color, color2pixel)                     \
+		PRIVATE struct video_codec const unaligned_##name = {           \
+			/* .vc_codec                  = */ codec,                   \
+			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_align                  = */ 1,                       \
+			/* .vc_nalgn                  = */ &unaligned_##name,       \
+			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
+			/* .vc_getpixel               = */ &unaligned_getpixel,     \
+			/* .vc_setpixel               = */ &unaligned_setpixel,     \
+			/* .vc_linecopy               = */ &unaligned_linecopy,     \
+			/* .vc_linefill               = */ &unaligned_linefill,     \
+			/* .vc_pixel2color            = */ &pixel2color,            \
+			/* .vc_color2pixel            = */ &color2pixel,            \
 		};                                                              \
-		result = &_codec_##codec;                                       \
-	} break
-#else
-#define DEFINE_CODEC(codec, align, rambuffer_requirements,                      \
-                     getpixel, setpixel, linecopy, linefill,                    \
-                     pixel2color, color2pixel)                                  \
-	case codec: {                                                               \
-		PRIVATE struct video_codec _codec_##codec = {                           \
-			/* .vc_codec  = */ codec,                                           \
-			/* ._vc_flags = */ VIDEO_CODEC_FLAG_NORMAL,                         \
-			/* .vc_align  = */ align                                            \
-		};                                                                      \
-		if (!_codec_##codec.vc_color2pixel) {                                   \
-			/* Lazily initialize to prevent relocations */                      \
-			_codec_##codec.vc_rambuffer_requirements = &rambuffer_requirements; \
-			_codec_##codec.vc_getpixel               = &getpixel;               \
-			_codec_##codec.vc_setpixel               = &setpixel;               \
-			_codec_##codec.vc_linecopy               = &linecopy;               \
-			_codec_##codec.vc_linefill               = &linefill;               \
-			_codec_##codec.vc_pixel2color            = &pixel2color;            \
-			COMPILER_WRITE_BARRIER();                                           \
-			_codec_##codec.vc_color2pixel = &color2pixel;                       \
-			COMPILER_WRITE_BARRIER();                                           \
-		}                                                                       \
-		result = &_codec_##codec;                                               \
-	} break
-#endif
+		PRIVATE struct video_codec const name = {                       \
+			/* .vc_codec                  = */ codec,                   \
+			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_align                  = */ align,                   \
+			/* .vc_nalgn                  = */ &unaligned_##name,       \
+			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
+			/* .vc_getpixel               = */ &getpixel,               \
+			/* .vc_setpixel               = */ &setpixel,               \
+			/* .vc_linecopy               = */ &linecopy,               \
+			/* .vc_linefill               = */ &linefill,               \
+			/* .vc_pixel2color            = */ &pixel2color,            \
+			/* .vc_color2pixel            = */ &color2pixel,            \
+		}
+#else /* __KERNEL__ || !__pic__ */
+#define _DEFINE_CODEC_AL1(name, codec, flags, rambuffer_requirements,   \
+                          getpixel, setpixel, linecopy, linefill,       \
+                          pixel2color, color2pixel)                     \
+		PRIVATE struct video_codec name = {                             \
+			/* .vc_codec  = */ codec,                                   \
+			/* ._vc_flags = */ flags,                                   \
+			/* .vc_align  = */ 1,                                       \
+		};                                                              \
+		if (!name.vc_color2pixel) {                                     \
+			name.vc_nalgn                  = &name;                     \
+			name.vc_rambuffer_requirements = &rambuffer_requirements;   \
+			name.vc_getpixel               = &getpixel;                 \
+			name.vc_setpixel               = &setpixel;                 \
+			name.vc_linecopy               = &linecopy;                 \
+			name.vc_linefill               = &linefill;                 \
+			name.vc_pixel2color            = &pixel2color;              \
+			COMPILER_WRITE_BARRIER();                                   \
+			name.vc_color2pixel = &color2pixel;                         \
+			COMPILER_WRITE_BARRIER();                                   \
+		}
+#define _DEFINE_CODEC_ALX(name, codec, flags, align, rambuffer_requirements,      \
+                          getpixel, setpixel, linecopy, linefill,                 \
+                          unaligned_getpixel, unaligned_setpixel,                 \
+                          unaligned_linecopy, unaligned_linefill,                 \
+                          pixel2color, color2pixel)                               \
+		PRIVATE struct video_codec unaligned_##name = {                           \
+			/* .vc_codec                  = */ codec,                             \
+			/* ._vc_flags                 = */ flags,                             \
+			/* .vc_align                  = */ 1,                                 \
+		};                                                                        \
+		PRIVATE struct video_codec name = {                                       \
+			/* .vc_codec                  = */ codec,                             \
+			/* ._vc_flags                 = */ flags,                             \
+			/* .vc_align                  = */ align,                             \
+		};                                                                        \
+		if (!name.vc_color2pixel) {                                               \
+			unaligned_##name.vc_nalgn                  = &unaligned_##name;       \
+			unaligned_##name.vc_rambuffer_requirements = &rambuffer_requirements; \
+			unaligned_##name.vc_getpixel               = &unaligned_getpixel;     \
+			unaligned_##name.vc_setpixel               = &unaligned_setpixel;     \
+			unaligned_##name.vc_linecopy               = &unaligned_linecopy;     \
+			unaligned_##name.vc_linefill               = &unaligned_linefill;     \
+			unaligned_##name.vc_pixel2color            = &pixel2color;            \
+			unaligned_##name.vc_color2pixel            = &color2pixel;            \
+			name.vc_nalgn                              = &unaligned_##name;       \
+			name.vc_rambuffer_requirements             = &rambuffer_requirements; \
+			name.vc_getpixel                           = &getpixel;               \
+			name.vc_setpixel                           = &setpixel;               \
+			name.vc_linecopy                           = &linecopy;               \
+			name.vc_linefill                           = &linefill;               \
+			name.vc_pixel2color                        = &pixel2color;            \
+			COMPILER_WRITE_BARRIER();                                             \
+			name.vc_color2pixel = &color2pixel;                                   \
+			COMPILER_WRITE_BARRIER();                                             \
+			COMPILER_WRITE_BARRIER();                                             \
+		}
+#endif /* !__KERNEL__ && __pic__ */
+
+#define CASE_CODEC_AL1(codec, flags, rambuffer_requirements,      \
+                       getpixel, setpixel, linecopy, linefill,    \
+                       pixel2color, color2pixel)                  \
+	case codec: {                                                 \
+		_DEFINE_CODEC_AL1(_codec_##codec, codec,                  \
+		                  flags, rambuffer_requirements,          \
+		                  getpixel, setpixel, linecopy, linefill, \
+		                  pixel2color, color2pixel);              \
+		result = &_codec_##codec;                                 \
+	}	break
+#define CASE_CODEC_ALX(codec, flags,                              \
+                       align, rambuffer_requirements,             \
+                       getpixel, setpixel, linecopy, linefill,    \
+                       unaligned_getpixel, unaligned_setpixel,    \
+                       unaligned_linecopy, unaligned_linefill,    \
+                       pixel2color, color2pixel)                  \
+	case codec: {                                                 \
+		_DEFINE_CODEC_ALX(_codec_##codec, codec, flags,           \
+		                  align, rambuffer_requirements,          \
+		                  getpixel, setpixel, linecopy, linefill, \
+		                  unaligned_getpixel, unaligned_setpixel, \
+		                  unaligned_linecopy, unaligned_linefill, \
+		                  pixel2color, color2pixel);              \
+		result = &_codec_##codec;                                 \
+	}	break
+
+
+	struct video_codec const *result;
+	switch (codec) {
 
 	/* Grayscale formats. */
-	DEFINE_CODEC(VIDEO_CODEC_GRAY2_LSB, 1, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, gray2_pixel2color, gray2_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY2_MSB, 1, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, gray2_pixel2color, gray2_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY4_LSB, 1, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, gray4_pixel2color, gray4_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY4_MSB, 1, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, gray4_pixel2color, gray4_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY16_LSB, 1, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, gray16_pixel2color, gray16_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY16_MSB, 1, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, gray16_pixel2color, gray16_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_GRAY256, 1, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, gray256_pixel2color, gray256_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, gray2_pixel2color, gray2_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, gray2_pixel2color, gray2_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, gray4_pixel2color, gray4_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, gray4_pixel2color, gray4_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, gray16_pixel2color, gray16_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, gray16_pixel2color, gray16_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY256, VIDEO_CODEC_FLAG_NORMAL, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, gray256_pixel2color, gray256_color2pixel);
 
 	/* 4-byte-per-pixel formats. */
-	DEFINE_CODEC(VIDEO_CODEC_RGBA8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, colorpixel_identity, colorpixel_identity);
-	DEFINE_CODEC(VIDEO_CODEC_RGBX8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, rgbx8888_pixel2color, colorpixel_identity);
-	DEFINE_CODEC(VIDEO_CODEC_ARGB8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, argb8888_pixel2color, argb8888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XRGB8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, xrgb8888_pixel2color, xrgb8888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_ABGR8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, abgr8888_pixel2color, abgr8888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XBGR8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, xbgr8888_pixel2color, xbgr8888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRA8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, bgra8888_pixel2color, bgra8888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRX8888, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, bgrx8888_pixel2color, bgrx8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, colorpixel_identity, colorpixel_identity);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, rgbx8888_pixel2color, colorpixel_identity);
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, argb8888_pixel2color, argb8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, xrgb8888_pixel2color, xrgb8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, abgr8888_pixel2color, abgr8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, xbgr8888_pixel2color, xbgr8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, bgra8888_pixel2color, bgra8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, bgrx8888_pixel2color, bgrx8888_color2pixel);
 
-	DEFINE_CODEC(VIDEO_CODEC_RGBA4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, rgba4444_pixel2color, rgba4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_RGBX4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, rgbx4444_pixel2color, rgbx4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_ARGB4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, argb4444_pixel2color, argb4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XRGB4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, xrgb4444_pixel2color, xrgb4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_ABGR4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, abgr4444_pixel2color, abgr4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XBGR4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, xbgr4444_pixel2color, xbgr4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRA4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, bgra4444_pixel2color, bgra4444_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRX4444, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, bgrx4444_pixel2color, bgrx4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgba4444_pixel2color, rgba4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgbx4444_pixel2color, rgbx4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, argb4444_pixel2color, argb4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xrgb4444_pixel2color, xrgb4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, abgr4444_pixel2color, abgr4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xbgr4444_pixel2color, xbgr4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgra4444_pixel2color, bgra4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgrx4444_pixel2color, bgrx4444_color2pixel);
 
-	DEFINE_CODEC(VIDEO_CODEC_RGBA5551, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, rgba5551_pixel2color, rgba5551_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_RGBX5551, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, rgbx5551_pixel2color, rgbx5551_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_ARGB1555, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, argb1555_pixel2color, argb1555_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XRGB1555, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, xrgb1555_pixel2color, xrgb1555_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_ABGR1555, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, abgr1555_pixel2color, abgr1555_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_XBGR1555, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, xbgr1555_pixel2color, xbgr1555_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRA5551, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, bgra5551_pixel2color, bgra5551_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGRX5551, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, bgrx5551_pixel2color, bgrx5551_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA5551, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgba5551_pixel2color, rgba5551_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX5551, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgbx5551_pixel2color, rgbx5551_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB1555, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, argb1555_pixel2color, argb1555_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB1555, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xrgb1555_pixel2color, xrgb1555_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR1555, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, abgr1555_pixel2color, abgr1555_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR1555, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xbgr1555_pixel2color, xbgr1555_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA5551, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgra5551_pixel2color, bgra5551_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX5551, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgrx5551_pixel2color, bgrx5551_color2pixel);
 
-	DEFINE_CODEC(VIDEO_CODEC_RGB888, 1, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, rgb888_pixel2color, rgb888_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGR888, 1, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, bgr888_pixel2color, bgr888_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_RGB888, VIDEO_CODEC_FLAG_NORMAL, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, rgb888_pixel2color, rgb888_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_BGR888, VIDEO_CODEC_FLAG_NORMAL, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, bgr888_pixel2color, bgr888_color2pixel);
 
-	DEFINE_CODEC(VIDEO_CODEC_RGB565, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, rgb565_pixel2color, rgb565_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_BGR565, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, bgr565_pixel2color, bgr565_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGB565, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgb565_pixel2color, rgb565_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_BGR565, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgr565_pixel2color, bgr565_color2pixel);
 
-	DEFINE_CODEC(VIDEO_CODEC_PAL2_LSB, 1, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL2_MSB, 1, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL4_LSB, 1, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL4_MSB, 1, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL16_LSB, 1, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL16_MSB, 1, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, pal_pixel2color, pal_color2pixel);
-	DEFINE_CODEC(VIDEO_CODEC_PAL256, 1, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL256, VIDEO_CODEC_FLAG_NORMAL, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, pal_pixel2color, pal_color2pixel);
 
-#undef DEFINE_CODEC
 	default:
 		result = NULL;
+		break;
 	}
 	return result;
+#undef CASE_CODEC_ALX
+#undef CASE_CODEC_AL1
+#undef _DEFINE_CODEC_ALX
+#undef _DEFINE_CODEC_AL1
 }
 
 

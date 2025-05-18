@@ -31,11 +31,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
 #include <sys/mman.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -757,18 +759,18 @@ struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
 
 
 /* Create a new RAM-based video buffer */
-INTERN WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
+INTERN WUNUSED NONNULL((3)) REF struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec const *__restrict codec,
                           struct video_palette *palette) {
-	/*REF*/ struct video_rambuffer *result;
+	REF struct video_rambuffer *result;
 	struct video_rambuffer_requirements req;
 	assert(codec);
 	/* Figure out buffer requirements. */
 	(*codec->vc_rambuffer_requirements)(size_x, size_y, &req);
 
 	/* Allocate heap memory for the buffer */
-	result = (/*REF*/ struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
+	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
 	result->vb_data = (byte_t *)calloc(1, req.vbs_bufsize);
@@ -787,6 +789,105 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
 	return result;
 err_result:
 	free(result);
+err:
+	return NULL;
+}
+
+
+
+struct video_membuffer: video_rambuffer {
+	void (CC *vm_release_mem)(void *cookie, void *mem);
+	void     *vm_release_mem_cookie;
+};
+
+PRIVATE struct video_buffer_ops membuffer_ops = {};
+
+PRIVATE NONNULL((1)) void CC
+membuffer_destroy(struct video_buffer *__restrict self) {
+	struct video_membuffer *me = (struct video_membuffer *)self;
+	assert(me->vb_ops == &membuffer_ops);
+	if (me->vb_format.vf_pal)
+		video_palette_decref(me->vb_format.vf_pal);
+	if (me->vm_release_mem)
+		(*me->vm_release_mem)(me->vm_release_mem_cookie, me->vb_data);
+	free(me);
+}
+
+
+PRIVATE ATTR_RETNONNULL WUNUSED
+struct video_buffer_ops *CC membuffer_getops(void) {
+	if unlikely(!membuffer_ops.vi_destroy) {
+		membuffer_ops.vi_lock    = &rambuffer_lock;
+		membuffer_ops.vi_unlock  = &rambuffer_unlock;
+		membuffer_ops.vi_getgfx  = &rambuffer_getgfx;
+		membuffer_ops.vi_clipgfx = &rambuffer_clipgfx;
+		COMPILER_WRITE_BARRIER();
+		membuffer_ops.vi_destroy = &membuffer_destroy;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &membuffer_ops;
+}
+
+
+
+/* Create a video buffer that interfaces with a pre-existing buffer whose
+ * base address is located at `mem' (which consists of  `stride * size_y'
+ * bytes). When  non-NULL,  `(*release_mem)(release_mem_cookie, mem)'  is
+ * called when the final reference for the returned buffer is dropped.
+ *
+ * This function can be used to wrap a memory-resident graphics buffer
+ * in-place,    without   needing   to    copy   it   anywhere   else.
+ * @param: mem:     Base address  of  the  pre-loaded  memory  buffer.
+ *                  If this location isn't writable, attempts to write
+ *                  pixel  data of the  returned buffer will SEGFAULT.
+ * @param: size_x:  Width of returned buffer
+ * @param: size_y:  Height of returned buffer
+ * @param: stride:  Scanline width in `mem'
+ * @param: codec:   The video codec that describes how `mem' is encoded.
+ * @param: palette: The palette to use (only needed if used by `codec')
+ * @param: release_mem: Optional callback invoked when the returned buffer is destroyed
+ * @param: release_mem_cookie: Cookie argument for `release_mem'
+ * @return: * :   The newly created video buffer
+ * @return: NULL: Error (s.a. `errno') */
+DEFINE_PUBLIC_ALIAS(video_buffer_formem, libvideo_buffer_formem);
+INTERN WUNUSED NONNULL((5)) REF struct video_buffer *CC
+libvideo_buffer_formem(void *mem, size_t size_x, size_t size_y, size_t stride,
+                       struct video_codec const *codec, struct video_palette *palette,
+                       void (CC *release_mem)(void *cookie, void *mem),
+                       void *release_mem_cookie) {
+	REF struct video_membuffer *result;
+	struct video_rambuffer_requirements req;
+	assert(codec);
+
+	/* Ensure that the specified stride is great enough */
+	(*codec->vc_rambuffer_requirements)(size_x, size_y, &req);
+	if (stride < req.vbs_stride) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	/* Must use a different, fallback "codec" that can deal with bad alignment */
+	if (!IS_ALIGNED(stride, codec->vc_align) ||
+	    !IS_ALIGNED((uintptr_t)mem, codec->vc_align))
+		codec = codec->vc_nalgn;
+
+	/* Allocate heap memory for the buffer */
+	result = (REF struct video_membuffer *)malloc(sizeof(struct video_membuffer));
+	if unlikely(!result)
+		goto err;
+	result->vb_data               = (byte_t *)mem;
+	result->vb_total              = stride * size_y;
+	result->vb_refcnt             = 1;
+	result->vb_ops                = membuffer_getops();
+	result->vb_format.vf_codec    = codec;
+	result->vb_format.vf_pal      = palette;
+	result->vb_size_x             = size_x;
+	result->vb_size_y             = size_y;
+	result->vm_release_mem        = release_mem;
+	result->vm_release_mem_cookie = release_mem_cookie;
+	if (palette)
+		video_palette_incref(palette);
+	return result;
 err:
 	return NULL;
 }

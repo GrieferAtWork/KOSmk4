@@ -131,7 +131,7 @@ struct flatdirnode_xops {
 	 * - Write a directory entry `ent' pointing to `file' into the stream of  `self'.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and not invoke
 	 *   it if that flag was set at the time of the check.
-	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
+	 * - This  operator must not be called if  `MFILE_F_DELETED' was found to be set
 	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
 	 * - When `FFLATSUPER_FEAT_WRITEDIR_CHANGES_INO' is set, this operator may alter:
 	 *   - file->fn_ino          (in this case though, only while holding `mfile_tslock_acquire()')
@@ -177,7 +177,7 @@ struct flatdirnode_xops {
 	 *                 to a higher location in case it overlapped with a reserved area).
 	 *                 The requires space was saved in `ent->fde_size'.
 	 * @throw: E_FSERROR_ILLEGAL_PATH: `ent->fde_ent.fd_name' contains illegal characters.
-	 * @throw: E_FSERROR_DISK_FULL:    Unable to write many more data: disk is full. */
+	 * @throw: E_FSERROR_DISK_FULL:    Unable to write any more data: disk is full. */
 	BLOCKING WUNUSED_T NONNULL_T((1, 2, 3)) __BOOL
 	(KCALL *fdnx_writedir)(struct flatdirnode *__restrict self,
 	                       struct flatdirent *__restrict ent,

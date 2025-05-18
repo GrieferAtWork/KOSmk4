@@ -56,6 +56,7 @@ DECL_BEGIN
  *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
+DEFINE_PUBLIC_ALIAS(video_buffer_create, libvideo_buffer_create);
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
                        struct video_codec const *codec, struct video_palette *palette) {
@@ -104,6 +105,7 @@ PRIVATE struct video_rambuffer *screen_buffer = NULL;
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
+DEFINE_PUBLIC_ALIAS(video_buffer_screen, libvideo_buffer_screen);
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_screen(void) {
 #if 1
@@ -191,6 +193,7 @@ PRIVATE struct video_format preferred_video_format;
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
+DEFINE_PUBLIC_ALIAS(video_preferred_format, libvideo_preferred_format);
 INTERN ATTR_RETNONNULL WUNUSED struct video_format const *CC
 libvideo_preferred_format(void) {
 	struct video_format *result;
@@ -213,7 +216,8 @@ PRIVATE fd_t libvideo_driver_fd = -1;
 
 /* Return a handle for the video device driver that is being used.
  * @return: -1:errno=ENODEV: No video driver found */
-INTERN WUNUSED fd_t LIBVIDEO_GFX_CC libvideo_driver(void) {
+DEFINE_PUBLIC_ALIAS(video_driver, libvideo_driver);
+INTERN WUNUSED fd_t CC libvideo_driver(void) {
 	fd_t result;
 	char const *vd_driver;
 	result = libvideo_driver_fd;
@@ -249,10 +253,6 @@ done:
 
 
 
-DEFINE_PUBLIC_ALIAS(video_buffer_create, libvideo_buffer_create);
-DEFINE_PUBLIC_ALIAS(video_buffer_screen, libvideo_buffer_screen);
-DEFINE_PUBLIC_ALIAS(video_preferred_format, libvideo_preferred_format);
-DEFINE_PUBLIC_ALIAS(video_driver, libvideo_driver);
 
 DECL_END
 
