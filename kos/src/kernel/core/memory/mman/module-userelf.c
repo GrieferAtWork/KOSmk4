@@ -1979,6 +1979,10 @@ uem_trycreate(struct mman *__restrict self,
 	struct mpart *part;
 	struct mfile *file;
 
+	/* Prevent the stack from overflowing if memory mappings are too complex. */
+	if (get_stack_avail() < 512 * sizeof(void *))
+		return NULL;
+
 	/* Quick check: Is there already a module registered under this node? */
 	result = (REF struct userelf_module *)node->mn_module;
 	if (result != NULL) {
