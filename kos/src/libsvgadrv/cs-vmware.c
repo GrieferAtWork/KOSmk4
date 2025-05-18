@@ -711,6 +711,7 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->vw_fifo_caps = 0;
 		me->vm_fifo_debounce_inuse = false;
 		me->vm_hw_render_started = false;
+		me->vm_vga_mode = vm_getreg(me, SVGA_REG_ENABLE) == SVGA_REG_ENABLE_DISABLE;
 
 		/* Map the FIFO into memory. */
 #ifdef __KERNEL__

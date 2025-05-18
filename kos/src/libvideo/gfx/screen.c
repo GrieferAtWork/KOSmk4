@@ -63,6 +63,7 @@
 DECL_BEGIN
 
 struct svga_screen_buffer: video_rambuffer {
+	REF struct video_codec_handle    *ssb_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
 	fd_t                              ssb_vdlck;         /* [const] Video lock file */
 	void                             *ssb_libphys;       /* [1..1][const] Handle for libphys */
 	PMMAPPHYS                         ssb_libphys_map;   /* [1..1][const] Helper to map physical memory */
@@ -86,6 +87,7 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 	(void)close(me->ssb_vdlck);
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
+	video_codec_handle_decref(me->ssb_codec_handle);
 	(void)free(me);
 }
 
@@ -124,162 +126,94 @@ NOTHROW(LIBVIDEO_CODEC_CC svga_palette_destroy)(struct video_palette *__restrict
 	free(self);
 }
 
-
-PRIVATE WUNUSED NONNULL((1, 2)) bool CC
-svga_get_format(struct svga_modeinfo const *__restrict mode,
-                struct video_format *__restrict result, fd_t vdlck) {
-	video_codec_t codec;
-	syslog(LOG_DEBUG,
-	       "Video mode:\n"
-	       "mode->smi_flags          = %#x\n"
-	       "mode->smi_bits_per_pixel = %u\n"
-	       "mode->smi_colorbits      = %u\n"
-	       "mode->smi_rshift         = %u\n"
-	       "mode->smi_rbits          = %u\n"
-	       "mode->smi_gshift         = %u\n"
-	       "mode->smi_gbits          = %u\n"
-	       "mode->smi_bshift         = %u\n"
-	       "mode->smi_bbits          = %u\n"
-	       "",
-	       (unsigned int)mode->smi_flags,
-	       (unsigned int)mode->smi_bits_per_pixel,
-	       (unsigned int)mode->smi_colorbits,
-	       (unsigned int)mode->smi_rshift,
-	       (unsigned int)mode->smi_rbits,
-	       (unsigned int)mode->smi_gshift,
-	       (unsigned int)mode->smi_gbits,
-	       (unsigned int)mode->smi_bshift,
-	       (unsigned int)mode->smi_bbits);
-
-	result->vf_pal = NULL;
-	if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
-		goto nope; /* TODO: Linear frame buffer emulation */
-	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-		goto nope;
-	codec = VIDEO_CODEC_NONE;
-	if (mode->smi_flags & SVGA_MODEINFO_F_BW) {
-		switch (mode->smi_colorbits) {
-		case 1: codec = VIDEO_CODEC_GRAY2_LSB; break;
-		case 2: codec = VIDEO_CODEC_GRAY4_LSB; break;
-		case 4: codec = VIDEO_CODEC_GRAY16_LSB; break;
-		case 8: codec = VIDEO_CODEC_GRAY256; break;
-		default: goto nope;
-		}
-	} else if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {
-		size_t i, palsize = (size_t)1 << mode->smi_colorbits;
-		struct video_palette *pal;
-		struct svga_palette_color *colors;
-		struct svga_palette buf;
-		switch (mode->smi_colorbits) {
-		case 1: codec = VIDEO_CODEC_PAL2_LSB; break;
-		case 2: codec = VIDEO_CODEC_PAL4_LSB; break;
-		case 4: codec = VIDEO_CODEC_PAL16_LSB; break;
-		case 8: codec = VIDEO_CODEC_PAL256; break;
-		default: goto nope;
-		}
-
-		colors = (struct svga_palette_color *)malloca(palsize, sizeof(struct svga_palette_color));
-		if unlikely(!colors) {
-			LOGERR("Failed to allocate palette color buffer: %m\n");
-			goto nope;
-		}
-		buf.svp_base = 0;
-		buf.svp_size = palsize;
-		buf.svp_pal  = colors;
-		if (ioctl(vdlck, SVGA_IOC_GETPAL_RGBX, &buf) < 0) {
-			LOGERR("Failed to query palette: %m\n");
-			freea(colors);
-			goto nope;
-		}
-
-		pal = (struct video_palette *)malloc(offsetof(struct video_palette, vp_pal) +
-		                                     (buf.svp_size * sizeof(video_color_t)));
-		if unlikely(!pal) {
-			LOGERR("Failed to allocate palette controller: %m\n");
-			freea(colors);
-			goto nope;
-		}
-		result->vf_pal  = pal;
-		pal->vp_destroy = &svga_palette_destroy;
-		pal->vp_refcnt  = 1;
-		pal->vp_cache   = NULL;
-		pal->vp_cnt     = buf.svp_size;
-		for (i = 0; i < pal->vp_cnt; ++i) {
-			struct svga_palette_color color = colors[i];
-			video_color_t vcolor = VIDEO_COLOR_RGB(color.spc_r, color.spc_g, color.spc_b);
-			pal->vp_pal[i] = vcolor;
-		}
+PRIVATE WUNUSED REF struct video_palette *CC
+svga_palette_new(fd_t vdlck, shift_t colorbits) {
+	size_t i, palsize;
+	struct video_palette *result;
+	struct svga_palette_color *colors;
+	struct svga_palette buf;
+	palsize = (size_t)1 << colorbits;
+	colors  = (struct svga_palette_color *)malloca(palsize, sizeof(struct svga_palette_color));
+	if unlikely(!colors) {
+		LOGERR("Failed to allocate palette color buffer: %m\n");
+		goto err;
+	}
+	buf.svp_base = 0;
+	buf.svp_size = palsize;
+	buf.svp_pal  = colors;
+	if (ioctl(vdlck, SVGA_IOC_GETPAL_RGBX, &buf) < 0) {
+		LOGERR("Failed to query palette: %m\n");
 		freea(colors);
-	} else {
-		switch (mode->smi_bits_per_pixel) {
-
-		case 32:
-			if (mode->smi_rbits == 8 && mode->smi_gbits == 8 && mode->smi_bbits == 8) {
-				if (mode->smi_rshift == 24 && mode->smi_gshift == 16 && mode->smi_bshift == 8) {
-					codec = VIDEO_CODEC_RGBX8888;
-				} else if (mode->smi_rshift == 16 && mode->smi_gshift == 8 && mode->smi_bshift == 0) {
-					codec = VIDEO_CODEC_XRGB8888;
-				} else if (mode->smi_bshift == 16 && mode->smi_gshift == 8 && mode->smi_rshift == 0) {
-					codec = VIDEO_CODEC_XBGR8888;
-				} else if (mode->smi_bshift == 24 && mode->smi_gshift == 16 && mode->smi_rshift == 8) {
-					codec = VIDEO_CODEC_BGRX8888;
-				}
-			}
-			break;
-
-		case 24:
-			if (mode->smi_rbits == 8 && mode->smi_gbits == 8 && mode->smi_bbits == 8) {
-				if (mode->smi_rshift == 16 && mode->smi_gshift == 8 && mode->smi_bshift == 0) {
-					codec = VIDEO_CODEC_RGB888;
-				} else if (mode->smi_bshift == 16 && mode->smi_gshift == 8 && mode->smi_rshift == 0) {
-					codec = VIDEO_CODEC_BGR888;
-				}
-			}
-			break;
-
-		case 16:
-			if (mode->smi_rbits == 4 && mode->smi_gbits == 4 && mode->smi_bbits == 4) {
-				if (mode->smi_rshift == 12 && mode->smi_gshift == 8 && mode->smi_bshift == 4) {
-					codec = VIDEO_CODEC_RGBX4444;
-				} else if (mode->smi_rshift == 8 && mode->smi_gshift == 4 && mode->smi_bshift == 0) {
-					codec = VIDEO_CODEC_XRGB4444;
-				} else if (mode->smi_bshift == 8 && mode->smi_gshift == 4 && mode->smi_rshift == 0) {
-					codec = VIDEO_CODEC_XBGR4444;
-				} else if (mode->smi_bshift == 12 && mode->smi_gshift == 8 && mode->smi_rshift == 4) {
-					codec = VIDEO_CODEC_BGRX4444;
-				}
-			} else if (mode->smi_rbits == 5 && mode->smi_gbits == 6 && mode->smi_bbits == 5) {
-				if (mode->smi_rshift == 11 && mode->smi_gshift == 5 && mode->smi_bshift == 0) {
-					codec = VIDEO_CODEC_RGB565;
-				} else if (mode->smi_bshift == 11 && mode->smi_gshift == 5 && mode->smi_rshift == 0) {
-					codec = VIDEO_CODEC_BGR565;
-				}
-			} else if (mode->smi_rbits == 5 && mode->smi_gbits == 5 && mode->smi_bbits == 5) {
-				if (mode->smi_rshift == 11 && mode->smi_gshift == 6 && mode->smi_bshift == 1) {
-					codec = VIDEO_CODEC_RGBX5551;
-				} else if (mode->smi_rshift == 10 && mode->smi_gshift == 5 && mode->smi_bshift == 0) {
-					codec = VIDEO_CODEC_XRGB1555;
-				} else if (mode->smi_bshift == 10 && mode->smi_gshift == 5 && mode->smi_rshift == 0) {
-					codec = VIDEO_CODEC_XBGR1555;
-				} else if (mode->smi_bshift == 11 && mode->smi_gshift == 6 && mode->smi_rshift == 1) {
-					codec = VIDEO_CODEC_BGRX5551;
-				}
-			}
-			break;
-
-		default: break;
-		}
+		goto err;
 	}
 
-	/* TODO: Support for custom codecs (that are then able to work with any arbitrary pixel format) */
-	result->vf_codec = video_codec_lookup(codec);
-	if unlikely(!result->vf_codec)
-		goto nope;
-	return true;
-nope:
-	if unlikely(result->vf_pal)
-		video_palette_decref(result->vf_pal);
-	return false;
+	result = (REF struct video_palette *)malloc(offsetof(struct video_palette, vp_pal) +
+	                                            (buf.svp_size * sizeof(video_color_t)));
+	if unlikely(!result) {
+		LOGERR("Failed to allocate palette controller: %m\n");
+		freea(colors);
+		goto err;
+	}
+	result->vp_destroy = &svga_palette_destroy;
+	result->vp_refcnt  = 1;
+	result->vp_cache   = NULL;
+	result->vp_cnt     = buf.svp_size;
+	for (i = 0; i < result->vp_cnt; ++i) {
+		struct svga_palette_color color = colors[i];
+		video_color_t vcolor = VIDEO_COLOR_RGB(color.spc_r, color.spc_g, color.spc_b);
+		result->vp_pal[i] = vcolor;
+	}
+	for (; i < palsize; ++i)
+		result->vp_pal[i] = 0; /* Unused colors? */
+	freea(colors);
+	return result;
+err:
+	return NULL;
+}
+
+
+PRIVATE NONNULL((1, 2)) void CC
+svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
+                             struct video_codec_specs *__restrict result) {
+	syslog(LOG_DEBUG,
+	       "Video mode:\n"
+	       "self->smi_flags          = %#x\n"
+	       "self->smi_bits_per_pixel = %u\n"
+	       "self->smi_colorbits      = %u\n"
+	       "self->smi_rshift         = %u\n"
+	       "self->smi_rbits          = %u\n"
+	       "self->smi_gshift         = %u\n"
+	       "self->smi_gbits          = %u\n"
+	       "self->smi_bshift         = %u\n"
+	       "self->smi_bbits          = %u\n"
+	       "",
+	       (unsigned int)self->smi_flags,
+	       (unsigned int)self->smi_bits_per_pixel,
+	       (unsigned int)self->smi_colorbits,
+	       (unsigned int)self->smi_rshift,
+	       (unsigned int)self->smi_rbits,
+	       (unsigned int)self->smi_gshift,
+	       (unsigned int)self->smi_gbits,
+	       (unsigned int)self->smi_bshift,
+	       (unsigned int)self->smi_bbits);
+	bzero(result, sizeof(*result));
+	if (self->smi_flags & SVGA_MODEINFO_F_PAL)
+		result->vcs_flags |= VIDEO_CODEC_FLAG_PAL;
+	if (self->smi_flags & SVGA_MODEINFO_F_BW)
+		result->vcs_flags |= VIDEO_CODEC_FLAG_GRAY;
+
+	result->vcs_bpp = self->smi_bits_per_pixel;
+	if (result->vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
+		result->vcs_cbits = self->smi_colorbits;
+		result->vcs_rmask = ((uint32_t)1 << result->vcs_cbits) - 1;
+		result->vcs_gmask = result->vcs_rmask;
+		result->vcs_bmask = result->vcs_rmask;
+	} else {
+		result->vcs_rmask = (((uint32_t)1 << self->smi_rbits) - 1) << self->smi_rshift;
+		result->vcs_gmask = (((uint32_t)1 << self->smi_gbits) - 1) << self->smi_gshift;
+		result->vcs_bmask = (((uint32_t)1 << self->smi_bbits) - 1) << self->smi_bshift;
+	}
+	result->vcs_amask = 0;
 }
 
 PRIVATE WUNUSED REF struct svga_screen_buffer *CC
@@ -290,6 +224,8 @@ svga_newscreen(void) {
 	struct openfd vdlck;
 	struct svga_modeinfo mode;
 	struct video_format format;
+	REF struct video_codec_handle *codec_handle;
+	struct video_codec_specs codec_specs;
 	REF struct svga_screen_buffer *result;
 	struct svga_chipset_driver const *driver;
 	char csname[SVGA_CSNAMELEN];
@@ -327,47 +263,57 @@ svga_newscreen(void) {
 	}
 
 	/* Load codec to-be used for video mode. */
-	if (!svga_get_format(&mode, &format, vdlck.of_hint)) {
+	svga_modeinfo_to_codec_specs(&mode, &codec_specs);
+	format.vf_codec = video_codec_fromspecs(&codec_specs, &codec_handle);
+	if (!format.vf_codec) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
 		goto err_svga_vdlck;
+	}
+	format.vf_pal = NULL;
+	if (format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		format.vf_pal = svga_palette_new(vdlck.of_hint, format.vf_codec->vc_specs.vcs_cbits);
+		if unlikely(!format.vf_pal) {
+			LOGERR("Failed to allocate palette controller: %m\n");
+			goto err_svga_vdlck_codec;
+		}
 	}
 
 	/* Figure out which chipset we're using. */
 	if (ioctl(vdlck.of_hint, SVGA_IOC_GETCSNAME, csname) < 0) {
 		LOGERR("SVGA_IOC_GETCSNAME failed: %m\n");
-		goto err_svga_vdlck_format;
+		goto err_svga_vdlck_codec_format;
 	}
 
 	/* Make sure we ring#3 have I/O permissions */
 	if (iopl(3)) {
 		LOGERR("iopl failed: %m\n");
-		goto err_svga_vdlck_format;
+		goto err_svga_vdlck_codec_format;
 	}
 
 	/* Load "libsvgadrv" */
 	libsvgadrv = dlopen(LIBSVGADRV_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!libsvgadrv) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_format;
+		goto err_svga_vdlck_codec_format;
 	}
 	*(void **)&svga_chipset_getdrivers = dlsym(libsvgadrv, "svga_chipset_getdrivers");
 	if unlikely(!svga_chipset_getdrivers) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_format_libsvgadrv;
+		goto err_svga_vdlck_codec_format_libsvgadrv;
 	}
 
 	/* Find the relevant chipset driver. */
 	driver = (*svga_chipset_getdrivers)();
 	if unlikely(!driver) {
 		syslog(LOG_ERR, "[libvideo] No drivers available\n");
-		goto err_svga_vdlck_format_libsvgadrv;
+		goto err_svga_vdlck_codec_format_libsvgadrv;
 	}
 	while (strcmp(driver->scd_name, csname) != 0) {
 		if unlikely(!driver->scd_probe) {
 			syslog(LOG_ERR, "[libvideo] No driver to active chipset %q\n", csname);
 			errno = ENODEV; /*  */
-			goto err_svga_vdlck_format_libsvgadrv;
+			goto err_svga_vdlck_codec_format_libsvgadrv;
 		}
 		++driver;
 	}
@@ -378,7 +324,7 @@ svga_newscreen(void) {
 		               driver->scd_cssize;
 		result = (REF struct svga_screen_buffer *)malloc(bufsz);
 		if unlikely(!result)
-			goto err_svga_vdlck_format_libsvgadrv;
+			goto err_svga_vdlck_codec_format_libsvgadrv;
 	}
 
 	/* Initialize the chipset for user-space. */
@@ -386,24 +332,24 @@ svga_newscreen(void) {
 	 *       chipset is correct, meaning it won't have to probe for the driver's existance. */
 	if (!(*driver->scd_probe)(&result->ssb_cs)) {
 		syslog(LOG_ERR, "[libvideo] Failed to init chipset %q\n", csname);
-		goto err_svga_vdlck_format_libsvgadrv_r;
+		goto err_svga_vdlck_codec_format_libsvgadrv_r;
 	}
 
 	/* Load phyiscal memory mapping functions. */
 	result->ssb_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!result->ssb_libphys) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_format_libsvgadrv_r_cs;
+		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs;
 	}
 	*(void **)&result->ssb_libphys_map = dlsym(result->ssb_libphys, "mmapphys");
 	if unlikely(!result->ssb_libphys_map) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
 	*(void **)&result->ssb_libphys_unmap = dlsym(result->ssb_libphys, "munmapphys");
 	if unlikely(!result->ssb_libphys_unmap) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
 
 	/* Map screen memory into a physical buffer. */
@@ -412,7 +358,7 @@ svga_newscreen(void) {
 	result->vb_data   = (byte_t *)(*result->ssb_libphys_map)(mode.smi_lfb, result->vb_total);
 	if unlikely((void *)result->vb_data == MAP_FAILED) {
 		LOGERR("Failed to map LFB: %m\n");
-		goto err_svga_vdlck_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
 
 	/* Fill in remaining fields of "result" */
@@ -422,6 +368,7 @@ svga_newscreen(void) {
 	result->vb_format.vf_pal   = format.vf_pal;
 	result->vb_size_x          = mode.smi_resx;
 	result->vb_size_y          = mode.smi_resy;
+	result->ssb_codec_handle   = codec_handle;
 	result->ssb_vdlck          = vdlck.of_hint;
 	result->ssb_libsvgadrv     = libsvgadrv;
 	result->ssb_drv            = driver;
@@ -431,19 +378,21 @@ svga_newscreen(void) {
 
 	/* And we're done! */
 	return result;
-/*err_svga_vdlck_format_libsvgadrv_r_cs_libphys_data:
+/*err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys_data:
 	(*result->ssb_libphys_unmap)(result->vb_data, result->vb_total);*/
-err_svga_vdlck_format_libsvgadrv_r_cs_libphys:
+err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys:
 	(void)dlclose(result->ssb_libphys);
-err_svga_vdlck_format_libsvgadrv_r_cs:
+err_svga_vdlck_codec_format_libsvgadrv_r_cs:
 	(*result->ssb_cs.sc_ops.sco_fini)(&result->ssb_cs);
-err_svga_vdlck_format_libsvgadrv_r:
+err_svga_vdlck_codec_format_libsvgadrv_r:
 	free(result);
-err_svga_vdlck_format_libsvgadrv:
+err_svga_vdlck_codec_format_libsvgadrv:
 	(void)dlclose(libsvgadrv);
-err_svga_vdlck_format:
+err_svga_vdlck_codec_format:
 	if (format.vf_pal)
 		video_palette_decref(format.vf_pal);
+err_svga_vdlck_codec:
+	video_codec_handle_decref(codec_handle);
 err_svga_vdlck:
 	(void)close(vdlck.of_hint);
 err_svga:

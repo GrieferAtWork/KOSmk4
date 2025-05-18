@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.removeif(x -> x.startswith("-O"));
+gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +32,21 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/__bitfield.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/host.h>
-#include <hybrid/unaligned.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
 
 #include "codecs.h"
 #include "palette.h"
@@ -678,12 +686,6 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 #define bgr888_color2pixel bgrx8888_color2pixel
 
 
-
-
-#define VIDEO_CODEC_GRAY2_LSB  0x1001 /* 1-bit-per-pixel, least-significant-bit-first, black/white */
-#define VIDEO_CODEC_GRAY2_MSB  0x1002 /* 1-bit-per-pixel, most-significant-bit-first, black/white */
-#define VIDEO_CODEC_GRAY4_LSB  0x1003 /* 2-bit-per-pixel, least-significant-bit-first, 4-color grayscale (0=black; 3=white) */
-#define VIDEO_CODEC_GRAY4_MSB  0x1004 /* 2-bit-per-pixel, most-significant-bit-first, 4-color grayscale (0=black; 3=white) */
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
@@ -1423,17 +1425,19 @@ buffer1_requirements(size_t size_x, size_t size_y,
 }
 
 
-
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
 INTERN ATTR_CONST WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec) {
+#define UNPACK_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
+	{ flags, bpp, cbits, rmask, gmask, bmask, amask }
+
 #if defined(__KERNEL__) || !defined(__pic__)
-#define _DEFINE_CODEC_AL1(name, codec, flags, rambuffer_requirements,   \
+#define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
                           getpixel, setpixel, linecopy, linefill,       \
                           pixel2color, color2pixel)                     \
 		PRIVATE struct video_codec const name = {                       \
 			/* .vc_codec                  = */ codec,                   \
-			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_specs                  = */ UNPACK_SPECS specs,      \
 			/* .vc_align                  = */ 1,                       \
 			/* .vc_nalgn                  = */ &name,                   \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
@@ -1444,7 +1448,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_pixel2color            = */ &pixel2color,            \
 			/* .vc_color2pixel            = */ &color2pixel,            \
 		}
-#define _DEFINE_CODEC_ALX(name, codec, flags,                           \
+#define _DEFINE_CODEC_ALX(name, codec, specs,                           \
                           align, rambuffer_requirements,                \
                           getpixel, setpixel, linecopy, linefill,       \
                           unaligned_getpixel, unaligned_setpixel,       \
@@ -1452,7 +1456,7 @@ libvideo_codec_lookup(video_codec_t codec) {
                           pixel2color, color2pixel)                     \
 		PRIVATE struct video_codec const unaligned_##name = {           \
 			/* .vc_codec                  = */ codec,                   \
-			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_specs                  = */ UNPACK_SPECS specs,      \
 			/* .vc_align                  = */ 1,                       \
 			/* .vc_nalgn                  = */ &unaligned_##name,       \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
@@ -1465,7 +1469,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 		};                                                              \
 		PRIVATE struct video_codec const name = {                       \
 			/* .vc_codec                  = */ codec,                   \
-			/* ._vc_flags                 = */ flags,                   \
+			/* .vc_specs                  = */ UNPACK_SPECS specs,      \
 			/* .vc_align                  = */ align,                   \
 			/* .vc_nalgn                  = */ &unaligned_##name,       \
 			/* .vc_rambuffer_requirements = */ &rambuffer_requirements, \
@@ -1477,13 +1481,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_color2pixel            = */ &color2pixel,            \
 		}
 #else /* __KERNEL__ || !__pic__ */
-#define _DEFINE_CODEC_AL1(name, codec, flags, rambuffer_requirements,   \
+#define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
                           getpixel, setpixel, linecopy, linefill,       \
                           pixel2color, color2pixel)                     \
 		PRIVATE struct video_codec name = {                             \
-			/* .vc_codec  = */ codec,                                   \
-			/* ._vc_flags = */ flags,                                   \
-			/* .vc_align  = */ 1,                                       \
+			/* .vc_codec = */ codec,                                    \
+			/* .vc_specs = */ UNPACK_SPECS specs,                       \
+			/* .vc_align = */ 1,                                        \
 		};                                                              \
 		if (!name.vc_color2pixel) {                                     \
 			name.vc_nalgn                  = &name;                     \
@@ -1497,20 +1501,20 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_color2pixel = &color2pixel;                         \
 			COMPILER_WRITE_BARRIER();                                   \
 		}
-#define _DEFINE_CODEC_ALX(name, codec, flags, align, rambuffer_requirements,      \
+#define _DEFINE_CODEC_ALX(name, codec, specs, align, rambuffer_requirements,      \
                           getpixel, setpixel, linecopy, linefill,                 \
                           unaligned_getpixel, unaligned_setpixel,                 \
                           unaligned_linecopy, unaligned_linefill,                 \
                           pixel2color, color2pixel)                               \
 		PRIVATE struct video_codec unaligned_##name = {                           \
-			/* .vc_codec                  = */ codec,                             \
-			/* ._vc_flags                 = */ flags,                             \
-			/* .vc_align                  = */ 1,                                 \
+			/* .vc_codec = */ codec,                                              \
+			/* .vc_specs = */ UNPACK_SPECS specs,                                 \
+			/* .vc_align = */ 1,                                                  \
 		};                                                                        \
 		PRIVATE struct video_codec name = {                                       \
-			/* .vc_codec                  = */ codec,                             \
-			/* ._vc_flags                 = */ flags,                             \
-			/* .vc_align                  = */ align,                             \
+			/* .vc_codec = */ codec,                                              \
+			/* .vc_specs = */ UNPACK_SPECS specs,                                 \
+			/* .vc_align = */ align,                                              \
 		};                                                                        \
 		if (!name.vc_color2pixel) {                                               \
 			unaligned_##name.vc_nalgn                  = &unaligned_##name;       \
@@ -1535,29 +1539,29 @@ libvideo_codec_lookup(video_codec_t codec) {
 		}
 #endif /* !__KERNEL__ && __pic__ */
 
-#define CASE_CODEC_AL1(codec, flags, rambuffer_requirements,      \
+#define CASE_CODEC_AL1(codec, specs, rambuffer_requirements,      \
                        getpixel, setpixel, linecopy, linefill,    \
                        pixel2color, color2pixel)                  \
 	case codec: {                                                 \
 		_DEFINE_CODEC_AL1(_codec_##codec, codec,                  \
-		                  flags, rambuffer_requirements,          \
-		                  getpixel, setpixel, linecopy, linefill, \
-		                  pixel2color, color2pixel);              \
+	                      specs, rambuffer_requirements,          \
+	                      getpixel, setpixel, linecopy, linefill, \
+	                      pixel2color, color2pixel);              \
 		result = &_codec_##codec;                                 \
 	}	break
-#define CASE_CODEC_ALX(codec, flags,                              \
+#define CASE_CODEC_ALX(codec, specs,                              \
                        align, rambuffer_requirements,             \
                        getpixel, setpixel, linecopy, linefill,    \
                        unaligned_getpixel, unaligned_setpixel,    \
                        unaligned_linecopy, unaligned_linefill,    \
                        pixel2color, color2pixel)                  \
 	case codec: {                                                 \
-		_DEFINE_CODEC_ALX(_codec_##codec, codec, flags,           \
-		                  align, rambuffer_requirements,          \
-		                  getpixel, setpixel, linecopy, linefill, \
-		                  unaligned_getpixel, unaligned_setpixel, \
-		                  unaligned_linecopy, unaligned_linefill, \
-		                  pixel2color, color2pixel);              \
+		_DEFINE_CODEC_ALX(_codec_##codec, codec, specs,           \
+	                      align, rambuffer_requirements,          \
+	                      getpixel, setpixel, linecopy, linefill, \
+	                      unaligned_getpixel, unaligned_setpixel, \
+	                      unaligned_linecopy, unaligned_linefill, \
+	                      pixel2color, color2pixel);              \
 		result = &_codec_##codec;                                 \
 	}	break
 
@@ -1566,55 +1570,613 @@ libvideo_codec_lookup(video_codec_t codec) {
 	switch (codec) {
 
 	/* Grayscale formats. */
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, gray2_pixel2color, gray2_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, gray2_pixel2color, gray2_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, gray4_pixel2color, gray4_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, gray4_pixel2color, gray4_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, gray16_pixel2color, gray16_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, gray16_pixel2color, gray16_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_GRAY256, VIDEO_CODEC_FLAG_NORMAL, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, gray256_pixel2color, gray256_color2pixel);
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x0),
+	               buffer1_requirements,
+	               getpixel1_lsb, setpixel1_lsb,
+	               linecopy1_lsb, linefill1_lsb,
+	               gray2_pixel2color, gray2_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY2_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x0),
+	               buffer1_requirements,
+	               getpixel1_msb, setpixel1_msb,
+	               linecopy1_msb, linefill1_msb,
+	               gray2_pixel2color, gray2_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0x0),
+	               buffer2_requirements,
+	               getpixel2_lsb, setpixel2_lsb,
+	               linecopy2_lsb, linefill2_lsb,
+	               gray4_pixel2color, gray4_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY4_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0x0),
+	               buffer2_requirements,
+	               getpixel2_msb, setpixel2_msb,
+	               linecopy2_msb, linefill2_msb,
+	               gray4_pixel2color, gray4_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xf,
+	                /* vcs_gmask */ 0xf,
+	                /* vcs_bmask */ 0xf,
+	                /* vcs_amask */ 0x0),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               gray16_pixel2color, gray16_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY16_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xf,
+	                /* vcs_gmask */ 0xf,
+	                /* vcs_bmask */ 0xf,
+	                /* vcs_amask */ 0x0),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               gray16_pixel2color, gray16_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_GRAY256,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xff,
+	                /* vcs_gmask */ 0xff,
+	                /* vcs_bmask */ 0xff,
+	                /* vcs_amask */ 0x0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8, linecopy8, linefill8,
+	               gray256_pixel2color, gray256_color2pixel);
 
 	/* 4-byte-per-pixel formats. */
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, colorpixel_identity, colorpixel_identity);
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, rgbx8888_pixel2color, colorpixel_identity);
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, argb8888_pixel2color, argb8888_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, xrgb8888_pixel2color, xrgb8888_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, abgr8888_pixel2color, abgr8888_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, xbgr8888_pixel2color, xbgr8888_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA8888, VIDEO_CODEC_FLAG_ALPHA, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, bgra8888_pixel2color, bgra8888_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX8888, VIDEO_CODEC_FLAG_NORMAL, 4, buffer32_requirements, getpixel32, setpixel32, linecopy32, linefill32, unaligned_getpixel32, unaligned_setpixel32, unaligned_linecopy32, unaligned_linefill32, bgrx8888_pixel2color, bgrx8888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4(0xff000000),
+	                /* vcs_gmask */ MASK4(0x00ff0000),
+	                /* vcs_bmask */ MASK4(0x0000ff00),
+	                /* vcs_amask */ MASK4(0x000000ff)),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               colorpixel_identity, colorpixel_identity);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgba4444_pixel2color, rgba4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgbx4444_pixel2color, rgbx4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, argb4444_pixel2color, argb4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xrgb4444_pixel2color, xrgb4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, abgr4444_pixel2color, abgr4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xbgr4444_pixel2color, xbgr4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA4444, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgra4444_pixel2color, bgra4444_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX4444, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgrx4444_pixel2color, bgrx4444_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK4(0xff000000),
+	                /* vcs_gmask */ MASK4(0x00ff0000),
+	                /* vcs_bmask */ MASK4(0x0000ff00),
+	                /* vcs_amask */ 0),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               rgbx8888_pixel2color, colorpixel_identity);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA5551, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgba5551_pixel2color, rgba5551_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX5551, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgbx5551_pixel2color, rgbx5551_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB1555, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, argb1555_pixel2color, argb1555_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB1555, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xrgb1555_pixel2color, xrgb1555_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR1555, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, abgr1555_pixel2color, abgr1555_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR1555, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, xbgr1555_pixel2color, xbgr1555_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA5551, VIDEO_CODEC_FLAG_ALPHA, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgra5551_pixel2color, bgra5551_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX5551, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgrx5551_pixel2color, bgrx5551_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4(0x00ff0000),
+	                /* vcs_gmask */ MASK4(0x0000ff00),
+	                /* vcs_bmask */ MASK4(0x000000ff),
+	                /* vcs_amask */ MASK4(0xff000000)),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               argb8888_pixel2color, argb8888_color2pixel);
 
-	CASE_CODEC_AL1(VIDEO_CODEC_RGB888, VIDEO_CODEC_FLAG_NORMAL, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, rgb888_pixel2color, rgb888_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_BGR888, VIDEO_CODEC_FLAG_NORMAL, buffer24_requirements, getpixel24, setpixel24, linecopy24, linefill24, bgr888_pixel2color, bgr888_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK4(0x00ff0000),
+	                /* vcs_gmask */ MASK4(0x0000ff00),
+	                /* vcs_bmask */ MASK4(0x000000ff),
+	                /* vcs_amask */ 0),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               xrgb8888_pixel2color, xrgb8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGB565, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, rgb565_pixel2color, rgb565_color2pixel);
-	CASE_CODEC_ALX(VIDEO_CODEC_BGR565, VIDEO_CODEC_FLAG_NORMAL, 2, buffer16_requirements, getpixel16, setpixel16, linecopy16, linefill16, unaligned_getpixel16, unaligned_setpixel16, unaligned_linecopy16, unaligned_linefill16, bgr565_pixel2color, bgr565_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4(0x000000ff),
+	                /* vcs_gmask */ MASK4(0x0000ff00),
+	                /* vcs_bmask */ MASK4(0x00ff0000),
+	                /* vcs_amask */ MASK4(0xff000000)),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               abgr8888_pixel2color, abgr8888_color2pixel);
 
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_lsb, setpixel1_lsb, linecopy1_lsb, linefill1_lsb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer1_requirements, getpixel1_msb, setpixel1_msb, linecopy1_msb, linefill1_msb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_lsb, setpixel2_lsb, linecopy2_lsb, linefill2_lsb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer2_requirements, getpixel2_msb, setpixel2_msb, linecopy2_msb, linefill2_msb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_LSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_lsb, setpixel4_lsb, linecopy4_lsb, linefill4_lsb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_MSB, VIDEO_CODEC_FLAG_NORMAL, buffer4_requirements, getpixel4_msb, setpixel4_msb, linecopy4_msb, linefill4_msb, pal_pixel2color, pal_color2pixel);
-	CASE_CODEC_AL1(VIDEO_CODEC_PAL256, VIDEO_CODEC_FLAG_NORMAL, buffer8_requirements, getpixel8, setpixel8, linecopy8, linefill8, pal_pixel2color, pal_color2pixel);
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK4(0x000000ff),
+	                /* vcs_gmask */ MASK4(0x0000ff00),
+	                /* vcs_bmask */ MASK4(0x00ff0000),
+	                /* vcs_amask */ 0),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               xbgr8888_pixel2color, xbgr8888_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 32,
+	                /* vcs_rmask */ MASK4(0x0000ff00),
+	                /* vcs_gmask */ MASK4(0x00ff0000),
+	                /* vcs_bmask */ MASK4(0xff000000),
+	                /* vcs_amask */ MASK4(0x000000ff)),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               bgra8888_pixel2color, bgra8888_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX8888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 32,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK4(0x0000ff00),
+	                /* vcs_gmask */ MASK4(0x00ff0000),
+	                /* vcs_bmask */ MASK4(0xff000000),
+	                /* vcs_amask */ 0),
+	               4, buffer32_requirements,
+	               getpixel32, setpixel32,
+	               linecopy32, linefill32,
+	               unaligned_getpixel32, unaligned_setpixel32,
+	               unaligned_linecopy32, unaligned_linefill32,
+	               bgrx8888_pixel2color, bgrx8888_color2pixel);
+
+
+
+	/* 2-byte-per-pixel formats. */
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0xf000),
+	                /* vcs_gmask */ MASK2(0x0f00),
+	                /* vcs_bmask */ MASK2(0x00f0),
+	                /* vcs_amask */ MASK2(0x000f)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               rgba4444_pixel2color, rgba4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 12,
+	                /* vcs_rmask */ MASK2(0xf000),
+	                /* vcs_gmask */ MASK2(0x0f00),
+	                /* vcs_bmask */ MASK2(0x00f0),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               rgbx4444_pixel2color, rgbx4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x0f00),
+	                /* vcs_gmask */ MASK2(0x00f0),
+	                /* vcs_bmask */ MASK2(0x000f),
+	                /* vcs_amask */ MASK2(0xf000)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               argb4444_pixel2color, argb4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 12,
+	                /* vcs_rmask */ MASK2(0x0f00),
+	                /* vcs_gmask */ MASK2(0x00f0),
+	                /* vcs_bmask */ MASK2(0x000f),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               xrgb4444_pixel2color, xrgb4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x000f),
+	                /* vcs_gmask */ MASK2(0x00f0),
+	                /* vcs_bmask */ MASK2(0x0f00),
+	                /* vcs_amask */ MASK2(0xf000)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               abgr4444_pixel2color, abgr4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 12,
+	                /* vcs_rmask */ MASK2(0x000f),
+	                /* vcs_gmask */ MASK2(0x00f0),
+	                /* vcs_bmask */ MASK2(0x0f00),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               xbgr4444_pixel2color, xbgr4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x00f0),
+	                /* vcs_gmask */ MASK2(0x0f00),
+	                /* vcs_bmask */ MASK2(0xf000),
+	                /* vcs_amask */ MASK2(0x000f)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               bgra4444_pixel2color, bgra4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX4444,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 12,
+	                /* vcs_rmask */ MASK2(0x00f0),
+	                /* vcs_gmask */ MASK2(0x0f00),
+	                /* vcs_bmask */ MASK2(0xf000),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               bgrx4444_pixel2color, bgrx4444_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBA5551,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0xf800),
+	                /* vcs_gmask */ MASK2(0x07c0),
+	                /* vcs_bmask */ MASK2(0x003e),
+	                /* vcs_amask */ MASK2(0x0001)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               rgba5551_pixel2color, rgba5551_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_RGBX5551,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 15,
+	                /* vcs_rmask */ MASK2(0xf800),
+	                /* vcs_gmask */ MASK2(0x07c0),
+	                /* vcs_bmask */ MASK2(0x003e),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               rgbx5551_pixel2color, rgbx5551_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_ARGB1555,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x7c00),
+	                /* vcs_gmask */ MASK2(0x03e0),
+	                /* vcs_bmask */ MASK2(0x001f),
+	                /* vcs_amask */ MASK2(0x8000)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               argb1555_pixel2color, argb1555_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_XRGB1555,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 15,
+	                /* vcs_rmask */ MASK2(0x7c00),
+	                /* vcs_gmask */ MASK2(0x03e0),
+	                /* vcs_bmask */ MASK2(0x001f),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               xrgb1555_pixel2color, xrgb1555_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_ABGR1555,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x001f),
+	                /* vcs_gmask */ MASK2(0x03e0),
+	                /* vcs_bmask */ MASK2(0x7c00),
+	                /* vcs_amask */ MASK2(0x8000)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               abgr1555_pixel2color, abgr1555_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_XBGR1555,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 15,
+	                /* vcs_rmask */ MASK2(0x001f),
+	                /* vcs_gmask */ MASK2(0x03e0),
+	                /* vcs_bmask */ MASK2(0x7c00),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               xbgr1555_pixel2color, xbgr1555_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRA5551,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x003e),
+	                /* vcs_gmask */ MASK2(0x07c0),
+	                /* vcs_bmask */ MASK2(0xf800),
+	                /* vcs_amask */ MASK2(0x0001)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               bgra5551_pixel2color, bgra5551_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGRX5551,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 15,
+	                /* vcs_rmask */ MASK2(0x003e),
+	                /* vcs_gmask */ MASK2(0x07c0),
+	                /* vcs_bmask */ MASK2(0xf800),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               bgrx5551_pixel2color, bgrx5551_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_RGB565,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0xf800),
+	                /* vcs_gmask */ MASK2(0x07e0),
+	                /* vcs_bmask */ MASK2(0x001f),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               rgb565_pixel2color, rgb565_color2pixel);
+
+	CASE_CODEC_ALX(VIDEO_CODEC_BGR565,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2(0x001f),
+	                /* vcs_gmask */ MASK2(0x07e0),
+	                /* vcs_bmask */ MASK2(0xf800),
+	                /* vcs_amask */ 0),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               bgr565_pixel2color, bgr565_color2pixel);
+
+
+
+	/* 3-byte-per-pixel formats. */
+	CASE_CODEC_AL1(VIDEO_CODEC_RGB888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 24,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK3(0xf00),
+	                /* vcs_gmask */ MASK3(0x0f0),
+	                /* vcs_bmask */ MASK3(0x00f),
+	                /* vcs_amask */ 0),
+	               buffer24_requirements,
+	               getpixel24, setpixel24,
+	               linecopy24, linefill24,
+	               rgb888_pixel2color, rgb888_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGR888,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 24,
+	                /* vcs_cbits */ 24,
+	                /* vcs_rmask */ MASK3(0x00f),
+	                /* vcs_gmask */ MASK3(0x0f0),
+	                /* vcs_bmask */ MASK3(0xf00),
+	                /* vcs_amask */ 0),
+	               buffer24_requirements,
+	               getpixel24, setpixel24,
+	               linecopy24, linefill24,
+	               bgr888_pixel2color, bgr888_color2pixel);
+
+
+
+	/* Palette-driven formats. */
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_LSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x0),
+	               buffer1_requirements,
+	               getpixel1_lsb, setpixel1_lsb,
+	               linecopy1_lsb, linefill1_lsb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL2_MSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x0),
+	               buffer1_requirements,
+	               getpixel1_msb, setpixel1_msb,
+	               linecopy1_msb, linefill1_msb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_LSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0x0),
+	               buffer2_requirements,
+	               getpixel2_lsb, setpixel2_lsb,
+	               linecopy2_lsb, linefill2_lsb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL4_MSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0x0),
+	               buffer2_requirements,
+	               getpixel2_msb, setpixel2_msb,
+	               linecopy2_msb, linefill2_msb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_LSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xf,
+	                /* vcs_gmask */ 0xf,
+	                /* vcs_bmask */ 0xf,
+	                /* vcs_amask */ 0x0),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL16_MSB,
+	               (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xf,
+	                /* vcs_gmask */ 0xf,
+	                /* vcs_bmask */ 0xf,
+	                /* vcs_amask */ 0x0),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               pal_pixel2color, pal_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_PAL256,
+	               (VIDEO_CODEC_FLAG_PAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xff,
+	                /* vcs_gmask */ 0xff,
+	                /* vcs_bmask */ 0xff,
+	                /* vcs_amask */ 0x0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               linecopy8, linefill8,
+	               pal_pixel2color, pal_color2pixel);
+
 
 	default:
 		result = NULL;
@@ -1627,9 +2189,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 #undef _DEFINE_CODEC_AL1
 }
 
-
 DEFINE_PUBLIC_ALIAS(video_codec_lookup, libvideo_codec_lookup);
-
 
 DECL_END
 

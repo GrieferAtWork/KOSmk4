@@ -219,7 +219,7 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_convert_to_rgb(struct video_buffer *__restrict self) {
 	REF struct video_buffer *rgb_buffer;
-	bool has_alpha = (self->vb_format.vf_codec->_vc_flags & VIDEO_CODEC_FLAG_ALPHA) != 0;
+	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
 	struct video_codec const *codec;
 	codec = video_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888
 	                                     : VIDEO_CODEC_RGB888);

@@ -44,8 +44,8 @@ struct video_palette {
 	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                            vp_refcnt; /* Reference counter. */
 	struct video_palette_cache            *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
-	__size_t                               vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
-	COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [VIDEO_CODEC_PALSIZ(*)] Palette colors. */
+	__size_t                               vp_cnt;    /* [const] # of colors (must be >= what is required by the associated codec) */
+	COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [vp_cnt] Palette colors */
 };
 
 #define video_palette_destroy(self) (*(self)->vp_destroy)(self)

@@ -17,38 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODECS_H
-#define GUARD_LIBVIDEO_CODEC_CODECS_H 1
+#ifndef GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H
+#define GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H 1
 
 #include "api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/__byteswap.h>
-#include <hybrid/byteorder.h>
-#include <hybrid/typecore.h>
-
-#include <kos/types.h>
-
 #include <libvideo/codec/codecs.h>
 
 DECL_BEGIN
-
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define MASK4(x) __UINT32_C(x)
-#define MASK3(x) __UINT32_C(x)
-#define MASK2(x) __UINT16_C(x)
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-#define MASK4(x) __hybrid_bswap32_c(__UINT32_C(x))
-#define MASK3(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
-#define MASK2(x) __hybrid_bswap16_c(__UINT16_C(x))
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-
-
-/* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-INTDEF ATTR_CONST WUNUSED struct video_codec const *CC
-libvideo_codec_lookup(video_codec_t codec);
 
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID. */
@@ -73,8 +52,6 @@ INTDEF WUNUSED NONNULL((1, 2)) struct video_codec const *CC
 libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
                          /*out*/ REF struct video_codec_handle **__restrict p_handle);
 
-
-
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODECS_H */
+#endif /* !GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H */
