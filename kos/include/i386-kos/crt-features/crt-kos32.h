@@ -3510,6 +3510,7 @@
 #define __CRT_HAVE_freeifaddrs
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
+#define __CRT_HAVE_frelease
 #define __CRT_HAVE_fremovexattr
 #define __CRT_HAVE_freopen
 #define __CRT_HAVE_freopen64

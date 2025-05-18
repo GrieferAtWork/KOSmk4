@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d4cfae7 */
+/* HASH CRC-32:0x7573ae35 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2361,6 +2361,7 @@ DFUN(".text.crt.dos.FILE.unlocked.read.read", libd_getdelim_unlocked, libc_getde
 DFUN(".text.crt.dos.FILE.unlocked.read.read", libd_getline_unlocked, libc_getline_unlocked, TI, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.utility", libd_rewind_unlocked, libc_rewind_unlocked, TV, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_fisatty, libc_fisatty, TD, 1, TP)
+DFUN(".text.crt.dos.FILE.locked.utility", libd_frelease, libc_frelease, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_fftruncate, libc_fftruncate, TD, 2, TP, TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.FILE.unlocked.utility", libd_fftruncate_unlocked, libc_fftruncate_unlocked, TD, 2, TP, TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_puts_unlocked, libc_puts_unlocked, TD, 1, TP)

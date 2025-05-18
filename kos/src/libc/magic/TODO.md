@@ -109,6 +109,8 @@
 	- `<ssp/sys/syslog.h>`:
 		- `__syslog_chk()`
 		- `__vsyslog_chk()`
+	- `<pthread.h>`:
+		- `pthread_cond_timedwait_relative_np()` (alias to `pthread_cond_reltimedwait_np()`)
 - Misc
 	- `walkcontext()`
 	- `int ungetchar(int ch)`     (same as `ungetc(ch, stdin)`)

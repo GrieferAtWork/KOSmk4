@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x187b6b4b */
+/* HASH CRC-32:0xcdaba7d5 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -743,7 +743,7 @@ INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(3) ssize_t NOTHROW_CB_NCX(
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_INOUT(1) void NOTHROW_CB_NCX(LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream);
-/* >> fisatty(2)
+/* >> fisatty(3)
  * Check if the a given file stream `stream' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
@@ -751,6 +751,17 @@ INTDEF ATTR_INOUT(1) void NOTHROW_CB_NCX(LIBDCALL libd_rewind_unlocked)(FILE *__
  * @return: 0: [errno=<unchanged>] Not a tty
  * @return: 0: [errno=*]           Not a tty */
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_fisatty)(FILE *__restrict stream);
+/* >> frelease(3)
+ * Release the file descriptor for `stream'  to the caller, causing them  to
+ * inherit  ownership. When  `stream' is  opened for  writing, any unwritten
+ * data will be written prior to the FD being released. This function can be
+ * used to take ownership of a stream's internal FD, causing any  subsequent
+ * I/O operation to fail with `EBADF', and `fclose(3)' to not close anything
+ * @return: * : The file descriptor of `stream', which now belongs to you
+ * @return: -1: [errno=EPERM] The given `stream' does not have a file descriptor
+ * @return: -1: [errno=EBADF] The given `stream's file descriptor has already been released
+ * @return: -1: [errno=*]     Error flushing pending output prior to FD release. */
+INTDEF ATTR_INOUT(1) fd_t NOTHROW_NCX(LIBDCALL libd_frelease)(FILE *__restrict stream);
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 INTDEF ATTR_INOUT(1) int NOTHROW_CB_NCX(LIBDCALL libd_fftruncate)(FILE *__restrict stream, __PIO_OFFSET length);

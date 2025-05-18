@@ -3230,6 +3230,7 @@
 #define __CRT_HAVE_freeifaddrs
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
+#define __CRT_HAVE_frelease
 #define __CRT_HAVE_fremovexattr
 #define __CRT_HAVE_freopen
 #define __CRT_HAVE_freopen64
@@ -9280,6 +9281,7 @@
 #define __CRT_HAVE_KOS$freeifaddrs
 #define __CRT_HAVE_KOS$freelocale
 #define __CRT_HAVE_KOS$freezero
+#define __CRT_HAVE_KOS$frelease
 #define __CRT_HAVE_KOS$fremovexattr
 #define __CRT_HAVE_KOS$freopen
 #define __CRT_HAVE_KOS$freopen64
@@ -14140,6 +14142,7 @@
 #define __CRT_HAVE_DOS$freeifaddrs
 #define __CRT_HAVE_DOS$freelocale
 #define __CRT_HAVE_DOS$freezero
+#define __CRT_HAVE_DOS$frelease
 #define __CRT_HAVE_DOS$fremovexattr
 #define __CRT_HAVE_DOS$freopen
 #define __CRT_HAVE_DOS$freopen64

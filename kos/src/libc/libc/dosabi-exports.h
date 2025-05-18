@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7984dd6f */
+/* HASH CRC-32:0x1c8e5882 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2522,6 +2522,7 @@ DEFINE_PUBLIC_ALIAS(DOS$getdelim_unlocked, libd_getdelim_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$getline_unlocked, libd_getline_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$rewind_unlocked, libd_rewind_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fisatty, libd_fisatty);
+DEFINE_PUBLIC_ALIAS(DOS$frelease, libd_frelease);
 DEFINE_PUBLIC_ALIAS(DOS$fftruncate, libd_fftruncate);
 DEFINE_PUBLIC_ALIAS(DOS$fftruncate_unlocked, libd_fftruncate_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$puts_unlocked, libd_puts_unlocked);

@@ -3008,8 +3008,8 @@ NOTHROW_CB_NCX(LIBCCALL libc_rewind_unlocked)(FILE *__restrict stream)
 /* fisatty(3)                                                           */
 /************************************************************************/
 
-/*[[[head:libc_fisatty,hash:CRC-32=0x57316f96]]]*/
-/* >> fisatty(2)
+/*[[[head:libc_fisatty,hash:CRC-32=0xb8c4860b]]]*/
+/* >> fisatty(3)
  * Check if the a given file stream `stream' refers to a TTY
  * @return: 1: Is a tty
  * @return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
@@ -3029,6 +3029,43 @@ NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 	return (stream->if_flag & IO_ISATTY) != 0;
 }
 /*[[[end:libc_fisatty]]]*/
+
+/*[[[head:libc_frelease,hash:CRC-32=0xf880b6a7]]]*/
+/* >> frelease(3)
+ * Release the file descriptor for `stream'  to the caller, causing them  to
+ * inherit  ownership. When  `stream' is  opened for  writing, any unwritten
+ * data will be written prior to the FD being released. This function can be
+ * used to take ownership of a stream's internal FD, causing any  subsequent
+ * I/O operation to fail with `EBADF', and `fclose(3)' to not close anything
+ * @return: * : The file descriptor of `stream', which now belongs to you
+ * @return: -1: [errno=EPERM] The given `stream' does not have a file descriptor
+ * @return: -1: [errno=EBADF] The given `stream's file descriptor has already been released
+ * @return: -1: [errno=*]     Error flushing pending output prior to FD release. */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_INOUT(1) fd_t
+NOTHROW_NCX(LIBCCALL libc_frelease)(FILE *__restrict stream)
+/*[[[body:libc_frelease]]]*/
+{
+	fd_t result;
+	if unlikely(!stream)
+		return libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+
+	/* Make sure that the stream doesn't have a VTAB (in which case it wouldn't have an FD) */
+	if (stream->if_flag & IO_HASVTAB)
+		return libc_seterrno(EPERM);
+
+	/* Steal the stream's file descriptor */
+	file_lock_write(stream);
+	result = stream->if_fd;
+	stream->if_fd = -1;
+	file_lock_endwrite(stream);
+
+	/* Check if the stream had already been stolen. */
+	if (result < 0)
+		return libc_seterrno(EBADF);
+	return result;
+}
+/*[[[end:libc_frelease]]]*/
 
 
 
@@ -4350,7 +4387,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1d97bba3]]]*/
+/*[[[start:exports,hash:CRC-32=0x634b3079]]]*/
 DEFINE_PUBLIC_ALIAS_P(DOS$__rename,libd_rename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *oldname, char const *newname_or_path),(oldname,newname_or_path));
 DEFINE_PUBLIC_ALIAS_P(DOS$__libc_rename,libd_rename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *oldname, char const *newname_or_path),(oldname,newname_or_path));
 DEFINE_PUBLIC_ALIAS_P(DOS$rename,libd_rename,ATTR_IN(1) ATTR_IN(2),int,NOTHROW_RPC,LIBDCALL,(char const *oldname, char const *newname_or_path),(oldname,newname_or_path));
@@ -4526,6 +4563,7 @@ DEFINE_PUBLIC_ALIAS_P(ungetc_unlocked,libc_ungetc_unlocked,ATTR_INOUT(2),int,NOT
 DEFINE_PUBLIC_ALIAS_P(_ungetc_nolock,libc_ungetc_unlocked,ATTR_INOUT(2),int,NOTHROW_NCX,LIBCCALL,(int ch, FILE *__restrict stream),(ch,stream));
 DEFINE_PUBLIC_ALIAS_P_VOID(rewind_unlocked,libc_rewind_unlocked,ATTR_INOUT(1),NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream),(stream));
 DEFINE_PUBLIC_ALIAS_P(fisatty,libc_fisatty,WUNUSED ATTR_INOUT(1),int,NOTHROW_NCX,LIBCCALL,(FILE *__restrict stream),(stream));
+DEFINE_PUBLIC_ALIAS_P(frelease,libc_frelease,ATTR_INOUT(1),fd_t,NOTHROW_NCX,LIBCCALL,(FILE *__restrict stream),(stream));
 DEFINE_PUBLIC_ALIAS_P(fftruncate,libc_fftruncate,ATTR_INOUT(1),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, __PIO_OFFSET length),(stream,length));
 DEFINE_PUBLIC_ALIAS_P(fftruncate_unlocked,libc_fftruncate_unlocked,ATTR_INOUT(1),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, __PIO_OFFSET length),(stream,length));
 DEFINE_PUBLIC_ALIAS_P(fseeko64_unlocked,libc_fseeko64_unlocked,ATTR_INOUT(1),int,NOTHROW_CB_NCX,LIBCCALL,(FILE *__restrict stream, off64_t off, int whence),(stream,off,whence));

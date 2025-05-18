@@ -3786,7 +3786,7 @@ void rewind_unlocked([[inout]] $FILE *__restrict stream) {
 	fsetpos_unlocked(stream, 0);
 }
 
-@@>> fisatty(2)
+@@>> fisatty(3)
 @@Check if the a given file stream `stream' refers to a TTY
 @@@return: 1: Is a tty
 @@@return: 0: [errno=EINVAL]      The given `stream' is invalid (so not a tty)
@@ -3799,6 +3799,21 @@ void rewind_unlocked([[inout]] $FILE *__restrict stream) {
 int fisatty([[inout]] $FILE *__restrict stream) {
 	return isatty(fileno(stream));
 }
+
+@@>> frelease(3)
+@@Release the file descriptor for `stream'  to the caller, causing them  to
+@@inherit  ownership. When  `stream' is  opened for  writing, any unwritten
+@@data will be written prior to the FD being released. This function can be
+@@used to take ownership of a stream's internal FD, causing any  subsequent
+@@I/O operation to fail with `EBADF', and `fclose(3)' to not close anything
+@@@return: * : The file descriptor of `stream', which now belongs to you
+@@@return: -1: [errno=EPERM] The given `stream' does not have a file descriptor
+@@@return: -1: [errno=EBADF] The given `stream's file descriptor has already been released
+@@@return: -1: [errno=*]     Error flushing pending output prior to FD release.
+[[decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.FILE.locked.utility")]]
+$fd_t frelease([[inout]] $FILE *__restrict stream);
+
 
 %{
 #ifndef __PIO_OFFSET
