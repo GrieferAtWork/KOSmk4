@@ -134,6 +134,13 @@ struct video_buffer {
 	__size_t                 vb_size_y; /* Buffer size in Y */
 	/* Buffer-specific fields go here */
 
+#define video_buffer_lock(self, lock) \
+	(*(self)->vb_ops->vi_lock)(self, lock)
+#define video_buffer_unlock(self, lock) \
+	(*(self)->vb_ops->vi_unlock)(self, lock)
+#define video_buffer_getgfx(self, result, blendmode, flags, colorkey, clip) \
+	(*(self)->vb_ops->vi_getgfx)(self, result, blendmode, flags, colorkey, clip)
+
 #ifdef __cplusplus
 #ifndef GUARD_LIBVIDEO_GFX_API_H
 	__CXX_DELETE_CTOR(video_buffer);
@@ -162,13 +169,13 @@ public:
 	 * @return: -1: Error (s.a. `errno') */
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
 	int LIBVIDEO_GFX_CC lock(struct video_lock &__lock) {
-		return (*vb_ops->vi_lock)(this, &__lock);
+		return video_buffer_lock(this, &__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
 	void LIBVIDEO_GFX_CC unlock(struct video_lock const &__lock) {
-		(*vb_ops->vi_unlock)(this, &__lock);
+		video_buffer_unlock(this, &__lock);
 	}
 
 
@@ -180,7 +187,7 @@ public:
 	    __uintptr_t __flags            = VIDEO_GFX_FNORMAL,
 	    video_color_t __colorkey       = 0,
 		struct video_buffer_rect *clip = __NULLPTR) {
-		(*vb_ops->vi_getgfx)(this, &__result, __blendmode, __flags, __colorkey, clip);
+		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey, clip);
 		return __result;
 	}
 
@@ -214,18 +221,14 @@ __CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
 video_gfx::clip(struct video_gfx &__result,
                 __intptr_t __start_x, __intptr_t __start_y,
                 __size_t __size_x, __size_t __size_y) const {
-	(*vx_buffer->vb_ops->vi_clipgfx)(this, &__result,
-	                                 __start_x, __start_y,
-	                                 __size_x, __size_y);
+	video_gfx_clip(this, &__result, __start_x, __start_y, __size_x, __size_y);
 	return __result;
 }
 
 __CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
 video_gfx::clip(__intptr_t __start_x, __intptr_t __start_y,
                 __size_t __size_x, __size_t __size_y) {
-	(*vx_buffer->vb_ops->vi_clipgfx)(this, this,
-	                                 __start_x, __start_y,
-	                                 __size_x, __size_y);
+	video_gfx_clip(this, this, __start_x, __start_y, __size_x, __size_y);
 	return *this;
 }
 

@@ -287,6 +287,37 @@ struct video_gfx {
 #define video_gfx_sizey(self)  ((__size_t)((__intptr_t)(self)->vx_yend - (self)->vx_offt_y))
 
 
+#define video_gfx_clip(self, result, start_x, start_y, size_x, size_y) \
+	(*(self)->vx_buffer->vb_ops->vi_clipgfx)(self, result, start_x, start_y, size_x, size_y)
+#define _video_gfx_getcolor(self, x, y) \
+	(*(self)->vx_pxops.fxo_getcolor)(self, x, y)
+#define _video_gfx_putcolor(self, x, y, color) \
+	(*(self)->vx_pxops.fxo_putcolor)(self, x, y, color)
+#define video_gfx_line(self, x1, y1, x2, y2, color) \
+	(*(self)->vx_ops->fxo_line)(self, x1, y1, x2, y2, color)
+#define video_gfx_vline(self, x, y, length, color) \
+	(*(self)->vx_ops->fxo_vline)(self, x, y, length, color)
+#define video_gfx_hline(self, x, y, length, color) \
+	(*(self)->vx_ops->fxo_hline)(self, x, y, length, color)
+#define video_gfx_fill(self, x, y, size_x, size_y, color) \
+	(*(self)->vx_ops->fxo_fill)(self, x, y, size_x, size_y, color)
+#define video_gfx_fillall(self, color) \
+	video_gfx_fill(self, 0, 0, (__size_t)-1, (__size_t)-1, color)
+#define video_gfx_rect(self, x, y, size_x, size_y, color) \
+	(*(self)->vx_ops->fxo_rect)(self, x, y, size_x, size_y, color)
+#define video_gfx_blit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
+	(*(self)->vx_ops->fxo_blit)(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y)
+#define video_gfx_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
+	(*(self)->vx_ops->fxo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y)
+#define video_gfx_bitfill(self, x, y, color, size_x, size_y, bigtmask, bitskip, bitscan) \
+	(*(self)->vx_ops->fxo_bitfill)(self, x, y, color, size_x, size_y, bigtmask, bitskip, bitscan)
+#define video_gfx_bitblit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bigtmask, bitskip, bitscan) \
+	(*(self)->vx_ops->fxo_bitblit)(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bigtmask, bitskip, bitscan)
+#define video_gfx_bitstretchfill(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask, bitskip, bitscan) \
+	(*(self)->vx_ops->fxo_bitstretchfill)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask, bitskip, bitscan)
+#define video_gfx_bitstretchblit(self, dst_x, dst_y, dst_sizex, dst_sizey, src, src_x, src_y, src_size_x, src_size_y, bigtmask, bitskip, bitscan) \
+	(*(self)->vx_ops->fxo_bitstretchblit)(self, dst_x, dst_y, dst_sizex, dst_sizey, src, src_x, src_y, src_size_x, src_size_y, bigtmask, bitskip, bitscan)
+
 #ifdef __cplusplus
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("clip")
@@ -347,9 +378,7 @@ public:
 		if __unlikely(__used_x < (__intptr_t)vx_xmin || __used_y < (__intptr_t)vx_ymin ||
 		              __used_x >= (__intptr_t)vx_xend || __used_y >= (__intptr_t)vx_yend)
 			return 0;
-		return (*vx_pxops.fxo_getcolor)(this,
-		                                (__uintptr_t)__used_x,
-		                                (__uintptr_t)__used_y);
+		return _video_gfx_getcolor(this, (__uintptr_t)__used_x, (__uintptr_t)__used_y);
 	}
 
 	/* Place a colored pixel ontop of the graphic */
@@ -363,45 +392,42 @@ public:
 		if __unlikely(__used_x < (__intptr_t)vx_xmin || __used_y < (__intptr_t)vx_ymin ||
 		              __used_x >= (__intptr_t)vx_xend || __used_y >= (__intptr_t)vx_yend)
 			return;
-		(*vx_pxops.fxo_putcolor)(this,
-		                         (__uintptr_t)__used_x,
-		                         (__uintptr_t)__used_y,
-		                         __color);
+		_video_gfx_putcolor(this, (__uintptr_t)__used_x, (__uintptr_t)__used_y, __color);
 	}
 
 	/* Draw a line */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC line(__intptr_t __x1, __intptr_t __y1,
 	                                            __intptr_t __x2, __intptr_t __y2,
 	                                            video_color_t __color) {
-		(*vx_ops->fxo_line)(this, __x1, __y1, __x2, __y2, __color);
+		video_gfx_line(this, __x1, __y1, __x2, __y2, __color);
 	}
 
 	/* Vertical line */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC vline(__intptr_t __x, __intptr_t __y,
 	                                             __size_t __length, video_color_t __color) {
-		(*vx_ops->fxo_vline)(this, __x, __y, __length, __color);
+		video_gfx_vline(this, __x, __y, __length, __color);
 	}
 
 	/* Horizontal line */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC hline(__intptr_t __x, __intptr_t __y,
 	                                             __size_t __length, video_color_t __color) {
-		(*vx_ops->fxo_hline)(this, __x, __y, __length, __color);
+		video_gfx_hline(this, __x, __y, __length, __color);
 	}
 
 	/* Fill an area with a solid color. */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC fill(__intptr_t __x, __intptr_t __y,
 	                                            __size_t __size_x, __size_t __size_y,
 	                                            video_color_t __color) {
-		(*vx_ops->fxo_fill)(this, __x, __y, __size_x, __size_y, __color);
+		video_gfx_fill(this, __x, __y, __size_x, __size_y, __color);
 	}
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC fill(video_color_t __color) {
-		(*vx_ops->fxo_fill)(this, 0, 0, (__size_t)-1, (__size_t)-1, __color);
+		video_gfx_fillall(this, __color);
 	}
 
 	/* Outline an area with a rectangle. */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC
 	rect(__intptr_t __x, __intptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		(*vx_ops->fxo_rect)(this, __x, __y, __size_x, __size_y, __color);
+		video_gfx_rect(this, __x, __y, __size_x, __size_y, __color);
 	}
 
 	/* Blit the contents of another video buffer into this one. */
@@ -409,9 +435,9 @@ public:
 	                                            struct video_gfx const &__src,
 	                                            __intptr_t __src_x, __intptr_t __src_y,
 	                                            __size_t __size_x, __size_t __size_y) {
-		(*vx_ops->fxo_blit)(this, __dst_x, __dst_y,
-		                     &__src, __src_x, __src_y,
-		                     __size_x, __size_y);
+		video_gfx_blit(this, __dst_x, __dst_y,
+		               &__src, __src_x, __src_y,
+		               __size_x, __size_y);
 	}
 
 	/* Same as `fxo_blit', but stretch the contents */
@@ -420,8 +446,8 @@ public:
 	                                               struct video_gfx const &__src,
 	                                               __intptr_t __src_x, __intptr_t __src_y,
 	                                               __size_t __src_size_x, __size_t __src_size_y) {
-		(*vx_ops->fxo_stretch)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                        &__src, __src_x, __src_y, __src_size_x, __src_size_y);
+		video_gfx_stretch(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                  &__src, __src_x, __src_y, __src_size_x, __src_size_y);
 	}
 
 	/* Fill an area with a solid color. */
@@ -430,8 +456,8 @@ public:
 	                                               __size_t __size_x, __size_t __size_y,
 	                                               void const *__restrict __bitmask,
 	                                               __uintptr_t __bitskip, __size_t __bitscan) {
-		(*vx_ops->fxo_bitfill)(this, __x, __y, __color, __size_x, __size_y,
-		                       __bitmask, __bitskip, __bitscan);
+		video_gfx_bitfill(this, __x, __y, __color, __size_x, __size_y,
+		                  __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Blit the contents of another video buffer into this one. */
@@ -441,8 +467,8 @@ public:
 	                                               __size_t __size_x, __size_t __size_y,
 	                                               void const *__restrict __bitmask,
 	                                               __uintptr_t __bitskip, __size_t __bitscan) {
-		(*vx_ops->fxo_bitblit)(this, __dst_x, __dst_y, &__src, __src_x, __src_y,
-		                       __size_x, __size_y, __bitmask, __bitskip, __bitscan);
+		video_gfx_bitblit(this, __dst_x, __dst_y, &__src, __src_x, __src_y,
+		                  __size_x, __size_y, __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
@@ -452,9 +478,9 @@ public:
 	                                                      __size_t __src_size_x, __size_t __src_size_y,
 	                                                      void const *__restrict __bitmask,
 	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
-		(*vx_ops->fxo_bitstretchfill)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                              __color, __src_size_x, __src_size_y,
-		                              __bitmask, __bitskip, __bitscan);
+		video_gfx_bitstretchfill(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                         __color, __src_size_x, __src_size_y,
+		                         __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
@@ -465,9 +491,9 @@ public:
 	                                                      __size_t __src_size_x, __size_t __src_size_y,
 	                                                      void const *__restrict __bitmask,
 	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
-		(*vx_ops->fxo_bitstretchblit)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                              __src, __src_x, __src_y, __src_size_x, __src_size_y,
-		                              __bitmask, __bitskip, __bitscan);
+		video_gfx_bitstretchblit(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                         __src, __src_x, __src_y, __src_size_x, __src_size_y,
+		                         __bitmask, __bitskip, __bitscan);
 	}
 
 

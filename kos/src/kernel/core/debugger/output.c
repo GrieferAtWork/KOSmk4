@@ -140,7 +140,7 @@ NOTHROW(FCALL dbgtty_init4tty)(struct vidttyaccess *__restrict tty) {
 	dbg_screen_height   = tty->vta_resy;
 	dbg_screen_cellsize = tty->vta_cellsize;
 	dbgtty_linesize     = dbg_screen_cellsize * dbg_screen_width;
-	dbg_scroll_maxline  = DBG_TTY_BACKLOG_SIZE / dbgtty_linesize;
+	dbg_scroll_maxline  = dbgtty_linesize ? (DBG_TTY_BACKLOG_SIZE / dbgtty_linesize) : 0;
 
 	/* Clear backlog */
 	dbgtty_backend        = 0;
