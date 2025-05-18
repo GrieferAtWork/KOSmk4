@@ -117,6 +117,7 @@ svga_find_first_gfx_mode(fd_t fd, struct svga_modeinfo *__restrict mode) {
 	LOGERR("Not implemented: svga_find_first_gfx_mode()\n");
 	(void)fd;
 	(void)mode;
+	errno = ENODATA;
 	return -1;
 }
 
@@ -229,13 +230,25 @@ svga_newscreen(void) {
 	REF struct svga_screen_buffer *result;
 	struct svga_chipset_driver const *driver;
 	char csname[SVGA_CSNAMELEN];
+
+	/* Access the SVGA video driver (/bin/init will have already loaded it) */
 	svga = open("/dev/svga", O_RDWR | O_CLOEXEC);
 	if unlikely(svga < 0) {
 		LOGERR("Failed to open svga driver: %m\n");
 		goto err;
 	}
 
-	/* Acquire a video lock */
+	/* Acquire a video lock. If  another video lock already exists,  this
+	 * will block until that lock goes away. Since video locks are stored
+	 * in file descriptors, a process  exiting while owning a video  lock
+	 * will see that lock be closed automatically by the kernel.
+	 *
+	 * Additionally, the kernel links video locks against the libsvgadrv,
+	 * which in turn keep a full  copy of the video chipset's  registers,
+	 * meaning we're free to do whatever with want with the chipset,  and
+	 * can  rest assured that  our process exiting  will restore a known-
+	 * good register state, as well  as automatically switch back to  the
+	 * terminal UI provided by /dev/console (aka. /dev/svga1) */
 	bzero(&vdlck, sizeof(vdlck));
 	vdlck.of_flags = IO_CLOEXEC;
 	if (ioctl(svga, SVGA_IOC_MAKELCK, &vdlck) < 0) {
@@ -243,15 +256,23 @@ svga_newscreen(void) {
 		goto err_svga;
 	}
 
-	/* Lookup current video mode. */
+	/* Lookup  current video mode. We could just  not do this part and always
+	 * switch to a custom  video mode, but  then: where do  we get this  mode
+	 * from? Instead, use whatever mode the user last set for their terminal,
+	 * meaning that `vconf(1)' can be used to set the mode used here. */
 	if (ioctl(vdlck.of_hint, SVGA_IOC_GETMODE, &mode) < 0) {
 		LOGERR("SVGA_IOC_GETMODE failed: %m\n");
 		goto err_svga_vdlck;
 	}
 
-	/* If we're in text-mode, switch to graphics mode. */
+	/* If we're in text-mode, force a switch to graphics mode. */
 	if (mode.smi_flags & SVGA_MODEINFO_F_TXT) {
-		if (svga_find_first_gfx_mode(vdlck.of_hint, &mode) != 0) {
+		int status = svga_find_first_gfx_mode(vdlck.of_hint, &mode);
+		if (status < 0) {
+			LOGERR("Failed to enumerate supported video modes: %m\n");
+			goto err_svga_vdlck;
+		}
+		if (status != 0) {
 			LOGERR("Failed to find any viable GFX mode\n");
 			errno = ENODEV; /* Chipset doesn't support any kind of GFX */
 			goto err_svga_vdlck;
@@ -262,14 +283,21 @@ svga_newscreen(void) {
 		}
 	}
 
-	/* Load codec to-be used for video mode. */
+	/* Convert the SVGA video mode into libvideo codec specs. */
 	svga_modeinfo_to_codec_specs(&mode, &codec_specs);
+
+	/* Build a codec from the newly constructed specs. */
 	format.vf_codec = video_codec_fromspecs(&codec_specs, &codec_handle);
 	if (!format.vf_codec) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
 		goto err_svga_vdlck;
 	}
+
+	/* If necessary, construct a palette controller for the codec, and populate
+	 * it with whatever is currently configured  by the chipset. In theory,  we
+	 * could also just come up with a  new palette here, but again: use  what's
+	 * already there, so another program can pre-configure it for us. */
 	format.vf_pal = NULL;
 	if (format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
 		format.vf_pal = svga_palette_new(vdlck.of_hint, format.vf_codec->vc_specs.vcs_cbits);
@@ -279,19 +307,23 @@ svga_newscreen(void) {
 		}
 	}
 
-	/* Figure out which chipset we're using. */
+	/* Figure out which chipset we're using (so we can more easily
+	 * load  the user-land version of the driver to gain access to
+	 * any chipset-specific I/O operations we might need) */
 	if (ioctl(vdlck.of_hint, SVGA_IOC_GETCSNAME, csname) < 0) {
 		LOGERR("SVGA_IOC_GETCSNAME failed: %m\n");
 		goto err_svga_vdlck_codec_format;
 	}
 
-	/* Make sure we ring#3 have I/O permissions */
+	/* Make sure we  (ring#3) have I/O  permissions. These will  probably
+	 * be needed by "libsvgadrv" in order to perform any chipset-specific
+	 * I/O operations and so on. */
 	if (iopl(3)) {
 		LOGERR("iopl failed: %m\n");
 		goto err_svga_vdlck_codec_format;
 	}
 
-	/* Load "libsvgadrv" */
+	/* Load "libsvgadrv" (user-land version) */
 	libsvgadrv = dlopen(LIBSVGADRV_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!libsvgadrv) {
 		LOGERR("dlerror: %s\n", dlerror());
@@ -318,7 +350,8 @@ svga_newscreen(void) {
 		++driver;
 	}
 
-	/* Allocate the screen control structure */
+	/* Allocate the screen buffer control structure, and include
+	 * space needed  to embed  libsvgadrv's chipset  controller. */
 	{
 		size_t bufsz = offsetof(struct svga_screen_buffer, ssb_cs) +
 		               driver->scd_cssize;
@@ -335,7 +368,7 @@ svga_newscreen(void) {
 		goto err_svga_vdlck_codec_format_libsvgadrv_r;
 	}
 
-	/* Load phyiscal memory mapping functions. */
+	/* Load physical memory mapping functions. */
 	result->ssb_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!result->ssb_libphys) {
 		LOGERR("dlerror: %s\n", dlerror());
@@ -351,6 +384,11 @@ svga_newscreen(void) {
 		LOGERR("dlerror: %s\n", dlerror());
 		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
 	}
+
+	/* If the video mode doesn't provide a custom frame
+	 * buffer address, use the default VGA LFB address. */
+	if (!(mode.smi_flags & SVGA_MODEINFO_F_LFB))
+		mode.smi_lfb = (physaddr_t)0xA0000;
 
 	/* Map screen memory into a physical buffer. */
 	result->vb_stride = mode.smi_scanline;
