@@ -159,6 +159,12 @@ typedef __ATTR_NONNULL_T((2, 3)) __ssize_t
                                            char const *__restrict value);
 
 
+struct svga_palette_color {
+	__uint8_t spc_r; /* Red */
+	__uint8_t spc_g; /* Green */
+	__uint8_t spc_b; /* Blue */
+};
+
 struct svga_chipset_ops {
 
 	/* [1..1][const] Chipset-specific finalization. */
@@ -214,6 +220,20 @@ struct svga_chipset_ops {
 
 	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
 	__size_t sco_regsize;
+
+	/* [1..1][const][lock(EXTERNAL)]
+	 * - Get/set (parts of) the video palette.
+	 * - Weak undefined behavior when current video mode has no palette
+	 * - Caller must ensure that `base + count <= 0x100'
+	 * - In most cases, this will simply read/write the core VGA palette */
+	__ATTR_NONNULL_T((1)) void
+	(LIBSVGADRV_CC *sco_getpal)(struct svga_chipset *__restrict self,
+	                            __uint8_t base, __uint8_t count,
+	                            __NCX struct svga_palette_color *buf);
+	__ATTR_NONNULL_T((1)) void
+	(LIBSVGADRV_CC *sco_setpal)(struct svga_chipset *__restrict self,
+	                            __uint8_t base, __uint8_t count,
+	                            __NCX struct svga_palette_color const *buf);
 
 	/* NOTE: Operators below may be altered by chipset drivers during `sco_setmode()'
 	 *       This should be fine since they can already only be called while  already

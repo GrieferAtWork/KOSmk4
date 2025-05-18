@@ -64,11 +64,14 @@ INTDEF NONNULL((1)) void CC basevga_setmode(struct vga_mode const *__restrict mo
 /* Current (assumed) EGA register state. */
 INTDEF struct vga_regs baseega_registers;
 
+struct svga_palette_color;
+
 /* Read/write to/from the current color palette.
- * @param: color_index: Starting palette color index.
- * @param: count:       # of color rgb-triples to read/write */
-INTDEF NONNULL((2)) void CC basevga_rdpal(uint8_t color_index, struct vga_palcolor *__restrict buf, uint8_t count);
-INTDEF NONNULL((2)) void CC basevga_wrpal(uint8_t color_index, struct vga_palcolor const *__restrict buf, uint8_t count);
+ * @param: base:  Starting palette color index.
+ * @param: count: # of color rgb-triples to read/write */
+INTDEF void CC cs_basevga_rdpal(struct svga_chipset *__restrict ignored, uint8_t base, uint8_t count, NCX struct svga_palette_color *__restrict buf);
+INTDEF void CC cs_basevga_wrpal(struct svga_chipset *__restrict ignored, uint8_t base, uint8_t count, NCX struct svga_palette_color const *__restrict buf);
+
 
 /* Direct access  to the  standard 256K  of VGA  video  memory.
  * These functions take the current register state into account

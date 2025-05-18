@@ -153,6 +153,45 @@ svgadev_ioctl_getcsname(struct svgadev *__restrict self,
 	return 0;
 }
 
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_getpal(struct svgadev *__restrict self,
+                     NCX UNCHECKED struct svga_palette *upal)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	struct svga_palette pal;
+	memcpy(&pal, validate_readwrite(upal, sizeof(pal)), sizeof(pal));
+	if (((uint16_t)pal.svp_base + pal.svp_size) > 0x100) {
+		pal.svp_size   = (uint8_t)(0x100 - pal.svp_base);
+		upal->svp_size = pal.svp_size;
+		COMPILER_WRITE_BARRIER();
+	}
+	validate_writablem(pal.svp_pal, pal.svp_size, sizeof(struct svga_palette_color));
+	viddev_acquire(self);
+	RAII_FINALLY { viddev_release(self); };
+	(*self->svd_chipset.sc_ops.sco_getpal)(&self->svd_chipset, pal.svp_base,
+	                                       pal.svp_size, pal.svp_pal);
+	return 0;
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgadev_ioctl_setpal(struct svgadev *__restrict self,
+                     NCX UNCHECKED struct svga_palette *upal)
+		THROWS(E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
+	struct svga_palette pal;
+	require(CAP_SYS_RAWIO);
+	memcpy(&pal, validate_readwrite(upal, sizeof(pal)), sizeof(pal));
+	if (((uint16_t)pal.svp_base + pal.svp_size) > 0x100) {
+		pal.svp_size   = (uint8_t)(0x100 - pal.svp_base);
+		upal->svp_size = pal.svp_size;
+		COMPILER_WRITE_BARRIER();
+	}
+	validate_readablem(pal.svp_pal, pal.svp_size, sizeof(struct svga_palette_color));
+	viddev_acquire(self);
+	RAII_FINALLY { viddev_release(self); };
+	(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, pal.svp_base,
+	                                       pal.svp_size, pal.svp_pal);
+	return 0;
+}
+
 
 struct cs_strings_printer {
 	struct svga_strings csp_req;    /* User-request. */
@@ -302,6 +341,10 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return svgadev_ioctl_getcsname(viddev_assvga(me->vlc_dev), (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
 		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_strings *)arg);
+	case SVGA_IOC_GETPAL_RGBX:
+		return svgadev_ioctl_getpal(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_palette *)arg);
+	case SVGA_IOC_SETPAL_RGBX:
+		return svgadev_ioctl_setpal(viddev_assvga(me->vlc_dev), (NCX UNCHECKED struct svga_palette *)arg);
 
 	default:
 		break;
@@ -579,6 +622,10 @@ svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return svgadev_ioctl_getcsname(viddev_assvga(me->vty_dev), (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
 		return svgadev_ioctl_getcsstrings(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_strings *)arg);
+	case SVGA_IOC_GETPAL_RGBX:
+		return svgadev_ioctl_getpal(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_palette *)arg);
+	case SVGA_IOC_SETPAL_RGBX:
+		return svgadev_ioctl_setpal(viddev_assvga(me->vty_dev), (NCX UNCHECKED struct svga_palette *)arg);
 
 	default:
 		break;
@@ -680,10 +727,10 @@ svgadev_setmode(struct svgadev *__restrict self,
 
 		if (mode->smi_colorbits == 1) {
 			/* Black & white emulation. */
-			basevga_wrpal(0, basevga_monopal, 16);
+			(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_monopal);
 		} else {
 			/* Load an ANSI-compatible color palette */
-			basevga_wrpal(0, basevga_defaultpal, 16);
+			(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_defaultpal);
 		}
 	}
 }
@@ -793,6 +840,10 @@ svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return svgadev_ioctl_getcsname(me, (NCX UNCHECKED char *)arg);
 	case SVGA_IOC_CSSTRINGS:
 		return svgadev_ioctl_getcsstrings(me, (NCX UNCHECKED struct svga_strings *)arg);
+	case SVGA_IOC_GETPAL_RGBX:
+		return svgadev_ioctl_getpal(me, (NCX UNCHECKED struct svga_palette *)arg);
+	case SVGA_IOC_SETPAL_RGBX:
+		return svgadev_ioctl_setpal(me, (NCX UNCHECKED struct svga_palette *)arg);
 
 	case SVGA_IOC_MAKETTY: {
 		NCX struct svga_maketty *info;

@@ -48,6 +48,7 @@
 #include <libpciaccess/pciaccess.h>
 #include <libsvgadrv/chipsets/vmware.h>
 
+#include "basevga.h"
 #include "cs-vga.h"
 #include "cs-vmware.h"
 
@@ -305,6 +306,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	if (mode->vmi_modeid >= lengthof(vmware_videomodes)) {
 		vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_DISABLE);
 		vga_v_setmode(self, mode);
+		me->vm_vga_mode = true;
 		return;
 	}
 
@@ -359,6 +361,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 
 	/* Enable the command FIFO */
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 1);
+	me->vm_vga_mode = false;
 }
 
 PRIVATE NONNULL((1, 2)) void
@@ -438,6 +441,41 @@ NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_fillrect)(struct svga_chipset *__restric
 	me->vm_hw_render_started = true;
 }
 #endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+
+
+PRIVATE NONNULL((1)) void LIBSVGADRV_CC
+vmware_v_getpal(struct svga_chipset *__restrict self,
+                uint8_t base, uint8_t count,
+                NCX struct svga_palette_color *buf) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	if (me->vm_vga_mode) {
+		cs_basevga_rdpal(self, base, count, buf);
+	} else {
+		uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
+		for (; count; --count, ++buf, entry_base += 3) {
+			buf->spc_r = (uint8_t)vm_getreg(me, entry_base + 0);
+			buf->spc_g = (uint8_t)vm_getreg(me, entry_base + 1);
+			buf->spc_b = (uint8_t)vm_getreg(me, entry_base + 2);
+		}
+	}
+}
+
+PRIVATE NONNULL((1)) void LIBSVGADRV_CC
+vmware_v_setpal(struct svga_chipset *__restrict self,
+                uint8_t base, uint8_t count,
+                NCX struct svga_palette_color const *buf) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	if (me->vm_vga_mode) {
+		cs_basevga_wrpal(self, base, count, buf);
+	} else {
+		uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
+		for (; count; --count, ++buf, entry_base += 3) {
+			vm_setreg(me, entry_base + 0, buf->spc_r);
+			vm_setreg(me, entry_base + 1, buf->spc_g);
+			vm_setreg(me, entry_base + 2, buf->spc_b);
+		}
+	}
+}
 
 
 
@@ -654,6 +692,9 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_setregs      = &vmware_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
 		me->sc_ops.sco_updaterect   = &vmware_v_updaterect;
+		me->sc_ops.sco_getpal       = &vmware_v_getpal;
+		me->sc_ops.sco_setpal       = &vmware_v_setpal;
+
 #ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
 		if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
 			me->sc_ops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;

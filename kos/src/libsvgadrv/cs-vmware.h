@@ -91,6 +91,7 @@ struct vmware_chipset: svga_chipset {
 	uint32_t vm_fifo_debounce[VMWARE_MAX_FIFO_COMMAND_WORDS]; /* [lock(EXTERN)] Debounce buffer for fifo */
 	bool     vm_fifo_debounce_inuse;    /* [lock(EXTERN)] Is `vm_fifo_debounce' being used? */
 	bool     vm_hw_render_started;      /* [lock(EXTERN)] Set to true after a HW render was started */
+	bool     vm_vga_mode;               /* [lock(EXTERN)] Set to true if currently-set mode is VGA */
 #ifdef __KERNEL__
 	void              *vm_fifo_unmap_cookie; /* [1..1][owned] Unmap cookie for `vm_fifo' */
 #else /* __KERNEL__ */

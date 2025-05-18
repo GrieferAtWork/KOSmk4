@@ -657,9 +657,11 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		/* XXX: At this point, we could override `me->vc_regsavebits'! */
 
 		/* Fill in register get/set operators. */
-		me->sc_ops.sco_regsize = vesa_getregsbufsize(me);
-		me->sc_ops.sco_getregs = &vesa_v_getregs;
-		me->sc_ops.sco_setregs = &vesa_v_setregs;
+		me->sc_ops.sco_regsize  = vesa_getregsbufsize(me);
+		me->sc_ops.sco_getregs  = &vesa_v_getregs;
+		me->sc_ops.sco_setregs  = &vesa_v_setregs;
+		self->sc_ops.sco_getpal = &cs_basevga_rdpal;
+		self->sc_ops.sco_setpal = &cs_basevga_wrpal;
 	} EXCEPT {
 		vesa_v_fini(me);
 		RETHROW();

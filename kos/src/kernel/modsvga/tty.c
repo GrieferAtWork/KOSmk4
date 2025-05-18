@@ -1016,14 +1016,12 @@ notsup:
 	} else {
 		unsigned int i;
 		for (i = 0; i < 16; ++i) {
-			struct vga_palcolor col;
+			struct svga_palette_color col;
 			uint32_t dcl; /* DirectCoLor */
 			col = basevga_defaultpal[i];
-#define sixbit2eight(x) ((x) ? ((((x) + 1) << 2) - 1) : 0)
-			dcl = ((sixbit2eight(col.vpc_r) >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
-			      ((sixbit2eight(col.vpc_g) >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
-			      ((sixbit2eight(col.vpc_b) >> (8 - mode->smi_bbits)) << mode->smi_bshift);
-#undef sixbit2eight
+			dcl = ((col.spc_r >> (8 - mode->smi_rbits)) << mode->smi_rshift) |
+			      ((col.spc_g >> (8 - mode->smi_gbits)) << mode->smi_gshift) |
+			      ((col.spc_b >> (8 - mode->smi_bbits)) << mode->smi_bshift);
 			result->stx_colors[i] = dcl;
 		}
 	}

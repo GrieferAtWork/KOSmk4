@@ -439,6 +439,8 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 	self->sc_ops.sco_getregs      = &vga_v_getregs;
 	self->sc_ops.sco_setregs      = &vga_v_setregs;
 	self->sc_ops.sco_regsize      = 0;
+	self->sc_ops.sco_getpal       = &cs_basevga_rdpal;
+	self->sc_ops.sco_setpal       = &cs_basevga_wrpal;
 	return true;
 }
 

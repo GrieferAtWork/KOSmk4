@@ -89,9 +89,10 @@ __DECL_BEGIN
 #define SVGA_IOC_LSMODES     _IOR_KOS('S', 0x03, struct svga_lsmodes)  /* [   svga|tty|lck] List available modes */
 #define SVGA_IOC_GETCSNAME   _IOR_KOS('S', 0x04, char[SVGA_CSNAMELEN]) /* [   svga|tty|lck] Get chipset name */
 #define SVGA_IOC_CSSTRINGS   _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
-/*      SVGA_IOC_            _IO*_KOS('S', 0x06, ...)                   * ... */
+#define SVGA_IOC_GETPAL_RGBX _IOR_KOS('S', 0x06, struct svga_palette)  /* [   svga|tty|lck] Get video palette (using `video_color_t' format) */
+#define SVGA_IOC_SETPAL_RGBX _IOW_KOS('S', 0x06, struct svga_palette)  /* [io:svga|tty|lck] Set video palette (using `video_color_t' format) */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x07, ...)                   * ... */
-/* TODO: ioctls to get/set palette */
+/*      SVGA_IOC_            _IO*_KOS('S', 0x08, ...)                   * ... */
 
 /* Misc tty functions. */
 #define SVGA_IOC_GETTTYINFO  VID_IOC_GETTTYINFO                        /* [   svga|tty    ] Get TTY information */
@@ -135,6 +136,19 @@ struct svga_strings {
 		                        * which points after the  "\0" of `"lastvalue"', or  by
 		                        * counting the # of `\0', which equals `svs_count * 2'. */
 		__uint64_t _svs_albuf; /* Align... */
+	};
+};
+
+struct svga_palette_color;
+struct svga_palette {
+	__uint8_t                      svp_base;   /* [in] Color base index */
+	__uint8_t                      svp_size;   /* [in] # of colors to read/write
+	                                            * [out] # of actually read colors (clamped
+	                                            * when trying to read past end of palette) */
+	__uint8_t                     _svp_pad[6]; /* ... */
+	union {
+		struct svga_palette_color *svp_pal;    /* [0..svp_size] Palette color I/O data */
+		__uint64_t                _svp_alpal;  /* Align... */
 	};
 };
 

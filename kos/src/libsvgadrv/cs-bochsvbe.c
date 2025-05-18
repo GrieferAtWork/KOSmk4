@@ -49,9 +49,9 @@
 #include <libsvgadrv/chipsets/bochsvbe.h>
 #include <libsvgadrv/util/vgaio.h>
 
+#include "basevga.h"
 #include "cs-bochsvbe.h"
 #include "cs-vga.h"
-
 
 #ifndef __KERNEL__
 #include <dlfcn.h>
@@ -494,6 +494,8 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_getregs      = &bochs_v_getregs;
 		me->sc_ops.sco_setregs      = &bochs_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof(struct bochs_regs);
+		self->sc_ops.sco_getpal     = &cs_basevga_rdpal;
+		self->sc_ops.sco_setpal     = &cs_basevga_wrpal;
 #ifdef SVGA_HAVE_HW_SCROLL
 		me->sc_ops.sco_setdisplaystart = &bochs_v_setdisplaystart;
 		me->sc_ops.sco_setlogicalwidth = &bochs_v_setlogicalwidth;

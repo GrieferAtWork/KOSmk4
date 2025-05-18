@@ -23,9 +23,11 @@
 
 #include <kernel/compiler.h>
 
-#include "svga.h"
+#include <kos/ioctl/svga.h>
 
 #include <stddef.h>
+
+#include "svga.h"
 
 DECL_BEGIN
 
@@ -44,8 +46,8 @@ DECL_BEGIN
  *    CGA color palette indices for ANSI color codes (for `vm_att_pal'). */
 
 /* Default text-mode palette colors for KOS (these are set-up for ANSI TTY compatibility) */
-INTERN_CONST struct vga_palcolor const basevga_defaultpal[16] = {
-#define RGB(r, g, b) { r >> 2, g >> 2, b >> 2 }
+INTERN_CONST struct svga_palette_color const basevga_defaultpal[16] = {
+#define RGB(r, g, b) { r, g, b }
 	[0x0] = RGB(0x00, 0x00, 0x00),
 	[0x1] = RGB(0xaa, 0x00, 0x00),
 	[0x2] = RGB(0x00, 0xaa, 0x00),
@@ -66,8 +68,8 @@ INTERN_CONST struct vga_palcolor const basevga_defaultpal[16] = {
 };
 
 /* Monochrome emulation palette. */
-INTERN_CONST struct vga_palcolor const basevga_monopal[16] = {
-#define RGB(r, g, b) { r >> 2, g >> 2, b >> 2 }
+INTERN_CONST struct svga_palette_color const basevga_monopal[16] = {
+#define RGB(r, g, b) { r, g, b }
 	/* Everything is white except for palette entry #0 */
 	[0x0] = RGB(0x00, 0x00, 0x00),
 	[0x1] = RGB(0xff, 0xff, 0xff),

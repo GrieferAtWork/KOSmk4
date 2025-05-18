@@ -382,30 +382,40 @@ basevga_setmode(struct vga_mode const *__restrict mode) {
 
 
 /* Read/write to/from the current color palette.
- * @param: color_index: Starting palette color index.
- * @param: count:       # of color rgb-triples to read/write */
-INTERN NONNULL((2)) void CC
-basevga_rdpal(uint8_t color_index,
-              struct vga_palcolor *__restrict buf,
-              uint8_t count) {
-	vga_w(VGA_PEL_IR, color_index);
+ * @param: base:  Starting palette color index.
+ * @param: count: # of color rgb-triples to read/write */
+INTERN void CC
+cs_basevga_rdpal(struct svga_chipset *__restrict UNUSED(ignored), uint8_t base,
+                 uint8_t count, NCX struct svga_palette_color *__restrict buf) {
+	vga_w(VGA_PEL_IR, base);
 	while (count--) {
-		buf->vpc_r = vga_r(VGA_PEL_D);
-		buf->vpc_g = vga_r(VGA_PEL_D);
-		buf->vpc_b = vga_r(VGA_PEL_D);
+		uint8_t r, g, b;
+		r = vga_r(VGA_PEL_D);
+		g = vga_r(VGA_PEL_D);
+		b = vga_r(VGA_PEL_D);
+		COMPILER_WRITE_BARRIER();
+#define sixbit2eight(x) ((x) ? ((((x) + 1) << 2) - 1) : 0)
+		buf->spc_r = sixbit2eight(r);
+		buf->spc_g = sixbit2eight(g);
+		buf->spc_b = sixbit2eight(b);
+#undef sixbit2eight
 		++buf;
 	}
 }
 
-INTERN NONNULL((2)) void CC
-basevga_wrpal(uint8_t color_index,
-              struct vga_palcolor const *__restrict buf,
-              uint8_t count) {
-	vga_w(VGA_PEL_IW, color_index);
+INTERN void CC
+cs_basevga_wrpal(struct svga_chipset *__restrict UNUSED(ignored), uint8_t base,
+                 uint8_t count, NCX struct svga_palette_color const *__restrict buf) {
+	vga_w(VGA_PEL_IW, base);
 	while (count--) {
-		vga_w(VGA_PEL_D, buf->vpc_r);
-		vga_w(VGA_PEL_D, buf->vpc_g);
-		vga_w(VGA_PEL_D, buf->vpc_b);
+		uint8_t r, g, b;
+		r = buf->spc_r >> 2;
+		g = buf->spc_g >> 2;
+		b = buf->spc_b >> 2;
+		COMPILER_READ_BARRIER();
+		vga_w(VGA_PEL_D, r);
+		vga_w(VGA_PEL_D, g);
+		vga_w(VGA_PEL_D, b);
 		++buf;
 	}
 }
