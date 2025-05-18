@@ -849,8 +849,9 @@ libvideo_buffer_formem(void *mem, size_t size_x, size_t size_y, size_t stride,
 	result = (REF struct video_membuffer *)malloc(sizeof(struct video_membuffer));
 	if unlikely(!result)
 		goto err;
-	result->vb_data               = (byte_t *)mem;
+	result->vb_stride             = stride;
 	result->vb_total              = stride * size_y;
+	result->vb_data               = (byte_t *)mem;
 	result->vb_refcnt             = 1;
 	result->vb_ops                = membuffer_getops();
 	result->vb_format.vf_codec    = codec;
