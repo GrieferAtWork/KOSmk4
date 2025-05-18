@@ -28,6 +28,7 @@
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
+#include <kernel/malloc.h>
 #include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>
@@ -901,8 +902,8 @@ NOTHROW(FCALL vidlck_async_v_destroy)(struct async *__restrict self) {
 	decref_unlikely(me->vlc_dev);
 	xdecref_unlikely(me->vlc_oldtty);
 
-	/* Destroy the original underlying character-device. */
-	chrdev_v_destroy(me);
+	/* Free the lock control structure. */
+	kfree(me);
 }
 
 PRIVATE NONNULL((1)) ktime_t FCALL

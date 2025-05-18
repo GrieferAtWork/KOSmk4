@@ -45,12 +45,21 @@ struct video_rambuffer: video_buffer {
 
 /* Ram-buffer operator callbacks. */
 INTDEF NONNULL((1)) void CC rambuffer_destroy(struct video_buffer *__restrict self);
-INTDEF NONNULL((1)) void CC rambuffer_destroy_munmap(struct video_buffer *__restrict self);
 INTDEF NONNULL((1, 2)) int CC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
 INTDEF NONNULL((1, 2)) void NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock const *__restrict lock);
+INTDEF NONNULL((1, 2)) void CC
+rambuffer_getgfx(struct video_buffer *__restrict self,
+                 struct video_gfx *__restrict result,
+                 gfx_blendmode_t blendmode, uintptr_t flags,
+                 video_color_t colorkey,
+                 struct video_buffer_rect const *clip);
+INTDEF NONNULL((1, 2)) void CC
+rambuffer_clipgfx(struct video_gfx const *gfx,
+                  struct video_gfx *result,
+                  intptr_t start_x, intptr_t start_y,
+                  size_t size_x, size_t size_y);
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munmap(void);
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
@@ -92,13 +101,6 @@ libvideo_buffer_formem(void *mem, size_t size_x, size_t size_y, size_t stride,
                        struct video_codec const *codec, struct video_palette *palette,
                        void (CC *release_mem)(void *cookie, void *mem),
                        void *release_mem_cookie);
-
-/* Return the preferred video format.
- * If  possible, this format will match the format used by the host's graphics card.
- * If no graphics card exists, or the card isn't clear on its preferred format, some
- * other, common format will be returned instead. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_format const *CC libvideo_preferred_format(void);
-
 
 DECL_END
 

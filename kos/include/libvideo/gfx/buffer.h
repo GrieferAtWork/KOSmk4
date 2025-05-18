@@ -108,6 +108,9 @@ struct video_buffer_ops {
 	                              struct video_gfx *__result,
 	                              __intptr_t __start_x, __intptr_t __start_y,
 	                              __size_t __size_x, __size_t __size_y);
+
+	/* TODO: Have a sub-class "screen_buffer" that provides additional ops relevant to
+	 *       only the screen itself (primarily: waiting for ) */
 };
 #endif /* __CC__ */
 
@@ -355,13 +358,6 @@ video_buffer_save(struct video_buffer *__self, char const *__filename,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
-/* Returns a video buffer for the entire screen (or return NULL and set errno on error)
- * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
-typedef __ATTR_WUNUSED_T __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
 /* Return the preferred video format.
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
@@ -371,11 +367,14 @@ typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *(LIBVIDE
 LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-/* Return a handle for the video device driver that is being used.
- * @return: -1:errno=ENODEV: No video driver found */
-typedef __ATTR_WUNUSED_T __fd_t (LIBVIDEO_GFX_CC *PVIDEO_DRIVER)(void);
+
+
+/* Creates+returns a video buffer for the entire screen (or return NULL and set
+ * errno  on error). Note that screen buffer access is only granted to ROOT and
+ * the window server */
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __fd_t LIBVIDEO_GFX_CC video_driver(void);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 #endif /* __CC__ */

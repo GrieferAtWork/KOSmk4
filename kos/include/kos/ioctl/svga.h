@@ -91,6 +91,7 @@ __DECL_BEGIN
 #define SVGA_IOC_CSSTRINGS   _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x06, ...)                   * ... */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x07, ...)                   * ... */
+/* TODO: ioctls to get/set palette */
 
 /* Misc tty functions. */
 #define SVGA_IOC_GETTTYINFO  VID_IOC_GETTTYINFO                        /* [   svga|tty    ] Get TTY information */

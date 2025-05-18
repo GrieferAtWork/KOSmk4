@@ -26,22 +26,19 @@
 #include <hybrid/compiler.h>
 
 #include <kos/refptr.h>
-#include <kos/types.h>
-#include <linux/kd.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 
 #include <err.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
 #include <stddef.h>
+#include <sys/wait.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <termios.h>
 #include <time.h>
 #include <unicode.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include <libvideo/codec/pixel.h>
@@ -51,13 +48,9 @@
 
 DECL_BEGIN
 
-PRIVATE void enable_graphics_mode(void) {
-	fd_t driver;
+PRIVATE void enable_rawtty_mode(void) {
 	pid_t cpid;
 	struct termios tios;
-	driver = video_driver();
-	if (driver < 0)
-		err(EXIT_FAILURE, "Failed to open driver driver");
 	cpid = fork();
 	if (cpid < 0)
 		err(EXIT_FAILURE, "fork() failed");
@@ -68,25 +61,14 @@ PRIVATE void enable_graphics_mode(void) {
 		int status;
 		while (waitpid(cpid, &status, 0) == -1 && errno == EINTR)
 			;
-		tcsetpgrp(STDIN_FILENO, 0);
-		ioctl(STDOUT_FILENO, KDSETMODE, KD_TEXT); /* Restore text mode */
 		tcsetattr(STDIN_FILENO, TCSADRAIN, &tios); /* Restore tty mode */
 		exit(WEXITSTATUS(status));
 	}
-	/* Become our own process group. */
-	setpgrp();
-	/* Make ourself the foreground process (so we'll receive CTRL+C). */
-	tcsetpgrp(STDIN_FILENO, 0);
 	/* Setup raw TTY mode. */
 	cfmakeraw(&tios);
 	tcsetattr(STDIN_FILENO, TCSADRAIN, &tios);
-	/* Actually do the switch to graphics mode.
-	 * NOTE: The proper way of doing this would be to use `VIDEOIO_SETFORMAT',
-	 *       however  then we'd have  to decide on which  graphics mode to use
-	 *       ourself, rather than simply letting the kernel decide on one. */
-	if (ioctl(driver, KDSETMODE, KD_GRAPHICS) < 0)
-		err(EXIT_FAILURE, "ioctl(KDSETMODE, KD_GRAPHICS) failed");
 }
+
 
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
@@ -98,16 +80,17 @@ int main(int argc, char *argv[]) {
 	(void)argv;
 	srand(time(NULL));
 
+	enable_rawtty_mode();
+
 	/* Load the video-mode font. */
 	font = kos::inherit(video_font_lookup(VIDEO_FONT_FIXEDWIDTH));
 	if (!font)
 		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
 
-	/* Enable graphics mode. */
-	enable_graphics_mode();
-
 	/* Bind the screen buffer. */
 	screen = kos::inherit(video_buffer_screen());
+	if (!screen)
+		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->gfx(gfx,
 	            GFX_BLENDINFO_ALPHA,
 	            VIDEO_GFX_FLINEARBLIT,

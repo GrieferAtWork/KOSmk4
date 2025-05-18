@@ -182,7 +182,7 @@ NOTHROW(CC vmware_v_fini)(struct svga_chipset *__restrict self) {
 	mman_unmap_kram_and_kfree((void *)me->vm_fifo, me->vw_fifosize,
 	                          me->vm_fifo_unmap_cookie);
 #else /* __KERNEL__ */
-	(*me->vw_munmapphys)((void *)me->vm_fifo, me->vw_fifosize);
+	munmapphys((void *)me->vm_fifo, me->vw_fifosize);
 	if (me->vw_libpciaccess)
 		dlclose(me->vw_libpciaccess);
 #endif /* !__KERNEL__ */
@@ -557,9 +557,7 @@ INTERN WUNUSED NONNULL((1)) bool CC
 cs_vmware_probe(struct svga_chipset *__restrict self) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
 #ifndef __KERNEL__
-	PMMAPPHYS mmapphys;
 	me->vw_libpciaccess = NULL;
-	me->vw_libphys = NULL;
 	TRY
 #endif /* !__KERNEL__ */
 	{
@@ -567,16 +565,10 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 #ifdef __KERNEL__
 		pci = SLIST_FIRST(&pci_devices);
 #else /* __KERNEL__ */
-		/* Load+initialize libphys. */
-		me->vw_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
-		if unlikely(!me->vw_libphys)
-			goto err_initfailed;
-		*(void **)&me->vw_munmapphys = dlsym(me->vw_libphys, "munmapphys");
-		if unlikely(!me->vw_munmapphys)
-			goto err_initfailed;
-		*(void **)&mmapphys = dlsym(me->vw_libphys, "mmapphys");
-		if unlikely(!mmapphys)
-			goto err_initfailed;
+		typeof(pci_device_cfg_readl) *pdyn_pci_device_cfg_readl;
+		typeof(pci_device_cfg_write_u32) *pdyn_pci_device_cfg_write_u32;
+#undef pci_device_cfg_readl
+#undef pci_device_cfg_writel
 
 		/* Load+initialize libpciaccess. */
 		pci = NULL;
@@ -586,11 +578,15 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 			typeof(__pci_devices) *pdyn_pci_devices;
 			if ((*(void **)&pdyn_pci_system_init = dlsym(me->vw_libpciaccess, "pci_system_init")) == NULL ||
 			    (*(void **)&pdyn_pci_devices = dlsym(me->vw_libpciaccess, "pci_devices")) == NULL ||
+			    (*(void **)&pdyn_pci_device_cfg_readl = dlsym(me->vw_libpciaccess, "pci_device_cfg_readl")) == NULL ||
+			    (*(void **)&pdyn_pci_device_cfg_write_u32 = dlsym(me->vw_libpciaccess, "pci_device_cfg_write_u32")) == NULL ||
 			    ((*pdyn_pci_system_init)() != EOK) || (pci = (*pdyn_pci_devices)()) == NULL) {
 				dlclose(me->vw_libpciaccess);
 				me->vw_libpciaccess = NULL;
 			}
 		}
+#define pci_device_cfg_readl  (*pdyn_pci_device_cfg_readl)
+#define pci_device_cfg_writel (*pdyn_pci_device_cfg_write_u32)
 #endif /* !__KERNEL__ */
 
 		/* Find the relevant PCI device. */
@@ -693,7 +689,7 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 			RETHROW();
 		}
 #else /* __KERNEL__ */
-		me->vm_fifo = (uint32_t volatile *)(*mmapphys)(me->vw_fifoaddr, me->vw_fifosize);
+		me->vm_fifo = (uint32_t volatile *)mmapphys(me->vw_fifoaddr, me->vw_fifosize);
 		if unlikely(me->vm_fifo == (uint32_t *)MAP_FAILED)
 			goto err_initfailed_late;
 #endif /* !__KERNEL__ */
@@ -701,8 +697,6 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 	}
 #ifndef __KERNEL__
 	EXCEPT {
-		if (me->vw_libphys)
-			dlclose(me->vw_libphys);
 		if (me->vw_libpciaccess)
 			dlclose(me->vw_libpciaccess);
 		RETHROW();
@@ -712,8 +706,6 @@ err_initfailed_late:
 	printk(KERN_ERR "[vmware] Adapter initialization failed\n");
 err_initfailed:
 #ifndef __KERNEL__
-	if (me->vw_libphys)
-		dlclose(me->vw_libphys);
 	if (me->vw_libpciaccess)
 		dlclose(me->vw_libpciaccess);
 #endif /* !__KERNEL__ */

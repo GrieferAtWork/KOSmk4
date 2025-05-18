@@ -95,8 +95,6 @@ struct vmware_chipset: svga_chipset {
 	void              *vm_fifo_unmap_cookie; /* [1..1][owned] Unmap cookie for `vm_fifo' */
 #else /* __KERNEL__ */
 	void              *vw_libpciaccess; /* [1..1][const] dlopen(3D) handle for libpciaccess. */
-	void              *vw_libphys;      /* [1..1][const] dlopen(3D) handle for libphys. */
-	PMUNMAPPHYS        vw_munmapphys;   /* [1..1][const] munmapphys. */
 #endif /* !__KERNEL__ */
 };
 
