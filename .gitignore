@@ -179,6 +179,12 @@ __ice__
 # These headers are installed by `make_utility.sh ... make`
 /kos/include/gnumake.h
 
+# These headers are installed by `make_utility.sh ... libjpeg`
+/kos/include/jconfig.h
+/kos/include/jerror.h
+/kos/include/jmorecfg.h
+/kos/include/jpeglib.h
+
 # These headers are installed by `make_utility.sh ... binutils`
 /kos/include/bfd.h
 /kos/include/bfdlink.h
