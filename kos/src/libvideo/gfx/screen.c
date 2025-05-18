@@ -425,6 +425,12 @@ svga_newscreen(void) {
 	/* Initialize the chipset for user-space. */
 	/* TODO: Add a second  function "driver->scd_open"  that's allowed to  assume that  the
 	 *       chipset is correct, meaning it won't have to probe for the driver's existance. */
+	result->ss_cs.sc_ops.sco_setdisplaystart   = NULL;
+	result->ss_cs.sc_ops.sco_setlogicalwidth   = NULL;
+	result->ss_cs.sc_ops.sco_updaterect        = NULL;
+	result->ss_cs.sc_ops.sco_hw_async_waitfor  = NULL;
+	result->ss_cs.sc_ops.sco_hw_async_copyrect = NULL;
+	result->ss_cs.sc_ops.sco_hw_async_fillrect = NULL;
 	if (!(*driver->scd_probe)(&result->ss_cs)) {
 		syslog(LOG_ERR, "[libvideo] Failed to init chipset %q\n", csname);
 		goto err_svga_vdlck_codec_format_libsvgadrv_r;
