@@ -69,8 +69,8 @@ DECL_BEGIN
  * >> if (!*result)
  * >>     result = NULL;
  * >> return result;
- * The raw text database strings could then be encoding via an inline
- * deemon    script   that   looks   at   the   associated   headers.
+ * The raw text database strings could then be encoding via an
+ * inline deemon script that looks at the associated  headers.
  */
 
 
@@ -691,6 +691,7 @@ print_cfi_expression_with_labels(pformatprinter printer, void *arg,
 		struct label_entry const *label;
 		if (!is_first)
 			PRINT("\n");
+
 		/* Check if there is a label at this instruction. */
 		label = label_buffer_locate(labels, reader);
 		if (label != NULL) {
@@ -700,10 +701,12 @@ print_cfi_expression_with_labels(pformatprinter printer, void *arg,
 		} else if (indent_on_first_line) {
 			DO(format_repeat(printer, arg, '\t', indent));
 		}
+
 		/* Print the actual instruction. */
 		DO(print_cfi_instruction(printer, arg, reader, addrsize, ptrsize, labels, indent));
 		is_first             = false;
 		indent_on_first_line = true;
+
 		/* Advance to the next instruction */
 		reader = unwind_instruction_succ_failsafe(reader, addrsize, ptrsize);
 	}
@@ -725,6 +728,7 @@ print_cfi_expression_with_label_bufsize(pformatprinter printer, void *arg,
 	                                       (label_bufsize * sizeof(struct label_entry)));
 	labels->lb_count = 0;
 	labels->lb_alloc = label_bufsize;
+
 	/* Scan for labels. */
 	reader = pc;
 	end    = pc + length;
@@ -907,12 +911,12 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	                                          &cu_sections, &parser,
 	                                          &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		do {
+			di_debuginfo_component_attrib_t attr;
 			DO(format_repeat(printer, arg, '\t', parser.dup_child_depth));
 			PRINTF("%#p:", parser.dsp_cu_info_pos - debug_info_start);
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s)
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
-			di_debuginfo_component_attrib_t attr;
 			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 				NCX byte_t const *orig_reader = parser.dsp_cu_info_pos;
 				DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 1));

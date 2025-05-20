@@ -100,7 +100,7 @@ DECL_BEGIN
 #define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
 #endif /* !__x86_64__ */
 #else /* __x86_64__ || __i386__ */
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT 0x0000
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  0x0000
 #endif /* !__x86_64__ && !__i386__ */
 
 #define CTYPE_KIND_SIZEMASK               0x00ff
@@ -158,11 +158,11 @@ struct ctypeinfo {
 };
 #define ctypeinfo_equal(a, b) \
 	((a)->ci_name == (b)->ci_name)
-#define ctypeinfo_init(self)         \
-	((self)->ci_name    = __NULLPTR, \
-	 (self)->ci_nameref = __NULLPTR)
+#define ctypeinfo_init(self)               \
+	(void)((self)->ci_name    = __NULLPTR, \
+	       (self)->ci_nameref = __NULLPTR)
 #define ctypeinfo_fini(self) \
-	(xdecref((self)->ci_nameref))
+	xdecref((self)->ci_nameref)
 #define ctypeinfo_initcopy(self, src)              \
 	(void)((self)->ci_nameref = (src)->ci_nameref, \
 	       (self)->ci_name    = (src)->ci_name,    \

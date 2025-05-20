@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/typecore.h>
+
 #include <bits/types.h>
 
 #include <libvideo/codec/pixel.h>
@@ -130,8 +132,8 @@ struct video_gfx;
 
 struct video_gfx_pxops {
 	/* All of the following callbacks are [1..1]
-	 * WARNING: None  of these functions will add `vx_offt_(x|y)' to the given X/Y,
-	 *          as well as always assume that the given coords are in-bounds of the
+	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
+	 *          as well as always  assume that the given  coords are in-bounds of  the
 	 *          underlying buffer. */
 	/* Get the color of a pixel */
 	__ATTR_NONNULL_T((1)) video_color_t
@@ -180,6 +182,14 @@ struct video_gfx_ops {
 	                            __intptr_t __x, __intptr_t __y,
 	                            __size_t __size_x, __size_t __size_y,
 	                            video_color_t __color);
+
+	/* TODO: For all the  gfx->gfx blitting functions,  instead of having  them
+	 *       all be here in-place, there should be one, common function to load
+	 *       a gfx->gfx blitting  context that then  features all the  blitting
+	 *       functions.
+	 * That way, this "loader" function  can compare the src/dst codecs  and
+	 * dynamically select the fastest (and still appropriate) blitting impl.
+	 */
 
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_NONNULL_T((1, 4)) void
@@ -302,7 +312,7 @@ struct video_gfx {
 #define video_gfx_fill(self, x, y, size_x, size_y, color) \
 	(*(self)->vx_ops->fxo_fill)(self, x, y, size_x, size_y, color)
 #define video_gfx_fillall(self, color) \
-	video_gfx_fill(self, 0, 0, (__size_t)-1, (__size_t)-1, color)
+	video_gfx_fill(self, 0, 0, __SIZE_MAX__, __SIZE_MAX__, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \
 	(*(self)->vx_ops->fxo_rect)(self, x, y, size_x, size_y, color)
 #define video_gfx_blit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \

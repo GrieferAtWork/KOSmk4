@@ -54,6 +54,7 @@
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
+#include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/errno.h>
 

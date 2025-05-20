@@ -32,10 +32,8 @@
 
 #include "pixel.h"
 
-__DECL_BEGIN
-
-
 #ifdef __CC__
+__DECL_BEGIN
 
 struct video_palette_cache;
 struct video_palette {
@@ -71,9 +69,7 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t LIBVIDEO_CO
 video_palette_getpixel(struct video_palette *__restrict self, video_color_t color);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
-#endif /* __CC__ */
-
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBVIDEO_CODEC_PALETTE_H */

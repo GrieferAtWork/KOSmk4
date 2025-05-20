@@ -82,6 +82,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			     module_relative_pc < (uintptr_t)st_value + UNALIGNED_GET(&iter->st_size)))
 				return (byte_t const *)iter; /* Perfect match! */
 		}
+
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf32_Addr)-1;
@@ -121,6 +122,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(NCX byte_t const *symtab_start,
 			     module_relative_pc < st_value + UNALIGNED_GET(&iter->st_size)))
 				return (byte_t const *)iter; /* Perfect match! */
 		}
+
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf64_Addr)-1;

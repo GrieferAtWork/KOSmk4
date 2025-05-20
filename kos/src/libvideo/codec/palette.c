@@ -57,7 +57,7 @@ color_delta(uint8_t r1, uint8_t g1, uint8_t b1,
 	return result;
 }
 
-LOCAL video_pixel_t CC
+LOCAL ATTR_PURE NONNULL((1)) video_pixel_t CC
 calculate_best_matching_palette_pixel(struct video_palette const *__restrict self,
                                       uint8_t r, uint8_t g, uint8_t b) {
 	video_pixel_t result = 0, i;

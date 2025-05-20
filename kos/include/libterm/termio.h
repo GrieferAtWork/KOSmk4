@@ -50,7 +50,9 @@ __DECL_BEGIN
 struct terminal;
 
 /* Print the given `src' data
- * @return: >= 0: The number of printed bytes (equal to `num_bytes', unless `IO_NONBLOCK', or EOF was reached)
+ * @return: >= 0: The number of printed bytes (should be equal  to
+ *                `num_bytes', unless `mode & IO_NONBLOCK', or EOF
+ *                was reached)
  * @return: < 0:  An error status that should be propagated immediately. */
 typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (LIBTERM_CC *pterminal_oprinter_t)(struct terminal *__restrict term,
@@ -66,12 +68,14 @@ typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
                                 __signo_t signo);
 
-/* Check if the  calling process's  group leader  is apart  of the  foreground
- * process  group  associated with  the  given terminal  `self'.  - If  it is,
- * return 0. Otherwise,  the POSIX  behavior is  to raise  a signal  `SIGTTOU'
- * within  every  process   in  the  caller's   process  group,  however   the
- * implementation  of  this   function  may  also   choose  to  do   something
- * completely different. (or just be a no-op; >I'm just a sign, not a cop...<)
+/* Check if the calling process's group leader is apart of the
+ * foreground process group associated with the given terminal
+ * `self'.
+ * - If it is, return 0.
+ * - Otherwise, the POSIX  behavior is  to raise a  signal `SIGTTOU'  within
+ *   every process in the caller's process group, however the implementation
+ *   of  this function may also choose to do something completely different.
+ *   Or just be a no-op; "I'm just a sign, not a cop..."
  * @return: < 0:  An error status that should be propagated immediately. */
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *pterminal_check_sigttou_t)(struct terminal *__restrict self);
@@ -87,12 +91,12 @@ struct terminal {
 	struct ringbuffer         t_ibuf;        /* Buffer for keyboard input.
 	                                          * NOTE: When `__IEOFING' is set, `t_ibuf.rb_nempty' must be broadcast! */
 	struct linebuffer         t_canon;       /* Canonical buffer for line-wise input (used for input when `t_ios.c_lflag & ICANON' is set)
-	                                          * NOTE:   When    `ICANON'    is    cleared,   `t_canon.lb_nful'    must    be    broadcast! */
+	                                          * NOTE: When `ICANON' is cleared, `t_canon.lb_nful' must be broadcast! */
 	struct linebuffer         t_opend;       /* Buffer for pending output text (used when `t_ios.c_iflag & IXOFF' is set)
-	                                          * NOTE: When  `IXOFF'  is  cleared, `t_opend.lb_nful'  must  be  broadcast!
+	                                          * NOTE: When `IXOFF' is cleared, `t_opend.lb_nful' must be broadcast!
 	                                          * NOTE: When `(c_lflag & (ECHO | EXTPROC)) != ECHO', `t_opend.lb_nful' must be broadcast! */
 	struct linebuffer         t_ipend;       /* Buffer for pending input text (used when `t_ios.c_iflag & __IIOFF' is set)
-	                                          * NOTE: When  `__IIOFF' is  cleared,  `t_ipend.lb_nful' must  be  broadcast! */
+	                                          * NOTE: When `__IIOFF' is cleared, `t_ipend.lb_nful' must be broadcast! */
 	struct termios            t_ios;         /* Terminal I/O configuration. */
 	sched_signal_t            t_ioschange;   /* Signal broadcast when: `IXOFF' is set, `(c_lflag & (ECHO | EXTPROC)) != ECHO' */
 };
@@ -166,14 +170,14 @@ terminal_iwrite(struct terminal *__restrict self,
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
 typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_IREAD)(struct terminal *__restrict self,
-                              __NCX void *dst,
-                              __size_t num_bytes, iomode_t mode)
+                              __NCX void *dst, __size_t num_bytes,
+                              iomode_t mode)
 		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_iread(struct terminal *__restrict self,
-               __NCX void *dst,
-               __size_t num_bytes, iomode_t mode)
+               __NCX void *dst, __size_t num_bytes,
+               iomode_t mode)
 		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 #endif /* LIBTERM_WANT_PROTOTYPES */
 

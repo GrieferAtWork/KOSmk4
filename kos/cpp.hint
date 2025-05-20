@@ -2829,3 +2829,5 @@
 #define TARGET(...)
 #define XTARGET(...)
 #define UM_ElfW ElfW
+
+#define __KERNEL_SELECT(a,...) a

@@ -53,9 +53,9 @@ __DECL_BEGIN
 
 struct linecapture {
 	/* Descriptor for data captured from a linebuffer */
-	__byte_t   *lc_base;  /* [0..lc_size|alloc(lc_alloc)][owned] Captured data */
-	__size_t    lc_size;  /* Used buffer size */
-	__size_t    lc_alloc; /* Allocated buffer size */
+	__byte_t *lc_base;  /* [0..lc_size|alloc(lc_alloc)][owned] Captured data */
+	__size_t  lc_size;  /* Used buffer size */
+	__size_t  lc_alloc; /* Allocated buffer size */
 };
 
 #ifdef __KERNEL__
@@ -66,7 +66,7 @@ struct linecapture {
 	             (self)->lc_alloc,     \
 	             GFP_NORMAL)           \
 	 : (void)0)
-#elif defined(__CRT_HAVE_free)
+#elif defined(____libc_free_defined)
 #define linecapture_fini(self) \
 	__libc_free((self)->lc_base)
 #else /* ... */
@@ -136,7 +136,7 @@ struct linebuffer {
 
 
 /* Poll for writing to become possible. */
-#define linebuffer_canwrite(self)                                      \
+#define linebuffer_canwrite(self)                                       \
 	(__hybrid_atomic_load(&(self)->lb_line.lc_size, __ATOMIC_ACQUIRE) < \
 	 __hybrid_atomic_load(&(self)->lb_limt, __ATOMIC_ACQUIRE))
 #define linebuffer_pollconnect_write_ex(self, cb) cb(&(self)->lb_nful)
@@ -161,7 +161,7 @@ struct linebuffer {
 LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_close)(struct linebuffer *__restrict __self);
 #else /* __INTELLISENSE__ */
-#define linebuffer_close(self)                                    \
+#define linebuffer_close(self)                                     \
 	(__hybrid_atomic_store(&(self)->lb_limt, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->lb_nful))
 #endif /* !__INTELLISENSE__ */

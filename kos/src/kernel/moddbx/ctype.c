@@ -999,6 +999,7 @@ NOTHROW_NCX(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
 		} while (debuginfo_cu_parser_next(parser) &&
 		         parser->dup_child_depth >= depth);
 	}
+
 	/* Form the actual function type. */
 	result   = DBX_EOK;
 	*presult = ctype_function(return_type, argc, argv, cc);
@@ -1084,6 +1085,7 @@ again:
 		case DW_ATE_boolean:
 			if (!typinfo.t_sizeof || typinfo.t_sizeof == sizeof(bool)) {
 				presult->ct_typ = incref(&ctype_bool);
+
 				/* Keep a bit  of consistency, and  discard boolean  types
 				 * that have been  named as `_Bool'.  This happens when  a
 				 * program written in  C uses <stdbool.h>,  and we  filter

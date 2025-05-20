@@ -19,8 +19,6 @@
  */
 #ifndef GUARD_APPS_SHOWPIC_MAIN_C
 #define GUARD_APPS_SHOWPIC_MAIN_C 1
-#define _GNU_SOURCE 1
-#define _KOS_SOURCE 1
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
@@ -113,7 +111,7 @@ int main(int argc, char *argv[]) {
 	/* Display the image */
 	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
-	                  &image_gfx, 0, 0, (size_t)-1, (size_t)-1);
+	                  &image_gfx, 0, 0, SIZE_MAX, SIZE_MAX);
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
 	/* Wait for user input */

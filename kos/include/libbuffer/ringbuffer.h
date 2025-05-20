@@ -39,14 +39,11 @@
 #endif /* !__KERNEL__ */
 
 
-
-
 /* Implementation of the  general-purpose ring-buffer used  to
  * implement kernel-space pipes, as well as input data queues. */
 
-__DECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 struct ringbuffer {
 	struct atomic_rwlock rb_lock;   /* Lock for the buffer. */
@@ -408,8 +405,7 @@ ringbuffer_setwritten(struct ringbuffer *__restrict __self, __size_t __num_bytes
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
-#endif /* __CC__ */
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBBUFFER_RINGBUFFER_H */

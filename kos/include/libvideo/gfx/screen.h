@@ -24,6 +24,8 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/typecore.h>
+
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -97,8 +99,8 @@ public:
 
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1)) void LIBVIDEO_GFX_CC
 	updaterect(__intptr_t x = 0, __intptr_t y = 0,
-	           __size_t sx = (__size_t)-1,
-	           __size_t sy = (__size_t)-1) {
+	           __size_t sx = __SIZE_MAX__,
+	           __size_t sy = __SIZE_MAX__) {
 		struct video_buffer_rect rect;
 		rect.vbr_startx = x;
 		rect.vbr_starty = y;
