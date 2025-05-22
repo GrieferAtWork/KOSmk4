@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x617cae96 */
+/* HASH CRC-32:0x9d8871e6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1178,7 +1178,7 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t _
  * @return: * : The TID of the given thread
  * @return: 0 : The given `self' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __self),(__self))
-#elif defined(__CRT_HAVE_pthread_getunique_np)
+#elif defined(__CRT_HAVE_pthread_getunique_np) || defined(__CRT_HAVE_pthread_threadid_np)
 #include <libc/local/pthread/pthread_gettid_np.h>
 /* >> pthread_gettid_np(3)
  * Return the TID of the given `self'.
@@ -1324,6 +1324,14 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thr_yield,())
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),cthread_yield,())
+#elif defined(__CRT_HAVE_pthread_yield_np)
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might  be differently implemented in the case of a m-on-n thread
+ * implementation
+ * @return: EOK: Success */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),pthread_yield_np,())
 #endif /* ... */
 #if !defined(__pthread_setaffinity_np_defined) && defined(__CRT_HAVE_pthread_setaffinity_np)
 #define __pthread_setaffinity_np_defined
@@ -2602,6 +2610,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_AR
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_timedwait_relative_np,(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
  * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
@@ -2610,7 +2626,15 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__self,__mutex,__reltime))
-#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_timedwait_relative64_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
  * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
@@ -2637,7 +2661,15 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__self,__mutex,__reltime))
-#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_timedwait_relative64_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
  * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
@@ -2649,6 +2681,86 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __A
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
+#if defined(__USE_APPLE) || defined(__USE_WINPTHREADS)
+#if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_timedwait_relative64_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative_np)
+#include <libc/local/pthread/pthread_cond_reltimedwait_np.h>
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait_relative_np)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__self, __mutex, __reltime); }
+#endif /* ... */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait_relative64_np)
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait_relative64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__self,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) || defined(__CRT_HAVE_pthread_cond_timedwait_relative_np)
+#include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
+/* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
+ * until `reltime'. `mutex' is assumed to be locked before.
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `reltime' is invalid
+ * @return: ETIMEDOUT: The given `reltime' has expired */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait_relative64_np)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__self, __mutex, __reltime); }
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_APPLE || __USE_WINPTHREADS */
 
 
 /************************************************************************/
@@ -3052,7 +3164,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
 #endif /* ... */
-#ifdef __USE_BSD
+#if defined(__USE_BSD) || (defined(__USE_APPLE) && (!defined(__USE_POSIX) || defined(_DARWIN_C_SOURCE) || defined(__cplusplus)))
 #ifndef __pthread_main_np_defined
 #define __pthread_main_np_defined
 #ifdef __CRT_HAVE_pthread_main_np
@@ -3084,7 +3196,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #undef __pthread_main_np_defined
 #endif /* !... */
 #endif /* !__pthread_main_np_defined */
-#endif /* __USE_BSD */
+#endif /* __USE_BSD || (__USE_APPLE && (!__USE_POSIX || _DARWIN_C_SOURCE || __cplusplus)) */
 
 
 /* KOS-specific pthread extensions. */
@@ -3415,6 +3527,125 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_resume_all_np,(void),pthread_multi_
 #endif /* !... */
 #endif /* !__pthread_resume_all_np_defined */
 #endif /* __USE_KOS */
+
+#ifdef __USE_APPLE
+#if !defined(__USE_POSIX) || defined(_DARWIN_C_SOURCE) || defined(__cplusplus)
+#ifndef __pthread_id_np_t_defined
+#define __pthread_id_np_t_defined
+typedef __pid_t pthread_id_np_t;
+#endif /* !__pthread_id_np_t_defined */
+#ifdef __CRT_HAVE_pthread_getunique_np
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_threadid_np,(pthread_t __self, pthread_id_np_t *__ptid),pthread_getunique_np,(__self,__ptid))
+#elif defined(__CRT_HAVE_pthread_threadid_np)
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_threadid_np,(pthread_t __self, pthread_id_np_t *__ptid),(__self,__ptid))
+#elif defined(__CRT_HAVE_pthread_gettid_np)
+#include <libc/local/pthread/pthread_getunique_np.h>
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __errno_t __NOTHROW_NCX(__LIBCCALL pthread_threadid_np)(pthread_t __self, pthread_id_np_t *__ptid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_getunique_np))(__self, __ptid); }
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_is_threaded_np
+__CDECLARE(,int,__NOTHROW_NCX,pthread_is_threaded_np,(void),())
+#else /* __CRT_HAVE_pthread_is_threaded_np */
+#include <sys/single_threaded.h>
+#ifdef __libc_single_threaded
+#include <libc/local/pthread/pthread_is_threaded_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_is_threaded_np, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pthread_is_threaded_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_is_threaded_np))(); })
+#endif /* __libc_single_threaded */
+#endif /* !__CRT_HAVE_pthread_is_threaded_np */
+#ifdef __CRT_HAVE_pthread_get_stacksize_np
+__CDECLARE(,size_t,__NOTHROW_NCX,pthread_get_stacksize_np,(pthread_t __self),(__self))
+#elif (defined(__CRT_HAVE_pthread_getattr_np) || defined(__CRT_HAVE_pthread_attr_get_np)) && (defined(__CRT_HAVE_pthread_attr_getstacksize) || defined(__CRT_HAVE_pthread_attr_getstack))
+#include <libc/local/pthread/pthread_get_stacksize_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_get_stacksize_np, __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL pthread_get_stacksize_np)(pthread_t __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_get_stacksize_np))(__self); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_get_stackaddr_np
+__CDECLARE(,void *,__NOTHROW_NCX,pthread_get_stackaddr_np,(pthread_t __self),(__self))
+#elif (defined(__CRT_HAVE_pthread_getattr_np) || defined(__CRT_HAVE_pthread_attr_get_np)) && (defined(__CRT_HAVE_pthread_attr_getstackaddr) || defined(__CRT_HAVE_pthread_attr_getstack))
+#include <libc/local/pthread/pthread_get_stackaddr_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_get_stackaddr_np, __FORCELOCAL __ATTR_ARTIFICIAL void *__NOTHROW_NCX(__LIBCCALL pthread_get_stackaddr_np)(pthread_t __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_get_stackaddr_np))(__self); })
+#endif /* ... */
+#ifndef __pthread_kill_defined
+#define __pthread_kill_defined
+#ifdef __CRT_HAVE_pthread_kill
+/* >> pthread_kill(3)
+ * Portable function for sending a signal to a specific `pthread' within one's own process.
+ * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
+ * @return: EINVAL: The given `signo' is invalid */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),(__pthread,__signo))
+#elif defined(__CRT_HAVE_thr_kill)
+/* >> pthread_kill(3)
+ * Portable function for sending a signal to a specific `pthread' within one's own process.
+ * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
+ * @return: EINVAL: The given `signo' is invalid */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),thr_kill,(__pthread,__signo))
+#else /* ... */
+#undef __pthread_kill_defined
+#endif /* !... */
+#endif /* !__pthread_kill_defined */
+#ifdef __CRT_HAVE_sched_yield
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),sched_yield,())
+#elif defined(__CRT_HAVE_thrd_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),thrd_yield,())
+#elif defined(__CRT_HAVE_pthread_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),pthread_yield,())
+#elif defined(__CRT_HAVE___sched_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),__sched_yield,())
+#elif defined(__CRT_HAVE___libc_sched_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),__libc_sched_yield,())
+#elif defined(__CRT_HAVE_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),yield,())
+#elif defined(__CRT_HAVE_thr_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),thr_yield,())
+#elif defined(__CRT_HAVE_cthread_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),cthread_yield,())
+#elif defined(__CRT_HAVE_pthread_yield_np)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CDECLARE_VOID(,__NOTHROW_NCX,pthread_yield_np,(void),())
+#endif /* ... */
+#endif /* !__USE_POSIX || _DARWIN_C_SOURCE || __cplusplus */
+#endif /* __USE_APPLE */
 #endif /* __CC__ */
 
 __SYSDECL_END

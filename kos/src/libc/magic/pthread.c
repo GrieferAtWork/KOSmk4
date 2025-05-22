@@ -82,6 +82,10 @@
 #include <pthread_np.h>
 }
 
+%(auto_source){
+#include "../libc/globals.h"
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -2488,10 +2492,11 @@ $errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict self,
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_reltimedwait_np")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_reltimedwait64_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_reltimedwait_np", "pthread_cond_timedwait_relative_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_reltimedwait64_np", "pthread_cond_timedwait_relative64_np")]]
 [[userimpl, requires($has_function(crt_pthread_cond_reltimedwait32_np) ||
                      $has_function(pthread_cond_reltimedwait64_np))]]
+[[export_as("pthread_cond_timedwait_relative_np")]]
 $errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict self,
                                       [[inout]] pthread_mutex_t *__restrict mutex,
                                       [[in]] struct timespec const *__restrict reltime) {
@@ -2514,7 +2519,7 @@ $errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict self,
 
 %#ifdef __USE_TIME64
 [[cp, wunused, doc_alias("pthread_cond_reltimedwait_np")]]
-[[ignore, nocrt, alias("pthread_cond_reltimedwait_np")]]
+[[ignore, nocrt, alias("pthread_cond_reltimedwait_np", "pthread_cond_timedwait_relative_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 $errno_t crt_pthread_cond_reltimedwait32_np([[inout]] pthread_cond_t *__restrict self,
                                             [[inout]] pthread_mutex_t *__restrict mutex,
@@ -2523,6 +2528,7 @@ $errno_t crt_pthread_cond_reltimedwait32_np([[inout]] pthread_cond_t *__restrict
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_cond_reltimedwait_np), doc_alias("pthread_cond_reltimedwait_np")]]
 [[userimpl, requires_function(crt_pthread_cond_reltimedwait32_np)]]
+[[export_alias("pthread_cond_timedwait_relative64_np")]]
 $errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict self,
                                         [[inout]] pthread_mutex_t *__restrict mutex,
                                         [[in]] struct timespec64 const *__restrict reltime) {
@@ -2536,6 +2542,13 @@ $errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict sel
 
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_SOLARIS */
+
+%#if defined(__USE_APPLE) || defined(__USE_WINPTHREADS)
+%[insert:function(pthread_cond_timedwait_relative_np = pthread_cond_reltimedwait_np)]
+%#ifdef __USE_TIME64
+%[insert:function(pthread_cond_timedwait_relative64_np = pthread_cond_reltimedwait64_np)]
+%#endif /* __USE_TIME64 */
+%#endif /* __USE_APPLE || __USE_WINPTHREADS */
 
 
 %
@@ -2949,7 +2962,7 @@ $errno_t pthread_set_num_processors_np(int n) {
 }
 
 
-%#ifdef __USE_BSD
+%#if defined(__USE_BSD) || (defined(__USE_APPLE) && (!defined(__USE_POSIX) || defined(_DARWIN_C_SOURCE) || defined(__cplusplus)))
 @@>> pthread_main_np(3)
 @@Returns  1 if the  calling thread is the  main() thread (i.e. the
 @@thread  that was  started by the  kernel in order  to execute the
@@ -2966,7 +2979,7 @@ int pthread_main_np() {
 	return gettid() == getpid();
 @@pp_endif@@
 }
-%#endif /* __USE_BSD */
+%#endif /* __USE_BSD || (__USE_APPLE && (!__USE_POSIX || _DARWIN_C_SOURCE || __cplusplus)) */
 
 
 
@@ -3204,6 +3217,7 @@ $pid_t crt_pthread_gettid_np(pthread_t self);
 [[section(".text.crt{|.dos}.sched.pthread_ext")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<libc/errno.h>")]]
+[[export_alias("pthread_threadid_np")]]
 [[requires_function(crt_pthread_gettid_np)]]
 $errno_t pthread_getunique_np(pthread_t self, pthread_id_np_t *ptid) {
 	if unlikely((*ptid = crt_pthread_gettid_np(self)) == 0) {
@@ -3262,6 +3276,65 @@ $errno_t pthread_switch_delete_np([[nonnull]] pthread_switch_routine_t routine) 
 
 %#endif /* __USE_KOS */
 
+
+
+%
+%#ifdef __USE_APPLE
+%#if !defined(__USE_POSIX) || defined(_DARWIN_C_SOURCE) || defined(__cplusplus)
+%#ifndef __pthread_id_np_t_defined
+%#define __pthread_id_np_t_defined
+%typedef __pid_t pthread_id_np_t;
+%#endif /* !__pthread_id_np_t_defined */
+
+%[default:section(".text.crt{|.dos}.sched.pthread_ext")]
+%[insert:function(pthread_threadid_np = pthread_getunique_np)]
+
+[[impl_include("<sys/single_threaded.h>")]]
+[[requires_include("<sys/single_threaded.h>")]]
+[[requires(defined(__libc_single_threaded))]]
+int pthread_is_threaded_np(void) {
+	return !__libc_single_threaded;
+}
+
+[[decl_include("<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<bits/crt/pthreadtypes.h>")]]
+[[requires_function(pthread_getattr_np, pthread_attr_getstacksize)]]
+size_t pthread_get_stacksize_np(pthread_t self) {
+	size_t result = 0;
+	pthread_attr_t attr;
+	if (pthread_getattr_np(self, &attr) == 0) {
+		if (pthread_attr_getstacksize(&attr, &result) != 0)
+			result = 0;
+@@pp_if $has_function(pthread_attr_destroy)@@
+		pthread_attr_destroy(&attr);
+@@pp_endif@@
+	}
+	return result;
+}
+
+[[decl_include("<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<bits/crt/pthreadtypes.h>")]]
+[[requires_function(pthread_getattr_np, pthread_attr_getstackaddr)]]
+void *pthread_get_stackaddr_np(pthread_t self) {
+	void *result = NULL;
+	pthread_attr_t attr;
+	if (pthread_getattr_np(self, &attr) == 0) {
+		if (pthread_attr_getstackaddr(&attr, &result) != 0)
+			result = NULL;
+@@pp_if $has_function(pthread_attr_destroy)@@
+		pthread_attr_destroy(&attr);
+@@pp_endif@@
+	}
+	return result;
+}
+
+// TODO: $errno_t pthread_cond_signal_thread_np([[nonnull]] pthread_cond_t *self, pthread_t thread);
+
+%[insert:extern(pthread_kill)]
+void pthread_yield_np(void) = sched_yield;
+
+%#endif /* !__USE_POSIX || _DARWIN_C_SOURCE || __cplusplus */
+%#endif /* __USE_APPLE */
 
 
 

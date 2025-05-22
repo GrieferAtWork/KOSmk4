@@ -325,6 +325,16 @@
 #define _ATFILE_SOURCE 1
 #endif /* __EXTENSIONS__ */
 
+/* Enable mac-specific extensions */
+#ifdef _APPLE_SOURCE
+#define __USE_APPLE 1
+#endif /* _APPLE_SOURCE */
+
+/* Enable winpthreads extensions */
+#ifdef _WINPTHREADS_SOURCE
+#define __USE_WINPTHREADS 1
+#endif /* _WINPTHREADS_SOURCE */
+
 
 
 #if ((defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
@@ -770,6 +780,8 @@
 #undef __USE_NETBSD
 #undef __USE_SOLARIS
 #undef __USE_MINIX
+#undef __USE_APPLE
+#undef __USE_WINPTHREADS
 
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -811,6 +823,8 @@
 #define __USE_NETBSD 1
 #define __USE_SOLARIS 1
 #define __USE_MINIX 1
+#define __USE_APPLE 1
+#define __USE_WINPTHREADS 1
 #endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order

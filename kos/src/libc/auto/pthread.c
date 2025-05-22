@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b38d249 */
+/* HASH CRC-32:0xf216ada9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 /* >> pthread_equal(3)
  * Compare two thread identifiers
@@ -423,6 +424,39 @@ NOTHROW_NCX(LIBCCALL libc_pthread_switch_add_np)(pthread_switch_routine_t routin
 
 }
 DEFINE_INTERN_ALIAS_P(libc_pthread_switch_delete_np,libc_pthread_switch_add_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
+#include <sys/single_threaded.h>
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") int
+NOTHROW_NCX(LIBCCALL libc_pthread_is_threaded_np)(void) {
+	return !__libc_single_threaded;
+}
+#include <bits/crt/pthreadtypes.h>
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") size_t
+NOTHROW_NCX(LIBCCALL libc_pthread_get_stacksize_np)(pthread_t self) {
+	size_t result = 0;
+	pthread_attr_t attr;
+	if (libc_pthread_getattr_np(self, &attr) == 0) {
+		if (libc_pthread_attr_getstacksize(&attr, &result) != 0)
+			result = 0;
+
+		libc_pthread_attr_destroy(&attr);
+
+	}
+	return result;
+}
+#include <bits/crt/pthreadtypes.h>
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") void *
+NOTHROW_NCX(LIBCCALL libc_pthread_get_stackaddr_np)(pthread_t self) {
+	void *result = NULL;
+	pthread_attr_t attr;
+	if (libc_pthread_getattr_np(self, &attr) == 0) {
+		if (libc_pthread_attr_getstackaddr(&attr, &result) != 0)
+			result = NULL;
+
+		libc_pthread_attr_destroy(&attr);
+
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -449,9 +483,13 @@ DEFINE_PUBLIC_ALIAS_P(pthread_attr_setcreatesuspend_np,libc_pthread_attr_setcrea
 DEFINE_PUBLIC_ALIAS_P(thr_suspend,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_suspend_np,libc_pthread_suspend_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 DEFINE_PUBLIC_ALIAS_P(pthread_resume_np,libc_pthread_resume_np,,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_threadid_np,libc_pthread_getunique_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_id_np_t *ptid),(self,ptid));
 DEFINE_PUBLIC_ALIAS_P(pthread_getunique_np,libc_pthread_getunique_np,ATTR_PURE WUNUSED,errno_t,NOTHROW_NCX,LIBCCALL,(pthread_t self, pthread_id_np_t *ptid),(self,ptid));
 DEFINE_PUBLIC_ALIAS_P(pthread_switch_add_np,libc_pthread_switch_add_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
 DEFINE_PUBLIC_ALIAS_P(pthread_switch_delete_np,libc_pthread_switch_delete_np,WUNUSED NONNULL((1)),errno_t,NOTHROW_NCX,LIBCCALL,(pthread_switch_routine_t routine),(routine));
+DEFINE_PUBLIC_ALIAS_P(pthread_is_threaded_np,libc_pthread_is_threaded_np,,int,NOTHROW_NCX,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_get_stacksize_np,libc_pthread_get_stacksize_np,,size_t,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
+DEFINE_PUBLIC_ALIAS_P(pthread_get_stackaddr_np,libc_pthread_get_stackaddr_np,,void *,NOTHROW_NCX,LIBCCALL,(pthread_t self),(self));
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

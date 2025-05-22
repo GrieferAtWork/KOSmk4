@@ -5603,7 +5603,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8e6d4872]]]*/
+/*[[[start:exports,hash:CRC-32=0x45f58231]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$pthread_create,libd_pthread_create,ATTR_IN_OPT(2) ATTR_OUT(1) NONNULL((3)),errno_t,NOTHROW_NCX,LIBDCALL,(pthread_t *__restrict p_newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg),(p_newthread,attr,start_routine,arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -5776,7 +5776,9 @@ DEFINE_PUBLIC_ALIAS_P(pthread_cond_timedwait,libc_pthread_cond_timedwait,WUNUSED
 DEFINE_PUBLIC_ALIAS_P(__pthread_cond_timedwait64,libc_pthread_cond_timedwait64,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime),(self,mutex,abstime));
 DEFINE_PUBLIC_ALIAS_P(pthread_cond_timedwait64,libc_pthread_cond_timedwait64,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime),(self,mutex,abstime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS_P(pthread_cond_timedwait_relative_np,libc_pthread_cond_reltimedwait_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict reltime),(self,mutex,reltime));
 DEFINE_PUBLIC_ALIAS_P(pthread_cond_reltimedwait_np,libc_pthread_cond_reltimedwait_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict reltime),(self,mutex,reltime));
+DEFINE_PUBLIC_ALIAS_P(pthread_cond_timedwait_relative64_np,libc_pthread_cond_reltimedwait64_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime),(self,mutex,reltime));
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS_P(pthread_cond_reltimedwait64_np,libc_pthread_cond_reltimedwait64_np,WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2),errno_t,NOTHROW_RPC,LIBCCALL,(pthread_cond_t *__restrict self, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict reltime),(self,mutex,reltime));
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

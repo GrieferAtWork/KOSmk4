@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9359cd33 */
+/* HASH CRC-32:0x69f659ec */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2832,6 +2832,8 @@
 #define __CRT_HAVE_DOS$pthread_enumthreads_np
 #define __CRT_HAVE_DOS$pthread_equal
 #define __CRT_HAVE_DOS$pthread_exit
+#define __CRT_HAVE_DOS$pthread_get_stackaddr_np
+#define __CRT_HAVE_DOS$pthread_get_stacksize_np
 #define __CRT_HAVE_DOS$pthread_getaffinity_np
 #define __CRT_HAVE_DOS$pthread_getattr_default_np
 #define __CRT_HAVE_DOS$pthread_getattr_np
@@ -7338,6 +7340,8 @@
 #define __CRT_HAVE_pthread_enumthreads_np
 #define __CRT_HAVE_pthread_equal
 #define __CRT_HAVE_pthread_exit
+#define __CRT_HAVE_pthread_get_stackaddr_np
+#define __CRT_HAVE_pthread_get_stacksize_np
 #define __CRT_HAVE_pthread_getaffinity_np
 #define __CRT_HAVE_pthread_getattr_default_np
 #define __CRT_HAVE_pthread_getattr_np
@@ -7351,6 +7355,7 @@
 #define __CRT_HAVE_pthread_getspecificptr_np
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_getunique_np
+#define __CRT_HAVE_pthread_is_threaded_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
 #define __CRT_HAVE_pthread_key_create_once_np

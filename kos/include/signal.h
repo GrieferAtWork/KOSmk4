@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18d32ee0 */
+/* HASH CRC-32:0x8b41b87f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2552,12 +2552,14 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_s
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),(__pthread,__signo))
 #elif defined(__CRT_HAVE_thr_kill)
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),thr_kill,(__pthread,__signo))
 #else /* ... */

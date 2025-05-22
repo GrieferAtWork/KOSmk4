@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c8e5882 */
+/* HASH CRC-32:0xa4c63935 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1871,7 +1871,9 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait, libd_pthread_cond_timedwait);
 DEFINE_PUBLIC_ALIAS(DOS$__pthread_cond_timedwait64, libd_pthread_cond_timedwait64);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait64, libd_pthread_cond_timedwait64);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait_relative_np, libd_pthread_cond_reltimedwait_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait_np, libd_pthread_cond_reltimedwait_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_timedwait_relative64_np, libd_pthread_cond_reltimedwait64_np);
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 DEFINE_PUBLIC_ALIAS(DOS$pthread_cond_reltimedwait64_np, libd_pthread_cond_reltimedwait64_np);
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
@@ -1923,10 +1925,13 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_attr_setcreatesuspend_np, libd_pthread_attr_setc
 DEFINE_PUBLIC_ALIAS(DOS$thr_suspend, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_suspend_np, libd_pthread_suspend_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_resume_np, libd_pthread_resume_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_threadid_np, libd_pthread_getunique_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getunique_np, libd_pthread_getunique_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_isowned_np, libd_pthread_mutex_isowned_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_switch_add_np, libd_pthread_switch_add_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_switch_delete_np, libd_pthread_switch_delete_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_get_stacksize_np, libd_pthread_get_stacksize_np);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_get_stackaddr_np, libd_pthread_get_stackaddr_np);
 
 /* pthread_np */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_stackseg_np, libd_pthread_stackseg_np);

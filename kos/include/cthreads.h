@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed920966 */
+/* HASH CRC-32:0xa306ad94 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -385,6 +385,12 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,cthread_yield,(void),thr_yield,())
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CDECLARE_VOID(,__NOTHROW_NCX,cthread_yield,(void),())
+#elif defined(__CRT_HAVE_pthread_yield_np)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,cthread_yield,(void),pthread_yield_np,())
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_exit
 /* >> pthread_exit(3)

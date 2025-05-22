@@ -1210,6 +1210,7 @@ incdir("");
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/screen.h>
 #include <libvideo/window/api.h>
 #include <libvideo/window/window.h>
 #include <libvio/access.h>

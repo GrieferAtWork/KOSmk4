@@ -421,7 +421,7 @@ int sched_getscheduler($pid_t pid);
 @@            The thread may not necessarily be apart of the calling process
 @@@return: 0: The function returned immediately when no other thread was executed
 [[export_alias("thrd_yield", "pthread_yield", "__sched_yield", "__libc_sched_yield",
-               "yield", "thr_yield", "cthread_yield")]]
+               "yield", "thr_yield", "cthread_yield", "pthread_yield_np")]]
 [[nothrow]]
 int sched_yield();
 

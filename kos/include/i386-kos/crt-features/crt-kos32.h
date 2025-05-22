@@ -4657,6 +4657,8 @@
 #define __CRT_HAVE_pthread_cond_signal
 #define __CRT_HAVE_pthread_cond_timedwait
 #define __CRT_HAVE_pthread_cond_timedwait64
+#define __CRT_HAVE_pthread_cond_timedwait_relative64_np
+#define __CRT_HAVE_pthread_cond_timedwait_relative_np
 #define __CRT_HAVE_pthread_cond_wait
 #define __CRT_HAVE_pthread_condattr_destroy
 #define __CRT_HAVE_pthread_condattr_getclock
@@ -4671,6 +4673,8 @@
 #define __CRT_HAVE_pthread_equal
 #define __CRT_HAVE_pthread_exit
 #define __CRT_HAVE_pthread_get_name_np
+#define __CRT_HAVE_pthread_get_stackaddr_np
+#define __CRT_HAVE_pthread_get_stacksize_np
 #define __CRT_HAVE_pthread_getaffinity_np
 #define __CRT_HAVE_pthread_getattr_default_np
 #define __CRT_HAVE_pthread_getattr_np
@@ -4685,6 +4689,7 @@
 #define __CRT_HAVE_pthread_getthreadid_np
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_getunique_np
+#define __CRT_HAVE_pthread_is_threaded_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
 #define __CRT_HAVE_pthread_key_create_once_np
@@ -4778,11 +4783,13 @@
 #define __CRT_HAVE_pthread_switch_add_np
 #define __CRT_HAVE_pthread_switch_delete_np
 #define __CRT_HAVE_pthread_testcancel
+#define __CRT_HAVE_pthread_threadid_np
 #define __CRT_HAVE_pthread_timedjoin64_np
 #define __CRT_HAVE_pthread_timedjoin_np
 #define __CRT_HAVE_pthread_tryjoin_np
 #define __CRT_HAVE_pthread_unsuspend_np
 #define __CRT_HAVE_pthread_yield
+#define __CRT_HAVE_pthread_yield_np
 #define __CRT_HAVE_ptrace
 #define __CRT_HAVE_ptsname
 #define __CRT_HAVE_ptsname_r

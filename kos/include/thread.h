@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x132050f4 */
+/* HASH CRC-32:0x67548cb9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,12 +170,14 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCC
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_kill,(thread_t __thr, __signo_t __signo),pthread_kill,(__thr,__signo))
 #elif defined(__CRT_HAVE_thr_kill)
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_kill,(thread_t __thr, __signo_t __signo),(__thr,__signo))
 #endif /* ... */
@@ -455,6 +457,12 @@ __CDECLARE_VOID(,__NOTHROW_NCX,thr_yield,(void),())
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT_VOID(,__NOTHROW_NCX,thr_yield,(void),cthread_yield,())
+#elif defined(__CRT_HAVE_pthread_yield_np)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT_VOID(,__NOTHROW_NCX,thr_yield,(void),pthread_yield_np,())
 #endif /* ... */
 
 #ifdef __USE_SOLARIS

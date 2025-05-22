@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96301c0f */
+/* HASH CRC-32:0xd3b859ff */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -671,6 +671,10 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_resume_all_np,(void),pthread_multi_
 /* >> pthread_getunique_np(3)
  * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getunique_np,(pthread_t __self, pthread_id_np_t *__ptid),(__self,__ptid))
+#elif defined(__CRT_HAVE_pthread_threadid_np)
+/* >> pthread_getunique_np(3)
+ * Wrapper around `pthread_gettid_np(3)' that is also available on some other platforms. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,pthread_getunique_np,(pthread_t __self, pthread_id_np_t *__ptid),pthread_threadid_np,(__self,__ptid))
 #elif defined(__CRT_HAVE_pthread_gettid_np)
 #include <libc/local/pthread/pthread_getunique_np.h>
 /* >> pthread_getunique_np(3)

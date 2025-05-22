@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0a93c87 */
+/* HASH CRC-32:0x403a746f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pthread_gettid_np_defined
 #define __local_pthread_gettid_np_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_getunique_np) || defined(__CRT_HAVE_pthread_gettid_np)
+#if defined(__CRT_HAVE_pthread_getunique_np) || defined(__CRT_HAVE_pthread_threadid_np) || defined(__CRT_HAVE_pthread_gettid_np)
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,6 +29,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_getunique_np_defined
 #ifdef __CRT_HAVE_pthread_getunique_np
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,__localdep_pthread_getunique_np,(__pthread_t __self, __pid_t *__ptid),pthread_getunique_np,(__self,__ptid))
+#elif defined(__CRT_HAVE_pthread_threadid_np)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,__localdep_pthread_getunique_np,(__pthread_t __self, __pid_t *__ptid),pthread_threadid_np,(__self,__ptid))
 #elif defined(__CRT_HAVE_pthread_gettid_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_getunique_np.h>
@@ -53,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pthread_gettid_np_defined
 #define __localdep_pthread_gettid_np __LIBC_LOCAL_NAME(pthread_gettid_np)
 #endif /* !__local___localdep_pthread_gettid_np_defined */
-#else /* __CRT_HAVE_pthread_getunique_np || __CRT_HAVE_pthread_gettid_np */
+#else /* __CRT_HAVE_pthread_getunique_np || __CRT_HAVE_pthread_threadid_np || __CRT_HAVE_pthread_gettid_np */
 #undef __local_pthread_gettid_np_defined
-#endif /* !__CRT_HAVE_pthread_getunique_np && !__CRT_HAVE_pthread_gettid_np */
+#endif /* !__CRT_HAVE_pthread_getunique_np && !__CRT_HAVE_pthread_threadid_np && !__CRT_HAVE_pthread_gettid_np */
 #endif /* !__local_pthread_gettid_np_defined */

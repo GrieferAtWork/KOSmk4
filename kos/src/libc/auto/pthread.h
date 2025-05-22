@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4f456b0 */
+/* HASH CRC-32:0xca273836 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1071,6 +1071,19 @@ INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_switch_del
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_switch_delete_np)(pthread_switch_routine_t routine);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_is_threaded_np)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF size_t NOTHROW_NCX(LIBDCALL libd_pthread_get_stacksize_np)(pthread_t self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF size_t NOTHROW_NCX(LIBCCALL libc_pthread_get_stacksize_np)(pthread_t self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF void *NOTHROW_NCX(LIBDCALL libd_pthread_get_stackaddr_np)(pthread_t self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF void *NOTHROW_NCX(LIBCCALL libc_pthread_get_stackaddr_np)(pthread_t self);
 #endif /* !__KERNEL__ */
 
 DECL_END

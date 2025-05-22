@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x192eb176 */
+/* HASH CRC-32:0x749206d4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4539,6 +4539,10 @@ __CREDIRECT_VOID(,__NOTHROW,yield,(void),thr_yield,())
 /* >> thrd_yield(3)
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,yield,(void),cthread_yield,())
+#elif defined(__CRT_HAVE_pthread_yield_np)
+/* >> thrd_yield(3)
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
+__CREDIRECT_VOID(,__NOTHROW,yield,(void),pthread_yield_np,())
 #endif /* ... */
 #ifdef __CRT_HAVE_resolvepath
 /* >> resolvepath(3)

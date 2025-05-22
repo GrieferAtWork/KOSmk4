@@ -1158,10 +1158,11 @@ NOTHROW_NCX(LIBCCALL libc_sigaltstack)(struct sigaltstack const *ss,
 }
 /*[[[end:libc_sigaltstack]]]*/
 
-/*[[[head:libc_pthread_kill,hash:CRC-32=0xccc0e8e7]]]*/
+/*[[[head:libc_pthread_kill,hash:CRC-32=0x63869003]]]*/
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.sched.signal") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t pthread,

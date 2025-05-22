@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7573ae35 */
+/* HASH CRC-32:0x7b0348d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1955,6 +1955,8 @@ DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_getunique_np, libc_pthread_
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_mutex_isowned_np, libc_pthread_mutex_isowned_np, TD, 1, TP)
 DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_switch_add_np, libc_pthread_switch_add_np, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DEFINE_INTERN_ALIAS(libd_pthread_switch_delete_np, libd_pthread_switch_add_np);
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_get_stacksize_np, libc_pthread_get_stacksize_np, TI, 1, TIn(__SIZEOF_PTHREAD_T))
+DFUN(".text.crt.dos.sched.pthread_ext", libd_pthread_get_stackaddr_np, libc_pthread_get_stackaddr_np, TP, 1, TIn(__SIZEOF_PTHREAD_T))
 
 /* pthread_np */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_stackseg_np, libc_pthread_stackseg_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)

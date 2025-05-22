@@ -3120,6 +3120,7 @@ $errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
 @@>> pthread_kill(3)
 @@Portable function for sending a signal to a specific `pthread' within one's own process.
 @@@return: EOK:    Success
+@@@return: ESRCH:  The given `pthread' has already exited
 @@@return: EINVAL: The given `signo' is invalid
 [[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("thr_kill")]]

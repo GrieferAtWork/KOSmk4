@@ -307,7 +307,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa2219674]]]*/
+/*[[[start:exports,hash:CRC-32=0x970a5d5f]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS_P(DOS$__clone,libd_clone,NONNULL((1)),pid_t,NOTHROW_NCX,VLIBDCALL,(int (LIBDCALL *fn)(void *arg), void *child_stack, int flags, void *arg, ...),(fn,child_stack,flags,arg,));
 DEFINE_PUBLIC_ALIAS_P(DOS$clone,libd_clone,NONNULL((1)),pid_t,NOTHROW_NCX,VLIBDCALL,(int (LIBDCALL *fn)(void *arg), void *child_stack, int flags, void *arg, ...),(fn,child_stack,flags,arg,));
@@ -335,6 +335,7 @@ DEFINE_PUBLIC_ALIAS_P(__libc_sched_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,
 DEFINE_PUBLIC_ALIAS_P(yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(thr_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(cthread_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
+DEFINE_PUBLIC_ALIAS_P(pthread_yield_np,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(sched_yield,libc_sched_yield,,int,NOTHROW,LIBCCALL,(void),());
 DEFINE_PUBLIC_ALIAS_P(__sched_get_priority_max,libc_sched_get_priority_max,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));
 DEFINE_PUBLIC_ALIAS_P(__libc_sched_get_priority_max,libc_sched_get_priority_max,WUNUSED,int,NOTHROW_NCX,LIBCCALL,(__STDC_INT_AS_UINT_T algorithm),(algorithm));

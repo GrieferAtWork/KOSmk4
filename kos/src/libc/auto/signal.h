@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12fb5e0 */
+/* HASH CRC-32:0x87b5178f */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -536,6 +536,7 @@ INTDEF WUNUSED signo_t NOTHROW_NCX(LIBDCALL libd___libc_allocate_rtsig)(int high
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
+ * @return: ESRCH:  The given `pthread' has already exited
  * @return: EINVAL: The given `signo' is invalid */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_t signo);
 /* >> pthread_sigqueue(3)
