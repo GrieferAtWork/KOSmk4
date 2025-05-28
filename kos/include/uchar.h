@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89a82ece */
+/* HASH CRC-32:0xcb385217 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,8 @@ __NAMESPACE_STD_USING(mbstate_t)
 #define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
+__NAMESPACE_STD_USING(mbrtoc8)
+__NAMESPACE_STD_USING(c8rtomb)
 __NAMESPACE_STD_USING(mbrtoc16)
 __NAMESPACE_STD_USING(mbrtoc32)
 __NAMESPACE_STD_USING(c16rtomb)
@@ -135,11 +137,79 @@ typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */
 
+/* char8_t is a C23/C++20 feature */
+#if defined(__USE_ISOC23) || defined(__USE_ISOCXX2A)
+#ifndef __char8_t_defined
+#define __char8_t_defined
+__pragma_GCC_diagnostic_push_ignored(Wcxx20_compat) /* char8_t is a keyword in C++20 */
+typedef __CHAR8_TYPE__ char8_t;
+__pragma_GCC_diagnostic_pop_ignored(Wcxx20_compat)
+#endif /* !__char8_t_defined */
+#endif /* __USE_ISOC23 || __USE_ISOCXX2A */
+
 /* Libc uses utf16/utf32 to encode/decode char16_t and char32_t */
 #define __STD_UTF_16__ 1
 #define __STD_UTF_32__ 1
 
 __NAMESPACE_STD_BEGIN
+#if defined(__USE_ISOC23) || defined(__USE_ISOCXX2A) || defined(__cpp_char8_t)
+#ifdef __CRT_HAVE_mbrtoc8
+/* >> mbrtoc8(3)
+ * Convert a multi-byte string into utf-8
+ * @param: pc8:    Output buffer for utf-8 byte (or `NULL' to discard conversion output)
+ * @param: str:    Multi-byte input string (when `NULL', same as `mbrtoc8(pc8, "", 1, mbs)')
+ * @param: maxlen: The max # of bytes to read starting at `str'
+ * @param: mbs:    Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes consumed from `str' to fill
+ *              in `*pc8' and update `mbs' (always `<= maxlen')
+ * @return: 0 : The character written to `*pc8' is the NUL-character, and `*mbs' was reset
+ * @return: (size_t)-3: `*pc8' was populated from `mbs', but nothing was read from `str'
+ * @return: (size_t)-2: Incomplete sequence; "mbs" was updated and all "maxlen"
+ *                      bytes were read, but no  full utf-8 byte was  produced.
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+str+maxlen' cannot be decoded */
+__CDECLARE(__ATTR_INOUT_OPT(4) __ATTR_IN_OPT(2) __ATTR_OUT_OPT(1),size_t,__NOTHROW_NCX,mbrtoc8,(char8_t *__pc8, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),(__pc8,__str,__maxlen,__mbs))
+#else /* __CRT_HAVE_mbrtoc8 */
+__NAMESPACE_STD_END
+#include <libc/local/uchar/mbrtoc8.h>
+__NAMESPACE_STD_BEGIN
+/* >> mbrtoc8(3)
+ * Convert a multi-byte string into utf-8
+ * @param: pc8:    Output buffer for utf-8 byte (or `NULL' to discard conversion output)
+ * @param: str:    Multi-byte input string (when `NULL', same as `mbrtoc8(pc8, "", 1, mbs)')
+ * @param: maxlen: The max # of bytes to read starting at `str'
+ * @param: mbs:    Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes consumed from `str' to fill
+ *              in `*pc8' and update `mbs' (always `<= maxlen')
+ * @return: 0 : The character written to `*pc8' is the NUL-character, and `*mbs' was reset
+ * @return: (size_t)-3: `*pc8' was populated from `mbs', but nothing was read from `str'
+ * @return: (size_t)-2: Incomplete sequence; "mbs" was updated and all "maxlen"
+ *                      bytes were read, but no  full utf-8 byte was  produced.
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+str+maxlen' cannot be decoded */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbrtoc8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(2) __ATTR_OUT_OPT(1) size_t __NOTHROW_NCX(__LIBCCALL mbrtoc8)(char8_t *__pc8, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc8))(__pc8, __str, __maxlen, __mbs); })
+#endif /* !__CRT_HAVE_mbrtoc8 */
+#ifdef __CRT_HAVE_c8rtomb
+/* >> c8rtomb(3)
+ * Convert utf-8 into a multi-byte string
+ * @param: str: Multi-byte output buffer (when `NULL', same as `char buf[MB_CUR_MAX]; c8rtomb(buf, u8'\0', mbs);')
+ * @param: c8:  UTF-8 byte to convert into its multi-byte representation
+ * @param: mbs: Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes written starting at `str'
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+c8' cannot be encoded as multi-byte */
+__CDECLARE(__ATTR_INOUT_OPT(3) __ATTR_OUT_OPT(1),size_t,__NOTHROW_NCX,c8rtomb,(char *__restrict __str, char8_t __c8, mbstate_t *__mbs),(__str,__c8,__mbs))
+#else /* __CRT_HAVE_c8rtomb */
+__NAMESPACE_STD_END
+#include <libc/local/uchar/c8rtomb.h>
+__NAMESPACE_STD_BEGIN
+/* >> c8rtomb(3)
+ * Convert utf-8 into a multi-byte string
+ * @param: str: Multi-byte output buffer (when `NULL', same as `char buf[MB_CUR_MAX]; c8rtomb(buf, u8'\0', mbs);')
+ * @param: c8:  UTF-8 byte to convert into its multi-byte representation
+ * @param: mbs: Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes written starting at `str'
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+c8' cannot be encoded as multi-byte */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c8rtomb, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(3) __ATTR_OUT_OPT(1) size_t __NOTHROW_NCX(__LIBCCALL c8rtomb)(char *__restrict __str, char8_t __c8, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c8rtomb))(__str, __c8, __mbs); })
+#endif /* !__CRT_HAVE_c8rtomb */
+#endif /* __USE_ISOC23 || __cpp_char8_t */
 #ifdef __CRT_HAVE_mbrtoc16
 /* >> mbrtoc16(3) */
 __CDECLARE(__ATTR_INOUT_OPT(4) __ATTR_IN_OPT(2) __ATTR_OUT_OPT(1),size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),(__pc16,__str,__maxlen,__mbs))
@@ -235,6 +305,12 @@ __NAMESPACE_STD_BEGIN
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(3) __ATTR_OUT_OPT(1) size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_c32rtomb))(__str, __c32, __mbs); }
 #endif /* !... */
 __NAMESPACE_STD_END
+#if defined(__USE_ISOC23) || defined(__USE_ISOCXX2A) || defined(__cpp_char8_t)
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(mbrtoc8)
+__NAMESPACE_STD_USING(c8rtomb)
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC23 || __cpp_char8_t */
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(mbrtoc16)
 __NAMESPACE_STD_USING(mbrtoc32)

@@ -37,12 +37,17 @@
 %[define_ccompat_header("cuchar")]
 %[define_replacement(locale_t = __locale_t)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
+%[define_replacement(char8_t = __CHAR8_TYPE__)]
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(mbstate_t = "struct __mbstate")]
 %[default:section(".text.crt{|.dos}.unicode.mbr")]
 
 %[define_decl_include("<bits/crt/mbstate.h>": ["struct __mbstate"])]
+
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 %[insert:prefix(
 #include <features.h>
@@ -125,6 +130,16 @@ typedef __CHAR16_TYPE__ char16_t;
 typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__char16_t_defined */
 
+/* char8_t is a C23/C++20 feature */
+#if defined(__USE_ISOC23) || defined(__USE_ISOCXX2A)
+#ifndef __char8_t_defined
+#define __char8_t_defined
+__pragma_GCC_diagnostic_push_ignored(Wcxx20_compat) /* char8_t is a keyword in C++20 */
+typedef __CHAR8_TYPE__ char8_t;
+__pragma_GCC_diagnostic_pop_ignored(Wcxx20_compat)
+#endif /* !__char8_t_defined */
+#endif /* __USE_ISOC23 || __USE_ISOCXX2A */
+
 /* Libc uses utf16/utf32 to encode/decode char16_t and char32_t */
 #define __STD_UTF_16__ 1
 #define __STD_UTF_32__ 1
@@ -132,6 +147,83 @@ typedef __CHAR32_TYPE__ char32_t;
 }
 
 %[insert:std]
+
+%(c,std)#if defined(__USE_ISOC23) || defined(__USE_ISOCXX2A) || defined(__cpp_char8_t)
+@@>> mbrtoc8(3)
+@@Convert a multi-byte string into utf-8
+@@@param: pc8:    Output buffer for utf-8 byte (or `NULL' to discard conversion output)
+@@@param: str:    Multi-byte input string (when `NULL', same as `mbrtoc8(pc8, "", 1, mbs)')
+@@@param: maxlen: The max # of bytes to read starting at `str'
+@@@param: mbs:    Multi-byte shift state, or `NULL' to use an internal buffer
+@@@return: * : The number of bytes consumed from `str' to fill
+@@             in `*pc8' and update `mbs' (always `<= maxlen')
+@@@return: 0 : The character written to `*pc8' is the NUL-character, and `*mbs' was reset
+@@@return: (size_t)-3: `*pc8' was populated from `mbs', but nothing was read from `str'
+@@@return: (size_t)-2: Incomplete sequence; "mbs" was updated and all "maxlen"
+@@                     bytes were read, but no  full utf-8 byte was  produced.
+@@@return: (size_t)-1: [errno=EILSEQ] Given `mbs+str+maxlen' cannot be decoded
+[[std, decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+size_t mbrtoc8([[out_opt]] char8_t *pc8,
+               [[in_opt/*(maxlen)*/]] char const *__restrict str,
+               size_t maxlen, [[inout_opt]] mbstate_t *mbs) {
+	/* We only support UTF-8 locales, so this function is pretty
+	 * much just a  no-op that simply  forwards data from  `str'
+	 * into `*pc8' */
+@@pp_ifdef __BUILDING_LIBC@@
+	if (mbs == NULL)
+		mbs = &_mb_shift;
+@@pp_endif@@
+	if (str == NULL) {
+reset_mbs:
+@@pp_ifndef __BUILDING_LIBC@@
+		if (mbs)
+@@pp_endif@@
+		{
+			mbstate_init(mbs);
+		}
+		return 0;
+	}
+	if (maxlen == 0)
+		return 0;
+	if (*str == '\0')
+		goto reset_mbs;
+	if likely(pc8 != NULL)
+		*pc8 = *str;
+	return 1;
+}
+
+@@>> c8rtomb(3)
+@@Convert utf-8 into a multi-byte string
+@@@param: str: Multi-byte output buffer (when `NULL', same as `char buf[MB_CUR_MAX]; c8rtomb(buf, u8'\0', mbs);')
+@@@param: c8:  UTF-8 byte to convert into its multi-byte representation
+@@@param: mbs: Multi-byte shift state, or `NULL' to use an internal buffer
+@@@return: * : The number of bytes written starting at `str'
+@@@return: (size_t)-1: [errno=EILSEQ] Given `mbs+c8' cannot be encoded as multi-byte
+[[std, decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+size_t c8rtomb([[out_opt]] char *__restrict str/*char str[MB_CUR_MAX]*/, char8_t c8,
+               [[inout_opt]] mbstate_t *mbs) {
+	/* We only support UTF-8 locales, so this function is pretty
+	 * much  just a  no-op that  simply forwards  data from `c8'
+	 * into `*str' */
+	if (str == NULL) {
+@@pp_ifdef __BUILDING_LIBC@@
+		if (!mbs)
+			mbs = &_mb_shift;
+@@pp_else@@
+		if (mbs)
+@@pp_endif@@
+		{
+			mbstate_init(mbs);
+		}
+	} else {
+		*str = c8;
+	}
+	return 1;
+}
+
+%(c,std)#endif /* __USE_ISOC23 || __cpp_char8_t */
 
 @@>> mbrtoc16(3)
 [[std, no_crt, preferred_alias("mbrtoc16")]]

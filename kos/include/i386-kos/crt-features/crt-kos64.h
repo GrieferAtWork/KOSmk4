@@ -2642,6 +2642,7 @@
 #define __CRT_HAVE_bzerow
 #define __CRT_HAVE_c16rtomb
 #define __CRT_HAVE_c32rtomb
+#define __CRT_HAVE_c8rtomb
 #define __CRT_HAVE_cabs
 #define __CRT_HAVE_cabsf
 #define __CRT_HAVE_cabsl
@@ -3879,6 +3880,7 @@
 #define __CRT_HAVE_mbrlen
 #define __CRT_HAVE_mbrtoc16
 #define __CRT_HAVE_mbrtoc32
+#define __CRT_HAVE_mbrtoc8
 #define __CRT_HAVE_mbrtowc
 #define __CRT_HAVE_mbsinit
 #define __CRT_HAVE_mbsnrtowcs
@@ -8805,6 +8807,7 @@
 #define __CRT_HAVE_KOS$bzeroq
 #define __CRT_HAVE_KOS$bzerow
 #define __CRT_HAVE_KOS$c16rtomb
+#define __CRT_HAVE_KOS$c8rtomb
 #define __CRT_HAVE_KOS$cabs
 #define __CRT_HAVE_KOS$cabsf
 #define __CRT_HAVE_KOS$cabsl
@@ -9803,6 +9806,7 @@
 #define __CRT_HAVE_KOS$mblen
 #define __CRT_HAVE_KOS$mbrlen
 #define __CRT_HAVE_KOS$mbrtoc16
+#define __CRT_HAVE_KOS$mbrtoc8
 #define __CRT_HAVE_KOS$mbrtowc
 #define __CRT_HAVE_KOS$mbsinit
 #define __CRT_HAVE_KOS$mbsnrtowcs
@@ -13671,6 +13675,7 @@
 #define __CRT_HAVE_DOS$bzeroq
 #define __CRT_HAVE_DOS$bzerow
 #define __CRT_HAVE_DOS$c16rtomb
+#define __CRT_HAVE_DOS$c8rtomb
 #define __CRT_HAVE_DOS$cabs
 #define __CRT_HAVE_DOS$cabsf
 #define __CRT_HAVE_DOS$cabsl
@@ -14669,6 +14674,7 @@
 #define __CRT_HAVE_DOS$mblen
 #define __CRT_HAVE_DOS$mbrlen
 #define __CRT_HAVE_DOS$mbrtoc16
+#define __CRT_HAVE_DOS$mbrtoc8
 #define __CRT_HAVE_DOS$mbrtowc
 #define __CRT_HAVE_DOS$mbsinit
 #define __CRT_HAVE_DOS$mbsnrtowcs

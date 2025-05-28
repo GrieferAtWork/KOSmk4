@@ -1191,7 +1191,7 @@
 
 #ifndef __CHAR8_TYPE__
 #if __SIZEOF_CHAR__ == 1
-#define __CHAR8_TYPE__ char
+#define __CHAR8_TYPE__ unsigned char
 #elif defined(__CHAR_UNSIGNED__)
 #define __CHAR8_TYPE__ __UINT8_TYPE__
 #else /* ... */
@@ -1949,6 +1949,12 @@ __NAMESPACE_INT_END
 #define __char16_t_defined
 #define __native_char16_t_defined
 #endif /* ... */
+
+#ifdef __cpp_char8_t
+#undef __CHAR8_TYPE__
+#define __CHAR8_TYPE__ char8_t
+#define __char8_t_defined
+#endif /* __cpp_char8_t */
 
 
 #ifdef __INTELLISENSE__

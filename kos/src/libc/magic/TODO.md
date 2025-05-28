@@ -1,11 +1,6 @@
 
 ### Missing functions (ABI)
 
-- STDC:
-	- <uchar.h>
-		- `c8rtomb` (c++20)
-		- `mbrtoc8` (c++20)
-
 - Glibc:
 	- Misc:
 		- `__register_atfork()`

@@ -2912,6 +2912,7 @@
 #define __CRT_HAVE_bzerow
 #define __CRT_HAVE_c16rtomb
 #define __CRT_HAVE_c32rtomb
+#define __CRT_HAVE_c8rtomb
 #define __CRT_HAVE_cabs
 #define __CRT_HAVE_cabsf
 #define __CRT_HAVE_cabsl
@@ -4185,6 +4186,7 @@
 #define __CRT_HAVE_mbrlen
 #define __CRT_HAVE_mbrtoc16
 #define __CRT_HAVE_mbrtoc32
+#define __CRT_HAVE_mbrtoc8
 #define __CRT_HAVE_mbrtowc
 #define __CRT_HAVE_mbsdup_dbg
 #define __CRT_HAVE_mbsinit

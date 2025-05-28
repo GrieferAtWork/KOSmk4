@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bd19453 */
+/* HASH CRC-32:0xb0519daf */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,80 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
+/* >> mbrtoc8(3)
+ * Convert a multi-byte string into utf-8
+ * @param: pc8:    Output buffer for utf-8 byte (or `NULL' to discard conversion output)
+ * @param: str:    Multi-byte input string (when `NULL', same as `mbrtoc8(pc8, "", 1, mbs)')
+ * @param: maxlen: The max # of bytes to read starting at `str'
+ * @param: mbs:    Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes consumed from `str' to fill
+ *              in `*pc8' and update `mbs' (always `<= maxlen')
+ * @return: 0 : The character written to `*pc8' is the NUL-character, and `*mbs' was reset
+ * @return: (size_t)-3: `*pc8' was populated from `mbs', but nothing was read from `str'
+ * @return: (size_t)-2: Incomplete sequence; "mbs" was updated and all "maxlen"
+ *                      bytes were read, but no  full utf-8 byte was  produced.
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+str+maxlen' cannot be decoded */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_INOUT_OPT(4) ATTR_IN_OPT(2) ATTR_OUT_OPT(1) size_t
+NOTHROW_NCX(LIBCCALL libc_mbrtoc8)(char8_t *pc8,
+                                   char const *__restrict str,
+                                   size_t maxlen,
+                                   mbstate_t *mbs) {
+	/* We only support UTF-8 locales, so this function is pretty
+	 * much just a  no-op that simply  forwards data from  `str'
+	 * into `*pc8' */
+
+	if (mbs == NULL)
+		mbs = &_mb_shift;
+
+	if (str == NULL) {
+reset_mbs:
+
+
+
+		{
+			mbstate_init(mbs);
+		}
+		return 0;
+	}
+	if (maxlen == 0)
+		return 0;
+	if (*str == '\0')
+		goto reset_mbs;
+	if likely(pc8 != NULL)
+		*pc8 = *str;
+	return 1;
+}
+/* >> c8rtomb(3)
+ * Convert utf-8 into a multi-byte string
+ * @param: str: Multi-byte output buffer (when `NULL', same as `char buf[MB_CUR_MAX]; c8rtomb(buf, u8'\0', mbs);')
+ * @param: c8:  UTF-8 byte to convert into its multi-byte representation
+ * @param: mbs: Multi-byte shift state, or `NULL' to use an internal buffer
+ * @return: * : The number of bytes written starting at `str'
+ * @return: (size_t)-1: [errno=EILSEQ] Given `mbs+c8' cannot be encoded as multi-byte */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_INOUT_OPT(3) ATTR_OUT_OPT(1) size_t
+NOTHROW_NCX(LIBCCALL libc_c8rtomb)(char *__restrict str,
+                                   char8_t c8,
+                                   mbstate_t *mbs) {
+	/* We only support UTF-8 locales, so this function is pretty
+	 * much  just a  no-op that  simply forwards  data from `c8'
+	 * into `*str' */
+	if (str == NULL) {
+
+		if (!mbs)
+			mbs = &_mb_shift;
+
+
+
+		{
+			mbstate_init(mbs);
+		}
+	} else {
+		*str = c8;
+	}
+	return 1;
+}
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") void
 NOTHROW_NCX(LIBCCALL libc_convert_freev)(void *vector) {
 	void **iter, *temp;
@@ -411,6 +484,8 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS_P(mbrtoc8,libc_mbrtoc8,ATTR_INOUT_OPT(4) ATTR_IN_OPT(2) ATTR_OUT_OPT(1),size_t,NOTHROW_NCX,LIBCCALL,(char8_t *pc8, char const *__restrict str, size_t maxlen, mbstate_t *mbs),(pc8,str,maxlen,mbs));
+DEFINE_PUBLIC_ALIAS_P(c8rtomb,libc_c8rtomb,ATTR_INOUT_OPT(3) ATTR_OUT_OPT(1),size_t,NOTHROW_NCX,LIBCCALL,(char *__restrict str, char8_t c8, mbstate_t *mbs),(str,c8,mbs));
 DEFINE_PUBLIC_ALIAS_P_VOID(convert_freev,libc_convert_freev,,NOTHROW_NCX,LIBCCALL,(void *vector),(vector));
 DEFINE_PUBLIC_ALIAS_P_VOID(convert_freevn,libc_convert_freevn,,NOTHROW_NCX,LIBCCALL,(void *vector, size_t count),(vector,count));
 DEFINE_PUBLIC_ALIAS_P(DOS$convert_wcstombs,libd_convert_wcstombs,ATTR_MALLOC WUNUSED ATTR_IN_OPT(1),char *,NOTHROW_NCX,LIBDCALL,(char16_t const *str),(str));

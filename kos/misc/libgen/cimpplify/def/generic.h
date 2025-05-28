@@ -129,7 +129,7 @@
 #xdefine __SIZEOF_SIG_ATOMIC_T__ __SIZEOF_INT__
 #xdefine __SIZEOF_WINT_T__ __SIZEOF_INT__
 #xdefine __SIZEOF_WCHAR_T__ 4
-#xdefine __CHAR8_TYPE__ char
+#xdefine __CHAR8_TYPE__ unsigned char
 #xdefine __INT8_TYPE__ signed char
 #xdefine __INT16_TYPE__ short
 #xdefine __INT32_TYPE__ int

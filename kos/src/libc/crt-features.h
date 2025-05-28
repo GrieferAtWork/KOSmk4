@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69f659ec */
+/* HASH CRC-32:0xe3634903 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1186,6 +1186,7 @@
 #define __CRT_HAVE_DOS$bzerol
 #define __CRT_HAVE_DOS$bzeroq
 #define __CRT_HAVE_DOS$bzerow
+#define __CRT_HAVE_DOS$c8rtomb
 #define __CRT_HAVE_DOS$cabs
 #define __CRT_HAVE_DOS$cabsf
 #define __CRT_HAVE_DOS$cabsl
@@ -2334,6 +2335,11 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mbrlen
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$mbrtoc8
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mbrtowc
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -5592,6 +5598,7 @@
 #define __CRT_HAVE_bzerow
 #ifndef __KERNEL__
 #define __CRT_HAVE_c16rtomb
+#define __CRT_HAVE_c8rtomb
 #define __CRT_HAVE_cabs
 #define __CRT_HAVE_cabsf
 #define __CRT_HAVE_cabsl
@@ -6825,6 +6832,7 @@
 #define __CRT_HAVE_mblen
 #define __CRT_HAVE_mbrlen
 #define __CRT_HAVE_mbrtoc16
+#define __CRT_HAVE_mbrtoc8
 #define __CRT_HAVE_mbrtowc
 #define __CRT_HAVE_mbsinit
 #define __CRT_HAVE_mbsnrtowcs
