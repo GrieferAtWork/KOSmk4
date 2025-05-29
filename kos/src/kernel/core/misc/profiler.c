@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_PROFILER_C
 #define GUARD_KERNEL_SRC_MISC_PROFILER_C 1
-#define DISABLE_BRANCH_PROFILING /* Don't profile ourself! */
+#define DISABLE_BRANCH_PROFILING /* Don't profile ourselves! */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

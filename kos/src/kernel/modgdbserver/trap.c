@@ -313,7 +313,7 @@ again_gdb_main:
 	/* Call the GDB main function. */
 	GDB_MainWithAlternateStack();
 
-	/* Check if we ourself are supposed to remain stopped. */
+	/* Check if we ourselves are supposed to remain stopped. */
 	if (stop_event.tse_mayresume != GDB_THREAD_MAYRESUME_RESUME)
 		goto again_gdb_main;
 

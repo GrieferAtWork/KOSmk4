@@ -11,7 +11,7 @@
 - Runtime configuration options
 	- Supported LD environment variables
 		- `LD_LIBRARY_PATH`
-			- `:`-seperated list of library search paths (defaults to `/usr/lib:/lib` (or `/usr/lib64:/lib64` on x86_64))
+			- `:`-separated list of library search paths (defaults to `/usr/lib:/lib` (or `/usr/lib64:/lib64` on x86_64))
 		- `LD_BIND_NOW`
 			- Disable support for lazy relocations
 			- Same as...

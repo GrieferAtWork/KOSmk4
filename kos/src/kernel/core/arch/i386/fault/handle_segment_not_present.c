@@ -34,27 +34,33 @@
 #include <kernel/x86/fault.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
-#include <sched/group.h>
+#include <sched/pertask.h>
+#include <sched/pid.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
 
-#include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <kos/kernel/cpu-state-compat.h>
+#include <kos/asm/rpc-method.h>
+#include <kos/asm/rpc.h>
+#include <kos/bits/syscall-info.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/types.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/types.h>
+#include <sys/types.h>
 
-#include <assert.h>
 #include <atomic.h>
-#include <sched.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
+#include <libemu86/emu86.h>
 #include <libinstrlen/instrlen.h>
 
 #include "decode.h"
@@ -136,8 +142,8 @@ again:
 	sc_info.rsi_sysno = segment_offset ? segment_offset
 	                                   : (u32)gpregs_getpax(&state->ics_gpregs);
 #ifndef __OPTIMIZE_SIZE__
-	/* 32-bit libc makes use of lcall7-clone to implement its  pthread_create().
-	 * To prevent the need of going the long route of sending an RPC to ourself,
+	/* 32-bit libc makes  use of lcall7-clone  to implement its  pthread_create().
+	 * To prevent the need of going the long route of sending an RPC to ourselves,
 	 * have a special optimization for this use-case.
 	 *
 	 * n.b.: libc no longer does this; it now uses SYS_clone3 on i386 and x86_64! */

@@ -31,8 +31,8 @@
 
 #ifdef BUILDING_MODSCTRACE
 #undef LIBSCTRACE_DECL
-/* Link the lib-internal variants to prevent
- * unnecessary relocations against  ourself. */
+/* Link the lib-internal variants to  prevent
+ * unnecessary relocations against ourselves. */
 #define LIBSCTRACE_DECL INTDEF
 #define sc_getdesc    libsc_getdesc
 #define sc_printvalue libsc_printvalue

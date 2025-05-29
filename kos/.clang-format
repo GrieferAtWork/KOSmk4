@@ -9,7 +9,7 @@
 #             - EXCEPT on a new line
 #  REPLACE:  "#else  +/\*" --> "#else /\*"
 #             - More than 1 whitespace before comment after `#else' (clang-format likes to
-#               introduce these non-sensical whitespaces because of AlignTrailingComments,
+#               introduce these nonsensical whitespaces because of AlignTrailingComments,
 #               which it does with the associated `#endif' for whatever reason).
 #             - I don't really know why it does that, since the following works fine:
 #               >> foo();    // Comment 1

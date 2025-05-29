@@ -504,7 +504,7 @@ found_base_region:
 	/* With the base region found, check if it has already been marked as changed */
 	if (rtm_memory_region_waschanged(base_region)) {
 		/* The base region was already marked as changed.
-		 * -> We can just mark ourself as changed, too. */
+		 * -> We can just mark ourselves as changed, too. */
 		rtm_memory_region_setchanged(region);
 		return;
 	}

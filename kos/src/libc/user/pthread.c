@@ -881,8 +881,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t self)
 				continue;
 			}
 
-			/* The TID field was already set to ZERO. -> Set the  reference
-			 * counter to zero and destroy() the pthread structure ourself. */
+			/* The  TID field was  already set to ZERO.  -> Set the reference
+			 * counter to zero and destroy() the pthread structure ourselves. */
 			if (!atomic_cmpxch_weak(&self->pt_refcnt, 1, 0))
 				continue;
 			destroy(self);

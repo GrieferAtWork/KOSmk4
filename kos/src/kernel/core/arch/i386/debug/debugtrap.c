@@ -398,7 +398,7 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 	(void)state;
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {
-		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 #ifdef __x86_64__
 		task_rpc_userunwind(&sys_debugtrap_rpc64, NULL);
 #else /* __x86_64__ */
@@ -416,7 +416,7 @@ DEFINE_SYSCALL32_2(errno_t, debugtrap,
 	(void)state;
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {
-		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+		/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 		task_rpc_userunwind(&sys_debugtrap_rpc32, NULL);
 	}
 	return -ENOENT;

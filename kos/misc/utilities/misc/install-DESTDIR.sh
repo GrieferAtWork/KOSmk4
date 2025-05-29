@@ -21,7 +21,7 @@
 # Variables:
 #   $INSTALL_NONE:      If non-empty, don't install anything
 #   $DESTDIR:           Sysroot of files that should be installed
-#   $INSTALL_SKIP:      NL-seperated list of files to never install
+#   $INSTALL_SKIP:      NL-separated list of files to never install
 #   $PACKAGE_*:         Generic package information variables
 
 

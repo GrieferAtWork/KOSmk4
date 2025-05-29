@@ -158,7 +158,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	 *  - GFP_LOCKED: All   components  must  be  locked,  since  we're
 	 *                allocating stuff such as mem-nodes and mem-parts!
 	 *  - GFP_PREFLT: Slightly improve through-put for locked memory
-	 *  - GFP_MCHEAP: If  we end up  calling ourself recursively, don't
+	 *  - GFP_MCHEAP: If we end up calling ourselves recursively, don't
 	 *                allocate mem-nodes/parts using kmalloc(), but use
 	 *                the  mcoreheap system instead, thus resolving the
 	 *                dependency loop between  us calling kmalloc,  and

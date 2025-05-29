@@ -825,7 +825,7 @@ have_non_boolean_in_brt_all:
 				 * for   sub-expressions   from   `data':
 				 * >> foo && bar && foobar
 				 * There may be an assumption `(foo && foobar) == V', which
-				 * would allow us to  be optimize ourself to  `V && foobar' */
+				 * would allow us to be optimize ourselves to `V && foobar' */
 				data = eliminateKnownSubExpressions(data, typ, assume);
 			}
 			for (local e: data) {
@@ -941,7 +941,7 @@ have_non_boolean_in_brt_any:
 				 * for   sub-expressions   from   `data':
 				 * >> foo || bar || foobar
 				 * There may be an assumption `(foo || foobar) == V', which
-				 * would allow us to  be optimize ourself to  `V || foobar' */
+				 * would allow us to be optimize ourselves to `V || foobar' */
 				data = eliminateKnownSubExpressions(data, typ, assume);
 			}
 			for (local e: data) {

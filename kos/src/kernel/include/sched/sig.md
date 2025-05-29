@@ -35,9 +35,9 @@ Synchronization here happens as follows:
 
 - Whenever a thread calls `connect()`, it will become attached to `mysig`, such that another thread sending that signal (as by `post()`) will notify the original thread that called `connect()` of this condition.
 - For this purpose, it doesn't matter if the original thread that called `connect()` has already called `wait()` (and began blocking), or is still busy doing other things, but is planning to call `wait()` eventually
-- The `task_waitfor()` function (when eventually called) will then cause the calling thread to suspend execution until one of the signals that its caller is connected to has been sent (but note that if one of those signals is send before `task_waitfor()` is called, then `task_waitfor()` will never block to begin with, but return immediately)
-- The moment that `task_waitfor()` returns, **all** connections that the calling thread had made in the past will have already been severed (to be even more precise: a connection is severed before `sig_send()` returns, with the only exception being signal completion functions that call `sig_completion_reprime()`)
-*
+- The `task_waitfor()` function (when eventually called) will then cause the calling thread to suspend execution until one of the signals that its caller is connected to has been sent (but note that if one of those signals is sent before `task_waitfor()` is called, then `task_waitfor()` will never block to begin with, but return immediately)
+- The moment that `task_waitfor()` returns, **all** connections that the calling thread had made in the past will have already been severed (to be even more precise: a connection is severed before `sig_send()` returns, with the only exception being signal completion functions that set the `SIGCOMP_MODE_F_REPRIME` flag)
+
 
 ### Real-World Example
 
@@ -71,10 +71,10 @@ Here, the read from `is_ready` on line #6 is interlocked with the async monitori
 - case #1: `atomic_write(&is_ready, true);` happens before `task_connect(&became_ready)`:
 	- `sig_broadcast(&became_ready)` has no-one to notify
 	- The caller of `wait_until_ready()` will notice this in line #6
-	- The `wait_until_ready()` function never starts blocking Note that since this case is usually the most likely one, another test of the `is_ready` condition usually also happens before the initial connect. Though since no connect() will have happened at that point, such a test wouldn't be interlocked, and can only ever serve to speed up the case where an object is already ready from the get-go. Such models are referred to as test+connect+test, whereas the minimal requirement for race-less synchronization is connect+test.
+	- The `wait_until_ready()` function never starts blocking. Note that since this case is usually the most likely one, another test of the `is_ready` condition usually also happens before the initial connect. Though since no connect() will have happened at that point, such a test wouldn't be interlocked, and can only ever serve to speed up the case where an object is already ready from the get-go. Such models are referred to as test+connect+test, though the minimal requirement for race-less synchronization is always connect+test.
 - case #2: `atomic_write(&is_ready, true);` happens after `task_connect(&became_ready)`, but before `atomic_read(&is_ready)`.
 	- Line #6 will notice this, and disconnect from the `became_ready` signal once again, and the waiting thread never starts blocking.
-- case #3: `atomic_write(&is_ready, true);` happens after `if (atomic_read&(&is_ready))`
+- case #3: `atomic_write(&is_ready, true);` happens after `if (atomic_read(&is_ready))`
 	- In this case, the caller of `wait_until_ready()` will end up inside of `task_waitfor()`, which will return as soon as line #15 gets executed.
 	- Because by this point, the waiting thread has already been connected to the `became_ready` signal, it doesn't matter if `sig_broadcast()` is called before, or after `task_waitfor();`. In both cases, `task_waitfor()` will not return before `sig_broadcast()` has been called, but will return as soon as it has been called.
 
@@ -87,20 +87,22 @@ In order to improve performance, signals sent through `struct sig` may not alway
 
 - `sig_send()`:
 	1. Try to send a signal to the longest-living connection that wasn't established as a poll-connection, and return `true`
-	2. If no such connection exists, but there are still (alive) connections (iow: only poll-connections remain), randomly select one of the poll-based connections and signal it. (Note that "random" here may not actually required to be random at all, but, in fact, is allowed to depend to the order in which connections had been enqueued).Continue with step #1
-	3. If no (alive) connections are left, return `false`
+	2. If no such connection exists, but there are still other connections (iow: only poll-connections remain), randomly select one of the poll-based connections and signal it. (Note that "random" here may not actually required to be random at all, but, in fact, is allowed to depend to the order in which connections had been enqueued).Continue with step #1
+	3. If no connections are left, return `false`
 - `sig_broadcast()`:
-	1. If there is any (alive) connection (regardless of that connection being non-poll-, or poll-based), simply signal that connection. If the connection was non-poll-based, the value to-be returned by `sig_broadcast()` is incremented by one. Continue with step #1
-	2. If no (alive) connections are left, return the number of signaled non-poll connections.
+	1. If there is any connection (regardless of that connection being non-poll-, or poll-based), simply signal that connection. If the connection was non-poll-based, the value to-be returned by `sig_broadcast()` is incremented by one. Continue with step #1
+	2. If no connections are left, return the number of signaled non-poll connections.
+
+Whether a connection is poll- or non-poll-based depends on how it was established:
 
 - Normal (non-poll) connections:
 	- `task_connect()`
 	- `sig_connect_completion()`
-	- `sig_completion_reprime(for_poll: false)`
+	- `SIGCOMP_MODE_F_REPRIME` (under `sigcompcon_disablepoll()`)
 - Poll connections:
 	- `task_connect_for_poll()`
 	- `sig_connect_completion_for_poll()`
-	- `sig_completion_reprime(for_poll: true)`
+	- `SIGCOMP_MODE_F_REPRIME` (under `sigcompcon_enablepoll()`)
 
 
 
@@ -114,19 +116,19 @@ Signals are a mid-level concept:
 
 1. Low-level: per-task scheduling controls
 	- `task_wake()`
-		- Send a sporadic wake-ups to a specific thread
+		- Send a sporadic wake-up to a specific thread
 	- `task_sleep()`
-		- Enter a sleeping state until a timeout expires, or a sporadic wake-ups is received
+		- Enter a sleeping state until a timeout expires, or a sporadic wake-up is received
 	- Sporadic interrupts (aka. *wake-ups*) still exist at this level
-	- These API-level then wraps arch-specific IPI mechanisms, as well as the system scheduler (both of which could be considered as *0. super-low-level* for our purposes)
+	- This API-level then wraps arch-specific IPI mechanisms, as well as the system scheduler (both of which could be considered as part of an even lower level for our purposes: *0. super-low-level*)
 2. Mid-level: Kernel Signals
 	- `task_connect()`
-		- (Establishes a `struct sigtaskcon` between the calling thread and some `struct sig`)
+		- Establishes a `struct sigtaskcon` between the calling thread and some `struct sig`
 	- `task_waitfor()`
 		- Wait until at least one of the signals the calling thread is connected to has been delivered. If at least one signal was already delivered at the time this function is called, the thread never starts sleeping and the call returns immediately. This call is the mid-level wrapper around `task_sleep()`
 	- `sig_send()`, `sig_boardcast()`
 		- Send signals to threads/completion-callbacks that may be connected to a given signal. In the case of threads, this call is the mid-level wrapper around `task_wake()`
-	- Sporadic interrupts are no longer possible at this level
+	- Sporadic interrupts are no longer possible at this level, since a thread only stops sleeping upon the **explicit** delivery of a connected signal, and wake-events are context-targeted, rather than thread-targeted.
 3. High-level: Synchronization primitives
 	- `struct semaphore` (`<sched/semaphore.h>`)
 	- `struct shared_lock` (`<kos/sched/shared-lock.h>`)
@@ -516,7 +518,7 @@ again_find_receiver:
 		 *     - if it also re-primed itself, add "receiver" to an internal list
 		 *       of non-viable receivers that will always be skipped by the code
 		 *       used to search for receivers, as seen above.
-		 *     - Make use of a custom "sig_send" implementation that is skips
+		 *     - Make use of a custom "sig_send" implementation that skips
 		 *       non-viable receivers, and inherits the caller's SMP-lock,
 		 *       preemption_flag_t, "caller", "cleanup", etc.. Once that call
 		 *       has completed, and released all relevant locks and so on,
@@ -553,7 +555,7 @@ again_find_receiver:
 			 * - Jump back to find another receiver (this one we already removed from the queue)
 			 */
 			atomic_write(&receiver->sc_stat, SIGCON_STAT_ST_THRBCAST); /* This releases our ownership of "receiver" */
-			/* vvv this write isn't necessary, because "self->s_con" isn't anywhere after
+			/* vvv this write isn't necessary, because "self->s_con" isn't used anywhere after
 			 *     the "again_find_receiver" label (because there is no jump back to "again",
 			 *     which is the only place where such a read happens) */
 //			atomic_write(&self->s_con, (struct sigcon *)((uintptr_t)remainder | SIG_SMPLOCK)); /* Keep SMP-lock */

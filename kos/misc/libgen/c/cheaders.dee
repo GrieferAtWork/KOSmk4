@@ -452,7 +452,7 @@ class Argument {
 
 	@@The  argument name that  should be combined with  @ctype in the prototype
 	@@Usually this is  the same as  @name, but  in the case  of functions  such
-	@@as @"execv", this would be  an empty string to  accout for the fact  that
+	@@as @"execv", this would be an empty  string to account for the fact  that
 	@@the set @ctype  is actually  the name of  a macro  that already  includes
 	@@the name of the argument (meaning that the name mustn't be written twice)
 	public member protoTypeName: string | UserString;
@@ -487,7 +487,7 @@ class FunctionPrototype {
 	@@  - @"NOTHROW_RPC_NOKOS":  Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS) && !defined(__KOS__)
 	@@  - @"NOTHROW_RPC_PURE":   Function is nothrow when: #if defined(__NO_RPC_EXCEPTIONS)
 	@@  - @"THROWS(...)":        Function can  throw  and  should  be  warned  about  if  used  from  NOTHROW.
-	@@                           The given @"..." is a comma-seperated list of `E_*' codes from <kos/except.h>
+	@@                           The given @"..." is a comma-separated list of `E_*' codes from <kos/except.h>
 	public member nothrow: string | UserString = "";
 
 	@@Calling convention of this function prototype (e.g. @"ATTR_CDECL")
@@ -1515,7 +1515,7 @@ class FunctionImplementation {
 		return result;
 	}
 
-	@@Print everything necessary for this implmentation
+	@@Print everything necessary for this implementation
 	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
 	@@@param: escapeMode:     One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	@@@param: keyDependency:  Transformation key for the names of dependent functions
@@ -1634,7 +1634,7 @@ class FunctionImplementation {
 					/* Always prefix with the  LOCAL namespace prefix. We  can't rely on the  compiler
 					 * being able to figure out what we want to do by using relative names. It doesn't
 					 * matter  that we're currently  inside the local namespace,  because c++ has this
-					 * weird,  non-sensical rule that  causes functions between  different names to be
+					 * weird, nonsensical rule  that causes  functions between different  names to  be
 					 * ambiguous with each other, even when called  from the same namespace as one  of
 					 * the functions is defined within:
 					 *
@@ -1732,8 +1732,8 @@ class LocalFunction {
 	@@for this local function implementation to be chosen.
 	public member ppCond: string | UserString = "1";
 
-	@@Pieces of code that must be written before @ppCond can be evaluated
-	@@This  code   is   inserted   at   the   global   namespace   scope!
+	@@Pieces  of  code that  must be  written  before @ppCond  can be
+	@@evaluated. This code is inserted at the global namespace scope!
 	public member ppCondPrefix: {(string | UserString)...} = ();
 
 	@@The bound implementation for the local function
@@ -1817,7 +1817,7 @@ class LocalFunction {
 			local myLocalDepName = keyLocalDep(name);
 			local myLocalDepGuard = namespace.keyDefaultGuard(myLocalDepName);
 			fp.forceStartOfLine();
-			/* Also bind ourself as a local dependency function */
+			/* Also bind ourselves as a local dependency function */
 			fp << "#ifndef " << myLocalDepGuard << "\n"
 				"#define " << myLocalDepGuard << "\n"
 				"#define " << myLocalDepName << " " << namespace.keyCSymbolName(name) << "\n"

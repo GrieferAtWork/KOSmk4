@@ -605,7 +605,7 @@ twochar:
 	}
 
 	@@Same   as    @parseCStringOrFunctionLikeExpression,   but    parse
-	@@multiple such expressions, which must be seperated by  @","-tokens
+	@@multiple such expressions, which must be separated by  @","-tokens
 	@@Stop if the token at the start of an element would be a @"]", @"}"
 	@@or  @")",  or if  some element  isn't  followed with  a @","-token
 	function parseCStringOrFunctionLikeExpressionList(): {(UserString | string)...} {

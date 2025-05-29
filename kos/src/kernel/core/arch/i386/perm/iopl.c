@@ -210,7 +210,7 @@ sys_iopl_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
 	(void)level;
 
-	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
 	task_rpc_userunwind(&sys_iopl_rpc, NULL);
 	__builtin_unreachable();
 }

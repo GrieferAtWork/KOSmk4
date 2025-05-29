@@ -839,7 +839,7 @@ for BUILD_CONFIG in *.h; do
 done
 
 # Installing libstdc++ leaves behind a bunch of unwanted overrides for system headers which
-# we're already providing ourself. - Just remove those headers
+# we're already providing ourselves. - Just remove those headers
 for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/c$HEADER_NAME"
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"

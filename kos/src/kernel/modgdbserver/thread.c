@@ -90,7 +90,7 @@ again_gdb_main:
 	/* Call the GDB main function. */
 	GDB_MainWithAlternateStack();
 
-	/* Check if we ourself are supposed to remain stopped. */
+	/* Check if we ourselves are supposed to remain stopped. */
 	if (atomic_read(&notif->tse_mayresume) != GDB_THREAD_MAYRESUME_RESUME)
 		goto again_gdb_main;
 
@@ -161,7 +161,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	} else {
 		/* NOTE: Event though `GDBThread_Stopped' is normally private to the GDB host thread,
 		 *       the host thread itself is currently waiting for us to become suspended,  and
-		 *       is actually expecting us to access this field ourself. */
+		 *       is actually expecting us to access this field ourselves. */
 		do {
 			stop_event.e.tse_next = atomic_read(&GDBThread_Stopped);
 		} while (!atomic_cmpxch_weak(&GDBThread_Stopped, stop_event.e.tse_next,
@@ -632,10 +632,10 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 		 *      `GDBThread_CreateMissingAsyncStopNotification()'
 		 */
 		target_cpu = thread->t_cpu;
-		/* Special case: If the target is our own host  CPU, then we ourself are the  ones
+		/* Special case: If the target is our own host CPU, then we ourselves are the ones
 		 *               holding the scheduling override, also meaning that there wouldn't
 		 *               be a whole-cpu stop event for our own CPU, and also meaning  that
-		 *               we shouldn't send an IPI to ourself. */
+		 *               we shouldn't send an IPI to ourselves. */
 		if (target_cpu == GDBServer_Host->t_cpu) {
 			COMPILER_BARRIER();
 			/* TODO: Don't directly access `thiscpu_sched_override'! */

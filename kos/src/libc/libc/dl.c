@@ -181,7 +181,7 @@ NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
 	 * to  resolve the symbol as soon as our library gets loaded, which would be
 	 * a tiny bit slower than doing so lazily.
 	 *
-	 * As  such, the  seemingly non-sensical  construct you're  seeing below does
+	 * As such,  the seemingly  nonsensical construct  you're seeing  below  does
 	 * actually serve a purpose, that purpose being to speed up initialization of
 	 * libc! */
 	return (PDLSYM)dlsym(RTLD_DEFAULT, "dlsym");

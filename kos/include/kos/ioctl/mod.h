@@ -44,7 +44,7 @@
 /* Possible values for `struct mod_string::ms_index' under `MOD_IOC_GETSTRING' */
 #define MOD_STR_NAME     __UINT64_C(0) /* Driver name */
 #define MOD_STR_FILENAME __UINT64_C(1) /* Driver filename (frealpath()-style) */
-#define MOD_STR_CMDLINE  __UINT64_C(2) /* Driver commandline (arguments are \0-seperated; terminated by \0\0) */
+#define MOD_STR_CMDLINE  __UINT64_C(2) /* Driver commandline (arguments are \0-separated; terminated by \0\0) */
 
 
 /************************************************************************/

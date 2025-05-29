@@ -108,7 +108,7 @@ again:
 		goto again;
 	}
 
-	/* Do the yield ourself! */
+	/* Do the yield ourselves! */
 	TRY {
 		udp_autobind_impl(me);
 	} EXCEPT {

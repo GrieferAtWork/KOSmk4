@@ -383,14 +383,14 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 	 *             controller is able to trigger interrupts right now is contained
 	 *             in the very byte which we're trying to extract from the  thing.
 	 * Solution:   Configure the probe controller to accept interrupt data while
-	 *             simultaneously polling the port ourself.
+	 *             simultaneously polling the port ourselves.
 	 *             This gives us 3 different paths to success:
-	 *               #1: We manage to read the port ourself and interrupts were disabled.
-	 *               #2: We manage to read the port ourself and interrupts were enabled,
-	 *                   and  the device  did send an  interrupt that was  entered as an
+	 *               #1: We manage to read the port ourselves and interrupts were disabled.
+	 *               #2: We manage to read the port ourselves and interrupts were enabled,
+	 *                   and  the  device did  send an  interrupt that  was entered  as an
 	 *                   Unhandled interrupt.
-	 *               #3: We don't manage to read the port ourself, but we do notice that
-	 *                   one  of  the  probe  controllers  has  received  a  data  byte. */
+	 *               #3: We don't manage to read the port ourselves, but we do notice that
+	 *                   one  of  the  probe  controllers   has  received  a  data   byte. */
 	{
 		unsigned int i;
 		for (i = 0; i < PS2_PORTCOUNT; ++i)

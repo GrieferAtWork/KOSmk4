@@ -787,7 +787,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	 * NOTE: This  is why this  part must appear  in the .pdata section.
 	 *       Because  we still  are in  physical memory,  we must enable
 	 *       paging in a context where the page directory we're enabling
-	 *       has our current location mapped to ourself.
+	 *       has our current location mapped to ourselves.
 	 *       Later then, we'll jump into true virtual memory, but for
 	 *       now,  our  actual  PC  is  offset  by `KERNEL_CORE_BASE' */
 	movl   $(pagedir_kernel_phys), %esp
@@ -1367,8 +1367,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	EXTERN(thiscpu_state)
 	movP   $(CPU_STATE_DREAMING), thiscpu_state(%R_fcall0P)
 
-	/* We're now dreaming, meaning that our core may get reset at any moment,
-	 * and there is nothing we can do to undo this ourself, or prevent such a
+	/* We're  now dreaming, meaning that our core  may get reset at any moment,
+	 * and there is nothing we can do to undo this ourselves, or prevent such a
 	 * reset from happening.
 	 * However, in the interest of ensuring that everyone got the memo, invalidate
 	 * caches  one more time (although this time  it should only be caches related

@@ -641,7 +641,7 @@ To help you understand how this script works to do what it does, here is a docum
 - `--install-sh`
 	- Print a shell-script to stdout that can be used to install the selected KOS configuration to `$DESTDIR` (see also [Installing KOS](#installing))
 - `--`
-	- Join the remainder of the argument list into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
+	- Join the remainder of the argument list into a single string separated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
 		- e.g. `deemon magic.dee -- init=/bin/system-test` will run `system-test` after boot instead of `/bin/init`
 - `-n=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
 	- Set the max number of parallel processes to run during building to `N`

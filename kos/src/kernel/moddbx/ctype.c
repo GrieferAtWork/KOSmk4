@@ -20,6 +20,7 @@
 #ifndef GUARD_MODDBX_CTYPE_C
 #define GUARD_MODDBX_CTYPE_C 1
 #define _KOS_SOURCE 1
+#define _ISOC23_SOURCE 1
 
 /* DeBug eXtensions. */
 
@@ -43,6 +44,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <uchar.h>
 
 #include <libcpustate/register.h>
 #include <libdebuginfo/debug_info.h>
@@ -389,6 +391,8 @@ return_b:
 	return incref(b);
 }
 
+/* Initial reference count value for builtin ctype objects */
+#define CTYPE_REFCNT_INIT 0x7fff
 
 /* Builtin types. */
 struct _basic_ctype {
@@ -397,20 +401,20 @@ struct _basic_ctype {
 	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 };
 #define _BASIC_CTYPE_INIT(kind, children) \
-	{ 0x7fff, kind, children }
+	{ CTYPE_REFCNT_INIT, kind, children }
 
 struct _pointer_ctype {
-	uintptr_half_t          ct_refcnt;   /* Reference counter. */
-	uintptr_half_t          ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
-	struct ctype           *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
-	struct ctype           *_cp_sib;     /* [0..1] Sibling type */
-	struct ctyperef         cp_base;     /* Pointed-to type (and const/volatile flags) */
+	uintptr_half_t  ct_refcnt;   /* Reference counter. */
+	uintptr_half_t  ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
+	struct ctype   *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
+	struct ctype  *_cp_sib;      /* [0..1] Sibling type */
+	struct ctyperef cp_base;     /* Pointed-to type (and const/volatile flags) */
 };
 #define _POINTER_CTYPE_INIT(children, sib, base_typ, base_flags) \
-	{ 0x7fff, CTYPE_KIND_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
+	{ CTYPE_REFCNT_INIT, CTYPE_KIND_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
 #ifdef __ARCH_HAVE_COMPAT
 #define _COMPAT_POINTER_CTYPE_INIT(children, sib, base_typ, base_flags) \
-	{ 0x7fff, CTYPE_KIND_COMPAT_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
+	{ CTYPE_REFCNT_INIT, CTYPE_KIND_COMPAT_PTR, children, sib, { base_typ, { NULL, NULL }, base_flags } }
 #endif /* __ARCH_HAVE_COMPAT */
 
 
@@ -504,23 +508,23 @@ PRIVATE struct ctype_triple const builtin_triples[] = {
 INTERN void NOTHROW(KCALL reset_builtin_types)(void) {
 	unsigned int i;
 	for (i = 0; i < lengthof(standalong_ctypes); ++i) {
-		standalong_ctypes[i]->ct_refcnt             = 0x7fff;
+		standalong_ctypes[i]->ct_refcnt             = CTYPE_REFCNT_INIT;
 		standalong_ctypes[i]->ct_children.slh_first = NULL;
 	}
 	for (i = 0; i < lengthof(builtin_triples); ++i) {
-		builtin_triples[i].ct_base->ct_refcnt                  = 0x7fff;
+		builtin_triples[i].ct_base->ct_refcnt                  = CTYPE_REFCNT_INIT;
 		builtin_triples[i].ct_base->ct_children.slh_first      = builtin_triples[i].ct_ptr;
-		builtin_triples[i].ct_ptr->ct_refcnt                   = 0x7fff;
+		builtin_triples[i].ct_ptr->ct_refcnt                   = CTYPE_REFCNT_INIT;
 		builtin_triples[i].ct_ptr->ct_children.slh_first       = NULL;
 		builtin_triples[i].ct_ptr->ct_sibling.sle_next         = builtin_triples[i].ct_const_ptr;
-		builtin_triples[i].ct_const_ptr->ct_refcnt             = 0x7fff;
+		builtin_triples[i].ct_const_ptr->ct_refcnt             = CTYPE_REFCNT_INIT;
 		builtin_triples[i].ct_const_ptr->ct_children.slh_first = NULL;
 #ifdef __ARCH_HAVE_COMPAT
 		builtin_triples[i].ct_const_ptr->ct_sibling.sle_next          = builtin_triples[i].ct_compat_ptr;
-		builtin_triples[i].ct_compat_ptr->ct_refcnt                   = 0x7fff;
+		builtin_triples[i].ct_compat_ptr->ct_refcnt                   = CTYPE_REFCNT_INIT;
 		builtin_triples[i].ct_compat_ptr->ct_children.slh_first       = NULL;
 		builtin_triples[i].ct_compat_ptr->ct_sibling.sle_next         = builtin_triples[i].ct_const_compat_ptr;
-		builtin_triples[i].ct_const_compat_ptr->ct_refcnt             = 0x7fff;
+		builtin_triples[i].ct_const_compat_ptr->ct_refcnt             = CTYPE_REFCNT_INIT;
 		builtin_triples[i].ct_const_compat_ptr->ct_children.slh_first = NULL;
 		builtin_triples[i].ct_const_compat_ptr->ct_sibling.sle_next   = NULL;
 #else  /* __ARCH_HAVE_COMPAT */
@@ -1135,18 +1139,19 @@ again:
 					if (!typinfo.t_sizeof)
 						typinfo.t_sizeof = sizeof(char);
 					goto do_character;
-				}
-				if (strcmp(typinfo.t_name, "wchar_t") == 0) {
+				} else if (strcmp(typinfo.t_name, "wchar_t") == 0) {
 					if (!typinfo.t_sizeof)
 						typinfo.t_sizeof = sizeof(wchar_t);
 					goto do_character;
-				}
-				if (strcmp(typinfo.t_name, "char16_t") == 0) {
+				} else if (strcmp(typinfo.t_name, "char8_t") == 0) {
+					if (!typinfo.t_sizeof)
+						typinfo.t_sizeof = sizeof(char8_t);
+					goto do_character;
+				} else if (strcmp(typinfo.t_name, "char16_t") == 0) {
 					if (!typinfo.t_sizeof)
 						typinfo.t_sizeof = sizeof(char16_t);
 					goto do_character;
-				}
-				if (strcmp(typinfo.t_name, "char32_t") == 0) {
+				} else if (strcmp(typinfo.t_name, "char32_t") == 0) {
 					if (!typinfo.t_sizeof)
 						typinfo.t_sizeof = sizeof(char32_t);
 					goto do_character;

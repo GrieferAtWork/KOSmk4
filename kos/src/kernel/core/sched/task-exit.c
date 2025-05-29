@@ -495,7 +495,7 @@ again_get_ctty:
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing  the undefined behavior that would  be
-	 * caused if we tried to decref (and possibly destroy) ourself.
+	 * caused if we tried to decref (and possibly destroy) ourselves.
 	 *
 	 * NOTE: The reference destroyed here was gifted to us by `sched_intern_yield_onexit()' */
 	{

@@ -87,7 +87,7 @@ DATDEF byte_t /*  */ drv_loadmin[];  /* Absolute min-address of the driver progr
 DATDEF byte_t /*  */ drv_loadmax[];  /* Absolute max-address of the driver program (== drv_self.md_loadmax) */
 DATDEF char /*    */ drv_name[];     /* Name of the driver (== drv_self.d_name) */
 DATDEF struct mfile *drv_file;       /* [0..1] File object of the driver (== drv_self.d_file) */
-DATDEF char /*    */ drv_cmdline[];  /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
+DATDEF char /*    */ drv_cmdline[];  /* Driver commandline as a \0\0-terminated, \0-separated string (== drv_self.d_cmdline) */
 DATDEF size_t /*  */ drv_argc;       /* Driver argument count (== &drv_self.d_argc) */
 DATDEF char /*   */ *drv_argv[];     /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 

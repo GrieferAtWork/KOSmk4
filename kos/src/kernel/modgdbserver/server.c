@@ -2718,7 +2718,7 @@ send_nack_and_wait_for_next_packet:
 					 * to give future async threads  a chance to become hosts  themself. */
 					if (GDBServer_Host == GDBServer_FallbackHost)
 						goto done;
-					/* We   ourself   are   one   of   the   async-suspended  threads,
+					/* We   ourselves   are  one   of  the   async-suspended  threads,
 					 * however GDB  doesn't  actually  want us  to  resume  execution.
 					 * With this in mind, keep on being the host, and wait for either:
 					 *  - New stop notifications (which we can then tell GDB about)

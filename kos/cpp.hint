@@ -2831,3 +2831,6 @@
 #define UM_ElfW ElfW
 
 #define __KERNEL_SELECT(a,...) a
+#define KERNEL_INTERRUPT_CALLBACK_CC
+#define DEFINE_CTYPE(T,n) T n
+#define DEFINE_CTYPE_TRIPLE(_,n) struct _basic_ctype ctype_##n={};struct _pointer_ctype ctype_##n##_ptr={};struct _pointer_ctype ctype_##n##_const_ptr={};struct _pointer_ctype ctype_##n##_compat_ptr={};struct _pointer_ctype ctype_##n##_const_compat_ptr={};

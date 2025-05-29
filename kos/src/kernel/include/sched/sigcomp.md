@@ -7,7 +7,7 @@ Signal completion callbacks are custom connections for `struct sig`.
 
 ## Brief
 
-Through use of a signal completion callbacks, it becomes possible to dynamically monitor/intercept signals being delivered, as well as inject other custom code to-be executed upon some signal being delivered.
+Through use of signal completion callbacks, it becomes possible to dynamically monitor/intercept signals being delivered, as well as inject other custom code to-be executed upon some signal being delivered.
 
 ## Usage
 
@@ -35,7 +35,7 @@ DEFINE_REFCNT_FUNCTIONS(struct rising_edge_detector, red_refcnt, rising_edge_det
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL red_phase2)(struct sigcompctx *__restrict UNUSED(context), void *buf) {
-	/* We use a phase #2 callback to broadcast out own signal,
+	/* We use a phase #2 callback to broadcast our own signal,
 	 * indicating that a raising edge event has been detected. */
 	REF struct rising_edge_detector *me;
 	me = *(REF struct rising_edge_detector **)buf;

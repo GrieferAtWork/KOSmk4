@@ -50,7 +50,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
 	cmd cp spr/*.txt "$OPTPATH/myman-files/spr"
 
 	# The ./configure script of this program is insanely broken and not at all designed
-	# for cross-compiling! Instead, try to piece the broken bits together ourself
+	# for cross-compiling! Instead, try to piece the broken bits together ourselves
 	cat > "$OPTPATH/config.h" <<EOF
 #ifndef MYMAN_CONFIG_H_INCLUDED
 #define MYMAN_CONFIG_H_INCLUDED 1

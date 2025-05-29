@@ -31,10 +31,10 @@
  * Where <KEY_NAME> is one of the <KEY_*> constants from the KOS system
  * header   <kos/keyboard.h>,   or    a   c-like   integer    constant.
  *
- * Where  <MODIFIERS>  is  a   `,'-seperated  list  of  `|'-seperated   modifer
+ * Where  <MODIFIERS>  is  a   `,'-separated  list  of  `|'-separated   modifer
  * flags that need  to be  present when  the key  is pressed.  - When  omitted,
  * the  associated  text   is  emit   when  no  modifier   keys  are   pressed.
- * When given,  each `,'-seperated  segment describes  a set  of  `|'-seperated
+ * When given,  each `,'-separated  segment describes  a set  of  `|'-separated
  * flags that are or'd together. Each of these flag-sets describes one modifier
  * combination for which the line describes a mapping
  * With this in mind, omitting <MODIFIERS> is the same as using `0' for it:

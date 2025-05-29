@@ -253,7 +253,7 @@ err_tempname_filename:
 				if (fd == -1) {
 					if unlikely(libc_geterrno() != EEXIST)
 						goto err_tempname_filename;
-					/* Just delete the file and re-create it ourself. */
+					/* Just delete the file and re-create it ourselves. */
 					if unlikely(unlink(tempname) != 0)
 						goto err_tempname_filename;
 					goto again_create_temp_file;

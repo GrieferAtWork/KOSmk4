@@ -368,7 +368,7 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 	               lapic_read(APIC_TIMER_INITIAL));
 	tscbase = FORCPU(me, thiscpu_x86_apic_emutsc_tscbase);
 	if unlikely(current > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
-		/* Interrupt hasn't fired yet. (correct timings ourself) */
+		/* Interrupt hasn't fired yet. (correct timings ourselves) */
 		tscbase += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
 		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase)         = tscbase;
 		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = true;
@@ -421,7 +421,7 @@ again_with_timer:
 	               FORCPU(me, thiscpu_x86_apic_emutsc_initial),
 	               lapic_read(APIC_TIMER_INITIAL));
 	if unlikely(current_reg > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
-		/* Interrupt hasn't fired yet. (correct timings ourself) */
+		/* Interrupt hasn't fired yet. (correct timings ourselves) */
 		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
 		FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = current_reg;
 		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = true;
@@ -513,7 +513,7 @@ again_with_timer:
 	               FORCPU(me, thiscpu_x86_apic_emutsc_initial),
 	               lapic_read(APIC_TIMER_INITIAL));
 	if unlikely(current_reg > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
-		/* Interrupt hasn't fired yet. (correct timings ourself) */
+		/* Interrupt hasn't fired yet. (correct timings ourselves) */
 		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
 		FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = current_reg;
 		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = true;

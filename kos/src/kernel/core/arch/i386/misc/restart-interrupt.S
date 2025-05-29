@@ -32,6 +32,12 @@
 #include <kos/kernel/cpu-state-asm.h>
 
 
+#ifdef __x86_64__
+#define libcpu_apply_icpustate_Psp libcpu_apply_icpustate_rsp
+#else /* __x86_64__ */
+#define libcpu_apply_icpustate_Psp libcpu_apply_icpustate_esp
+#endif /* !__x86_64__ */
+
 /* Hard-set the current stack depth to `state' and invoke `cb()' by passing `state' to it.
  * Once  `cb()' returns, the cpu state returned by it is loaded, and execution is resumed.
  * WARNING: When this function is called, the caller's stack is _NOT_ unwound until `state'
@@ -52,13 +58,8 @@ PUBLIC_FUNCTION(kernel_restart_interrupt)
 	.cfi_def_cfa_register %Psp
 	callP  *%R_fcall1P /* %Pax = (*cb)(state); */
 	movP   %Pax, %Psp
-#ifdef __x86_64__
-	EXTERN(libcpu_apply_icpustate_rsp)
-	jmp    libcpu_apply_icpustate_rsp
-#else /* __x86_64__ */
-	EXTERN(libcpu_apply_icpustate_esp)
-	jmp    libcpu_apply_icpustate_esp
-#endif /* !__x86_64__ */
+	EXTERN(libcpu_apply_icpustate_Psp)
+	jmp    libcpu_apply_icpustate_Psp
 	.cfi_endproc
 END(kernel_restart_interrupt)
 

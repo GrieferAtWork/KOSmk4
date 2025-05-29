@@ -625,7 +625,7 @@ again:
 		NE2K_DEBUG("[ne2k:async] Begin TX_UPLOAD\n");
 		assert(PREEMPTION_ENABLED());
 		/* Remove one handle  from `nk_tranit'  and make sure  that that  handle's
-		 * `pd_packet'  field  is  non-NULL  (by  clearing  that  field  ourself).
+		 * `pd_packet' field  is  non-NULL  (by clearing  that  field  ourselves).
 		 * This has to be  done in this manner  to ensure proper interaction  with
 		 * aio_cancel(),  and  also  has  to  be  done  with  preemption disabled,
 		 * since  aio_cancel() will  wait for  us to  re-add just-canceled handles

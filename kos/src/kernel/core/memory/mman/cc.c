@@ -1655,7 +1655,7 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 		}
 	}
 
-	/* Start out by trying to clear system caches ourself. */
+	/* Start out by trying to clear system caches ourselves. */
 	atomic_inc(&cc_inside);
 
 	/* Keep the `_TASK_FSYSTEMCC' flag set whilst actually doing cc operations */

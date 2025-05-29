@@ -2188,7 +2188,7 @@ class LoaderContext {
 	@@This directive has a somewhat weird syntax that is the result of its history:
 	@@   '%' '[' 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' ']'
 	@@   '%' '[' 'push_macro' ['(' groups ')'] [@option...] '{' macros... '}' ']'
-	@@ - Where "macros..." is a space-seperated list of keywords  or
+	@@ - Where "macros..." is a space-separated list of keywords  or
 	@@   C-strings, with ","-tokens in-between simply being ignored.
 	@@ - The only recognized value for @option is the literal  token
 	@@   sequence '@' 'undef', which will cause all pushed macros to
