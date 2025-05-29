@@ -594,6 +594,7 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
 
+	/* Select optimal operator implementations based on requested features. */
 	if (result->vx_xops.vgxo_putcolor == &libvideo_gfx_ramgfx_putcolor_noblend) {
 		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
 		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
@@ -623,19 +624,52 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
 		}
 	}
+	if (flags & VIDEO_GFX_FAALINES) {
+		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+	}
 	result->vx_ops = &libvideo_gfx_generic_ops;
 	return result;
 }
+
+INTERN ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
+rambuffer_noblend(struct video_gfx *__restrict self) {
+	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
+	self->vx_colorkey = 0;
+	self->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor;
+	self->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
+	if (self->vx_flags & VIDEO_GFX_FAALINES) {
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+	} else {
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+	}
+	self->vx_xops.vgxo_absline_h = &libvideo_gfx_noblend__absline_h;
+	self->vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
+	self->vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
+	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
+	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
+		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_l;
+		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_l;
+	} else {
+		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
+		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+	}
+	return self;
+}
+
 
 
 
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_rlock   = &rambuffer_lock;
-		rambuffer_ops.vi_wlock   = &rambuffer_lock;
-		rambuffer_ops.vi_unlock  = &rambuffer_unlock;
-		rambuffer_ops.vi_getgfx  = &rambuffer_getgfx;
+		rambuffer_ops.vi_rlock       = &rambuffer_lock;
+		rambuffer_ops.vi_wlock       = &rambuffer_lock;
+		rambuffer_ops.vi_unlock      = &rambuffer_unlock;
+		rambuffer_ops.vi_getgfx      = &rambuffer_getgfx;
+		rambuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -705,10 +739,11 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC membuffer_getops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
-		membuffer_ops.vi_rlock  = &rambuffer_lock;
-		membuffer_ops.vi_wlock  = &rambuffer_lock;
-		membuffer_ops.vi_unlock = &rambuffer_unlock;
-		membuffer_ops.vi_getgfx = &rambuffer_getgfx;
+		membuffer_ops.vi_rlock       = &rambuffer_lock;
+		membuffer_ops.vi_wlock       = &rambuffer_lock;
+		membuffer_ops.vi_unlock      = &rambuffer_unlock;
+		membuffer_ops.vi_getgfx      = &rambuffer_getgfx;
+		membuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		membuffer_ops.vi_destroy = &membuffer_destroy;
 		COMPILER_WRITE_BARRIER();

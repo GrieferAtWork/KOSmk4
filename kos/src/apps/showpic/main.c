@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
-#if 1 /* For debugging the same-format blit-scretch function */
+#if 0 /* For debugging the same-format blit-scretch function */
 	image = video_buffer_convert(image,
 	                             ((REF struct video_buffer *)screen)->vb_format.vf_codec,
 	                             ((REF struct video_buffer *)screen)->vb_format.vf_pal,

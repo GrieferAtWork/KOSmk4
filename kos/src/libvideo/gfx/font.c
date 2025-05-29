@@ -178,10 +178,10 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
  * @return: * : The  width  of  the  printed  character  (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
-INTERN NONNULL((1)) size_t CC
+INTERN NONNULL((1)) video_dim_t CC
 libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
                      char32_t ch) {
-	size_t result;
+	video_dim_t result;
 	switch (ch) {
 
 	case '\r':
@@ -200,7 +200,7 @@ again_do_render:
 		if (self->vfp_lnstart < self->vfp_lnend) {
 			/* Must force wrap-around when a line grows too long. */
 			result = self->vfp_font->glyphsize(self->vfp_height, ch);
-			if (self->vfp_curx + (intptr_t)result > self->vfp_lnend) {
+			if (self->vfp_curx + (video_offset_t)result > self->vfp_lnend) {
 				self->vfp_curx  = self->vfp_lnstart;
 				self->vfp_cury += self->vfp_height;
 			}

@@ -2179,7 +2179,6 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               linecopy8, linefill8,
 	               pal_pixel2color, pal_color2pixel);
 
-
 	default:
 		result = NULL;
 		break;

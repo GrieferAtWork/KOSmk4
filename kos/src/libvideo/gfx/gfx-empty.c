@@ -25,8 +25,13 @@
 
 #include <hybrid/compiler.h>
 
-#include <stddef.h>
+#include <kos/types.h>
 
+#include <stddef.h>
+#include <stdint.h>
+
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
@@ -87,8 +92,8 @@ libvideo_gfx_empty__bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                    video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                                    video_color_t UNUSED(color),
                                    video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                                   void const *__restrict UNUSED(bitmask), uintptr_t UNUSED(bitskip),
-                                   video_dim_t UNUSED(bitmask_size_x), video_dim_t UNUSED(bitmask_size_y)) {
+                                   void const *__restrict UNUSED(bitmask),
+                                   uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 	COMPILER_IMPURE();
 }
 
@@ -135,8 +140,8 @@ libvideo_gfx_empty__bitstretch(struct video_blit *__restrict UNUSED(self),
                                video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                                video_coord_t UNUSED(src_x), video_coord_t UNUSED(src_y),
                                video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                               void const *__restrict UNUSED(bitmask), uintptr_t UNUSED(bitskip),
-                               video_dim_t UNUSED(bitmask_size_x), video_dim_t UNUSED(bitmask_size_y)) {
+                               void const *__restrict UNUSED(bitmask),
+                               uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 	COMPILER_IMPURE();
 }
 
@@ -269,6 +274,12 @@ NOTHROW(CC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict UNUSED(
 	COMPILER_IMPURE();
 }
 
+INTERN ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
+libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
+	COMPILER_IMPURE();
+	return self;
+}
+
 INTERN ATTR_RETNONNULL NONNULL((1, 2)) struct video_gfx *CC
 libvideo_buffer_empty_getgfx(struct video_buffer *__restrict self,
                              struct video_gfx *__restrict result,
@@ -287,9 +298,10 @@ libvideo_buffer_empty_getgfx(struct video_buffer *__restrict self,
 PRIVATE struct video_buffer_ops libvideo_buffer_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void) {
 	if (!libvideo_buffer_empty_ops.vi_getgfx) {
-		libvideo_buffer_empty_ops.vi_rlock  = &libvideo_buffer_empty_lock;
-		libvideo_buffer_empty_ops.vi_wlock  = &libvideo_buffer_empty_lock;
-		libvideo_buffer_empty_ops.vi_unlock = &libvideo_buffer_empty_unlock;
+		libvideo_buffer_empty_ops.vi_gfx_noblend = &libvideo_buffer_empty_noblend;
+		libvideo_buffer_empty_ops.vi_rlock       = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_wlock       = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_unlock      = &libvideo_buffer_empty_unlock;
 		COMPILER_WRITE_BARRIER();
 		libvideo_buffer_empty_ops.vi_getgfx = &libvideo_buffer_empty_getgfx;
 		COMPILER_WRITE_BARRIER();

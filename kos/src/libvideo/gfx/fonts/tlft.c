@@ -28,17 +28,17 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
-#include <kos/types.h>
+#include <kos/anno.h>
 #include <sys/mman.h>
 
-#include <assert.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <uchar.h>
-#include <unicode.h>
 
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/font.h>
+#include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
 
 #include "../api.h"
@@ -50,8 +50,8 @@ PRIVATE NONNULL((1)) void CC
 libvideo_tlft_destroy(struct video_font *__restrict self) {
 	struct tlft_font *me;
 	me = (struct tlft_font *)self;
-	munmap(me->tf_hdr, me->tf_siz);
-	free(me);
+	(void)munmap(me->tf_hdr, me->tf_siz);
+	(void)free(me);
 }
 
 
@@ -75,11 +75,11 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 }
 
 /* Return the width (in pixels) of a glyph, given its height (in pixels). */
-PRIVATE ATTR_PURE NONNULL((1)) size_t CC
+PRIVATE ATTR_PURE NONNULL((1)) video_dim_t CC
 libvideo_tlft_glyphsize(struct video_font *__restrict self,
-                        size_t height, char32_t UNUSED(ord)) {
+                        video_dim_t height, char32_t UNUSED(ord)) {
 	struct tlft_font *me;
-	size_t result;
+	video_dim_t result;
 	me = (struct tlft_font *)self;
 	if (height == me->tf_bestheight) {
 		result = me->tf_hdr->h_chwidth;
@@ -95,16 +95,16 @@ libvideo_tlft_glyphsize(struct video_font *__restrict self,
 
 /* Draw a single glyph at the given coords and return its width.
  * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-PRIVATE NONNULL((1, 2)) size_t CC
+PRIVATE NONNULL((1, 2)) video_dim_t CC
 libvideo_tlft_drawglyph(struct video_font *__restrict self,
                         struct video_gfx *__restrict gfx,
-                        intptr_t x,
-                        intptr_t y,
-                        size_t height,
+                        video_offset_t x,
+                        video_offset_t y,
+                        video_dim_t height,
                         char32_t ord,
                         video_color_t color) {
 	void *bm;
-	size_t result;
+	video_dim_t result;
 	struct tlft_font *me;
 	if unlikely(ord > 0xffff)
 		goto unknown;
@@ -165,12 +165,12 @@ struct video_font_ops *CC libvideo_tlft_getops(void) {
 
 
 
-/* Returns `(__REF struct video_font *)-1'  if not  a tlft  file.
+/* Returns `(REF struct video_font *)-1'  if  not  a  tlft  file.
  * Upon success, the mmap-ed region `base...+=size' is inherited. */
-INTERN WUNUSED NONNULL((1)) __REF struct video_font *CC
+INTERN WUNUSED NONNULL((1)) REF struct video_font *CC
 libvideo_font_tryopen_tlft(void *base, size_t size) {
 	TLFT_Hdr *hdr;
-	__REF struct tlft_font *result;
+	REF struct tlft_font *result;
 	uintptr_t chend;
 	hdr = (TLFT_Hdr *)base;
 	if unlikely(size < sizeof(TLFT_Hdr))
@@ -197,7 +197,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 		goto err_inval;
 
 	/* Allocate the font descriptor. */
-	result = (__REF struct tlft_font *)malloc(sizeof(struct tlft_font));
+	result = (REF struct tlft_font *)malloc(sizeof(struct tlft_font));
 	if unlikely(!result)
 		goto done;
 	result->tf_hdr = hdr; /* Inherited (on success) */
@@ -235,7 +235,7 @@ done:
 err_inval_r:
 	free(result);
 err_inval:
-	return (__REF struct video_font *)-1;
+	return (REF struct video_font *)-1;
 }
 
 

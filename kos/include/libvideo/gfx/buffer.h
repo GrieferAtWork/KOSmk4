@@ -92,6 +92,15 @@ struct video_buffer_ops {
 	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
 	                             video_color_t __colorkey);
 
+	/* Disable blending for `self', which uses this video buffer.
+	 * CAUTION: Only use this operator on a freshly copied/created GFX  context.
+	 *          If the given context is already in use (especially if by another
+	 *          thread), use of this function may result in a crash. */
+	__ATTR_NONNULL_T((1)) struct video_gfx *
+	(LIBVIDEO_GFX_CC *vi_gfx_noblend)(struct video_gfx *__restrict __self);
+
+	void (*_vi_pad1[5])(void);
+
 	/* Lock the video buffer into memory for reading.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
 	 *          a  lock to video  memory may block and/or  be much slower until
@@ -113,6 +122,8 @@ struct video_buffer_ops {
 	__ATTR_NONNULL_T((1, 2)) void
 	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
 	                                        struct video_lock *__restrict __lock);
+
+	void (*_vi_pad2[3])(void);
 };
 
 

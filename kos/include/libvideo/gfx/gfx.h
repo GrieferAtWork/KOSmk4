@@ -187,8 +187,8 @@ struct video_blit_xops {
 	                                   video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                   video_coord_t __src_x, video_coord_t __src_y,
 	                                   video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                   void const *__restrict __bitmask, __uintptr_t __bitskip,
-		                               video_dim_t __bitmask_size_x, video_dim_t __bitmask_size_y);
+	                                   void const *__restrict __bitmask,
+	                                   __uintptr_t __bitskip, __size_t __bitscan);
 };
 
 struct video_blit_ops {
@@ -342,8 +342,8 @@ struct video_gfx_xops {
 	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                       video_color_t __color,
 	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                       void const *__restrict __bitmask, __uintptr_t __bitskip,
-		                                   video_dim_t __bitmask_size_x, video_dim_t __bitmask_size_y);
+	                                       void const *__restrict __bitmask,
+	                                       __uintptr_t __bitskip, __size_t __bitscan);
 };
 
 struct video_gfx_ops {
@@ -554,6 +554,8 @@ struct video_gfx {
 
 #define video_gfx_clip(self, start_x, start_y, size_x, size_y) \
 	(*(self)->vx_ops->fxo_clip)(self, start_x, start_y, size_x, size_y)
+#define video_gfx_noblend(self) \
+	(*(self)->vx_buffer->vb_ops->vi_gfx_noblend)(self)
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_ops->fxo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \

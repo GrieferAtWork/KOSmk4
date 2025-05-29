@@ -40,15 +40,17 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <assert.h>
 #include <inttypes.h>
 #include <math.h>
+#include <stddef.h>
 #include <string.h>
 
+#include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
 #include "buffer.h"
-#include "ram-buffer.h"
 #include "gfx-empty.h"
+#include "ram-buffer.h"
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset(p, c, n) memset(p, c, n)
@@ -112,6 +114,25 @@ DECL_BEGIN
 #define video_gfx_putabscolor(self, abs_x, abs_y, color) \
 	(*(self)->vx_xops.vgxo_putcolor)(self, abs_x, abs_y, color)
 #endif /* ASSERT_ABS_COORDS_IS_NOOP */
+
+/************************************************************************/
+/* BLENDING HELPERS                                                     */
+/************************************************************************/
+
+/* Check if `color' must be blended (false), or blending is optional (true),
+ * such that behavior would be  the same when `GFX_BLENDINFO_OVERRIDE'  were
+ * to be used. */
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool CC
+libvideo_gfx_allow_noblend(struct video_gfx *__restrict self,
+                           video_color_t *__restrict p_color) {
+	gfx_blendmode_t mode = self->vx_blend;
+	/* TODO: Do this dynamically for all blending modes */
+	if (mode == GFX_BLENDINFO_ALPHA)
+		return (*p_color & VIDEO_COLOR_ALPHA_MASK) == VIDEO_COLOR_ALPHA_MASK;
+	return false;
+}
+
+
 
 /************************************************************************/
 /* LINEAR BLITTING HELPERS                                              */
@@ -363,6 +384,11 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t color) {
 	video_dim_t step;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	assert(size_x > 0);
 	assert(size_y > 0);
 	step = 0;
@@ -396,6 +422,11 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t color) {
 	video_dim_t step;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	assert(size_x > 0);
 	assert(size_y > 0);
 	step = 0;
@@ -424,43 +455,78 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
 }
 
 INTERN NONNULL((1)) void CC
+libvideo_gfx_generic__absline_llhh_aa(struct video_gfx *__restrict self,
+                                      video_coord_t x, video_coord_t y,
+                                      video_dim_t size_x, video_dim_t size_y,
+                                      video_color_t color) {
+	/* TODO: anti-aliased line drawing */
+	libvideo_gfx_generic__absline_llhh(self, x, y, size_x, size_y, color);
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_generic__absline_lhhl_aa(struct video_gfx *__restrict self,
+                                      video_coord_t x, video_coord_t y,
+                                      video_dim_t size_x, video_dim_t size_y,
+                                      video_color_t color) {
+	/* TODO: anti-aliased line drawing */
+	libvideo_gfx_generic__absline_lhhl(self, x, y, size_x, size_y, color);
+}
+
+
+
+INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_h(struct video_gfx *__restrict self,
-                                video_coord_t x, video_coord_t y, video_dim_t length,
-                                video_color_t color) {
-	video_coord_t i = 0;
+                                video_coord_t dst_x, video_coord_t dst_y,
+                                video_dim_t length, video_color_t color) {
+	video_coord_t y = 0;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	do {
 		video_gfx_putabscolor(self,
-		                      x + i,
-		                      y,
+		                      dst_x + y,
+		                      dst_y,
 		                      color);
-		++i;
-	} while (i < length);
+		++y;
+	} while (y < length);
 }
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_v(struct video_gfx *__restrict self,
-                                video_coord_t x, video_coord_t y, video_dim_t length,
-                                video_color_t color) {
-	video_coord_t i = 0;
+                                video_coord_t dst_x, video_coord_t dst_y,
+                                video_dim_t length, video_color_t color) {
+	video_coord_t y = 0;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	do {
 		video_gfx_putabscolor(self,
-		                      x,
-		                      y + i,
+		                      dst_x,
+		                      dst_y + y,
 		                      color);
-		++i;
-	} while (i < length);
+		++y;
+	} while (y < length);
 }
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absfill(struct video_gfx *__restrict self,
-                              video_coord_t x, video_coord_t y,
+                              video_coord_t dst_x, video_coord_t dst_y,
                               video_dim_t size_x, video_dim_t size_y,
                               video_color_t color) {
-	video_coord_t iy = 0;
+	video_coord_t y = 0;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	do {
-		(*self->vx_xops.vgxo_absline_h)(self, x, y + iy, size_x, color);
-		++iy;
-	} while (iy < size_y);
+		(*self->vx_xops.vgxo_absline_h)(self, dst_x, dst_y + y, size_x, color);
+		++y;
+	} while (y < size_y);
 }
 
 
@@ -477,6 +543,11 @@ libvideo_gfx_generic__bitfill(struct video_gfx *__restrict self,
                               video_color_t color,
                               void const *__restrict bitmask,
                               uintptr_t bitskip, size_t bitscan) {
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
+	}
 	do {
 		video_dim_t x = 0;
 		uintptr_t row_bitskip = bitskip;
@@ -541,8 +612,8 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx *__restrict self,
                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
                                        video_color_t color,
                                        video_dim_t src_size_x, video_dim_t src_size_y,
-                                       void const *__restrict bitmask, uintptr_t bitskip,
-                                       video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                       void const *__restrict bitmask,
+                                       uintptr_t bitskip, size_t bitscan) {
 	video_dim_t x, y;
 	double x_scale, y_scale;
 	assert(dst_size_x > 0);
@@ -560,8 +631,8 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx *__restrict self,
 			rel_y = (double)y * y_scale;
 			opacity = getlinearbit(bitmask,
 			                       bitskip,
-			                       bitmask_size_x,
-			                       bitmask_size_y,
+			                       bitscan,
+			                       src_size_y,
 			                       rel_x,
 			                       rel_y);
 			if (!opacity)
@@ -584,35 +655,36 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx *__restrict self,
                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
                                        video_color_t color,
                                        video_dim_t src_size_x, video_dim_t src_size_y,
-                                       void const *__restrict bitmask, uintptr_t bitskip,
-                                       video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
-			video_coord_t rel_x, rel_y;
-			video_dim_t bitno;
-			rel_x = (video_coord_t)round((double)x * x_scale);
-			rel_y = (video_coord_t)round((double)y * y_scale);
-			if unlikely(rel_x >= bitmask_size_x)
-				continue; /* This can happen because of rounding */
-			if unlikely(rel_y >= bitmask_size_y)
-				continue; /* This can happen because of rounding */
-			bitno = bitskip + rel_x + rel_y * bitmask_size_x;
-			if (!(((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))))
-				continue;
-			video_gfx_putabscolor(self,
-			                      dst_x + x,
-			                      dst_y + y,
-			                      color);
-		}
+                                       void const *__restrict bitmask,
+                                       uintptr_t bitskip, size_t bitscan) {
+	video_dim_t y;
+	stretch_nearest_t step_x, step_y, src_pos_y;
+	struct video_gfx noblend;
+	if (libvideo_gfx_allow_noblend(self, &color)) {
+		noblend = *self;
+		self = video_gfx_noblend(&noblend);
 	}
+	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
+	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	y = 0;
+	do {
+		video_coord_t row_dst_y = dst_y + y;
+		video_coord_t row_src_y = (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
+		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_dim_t x = 0;
+		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
+		do {
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			uintptr_t bitno = row_bitno + row_src_x;
+			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY))))
+				video_gfx_putabscolor(self, dst_x + x, row_dst_y, color);
+			src_pos_x += step_x;
+			++x;
+		} while (x < dst_size_x);
+		++y;
+		src_pos_y += step_y;
+	} while (y < dst_size_y);
 }
 
 /************************************************************************/
@@ -730,38 +802,41 @@ libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
 	}
 }
 
+#define BITSOF(x) (sizeof(x) * NBBY)
+static_assert(BITSOF(stretch_nearest_t) >= BITSOF(video_coord_t) + STRETCH_NEAREST_FRAC,
+              "stretch_nearest_t is too small to hold arbitrary video coords + a fractional part");
+
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
                                 video_dim_t dst_size_x, video_dim_t dst_size_y,
                                 video_coord_t src_x, video_coord_t src_y,
                                 video_dim_t src_size_x, video_dim_t src_size_y) {
+	video_dim_t y;
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
+	stretch_nearest_t step_x, step_y, src_pos_y;
+	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
+	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	y = 0;
+	do {
+		video_coord_t row_dst_y = dst_y + y;
+		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
+		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_dim_t x = 0;
+		src_pos_x += (stretch_nearest_t)src_x << STRETCH_NEAREST_FRAC;
+		do {
 			video_color_t color;
-			video_coord_t rel_x, rel_y;
-			rel_x = (video_coord_t)round((double)x * x_scale);
-			rel_y = (video_coord_t)round((double)y * y_scale);
-			rel_x += src_x;
-			rel_y += src_y;
-			if unlikely(rel_x >= src->vx_xend || rel_y >= src->vx_yend) {
-				color = 0; /* This can happen because of rounding */
-			} else {
-				color = video_gfx_getabscolor(src, rel_x, rel_y);
-			}
-			video_gfx_putabscolor(dst, dst_x + x, dst_y + y, color);
-		}
-	}
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			color = video_gfx_getabscolor(src, row_src_x, row_src_y);
+			video_gfx_putabscolor(dst, dst_x + x, row_dst_y, color);
+			src_pos_x += step_x;
+			++x;
+		} while (x < dst_size_x);
+		++y;
+		src_pos_y += step_y;
+	} while (y < dst_size_y);
 }
 
 INTERN NONNULL((1, 10)) void CC
@@ -770,8 +845,8 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
                                    video_dim_t dst_size_x, video_dim_t dst_size_y,
                                    video_coord_t src_x, video_coord_t src_y,
                                    video_dim_t src_size_x, video_dim_t src_size_y,
-                                   void const *__restrict bitmask, uintptr_t bitskip,
-                                   video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                   void const *__restrict bitmask,
+                                   uintptr_t bitskip, size_t bitscan) {
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	video_dim_t x, y;
@@ -790,8 +865,8 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
 			rel_x = (double)x * x_scale;
 			rel_y = (double)y * y_scale;
 			opacity = getlinearbit(bitmask, bitskip,
-			                       bitmask_size_x,
-			                       bitmask_size_y,
+			                       bitscan,
+			                       src_size_y,
 			                       rel_x, rel_y);
 			if (!opacity)
 				continue;
@@ -812,42 +887,37 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
                                    video_dim_t dst_size_x, video_dim_t dst_size_y,
                                    video_coord_t src_x, video_coord_t src_y,
                                    video_dim_t src_size_x, video_dim_t src_size_y,
-                                   void const *__restrict bitmask, uintptr_t bitskip,
-                                   video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                   void const *__restrict bitmask,
+                                   uintptr_t bitskip, size_t bitscan) {
+	video_dim_t y;
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
-			video_color_t color;
-			video_coord_t rel_x, rel_y;
-			video_dim_t bitno;
-			rel_x = (video_coord_t)round((double)x * x_scale);
-			rel_y = (video_coord_t)round((double)y * y_scale);
-			if unlikely(rel_x >= bitmask_size_x)
-				continue; /* This can happen because of rounding */
-			if unlikely(rel_y >= bitmask_size_y)
-				continue; /* This can happen because of rounding */
-			bitno = bitskip + rel_x + rel_y * bitmask_size_x;
-			if (!(((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))))
-				continue;
-			rel_x += src_x;
-			rel_y += src_y;
-			if unlikely(rel_x >= src->vx_xend || rel_y >= src->vx_yend) {
-				color = 0; /* This can happen because of rounding */
-			} else {
-				color = video_gfx_getabscolor(src, rel_x, rel_y);
+	stretch_nearest_t step_x, step_y, src_pos_y;
+	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
+	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	y = 0;
+	do {
+		video_coord_t row_dst_y = dst_y + y;
+		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
+		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_dim_t x = 0;
+		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
+		src_pos_x += (stretch_nearest_t)src_x << STRETCH_NEAREST_FRAC;
+		do {
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			uintptr_t bitno = row_bitno + row_src_x;
+			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) {
+				video_color_t color;
+				color = video_gfx_getabscolor(src, row_src_x, row_src_y);
+				video_gfx_putabscolor(dst, dst_x + x, row_dst_y, color);
 			}
-			video_gfx_putabscolor(dst, dst_x + x, dst_y + y, color);
-		}
-	}
+			src_pos_x += step_x;
+			++x;
+		} while (x < dst_size_x);
+		++y;
+		src_pos_y += step_y;
+	} while (y < dst_size_y);
 }
 
 /* Special impls for when the blit src/dst are identical */
@@ -898,12 +968,12 @@ libvideo_gfx_generic_samebuf__bitstretch_l(struct video_blit *__restrict self,
                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
                                            video_coord_t src_x, video_coord_t src_y,
                                            video_dim_t src_size_x, video_dim_t src_size_y,
-                                           void const *__restrict bitmask, uintptr_t bitskip,
-                                           video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                           void const *__restrict bitmask,
+                                           uintptr_t bitskip, size_t bitscan) {
 	/* TODO */
 	libvideo_gfx_generic__bitstretch_l(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                   src_x, src_y, src_size_x, src_size_y,
-	                                   bitmask, bitskip, bitmask_size_x, bitmask_size_y);
+	                                   bitmask, bitskip, bitscan);
 }
 
 INTERN NONNULL((1, 10)) void CC
@@ -912,12 +982,12 @@ libvideo_gfx_generic_samebuf__bitstretch_n(struct video_blit *__restrict self,
                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
                                            video_coord_t src_x, video_coord_t src_y,
                                            video_dim_t src_size_x, video_dim_t src_size_y,
-                                           void const *__restrict bitmask, uintptr_t bitskip,
-                                           video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                           void const *__restrict bitmask,
+                                           uintptr_t bitskip, size_t bitscan) {
 	/* TODO */
 	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                   src_x, src_y, src_size_x, src_size_y,
-	                                   bitmask, bitskip, bitmask_size_x, bitmask_size_y);
+	                                   bitmask, bitskip, bitscan);
 }
 
 
@@ -944,7 +1014,7 @@ libvideo_gfx_generic_samebuf__bitstretch_n(struct video_blit *__restrict self,
 /************************************************************************/
 /* CLIP()                                                               */
 /************************************************************************/
-INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
+INTERN ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
 libvideo_gfx_generic_clip(struct video_gfx *__restrict self,
                           video_offset_t clip_x, video_offset_t clip_y,
                           video_dim_t size_x, video_dim_t size_y) {
@@ -1197,7 +1267,7 @@ libvideo_gfx_generic_fill(struct video_gfx *__restrict self,
                           video_dim_t size_x, video_dim_t size_y,
                           video_color_t color) {
 	video_coord_t temp;
-	if unlikely(!size_x)
+	if unlikely(!size_x || !size_y)
 		return;
 	x += self->vx_offt_x;
 	y += self->vx_offt_y;
@@ -1455,12 +1525,10 @@ libvideo_gfx_generic_bitstretchfill(struct video_gfx *__restrict self,
                                     void const *__restrict bitmask,
                                     uintptr_t bitskip, size_t bitscan) {
 	video_coord_t temp;
-	video_dim_t bitmask_size_y;
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
 		return;
 	dst_x += self->vx_offt_x;
 	dst_y += self->vx_offt_y;
-	bitmask_size_y = src_size_y;
 	if unlikely(dst_x < (video_offset_t)GFX_XMIN) {
 		video_dim_t srcpart;
 		dst_x = (video_offset_t)(GFX_XMIN - (video_coord_t)dst_x);
@@ -1523,7 +1591,7 @@ libvideo_gfx_generic_bitstretchfill(struct video_gfx *__restrict self,
 		(*self->vx_xops.vgxo_bitstretchfill)(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
 		                                     dst_size_x, dst_size_y, color,
 		                                     src_size_x, src_size_y, bitmask,
-		                                     bitskip, bitscan, bitmask_size_y);
+		                                     bitskip, bitscan);
 	}
 }
 

@@ -120,7 +120,7 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
 		    cs_rect.svr_w > self->vb_size_x)
 			cs_rect.svr_w = self->vb_size_x;
 	} else {
-		if (OVERFLOW_UCAST((uintptr_t)rect->vbr_startx, &cs_rect.svr_x) ||
+		if (OVERFLOW_UCAST((video_coord_t)rect->vbr_startx, &cs_rect.svr_x) ||
 		    cs_rect.svr_x >= self->vb_size_x)
 			return;
 		if (OVERFLOW_USUB(self->vb_size_x, cs_rect.svr_x, &cs_rect.svr_w))
@@ -132,7 +132,7 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
 		    cs_rect.svr_h > self->vb_size_y)
 			cs_rect.svr_h = self->vb_size_y;
 	} else {
-		if (OVERFLOW_UCAST((uintptr_t)rect->vbr_starty, &cs_rect.svr_y) ||
+		if (OVERFLOW_UCAST((video_coord_t)rect->vbr_starty, &cs_rect.svr_y) ||
 		    cs_rect.svr_y >= self->vb_size_y)
 			return;
 		if (OVERFLOW_USUB(self->vb_size_y, cs_rect.svr_y, &cs_rect.svr_h))
@@ -481,11 +481,12 @@ svga_newscreen(void) {
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
-	result->ss_ops.sbo_video.vi_rlock   = &rambuffer_lock;
-	result->ss_ops.sbo_video.vi_wlock   = &rambuffer_lock;
-	result->ss_ops.sbo_video.vi_unlock  = &rambuffer_unlock;
-	result->ss_ops.sbo_video.vi_getgfx  = &rambuffer_getgfx;
-	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
+	result->ss_ops.sbo_video.vi_rlock       = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_wlock       = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_unlock      = &rambuffer_unlock;
+	result->ss_ops.sbo_video.vi_getgfx      = &rambuffer_getgfx;
+	result->ss_ops.sbo_video.vi_gfx_noblend = &rambuffer_noblend;
+	result->ss_ops.sbo_video.vi_destroy     = &svga_screen_destroy;
 	shared_lock_init(&result->ss_cslock);
 
 	/* Define the updaterects operators if needed by the chipset */

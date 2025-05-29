@@ -34,6 +34,7 @@
 #include <kos/refcnt.h>
 
 #include <libvideo/codec/pixel.h> /* video_color_t */
+#include <libvideo/codec/types.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -50,18 +51,18 @@ struct video_font_ops {
 
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__ATTR_NONNULL_T((1, 2)) __size_t
+	__ATTR_NONNULL_T((1, 2)) video_dim_t
 	(LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
 	                                 struct video_gfx *__restrict __gfx,
-	                                 __intptr_t __x, __intptr_t __y,
-	                                 __size_t __height,
+	                                 video_offset_t __x, video_offset_t __y,
+	                                 video_dim_t __height,
 	                                 __CHAR32_TYPE__ __ord,
 	                                 video_color_t __color);
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__ATTR_NONNULL_T((1)) __size_t
+	__ATTR_NONNULL_T((1)) video_dim_t
 	(LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
-	                                 __size_t __height,
+	                                 video_dim_t __height,
 	                                 __CHAR32_TYPE__ __ord);
 };
 
@@ -78,15 +79,15 @@ struct video_font {
 
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__CXX_CLASSMEMBER __size_t LIBVIDEO_GFX_CC
-	drawglyph(struct video_gfx *__restrict __gfx, __intptr_t __x, __intptr_t __y,
-	          __size_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
+	__CXX_CLASSMEMBER video_dim_t LIBVIDEO_GFX_CC
+	drawglyph(struct video_gfx *__restrict __gfx, video_offset_t __x, video_offset_t __y,
+	          video_dim_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
 		return (*vf_ops->vfo_drawglyph)(this, __gfx, __x, __y, __height, __ord, __color);
 	}
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__CXX_CLASSMEMBER __size_t LIBVIDEO_GFX_CC
-	glyphsize(__size_t __height, __CHAR32_TYPE__ __ord) {
+	__CXX_CLASSMEMBER video_dim_t LIBVIDEO_GFX_CC
+	glyphsize(video_dim_t __height, __CHAR32_TYPE__ __ord) {
 		return (*vf_ops->vfo_glyphsize)(this, __height, __ord);
 	}
 
@@ -127,11 +128,11 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_
 struct video_fontprinter_data {
 	struct video_font *vfp_font;     /* [1..1][const] The font used for printing. */
 	struct video_gfx  *vfp_gfx;      /* [1..1][const] Target graphics context. */
-	__size_t           vfp_height;   /* Glyph height. */
-	__intptr_t         vfp_curx;     /* X coord for the top-left corner of the next glyph */
-	__intptr_t         vfp_cury;     /* Y coord for the top-left corner of the next glyph */
-	__intptr_t         vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
-	__intptr_t         vfp_lnend;    /* Ending  X coord for additional lines (when `> vfp_lnstart',
+	video_dim_t        vfp_height;   /* Glyph height. */
+	video_offset_t     vfp_curx;     /* X coord for the top-left corner of the next glyph */
+	video_offset_t     vfp_cury;     /* Y coord for the top-left corner of the next glyph */
+	video_offset_t     vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
+	video_offset_t     vfp_lnend;    /* Ending  X coord for additional lines (when `> vfp_lnstart',
 	                                  * wrap to a new line when a glyph would exceed this position) */
 	video_color_t      vfp_color;    /* Output color for the next glyph. */
 	struct __mbstate   vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
@@ -164,11 +165,11 @@ video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
  * @return: * : The  width  of  the  printed  character  (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
-typedef __ATTR_NONNULL_T((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) video_dim_t
 (LIBVIDEO_GFX_CC *PVIDEO_FONTPRINTCH)(struct video_fontprinter_data *__restrict __self,
                                       __CHAR32_TYPE__ __ch);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) __size_t LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) video_dim_t LIBVIDEO_GFX_CC
 video_fontprintch(struct video_fontprinter_data *__restrict __self,
                   __CHAR32_TYPE__ __ch);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */

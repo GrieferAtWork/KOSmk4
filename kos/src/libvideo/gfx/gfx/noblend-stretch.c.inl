@@ -58,12 +58,12 @@ LOCAL_libvideo_gfx_noblend__bitstretchfill(struct video_gfx *__restrict self,
                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
                                            video_color_t color,
                                            video_dim_t src_size_x, video_dim_t src_size_y,
-                                           void const *__restrict bitmask, uintptr_t bitskip,
-                                           video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                           void const *__restrict bitmask,
+                                           uintptr_t bitskip, size_t bitscan) {
 	/* TODO */
 	LOCAL_libvideo_gfx_generic__bitstretchfill(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                           color, src_size_x, src_size_y,
-	                                           bitmask, bitskip, bitmask_size_x, bitmask_size_y);
+	                                           bitmask, bitskip, bitscan);
 }
 
 #include <kos/kernel/printk.h>
@@ -86,12 +86,12 @@ LOCAL_libvideo_gfx_noblend_samefmt__bitstretch(struct video_blit *__restrict sel
                                                video_dim_t dst_size_x, video_dim_t dst_size_y,
                                                video_coord_t src_x, video_coord_t src_y,
                                                video_dim_t src_size_x, video_dim_t src_size_y,
-                                               void const *__restrict bitmask, uintptr_t bitskip,
-                                               video_dim_t bitmask_size_x, video_dim_t bitmask_size_y) {
+                                               void const *__restrict bitmask,
+                                               uintptr_t bitskip, size_t bitscan) {
 	/* TODO */
 	LOCAL_libvideo_gfx_generic__bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                       src_x, src_y, src_size_x, src_size_y,
-	                                       bitmask, bitskip, bitmask_size_x, bitmask_size_y);
+	                                       bitmask, bitskip, bitscan);
 }
 
 

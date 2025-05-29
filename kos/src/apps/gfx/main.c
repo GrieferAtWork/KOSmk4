@@ -28,6 +28,7 @@
 #include <kos/refptr.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <kos/kernel/printk.h>
 
 #include <err.h>
 #include <errno.h>
@@ -126,7 +127,10 @@ again_font:
 	fontprinter_data.vfp_gfx   = &fontgfx;
 	fontprinter_data.vfp_lnend = video_gfx_sizex(&fontgfx);
 	fontprinter_data.vfp_curx  = 0;
+
+	printk(KERN_DEBUG "GFX: BEGIN RENDER\n");
 	gfx.fill(VIDEO_COLOR_WHITE);
+	printk(KERN_DEBUG "GFX: AFTER FILL\n");
 	format_printf(&video_fontprinter,
 	              &fontprinter_data,
 //	              "Hello World!\n"
@@ -143,6 +147,7 @@ again_font:
 
 	              "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏\n"
 	              "▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟\n");
+	printk(KERN_DEBUG "GFX: DONE RENDER\n");
 
 	for (;;) {
 		char buf[1];

@@ -37,12 +37,12 @@ INTDEF NONNULL((1)) void CC libvideo_gfx_empty__absline_h(struct video_gfx *__re
 INTDEF NONNULL((1)) void CC libvideo_gfx_empty__absline_v(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_dim_t length, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_empty__absfill(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF NONNULL((1, 7)) void CC libvideo_gfx_empty__bitfill(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, void const *__restrict bitmask, uintptr_t bitskip, size_t bitscan);
-INTDEF NONNULL((1, 9)) void CC libvideo_gfx_empty__bitstretchfill(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, void const *__restrict bitmask, uintptr_t bitskip, video_dim_t bitmask_size_x, video_dim_t bitmask_size_y);
+INTDEF NONNULL((1, 9)) void CC libvideo_gfx_empty__bitstretchfill(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, void const *__restrict bitmask, uintptr_t bitskip, size_t bitscan);
 INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx);
 INTDEF NONNULL((1)) void CC libvideo_gfx_empty__blit(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF NONNULL((1)) void CC libvideo_gfx_empty__stretch(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF NONNULL((1, 8)) void CC libvideo_gfx_empty__bitblit(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, void const *__restrict bitmask, uintptr_t bitskip, size_t bitscan);
-INTDEF NONNULL((1, 10)) void CC libvideo_gfx_empty__bitstretch(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, void const *__restrict bitmask, uintptr_t bitskip, video_dim_t bitmask_size_x, video_dim_t bitmask_size_y);
+INTDEF NONNULL((1, 10)) void CC libvideo_gfx_empty__bitstretch(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, void const *__restrict bitmask, uintptr_t bitskip, size_t bitscan);
 
 /* Empty GFX operators */
 INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_empty_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
@@ -68,6 +68,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_em
 /* Empty video buffer. */
 INTDEF NONNULL((1, 2)) int CC libvideo_buffer_empty_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
 INTDEF NONNULL((1, 2)) void NOTHROW(CC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC libvideo_buffer_empty_noblend(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) struct video_gfx *CC libvideo_buffer_empty_getgfx(struct video_buffer *__restrict self, struct video_gfx *__restrict result, gfx_blendmode_t blendmode, uintptr_t flags, video_color_t colorkey);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void);
 #define libvideo_buffer_empty_ops (*_libvideo_buffer_empty_ops())

@@ -52,6 +52,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
                  struct video_gfx *__restrict result,
                  gfx_blendmode_t blendmode, uintptr_t flags,
                  video_color_t colorkey);
+INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
+rambuffer_noblend(struct video_gfx *__restrict self);
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
 
