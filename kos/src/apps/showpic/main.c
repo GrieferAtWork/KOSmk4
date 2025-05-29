@@ -33,6 +33,7 @@
 #include <stdlib.h>
 
 #include <libvideo/codec/pixel.h>
+#include <libvideo/codec/codecs.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
@@ -70,13 +71,20 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
+#if 1 /* For debugging the same-format blit-scretch function */
+	image = video_buffer_convert(image,
+	                             ((REF struct video_buffer *)screen)->vb_format.vf_codec,
+	                             ((REF struct video_buffer *)screen)->vb_format.vf_pal,
+	                             VIDEO_BUFFER_AUTO);
+#endif
+
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FLINEARBLIT, 0);
+	                    VIDEO_GFX_FNEARESTBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FLINEARBLIT, 0);
+	                    VIDEO_GFX_FNORMAL, 0);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_sizex(&image_gfx);

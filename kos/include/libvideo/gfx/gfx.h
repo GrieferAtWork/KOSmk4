@@ -110,9 +110,6 @@ typedef __uint64_t gfx_blendmode_t;
 #define GFX_BLENDINFO_OVERRIDE \
 	GFX_BLENDINFO(GFX_BLENDMODE_ONE, GFX_BLENDMODE_ZERO, GFX_BLENDFUNC_ADD)
 
-/* Default blending mode */
-#define GFX_BLENDINFO_DEFAULT GFX_BLENDINFO_ALPHA
-
 
 /* Video graphic flags.
  * [READ]:  Indicates a flag that affects the results when the associated
@@ -121,9 +118,9 @@ typedef __uint64_t gfx_blendmode_t;
  *          that use  the associated  GFX context  as destination,  or  when
  *          writing pixel data. */
 #define VIDEO_GFX_FNORMAL      0x0000 /* Normal render flags. */
-#define VIDEO_GFX_FAALINES     0x0001 /* [WRITE] Render smooth lines. */
 #define VIDEO_GFX_FNEARESTBLIT 0x0000 /* [WRITE] Use nearest interpolation for stretch() */
-#define VIDEO_GFX_FLINEARBLIT  0x0002 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FLINEARBLIT  0x0001 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FAALINES     0x0002 /* [WRITE] Render smooth lines. */
 #define VIDEO_GFX_FBLUR        0x0004 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
                                        *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                        * The behavior is weak undefined if this flag is used alongside a non-zero color key */
@@ -309,6 +306,15 @@ struct video_gfx_xops {
 	(LIBVIDEO_GFX_CC *vgxo_absline_v)(struct video_gfx *__restrict __self,
 		                              video_coord_t __x, video_coord_t __y,
 		                              video_dim_t __length, video_color_t __color);
+
+	/* Rect fill
+	 * @assume(__size_x > 0);
+	 * @assume(__size_y > 0); */
+	__ATTR_NONNULL_T((1)) void
+	(LIBVIDEO_GFX_CC *vgxo_absfill)(struct video_gfx *__restrict __self,
+	                                video_coord_t __x, video_coord_t __y,
+	                                video_dim_t __size_x, video_dim_t __size_y,
+	                                video_color_t __color);
 
 	/* Paint masked pixels
 	 * @param: bitskip: Number of leading bits to skip
@@ -574,13 +580,13 @@ struct video_gfx {
 #define video_gfx_blitto(self, dst, ctx) \
 	((ctx)->vb_src = (self), (*((ctx)->vb_dst = (dst))->vx_xops.vgxo_blitfrom)(ctx))
 #define video_gfx_blit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
-	__XBLOCK({ struct video_blit _vgb_blit; video_blit_blit(video_gfx_blitfrom(self, src, &_vgb_blit), dst_x, dst_y, src_x, src_y, size_x, size_y); })
+	__XBLOCK({ struct video_blit _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(self, src, &_vgb_blit); video_blit_blit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
 #define video_gfx_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
-	__XBLOCK({ struct video_blit _vgs_blit; video_blit_stretch(video_gfx_blitfrom(self, src, &_vgs_blit), dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
+	__XBLOCK({ struct video_blit _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(self, src, &_vgs_blit); video_blit_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
 #define video_gfx_bitblit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan) \
-	__XBLOCK({ struct video_blit _vgbb_blit; video_blit_bitblit(video_gfx_blitfrom(self, src, &_vgbb_blit), dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan); })
+	__XBLOCK({ struct video_blit _vgbb_blit, *_vgbb_blit_ptr = video_gfx_blitfrom(self, src, &_vgbb_blit); video_blit_bitblit(_vgbb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan); })
 #define video_gfx_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan) \
-	__XBLOCK({ struct video_blit _vgbs_blit; video_blit_bitstretch(video_gfx_blitfrom(self, src, &_vgbs_blit), dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan); })
+	__XBLOCK({ struct video_blit _vgbs_blit, *_vgbs_blit_ptr = video_gfx_blitfrom(self, src, &_vgbs_blit); video_blit_bitstretch(_vgbs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan); })
 
 #ifdef __cplusplus
 public:

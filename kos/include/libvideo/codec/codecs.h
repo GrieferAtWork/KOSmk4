@@ -91,11 +91,11 @@ __DECL_BEGIN
 
 
 /* Normal codec flags. */
-#define VIDEO_CODEC_FLAG_NORMAL 0x0000 /* Normal flags */
-#define VIDEO_CODEC_FLAG_PAL    0x0001 /* Does this codec use a palette? */
-#define VIDEO_CODEC_FLAG_GRAY   0x0002 /* Is this a grayscale-mode codec? */
-#define VIDEO_CODEC_FLAG_LSB    0x0000 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_FLAG_MSB    0x0004 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_FLAG_NORMAL 0x00 /* Normal flags */
+#define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? */
+#define VIDEO_CODEC_FLAG_GRAY   0x02 /* Is this a grayscale-mode codec? */
+#define VIDEO_CODEC_FLAG_LSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_FLAG_MSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
 
 #ifdef __CC__
 typedef __uint16_t video_codec_t; /* One of `VIDEO_CODEC_*' */
@@ -106,7 +106,8 @@ struct video_rambuffer_requirements {
 };
 
 struct video_codec_specs {
-	__uint16_t vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
+	__uint8_t  vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
+	__uint8_t  vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
 	__uint8_t  vcs_bpp;   /* # of bits per pixel (when not divisible by "8", pixels aren't aligned by byte-boundaries) */
 	__uint8_t  vcs_cbits; /* [<= vcs_bpp] # of color  bits per pixel.  Usually same as  "vcs_bpp", except when  some bits  go
 	                       * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
@@ -179,7 +180,9 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
- * is  done via `specs', as opposed to the  caller having to provide the codec's ID. */
+ * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
+ *
+ * NOTE: This function doesn't need `vcs_pxsz' to be initialized. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict __specs);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
@@ -213,6 +216,8 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_han
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
+ *
+ * NOTE: This function doesn't need `vcs_pxsz' to be initialized.
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec

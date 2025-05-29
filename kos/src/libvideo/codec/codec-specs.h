@@ -30,7 +30,9 @@
 DECL_BEGIN
 
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
- * is  done via `specs', as opposed to the  caller having to provide the codec's ID. */
+ * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
+ *
+ * NOTE: This function doesn't need `vcs_pxsz' to be initialized. */
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
 
@@ -43,6 +45,8 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
+ *
+ * NOTE: This function doesn't need `vcs_pxsz' to be initialized.
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec

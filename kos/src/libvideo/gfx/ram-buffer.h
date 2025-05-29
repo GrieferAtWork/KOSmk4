@@ -46,7 +46,7 @@ struct video_rambuffer: video_buffer {
 /* Ram-buffer operator callbacks. */
 INTDEF NONNULL((1)) void CC rambuffer_destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1, 2)) int CC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
-INTDEF NONNULL((1, 2)) void NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock const *__restrict lock);
+INTDEF NONNULL((1, 2)) void NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) struct video_gfx *CC
 rambuffer_getgfx(struct video_buffer *__restrict self,
                  struct video_gfx *__restrict result,

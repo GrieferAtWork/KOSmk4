@@ -32,11 +32,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/compiler.h>
 
 #include <hybrid/__bitfield.h>
+#include <hybrid/align.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
+#include <sys/param.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -226,62 +228,62 @@ setpixel4_inbyte_msb(byte_t *__restrict byte,
 
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel1_lsb(byte_t const *__restrict line, uintptr_t x) {
+getpixel1_lsb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel1_inbyte_lsb(line + (x / 8), (shift_t)(x % 8));
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel1_msb(byte_t const *__restrict line, uintptr_t x) {
+getpixel1_msb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel1_inbyte_msb(line + (x / 8), (shift_t)(x % 8));
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel1_lsb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel1_inbyte_lsb(line + (x / 8), (shift_t)(x % 8), pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel1_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel1_inbyte_msb(line + (x / 8), (shift_t)(x % 8), pixel);
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel2_lsb(byte_t const *__restrict line, uintptr_t x) {
+getpixel2_lsb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel2_inbyte_lsb(line + (x / 4), x % 4);
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel2_msb(byte_t const *__restrict line, uintptr_t x) {
+getpixel2_msb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel2_inbyte_msb(line + (x / 4), x % 4);
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel2_lsb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel2_inbyte_lsb(line + (x / 4), x % 4, pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel2_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel2_inbyte_msb(line + (x / 4), x % 4, pixel);
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel4_lsb(byte_t const *__restrict line, uintptr_t x) {
+getpixel4_lsb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel4_inbyte_lsb(line + (x / 2), x % 2);
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel4_msb(byte_t const *__restrict line, uintptr_t x) {
+getpixel4_msb(byte_t const *__restrict line, video_coord_t x) {
 	return getpixel4_inbyte_msb(line + (x / 2), x % 2);
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel4_lsb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel4_inbyte_lsb(line + (x / 2), x % 2, pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel4_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	setpixel4_inbyte_msb(line + (x / 2), x % 2, pixel);
 }
 
@@ -289,22 +291,22 @@ setpixel4_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel8(byte_t const *__restrict line, uintptr_t x) {
+getpixel8(byte_t const *__restrict line, video_coord_t x) {
 	return ((u8 const *)line)[x];
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel8(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((u8 *)line)[x] = (u8)pixel;
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel16(byte_t const *__restrict line, uintptr_t x) {
+getpixel16(byte_t const *__restrict line, video_coord_t x) {
 	return ((u16 const *)line)[x];
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((u16 *)line)[x] = (u16)pixel;
 }
 
@@ -313,19 +315,19 @@ setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 #define unaligned_setpixel16 setpixel16
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-unaligned_getpixel16(byte_t const *__restrict line, uintptr_t x) {
+unaligned_getpixel16(byte_t const *__restrict line, video_coord_t x) {
 	return UNALIGNED_GET16(&((u16 const *)line)[x]);
 }
 
 PRIVATE NONNULL((1)) void CC
-unaligned_setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET16(&((u16 *)line)[x], (u16)pixel);
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel24(byte_t const *__restrict line, uintptr_t x) {
+getpixel24(byte_t const *__restrict line, video_coord_t x) {
 	union pixel24 result;
 	line += x * 3;
 	result.bytes[0] = line[0];
@@ -335,7 +337,7 @@ getpixel24(byte_t const *__restrict line, uintptr_t x) {
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel24(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	union pixel24 data;
 	data.pixel = pixel;
 	line += x * 3;
@@ -345,12 +347,12 @@ setpixel24(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-getpixel32(byte_t const *__restrict line, uintptr_t x) {
+getpixel32(byte_t const *__restrict line, video_coord_t x) {
 	return ((u32 const *)line)[x];
 }
 
 PRIVATE NONNULL((1)) void CC
-setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((u32 *)line)[x] = (u32)pixel;
 }
 
@@ -359,12 +361,12 @@ setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 #define unaligned_setpixel32 setpixel32
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-unaligned_getpixel32(byte_t const *__restrict line, uintptr_t x) {
+unaligned_getpixel32(byte_t const *__restrict line, video_coord_t x) {
 	return UNALIGNED_GET32(&((u32 const *)line)[x]);
 }
 
 PRIVATE NONNULL((1)) void CC
-unaligned_setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
+unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET32(&((u32 *)line)[x], (u32)pixel);
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
@@ -374,36 +376,36 @@ unaligned_setpixel32(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) 
 
 
 PRIVATE void CC
-linecopy8(byte_t *__restrict dst_line, uintptr_t dst_x,
-          byte_t const *__restrict src_line, uintptr_t src_x,
-          size_t num_pixels) {
+linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
+          byte_t const *__restrict src_line, video_coord_t src_x,
+          video_dim_t num_pixels) {
 	memcpyb((u8 *)dst_line + dst_x,
 	        (u8 *)src_line + src_x,
 	        num_pixels);
 }
 
 PRIVATE void CC
-linecopy16(byte_t *__restrict dst_line, uintptr_t dst_x,
-           byte_t const *__restrict src_line, uintptr_t src_x,
-           size_t num_pixels) {
+linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t num_pixels) {
 	memcpyw((u16 *)dst_line + dst_x,
 	        (u16 *)src_line + src_x,
 	        num_pixels);
 }
 
 PRIVATE void CC
-linecopy24(byte_t *__restrict dst_line, uintptr_t dst_x,
-           byte_t const *__restrict src_line, uintptr_t src_x,
-           size_t num_pixels) {
+linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t num_pixels) {
 	memcpy((u8 *)dst_line + dst_x * 3,
 	       (u8 *)src_line + src_x * 3,
 	       num_pixels, 3);
 }
 
 PRIVATE void CC
-linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
-           byte_t const *__restrict src_line, uintptr_t src_x,
-           size_t num_pixels) {
+linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t num_pixels) {
 	memcpyl((u32 *)dst_line + dst_x,
 	        (u32 *)src_line + src_x,
 	        num_pixels);
@@ -414,18 +416,18 @@ linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
 #define unaligned_linecopy32 linecopy32
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE void CC
-unaligned_linecopy16(byte_t *__restrict dst_line, uintptr_t dst_x,
-                     byte_t const *__restrict src_line, uintptr_t src_x,
-                     size_t num_pixels) {
+unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t num_pixels) {
 	memcpy(dst_line + dst_x * 2,
 	       src_line + src_x * 2,
 	       num_pixels * 2);
 }
 
 PRIVATE void CC
-unaligned_linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
-                     byte_t const *__restrict src_line, uintptr_t src_x,
-                     size_t num_pixels) {
+unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t num_pixels) {
 	memcpy(dst_line + dst_x * 4,
 	       src_line + src_x * 4,
 	       num_pixels * 4);
@@ -437,22 +439,22 @@ unaligned_linecopy32(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 PRIVATE void CC
-linefill8(byte_t *__restrict dst_line, uintptr_t dst_x,
-          video_pixel_t pixel, size_t num_pixels) {
+linefill8(byte_t *__restrict dst_line, video_coord_t dst_x,
+          video_pixel_t pixel, video_dim_t num_pixels) {
 	memsetb((u8 *)dst_line + dst_x, (u8)pixel, num_pixels);
 }
 
 PRIVATE void CC
-linefill16(byte_t *__restrict dst_line, uintptr_t dst_x,
-           video_pixel_t pixel, size_t num_pixels) {
+linefill16(byte_t *__restrict dst_line, video_coord_t dst_x,
+           video_pixel_t pixel, video_dim_t num_pixels) {
 	memsetw((u16 *)dst_line + dst_x, (u16)pixel, num_pixels);
 }
 
 PRIVATE void CC
-linefill24(byte_t *__restrict dst_line, uintptr_t dst_x,
-           video_pixel_t pixel, size_t num_pixels) {
+linefill24(byte_t *__restrict dst_line, video_coord_t dst_x,
+           video_pixel_t pixel, video_dim_t num_pixels) {
 	union pixel24 data;
-	size_t i;
+	video_coord_t i;
 	data.pixel = pixel;
 	dst_line += dst_x * 3;
 	for (i = 0; i < num_pixels; ++i) {
@@ -464,8 +466,8 @@ linefill24(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linefill32(byte_t *__restrict dst_line, uintptr_t dst_x,
-           video_pixel_t pixel, size_t num_pixels) {
+linefill32(byte_t *__restrict dst_line, video_coord_t dst_x,
+           video_pixel_t pixel, video_dim_t num_pixels) {
 	memsetl((u32 *)dst_line + dst_x, (u32)pixel, num_pixels);
 }
 
@@ -474,15 +476,15 @@ linefill32(byte_t *__restrict dst_line, uintptr_t dst_x,
 #define unaligned_linefill32 linefill32
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE void CC
-unaligned_linefill16(byte_t *__restrict dst_line, uintptr_t dst_x,
-                     video_pixel_t pixel, size_t num_pixels) {
+unaligned_linefill16(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     video_pixel_t pixel, video_dim_t num_pixels) {
 #ifndef __OPTIMIZE_SIZE__
 	if (((uintptr_t)dst_line & 1) == 0) {
 		linefill16(dst_line, dst_x, pixel, num_pixels);
 	} else
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		size_t i;
+		video_coord_t i;
 		union {
 			u8 bytes[2];
 			u16 pixel;
@@ -497,15 +499,15 @@ unaligned_linefill16(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-unaligned_linefill32(byte_t *__restrict dst_line, uintptr_t dst_x,
-                     video_pixel_t pixel, size_t num_pixels) {
+unaligned_linefill32(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     video_pixel_t pixel, video_dim_t num_pixels) {
 #ifndef __OPTIMIZE_SIZE__
 	if (((uintptr_t)dst_line & 3) == 0) {
 		linefill32(dst_line, dst_x, pixel, num_pixels);
 	} else
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		size_t i;
+		video_coord_t i;
 		union {
 			u8 bytes[4];
 			u32 pixel;
@@ -754,9 +756,9 @@ gray256_color2pixel(struct video_format const *__restrict UNUSED(format),
 
 
 PRIVATE void CC
-linecopy1_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -802,9 +804,9 @@ linecopy1_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linecopy1_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -851,9 +853,9 @@ linecopy1_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 PRIVATE void CC
-linecopy2_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -899,9 +901,9 @@ linecopy2_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linecopy2_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -947,9 +949,9 @@ linecopy2_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linecopy4_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -994,9 +996,9 @@ linecopy4_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linecopy4_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              byte_t const *__restrict src_line, uintptr_t src_x,
-              size_t num_pixels) {
+linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              byte_t const *__restrict src_line, video_coord_t src_x,
+              video_dim_t num_pixels) {
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -1043,8 +1045,8 @@ linecopy4_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 PRIVATE void CC
-linefill1_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
@@ -1064,8 +1066,8 @@ linefill1_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linefill1_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
@@ -1086,8 +1088,8 @@ linefill1_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 PRIVATE void CC
-linefill2_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
@@ -1107,8 +1109,8 @@ linefill2_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linefill2_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
@@ -1129,8 +1131,8 @@ linefill2_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 PRIVATE void CC
-linefill4_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
@@ -1144,8 +1146,8 @@ linefill4_lsb(byte_t *__restrict dst_line, uintptr_t dst_x,
 }
 
 PRIVATE void CC
-linefill4_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
-              video_pixel_t pixel, size_t num_pixels) {
+linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
+              video_pixel_t pixel, video_dim_t num_pixels) {
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
@@ -1376,49 +1378,49 @@ pal_color2pixel(struct video_format const *__restrict format,
 
 
 PRIVATE NONNULL((3)) void CC
-buffer32_requirements(size_t size_x, size_t size_y,
+buffer32_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer24_requirements(size_t size_x, size_t size_y,
+buffer24_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 3;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer16_requirements(size_t size_x, size_t size_y,
+buffer16_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer8_requirements(size_t size_x, size_t size_y,
+buffer8_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x;
 	result->vbs_bufsize = size_y * size_x;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer4_requirements(size_t size_x, size_t size_y,
+buffer4_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 1) / 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer2_requirements(size_t size_x, size_t size_y,
+buffer2_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 3) / 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 PRIVATE NONNULL((3)) void CC
-buffer1_requirements(size_t size_x, size_t size_y,
+buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 7) / 8;
 	result->vbs_bufsize = size_y * result->vbs_stride;
@@ -1429,7 +1431,7 @@ buffer1_requirements(size_t size_x, size_t size_y,
 INTERN ATTR_CONST WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec) {
 #define UNPACK_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
-	{ flags, bpp, cbits, rmask, gmask, bmask, amask }
+	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, rmask, gmask, bmask, amask }
 
 #if defined(__KERNEL__) || !defined(__pic__)
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \

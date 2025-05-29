@@ -42,15 +42,21 @@
 #include <__stdcxx.h>
 #endif /* __cplusplus */
 
-__DECL_BEGIN
+/* Video buffer types. */
+#define VIDEO_BUFFER_AUTO 0x0000 /* Type doesn't matter. */
+#define VIDEO_BUFFER_RAM  0x0001 /* RAM buffer. */
+#define VIDEO_BUFFER_GPU  0x0002 /* GPU buffer. */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 struct video_format;
 
 struct video_lock {
-	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
-	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_size_y) */
-	__size_t  vl_stride; /* Scanline width (in bytes) */
+	__byte_t *vl_data;      /* [1..vl_size] Memory-mapped video data. */
+	__size_t  vl_size;      /* Total image size (>= vl_stride * :vb_size_y) */
+	__size_t  vl_stride;    /* Scanline width (in bytes) */
+	void     *vl_driver[1]; /* Driver-specific data */
 };
 
 struct video_buffer_rect {
@@ -66,23 +72,6 @@ struct video_buffer_ops {
 	/* Buffer finalization. */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
-
-	/* Lock the video buffer into memory.
-	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
-	 *          a  lock to video  memory may block and/or  be much slower until
-	 *          said lock is released! The reason for this is that it is unsafe
-	 *          to use hardware accelerated 2D operations while a video lock is
-	 *          being held!
-	 * @return: 0:  Success
-	 * @return: -1: Error (s.a. `errno') */
-	__ATTR_NONNULL_T((1, 2)) int
-	(LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
-	                           struct video_lock *__restrict __result);
-
-	/* Unlock a video buffer that had previously been mapped into memory. */
-	__ATTR_NONNULL_T((1, 2)) void
-	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
-	                                        struct video_lock const *__restrict __lock);
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
@@ -102,12 +91,53 @@ struct video_buffer_ops {
 	                             struct video_gfx *__restrict __result,
 	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
 	                             video_color_t __colorkey);
+
+	/* Lock the video buffer into memory for reading.
+	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
+	 *          a  lock to video  memory may block and/or  be much slower until
+	 *          said lock is released! The reason for this is that it is unsafe
+	 *          to use hardware accelerated 2D operations while a video lock is
+	 *          being held!
+	 * @return: 0:  Success
+	 * @return: -1: Error (s.a. `errno') */
+	__ATTR_NONNULL_T((1, 2)) int
+	(LIBVIDEO_GFX_CC *vi_rlock)(struct video_buffer *__restrict __self,
+	                            struct video_lock *__restrict __result);
+
+	/* Same as `vi_rlock', but also lock for reading+writing */
+	__ATTR_NONNULL_T((1, 2)) int
+	(LIBVIDEO_GFX_CC *vi_wlock)(struct video_buffer *__restrict __self,
+	                            struct video_lock *__restrict __result);
+
+	/* Unlock a video buffer that had previously been mapped into memory. */
+	__ATTR_NONNULL_T((1, 2)) void
+	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
+	                                        struct video_lock *__restrict __lock);
 };
-#endif /* __CC__ */
 
 
 
-#ifdef __CC__
+
+/************************************************************************/
+/* Video GFX helper functions                                           */
+/************************************************************************/
+
+/* Convert `__self' into the specified format.
+ * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT)(struct video_buffer *__restrict __self,
+                                         struct video_codec const *__codec,
+                                         struct video_palette *__palette,
+                                         unsigned int __type);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_convert(struct video_buffer *__restrict __self,
+                     struct video_codec const *__codec,
+                     struct video_palette *__palette,
+                     unsigned int __type);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 #ifdef __cplusplus
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
@@ -120,8 +150,10 @@ struct video_buffer {
 	video_dim_t              vb_size_y; /* Buffer size in Y (in pixels) */
 	/* Buffer-specific fields go here */
 
-#define video_buffer_lock(self, lock) \
-	(*(self)->vb_ops->vi_lock)(self, lock)
+#define video_buffer_rlock(self, lock) \
+	(*(self)->vb_ops->vi_rlock)(self, lock)
+#define video_buffer_wlock(self, lock) \
+	(*(self)->vb_ops->vi_wlock)(self, lock)
 #define video_buffer_unlock(self, lock) \
 	(*(self)->vb_ops->vi_unlock)(self, lock)
 #define video_buffer_getgfx(self, result, blendmode, flags, colorkey) \
@@ -136,7 +168,7 @@ struct video_buffer {
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */
 public:
 
-	/* Lock the video buffer into memory.
+	/* Lock the video buffer into memory for reading.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
 	 *          a  lock to video  memory may block and/or  be much slower until
 	 *          said lock is released! The reason for this is that it is unsafe
@@ -144,14 +176,20 @@ public:
 	 *          being held!
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
-	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
-	int LIBVIDEO_GFX_CC lock(struct video_lock &__lock) {
-		return video_buffer_lock(this, &__lock);
+	__CXX_CLASSMEMBER __ATTR_WUNUSED __ATTR_NONNULL_CXX((1))
+	int LIBVIDEO_GFX_CC rlock(struct video_lock &__lock) {
+		return video_buffer_rlock(this, &__lock);
+	}
+
+	/* Same as `vi_rlock', but also lock for reading+writing */
+	__CXX_CLASSMEMBER __ATTR_WUNUSED __ATTR_NONNULL_CXX((1))
+	int LIBVIDEO_GFX_CC wlock(struct video_lock &__lock) {
+		return video_buffer_wlock(this, &__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
-	void LIBVIDEO_GFX_CC unlock(struct video_lock const &__lock) {
+	void LIBVIDEO_GFX_CC unlock(struct video_lock &__lock) {
 		video_buffer_unlock(this, &__lock);
 	}
 
@@ -159,23 +197,46 @@ public:
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
-	gfx(struct video_gfx &__result,
-	    gfx_blendmode_t __blendmode = GFX_BLENDINFO_DEFAULT,
-	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey    = 0) {
+	getgfx(struct video_gfx &__result,
+	       gfx_blendmode_t __blendmode = GFX_BLENDINFO_OVERRIDE,
+	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	       video_color_t __colorkey    = 0) {
 		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 	}
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx LIBVIDEO_GFX_CC
-	gfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_DEFAULT,
-	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey    = 0) {
+	getgfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_OVERRIDE,
+	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	       video_color_t __colorkey    = 0) {
 		struct video_gfx __result;
 		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 		return __result;
 	}
+
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+	/* Convert `__self' into the specified format.
+	 * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
+	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
+	convert(struct video_codec const *__codec, struct video_palette *__palette,
+	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+		return video_buffer_convert(this, __codec, __palette, __type);
+	}
+	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
+	convert(struct video_format const *__format,
+	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+		return video_buffer_convert(this, __format->vf_codec, __format->vf_pal, __type);
+	}
+	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
+	convert(struct video_buffer const *__buffer_with_wanted_format,
+	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+		return video_buffer_convert(this,
+		                            __buffer_with_wanted_format->vb_format.vf_codec,
+		                            __buffer_with_wanted_format->vb_format.vf_pal,
+		                            __type);
+	}
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 #endif /* __cplusplus */
 };
 
@@ -191,16 +252,7 @@ __CXXDECL_END
 	(void)(__hybrid_atomic_decfetch(&(self)->vb_refcnt, __ATOMIC_SEQ_CST) || \
 	       (video_buffer_destroy(self), 0))
 __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
-#endif /* __CC__ */
 
-
-/* Video buffer types. */
-#define VIDEO_BUFFER_AUTO 0x0000 /* Type doesn't matter. */
-#define VIDEO_BUFFER_RAM  0x0001 /* RAM buffer. */
-#define VIDEO_BUFFER_GPU  0x0002 /* GPU buffer. */
-
-
-#ifdef __CC__
 
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
@@ -321,8 +373,7 @@ typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *(LIBVIDE
 LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-#endif /* __CC__ */
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBVIDEO_GFX_BUFFER_H */

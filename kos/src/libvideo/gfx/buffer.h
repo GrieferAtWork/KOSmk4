@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <libvideo/gfx/buffer.h>
@@ -31,13 +32,21 @@
 
 DECL_BEGIN
 
+/* Convert `__self' into the specified format.
+ * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_convert(struct video_buffer *__restrict self,
+                        struct video_codec const *codec,
+                        struct video_palette *palette,
+                        unsigned int type);
+
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
  *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
-INTDEF WUNUSED /*REF*/ struct video_buffer *CC
-libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
+INTDEF WUNUSED REF struct video_buffer *CC
+libvideo_buffer_create(unsigned int type, video_dim_t size_x, video_dim_t size_y,
                        struct video_codec const *codec, struct video_palette *palette);
 
 /* Return the preferred video format.

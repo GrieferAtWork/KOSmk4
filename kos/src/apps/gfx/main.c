@@ -92,9 +92,9 @@ int main(int argc, char *argv[]) {
 	screen = kos::inherit(screen_buffer_create());
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
-	screen->gfx(gfx,
-	            GFX_BLENDINFO_ALPHA,
-	            VIDEO_GFX_FLINEARBLIT);
+	screen->getgfx(gfx,
+	               GFX_BLENDINFO_ALPHA,
+	               VIDEO_GFX_FLINEARBLIT);
 
 	fontprinter_data.vfp_height  = 16;
 	fontprinter_data.vfp_font    = font;
@@ -156,9 +156,9 @@ again_font:
 		} else if (buf[0] == 'm') {
 			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
-			screen->gfx(gfx,
-			            GFX_BLENDINFO_ALPHA,
-			            gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT);
+			screen->getgfx(gfx,
+			               GFX_BLENDINFO_ALPHA,
+			               gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
@@ -265,10 +265,10 @@ step:
 			intptr_t y = (rand() % screen->vb_size_y) - 16;
 			dst_size_x = rand() % screen->vb_size_x;
 			dst_size_y = rand() % screen->vb_size_y;
-			screen->gfx(blurgfx,
-			            gfx.vx_blend,
-			            gfx.vx_flags | VIDEO_GFX_FBLUR,
-			            gfx.vx_colorkey);
+			screen->getgfx(blurgfx,
+			               gfx.vx_blend,
+			               gfx.vx_flags | VIDEO_GFX_FBLUR,
+			               gfx.vx_colorkey);
 			blurgfx.clip(video_gfx_startx(&gfx),
 			             video_gfx_starty(&gfx),
 			             video_gfx_sizex(&gfx),

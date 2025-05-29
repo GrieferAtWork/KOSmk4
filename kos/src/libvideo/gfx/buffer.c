@@ -41,6 +41,45 @@
 
 DECL_BEGIN
 
+/* Convert `__self' into the specified format.
+ * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
+DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_convert(struct video_buffer *__restrict self,
+                        struct video_codec const *codec,
+                        struct video_palette *palette,
+                        unsigned int type) {
+	REF struct video_buffer *result;
+
+	/* Ensure that no palette is used if none is needed. */
+	if (/*palette &&*/ !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+		palette = NULL;
+
+	/* Check for simple case: buffer is already in the expected format. */
+	if (self->vb_format.vf_codec == codec &&
+	    self->vb_format.vf_pal == palette) {
+		if (type == VIDEO_BUFFER_AUTO ||
+		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == rambuffer_getops())))
+			return incref(self);
+	}
+
+	/* Create a new video buffer */
+	result = libvideo_buffer_create(type, self->vb_size_x, self->vb_size_y, codec, palette);
+	if likely(result) {
+		struct video_gfx src_gfx;
+		struct video_gfx dst_gfx;
+		struct video_blit blit;
+
+		/* Blit the entirety of the source buffer into the target buffer. */
+		video_buffer_getgfx(self, &src_gfx, GFX_BLENDINFO_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDINFO_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+		video_gfx_blitfrom(&dst_gfx, &src_gfx, &blit);
+		(*blit.vb_xops.vbxo_blit)(&blit, 0, 0, 0, 0, self->vb_size_x, self->vb_size_y);
+	}
+	return result;
+}
+
+
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
  *       which may not necessarily use the  given, or default `codec' and  `palette'
@@ -48,7 +87,7 @@ DECL_BEGIN
  * @param: palette: The palette to use (only needed if used by `codec') */
 DEFINE_PUBLIC_ALIAS(video_buffer_create, libvideo_buffer_create);
 INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
+libvideo_buffer_create(unsigned int type, video_dim_t size_x, video_dim_t size_y,
                        struct video_codec const *codec, struct video_palette *palette) {
 	struct video_buffer *result;
 	/* Check for special case: empty video buffer. */
@@ -60,6 +99,10 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 		default_format = libvideo_preferred_format();
 		codec          = default_format->vf_codec;
 		palette        = default_format->vf_pal;
+	} else {
+		/* Ensure that no palette is used if none is needed. */
+		if (/*palette &&*/ !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
+			palette = NULL;
 	}
 	switch (type) {
 

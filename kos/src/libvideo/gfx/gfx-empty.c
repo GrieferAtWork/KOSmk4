@@ -52,6 +52,7 @@ libvideo_gfx_empty__putcolor(struct video_gfx *__restrict UNUSED(self),
 }
 
 DEFINE_INTERN_ALIAS(libvideo_gfx_empty__absline_lhhl, libvideo_gfx_empty__absline_llhh);
+DEFINE_INTERN_ALIAS(libvideo_gfx_empty__absfill, libvideo_gfx_empty__absline_llhh);
 INTERN NONNULL((1)) void CC
 libvideo_gfx_empty__absline_llhh(struct video_gfx *__restrict UNUSED(self),
                                  video_coord_t UNUSED(x), video_coord_t UNUSED(y),
@@ -264,7 +265,7 @@ libvideo_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
 
 INTERN NONNULL((1, 2)) void
 NOTHROW(CC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict UNUSED(self),
-                                         struct video_lock const *__restrict UNUSED(lock)) {
+                                         struct video_lock *__restrict UNUSED(lock)) {
 	COMPILER_IMPURE();
 }
 
@@ -286,7 +287,8 @@ libvideo_buffer_empty_getgfx(struct video_buffer *__restrict self,
 PRIVATE struct video_buffer_ops libvideo_buffer_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void) {
 	if (!libvideo_buffer_empty_ops.vi_getgfx) {
-		libvideo_buffer_empty_ops.vi_lock   = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_rlock  = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_wlock  = &libvideo_buffer_empty_lock;
 		libvideo_buffer_empty_ops.vi_unlock = &libvideo_buffer_empty_unlock;
 		COMPILER_WRITE_BARRIER();
 		libvideo_buffer_empty_ops.vi_getgfx = &libvideo_buffer_empty_getgfx;
@@ -339,6 +341,7 @@ libvideo_gfx_setempty(struct video_gfx *__restrict self) {
 	self->vx_xops.vgxo_absline_lhhl   = &libvideo_gfx_empty__absline_lhhl;
 	self->vx_xops.vgxo_absline_h      = &libvideo_gfx_empty__absline_h;
 	self->vx_xops.vgxo_absline_v      = &libvideo_gfx_empty__absline_v;
+	self->vx_xops.vgxo_absfill        = &libvideo_gfx_empty__absfill;
 	self->vx_xops.vgxo_bitfill        = &libvideo_gfx_empty__bitfill;
 	self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_empty__bitstretchfill;
 

@@ -302,7 +302,7 @@ libvideo_buffer_save_png(struct video_buffer *__restrict self,
 		return libvideo_buffer_convert_and_save_png(self, stream, options);
 	}
 
-	result = (*self->vb_ops->vi_lock)(self, &lock);
+	result = (*self->vb_ops->vi_rlock)(self, &lock);
 	if unlikely(result)
 		return result;
 	lodepng_stride = get_lodepng_stride(self->vb_size_x,

@@ -528,7 +528,7 @@ rambuffer_lock(struct video_buffer *__restrict self,
 
 INTERN NONNULL((1, 2)) void
 NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
-                             struct video_lock const *__restrict lock) {
+                             struct video_lock *__restrict lock) {
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
@@ -564,6 +564,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
 	result->vx_offt_x = 0;
 	result->vx_offt_y = 0;
+	result->vx_xmin   = 0;
+	result->vx_ymin   = 0;
 	result->vx_xend   = self->vb_size_x;
 	result->vx_yend   = self->vb_size_y;
 
@@ -592,20 +594,36 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
 
-	result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom;
-	result->vx_xops.vgxo_absline_llhh   = &libvideo_gfx_generic__absline_llhh;
-	result->vx_xops.vgxo_absline_lhhl   = &libvideo_gfx_generic__absline_lhhl;
-	result->vx_xops.vgxo_absline_h      = &libvideo_gfx_generic__absline_h;
-	result->vx_xops.vgxo_absline_v      = &libvideo_gfx_generic__absline_v;
-	result->vx_xops.vgxo_bitfill        = &libvideo_gfx_generic__bitfill;
-	result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill;
 	if (result->vx_xops.vgxo_putcolor == &libvideo_gfx_ramgfx_putcolor_noblend) {
-		/* TODO: Assign more optimal operators to `result->vx_xops' */
+		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+		result->vx_xops.vgxo_absline_h    = &libvideo_gfx_noblend__absline_h;
+		result->vx_xops.vgxo_absline_v    = &libvideo_gfx_noblend__absline_v;
+		result->vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
+		result->vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
+		if (flags & VIDEO_GFX_FLINEARBLIT) {
+			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_l;
+			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_l;
+		} else {
+			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
+			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+		}
+	} else {
+		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
+		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
+		result->vx_xops.vgxo_absline_h    = &libvideo_gfx_generic__absline_h;
+		result->vx_xops.vgxo_absline_v    = &libvideo_gfx_generic__absline_v;
+		result->vx_xops.vgxo_absfill      = &libvideo_gfx_generic__absfill;
+		result->vx_xops.vgxo_bitfill      = &libvideo_gfx_generic__bitfill;
+		if (flags & VIDEO_GFX_FLINEARBLIT) {
+			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_l;
+			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+		} else {
+			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_n;
+			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
+		}
 	}
-
 	result->vx_ops = &libvideo_gfx_generic_ops;
-	result->vx_xmin = result->vx_offt_x <= 0 ? (video_coord_t)0 : (video_coord_t)result->vx_offt_x;
-	result->vx_ymin = result->vx_offt_y <= 0 ? (video_coord_t)0 : (video_coord_t)result->vx_offt_y;
 	return result;
 }
 
@@ -614,7 +632,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_lock    = &rambuffer_lock;
+		rambuffer_ops.vi_rlock   = &rambuffer_lock;
+		rambuffer_ops.vi_wlock   = &rambuffer_lock;
 		rambuffer_ops.vi_unlock  = &rambuffer_unlock;
 		rambuffer_ops.vi_getgfx  = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
@@ -686,7 +705,8 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC membuffer_getops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
-		membuffer_ops.vi_lock   = &rambuffer_lock;
+		membuffer_ops.vi_rlock  = &rambuffer_lock;
+		membuffer_ops.vi_wlock  = &rambuffer_lock;
 		membuffer_ops.vi_unlock = &rambuffer_unlock;
 		membuffer_ops.vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
@@ -760,9 +780,6 @@ libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t
 err:
 	return NULL;
 }
-
-
-
 
 DECL_END
 

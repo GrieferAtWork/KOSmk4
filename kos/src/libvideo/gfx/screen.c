@@ -481,7 +481,8 @@ svga_newscreen(void) {
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
-	result->ss_ops.sbo_video.vi_lock    = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_rlock   = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_wlock   = &rambuffer_lock;
 	result->ss_ops.sbo_video.vi_unlock  = &rambuffer_unlock;
 	result->ss_ops.sbo_video.vi_getgfx  = &rambuffer_getgfx;
 	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
