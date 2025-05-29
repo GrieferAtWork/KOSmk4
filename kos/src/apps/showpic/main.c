@@ -73,10 +73,10 @@ int main(int argc, char *argv[]) {
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FLINEARBLIT, 0, NULL);
+	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FLINEARBLIT, 0, NULL);
+	                    VIDEO_GFX_FLINEARBLIT, 0);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_sizex(&image_gfx);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 	/* Display the image */
 	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
-	                  &image_gfx, 0, 0, SIZE_MAX, SIZE_MAX);
+	                  &image_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
 	/* Wait for user input */

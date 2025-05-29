@@ -28,6 +28,7 @@
 
 #include "api.h"
 #include "pixel.h"
+#include "types.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
@@ -60,28 +61,28 @@ struct video_format {
 public: /* Low-level, memory-based pixel accessor functions. */
 
 	/* Get a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict line, __uintptr_t x) const { return video_format_getpixel(this, line, x); }
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict line, __uintptr_t x) const { return video_format_getcolor(this, line, x); }
+	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getpixel(this, __line, __x); }
+	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getcolor(this, __line, __x); }
 
 	/* Set a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setpixel(__byte_t *__restrict line, __uintptr_t x, video_pixel_t pixel) const { video_format_setpixel(this, line, x, pixel); }
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setcolor(__byte_t *__restrict line, __uintptr_t x, video_color_t color) const { video_format_setcolor(this, line, x, color); }
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setpixel(__byte_t *__restrict __line, video_coord_t __x, video_pixel_t __pixel) const { video_format_setpixel(this, __line, __x, __pixel); }
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setcolor(__byte_t *__restrict __line, video_coord_t __x, video_color_t __color) const { video_format_setcolor(this, __line, __x, __color); }
 
 	/* Convert between color and pixel values. */
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t pixel) const { return video_format_pixel2color(this, pixel); }
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t color) const { return video_format_color2pixel(this, color); }
+	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t __pixel) const { return video_format_pixel2color(this, __pixel); }
+	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t __color) const { return video_format_color2pixel(this, __color); }
 
 	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linecopy(__byte_t *__restrict dst_line, __uintptr_t dst_x,
-	                                                  __byte_t const *__restrict src_line, __uintptr_t src_x,
-	                                                  __size_t num_pixels) const {
-		video_format_linecopy(this, dst_line, dst_x, src_line, src_x, num_pixels);
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linecopy(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
+	                                                  __byte_t const *__restrict __src_line, video_coord_t __src_x,
+	                                                  video_dim_t __num_pixels) const {
+		video_format_linecopy(this, __dst_line, __dst_x, __src_line, __src_x, __num_pixels);
 	}
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linefill(__byte_t *__restrict line, __uintptr_t dst_x,
-	                                                  video_pixel_t pixel, __size_t num_pixels) const {
-		video_format_linefill(this, line, dst_x, pixel, num_pixels);
+	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linefill(__byte_t *__restrict __line, video_coord_t __dst_x,
+	                                                  video_pixel_t __pixel, video_dim_t __num_pixels) const {
+		video_format_linefill(this, __line, __dst_x, __pixel, __num_pixels);
 	}
 
 #endif /* __cplusplus */

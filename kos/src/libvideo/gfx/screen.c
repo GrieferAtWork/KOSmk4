@@ -484,7 +484,6 @@ svga_newscreen(void) {
 	result->ss_ops.sbo_video.vi_lock    = &rambuffer_lock;
 	result->ss_ops.sbo_video.vi_unlock  = &rambuffer_unlock;
 	result->ss_ops.sbo_video.vi_getgfx  = &rambuffer_getgfx;
-	result->ss_ops.sbo_video.vi_clipgfx = &rambuffer_clipgfx;
 	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
 	shared_lock_init(&result->ss_cslock);
 

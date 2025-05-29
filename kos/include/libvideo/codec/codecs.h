@@ -32,6 +32,7 @@
 #include <kos/refcnt.h>
 
 #include "pixel.h"
+#include "types.h"
 
 __DECL_BEGIN
 
@@ -136,61 +137,61 @@ struct video_codec {
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes. */
 	__ATTR_NONNULL_T((3)) void
-	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(__size_t size_x, __size_t size_y,
-	                                               struct video_rambuffer_requirements *__restrict result);
+	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
+	                                               struct video_rambuffer_requirements *__restrict __result);
 
 	/* Get a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-	(LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict line, __uintptr_t x);
+	(LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict __line, video_coord_t __x);
 
 	/* Set a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict line,
-	                                 __uintptr_t x, video_pixel_t pixel);
+	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict __line,
+	                                 video_coord_t __x, video_pixel_t __pixel);
 
 	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__ATTR_NONNULL_T((1, 3)) void
-	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict dst_line, __uintptr_t dst_x,
-	                                 __byte_t const *__restrict src_line, __uintptr_t src_x,
-	                                 __size_t num_pixels);
+	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
+	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x,
+	                                 video_dim_t __num_pixels);
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict line, __uintptr_t dst_x,
-	                                 video_pixel_t pixel, __size_t num_pixels);
+	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict __line, video_coord_t __dst_x,
+	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
 
 	/* Convert between color and pixel values. */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
-	(LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict self,
-	                                    video_pixel_t pixel);
+	(LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict __self,
+	                                    video_pixel_t __pixel);
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict self,
-	                                    video_color_t color);
+	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict __self,
+	                                    video_color_t __color);
 };
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t codec);
+(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t __codec);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_lookup)(video_codec_t codec);
+(LIBVIDEO_CODEC_CC video_codec_lookup)(video_codec_t __codec);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict specs);
+(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict __specs);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_lookup_specs)(struct video_codec_specs const *__restrict specs);
+(LIBVIDEO_CODEC_CC video_codec_lookup_specs)(struct video_codec_specs const *__restrict __specs);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 
 /* Anonymous descriptor for a (possibly) dynamically created codec. */
 struct video_codec_handle {
 	__uintptr_t              vch_refcnt; /* Reference counter. */
-	void (LIBVIDEO_CODEC_CC *vch_destroy)(struct video_codec_handle *__restrict self);
+	void (LIBVIDEO_CODEC_CC *vch_destroy)(struct video_codec_handle *__restrict __self);
 	/* Actual implementation data goes here */
 };
 
@@ -218,12 +219,12 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_han
  * @return: NULL: [ENOMEM] Out-of-memory or too many custom codecs allocated already
  * @return: NULL: [*] Error */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_FROMSPECS)(struct video_codec_specs const *__restrict specs,
-                                            /*out*/ __REF struct video_codec_handle **__restrict p_handle);
+(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_FROMSPECS)(struct video_codec_specs const *__restrict __specs,
+                                            /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_fromspecs)(struct video_codec_specs const *__restrict specs,
-                                          /*out*/ __REF struct video_codec_handle **__restrict p_handle);
+(LIBVIDEO_CODEC_CC video_codec_fromspecs)(struct video_codec_specs const *__restrict __specs,
+                                          /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 

@@ -94,9 +94,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->gfx(gfx,
 	            GFX_BLENDINFO_ALPHA,
-	            VIDEO_GFX_FLINEARBLIT,
-	            0,
-	            NULL);
+	            VIDEO_GFX_FLINEARBLIT);
 
 	fontprinter_data.vfp_height  = 16;
 	fontprinter_data.vfp_font    = font;
@@ -108,21 +106,21 @@ int main(int argc, char *argv[]) {
 again_font:
 
 	struct video_gfx fontgfx;
+	fontgfx = gfx;
 	if (render_mode == 0) {
 		/* Upper half + lower half */
-		gfx.clip(fontgfx, 0, 0, (size_t)-1, (size_t)-1);
+		fontgfx.clip(0, 0, (size_t)-1, (size_t)-1);
 		fontprinter_data.vfp_cury = 0;
 	} else if (render_mode == 1) {
 		/* lower half only (plus additional lines) */
-		gfx.clip(fontgfx,
-		         0,
-		         (intptr_t)(fontprinter_data.vfp_height / 2),
-		         (size_t)-1,
-		         (size_t)-1);
+		fontgfx.clip(0,
+		             (intptr_t)(fontprinter_data.vfp_height / 2),
+		             (size_t)-1,
+		             (size_t)-1);
 		fontprinter_data.vfp_cury = -(intptr_t)(fontprinter_data.vfp_height / 2);
 	} else {
 		/* upper half only */
-		gfx.clip(fontgfx, 0, 0, (size_t)-1, fontprinter_data.vfp_height / 2);
+		fontgfx.clip(0, 0, (size_t)-1, fontprinter_data.vfp_height / 2);
 		fontprinter_data.vfp_cury = 0;
 	}
 	fontprinter_data.vfp_gfx   = &fontgfx;
@@ -160,9 +158,7 @@ again_font:
 		} else if (buf[0] == 's') {
 			screen->gfx(gfx,
 			            GFX_BLENDINFO_ALPHA,
-			            gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT,
-			            0,
-			            NULL);
+			            gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
@@ -264,21 +260,19 @@ step:
 
 		case 3: {
 			struct video_gfx blurgfx;
-			struct video_buffer_rect clip;
 			size_t dst_size_x, dst_size_y;
 			intptr_t x = (rand() % screen->vb_size_x) - 16;
 			intptr_t y = (rand() % screen->vb_size_y) - 16;
 			dst_size_x = rand() % screen->vb_size_x;
 			dst_size_y = rand() % screen->vb_size_y;
-			clip.vbr_startx = video_gfx_startx(&gfx);
-			clip.vbr_starty = video_gfx_starty(&gfx);
-			clip.vbr_sizex  = video_gfx_sizex(&gfx);
-			clip.vbr_sizey  = video_gfx_sizey(&gfx);
 			screen->gfx(blurgfx,
 			            gfx.vx_blend,
 			            gfx.vx_flags | VIDEO_GFX_FBLUR,
-			            gfx.vx_colorkey,
-			            &clip);
+			            gfx.vx_colorkey);
+			blurgfx.clip(video_gfx_startx(&gfx),
+			             video_gfx_starty(&gfx),
+			             video_gfx_sizex(&gfx),
+			             video_gfx_sizey(&gfx));
 			gfx.blit((intptr_t)x - gfx.vx_offt_x,
 			         (intptr_t)y - gfx.vx_offt_y,
 			         blurgfx,

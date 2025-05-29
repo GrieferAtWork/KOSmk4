@@ -17,29 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H
-#define GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H 1
+#ifndef _LIBVIDEO_CODEC_TYPES_H
+#define _LIBVIDEO_CODEC_TYPES_H 1
+
+#include <__stdinc.h>
+
+#include <hybrid/typecore.h>
 
 #include "api.h"
 
-#include <hybrid/compiler.h>
+#define __SIZEOF_VIDEO_OFFSET_T__ __SIZEOF_INT_FAST32_T__
+#define __SIZEOF_VIDEO_COORD_T__  __SIZEOF_INT_FAST32_T__
+#define __SIZEOF_VIDEO_DIM_T__    __SIZEOF_INT_FAST32_T__
 
-#include "buffer.h"
+#ifdef __CC__
+__DECL_BEGIN
 
-DECL_BEGIN
+typedef __INT_FAST32_TYPE__ video_offset_t; /* Pixel offset (usually relative to some GFX context) */
+typedef __UINT_FAST32_TYPE__ video_coord_t; /* Pixel coordinate (usually absolute) */
+typedef __UINT_FAST32_TYPE__ video_dim_t;   /* Graphic dimension (in pixels) */
+#define VIDEO_DIM_MAX ((video_dim_t)-1)
 
-INTDEF ATTR_CONST NONNULL((1)) video_color_t CC video_gfx_empty_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF NONNULL((1)) void CC video_gfx_empty_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+__DECL_END
+#endif /* __CC__ */
 
-/* Return GFX operators for an empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_getemptygfxops(void);
-
-/* Return operators for an empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC libvideo_getemptybufferops(void);
-
-/* Return the empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC libvideo_getemptybuffer(void);
-
-DECL_END
-
-#endif /* !GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H */
+#endif /* !_LIBVIDEO_CODEC_TYPES_H */

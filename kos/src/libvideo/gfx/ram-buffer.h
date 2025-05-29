@@ -47,33 +47,27 @@ struct video_rambuffer: video_buffer {
 INTDEF NONNULL((1)) void CC rambuffer_destroy(struct video_buffer *__restrict self);
 INTDEF NONNULL((1, 2)) int CC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
 INTDEF NONNULL((1, 2)) void NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock const *__restrict lock);
-INTDEF NONNULL((1, 2)) void CC
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) struct video_gfx *CC
 rambuffer_getgfx(struct video_buffer *__restrict self,
                  struct video_gfx *__restrict result,
                  gfx_blendmode_t blendmode, uintptr_t flags,
-                 video_color_t colorkey,
-                 struct video_buffer_rect const *clip);
-INTDEF NONNULL((1, 2)) void CC
-rambuffer_clipgfx(struct video_gfx const *gfx,
-                  struct video_gfx *result,
-                  intptr_t start_x, intptr_t start_y,
-                  size_t size_x, size_t size_y);
+                 video_color_t colorkey);
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
-INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
-INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 
 
 /* Create a new RAM-based video buffer */
 INTDEF WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
-libvideo_rambuffer_create(size_t size_x, size_t size_y,
+libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
                           struct video_codec const *__restrict codec,
                           struct video_palette *palette);
 
@@ -97,7 +91,7 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
  * @return: * :   The newly created video buffer
  * @return: NULL: Error (s.a. `errno') */
 INTDEF WUNUSED NONNULL((5)) REF struct video_buffer *CC
-libvideo_buffer_formem(void *mem, size_t size_x, size_t size_y, size_t stride,
+libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t stride,
                        struct video_codec const *codec, struct video_palette *palette,
                        void (CC *release_mem)(void *cookie, void *mem),
                        void *release_mem_cookie);

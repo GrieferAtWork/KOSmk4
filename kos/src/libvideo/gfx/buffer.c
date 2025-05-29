@@ -36,7 +36,7 @@
 /**/
 
 #include "buffer.h"
-#include "empty-buffer.h"
+#include "gfx-empty.h"
 #include "ram-buffer.h"
 
 DECL_BEGIN
@@ -53,7 +53,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 	struct video_buffer *result;
 	/* Check for special case: empty video buffer. */
 	if unlikely(!size_x || !size_y)
-		return incref(libvideo_getemptybuffer());
+		return incref(&libvideo_buffer_empty);
 	if (!codec) {
 		/* Lookup the default format. */
 		struct video_format const *default_format;

@@ -34,6 +34,7 @@
 
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 
 #include "gfx.h"
 
@@ -47,16 +48,16 @@ __DECL_BEGIN
 struct video_format;
 
 struct video_lock {
-	__size_t  vl_stride; /* Scanline width (in bytes) */
-	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_size_y) */
 	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
+	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_size_y) */
+	__size_t  vl_stride; /* Scanline width (in bytes) */
 };
 
 struct video_buffer_rect {
-	__intptr_t vbr_startx; /* Starting X coord */
-	__intptr_t vbr_starty; /* Starting Y coord */
-	__size_t   vbr_sizex;  /* Rect size in X */
-	__size_t   vbr_sizey;  /* Rect size in Y */
+	video_offset_t vbr_startx; /* Starting X coord */
+	video_offset_t vbr_starty; /* Starting Y coord */
+	video_dim_t    vbr_sizex;  /* Rect size in X */
+	video_dim_t    vbr_sizey;  /* Rect size in Y */
 };
 
 struct video_buffer_ops {
@@ -95,27 +96,12 @@ struct video_buffer_ops {
 	 * @param: colorkey:  A specific color that should always return fully opaque when read
 	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or
 	 *                    alternatively, just pass `0' (which would be one such color))
-	 * @param: clip:      When non-NULL, specify  a clip-rect  to which drawing  should be  restricted.
-	 *                    All canvas coords  will be  relative to this  rectangle, and  and attempt  to
-	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
-	__ATTR_NONNULL_T((1, 2)) void
+	 * @return: * : Always re-returns `__result' */
+	__ATTR_RETNONNULL __ATTR_NONNULL_T((1, 2)) struct video_gfx *
 	(LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
 	                             struct video_gfx *__restrict __result,
 	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
-	                             video_color_t __colorkey,
-	                             struct video_buffer_rect const *__clip);
-
-	/* Clip the given `gfx', given a set of coords relative to the current clip state `gfx',
-	 * and store the newly created  GFX context in `*result'  (note that `gfx' and  `result'
-	 * may be identical for this purpose!) */
-	__ATTR_NONNULL_T((1, 2)) void
-	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
-	                              struct video_gfx *__result,
-	                              __intptr_t __start_x, __intptr_t __start_y,
-	                              __size_t __size_x, __size_t __size_y);
-
-	/* TODO: Have a sub-class "screen_buffer" that provides additional ops relevant to
-	 *       only the screen itself (primarily: waiting for ) */
+	                             video_color_t __colorkey);
 };
 #endif /* __CC__ */
 
@@ -130,16 +116,16 @@ struct video_buffer {
 	__uintptr_t              vb_refcnt; /* Reference counter. */
 	struct video_buffer_ops *vb_ops;    /* [1..1][const] Buffer operations. */
 	struct video_format      vb_format; /* [const] Buffer format. */
-	__size_t                 vb_size_x; /* Buffer size in X */
-	__size_t                 vb_size_y; /* Buffer size in Y */
+	video_dim_t              vb_size_x; /* Buffer size in X (in pixels) */
+	video_dim_t              vb_size_y; /* Buffer size in Y (in pixels) */
 	/* Buffer-specific fields go here */
 
 #define video_buffer_lock(self, lock) \
 	(*(self)->vb_ops->vi_lock)(self, lock)
 #define video_buffer_unlock(self, lock) \
 	(*(self)->vb_ops->vi_unlock)(self, lock)
-#define video_buffer_getgfx(self, result, blendmode, flags, colorkey, clip) \
-	(*(self)->vb_ops->vi_getgfx)(self, result, blendmode, flags, colorkey, clip)
+#define video_buffer_getgfx(self, result, blendmode, flags, colorkey) \
+	(*(self)->vb_ops->vi_getgfx)(self, result, blendmode, flags, colorkey)
 
 #ifdef __cplusplus
 #ifndef GUARD_LIBVIDEO_GFX_API_H
@@ -149,15 +135,6 @@ struct video_buffer {
 	__CXX_DELETE_COPY_ASSIGN(video_buffer);
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */
 public:
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("lock")
-#pragma push_macro("unlock")
-#pragma push_macro("gfx")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef lock
-#undef unlock
-#undef gfx
 
 	/* Lock the video buffer into memory.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
@@ -183,60 +160,24 @@ public:
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
 	gfx(struct video_gfx &__result,
-	    gfx_blendmode_t __blendmode    = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t __flags            = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey       = 0,
-		struct video_buffer_rect *clip = __NULLPTR) {
-		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey, clip);
-		return __result;
+	    gfx_blendmode_t __blendmode = GFX_BLENDINFO_DEFAULT,
+	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey    = 0) {
+		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 	}
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx LIBVIDEO_GFX_CC
-	gfx(gfx_blendmode_t __blendmode    = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t __flags            = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey       = 0,
-		struct video_buffer_rect *clip = __NULLPTR) {
+	gfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_DEFAULT,
+	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey    = 0) {
 		struct video_gfx __result;
-		gfx(__result, __blendmode, __flags, __colorkey, clip);
+		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 		return __result;
 	}
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("gfx")
-#pragma pop_macro("unlock")
-#pragma pop_macro("lock")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus */
 };
-
-#ifdef __cplusplus
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("clip")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef clip
-
-__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
-video_gfx::clip(struct video_gfx &__result,
-                __intptr_t __start_x, __intptr_t __start_y,
-                __size_t __size_x, __size_t __size_y) const {
-	video_gfx_clip(this, &__result, __start_x, __start_y, __size_x, __size_y);
-	return __result;
-}
-
-__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
-video_gfx::clip(__intptr_t __start_x, __intptr_t __start_y,
-                __size_t __size_x, __size_t __size_y) {
-	video_gfx_clip(this, this, __start_x, __start_y, __size_x, __size_y);
-	return *this;
-}
-
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("clip")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __cplusplus */
 
 #ifdef __cplusplus
 __CXXDECL_END
@@ -267,11 +208,11 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
 typedef __ATTR_WUNUSED_T __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int __type, __size_t __size_x, __size_t __size_y,
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int __type, video_dim_t __size_x, video_dim_t __size_y,
                                         struct video_codec const *__codec, struct video_palette *__palette);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
+video_buffer_create(unsigned int __type, video_dim_t __size_x, video_dim_t __size_y,
                     struct video_codec const *__codec, struct video_palette *__palette);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
@@ -297,13 +238,13 @@ video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
  * @return: NULL: [errno=EINVAL] Given `stride' is too small for `codec' and `size_y'
  * @return: NULL: [errno=ENOMEM] Insufficient memory */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((5)) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORMEM)(void *__mem, __size_t __size_x, __size_t __size_y, __size_t __stride,
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORMEM)(void *__mem, video_dim_t __size_x, video_dim_t __size_y, __size_t __stride,
                                         struct video_codec const *__codec, struct video_palette *__palette,
                                         void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
                                         void *__release_mem_cookie);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((5)) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_buffer_formem(void *__mem, __size_t __size_x, __size_t __size_y, __size_t __stride,
+video_buffer_formem(void *__mem, video_dim_t __size_x, video_dim_t __size_y, __size_t __stride,
                     struct video_codec const *__codec, struct video_palette *__palette,
                     void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
                     void *__release_mem_cookie);

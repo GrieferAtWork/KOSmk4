@@ -117,9 +117,9 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		result = me->tf_hdr->h_chwidth;
 		gfx->bitfill(/* x:       */ x,
 		             /* y:       */ y,
-		             /* color:   */ color,
 		             /* size_x:  */ result,
 		             /* size_y:  */ height,
+		             /* color:   */ color,
 		             /* bitmask: */ bm,
 		             /* bitskip: */ 0,
 		             /* bitscan: */ result);
