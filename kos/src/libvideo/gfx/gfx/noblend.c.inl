@@ -651,7 +651,7 @@ libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx) {
 	} else if (src_buffer->vb_format.vf_codec == dst_buffer->vb_format.vf_codec &&
 	           src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal &&
 	           (ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
-	           (ctx->vb_src->vx_colorkey & VIDEO_COLOR_ALPHA_MASK) == 0) {
+	           VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
 		/* Special optimization when not doing any blending, and both GFX contexts
 		 * share the same codec: in this case,  we can try to directly copy  pixel
 		 * data, either through video locks, or by directly reading/writing pixels */
@@ -681,7 +681,7 @@ libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx) {
 	} else if (src_buffer->vb_format.vf_codec == dst_buffer->vb_format.vf_codec &&
 	           src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal &&
 	           (ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
-	           (ctx->vb_src->vx_colorkey & VIDEO_COLOR_ALPHA_MASK) == 0) {
+	           VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
 		/* Special optimization when not doing any blending, and both GFX contexts
 		 * share the same codec: in this case,  we can try to directly copy  pixel
 		 * data, either through video locks, or by directly reading/writing pixels */

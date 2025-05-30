@@ -118,7 +118,7 @@ libvideo_gfx_allow_noblend(struct video_gfx *__restrict self,
 	gfx_blendmode_t mode = self->vx_blend;
 	/* TODO: Do this dynamically for all blending modes */
 	if (mode == GFX_BLENDINFO_ALPHA)
-		return (*p_color & VIDEO_COLOR_ALPHA_MASK) == VIDEO_COLOR_ALPHA_MASK;
+		return VIDEO_COLOR_ISOPAQUE(*p_color);
 	return false;
 }
 

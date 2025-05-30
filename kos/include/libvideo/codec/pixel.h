@@ -72,6 +72,9 @@ __DECL_BEGIN
 	 (__CCAST(video_color_t)(b) << VIDEO_COLOR_BLUE_SHIFT) |  \
 	 VIDEO_COLOR_ALPHA_MASK)
 
+/* Check if the given "color" should be treated as being "transparent" / "opaque" */
+#define VIDEO_COLOR_ISTRANSPARENT(color) (((color) & VIDEO_COLOR_ALPHA_MASK) == 0)
+#define VIDEO_COLOR_ISOPAQUE(color)      (((color) & VIDEO_COLOR_ALPHA_MASK) == VIDEO_COLOR_ALPHA_MASK)
 
 /* Standard video colors */
 #define VIDEO_COLOR_BLACK      VIDEO_COLOR_RGB(0x00, 0x00, 0x00)

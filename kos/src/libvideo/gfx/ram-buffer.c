@@ -539,7 +539,7 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	/* Select how pixels should be read. */
 	if (flags & VIDEO_GFX_FBLUR) {
 		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_blur;
-	} else if ((colorkey & VIDEO_COLOR_ALPHA_MASK) != 0) {
+	} else if (!VIDEO_COLOR_ISTRANSPARENT(colorkey)) {
 		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_with_key;
 	} else {
 		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_noblend;

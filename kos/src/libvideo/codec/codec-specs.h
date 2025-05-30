@@ -36,12 +36,11 @@ DECL_BEGIN
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
 
-/* Same as `video_codec_lookup_specs()', but can  also be used to  construct
- * new codecs on-the-fly (if supported/implemented by the host architecture)
- *
- * Because this function is able/allowed to create new codecs on-the-fly, the
- * caller must take ownership of a  reference to `*p_handle' on success,  and
- * keep that reference alive for as long as the returned codec is in-use.
+/* Same as `video_codec_lookup_specs()', but can also be used to construct
+ * new codecs on-the-fly. Because this function is able/allowed to  create
+ * new codecs on-the-fly, the caller must take ownership of a reference to
+ * `*p_handle'  on success, and  keep that reference alive  for as long as
+ * the the returned codec is in-use.
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
@@ -50,7 +49,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec
- * @return: NULL: [ENOMEM] Out-of-memory or too many custom codecs allocated already
+ * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
 INTDEF WUNUSED NONNULL((1, 2)) struct video_codec const *CC
 libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,

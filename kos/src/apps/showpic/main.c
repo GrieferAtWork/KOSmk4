@@ -75,13 +75,13 @@ int main(int argc, char *argv[]) {
 
 #if 0 /* For debugging the same-format blit-scretch function */
 	image = video_buffer_convert(image,
-	                             ((REF struct video_buffer *)screen)->vb_format.vf_codec,
-	                             ((REF struct video_buffer *)screen)->vb_format.vf_pal,
+	                             screen_buffer_asvideo(screen)->vb_format.vf_codec,
+	                             screen_buffer_asvideo(screen)->vb_format.vf_pal,
 	                             VIDEO_BUFFER_AUTO);
 #endif
 
 	/* Load GFX contexts for the image and the screen */
-	video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
+	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
 	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 	blit_x = (video_gfx_sizex(&screen_gfx) - blit_w) / 2;
 	blit_y = (video_gfx_sizey(&screen_gfx) - blit_h) / 2;
 
-#if 1
+#if 0
 	blit_w = video_gfx_sizex(&screen_gfx);
 	blit_h = video_gfx_sizey(&screen_gfx);
 	blit_x = 0;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
 #if 0 /* Not necessary; we're about to exit, so this happens automatically */
 	video_buffer_decref(image);
-	video_buffer_decref((struct video_buffer *)screen);
+	video_buffer_decref(screen_buffer_asvideo(screen));
 #endif
 	return 0;
 }

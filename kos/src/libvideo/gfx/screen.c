@@ -58,6 +58,7 @@
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/screen.h>
 /**/
@@ -172,7 +173,7 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 }
 
 #define LOGERR(format, ...) \
-	syslog(LOG_ERR, "[libvideo][screen:%d] " format, __LINE__, ##__VA_ARGS__)
+	syslog(LOG_ERR, "[libvideo][svga-screen:%d] " format, __LINE__, ##__VA_ARGS__)
 
 PRIVATE WUNUSED NONNULL((2)) int CC
 svga_find_first_gfx_mode(fd_t fd, struct svga_modeinfo *__restrict mode) {
@@ -269,13 +270,13 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 	result->vcs_bpp = self->smi_bits_per_pixel;
 	if (result->vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
 		result->vcs_cbits = self->smi_colorbits;
-		result->vcs_rmask = ((uint32_t)1 << result->vcs_cbits) - 1;
+		result->vcs_rmask = ((video_pixel_t)1 << result->vcs_cbits) - 1;
 		result->vcs_gmask = result->vcs_rmask;
 		result->vcs_bmask = result->vcs_rmask;
 	} else {
-		result->vcs_rmask = (((uint32_t)1 << self->smi_rbits) - 1) << self->smi_rshift;
-		result->vcs_gmask = (((uint32_t)1 << self->smi_gbits) - 1) << self->smi_gshift;
-		result->vcs_bmask = (((uint32_t)1 << self->smi_bbits) - 1) << self->smi_bshift;
+		result->vcs_rmask = (((video_pixel_t)1 << self->smi_rbits) - 1) << self->smi_rshift;
+		result->vcs_gmask = (((video_pixel_t)1 << self->smi_gbits) - 1) << self->smi_gshift;
+		result->vcs_bmask = (((video_pixel_t)1 << self->smi_bbits) - 1) << self->smi_bshift;
 	}
 	result->vcs_amask = 0;
 }
@@ -401,13 +402,13 @@ svga_newscreen(void) {
 	/* Find the relevant chipset driver. */
 	driver = (*svga_chipset_getdrivers)();
 	if unlikely(!driver) {
-		syslog(LOG_ERR, "[libvideo] No drivers available\n");
+		LOGERR("No drivers available\n");
 		goto err_svga_vdlck_codec_format_libsvgadrv;
 	}
 	while (strcmp(driver->scd_name, csname) != 0) {
 		if unlikely(!driver->scd_probe) {
-			syslog(LOG_ERR, "[libvideo] No driver to active chipset %q\n", csname);
-			errno = ENODEV; /*  */
+			LOGERR("No driver matching active chipset %q\n", csname);
+			errno = ENODEV;
 			goto err_svga_vdlck_codec_format_libsvgadrv;
 		}
 		++driver;
@@ -433,7 +434,7 @@ svga_newscreen(void) {
 	result->ss_cs.sc_ops.sco_hw_async_copyrect = NULL;
 	result->ss_cs.sc_ops.sco_hw_async_fillrect = NULL;
 	if (!(*driver->scd_probe)(&result->ss_cs)) {
-		syslog(LOG_ERR, "[libvideo] Failed to init chipset %q\n", csname);
+		LOGERR("Failed to init chipset %q\n", csname);
 		goto err_svga_vdlck_codec_format_libsvgadrv_r;
 	}
 

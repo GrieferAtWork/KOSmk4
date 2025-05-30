@@ -79,8 +79,10 @@ struct screen_buffer
 #ifndef __cplusplus
 	struct video_buffer sb_video; /* Underlying video controller */
 #define _screen_buffer__sb_video sb_video.
+#define screen_buffer_asvideo(self) (&(self)->sb_video)
 #else /* __cplusplus */
 #define _screen_buffer__sb_video /* nothing */
+#define screen_buffer_asvideo(self) (self)
 #endif /* !__cplusplus */
 
 #ifdef __cplusplus

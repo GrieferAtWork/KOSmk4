@@ -28,10 +28,14 @@
 
 #include <hybrid/host.h>
 
-#include <errno.h>
-#include <stddef.h>
 #include <kos/anno.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <malloc.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <libvideo/codec/codecs.h>
 
@@ -249,17 +253,30 @@ nope:
 
 
 PRIVATE struct video_codec_handle dummy_handle = {
-	.vch_refcnt  = 100,
+	.vch_refcnt  = 0x7fff,
 	.vch_destroy = (void (CC *)(struct video_codec_handle *__restrict))(void *)-1,
 };
 
 
-/* Same as `video_codec_lookup_specs()', but can  also be used to  construct
- * new codecs on-the-fly (if supported/implemented by the host architecture)
- *
- * Because this function is able/allowed to create new codecs on-the-fly, the
- * caller must take ownership of a  reference to `*p_handle' on success,  and
- * keep that reference alive for as long as the returned codec is in-use.
+struct video_codec_custom_handle: video_codec_handle {
+	struct video_codec_custom vcch_aligned;
+	struct video_codec_custom vcch_unaligned;
+};
+
+PRIVATE NONNULL((1)) void CC
+video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
+	struct video_codec_custom_handle *me;
+	me = (struct video_codec_custom_handle *)self;
+	free(me);
+}
+
+
+
+/* Same as `video_codec_lookup_specs()', but can also be used to construct
+ * new codecs on-the-fly. Because this function is able/allowed to  create
+ * new codecs on-the-fly, the caller must take ownership of a reference to
+ * `*p_handle'  on success, and  keep that reference alive  for as long as
+ * the the returned codec is in-use.
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
@@ -268,24 +285,58 @@ PRIVATE struct video_codec_handle dummy_handle = {
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec
- * @return: NULL: [ENOMEM] Out-of-memory or too many custom codecs allocated already
+ * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
 INTERN WUNUSED NONNULL((1, 2)) struct video_codec const *CC
 libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
                          /*out*/ REF struct video_codec_handle **__restrict p_handle) {
-	struct video_codec const *result;
-	result = libvideo_codec_lookup_specs(specs);
-	if (result) {
+	struct video_codec_custom_handle *custom;
+	struct video_codec const *builtin;
+
+	/* Check if the codec is available as a built-in */
+	builtin = libvideo_codec_lookup_specs(specs);
+	if (builtin) {
 		*p_handle = &dummy_handle;
 		video_codec_handle_incref(&dummy_handle);
-		return result;
+		return builtin;
 	}
 
-	/* TODO: Arch-specific code generators for wrappers that simply
-	 *       pass an the codec itself as an additional argument  to
-	 *       common, generic implementations of line functions. */
+	/* Allocate a custom codec handle (aligned-only for now) */
+	custom = (struct video_codec_custom_handle *)malloc(offsetafter(struct video_codec_custom_handle, vcch_aligned));
+	if unlikely(!custom)
+		return NULL;
 
-	errno = ENOMEM;
+	/* Populate the new codec's specs. */
+	memcpy(&custom->vcch_aligned.vc_specs, specs,
+	       sizeof(struct video_codec_specs));
+	if unlikely(!libvideo_codec_populate_custom(&custom->vcch_aligned, false))
+		goto err_inval;
+
+	/* Check if we also need the unaligned version of the codec. */
+	if (custom->vcch_aligned.vc_nalgn == NULL) {
+		struct video_codec_custom_handle *full_custom;
+		full_custom = (struct video_codec_custom_handle *)realloc(custom, sizeof(struct video_codec_custom_handle));
+		if unlikely(!full_custom) {
+			free(custom);
+			return NULL;
+		}
+		custom = full_custom;
+		memcpy(&custom->vcch_unaligned.vc_specs, specs,
+		       sizeof(struct video_codec_specs));
+		if unlikely(!libvideo_codec_populate_custom(&custom->vcch_unaligned, true))
+			goto err_inval;
+		assert(custom->vcch_unaligned.vc_nalgn == &custom->vcch_unaligned);
+		custom->vcch_aligned.vc_nalgn = &custom->vcch_unaligned;
+	}
+
+	/* Finish initialization & return the aligned version of the codec. */
+	custom->vch_refcnt  = 1;
+	custom->vch_destroy = &video_codec_custom_handle_destroy;
+	*p_handle = custom;
+	return &custom->vcch_aligned;
+err_inval:
+	free(custom);
+	errno = EINVAL;
 	return NULL;
 }
 

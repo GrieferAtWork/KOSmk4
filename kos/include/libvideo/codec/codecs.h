@@ -34,9 +34,8 @@
 #include "pixel.h"
 #include "types.h"
 
-__DECL_BEGIN
-
 #define VIDEO_CODEC_NONE       0x0000 /* Invalid codec. */
+#define VIDEO_CODEC_USER       0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */
 #define VIDEO_CODEC_CUSTOM     0xffff /* Custom codec (not one of the built-in ones) */
 
 /* Gray-scale */
@@ -98,6 +97,8 @@ __DECL_BEGIN
 #define VIDEO_CODEC_FLAG_MSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 typedef __uint16_t video_codec_t; /* One of `VIDEO_CODEC_*' */
 
 struct video_rambuffer_requirements {
@@ -106,12 +107,12 @@ struct video_rambuffer_requirements {
 };
 
 struct video_codec_specs {
-	__uint8_t  vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
-	__uint8_t  vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
-	__uint8_t  vcs_bpp;   /* # of bits per pixel (when not divisible by "8", pixels aren't aligned by byte-boundaries) */
-	__uint8_t  vcs_cbits; /* [<= vcs_bpp] # of color  bits per pixel.  Usually same as  "vcs_bpp", except when  some bits  go
-	                       * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
-	                       * For normal codecs, this is always equal to `SUM(POPCOUNT(vcs_*mask))' (and includes "vcs_amask") */
+	__uint8_t     vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
+	__uint8_t     vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
+	__uint8_t     vcs_bpp;   /* # of bits per pixel (when not divisible by "8", pixels aren't aligned by byte-boundaries) */
+	__uint8_t     vcs_cbits; /* [<= vcs_bpp] # of color  bits per pixel.  Usually same as  "vcs_bpp", except when  some bits  go
+	                          * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
+	                          * For normal codecs, this is always equal to `SUM(POPCOUNT(vcs_*mask))' (and includes "vcs_amask") */
 	/* Color masks. For grayscale / palette-driven codecs, these are all identical and
 	 * specify the mask of bits within a single pixel whose "PEXT" result is then used
 	 * as palette index / grayscale-strength.
@@ -119,11 +120,11 @@ struct video_codec_specs {
 	 * For multi-byte codecs, these masks assume that you read a pixel as:
 	 * >> uintN_t pixel = UNALIGNED_GET((uintN_t *)pixel_addr);
 	 * iow: these masks are always in host-endian */
-	__uint32_t vcs_rmask; /* Mask of bits in a pixel that make up red */
-	__uint32_t vcs_gmask; /* Mask of bits in a pixel that make up green */
-	__uint32_t vcs_bmask; /* Mask of bits in a pixel that make up blue */
+	video_pixel_t vcs_rmask; /* Mask of bits in a pixel that make up red */
+	video_pixel_t vcs_gmask; /* Mask of bits in a pixel that make up green */
+	video_pixel_t vcs_bmask; /* Mask of bits in a pixel that make up blue */
 	/* The alpha-mask does not participate in palette/grayscale lookup; it always functions as its own thing */
-	__uint32_t vcs_amask; /* Mask of bits in a pixel that make up alpha */
+	video_pixel_t vcs_amask; /* Mask of bits in a pixel that make up alpha */
 };
 
 struct video_format;
@@ -136,7 +137,8 @@ struct video_codec {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
-	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes. */
+	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes,
+	 * though this restriction may be omitted by simply using `vc_nalgn' instead. */
 	__ATTR_NONNULL_T((3)) void
 	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
 	                                               struct video_rambuffer_requirements *__restrict __result);
@@ -168,6 +170,8 @@ struct video_codec {
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict __self,
 	                                    video_color_t __color);
+
+	/* Extra implementation-specific operators/fields go here... */
 };
 
 
@@ -194,6 +198,7 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) struct video_
 /* Anonymous descriptor for a (possibly) dynamically created codec. */
 struct video_codec_handle {
 	__uintptr_t              vch_refcnt; /* Reference counter. */
+	__ATTR_NONNULL_T((1))
 	void (LIBVIDEO_CODEC_CC *vch_destroy)(struct video_codec_handle *__restrict __self);
 	/* Actual implementation data goes here */
 };
@@ -207,12 +212,11 @@ struct video_codec_handle {
 __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_handle_destroy)
 
 
-/* Same as `video_codec_lookup_specs()', but can  also be used to  construct
- * new codecs on-the-fly (if supported/implemented by the host architecture)
- *
- * Because this function is able/allowed to create new codecs on-the-fly, the
- * caller must take ownership of a  reference to `*p_handle' on success,  and
- * keep that reference alive for as long as the returned codec is in-use.
+/* Same as `video_codec_lookup_specs()', but can also be used to construct
+ * new codecs on-the-fly. Because this function is able/allowed to  create
+ * new codecs on-the-fly, the caller must take ownership of a reference to
+ * `*p_handle'  on success, and  keep that reference alive  for as long as
+ * the the returned codec is in-use.
  *
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
@@ -221,7 +225,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_han
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec
- * @return: NULL: [ENOMEM] Out-of-memory or too many custom codecs allocated already
+ * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_FROMSPECS)(struct video_codec_specs const *__restrict __specs,
@@ -232,10 +236,7 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct video_codec con
                                           /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
-
-#endif /* __CC__ */
-
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBVIDEO_CODEC_CODECS_H */
