@@ -418,15 +418,12 @@ libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx *__restrict self,
 	                                       bitmask, bitskip, bitscan);
 }
 
-#include <kos/kernel/printk.h>
-
 INTERN NONNULL((1)) void CC
 libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit *__restrict self,
                                         video_coord_t dst_x, video_coord_t dst_y,
                                         video_dim_t dst_size_x, video_dim_t dst_size_y,
                                         video_coord_t src_x, video_coord_t src_y,
                                         video_dim_t src_size_x, video_dim_t src_size_y) {
-	printk(KERN_DEBUG "In: libvideo_gfx_noblend_samefmt__stretch_n\n");
 	/* TODO */
 	libvideo_gfx_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                src_x, src_y, src_size_x, src_size_y);

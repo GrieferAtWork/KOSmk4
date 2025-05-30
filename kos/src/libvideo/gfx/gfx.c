@@ -132,6 +132,10 @@ typedef uint_fast16_t twochannels_t;
 #define CHANNEL_MIN 0x00
 #define CHANNEL_MAX 0xff
 
+#define BITSOF(x) (sizeof(x) * NBBY)
+static_assert(BITSOF(stretch_fp_t) >= BITSOF(video_coord_t) + STRETCH_FP_NFRAC,
+              "stretch_fp_t is too small to hold arbitrary video coords + a fractional part");
+
 
 /************************************************************************/
 /* DISCLAIMER: The linear stretch algorithm is derived from SDL!        */
@@ -395,6 +399,12 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			}                                                                                                                      \
 		}                                                                                                                          \
 	}	__WHILE0
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
+
+
 
 LOCAL ATTR_PURE WUNUSED channel_t
 bitmask2d_getbit(void const *__restrict bitmask, size_t bitscan,
@@ -774,18 +784,23 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx *__restrict self,
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
 	}
-	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
-	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
+	if ((src_size_x < (dst_size_x >> 1)) &&
+	    (src_size_y < (dst_size_y >> 1))) {
+		/* TODO: Iterate across "src" and use "self->vx_xops.vgxo_absfill"
+		 *       to  fill  rects  associated with  visible  source pixels. */
+	}
+	step_x = STRETCH_FP(src_size_x) / dst_size_x;
+	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		video_coord_t row_src_y = STRETCH_FP_WHOLE(src_pos_y);
 		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
 		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
 		do {
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
+			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
 			uintptr_t bitno = row_bitno + row_src_x;
 			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY))))
 				video_gfx_putabscolor(self, dst_x + x, row_dst_y, color);
@@ -956,10 +971,6 @@ libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
 #undef pixel_blend_xmax_ymax
 }
 
-#define BITSOF(x) (sizeof(x) * NBBY)
-static_assert(BITSOF(stretch_fp_t) >= BITSOF(video_coord_t) + STRETCH_FP_NFRAC,
-              "stretch_fp_t is too small to hold arbitrary video coords + a fractional part");
-
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
@@ -970,19 +981,19 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
-	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
-	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
+	step_x = STRETCH_FP(src_size_x) / dst_size_x;
+	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		video_coord_t row_src_y = src_y + STRETCH_FP_WHOLE(src_pos_y);
 		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
-		src_pos_x += (stretch_fp_t)src_x << STRETCH_FP_NFRAC;
+		src_pos_x += STRETCH_FP(src_x);
 		do {
 			video_color_t color;
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
+			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
 			color = video_gfx_getabscolor(src, row_src_x, row_src_y);
 			video_gfx_putabscolor(dst, dst_x + x, row_dst_y, color);
 			src_pos_x += step_x;
@@ -1120,19 +1131,19 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
-	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
-	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
+	step_x = STRETCH_FP(src_size_x) / dst_size_x;
+	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		video_coord_t row_src_y = src_y + STRETCH_FP_WHOLE(src_pos_y);
 		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
 		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
-		src_pos_x += (stretch_fp_t)src_x << STRETCH_FP_NFRAC;
+		src_pos_x += STRETCH_FP(src_x);
 		do {
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
+			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
 			uintptr_t bitno = row_bitno + row_src_x;
 			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) {
 				video_color_t color;
