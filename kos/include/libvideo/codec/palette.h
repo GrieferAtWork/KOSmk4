@@ -23,7 +23,6 @@
 #include "api.h"
 
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/__atomic.h>
 

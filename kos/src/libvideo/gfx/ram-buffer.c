@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_RAM_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_RAM_BUFFER_C 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -48,14 +49,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/blend.h>
+#include <libvideo/gfx/blendcolors.h>
 
 #include "gfx.h"
 #include "ram-buffer.h"
-
-/* libstdc++ #undef's min/max (ugh... I'll really have to replace
- * that  library  with  my  own  version  of  it  at  one point).
- * But we want  them as  macros, so  include this  at the  end... */
-#include <minmax.h>
 
 DECL_BEGIN
 
@@ -341,125 +339,6 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
 	return result;
 }
 
-
-#if 0 /*< Define as 1 to have the blender round upwards. */
-#define div256(x) ((x)+0xfe)/0xff
-#else
-#define div256(x) (x)/0xff
-#endif
-
-#define blend_zero(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                       /* lhs* */ 0
-#define blend_one(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                           lhs
-#define blend_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                div256((uint32_t)lhs * csrc)
-#define blend_one_minus_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)      div256((uint32_t)lhs * (0xff - csrc))
-#define blend_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                div256((uint32_t)lhs * cdst)
-#define blend_one_minus_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)      div256((uint32_t)lhs * (0xff - cdst))
-#define blend_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                div256((uint32_t)lhs * asrc)
-#define blend_one_minus_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)      div256((uint32_t)lhs * (0xff - asrc))
-#define blend_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                div256((uint32_t)lhs * adst)
-#define blend_one_minus_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)      div256((uint32_t)lhs * (0xff - adst))
-#define blend_src_alpha_saturate(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)       div256((uint32_t)lhs * min(asrc, 0xff - adst))
-#define blend_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           div256((uint32_t)lhs * cc)
-#define blend_one_minus_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) div256((uint32_t)lhs * (0xff - cc))
-#define blend_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           div256((uint32_t)lhs * ac)
-#define blend_one_minus_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) div256((uint32_t)lhs * (0xff - ac))
-
-#define BLEND_SWITCH(kind, callback)                                                                  \
-	do {                                                                                              \
-		switch (kind) {                                                                               \
-		case GFX_BLENDMODE_ONE:                      callback(blend_one); break;                      \
-		case GFX_BLENDMODE_SRC_COLOR:                callback(blend_src_color); break;                \
-		case GFX_BLENDMODE_ONE_MINUS_SRC_COLOR:      callback(blend_one_minus_src_color); break;      \
-		case GFX_BLENDMODE_DST_COLOR:                callback(blend_dst_color); break;                \
-		case GFX_BLENDMODE_ONE_MINUS_DST_COLOR:      callback(blend_one_minus_dst_color); break;      \
-		case GFX_BLENDMODE_SRC_ALPHA:                callback(blend_src_alpha); break;                \
-		case GFX_BLENDMODE_ONE_MINUS_SRC_ALPHA:      callback(blend_one_minus_src_alpha); break;      \
-		case GFX_BLENDMODE_DST_ALPHA:                callback(blend_dst_alpha); break;                \
-		case GFX_BLENDMODE_ONE_MINUS_DST_ALPHA:      callback(blend_one_minus_dst_alpha); break;      \
-		case GFX_BLENDMODE_SRC_ALPHA_SATURATE:       callback(blend_src_alpha_saturate); break;       \
-		case GFX_BLENDMODE_CONSTANT_COLOR:           callback(blend_constant_color); break;           \
-		case GFX_BLENDMODE_ONE_MINUS_CONSTANT_COLOR: callback(blend_one_minus_constant_color); break; \
-		case GFX_BLENDMODE_CONSTANT_ALPHA:           callback(blend_constant_alpha); break;           \
-		case GFX_BLENDMODE_ONE_MINUS_CONSTANT_ALPHA: callback(blend_one_minus_constant_alpha); break; \
-		default:                                     callback(blend_zero); break;                     \
-		}                                                                                             \
-	}	__WHILE0
-
-#define func_add(a,b)              a + b
-#define func_subtract(a,b)         a - b
-#define func_reverse_subtract(a,b) b - a
-#define FUNC_SWITCH(kind, callback)                                                  \
-	do {                                                                             \
-		switch (kind) {                                                              \
-		case GFX_BLENDFUNC_SUBTRACT:         callback(func_subtract); break;         \
-		case GFX_BLENDFUNC_REVERSE_SUBTRACT: callback(func_reverse_subtract); break; \
-		case GFX_BLENDFUNC_MIN:              callback(min); break;                   \
-		case GFX_BLENDFUNC_MAX:              callback(max); break;                   \
-		default:                             callback(func_add); break;              \
-		}                                                                            \
-	}	__WHILE0
-
-
-LOCAL ATTR_CONST WUNUSED video_color_t CC
-blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
-	uint8_t new_lhs_r, new_lhs_g, new_lhs_b, new_lhs_a;
-	uint8_t new_rhs_r, new_rhs_g, new_rhs_b, new_rhs_a;
-	uint8_t dst_r, dst_g, dst_b, dst_a;
-	uint8_t src_r, src_g, src_b, src_a;
-	dst_r = VIDEO_COLOR_GET_RED(dst);
-	dst_g = VIDEO_COLOR_GET_GREEN(dst);
-	dst_b = VIDEO_COLOR_GET_BLUE(dst);
-	dst_a = VIDEO_COLOR_GET_ALPHA(dst);
-	src_r = VIDEO_COLOR_GET_RED(src);
-	src_g = VIDEO_COLOR_GET_GREEN(src);
-	src_b = VIDEO_COLOR_GET_BLUE(src);
-	src_a = VIDEO_COLOR_GET_ALPHA(src);
-#define blend_rgb_src(fun)                                                                                                            \
-	{                                                                                                                                 \
-		new_lhs_r = (uint8_t)(fun(src_r, dst_r, src_r, dst_r, src_a, dst_a, GFX_BLENDINFO_GET_CR(mode), GFX_BLENDINFO_GET_CA(mode))); \
-		new_lhs_g = (uint8_t)(fun(src_g, dst_g, src_g, dst_g, src_a, dst_a, GFX_BLENDINFO_GET_CG(mode), GFX_BLENDINFO_GET_CA(mode))); \
-		new_lhs_b = (uint8_t)(fun(src_b, dst_b, src_b, dst_b, src_a, dst_a, GFX_BLENDINFO_GET_CB(mode), GFX_BLENDINFO_GET_CA(mode))); \
-	}
-#define blend_a_src(fun)                                                                                                              \
-	{                                                                                                                                 \
-		new_lhs_a = (uint8_t)(fun(src_a, dst_a, src_a, dst_a, src_a, dst_a, GFX_BLENDINFO_GET_CA(mode), GFX_BLENDINFO_GET_CA(mode))); \
-	}
-#define blend_rgb_dst(fun)                                                                                                            \
-	{                                                                                                                                 \
-		new_rhs_r = (uint8_t)(fun(dst_r, src_r, src_r, dst_r, src_a, dst_a, GFX_BLENDINFO_GET_CR(mode), GFX_BLENDINFO_GET_CA(mode))); \
-		new_rhs_g = (uint8_t)(fun(dst_g, src_g, src_g, dst_g, src_a, dst_a, GFX_BLENDINFO_GET_CG(mode), GFX_BLENDINFO_GET_CA(mode))); \
-		new_rhs_b = (uint8_t)(fun(dst_b, src_b, src_b, dst_b, src_a, dst_a, GFX_BLENDINFO_GET_CB(mode), GFX_BLENDINFO_GET_CA(mode))); \
-	}
-#define blend_a_dst(fun)                                                                                                              \
-	{                                                                                                                                 \
-		new_rhs_a = (uint8_t)(fun(dst_a, src_a, src_a, dst_a, src_a, dst_a, GFX_BLENDINFO_GET_CA(mode), GFX_BLENDINFO_GET_CA(mode))); \
-	}
-	BLEND_SWITCH(GFX_BLENDINFO_GET_SRCRGB(mode), blend_rgb_src);
-	BLEND_SWITCH(GFX_BLENDINFO_GET_SRCA(mode), blend_a_src);
-	BLEND_SWITCH(GFX_BLENDINFO_GET_DSTRGB(mode), blend_rgb_dst);
-	BLEND_SWITCH(GFX_BLENDINFO_GET_DSTA(mode), blend_a_dst);
-#undef blend_a_dst
-#undef blend_rgb_dst
-#undef blend_a_src
-#undef blend_rgb_src
-#define func_rgb(fun)                                 \
-	{                                                 \
-		dst_r = (uint8_t)(fun(new_lhs_r, new_rhs_r)); \
-		dst_g = (uint8_t)(fun(new_lhs_g, new_rhs_g)); \
-		dst_b = (uint8_t)(fun(new_lhs_b, new_rhs_b)); \
-	}
-#define func_a(fun)                                   \
-	{                                                 \
-		dst_a = (uint8_t)(fun(new_lhs_a, new_rhs_a)); \
-	}
-	FUNC_SWITCH(GFX_BLENDINFO_GET_FUNRGB(mode), func_rgb);
-	FUNC_SWITCH(GFX_BLENDINFO_GET_FUNA(mode), func_a);
-#undef func_a
-#undef func_rgb
-	return VIDEO_COLOR_RGBA(dst_r, dst_g, dst_b, dst_a);
-}
-
-
 INTERN NONNULL((1)) void CC
 libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
                              video_coord_t x, video_coord_t y,
@@ -472,7 +351,7 @@ libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
 	buffer = self->vx_buffer;
 	/* Perform full color blending. */
 	o = buffer->vb_format.getcolor(line, x);
-	n = blend_color(o, color, self->vx_blend);
+	n = gfx_blendcolors(o, color, self->vx_blend);
 	buffer->vb_format.setcolor(line, x, n);
 }
 
@@ -499,7 +378,7 @@ libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	buffer = self->vx_buffer;
 	o = buffer->vb_format.getcolor(line, x);
-	n = blend_color(o, color, GFX_BLENDINFO_ALPHA);
+	n = gfx_blendcolors(o, color, GFX_BLENDINFO_ALPHA);
 	buffer->vb_format.setcolor(line, x, n);
 }
 

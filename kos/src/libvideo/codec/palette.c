@@ -40,7 +40,7 @@
 DECL_BEGIN
 
 LOCAL ATTR_CONST size_t CC
-diff(uint8_t a, uint8_t b) {
+diff(video_channel_t a, video_channel_t b) {
 	if (a > b) {
 		return a - b;
 	}
@@ -48,8 +48,8 @@ diff(uint8_t a, uint8_t b) {
 }
 
 LOCAL ATTR_CONST size_t CC
-color_delta(uint8_t r1, uint8_t g1, uint8_t b1,
-            uint8_t r2, uint8_t g2, uint8_t b2) {
+color_delta(video_channel_t r1, video_channel_t g1, video_channel_t b1,
+            video_channel_t r2, video_channel_t g2, video_channel_t b2) {
 	size_t result;
 	result  = diff(r1, r2);
 	result += diff(g1, g2) * 2; /* Put double the weight on green */
@@ -59,14 +59,15 @@ color_delta(uint8_t r1, uint8_t g1, uint8_t b1,
 
 LOCAL ATTR_PURE NONNULL((1)) video_pixel_t CC
 calculate_best_matching_palette_pixel(struct video_palette const *__restrict self,
-                                      uint8_t r, uint8_t g, uint8_t b) {
+                                      video_channel_t r, video_channel_t g,
+                                      video_channel_t b) {
 	video_pixel_t result = 0, i;
 	size_t best_delta = (size_t)-1;
 	assert(self->vp_cnt != 0);
 	for (i = 0; i < self->vp_cnt; ++i) {
 		size_t delta;
 		video_color_t color2;
-		uint8_t r2, g2, b2;
+		video_channel_t r2, g2, b2;
 		color2 = self->vp_pal[i];
 		r2     = VIDEO_COLOR_GET_RED(color2);
 		g2     = VIDEO_COLOR_GET_GREEN(color2);
@@ -119,7 +120,7 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 	video_pixel_t result;
 	struct video_palette_cache *cache;
 	struct video_palette_cacheset *cs;
-	uint8_t r, g, b;
+	video_channel_t r, g, b;
 	r = VIDEO_COLOR_GET_RED(color);
 	g = VIDEO_COLOR_GET_GREEN(color);
 	b = VIDEO_COLOR_GET_BLUE(color);

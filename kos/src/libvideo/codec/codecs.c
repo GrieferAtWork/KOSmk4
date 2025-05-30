@@ -88,23 +88,23 @@ union color_data {
 
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PIXEL_RD0(pixel)         ((pixel)&0xff)
+#define PIXEL_RD0(pixel)         ((pixel) & 0xff)
 #define PIXEL_RD1(pixel)         (((pixel) >> 8) & 0xff)
 #define PIXEL_RD2(pixel)         (((pixel) >> 16) & 0xff)
 #define PIXEL_RD3(pixel)         (((pixel) >> 24) & 0xff)
-#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~0x000000ff) | (byte))
-#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~0x0000ff00) | ((byte) << 8))
-#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~0x00ff0000) | ((byte) << 16))
-#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~0xff000000) | ((byte) << 24))
+#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
+#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
+#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
+#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PIXEL_RD3(pixel)         ((pixel)&0xff)
+#define PIXEL_RD3(pixel)         ((pixel) & 0xff)
 #define PIXEL_RD2(pixel)         (((pixel) >> 8) & 0xff)
 #define PIXEL_RD1(pixel)         (((pixel) >> 16) & 0xff)
 #define PIXEL_RD0(pixel)         (((pixel) >> 24) & 0xff)
-#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~0x000000ff) | (byte))
-#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~0x0000ff00) | ((byte) << 8))
-#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~0x00ff0000) | ((byte) << 16))
-#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~0xff000000) | ((byte) << 24))
+#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
+#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
+#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
+#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
 #endif
 
 
@@ -606,10 +606,10 @@ abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	union color_data data;
 	video_pixel_t result = 0;
 	data.color = color;
-	PIXEL_WR0(result,data.a);
-	PIXEL_WR1(result,data.b);
-	PIXEL_WR2(result,data.g);
-	PIXEL_WR3(result,data.r);
+	PIXEL_WR0(result, data.a);
+	PIXEL_WR1(result, data.b);
+	PIXEL_WR2(result, data.g);
+	PIXEL_WR3(result, data.r);
 	return result;
 }
 
@@ -630,9 +630,9 @@ xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	union color_data data;
 	video_pixel_t result = 0;
 	data.color = color;
-	PIXEL_WR1(result,data.b);
-	PIXEL_WR2(result,data.g);
-	PIXEL_WR3(result,data.r);
+	PIXEL_WR1(result, data.b);
+	PIXEL_WR2(result, data.g);
+	PIXEL_WR3(result, data.r);
 	return result;
 }
 
@@ -654,10 +654,10 @@ bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	union color_data data;
 	video_pixel_t result = 0;
 	data.color = color;
-	PIXEL_WR0(result,data.b);
-	PIXEL_WR1(result,data.g);
-	PIXEL_WR2(result,data.r);
-	PIXEL_WR3(result,data.a);
+	PIXEL_WR0(result, data.b);
+	PIXEL_WR1(result, data.g);
+	PIXEL_WR2(result, data.r);
+	PIXEL_WR3(result, data.a);
 	return result;
 }
 
@@ -678,9 +678,9 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	union color_data data;
 	video_pixel_t result = 0;
 	data.color = color;
-	PIXEL_WR0(result,data.b);
-	PIXEL_WR1(result,data.g);
-	PIXEL_WR2(result,data.r);
+	PIXEL_WR0(result, data.b);
+	PIXEL_WR1(result, data.g);
+	PIXEL_WR2(result, data.r);
 	return result;
 }
 
@@ -1362,7 +1362,7 @@ pal_pixel2color(struct video_format const *__restrict format,
 	assert(format);
 	pal = format->vf_pal;
 	assert(pal);
-	if (pixel >= pal->vp_cnt)
+	if unlikely(pixel >= pal->vp_cnt)
 		return VIDEO_COLOR_RGB(0, 0, 0);
 	return pal->vp_pal[pixel];
 }

@@ -23,6 +23,8 @@
 #include <__stdinc.h>
 #include <hybrid/host.h>
 
+/*#define LIBVIDEO_GFX_EXPOSE_INTERNALS*/
+
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_GFX_CC __ATTR_STDCALL
 #else /* ... */

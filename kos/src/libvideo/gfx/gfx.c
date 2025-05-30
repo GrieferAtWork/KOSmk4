@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_GFX_C
 #define GUARD_LIBVIDEO_GFX_GFX_C 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -127,14 +128,15 @@ libvideo_gfx_allow_noblend(struct video_gfx *__restrict self,
 /* LINEAR BLITTING HELPERS                                              */
 /************************************************************************/
 
-typedef uint8_t channel_t;
-typedef uint_fast16_t twochannels_t;
-#define CHANNEL_MIN 0x00
-#define CHANNEL_MAX 0xff
+typedef video_channel_t channel_t;
+typedef video_twochannels_t twochannels_t;
+#define CHANNEL_MIN VIDEO_CHANNEL_MIN
+#define CHANNEL_MAX VIDEO_CHANNEL_MAX
 
 #define BITSOF(x) (sizeof(x) * NBBY)
 static_assert(BITSOF(stretch_fp_t) >= BITSOF(video_coord_t) + STRETCH_FP_NFRAC,
               "stretch_fp_t is too small to hold arbitrary video coords + a fractional part");
+static_assert(BITSOF(twochannels_t) >= (BITSOF(channel_t) * 2));
 
 
 /************************************************************************/

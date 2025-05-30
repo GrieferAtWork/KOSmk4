@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_SCREEN_C
 #define GUARD_LIBVIDEO_GFX_SCREEN_C 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
 #include "api.h"

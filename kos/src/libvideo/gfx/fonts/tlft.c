@@ -19,9 +19,11 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_FONTS_TLFT_C
 #define GUARD_LIBVIDEO_GFX_FONTS_TLFT_C 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define TLFT_NO_LOOKUP 1
 
-#include "tlft.h"
+#include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -41,7 +43,8 @@
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "../api.h"
+/**/
+#include "tlft.h"
 
 DECL_BEGIN
 

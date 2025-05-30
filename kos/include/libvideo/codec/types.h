@@ -26,9 +26,18 @@
 
 #include "api.h"
 
+/* Sizes of video types. */
 #define __SIZEOF_VIDEO_OFFSET_T__ __SIZEOF_INT_FAST32_T__
 #define __SIZEOF_VIDEO_COORD_T__  __SIZEOF_INT_FAST32_T__
 #define __SIZEOF_VIDEO_DIM_T__    __SIZEOF_INT_FAST32_T__
+
+/* The max possible value for a graphics dimension.
+ *
+ * This value should  be used as  "size_x" /  "size_y"
+ * argument in graphics operations, when the operation
+ * should reach the  right/bottom edge  of the  active
+ * clip region. */
+#define VIDEO_DIM_MAX ((video_dim_t)-1)
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -36,7 +45,6 @@ __DECL_BEGIN
 typedef __INT_FAST32_TYPE__ video_offset_t; /* Pixel offset (usually relative to some GFX context) */
 typedef __UINT_FAST32_TYPE__ video_coord_t; /* Pixel coordinate (usually absolute) */
 typedef __UINT_FAST32_TYPE__ video_dim_t;   /* Graphic dimension (in pixels) */
-#define VIDEO_DIM_MAX ((video_dim_t)-1)
 
 __DECL_END
 #endif /* __CC__ */
