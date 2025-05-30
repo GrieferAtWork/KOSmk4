@@ -246,6 +246,148 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 	return interpolate_1d(y0, y1, frac_x0, frac_x1);
 }
 
+/* Macro-implementation of a general-purpose linear stretch algorithm.
+ *
+ * @param: video_coord_t dst_x:      Destination X coord
+ * @param: video_coord_t dst_y:      Destination Y coord
+ * @param: video_dim_t   dst_size_x: Destination size in X
+ * @param: video_dim_t   dst_size_y: Destination size in Y
+ * @param: video_coord_t src_x:      Source X coord
+ * @param: video_coord_t src_y:      Source Y coord
+ * @param: video_dim_t   src_size_x: Source size in X
+ * @param: video_dim_t   src_size_y: Source size in Y
+ *
+ * Blending implementation callbacks (macros). All of these are expected
+ * to fill in a specific portion of the destination GFX using data  from
+ * the specified source coords. When appropriate, blending fractions to-
+ * be applied to source pixels are also supplied.
+ * In all cases, the supplied "src_x/src_y" points to the top-left of a
+ * 1x1,  1x2,  2x1 or  2x2  pixel area  from  which data  can  be read.
+ *
+ * @param: [1x1] "top-left":     void blend_xmin_ymin(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y)
+ * @param: [2x1] "top":          void blend_ymin(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_y, video_coord_t src_x0, video_coord_t src_y, video_coord_t src_x1, linear_fp_blend_t frac_x0, linear_fp_blend_t frac_x1)
+ * @param: [1x1] "top-right":    void blend_xmax_ymin(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y)
+ * @param: [1x2] "left":         void blend_xmin(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_coord_t src_x, video_coord_t src_y0, video_coord_t src_y1, linear_fp_blend_t frac_y0, linear_fp_blend_t frac_y1)
+ * @param: [2x2] "center":       void blend(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x0, video_coord_t src_y0, video_coord_t src_x1, video_coord_t src_y1, linear_fp_blend_t frac_x0, linear_fp_blend_t frac_x1, linear_fp_blend_t frac_y0, linear_fp_blend_t frac_y1)
+ * @param: [1x2] "right":        void blend_xmax(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_coord_t src_x, video_coord_t src_y0, video_coord_t src_y1, linear_fp_blend_t frac_y0, linear_fp_blend_t frac_y1)
+ * @param: [1x1] "bottom-left":  void blend_xmin_ymax(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y)
+ * @param: [2x1] "bottom":       void blend_ymax(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_y, video_coord_t src_x0, video_coord_t src_y, video_coord_t src_x1, linear_fp_blend_t frac_x0, linear_fp_blend_t frac_x1)
+ * @param: [1x1] "bottom-right": void blend_xmax_ymax(video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y)
+ */
+#define GFX_LINEAR_STRETCH(dst_x, dst_y, dst_size_x, dst_size_y,                                                                   \
+                           src_x, src_y, src_size_x, src_size_y,                                                                   \
+                           blend_xmin_ymin /*(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)*/,                               \
+                           blend_ymin /**/ /*(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1)*/,                \
+                           blend_xmax_ymin /*(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)*/,                               \
+                           blend_xmin /**/ /*(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1)*/,                \
+                           blend /*     */ /*(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1)*/, \
+                           blend_xmax /**/ /*(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1)*/,                \
+                           blend_xmin_ymax /*(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)*/,                               \
+                           blend_ymax /**/ /*(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1)*/,                \
+                           blend_xmax_ymax /*(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)*/)                               \
+	do {                                                                                                                           \
+		video_coord_t _rel_dst_y; /* Relative destination Y coord [0,dst_size_y) */                                                \
+		video_dim_t _pad_xmin, _pad_xmax;                                                                                          \
+		video_dim_t _pad_ymin, _pad_ymax;                                                                                          \
+		sstretch_fp_t _fp_src_x;                                                                                                   \
+		sstretch_fp_t _fp_src_y;                                                                                                   \
+		stretch_fp_t _fp_step_x;                                                                                                   \
+		stretch_fp_t _fp_step_y;                                                                                                   \
+		video_dim_t _nopad_dst_x; /* # of horizontal pixels that can be written w/o padding */                                     \
+		calc_linear_stretch_dim(src_size_x, dst_size_x, &_fp_src_x, &_fp_step_x, &_pad_xmin, &_pad_xmax);                          \
+		calc_linear_stretch_dim(src_size_y, dst_size_y, &_fp_src_y, &_fp_step_y, &_pad_ymin, &_pad_ymax);                          \
+		_nopad_dst_x = dst_size_x - _pad_xmin - _pad_xmax;                                                                         \
+		_fp_src_x += _pad_xmin * _fp_step_x; /* Skip over leading padding */                                                       \
+		                                                                                                                           \
+		/* Render padding near the top */                                                                                          \
+		if (_pad_ymin) {                                                                                                           \
+			video_coord_t _used_dst_x = dst_x;                                                                                     \
+			video_dim_t _middle;                                                                                                   \
+			sstretch_fp_t _row_fp_src_x;                                                                                           \
+			if (_pad_xmin) {                                                                                                       \
+				blend_xmin_ymin(_used_dst_x, dst_y, _pad_xmin, _pad_ymin, src_x, src_y);                                           \
+				_used_dst_x += _pad_xmin;                                                                                          \
+			}                                                                                                                      \
+			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
+			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
+				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
+				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
+				blend_ymin(_used_dst_x, dst_y, _pad_ymin, _used_src_x, src_y, _used_src_x + 1, _frac_x0, _frac_x1);                \
+			}                                                                                                                      \
+			if (_pad_xmax) {                                                                                                       \
+				video_coord_t _used_src_x = src_x + src_size_x - 1;                                                                \
+				blend_xmax_ymin(_used_dst_x, dst_y, _pad_xmax, _pad_ymin, _used_src_x, src_y);                                     \
+				/*_used_dst_x += left_pad_w;*/                                                                                     \
+			}                                                                                                                      \
+			_fp_src_y += _fp_step_y * _pad_ymin;                                                                                   \
+		}                                                                                                                          \
+		                                                                                                                           \
+		/* Render the main image */                                                                                                \
+		for (_rel_dst_y = _pad_ymin; _rel_dst_y < dst_size_y - _pad_ymax; ++_rel_dst_y, _fp_src_y += _fp_step_y) {                 \
+			video_coord_t _used_dst_y = dst_y + _rel_dst_y; /* Absolute destination Y coord [dst_y,dst_y+dst_size_y) */            \
+			video_coord_t _used_dst_x;                                                                                             \
+			video_coord_t _rel_src_y;                                                                                              \
+			linear_fp_blend_t _frac_y0, _frac_y1;                                                                                  \
+			video_dim_t _middle;                                                                                                   \
+			video_coord_t _used_src_y0, _used_src_y1;                                                                              \
+			sstretch_fp_t _row_fp_src_x;                                                                                           \
+			_rel_src_y = STRETCH_FP_WHOLE(_fp_src_y);                                                                              \
+			_frac_y0   = STRETCH_FP_BLEND_FRAC(_fp_src_y);                                                                         \
+			_frac_y1   = LINEAR_FP_BLEND(1) - _frac_y0;                                                                            \
+			                                                                                                                       \
+			_used_src_y0 = src_y + _rel_src_y; /* Y coord of first src row */                                                      \
+			_used_src_y1 = _used_src_y0 + 1;   /* Y coord of second src row */                                                     \
+			_used_dst_x  = dst_x;                                                                                                  \
+			if (_pad_xmin) {                                                                                                       \
+				blend_xmin(_used_dst_x, _used_dst_y, _pad_xmin, src_x, _used_src_y0, _used_src_y1, _frac_y0, _frac_y1);            \
+				_used_dst_x += _pad_xmin;                                                                                          \
+			}                                                                                                                      \
+			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
+			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
+				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
+				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
+				blend(_used_dst_x, _used_dst_y, _used_src_x, _used_src_y0, _used_src_x + 1, _used_src_y1,                          \
+				      _frac_x0, _frac_x1, _frac_y0, _frac_y1);                                                                     \
+			}                                                                                                                      \
+			if (_pad_xmax) {                                                                                                       \
+				video_coord_t _used_src_x = src_x + src_size_x - 1;                                                                \
+				blend_xmin(_used_dst_x, _used_dst_y, _pad_xmax, _used_src_x, _used_src_y0, _used_src_y1, _frac_y0, _frac_y1);      \
+				/*_used_dst_x += left_pad_w;*/                                                                                     \
+			}                                                                                                                      \
+		}                                                                                                                          \
+		                                                                                                                           \
+		/* Render padding near the bottom */                                                                                       \
+		if (_pad_ymax) {                                                                                                           \
+			video_coord_t _used_dst_y = dst_y + dst_size_y - _pad_ymax;                                                            \
+			video_coord_t _used_dst_x = dst_x;                                                                                     \
+			video_dim_t _middle;                                                                                                   \
+			video_coord_t _used_src_y = src_y + src_size_y - 1;                                                                    \
+			sstretch_fp_t _row_fp_src_x;                                                                                           \
+			                                                                                                                       \
+			if (_pad_xmin) {                                                                                                       \
+				blend_xmin_ymin(_used_dst_x, _used_dst_y, _pad_xmin, _pad_ymax, src_x, _used_src_y);                               \
+				_used_dst_x += _pad_xmin;                                                                                          \
+			}                                                                                                                      \
+			for (_middle = _nopad_dst_x, _row_fp_src_x = _fp_src_x;                                                                \
+			     _middle; --_middle, ++_used_dst_x, _row_fp_src_x += _fp_step_x) {                                                 \
+				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
+				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
+				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
+				blend_ymin(_used_dst_x, _used_dst_y, _pad_ymax, _used_src_x, _used_src_y, _used_src_x + 1, _frac_x0, _frac_x1);    \
+			}                                                                                                                      \
+			if (_pad_xmax) {                                                                                                       \
+				video_coord_t _used_src_x = src_x + src_size_x - 1;                                                                \
+				blend_xmax_ymax(_used_dst_x, _used_dst_y, _pad_xmax, _pad_ymax, _used_src_x, _used_src_y);                         \
+				/*_used_dst_x += left_pad_w;*/                                                                                     \
+			}                                                                                                                      \
+		}                                                                                                                          \
+	}                                                                                                                              \
+	__WHILE0
+
+
+
 
 
 LOCAL ATTR_CONST channel_t CC
@@ -883,132 +1025,72 @@ next_row:
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
-                                video_coord_t dst_x, video_coord_t dst_y,
-                                video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                video_coord_t src_x, video_coord_t src_y,
-                                video_dim_t src_size_x, video_dim_t src_size_y) {
+                                video_coord_t dst_x_, video_coord_t dst_y_,
+                                video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                video_coord_t src_x_, video_coord_t src_y_,
+                                video_dim_t src_size_x_, video_dim_t src_size_y_) {
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	video_coord_t rel_dst_y;  /* Relative destination Y coord [0,dst_size_y) */
-	video_dim_t pad_xmin, pad_xmax;
-	video_dim_t pad_ymin, pad_ymax;
-	sstretch_fp_t fp_src_x;
-	sstretch_fp_t fp_src_y;
-	stretch_fp_t fp_step_x;
-	stretch_fp_t fp_step_y;
-	video_dim_t nopad_dst_x; /* # of horizontal pixels that can be written w/o padding */
-	calc_linear_stretch_dim(src_size_x, dst_size_x, &fp_src_x, &fp_step_x, &pad_xmin, &pad_xmax);
-	calc_linear_stretch_dim(src_size_y, dst_size_y, &fp_src_y, &fp_step_y, &pad_ymin, &pad_ymax);
-	nopad_dst_x = dst_size_x - pad_xmin - pad_xmax;
-	fp_src_x += pad_xmin * fp_step_x; /* Skip over leading padding */
-
-	/* Render padding near the top */
-	if (pad_ymin) {
-		video_coord_t used_dst_x = dst_x;
-		video_dim_t middle;
-		sstretch_fp_t row_fp_src_x;
-		if (pad_xmin) {
-			video_color_t out = video_gfx_getabscolor(src, src_x, src_y);
-			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, dst_y, pad_xmin, pad_ymin, out);
-			used_dst_x += pad_xmin;
-		}
-		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
-		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
-			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
-			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, src_y);
-			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, src_y);
-			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
-			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
-			video_color_t out = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);
-			(*dst->vx_xops.vgxo_absline_v)(dst, used_dst_x, dst_y, pad_ymin, out);
-		}
-		if (pad_xmax) {
-			video_coord_t used_src_x = src_x + src_size_x - 1;
-			video_color_t out = video_gfx_getabscolor(src, used_src_x, src_y);
-			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, dst_y, pad_xmax, pad_ymin, out);
-			/*used_dst_x += left_pad_w;*/
-		}
-		fp_src_y += fp_step_y * pad_ymin;
+#define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmax_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)     \
+	{                                                                                 \
+		video_color_t out = video_gfx_getabscolor(src, src_x, src_y);                 \
+		(*dst->vx_xops.vgxo_absfill)(dst, dst_x, dst_y, dst_size_x, dst_size_y, out); \
 	}
 
-	/* Render the main image */
-	for (rel_dst_y = pad_ymin; rel_dst_y < dst_size_y - pad_ymax; ++rel_dst_y, fp_src_y += fp_step_y) {
-		video_coord_t used_dst_y = dst_y + rel_dst_y; /* Absolute destination Y coord [dst_y,dst_y+dst_size_y) */
-		video_coord_t used_dst_x;
-		video_coord_t rel_src_y;
-		linear_fp_blend_t frac_y0, frac_y1;
-		video_dim_t middle;
-		video_coord_t used_src_y0, used_src_y1;
-		sstretch_fp_t row_fp_src_x;
-		rel_src_y  = STRETCH_FP_WHOLE(fp_src_y);
-		frac_y0    = STRETCH_FP_BLEND_FRAC(fp_src_y);
-		frac_y1    = LINEAR_FP_BLEND(1) - frac_y0;
-
-		used_src_y0 = src_y + rel_src_y; /* Y coord of first src row */
-		used_src_y1 = used_src_y0 + 1;   /* Y coord of second src row */
-		used_dst_x  = dst_x;
-		if (pad_xmin) {
-			video_color_t src_y0_x0 = video_gfx_getabscolor(src, src_x, used_src_y0);
-			video_color_t src_y1_x0 = video_gfx_getabscolor(src, src_x, used_src_y1);
-			video_color_t out = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);
-			(*dst->vx_xops.vgxo_absline_h)(dst, used_dst_x, used_dst_y, pad_xmin, out);
-			used_dst_x += pad_xmin;
-		}
-		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
-		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
-			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
-			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y0);
-			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y0);
-			video_color_t src_y1_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y1);
-			video_color_t src_y1_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y1);
-			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
-			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
-			video_color_t out = interpolate_2d(src_y0_x0, src_y0_x1,
-			                                   src_y1_x0, src_y1_x1,
-			                                   frac_x0, frac_x1,
-			                                   frac_y0, frac_y1);
-			video_gfx_putabscolor(dst, used_dst_x, used_dst_y, out);
-		}
-		if (pad_xmax) {
-			video_coord_t used_src_x = src_x + src_size_x - 1;
-			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y0);
-			video_color_t src_y1_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y1);
-			video_color_t out = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);
-			(*dst->vx_xops.vgxo_absline_h)(dst, used_dst_x, used_dst_y, pad_xmax, out);
-			/*used_dst_x += left_pad_w;*/
-		}
+#define pixel_blend_ymax pixel_blend_ymin
+#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
+	{                                                                                       \
+		video_color_t src_y0_x0 = video_gfx_getabscolor(src, src_x0, src_y);                \
+		video_color_t src_y0_x1 = video_gfx_getabscolor(src, src_x1, src_y);                \
+		video_color_t out       = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);   \
+		(*dst->vx_xops.vgxo_absline_v)(dst, dst_x, dst_y, dst_size_y, out);                 \
 	}
 
-	/* Render padding near the bottom */
-	if (pad_ymax) {
-		video_coord_t used_dst_y = dst_y + dst_size_y - pad_ymax;
-		video_coord_t used_dst_x = dst_x;
-		video_dim_t middle;
-		video_coord_t used_src_y = src_y + src_size_y - 1;
-		sstretch_fp_t row_fp_src_x;
-
-		if (pad_xmin) {
-			video_color_t out = video_gfx_getabscolor(src, src_x, used_src_y);
-			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, used_dst_y, pad_xmin, pad_ymax, out);
-			used_dst_x += pad_xmin;
-		}
-		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
-		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
-			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
-			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y);
-			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y);
-			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
-			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
-			video_color_t out = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);
-			(*dst->vx_xops.vgxo_absline_v)(dst, used_dst_x, used_dst_y, pad_ymax, out);
-		}
-		if (pad_xmax) {
-			video_coord_t used_src_x = src_x + src_size_x - 1;
-			video_color_t out = video_gfx_getabscolor(src, used_src_x, used_src_y);
-			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, used_dst_y, pad_xmax, pad_ymax, out);
-			/*used_dst_x += left_pad_w;*/
-		}
+#define pixel_blend_xmax pixel_blend_xmin
+#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
+	{                                                                                       \
+		video_color_t src_y0_x0 = video_gfx_getabscolor(src, src_x, src_y0);                \
+		video_color_t src_y1_x0 = video_gfx_getabscolor(src, src_x, src_y1);                \
+		video_color_t out       = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);   \
+		(*dst->vx_xops.vgxo_absline_h)(dst, dst_x, dst_y, dst_size_x, out);                 \
 	}
+
+#define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
+	{                                                                                                 \
+		video_color_t src_y0_x0 = video_gfx_getabscolor(src, src_x0, src_y0);                         \
+		video_color_t src_y0_x1 = video_gfx_getabscolor(src, src_x1, src_y0);                         \
+		video_color_t src_y1_x0 = video_gfx_getabscolor(src, src_x0, src_y1);                         \
+		video_color_t src_y1_x1 = video_gfx_getabscolor(src, src_x1, src_y1);                         \
+		video_color_t out       = interpolate_2d(src_y0_x0, src_y0_x1,                                \
+		                                         src_y1_x0, src_y1_x1,                                \
+		                                         frac_x0, frac_x1,                                    \
+		                                         frac_y0, frac_y1);                                   \
+		video_gfx_putabscolor(dst, dst_x, dst_y, out);                                                \
+	}
+
+	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                   src_x_, src_y_, src_size_x_, src_size_y_,
+	                   pixel_blend_xmin_ymin,
+	                   pixel_blend_ymin,
+	                   pixel_blend_xmax_ymin,
+	                   pixel_blend_xmin,
+	                   pixel_blend,
+	                   pixel_blend_xmax,
+	                   pixel_blend_xmin_ymax,
+	                   pixel_blend_ymax,
+	                   pixel_blend_xmax_ymax);
+#undef pixel_blend_xmin_ymin
+#undef pixel_blend_ymin
+#undef pixel_blend_xmax_ymin
+#undef pixel_blend_xmin
+#undef pixel_blend
+#undef pixel_blend_xmax
+#undef pixel_blend_xmin_ymax
+#undef pixel_blend_ymax
+#undef pixel_blend_xmax_ymax
 }
 
 #define BITSOF(x) (sizeof(x) * NBBY)
