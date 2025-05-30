@@ -333,6 +333,7 @@ getpixel24(byte_t const *__restrict line, video_coord_t x) {
 	result.bytes[0] = line[0];
 	result.bytes[1] = line[1];
 	result.bytes[2] = line[2];
+	result.bytes[3] = 0;
 	return result.pixel;
 }
 

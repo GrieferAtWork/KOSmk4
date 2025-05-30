@@ -349,6 +349,8 @@ libvideo_gfx_setempty(struct video_gfx *__restrict self) {
 	self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_empty__blitfrom;
 	self->vx_xops.vgxo_getcolor       = &libvideo_gfx_empty__getcolor;
 	self->vx_xops.vgxo_putcolor       = &libvideo_gfx_empty__putcolor;
+	self->vx_xops.vgxo_getpixel       = &libvideo_gfx_empty__getcolor;
+	self->vx_xops.vgxo_setpixel       = &libvideo_gfx_empty__putcolor;
 	self->vx_xops.vgxo_absline_llhh   = &libvideo_gfx_empty__absline_llhh;
 	self->vx_xops.vgxo_absline_lhhl   = &libvideo_gfx_empty__absline_lhhl;
 	self->vx_xops.vgxo_absline_h      = &libvideo_gfx_empty__absline_h;

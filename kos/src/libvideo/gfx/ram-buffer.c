@@ -95,8 +95,8 @@ DECL_BEGIN
 
 /* GFX functions for memory-based video buffers (without GPU support) */
 INTERN NONNULL((1)) video_color_t CC
-libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
-                             video_coord_t x, video_coord_t y) {
+libvideo_gfx_ramgfx_getcolor_noblend(struct video_gfx const *__restrict self,
+                                     video_coord_t x, video_coord_t y) {
 	byte_t *line;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
@@ -503,6 +503,90 @@ libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
 	buffer->vb_format.setcolor(line, x, n);
 }
 
+INTERN NONNULL((1)) video_pixel_t CC
+libvideo_gfx_ramgfx_getpixel(struct video_gfx const *__restrict self,
+                             video_coord_t x, video_coord_t y) {
+	byte_t const *line;
+	struct video_buffer *buffer;
+	ASSERT_ABS_COORDS(self, x, y);
+	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
+	buffer = self->vx_buffer;
+	return buffer->vb_format.getpixel(line, x);
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_ramgfx_setpixel(struct video_gfx *__restrict self,
+                             video_coord_t x, video_coord_t y,
+                             video_pixel_t pixel) {
+	byte_t *line;
+	struct video_buffer *buffer;
+	ASSERT_ABS_COORDS(self, x, y);
+	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
+	buffer = self->vx_buffer;
+	buffer->vb_format.setpixel(line, x, pixel);
+}
+
+
+#ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+#define DEFINE_RAMGFX_GETSETPIXELn(n)                                        \
+	INTERN NONNULL((1)) video_pixel_t CC                                     \
+	libvideo_gfx_ramgfx_getpixel##n(struct video_gfx const *__restrict self, \
+	                                video_coord_t x, video_coord_t y) {      \
+		byte_t *line;                                                        \
+		ASSERT_ABS_COORDS(self, x, y);                                       \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                              \
+		return ((uint##n##_t const *)line)[x];                               \
+	}                                                                        \
+	                                                                         \
+	INTERN NONNULL((1)) void CC                                              \
+	libvideo_gfx_ramgfx_setpixel##n(struct video_gfx *__restrict self,       \
+	                                video_coord_t x, video_coord_t y,        \
+	                                video_pixel_t pixel) {                   \
+		byte_t *line;                                                        \
+		ASSERT_ABS_COORDS(self, x, y);                                       \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                              \
+		((uint##n##_t *)line)[x] = pixel;                                    \
+	}
+DEFINE_RAMGFX_GETSETPIXELn(8)
+DEFINE_RAMGFX_GETSETPIXELn(16)
+DEFINE_RAMGFX_GETSETPIXELn(32)
+#undef DEFINE_RAMGFX_GETSETPIXELn
+
+union pixel24 {
+	video_pixel_t pixel;
+	byte_t        bytes[3];
+};
+
+INTERN NONNULL((1)) video_pixel_t CC
+libvideo_gfx_ramgfx_getpixel24(struct video_gfx const *__restrict self,
+                               video_coord_t x, video_coord_t y) {
+	union pixel24 result;
+	byte_t const *line;
+	ASSERT_ABS_COORDS(self, x, y);
+	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
+	line += x * 3;
+	result.bytes[0] = line[0];
+	result.bytes[1] = line[1];
+	result.bytes[2] = line[2];
+	result.bytes[3] = 0;
+	return result.pixel;
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_ramgfx_setpixel24(struct video_gfx *__restrict self,
+                               video_coord_t x, video_coord_t y,
+                               video_pixel_t pixel) {
+	union pixel24 data;
+	byte_t *line;
+	ASSERT_ABS_COORDS(self, x, y);
+	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
+	line += x * 3;
+	data.pixel = pixel;
+	line[0] = data.bytes[0];
+	line[1] = data.bytes[1];
+	line[2] = data.bytes[2];
+}
+#endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
 
 
 
@@ -579,7 +663,7 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	} else if ((colorkey & VIDEO_COLOR_ALPHA_MASK) != 0) {
 		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_with_key;
 	} else {
-		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor;
+		result->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_noblend;
 	}
 
 	/* Detect special blend modes. */
@@ -601,6 +685,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	/* Load  generic implementations by default (will be
 	 * overwritten when more optimal ones are available) */
 	result->vx_ops = &libvideo_gfx_generic_ops;
+	result->vx_xops.vgxo_getpixel = &libvideo_gfx_ramgfx_getpixel;
+	result->vx_xops.vgxo_setpixel = &libvideo_gfx_ramgfx_setpixel;
 	if (flags & VIDEO_GFX_FAALINES) {
 		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
 		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
@@ -608,10 +694,10 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
 		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
 	}
-	result->vx_xops.vgxo_absline_h    = &libvideo_gfx_generic__absline_h;
-	result->vx_xops.vgxo_absline_v    = &libvideo_gfx_generic__absline_v;
-	result->vx_xops.vgxo_absfill      = &libvideo_gfx_generic__absfill;
-	result->vx_xops.vgxo_bitfill      = &libvideo_gfx_generic__bitfill;
+	result->vx_xops.vgxo_absline_h = &libvideo_gfx_generic__absline_h;
+	result->vx_xops.vgxo_absline_v = &libvideo_gfx_generic__absline_v;
+	result->vx_xops.vgxo_absfill   = &libvideo_gfx_generic__absfill;
+	result->vx_xops.vgxo_bitfill   = &libvideo_gfx_generic__bitfill;
 	if (flags & VIDEO_GFX_FLINEARBLIT) {
 		result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_l;
 		result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
@@ -632,8 +718,33 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		if (!(flags & VIDEO_GFX_FLINEARBLIT)) {
 			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
 			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+		} else {
+			result->vx_xops.vgxo_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
 		}
 	}
+
+	/* Load optimized pixel accessors if applicable to the loaded format. */
+#ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+	switch (self->vb_format.vf_codec->vc_specs.vcs_bpp) {
+	case 8:
+		result->vx_xops.vgxo_setpixel = &libvideo_gfx_ramgfx_setpixel8;
+		result->vx_xops.vgxo_getpixel = &libvideo_gfx_ramgfx_getpixel8;
+		break;
+	case 16:
+		result->vx_xops.vgxo_setpixel = &libvideo_gfx_ramgfx_setpixel16;
+		result->vx_xops.vgxo_getpixel = &libvideo_gfx_ramgfx_getpixel16;
+		break;
+	case 24:
+		result->vx_xops.vgxo_setpixel = &libvideo_gfx_ramgfx_setpixel24;
+		result->vx_xops.vgxo_getpixel = &libvideo_gfx_ramgfx_getpixel24;
+		break;
+	case 32:
+		result->vx_xops.vgxo_setpixel = &libvideo_gfx_ramgfx_setpixel32;
+		result->vx_xops.vgxo_getpixel = &libvideo_gfx_ramgfx_getpixel32;
+		break;
+	default: break;
+	}
+#endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
 	/* ... */
 
 	return result;
@@ -643,7 +754,7 @@ INTERN ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
 rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
 	self->vx_colorkey = 0;
-	self->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor;
+	self->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor_noblend;
 	self->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
 	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
 		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
@@ -656,6 +767,8 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
 		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
 		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+	} else {
+		self->vx_xops.vgxo_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
 	}
 	return self;
 }

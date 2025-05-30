@@ -450,7 +450,7 @@ bitmask2d_getbit(void const *__restrict bitmask, size_t bitscan,
 /* Generic, always-valid GFX functions (using only `vx_pxops') */
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self,
-                                   video_coord_t x, video_coord_t y,
+                                   video_coord_t dst_x, video_coord_t dst_y,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t color) {
 	video_dim_t step;
@@ -458,6 +458,8 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self,
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);
+		return;
 	}
 	assert(size_x > 0);
 	assert(size_y > 0);
@@ -465,22 +467,22 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self,
 	if (size_x > size_y) {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + step,
-			                      y + (video_dim_t)(((uint64_t)size_y * step) / size_x),
+			                      dst_x + step,
+			                      dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x),
 			                      color);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
-			                      y + step,
+			                      dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
+			                      dst_y + step,
 			                      color);
 		} while (++step != size_y);
 	} else {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + step,
-			                      y + step,
+			                      dst_x + step,
+			                      dst_y + step,
 			                      color);
 		} while (++step != size_x);
 	}
@@ -488,7 +490,7 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
-                                   video_coord_t x, video_coord_t y,
+                                   video_coord_t dst_x, video_coord_t dst_y,
                                    video_dim_t size_x, video_dim_t size_y,
                                    video_color_t color) {
 	video_dim_t step;
@@ -496,6 +498,8 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);
+		return;
 	}
 	assert(size_x > 0);
 	assert(size_y > 0);
@@ -503,22 +507,22 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
 	if (size_x > size_y) {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + step,
-			                      y - (video_dim_t)(((uint64_t)size_y * step) / size_x),
+			                      dst_x + step,
+			                      dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x),
 			                      color);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
-			                      y - step,
+			                      dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
+			                      dst_y - step,
 			                      color);
 		} while (++step != size_y);
 	} else {
 		do {
 			video_gfx_putabscolor(self,
-			                      x + step,
-			                      y - step,
+			                      dst_x + step,
+			                      dst_y - step,
 			                      color);
 		} while (++step != size_x);
 	}
@@ -526,20 +530,20 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_llhh_aa(struct video_gfx *__restrict self,
-                                      video_coord_t x, video_coord_t y,
+                                      video_coord_t dst_x, video_coord_t dst_y,
                                       video_dim_t size_x, video_dim_t size_y,
                                       video_color_t color) {
 	/* TODO: anti-aliased line drawing */
-	libvideo_gfx_generic__absline_llhh(self, x, y, size_x, size_y, color);
+	libvideo_gfx_generic__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);
 }
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_lhhl_aa(struct video_gfx *__restrict self,
-                                      video_coord_t x, video_coord_t y,
+                                      video_coord_t dst_x, video_coord_t dst_y,
                                       video_dim_t size_x, video_dim_t size_y,
                                       video_color_t color) {
 	/* TODO: anti-aliased line drawing */
-	libvideo_gfx_generic__absline_lhhl(self, x, y, size_x, size_y, color);
+	libvideo_gfx_generic__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);
 }
 
 
@@ -548,19 +552,17 @@ INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__absline_h(struct video_gfx *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
                                 video_dim_t length, video_color_t color) {
-	video_coord_t y = 0;
+	video_coord_t x = 0;
 	struct video_gfx noblend;
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__absline_h(self, dst_x, dst_y, length, color);
+		return;
 	}
 	do {
-		video_gfx_putabscolor(self,
-		                      dst_x + y,
-		                      dst_y,
-		                      color);
-		++y;
-	} while (y < length);
+		video_gfx_putabscolor(self, dst_x + x, dst_y, color);
+	} while (++x < length);
 }
 
 INTERN NONNULL((1)) void CC
@@ -572,14 +574,12 @@ libvideo_gfx_generic__absline_v(struct video_gfx *__restrict self,
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__absline_v(self, dst_x, dst_y, length, color);
+		return;
 	}
 	do {
-		video_gfx_putabscolor(self,
-		                      dst_x,
-		                      dst_y + y,
-		                      color);
-		++y;
-	} while (y < length);
+		video_gfx_putabscolor(self, dst_x, dst_y + y, color);
+	} while (++y < length);
 }
 
 INTERN NONNULL((1)) void CC
@@ -587,16 +587,17 @@ libvideo_gfx_generic__absfill(struct video_gfx *__restrict self,
                               video_coord_t dst_x, video_coord_t dst_y,
                               video_dim_t size_x, video_dim_t size_y,
                               video_color_t color) {
-	video_coord_t y = 0;
 	struct video_gfx noblend;
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__absfill(self, dst_x, dst_y, size_x, size_y, color);
+		return;
 	}
+	video_coord_t y = 0;
 	do {
 		(*self->vx_xops.vgxo_absline_h)(self, dst_x, dst_y + y, size_x, color);
-		++y;
-	} while (y < size_y);
+	} while (++y < size_y);
 }
 
 
@@ -617,6 +618,9 @@ libvideo_gfx_generic__bitfill(struct video_gfx *__restrict self,
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
+		libvideo_gfx_noblend__bitfill(self, dst_x, dst_y, size_x, size_y,
+		                              color, bitmask, bitskip, bitscan);
+		return;
 	}
 	do {
 		video_dim_t x = 0;
@@ -671,9 +675,8 @@ libvideo_gfx_generic__bitfill(struct video_gfx *__restrict self,
 		} while (x < size_x);
 next_row:
 		bitskip += bitscan;
-		--size_y;
 		++dst_y;
-	} while (size_y);
+	} while (--size_y);
 }
 
 INTERN NONNULL((1, 9)) void CC

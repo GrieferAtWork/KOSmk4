@@ -31,6 +31,11 @@
 
 #include "buffer.h"
 
+/* Define and link  optimized fast-pass  pixel
+ * accessors for 8,16,24,32-bit pixel formats. */
+#undef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+#define CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+
 DECL_BEGIN
 
 /* Indices into `video_gfx::bfx_driver' for RAM gfx buffers. */
@@ -59,12 +64,24 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF NONNULL((1)) video_pixel_t CC libvideo_gfx_ramgfx_getpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_setpixel(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+#ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+INTDEF NONNULL((1)) video_pixel_t CC libvideo_gfx_ramgfx_getpixel8(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_setpixel8(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+INTDEF NONNULL((1)) video_pixel_t CC libvideo_gfx_ramgfx_getpixel16(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_setpixel16(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+INTDEF NONNULL((1)) video_pixel_t CC libvideo_gfx_ramgfx_getpixel24(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_setpixel24(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+INTDEF NONNULL((1)) video_pixel_t CC libvideo_gfx_ramgfx_getpixel32(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_setpixel32(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
+#endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
 
 
 /* Create a new RAM-based video buffer */

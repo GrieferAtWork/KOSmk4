@@ -269,11 +269,22 @@ struct video_gfx_xops {
 	(LIBVIDEO_GFX_CC *vgxo_getcolor)(struct video_gfx const *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y);
 
-	/* Place a colored pixel ontop of the graphic */
+	/* Place a colored pixel ontop of the graphic (whilst also performing blending) */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vgxo_putcolor)(struct video_gfx *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y,
 	                                 video_color_t __color);
+
+	/* Get the raw data of a pixel (no blending is done) */
+	__ATTR_NONNULL_T((1)) video_pixel_t
+	(LIBVIDEO_GFX_CC *vgxo_getpixel)(struct video_gfx const *__restrict __self,
+	                                 video_coord_t __abs_x, video_coord_t __abs_y);
+
+	/* Set the raw data of a pixel (no blending is done) */
+	__ATTR_NONNULL_T((1)) void
+	(LIBVIDEO_GFX_CC *vgxo_setpixel)(struct video_gfx *__restrict __self,
+	                                 video_coord_t __abs_x, video_coord_t __abs_y,
+	                                 video_pixel_t __pixel);
 
 	/* Diagonal line from top-left -> bottom-right
 	 * @assume(__size_x > 0);
@@ -530,8 +541,7 @@ public:
 
 
 struct video_gfx {
-	struct video_gfx_ops const *vx_ops;       /* [1..1][const] Graphics operations. */
-	struct video_gfx_xops       vx_xops;      /* [1..1][const] Internal GFX operators. */
+	struct video_gfx_ops const *vx_ops;       /* [1..1][const] GFX operations (use these) */
 	struct video_buffer        *vx_buffer;    /* [1..1][const] The associated buffer. */
 	gfx_blendmode_t             vx_blend;     /* [const] Blending mode. */
 	__uintptr_t                 vx_flags;     /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
@@ -542,6 +552,7 @@ struct video_gfx {
 	video_coord_t               vx_ymin;      /* [const] == vx_offt_y <= 0 ? 0 : vx_offt_y */
 	video_coord_t               vx_xend;      /* [const] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
 	video_coord_t               vx_yend;      /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
+	struct video_gfx_xops       vx_xops;      /* [1..1][const] Internal GFX operators (do not use directly) */
 	void                       *vx_driver[4]; /* [?..?] Driver-specific graphics data. */
 
 	/* Return the API-visible clip rect offset in X or Y */
