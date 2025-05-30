@@ -82,8 +82,7 @@ libvideo_gfx_empty__bitfill(struct video_gfx *__restrict UNUSED(self),
                             video_coord_t UNUSED(dst_x), video_coord_t UNUSED(dst_y),
                             video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
                             video_color_t UNUSED(color),
-                            void const *__restrict UNUSED(bitmask),
-                            uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                            struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -93,8 +92,7 @@ libvideo_gfx_empty__bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                    video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                                    video_color_t UNUSED(color),
                                    video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                                   void const *__restrict UNUSED(bitmask),
-                                   uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                                   struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -130,8 +128,7 @@ libvideo_gfx_empty__bitblit(struct video_blit *__restrict UNUSED(self),
                             video_coord_t UNUSED(dst_x), video_coord_t UNUSED(dst_y),
                             video_coord_t UNUSED(src_x), video_coord_t UNUSED(src_y),
                             video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                            void const *__restrict UNUSED(bitmask),
-                            uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                            struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -141,8 +138,7 @@ libvideo_gfx_empty__bitstretch(struct video_blit *__restrict UNUSED(self),
                                video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                                video_coord_t UNUSED(src_x), video_coord_t UNUSED(src_y),
                                video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                               void const *__restrict UNUSED(bitmask),
-                               uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                               struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -169,8 +165,7 @@ libvideo_gfx_empty_bitfill(struct video_gfx *__restrict UNUSED(self),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
                            video_color_t UNUSED(color),
-                           void const *__restrict UNUSED(bitmask),
-                           uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                           struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -180,8 +175,7 @@ libvideo_gfx_empty_bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                   video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                                   video_color_t UNUSED(color),
                                   video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                                  void const *__restrict UNUSED(bitmask),
-                                  uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                                  struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -226,8 +220,7 @@ libvideo_gfx_empty_bitblit(struct video_blit *__restrict UNUSED(self),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                           void const *__restrict UNUSED(bitmask),
-                           uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                           struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -237,8 +230,7 @@ libvideo_gfx_empty_bitstretch(struct video_blit *__restrict UNUSED(self),
                               video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                               video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
                               video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                              void const *__restrict UNUSED(bitmask),
-                              uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
+                              struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 

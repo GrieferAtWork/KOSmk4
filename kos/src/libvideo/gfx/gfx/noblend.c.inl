@@ -333,12 +333,12 @@ libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx *__restrict self,
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_dim_t size_x, video_dim_t size_y,
                                        video_pixel_t pixel,
-                                       void const *__restrict bitmask,
-                                       uintptr_t bitskip, size_t bitscan) {
+                                       struct video_bitmask const *__restrict bm) {
+	uintptr_t bitskip = bm->vbm_skip;
 	do {
 		video_dim_t x = 0;
 		uintptr_t row_bitskip = bitskip;
-		byte_t const *row = (byte_t const *)bitmask;
+		byte_t const *row = (byte_t const *)bm->vbm_mask;
 		do {
 			video_dim_t count;
 			byte_t byte;
@@ -387,7 +387,7 @@ libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx *__restrict self,
 			} while (--count);
 		} while (x < size_x);
 next_row:
-		bitskip += bitscan;
+		bitskip += bm->vbm_scan;
 		++dst_y;
 	} while (--size_y);
 }
@@ -397,8 +397,7 @@ libvideo_gfx_noblend__bitfill(struct video_gfx *__restrict self,
                               video_coord_t dst_x, video_coord_t dst_y,
                               video_dim_t size_x, video_dim_t size_y,
                               video_color_t color,
-                              void const *__restrict bitmask,
-                              uintptr_t bitskip, size_t bitscan) {
+                              struct video_bitmask const *__restrict bm) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
@@ -406,13 +405,14 @@ libvideo_gfx_noblend__bitfill(struct video_gfx *__restrict self,
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		uintptr_t bitskip = bm->vbm_skip;
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
 		assert(size_x > 0);
 		assert(size_y > 0);
 		do {
 			video_dim_t x = 0;
 			uintptr_t row_bitskip = bitskip;
-			byte_t const *row = (byte_t const *)bitmask;
+			byte_t const *row = (byte_t const *)bm->vbm_mask;
 			do {
 				video_dim_t count;
 				byte_t byte;
@@ -458,14 +458,13 @@ libvideo_gfx_noblend__bitfill(struct video_gfx *__restrict self,
 				x += count;
 			} while (x < size_x);
 next_row:
-			bitskip += bitscan;
+			bitskip += bm->vbm_scan;
 			line += lock.vl_stride;
 		} while (--size_y);
 		buffer->unlock(lock);
 	} else {
 		/* Use pixel-based rendering */
-		libvideo_gfx_noblend__bitfill__bypixel(self, dst_x, dst_y, size_x, size_y,
-		                                       pixel, bitmask, bitskip, bitscan);
+		libvideo_gfx_noblend__bitfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
 	}
 }
 
@@ -524,14 +523,14 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit *__restrict self,
                                       video_coord_t dst_x, video_coord_t dst_y,
                                       video_coord_t src_x, video_coord_t src_y,
                                       video_dim_t size_x, video_dim_t size_y,
-                                      void const *__restrict bitmask,
-                                      uintptr_t bitskip, size_t bitscan) {
+                                      struct video_bitmask const *__restrict bm) {
 	struct video_lock dst_lock;
 	struct video_buffer *dst_buffer = self->vb_dst->vx_buffer;
 	if likely(dst_buffer->wlock(dst_lock) == 0) {
 		struct video_lock src_lock;
 		struct video_buffer *src_buffer = self->vb_src->vx_buffer;
 		if likely(src_buffer->rlock(src_lock) == 0) {
+			uintptr_t bitskip = bm->vbm_skip;
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
 			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
@@ -541,7 +540,7 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit *__restrict self,
 			do {
 				video_dim_t x = 0;
 				uintptr_t row_bitskip = bitskip;
-				byte_t const *row = (byte_t const *)bitmask;
+				byte_t const *row = (byte_t const *)bm->vbm_mask;
 				do {
 					video_dim_t count;
 					byte_t byte;
@@ -587,7 +586,7 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit *__restrict self,
 					x += count;
 				} while (x < size_x);
 next_row:
-				bitskip += bitscan;
+				bitskip += bm->vbm_scan;
 				dst_line += dst_lock.vl_stride;
 				src_line += src_lock.vl_stride;
 			} while (--size_y);
@@ -598,7 +597,7 @@ next_row:
 		dst_buffer->unlock(dst_lock);
 	}
 	libvideo_gfx_generic__bitblit(self, dst_x, dst_y, src_x, src_y,
-	                              size_x, size_y, bitmask, bitskip, bitscan);
+	                              size_x, size_y, bm);
 }
 
 
@@ -609,12 +608,10 @@ libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx *__restrict self,
                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
                                        video_color_t color,
                                        video_dim_t src_size_x, video_dim_t src_size_y,
-                                       void const *__restrict bitmask,
-                                       uintptr_t bitskip, size_t bitscan) {
+                                       struct video_bitmask const *__restrict bm) {
 	/* TODO */
 	libvideo_gfx_generic__bitstretchfill_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                       color, src_size_x, src_size_y,
-	                                       bitmask, bitskip, bitscan);
+	                                       color, src_size_x, src_size_y, bm);
 }
 
 INTERN NONNULL((1)) void CC
@@ -634,12 +631,10 @@ libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit *__restrict self,
                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
                                            video_coord_t src_x, video_coord_t src_y,
                                            video_dim_t src_size_x, video_dim_t src_size_y,
-                                           void const *__restrict bitmask,
-                                           uintptr_t bitskip, size_t bitscan) {
+                                           struct video_bitmask const *__restrict bm) {
 	/* TODO */
 	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                   src_x, src_y, src_size_x, src_size_y,
-	                                   bitmask, bitskip, bitscan);
+	                                   src_x, src_y, src_size_x, src_size_y, bm);
 }
 
 

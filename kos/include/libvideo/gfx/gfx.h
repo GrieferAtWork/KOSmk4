@@ -59,6 +59,36 @@ struct video_buffer;
 struct video_gfx;
 struct video_blit;
 
+/* Video bitmask descriptor.
+ *
+ * Bitmasks can be used to mask blitting/filling of pixels in
+ * fill/blit/stretch  operations, such that only pixels where
+ * the corresponding bit is "1"  in the used bitmask will  be
+ * copied/filled.
+ *
+ * Bitmasks are expected to encode their bits similar  to
+ * `VIDEO_CODEC_GRAY2_MSB', except that `vbm_skip' allows
+ * the user to specify a bit-perfect starting offset.
+ *
+ * USAGE:
+ * - Bitmasks are meant for rendering of simple terminal fonts,
+ *   as well as emulation of hardware VGA fonts. As a matter of
+ *   fact: the default VGA terminal font can be rendered when
+ *   treated as a bitmask.
+ *
+ * The status of a pixel is calculated as:
+ * >> uintptr_t bitno = vbm_skip + x + y * vbm_scan;
+ * >> byte_t byte = ((byte_t const *)vbm_mask)[bitno / NBBY];
+ * >> shift_t bit = bitno % NBBY;
+ * >> bool status = (byte >> (NBBY - 1 - bit)) & 1;
+ */
+struct video_bitmask {
+	void const *vbm_mask; /* [1..1] Bitmask base pointer */
+	__uintptr_t vbm_skip; /* # of leading bits to skip */
+	__size_t    vbm_scan; /* # of bits to move ahead */
+};
+
+
 struct video_blit_xops {
 	/* All of the following callbacks are [1..1]
 	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
@@ -90,8 +120,6 @@ struct video_blit_xops {
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
 	/* Same as `vbxo_blit()', but only copy bit-masked pixels
-	 * @param: bitskip: Number of leading bits to skip
-	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_NONNULL_T((1, 8)) void
@@ -99,8 +127,7 @@ struct video_blit_xops {
 	                                video_coord_t __dst_x, video_coord_t __dst_y,
 	                                video_coord_t __src_x, video_coord_t __src_y,
 	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                void const *__restrict __bitmask,
-	                                __uintptr_t __bitskip, __size_t __bitscan);
+	                                struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vbxo_stretch()', but only copy bit-masked pixels
 	 * @assume(__dst_size_x > 0);
@@ -115,8 +142,7 @@ struct video_blit_xops {
 	                                   video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                   video_coord_t __src_x, video_coord_t __src_y,
 	                                   video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                   void const *__restrict __bitmask,
-	                                   __uintptr_t __bitskip, __size_t __bitscan);
+	                                   struct video_bitmask const *__restrict __bm);
 };
 
 struct video_blit_ops {
@@ -135,21 +161,14 @@ struct video_blit_ops {
 	                               video_offset_t __src_x, video_offset_t __src_y,
 	                               video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	/* Same as `vbo_blit()', but only copy a pixel if:
-	 * >> offset = bitskip + (<final_y> - dst_y) * bitscan + (<final_x> - dst_x);
-	 * >> if ((((u8 *)bitmask)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
-	 * >>     FILL_PIXEL();
-	 * >> }
-	 * @param: bitskip: Number of leading bits to skip
-	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
+	/* Same as `vbo_blit()', but only copy a pixel if masked by `__bm'
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 	__ATTR_NONNULL_T((1, 8)) void
 	(LIBVIDEO_GFX_CC *vbo_bitblit)(struct video_blit *__restrict __self,
 	                               video_offset_t __dst_x, video_offset_t __dst_y,
 	                               video_offset_t __src_x, video_offset_t __src_y,
 	                               video_dim_t __size_x, video_dim_t __size_y,
-	                               void const *__restrict __bitmask,
-	                               __uintptr_t __bitskip, __size_t __bitscan);
+	                               struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vbo_stretch()', however perform the blit while also up-scaling the given
 	 * bitmask. The resulting image will be similar (but not necessarily identical)  to:
@@ -161,7 +180,7 @@ struct video_blit_ops {
 	 * >>                            NULL);
 	 * >> temp_gfx  = temp->gfx(GFX_BLENDINFO_OVERRIDE);
 	 * >> temp_blit = temp_gfx.blitfrom(*__self->vb_src);
-	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bitmask, __bitskip, __bitscan);
+	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bm);
 	 * >> temp_blit = temp_gfx.blitto(*__self->vb_dst);
 	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
 	 * >> temp_blit.stretch(__dst_x, __dst_y, __dst_size_x, __dst_size_y, &temp_gfx, 0, 0, __src_size_x, __src_size_y);
@@ -172,8 +191,7 @@ struct video_blit_ops {
 	                                  video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                  video_offset_t __src_x, video_offset_t __src_y,
 	                                  video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                  void const *__restrict __bitmask,
-	                                  __uintptr_t __bitskip, __size_t __bitscan);
+	                                  struct video_bitmask const *__restrict __bm);
 };
 
 
@@ -256,8 +274,6 @@ struct video_gfx_xops {
 	                                video_color_t __color);
 
 	/* Paint masked pixels
-	 * @param: bitskip: Number of leading bits to skip
-	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_NONNULL_T((1, 7)) void
@@ -265,8 +281,7 @@ struct video_gfx_xops {
 	                                video_coord_t __dst_x, video_coord_t __dst_y,
 	                                video_dim_t __size_x, video_dim_t __size_y,
 	                                video_color_t __color,
-	                                void const *__restrict __bitmask,
-	                                __uintptr_t __bitskip, __size_t __bitscan);
+	                                struct video_bitmask const *__restrict __bm);
 
 	/* Stretch and paint masked pixels
 	 * @assume(__dst_size_x > 0);
@@ -281,8 +296,7 @@ struct video_gfx_xops {
 	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                       video_color_t __color,
 	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                       void const *__restrict __bitmask,
-	                                       __uintptr_t __bitskip, __size_t __bitscan);
+	                                       struct video_bitmask const *__restrict __bm);
 };
 
 struct video_gfx_ops {
@@ -345,21 +359,14 @@ struct video_gfx_ops {
 	                            video_dim_t __size_x, video_dim_t __size_y,
 	                            video_color_t __color);
 
-	/* Same as `fxo_fill()', but only fill in a pixel if:
-	 * >> offset = bitskip + (<final_y> - dst_y) * bitscan + (<final_x> - dst_x);
-	 * >> if ((((u8 *)bitmask)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
-	 * >>     FILL_PIXEL();
-	 * >> }
-	 * @param: bitskip: Number of leading bits to skip
-	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
+	/* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 	__ATTR_NONNULL_T((1, 7)) void
 	(LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx *__restrict __self,
 	                               video_offset_t __x, video_offset_t __y,
 	                               video_dim_t __size_x, video_dim_t __size_y,
 	                               video_color_t __color,
-	                               void const *__restrict __bitmask,
-	                               __uintptr_t __bitskip, __size_t __bitscan);
+	                               struct video_bitmask const *__restrict __bm);
 
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask.
 	 * The  resulting  image   will  be   similar  (but  not   necessarily  identical)   to:
@@ -369,7 +376,7 @@ struct video_gfx_ops {
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
 	 * >> temp->gfx(temp_gfx, GFX_BLENDINFO_OVERRIDE);
-	 * >> temp_gfx.bitfill(0, 0, src_size_x, src_size_y, color, bitmask, bitskip);
+	 * >> temp_gfx.bitfill(0, 0, src_size_x, src_size_y, color, bitmask);
 	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
 	 * >> self->stretch(dst_x, dst_y, dst_size_x, dst_size_y, &temp_gfx, 0, 0, src_size_x, src_size_y);
 	 * >> destroy(temp); */
@@ -379,8 +386,7 @@ struct video_gfx_ops {
 	                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                      video_color_t __color,
 	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                      void const *__restrict __bitmask,
-	                                      __uintptr_t __bitskip, __size_t __bitscan);
+	                                      struct video_bitmask const *__restrict __bm);
 };
 
 
@@ -401,10 +407,10 @@ struct video_blit {
 	(*(self)->vb_ops->vbo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
 #define video_blit_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
 	(*(self)->vb_ops->vbo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
-#define video_blit_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan) \
-	(*(self)->vb_ops->vbo_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan)
-#define video_blit_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan) \
-	(*(self)->vb_ops->vbo_bitstretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan)
+#define video_blit_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask) \
+	(*(self)->vb_ops->vbo_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask)
+#define video_blit_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask) \
+	(*(self)->vb_ops->vbo_bitstretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask)
 #ifdef __cplusplus
 public:
 	/* Blit the contents of another video buffer into this one. */
@@ -423,21 +429,14 @@ public:
 		                   __src_x, __src_y, __src_size_y, __src_size_y);
 	}
 
-	/* Same as `blit()', but only copy a pixel if:
-	 * >> offset = bitskip + (<final_y> - dst_y) * bitscan + (<final_x> - dst_x);
-	 * >> if ((((u8 *)bitmask)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
-	 * >>     FILL_PIXEL();
-	 * >> }
-	 * @param: bitskip: Number of leading bits to skip
-	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
+	/* Same as `blit()', but only copy a pixel if masked by `__bm'.
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC bitblit(video_offset_t __dst_x, video_offset_t __dst_y,
 	                                               video_offset_t __src_x, video_offset_t __src_y,
 	                                               video_dim_t __size_x, video_dim_t __size_y,
-	                                               void const *__restrict __bitmask,
-	                                               __uintptr_t __bitskip, __size_t __bitscan) {
+	                                               struct video_bitmask const *__restrict __bm) {
 		video_blit_bitblit(this, __dst_x, __dst_y, __src_x, __src_y,
-		                   __size_x, __size_y, __bitmask, __bitskip, __bitscan);
+		                   __size_x, __size_y, __bm);
 	}
 
 	/* Same  as `stretch()', however  perform the blit while  also up-scaling the given
@@ -450,7 +449,7 @@ public:
 	 * >>                            NULL);
 	 * >> temp_gfx  = temp->gfx(GFX_BLENDINFO_OVERRIDE);
 	 * >> temp_blit = temp_gfx.blitfrom(*__self->vb_src);
-	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bitmask, __bitskip, __bitscan);
+	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bm);
 	 * >> temp_blit = temp_gfx.blitto(*__self->vb_dst);
 	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
 	 * >> temp_blit.stretch(__dst_x, __dst_y, __dst_size_x, __dst_size_y, &temp_gfx, 0, 0, __src_size_x, __src_size_y);
@@ -459,10 +458,9 @@ public:
 	                                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                                      video_offset_t __src_x, video_offset_t __src_y,
 	                                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                                      void const *__restrict __bitmask,
-	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
-		video_blit_bitstretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y, __src_x, __src_y,
-		                      __src_size_y, __src_size_y, __bitmask, __bitskip, __bitscan);
+	                                                      struct video_bitmask const *__restrict __bm) {
+		video_blit_bitstretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
+		                      __src_x, __src_y, __src_size_y, __src_size_y, __bm);
 	}
 #endif /* __cplusplus */
 };
@@ -511,10 +509,10 @@ struct video_gfx {
 	video_gfx_fill(self, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \
 	(*(self)->vx_ops->fxo_rect)(self, x, y, size_x, size_y, color)
-#define video_gfx_bitfill(self, x, y, size_x, size_y, color, bigtmask, bitskip, bitscan) \
-	(*(self)->vx_ops->fxo_bitfill)(self, x, y, size_x, size_y, color, bigtmask, bitskip, bitscan)
-#define video_gfx_bitstretchfill(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask, bitskip, bitscan) \
-	(*(self)->vx_ops->fxo_bitstretchfill)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask, bitskip, bitscan)
+#define video_gfx_bitfill(self, x, y, size_x, size_y, color, bigtmask) \
+	(*(self)->vx_ops->fxo_bitfill)(self, x, y, size_x, size_y, color, bigtmask)
+#define video_gfx_bitstretchfill(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask) \
+	(*(self)->vx_ops->fxo_bitstretchfill)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
 
 #define video_gfx_blitfrom(self, src, ctx) \
 	((ctx)->vb_src = (src), (*((ctx)->vb_dst = (self))->vx_xops.vgxo_blitfrom)(ctx))
@@ -524,10 +522,10 @@ struct video_gfx {
 	__XBLOCK({ struct video_blit _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(self, src, &_vgb_blit); video_blit_blit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
 #define video_gfx_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
 	__XBLOCK({ struct video_blit _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(self, src, &_vgs_blit); video_blit_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
-#define video_gfx_bitblit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan) \
-	__XBLOCK({ struct video_blit _vgbb_blit, *_vgbb_blit_ptr = video_gfx_blitfrom(self, src, &_vgbb_blit); video_blit_bitblit(_vgbb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask, bitskip, bitscan); })
-#define video_gfx_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan) \
-	__XBLOCK({ struct video_blit _vgbs_blit, *_vgbs_blit_ptr = video_gfx_blitfrom(self, src, &_vgbs_blit); video_blit_bitstretch(_vgbs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask, bitskip, bitscan); })
+#define video_gfx_bitblit(self, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bitmask) \
+	__XBLOCK({ struct video_blit _vgbb_blit, *_vgbb_blit_ptr = video_gfx_blitfrom(self, src, &_vgbb_blit); video_blit_bitblit(_vgbb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y, bitmask); })
+#define video_gfx_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y, bitmask) \
+	__XBLOCK({ struct video_blit _vgbs_blit, *_vgbs_blit_ptr = video_gfx_blitfrom(self, src, &_vgbs_blit); video_blit_bitstretch(_vgbs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask); })
 
 #ifdef __cplusplus
 public:
@@ -596,10 +594,8 @@ public:
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC bitfill(video_offset_t __x, video_offset_t __y,
 	                                               video_dim_t __size_x, video_dim_t __size_y,
 	                                               video_color_t __color,
-	                                               void const *__restrict __bitmask,
-	                                               __uintptr_t __bitskip, __size_t __bitscan) {
-		video_gfx_bitfill(this, __x, __y, __size_x, __size_y, __color,
-		                  __bitmask, __bitskip, __bitscan);
+	                                               struct video_bitmask const *__restrict __bm) {
+		video_gfx_bitfill(this, __x, __y, __size_x, __size_y, __color, __bm);
 	}
 
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
@@ -607,11 +603,9 @@ public:
 	                                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                                      video_color_t __color,
 	                                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                                      void const *__restrict __bitmask,
-	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
+	                                                      struct video_bitmask const *__restrict __bm) {
 		video_gfx_bitstretchfill(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                         __color, __src_size_x, __src_size_y,
-		                         __bitmask, __bitskip, __bitscan);
+		                         __color, __src_size_x, __src_size_y, __bm);
 	}
 
 
@@ -670,10 +664,8 @@ public:
 	                                               struct video_gfx const &__src,
 	                                               video_offset_t __src_x, video_offset_t __src_y,
 	                                               video_dim_t __size_x, video_dim_t __size_y,
-	                                               void const *__restrict __bitmask,
-	                                               __uintptr_t __bitskip, __size_t __bitscan) {
-		video_gfx_bitblit(this, __dst_x, __dst_y, &__src, __src_x, __src_y,
-		                  __size_x, __size_y, __bitmask, __bitskip, __bitscan);
+	                                               struct video_bitmask const *__restrict __bm) {
+		video_gfx_bitblit(this, __dst_x, __dst_y, &__src, __src_x, __src_y, __size_x, __size_y, __bm);
 	}
 
 	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
@@ -682,11 +674,9 @@ public:
 	                                                      struct video_gfx const &__src,
 	                                                      video_offset_t __src_x, video_offset_t __src_y,
 	                                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                                      void const *__restrict __bitmask,
-	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
+	                                                      struct video_bitmask const *__restrict __bm) {
 		video_gfx_bitstretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
-		                     &__src, __src_x, __src_y, __src_size_y, __src_size_y,
-		                     __bitmask, __bitskip, __bitscan);
+		                     &__src, __src_x, __src_y, __src_size_y, __src_size_y, __bm);
 	}
 #endif /* __cplusplus */
 };

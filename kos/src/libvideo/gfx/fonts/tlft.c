@@ -107,6 +107,7 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
                         char32_t ord,
                         video_color_t color) {
 	void *bm;
+	struct video_bitmask bitmask;
 	video_dim_t result;
 	struct tlft_font *me;
 	if unlikely(ord > 0xffff)
@@ -115,17 +116,18 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 	bm = libvideo_tlft_lookup(me, (char16_t)ord);
 	if unlikely(!bm)
 		goto unknown;
+	bitmask.vbm_mask = bm;
+	bitmask.vbm_skip = 0;
 	if (height == me->tf_bestheight) {
 		/* Can just directly blit the glyph */
 		result = me->tf_hdr->h_chwidth;
+		bitmask.vbm_scan = result;
 		gfx->bitfill(/* x:       */ x,
 		             /* y:       */ y,
 		             /* size_x:  */ result,
 		             /* size_y:  */ height,
 		             /* color:   */ color,
-		             /* bitmask: */ bm,
-		             /* bitskip: */ 0,
-		             /* bitscan: */ result);
+		             /* bitmask: */ &bitmask);
 	} else {
 		/* Must stretch the glyph somehow... */
 		result = ((height * me->tf_hdr->h_chwidth) +
@@ -133,6 +135,7 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		         me->tf_bestheight;
 		if unlikely(!result)
 			result = 1;
+		bitmask.vbm_scan = me->tf_hdr->h_chwidth;
 		gfx->bitstretchfill(/* dst_x:      */ x,
 		                    /* dst_y:      */ y,
 		                    /* dst_size_x: */ result,
@@ -140,9 +143,7 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		                    /* color:      */ color,
 		                    /* src_size_x: */ me->tf_hdr->h_chwidth,
 		                    /* src_size_y: */ me->tf_bestheight,
-		                    /* bitmask:    */ bm,
-		                    /* bitskip:    */ 0,
-		                    /* bitscan:    */ me->tf_hdr->h_chwidth);
+		                    /* bitmask:    */ &bitmask);
 	}
 	return result;
 unknown:
