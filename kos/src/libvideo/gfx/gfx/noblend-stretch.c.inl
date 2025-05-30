@@ -23,6 +23,19 @@
 //#define DEFINE_noblend__stretch_n
 #endif /* __INTELLISENSE__ */
 
+#include <hybrid/compiler.h>
+
+#include <stddef.h>
+#include <stdint.h>
+
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
+
+#include "../api.h"
+#include "../gfx.h"
+
 #if (defined(DEFINE_noblend__stretch_l) + \
      defined(DEFINE_noblend__stretch_n)) != 1
 #error "Must #define exactly one of these macros"
@@ -99,7 +112,6 @@ INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
 LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
-	DBG_memset(ctx->vb_driver, 0xcc, sizeof(ctx->vb_driver));
 	ctx->vb_ops = &libvideo_blit_generic_ops;
 	if (src_buffer == dst_buffer) {
 		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;

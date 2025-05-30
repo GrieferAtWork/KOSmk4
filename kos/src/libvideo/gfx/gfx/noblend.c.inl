@@ -25,18 +25,21 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/types.h>
+#include <sys/param.h>
+
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include <libvideo/codec/api.h>
+#include <libvideo/codec/format.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
 
-#ifdef __INTELLISENSE__
-#include "../gfx.c"
-#endif /* __INTELLISENSE__ */
+#include "../gfx.h"
 
 DECL_BEGIN
 

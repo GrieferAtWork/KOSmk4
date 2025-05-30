@@ -26,8 +26,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #define GUARD_LIBVIDEO_GFX_GFX_C 1
 #define _KOS_SOURCE 1
 
-#include "gfx.h"
-
 #include "api.h"
 
 #include <hybrid/compiler.h>
@@ -41,22 +39,14 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <inttypes.h>
 #include <math.h>
 #include <stddef.h>
-#include <string.h>
 
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
-#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+/**/
 
-#include "buffer.h"
 #include "gfx-empty.h"
-#include "ram-buffer.h"
-
-#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
-#define DBG_memset(p, c, n) memset(p, c, n)
-#else /* !NDEBUG && !NDEBUG_FINI */
-#define DBG_memset(p, c, n) (void)0
-#endif /* NDEBUG || NDEBUG_FINI */
+#include "gfx.h"
 
 DECL_BEGIN
 
@@ -1599,7 +1589,6 @@ libvideo_gfx_generic_bitstretchfill(struct video_gfx *__restrict self,
 
 INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
 libvideo_gfx_generic__blitfrom_l(struct video_blit *__restrict ctx) {
-	DBG_memset(ctx->vb_driver, 0xcc, sizeof(ctx->vb_driver));
 	ctx->vb_ops = &libvideo_blit_generic_ops;
 	if (ctx->vb_src->vx_buffer == ctx->vb_dst->vx_buffer) {
 		/* Need to use different impls here that essentially do a "memmove"-style blit,
@@ -1621,7 +1610,6 @@ libvideo_gfx_generic__blitfrom_l(struct video_blit *__restrict ctx) {
 
 INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
 libvideo_gfx_generic__blitfrom_n(struct video_blit *__restrict ctx) {
-	DBG_memset(ctx->vb_driver, 0xcc, sizeof(ctx->vb_driver));
 	ctx->vb_ops = &libvideo_blit_generic_ops;
 	if (ctx->vb_src->vx_buffer == ctx->vb_dst->vx_buffer) {
 		/* Need to use different impls here that essentially do a "memmove"-style blit,

@@ -32,19 +32,23 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
-#include <hybrid/overflow.h>
 
-#include <sys/mman.h>
+#include <kos/anno.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
-#include <string.h>
 
-#include "buffer.h"
-#include "gfx-empty.h"
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
+
 #include "gfx.h"
 #include "ram-buffer.h"
 
