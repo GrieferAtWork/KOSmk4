@@ -1122,7 +1122,7 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 	stretch_fp_t step_x, step_y, src_pos_y;
 	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
 	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
-	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;

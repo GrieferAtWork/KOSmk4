@@ -402,13 +402,78 @@ next_row:
 	                              size_x, size_y, bitmask, bitskip, bitscan);
 }
 
-DECL_END
 
-#ifndef __INTELLISENSE__
-#define DEFINE_noblend__stretch_l
-#include "noblend-stretch.c.inl"
-#define DEFINE_noblend__stretch_n
-#include "noblend-stretch.c.inl"
-#endif /* !__INTELLISENSE__ */
+
+INTERN NONNULL((1, 9)) void CC
+libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx *__restrict self,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                       video_color_t color,
+                                       video_dim_t src_size_x, video_dim_t src_size_y,
+                                       void const *__restrict bitmask,
+                                       uintptr_t bitskip, size_t bitscan) {
+	/* TODO */
+	libvideo_gfx_generic__bitstretchfill_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                       color, src_size_x, src_size_y,
+	                                       bitmask, bitskip, bitscan);
+}
+
+#include <kos/kernel/printk.h>
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit *__restrict self,
+                                        video_coord_t dst_x, video_coord_t dst_y,
+                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                        video_coord_t src_x, video_coord_t src_y,
+                                        video_dim_t src_size_x, video_dim_t src_size_y) {
+	printk(KERN_DEBUG "In: libvideo_gfx_noblend_samefmt__stretch_n\n");
+	/* TODO */
+	libvideo_gfx_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                src_x, src_y, src_size_x, src_size_y);
+}
+
+INTERN NONNULL((1, 10)) void CC
+libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit *__restrict self,
+                                           video_coord_t dst_x, video_coord_t dst_y,
+                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                           video_coord_t src_x, video_coord_t src_y,
+                                           video_dim_t src_size_x, video_dim_t src_size_y,
+                                           void const *__restrict bitmask,
+                                           uintptr_t bitskip, size_t bitscan) {
+	/* TODO */
+	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                   src_x, src_y, src_size_x, src_size_y,
+	                                   bitmask, bitskip, bitscan);
+}
+
+
+INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
+libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx) {
+	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
+	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
+	ctx->vb_ops                           = &libvideo_blit_generic_ops;
+	if (src_buffer == dst_buffer) {
+		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
+		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
+		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic_samebuf__stretch_n;
+		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic_samebuf__bitstretch_n;
+	} else if (src_buffer->vb_format.vf_codec == dst_buffer->vb_format.vf_codec &&
+	           src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal &&
+	           (ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
+	           (ctx->vb_src->vx_colorkey & VIDEO_COLOR_ALPHA_MASK) == 0) {
+		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
+		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
+		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_noblend_samefmt__stretch_n;
+		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_noblend_samefmt__bitstretch_n;
+	} else {
+		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
+		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
+		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic__stretch_n;
+		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic__bitstretch_n;
+	}
+	return ctx;
+}
+
+DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL */

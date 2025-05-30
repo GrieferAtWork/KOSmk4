@@ -598,41 +598,44 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
 
+	/* Load  generic implementations by default (will be
+	 * overwritten when more optimal ones are available) */
+	result->vx_ops = &libvideo_gfx_generic_ops;
+	if (flags & VIDEO_GFX_FAALINES) {
+		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+	} else {
+		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
+		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
+	}
+	result->vx_xops.vgxo_absline_h    = &libvideo_gfx_generic__absline_h;
+	result->vx_xops.vgxo_absline_v    = &libvideo_gfx_generic__absline_v;
+	result->vx_xops.vgxo_absfill      = &libvideo_gfx_generic__absfill;
+	result->vx_xops.vgxo_bitfill      = &libvideo_gfx_generic__bitfill;
+	if (flags & VIDEO_GFX_FLINEARBLIT) {
+		result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_l;
+		result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+	} else {
+		result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_n;
+		result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
+	}
+
 	/* Select optimal operator implementations based on requested features. */
 	if (result->vx_xops.vgxo_putcolor == &libvideo_gfx_ramgfx_putcolor_noblend) {
+		/* No blending is being done -> link operators that try to make use of direct memory access. */
 		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
 		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
 		result->vx_xops.vgxo_absline_h    = &libvideo_gfx_noblend__absline_h;
 		result->vx_xops.vgxo_absline_v    = &libvideo_gfx_noblend__absline_v;
 		result->vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
 		result->vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
-		if (flags & VIDEO_GFX_FLINEARBLIT) {
-			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_l;
-			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_l;
-		} else {
+		if (!(flags & VIDEO_GFX_FLINEARBLIT)) {
 			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
 			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 		}
-	} else {
-		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
-		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
-		result->vx_xops.vgxo_absline_h    = &libvideo_gfx_generic__absline_h;
-		result->vx_xops.vgxo_absline_v    = &libvideo_gfx_generic__absline_v;
-		result->vx_xops.vgxo_absfill      = &libvideo_gfx_generic__absfill;
-		result->vx_xops.vgxo_bitfill      = &libvideo_gfx_generic__bitfill;
-		if (flags & VIDEO_GFX_FLINEARBLIT) {
-			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_l;
-			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
-		} else {
-			result->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_n;
-			result->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
-		}
 	}
-	if (flags & VIDEO_GFX_FAALINES) {
-		result->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
-		result->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
-	}
-	result->vx_ops = &libvideo_gfx_generic_ops;
+	/* ... */
+
 	return result;
 }
 
@@ -642,10 +645,7 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_colorkey = 0;
 	self->vx_xops.vgxo_getcolor = &libvideo_gfx_ramgfx_getcolor;
 	self->vx_xops.vgxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
-	if (self->vx_flags & VIDEO_GFX_FAALINES) {
-		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
-		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
-	} else {
+	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
 		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
 		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
 	}
@@ -653,10 +653,7 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
 	self->vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
 	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
-	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
-		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_l;
-		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_l;
-	} else {
+	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
 		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
 		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 	}
