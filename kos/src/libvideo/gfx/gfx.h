@@ -35,8 +35,13 @@ DECL_BEGIN
 
 /* # of bits to use for the fractional part of the fixed-
  * point  numbers used during nearest stretch operations. */
-#define STRETCH_NEAREST_FRAC 16
-typedef uint_fast64_t stretch_nearest_t; /* uint_fast{BITSOF(video_coord_t) + STRETCH_NEAREST_FRAC}_t */
+#define STRETCH_FP_NFRAC 16
+typedef uint_fast64_t stretch_fp_t;      /* uint_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
+typedef int_fast64_t sstretch_fp_t;      /* int_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
+typedef uint_fast16_t stretch_fp_frac_t; /* uint_fast{STRETCH_FP_NFRAC}_t */
+#define STRETCH_FP(whole)    ((stretch_fp_t)(whole) << STRETCH_FP_NFRAC)
+#define STRETCH_FP_WHOLE(fp) ((video_coord_t)(fp) >> STRETCH_FP_NFRAC)
+#define STRETCH_FP_FRAC(fp)  ((stretch_fp_frac_t)(fp) & (stretch_fp_frac_t)(STRETCH_FP(1) - 1))
 
 
 /* Low-level, Generic, always-valid GFX functions (using only `fxo_getcolor' + `fxo_putcolor') */

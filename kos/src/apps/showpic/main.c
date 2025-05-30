@@ -25,15 +25,17 @@
 
 #include <hybrid/minmax.h>
 
+#include <kos/kernel/printk.h>
+#include <sys/syslog.h>
+
 #include <err.h>
 #include <stddef.h>
-#include <sys/syslog.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <libvideo/codec/pixel.h>
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
@@ -81,7 +83,7 @@ int main(int argc, char *argv[]) {
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FNEARESTBLIT, 0);
+	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
 	                    VIDEO_GFX_FNORMAL, 0);
@@ -116,10 +118,20 @@ int main(int argc, char *argv[]) {
 	blit_x = (video_gfx_sizex(&screen_gfx) - blit_w) / 2;
 	blit_y = (video_gfx_sizey(&screen_gfx) - blit_h) / 2;
 
+#if 1
+	blit_w = video_gfx_sizex(&screen_gfx);
+	blit_h = video_gfx_sizey(&screen_gfx);
+	blit_x = 0;
+	blit_y = 0;
+#endif
+
 	/* Display the image */
+	printk(KERN_DEBUG "SHOWPIC: BEGIN\n");
 	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
+	printk(KERN_DEBUG "SHOWPIC: START STRETCH\n");
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
+	printk(KERN_DEBUG "SHOWPIC: END\n");
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
 	/* Wait for user input */

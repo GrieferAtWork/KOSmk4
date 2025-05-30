@@ -133,6 +133,121 @@ typedef uint_fast16_t twochannels_t;
 #define CHANNEL_MIN 0x00
 #define CHANNEL_MAX 0xff
 
+
+/************************************************************************/
+/* DISCLAIMER: The linear stretch algorithm is derived from SDL!        */
+/* s.a. SDL:/src/video/SDL_stretch.c:scale_mat                          */
+/************************************************************************/
+
+/* # of  leading bits  of "STRETCH_FP_NFRAC"  actually used  during
+ * linear interpolation. Allowed to be less than "STRETCH_FP_NFRAC"
+ * since no as much precision is still needed at that point.
+ *
+ * Specifically, we need at most "BITSOF(channel_t)" bots of precision,
+ * however since for the purpose of blending we also need to be able to
+ * represent a fixed-point "1.0", we need  1 extra bit for the  decimal
+ * part.  And since we want to be  as efficient as possible, that means
+ * we just restrict ourselves to 7 bits.
+ *
+ * In practice, you won't ever be able to see the difference, since this
+ * missing bit of precision only comes  into play in how exactly  pixels
+ * are  blended into  each other  during stretching,  having a minuscule
+ * effect during color interpolation.
+ */
+#define LINEAR_FP_BLEND_NFRAC 7
+typedef uint_fast8_t linear_fp_blend_t;     /* uint_fast{LINEAR_FP_BLEND_NFRAC+1}_t */
+typedef uint_fast16_t linear_fp_twoblend_t; /* uint_fast{(LINEAR_FP_BLEND_NFRAC+1)*2}_t */
+#define LINEAR_FP_BLEND(whole)    ((linear_fp_blend_t)(whole) << LINEAR_FP_BLEND_NFRAC)
+#define LINEAR_FP_BLEND_WHOLE(fp) ((linear_fp_twoblend_t)(fp) >> LINEAR_FP_BLEND_NFRAC)
+
+/* Return the blend-fraction of a gfx-stretch fixed-point (stretch_fp_t) "fp" value */
+#define STRETCH_FP_BLEND_FRAC(fp) \
+	((linear_fp_blend_t)((uint32_t)((fp) >> (STRETCH_FP_NFRAC - LINEAR_FP_BLEND_NFRAC)) & ((1 << LINEAR_FP_BLEND_NFRAC) - 1)))
+static_assert(LINEAR_FP_BLEND_NFRAC <= STRETCH_FP_NFRAC);
+
+
+LOCAL NONNULL((3, 4, 5, 6)) void CC
+calc_linear_stretch_dim(video_dim_t src_dim,     /* in: "src" dimension */
+                        video_dim_t dst_dim,     /* in: "dst" dimension */
+                        sstretch_fp_t *fp_start, /* out: FP start value for "src" (still includes `*pad_min') */
+                        stretch_fp_t *fp_step,   /* out: FP-delta in "src" to add for each pixel */
+                        video_dim_t *pad_min,    /* out: # of leading pixels of padding in "dst" */
+                        video_dim_t *pad_max) {  /* out: # of trailing pixels of padding in "dst" */
+	stretch_fp_t fp_ratio; /* # of "src" pixels for each "dst" pixel */
+	sstretch_fp_t fp_iter; /* Must be signed because *pad_min can result in negative values */
+	assert(src_dim >= 1);
+	assert(dst_dim >= 1);
+
+	/* Special case for when the source dimension is so small that no blending can happen.
+	 * Without this, we'd get a pixel out-of-bounds assertion fail in the "middle" part of
+	 * the linear blender, which would try to access out-of-bounds pixels. */
+	if unlikely(src_dim <= 1) {
+		*fp_start = 0; /* Could also be left uninitialized */
+		*fp_step  = 0; /* Could also be left uninitialized */
+		*pad_min  = dst_dim;
+		*pad_max  = 0;
+		return;
+	}
+
+	fp_ratio = STRETCH_FP(src_dim) / dst_dim;
+
+	fp_iter = fp_ratio * STRETCH_FP_FRAC(STRETCH_FP(1) / 2);
+	fp_iter = STRETCH_FP_WHOLE(fp_iter + (STRETCH_FP(1) / 2));
+	fp_iter -= STRETCH_FP(1) / 2; /* Start in the middle of pixels (this is also the reason why "*pad_min" is needed) */
+
+	*fp_start = fp_iter;
+	*fp_step  = fp_ratio;
+	*pad_min  = 0;
+	*pad_max  = 0;
+	do {
+		if (fp_iter < 0) {
+			*pad_min += 1;
+		} else {
+			video_coord_t index = STRETCH_FP_WHOLE(fp_iter);
+			if (index > src_dim - 2) {
+				*pad_max += 1;
+			}
+		}
+		fp_iter += fp_ratio;
+		--dst_dim;
+	} while (dst_dim);
+}
+
+/* Interpolate "c0" with "c1".
+ * NOTE: Make sure that "frac0 + frac1 == LINEAR_FP_BLEND(1)" */
+LOCAL ATTR_CONST channel_t CC
+interpolate_channel(channel_t c0, channel_t c1,
+                    linear_fp_blend_t frac0,
+                    linear_fp_blend_t frac1) {
+	__builtin_assume(frac0 + frac1 == LINEAR_FP_BLEND(1));
+	return (channel_t)LINEAR_FP_BLEND_WHOLE(((linear_fp_twoblend_t)c0 * frac1) +
+	                                        ((linear_fp_twoblend_t)c1 * frac0));
+}
+
+LOCAL ATTR_CONST video_color_t CC
+interpolate_1d(video_color_t c0, video_color_t c1,
+               linear_fp_blend_t frac0, linear_fp_blend_t frac1) {
+	channel_t r = interpolate_channel(VIDEO_COLOR_GET_RED(c0), VIDEO_COLOR_GET_RED(c1), frac0, frac1);
+	channel_t g = interpolate_channel(VIDEO_COLOR_GET_GREEN(c0), VIDEO_COLOR_GET_GREEN(c1), frac0, frac1);
+	channel_t b = interpolate_channel(VIDEO_COLOR_GET_BLUE(c0), VIDEO_COLOR_GET_BLUE(c1), frac0, frac1);
+	channel_t a = interpolate_channel(VIDEO_COLOR_GET_ALPHA(c0), VIDEO_COLOR_GET_ALPHA(c1), frac0, frac1);
+	return VIDEO_COLOR_RGBA(r, g, b, a);
+}
+
+LOCAL ATTR_CONST video_color_t
+interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
+               video_color_t c_y1_x0, video_color_t c_y1_x1,
+               linear_fp_blend_t frac_x0, linear_fp_blend_t frac_x1,
+               linear_fp_blend_t frac_y0, linear_fp_blend_t frac_y1) {
+	/* Blend vertically */
+	video_color_t y0 = interpolate_1d(c_y0_x0, c_y1_x0, frac_y0, frac_y1);
+	video_color_t y1 = interpolate_1d(c_y0_x1, c_y1_x1, frac_y0, frac_y1);
+	/* Blend horizontally */
+	return interpolate_1d(y0, y1, frac_x0, frac_x1);
+}
+
+
+
 LOCAL ATTR_CONST channel_t CC
 bitfactor(bool bit, double part) {
 	return (channel_t)((double)(bit ? CHANNEL_MAX : CHANNEL_MIN) * part);
@@ -648,24 +763,24 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx *__restrict self,
                                        void const *__restrict bitmask,
                                        uintptr_t bitskip, size_t bitscan) {
 	video_dim_t y;
-	stretch_nearest_t step_x, step_y, src_pos_y;
+	stretch_fp_t step_x, step_y, src_pos_y;
 	struct video_gfx noblend;
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
 	}
-	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
-	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
+	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
-		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_coord_t row_src_y = (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
 		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
 		do {
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
 			uintptr_t bitno = row_bitno + row_src_x;
 			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY))))
 				video_gfx_putabscolor(self, dst_x + x, row_dst_y, color);
@@ -764,6 +879,8 @@ next_row:
 	} while (size_y);
 }
 
+
+
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
@@ -772,29 +889,131 @@ libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
                                 video_dim_t src_size_x, video_dim_t src_size_y) {
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
-			video_color_t used_color;
-			double rel_x, rel_y;
-			rel_x = ((double)x * x_scale) + (double)src_x;
-			rel_y = ((double)y * y_scale) + (double)src_y;
-			used_color = getlinearcolor(src, rel_x, rel_y);
-			video_gfx_putabscolor(dst, dst_x + x, dst_y + y, used_color);
+	video_coord_t rel_dst_y;  /* Relative destination Y coord [0,dst_size_y) */
+	video_dim_t pad_xmin, pad_xmax;
+	video_dim_t pad_ymin, pad_ymax;
+	sstretch_fp_t fp_src_x;
+	sstretch_fp_t fp_src_y;
+	stretch_fp_t fp_step_x;
+	stretch_fp_t fp_step_y;
+	video_dim_t nopad_dst_x; /* # of horizontal pixels that can be written w/o padding */
+	calc_linear_stretch_dim(src_size_x, dst_size_x, &fp_src_x, &fp_step_x, &pad_xmin, &pad_xmax);
+	calc_linear_stretch_dim(src_size_y, dst_size_y, &fp_src_y, &fp_step_y, &pad_ymin, &pad_ymax);
+	nopad_dst_x = dst_size_x - pad_xmin - pad_xmax;
+	fp_src_x += pad_xmin * fp_step_x; /* Skip over leading padding */
+
+	/* Render padding near the top */
+	if (pad_ymin) {
+		video_coord_t used_dst_x = dst_x;
+		video_dim_t middle;
+		sstretch_fp_t row_fp_src_x;
+		if (pad_xmin) {
+			video_color_t out = video_gfx_getabscolor(src, src_x, src_y);
+			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, dst_y, pad_xmin, pad_ymin, out);
+			used_dst_x += pad_xmin;
+		}
+		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
+		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
+			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
+			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, src_y);
+			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, src_y);
+			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
+			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
+			video_color_t out = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);
+			(*dst->vx_xops.vgxo_absline_v)(dst, used_dst_x, dst_y, pad_ymin, out);
+		}
+		if (pad_xmax) {
+			video_coord_t used_src_x = src_x + src_size_x - 1;
+			video_color_t out = video_gfx_getabscolor(src, used_src_x, src_y);
+			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, dst_y, pad_xmax, pad_ymin, out);
+			/*used_dst_x += left_pad_w;*/
+		}
+		fp_src_y += fp_step_y * pad_ymin;
+	}
+
+	/* Render the main image */
+	for (rel_dst_y = pad_ymin; rel_dst_y < dst_size_y - pad_ymax; ++rel_dst_y, fp_src_y += fp_step_y) {
+		video_coord_t used_dst_y = dst_y + rel_dst_y; /* Absolute destination Y coord [dst_y,dst_y+dst_size_y) */
+		video_coord_t used_dst_x;
+		video_coord_t rel_src_y;
+		linear_fp_blend_t frac_y0, frac_y1;
+		video_dim_t middle;
+		video_coord_t used_src_y0, used_src_y1;
+		sstretch_fp_t row_fp_src_x;
+		rel_src_y  = STRETCH_FP_WHOLE(fp_src_y);
+		frac_y0    = STRETCH_FP_BLEND_FRAC(fp_src_y);
+		frac_y1    = LINEAR_FP_BLEND(1) - frac_y0;
+
+		used_src_y0 = src_y + rel_src_y; /* Y coord of first src row */
+		used_src_y1 = used_src_y0 + 1;   /* Y coord of second src row */
+		used_dst_x  = dst_x;
+		if (pad_xmin) {
+			video_color_t src_y0_x0 = video_gfx_getabscolor(src, src_x, used_src_y0);
+			video_color_t src_y1_x0 = video_gfx_getabscolor(src, src_x, used_src_y1);
+			video_color_t out = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);
+			(*dst->vx_xops.vgxo_absline_h)(dst, used_dst_x, used_dst_y, pad_xmin, out);
+			used_dst_x += pad_xmin;
+		}
+		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
+		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
+			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
+			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y0);
+			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y0);
+			video_color_t src_y1_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y1);
+			video_color_t src_y1_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y1);
+			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
+			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
+			video_color_t out = interpolate_2d(src_y0_x0, src_y0_x1,
+			                                   src_y1_x0, src_y1_x1,
+			                                   frac_x0, frac_x1,
+			                                   frac_y0, frac_y1);
+			video_gfx_putabscolor(dst, used_dst_x, used_dst_y, out);
+		}
+		if (pad_xmax) {
+			video_coord_t used_src_x = src_x + src_size_x - 1;
+			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y0);
+			video_color_t src_y1_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y1);
+			video_color_t out = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);
+			(*dst->vx_xops.vgxo_absline_h)(dst, used_dst_x, used_dst_y, pad_xmax, out);
+			/*used_dst_x += left_pad_w;*/
+		}
+	}
+
+	/* Render padding near the bottom */
+	if (pad_ymax) {
+		video_coord_t used_dst_y = dst_y + dst_size_y - pad_ymax;
+		video_coord_t used_dst_x = dst_x;
+		video_dim_t middle;
+		video_coord_t used_src_y = src_y + src_size_y - 1;
+		sstretch_fp_t row_fp_src_x;
+
+		if (pad_xmin) {
+			video_color_t out = video_gfx_getabscolor(src, src_x, used_src_y);
+			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, used_dst_y, pad_xmin, pad_ymax, out);
+			used_dst_x += pad_xmin;
+		}
+		for (middle = nopad_dst_x, row_fp_src_x = fp_src_x;
+		     middle; --middle, ++used_dst_x, row_fp_src_x += fp_step_x) {
+			video_coord_t used_src_x = src_x + STRETCH_FP_WHOLE(row_fp_src_x);
+			video_color_t src_y0_x0 = video_gfx_getabscolor(src, used_src_x, used_src_y);
+			video_color_t src_y0_x1 = video_gfx_getabscolor(src, used_src_x + 1, used_src_y);
+			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(row_fp_src_x);
+			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
+			video_color_t out = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);
+			(*dst->vx_xops.vgxo_absline_v)(dst, used_dst_x, used_dst_y, pad_ymax, out);
+		}
+		if (pad_xmax) {
+			video_coord_t used_src_x = src_x + src_size_x - 1;
+			video_color_t out = video_gfx_getabscolor(src, used_src_x, used_src_y);
+			(*dst->vx_xops.vgxo_absfill)(dst, used_dst_x, used_dst_y, pad_xmax, pad_ymax, out);
+			/*used_dst_x += left_pad_w;*/
 		}
 	}
 }
 
 #define BITSOF(x) (sizeof(x) * NBBY)
-static_assert(BITSOF(stretch_nearest_t) >= BITSOF(video_coord_t) + STRETCH_NEAREST_FRAC,
-              "stretch_nearest_t is too small to hold arbitrary video coords + a fractional part");
+static_assert(BITSOF(stretch_fp_t) >= BITSOF(video_coord_t) + STRETCH_FP_NFRAC,
+              "stretch_fp_t is too small to hold arbitrary video coords + a fractional part");
 
 INTERN NONNULL((1)) void CC
 libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
@@ -805,20 +1024,20 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 	video_dim_t y;
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	stretch_nearest_t step_x, step_y, src_pos_y;
-	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
-	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	stretch_fp_t step_x, step_y, src_pos_y;
+	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
+	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
-		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
-		src_pos_x += (stretch_nearest_t)src_x << STRETCH_NEAREST_FRAC;
+		src_pos_x += (stretch_fp_t)src_x << STRETCH_FP_NFRAC;
 		do {
 			video_color_t color;
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
 			color = video_gfx_getabscolor(src, row_src_x, row_src_y);
 			video_gfx_putabscolor(dst, dst_x + x, row_dst_y, color);
 			src_pos_x += step_x;
@@ -882,20 +1101,20 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 	video_dim_t y;
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	stretch_nearest_t step_x, step_y, src_pos_y;
-	step_x = ((stretch_nearest_t)src_size_x << STRETCH_NEAREST_FRAC) / dst_size_x;
-	step_y = ((stretch_nearest_t)src_size_y << STRETCH_NEAREST_FRAC) / dst_size_y;
+	stretch_fp_t step_x, step_y, src_pos_y;
+	step_x = ((stretch_fp_t)src_size_x << STRETCH_FP_NFRAC) / dst_size_x;
+	step_y = ((stretch_fp_t)src_size_y << STRETCH_FP_NFRAC) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
-		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_NEAREST_FRAC);
-		stretch_nearest_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		video_coord_t row_src_y = src_y + (video_coord_t)(src_pos_y >> STRETCH_FP_NFRAC);
+		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
 		uintptr_t row_bitno = bitskip + row_src_y * bitscan;
-		src_pos_x += (stretch_nearest_t)src_x << STRETCH_NEAREST_FRAC;
+		src_pos_x += (stretch_fp_t)src_x << STRETCH_FP_NFRAC;
 		do {
-			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_NEAREST_FRAC);
+			video_coord_t row_src_x = (video_coord_t)(src_pos_x >> STRETCH_FP_NFRAC);
 			uintptr_t bitno = row_bitno + row_src_x;
 			if (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) {
 				video_color_t color;
