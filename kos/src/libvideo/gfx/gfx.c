@@ -37,7 +37,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <assert.h>
 #include <inttypes.h>
-#include <math.h>
 #include <stddef.h>
 
 #include <libvideo/codec/pixel.h>
@@ -395,224 +394,26 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 				/*_used_dst_x += left_pad_w;*/                                                                                     \
 			}                                                                                                                      \
 		}                                                                                                                          \
-	}                                                                                                                              \
-	__WHILE0
+	}	__WHILE0
 
-
-
-
-
-LOCAL ATTR_CONST channel_t CC
-bitfactor(bool bit, double part) {
-	return (channel_t)((double)(bit ? CHANNEL_MAX : CHANNEL_MIN) * part);
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) channel_t CC
-getlinearbit(void const *__restrict bitmask,
-             uintptr_t bitskip,
-             video_dim_t bitmask_size_x,
-             video_dim_t bitmask_size_y,
-             double x, double y) {
-	channel_t result;
-	bool c[2][2];
-	video_offset_t base_x, base_y;
-	double base_xf, base_yf;
-	double rel_x, rel_y;
-	uintptr_t bitno;
-	x -= 0.5;
-	y -= 0.5;
-	base_xf = floor(x);
-	base_yf = floor(y);
-	base_x = (video_offset_t)base_xf;
-	base_y = (video_offset_t)base_yf;
-	if unlikely(base_x < 0) {
-		if unlikely(base_x <= -2)
-			return 0; /* This can happen because of rounding */
-		c[0][0] = false;
-		c[0][1] = false;
-		if unlikely(base_y < 0) {
-			if unlikely(base_y <= -2)
-				return 0; /* This can happen because of rounding */
-			c[1][0] = false;
-			c[1][1] = (((byte_t const *)bitmask)[0] & ((byte_t)1 << (NBBY - 1))) != 0;
-		} else {
-			if unlikely((video_coord_t)base_y >= bitmask_size_y)
-				return 0; /* This can happen because of rounding */
-			bitno = bitskip + (video_coord_t)base_y * bitmask_size_x;
-			c[1][0] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-			if unlikely((video_coord_t)base_y == bitmask_size_y - 1) {
-				c[1][1] = false;
-			} else {
-				bitno += bitmask_size_x;
-				c[1][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-			}
-		}
-	} else {
-		if unlikely((video_coord_t)base_x >= bitmask_size_x)
-			return 0; /* This can happen because of rounding */
-		if unlikely(base_y < 0) {
-			if (base_y <= -2)
-				return 0; /* This can happen because of rounding */
-			c[0][0] = false;
-			c[1][0] = false;
-			bitno = bitskip + (video_coord_t)base_x;
-			c[0][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-			if unlikely((video_coord_t)base_x == bitmask_size_x - 1) {
-				c[1][1] = false;
-			} else {
-				++bitno;
-				c[1][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-			}
-		} else {
-			if unlikely((video_coord_t)base_y >= bitmask_size_y)
-				return 0; /* This can happen because of rounding */
-			/* Load source colors. */
-			bitno = bitskip + (video_coord_t)base_x + (video_coord_t)base_y * bitmask_size_x;
-			c[0][0] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-			if unlikely((video_coord_t)base_x == bitmask_size_x - 1) {
-				/* This can happen because of rounding */
-				c[1][0] = false;
-				c[1][1] = false;
-				if unlikely((video_coord_t)base_y == bitmask_size_y - 1) {
-					c[0][1] = false; /* This can happen because of rounding */
-				} else {
-					bitno += bitmask_size_x;
-					c[0][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-				}
-			} else {
-				++bitno;
-				c[1][0] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-				if unlikely((video_coord_t)base_y == bitmask_size_y - 1) {
-					c[1][1] = false; /* This can happen because of rounding */
-					c[0][1] = false;
-				} else {
-					bitno += bitmask_size_x;
-					c[1][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-					--bitno;
-					c[0][1] = (((byte_t const *)bitmask)[bitno / NBBY] & ((byte_t)1 << ((NBBY - 1) - (bitno % NBBY)))) != 0;
-				}
-			}
-		}
-	}
-
-	/* Figure out the sub-pixel relation. */
-	rel_x = x - base_xf;
-	rel_y = y - base_yf;
-
-	/* Calculate color affinity */
-	result  = bitfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 4.0);
-	result += bitfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 4.0);
-	result += bitfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 4.0);
-	result += bitfactor(c[1][1], (rel_x + rel_y) / 4.0);
-	return result;
-}
-
-LOCAL ATTR_CONST video_color_t CC
-colorfactor(video_color_t color, double part) {
-	channel_t r, g, b, a;
-	/* Load color channels. */
-	r = VIDEO_COLOR_GET_RED(color);
-	g = VIDEO_COLOR_GET_GREEN(color);
-	b = VIDEO_COLOR_GET_BLUE(color);
-	a = VIDEO_COLOR_GET_ALPHA(color);
-	/* Apply color parts */
-	r = (channel_t)((double)r * part);
-	g = (channel_t)((double)g * part);
-	b = (channel_t)((double)b * part);
-	a = (channel_t)((double)a * part);
-	/* Pack the color back together. */
-	return VIDEO_COLOR_RGBA(r, g, b, a);
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
-getlinearcolor(struct video_gfx const *__restrict self, double x, double y) {
-	video_color_t result;
-	video_color_t c[2][2];
-	video_offset_t base_x, base_y;
-	double base_xf, base_yf;
-	double rel_x, rel_y;
-	x -= 0.5;
-	y -= 0.5;
-	base_xf = floor(x);
-	base_yf = floor(y);
-	base_x = (video_offset_t)base_xf;
-	base_y = (video_offset_t)base_yf;
-	if unlikely(base_x < (video_offset_t)self->vx_xmin) {
-		if unlikely(base_x <= (video_offset_t)self->vx_xmin - 2)
-			return 0; /* This can happen because of rounding */
-		c[0][0] = 0;
-		c[0][1] = 0;
-		if unlikely(base_y < (video_offset_t)self->vx_ymin) {
-			if unlikely(base_y <= (video_offset_t)self->vx_ymin - 2)
-				return 0; /* This can happen because of rounding */
-			c[1][0] = 0;
-			c[1][1] = video_gfx_getabscolor(self, self->vx_xmin, self->vx_ymin);
-		} else {
-			if unlikely((video_coord_t)base_y >= self->vx_yend)
-				return 0; /* This can happen because of rounding */
-			c[1][0] = video_gfx_getabscolor(self, self->vx_xmin, (video_coord_t)base_y);
-			if unlikely((video_coord_t)base_y == self->vx_yend - 1) {
-				c[1][1] = 0;
-			} else {
-				c[1][1] = video_gfx_getabscolor(self, self->vx_xmin, (video_coord_t)base_y + 1);
-			}
-		}
-	} else {
-		if unlikely((video_coord_t)base_x >= self->vx_xend)
-			return 0; /* This can happen because of rounding */
-		if unlikely(base_y < (video_offset_t)self->vx_ymin) {
-			if unlikely(base_y <= (video_offset_t)self->vx_ymin - 2)
-				return 0; /* This can happen because of rounding */
-			c[0][0] = 0;
-			c[1][0] = 0;
-			c[0][1] = video_gfx_getabscolor(self, (video_coord_t)base_x, self->vx_ymin);
-			if unlikely((video_coord_t)base_x == self->vx_xend - 1) {
-				c[1][1] = 0;
-			} else {
-				c[1][1] = video_gfx_getabscolor(self, (video_coord_t)base_x + 1, self->vx_ymin);
-			}
-		} else {
-			if unlikely((video_coord_t)base_y >= self->vx_yend)
-				return 0; /* This can happen because of rounding */
-			/* Load source colors. */
-			c[0][0] = video_gfx_getabscolor(self,
-			                                (video_coord_t)base_x,
-			                                (video_coord_t)base_y);
-			if unlikely((video_coord_t)base_x == self->vx_xend - 1) {
-				/* This can happen because of rounding */
-				c[1][0] = 0;
-				c[1][1] = 0;
-				if unlikely((video_coord_t)base_y == self->vx_yend - 1) {
-					c[0][1] = false; /* This can happen because of rounding */
-				} else {
-					c[0][1] = video_gfx_getabscolor(self,
-					                                (video_coord_t)base_x,
-					                                (video_coord_t)base_y + 1);
-				}
-			} else {
-				c[1][0] = video_gfx_getabscolor(self,
-				                                (video_coord_t)base_x + 1,
-				                                (video_coord_t)base_y);
-				if unlikely((video_coord_t)base_y == self->vx_yend - 1) {
-					c[0][1] = 0; /* This can happen because of rounding */
-					c[1][1] = 0;
-				} else {
-					c[0][1] = video_gfx_getabscolor(self, (video_coord_t)base_x, (video_coord_t)base_y + 1);
-					c[1][1] = video_gfx_getabscolor(self, (video_coord_t)base_x + 1, (video_coord_t)base_y + 1);
-				}
-			}
-		}
-	}
-
-	/* Figure out the sub-pixel relation. */
-	rel_x = x - base_xf;
-	rel_y = y - base_yf;
-	/* Calculate color affinity */
-	result  = colorfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 4.0);
-	result += colorfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 4.0);
-	result += colorfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 4.0);
-	result += colorfactor(c[1][1], (rel_x + rel_y) / 4.0);
-	return result;
+LOCAL ATTR_PURE WUNUSED channel_t
+bitmask2d_getbit(void const *__restrict bitmask, size_t bitscan,
+                 video_coord_t x, video_coord_t y) {
+	uintptr_t bitno = (uintptr_t)x + y * bitscan;
+	byte_t byte;
+	byte  = ((byte_t const *)bitmask)[bitno / NBBY];
+	bitno = bitno % NBBY;
+#if 1
+	/* Move the bit we're interested in to the most significant position.
+	 * e.g.: when "bitno == 0", then we want bit masked by 0x80
+	 *       when "bitno == 3", then we want bit masked by 0x10 */
+	byte <<= bitno;
+	/* Used signed shift to duplicate the most significant bit into all other bits. */
+	byte = (byte_t)((__SBYTE_TYPE__)byte >> (NBBY - 1));
+	return byte;
+#else
+	return ((byte >> (NBBY - 1) - bitno) & 1) ? 0xff : 0;
+#endif
 }
 
 
@@ -863,26 +664,6 @@ next_row:
 		--size_y;
 		++dst_y;
 	} while (size_y);
-}
-
-LOCAL ATTR_PURE WUNUSED channel_t
-bitmask2d_getbit(void const *__restrict bitmask, size_t bitscan,
-                 video_coord_t x, video_coord_t y) {
-	uintptr_t bitno = (uintptr_t)x + y * bitscan;
-	byte_t byte;
-	byte  = ((byte_t const *)bitmask)[bitno / NBBY];
-	bitno = bitno % NBBY;
-#if 1
-	/* Move the bit we're interested in to the most significant position.
-	 * e.g.: when "bitno == 0", then we want bit masked by 0x80
-	 *       when "bitno == 3", then we want bit masked by 0x10 */
-	byte <<= bitno;
-	/* Used signed shift to duplicate the most significant bit into all other bits. */
-	byte = (byte_t)((__SBYTE_TYPE__)byte >> (NBBY - 1));
-	return byte;
-#else
-	return ((byte >> (NBBY - 1) - bitno) & 1) ? 0xff : 0;
-#endif
 }
 
 INTERN NONNULL((1, 9)) void CC
@@ -1216,44 +997,115 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 
 INTERN NONNULL((1, 10)) void CC
 libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
-                                   video_coord_t dst_x, video_coord_t dst_y,
-                                   video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                   video_coord_t src_x, video_coord_t src_y,
-                                   video_dim_t src_size_x, video_dim_t src_size_y,
+                                   video_coord_t dst_x_, video_coord_t dst_y_,
+                                   video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                   video_coord_t src_x_, video_coord_t src_y_,
+                                   video_dim_t src_size_x_, video_dim_t src_size_y_,
                                    void const *__restrict bitmask,
                                    uintptr_t bitskip, size_t bitscan) {
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
-			video_color_t used_color;
-			double rel_x, rel_y;
-			channel_t opacity;
-			rel_x = (double)x * x_scale;
-			rel_y = (double)y * y_scale;
-			opacity = getlinearbit(bitmask, bitskip,
-			                       bitscan,
-			                       src_size_y,
-			                       rel_x, rel_y);
-			if (!opacity)
-				continue;
-			rel_x += (double)src_x;
-			rel_y += (double)src_y;
-			used_color = getlinearcolor(src, rel_x, rel_y);
-			opacity = (((twochannels_t)VIDEO_COLOR_GET_ALPHA(used_color) * opacity) / CHANNEL_MAX);
-			used_color &= ~VIDEO_COLOR_ALPHA_MASK;
-			used_color |= (video_color_t)opacity << VIDEO_COLOR_ALPHA_SHIFT;
-			video_gfx_putabscolor(dst, dst_x + x, dst_y + y, used_color);
-		}
+#define makealpha(raw_alpha, alpha_chan) \
+	(channel_t)(((twochannels_t)(raw_alpha) * (alpha_chan)) / CHANNEL_MAX)
+#define makecolor(color, alpha_chan)       \
+	(((color) & ~VIDEO_COLOR_ALPHA_MASK) | \
+	 ((video_color_t)makealpha(VIDEO_COLOR_GET_ALPHA(color), alpha_chan) << VIDEO_COLOR_ALPHA_SHIFT))
+	if (bitskip > NBBY) {
+		bitmask = (byte_t const *)bitmask + (bitskip / NBBY);
+		bitskip = bitskip % NBBY;
 	}
+
+#define getbit(src_x, src_y)   bitmask2d_getbit(bitmask, bitscan, (video_coord_t)bitskip + src_x, src_y)
+#define getcolor(src_x, src_y) video_gfx_getabscolor(src, src_x, src_y)
+
+#define bitstretch_blend_xmax_ymin bitstretch_blend_xmin_ymin
+#define bitstretch_blend_xmin_ymax bitstretch_blend_xmin_ymin
+#define bitstretch_blend_xmax_ymax bitstretch_blend_xmin_ymin
+#define bitstretch_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)    \
+	{                                                                                     \
+		if (getbit(src_x, src_y)) {                                                       \
+			video_color_t out = getcolor(src_x, src_y);                                   \
+			(*dst->vx_xops.vgxo_absfill)(dst, dst_x, dst_y, dst_size_x, dst_size_y, out); \
+		}                                                                                 \
+	}
+
+#define bitstretch_blend_ymax bitstretch_blend_ymin
+#define bitstretch_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
+	{                                                                                            \
+		channel_t chan_y0_x0 = getbit(src_x0, src_y);                                            \
+		channel_t chan_y0_x1 = getbit(src_x1, src_y);                                            \
+		channel_t chan = interpolate_channel_1d(chan_y0_x0, chan_y0_x1, frac_x0, frac_x1);       \
+		if (chan) {                                                                              \
+			video_color_t src_y0_x0 = getcolor(src_x0, src_y);                                   \
+			video_color_t src_y0_x1 = getcolor(src_x1, src_y);                                   \
+			video_color_t color = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);        \
+			video_color_t out = makecolor(color, chan);                                          \
+			(*dst->vx_xops.vgxo_absline_v)(dst, dst_x, dst_y, dst_size_y, out);                  \
+		}                                                                                        \
+	}
+
+#define bitstretch_blend_xmax bitstretch_blend_xmin
+#define bitstretch_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
+	{                                                                                            \
+		channel_t chan_y0_x0 = getbit(src_x, src_y0);                                            \
+		channel_t chan_y1_x0 = getbit(src_x, src_y1);                                            \
+		channel_t chan = interpolate_channel_1d(chan_y0_x0, chan_y1_x0, frac_y0, frac_y1);       \
+		if (chan) {                                                                              \
+			video_color_t src_y0_x0 = getcolor(src_x, src_y0);                                   \
+			video_color_t src_y1_x0 = getcolor(src_x, src_y1);                                   \
+			video_color_t color = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);        \
+			video_color_t out = makecolor(color, chan);                                          \
+			(*dst->vx_xops.vgxo_absline_h)(dst, dst_x, dst_y, dst_size_x, out);                  \
+		}                                                                                        \
+	}
+
+#define bitstretch_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
+	{                                                                                                      \
+		channel_t chan_y0_x0 = getbit(src_x0, src_y0);                                                     \
+		channel_t chan_y0_x1 = getbit(src_x1, src_y0);                                                     \
+		channel_t chan_y1_x0 = getbit(src_x0, src_y1);                                                     \
+		channel_t chan_y1_x1 = getbit(src_x1, src_y1);                                                     \
+		channel_t chan = interpolate_channel_2d(chan_y0_x0, chan_y0_x1,                                    \
+		                                        chan_y1_x0, chan_y1_x1,                                    \
+		                                        frac_x0, frac_x1,                                          \
+		                                        frac_y0, frac_y1);                                         \
+		if (chan) {                                                                                        \
+			video_color_t src_y0_x0 = getcolor(src_x0, src_y0);                                            \
+			video_color_t src_y0_x1 = getcolor(src_x1, src_y0);                                            \
+			video_color_t src_y1_x0 = getcolor(src_x0, src_y1);                                            \
+			video_color_t src_y1_x1 = getcolor(src_x1, src_y1);                                            \
+			video_color_t color = interpolate_2d(src_y0_x0, src_y0_x1,                                     \
+			                                     src_y1_x0, src_y1_x1,                                     \
+			                                     frac_x0, frac_x1,                                         \
+			                                     frac_y0, frac_y1);                                        \
+			video_color_t out = makecolor(color, chan);                                                    \
+			video_gfx_putabscolor(dst, dst_x, dst_y, out);                                                 \
+		}                                                                                                  \
+	}
+	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                   src_x_, src_y_, src_size_x_, src_size_y_,
+	                   bitstretch_blend_xmin_ymin,
+	                   bitstretch_blend_ymin,
+	                   bitstretch_blend_xmax_ymin,
+	                   bitstretch_blend_xmin,
+	                   bitstretch_blend,
+	                   bitstretch_blend_xmax,
+	                   bitstretch_blend_xmin_ymax,
+	                   bitstretch_blend_ymax,
+	                   bitstretch_blend_xmax_ymax);
+#undef bitstretch_blend_xmin_ymin
+#undef bitstretch_blend_ymin
+#undef bitstretch_blend_xmax_ymin
+#undef bitstretch_blend_xmin
+#undef bitstretch_blend
+#undef bitstretch_blend_xmax
+#undef bitstretch_blend_xmin_ymax
+#undef bitstretch_blend_ymax
+#undef bitstretch_blend_xmax_ymax
+
+#undef getbit
+#undef makealpha
+#undef makecolor
 }
 
 INTERN NONNULL((1, 10)) void CC
