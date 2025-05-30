@@ -216,21 +216,33 @@ calc_linear_stretch_dim(video_dim_t src_dim,     /* in: "src" dimension */
 /* Interpolate "c0" with "c1".
  * NOTE: Make sure that "frac0 + frac1 == LINEAR_FP_BLEND(1)" */
 LOCAL ATTR_CONST channel_t CC
-interpolate_channel(channel_t c0, channel_t c1,
-                    linear_fp_blend_t frac0,
-                    linear_fp_blend_t frac1) {
+interpolate_channel_1d(channel_t c0, channel_t c1,
+                       linear_fp_blend_t frac0,
+                       linear_fp_blend_t frac1) {
 	__builtin_assume(frac0 + frac1 == LINEAR_FP_BLEND(1));
 	return (channel_t)LINEAR_FP_BLEND_WHOLE(((linear_fp_twoblend_t)c0 * frac1) +
 	                                        ((linear_fp_twoblend_t)c1 * frac0));
 }
 
+LOCAL ATTR_CONST channel_t
+interpolate_channel_2d(channel_t c_y0_x0, channel_t c_y0_x1,
+                       channel_t c_y1_x0, channel_t c_y1_x1,
+                       linear_fp_blend_t frac_x0, linear_fp_blend_t frac_x1,
+                       linear_fp_blend_t frac_y0, linear_fp_blend_t frac_y1) {
+	/* Blend vertically */
+	channel_t y0 = interpolate_channel_1d(c_y0_x0, c_y1_x0, frac_y0, frac_y1);
+	channel_t y1 = interpolate_channel_1d(c_y0_x1, c_y1_x1, frac_y0, frac_y1);
+	/* Blend horizontally */
+	return interpolate_channel_1d(y0, y1, frac_x0, frac_x1);
+}
+
 LOCAL ATTR_CONST video_color_t CC
 interpolate_1d(video_color_t c0, video_color_t c1,
                linear_fp_blend_t frac0, linear_fp_blend_t frac1) {
-	channel_t r = interpolate_channel(VIDEO_COLOR_GET_RED(c0), VIDEO_COLOR_GET_RED(c1), frac0, frac1);
-	channel_t g = interpolate_channel(VIDEO_COLOR_GET_GREEN(c0), VIDEO_COLOR_GET_GREEN(c1), frac0, frac1);
-	channel_t b = interpolate_channel(VIDEO_COLOR_GET_BLUE(c0), VIDEO_COLOR_GET_BLUE(c1), frac0, frac1);
-	channel_t a = interpolate_channel(VIDEO_COLOR_GET_ALPHA(c0), VIDEO_COLOR_GET_ALPHA(c1), frac0, frac1);
+	channel_t r = interpolate_channel_1d(VIDEO_COLOR_GET_RED(c0), VIDEO_COLOR_GET_RED(c1), frac0, frac1);
+	channel_t g = interpolate_channel_1d(VIDEO_COLOR_GET_GREEN(c0), VIDEO_COLOR_GET_GREEN(c1), frac0, frac1);
+	channel_t b = interpolate_channel_1d(VIDEO_COLOR_GET_BLUE(c0), VIDEO_COLOR_GET_BLUE(c1), frac0, frac1);
+	channel_t a = interpolate_channel_1d(VIDEO_COLOR_GET_ALPHA(c0), VIDEO_COLOR_GET_ALPHA(c1), frac0, frac1);
 	return VIDEO_COLOR_RGBA(r, g, b, a);
 }
 
@@ -313,7 +325,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
-				blend_ymin(_used_dst_x, dst_y, _pad_ymin, _used_src_x, src_y, _used_src_x + 1, _frac_x0, _frac_x1);                \
+				blend_ymin(_used_dst_x, dst_y, _pad_ymin, _used_src_x, src_y, (_used_src_x + 1), _frac_x0, _frac_x1);              \
 			}                                                                                                                      \
 			if (_pad_xmax) {                                                                                                       \
 				video_coord_t _used_src_x = src_x + src_size_x - 1;                                                                \
@@ -348,7 +360,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
-				blend(_used_dst_x, _used_dst_y, _used_src_x, _used_src_y0, _used_src_x + 1, _used_src_y1,                          \
+				blend(_used_dst_x, _used_dst_y, _used_src_x, _used_src_y0, (_used_src_x + 1), _used_src_y1,                        \
 				      _frac_x0, _frac_x1, _frac_y0, _frac_y1);                                                                     \
 			}                                                                                                                      \
 			if (_pad_xmax) {                                                                                                       \
@@ -375,7 +387,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 				video_coord_t _used_src_x  = src_x + STRETCH_FP_WHOLE(_row_fp_src_x);                                              \
 				linear_fp_blend_t _frac_x0 = STRETCH_FP_BLEND_FRAC(_row_fp_src_x);                                                 \
 				linear_fp_blend_t _frac_x1 = LINEAR_FP_BLEND(1) - _frac_x0;                                                        \
-				blend_ymin(_used_dst_x, _used_dst_y, _pad_ymax, _used_src_x, _used_src_y, _used_src_x + 1, _frac_x0, _frac_x1);    \
+				blend_ymin(_used_dst_x, _used_dst_y, _pad_ymax, _used_src_x, _used_src_y, (_used_src_x + 1), _frac_x0, _frac_x1);  \
 			}                                                                                                                      \
 			if (_pad_xmax) {                                                                                                       \
 				video_coord_t _used_src_x = src_x + src_size_x - 1;                                                                \
@@ -853,47 +865,117 @@ next_row:
 	} while (size_y);
 }
 
+LOCAL ATTR_PURE WUNUSED channel_t
+bitmask2d_getbit(void const *__restrict bitmask, size_t bitscan,
+                 video_coord_t x, video_coord_t y) {
+	uintptr_t bitno = (uintptr_t)x + y * bitscan;
+	byte_t byte;
+	byte  = ((byte_t const *)bitmask)[bitno / NBBY];
+	bitno = bitno % NBBY;
+#if 1
+	/* Move the bit we're interested in to the most significant position.
+	 * e.g.: when "bitno == 0", then we want bit masked by 0x80
+	 *       when "bitno == 3", then we want bit masked by 0x10 */
+	byte <<= bitno;
+	/* Used signed shift to duplicate the most significant bit into all other bits. */
+	byte = (byte_t)((__SBYTE_TYPE__)byte >> (NBBY - 1));
+	return byte;
+#else
+	return ((byte >> (NBBY - 1) - bitno) & 1) ? 0xff : 0;
+#endif
+}
+
 INTERN NONNULL((1, 9)) void CC
 libvideo_gfx_generic__bitstretchfill_l(struct video_gfx *__restrict self,
-                                       video_coord_t dst_x, video_coord_t dst_y,
-                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                       video_coord_t dst_x_, video_coord_t dst_y_,
+                                       video_dim_t dst_size_x_, video_dim_t dst_size_y_,
                                        video_color_t color,
-                                       video_dim_t src_size_x, video_dim_t src_size_y,
+                                       video_dim_t src_size_x_, video_dim_t src_size_y_,
                                        void const *__restrict bitmask,
-                                       uintptr_t bitskip, size_t bitscan) {
-	video_dim_t x, y;
-	double x_scale, y_scale;
-	assert(dst_size_x > 0);
-	assert(dst_size_y > 0);
-	assert(src_size_x > 0);
-	assert(src_size_y > 0);
-	x_scale = (double)src_size_x / (double)dst_size_x;
-	y_scale = (double)src_size_y / (double)dst_size_y;
-	for (y = 0; y < dst_size_y; ++y) {
-		for (x = 0; x < dst_size_x; ++x) {
-			video_color_t used_color;
-			double rel_x, rel_y;
-			channel_t opacity;
-			rel_x = (double)x * x_scale;
-			rel_y = (double)y * y_scale;
-			opacity = getlinearbit(bitmask,
-			                       bitskip,
-			                       bitscan,
-			                       src_size_y,
-			                       rel_x,
-			                       rel_y);
-			if (!opacity)
-				continue;
-			used_color = color;
-			opacity = ((twochannels_t)VIDEO_COLOR_GET_ALPHA(used_color) * opacity) / CHANNEL_MAX;
-			used_color &= ~VIDEO_COLOR_ALPHA_MASK;
-			used_color |= (video_color_t)opacity << VIDEO_COLOR_ALPHA_SHIFT;
-			video_gfx_putabscolor(self,
-			                      dst_x + x,
-			                      dst_y + y,
-			                      used_color);
-		}
+                                       uintptr_t bitskip_, size_t bitscan) {
+	video_color_t raw_color = color & ~VIDEO_COLOR_ALPHA_MASK;
+	channel_t raw_alpha = VIDEO_COLOR_GET_ALPHA(color);
+#define makealpha(alpha_chan) (channel_t)(((twochannels_t)raw_alpha * (alpha_chan)) / CHANNEL_MAX)
+#define makecolor(alpha_chan) (raw_color | ((video_color_t)makealpha(alpha_chan) << VIDEO_COLOR_ALPHA_SHIFT))
+	if (bitskip_ > NBBY) {
+		bitmask = (byte_t const *)bitmask + (bitskip_ / NBBY);
+		bitskip_ = bitskip_ % NBBY;
 	}
+
+#define getbit(src_x, src_y) bitmask2d_getbit(bitmask, bitscan, src_x, src_y)
+
+#define bitmask_blend_xmax_ymin bitmask_blend_xmin_ymin
+#define bitmask_blend_xmin_ymax bitmask_blend_xmin_ymin
+#define bitmask_blend_xmax_ymax bitmask_blend_xmin_ymin
+#define bitmask_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)           \
+	{                                                                                         \
+		if (getbit(src_x, src_y))                                                             \
+			(*self->vx_xops.vgxo_absfill)(self, dst_x, dst_y, dst_size_x, dst_size_y, color); \
+	}
+
+#define bitmask_blend_ymax bitmask_blend_ymin
+#define bitmask_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1)   \
+	{                                                                                           \
+		channel_t src_y0_x0 = getbit(src_x0, src_y);                                            \
+		channel_t src_y0_x1 = getbit(src_x1, src_y);                                            \
+		channel_t chan = interpolate_channel_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);        \
+		if (chan) {                                                                             \
+			video_color_t out = makecolor(chan);                                                \
+			(*self->vx_xops.vgxo_absline_v)(self, dst_x, dst_y, dst_size_y, out);               \
+		}                                                                                       \
+	}
+
+#define bitmask_blend_xmax bitmask_blend_xmin
+#define bitmask_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
+	{                                                                                         \
+		channel_t src_y0_x0 = getbit(src_x, src_y0);                                          \
+		channel_t src_y1_x0 = getbit(src_x, src_y1);                                          \
+		channel_t chan = interpolate_channel_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);      \
+		if (chan) {                                                                           \
+			video_color_t out = makecolor(chan);                                              \
+			(*self->vx_xops.vgxo_absline_h)(self, dst_x, dst_y, dst_size_x, out);             \
+		}                                                                                     \
+	}
+
+#define bitmask_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
+	{                                                                                                   \
+		channel_t src_y0_x0 = getbit(src_x0, src_y0);                                                   \
+		channel_t src_y0_x1 = getbit(src_x1, src_y0);                                                   \
+		channel_t src_y1_x0 = getbit(src_x0, src_y1);                                                   \
+		channel_t src_y1_x1 = getbit(src_x1, src_y1);                                                   \
+		channel_t chan      = interpolate_channel_2d(src_y0_x0, src_y0_x1,                              \
+		                                             src_y1_x0, src_y1_x1,                              \
+		                                             frac_x0, frac_x1,                                  \
+		                                             frac_y0, frac_y1);                                 \
+		if (chan) {                                                                                     \
+			video_color_t out = makecolor(chan);                                                        \
+			video_gfx_putabscolor(self, dst_x, dst_y, out);                                             \
+		}                                                                                               \
+	}
+	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                   bitskip_, 0, src_size_x_, src_size_y_,
+	                   bitmask_blend_xmin_ymin,
+	                   bitmask_blend_ymin,
+	                   bitmask_blend_xmax_ymin,
+	                   bitmask_blend_xmin,
+	                   bitmask_blend,
+	                   bitmask_blend_xmax,
+	                   bitmask_blend_xmin_ymax,
+	                   bitmask_blend_ymax,
+	                   bitmask_blend_xmax_ymax);
+#undef bitmask_blend_xmin_ymin
+#undef bitmask_blend_ymin
+#undef bitmask_blend_xmax_ymin
+#undef bitmask_blend_xmin
+#undef bitmask_blend
+#undef bitmask_blend_xmax
+#undef bitmask_blend_xmin_ymax
+#undef bitmask_blend_ymax
+#undef bitmask_blend_xmax_ymax
+
+#undef getbit
+#undef makealpha
+#undef makecolor
 }
 
 INTERN NONNULL((1, 9)) void CC
@@ -1129,6 +1211,8 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 		src_pos_y += step_y;
 	} while (y < dst_size_y);
 }
+
+
 
 INTERN NONNULL((1, 10)) void CC
 libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
