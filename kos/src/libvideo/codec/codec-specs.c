@@ -47,13 +47,12 @@ DECL_BEGIN
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
- * NOTE: This function doesn't need `vcs_pxsz' to be initialized. */
+ * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
 INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
 	if (specs->vcs_flags & VIDEO_CODEC_FLAG_GRAY) {
-		if (specs->vcs_bpp == specs->vcs_cbits &&
-		    specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
+		if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
 		    specs->vcs_gmask == specs->vcs_rmask &&
 		    specs->vcs_bmask == specs->vcs_rmask &&
 		    specs->vcs_amask == 0) {
@@ -71,8 +70,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 				++codec;
 		}
 	} else if (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		if (specs->vcs_bpp == specs->vcs_cbits &&
-		    specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
+		if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
 		    specs->vcs_gmask == specs->vcs_rmask &&
 		    specs->vcs_bmask == specs->vcs_rmask &&
 		    specs->vcs_amask == 0) {
@@ -281,7 +279,7 @@ video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
  *
- * NOTE: This function doesn't need `vcs_pxsz' to be initialized.
+ * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized.
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec

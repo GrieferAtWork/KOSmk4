@@ -56,13 +56,13 @@ struct video_codec_custom: video_codec {
 	video_pixel_t vcc_used_bmask; /* Most significant up-to 8 bits of b-mask */
 	video_pixel_t vcc_used_amask; /* Most significant up-to 8 bits of a-mask */
 	video_pixel_t vcc_xtra_rmask; /* Mask of remaining r-bits not in "vcc_used_rmask" */
-	video_pixel_t vcc_xtra_gmask; /* Mask of remaining g-bits not in "vcc_used_rmask" */
-	video_pixel_t vcc_xtra_bmask; /* Mask of remaining b-bits not in "vcc_used_rmask" */
-	video_pixel_t vcc_xtra_amask; /* Mask of remaining a-bits not in "vcc_used_rmask" */
-	shift_t       vcc_miss_rbits; /* [== 8 - POPCOUNT(vcc_used_rmask)] # of r-bits lost */
-	shift_t       vcc_miss_gbits; /* [== 8 - POPCOUNT(vcc_used_gmask)] # of g-bits lost */
-	shift_t       vcc_miss_bbits; /* [== 8 - POPCOUNT(vcc_used_bmask)] # of b-bits lost */
-	shift_t       vcc_miss_abits; /* [== 8 - POPCOUNT(vcc_used_amask)] # of a-bits lost */
+	video_pixel_t vcc_xtra_gmask; /* Mask of remaining g-bits not in "vcc_used_gmask" */
+	video_pixel_t vcc_xtra_bmask; /* Mask of remaining b-bits not in "vcc_used_bmask" */
+	video_pixel_t vcc_xtra_amask; /* Mask of remaining a-bits not in "vcc_used_amask" */
+	shift_t       vcc_miss_rbits; /* [== 8 - POPCOUNT(vcc_used_rmask)] # of r-bits lost during encode */
+	shift_t       vcc_miss_gbits; /* [== 8 - POPCOUNT(vcc_used_gmask)] # of g-bits lost during encode */
+	shift_t       vcc_miss_bbits; /* [== 8 - POPCOUNT(vcc_used_bmask)] # of b-bits lost during encode */
+	shift_t       vcc_miss_abits; /* [== 8 - POPCOUNT(vcc_used_amask)] # of a-bits lost during encode */
 	shift_t       vcc_shft_rmask; /* `CTZ(vcc_used_rmask)' if `vcc_xtra_rmask == 0' and bits of `vcc_used_rmask' are continuous; else, `(shift_t)-1' */
 	shift_t       vcc_shft_gmask; /* `CTZ(vcc_used_gmask)' if `vcc_xtra_gmask == 0' and bits of `vcc_used_gmask' are continuous; else, `(shift_t)-1' */
 	shift_t       vcc_shft_bmask; /* `CTZ(vcc_used_bmask)' if `vcc_xtra_bmask == 0' and bits of `vcc_used_bmask' are continuous; else, `(shift_t)-1' */
@@ -71,7 +71,8 @@ struct video_codec_custom: video_codec {
 
 
 /* Try to populate the following fields of `self' based on `self->vc_specs':
- * - vc_specs.vcs_pxsz (always initialized)
+ * - vc_specs.vcs_pxsz
+ * - vc_specs.vcs_cbits
  * - vc_codec  (always set `VIDEO_CODEC_CUSTOM')
  * - vc_nalgn  (set to "NULL" if an extra codec is needed here)
  * - vc_align
@@ -84,7 +85,7 @@ struct video_codec_custom: video_codec {
  * - vc_color2pixel
  * - vcc_*
  * As such, the caller need only initialize:
- * - vc_specs   (excluding the "vcs_pxsz" field)
+ * - vc_specs   (excluding the "vcs_pxsz" and "vcs_cbits" fields)
  *
  * @return: true:  Success -- all fields initialized
  * @return: false: Failure -- codec cannot be represented */

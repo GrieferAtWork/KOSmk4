@@ -121,8 +121,8 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_text_startpage_p = addr2pageptr_p(ABSOLUTE(.)));
 	SECTION(.text) {
 		*(.text.hot .text.likely .text.hot.*)
-		*(.text .text._ZN*)
-		*(.text.crt.*)
+		*(.text .text._Z*)
+		*(.text.crt.* .text.string.*)
 		*(.text.kernel.*)
 		*(.text.unlikely*)     /* Should be necessary, but prevents problems... */
 #if defined(__i386__) || defined(__x86_64__)
@@ -182,6 +182,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(compat_execabi_system_rtld_numpages    = ABSOLUTE(compat_execabi_system_rtld_size) / PAGESIZE);
 #endif /* __x86_64__ */
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
+		*(.rodata.crt .rodata.crt.*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)
 
 #ifndef CONFIG_NO_KERNEL_DEBUGGER
@@ -207,7 +208,7 @@ SECTIONS {
 		DEFINE_VECTOR(validatable_heaps, .rodata.heaps.validatable)
 #undef DEFINE_VECTOR
 
-		*(.rodata.local.* .rodata.cold .rodata.unlikely .rodata.cold.*)
+		*(.rodata.local.* .rodata.cold .rodata.unlikely .rodata.cold.* .rodata._Z*apfail_specs*)
 	}
 
 	PROVIDE_HIDDEN(__kernel_sect_rodata_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_rodata_start)));

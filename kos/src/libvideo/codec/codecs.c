@@ -2212,30 +2212,45 @@ pdep_pal_color2pixel(struct video_format const *__restrict format,
 	return PDEP(pixl, mask);
 }
 
+LOCAL ATTR_CONST video_channel_t CC
+repeat_lsb(video_channel_t chan, shift_t n) {
+#if 1 /* Same as other impl, but without if-statements */
+	chan = (chan << n) |
+	       ((video_channel_t)(chan & 1) *
+	        (((video_channel_t)1 << n) - 1));
+#else
+	if (n) {
+		if (chan & 1) {
+			chan <<= n;
+			chan |= ((video_channel_t)1 << n) - 1;
+		} else {
+			chan <<= n;
+		}
+	}
+#endif
+	return chan;
+}
+
 
 LOCAL ATTR_CONST video_channel_t CC
 pext_channel(video_pixel_t pixel,
              video_pixel_t mask,
              shift_t miss_bits) {
 	video_channel_t result = PEXT(pixel, mask);
-	if (miss_bits) {
-		if (result & 1) {
-			result <<= miss_bits;
-			result |= ((video_channel_t)1 << miss_bits) - 1;
-		} else {
-			result <<= miss_bits;
-		}
-	}
-	return result;
+	return repeat_lsb(result, miss_bits);
 }
 
 LOCAL ATTR_CONST video_pixel_t CC
 pdep_channel(video_channel_t chan,
              video_pixel_t used_mask,
              video_pixel_t xtra_mask) {
-	video_channel_t result = PDEP((video_pixel_t)chan, used_mask);
+	video_pixel_t result = PDEP((video_pixel_t)chan, used_mask);
+#if 1 /* Same as other impl, but without if-statements */
+	result |= (video_pixel_t)(chan & 1) * xtra_mask;
+#else
 	if (chan & 1)
 		result |= xtra_mask;
+#endif
 	return result;
 }
 
@@ -2582,23 +2597,28 @@ pdep_rgb_color2pixel(struct video_format const *__restrict format,
 
 
 
+/* Extra optimized paths */
+#define HAVE_shft_channel_decode
+#define HAVE_shft_channel_decode_nomiss
 
+#ifdef HAVE_shft_channel_decode
 LOCAL ATTR_CONST video_channel_t CC
 shft_channel_decode(video_pixel_t pixel,
                     video_pixel_t mask,
                     shift_t shft,
                     shift_t miss_bits) {
 	video_channel_t result = (pixel & mask) >> shft;
-	if (miss_bits) {
-		if (result & 1) {
-			result <<= miss_bits;
-			result |= ((video_channel_t)1 << miss_bits) - 1;
-		} else {
-			result <<= miss_bits;
-		}
-	}
-	return result;
+	return repeat_lsb(result, miss_bits);
 }
+
+#ifdef HAVE_shft_channel_decode_nomiss
+LOCAL ATTR_CONST video_channel_t CC
+shft_channel_decode_nomiss(video_pixel_t pixel,
+                           video_pixel_t mask,
+                           shift_t shft) {
+	return (pixel & mask) >> shft;
+}
+#endif /* HAVE_shft_channel_decode_nomiss */
 
 LOCAL ATTR_CONST video_pixel_t CC
 shft_channel_encode(video_channel_t chan,
@@ -2609,6 +2629,16 @@ shft_channel_encode(video_channel_t chan,
 
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+shft_rgb_pixel2color(struct video_format const *__restrict format,
+                     video_pixel_t pixel) {
+	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	video_channel_t r = shft_channel_decode(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask, codec->vcc_miss_rbits);
+	video_channel_t g = shft_channel_decode(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask, codec->vcc_miss_gbits);
+	video_channel_t b = shft_channel_decode(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
+	return VIDEO_COLOR_RGB(r, g, b);
+}
+
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
 shft_rgba_pixel2color(struct video_format const *__restrict format,
                       video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -2617,6 +2647,41 @@ shft_rgba_pixel2color(struct video_format const *__restrict format,
 	video_channel_t b = shft_channel_decode(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
 	video_channel_t a = shft_channel_decode(pixel, codec->vcc_used_amask, codec->vcc_shft_amask, codec->vcc_miss_abits);
 	return VIDEO_COLOR_RGBA(r, g, b, a);
+}
+
+#ifdef HAVE_shft_channel_decode_nomiss
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+shft_rgb_pixel2color_nomiss(struct video_format const *__restrict format,
+                            video_pixel_t pixel) {
+	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	video_channel_t r = shft_channel_decode_nomiss(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask);
+	video_channel_t g = shft_channel_decode_nomiss(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask);
+	video_channel_t b = shft_channel_decode_nomiss(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask);
+	return VIDEO_COLOR_RGB(r, g, b);
+}
+
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+shft_rgba_pixel2color_nomiss(struct video_format const *__restrict format,
+                             video_pixel_t pixel) {
+	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	video_channel_t r = shft_channel_decode_nomiss(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask);
+	video_channel_t g = shft_channel_decode_nomiss(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask);
+	video_channel_t b = shft_channel_decode_nomiss(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask);
+	video_channel_t a = shft_channel_decode_nomiss(pixel, codec->vcc_used_amask, codec->vcc_shft_amask);
+	return VIDEO_COLOR_RGBA(r, g, b, a);
+}
+#endif /* HAVE_shft_channel_decode_nomiss */
+
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+shft_rgb_color2pixel(struct video_format const *__restrict format,
+                     video_color_t color) {
+	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
+	video_channel_t r = VIDEO_COLOR_GET_RED(color);
+	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
+	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
+	return shft_channel_encode(r, codec->vcc_shft_rmask, codec->vcc_miss_rbits) |
+	       shft_channel_encode(g, codec->vcc_shft_gmask, codec->vcc_miss_gbits) |
+	       shft_channel_encode(b, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
@@ -2632,28 +2697,7 @@ shft_rgba_color2pixel(struct video_format const *__restrict format,
 	       shft_channel_encode(b, codec->vcc_shft_bmask, codec->vcc_miss_bbits) |
 	       shft_channel_encode(a, codec->vcc_shft_amask, codec->vcc_miss_abits);
 }
-
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
-shft_rgb_pixel2color(struct video_format const *__restrict format,
-                     video_pixel_t pixel) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
-	video_channel_t r = shft_channel_decode(pixel, codec->vcc_used_rmask, codec->vcc_shft_rmask, codec->vcc_miss_rbits);
-	video_channel_t g = shft_channel_decode(pixel, codec->vcc_used_gmask, codec->vcc_shft_gmask, codec->vcc_miss_gbits);
-	video_channel_t b = shft_channel_decode(pixel, codec->vcc_used_bmask, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
-	return VIDEO_COLOR_RGB(r, g, b);
-}
-
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-shft_rgb_color2pixel(struct video_format const *__restrict format,
-                     video_color_t color) {
-	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
-	video_channel_t r = VIDEO_COLOR_GET_RED(color);
-	video_channel_t g = VIDEO_COLOR_GET_GREEN(color);
-	video_channel_t b = VIDEO_COLOR_GET_BLUE(color);
-	return shft_channel_encode(r, codec->vcc_shft_rmask, codec->vcc_miss_rbits) |
-	       shft_channel_encode(g, codec->vcc_shft_gmask, codec->vcc_miss_gbits) |
-	       shft_channel_encode(b, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
-}
+#endif /* HAVE_shft_channel_decode */
 
 
 
@@ -2680,11 +2724,12 @@ video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, 
 	*p_shft_mask = (shift_t)-1;
 	if (*p_xtra_mask == 0) {
 		if (spec_mask == 0) {
-			*p_shft_mask = 0;
+			*p_shft_mask = 0; /* Non-present channel */
 		} else {
 			shift_t chan_ctz = CTZ(spec_mask);
-			video_pixel_t chan_bits = ((video_pixel_t)1 << pc) - 1;
-			if (spec_mask == (chan_bits << chan_ctz)) {
+			video_pixel_t cont_bits = ((video_pixel_t)1 << pc) - 1;
+			if (spec_mask == (cont_bits << chan_ctz)) {
+				/* Channel bits are continuous */
 				*p_shft_mask = chan_ctz;
 			}
 		}
@@ -2722,7 +2767,8 @@ builtin_codec_from_masks(video_pixel_t rmask,
 }
 
 /* Try to populate the following fields of `self' based on `self->vc_specs':
- * - vc_specs.vcs_pxsz (always initialized)
+ * - vc_specs.vcs_pxsz
+ * - vc_specs.vcs_cbits
  * - vc_codec  (always set `VIDEO_CODEC_CUSTOM')
  * - vc_nalgn  (set to "NULL" if an extra codec is needed here)
  * - vc_align
@@ -2735,7 +2781,7 @@ builtin_codec_from_masks(video_pixel_t rmask,
  * - vc_color2pixel
  * - vcc_*
  * As such, the caller need only initialize:
- * - vc_specs   (excluding the "vcs_pxsz" field)
+ * - vc_specs   (excluding the "vcs_pxsz" and "vcs_cbits" fields)
  *
  * @return: true:  Success -- all fields initialized
  * @return: false: Failure -- codec cannot be represented */
@@ -2811,6 +2857,34 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		return false;
 	}
 
+	/* Fix  broken color masks -- only the least significant "vcs_bpp" bits
+	 * can ever be read/written from  pixes to underlying memory.  Anything
+	 * above that is impossible to store, so we may as well mask those bits
+	 * away since there would be no way to store them anyways. */
+	{
+		video_pixel_t cmask;
+		video_pixel_t bpp_mask = ((video_pixel_t)1 << self->vc_specs.vcs_bpp) - 1;
+		self->vc_specs.vcs_rmask &= bpp_mask;
+		self->vc_specs.vcs_gmask &= bpp_mask;
+		self->vc_specs.vcs_bmask &= bpp_mask;
+		self->vc_specs.vcs_amask &= bpp_mask;
+
+		/* Fix  */
+		cmask = self->vc_specs.vcs_rmask |
+		        self->vc_specs.vcs_gmask |
+		        self->vc_specs.vcs_bmask;
+		if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
+			self->vc_specs.vcs_rmask = cmask;
+			self->vc_specs.vcs_gmask = cmask;
+			self->vc_specs.vcs_bmask = cmask;
+			self->vc_specs.vcs_cbits = POPCOUNT(cmask);
+		} else {
+			cmask |= self->vc_specs.vcs_amask;
+			self->vc_specs.vcs_cbits = POPCOUNT(cmask);
+		}
+	}
+
+
 	/* Load effective color masks */
 	video_codec_custom__init__usedmask(self->vc_specs.vcs_rmask,
 	                                   &self->vcc_used_rmask,
@@ -2879,27 +2953,62 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			}
 		}
 	} else {
+		/* Fallback: must use generic PEXT/PDEP encode/decode functions. */
+		bool has_alpha = self->vcc_used_amask != 0;
+		self->vc_pixel2color = has_alpha ? &pext_rgba_pixel2color : &pext_rgb_pixel2color;
+		self->vc_color2pixel = has_alpha ? &pdep_rgba_color2pixel : &pdep_rgb_color2pixel;
+
+		/* Optimization for codecs where masks are continuous (meaning PDEP/PEXT aren't needed) */
+#ifdef HAVE_shft_channel_decode
+		if (self->vcc_shft_rmask != (shift_t)-1 && self->vcc_shft_gmask != (shift_t)-1 &&
+		    self->vcc_shft_bmask != (shift_t)-1 && self->vcc_shft_amask != (shift_t)-1) {
+#ifdef HAVE_shft_channel_decode_nomiss
+				bool hasmiss = (self->vcc_miss_rbits | self->vcc_miss_gbits |
+			                self->vcc_miss_bbits | self->vcc_miss_abits) != 0;
+			if (!hasmiss) {
+				self->vc_pixel2color = has_alpha ? &shft_rgba_pixel2color_nomiss
+				                                 : &shft_rgb_pixel2color_nomiss;
+			} else
+#endif /* HAVE_shft_channel_decode_nomiss */
+			{
+				self->vc_pixel2color = has_alpha ? &shft_rgba_pixel2color
+				                                 : &shft_rgb_pixel2color;
+			}
+			self->vc_color2pixel = has_alpha ? &shft_rgba_color2pixel
+			                                 : &shft_rgb_color2pixel;
+		}
+#endif /* HAVE_shft_channel_decode */
+
 		/* Check if there is a built-in full-color codec
 		 * that  can encode/decode the used color masks. */
-		struct video_codec const *builtin_codec;
-		builtin_codec = builtin_codec_from_masks(self->vc_specs.vcs_rmask,
-		                                         self->vc_specs.vcs_gmask,
-		                                         self->vc_specs.vcs_bmask,
-		                                         self->vc_specs.vcs_amask);
-		if (builtin_codec) {
-			self->vc_pixel2color = builtin_codec->vc_pixel2color;
-			self->vc_color2pixel = builtin_codec->vc_color2pixel;
-		} else {
-			/* Fallback: must use generic PEXT/PDEP encode/decode functions. */
-			bool has_alpha = self->vcc_used_amask != 0;
-			self->vc_pixel2color = has_alpha ? &pext_rgba_pixel2color : &pext_rgb_pixel2color;
-			self->vc_color2pixel = has_alpha ? &pdep_rgba_color2pixel : &pdep_rgb_color2pixel;
-
-			/* Optimization for codecs where masks are continuous (meaning PDEP/PEXT aren't needed) */
-			if (self->vcc_shft_rmask != (shift_t)-1 && self->vcc_shft_gmask != (shift_t)-1 &&
-			    self->vcc_shft_bmask != (shift_t)-1 && self->vcc_shft_amask != (shift_t)-1) {
-				self->vc_pixel2color = has_alpha ? &shft_rgba_pixel2color : &shft_rgb_pixel2color;
-				self->vc_color2pixel = has_alpha ? &shft_rgba_color2pixel : &shft_rgb_color2pixel;
+		{
+			struct video_codec const *encode_codec;
+			encode_codec = builtin_codec_from_masks(self->vc_specs.vcs_rmask,
+			                                        self->vc_specs.vcs_gmask,
+			                                        self->vc_specs.vcs_bmask,
+			                                        self->vc_specs.vcs_amask);
+			if (encode_codec) {
+				self->vc_pixel2color = encode_codec->vc_pixel2color;
+				self->vc_color2pixel = encode_codec->vc_color2pixel;
+			} else {
+				/* Even if no codec exists for the true masks, we might  still
+				 * find one for the truncated decode-masks when the codec uses
+				 * more than 8 bits for some channel. */
+				struct video_codec const *decode_codec;
+				decode_codec = builtin_codec_from_masks(self->vcc_used_rmask,
+				                                        self->vcc_used_gmask,
+				                                        self->vcc_used_bmask,
+				                                        self->vcc_used_amask);
+				if (decode_codec) {
+					/* Cannot inherit "vc_color2pixel" because we have to repeat
+					 * the least significant color bit into the channel's  extra
+					 * color bits.
+					 *
+					 * "vc_pixel2color" can be inherited because it is a decoder
+					 * that loads only  the most significant  (up-to) 8 bits  of
+					 * each color channel. */
+					self->vc_pixel2color = decode_codec->vc_pixel2color;
+				}
 			}
 		}
 	}

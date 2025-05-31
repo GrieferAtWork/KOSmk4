@@ -959,8 +959,10 @@ svga_makettyaccess_gfx(struct svgadev *__restrict self,
 		break;
 
 	case 2:
-		/* 2-bpp non-planar  wouldn't make  any sense,  so
-		 * we assume that `SVGA_MODEINFO_F_PLANAR' is set. */
+		/* 2-bpp non-planar  wouldn't  make  any  sense,  so
+		 * we only support `SVGA_MODEINFO_F_PLANAR'-enabled. */
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_PLANAR))
+			goto notsup;
 		SETOPS(2_p);
 		break;
 

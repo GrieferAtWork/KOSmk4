@@ -107,24 +107,25 @@ struct video_rambuffer_requirements {
 };
 
 struct video_codec_specs {
-	__uint8_t     vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
-	__uint8_t     vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
-	__uint8_t     vcs_bpp;   /* # of bits per pixel (when not divisible by "8", pixels aren't aligned by byte-boundaries) */
-	__uint8_t     vcs_cbits; /* [<= vcs_bpp] # of color  bits per pixel.  Usually same as  "vcs_bpp", except when  some bits  go
-	                          * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
-	                          * For normal codecs, this is always equal to `SUM(POPCOUNT(vcs_*mask))' (and includes "vcs_amask") */
+	__uint8_t      vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
+	__uint8_t      vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
+	__SHIFT_TYPE__ vcs_bpp;   /* # of bits per pixel (when not divisible by "8", pixels aren't aligned by byte-boundaries) */
+	__SHIFT_TYPE__ vcs_cbits; /* [<= vcs_bpp] # of color  bits per pixel.  Usually same as  "vcs_bpp", except when  some bits  go
+	                           * unused. In the  case of a  palette-driven codec, `1 << vcs_cbits'  is the size  of the  palette.
+	                           * For normal codecs, this is always equal to `SUM(POPCOUNT(vcs_*mask))' (and includes "vcs_amask",
+	                           * which it doesn't for palette/gray-scale codecs) */
 	/* Color masks. For grayscale / palette-driven codecs, these are all identical and
 	 * specify the mask of bits within a single pixel whose "PEXT" result is then used
 	 * as palette index / grayscale-strength.
 	 *
-	 * For multi-byte codecs, these masks assume that you read a pixel as:
-	 * >> uintN_t pixel = UNALIGNED_GET((uintN_t *)pixel_addr);
+	 * For whole/multi-byte codecs, these masks assume that you read a pixel as:
+	 * >> video_pixel_t pixel = UNALIGNED_GET((uintN_t *)pixel_addr);
 	 * iow: these masks are always in host-endian */
-	video_pixel_t vcs_rmask; /* Mask of bits in a pixel that make up red */
-	video_pixel_t vcs_gmask; /* Mask of bits in a pixel that make up green */
-	video_pixel_t vcs_bmask; /* Mask of bits in a pixel that make up blue */
+	video_pixel_t  vcs_rmask; /* Mask of bits in a pixel that make up red */
+	video_pixel_t  vcs_gmask; /* Mask of bits in a pixel that make up green */
+	video_pixel_t  vcs_bmask; /* Mask of bits in a pixel that make up blue */
 	/* The alpha-mask does not participate in palette/grayscale lookup; it always functions as its own thing */
-	video_pixel_t vcs_amask; /* Mask of bits in a pixel that make up alpha */
+	video_pixel_t  vcs_amask; /* Mask of bits in a pixel that make up alpha */
 };
 
 struct video_format;
@@ -186,7 +187,7 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
- * NOTE: This function doesn't need `vcs_pxsz' to be initialized. */
+ * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict __specs);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
@@ -221,7 +222,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_han
  * When the described codec is actually a built-in one, this function always
  * succeeds,  and a  reference to a  dummy object is  stored in `*p_handle'.
  *
- * NOTE: This function doesn't need `vcs_pxsz' to be initialized.
+ * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized.
  *
  * @return: * :   The codec in question (`*p_handle' must be inherited in this case)
  * @return: NULL: [EINVAL] Impossible codec

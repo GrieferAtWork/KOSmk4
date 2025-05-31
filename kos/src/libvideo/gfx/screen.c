@@ -269,8 +269,7 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 
 	result->vcs_bpp = self->smi_bits_per_pixel;
 	if (result->vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
-		result->vcs_cbits = self->smi_colorbits;
-		result->vcs_rmask = ((video_pixel_t)1 << result->vcs_cbits) - 1;
+		result->vcs_rmask = ((video_pixel_t)1 << self->smi_colorbits) - 1;
 		result->vcs_gmask = result->vcs_rmask;
 		result->vcs_bmask = result->vcs_rmask;
 	} else {
@@ -346,6 +345,8 @@ svga_newscreen(void) {
 			goto err_svga_vdlck;
 		}
 	}
+
+	/* TODO: Support for "SVGA_MODEINFO_F_PLANAR" */
 
 	/* Convert the SVGA video mode into libvideo codec specs. */
 	svga_modeinfo_to_codec_specs(&mode, &codec_specs);

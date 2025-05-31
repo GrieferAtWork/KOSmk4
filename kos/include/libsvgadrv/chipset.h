@@ -100,7 +100,10 @@ __DECL_BEGIN
                                        *  - smi_bits_per_pixel == 1 && smi_colorbits == 4:
                                        *    This is a 16-color mode, with each plane holding exactly 1 bit of the final palette index
                                        *  - smi_bits_per_pixel == 2 && smi_colorbits == 8:
-                                       *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index */
+                                       *    This is a 256-color mode, with each plane holding exactly 2 bits of the final palette index
+                                       *
+                                       * In this mode, video planes are selected using `VGA_GFX_PLANE_READ' + `VGA_SEQ_PLANE_WRITE'.
+                                       * For an example on how to do this, refer to the code in /kos/src/kernel/modsvga/gfxtty.c.inl */
 
 
 typedef __uint16_t svga_res_t; /* Video resolution */
@@ -116,9 +119,9 @@ struct svga_modeinfo {
 	__shift_t    smi_colorbits;          /* [!0][valid_if(!SVGA_MODEINFO_F_TXT)]
 	                                      * # of bits per pixel that encode color (usually <= smi_bits_per_pixel, unless in
 	                                      * `SVGA_MODEINFO_F_PLANAR').  Use  as  `NUM_PALETTE_COLORS = 1 << smi_colorbits'. */
-	__shift_t    smi_rshift, smi_rbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Red color shift/bits */
-	__shift_t    smi_gshift, smi_gbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Green color shift/bits */
-	__shift_t    smi_bshift, smi_bbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)] Blue color shift/bits */
+	__shift_t    smi_rshift, smi_rbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)][smi_rshift + smi_rbits <= smi_bits_per_pixel] Red color shift/bits */
+	__shift_t    smi_gshift, smi_gbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)][smi_gshift + smi_gbits <= smi_bits_per_pixel] Green color shift/bits */
+	__shift_t    smi_bshift, smi_bbits;  /* [valid_if(!SVGA_MODEINFO_F_PAL && !SVGA_MODEINFO_F_BW)][smi_bshift + smi_bbits <= smi_bits_per_pixel] Blue color shift/bits */
 	/* Chipset-specific data (a total of `sco_modeinfosize - sizeof(struct svga_modeinfo)' bytes) goes here. */
 };
 
