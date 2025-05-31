@@ -533,7 +533,8 @@ if ! [ -f "$PREFIX/gcc/Makefile" ]; then
 		"--enable-initfini-array" \
 		"--enable-__cxa_atexit" \
 		"--enable-multilib" \
-		"--enable-gnu-indirect-function"
+		"--enable-gnu-indirect-function" \
+		"--disable-frame-pointer" `# Use -fomit-frame-pointer by default`
 	cmd cd "$KOS_BINUTILS"
 else
 	echo "	Already configured"
