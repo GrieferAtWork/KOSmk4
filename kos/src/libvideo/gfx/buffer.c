@@ -60,7 +60,7 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
 	if (self->vb_format.vf_codec == codec &&
 	    self->vb_format.vf_pal == palette) {
 		if (type == VIDEO_BUFFER_AUTO ||
-		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == rambuffer_getops())))
+		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == _rambuffer_ops())))
 			return incref(self);
 	}
 

@@ -96,6 +96,10 @@ struct video_blit_xops {
 	 *          underlying buffer.
 	 * WARNING: Don't use these operators; only use `struct video_gfx_ops' */
 
+#define _VIDEO_BLIT_XOPS__N_INTERNAL 8
+#ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
+	void (*_vbxo_internal[_VIDEO_BLIT_XOPS__N_INTERNAL])(void);
+#else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
 	/* Blit the contents of another video buffer into this one.
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
@@ -143,6 +147,9 @@ struct video_blit_xops {
 	                                   video_coord_t __src_x, video_coord_t __src_y,
 	                                   video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                   struct video_bitmask const *__restrict __bm);
+
+	void (*_vbxo_pad[4])(void);
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
 struct video_blit_ops {
@@ -192,6 +199,8 @@ struct video_blit_ops {
 	                                  video_offset_t __src_x, video_offset_t __src_y,
 	                                  video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                  struct video_bitmask const *__restrict __bm);
+
+	/* More driver-specific operators go here... */
 };
 
 
@@ -204,6 +213,10 @@ struct video_gfx_xops {
 	__ATTR_RETNONNULL __ATTR_NONNULL_T((1)) struct video_blit *
 	(LIBVIDEO_GFX_CC *vgxo_blitfrom)(struct video_blit *__restrict __ctx);
 
+#define _VIDEO_GFX_XOPS__N_INTERNAL 15
+#ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
+	void (*_vbxo_internal[_VIDEO_GFX_XOPS__N_INTERNAL])(void);
+#else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
 	/* All of the following callbacks are [1..1]
 	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
 	 *          as well as always  assume that the given  coords are in-bounds of  the
@@ -297,6 +310,9 @@ struct video_gfx_xops {
 	                                       video_color_t __color,
 	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                       struct video_bitmask const *__restrict __bm);
+
+	void (*_vbxo_pad[4])(void);
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
 struct video_gfx_ops {
@@ -387,6 +403,8 @@ struct video_gfx_ops {
 	                                      video_color_t __color,
 	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                      struct video_bitmask const *__restrict __bm);
+
+	/* More driver-specific operators go here... */
 };
 
 
@@ -397,11 +415,12 @@ __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
 struct video_blit {
-	struct video_blit_ops const *vb_ops;       /* Blit operators */
-	struct video_gfx            *vb_dst;       /* [1..1][const] Destination GFX context */
-	struct video_gfx const      *vb_src;       /* [1..1][const] Source GFX context */
-	struct video_blit_xops       vb_xops;      /* Blit operators */
-	void                        *vb_driver[8]; /* [?..?] Driver-specific graphics data. */
+	struct video_blit_ops const *vb_ops;  /* Blit operators */
+	struct video_gfx            *vb_dst;  /* [1..1][const] Destination GFX context */
+	struct video_gfx const      *vb_src;  /* [1..1][const] Source GFX context */
+	struct video_blit_xops       vb_xops; /* Blit operators */
+#define _VIDEO_BLIT_N_DRIVER 6
+	void *vb_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #define video_blit_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
 	(*(self)->vb_ops->vbo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
@@ -467,19 +486,20 @@ public:
 
 
 struct video_gfx {
-	struct video_gfx_ops const *vx_ops;       /* [1..1][const] GFX operations (use these) */
-	struct video_buffer        *vx_buffer;    /* [1..1][const] The associated buffer. */
-	gfx_blendmode_t             vx_blend;     /* [const] Blending mode. */
-	__uintptr_t                 vx_flags;     /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
-	video_color_t               vx_colorkey;  /* [const] Transparent color key (or any color with alpha=0 when disabled). */
-	video_offset_t              vx_offt_x;    /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
-	video_offset_t              vx_offt_y;    /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
-	video_coord_t               vx_xmin;      /* [const] == vx_offt_x <= 0 ? 0 : vx_offt_x */
-	video_coord_t               vx_ymin;      /* [const] == vx_offt_y <= 0 ? 0 : vx_offt_y */
-	video_coord_t               vx_xend;      /* [const] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
-	video_coord_t               vx_yend;      /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
-	struct video_gfx_xops       vx_xops;      /* [1..1][const] Internal GFX operators (do not use directly) */
-	void                       *vx_driver[4]; /* [?..?] Driver-specific graphics data. */
+	struct video_gfx_ops const *vx_ops;      /* [1..1][const] GFX operations (use these) */
+	struct video_buffer        *vx_buffer;   /* [1..1][const] The associated buffer. */
+	gfx_blendmode_t             vx_blend;    /* [const] Blending mode. */
+	__uintptr_t                 vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
+	video_offset_t              vx_offt_x;   /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
+	video_offset_t              vx_offt_y;   /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
+	video_coord_t               vx_xmin;     /* [const] == vx_offt_x <= 0 ? 0 : vx_offt_x */
+	video_coord_t               vx_ymin;     /* [const] == vx_offt_y <= 0 ? 0 : vx_offt_y */
+	video_coord_t               vx_xend;     /* [const] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
+	video_coord_t               vx_yend;     /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
+	struct video_gfx_xops       vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
+#define _VIDEO_GFX_N_DRIVER 4
+	void *vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */
 
 	/* Return the API-visible clip rect offset in X or Y */
 #define video_gfx_startx(self) (self)->vx_offt_x

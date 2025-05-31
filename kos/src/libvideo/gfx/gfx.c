@@ -43,12 +43,20 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/blendcolors.h>
 /**/
 
 #include "gfx-empty.h"
 #include "gfx.h"
 
 DECL_BEGIN
+
+static_assert(sizeof(struct video_blit_xops) ==
+              (_VIDEO_BLIT_XOPS__N_INTERNAL * sizeof(void (*)(void))),
+              "sizeof(struct video_blit_xops) doesn't match '_VIDEO_BLIT_XOPS__N_INTERNAL'");
+static_assert((sizeof(struct video_gfx_xops) - offsetafter(struct video_gfx_xops, vgxo_blitfrom)) ==
+              (_VIDEO_GFX_XOPS__N_INTERNAL * sizeof(void (*)(void))),
+              "sizeof(struct video_gfx_xops) doesn't match '_VIDEO_GFX_XOPS__N_INTERNAL'");
 
 #define PRIdOFF PRIdN(__SIZEOF_VIDEO_OFFSET_T__)
 #define PRIxOFF PRIxN(__SIZEOF_VIDEO_OFFSET_T__)
@@ -444,6 +452,278 @@ bitmask2d_getbit(byte_t const *__restrict bitmask, size_t bitscan,
 /************************************************************************/
 /************************************************************************/
 /************************************************************************/
+
+
+/* Low-level, Generic, always-valid GFX color functions (using only `vgxo_getpixel' + `vgxo_setpixel') */
+INTERN NONNULL((1)) video_color_t CC
+libvideo_gfx_generic__getcolor_noblend(struct video_gfx const *__restrict self,
+                                       video_coord_t x, video_coord_t y) {
+	video_pixel_t pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);
+	return self->vx_buffer->vb_format.pixel2color(pixel);
+}
+
+INTERN NONNULL((1)) video_color_t CC
+libvideo_gfx_generic__getcolor_blur(struct video_gfx const *__restrict self,
+                                    video_coord_t x, video_coord_t y) {
+	video_color_t result;
+	video_color_t colors[8];
+	video_twochannels_t r, g, b, a;
+	uint_fast8_t i, color_count;
+#define MODE_XMIN 0x1
+#define MODE_XMAX 0x2
+#define MODE_YMIN 0x4
+#define MODE_YMAX 0x8
+	uint_fast8_t mode = 0x0;
+	ASSERT_ABS_COORDS(self, x, y);
+	/* Figure out how we're situated in relation to bounds. */
+	if unlikely(x == self->vx_xmin)
+		mode |= MODE_XMIN;
+	if unlikely(y == self->vx_ymin)
+		mode |= MODE_YMIN;
+	if unlikely(x == self->vx_xend - 1)
+		mode |= MODE_XMAX;
+	if unlikely(y == self->vx_yend - 1)
+		mode |= MODE_YMAX;
+	/* Load colors as needed. */
+	switch (__builtin_expect(mode, 0x0)) {
+#define GETCOLOR(xoff, yoff) \
+		libvideo_gfx_generic__getcolor_noblend(self, x + (xoff), y + (xoff))
+
+	case 0x0:
+		/* +++ */
+		/* +.+ */
+		/* +++ */
+		color_count = 8;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(1, -1);
+
+		colors[3] = GETCOLOR(-1, 0);
+		colors[4] = GETCOLOR(1, 0);
+
+		colors[5] = GETCOLOR(-1, 1);
+		colors[6] = GETCOLOR(0, 1);
+		colors[7] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_XMIN:
+		/* -++ */
+		/* -.+ */
+		/* -++ */
+		color_count = 5;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(1, -1);
+
+		colors[2] = GETCOLOR(1, 0);
+
+		colors[3] = GETCOLOR(0, 1);
+		colors[4] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_XMAX:
+		/* ++- */
+		/* +.- */
+		/* ++- */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+
+		colors[2] = GETCOLOR(-1, 0);
+
+		colors[3] = GETCOLOR(-1, 1);
+		colors[4] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMIN:
+		/* --- */
+		/* +.+ */
+		/* +++ */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(1, 0);
+		colors[2] = GETCOLOR(-1, 1);
+		colors[3] = GETCOLOR(0, 1);
+		colors[4] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_YMAX:
+		/* +++ */
+		/* +.+ */
+		/* --- */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(1, -1);
+		colors[3] = GETCOLOR(-1, 0);
+		colors[4] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMIN | MODE_YMAX:
+		/* --- */
+		/* +.+ */
+		/* --- */
+		color_count = 2;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_XMIN | MODE_XMAX:
+		/* -+- */
+		/* -.- */
+		/* -+- */
+		color_count = 2;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMIN | MODE_XMIN:
+		/* --- */
+		/* -.+ */
+		/* -++ */
+		color_count = 3;
+		colors[0] = GETCOLOR(1, 0);
+		colors[1] = GETCOLOR(0, 1);
+		colors[2] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_YMIN | MODE_XMAX:
+		/* --- */
+		/* +.- */
+		/* ++- */
+		color_count = 3;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(-1, 1);
+		colors[2] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMAX | MODE_XMIN:
+		/* -++ */
+		/* -.+ */
+		/* --- */
+		color_count = 3;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(1, -1);
+		colors[2] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMAX | MODE_XMAX:
+		/* ++- */
+		/* +.- */
+		/* --- */
+		color_count = 3;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(-1, 0);
+		break;
+
+	case MODE_XMIN | MODE_XMAX | MODE_YMIN:
+		/* --- */
+		/* -.- */
+		/* -+- */
+		color_count = 1;
+		colors[0] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_XMIN | MODE_XMAX | MODE_YMAX:
+		/* -+- */
+		/* -.- */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(0, -1);
+		break;
+
+	case MODE_YMIN | MODE_YMAX | MODE_XMIN:
+		/* --- */
+		/* -.+ */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMIN | MODE_YMAX | MODE_XMAX:
+		/* --- */
+		/* +.- */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(-1, 0);
+		break;
+
+	case MODE_XMIN | MODE_YMIN | MODE_XMAX | MODE_YMAX:
+		/* --- */
+		/* -.- */
+		/* --- */
+		color_count = 0;
+		break;
+
+#undef GETCOLOR
+	default: __builtin_unreachable();
+	}
+#undef MODE_XMIN
+#undef MODE_XMAX
+#undef MODE_YMIN
+#undef MODE_YMAX
+	result = libvideo_gfx_generic__getcolor_noblend(self, x, y);
+	r = VIDEO_COLOR_GET_RED(result);
+	g = VIDEO_COLOR_GET_GREEN(result);
+	b = VIDEO_COLOR_GET_BLUE(result);
+	a = VIDEO_COLOR_GET_ALPHA(result);
+	for (i = 0; i < color_count; ++i) {
+		r += VIDEO_COLOR_GET_RED(colors[i]);
+		g += VIDEO_COLOR_GET_GREEN(colors[i]);
+		b += VIDEO_COLOR_GET_BLUE(colors[i]);
+		a += VIDEO_COLOR_GET_ALPHA(colors[i]);
+	}
+	++color_count;
+	r /= color_count;
+	g /= color_count;
+	b /= color_count;
+	a /= color_count;
+	result = VIDEO_COLOR_RGBA((video_channel_t)r,
+	                          (video_channel_t)g,
+	                          (video_channel_t)b,
+	                          (video_channel_t)a);
+	return result;
+}
+
+INTERN NONNULL((1)) video_color_t CC
+libvideo_gfx_generic__getcolor_with_key(struct video_gfx const *__restrict self,
+                                        video_coord_t x, video_coord_t y) {
+	video_pixel_t pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);
+	video_color_t result = self->vx_buffer->vb_format.pixel2color(pixel);
+	if (result == self->vx_colorkey)
+		result = 0;
+	return result;
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_generic__putcolor(struct video_gfx *__restrict self,
+                               video_coord_t x, video_coord_t y,
+                               video_color_t color) {
+	video_pixel_t o_pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);
+	video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel);
+	video_color_t n_color = gfx_blendcolors(o_color, color, self->vx_blend);
+	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color);
+	(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_generic__putcolor_noblend(struct video_gfx *__restrict self,
+                                       video_coord_t x, video_coord_t y,
+                                       video_color_t color) {
+	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(color);
+	(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);
+}
+
+INTERN NONNULL((1)) void CC
+libvideo_gfx_generic__putcolor_alphablend(struct video_gfx *__restrict self,
+                                          video_coord_t x, video_coord_t y,
+                                          video_color_t color) {
+	video_pixel_t o_pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);
+	video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel);
+	video_color_t n_color = gfx_blendcolors(o_color, color, GFX_BLENDINFO_ALPHA);
+	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color);
+	(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);
+}
 
 
 

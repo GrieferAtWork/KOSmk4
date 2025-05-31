@@ -24,8 +24,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
-
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <libvideo/codec/types.h>
@@ -43,6 +42,14 @@ typedef uint_fast16_t stretch_fp_frac_t; /* uint_fast{STRETCH_FP_NFRAC}_t */
 #define STRETCH_FP_WHOLE(fp) ((video_coord_t)(fp) >> STRETCH_FP_NFRAC)
 #define STRETCH_FP_FRAC(fp)  ((stretch_fp_frac_t)(fp) & (stretch_fp_frac_t)(STRETCH_FP(1) - 1))
 
+
+/* Low-level, Generic, always-valid GFX color functions (using only `vgxo_getpixel' + `vgxo_setpixel') */
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_generic__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_generic__getcolor_blur(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_generic__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor_noblend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor_alphablend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 
 /* Low-level, Generic, always-valid GFX functions (using only `fxo_getcolor' + `fxo_putcolor') */
 INTDEF NONNULL((1)) void CC libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
@@ -113,6 +120,115 @@ INTDEF NONNULL((1, 10)) void CC libvideo_gfx_generic_bitstretch(struct video_bli
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_generic_ops(void);
 #define libvideo_blit_generic_ops (*_libvideo_blit_generic_ops())
 
+
+
+LOCAL ATTR_CONST WUNUSED bool CC
+_blendinfo__is_add_or_subtract_or_max(unsigned int func) {
+	return func == GFX_BLENDFUNC_ADD ||
+	       func == GFX_BLENDFUNC_SUBTRACT ||
+	       func == GFX_BLENDFUNC_MAX;
+}
+
+
+
+/* libvideo_gfx_populate_generic: fill in all
+ * operators (except the get/set pixel)  ones
+ * with generic impls.
+ *
+ * The caller must have already initialized:
+ * - self->vx_flags
+ * - self->vx_colorkey
+ * - self->vx_blend
+ */
+LOCAL NONNULL((1)) void CC
+libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
+	self->vx_ops = &libvideo_gfx_generic_ops;
+
+	/* Select how colors should be read. */
+	if (self->vx_flags & VIDEO_GFX_FBLUR) {
+		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_with_key;
+	} else {
+		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+	}
+
+	/* Detect special blend modes. */
+	if (self->vx_blend == GFX_BLENDINFO_OVERRIDE) {
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+	} else if (self->vx_blend == GFX_BLENDINFO_ALPHA) {
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_alphablend;
+	} else if (GFX_BLENDINFO_GET_SRCRGB(self->vx_blend) == GFX_BLENDMODE_ONE &&
+	           GFX_BLENDINFO_GET_SRCA(self->vx_blend) == GFX_BLENDMODE_ONE &&
+	           GFX_BLENDINFO_GET_DSTRGB(self->vx_blend) == GFX_BLENDMODE_ZERO &&
+	           GFX_BLENDINFO_GET_DSTA(self->vx_blend) == GFX_BLENDMODE_ZERO &&
+	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(self->vx_blend)) &&
+	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(self->vx_blend))) {
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+	} else {
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
+	}
+
+	/* Line/fill operators... */
+	if (self->vx_flags & VIDEO_GFX_FAALINES) {
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+	} else {
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
+	}
+	self->vx_xops.vgxo_absline_h = &libvideo_gfx_generic__absline_h;
+	self->vx_xops.vgxo_absline_v = &libvideo_gfx_generic__absline_v;
+	self->vx_xops.vgxo_absfill   = &libvideo_gfx_generic__absfill;
+	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_generic__bitfill;
+
+	/* Linear vs. Nearest blit */
+	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
+		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_l;
+		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+	} else {
+		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_generic__blitfrom_n;
+		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
+	}
+
+	/* Select optimal operator implementations based on requested features. */
+	if (self->vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend) {
+		/* No blending is being done -> link operators that try to make use of direct memory access. */
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+		self->vx_xops.vgxo_absline_h    = &libvideo_gfx_noblend__absline_h;
+		self->vx_xops.vgxo_absline_v    = &libvideo_gfx_noblend__absline_v;
+		self->vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
+		self->vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
+		if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
+			self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
+			self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+		} else {
+			self->vx_xops.vgxo_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
+		}
+	}
+}
+
+/* Same as `libvideo_gfx_populate_generic()', but load non-blending defaults */
+LOCAL NONNULL((1)) void CC
+libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
+	self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+	self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
+		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+	}
+	self->vx_xops.vgxo_absline_h = &libvideo_gfx_noblend__absline_h;
+	self->vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
+	self->vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
+	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
+	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
+		self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_noblend__blitfrom_n;
+		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+	} else {
+		self->vx_xops.vgxo_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
+	}
+}
 
 DECL_END
 

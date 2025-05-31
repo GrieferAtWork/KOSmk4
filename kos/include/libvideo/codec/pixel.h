@@ -30,8 +30,8 @@
 __DECL_BEGIN
 
 /* Encoding of the general-purpose video_color_t datatype.
- * NOTE: `video_color_t' is always encoded to match the
- *       memory-layout    of     `VIDEO_CODEC_RGBA8888' */
+ * NOTE: `video_color_t' is always encoded to  match
+ *       the memory-layout of `VIDEO_CODEC_RGBA8888' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define VIDEO_COLOR_RED_MASK     __UINT32_C(0x000000ff)
 #define VIDEO_COLOR_RED_SHIFT    0

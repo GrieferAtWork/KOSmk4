@@ -2835,5 +2835,5 @@
 #define DEFINE_CTYPE(T,n) T n
 #define DEFINE_CTYPE_TRIPLE(_,n) struct _basic_ctype ctype_##n={};struct _pointer_ctype ctype_##n##_ptr={};struct _pointer_ctype ctype_##n##_const_ptr={};struct _pointer_ctype ctype_##n##_compat_ptr={};struct _pointer_ctype ctype_##n##_const_compat_ptr={};
 #define DEFINE_RAMGFX_GETSETPIXELn(n)\
-	video_pixel_t libvideo_gfx_ramgfx_getpixel##n(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y){}\
-	void libvideo_gfx_ramgfx_setpixel##n(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_pixel_t pixel){}
+	video_pixel_t libvideo_ramgfx__getpixel##n(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y){}\
+	void libvideo_ramgfx__setpixel##n(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_pixel_t pixel){}
