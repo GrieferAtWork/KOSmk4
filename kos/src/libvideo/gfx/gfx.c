@@ -58,12 +58,15 @@ static_assert((sizeof(struct video_gfx_xops) - offsetafter(struct video_gfx_xops
               (_VIDEO_GFX_XOPS__N_INTERNAL * sizeof(void (*)(void))),
               "sizeof(struct video_gfx_xops) doesn't match '_VIDEO_GFX_XOPS__N_INTERNAL'");
 
+#ifndef PRIdOFF
 #define PRIdOFF PRIdN(__SIZEOF_VIDEO_OFFSET_T__)
 #define PRIxOFF PRIxN(__SIZEOF_VIDEO_OFFSET_T__)
 #define PRIuCRD PRIuN(__SIZEOF_VIDEO_COORD_T__)
 #define PRIxCRD PRIxN(__SIZEOF_VIDEO_COORD_T__)
 #define PRIuDIM PRIuN(__SIZEOF_VIDEO_DIM_T__)
 #define PRIxDIM PRIxN(__SIZEOF_VIDEO_DIM_T__)
+#define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
+#endif /* !PRIdOFF */
 
 #define _GFX_SELF self
 #define GFX_XMIN  _GFX_SELF->vx_xmin
@@ -904,6 +907,10 @@ libvideo_gfx_generic__bitfill(struct video_gfx *__restrict self,
 		                              color, bm);
 		return;
 	}
+	TRACE_START("generic__bitfill("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ", bm: %p)\n",
+	            dst_x, dst_y, size_x, size_y, color, bm);
 	bitskip = bm->vbm_skip;
 	do {
 		video_dim_t x = 0;
@@ -960,6 +967,7 @@ next_row:
 		bitskip += bm->vbm_scan;
 		++dst_y;
 	} while (--size_y);
+	TRACE_END("generic__bitfill()\n");
 }
 
 INTERN NONNULL((1, 9)) void CC
@@ -1030,6 +1038,13 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx *__restrict self,
 			video_gfx_putabscolor(self, dst_x, dst_y, out);                                             \
 		}                                                                                               \
 	}
+
+	TRACE_START("generic__bitstretchfill_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ", "
+	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	            color, src_size_x_, src_size_y_, bm);
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   bitskip_, 0, src_size_x_, src_size_y_,
 	                   bitmask_blend_xmin_ymin,
@@ -1041,6 +1056,7 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx *__restrict self,
 	                   bitmask_blend_xmin_ymax,
 	                   bitmask_blend_ymax,
 	                   bitmask_blend_xmax_ymax);
+	TRACE_END("generic__bitstretchfill_l()\n");
 #undef bitmask_blend_xmin_ymin
 #undef bitmask_blend_ymin
 #undef bitmask_blend_xmax_ymin
@@ -1075,6 +1091,12 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx *__restrict self,
 		/* TODO: Iterate across "src" and use "self->vx_xops.vgxo_absfill"
 		 *       to  fill  rects  associated with  visible  source pixels. */
 	}
+	TRACE_START("generic__bitstretchfill_n("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ", "
+	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            color, src_size_x, src_size_y, bm);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
@@ -1096,6 +1118,7 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx *__restrict self,
 		++y;
 		src_pos_y += step_y;
 	} while (y < dst_size_y);
+	TRACE_END("generic__bitstretchfill_n()\n");
 }
 
 /************************************************************************/
@@ -1109,6 +1132,11 @@ libvideo_gfx_generic__blit(struct video_blit *__restrict self,
 	video_dim_t x, y;
 	struct video_gfx const *src = self->vb_src;
 	struct video_gfx *dst = self->vb_dst;
+	TRACE_START("generic__blit("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	for (y = 0; y < size_y; ++y) {
 		for (x = 0; x < size_x; ++x) {
 			video_color_t color;
@@ -1116,6 +1144,7 @@ libvideo_gfx_generic__blit(struct video_blit *__restrict self,
 			video_gfx_putabscolor(dst, dst_x + x, dst_y + y, color);
 		}
 	}
+	TRACE_END("generic__blit()\n");
 }
 
 
@@ -1126,6 +1155,11 @@ libvideo_gfx_generic__bitblit(struct video_blit *__restrict self,
                               video_dim_t size_x, video_dim_t size_y,
                               struct video_bitmask const *__restrict bm) {
 	uintptr_t bitskip = bm->vbm_skip;
+	TRACE_START("generic__bitblit("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y, bm);
 	do {
 		video_dim_t x = 0;
 		uintptr_t row_bitskip = bitskip;
@@ -1183,6 +1217,7 @@ next_row:
 		++dst_y;
 		++src_y;
 	} while (size_y);
+	TRACE_END("generic__bitblit()\n");
 }
 
 
@@ -1235,6 +1270,11 @@ libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
 		video_gfx_putabscolor(dst, dst_x, dst_y, out);                                                \
 	}
 
+	TRACE_START("generic__stretch_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	            src_x_, src_y_, src_size_x_, src_size_y_);
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   src_x_, src_y_, src_size_x_, src_size_y_,
 	                   pixel_blend_xmin_ymin,
@@ -1246,6 +1286,7 @@ libvideo_gfx_generic__stretch_l(struct video_blit *__restrict self,
 	                   pixel_blend_xmin_ymax,
 	                   pixel_blend_ymax,
 	                   pixel_blend_xmax_ymax);
+	TRACE_END("generic__stretch_l()\n");
 #undef pixel_blend_xmin_ymin
 #undef pixel_blend_ymin
 #undef pixel_blend_xmax_ymin
@@ -1267,6 +1308,11 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
+	TRACE_START("generic__stretch_n("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
@@ -1288,6 +1334,7 @@ libvideo_gfx_generic__stretch_n(struct video_blit *__restrict self,
 		++y;
 		src_pos_y += step_y;
 	} while (y < dst_size_y);
+	TRACE_END("generic__stretch_n()\n");
 }
 
 
@@ -1380,6 +1427,12 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
 			video_gfx_putabscolor(dst, dst_x, dst_y, out);                                                 \
 		}                                                                                                  \
 	}
+
+	TRACE_START("generic__bitstretch_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	            src_x_, src_y_, src_size_x_, src_size_y_, bm);
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   src_x_, src_y_, src_size_x_, src_size_y_,
 	                   bitstretch_blend_xmin_ymin,
@@ -1391,6 +1444,7 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
 	                   bitstretch_blend_xmin_ymax,
 	                   bitstretch_blend_ymax,
 	                   bitstretch_blend_xmax_ymax);
+	TRACE_END("generic__bitstretch_l()\n");
 #undef bitstretch_blend_xmin_ymin
 #undef bitstretch_blend_ymin
 #undef bitstretch_blend_xmax_ymin
@@ -1417,6 +1471,11 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
+	TRACE_START("generic__bitstretch_n("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y, bm);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
@@ -1442,6 +1501,7 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 		++y;
 		src_pos_y += step_y;
 	} while (y < dst_size_y);
+	TRACE_END("generic__bitstretch_n()\n");
 }
 
 /* Special impls for when the blit src/dst are identical */

@@ -26,11 +26,16 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/syslog.h>
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
 
 DECL_BEGIN
+
+#define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
+#define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
+
 
 /* # of bits to use for the fractional part of the fixed-
  * point  numbers used during nearest stretch operations. */
