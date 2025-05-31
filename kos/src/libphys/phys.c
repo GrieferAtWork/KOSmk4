@@ -52,7 +52,7 @@ PRIVATE fd_t dev_mem = -1;
 /* This one's called by `-Wl,-fini=libphys_fini' */
 INTERN void libphys_fini(void) {
 	if (dev_mem >= 0)
-		close(dev_mem);
+		(void)close(dev_mem);
 }
 
 PRIVATE void NOTHROW(CC openmem)(void) {
@@ -60,7 +60,7 @@ PRIVATE void NOTHROW(CC openmem)(void) {
 	dm = open(_PATH_MEM, O_RDWR | O_CLOEXEC);
 	if likely(dm >= 0) {
 		if unlikely(!atomic_cmpxch(&dev_mem, -1, dm))
-			close(dm);
+			(void)close(dm);
 	}
 }
 
@@ -304,7 +304,7 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes) {
 	 * recently used physical memory location may be added to  libphys,
 	 * at which point this function would be used to mark cache entries
 	 * as no-longer-in-use. */
-	munmap(base, num_bytes);
+	(void)munmap(base, num_bytes);
 }
 /************************************************************************/
 
