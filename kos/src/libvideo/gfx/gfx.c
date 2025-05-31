@@ -487,7 +487,7 @@ libvideo_gfx_generic__getcolor_blur(struct video_gfx const *__restrict self,
 	/* Load colors as needed. */
 	switch (__builtin_expect(mode, 0x0)) {
 #define GETCOLOR(xoff, yoff) \
-		libvideo_gfx_generic__getcolor_noblend(self, x + (xoff), y + (xoff))
+		libvideo_gfx_generic__getcolor_noblend(self, x + (xoff), y + (yoff))
 
 	case 0x0:
 		/* +++ */
