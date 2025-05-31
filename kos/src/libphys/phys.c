@@ -35,6 +35,7 @@
 #include <alloca.h>
 #include <atomic.h>
 #include <fcntl.h>
+#include <paths.h> /* _PATH_MEM */
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -56,7 +57,7 @@ INTERN void libphys_fini(void) {
 
 PRIVATE void NOTHROW(CC openmem)(void) {
 	fd_t dm;
-	dm = open("/dev/mem", O_RDWR | O_CLOEXEC);
+	dm = open(_PATH_MEM, O_RDWR | O_CLOEXEC);
 	if likely(dm >= 0) {
 		if unlikely(!atomic_cmpxch(&dev_mem, -1, dm))
 			close(dm);
