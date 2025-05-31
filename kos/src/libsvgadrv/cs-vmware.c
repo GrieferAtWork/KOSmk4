@@ -433,6 +433,56 @@ next:
 }
 
 PRIVATE NONNULL((1, 2)) void CC
+vmware_v_curmode_impl(struct svga_chipset *__restrict self,
+                      struct svga_modeinfo const *__restrict mode) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	(void)mode;
+
+	/* Initialize the command FIFO */
+	me->vw_fifo_caps = SVGA_FIFO_CAP_NONE;
+	if (vm_svga_hascap(me, SVGA_CAP_EXTENDED_FIFO)) {
+		me->vw_fifo_rfsz = me->vm_fifo[SVGA_FIFO_MIN];
+		if (vm_fifo_hasreg(me, SVGA_FIFO_CAPABILITIES))
+			me->vw_fifo_caps = me->vm_fifo[SVGA_FIFO_CAPABILITIES];
+	} else {
+		me->vw_fifo_rfsz = 16;
+	}
+
+	/* Link vmware operators */
+	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
+	me->sc_modeops.sco_updaterect = &vmware_v_updaterect;
+	me->sc_modeops.sco_getpal = &vmware_v_getpal;
+	me->sc_modeops.sco_setpal = &vmware_v_setpal;
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+	if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
+		me->sc_modeops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+	if (vm_svga_hascap(me, SVGA_CAP_RECT_FILL))
+		me->sc_modeops.sco_hw_async_fillrect = &vmware_v_hw_async_fillrect;
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+	me->sc_modeops.sco_hw_async_waitfor = &vmware_v_hw_async_waitfor;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+}
+
+#ifdef SVGA_HAVE_CURMODE
+PRIVATE NONNULL((1, 2)) void CC
+vmware_v_curmode(struct svga_chipset *__restrict self,
+                 struct svga_modeinfo const *__restrict _mode) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	struct vmware_modeinfo const *mode = (struct vmware_modeinfo const *)_mode;
+	if (mode->vmi_modeid >= lengthof(vmware_videomodes)) {
+		me->vm_vga_mode = true;
+		vga_v_curmode(me, mode);
+	} else {
+		me->vm_vga_mode = false;
+		vmware_v_curmode_impl(me, mode);
+	}
+}
+#endif /* SVGA_HAVE_CURMODE */
+
+PRIVATE NONNULL((1, 2)) void CC
 vmware_v_setmode(struct svga_chipset *__restrict self,
                  struct svga_modeinfo const *__restrict _mode) {
 	uint32_t final_scanline;
@@ -478,15 +528,12 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 		printk(KERN_ERR "[vmware] Final bmask=%#.8" PRIx32 " differs from cached bmask=%#.8" PRIx32 "\n", bmask, want_bmask);
 
 	/* Initialize the command FIFO */
-	me->vw_fifo_caps = SVGA_FIFO_CAP_NONE;
 	if (vm_svga_hascap(me, SVGA_CAP_EXTENDED_FIFO)) {
 		me->vm_fifo[SVGA_FIFO_MIN] = SVGA_FIFO_NUM_REGS * 4;
 		me->vw_fifo_rfsz = me->vm_fifo[SVGA_FIFO_MIN];
 		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
 		me->vm_fifo[SVGA_FIFO_NEXT_CMD] = me->vw_fifo_min;
 		me->vm_fifo[SVGA_FIFO_STOP]     = me->vw_fifo_min;
-		if (vm_fifo_hasreg(me, SVGA_FIFO_CAPABILITIES))
-			me->vw_fifo_caps = me->vm_fifo[SVGA_FIFO_CAPABILITIES];
 	} else {
 		me->vm_fifo[SVGA_FIFO_MIN]      = 16;
 		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
@@ -503,21 +550,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	me->vm_vga_mode = false;
 
 	/* Link vmware operators */
-	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
-	me->sc_modeops.sco_updaterect = &vmware_v_updaterect;
-	me->sc_modeops.sco_getpal = &vmware_v_getpal;
-	me->sc_modeops.sco_setpal = &vmware_v_setpal;
-#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
-	if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
-		me->sc_modeops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;
-#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
-#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-	if (vm_svga_hascap(me, SVGA_CAP_RECT_FILL))
-		me->sc_modeops.sco_hw_async_fillrect = &vmware_v_hw_async_fillrect;
-#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
-#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
-	me->sc_modeops.sco_hw_async_waitfor = &vmware_v_hw_async_waitfor;
-#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+	vmware_v_curmode_impl(me, mode);
 }
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -726,12 +759,15 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		DBG_memset(&me->sc_ops, 0xcc, sizeof(me->sc_ops));
 		me->sc_ops.sco_fini         = &vmware_v_fini;
 		me->sc_ops.sco_modeinfosize = sizeof(struct vmware_modeinfo);
-		me->sc_ops.sco_strings      = &vmware_v_strings;
-		me->sc_ops.sco_getmode      = &vmware_v_getmode;
-		me->sc_ops.sco_setmode      = &vmware_v_setmode;
-		me->sc_ops.sco_getregs      = &vmware_v_getregs;
-		me->sc_ops.sco_setregs      = &vmware_v_setregs;
-		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
+		me->sc_ops.sco_strings = &vmware_v_strings;
+		me->sc_ops.sco_getmode = &vmware_v_getmode;
+		me->sc_ops.sco_setmode = &vmware_v_setmode;
+#ifdef SVGA_HAVE_CURMODE
+		me->sc_ops.sco_curmode = &vmware_v_curmode;
+#endif /* SVGA_HAVE_CURMODE */
+		me->sc_ops.sco_getregs = &vmware_v_getregs;
+		me->sc_ops.sco_setregs = &vmware_v_setregs;
+		me->sc_ops.sco_regsize = sizeof__vmware_regs(me->vw_nscratch);
 
 		/* Misc. runtime fields. */
 		me->vw_fifo_caps = 0;

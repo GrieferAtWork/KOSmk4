@@ -651,9 +651,12 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_fini         = &vesa_v_fini;
 		me->sc_ops.sco_strings      = &vesa_v_strings;
 		me->sc_ops.sco_modeinfosize = sizeof(struct vesa_modeinfo);
-		me->sc_ops.sco_getmode      = &vesa_v_getmode;
-		me->sc_ops.sco_setmode      = &vesa_v_setmode;
-		me->vc_regsavebits          = 0x000e; /* Everything except VGA controller hardware state */
+		me->sc_ops.sco_getmode = &vesa_v_getmode;
+		me->sc_ops.sco_setmode = &vesa_v_setmode;
+#ifdef SVGA_HAVE_CURMODE
+		me->sc_ops.sco_curmode = &vesa_v_setmode;
+#endif /* SVGA_HAVE_CURMODE */
+		me->vc_regsavebits = 0x000e; /* Everything except VGA controller hardware state */
 		/* XXX: At this point, we could override `me->vc_regsavebits'! */
 
 		/* Fill in register get/set operators. */

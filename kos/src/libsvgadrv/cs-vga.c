@@ -352,22 +352,16 @@ vga_setmode_common(struct vga_chipset *__restrict self,
 	}
 }
 
-INTERN NONNULL((1, 2)) void CC
-vga_v_setmode(struct svga_chipset *__restrict self,
+#ifdef SVGA_HAVE_CURMODE
+INTERN
+#else /* SVGA_HAVE_CURMODE */
+PRIVATE
+#endif /* !SVGA_HAVE_CURMODE */
+NONNULL((1, 2)) void CC
+vga_v_curmode(struct svga_chipset *__restrict self,
               struct svga_modeinfo const *__restrict mode) {
 	struct vga_chipset *me = (struct vga_chipset *)self;
-	uint8_t modeid;
-	for (modeid = 0;; ++modeid) {
-		assert(modeid <= lengthof(vga_modelist));
-		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
-		         sizeof(struct svga_modeinfo)) == 0)
-			break;
-	}
-
-	/* Set VGA registers. */
-	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
-
-	/* Define mode-specific operators. */
+	(void)mode;
 	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
 	me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
 	me->sc_modeops.sco_setpal = &cs_basevga_wrpal;
@@ -394,6 +388,42 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 #endif /* SVGA_HAVE_HW_SCROLL */
 }
 
+INTERN NONNULL((1, 2)) void CC
+vga_v_setmode(struct svga_chipset *__restrict self,
+              struct svga_modeinfo const *__restrict mode) {
+	struct vga_chipset *me = (struct vga_chipset *)self;
+	uint8_t modeid;
+	for (modeid = 0;; ++modeid) {
+		assert(modeid <= lengthof(vga_modelist));
+		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
+		         sizeof(struct svga_modeinfo)) == 0)
+			break;
+	}
+
+	/* Set VGA registers. */
+	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
+
+	/* Define mode-specific operators. */
+	vga_v_curmode(me, mode);
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+ega_v_curmode(struct svga_chipset *__restrict self,
+              struct svga_modeinfo const *__restrict mode) {
+	struct vga_chipset *me = (struct vga_chipset *)self;
+	(void)mode;
+
+	/* Define mode-specific operators. */
+	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
+	me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
+	me->sc_modeops.sco_setpal = &cs_basevga_wrpal;
+#ifdef SVGA_HAVE_HW_SCROLL
+	me->sc_modeops.sco_setdisplaystart = &ega_v_setdisplaystart;
+	me->sc_displaystart = 0;
+	me->sc_logicalwidth = 0;
+#endif /* SVGA_HAVE_HW_SCROLL */
+}
+
 PRIVATE NONNULL((1, 2)) void CC
 ega_v_setmode(struct svga_chipset *__restrict self,
               struct svga_modeinfo const *__restrict mode) {
@@ -410,13 +440,7 @@ ega_v_setmode(struct svga_chipset *__restrict self,
 	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
 
 	/* Define mode-specific operators. */
-	self->sc_modeops.sco_getpal = &cs_basevga_rdpal;
-	self->sc_modeops.sco_setpal = &cs_basevga_wrpal;
-#ifdef SVGA_HAVE_HW_SCROLL
-	me->sc_modeops.sco_setdisplaystart = &ega_v_setdisplaystart;
-	me->sc_displaystart = 0;
-	me->sc_logicalwidth = 0;
-#endif /* SVGA_HAVE_HW_SCROLL */
+	ega_v_curmode(me, mode);
 }
 
 
@@ -432,11 +456,17 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 	if (basevga_flags & BASEVGA_FLAG_ISEGA) {
 		self->sc_ops.sco_getmode = &ega_v_getmode;
 		self->sc_ops.sco_setmode = &ega_v_setmode;
-		self->sc_vmemsize        = 16 * 1024; /* EGA had at least 64K video memory. */
+#ifdef SVGA_HAVE_CURMODE
+		self->sc_ops.sco_curmode = &ega_v_curmode;
+#endif /* SVGA_HAVE_CURMODE */
+		self->sc_vmemsize = 16 * 1024; /* EGA had at least 64K video memory. */
 	} else {
 		self->sc_ops.sco_getmode = &vga_v_getmode;
 		self->sc_ops.sco_setmode = &vga_v_setmode;
-		self->sc_vmemsize        = 4 * 16 * 1024; /* Standard VGA has 256K of video memory */
+#ifdef SVGA_HAVE_CURMODE
+		self->sc_ops.sco_curmode = &vga_v_curmode;
+#endif /* SVGA_HAVE_CURMODE */
+		self->sc_vmemsize = 4 * 16 * 1024; /* Standard VGA has 256K of video memory */
 	}
 	self->sc_ops.sco_modeinfosize = sizeof(struct svga_modeinfo);
 	self->sc_ops.sco_strings      = NULL;

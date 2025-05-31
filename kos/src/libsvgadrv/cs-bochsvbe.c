@@ -207,11 +207,46 @@ next:
 }
 
 PRIVATE NONNULL((1, 2)) void CC
-bochs_v_setmode(struct svga_chipset *__restrict self,
-                struct svga_modeinfo const *__restrict _mode) {
+bochs_v_curmode_impl(struct svga_chipset *__restrict self,
+                     struct svga_modeinfo const *__restrict _mode) {
 #ifdef SVGA_HAVE_HW_SCROLL
 	struct bochs_chipset *me = (struct bochs_chipset *)self;
+	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
+	struct bga_mode const *bm = &bochs_modes[mode->bmi_modeid];
+	me->sc_logicalwidth = dispi_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH);
+	me->sc_displaystart = dispi_rdreg(VBE_DISPI_INDEX_X_OFFSET) +
+	                      dispi_rdreg(VBE_DISPI_INDEX_Y_OFFSET) *
+	                      me->sc_logicalwidth;
+	me->sc_logicalwidth_align = 1;
+	if (bm->bm_bpp <= 1) {
+		me->sc_logicalwidth_align = 8;
+	} else if (bm->bm_bpp <= 2) {
+		me->sc_logicalwidth_align = 4;
+	} if (bm->bm_bpp <= 4) {
+		me->sc_logicalwidth_align = 2;
+	}
 #endif /* SVGA_HAVE_HW_SCROLL */
+	(void)self;
+	(void)_mode;
+}
+
+#ifdef SVGA_HAVE_CURMODE
+PRIVATE NONNULL((1, 2)) void CC
+bochs_v_curmode(struct svga_chipset *__restrict self,
+                struct svga_modeinfo const *__restrict _mode) {
+	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
+	if (mode->bmi_modeid >= lengthof(bochs_modes)) {
+		vga_v_curmode(self, mode);
+	} else {
+		bochs_v_curmode_impl(self, mode);
+	}
+}
+#endif /* SVGA_HAVE_CURMODE */
+
+PRIVATE NONNULL((1, 2)) void CC
+bochs_v_setmode(struct svga_chipset *__restrict self,
+                struct svga_modeinfo const *__restrict _mode) {
+	struct bochs_chipset *me = (struct bochs_chipset *)self;
 	struct bochs_modeinfo const *mode = (struct bochs_modeinfo const *)_mode;
 	struct bga_mode const *bm;
 
@@ -220,7 +255,7 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 
 	/* Support for standard VGA modes. */
 	if (mode->bmi_modeid >= lengthof(bochs_modes)) {
-		vga_v_setmode(self, mode);
+		vga_v_setmode(me, mode);
 		return;
 	}
 
@@ -238,20 +273,7 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 	            VBE_DISPI_LFB_ENABLED);
 
 	/* Read additional information. */
-#ifdef SVGA_HAVE_HW_SCROLL
-	me->sc_logicalwidth = dispi_rdreg(VBE_DISPI_INDEX_VIRT_WIDTH);
-	me->sc_displaystart = dispi_rdreg(VBE_DISPI_INDEX_X_OFFSET) +
-	                      dispi_rdreg(VBE_DISPI_INDEX_Y_OFFSET) *
-	                      me->sc_logicalwidth;
-	me->sc_logicalwidth_align = 1;
-	if (bm->bm_bpp <= 1) {
-		me->sc_logicalwidth_align = 8;
-	} else if (bm->bm_bpp <= 2) {
-		me->sc_logicalwidth_align = 4;
-	} if (bm->bm_bpp <= 4) {
-		me->sc_logicalwidth_align = 2;
-	}
-#endif /* SVGA_HAVE_HW_SCROLL */
+	bochs_v_curmode_impl(me, mode);
 }
 
 PRIVATE NONNULL((1, 2)) void CC
@@ -488,12 +510,15 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 		/* Fill in operators and the like... */
 		me->sc_ops.sco_fini         = &bochs_v_fini;
 		me->sc_ops.sco_modeinfosize = sizeof(struct bochs_modeinfo);
-		me->sc_ops.sco_strings      = &bochs_v_strings;
-		me->sc_ops.sco_getmode      = &bochs_v_getmode;
-		me->sc_ops.sco_setmode      = &bochs_v_setmode;
-		me->sc_ops.sco_getregs      = &bochs_v_getregs;
-		me->sc_ops.sco_setregs      = &bochs_v_setregs;
-		me->sc_ops.sco_regsize      = sizeof(struct bochs_regs);
+		me->sc_ops.sco_strings = &bochs_v_strings;
+		me->sc_ops.sco_getmode = &bochs_v_getmode;
+		me->sc_ops.sco_setmode = &bochs_v_setmode;
+#ifdef SVGA_HAVE_CURMODE
+		me->sc_ops.sco_curmode = &bochs_v_curmode;
+#endif /* SVGA_HAVE_CURMODE */
+		me->sc_ops.sco_getregs = &bochs_v_getregs;
+		me->sc_ops.sco_setregs = &bochs_v_setregs;
+		me->sc_ops.sco_regsize = sizeof(struct bochs_regs);
 
 		me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
 		me->sc_modeops.sco_setpal = &cs_basevga_wrpal;

@@ -391,10 +391,12 @@ find_with_hint:
 		}
 
 		/* Initialize CS mode operators as per the currently set mode. */
-		(*result->ss_cs.sc_ops.sco_setmode)(&result->ss_cs, mode); /* TODO: sco_curmode */
+		(*result->ss_cs.sc_ops.sco_curmode)(&result->ss_cs, mode);
 	}
 
-	/* TODO: Support for "SVGA_MODEINFO_F_PLANAR" */
+	if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR) {
+		/* TODO: Support for "SVGA_MODEINFO_F_PLANAR" */
+	}
 
 	/* Convert the SVGA video mode into libvideo codec specs. */
 	svga_modeinfo_to_codec_specs(mode, &codec_specs);

@@ -57,10 +57,12 @@
  *   set  of operations the graphics card can perform
  *   to manipulate VRAM while the CPU isn't looking.
  */
+#undef SVGA_HAVE_CURMODE           /* sco_curmode */
 #undef SVGA_HAVE_HW_SCROLL         /* sco_setdisplaystart + sco_setlogicalwidth */
 #undef SVGA_HAVE_HW_ASYNC_COPYRECT /* sco_hw_async_copyrect */
 #undef SVGA_HAVE_HW_ASYNC_FILLRECT /* sco_hw_async_fillrect */
 #ifndef __KERNEL__
+#define SVGA_HAVE_CURMODE
 #define SVGA_HAVE_HW_SCROLL /* Unused by modsvga, and therefor not enabled here */
 #endif /* !__KERNEL__ */
 #define SVGA_HAVE_HW_ASYNC_COPYRECT
@@ -170,7 +172,7 @@ struct svga_palette_color {
 
 struct svga_chipset_modeops {
 	/************************************************************************/
-	/* MODE-SPECIFIC OPERATORS (may change when `sco_setmode' is called)    */
+	/* MODE-SPECIFIC OPERATORS (may change in `sco_setmode'/`sco_curmode')  */
 	/************************************************************************/
 
 	/* [1..1][lock(EXTERNAL)]
@@ -197,7 +199,7 @@ struct svga_chipset_modeops {
 	 *   available. If such a buffer is available, you must mmap() `smi_lfb'
 	 *   and just directly modify its backing memory!
 	 * @assume(windows != sc_rdwindow || windows != sc_wrwindow); // as relevant
-	 * @assume(WAS_CALLED(sco_setmode));
+	 * @assume(WAS_CALLED(sco_setmode || sco_curmode));
 	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_LFB)); */
 	__ATTR_NONNULL_T((1)) void
@@ -225,7 +227,7 @@ struct svga_chipset_modeops {
 	 * - Set `self->sc_displaystart = offset;'
 	 * - Not available in text-mode video modes.
 	 * - Set to "NULL" if never supported
-	 * @assume(WAS_CALLED(sco_setmode));
+	 * @assume(WAS_CALLED(sco_setmode || sco_curmode));
 	 * @assume(offset <= self->sc_vmemsize * 8 / CURRENT_VIDEO_MODE.smi_bits_per_pixel);
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
 	__ATTR_NONNULL_T((1)) void
@@ -242,7 +244,7 @@ struct svga_chipset_modeops {
 	 * - The default value is `smi_scanline'
 	 * - Not available in text-mode video modes.
 	 * - Set to "NULL" if never supported
-	 * @assume(WAS_CALLED(sco_setmode));
+	 * @assume(WAS_CALLED(sco_setmode || sco_curmode));
 	 * @assume(IS_ALIGNED(width, self->sc_logicalwidth_align));
 	 * @assume(width <= sc_logicalwidth_max);
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
@@ -325,7 +327,7 @@ struct svga_chipset_ops {
 	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
 	 * - Prior to this function being called for the first time, any  function
 	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
-	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]'
+	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode || sco_curmode))]'
 	 * - Calls to this function are allowed to fully (re-)initialize "sc_modeops"
 	 *   Additionally, "sc_modeops" may  only be  considered "initialized"  after
 	 *   this function has been called at least once. */
@@ -333,7 +335,7 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo const *__restrict mode);
 
-#if 0 /* TODO */
+#ifdef SVGA_HAVE_CURMODE
 	/* [1..1][const][lock(EXTERNAL)]
 	 * Same as "sco_setmode", but assume that the given "mode" is what is already
 	 * set in hardware. Chipsets  are allowed to simply  set this operator as  an
@@ -341,7 +343,7 @@ struct svga_chipset_ops {
 	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_curmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo const *__restrict mode);
-#endif
+#endif /* SVGA_HAVE_CURMODE */
 
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
@@ -362,24 +364,23 @@ struct svga_chipset_ops {
 
 struct svga_chipset {
 	struct svga_chipset_ops     sc_ops;                /* [const] Chipset operators. */
-	struct svga_chipset_modeops sc_modeops;            /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode)] Mode-specific operators */
+	struct svga_chipset_modeops sc_modeops;            /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode || sco_curmode)] Mode-specific operators */
 	__size_t                    sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                    sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
+	__size_t                    sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                    * Current display window for reads. */
-	__size_t                    sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
+	__size_t                    sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                    * Current display window for writes. */
 #ifdef SVGA_HAVE_HW_SCROLL
-	__size_t                    sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setdisplaystart != NULL)]
-	                                                    * Current display  start (pixels  from  `CURRENT_VIDEO_MODE.smi_lfb', or  the  start
-	                                                    * of video memory, to the beginning of the screen; usually top-left corner). */
-	__uint32_t                  sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)]
-	                                                    * Current  logical  screen  width  (in  pixels;  updated  by  `sco_setlogicalwidth')
-	                                                    * This  is  the  # of  pixel  between the  start  of  two lines,  commonly  known as
-	                                                    * the scanline,  only  this  time  expressed in  pixels,  rather  than  bytes.  Also
-	                                                    * note that  because  scanlines  always have  to  start  on whole  bytes,  there  is
-	                                                    * a alignment requirement of `sc_logicalwidth_align' pixels. */
-	__uint32_t                  sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
-	__uint32_t                  sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
+	__size_t                    sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && sco_setdisplaystart != NULL)]
+	                                                    * Current display start (pixels from `CURRENT_VIDEO_MODE.smi_lfb', or the start of video memory, to
+	                                                    * the beginning of the screen; usually top-left corner). */
+	__uint32_t                  sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && sco_setlogicalwidth != NULL)]
+	                                                    * Current  logical screen width (in pixels; updated by `sco_setlogicalwidth'). This is the # of pixel
+	                                                    * between the start of two lines, commonly known as the scanline, only this time expressed in pixels,
+	                                                    * rather than bytes. Also note that because scanlines  always have to start on whole bytes, there  is
+	                                                    * an alignment requirement of `sc_logicalwidth_align' pixels. */
+	__uint32_t                  sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
+	__uint32_t                  sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode || sco_curmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
 #endif /* SVGA_HAVE_HW_SCROLL */
 	/* Chipset-specific data goes here. */
 };
