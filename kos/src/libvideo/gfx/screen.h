@@ -34,8 +34,13 @@ DECL_BEGIN
  * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
  * only  a single screen buffer can ever exist system-wide. If an attempt is made
  * to create a second screen buffer, this function will block until the first one
- * is destroyed, or the processing owning it exits. */
-INTDEF WUNUSED REF struct screen_buffer *CC libvideo_screen_buffer_create(void);
+ * is destroyed, or the processing owning it exits.
+ *
+ * @param: hint: Hint regarding the intended video resolution (or "NULL" to  just
+ *               use the same video mode as had already been set by whatever came
+ *               before us). */
+INTDEF WUNUSED REF struct screen_buffer *CC
+libvideo_screen_buffer_create(struct screen_buffer_hint *hint);
 
 DECL_END
 

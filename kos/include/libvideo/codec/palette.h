@@ -54,6 +54,29 @@ struct video_palette {
 __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy)
 
 
+/* Create a new (uninitialized) palette for `__count' colors.
+ *
+ * This function is allowed to allocate a larger palette  than
+ * requested if doing  so improves  performances, though  when
+ * this is done, all additional palette entries will have been
+ * initialized to `0'
+ *
+ * On success, the caller must initialize:
+ * - return->vp_pal[0]
+ * - return->vp_pal[1]
+ * - ...
+ * - return->vp_pal[__count - 2]
+ * - return->vp_pal[__count - 1]
+ *
+ * @return: * :   The newly created palette
+ * @return: NULL: Out of memory */
+typedef __ATTR_WUNUSED __REF struct video_palette *
+(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_CREATE)(__size_t __count);
+#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
+LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __REF struct video_palette *
+LIBVIDEO_CODEC_CC video_palette_create(__size_t __count);
+#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+
 /* Return the best-matching pixel for a given color.
  * For  the purpose  of determining  the best  match, this algorithm
  * leans towards emphasizing  colors best viewed  by the human  eye,

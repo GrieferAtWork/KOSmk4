@@ -469,7 +469,7 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 
 		/* The granularity is important for loading video memory windows.
 		 * >> The window number expected by the BIOS is `INDEX_AS_NTH_64K_PAGE * 64 / GRANULARITY' */
-		me->vc_wingranshift = CTZ(me->vc_mode.vmi_win_granularity);
+		me->vc_wingranshift = CTZ(mode->vm_vesa.vmi_win_granularity);
 
 		/* Figure out the window numbers for the read/write windows. */
 		rdwindow = wrwindow = 0;

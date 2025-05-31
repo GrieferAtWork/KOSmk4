@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to open image");
 
 	/* Bind the screen buffer. */
-	screen = screen_buffer_create();
+	screen = screen_buffer_create(NULL);
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 

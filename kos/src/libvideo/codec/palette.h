@@ -24,11 +24,32 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
+#include <kos/anno.h>
+#include <stddef.h>
 
 #include <libvideo/codec/palette.h>
 
 DECL_BEGIN
+
+/* Create a new (uninitialized) palette for `count' colors.
+ *
+ * This function is allowed to allocate a larger palette  than
+ * requested if doing  so improves  performances, though  when
+ * this is done, all additional palette entries will have been
+ * initialized to `0'
+ *
+ * On success, the caller must initialize:
+ * - return->vp_pal[0]
+ * - return->vp_pal[1]
+ * - ...
+ * - return->vp_pal[count - 2]
+ * - return->vp_pal[count - 1]
+ *
+ * @return: * :   The newly created palette
+ * @return: NULL: Out of memory */
+INTDEF WUNUSED REF struct video_palette *CC
+libvideo_palette_create(size_t count);
+
 
 /* Return the best-matching pixel for a given color.
  * For  the purpose  of determining  the best  match, this algorithm

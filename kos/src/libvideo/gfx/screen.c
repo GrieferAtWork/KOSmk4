@@ -42,6 +42,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <malloca.h>
 #include <stdbool.h>
@@ -175,61 +176,33 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 #define LOGERR(format, ...) \
 	syslog(LOG_ERR, "[libvideo][svga-screen:%d] " format, __LINE__, ##__VA_ARGS__)
 
-PRIVATE WUNUSED NONNULL((2)) int CC
-svga_find_first_gfx_mode(fd_t fd, struct svga_modeinfo *__restrict mode) {
-	/* TODO */
-	LOGERR("Not implemented: svga_find_first_gfx_mode()\n");
-	(void)fd;
-	(void)mode;
-	errno = ENODATA;
-	return -1;
-}
-
-PRIVATE NONNULL((1)) void
-NOTHROW(LIBVIDEO_CODEC_CC svga_palette_destroy)(struct video_palette *__restrict self) {
-	free(self->vp_cache);
-	free(self);
-}
-
-PRIVATE WUNUSED REF struct video_palette *CC
-svga_palette_new(fd_t vdlck, shift_t colorbits) {
+PRIVATE WUNUSED NONNULL((1)) REF struct video_palette *CC
+svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 	size_t i, palsize;
 	struct video_palette *result;
 	struct svga_palette_color *colors;
-	struct svga_palette buf;
 	palsize = (size_t)1 << colorbits;
 	colors  = (struct svga_palette_color *)malloca(palsize, sizeof(struct svga_palette_color));
 	if unlikely(!colors) {
 		LOGERR("Failed to allocate palette color buffer: %m\n");
 		goto err;
 	}
-	buf.svp_base = 0;
-	buf.svp_size = palsize;
-	buf.svp_pal  = colors;
-	if (ioctl(vdlck, SVGA_IOC_GETPAL_RGBX, &buf) < 0) {
-		LOGERR("Failed to query palette: %m\n");
-		freea(colors);
-		goto err;
-	}
 
-	result = (REF struct video_palette *)malloc(offsetof(struct video_palette, vp_pal) +
-	                                            (buf.svp_size * sizeof(video_color_t)));
+	/* Load SVGA palette */
+	(*cs->sc_modeops.sco_getpal)(cs, 0, palsize, colors);
+
+	/* Allocate video palette */
+	result = video_palette_create(palsize);
 	if unlikely(!result) {
 		LOGERR("Failed to allocate palette controller: %m\n");
 		freea(colors);
 		goto err;
 	}
-	result->vp_destroy = &svga_palette_destroy;
-	result->vp_refcnt  = 1;
-	result->vp_cache   = NULL;
-	result->vp_cnt     = buf.svp_size;
-	for (i = 0; i < result->vp_cnt; ++i) {
+	for (i = 0; i < palsize; ++i) {
 		struct svga_palette_color color = colors[i];
 		video_color_t vcolor = VIDEO_COLOR_RGB(color.spc_r, color.spc_g, color.spc_b);
 		result->vp_pal[i] = vcolor;
 	}
-	for (; i < palsize; ++i)
-		result->vp_pal[i] = 0; /* Unused colors? */
 	freea(colors);
 	return result;
 err:
@@ -281,14 +254,13 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 }
 
 PRIVATE WUNUSED REF struct svga_screen *CC
-svga_newscreen(void) {
+svga_newscreen(struct screen_buffer_hint *hint) {
 	fd_t svga;
 	void *libsvgadrv;
+	struct screen_buffer_hint _default_hint;
 	PSVGA_CHIPSET_GETDRIVERS svga_chipset_getdrivers;
 	struct openfd vdlck;
-	struct svga_modeinfo mode;
-	struct video_format format;
-	REF struct video_codec_handle *codec_handle;
+	struct svga_modeinfo *mode;
 	struct video_codec_specs codec_specs;
 	REF struct svga_screen *result;
 	struct svga_chipset_driver const *driver;
@@ -319,65 +291,12 @@ svga_newscreen(void) {
 		goto err_svga;
 	}
 
-	/* Lookup  current video mode. We could just  not do this part and always
-	 * switch to a custom  video mode, but  then: where do  we get this  mode
-	 * from? Instead, use whatever mode the user last set for their terminal,
-	 * meaning that `vconf(1)' can be used to set the mode used here. */
-	if (ioctl(vdlck.of_hint, SVGA_IOC_GETMODE, &mode) < 0) {
-		LOGERR("SVGA_IOC_GETMODE failed: %m\n");
-		goto err_svga_vdlck;
-	}
-
-	/* If we're in text-mode, force a switch to graphics mode. */
-	if (mode.smi_flags & SVGA_MODEINFO_F_TXT) {
-		int status = svga_find_first_gfx_mode(vdlck.of_hint, &mode);
-		if (status < 0) {
-			LOGERR("Failed to enumerate supported video modes: %m\n");
-			goto err_svga_vdlck;
-		}
-		if (status != 0) {
-			LOGERR("Failed to find any viable GFX mode\n");
-			errno = ENODEV; /* Chipset doesn't support any kind of GFX */
-			goto err_svga_vdlck;
-		}
-		if (ioctl(vdlck.of_hint, SVGA_IOC_SETMODE, &mode) < 0) {
-			LOGERR("SVGA_IOC_SETMODE failed: %m\n");
-			goto err_svga_vdlck;
-		}
-	}
-
-	/* TODO: Support for "SVGA_MODEINFO_F_PLANAR" */
-
-	/* Convert the SVGA video mode into libvideo codec specs. */
-	svga_modeinfo_to_codec_specs(&mode, &codec_specs);
-
-	/* Build a codec from the newly constructed specs. */
-	format.vf_codec = video_codec_fromspecs(&codec_specs, &codec_handle);
-	if (!format.vf_codec) {
-		LOGERR("No codec for SVGA video mode\n");
-		errno = ENODEV;
-		goto err_svga_vdlck;
-	}
-
-	/* If necessary, construct a palette controller for the codec, and populate
-	 * it with whatever is currently configured  by the chipset. In theory,  we
-	 * could also just come up with a  new palette here, but again: use  what's
-	 * already there, so another program can pre-configure it for us. */
-	format.vf_pal = NULL;
-	if (format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		format.vf_pal = svga_palette_new(vdlck.of_hint, format.vf_codec->vc_specs.vcs_cbits);
-		if unlikely(!format.vf_pal) {
-			LOGERR("Failed to allocate palette controller: %m\n");
-			goto err_svga_vdlck_codec;
-		}
-	}
-
 	/* Figure out which chipset we're using (so we can more easily
 	 * load  the user-land version of the driver to gain access to
 	 * any chipset-specific I/O operations we might need) */
 	if (ioctl(vdlck.of_hint, SVGA_IOC_GETCSNAME, csname) < 0) {
 		LOGERR("SVGA_IOC_GETCSNAME failed: %m\n");
-		goto err_svga_vdlck_codec_format;
+		goto err_svga_vdlck;
 	}
 
 	/* Make sure we  (ring#3) have I/O  permissions. These will  probably
@@ -385,32 +304,32 @@ svga_newscreen(void) {
 	 * I/O operations and so on. */
 	if (iopl(3)) {
 		LOGERR("iopl failed: %m\n");
-		goto err_svga_vdlck_codec_format;
+		goto err_svga_vdlck;
 	}
 
 	/* Load "libsvgadrv" (user-land version) */
 	libsvgadrv = dlopen(LIBSVGADRV_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!libsvgadrv) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_codec_format;
+		goto err_svga_vdlck;
 	}
 	*(void **)&svga_chipset_getdrivers = dlsym(libsvgadrv, "svga_chipset_getdrivers");
 	if unlikely(!svga_chipset_getdrivers) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_codec_format_libsvgadrv;
+		goto err_svga_vdlck_libsvgadrv;
 	}
 
 	/* Find the relevant chipset driver. */
 	driver = (*svga_chipset_getdrivers)();
 	if unlikely(!driver) {
 		LOGERR("No drivers available\n");
-		goto err_svga_vdlck_codec_format_libsvgadrv;
+		goto err_svga_vdlck_libsvgadrv;
 	}
 	while (strcmp(driver->scd_name, csname) != 0) {
 		if unlikely(!driver->scd_probe) {
 			LOGERR("No driver matching active chipset %q\n", csname);
 			errno = ENODEV;
-			goto err_svga_vdlck_codec_format_libsvgadrv;
+			goto err_svga_vdlck_libsvgadrv;
 		}
 		++driver;
 	}
@@ -422,60 +341,125 @@ svga_newscreen(void) {
 		               driver->scd_cssize;
 		result = (REF struct svga_screen *)malloc(bufsz);
 		if unlikely(!result)
-			goto err_svga_vdlck_codec_format_libsvgadrv;
+			goto err_svga_vdlck_libsvgadrv;
 	}
 
 	/* Initialize the chipset for user-space. */
 	/* TODO: Add a second  function "driver->scd_open"  that's allowed to  assume that  the
-	 *       chipset is correct, meaning it won't have to probe for the driver's existance. */
+	 *       chipset is correct, meaning it won't have to probe for the driver's existence. */
 	bzero(&result->ss_cs.sc_modeops, sizeof(result->ss_cs.sc_modeops));
 	if (!(*driver->scd_probe)(&result->ss_cs)) {
 		LOGERR("Failed to init chipset %q\n", csname);
-		goto err_svga_vdlck_codec_format_libsvgadrv_r;
+		goto err_svga_vdlck_libsvgadrv_r;
+	}
+
+	/* Allocate buffer for video mode. */
+	mode = (struct svga_modeinfo *)malloca(result->ss_cs.sc_ops.sco_modeinfosize);
+	if unlikely(!mode) {
+		LOGERR("Failed to allocate mode buffer\n");
+		goto err_svga_vdlck_libsvgadrv_r_cs;
+	}
+
+	if (hint) {
+		/* Find video mode that matches "hint" the closest. */
+find_with_hint:
+		LOGERR("TODO: Mode hint\n");
+		goto err_svga_vdlck_libsvgadrv_r_cs;
+	} else {
+		/* Find video mode that is currently active. */
+		struct svga_csmode csmode;
+		bzero(&csmode, sizeof(csmode));
+		csmode.svcm_buf   = mode;
+		csmode.svcm_bufsz = result->ss_cs.sc_ops.sco_modeinfosize;
+		if unlikely(ioctl(vdlck.of_hint, SVGA_IOC_GETCSMODE, &csmode)) {
+			LOGERR("Failed to determine chipset mode\n");
+			goto err_svga_vdlck_libsvgadrv_r_cs_mode;
+		}
+		if unlikely(csmode.svcm_bufsz != result->ss_cs.sc_ops.sco_modeinfosize) {
+			LOGERR("chipset %q: kernel mode size %#" PRIxSIZ " differs from expected size %#" PRIxSIZ "\n",
+			       csname, csmode.svcm_bufsz, result->ss_cs.sc_ops.sco_modeinfosize);
+			goto err_svga_vdlck_libsvgadrv_r_cs_mode;
+		}
+
+		/* Deal with special case: video is in text-mode */
+		if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
+			_default_hint.sbh_resx = mode->smi_resx * 9;
+			_default_hint.sbh_resy = mode->smi_resy * 16;
+			_default_hint.sbh_bpp  = 8;
+			hint = &_default_hint;
+			goto find_with_hint;
+		}
+
+		/* Initialize CS mode operators as per the currently set mode. */
+		(*result->ss_cs.sc_ops.sco_setmode)(&result->ss_cs, mode); /* TODO: sco_curmode */
+	}
+
+	/* TODO: Support for "SVGA_MODEINFO_F_PLANAR" */
+
+	/* Convert the SVGA video mode into libvideo codec specs. */
+	svga_modeinfo_to_codec_specs(mode, &codec_specs);
+
+	/* Build a codec from the newly constructed specs. */
+	result->vb_format.vf_codec = video_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
+	if (!result->vb_format.vf_codec) {
+		LOGERR("No codec for SVGA video mode\n");
+		errno = ENODEV;
+		goto err_svga_vdlck_libsvgadrv_r_cs_mode;
+	}
+
+	/* If necessary, construct a palette controller for the codec, and populate
+	 * it with whatever is currently configured  by the chipset. In theory,  we
+	 * could also just come up with a  new palette here, but again: use  what's
+	 * already there, so another program can pre-configure it for us. */
+	result->vb_format.vf_pal = NULL;
+	if (result->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		shift_t cbits = result->vb_format.vf_codec->vc_specs.vcs_cbits;
+		result->vb_format.vf_pal = svga_palette_new(&result->ss_cs, cbits);
+		if unlikely(!result->vb_format.vf_pal) {
+			LOGERR("Failed to allocate palette controller: %m\n");
+			goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec;
+		}
 	}
 
 	/* Load physical memory mapping functions. */
 	result->ss_libphys = dlopen(LIBPHYS_LIBRARY_NAME, RTLD_LOCAL);
 	if unlikely(!result->ss_libphys) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs;
+		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal;
 	}
 	*(void **)&result->ss_libphys_map = dlsym(result->ss_libphys, "mmapphys");
 	if unlikely(!result->ss_libphys_map) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys;
 	}
 	*(void **)&result->ss_libphys_unmap = dlsym(result->ss_libphys, "munmapphys");
 	if unlikely(!result->ss_libphys_unmap) {
 		LOGERR("dlerror: %s\n", dlerror());
-		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys;
 	}
 
 	/* If the video mode doesn't provide a custom frame
 	 * buffer address, use the default VGA LFB address. */
-	if (!(mode.smi_flags & SVGA_MODEINFO_F_LFB))
-		mode.smi_lfb = (physaddr_t)0xA0000;
+	if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+		mode->smi_lfb = (physaddr_t)0xA0000;
 
 	/* Map screen memory into a physical buffer. */
-	result->vb_stride = mode.smi_scanline;
-	result->vb_total  = mode.smi_scanline * mode.smi_resy;
-	result->vb_data   = (byte_t *)(*result->ss_libphys_map)(mode.smi_lfb, result->vb_total);
+	result->vb_stride = mode->smi_scanline;
+	result->vb_total  = mode->smi_scanline * mode->smi_resy;
+	result->vb_data   = (byte_t *)(*result->ss_libphys_map)(mode->smi_lfb, result->vb_total);
 	if unlikely((void *)result->vb_data == MAP_FAILED) {
 		LOGERR("Failed to map LFB: %m\n");
-		goto err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys;
+		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys;
 	}
 
 	/* Fill in remaining fields of "result" */
-	result->vb_refcnt          = 1;
-	result->vb_ops             = &result->ss_ops.sbo_video;
-	result->vb_format.vf_codec = format.vf_codec;
-	result->vb_format.vf_pal   = format.vf_pal;
-	result->vb_size_x          = mode.smi_resx;
-	result->vb_size_y          = mode.smi_resy;
-	result->ss_codec_handle    = codec_handle;
-	result->ss_vdlck           = vdlck.of_hint;
-	result->ss_libsvgadrv      = libsvgadrv;
-	result->ss_drv             = driver;
+	result->vb_refcnt     = 1;
+	result->vb_ops        = &result->ss_ops.sbo_video;
+	result->vb_size_x     = mode->smi_resx;
+	result->vb_size_y     = mode->smi_resy;
+	result->ss_vdlck      = vdlck.of_hint;
+	result->ss_libsvgadrv = libsvgadrv;
+	result->ss_drv        = driver;
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
@@ -496,26 +480,31 @@ svga_newscreen(void) {
 		result->ss_ops.sbo_updaterects = &svga_screen_updaterects_noop;
 	}
 
+	/* Free our temporary mode buffer. */
+	freea(mode);
+
 	/* Close our handle to the SVGA base driver */
 	(void)close(svga);
 
 	/* And we're done! */
 	return result;
-/*err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys_data:
+/*err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys_data:
 	(*result->ss_libphys_unmap)(result->vb_data, result->vb_total);*/
-err_svga_vdlck_codec_format_libsvgadrv_r_cs_libphys:
+err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys:
 	(void)dlclose(result->ss_libphys);
-err_svga_vdlck_codec_format_libsvgadrv_r_cs:
+err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal:
+	if (result->vb_format.vf_pal)
+		video_palette_decref(result->vb_format.vf_pal);
+err_svga_vdlck_libsvgadrv_r_cs_mode_codec:
+	video_codec_handle_decref(result->ss_codec_handle);
+err_svga_vdlck_libsvgadrv_r_cs_mode:
+	freea(mode);
+err_svga_vdlck_libsvgadrv_r_cs:
 	(*result->ss_cs.sc_ops.sco_fini)(&result->ss_cs);
-err_svga_vdlck_codec_format_libsvgadrv_r:
+err_svga_vdlck_libsvgadrv_r:
 	free(result);
-err_svga_vdlck_codec_format_libsvgadrv:
+err_svga_vdlck_libsvgadrv:
 	(void)dlclose(libsvgadrv);
-err_svga_vdlck_codec_format:
-	if (format.vf_pal)
-		video_palette_decref(format.vf_pal);
-err_svga_vdlck_codec:
-	video_codec_handle_decref(codec_handle);
 err_svga_vdlck:
 	(void)close(vdlck.of_hint);
 err_svga:
@@ -529,11 +518,15 @@ err:
  * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
  * only  a single screen buffer can ever exist system-wide. If an attempt is made
  * to create a second screen buffer, this function will block until the first one
- * is destroyed, or the processing owning it exits. */
+ * is destroyed, or the processing owning it exits.
+ *
+ * @param: hint: Hint regarding the intended video resolution (or "NULL" to  just
+ *               use the same video mode as had already been set by whatever came
+ *               before us). */
 INTERN WUNUSED REF struct screen_buffer *CC
-libvideo_screen_buffer_create(void) {
+libvideo_screen_buffer_create(struct screen_buffer_hint *hint) {
 	/* XXX: Support for other video drivers would go here... */
-	return (REF struct screen_buffer *)svga_newscreen();
+	return (REF struct screen_buffer *)svga_newscreen(hint);
 }
 
 DEFINE_PUBLIC_ALIAS(screen_buffer_create, libvideo_screen_buffer_create);

@@ -58,9 +58,6 @@ struct bochs_regs {
 };
 
 struct bochs_chipset: svga_chipset {
-	uint16_t           bc_curresx;      /* [valid_if(WAS_CALLED(sco_setmode))] Current X resolution */
-	uint16_t           bc_curresy;      /* [valid_if(WAS_CALLED(sco_setmode))] Current Y resolution */
-	uint16_t           bc_curbpp;       /* [valid_if(WAS_CALLED(sco_setmode))] Current bpp */
 	uint16_t           bc_maxresx;      /* [const] Max supported X resolution */
 	uint16_t           bc_maxresy;      /* [const] Max supported Y resolution */
 	uint16_t           bc_maxbpp;       /* [const] Max supported bpp */

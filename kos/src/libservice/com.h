@@ -349,7 +349,7 @@ struct service_shm {
 	 * >>         // Ensure that at least 1 additional thread is also waiting for
 	 * >>         // more commands to arrive (or service commands that are still
 	 * >>         // within the pending queue)
-	 * >>         ENSURE_EXISTANCE_OF_MORE_SERVICE_THREADS();
+	 * >>         ENSURE_EXISTENCE_OF_MORE_SERVICE_THREADS();
 	 * >>         break;
 	 * >>     }
 	 * >>     return result;

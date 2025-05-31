@@ -91,8 +91,9 @@ __DECL_BEGIN
 #define SVGA_IOC_CSSTRINGS   _IOR_KOS('S', 0x05, struct svga_strings)  /* [   svga|tty|lck] Get chipset strings */
 #define SVGA_IOC_GETPAL_RGBX _IOR_KOS('S', 0x06, struct svga_palette)  /* [   svga|tty|lck] Get video palette (using `video_color_t' format) */
 #define SVGA_IOC_SETPAL_RGBX _IOW_KOS('S', 0x06, struct svga_palette)  /* [io:svga|tty|lck] Set video palette (using `video_color_t' format) */
-/*      SVGA_IOC_            _IO*_KOS('S', 0x07, ...)                   * ... */
+#define SVGA_IOC_GETCSMODE   _IOR_KOS('S', 0x07, struct svga_csmode)   /* [   svga|tty|lck] Get current video mode (including extra chipset fields) */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x08, ...)                   * ... */
+/*      SVGA_IOC_            _IO*_KOS('S', 0x09, ...)                   * ... */
 
 /* Misc tty functions. */
 #define SVGA_IOC_GETTTYINFO  VID_IOC_GETTTYINFO                        /* [   svga|tty    ] Get TTY information */
@@ -103,6 +104,15 @@ __DECL_BEGIN
 
 
 #ifdef __CC__
+struct svga_csmode {
+	__uint64_t                svcm_bufsz; /* [in]  Available buffer size
+	                                       * [out] Required buffer size */
+	union {
+		struct svga_modeinfo *svcm_buf;   /* [svcm_bufsz] Buffer for CS-specific mode info */
+		__uint64_t           _svcm_albuf; /* Align... */
+	};
+};
+
 struct svga_lsmodes {
 	__uint32_t                svl_offset; /* Start enumeration with the `svl_offset'th mode */
 	__uint32_t                svl_count;  /* [in]  max # of modes to enumerate.

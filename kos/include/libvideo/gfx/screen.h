@@ -121,19 +121,29 @@ public:
 #ifdef __cplusplus
 __CXXDECL_END
 #endif /* __cplusplus */
-#endif /* __CC__ */
 
 
-#ifdef __CC__
+struct screen_buffer_hint {
+	video_dim_t    sbh_resx;
+	video_dim_t    sbh_resy;
+	__SHIFT_TYPE__ sbh_bpp;
+};
+
 
 /* Creates+returns  a video buffer for the entire  screen (or return NULL and set
  * errno  on error). Note that screen buffer access requires `CAP_SYS_RAWIO', and
  * only  a single screen buffer can ever exist system-wide. If an attempt is made
  * to create a second screen buffer, this function will block until the first one
- * is destroyed, or the processing owning it exits. */
-typedef __ATTR_WUNUSED_T __REF struct screen_buffer *(LIBVIDEO_GFX_CC *PSCREEN_BUFFER_CREATE)(void);
+ * is destroyed, or the processing owning it exits.
+ *
+ * @param: hint: Hint regarding the intended video resolution (or "NULL" to  just
+ *               use the same video mode as had already been set by whatever came
+ *               before us). */
+typedef __ATTR_WUNUSED_T __REF struct screen_buffer *
+(LIBVIDEO_GFX_CC *PSCREEN_BUFFER_CREATE)(struct screen_buffer_hint *__hint);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct screen_buffer *LIBVIDEO_GFX_CC screen_buffer_create(void);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct screen_buffer *LIBVIDEO_GFX_CC
+screen_buffer_create(struct screen_buffer_hint *__hint);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 #endif /* __CC__ */

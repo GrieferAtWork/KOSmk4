@@ -39,6 +39,49 @@
 
 DECL_BEGIN
 
+PRIVATE NONNULL((1)) void
+NOTHROW(CC video_palette_destroy)(struct video_palette *__restrict self) {
+	free(self->vp_cache);
+	free(self);
+}
+
+
+
+/* Create a new (uninitialized) palette for `count' colors.
+ *
+ * This function is allowed to allocate a larger palette  than
+ * requested if doing  so improves  performances, though  when
+ * this is done, all additional palette entries will have been
+ * initialized to `0'
+ *
+ * On success, the caller must initialize:
+ * - return->vp_pal[0]
+ * - return->vp_pal[1]
+ * - ...
+ * - return->vp_pal[count - 2]
+ * - return->vp_pal[count - 1]
+ *
+ * @return: * :   The newly created palette
+ * @return: NULL: Out of memory */
+INTERN WUNUSED REF struct video_palette *CC
+libvideo_palette_create(size_t count) {
+	REF struct video_palette *result;
+	result = (REF struct video_palette *)malloc(offsetof(struct video_palette, vp_pal) +
+	                                            (count * sizeof(video_color_t)));
+	if unlikely(!result)
+		goto err;
+	result->vp_destroy = &video_palette_destroy;
+	result->vp_refcnt  = 1;
+	result->vp_cache   = NULL;
+	result->vp_cnt     = count;
+	/*result->vp_pal[...] = ...;*/ /* To-be initialized by the caller... */
+	return result;
+err:
+	return NULL;
+}
+
+
+
 LOCAL ATTR_CONST size_t CC
 diff(video_channel_t a, video_channel_t b) {
 	if (a > b) {
@@ -175,6 +218,7 @@ done:
 	return result;
 }
 
+DEFINE_PUBLIC_ALIAS(video_palette_create, libvideo_palette_create);
 DEFINE_PUBLIC_ALIAS(video_palette_getpixel, libvideo_palette_getpixel);
 
 DECL_END

@@ -77,19 +77,47 @@ DECL_BEGIN
 #endif /* !__KERNEL__ */
 
 
-#define vmware_fifo_handle_full(self) \
-	yield()
+PRIVATE void vmware_fifo_handle_full(struct vmware_chipset *__restrict self) {
+	printk(KERN_DEBUG "[vmware] FIFO is full; syncing...\n");
+	yield();
+	vm_setreg(self, SVGA_REG_SYNC, 1);
+	vm_getreg(self, SVGA_REG_BUSY);
+}
+
+
+/* Deviate from the reference impl and cache the  min/max
+ * values (whereas the ref impl re-reads them every time) */
+#undef VMWARE_USE_CACHED_MINMAX
+#define VMWARE_USE_CACHED_MINMAX
+
+#if 1 /* Extra logging for interactions with the FIFO */
+#define VMWARE_FIFO_TRACE_RESERVE(min, max, stop, next_cmd)                                        \
+	printk(KERN_DEBUG "[vmware] reserv: {min:%#I32x, max:%#I32x, stop:%#I32x, next_cmd:%#I32x}\n", \
+	       min, max, stop, next_cmd)
+#define VMWARE_FIFO_TRACE_COMMIT(min, max, next_cmd)                                  \
+	printk(KERN_DEBUG "[vmware] commit: {min:%#I32x, max:%#I32x, next_cmd:%#I32x}\n", \
+	       min, max, next_cmd)
+#else
+#define VMWARE_FIFO_TRACE_RESERVE(min, max, stop, next_cmd) (void)0
+#define VMWARE_FIFO_TRACE_COMMIT(min, max, next_cmd)        (void)0
+#endif
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *CC
 vmware_fifo_reserve(struct vmware_chipset *__restrict self, size_t n_bytes) {
 	/* Derived from reference impl of "SVGA_FIFOReserve" */
-	uint32_t max = self->vw_fifo_max;
+#ifdef VMWARE_USE_CACHED_MINMAX
 	uint32_t min = self->vw_fifo_min;
+	uint32_t max = self->vw_fifo_max;
+#else /* VMWARE_USE_CACHED_MINMAX */
+	uint32_t min = self->vm_fifo[SVGA_FIFO_MIN];
+	uint32_t max = self->vm_fifo[SVGA_FIFO_MAX];
+#endif /* !VMWARE_USE_CACHED_MINMAX */
 	uint32_t next_cmd = self->vm_fifo[SVGA_FIFO_NEXT_CMD];
 	assert((n_bytes & 3) == 0);
 	assert(n_bytes <= (VMWARE_MAX_FIFO_COMMAND_WORDS * 4));
 	for (;;) {
 		uint32_t stop = self->vm_fifo[SVGA_FIFO_STOP];
+		VMWARE_FIFO_TRACE_RESERVE(min, max, stop, next_cmd);
 		if (next_cmd >= stop) {
 			if (next_cmd + n_bytes < max ||
 			    (next_cmd + n_bytes == max && stop > min)) {
@@ -124,10 +152,16 @@ PRIVATE NONNULL((1)) void CC
 vmware_fifo_commit(struct vmware_chipset *__restrict self, size_t n_bytes) {
 	/* Derived from reference impl of "SVGA_FIFOCommit" */
 	uint32_t next_cmd = self->vm_fifo[SVGA_FIFO_NEXT_CMD];
-	uint32_t max = self->vw_fifo_max;
+#ifdef VMWARE_USE_CACHED_MINMAX
 	uint32_t min = self->vw_fifo_min;
+	uint32_t max = self->vw_fifo_max;
+#else /* VMWARE_USE_CACHED_MINMAX */
+	uint32_t min = self->vm_fifo[SVGA_FIFO_MIN];
+	uint32_t max = self->vm_fifo[SVGA_FIFO_MAX];
+#endif /* !VMWARE_USE_CACHED_MINMAX */
 	assert((n_bytes & 3) == 0);
 	assert(n_bytes <= (VMWARE_MAX_FIFO_COMMAND_WORDS * 4));
+	VMWARE_FIFO_TRACE_COMMIT(min, max, next_cmd);
 	if (self->vm_fifo_debounce_inuse) {
 		uint32_t *buffer = self->vm_fifo_debounce;
 		if (vm_fifo_hascap(self, SVGA_FIFO_CAP_RESERVE)) {
@@ -410,7 +444,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	/* Support for standard VGA modes. */
 	if (mode->vmi_modeid >= lengthof(vmware_videomodes)) {
 		vm_setreg(me, SVGA_REG_ENABLE, SVGA_REG_ENABLE_DISABLE);
-		vga_v_setmode(self, mode);
+		vga_v_setmode(me, mode);
 		me->vm_vga_mode = true;
 		return;
 	}
@@ -446,7 +480,7 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	/* Initialize the command FIFO */
 	me->vw_fifo_caps = SVGA_FIFO_CAP_NONE;
 	if (vm_svga_hascap(me, SVGA_CAP_EXTENDED_FIFO)) {
-		me->vm_fifo[SVGA_FIFO_MIN] = SVGA_FIFO_NUM_REGS;
+		me->vm_fifo[SVGA_FIFO_MIN] = SVGA_FIFO_NUM_REGS * 4;
 		me->vw_fifo_rfsz = me->vm_fifo[SVGA_FIFO_MIN];
 		me->vm_fifo[SVGA_FIFO_MAX]      = me->vw_fifosize;
 		me->vm_fifo[SVGA_FIFO_NEXT_CMD] = me->vw_fifo_min;
@@ -698,11 +732,6 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_getregs      = &vmware_v_getregs;
 		me->sc_ops.sco_setregs      = &vmware_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
-
-		/* FIXME: This here is needed  because "svga_newscreen" doesn't want  to
-		 *        set a new video mode, but expects this operator to be set when
-		 *        needed. */
-		me->sc_modeops.sco_updaterect = &vmware_v_updaterect;
 
 		/* Misc. runtime fields. */
 		me->vw_fifo_caps = 0;

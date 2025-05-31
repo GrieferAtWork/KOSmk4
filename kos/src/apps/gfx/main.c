@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
 
 	/* Bind the screen buffer. */
-	screen = kos::inherit(screen_buffer_create());
+	screen = kos::inherit(screen_buffer_create(NULL));
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->getgfx(gfx,

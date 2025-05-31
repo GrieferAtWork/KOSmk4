@@ -333,6 +333,16 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo const *__restrict mode);
 
+#if 0 /* TODO */
+	/* [1..1][const][lock(EXTERNAL)]
+	 * Same as "sco_setmode", but assume that the given "mode" is what is already
+	 * set in hardware. Chipsets  are allowed to simply  set this operator as  an
+	 * alias for "sco_setmode". */
+	__ATTR_NONNULL_T((1, 2)) void
+	(LIBSVGADRV_CC *sco_curmode)(struct svga_chipset *__restrict self,
+	                             struct svga_modeinfo const *__restrict mode);
+#endif
+
 	/* [1..1][const][lock(EXTERNAL)]
 	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
 	 * - These functions can be used  to save/restore the current video  mode
@@ -352,7 +362,7 @@ struct svga_chipset_ops {
 
 struct svga_chipset {
 	struct svga_chipset_ops     sc_ops;                /* [const] Chipset operators. */
-	struct svga_chipset_modeops sc_modeops;            /* [lock(EXTERNAL)] Mode-specific operators () */
+	struct svga_chipset_modeops sc_modeops;            /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode)] Mode-specific operators */
 	__size_t                    sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
 	__size_t                    sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
 	                                                    * Current display window for reads. */

@@ -93,6 +93,22 @@ svgadev_findmode(struct svgadev const *__restrict self,
 	      E_INVALID_ARGUMENT_CONTEXT_SVGA_INVALID_MODE);
 }
 
+PRIVATE NONNULL((1, 3)) syscall_slong_t KCALL
+svgadev_ioctl_getcsmode(struct svgadev *__restrict self,
+                        NCX UNCHECKED struct svga_csmode *udesc,
+                        struct svga_modeinfo const *cs_mode) {
+	struct svga_csmode desc;
+	validate_readwrite(udesc, sizeof(*udesc));
+	memcpy(&desc, udesc, sizeof(desc));
+	COMPILER_READ_BARRIER();
+	udesc->svcm_bufsz = self->svd_chipset.sc_ops.sco_modeinfosize;
+	COMPILER_WRITE_BARRIER();
+	validate_writable(desc.svcm_buf, desc.svcm_bufsz);
+	if (desc.svcm_bufsz >= self->svd_chipset.sc_ops.sco_modeinfosize)
+		memcpy(desc.svcm_buf, cs_mode, self->svd_chipset.sc_ops.sco_modeinfosize);
+	return 0;
+}
+
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgadev_ioctl_getdefmode(struct svgadev *__restrict self,
                          NCX UNCHECKED struct svga_modeinfo *modeinfo)
@@ -301,6 +317,17 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		}
 		memcpy(arg, mymode, sizeof(struct svga_modeinfo));
 		return 0;
+	}	break;
+
+	case SVGA_IOC_GETCSMODE: {
+		struct svga_modeinfo const *mymode = atomic_read(&me->slc_mode);
+		if (!mymode) {
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET);
+		}
+		return svgadev_ioctl_getcsmode(viddev_assvga(me->vlc_dev),
+		                               (NCX UNCHECKED struct svga_csmode *)arg,
+		                               mymode);
 	}	break;
 
 	case SVGA_IOC_SETMODE: {
@@ -579,6 +606,15 @@ svgatty_ioctl_getmode(struct svgatty *__restrict self,
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
+svgatty_ioctl_getcsmode(struct svgatty *__restrict self,
+                        NCX UNCHECKED struct svga_csmode *arg) {
+	REF struct svga_ttyaccess *tty;
+	tty = vidttyaccess_assvga(arref_get(&self->vty_tty));
+	FINALLY_DECREF_UNLIKELY(tty);
+	return svgadev_ioctl_getcsmode(viddev_assvga(self->vty_dev), arg, tty->sta_mode);
+}
+
+PRIVATE NONNULL((1)) syscall_slong_t KCALL
 svgatty_ioctl_setmode(struct svgatty *__restrict self,
                       NCX UNCHECKED struct svga_modeinfo const *modeinfo) {
 	REF struct svga_ttyaccess *newtty;
@@ -610,6 +646,8 @@ svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case SVGA_IOC_GETMODE:
 		return svgatty_ioctl_getmode(me, (NCX UNCHECKED struct svga_modeinfo *)arg);
+	case SVGA_IOC_GETCSMODE:
+		return svgatty_ioctl_getcsmode(me, (NCX UNCHECKED struct svga_csmode *)arg);
 	case SVGA_IOC_SETMODE:
 		return svgatty_ioctl_setmode(me, (NCX UNCHECKED struct svga_modeinfo const *)arg);
 	case SVGA_IOC_GETDEFMODE:
@@ -818,7 +856,8 @@ svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	switch (cmd) {
 
 	case SVGA_IOC_GETMODE:
-	case SVGA_IOC_SETMODE: {
+	case SVGA_IOC_SETMODE:
+	case SVGA_IOC_GETCSMODE: {
 		/* Forward  these ioctls to the currently "active" tty,
 		 * or the tty that will become active once a video lock
 		 * is released. */
