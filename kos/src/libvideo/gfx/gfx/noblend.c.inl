@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL
 #define GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include "../api.h"
 /**/
@@ -637,69 +638,13 @@ libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit *__restrict self,
 	                                   src_x, src_y, src_size_x, src_size_y, bm);
 }
 
-
-INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
-libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx) {
-	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
-	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
-	ctx->vb_ops = &libvideo_blit_generic_ops;
-	if (src_buffer == dst_buffer) {
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic_samebuf__stretch_n;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic_samebuf__bitstretch_n;
-	} else if (src_buffer->vb_format.vf_codec == dst_buffer->vb_format.vf_codec &&
-	           src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal &&
-	           (ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
-	           VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
-		/* Special optimization when not doing any blending, and both GFX contexts
-		 * share the same codec: in this case,  we can try to directly copy  pixel
-		 * data, either through video locks, or by directly reading/writing pixels */
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_noblend_samefmt__stretch_n;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_noblend_samefmt__bitstretch_n;
-	} else {
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic__stretch_n;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic__bitstretch_n;
-	}
-	return ctx;
-}
-
-INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
-libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx) {
-	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
-	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
-	ctx->vb_ops = &libvideo_blit_generic_ops;
-	if (src_buffer == dst_buffer) {
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic_samebuf__stretch_l;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic_samebuf__bitstretch_l;
-	} else if (src_buffer->vb_format.vf_codec == dst_buffer->vb_format.vf_codec &&
-	           src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal &&
-	           (ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
-	           VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
-		/* Special optimization when not doing any blending, and both GFX contexts
-		 * share the same codec: in this case,  we can try to directly copy  pixel
-		 * data, either through video locks, or by directly reading/writing pixels */
-#define libvideo_gfx_noblend_samefmt__stretch_l    libvideo_gfx_generic__stretch_l
-#define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_noblend_samefmt__stretch_l;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_noblend_samefmt__bitstretch_l;
-	} else {
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &libvideo_gfx_generic__stretch_l;
-		ctx->vb_xops.vbxo_bitstretch = &libvideo_gfx_generic__bitstretch_l;
-	}
-	return ctx;
-}
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_libvideo_gfx_noblend__blitfrom_n
+#include "noblend-blitfrom.c.inl"
+#define DEFINE_libvideo_gfx_noblend__blitfrom_l
+#include "noblend-blitfrom.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL */

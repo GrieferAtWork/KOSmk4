@@ -93,6 +93,8 @@ INTDEF NONNULL((1)) void CC libvideo_gfx_noblend_samefmt__blit(struct video_blit
 INTDEF NONNULL((1)) void CC libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF NONNULL((1, 8)) void CC libvideo_gfx_noblend_samefmt__bitblit(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
 INTDEF NONNULL((1, 10)) void CC libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+#define libvideo_gfx_noblend_samefmt__stretch_l    libvideo_gfx_generic__stretch_l
+#define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
 INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
 INTDEF ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
 
