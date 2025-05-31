@@ -102,231 +102,6 @@ libvideo_ramgfx__getcolor_noblend(struct video_gfx const *__restrict self,
 }
 
 INTERN NONNULL((1)) video_color_t CC
-libvideo_ramgfx__getcolor_blur(struct video_gfx const *__restrict self,
-                                   video_coord_t x, video_coord_t y) {
-	byte_t *line;
-	video_color_t result;
-	video_color_t colors[8];
-	video_twochannels_t r, g, b, a;
-	uint_fast8_t i, color_count;
-#define MODE_XMIN 0x1
-#define MODE_XMAX 0x2
-#define MODE_YMIN 0x4
-#define MODE_YMAX 0x8
-	uint_fast8_t mode = 0x0;
-	ASSERT_ABS_COORDS(self, x, y);
-	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	/* Figure out how we're situated in relation to bounds. */
-	if unlikely(x == self->vx_xmin)
-		mode |= MODE_XMIN;
-	if unlikely(y == self->vx_ymin)
-		mode |= MODE_YMIN;
-	if unlikely(x == self->vx_xend - 1)
-		mode |= MODE_XMAX;
-	if unlikely(y == self->vx_yend - 1)
-		mode |= MODE_YMAX;
-	/* Load colors as needed. */
-	switch (__builtin_expect(mode, 0x0)) {
-#define GETCOLOR(xoff, yoff) \
-		self->vx_buffer->vb_format.getcolor(line + (RAMGFX_STRIDE * (yoff)), x + (xoff))
-
-	case 0x0:
-		/* +++ */
-		/* +.+ */
-		/* +++ */
-		color_count = 8;
-		colors[0] = GETCOLOR(-1, -1);
-		colors[1] = GETCOLOR(0, -1);
-		colors[2] = GETCOLOR(1, -1);
-
-		colors[3] = GETCOLOR(-1, 0);
-		colors[4] = GETCOLOR(1, 0);
-
-		colors[5] = GETCOLOR(-1, 1);
-		colors[6] = GETCOLOR(0, 1);
-		colors[7] = GETCOLOR(1, 1);
-		break;
-
-	case MODE_XMIN:
-		/* -++ */
-		/* -.+ */
-		/* -++ */
-		color_count = 5;
-		colors[0] = GETCOLOR(0, -1);
-		colors[1] = GETCOLOR(1, -1);
-
-		colors[2] = GETCOLOR(1, 0);
-
-		colors[3] = GETCOLOR(0, 1);
-		colors[4] = GETCOLOR(1, 1);
-		break;
-
-	case MODE_XMAX:
-		/* ++- */
-		/* +.- */
-		/* ++- */
-		color_count = 5;
-		colors[0] = GETCOLOR(-1, -1);
-		colors[1] = GETCOLOR(0, -1);
-
-		colors[2] = GETCOLOR(-1, 0);
-
-		colors[3] = GETCOLOR(-1, 1);
-		colors[4] = GETCOLOR(0, 1);
-		break;
-
-	case MODE_YMIN:
-		/* --- */
-		/* +.+ */
-		/* +++ */
-		color_count = 5;
-		colors[0] = GETCOLOR(-1, 0);
-		colors[1] = GETCOLOR(1, 0);
-		colors[2] = GETCOLOR(-1, 1);
-		colors[3] = GETCOLOR(0, 1);
-		colors[4] = GETCOLOR(1, 1);
-		break;
-
-	case MODE_YMAX:
-		/* +++ */
-		/* +.+ */
-		/* --- */
-		color_count = 5;
-		colors[0] = GETCOLOR(-1, -1);
-		colors[1] = GETCOLOR(0, -1);
-		colors[2] = GETCOLOR(1, -1);
-		colors[3] = GETCOLOR(-1, 0);
-		colors[4] = GETCOLOR(1, 0);
-		break;
-
-	case MODE_YMIN | MODE_YMAX:
-		/* --- */
-		/* +.+ */
-		/* --- */
-		color_count = 2;
-		colors[0] = GETCOLOR(-1, 0);
-		colors[1] = GETCOLOR(1, 0);
-		break;
-
-	case MODE_XMIN | MODE_XMAX:
-		/* -+- */
-		/* -.- */
-		/* -+- */
-		color_count = 2;
-		colors[0] = GETCOLOR(0, -1);
-		colors[1] = GETCOLOR(0, 1);
-		break;
-
-	case MODE_YMIN | MODE_XMIN:
-		/* --- */
-		/* -.+ */
-		/* -++ */
-		color_count = 3;
-		colors[0] = GETCOLOR(1, 0);
-		colors[1] = GETCOLOR(0, 1);
-		colors[2] = GETCOLOR(1, 1);
-		break;
-
-	case MODE_YMIN | MODE_XMAX:
-		/* --- */
-		/* +.- */
-		/* ++- */
-		color_count = 3;
-		colors[0] = GETCOLOR(-1, 0);
-		colors[1] = GETCOLOR(-1, 1);
-		colors[2] = GETCOLOR(0, 1);
-		break;
-
-	case MODE_YMAX | MODE_XMIN:
-		/* -++ */
-		/* -.+ */
-		/* --- */
-		color_count = 3;
-		colors[0] = GETCOLOR(0, -1);
-		colors[1] = GETCOLOR(1, -1);
-		colors[2] = GETCOLOR(1, 0);
-		break;
-
-	case MODE_YMAX | MODE_XMAX:
-		/* ++- */
-		/* +.- */
-		/* --- */
-		color_count = 3;
-		colors[0] = GETCOLOR(-1, -1);
-		colors[1] = GETCOLOR(0, -1);
-		colors[2] = GETCOLOR(-1, 0);
-		break;
-
-	case MODE_XMIN | MODE_XMAX | MODE_YMIN:
-		/* --- */
-		/* -.- */
-		/* -+- */
-		color_count = 1;
-		colors[0] = GETCOLOR(0, 1);
-		break;
-
-	case MODE_XMIN | MODE_XMAX | MODE_YMAX:
-		/* -+- */
-		/* -.- */
-		/* --- */
-		color_count = 1;
-		colors[0] = GETCOLOR(0, -1);
-		break;
-
-	case MODE_YMIN | MODE_YMAX | MODE_XMIN:
-		/* --- */
-		/* -.+ */
-		/* --- */
-		color_count = 1;
-		colors[0] = GETCOLOR(1, 0);
-		break;
-
-	case MODE_YMIN | MODE_YMAX | MODE_XMAX:
-		/* --- */
-		/* +.- */
-		/* --- */
-		color_count = 1;
-		colors[0] = GETCOLOR(-1, 0);
-		break;
-
-	case MODE_XMIN | MODE_YMIN | MODE_XMAX | MODE_YMAX:
-		/* --- */
-		/* -.- */
-		/* --- */
-		color_count = 0;
-		break;
-
-#undef GETCOLOR
-	default: __builtin_unreachable();
-	}
-#undef MODE_XMIN
-#undef MODE_XMAX
-#undef MODE_YMIN
-#undef MODE_YMAX
-	result = self->vx_buffer->vb_format.getcolor(line, x);
-	r = VIDEO_COLOR_GET_RED(result);
-	g = VIDEO_COLOR_GET_GREEN(result);
-	b = VIDEO_COLOR_GET_BLUE(result);
-	a = VIDEO_COLOR_GET_ALPHA(result);
-	for (i = 0; i < color_count; ++i) {
-		r += VIDEO_COLOR_GET_RED(colors[i]);
-		g += VIDEO_COLOR_GET_GREEN(colors[i]);
-		b += VIDEO_COLOR_GET_BLUE(colors[i]);
-		a += VIDEO_COLOR_GET_ALPHA(colors[i]);
-	}
-	++color_count;
-	r /= color_count;
-	g /= color_count;
-	b /= color_count;
-	a /= color_count;
-	result = VIDEO_COLOR_RGBA((video_channel_t)r,
-	                          (video_channel_t)g,
-	                          (video_channel_t)b,
-	                          (video_channel_t)a);
-	return result;
-}
-
-INTERN NONNULL((1)) video_color_t CC
 libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self,
                                        video_coord_t x, video_coord_t y) {
 	byte_t *line;
@@ -524,34 +299,6 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	result->vx_xend   = me->vb_size_x;
 	result->vx_yend   = me->vb_size_y;
 
-	/* Load generic operator defaults (overwritten as appropriate below) */
-	libvideo_gfx_populate_generic(result);
-
-	/* Select how colors should be read. */
-	if (flags & VIDEO_GFX_FBLUR) {
-		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_blur;
-	} else if (!VIDEO_COLOR_ISTRANSPARENT(colorkey)) {
-		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_with_key;
-	} else {
-		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
-	}
-
-	/* Detect special blend modes. */
-	if (blendmode == GFX_BLENDINFO_OVERRIDE) {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
-	} else if (blendmode == GFX_BLENDINFO_ALPHA) {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_alphablend;
-	} else if (GFX_BLENDINFO_GET_SRCRGB(blendmode) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_SRCA(blendmode) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_DSTRGB(blendmode) == GFX_BLENDMODE_ZERO &&
-	           GFX_BLENDINFO_GET_DSTA(blendmode) == GFX_BLENDMODE_ZERO &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
-	} else {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
-	}
-
 	/* Default pixel accessors */
 	result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel;
 	result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel;
@@ -578,6 +325,42 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	default: break;
 	}
 #endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
+
+	/* Load generic operator defaults (overwritten as appropriate below) */
+	libvideo_gfx_populate_generic(result);
+
+	/* Select how colors should be read. */
+	if (flags & VIDEO_GFX_FBLUR) {
+		result->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+	} else if (!VIDEO_COLOR_ISTRANSPARENT(colorkey)) {
+		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_with_key;
+	} else {
+		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
+	}
+
+	/* Detect special blend modes. */
+	if (blendmode == GFX_BLENDINFO_OVERRIDE) {
+		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+	} else if (blendmode == GFX_BLENDINFO_ALPHA) {
+		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_alphablend;
+	} else if (GFX_BLENDINFO_GET_SRCRGB(blendmode) == GFX_BLENDMODE_ONE &&
+	           GFX_BLENDINFO_GET_SRCA(blendmode) == GFX_BLENDMODE_ONE &&
+	           GFX_BLENDINFO_GET_DSTRGB(blendmode) == GFX_BLENDMODE_ZERO &&
+	           GFX_BLENDINFO_GET_DSTA(blendmode) == GFX_BLENDMODE_ZERO &&
+	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
+	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
+		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+	} else {
+		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
+	}
+
+	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+	if (self->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+		if (result->vx_xops.vgxo_getcolor == &libvideo_ramgfx__getcolor_noblend)
+			result->vx_xops.vgxo_getcolor = result->vx_xops.vgxo_getpixel;
+		if (result->vx_xops.vgxo_putcolor == &libvideo_ramgfx__putcolor_noblend)
+			result->vx_xops.vgxo_putcolor = result->vx_xops.vgxo_setpixel;
+	}
 	/* ... */
 
 	return result;
@@ -588,8 +371,10 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
 	self->vx_colorkey = 0;
 	libvideo_gfx_populate_noblend(self);
-	self->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
-	self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+	if (self->vx_xops.vgxo_getcolor != self->vx_xops.vgxo_getpixel)
+		self->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
+	if (self->vx_xops.vgxo_putcolor != self->vx_xops.vgxo_setpixel)
+		self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
 	return self;
 }
 

@@ -136,9 +136,12 @@ _blendinfo__is_add_or_subtract_or_max(unsigned int func) {
  * with generic impls.
  *
  * The caller must have already initialized:
+ * - self->vx_xops.vgxo_getpixel
+ * - self->vx_xops.vgxo_setpixel
  * - self->vx_flags
  * - self->vx_colorkey
  * - self->vx_blend
+ * - self->vx_buffer
  */
 LOCAL NONNULL((1)) void CC
 libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
@@ -207,13 +210,23 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 			self->vx_xops.vgxo_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
 		}
 	}
+
+	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+		if (self->vx_xops.vgxo_getcolor == &libvideo_gfx_generic__getcolor_noblend)
+			self->vx_xops.vgxo_getcolor = self->vx_xops.vgxo_getpixel;
+		if (self->vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend)
+			self->vx_xops.vgxo_putcolor = self->vx_xops.vgxo_setpixel;
+	}
 }
 
 /* Same as `libvideo_gfx_populate_generic()', but load non-blending defaults */
 LOCAL NONNULL((1)) void CC
 libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
-	self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
-	self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+	if (self->vx_xops.vgxo_getcolor != self->vx_xops.vgxo_getpixel)
+		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+	if (self->vx_xops.vgxo_putcolor != self->vx_xops.vgxo_setpixel)
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
 	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
 		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
 		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;

@@ -48,7 +48,7 @@
 #define VIDEO_CODEC_GRAY256    0x1007 /* 8-bit-per-pixel, 256-color grayscale (0=black; 255=white) */
 
 /* Full-color */
-#define VIDEO_CODEC_RGBA8888   0x2001
+#define VIDEO_CODEC_RGBA8888   0x2001 /* Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
 #define VIDEO_CODEC_RGBX8888   0x2002
 #define VIDEO_CODEC_ARGB8888   0x2003
 #define VIDEO_CODEC_XRGB8888   0x2004
