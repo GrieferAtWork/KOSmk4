@@ -494,12 +494,16 @@ cs_bochs_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_getregs      = &bochs_v_getregs;
 		me->sc_ops.sco_setregs      = &bochs_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof(struct bochs_regs);
-		self->sc_ops.sco_getpal     = &cs_basevga_rdpal;
-		self->sc_ops.sco_setpal     = &cs_basevga_wrpal;
+
+		me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
+		me->sc_modeops.sco_setpal = &cs_basevga_wrpal;
 #ifdef SVGA_HAVE_HW_SCROLL
-		me->sc_ops.sco_setdisplaystart = &bochs_v_setdisplaystart;
-		me->sc_ops.sco_setlogicalwidth = &bochs_v_setlogicalwidth;
-		me->sc_logicalwidth_max        = me->bc_maxresx;
+		me->sc_modeops.sco_setdisplaystart = &bochs_v_setdisplaystart;
+		me->sc_modeops.sco_setlogicalwidth = &bochs_v_setlogicalwidth;
+		me->sc_logicalwidth_max            = me->bc_maxresx;
+#endif /* SVGA_HAVE_HW_SCROLL */
+#ifdef SVGA_HAVE_HW_SCROLL
+		me->sc_logicalwidth_max = me->bc_maxresx;
 #endif /* SVGA_HAVE_HW_SCROLL */
 		return true;
 	}

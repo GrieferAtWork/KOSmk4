@@ -141,7 +141,7 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
 			return;
 	}
 	svga_screen_cs_acquire(me);
-	(*me->ss_cs.sc_ops.sco_updaterect)(&me->ss_cs, &cs_rect);
+	(*me->ss_cs.sc_modeops.sco_updaterect)(&me->ss_cs, &cs_rect);
 	svga_screen_cs_release(me);
 }
 
@@ -428,12 +428,7 @@ svga_newscreen(void) {
 	/* Initialize the chipset for user-space. */
 	/* TODO: Add a second  function "driver->scd_open"  that's allowed to  assume that  the
 	 *       chipset is correct, meaning it won't have to probe for the driver's existance. */
-	result->ss_cs.sc_ops.sco_setdisplaystart   = NULL;
-	result->ss_cs.sc_ops.sco_setlogicalwidth   = NULL;
-	result->ss_cs.sc_ops.sco_updaterect        = NULL;
-	result->ss_cs.sc_ops.sco_hw_async_waitfor  = NULL;
-	result->ss_cs.sc_ops.sco_hw_async_copyrect = NULL;
-	result->ss_cs.sc_ops.sco_hw_async_fillrect = NULL;
+	bzero(&result->ss_cs.sc_modeops, sizeof(result->ss_cs.sc_modeops));
 	if (!(*driver->scd_probe)(&result->ss_cs)) {
 		LOGERR("Failed to init chipset %q\n", csname);
 		goto err_svga_vdlck_codec_format_libsvgadrv_r;
@@ -477,10 +472,10 @@ svga_newscreen(void) {
 	result->vb_format.vf_pal   = format.vf_pal;
 	result->vb_size_x          = mode.smi_resx;
 	result->vb_size_y          = mode.smi_resy;
-	result->ss_codec_handle   = codec_handle;
-	result->ss_vdlck          = vdlck.of_hint;
-	result->ss_libsvgadrv     = libsvgadrv;
-	result->ss_drv            = driver;
+	result->ss_codec_handle    = codec_handle;
+	result->ss_vdlck           = vdlck.of_hint;
+	result->ss_libsvgadrv      = libsvgadrv;
+	result->ss_drv             = driver;
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
@@ -493,7 +488,7 @@ svga_newscreen(void) {
 	shared_lock_init(&result->ss_cslock);
 
 	/* Define the updaterects operators if needed by the chipset */
-	if (result->ss_cs.sc_ops.sco_updaterect) {
+	if (result->ss_cs.sc_modeops.sco_updaterect) { /* FIXME: "sc_modeops" is only supposed to be valid after a mode was set! */
 		result->ss_ops.sbo_updaterect  = &svga_screen_updaterect_cs;
 		result->ss_ops.sbo_updaterects = &svga_screen_updaterects_cs;
 	} else {

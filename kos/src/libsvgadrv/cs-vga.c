@@ -368,26 +368,29 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
 
 	/* Define mode-specific operators. */
+	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
+	me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
+	me->sc_modeops.sco_setpal = &cs_basevga_wrpal;
 #ifdef SVGA_HAVE_HW_SCROLL
 	switch (mode->smi_bits_per_pixel) {
-	case 1: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_16; break;
-	case 2: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_256; break;
-	case 8: me->sc_ops.sco_setdisplaystart = &vga_v_setdisplaystart_linear; break;
+	case 1: me->sc_modeops.sco_setdisplaystart = &vga_v_setdisplaystart_16; break;
+	case 2: me->sc_modeops.sco_setdisplaystart = &vga_v_setdisplaystart_256; break;
+	case 8: me->sc_modeops.sco_setdisplaystart = &vga_v_setdisplaystart_linear; break;
 	case 16: break; /* Text-mode. */
 	default: __builtin_unreachable();
 	}
-	self->sc_ops.sco_setlogicalwidth = &vga_v_setlogicalwidth;
+	me->sc_modeops.sco_setlogicalwidth = &vga_v_setlogicalwidth;
 	me->sc_displaystart = 0;
 	me->sc_logicalwidth = 0;
 #endif /* SVGA_HAVE_HW_SCROLL */
 
 	/* NOTE: We don't define the setwindow operators because
 	 *       standard EGA/VGA don't  have multiple  windows! */
-	self->sc_rdwindow = 0;
-	self->sc_wrwindow = 0;
+	me->sc_rdwindow = 0;
+	me->sc_wrwindow = 0;
 #ifdef SVGA_HAVE_HW_SCROLL
-	self->sc_logicalwidth_max   = 2040; /* s.a. `vga_v_setlogicalwidth' */
-	self->sc_logicalwidth_align = 8;    /* s.a. `vga_v_setlogicalwidth' */
+	me->sc_logicalwidth_max   = 2040; /* s.a. `vga_v_setlogicalwidth' */
+	me->sc_logicalwidth_align = 8;    /* s.a. `vga_v_setlogicalwidth' */
 #endif /* SVGA_HAVE_HW_SCROLL */
 }
 
@@ -407,10 +410,12 @@ ega_v_setmode(struct svga_chipset *__restrict self,
 	vga_setmode_common(me, &vga_modelist[modeid].vkm_regs);
 
 	/* Define mode-specific operators. */
+	self->sc_modeops.sco_getpal = &cs_basevga_rdpal;
+	self->sc_modeops.sco_setpal = &cs_basevga_wrpal;
 #ifdef SVGA_HAVE_HW_SCROLL
-	me->sc_ops.sco_setdisplaystart = &ega_v_setdisplaystart;
-	me->sc_displaystart            = 0;
-	me->sc_logicalwidth            = 0;
+	me->sc_modeops.sco_setdisplaystart = &ega_v_setdisplaystart;
+	me->sc_displaystart = 0;
+	me->sc_logicalwidth = 0;
 #endif /* SVGA_HAVE_HW_SCROLL */
 }
 
@@ -421,7 +426,6 @@ ega_v_setmode(struct svga_chipset *__restrict self,
  * @return: false: Chipset isn't present. */
 INTERN WUNUSED NONNULL((1)) bool CC
 cs_vga_probe(struct svga_chipset *__restrict self) {
-
 	/* Initialize the VGA chipset controller. */
 	self->sc_ops.sco_fini = &vga_v_fini;
 
@@ -439,8 +443,6 @@ cs_vga_probe(struct svga_chipset *__restrict self) {
 	self->sc_ops.sco_getregs      = &vga_v_getregs;
 	self->sc_ops.sco_setregs      = &vga_v_setregs;
 	self->sc_ops.sco_regsize      = 0;
-	self->sc_ops.sco_getpal       = &cs_basevga_rdpal;
-	self->sc_ops.sco_setpal       = &cs_basevga_wrpal;
 	return true;
 }
 

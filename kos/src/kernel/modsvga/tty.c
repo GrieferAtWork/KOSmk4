@@ -431,11 +431,173 @@ NOTHROW(FCALL svga_ttyaccess_gfx_font_getglyph)(struct svga_ttyaccess_gfx *__res
 	return basevga_defaultfont[basevga_defaultfont_encode(ch)];
 }
 
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updaterect_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
+                                                       struct svga_ttyrect const *__restrict rect) {
+	struct svga_rect hw_rect;
+	hw_rect.svr_x = rect->sttr_x * 9;
+	hw_rect.svr_y = rect->sttr_y * 16;
+	hw_rect.svr_w = rect->sttr_w * 9;
+	hw_rect.svr_h = rect->sttr_h * 16;
+	(*self->stx_chipset->sc_modeops.sco_updaterect)(self->stx_chipset, &hw_rect);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updateline_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
+                                                       uintptr_t address, size_t num_cells) {
+	uintptr_t end;
+	uintptr_half_t start_x, end_x;
+	uintptr_half_t start_y, end_y;
+	struct svga_ttyrect rect;
+	start_x = address % self->vta_scan;
+	start_y = address / self->vta_scan;
+	end     = address + num_cells;
+	end_x   = end % self->vta_scan;
+	end_y   = end / self->vta_scan;
+	if (end_x == 0) {
+		--end_y;
+		end_x = self->vta_resx;
+	}
+	if (start_y == end_y) {
+		/* Simple case: everything is in 1 row. */
+		rect.sttr_x = start_x;
+		rect.sttr_y = start_y;
+		rect.sttr_w = end_x - start_x;
+		rect.sttr_h = 1;
+		(*self->stx_hw_updaterect)(self, &rect);
+	} else if (start_x == 0 && end_x == self->vta_resx) {
+		/* Simple case: updating whole lines from start-to-end */
+		rect.sttr_x = 0;
+		rect.sttr_y  = start_y;
+		rect.sttr_w = end_x;
+		rect.sttr_h = (end_y - start_y) + 1;
+		(*self->stx_hw_updaterect)(self, &rect);
+	} else {
+		/* Complicated case:
+		 * ......................XXXXXXXX
+		 * XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		 * XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		 * XXXXXX........................
+		 */
+		if (start_x != 0) {
+			rect.sttr_x = start_x;
+			rect.sttr_y = start_y;
+			rect.sttr_w = self->vta_resx - start_x;
+			rect.sttr_h = 1;
+			(*self->stx_hw_updaterect)(self, &rect);
+			start_x = 0;
+			++start_y;
+		}
+
+		if (end_x != self->vta_resx) {
+			rect.sttr_x = 0;
+			rect.sttr_y = end_y;
+			rect.sttr_w = end_x;
+			rect.sttr_h = 1;
+			(*self->stx_hw_updaterect)(self, &rect);
+			--end_y;
+			end_x = self->vta_resx;
+		}
+
+		if (start_y <= end_y) {
+			rect.sttr_x = 0;
+			rect.sttr_y = start_y;
+			rect.sttr_w = self->vta_resx;
+			rect.sttr_h = (end_y - start_y) + 1;
+			(*self->stx_hw_updaterect)(self, &rect);
+		}
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updatecell_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
+                                                       uintptr_t address) {
+	struct svga_rect hw_rect;
+	hw_rect.svr_x = address % self->vta_scan;
+	hw_rect.svr_y = address / self->vta_scan;
+	hw_rect.svr_x *= 9;
+	hw_rect.svr_y *= 16;
+	hw_rect.svr_w = 9;
+	hw_rect.svr_h = 16;
+	(*self->stx_chipset->sc_modeops.sco_updaterect)(self->stx_chipset, &hw_rect);
+}
+
+INTERN NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updaterect_noop)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   struct svga_ttyrect const *__restrict rect) {
+	(void)self;
+	(void)rect;
+	COMPILER_IMPURE();
+}
+
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updateline_noop)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   uintptr_t address, size_t num_cells) {
+	(void)self;
+	(void)address;
+	(void)num_cells;
+	COMPILER_IMPURE();
+}
+
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_hw_updatecell_noop)(struct svga_ttyaccess_gfx *__restrict self,
+                                                   uintptr_t address)
+		ASMNAME("svga_ttyaccess_v_hw_updaterect_noop");
+
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+PRIVATE NONNULL((1)) void
+NOTHROW(LIBSVGADRV_CC svga_v_hw_async_waitfor_noop)(struct svga_chipset *__restrict self) {
+	(void)self;
+	COMPILER_IMPURE();
+}
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_activate_gfx)(struct vidttyaccess *__restrict self) {
 	/* Redraw the entire screen after reactivation. */
 	struct svga_ttyrect rect;
 	struct svga_ttyaccess_gfx *me = vidttyaccess_assvga_gfx(self);
+	struct svga_chipset *cs = me->stx_chipset;
+
+	/* Optimize hardware render operators: if no HW render is
+	 * supported, then we'll never  need any HW waitfor  ops! */
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+	if (true &&
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+	    cs->sc_modeops.sco_hw_async_copyrect == NULL &&
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+	    cs->sc_modeops.sco_hw_async_fillrect == NULL &&
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+	    true)
+		cs->sc_modeops.sco_hw_async_waitfor = NULL;
+
+	/* Substitute a no-op HW render waitfor operator. */
+	if (cs->sc_modeops.sco_hw_async_waitfor == NULL)
+		cs->sc_modeops.sco_hw_async_waitfor = &svga_v_hw_async_waitfor_noop;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+	/* Fill in HW update operators (if required by the chipset)
+	 *
+	 * NOTE: These are all marked as only being valid when  "VIDTTYACCESS_F_ACTIVE"
+	 *       is set. As such,  it is perfectly  OK for us  to only initialize  them
+	 *       here, rather than having to do so when the TTY was originally created. */
+	if (cs->sc_modeops.sco_updaterect) {
+		me->stx_hw_updatecell = &svga_ttyaccess_v_hw_updatecell_gfx_9_16;
+		me->stx_hw_updateline = &svga_ttyaccess_v_hw_updateline_gfx_9_16;
+		me->stx_hw_updaterect = &svga_ttyaccess_v_hw_updaterect_gfx_9_16;
+	} else {
+		me->stx_hw_updatecell = &svga_ttyaccess_v_hw_updatecell_noop;
+		me->stx_hw_updateline = &svga_ttyaccess_v_hw_updateline_noop;
+		me->stx_hw_updaterect = &svga_ttyaccess_v_hw_updaterect_noop;
+	}
+
+	/* If available, use hardware-acceleration to draw the cursor overlay. */
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+//	if (cs->svd_chipset.sc_ops.sco_hw_async_fillrect)
+//		me->stx_redraw_cursor = &svga_ttyaccess_v_redraw_cursor_hwgfx; /* TODO */
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+
 	svga_makettyaccess_redraw_cells_gfx(me, 0, me->vta_resx * me->vta_resy);
 
 	/* Perform HW update */
@@ -544,7 +706,7 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 		 * we can use hardware acceleration (e.g. SVGA's SVGA_CMD_RECT_FILL) to do
 		 * the fill for us. */
 #ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-		if (me->stx_chipset->sc_ops.sco_hw_async_fillrect &&
+		if (me->stx_chipset->sc_modeops.sco_hw_async_fillrect &&
 		    num_cells > 32) { /* Random threshold so we don't do this for small fills */
 			/* Rect-fill for ' ' and '█' */
 			uint8_t line0 = src->sgc_lines[0];
@@ -575,11 +737,11 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 			color_index = line0 ? ((src->sgc_color & 0x0f))
 				                : ((src->sgc_color & 0xf0) >> 4);
 			color = me->stx_colors[color_index];
-#define FILL_RECT(p_rect, color)                                                                  \
-			do {                                                                                  \
-				(*me->stx_chipset->sc_ops.sco_hw_async_fillrect)(me->stx_chipset, p_rect, color); \
-				if (me->stx_chipset->sc_ops.sco_updaterect)                                       \
-					(*me->stx_chipset->sc_ops.sco_updaterect)(me->stx_chipset, p_rect);           \
+#define FILL_RECT(p_rect, color)                                                                      \
+			do {                                                                                      \
+				(*me->stx_chipset->sc_modeops.sco_hw_async_fillrect)(me->stx_chipset, p_rect, color); \
+				if (me->stx_chipset->sc_modeops.sco_updaterect)                                       \
+					(*me->stx_chipset->sc_modeops.sco_updaterect)(me->stx_chipset, p_rect);           \
 			}	__WHILE0
 
 			if (src_x1 > 0) {
@@ -631,7 +793,7 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_gfx)(struct vidttyaccess *__restrict sel
 		 * we can use hardware acceleration (e.g. SVGA's SVGA_CMD_RECT_COPY)
 		 * to do the move for us! */
 #ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
-		if (me->stx_chipset->sc_ops.sco_hw_async_copyrect) {
+		if (me->stx_chipset->sc_modeops.sco_hw_async_copyrect) {
 			uintptr_t end_from_cellid = from_cellid + num_cells;
 			uintptr_t end_to_cellid   = to_cellid + num_cells;
 			uintptr_half_t src_x1 = from_cellid % self->vta_resx;
@@ -681,9 +843,9 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_gfx)(struct vidttyaccess *__restrict sel
 				rect.svcr_w  = (src_x2 - src_x1) * 9;
 				rect.svcr_h  = ((src_y2 - src_y1) + 1) * 16;
 
-				(*me->stx_chipset->sc_ops.sco_hw_async_copyrect)(me->stx_chipset, &rect);
-				if (me->stx_chipset->sc_ops.sco_updaterect)
-					(*me->stx_chipset->sc_ops.sco_updaterect)(me->stx_chipset, &rect.svcr_dest);
+				(*me->stx_chipset->sc_modeops.sco_hw_async_copyrect)(me->stx_chipset, &rect);
+				if (me->stx_chipset->sc_modeops.sco_updaterect)
+					(*me->stx_chipset->sc_modeops.sco_updaterect)(me->stx_chipset, &rect.svcr_dest);
 				if (must_hide_cusor) {
 					svga_ttyaccess_gfx_hw_async_waitfor(me); /* TODO: Not needed if `svga_ttyaccess_v_redraw_cursor_hwgfx' is used */
 					(*me->stx_redraw_cursor)(me);
@@ -768,121 +930,6 @@ NOTHROW(FCALL svga_ttyaccess_v_setcelldata_gfx)(struct vidttyaccess *__restrict 
 }
 
 
-PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updaterect_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
-                                                       struct svga_ttyrect const *__restrict rect) {
-	struct svga_rect hw_rect;
-	hw_rect.svr_x = rect->sttr_x * 9;
-	hw_rect.svr_y = rect->sttr_y * 16;
-	hw_rect.svr_w = rect->sttr_w * 9;
-	hw_rect.svr_h = rect->sttr_h * 16;
-	(*self->stx_chipset->sc_ops.sco_updaterect)(self->stx_chipset, &hw_rect);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updateline_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
-                                                       uintptr_t address, size_t num_cells) {
-	uintptr_t end;
-	uintptr_half_t start_x, end_x;
-	uintptr_half_t start_y, end_y;
-	struct svga_ttyrect rect;
-	start_x = address % self->vta_scan;
-	start_y = address / self->vta_scan;
-	end     = address + num_cells;
-	end_x   = end % self->vta_scan;
-	end_y   = end / self->vta_scan;
-	if (end_x == 0) {
-		--end_y;
-		end_x = self->vta_resx;
-	}
-	if (start_y == end_y) {
-		/* Simple case: everything is in 1 row. */
-		rect.sttr_x = start_x;
-		rect.sttr_y = start_y;
-		rect.sttr_w = end_x - start_x;
-		rect.sttr_h = 1;
-		(*self->stx_hw_updaterect)(self, &rect);
-	} else if (start_x == 0 && end_x == self->vta_resx) {
-		/* Simple case: updating whole lines from start-to-end */
-		rect.sttr_x = 0;
-		rect.sttr_y  = start_y;
-		rect.sttr_w = end_x;
-		rect.sttr_h = (end_y - start_y) + 1;
-		(*self->stx_hw_updaterect)(self, &rect);
-	} else {
-		/* Complicated case:
-		 * ......................XXXXXXXX
-		 * XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		 * XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		 * XXXXXX........................
-		 */
-		if (start_x != 0) {
-			rect.sttr_x = start_x;
-			rect.sttr_y = start_y;
-			rect.sttr_w = self->vta_resx - start_x;
-			rect.sttr_h = 1;
-			(*self->stx_hw_updaterect)(self, &rect);
-			start_x = 0;
-			++start_y;
-		}
-
-		if (end_x != self->vta_resx) {
-			rect.sttr_x = 0;
-			rect.sttr_y = end_y;
-			rect.sttr_w = end_x;
-			rect.sttr_h = 1;
-			(*self->stx_hw_updaterect)(self, &rect);
-			--end_y;
-			end_x = self->vta_resx;
-		}
-
-		if (start_y <= end_y) {
-			rect.sttr_x = 0;
-			rect.sttr_y = start_y;
-			rect.sttr_w = self->vta_resx;
-			rect.sttr_h = (end_y - start_y) + 1;
-			(*self->stx_hw_updaterect)(self, &rect);
-		}
-	}
-}
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updatecell_gfx_9_16)(struct svga_ttyaccess_gfx *__restrict self,
-                                                       uintptr_t address) {
-	struct svga_rect hw_rect;
-	hw_rect.svr_x = address % self->vta_scan;
-	hw_rect.svr_y = address / self->vta_scan;
-	hw_rect.svr_x *= 9;
-	hw_rect.svr_y *= 16;
-	hw_rect.svr_w = 9;
-	hw_rect.svr_h = 16;
-	(*self->stx_chipset->sc_ops.sco_updaterect)(self->stx_chipset, &hw_rect);
-}
-
-INTERN NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updaterect_noop)(struct svga_ttyaccess_gfx *__restrict self,
-                                                   struct svga_ttyrect const *__restrict rect) {
-	(void)self;
-	(void)rect;
-	COMPILER_IMPURE();
-}
-
-INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updateline_noop)(struct svga_ttyaccess_gfx *__restrict self,
-                                                   uintptr_t address, size_t num_cells) {
-	(void)self;
-	(void)address;
-	(void)num_cells;
-	COMPILER_IMPURE();
-}
-
-INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL svga_ttyaccess_v_hw_updatecell_noop)(struct svga_ttyaccess_gfx *__restrict self,
-                                                   uintptr_t address)
-		ASMNAME("svga_ttyaccess_v_hw_updaterect_noop");
-
-
-
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct svga_ttyaccess_gfx *FCALL
 svga_makettyaccess_gfx(struct svgadev *__restrict self,
@@ -927,17 +974,6 @@ svga_makettyaccess_gfx(struct svgadev *__restrict self,
 	result->vta_setcelldata    = &svga_ttyaccess_v_setcelldata_gfx;
 	result->vta_setcells_ascii = &svga_ttyaccess_v_setcells_ascii_gfx;
 	result->stx_chipset        = &self->svd_chipset;
-
-	/* Fill in HW update operators (if required by the chipset) */
-	if (self->svd_chipset.sc_ops.sco_updaterect) {
-		result->stx_hw_updatecell = &svga_ttyaccess_v_hw_updatecell_gfx_9_16;
-		result->stx_hw_updateline = &svga_ttyaccess_v_hw_updateline_gfx_9_16;
-		result->stx_hw_updaterect = &svga_ttyaccess_v_hw_updaterect_gfx_9_16;
-	} else {
-		result->stx_hw_updatecell = &svga_ttyaccess_v_hw_updatecell_noop;
-		result->stx_hw_updateline = &svga_ttyaccess_v_hw_updateline_noop;
-		result->stx_hw_updaterect = &svga_ttyaccess_v_hw_updaterect_noop;
-	}
 
 	/* BPP-specific operators. */
 	switch (mode->smi_bits_per_pixel) {
@@ -1003,12 +1039,6 @@ notsup:
 		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
 		break;
 	}
-
-	/* If available, use hardware-acceleration to draw the cursor overlay. */
-#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-//	if (self->svd_chipset.sc_ops.sco_hw_async_fillrect)
-//		result->stx_redraw_cursor = &svga_ttyaccess_v_redraw_cursor_hwgfx; /* TODO */
-#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
 
 	/* Precalculate palette colors. */
 	if (mode->smi_flags & SVGA_MODEINFO_F_PAL) {

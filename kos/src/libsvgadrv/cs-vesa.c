@@ -427,14 +427,14 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 		modeword |= 0x4000; /* Use linear buffer. */
 	if (!vesa_setmode(me, modeword))
 		THROW(E_IOERROR);
-	DBG_memset(&me->sc_ops.sco_setwindow, 0xcc, sizeof(me->sc_ops.sco_setwindow));
-	DBG_memset(&me->sc_ops.sco_setrdwindow, 0xcc, sizeof(me->sc_ops.sco_setrdwindow));
-	DBG_memset(&me->sc_ops.sco_setwrwindow, 0xcc, sizeof(me->sc_ops.sco_setwrwindow));
 	DBG_memset(&me->sc_rdwindow, 0xcc, sizeof(me->sc_rdwindow));
 	DBG_memset(&me->sc_wrwindow, 0xcc, sizeof(me->sc_wrwindow));
 
 	/* Remember current mode. */
 	memcpy(&me->vc_mode, &mode->vm_vesa, sizeof(struct vbe_modeinfo));
+	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
+	me->sc_modeops.sco_getpal = &cs_basevga_rdpal;
+	me->sc_modeops.sco_setpal = &cs_basevga_wrpal;
 #ifdef SVGA_HAVE_HW_SCROLL
 	me->sc_displaystart     = vesa_getdisplaystart(me);
 	me->sc_logicalwidth_max = vesa_getlogicalwidth_max(me);
@@ -459,8 +459,8 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 	}
 
 	/* Set operators. */
-	me->sc_ops.sco_setdisplaystart = &vesa_v_setdisplaystart;
-	me->sc_ops.sco_setlogicalwidth = &vesa_v_setlogicalwidth;
+	me->sc_modeops.sco_setdisplaystart = &vesa_v_setdisplaystart;
+	me->sc_modeops.sco_setlogicalwidth = &vesa_v_setlogicalwidth;
 #endif /* SVGA_HAVE_HW_SCROLL */
 
 	/* Load extended attributes only needed when there is no LFB */
@@ -484,21 +484,21 @@ vesa_v_setmode(struct svga_chipset *__restrict self,
 
 		/* Select most efficient set-window-index operators. */
 		if (rdwindow == 0 && wrwindow == 0) {
-			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_0;
-			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_both_0;
-			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_both_0;
+			me->sc_modeops.sco_setwindow   = &vesa_v_setwindow_both_0;
+			me->sc_modeops.sco_setrdwindow = &vesa_v_setwindow_both_0;
+			me->sc_modeops.sco_setwrwindow = &vesa_v_setwindow_both_0;
 		} else if (rdwindow == 1 && wrwindow == 1) {
-			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_1;
-			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_both_1;
-			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_both_1;
+			me->sc_modeops.sco_setwindow   = &vesa_v_setwindow_both_1;
+			me->sc_modeops.sco_setrdwindow = &vesa_v_setwindow_both_1;
+			me->sc_modeops.sco_setwrwindow = &vesa_v_setwindow_both_1;
 		} else if (rdwindow == 0 /*&& wrwindow == 1*/) {
-			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_01;
-			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_rd_0;
-			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_wr_1;
+			me->sc_modeops.sco_setwindow   = &vesa_v_setwindow_both_01;
+			me->sc_modeops.sco_setrdwindow = &vesa_v_setwindow_rd_0;
+			me->sc_modeops.sco_setwrwindow = &vesa_v_setwindow_wr_1;
 		} else /*if (rdwindow == 1 && wrwindow == 0)*/ {
-			me->sc_ops.sco_setwindow   = &vesa_v_setwindow_both_01;
-			me->sc_ops.sco_setrdwindow = &vesa_v_setwindow_rd_1;
-			me->sc_ops.sco_setwrwindow = &vesa_v_setwindow_wr_0;
+			me->sc_modeops.sco_setwindow   = &vesa_v_setwindow_both_01;
+			me->sc_modeops.sco_setrdwindow = &vesa_v_setwindow_rd_1;
+			me->sc_modeops.sco_setwrwindow = &vesa_v_setwindow_wr_0;
 		}
 
 		/* Load currently selected window numbers. */
@@ -660,8 +660,6 @@ cs_vesa_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_regsize  = vesa_getregsbufsize(me);
 		me->sc_ops.sco_getregs  = &vesa_v_getregs;
 		me->sc_ops.sco_setregs  = &vesa_v_setregs;
-		self->sc_ops.sco_getpal = &cs_basevga_rdpal;
-		self->sc_ops.sco_setpal = &cs_basevga_wrpal;
 	} EXCEPT {
 		vesa_v_fini(me);
 		RETHROW();

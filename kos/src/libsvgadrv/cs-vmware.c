@@ -175,6 +175,111 @@ vmware_fifo_reserve_cmd(struct vmware_chipset *__restrict self,
 
 
 
+PRIVATE NONNULL((1)) void LIBSVGADRV_CC
+vmware_v_getpal(struct svga_chipset *__restrict self,
+                uint8_t base, uint16_t count,
+                NCX struct svga_palette_color *buf) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
+	for (; count; --count, ++buf, entry_base += 3) {
+		buf->spc_r = (uint8_t)vm_getreg(me, entry_base + 0);
+		buf->spc_g = (uint8_t)vm_getreg(me, entry_base + 1);
+		buf->spc_b = (uint8_t)vm_getreg(me, entry_base + 2);
+	}
+}
+
+PRIVATE NONNULL((1)) void LIBSVGADRV_CC
+vmware_v_setpal(struct svga_chipset *__restrict self,
+                uint8_t base, uint16_t count,
+                NCX struct svga_palette_color const *buf) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
+	for (; count; --count, ++buf, entry_base += 3) {
+		vm_setreg(me, entry_base + 0, buf->spc_r);
+		vm_setreg(me, entry_base + 1, buf->spc_g);
+		vm_setreg(me, entry_base + 2, buf->spc_b);
+	}
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
+                                           struct svga_rect const *__restrict rect) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_UPDATE(x: %" PRIu16 ", y: %" PRIu16 ", w: %" PRIu16 ", h: %" PRIu16 ")\n",
+	       rect->svr_x, rect->svr_y, rect->svr_w, rect->svr_h);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_UPDATE, 4);
+	*packet++ = rect->svr_x;
+	*packet++ = rect->svr_y;
+	*packet++ = rect->svr_w;
+	*packet++ = rect->svr_h;
+	vmware_fifo_commit_cmd(me, 4);
+}
+
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+PRIVATE NONNULL((1)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_waitfor)(struct svga_chipset *__restrict self) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	if unlikely(me->vm_hw_render_started) {
+		vm_setreg(me, SVGA_REG_SYNC, 1);
+		while (vm_getreg(me, SVGA_REG_BUSY) != 0)
+			yield();
+		me->vm_hw_render_started = false;
+	}
+}
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+
+#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_copyrect)(struct svga_chipset *__restrict self,
+                                                  struct svga_copyrect const *__restrict rect) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_COPY("
+	                  "sx: %" PRIu16 ", sy: %" PRIu16 ", "
+	                  "dx: %" PRIu16 ", dy: %" PRIu16 ", "
+	                  "w: %" PRIu16 ", h: %" PRIu16 ")\n",
+	       rect->svcr_sx, rect->svcr_sy,
+	       rect->svcr_dx, rect->svcr_dy,
+	       rect->svcr_w, rect->svcr_h);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_COPY, 6);
+	*packet++ = rect->svcr_sx;
+	*packet++ = rect->svcr_sy;
+	*packet++ = rect->svcr_dx;
+	*packet++ = rect->svcr_dy;
+	*packet++ = rect->svcr_w;
+	*packet++ = rect->svcr_h;
+	vmware_fifo_commit_cmd(me, 6);
+	me->vm_hw_render_started = true;
+}
+#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
+
+#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_fillrect)(struct svga_chipset *__restrict self,
+                                                  struct svga_rect const *__restrict rect,
+                                                  uint32_t color) {
+	struct vmware_chipset *me = (struct vmware_chipset *)self;
+	uint32_t *packet;
+	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_FILL("
+	                  "x: %" PRIu16 ", y: %" PRIu16 ", "
+	                  "w: %" PRIu16 ", h: %" PRIu16 ", "
+	                  "color: %#" PRIx32 ")\n",
+	       rect->svr_x, rect->svr_y,
+	       rect->svr_w, rect->svr_h,
+	       color);
+	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_FILL, 5);
+	*packet++ = color;
+	*packet++ = rect->svr_x;
+	*packet++ = rect->svr_y;
+	*packet++ = rect->svr_w;
+	*packet++ = rect->svr_h;
+	vmware_fifo_commit_cmd(me, 5);
+	me->vm_hw_render_started = true;
+}
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC vmware_v_fini)(struct svga_chipset *__restrict self) {
 	struct vmware_chipset *me = (struct vmware_chipset *)self;
@@ -362,122 +467,24 @@ vmware_v_setmode(struct svga_chipset *__restrict self,
 	/* Enable the command FIFO */
 	vm_setreg(me, SVGA_REG_CONFIG_DONE, 1);
 	me->vm_vga_mode = false;
-}
 
-PRIVATE NONNULL((1, 2)) void
-NOTHROW(LIBSVGADRV_CC vmware_v_updaterect)(struct svga_chipset *__restrict self,
-                                           struct svga_rect const *__restrict rect) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	uint32_t *packet;
-	printk(KERN_DEBUG "[vmware] SVGA_CMD_UPDATE(x: %" PRIu16 ", y: %" PRIu16 ", w: %" PRIu16 ", h: %" PRIu16 ")\n",
-	       rect->svr_x, rect->svr_y, rect->svr_w, rect->svr_h);
-	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_UPDATE, 4);
-	*packet++ = rect->svr_x;
-	*packet++ = rect->svr_y;
-	*packet++ = rect->svr_w;
-	*packet++ = rect->svr_h;
-	vmware_fifo_commit_cmd(me, 4);
-}
-
-#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
-PRIVATE NONNULL((1)) void
-NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_waitfor)(struct svga_chipset *__restrict self) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	if unlikely(me->vm_hw_render_started) {
-		vm_setreg(me, SVGA_REG_SYNC, 1);
-		while (vm_getreg(me, SVGA_REG_BUSY) != 0)
-			yield();
-		me->vm_hw_render_started = false;
-	}
-}
-#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
-
+	/* Link vmware operators */
+	bzero(&me->sc_modeops, sizeof(me->sc_modeops));
+	me->sc_modeops.sco_updaterect = &vmware_v_updaterect;
+	me->sc_modeops.sco_getpal = &vmware_v_getpal;
+	me->sc_modeops.sco_setpal = &vmware_v_setpal;
 #ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
-PRIVATE NONNULL((1, 2)) void
-NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_copyrect)(struct svga_chipset *__restrict self,
-                                                  struct svga_copyrect const *__restrict rect) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	uint32_t *packet;
-	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_COPY("
-	                  "sx: %" PRIu16 ", sy: %" PRIu16 ", "
-	                  "dx: %" PRIu16 ", dy: %" PRIu16 ", "
-	                  "w: %" PRIu16 ", h: %" PRIu16 ")\n",
-	       rect->svcr_sx, rect->svcr_sy,
-	       rect->svcr_dx, rect->svcr_dy,
-	       rect->svcr_w, rect->svcr_h);
-	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_COPY, 6);
-	*packet++ = rect->svcr_sx;
-	*packet++ = rect->svcr_sy;
-	*packet++ = rect->svcr_dx;
-	*packet++ = rect->svcr_dy;
-	*packet++ = rect->svcr_w;
-	*packet++ = rect->svcr_h;
-	vmware_fifo_commit_cmd(me, 6);
-	me->vm_hw_render_started = true;
-}
+	if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
+		me->sc_modeops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;
 #endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
-
 #ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-PRIVATE NONNULL((1, 2)) void
-NOTHROW(LIBSVGADRV_CC vmware_v_hw_async_fillrect)(struct svga_chipset *__restrict self,
-                                                  struct svga_rect const *__restrict rect,
-                                                  uint32_t color) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	uint32_t *packet;
-	printk(KERN_DEBUG "[vmware] SVGA_CMD_RECT_FILL("
-	                  "x: %" PRIu16 ", y: %" PRIu16 ", "
-	                  "w: %" PRIu16 ", h: %" PRIu16 ", "
-	                  "color: %#" PRIx32 ")\n",
-	       rect->svr_x, rect->svr_y,
-	       rect->svr_w, rect->svr_h,
-	       color);
-	packet = vmware_fifo_reserve_cmd(me, SVGA_CMD_RECT_FILL, 5);
-	*packet++ = color;
-	*packet++ = rect->svr_x;
-	*packet++ = rect->svr_y;
-	*packet++ = rect->svr_w;
-	*packet++ = rect->svr_h;
-	vmware_fifo_commit_cmd(me, 5);
-	me->vm_hw_render_started = true;
-}
+	if (vm_svga_hascap(me, SVGA_CAP_RECT_FILL))
+		me->sc_modeops.sco_hw_async_fillrect = &vmware_v_hw_async_fillrect;
 #endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
-
-
-PRIVATE NONNULL((1)) void LIBSVGADRV_CC
-vmware_v_getpal(struct svga_chipset *__restrict self,
-                uint8_t base, uint16_t count,
-                NCX struct svga_palette_color *buf) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	if (me->vm_vga_mode) {
-		cs_basevga_rdpal(self, base, count, buf);
-	} else {
-		uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
-		for (; count; --count, ++buf, entry_base += 3) {
-			buf->spc_r = (uint8_t)vm_getreg(me, entry_base + 0);
-			buf->spc_g = (uint8_t)vm_getreg(me, entry_base + 1);
-			buf->spc_b = (uint8_t)vm_getreg(me, entry_base + 2);
-		}
-	}
+#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
+	me->sc_modeops.sco_hw_async_waitfor = &vmware_v_hw_async_waitfor;
+#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
 }
-
-PRIVATE NONNULL((1)) void LIBSVGADRV_CC
-vmware_v_setpal(struct svga_chipset *__restrict self,
-                uint8_t base, uint16_t count,
-                NCX struct svga_palette_color const *buf) {
-	struct vmware_chipset *me = (struct vmware_chipset *)self;
-	if (me->vm_vga_mode) {
-		cs_basevga_wrpal(self, base, count, buf);
-	} else {
-		uint32_t entry_base = SVGA_PALETTE_BASE + base * 3;
-		for (; count; --count, ++buf, entry_base += 3) {
-			vm_setreg(me, entry_base + 0, buf->spc_r);
-			vm_setreg(me, entry_base + 1, buf->spc_g);
-			vm_setreg(me, entry_base + 2, buf->spc_b);
-		}
-	}
-}
-
-
 
 PRIVATE NONNULL((1, 2)) void CC
 vmware_v_getregs(struct svga_chipset *__restrict self, byte_t regbuf[]) {
@@ -691,21 +698,11 @@ cs_vmware_probe(struct svga_chipset *__restrict self) {
 		me->sc_ops.sco_getregs      = &vmware_v_getregs;
 		me->sc_ops.sco_setregs      = &vmware_v_setregs;
 		me->sc_ops.sco_regsize      = sizeof__vmware_regs(me->vw_nscratch);
-		me->sc_ops.sco_updaterect   = &vmware_v_updaterect;
-		me->sc_ops.sco_getpal       = &vmware_v_getpal;
-		me->sc_ops.sco_setpal       = &vmware_v_setpal;
 
-#ifdef SVGA_HAVE_HW_ASYNC_COPYRECT
-		if (vm_svga_hascap(me, SVGA_CAP_RECT_COPY))
-			me->sc_ops.sco_hw_async_copyrect = &vmware_v_hw_async_copyrect;
-#endif /* SVGA_HAVE_HW_ASYNC_COPYRECT */
-#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-		if (vm_svga_hascap(me, SVGA_CAP_RECT_FILL))
-			me->sc_ops.sco_hw_async_fillrect = &vmware_v_hw_async_fillrect;
-#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
-#ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
-		me->sc_ops.sco_hw_async_waitfor = &vmware_v_hw_async_waitfor;
-#endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
+		/* FIXME: This here is needed  because "svga_newscreen" doesn't want  to
+		 *        set a new video mode, but expects this operator to be set when
+		 *        needed. */
+		me->sc_modeops.sco_updaterect = &vmware_v_updaterect;
 
 		/* Misc. runtime fields. */
 		me->vw_fifo_caps = 0;

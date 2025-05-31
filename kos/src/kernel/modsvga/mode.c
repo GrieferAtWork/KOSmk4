@@ -167,8 +167,8 @@ svgadev_ioctl_getpal(struct svgadev *__restrict self,
 	validate_writablem(pal.svp_pal, pal.svp_size, sizeof(struct svga_palette_color));
 	viddev_acquire(self);
 	RAII_FINALLY { viddev_release(self); };
-	(*self->svd_chipset.sc_ops.sco_getpal)(&self->svd_chipset, pal.svp_base,
-	                                       pal.svp_size, pal.svp_pal);
+	(*self->svd_chipset.sc_modeops.sco_getpal)(&self->svd_chipset, pal.svp_base,
+	                                            pal.svp_size, pal.svp_pal);
 	return 0;
 }
 
@@ -187,8 +187,8 @@ svgadev_ioctl_setpal(struct svgadev *__restrict self,
 	validate_readablem(pal.svp_pal, pal.svp_size, sizeof(struct svga_palette_color));
 	viddev_acquire(self);
 	RAII_FINALLY { viddev_release(self); };
-	(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, pal.svp_base,
-	                                       pal.svp_size, pal.svp_pal);
+	(*self->svd_chipset.sc_modeops.sco_setpal)(&self->svd_chipset, pal.svp_base,
+	                                            pal.svp_size, pal.svp_pal);
 	return 0;
 }
 
@@ -727,10 +727,10 @@ svgadev_setmode(struct svgadev *__restrict self,
 
 		if (mode->smi_colorbits == 1) {
 			/* Black & white emulation. */
-			(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_monopal);
+			(*self->svd_chipset.sc_modeops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_monopal);
 		} else {
 			/* Load an ANSI-compatible color palette */
-			(*self->svd_chipset.sc_ops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_defaultpal);
+			(*self->svd_chipset.sc_modeops.sco_setpal)(&self->svd_chipset, 0, 16, basevga_defaultpal);
 		}
 	}
 }
@@ -1105,6 +1105,10 @@ NOTHROW(FCALL svgadev_v_enterdbg)(struct viddev *__restrict self) {
 	/* Don't do unnecessary assertions in here! */
 	/*assert(tty->vta_refcnt == 1);*/
 
+	/* Save mode-specific operators. */
+	memcpy(&sav->sdr_modeops, &me->svd_chipset.sc_modeops,
+	       sizeof(struct svga_chipset_modeops));
+
 	/* Save VGA registers into the designated state. */
 	basevga_getregs(&sav->sdr_vmode);
 
@@ -1141,7 +1145,7 @@ PRIVATE NONNULL((1)) void
 NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
 	struct svga_ttyaccess *tty;
 	struct svgadev *me;
-	struct svga_dbgregs *sav;
+	struct svga_dbgregs const *sav;
 	me  = viddev_assvga(self);
 	tty = me->svd_dbgtty;
 	sav = me->svd_dbgsav;
@@ -1166,6 +1170,10 @@ NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
 
 	/* Restore basic VGA registers. */
 	basevga_setregs(&sav->sdr_vmode);
+
+	/* Restore mode-specific operators. */
+	memcpy(&me->svd_chipset.sc_modeops, &sav->sdr_modeops,
+	       sizeof(struct svga_chipset_modeops));
 }
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 

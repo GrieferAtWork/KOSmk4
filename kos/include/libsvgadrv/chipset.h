@@ -168,67 +168,17 @@ struct svga_palette_color {
 	__uint8_t spc_b; /* Blue */
 };
 
-struct svga_chipset_ops {
+struct svga_chipset_modeops {
+	/************************************************************************/
+	/* MODE-SPECIFIC OPERATORS (may change when `sco_setmode' is called)    */
+	/************************************************************************/
 
-	/* [1..1][const] Chipset-specific finalization. */
-	__NOBLOCK __ATTR_NONNULL_T((1)) void
-	__NOTHROW_T(LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
-
-	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
-	__size_t sco_modeinfosize;
-
-	/* [0..1][const][lock(EXTERNAL)]
-	 * Enumerate chipset-specific identification strings. */
-	__ATTR_NONNULL_T((1, 2)) __ssize_t
-	(LIBSVGADRV_CC *sco_strings)(struct svga_chipset *__restrict self,
-	                             svga_chipset_enumstring_t cb, void *arg);
-
-	/* [1..1][const][lock(EXTERNAL)]
-	 * - Return  information about the first mode with a cs-specific ID that
-	 *   is `>= *p_index'. If no such mode exists, return `false'. Otherwise
-	 *   advance `*p_index' to point to the next mode and return `true'.
-	 * - `result' is a `sco_modeinfosize'-bytes large buffer allocated by the
-	 *   caller. If the caller decides they  want to use some specific  mode,
-	 *   they will pass `result' to `sco_setmode()'
-	 * - The caller guaranties that `*p_index' is either `0', or whatever
-	 *   was  written  back to  that  variable during  a  preceding call.
-	 * @return: true:  Another mode was retrieved.
-	 * @return: false: All modes enumerated. */
-	__ATTR_WUNUSED __ATTR_NONNULL_T((1, 2, 3)) __BOOL
-	(LIBSVGADRV_CC *sco_getmode)(struct svga_chipset *__restrict self,
-	                             struct svga_modeinfo *__restrict result,
-	                             __uintptr_t *__restrict p_index)
-			__THROWS(E_IOERROR);
-
-	/* [1..1][const][lock(EXTERNAL)]
-	 * - Set a given video  mode to `mode'.
-	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
-	 * - Prior to this function being called for the first time, any  function
-	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
-	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]' */
-	__ATTR_NONNULL_T((1, 2)) void
-	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
-	                             struct svga_modeinfo const *__restrict mode);
-
-	/* [1..1][const][lock(EXTERNAL)]
-	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
-	 * - These functions can be used  to save/restore the current video  mode
-	 *   even before `sco_setmode' was called for the first time. They should
-	 *   also  be used before  exclusive display control is  handed to a user
-	 *   application, and after that application relinquishes control. */
-	__ATTR_NONNULL_T((1, 2)) void
-	(LIBSVGADRV_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
-	__ATTR_NONNULL_T((1, 2)) void
-	(LIBSVGADRV_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
-
-	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
-	__size_t sco_regsize;
-
-	/* [1..1][const][lock(EXTERNAL)]
+	/* [1..1][lock(EXTERNAL)]
 	 * - Get/set (parts of) the video palette.
 	 * - Weak undefined behavior when current video mode has no palette
 	 * - Caller must ensure that `base + count <= 0x100'
-	 * - In most cases, this will simply read/write the core VGA palette */
+	 * - In most cases, this will simply read/write the core VGA palette
+	 * - Requires "CURRENT_VIDEO_MODE" */
 	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_getpal)(struct svga_chipset *__restrict self,
 	                            __uint8_t base, __uint16_t count,
@@ -237,12 +187,6 @@ struct svga_chipset_ops {
 	(LIBSVGADRV_CC *sco_setpal)(struct svga_chipset *__restrict self,
 	                            __uint8_t base, __uint16_t count,
 	                            __NCX struct svga_palette_color const *buf);
-
-	/* NOTE: Operators below may be altered by chipset drivers during `sco_setmode()'
-	 *       This should be fine since they can already only be called while  already
-	 *       holding a lock to `EXTERNAL', which prevents one from changing the mode.
-	 * Additionally, they may not actually be initialized prior to the first call to
-	 * `sco_setmode()'. */
 
 	/* [1..1][lock(EXTERNAL)]
 	 * - Set the current display window to the `window'th 64K chunk
@@ -309,7 +253,8 @@ struct svga_chipset_ops {
 
 	/* [0..1][lock(EXTERNAL)]
 	 * Indicate to the chipset that a rect of pixels may have been modified.
-	 * Caller must ensure that the rect does not exceed the set  resolution. */
+	 * Caller must ensure that the rect does not exceed the set  resolution.
+	 * - Requires "CURRENT_VIDEO_MODE" */
 	__ATTR_NONNULL_T((1, 2)) void
 	NOTHROW_T(LIBSVGADRV_CC *sco_updaterect)(struct svga_chipset *__restrict self,
 	                                         struct svga_rect const *__restrict rect);
@@ -322,6 +267,7 @@ struct svga_chipset_ops {
 	 *                          directly.
 	 * - sco_hw_async_copyrect: Perform a hardware-accelerated copy of pixels
 	 * - sco_hw_async_fillrect: Perform a hardware-accelerated fill of pixels
+	 * - Requires "CURRENT_VIDEO_MODE"
 	 */
 #ifdef SVGA_HAVE_HW_ASYNC_WAITFOR
 	__ATTR_NONNULL_T((1)) void
@@ -341,25 +287,89 @@ struct svga_chipset_ops {
 #endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
 };
 
+
+struct svga_chipset_ops {
+
+	/* [1..1][const] Chipset-specific finalization. */
+	__NOBLOCK __ATTR_NONNULL_T((1)) void
+	__NOTHROW_T(LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
+
+	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
+	__size_t sco_modeinfosize;
+
+	/* [0..1][const][lock(EXTERNAL)]
+	 * Enumerate chipset-specific identification strings. */
+	__ATTR_NONNULL_T((1, 2)) __ssize_t
+	(LIBSVGADRV_CC *sco_strings)(struct svga_chipset *__restrict self,
+	                             svga_chipset_enumstring_t cb, void *arg);
+
+	/* [1..1][const][lock(EXTERNAL)]
+	 * - Return  information about the first mode with a cs-specific ID that
+	 *   is `>= *p_index'. If no such mode exists, return `false'. Otherwise
+	 *   advance `*p_index' to point to the next mode and return `true'.
+	 * - `result' is a `sco_modeinfosize'-bytes large buffer allocated by the
+	 *   caller. If the caller decides they  want to use some specific  mode,
+	 *   they will pass `result' to `sco_setmode()'
+	 * - The caller guaranties that `*p_index' is either `0', or whatever
+	 *   was  written  back to  that  variable during  a  preceding call.
+	 * @return: true:  Another mode was retrieved.
+	 * @return: false: All modes enumerated. */
+	__ATTR_WUNUSED __ATTR_NONNULL_T((1, 2, 3)) __BOOL
+	(LIBSVGADRV_CC *sco_getmode)(struct svga_chipset *__restrict self,
+	                             struct svga_modeinfo *__restrict result,
+	                             __uintptr_t *__restrict p_index)
+			__THROWS(E_IOERROR);
+
+	/* [1..1][const][lock(EXTERNAL)]
+	 * - Set a given video  mode to `mode'.
+	 * - The contents of `mode' have previously been retrieved via `sco_getmode'
+	 * - Prior to this function being called for the first time, any  function
+	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
+	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]'
+	 * - Calls to this function are allowed to fully (re-)initialize "sc_modeops"
+	 *   Additionally, "sc_modeops" may  only be  considered "initialized"  after
+	 *   this function has been called at least once. */
+	__ATTR_NONNULL_T((1, 2)) void
+	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
+	                             struct svga_modeinfo const *__restrict mode);
+
+	/* [1..1][const][lock(EXTERNAL)]
+	 * - Save/load all chipset registers to/from a `sco_regsize'-long `regbuf'
+	 * - These functions can be used  to save/restore the current video  mode
+	 *   even before `sco_setmode' was called for the first time. They should
+	 *   also  be used before  exclusive display control is  handed to a user
+	 *   application, and after that application relinquishes control.
+	 * - Mode- */
+	__ATTR_NONNULL_T((1, 2)) void
+	(LIBSVGADRV_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
+	__ATTR_NONNULL_T((1, 2)) void
+	(LIBSVGADRV_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
+
+	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
+	__size_t sco_regsize;
+
+};
+
 struct svga_chipset {
-	struct svga_chipset_ops sc_ops;                /* [const] Chipset operators. */
-	__size_t                sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
-	__size_t                sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
-	                                                * Current display window for reads. */
-	__size_t                sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
-	                                                * Current display window for writes. */
+	struct svga_chipset_ops     sc_ops;                /* [const] Chipset operators. */
+	struct svga_chipset_modeops sc_modeops;            /* [lock(EXTERNAL)] Mode-specific operators () */
+	__size_t                    sc_vmemsize;           /* [const] Video memory size (in bytes; usually a multiple of 64K). */
+	__size_t                    sc_rdwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
+	                                                    * Current display window for reads. */
+	__size_t                    sc_wrwindow;           /* [lock(EXTERNAL)][< CEILDIV(sc_vmemsize, 64 * 1024)][valid_if(WAS_CALLED(sco_setmode) && !SVGA_MODEINFO_F_LFB)]
+	                                                    * Current display window for writes. */
 #ifdef SVGA_HAVE_HW_SCROLL
-	__size_t                sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setdisplaystart != NULL)]
-	                                                * Current display  start (pixels  from  `CURRENT_VIDEO_MODE.smi_lfb', or  the  start
-	                                                * of video memory, to the beginning of the screen; usually top-left corner). */
-	__uint32_t              sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)]
-	                                                * Current  logical  screen  width  (in  pixels;  updated  by  `sco_setlogicalwidth')
-	                                                * This  is  the  # of  pixel  between the  start  of  two lines,  commonly  known as
-	                                                * the scanline,  only  this  time  expressed in  pixels,  rather  than  bytes.  Also
-	                                                * note that  because  scanlines  always have  to  start  on whole  bytes,  there  is
-	                                                * a alignment requirement of `sc_logicalwidth_align' pixels. */
-	__uint32_t              sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
-	__uint32_t              sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
+	__size_t                    sc_displaystart;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setdisplaystart != NULL)]
+	                                                    * Current display  start (pixels  from  `CURRENT_VIDEO_MODE.smi_lfb', or  the  start
+	                                                    * of video memory, to the beginning of the screen; usually top-left corner). */
+	__uint32_t                  sc_logicalwidth;       /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)]
+	                                                    * Current  logical  screen  width  (in  pixels;  updated  by  `sco_setlogicalwidth')
+	                                                    * This  is  the  # of  pixel  between the  start  of  two lines,  commonly  known as
+	                                                    * the scanline,  only  this  time  expressed in  pixels,  rather  than  bytes.  Also
+	                                                    * note that  because  scanlines  always have  to  start  on whole  bytes,  there  is
+	                                                    * a alignment requirement of `sc_logicalwidth_align' pixels. */
+	__uint32_t                  sc_logicalwidth_max;   /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Max value allowed for `sc_logicalwidth' */
+	__uint32_t                  sc_logicalwidth_align; /* [lock(EXTERNAL)][valid_if(WAS_CALLED(sco_setmode) && sco_setlogicalwidth != NULL)] Alignment requirements of `sc_logicalwidth' */
 #endif /* SVGA_HAVE_HW_SCROLL */
 	/* Chipset-specific data goes here. */
 };
