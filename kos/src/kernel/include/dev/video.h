@@ -455,8 +455,11 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 /* Default operators for `struct vidlck' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self);
-#define vidlck_v_ioctl      mfile_v_ioctl
-#define vidlck_v_stream_ops UNDEFINED
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
+vidlck_v_printlink(struct mfile *__restrict self, __pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...);
+#define vidlck_v_ioctl mfile_v_ioctl /* TODO: Add ioctls to get/set/clear "vlc_oldtty" */
+DATDEF struct mfile_stream_ops const vidlck_v_stream_ops;
 
 
 

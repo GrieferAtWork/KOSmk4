@@ -2571,7 +2571,8 @@ PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
 multifat_sync_file_v_printlink(struct mfile *__restrict self, __pformatprinter printer, void *arg)
 		THROWS(E_WOULDBLOCK, ...) {
 	ssize_t result, temp;
-	static char const prefix[]    = "anon_inode:[fatfs:multifat_sync:";
+	static char const prefix[] = "anon_inode:[fatfs:multifat_sync:";
+	static char const suffix[] = "]";
 	struct multifat_sync_file *me = (struct multifat_sync_file *)self;
 	result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
 	if unlikely(result < 0)
@@ -2580,7 +2581,7 @@ multifat_sync_file_v_printlink(struct mfile *__restrict self, __pformatprinter p
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;
-	temp = (*printer)(arg, "]", 1);
+	temp = (*printer)(arg, suffix, COMPILER_STRLEN(suffix));
 	if unlikely(temp < 0)
 		goto err;
 	result += temp;

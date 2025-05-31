@@ -45,6 +45,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -976,6 +977,39 @@ NOTHROW(KCALL vidlck_v_destroy)(struct mfile *__restrict self) {
 	async_init(&me->vlc_rstor, &vidlck_async_v_ops);
 	decref_unlikely(async_start(&me->vlc_rstor));
 }
+
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
+vidlck_v_printlink(struct mfile *__restrict self,
+                   pformatprinter printer, void *arg)
+		THROWS(E_WOULDBLOCK, ...) {
+	static char const prefix[] = "anon_inode:[vidlck:";
+	static char const suffix[] = "]";
+	struct vidlck *me = mfile_asvidlck(self);
+	ssize_t temp, result;
+	result = (*printer)(arg, prefix, COMPILER_STRLEN(prefix));
+	if unlikely(result < 0)
+		goto done;
+	temp = mfile_uprintlink(me->vlc_dev, printer, arg);
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	temp = (*printer)(arg, suffix, COMPILER_STRLEN(suffix));
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	return result;
+done:
+	return result;
+err:
+	return temp;
+}
+
+PUBLIC_CONST struct mfile_stream_ops const vidlck_v_stream_ops = {
+	.mso_ioctl     = &vidlck_v_ioctl,
+	.mso_printlink = &vidlck_v_printlink,
+};
+
+
 
 
 

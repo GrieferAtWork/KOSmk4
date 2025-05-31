@@ -379,9 +379,9 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	return vidlck_v_ioctl(self, cmd, arg, mode);
 }
 
-
 PRIVATE struct mfile_stream_ops const svgalck_v_stream_ops = {
-	.mso_ioctl = &svgalck_v_ioctl,
+	.mso_ioctl     = &svgalck_v_ioctl,
+	.mso_printlink = &vidlck_v_printlink,
 	/* TODO: mmap (including support for automatic bank switching) */
 };
 
