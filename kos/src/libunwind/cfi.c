@@ -31,7 +31,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
-#include <asm/signed-shift.h>
+#include <asm/sar.h>
 #include <kos/anno.h>
 #include <kos/bits/thread.h>
 #include <kos/except.h>
@@ -1176,13 +1176,7 @@ do_make_second_const:
 				SECOND.s_uconst >>= TOP.s_uconst;
 				break;
 			case DW_OP_shra:
-#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
-				SECOND.s_sconst >>= TOP.s_uconst;
-#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
-				SECOND.s_sconst = SECOND.s_sconst < 0
-				                  ? (intptr_t)-1 - (((intptr_t)-1 - SECOND.s_sconst) >> TOP.s_uconst)
-				                  : SECOND.s_sconst >> TOP.s_uconst;
-#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
+				SECOND.s_sconst = sar(SECOND.s_sconst, TOP.s_uconst);
 				break;
 			case DW_OP_xor:
 				SECOND.s_uconst ^= TOP.s_uconst;

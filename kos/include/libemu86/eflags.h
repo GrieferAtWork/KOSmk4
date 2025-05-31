@@ -23,6 +23,8 @@
 #include "api.h"
 
 #include <hybrid/__overflow.h>
+
+#include <asm/sar.h>
 #include <bits/types.h>
 #include <i386-kos/asm/cpu-flags.h>
 
@@ -30,24 +32,13 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* ShiftArithmeticRight (same as `unsigned(val) >> num_bits | (val & MaskForMostSignificanBit)')
- * XXX: The C standard leaves the behavior of signed right-shift undefined!
- *      For portability, we  should check some  kind of arch-feature  here! */
-#if 1
-#define emu86_sarb(val, num_bits) ((__int8_t)(val) >> (num_bits))
-#define emu86_sarw(val, num_bits) ((__int16_t)(val) >> (num_bits))
-#define emu86_sarl(val, num_bits) ((__int32_t)(val) >> (num_bits))
+/* ShiftArithmeticRight */
+#define emu86_sarb(val, num_bits) sar((__int8_t)(val), num_bits)
+#define emu86_sarw(val, num_bits) sar((__int16_t)(val), num_bits)
+#define emu86_sarl(val, num_bits) sar((__int32_t)(val), num_bits)
 #if LIBEMU86_CONFIG_WANT_64BIT
-#define emu86_sarq(val, num_bits) ((__int64_t)(val) >> (num_bits))
+#define emu86_sarq(val, num_bits) sar((__int64_t)(val), num_bits)
 #endif /* LIBEMU86_CONFIG_WANT_64BIT */
-#else
-#define emu86_sarb(val, num_bits) ((__uint8_t)(val) >> (num_bits) | ((__uint8_t)(val) & __UINT8_C(0x80)))
-#define emu86_sarw(val, num_bits) ((__uint16_t)(val) >> (num_bits) | ((__uint16_t)(val) & __UINT16_C(0x8000)))
-#define emu86_sarl(val, num_bits) ((__uint32_t)(val) >> (num_bits) | ((__uint32_t)(val) & __UINT32_C(0x80000000)))
-#if LIBEMU86_CONFIG_WANT_64BIT
-#define emu86_sarq(val, num_bits) ((__uint64_t)(val) >> (num_bits) | ((__uint64_t)(val) & __UINT64_C(0x8000000000000000)))
-#endif /* LIBEMU86_CONFIG_WANT_64BIT */
-#endif
 
 #define emu86_geteflags_SFb(value) ((__int8_t)(value) < 0 ? EFLAGS_SF : 0)
 #define emu86_geteflags_SFw(value) ((__int16_t)(value) < 0 ? EFLAGS_SF : 0)

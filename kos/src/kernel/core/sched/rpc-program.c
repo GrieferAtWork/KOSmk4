@@ -51,7 +51,7 @@
 #include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
-#include <asm/signed-shift.h>
+#include <asm/sar.h>
 #include <compat/config.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
@@ -1348,13 +1348,7 @@ rpc_vm_instr(struct rpc_vm *__restrict self)
 			SECOND >>= TOP;
 			break;
 		case RPC_OP_shra:
-#ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
-			SECOND = (uintptr_t)((intptr_t)SECOND >> TOP);
-#else /* __ARCH_SIGNED_SHIFT_IS_SDIV */
-			SECOND = (uintptr_t)((intptr_t)SECOND < 0
-			                     ? (intptr_t)-1 - (((intptr_t)-1 - (intptr_t)SECOND) >> TOP)
-			                     : (intptr_t)SECOND >> TOP);
-#endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
+			SECOND = (uintptr_t)sar((intptr_t)SECOND, TOP);
 			break;
 		case RPC_OP_xor:
 			SECOND ^= TOP;
