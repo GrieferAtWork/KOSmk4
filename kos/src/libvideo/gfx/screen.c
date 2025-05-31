@@ -47,6 +47,7 @@
 #include <malloca.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -209,7 +210,6 @@ err:
 	return NULL;
 }
 
-
 PRIVATE NONNULL((1, 2)) void CC
 svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
                              struct video_codec_specs *__restrict result) {
@@ -251,6 +251,62 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 		result->vcs_bmask = (((video_pixel_t)1 << self->smi_bbits) - 1) << self->smi_bshift;
 	}
 	result->vcs_amask = 0;
+}
+
+/* Return a score regarding how closely "mode" matches "hint" */
+PRIVATE ATTR_PURE WUNUSED unsigned int CC
+score__svga_modeinfo__hint(struct svga_modeinfo const *__restrict mode,
+                           struct screen_buffer_hint const *__restrict hint) {
+	unsigned int result = 0;
+	result += abs((int)mode->smi_resx - (int)hint->sbh_resx);
+	result += abs((int)mode->smi_resy - (int)hint->sbh_resy);
+	result += abs((int)mode->smi_bits_per_pixel - (int)hint->sbh_bpp);
+	if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
+		result += 9999; /* Greatly discourage planar video modes. */
+	return result;
+}
+
+/* Find the (non-text) mode that is closest to "hint"
+ * @param: buf: Mode buffer (must be at least "self->sc_ops.sco_modeinfosize" bytes large)
+ * @return: buf:  Success
+ * @return: NULL: [errno=ENODEV]: Chipset does not support any graphics modes
+ * @return: NULL: [errno=ENOMEM]: Insufficient memory */
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3)) struct svga_modeinfo *CC
+cs_findmode_byhint(struct svga_chipset *__restrict self,
+                   struct screen_buffer_hint *__restrict hint,
+                   struct svga_modeinfo *__restrict buf) {
+	uintptr_t iterator;
+	struct svga_modeinfo *winner_buf;
+	unsigned int winner_score = (unsigned int)-1;
+	winner_buf = (struct svga_modeinfo *)malloca(self->sc_ops.sco_modeinfosize);
+	if unlikely(!winner_buf)
+		return NULL;
+	for (iterator = 0;;) {
+		unsigned int item_score;
+		if (!(*self->sc_ops.sco_getmode)(self, buf, &iterator)) {
+			if (winner_score == (unsigned int)-1) {
+				freea(winner_buf);
+				errno = ENODEV;
+				return NULL;
+			}
+			break;
+		}
+		if (buf->smi_flags & SVGA_MODEINFO_F_TXT)
+			continue; /* Ignore text modes... */
+		item_score = score__svga_modeinfo__hint(buf, hint);
+		if (item_score == 0) {
+			freea(winner_buf);
+			return buf;
+		}
+		if (winner_score > item_score) {
+			winner_score = item_score;
+			memcpy(winner_buf, buf, self->sc_ops.sco_modeinfosize);
+		}
+	}
+	buf = (struct svga_modeinfo *)memcpy(buf, winner_buf,
+	                                     self->sc_ops.sco_modeinfosize);
+	freea(winner_buf);
+	return buf;
 }
 
 PRIVATE WUNUSED REF struct svga_screen *CC
@@ -361,10 +417,18 @@ svga_newscreen(struct screen_buffer_hint *hint) {
 	}
 
 	if (hint) {
+		struct svga_modeinfo *used_mode;
+find_hinted_mode:
 		/* Find video mode that matches "hint" the closest. */
-find_with_hint:
-		LOGERR("TODO: Mode hint\n");
-		goto err_svga_vdlck_libsvgadrv_r_cs;
+		used_mode = cs_findmode_byhint(&result->ss_cs, hint, mode);
+		if unlikely(!used_mode) {
+			LOGERR("Failed to find hinted mode: %m\n");
+			goto err_svga_vdlck_libsvgadrv_r_cs_mode;
+		}
+		mode = used_mode;
+
+		/* Initialize CS mode operators as per the currently set mode. */
+		(*result->ss_cs.sc_ops.sco_setmode)(&result->ss_cs, mode);
 	} else {
 		/* Find video mode that is currently active. */
 		struct svga_csmode csmode;
@@ -387,7 +451,7 @@ find_with_hint:
 			_default_hint.sbh_resy = mode->smi_resy * 16;
 			_default_hint.sbh_bpp  = 8;
 			hint = &_default_hint;
-			goto find_with_hint;
+			goto find_hinted_mode;
 		}
 
 		/* Initialize CS mode operators as per the currently set mode. */
