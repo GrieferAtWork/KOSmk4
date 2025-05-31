@@ -59,8 +59,6 @@ struct fcpustate32 boot_cpustate;
 PUBLIC ATTR_USED ATTR_SECTION(".data.cold")
 struct boot_device_info boot_device = { 0xff, 0xff, 0xff, 0xff };
 
-INTDEF port_t x86_syslog_port;
-
 INTERN ATTR_FREEBSS bool x86_force_detect_moreram = false;
 DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_force_detect_moreram,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
@@ -112,24 +110,10 @@ PRIVATE void dump_debuginfo() {
 
 INTERN ATTR_FREETEXT struct icpustate *
 NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
-	/* Figure out how we can output data to an emulator's STDOUT (if we're being hosted by one)
-	 * NOTE: QEMU can  consistently  be  detected  via  `CPUID[0x80000002].EAX',
-	 *       but in order to allow KOS to properly detect BOCHS, you must change
-	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
-	 *       in your .bxrc file
-	 */
-	if (/* Normal QEMU                         */ sys86_isqemu() ||
-	    /* QEMU when running with `-accel hax' */ sys86_isqemu_accel()) {
-		x86_syslog_port = (port_t)0x3f8;
-	} else if (sys86_isbochs()) {
-		x86_syslog_port = (port_t)0xe9;
-	} else if (sys86_isvbox()) {
-		x86_syslog_port = (port_t)0x504;
-#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
-		if (_sys86_isvboxgdb())
-			x86_initialize_vboxgdb();
-#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
-	}
+	/* Initialize serial logging (if enabled) */
+	x86_initialize_syslog();
+
+	/* Initialize the clock (needed for the system log) */
 	x86_initialize_cmos();
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/*!replace_with_include <kernel/boot.h>*/
 #ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_BOOT_H
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_BOOT_H 1
 
@@ -60,6 +61,7 @@ DATDEF struct boot_device_info boot_device;
 
 
 #ifdef BUILDING_KERNEL_CORE
+INTDEF FREE void NOTHROW(KCALL x86_initialize_syslog)(void);
 #ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 INTDEF FREE void NOTHROW(KCALL x86_initialize_vboxgdb)(void);
 #endif /* CONFIG_HAVE_KERNEL_VBOXGDB */

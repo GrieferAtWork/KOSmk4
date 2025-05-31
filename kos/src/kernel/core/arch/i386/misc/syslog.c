@@ -25,9 +25,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/syslog.h>
+#include <kernel/boot.h>
 #include <kernel/paging.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
+#include <kernel/vboxgdb.h>
 #include <sched/task.h>
 
 #include <hybrid/sched/atomic-lock.h>
@@ -58,8 +60,12 @@
 
 DECL_BEGIN
 
-INTERN port_t x86_syslog_port = (port_t)0x80;
+PRIVATE port_t x86_syslog_port = (port_t)0x80;
 
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) void FCALL
+x86_syslog_doio(char const *__restrict data, size_t datalen) {
+	outsb(x86_syslog_port, data, datalen);
+}
 
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock x86_syslog_smplock = ATOMIC_LOCK_INIT;
@@ -76,7 +82,7 @@ x86_syslog_write(char const *__restrict data,
                  size_t datalen) {
 	preemption_flag_t was;
 	x86_syslog_smplock_acquire(&was);
-	outsb(x86_syslog_port, data, datalen);
+	x86_syslog_doio(data, datalen);
 	x86_syslog_smplock_release(&was);
 }
 
@@ -202,11 +208,11 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		if (packet->sp_msg[0] == '[')
 			--len;
 		x86_syslog_smplock_acquire(&was);
-		outsb(x86_syslog_port, buf, len);
+		x86_syslog_doio(buf, len);
 	} else {
 		x86_syslog_smplock_acquire(&was);
 	}
-	outsb(x86_syslog_port, packet->sp_msg, packet->sp_len);
+	x86_syslog_doio(packet->sp_msg, packet->sp_len);
 	x86_syslog_smplock_release(&was);
 }
 
@@ -218,6 +224,38 @@ PUBLIC struct syslog_sink x86_default_syslog_sink = {
 	.ss_fini   = NULL
 };
 
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL x86_initialize_syslog)(void) {
+	/* Figure out how we can output data to an emulator's STDOUT (if we're being hosted by one)
+	 * NOTE: QEMU can  consistently  be  detected  via  `CPUID[0x80000002].EAX',
+	 *       but in order to allow KOS to properly detect BOCHS, you must change
+	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
+	 *       in your .bxrc file
+	 */
+	if (/* Normal QEMU                         */ sys86_isqemu() ||
+	    /* QEMU when running with `-accel hax' */ sys86_isqemu_accel()) {
+		x86_syslog_port = (port_t)0x3f8;
+	} else if (sys86_isbochs()) {
+		x86_syslog_port = (port_t)0xe9;
+	} else if (sys86_isvbox()) {
+		x86_syslog_port = (port_t)0x504;
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
+		if (_sys86_isvboxgdb())
+			x86_initialize_vboxgdb();
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
+	} else {
+		/* Hard-disable all I/O related to the syslog */
+//TODO:		((byte_t *)&x86_syslog_doio)[0]  = 0xc3; /* ret */
+//TODO:		((byte_t *)&x86_syslog_print)[0] = 0xc3; /* ret */
+//TODO:#ifdef __x86_64__
+//TODO:		((byte_t *)&x86_syslog_printer)[0] = 0xc3; /* ret */
+//TODO:#else /* __x86_64__ */
+//TODO:		((byte_t *)&x86_syslog_printer)[0] = 0xc2; /* ret $12 */
+//TODO:		((byte_t *)&x86_syslog_printer)[1] = 0x04; /* ... */
+//TODO:		((byte_t *)&x86_syslog_printer)[2] = 0x00; /* ... */
+//TODO:#endif /* !__x86_64__ */
+	}
+}
 
 DECL_END
 
