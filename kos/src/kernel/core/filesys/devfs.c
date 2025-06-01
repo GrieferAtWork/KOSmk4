@@ -1346,13 +1346,8 @@ device_v_tryas(struct mfile *__restrict self,
 	case HANDLE_TYPE_PATH:
 		return vfs_mount_location(THIS_VFS, &devfs.fs_root);
 
-	case HANDLE_TYPE_DIRENT: {
-		REF struct fdirent *result;
-		device_getname_lock_acquire(me);
-		result = incref(&me->dv_dirent->dd_dirent);
-		device_getname_lock_release(me);
-		return result;
-	}	break;
+	case HANDLE_TYPE_DIRENT:
+		return device_getdevfsfilename(me);
 
 	default:
 		break;
@@ -1414,9 +1409,9 @@ NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self) {
  *  - devfs_byname_tree
  *  - devfs.fs_nodes
  *  - fallnodes_list
- * This  function never creates additional references for `self',
- * but leaves the job of setting up global references (though use
- * of the flags `MFILE_FN_GLOBAL_REF') to the caller
+ * This  function never creates  additional references for `self',
+ * but leaves the job of setting up global references (through use
+ * of the `MFILE_FN_GLOBAL_REF' flag) to the caller.
  *
  * This function initializes (before making `self' globally visible):
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes

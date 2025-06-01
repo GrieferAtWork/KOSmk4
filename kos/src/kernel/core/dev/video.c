@@ -1231,7 +1231,7 @@ viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 viddev_v_write(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...) {
-	/* Direct writes to an video device go to the currently active tty. */
+	/* Direct writes to a video device go to the currently active tty. */
 	struct viddev *me = (struct viddev *)mfile_asansitty(self);
 	REF struct vidtty *tty;
 	tty = viddev_getactivetty(me);
@@ -1246,7 +1246,7 @@ viddev_v_write(struct mfile *__restrict self, NCX void const *src,
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 viddev_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src,
                 size_t num_bytes, iomode_t mode) THROWS(...) {
-	/* Direct writes to an video device go to the currently active tty. */
+	/* Direct writes to a video device go to the currently active tty. */
 	struct viddev *me = (struct viddev *)mfile_asansitty(self);
 	REF struct vidtty *tty;
 	tty = viddev_getactivetty(me);

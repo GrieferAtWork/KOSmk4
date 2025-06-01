@@ -305,9 +305,9 @@ devfs_byname_caselocate(NCX char const *name, u16 namelen)
  *  - devfs_byname_tree
  *  - devfs.fs_nodes
  *  - fallnodes_list
- * This  function never creates additional references for `self',
- * but leaves the job of setting up global references (though use
- * of the flags `MFILE_FN_GLOBAL_REF') to the caller
+ * This  function never creates  additional references for `self',
+ * but leaves the job of setting up global references (through use
+ * of the `MFILE_FN_GLOBAL_REF' flag) to the caller.
  *
  * This function initializes (before making `self' globally visible):
  *  - self->_device_devnode_ _fdevnode_node_ fn_allnodes
