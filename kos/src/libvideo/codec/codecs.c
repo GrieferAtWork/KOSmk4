@@ -50,6 +50,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 
 #include "codec-specs.h"
 #include "codecs.h"
@@ -57,9 +58,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-union pixel24 {
+union pixelword {
 	video_pixel_t pixel;
-	byte_t        bytes[3];
+	byte_t        bytes[4];
 };
 
 union color_data {
@@ -75,7 +76,7 @@ union color_data {
 		u8 b;
 		u8 g;
 		u8 r;
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 	};
 };
 
@@ -330,7 +331,7 @@ unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pix
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel24(byte_t const *__restrict line, video_coord_t x) {
-	union pixel24 result;
+	union pixelword result;
 	line += x * 3;
 	result.bytes[0] = line[0];
 	result.bytes[1] = line[1];
@@ -341,7 +342,7 @@ getpixel24(byte_t const *__restrict line, video_coord_t x) {
 
 PRIVATE NONNULL((1)) void CC
 setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
-	union pixel24 data;
+	union pixelword data;
 	data.pixel = pixel;
 	line += x * 3;
 	line[0] = data.bytes[0];
@@ -382,36 +383,40 @@ PRIVATE void CC
 linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
           byte_t const *__restrict src_line, video_coord_t src_x,
           video_dim_t num_pixels) {
-	memcpyb((u8 *)dst_line + dst_x,
-	        (u8 *)src_line + src_x,
-	        num_pixels);
+	dst_line += dst_x;
+	src_line += src_x;
+	__builtin_assume(num_pixels > 0);
+	memcpyb(dst_line, src_line, num_pixels);
 }
 
 PRIVATE void CC
 linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            video_dim_t num_pixels) {
-	memcpyw((u16 *)dst_line + dst_x,
-	        (u16 *)src_line + src_x,
-	        num_pixels);
+	dst_line += dst_x << 1;
+	src_line += src_x << 1;
+	__builtin_assume(num_pixels > 0);
+	memcpyw(dst_line, src_line, num_pixels);
 }
 
 PRIVATE void CC
 linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            video_dim_t num_pixels) {
-	memcpy((u8 *)dst_line + dst_x * 3,
-	       (u8 *)src_line + src_x * 3,
-	       num_pixels, 3);
+	dst_line += dst_x * 3;
+	src_line += src_x * 3;
+	__builtin_assume(num_pixels > 0);
+	memcpy(dst_line, src_line, num_pixels * 3);
 }
 
 PRIVATE void CC
 linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            video_dim_t num_pixels) {
-	memcpyl((u32 *)dst_line + dst_x,
-	        (u32 *)src_line + src_x,
-	        num_pixels);
+	dst_line += dst_x << 2;
+	src_line += src_x << 2;
+	__builtin_assume(num_pixels > 0);
+	memcpyl(dst_line, src_line, num_pixels);
 }
 
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -422,18 +427,20 @@ PRIVATE void CC
 unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      video_dim_t num_pixels) {
-	memcpy(dst_line + dst_x * 2,
-	       src_line + src_x * 2,
-	       num_pixels * 2);
+	dst_line += dst_x << 1;
+	src_line += src_x << 1;
+	__builtin_assume(num_pixels > 0);
+	memcpy(dst_line, src_line, num_pixels << 1);
 }
 
 PRIVATE void CC
 unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      video_dim_t num_pixels) {
-	memcpy(dst_line + dst_x * 4,
-	       src_line + src_x * 4,
-	       num_pixels * 4);
+	dst_line += dst_x << 2;
+	src_line += src_x << 2;
+	__builtin_assume(num_pixels > 0);
+	memcpy(dst_line, src_line, num_pixels << 2);
 }
 
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
@@ -444,34 +451,118 @@ unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill8(byte_t *__restrict dst_line, video_coord_t dst_x,
           video_pixel_t pixel, video_dim_t num_pixels) {
-	memsetb((u8 *)dst_line + dst_x, (u8)pixel, num_pixels);
+	dst_line += dst_x;
+	__builtin_assume(num_pixels > 0);
+	memsetb(dst_line, (u8)pixel, num_pixels);
 }
 
 PRIVATE void CC
 linefill16(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_pixel_t pixel, video_dim_t num_pixels) {
-	memsetw((u16 *)dst_line + dst_x, (u16)pixel, num_pixels);
+	dst_line += dst_x << 1;
+	__builtin_assume(num_pixels > 0);
+	memsetw(dst_line, (u16)pixel, num_pixels);
 }
 
 PRIVATE void CC
 linefill24(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_pixel_t pixel, video_dim_t num_pixels) {
-	union pixel24 data;
-	video_coord_t i;
+#ifdef __OPTIMIZE_SIZE__
+	union pixelword data;
 	data.pixel = pixel;
 	dst_line += dst_x * 3;
-	for (i = 0; i < num_pixels; ++i) {
+	do {
 		dst_line[0] = data.bytes[0];
 		dst_line[1] = data.bytes[1];
 		dst_line[2] = data.bytes[2];
 		dst_line += 3;
+	} while (--num_pixels);
+#else /* __OPTIMIZE_SIZE__ */
+	union pixelword data, abc[3];
+	data.pixel = pixel;
+
+	/* Try to write in chunks of 4 pixels, by having 3 control words A,B and C:
+	 * >>  111222333444
+	 * >>  AAAABBBBCCCC
+	 */
+	abc[0].bytes[0] = data.bytes[0];
+	abc[0].bytes[1] = data.bytes[1];
+	abc[0].bytes[2] = data.bytes[2];
+	abc[0].bytes[3] = data.bytes[0];
+	abc[1].bytes[0] = data.bytes[1];
+	abc[1].bytes[1] = data.bytes[2];
+	abc[1].bytes[2] = data.bytes[0];
+	abc[1].bytes[3] = data.bytes[1];
+	abc[2].bytes[0] = data.bytes[2];
+	abc[2].bytes[1] = data.bytes[0];
+	abc[2].bytes[2] = data.bytes[1];
+	abc[2].bytes[3] = data.bytes[2];
+
+	dst_line += dst_x * 3;
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	if ((uintptr_t)dst_line & 3) {
+		while (num_pixels >= 4) {
+			*dst_line++ = abc[0].bytes[0];
+			*dst_line++ = abc[0].bytes[1];
+			*dst_line++ = abc[0].bytes[2];
+			*dst_line++ = abc[0].bytes[3];
+			*dst_line++ = abc[1].bytes[0];
+			*dst_line++ = abc[1].bytes[1];
+			*dst_line++ = abc[1].bytes[2];
+			*dst_line++ = abc[1].bytes[3];
+			*dst_line++ = abc[2].bytes[0];
+			*dst_line++ = abc[2].bytes[1];
+			*dst_line++ = abc[2].bytes[2];
+			*dst_line++ = abc[2].bytes[3];
+			num_pixels -= 4;
+		}
+	} else
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	{
+		while (num_pixels >= 4) {
+			*(uint32_t *)dst_line = abc[0].pixel;
+			dst_line += 4;
+			*(uint32_t *)dst_line = abc[1].pixel;
+			dst_line += 4;
+			*(uint32_t *)dst_line = abc[2].pixel;
+			dst_line += 4;
+			num_pixels -= 4;
+		}
 	}
+
+	/* Write remaining pixels */
+	switch (num_pixels) {
+	case 3:
+		dst_line[0] = data.bytes[0];
+		dst_line[1] = data.bytes[1];
+		dst_line[2] = data.bytes[2];
+		dst_line += 3;
+		ATTR_FALLTHROUGH
+	case 2:
+		dst_line[0] = data.bytes[0];
+		dst_line[1] = data.bytes[1];
+		dst_line[2] = data.bytes[2];
+		dst_line += 3;
+		ATTR_FALLTHROUGH
+	case 1:
+		dst_line[0] = data.bytes[0];
+		dst_line[1] = data.bytes[1];
+		dst_line[2] = data.bytes[2];
+		dst_line += 3;
+		ATTR_FALLTHROUGH
+	case 0:
+		break;
+	default: __builtin_unreachable();
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
 }
 
 PRIVATE void CC
 linefill32(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_pixel_t pixel, video_dim_t num_pixels) {
-	memsetl((u32 *)dst_line + dst_x, (u32)pixel, num_pixels);
+	dst_line += dst_x << 2;
+	__builtin_assume(num_pixels > 0);
+	memsetl(dst_line, (u32)pixel, num_pixels);
 }
 
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -487,17 +578,16 @@ unaligned_linefill16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	} else
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		video_coord_t i;
 		union {
 			u8 bytes[2];
 			u16 pixel;
 		} data;
 		data.pixel = (u16)pixel;
 		dst_line += dst_x * 2;
-		for (i = 0; i < num_pixels; ++i) {
+		do {
 			*dst_line++ = data.bytes[0];
 			*dst_line++ = data.bytes[1];
-		}
+		} while (--num_pixels);
 	}
 }
 
@@ -510,19 +600,18 @@ unaligned_linefill32(byte_t *__restrict dst_line, video_coord_t dst_x,
 	} else
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		video_coord_t i;
 		union {
 			u8 bytes[4];
 			u32 pixel;
 		} data;
 		data.pixel = (u32)pixel;
 		dst_line += dst_x * 4;
-		for (i = 0; i < num_pixels; ++i) {
+		do {
 			*dst_line++ = data.bytes[0];
 			*dst_line++ = data.bytes[1];
 			*dst_line++ = data.bytes[2];
 			*dst_line++ = data.bytes[3];
-		}
+		} while (--num_pixels);
 	}
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
@@ -762,6 +851,7 @@ PRIVATE void CC
 linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -771,16 +861,18 @@ linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			while (dst_x < 8) {
 				video_pixel_t pixel;
-				if (!num_pixels)
-					return;
 				pixel = getpixel1_inbyte_lsb(src_line, (shift_t)src_x);
 				setpixel1_inbyte_lsb(dst_line, (shift_t)dst_x, pixel);
 				++src_x;
 				++dst_x;
 				--num_pixels;
+				if (!num_pixels)
+					return;
 			}
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 8);
 		src_x += num_pixels & ~(8 - 1);
 		dst_x += num_pixels & ~(8 - 1);
@@ -810,6 +902,7 @@ PRIVATE void CC
 linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -819,16 +912,18 @@ linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			while (dst_x < 8) {
 				video_pixel_t pixel;
-				if (!num_pixels)
-					return;
 				pixel = getpixel1_inbyte_msb(src_line, (shift_t)src_x);
 				setpixel1_inbyte_msb(dst_line, (shift_t)dst_x, pixel);
 				++src_x;
 				++dst_x;
 				--num_pixels;
+				if (!num_pixels)
+					return;
 			}
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 8);
 		src_x += num_pixels & ~(8 - 1);
 		dst_x += num_pixels & ~(8 - 1);
@@ -859,6 +954,7 @@ PRIVATE void CC
 linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -868,16 +964,18 @@ linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			while (dst_x < 4) {
 				video_pixel_t pixel;
-				if (!num_pixels)
-					return;
 				pixel = getpixel2_inbyte_lsb(src_line, (shift_t)src_x);
 				setpixel2_inbyte_lsb(dst_line, (shift_t)dst_x, pixel);
 				++src_x;
 				++dst_x;
 				--num_pixels;
+				if (!num_pixels)
+					return;
 			}
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 4);
 		src_x += num_pixels & ~(4 - 1);
 		dst_x += num_pixels & ~(4 - 1);
@@ -907,6 +1005,7 @@ PRIVATE void CC
 linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -916,16 +1015,18 @@ linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			while (dst_x < 4) {
 				video_pixel_t pixel;
-				if (!num_pixels)
-					return;
 				pixel = getpixel2_inbyte_msb(src_line, (shift_t)src_x);
 				setpixel2_inbyte_msb(dst_line, (shift_t)dst_x, pixel);
 				++src_x;
 				++dst_x;
 				--num_pixels;
+				if (!num_pixels)
+					return;
 			}
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 4);
 		src_x += num_pixels & ~(4 - 1);
 		dst_x += num_pixels & ~(4 - 1);
@@ -955,6 +1056,7 @@ PRIVATE void CC
 linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -964,15 +1066,17 @@ linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			video_pixel_t pixel;
 			assert(dst_x == 1);
-			if (!num_pixels)
-				return;
 			pixel = getpixel4_inbyte_lsb(src_line, (shift_t)src_x);
 			setpixel4_inbyte_lsb(dst_line, (shift_t)dst_x, pixel);
 			++src_x;
 			++dst_x;
 			--num_pixels;
+			if (!num_pixels)
+				return;
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 2);
 		src_x += num_pixels & ~(2 - 1);
 		dst_x += num_pixels & ~(2 - 1);
@@ -1002,6 +1106,7 @@ PRIVATE void CC
 linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -1011,15 +1116,17 @@ linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (dst_x != 0) {
 			video_pixel_t pixel;
 			assert(dst_x == 1);
-			if (!num_pixels)
-				return;
 			pixel = getpixel4_inbyte_msb(src_line, (shift_t)src_x);
 			setpixel4_inbyte_msb(dst_line, (shift_t)dst_x, pixel);
 			++src_x;
 			++dst_x;
 			--num_pixels;
+			if (!num_pixels)
+				return;
 		}
+
 		/* Directly copy pixel data. */
+		__builtin_assume(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 2);
 		src_x += num_pixels & ~(2 - 1);
 		dst_x += num_pixels & ~(2 - 1);
@@ -1050,14 +1157,19 @@ linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
 		do {
 			setpixel1_inbyte_lsb(dst_line, dst_x, pixel);
+			--num_pixels;
+			if (!num_pixels)
+				return;
 		} while ((++dst_x) & 7);
 		++dst_line;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0xff * (pixel & 0x1),
 	                    num_pixels / 4);
@@ -1071,14 +1183,19 @@ linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
 		do {
 			setpixel1_inbyte_msb(dst_line, dst_x, pixel);
+			--num_pixels;
+			if (!num_pixels)
+				return;
 		} while ((++dst_x) & 7);
 		++dst_line;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0xff * (pixel & 0x1),
 	                    num_pixels / 4);
@@ -1093,14 +1210,19 @@ linefill1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
 		do {
 			setpixel2_inbyte_lsb(dst_line, dst_x, pixel);
+			--num_pixels;
+			if (!num_pixels)
+				return;
 		} while ((++dst_x) & 3);
 		++dst_line;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0x55 * (pixel & 0x3),
 	                    num_pixels / 4);
@@ -1114,14 +1236,19 @@ linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
 		do {
 			setpixel2_inbyte_msb(dst_line, dst_x, pixel);
+			--num_pixels;
+			if (!num_pixels)
+				return;
 		} while ((++dst_x) & 3);
 		++dst_line;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0x55 * (pixel & 0x3),
 	                    num_pixels / 4);
@@ -1136,12 +1263,17 @@ linefill2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
 		setpixel4_inbyte_lsb(dst_line, 1, pixel);
 		++dst_line;
+		--num_pixels;
+		if (!num_pixels)
+			return;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line, pixel | (pixel << 4), num_pixels / 2);
 	if (num_pixels & 1) {
 		setpixel4_inbyte_lsb(dst_line, 0, pixel);
@@ -1151,12 +1283,17 @@ linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
+	__builtin_assume(num_pixels > 0);
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
 		setpixel4_inbyte_msb(dst_line, 1, pixel);
 		++dst_line;
+		--num_pixels;
+		if (!num_pixels)
+			return;
 	}
+	__builtin_assume(num_pixels > 0);
 	dst_line = mempsetb(dst_line, pixel | (pixel << 4), num_pixels / 2);
 	if (num_pixels & 1) {
 		setpixel4_inbyte_msb(dst_line, 0, pixel);

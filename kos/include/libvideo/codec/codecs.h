@@ -155,13 +155,15 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict __line,
 	                                 video_coord_t __x, video_pixel_t __pixel);
 
-	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
+	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds)
+	 * @assume(__num_pixels > 0); */
 	__ATTR_NONNULL_T((1, 3)) void
 	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x,
 	                                 video_dim_t __num_pixels);
 
-	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
+	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds)
+	 * @assume(__num_pixels > 0); */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict __line, video_coord_t __dst_x,
 	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
