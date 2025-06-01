@@ -52,6 +52,7 @@
 
 #ifdef __KERNEL__
 #include <kernel/printk.h>
+#include <sched/rpc.h> /* task_serve() */
 #else /* __KERNEL__ */
 #include <sys/syslog.h>
 #endif /* !__KERNEL__ */
@@ -3992,6 +3993,9 @@ libansitty_printer(void *arg, NCX char const *data, size_t datalen) {
 			non_ascii = *data++;
 			--remaining;
 			libansitty_putc(self, non_ascii);
+#ifdef __KERNEL__
+			task_serve();
+#endif /* __KERNEL__ */
 		} while (remaining > 0);
 	} else {
 		size_t i;
