@@ -2799,26 +2799,26 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	case 1:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer1_requirements;
-		self->vc_getpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &getpixel1_msb : &getpixel1_lsb;
-		self->vc_setpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &setpixel1_msb : &setpixel1_lsb;
-		self->vc_linecopy = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linecopy1_msb : &linecopy1_lsb;
-		self->vc_linefill = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linefill1_msb : &linefill1_lsb;
+		self->vc_getpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &getpixel1_lsb : &getpixel1_msb;
+		self->vc_setpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &setpixel1_lsb : &setpixel1_msb;
+		self->vc_linecopy = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linecopy1_lsb : &linecopy1_msb;
+		self->vc_linefill = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linefill1_lsb : &linefill1_msb;
 		break;
 	case 2:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer2_requirements;
-		self->vc_getpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &getpixel2_msb : &getpixel2_lsb;
-		self->vc_setpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &setpixel2_msb : &setpixel2_lsb;
-		self->vc_linecopy = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linecopy2_msb : &linecopy2_lsb;
-		self->vc_linefill = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linefill2_msb : &linefill2_lsb;
+		self->vc_getpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &getpixel2_lsb : &getpixel2_msb;
+		self->vc_setpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &setpixel2_lsb : &setpixel2_msb;
+		self->vc_linecopy = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linecopy2_lsb : &linecopy2_msb;
+		self->vc_linefill = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linefill2_lsb : &linefill2_msb;
 		break;
 	case 4:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer4_requirements;
-		self->vc_getpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &getpixel4_msb : &getpixel4_lsb;
-		self->vc_setpixel = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &setpixel4_msb : &setpixel4_lsb;
-		self->vc_linecopy = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linecopy4_msb : &linecopy4_lsb;
-		self->vc_linefill = (self->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_MSB) ? &linefill4_msb : &linefill4_lsb;
+		self->vc_getpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &getpixel4_lsb : &getpixel4_msb;
+		self->vc_setpixel = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &setpixel4_lsb : &setpixel4_msb;
+		self->vc_linecopy = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linecopy4_lsb : &linecopy4_msb;
+		self->vc_linefill = VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags) ? &linefill4_lsb : &linefill4_msb;
 		break;
 	case 8:
 		self->vc_align = 1;

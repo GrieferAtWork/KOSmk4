@@ -66,7 +66,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			static_assert(VIDEO_CODEC_GRAY2_MSB == (VIDEO_CODEC_GRAY2_LSB + 1));
 			static_assert(VIDEO_CODEC_GRAY4_MSB == (VIDEO_CODEC_GRAY4_LSB + 1));
 			static_assert(VIDEO_CODEC_GRAY16_MSB == (VIDEO_CODEC_GRAY16_LSB + 1));
-			if ((specs->vcs_flags & VIDEO_CODEC_FLAG_MSB) && specs->vcs_bpp < 8)
+			if (VIDEO_CODEC_FLAG_ISMSB(specs->vcs_flags) && specs->vcs_bpp < 8)
 				++codec;
 		}
 	} else if (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL) {
@@ -84,7 +84,7 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			static_assert(VIDEO_CODEC_PAL2_MSB == (VIDEO_CODEC_PAL2_LSB + 1));
 			static_assert(VIDEO_CODEC_PAL4_MSB == (VIDEO_CODEC_PAL4_LSB + 1));
 			static_assert(VIDEO_CODEC_PAL16_MSB == (VIDEO_CODEC_PAL16_LSB + 1));
-			if ((specs->vcs_flags & VIDEO_CODEC_FLAG_MSB) && specs->vcs_bpp < 8)
+			if (VIDEO_CODEC_FLAG_ISMSB(specs->vcs_flags) && specs->vcs_bpp < 8)
 				++codec;
 		}
 	} else {

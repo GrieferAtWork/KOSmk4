@@ -93,8 +93,10 @@
 #define VIDEO_CODEC_FLAG_NORMAL 0x00 /* Normal flags */
 #define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? */
 #define VIDEO_CODEC_FLAG_GRAY   0x02 /* Is this a grayscale-mode codec? */
-#define VIDEO_CODEC_FLAG_LSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_FLAG_MSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_FLAG_MSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_FLAG_LSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_FLAG_ISLSB(x) ((x) & VIDEO_CODEC_FLAG_LSB)
+#define VIDEO_CODEC_FLAG_ISMSB(x) (!((x) & VIDEO_CODEC_FLAG_LSB))
 
 #ifdef __CC__
 __DECL_BEGIN
