@@ -26,13 +26,17 @@
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
 #include <dev/mktty.h>
-#include <dev/video.h>
 #include <kernel/except.h>
+#include <kernel/printk.h>
 #include <kernel/fs/chrdev.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/user.h>
 
+#include <hybrid/overflow.h>
+
 #include <kos/aref.h>
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
@@ -51,25 +55,108 @@
 DECL_BEGIN
 
 PUBLIC NONNULL((1)) size_t KCALL
-ansittydev_v_write(struct mfile *__restrict self,
-                   NCX void const *src,
+ansittydev_v_write(struct mfile *__restrict self, NCX void const *src,
                    size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
-
-	/* FIXME: Ugly hack because we can't override "mso_write" for ansi ttys */
-	if (num_bytes >= 8 && ansittydev_isvidtty(me)) {
-		struct vidtty *vd = ansittydev_asvidtty(me);
-		REF struct vidttyaccess *acc = vidtty_getaccess(vd);
-		FINALLY_DECREF_UNLIKELY(acc);
-		vidttyaccess_nocursor_start(acc);
-		RAII_FINALLY { vidttyaccess_nocursor_end(acc); };
-		return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
-	}
-
-#if !defined(NDEBUG) && 0
+#if !defined(NDEBUG) && 1
 	printk(KERN_DEBUG "[ansittydev_v_write] %$q\n", num_bytes, src);
 #endif
 	return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
+}
+
+
+PUBLIC NONNULL((1)) pos_t KCALL
+ansittydev_v_seek(struct mfile *__restrict self, off_t offset,
+                  unsigned int whence) THROWS(...) {
+	pos_t cursor_pos;
+	struct ansittydev *me = mfile_asansitty(self);
+	ansitty_coord_t old_cursor[2];
+	ansitty_coord_t new_cursor[2];
+	ansitty_coord_t winsz[2];
+
+	/* These 2 operators are emulated by libansitty and should _always_ be present. */
+	assert(me->at_ansi.at_ops.ato_getcursor);
+	assert(me->at_ansi.at_ops.ato_setcursor);
+
+	/* Allow use of "lseek()" to move the text-mode cursor of an ANSI tty. */
+	switch (whence) {
+
+	case SEEK_SET:
+		if (offset <= 1) {
+			if (offset < 0)
+				offset = 0;
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)offset, 0, true);
+			return (pos_t)offset;
+		}
+		if (me->at_ansi.at_ops.ato_getsize) {
+			(*me->at_ansi.at_ops.ato_getsize)(&me->at_ansi, winsz);
+		} else {
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, old_cursor);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, winsz);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, old_cursor[0], old_cursor[1], false);
+			++winsz[0];
+			++winsz[1];
+		}
+		cursor_pos = (pos_t)offset;
+		break;
+
+	case SEEK_CUR: {
+		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, old_cursor);
+		if (me->at_ansi.at_ops.ato_getsize) {
+			(*me->at_ansi.at_ops.ato_getsize)(&me->at_ansi, winsz);
+		} else {
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, winsz);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, old_cursor[0], old_cursor[1], false);
+			++winsz[0];
+			++winsz[1];
+		}
+		cursor_pos = (pos_t)((old_cursor[0]) +
+		                     (old_cursor[1] * winsz[0]));
+		if (OVERFLOW_SADD((off_t)cursor_pos, offset, (off_t *)&cursor_pos))
+			cursor_pos = offset < 0 ? 0 : (pos_t)-1;
+	}	break;
+
+	case SEEK_END: {
+		if (me->at_ansi.at_ops.ato_getsize) {
+			(*me->at_ansi.at_ops.ato_getsize)(&me->at_ansi, winsz);
+		} else {
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, old_cursor);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
+			(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, winsz);
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, old_cursor[0], old_cursor[1], false);
+			++winsz[0];
+			++winsz[1];
+		}
+		if (offset >= -1) {
+			(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, true);
+			return ((pos_t)winsz[0] * (pos_t)winsz[1]) - 1;
+		}
+		cursor_pos = ((pos_t)winsz[0] * (pos_t)winsz[1]);
+		if (OVERFLOW_SADD((off_t)cursor_pos, offset, (off_t *)&cursor_pos))
+			cursor_pos = 0;
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE,
+		      whence);
+		break;
+	}
+
+	/* Set position based on "cursor_pos" */
+	new_cursor[0] = (ansitty_coord_t)(cursor_pos % winsz[0]);
+	if (OVERFLOW_UCAST((__pos64_t)cursor_pos / winsz[0], &new_cursor[1]))
+		new_cursor[1] = (ansitty_coord_t)-1;
+	if (new_cursor[0] > winsz[0])
+		new_cursor[0] = winsz[0];
+	if (new_cursor[1] > winsz[1])
+		new_cursor[1] = winsz[1];
+	(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, new_cursor[0], new_cursor[1], true);
+	cursor_pos = ((pos_t)new_cursor[0]) +
+	             ((pos_t)new_cursor[1] * winsz[0]);
+	return cursor_pos;
 }
 
 

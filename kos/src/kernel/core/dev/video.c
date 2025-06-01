@@ -29,6 +29,7 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
+#include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>
@@ -374,6 +375,25 @@ NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self) {
 	rstor = _vidtty_toasyncrestore(me);
 	async_init(rstor, &vidtty_async_v_ops);
 	decref_unlikely(async_start(rstor));
+}
+
+PUBLIC NONNULL((1)) size_t KCALL
+vidtty_v_write(struct mfile *__restrict self, NCX void const *src,
+               size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	struct vidtty *me = mfile_asvidtty(self);
+#if !defined(NDEBUG) && 1
+	printk(KERN_DEBUG "[vidtty_v_write] %$q\n", num_bytes, src);
+#endif
+
+	/* Disable cursor updates for anything but the smallest of writes. */
+	if likely(num_bytes >= 8) {
+		REF struct vidttyaccess *acc = vidtty_getaccess(me);
+		FINALLY_DECREF_UNLIKELY(acc);
+		vidttyaccess_nocursor_start(acc);
+		RAII_FINALLY { vidttyaccess_nocursor_end(acc); };
+		return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
+	}
+	return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
 }
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
@@ -1312,9 +1332,10 @@ viddev_v_write(struct mfile *__restrict self, NCX void const *src,
 	if unlikely(!tty)
 		return 0; /* Indicate EOF */
 	FINALLY_DECREF_UNLIKELY(tty);
-	assert(tty->mf_ops->mo_stream != NULL &&
-	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
-	return ansittydev_v_write(tty, src, num_bytes, mode);
+	assert(tty->mf_ops->mo_stream != NULL);
+	assertf(tty->mf_ops->mo_stream->mso_write != NULL,
+	        "This should have at least been set to 'ansittydev_v_write'");
+	return (*tty->mf_ops->mo_stream->mso_write)(tty, src, num_bytes, mode);
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) size_t KCALL
@@ -1327,8 +1348,9 @@ viddev_v_writev(struct mfile *__restrict self, struct iov_buffer *__restrict src
 	if unlikely(!tty)
 		return 0; /* Indicate EOF */
 	FINALLY_DECREF_UNLIKELY(tty);
-	assert(tty->mf_ops->mo_stream != NULL &&
-	       tty->mf_ops->mo_stream->mso_write == &ansittydev_v_write);
+	assert(tty->mf_ops->mo_stream != NULL);
+	assertf(tty->mf_ops->mo_stream->mso_write != NULL,
+	        "This should have at least been set to 'ansittydev_v_write'");
 	return mfile_uwritev(tty, src, num_bytes, mode);
 }
 

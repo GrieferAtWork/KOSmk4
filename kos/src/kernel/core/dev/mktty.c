@@ -27,6 +27,7 @@
 #include <dev/keyboard.h>
 #include <dev/mktty.h>
 #include <dev/tty.h>
+#include <dev/video.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/fs/devfs.h>
@@ -66,7 +67,7 @@ mkttydev_v_oprinter(struct terminal *__restrict term,
 	me = container_of(term, struct mkttydev, t_term);
 	/* Forward output text to the display data handler. */
 	result = (*me->mtd_ohandle_write)(me->mtd_ohandle_ptr,
-	                                src, num_bytes, mode);
+	                                  src, num_bytes, mode);
 	return (ssize_t)result;
 }
 
@@ -343,6 +344,47 @@ PUBLIC_CONST struct ttydev_ops const mkttydev_ops = {{{{{
 }}}}};
 
 
+PRIVATE NONNULL((1)) size_t KCALL
+mktty_vidtty_v_write(struct mfile *__restrict self, NCX void const *src,
+                     size_t num_bytes, iomode_t mode) THROWS(...) {
+	if likely(num_bytes >= 8) {
+		struct mkttydev *me = mfile_asmktty(self);
+		struct mfile *out_file = (struct mfile *)me->mtd_ohandle_ptr;
+		struct vidtty *tty = mfile_asvidtty(out_file);
+		REF struct vidttyaccess *acc = vidtty_getaccess(tty);
+		FINALLY_DECREF_UNLIKELY(acc);
+		vidttyaccess_nocursor_start(acc);
+		RAII_FINALLY { vidttyaccess_nocursor_end(acc); };
+		return ttydev_v_write(self, src, num_bytes, mode);
+	}
+	return ttydev_v_write(self, src, num_bytes, mode);
+}
+
+
+PRIVATE struct mfile_stream_ops const mktty_vidtty_stream_ops = {
+	.mso_open        = &ttydev_v_open,
+	.mso_read        = &ttydev_v_read,
+	.mso_write       = &mktty_vidtty_v_write,
+	.mso_mmap        = &mkttydev_v_mmap,
+	.mso_stat        = &ttydev_v_stat,
+	.mso_pollconnect = &mkttydev_v_pollconnect,
+	.mso_polltest    = &mkttydev_v_polltest,
+	.mso_ioctl       = &mkttydev_v_ioctl,
+	.mso_tryas       = &ttydev_v_tryas,
+};
+
+/* Used when `mtd_ohandle_ptr' is a `vidtty' */
+PUBLIC_CONST struct ttydev_ops const mkttydev_vidtty_ops = {{{{{
+	.no_file = {
+		.mo_destroy = &mkttydev_v_destroy,
+		.mo_changed = &ttydev_v_changed,
+		.mo_stream  = &mktty_vidtty_stream_ops,
+	},
+	.no_wrattr = &ttydev_v_wrattr,
+}}}}};
+
+
+
 /* Create a new TTY device that connects the two given handles, such that
  * character-based keyboard input is taken from `ihandle_ptr', and  ansi-
  * compliant display output is written to `ohandle_ptr'.
@@ -397,6 +439,19 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 			if (stream->mso_write != NULL)
 				result->mtd_ohandle_write = (phandle_write_function_t)stream->mso_write;
 		}
+	}
+
+	/* Special handling when the output is a video terminal. In this case,
+	 * we want to use a custom set of operators that will disable hardware
+	 * cursor updates for the duration of terminal data being written. */
+	if (result->mtd_ohandle_write == (phandle_write_function_t)&vidtty_v_write) {
+		result->mf_ops = &mkttydev_vidtty_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file;
+
+		/* Use  the "raw" ANSI-tty  version of the  write-operator instead of the
+		 * one for the video device. Both work the same, but "ansittydev_v_write"
+		 * won't try  to create  another cursor  lock, which  would be  redundant
+		 * given taht we're already creating one in `mktty_vidtty_v_write'. */
+		result->mtd_ohandle_write = (phandle_write_function_t)&ansittydev_v_write;
 	}
 
 	/* incref() input and output handles, since we keep references to each. */

@@ -87,9 +87,12 @@ struct mkttydev
 
 /* Operators used by `struct mkttydev' */
 DATDEF struct ttydev_ops const mkttydev_ops;
+DATDEF struct ttydev_ops const mkttydev_vidtty_ops; /* Used when `mtd_ohandle_ptr' is a `vidtty' */
 
 /* Helper macros for `struct mktty' */
-#define mfile_ismktty(self)   ((self)->mf_ops == &mktty_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file)
+#define mfile_ismktty(self)                                                       \
+	((self)->mf_ops == &mkttydev_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file || \
+	 (self)->mf_ops == &mkttydev_vidtty_ops.to_cdev.cdo_dev.do_node.dvno_node.no_file)
 #define mfile_asmktty(self)   ((struct mkttydev *)(self))
 #define fnode_ismktty(self)   mfile_ismktty(_fnode_asfile(self))
 #define fnode_asmktty(self)   mfile_asmktty(_fnode_asfile(self))

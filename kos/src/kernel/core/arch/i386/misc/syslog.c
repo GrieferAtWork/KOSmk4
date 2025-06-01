@@ -244,7 +244,7 @@ NOTHROW(KCALL x86_initialize_syslog)(void) {
 			x86_initialize_vboxgdb();
 #endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 	} else {
-//		x86_syslog_port = (port_t)0x3f8; /* TODO: "accel=whpx" ends up here, and we fail to detect QEMU... */
+		x86_syslog_port = (port_t)0x3f8; /* TODO: "accel=whpx" ends up here, and we fail to detect QEMU... */
 
 		/* Hard-disable all I/O related to the syslog */
 //TODO:		((byte_t *)&x86_syslog_doio)[0]  = 0xc3; /* ret */

@@ -674,6 +674,7 @@ svgatty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 /* SVGA TTY device operators. */
 PRIVATE struct mfile_stream_ops const svgatty_v_stream_ops = {
 	.mso_write = &vidtty_v_write,
+	.mso_seek  = &vidtty_v_seek,
 	.mso_ioctl = &svgatty_v_ioctl,
 	.mso_tryas = &vidtty_v_tryas,
 };

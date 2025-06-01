@@ -65,12 +65,12 @@ struct ansittydev
 #else /* NDEBUG */
 #define _ansittydev_only_assert_ops_(ops)                                         \
 	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
-	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ansittydev_v_write),
+	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_seek == &ansittydev_v_seek),
 #endif /* !NDEBUG */
 #define _ansittydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ato_cdev) _ansittydev_only_assert_ops_(ops)
 
 /* Helper macros */
-#define mfile_isansitty(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_write == &ansittydev_v_write)
+#define mfile_isansitty(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_seek == &ansittydev_v_seek)
 #define mfile_asansitty(self)   ((struct ansittydev *)(self))
 #define fnode_isansitty(self)   mfile_isansitty(_fnode_asfile(self))
 #define fnode_asansitty(self)   mfile_asansitty(_fnode_asfile(self))
@@ -86,10 +86,13 @@ struct ansittydev
 #define ansittydev_v_changed chrdev_v_changed
 #define ansittydev_v_wrattr  chrdev_v_wrattr
 #define ansittydev_v_tryas   chrdev_v_tryas
-FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+FUNDEF NONNULL((1)) size_t KCALL
 ansittydev_v_write(struct mfile *__restrict self,
                    NCX void const *src,
                    size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) pos_t KCALL /* NOTE: This seek operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+ansittydev_v_seek(struct mfile *__restrict self, off_t offset,
+                  unsigned int whence) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 ansittydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                    NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);

@@ -76,10 +76,9 @@ FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_raise(struct terminal *__restr
 #ifdef NDEBUG
 #define _ttydev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define _ttydev_only_assert_ops_(ops)                                                                        \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream),                             \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &ttydev_v_read), \
-	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ttydev_v_write),
+#define _ttydev_only_assert_ops_(ops)                                            \
+	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
+	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &ttydev_v_read),
 #endif /* !NDEBUG */
 #define _ttydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->to_cdev) _ttydev_only_assert_ops_(ops)
 
@@ -110,7 +109,7 @@ ttydev_v_open(struct mfile *__restrict self,
 FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
 ttydev_v_read(struct mfile *__restrict self, NCX void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
+FUNDEF NONNULL((1)) size_t KCALL
 ttydev_v_write(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL

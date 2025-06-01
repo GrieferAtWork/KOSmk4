@@ -377,7 +377,11 @@ NOTHROW(KCALL vidtty_v_destroy)(struct mfile *__restrict self);
 #define vidtty_v_changed ansittydev_v_changed
 #define vidtty_v_wrattr  ansittydev_v_wrattr
 #define vidtty_v_tryas   ansittydev_v_tryas
-#define vidtty_v_write   ansittydev_v_write /* Cannot be overwritten! */
+#define vidtty_v_seek    ansittydev_v_seek /* Cannot be overwritten! */
+FUNDEF NONNULL((1)) size_t KCALL
+vidtty_v_write(struct mfile *__restrict self,
+               NCX void const *src,
+               size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL
 vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                NCX UNCHECKED void *arg, iomode_t mode) THROWS(...);
