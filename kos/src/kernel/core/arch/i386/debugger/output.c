@@ -286,6 +286,8 @@ NOTHROW(FCALL vgatty_v_setcelldata)(struct vidttyaccess *__restrict UNUSED(self)
 PRIVATE ATTR_DBGDATA struct vidttyaccess vgatty = {
 	.vta_refcnt         = 1,
 	.vta_lock           = ATOMIC_LOCK_INIT,
+	.vta_nocursor       = 0,
+	.vta_async_curon    = 0,
 	.vta_flags          = VIDTTYACCESS_F_ACTIVE,
 	.vta_cellw          = 9,
 	.vta_cellh          = 16,

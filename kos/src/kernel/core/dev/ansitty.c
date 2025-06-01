@@ -26,6 +26,7 @@
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
 #include <dev/mktty.h>
+#include <dev/video.h>
 #include <kernel/except.h>
 #include <kernel/fs/chrdev.h>
 #include <kernel/mman/mfile.h>
@@ -54,6 +55,17 @@ ansittydev_v_write(struct mfile *__restrict self,
                    NCX void const *src,
                    size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansittydev *me = mfile_asansitty(self);
+
+	/* FIXME: Ugly hack because we can't override "mso_write" for ansi ttys */
+	if (num_bytes >= 8 && ansittydev_isvidtty(me)) {
+		struct vidtty *vd = ansittydev_asvidtty(me);
+		REF struct vidttyaccess *acc = vidtty_getaccess(vd);
+		FINALLY_DECREF_UNLIKELY(acc);
+		vidttyaccess_nocursor_start(acc);
+		RAII_FINALLY { vidttyaccess_nocursor_end(acc); };
+		return (size_t)ansitty_printer(&me->at_ansi, (NCX char const *)src, num_bytes);
+	}
+
 #if !defined(NDEBUG) && 0
 	printk(KERN_DEBUG "[ansittydev_v_write] %$q\n", num_bytes, src);
 #endif

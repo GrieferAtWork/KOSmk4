@@ -93,8 +93,15 @@ union vidtty_cursor {
 /* Video tty accessor descriptor.
  * Used for encoding TTY display mode info and the like. */
 struct vidttyaccess {
-	WEAK refcnt_t               vta_refcnt; /* Reference counter. */
-	struct atomic_lock          vta_lock;   /* Lock for character movements. */
+	WEAK refcnt_t               vta_refcnt;        /* Reference counter. */
+	struct atomic_lock          vta_lock;          /* Lock for character movements. */
+	uintptr_half_t              vta_nocursor;      /* [lock(INC(old!=0: vta_lock; else: ATOMIC), DEC(ATOMIC))] When non-zero,
+	                                                * hardware cursor is hidden for long render ops. When decrements to zero,
+	                                                * you must either make the cursor  visible again, or (when "vta_lock"  is
+	                                                * locked), set "vta_async_curon" to non-zero  and reap the lock in  order
+	                                                * to have this done for you asynchronously. */
+	uintptr_half_t              vta_async_curon;   /* [lock(SET(ATOMIC), CLEAR(vta_lock))] When non-zero, next one to release
+	                                                * "vta_lock" must "reap" the lock and  turn the hardware cursor back  on. */
 #ifdef __WANT_VIDTTYACCESS__vta_mmlop
 	union {struct {
 #endif /* __WANT_VIDTTYACCESS__vta_mmlop */
@@ -206,14 +213,66 @@ struct vidttyaccess {
 	                                     char const *ascii_string, size_t num_cells);
 };
 
+/* Initialize basic fields of "self". The caller must still initialize:
+ * - vta_cellw
+ * - vta_cellh
+ * - vta_resx
+ * - vta_resy
+ * - vta_scan
+ * - vta_cellsize
+ * - vta_scroll_ystart
+ * - vta_scroll_yend
+ * - _vta_scrl_ymax   (use _vidttyaccess_update_scrl)
+ * - _vta_scrl1_to    (use _vidttyaccess_update_scrl)
+ * - _vta_scrl1_from  (use _vidttyaccess_update_scrl)
+ * - _vta_scrl1_cnt   (use _vidttyaccess_update_scrl)
+ * - _vta_scrl1_fil   (use _vidttyaccess_update_scrl)
+ * - vta_destroy
+ * - vta_setcell
+ * - vta_hidecursor
+ * - vta_showcursor
+ * - vta_copycell
+ * - vta_fillcells
+ * - vta_activate
+ * - vta_getcelldata
+ * - vta_setcelldata
+ * - vta_setcells_ascii
+ */
+#define _vidttyaccess_init(self)                                          \
+	(void)((self)->vta_refcnt   = 1, atomic_lock_init(&(self)->vta_lock), \
+	       (self)->vta_nocursor = 0, (self)->vta_async_curon = 0,         \
+	       (self)->vta_flags = VIDTTYACCESS_F_NORMAL, (self)->vta_cursor.vtc_word = 0)
+#define _vidttyaccess_fini(self) (void)0
+
+
+/* Helper macros for `struct vidttyaccess::vta_lock' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _vidttyaccess_reap)(struct vidttyaccess *__restrict self);
+#define vidttyaccess_reap(self)       (vidttyaccess_mustreap(self) ? _vidttyaccess_reap(self) : (void)0)
+#define vidttyaccess_mustreap(self)   (__hybrid_atomic_load(&(self)->vta_async_curon, __ATOMIC_ACQUIRE) != 0)
+#define vidttyaccess_tryacquire(self) atomic_lock_tryacquire(&(self)->vta_lock)
+#define vidttyaccess_acquire(self)    atomic_lock_acquire(&(self)->vta_lock)
+#define vidttyaccess_acquire_nx(self) atomic_lock_acquire_nx(&(self)->vta_lock)
+#define _vidttyaccess_release(self)   atomic_lock_release(&(self)->vta_lock)
+#define vidttyaccess_release(self)    (atomic_lock_release(&(self)->vta_lock), vidttyaccess_reap(self))
+#define vidttyaccess_acquired(self)   atomic_lock_acquired(&(self)->vta_lock)
+#define vidttyaccess_available(self)  atomic_lock_available(&(self)->vta_lock)
+
+/* Try to start/end a "nocursor" region (only call *_end when *_start returned true) */
+FUNDEF NONNULL((1)) void FCALL
+vidttyaccess_nocursor_start(struct vidttyaccess *__restrict self)
+		THROWS(E_WOULDBLOCK_PREEMPTED);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL vidttyaccess_nocursor_trystart)(struct vidttyaccess *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vidttyaccess_nocursor_end)(struct vidttyaccess *__restrict self);
+
 #define vidttyaccess_destroy(self) (*(self)->vta_destroy)(self)
 DEFINE_REFCNT_FUNCTIONS(struct vidttyaccess, vta_refcnt, vidttyaccess_destroy)
 
-FUNDEF NONNULL_T((1, 2)) void
+FUNDEF NONNULL((1, 2)) void
 NOTHROW(FCALL vidttyaccess_v_setcells_ascii)(struct vidttyaccess *__restrict self,
                                              struct ansitty *__restrict tty, uintptr_t address,
                                              char const *ascii_string, size_t num_cells);
-
 
 #ifndef __vidttyaccess_arref_defined
 #define __vidttyaccess_arref_defined

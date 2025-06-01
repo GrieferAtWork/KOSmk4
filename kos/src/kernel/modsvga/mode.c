@@ -500,19 +500,19 @@ svgatty_settty(struct svgatty *__restrict self,
 	assertf(!isshared(ntty), "Only pass new ttys!");
 
 	/* Mark the old tty as inactive. */
-	atomic_lock_acquire(&otty->vta_lock);
+	vidttyaccess_acquire(otty);
 	otty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
-	atomic_lock_release(&otty->vta_lock);
+	vidttyaccess_release(otty);
 
 	/* If this tty is active, update the hardware video mode. */
 	if (self->vty_active) {
 		TRY {
 			svgadev_setmode(dev, ntty->sta_mode);
 		} EXCEPT {
-			atomic_lock_acquire(&otty->vta_lock);
+			vidttyaccess_acquire(otty);
 			otty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
 			(*otty->vta_activate)(otty);
-			atomic_lock_release(&otty->vta_lock);
+			vidttyaccess_release(otty);
 			RETHROW();
 		}
 	}
@@ -544,7 +544,7 @@ svgatty_settty(struct svgatty *__restrict self,
 	_vidttyaccess_update_scrl(ntty);
 
 	/* If this tty is active, mark the caller-given accessor as active. */
-	atomic_lock_acquire(&ntty->vta_lock);
+	vidttyaccess_acquire(ntty);
 	assert(!(ntty->vta_flags & VIDTTYACCESS_F_ACTIVE));
 	if (self->vty_active) {
 		ntty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
@@ -554,7 +554,7 @@ svgatty_settty(struct svgatty *__restrict self,
 
 	/* Remember the new tty as active. */
 	arref_set(&self->vty_tty, ntty);
-	atomic_lock_release(&ntty->vta_lock);
+	vidttyaccess_release(ntty);
 }
 
 /* Same   as  `svgatty_settty()',  but  follow  up  by  sending

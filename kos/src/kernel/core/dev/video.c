@@ -55,6 +55,73 @@ DECL_BEGIN
 /* VIDEO TTY ACCESSOR                                                   */
 /************************************************************************/
 
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _vidttyaccess_reap)(struct vidttyaccess *__restrict self) {
+	do {
+		if (!vidttyaccess_tryacquire(self))
+			break;
+		if (atomic_read(&self->vta_async_curon)) {
+			atomic_write(&self->vta_async_curon, 0);
+			if ((self->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+			    (atomic_read(&self->vta_nocursor) == 0))
+				(*self->vta_showcursor)(self);
+		}
+		_vidttyaccess_release(self);
+	} while (vidttyaccess_mustreap(self));
+}
+
+/* Try to start/end a "nocursor" region (only call *_end when *_start returned true) */
+PUBLIC NONNULL((1)) void FCALL
+vidttyaccess_nocursor_start(struct vidttyaccess *__restrict self)
+		THROWS(E_WOULDBLOCK_PREEMPTED) {
+	while (!vidttyaccess_nocursor_trystart(self))
+		task_yield();
+}
+
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL vidttyaccess_nocursor_trystart)(struct vidttyaccess *__restrict self) {
+	uintptr_half_t recursion;
+again:
+	recursion = atomic_read(&self->vta_nocursor);
+	if (recursion > 0) {
+		if (!atomic_cmpxch_weak(&self->vta_nocursor, recursion, recursion + 1))
+			goto again;
+		return true;
+	}
+	if (!vidttyaccess_tryacquire(self))
+		return false;
+	recursion = atomic_fetchinc(&self->vta_nocursor);
+	if likely(recursion == 0) {
+		if (self->vta_flags & VIDTTYACCESS_F_ACTIVE)
+			(*self->vta_hidecursor)(self);
+	}
+	_vidttyaccess_release(self);
+	return true;
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vidttyaccess_nocursor_end)(struct vidttyaccess *__restrict self) {
+	uintptr_half_t recursion;
+	do {
+		recursion = atomic_read(&self->vta_nocursor);
+		assertf(recursion >= 1, "Forgot to call vidttyaccess_nocursor_start() somewhere");
+	} while (!atomic_cmpxch_weak(&self->vta_nocursor, recursion, recursion - 1));
+	if (recursion <= 1) {
+		if (vidttyaccess_tryacquire(self)) {
+			atomic_write(&self->vta_async_curon, 0);
+			if ((self->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+			    (atomic_read(&self->vta_nocursor) == 0))
+				(*self->vta_showcursor)(self);
+			_vidttyaccess_release(self);
+		} else {
+			atomic_write(&self->vta_async_curon, 1);
+		}
+		_vidttyaccess_reap(self);
+	}
+}
+
+
+
 PUBLIC NONNULL_T((1, 2)) void
 NOTHROW(FCALL vidttyaccess_v_setcells_ascii)(struct vidttyaccess *__restrict self,
                                              struct ansitty *__restrict tty, uintptr_t address,
@@ -154,11 +221,11 @@ got_old_active:
 		struct vidttyaccess *ot;
 		assert(oldtty->vty_active);
 		ot = arref_ptr(&oldtty->vty_tty); /* This can't change because we're holding the chipset lock! */
-		atomic_lock_acquire(&ot->vta_lock);
+		vidttyaccess_acquire(ot);
 		assert(ot->vta_flags & VIDTTYACCESS_F_ACTIVE);
 		ot->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
 		oldtty->vty_active = 0;
-		atomic_lock_release(&ot->vta_lock);
+		vidttyaccess_release(ot);
 	}
 
 	/* Load the video mode of the caller's tty. */
@@ -172,23 +239,23 @@ got_old_active:
 		 *       didn't leave chipset  registers in  an undefined  state! */
 		if (oldtty) {
 			struct vidttyaccess *ot;
-			ot = arref_ptr(&oldtty->vty_tty);   /* This can't change because we're holding the chipset lock! */
-			atomic_lock_acquire(&ot->vta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
+			ot = arref_ptr(&oldtty->vty_tty); /* This can't change because we're holding the chipset lock! */
+			vidttyaccess_acquire(ot);         /* NOTHROW because preemption is enabled (s.a. above) */
 			oldtty->vty_active = 1;
 			ot->vta_flags |= VIDTTYACCESS_F_ACTIVE;
 			(*ot->vta_activate)(ot);
-			atomic_lock_release(&ot->vta_lock);
+			vidttyaccess_release(ot);
 		}
 		RETHROW();
 	}
 	/* NOTHROW FROM HERE ON! */
 
 	/* Activate the tty accessor for the new active TTY */
-	atomic_lock_acquire(&nt->vta_lock); /* NOTHROW because preemption is enabled (s.a. above) */
+	vidttyaccess_acquire(nt); /* NOTHROW because preemption is enabled (s.a. above) */
 	nt->vta_flags |= VIDTTYACCESS_F_ACTIVE;
 	self->vty_active = 1;
 	(*nt->vta_activate)(nt);
-	atomic_lock_release(&nt->vta_lock);
+	vidttyaccess_release(nt);
 
 	/* Link old tty into restore list. */
 	if (oldtty) {
@@ -271,12 +338,12 @@ vidtty_async_v_work(struct async *__restrict self) {
 	(*dv_ops->vdo_setttyvideomode)(dv, ac);
 
 	/* Mark the tty as active. */
-	atomic_lock_acquire(&ac->vta_lock);     /* This can't throw because preemption is enabled. */
+	vidttyaccess_acquire(ac);               /* This can't throw because preemption is enabled. */
 	ac->vta_flags |= VIDTTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
 	nt->vty_active = 1;                     /* Mark TTY as active */
 	(*ac->vta_activate)(ac);                /* This is NOBLOCK+NOTHROW */
 	awref_set(&dv->vd_active, nt);          /* Remember TTY as active */
-	atomic_lock_release(&ac->vta_lock);
+	vidttyaccess_release(ac);
 	return ASYNC_FINISHED;
 }
 
@@ -384,9 +451,9 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			for (y = info.vcd_y; y < yend; ++y) {
 				for (x = info.vcd_x; x < xend; ++x) {
 					uintptr_t addr = x + y * tty->vta_scan;
-					atomic_lock_acquire(&tty->vta_lock);
+					vidttyaccess_acquire(tty);
 					(*tty->vta_getcelldata)(tty, addr, buf);
-					atomic_lock_release(&tty->vta_lock);
+					vidttyaccess_release(tty);
 					info.vcd_dat = (byte_t *)mempcpy(info.vcd_dat, buf,
 					                                 tty->vta_cellsize);
 				}
@@ -398,9 +465,9 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 					uintptr_t addr = x + y * tty->vta_scan;
 					memcpy(buf, info.vcd_dat, tty->vta_cellsize);
 					info.vcd_dat += tty->vta_cellsize;
-					atomic_lock_acquire(&tty->vta_lock);
+					vidttyaccess_acquire(tty);
 					(*tty->vta_setcelldata)(tty, addr, buf);
-					atomic_lock_release(&tty->vta_lock);
+					vidttyaccess_release(tty);
 				}
 			}
 		}
@@ -415,9 +482,9 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		/* Get cursor position word */
 		{
 			FINALLY_DECREF_UNLIKELY(tty);
-			atomic_lock_acquire(&tty->vta_lock);
+			vidttyaccess_acquire(tty);
 			cur.vtc_word = tty->vta_cursor.vtc_word;
-			atomic_lock_release(&tty->vta_lock);
+			vidttyaccess_release(tty);
 		}
 		((NCX uint16_t *)arg)[0] = cur.vtc_cellx;
 		((NCX uint16_t *)arg)[1] = cur.vtc_celly;
@@ -440,11 +507,12 @@ vidtty_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, cur.vtc_celly, tty->vta_resy - 1);
 
 		/* Set cursor position word */
-		atomic_lock_acquire(&tty->vta_lock);
+		vidttyaccess_acquire(tty);
 		tty->vta_cursor.vtc_word = cur.vtc_word;
-		if (tty->vta_flags & VIDTTYACCESS_F_ACTIVE)
+		if ((tty->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+		    (atomic_read(&tty->vta_nocursor) == 0))
 			(*tty->vta_showcursor)(tty);
-		atomic_lock_release(&tty->vta_lock);
+		vidttyaccess_release(tty);
 		return 0;
 	}	break;
 
@@ -471,7 +539,7 @@ vidtty_v_putc(struct ansitty *__restrict self,
 	REF struct vidttyaccess *me;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 	switch (ch) {
 
 	case 7: /* BEL */
@@ -578,7 +646,8 @@ maybe_hide_cursor_after_eol:
 			if (me->vta_cursor.vtc_celly >= me->vta_resy) {
 				/* Hide the hardware cursor (if it was visible before) */
 				if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
-				    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+				    (me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+				    (atomic_read(&me->vta_nocursor) == 0))
 					(*me->vta_hidecursor)(me);
 				goto after_clear_eol_nocursor;
 			}
@@ -592,10 +661,11 @@ maybe_hide_cursor_after_eol:
 	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
 after_clear_eol:
 	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
-	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+	    (atomic_read(&me->vta_nocursor) == 0))
 		(*me->vta_showcursor)(me); /* Update hardware cursor. */
 after_clear_eol_nocursor:
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC WUNUSED NONNULL((1)) size_t LIBANSITTY_CC
@@ -631,7 +701,7 @@ vidtty_v_puts_ascii(struct ansitty *__restrict self,
 
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 
 	/* Check if we need to scroll. */
 	if (me->vta_cursor.vtc_celly >= me->vta_scroll_yend) {
@@ -667,7 +737,8 @@ vidtty_v_puts_ascii(struct ansitty *__restrict self,
 		if (me->vta_cursor.vtc_celly >= me->vta_resy) {
 			/* Hide the hardware cursor (if it was visible before) */
 			if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
-			    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+			    (me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+			    (atomic_read(&me->vta_nocursor) == 0))
 				(*me->vta_hidecursor)(me);
 			goto after_clear_eol_nocursor;
 		}
@@ -678,10 +749,11 @@ vidtty_v_puts_ascii(struct ansitty *__restrict self,
 	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
 after_clear_eol:
 	if (!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
-	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+	    (atomic_read(&me->vta_nocursor) == 0))
 		(*me->vta_showcursor)(me); /* Update hardware cursor. */
 after_clear_eol_nocursor:
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 	return result;
 }
 
@@ -696,15 +768,16 @@ vidtty_v_setcursor(struct ansitty *__restrict self,
 		x = me->vta_resx - 1;
 	if unlikely(y >= me->vta_resy)
 		y = me->vta_resy - 1;
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 	me->vta_cursor.vtc_cellx = x;
 	me->vta_cursor.vtc_celly = y;
 	me->vta_flags &= ~VIDTTYACCESS_F_EOL;
 	if (update_hw_cursor &&
 	    !(self->at_ttymode & ANSITTY_MODE_HIDECURSOR) &&
-	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE))
+	    (me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+	    (atomic_read(&me->vta_nocursor) == 0))
 		(*me->vta_showcursor)(me); /* Update hardware cursor. */
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC NONNULL((1, 2)) void LIBANSITTY_CC
@@ -737,7 +810,7 @@ vidtty_v_copycell(struct ansitty *__restrict self,
 	uintptr_t srcaddr, dstaddr, copyend, dispend;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 	srcaddr = me->vta_cursor.vtc_celly;
 	/* Yes: vta_resx (and not `vta_scan'); s.a. the documentation of `vta_copycell' */
 	srcaddr *= me->vta_resx;
@@ -795,7 +868,7 @@ vidtty_v_copycell(struct ansitty *__restrict self,
 	}
 
 done:
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
@@ -806,7 +879,7 @@ vidtty_v_fillcell(struct ansitty *__restrict self,
 	uintptr_t dstaddr, fillend, dispend;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 	dstaddr = me->vta_cursor.vtc_cellx +
 	          me->vta_cursor.vtc_celly *
 	          me->vta_resx;
@@ -831,7 +904,7 @@ vidtty_v_fillcell(struct ansitty *__restrict self,
 	/* Do the fill. */
 	(*me->vta_fillcells)(me, self, dstaddr, ch, count);
 done:
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
@@ -839,8 +912,9 @@ vidtty_v_setttymode(struct ansitty *__restrict self) {
 	REF struct vidttyaccess *me;
 	me = ansitty_getvidttyaccess(self);
 	FINALLY_DECREF_UNLIKELY(me);
-	atomic_lock_acquire(&me->vta_lock);
-	if likely(me->vta_flags & VIDTTYACCESS_F_ACTIVE) {
+	vidttyaccess_acquire(me);
+	if likely((me->vta_flags & VIDTTYACCESS_F_ACTIVE) &&
+	          (atomic_read(&me->vta_nocursor) == 0)) {
 		/* Update the state of the on-screen cursor. */
 		if (self->at_ttymode & ANSITTY_MODE_HIDECURSOR) {
 			(*me->vta_hidecursor)(me);
@@ -848,7 +922,7 @@ vidtty_v_setttymode(struct ansitty *__restrict self) {
 			(*me->vta_showcursor)(me);
 		}
 	}
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC NONNULL((1)) void LIBANSITTY_CC
@@ -864,11 +938,11 @@ vidtty_v_scrollregion(struct ansitty *__restrict self) {
 		el = me->vta_resy;
 	if (sl > el)
 		sl = el;
-	atomic_lock_acquire(&me->vta_lock);
+	vidttyaccess_acquire(me);
 	me->vta_scroll_ystart = sl;
 	me->vta_scroll_yend   = el;
 	_vidttyaccess_update_scrl(me);
-	atomic_lock_release(&me->vta_lock);
+	vidttyaccess_release(me);
 }
 
 PUBLIC_CONST struct ansitty_operators const vidtty_ansitty_ops = {
@@ -951,12 +1025,12 @@ vidlck_async_v_work(struct async *__restrict self) {
 	(*dv_ops->vdo_setttyvideomode)(dv, ac);
 
 	/* Mark the tty as active. */
-	atomic_lock_acquire(&ac->vta_lock);     /* This can't throw because preemption is enabled. */
+	vidttyaccess_acquire(ac);               /* This can't throw because preemption is enabled. */
 	ac->vta_flags |= VIDTTYACCESS_F_ACTIVE; /* Mark TTY accessor as active */
 	nt->vty_active = 1;                     /* Mark TTY as active */
 	(*ac->vta_activate)(ac);                /* This is NOBLOCK+NOTHROW */
 	awref_set(&dv->vd_active, nt);          /* Remember TTY as active */
-	atomic_lock_release(&ac->vta_lock);
+	vidttyaccess_release(ac);
 	return ASYNC_FINISHED;
 }
 
@@ -1127,12 +1201,12 @@ got_active:
 	if (active_tty) {
 		struct vidttyaccess *tty;
 		tty = arref_ptr(&active_tty->vty_tty);
-		atomic_lock_acquire(&tty->vta_lock);
+		vidttyaccess_acquire(tty);
 		assert(active_tty->vty_active);
 		assert(tty->vta_flags & VIDTTYACCESS_F_ACTIVE);
 		tty->vta_flags &= ~VIDTTYACCESS_F_ACTIVE;
 		active_tty->vty_active = 0;
-		atomic_lock_release(&tty->vta_lock);
+		vidttyaccess_release(tty);
 	}
 	TRY {
 		/* Use the designated operator to allocate the raw video lock,
@@ -1146,11 +1220,11 @@ got_active:
 		if (active_tty) {
 			struct vidttyaccess *tty;
 			tty = arref_ptr(&active_tty->vty_tty);
-			atomic_lock_acquire(&tty->vta_lock); /* NOTHROW because preemption is enabled! */
+			vidttyaccess_acquire(tty); /* NOTHROW because preemption is enabled! */
 			tty->vta_flags |= VIDTTYACCESS_F_ACTIVE;
 			active_tty->vty_active = 1;
 			(*tty->vta_activate)(tty);
-			atomic_lock_release(&tty->vta_lock);
+			vidttyaccess_release(tty);
 		}
 		RETHROW();
 	}
