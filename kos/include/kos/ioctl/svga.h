@@ -92,6 +92,7 @@ __DECL_BEGIN
 #define SVGA_IOC_GETPAL_RGBX _IOR_KOS('S', 0x06, struct svga_palette)  /* [   svga|tty|lck] Get video palette (using `video_color_t' format) */
 #define SVGA_IOC_SETPAL_RGBX _IOW_KOS('S', 0x06, struct svga_palette)  /* [io:svga|tty|lck] Set video palette (using `video_color_t' format) */
 #define SVGA_IOC_GETCSMODE   _IOR_KOS('S', 0x07, struct svga_csmode)   /* [   svga|tty|lck] Get current video mode (including extra chipset fields) */
+#define SVGA_IOC_SETCSMODE   _IOW_KOS('S', 0x07, struct svga_csmode)   /* [io:         lck] Set current video mode (including extra chipset fields) (only allowed on video locks, since this allows setting invalid modes) */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x08, ...)                   * ... */
 /*      SVGA_IOC_            _IO*_KOS('S', 0x09, ...)                   * ... */
 

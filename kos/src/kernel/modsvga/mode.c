@@ -286,6 +286,26 @@ svgadev_ioctl_getcsstrings(struct svgadev *__restrict self,
 /************************************************************************/
 /* SVGALCK                                                              */
 /************************************************************************/
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL svgalck_free_custom_mode)(struct svgalck *__restrict self,
+                                        struct svga_modeinfo *mode) {
+	if (mode) {
+		struct svgadev *dv = viddev_assvga(self->vlc_dev);
+		struct svga_modeinfo *sup_start, *sup_end;
+		sup_start = (struct svga_modeinfo *)dv->svd_supmodev;
+		sup_end   = (struct svga_modeinfo *)(dv->svd_supmodev + dv->svd_supmodec * dv->svd_supmodeS);
+		if (!(mode >= sup_start && mode < sup_end))
+			kfree(mode);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL svgalck_v_destroy)(struct mfile *__restrict self) {
+	struct svgalck *me = mfile_assvgalck(self);
+	svgalck_free_custom_mode(me, me->slc_mode);
+	vidlck_v_destroy(me);
+}
+
 PRIVATE BLOCKING NONNULL((1)) void FCALL
 svgalck_v_restore(struct vidlck *__restrict self,
                   struct viddev *__restrict dev)
@@ -298,6 +318,18 @@ svgalck_v_restore(struct vidlck *__restrict self,
 
 	/* Restore base-vga registers. */
 	basevga_setregs(&me->slc_vregs);
+}
+
+PRIVATE void FCALL
+load_default_vga_font(void) THROWS(E_IOERROR) {
+	uint32_t fontbase;
+	uint8_t cmap;
+	cmap = baseega_registers.vr_mode.vm_seq_character_map;
+	if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
+		cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
+	cmap     = VGA_SR03_CSETA_GET(cmap);
+	fontbase = 0x20000 + basevga_fontoffset[cmap];
+	basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
 }
 
 
@@ -319,17 +351,6 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
-	case SVGA_IOC_GETCSMODE: {
-		struct svga_modeinfo const *mymode = atomic_read(&me->slc_mode);
-		if (!mymode) {
-			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
-			      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET);
-		}
-		return svgadev_ioctl_getcsmode(viddev_assvga(me->vlc_dev),
-		                               (NCX UNCHECKED struct svga_csmode *)arg,
-		                               mymode);
-	}	break;
-
 	case SVGA_IOC_SETMODE: {
 		struct svgadev *dv = viddev_assvga(me->vlc_dev);
 		struct svga_modeinfo const *newmode;
@@ -342,19 +363,75 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		svgadev_setmode(dv, newmode);
 
 		/* For text modes, also load the default font! */
-		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT) {
-			uint32_t fontbase;
-			uint8_t cmap;
-			cmap = baseega_registers.vr_mode.vm_seq_character_map;
-			if (!(basevga_flags & BASEVGA_FLAG_ISEGA))
-				cmap = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-			cmap     = VGA_SR03_CSETA_GET(cmap);
-			fontbase = 0x20000 + basevga_fontoffset[cmap];
-			basevga_wrvmem(fontbase, basevga_defaultfont, sizeof(basevga_defaultfont));
-		}
+		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT)
+			load_default_vga_font();
 
 		/* Remember last-set mode. */
 		atomic_write(&me->slc_mode, newmode);
+		return 0;
+	}	break;
+
+	case SVGA_IOC_GETCSMODE: {
+		struct svga_modeinfo const *mymode;
+		mymode = atomic_read(&me->slc_mode);
+		if (!mymode) {
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET);
+		}
+		return svgadev_ioctl_getcsmode(viddev_assvga(me->vlc_dev),
+		                               (NCX UNCHECKED struct svga_csmode *)arg,
+		                               mymode);
+	}	break;
+
+	case SVGA_IOC_SETCSMODE: {
+		struct svga_modeinfo *oldmode;
+		struct svga_modeinfo *newmode;
+		struct svgadev *dv = viddev_assvga(me->vlc_dev);
+		size_t modesize = dv->svd_chipset.sc_ops.sco_modeinfosize;
+		struct svga_csmode desc;
+		NCX struct svga_csmode *udesc;
+		udesc = (NCX UNCHECKED struct svga_csmode *)validate_readable(arg, sizeof(desc));
+		memcpy(&desc, udesc, sizeof(desc));
+		COMPILER_READ_BARRIER();
+		udesc->svcm_bufsz = modesize;
+		COMPILER_WRITE_BARRIER();
+		if (desc.svcm_bufsz < modesize)
+			THROW(E_BUFFER_TOO_SMALL, modesize, desc.svcm_bufsz);
+		validate_readable(desc.svcm_buf, modesize);
+
+		/* Copy the mode buffer into kernel space. */
+		newmode = (struct svga_modeinfo *)kmalloc(modesize, GFP_NORMAL);
+		TRY {
+			memcpy(newmode, desc.svcm_buf, modesize);
+		} EXCEPT {
+			kfree(newmode);
+			RETHROW();
+		}
+
+		/* Check if this is one of the standard modes... */
+		{
+			size_t i;
+			for (i = 0; i < dv->svd_supmodec; ++i) {
+				struct svga_modeinfo *def_mode;
+				def_mode = (struct svga_modeinfo *)(dv->svd_supmodev + i * dv->svd_supmodeS);
+				if (bcmp(newmode, def_mode, modesize) == 0) {
+					kfree(newmode);
+					newmode = def_mode;
+					break;
+				}
+			}
+		}
+
+		/* Set new video mode. */
+		svgadev_setmode(dv, newmode);
+
+		/* For text modes, also load the default font! */
+		if (newmode->smi_flags & SVGA_MODEINFO_F_TXT)
+			load_default_vga_font();
+
+		/* Remember last-set mode. */
+		oldmode = atomic_xch(&me->slc_mode, newmode);
+		svgalck_free_custom_mode(me, oldmode);
 		return 0;
 	}	break;
 
@@ -387,7 +464,7 @@ PRIVATE struct mfile_stream_ops const svgalck_v_stream_ops = {
 
 INTERN_CONST struct vidlck_ops const svgalck_ops = {
 	.vlo_file = {
-		.mo_destroy = &vidlck_v_destroy,
+		.mo_destroy = &svgalck_v_destroy,
 		.mo_stream  = &svgalck_v_stream_ops,
 	},
 	.vlo_restore = &svgalck_v_restore,
@@ -949,8 +1026,11 @@ svgadev_v_alloclck(struct viddev *__restrict self, struct vidtty *active_tty)
 
 	/* If we're overriding an active TTY, then we know what the current video-mode is! */
 	result->slc_mode = NULL;
-	if (active_tty != NULL)
-		result->slc_mode = vidttyaccess_assvga(arref_ptr(&active_tty->vty_tty))->sta_mode;
+	if (active_tty != NULL) {
+		struct vidttyaccess *vtty = arref_ptr(&active_tty->vty_tty);
+		struct svga_ttyaccess *stty = vidttyaccess_assvga(vtty);
+		result->slc_mode = (struct svga_modeinfo *)stty->sta_mode;
+	}
 
 	/* All other fields of `result' are filled by the caller! */
 	return result;

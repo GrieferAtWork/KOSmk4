@@ -189,7 +189,8 @@ struct svgatty: vidtty { };
 
 
 struct svgalck: vidlck {
-	struct svga_modeinfo const     *slc_mode;   /* [0..1][lock(vlc_dev->vd_lock)] Current video mode (for `SVGA_IOC_GETMODE' / `SVGA_IOC_SETMODE') */
+	struct svga_modeinfo           *slc_mode;   /* [0..1][lock(vlc_dev->vd_lock)][owned_if(NOT IN vlc_dev->svd_supmodev)]
+	                                             * Current video mode (for `SVGA_IOC_GET[CS]MODE' / `SVGA_IOC_SET[CS]MODE') */
 	struct vga_regs                 slc_vregs;  /* [lock(vlc_dev->vd_lock)] Standard VGA registers to restore upon release. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, slc_xregs); /* [lock(vlc_dev->vd_lock)][0..vlc_dev->svd_chipset.sco_regsize]
 	                                             * Extended registers (restored with `sul_screen.sty_dev->svd_chipset.sco_setregs') */
