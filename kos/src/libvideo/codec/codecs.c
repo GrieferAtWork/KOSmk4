@@ -107,14 +107,14 @@ union color_data {
 #define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
 #define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
 #define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_inbyte_lsb(byte_t const *__restrict byte,
                      shift_t shift) {
-	assert(shift < 8);
+	assert(shift < NBBY);
 	return (*byte >> shift) & 1;
 }
 
@@ -123,26 +123,26 @@ setpixel1_inbyte_lsb(byte_t *__restrict byte,
                      shift_t shift,
                      video_pixel_t pixel) {
 	byte_t newbyte;
-	assert(shift < 8);
+	assert(shift < NBBY);
 	newbyte = *byte;
-	newbyte &= ~(1 << shift);
-	newbyte |= ~((u8)(pixel & 1) << shift);
+	newbyte &= ~((byte_t)1 << shift);
+	newbyte |= ((byte_t)(pixel & 1) << shift);
 	*byte = newbyte;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_inbyte_msb(byte_t const *__restrict byte,
                      shift_t shift) {
-	assert(shift < 8);
-	return getpixel1_inbyte_lsb(byte, 7 - shift);
+	assert(shift < NBBY);
+	return getpixel1_inbyte_lsb(byte, (NBBY - 1) - shift);
 }
 
 LOCAL NONNULL((1)) void CC
 setpixel1_inbyte_msb(byte_t *__restrict byte,
                      shift_t shift,
                      video_pixel_t pixel) {
-	assert(shift < 8);
-	setpixel1_inbyte_lsb(byte, 7 - shift, pixel);
+	assert(shift < NBBY);
+	setpixel1_inbyte_lsb(byte, (NBBY - 1) - shift, pixel);
 }
 
 
@@ -169,7 +169,7 @@ setpixel2_inbyte_lsb(byte_t *__restrict byte,
 	newbyte = *byte;
 	shift = (shift_t)(shift * 2);
 	newbyte &= ~(3 << shift);
-	newbyte |= ~((u8)(pixel & 3) << shift);
+	newbyte |= ((u8)(pixel & 3) << shift);
 	*byte = newbyte;
 }
 
@@ -182,7 +182,7 @@ setpixel2_inbyte_msb(byte_t *__restrict byte,
 	newbyte = *byte;
 	shift = (shift_t)(7 - (shift * 2));
 	newbyte &= ~(3 << shift);
-	newbyte |= ~((u8)(pixel & 3) << shift);
+	newbyte |= ((u8)(pixel & 3) << shift);
 	*byte = newbyte;
 }
 
@@ -209,7 +209,7 @@ setpixel4_inbyte_lsb(byte_t *__restrict byte,
 	newbyte = *byte;
 	shift = (shift_t)(shift * 4);
 	newbyte &= ~(7 << shift);
-	newbyte |= ~((u8)(pixel & 7) << shift);
+	newbyte |= ((u8)(pixel & 7) << shift);
 	*byte = newbyte;
 }
 
@@ -222,7 +222,7 @@ setpixel4_inbyte_msb(byte_t *__restrict byte,
 	newbyte = *byte;
 	shift = (shift_t)(7 - (shift * 4));
 	newbyte &= ~(7 << shift);
-	newbyte |= ~((u8)(pixel & 7) << shift);
+	newbyte |= ((u8)(pixel & 7) << shift);
 	*byte = newbyte;
 }
 
@@ -231,22 +231,22 @@ setpixel4_inbyte_msb(byte_t *__restrict byte,
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_lsb(byte_t const *__restrict line, video_coord_t x) {
-	return getpixel1_inbyte_lsb(line + (x / 8), (shift_t)(x % 8));
+	return getpixel1_inbyte_lsb(line + (x / NBBY), (shift_t)(x % NBBY));
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_msb(byte_t const *__restrict line, video_coord_t x) {
-	return getpixel1_inbyte_msb(line + (x / 8), (shift_t)(x % 8));
+	return getpixel1_inbyte_msb(line + (x / NBBY), (shift_t)(x % NBBY));
 }
 
 PRIVATE NONNULL((1)) void CC
 setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
-	setpixel1_inbyte_lsb(line + (x / 8), (shift_t)(x % 8), pixel);
+	setpixel1_inbyte_lsb(line + (x / NBBY), (shift_t)(x % NBBY), pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
 setpixel1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
-	setpixel1_inbyte_msb(line + (x / 8), (shift_t)(x % 8), pixel);
+	setpixel1_inbyte_msb(line + (x / NBBY), (shift_t)(x % NBBY), pixel);
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
