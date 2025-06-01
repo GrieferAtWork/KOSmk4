@@ -90,7 +90,7 @@ PRIVATE void vmware_fifo_handle_full(struct vmware_chipset *__restrict self) {
 #undef VMWARE_USE_CACHED_MINMAX
 #define VMWARE_USE_CACHED_MINMAX
 
-#if 1 /* Extra logging for interactions with the FIFO */
+#if 0 /* Extra logging for interactions with the FIFO */
 #define VMWARE_FIFO_TRACE_RESERVE(min, max, stop, next_cmd)                                        \
 	printk(KERN_DEBUG "[vmware] reserv: {min:%#I32x, max:%#I32x, stop:%#I32x, next_cmd:%#I32x}\n", \
 	       min, max, stop, next_cmd)
