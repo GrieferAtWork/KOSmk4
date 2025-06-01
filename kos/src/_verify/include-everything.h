@@ -267,6 +267,7 @@ incdir("");
 #include <asm/prctl.h>
 #include <asm/redirect.h>
 #include <asm/resource.h>
+#include <asm/sar.h>
 #include <asm/setup.h>
 #include <asm/siginfo.h>
 #include <asm/signal.h>
@@ -1205,7 +1206,10 @@ incdir("");
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/api.h>
+#include <libvideo/gfx/blend.h>
+#include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/fonts/tlft.h>
