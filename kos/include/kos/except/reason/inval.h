@@ -310,7 +310,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING,       /* E_INVALID_ARGUMENT_BAD_VALUE: The specified default encoding is invalid */
 
 	/* ioctl() (mouse) */
-	E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE = 0x1c40, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSEIO_SETABSMODE, ...)' */
+	E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE = 0x1c40, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSE_IOC_SETABSMODE, ...)' */
 	E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSRECT_BADBOUNDS,        /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t minx, miny, maxx, maxy] The bounds specified are invalid and cannot be used */
 
 	/* ioctl() (driver) */
@@ -594,7 +594,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_MAPTEXT  E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_MAPTEXT  /* E_INVALID_ARGUMENT_BAD_VALUE: The text contained within the keymap is corrupted/invalid */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING /* E_INVALID_ARGUMENT_BAD_VALUE: The specified default encoding is invalid */
 /* ioctl() (mouse) */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSEIO_SETABSMODE, ...)' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSE_IOC_SETABSMODE, ...)' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSRECT_BADBOUNDS E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSRECT_BADBOUNDS /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t minx, miny, maxx, maxy] The bounds specified are invalid and cannot be used */
 /* ioctl() (driver) */
 #define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                    E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
@@ -868,7 +868,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_MAPTEXT  7217  /* E_INVALID_ARGUMENT_BAD_VALUE: The text contained within the keymap is corrupted/invalid */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING 7218  /* E_INVALID_ARGUMENT_BAD_VALUE: The specified default encoding is invalid */
 /* ioctl() (mouse) */
-#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   7232  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSEIO_SETABSMODE, ...)' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE   7232  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid value passed as argument to `ioctl(fd, MOUSE_IOC_SETABSMODE, ...)' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSRECT_BADBOUNDS 7233  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t minx, miny, maxx, maxy] The bounds specified are invalid and cannot be used */
 /* ioctl() (driver) */
 #define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                    7296  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */

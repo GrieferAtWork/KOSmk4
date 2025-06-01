@@ -791,7 +791,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 	(void)mode;
 	switch (cmd) {
 
-	case MOUSEIO_GETABSMODE: {
+	case MOUSE_IOC_GETABSMODE: {
 		int result;
 		validate_writable(arg, sizeof(int));
 		result = (me->md_flags & MOUSE_DEVICE_FLAG_GENABS) ? 1 : 0;
@@ -799,7 +799,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		*(NCX int *)arg = result;
 	}	break;
 
-	case MOUSEIO_SETABSMODE: {
+	case MOUSE_IOC_SETABSMODE: {
 		int mode;
 		validate_readable(arg, sizeof(int));
 		mode = *(NCX int const *)arg;
@@ -814,12 +814,12 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		}
 	}	break;
 
-	case MOUSEIO_GETABSRECT:
+	case MOUSE_IOC_GETABSRECT:
 		validate_writable(arg, sizeof(struct mouse_rect));
 		memcpy(arg, &me->md_rect, sizeof(struct mouse_rect));
 		break;
 
-	case MOUSEIO_SETABSRECT: {
+	case MOUSE_IOC_SETABSRECT: {
 		struct mouse_rect new_rect;
 		preemption_flag_t was;
 		bool was_clamped = false;
@@ -870,7 +870,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		preemption_pop(&was);
 	}	break;
 
-	case MOUSEIO_PUTMOTION: {
+	case MOUSE_IOC_PUTMOTION: {
 		struct mouse_fake_motion motion;
 		validate_readable(arg, sizeof(struct mouse_fake_motion));
 		memcpy(&motion, arg, sizeof(struct mouse_fake_motion));
@@ -879,7 +879,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			goto err_buffer_full;
 	}	break;
 
-	case MOUSEIO_GETPOS: {
+	case MOUSE_IOC_GETPOS: {
 		struct mouse_position pos;
 		validate_writable(arg, sizeof(struct mouse_position));
 		pos.mp_absx = atomic_read(&me->md_state.ms_abs_x);
@@ -887,7 +887,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		memcpy(arg, &pos, sizeof(struct mouse_position));
 	}	break;
 
-	case MOUSEIO_SETPOS: {
+	case MOUSE_IOC_SETPOS: {
 		struct mouse_position moveto;
 		validate_readable(arg, sizeof(struct mouse_position));
 		memcpy(&moveto, arg, sizeof(struct mouse_position));
@@ -896,7 +896,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			goto err_buffer_full;
 	}	break;
 
-	case MOUSEIO_GETBUTTONS: {
+	case MOUSE_IOC_GETBUTTONS: {
 		u32 buttons;
 		validate_writable(arg, sizeof(u32));
 		buttons = atomic_read(&me->md_state.ms_buttons);
@@ -904,7 +904,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		*(NCX u32 *)arg = buttons;
 	}	break;
 
-	case MOUSEIO_SETBUTTONS: {
+	case MOUSE_IOC_SETBUTTONS: {
 		u32 new_buttons;
 		validate_readable(arg, sizeof(u32));
 		new_buttons = *(NCX u32 const *)arg;
@@ -913,7 +913,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			goto err_buffer_full;
 	}	break;
 
-	case MOUSEIO_PUTBUTTON: {
+	case MOUSE_IOC_PUTBUTTON: {
 		struct mouse_fake_button button;
 		validate_writable(arg, sizeof(struct mouse_fake_button));
 		memcpy(&button, arg, sizeof(struct mouse_fake_button));
@@ -930,7 +930,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		((NCX struct mouse_fake_button *)arg)->mfb_new_buttons = button.mfb_new_buttons;
 	}	break;
 
-	case MOUSEIO_PUTVWHEEL: {
+	case MOUSE_IOC_PUTVWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
 		relmove = *(NCX s32 const *)arg;
@@ -939,7 +939,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			goto err_buffer_full;
 	}	break;
 
-	case MOUSEIO_PUTHWHEEL: {
+	case MOUSE_IOC_PUTHWHEEL: {
 		s32 relmove;
 		validate_readable(arg, sizeof(s32));
 		relmove = *(NCX s32 const *)arg;
@@ -948,7 +948,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			goto err_buffer_full;
 	}	break;
 
-	case MOUSEIO_FLUSHPENDING: {
+	case MOUSE_IOC_FLUSHPENDING: {
 		mouse_packet_t packet;
 		for (;;) {
 			packet = mousebuf_trygetpacket(&me->md_buf);

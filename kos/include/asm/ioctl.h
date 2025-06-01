@@ -59,10 +59,10 @@
  *  KOS    0x46 ('F')  FILE_IOC_*          <kos/ioctl/file.h>
  *  KOS    0x4B ('K')  KBD_IOC_*           <kos/ioctl/kbd.h>
  *  KOS    0x4C ('L')  LEAKS_IOC_*         <kos/ioctl/leaks.h>
- *  KOS    0x4D ('M')  MOUSEIO_*           <kos/ioctl/mouse.h>
+ *  KOS    0x4D ('M')  MOUSE_IOC_*         <kos/ioctl/mouse.h>
  *  KOS    0x50 ('P')  PIPE_IOC_*          <kos/ioctl/pipe.h>
  *  KOS    0x53 ('S')  SVGA_IOC_*          <kos/ioctl/svga.h>
- *  KOS    0x54 ('T')  TTYIO_*             <kos/ioctl/tty.h>
+ *  KOS    0x54 ('T')  TTY_IOC_*           <kos/ioctl/tty.h>
  *  KOS    0x56 ('V')  VID_IOC_*           <kos/ioctl/video.h>
  *  KOS    0x66 ('f')  FD_IOC_*            <kos/ioctl/fd.h>
  *  KOS    0x6D ('m')  MOD_IOC_*           <kos/ioctl/mod.h>

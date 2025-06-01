@@ -188,8 +188,8 @@
 #define IXANY   __IXANY   /* Any input character has the behavior of `VSTART' */
 #endif /* !IXANY && __IXANY */
 #if !defined(IXOFF) && defined(__IXOFF)
-#define IXOFF   __IXOFF   /* Status  bit  for   `VSTOP'  /   `VSTART':  Don't   transmit  pending   TTY  output   until  this   bit  is   cleared.
-                           * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
+#define IXOFF   __IXOFF   /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared. When set, tty
+                           * output is instead stored in a  secondary buffer (s.a. `TTY_IOC_OPEND_GETLIMIT' and  `TTY_IOC_OPEND_SETLIMIT') */
 #endif /* !IXOFF && __IXOFF */
 #if !defined(IMAXBEL) && defined(__IMAXBEL)
 #define IMAXBEL __IMAXBEL /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */

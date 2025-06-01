@@ -251,20 +251,20 @@ __DECL_END
 #endif /* __CC__ */
 
 /* Mouse device I/O functions. */
-#define MOUSEIO_GETABSMODE      _IOR_KOS('M', 0x00, int)  /* Get absolute mouse mode (`MOUSE_PACKET_TYPE_MOVED' are produced) (0: disabled; 1: enabled) */
-#define MOUSEIO_SETABSMODE      _IOW_KOS('M', 0x00, int)  /* Set absolute mouse mode (`MOUSE_PACKET_TYPE_MOVED' are produced) (0: disabled; 1: enabled) */
-#define MOUSEIO_GETABSRECT      _IOR_KOS('M', 0x01, struct mouse_rect) /* Get clip rectangle for absolute mouse mode. */
-#define MOUSEIO_SETABSRECT      _IOW_KOS('M', 0x01, struct mouse_rect) /* Set clip rectangle for absolute mouse mode. */
+#define MOUSE_IOC_GETABSMODE      _IOR_KOS('M', 0x00, int)  /* Get absolute mouse mode (`MOUSE_PACKET_TYPE_MOVED' are produced) (0: disabled; 1: enabled) */
+#define MOUSE_IOC_SETABSMODE      _IOW_KOS('M', 0x00, int)  /* Set absolute mouse mode (`MOUSE_PACKET_TYPE_MOVED' are produced) (0: disabled; 1: enabled) */
+#define MOUSE_IOC_GETABSRECT      _IOR_KOS('M', 0x01, struct mouse_rect) /* Get clip rectangle for absolute mouse mode. */
+#define MOUSE_IOC_SETABSRECT      _IOW_KOS('M', 0x01, struct mouse_rect) /* Set clip rectangle for absolute mouse mode. */
 /* Inject fake inputs. */
-#define MOUSEIO_PUTMOTION       _IOW_KOS('M', 0x02, struct mouse_fake_motion) /* Inject relative-motion inputs. (errno=EAGAIN: Buffer was full) */
-#define MOUSEIO_GETPOS          _IOR_KOS('M', 0x03, struct mouse_position) /* Return the current, absolute mouse position */
-#define MOUSEIO_SETPOS          _IOW_KOS('M', 0x03, struct mouse_position) /* Inject move-to inputs. (errno=EAGAIN: Buffer was full) */
-#define MOUSEIO_PUTMOVETO       MOUSEIO_SETPOS
-#define MOUSEIO_GETBUTTONS      _IOR_KOS('M', 0x04, __uint32_t) /* Get the set of currently pressed buttons. */
-#define MOUSEIO_SETBUTTONS      _IOW_KOS('M', 0x04, __uint32_t) /* Set the set of currently pressed buttons. */
-#define MOUSEIO_PUTBUTTON       _IOW_KOS('M', 0x04, struct mouse_fake_button) /* Inject button inputs. (errno=EAGAIN: Buffer was full) */
-#define MOUSEIO_PUTVWHEEL       _IOW_KOS('M', 0x05, __int32_t) /* Inject vertical wheel inputs. (errno=EAGAIN: Buffer was full) */
-#define MOUSEIO_PUTHWHEEL       _IOW_KOS('M', 0x06, __int32_t) /* Inject horizontal wheel inputs. (errno=EAGAIN: Buffer was full) */
-#define MOUSEIO_FLUSHPENDING     _IO_KOS('M', 0x07) /* Clear the buffer of pending mouse packets */
+#define MOUSE_IOC_PUTMOTION       _IOW_KOS('M', 0x02, struct mouse_fake_motion) /* Inject relative-motion inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSE_IOC_GETPOS          _IOR_KOS('M', 0x03, struct mouse_position) /* Return the current, absolute mouse position */
+#define MOUSE_IOC_SETPOS          _IOW_KOS('M', 0x03, struct mouse_position) /* Inject move-to inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSE_IOC_PUTMOVETO       MOUSE_IOC_SETPOS
+#define MOUSE_IOC_GETBUTTONS      _IOR_KOS('M', 0x04, __uint32_t) /* Get the set of currently pressed buttons. */
+#define MOUSE_IOC_SETBUTTONS      _IOW_KOS('M', 0x04, __uint32_t) /* Set the set of currently pressed buttons. */
+#define MOUSE_IOC_PUTBUTTON       _IOW_KOS('M', 0x04, struct mouse_fake_button) /* Inject button inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSE_IOC_PUTVWHEEL       _IOW_KOS('M', 0x05, __int32_t) /* Inject vertical wheel inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSE_IOC_PUTHWHEEL       _IOW_KOS('M', 0x06, __int32_t) /* Inject horizontal wheel inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSE_IOC_FLUSHPENDING     _IO_KOS('M', 0x07) /* Clear the buffer of pending mouse packets */
 
 #endif /* !_KOS_IOCTL_MOUSE_H */

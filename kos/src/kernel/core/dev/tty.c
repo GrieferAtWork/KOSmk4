@@ -874,26 +874,26 @@ again_TIOCNOTTY:
 	}	break;
 
 	/* KOS-specific tty ioctl commands */
-	case _IO_WITHSIZE(TTYIO_IBUF_GETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_CANON_GETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_OPEND_GETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_IPEND_GETLIMIT, 0): {
+	case _IO_WITHSIZE(TTY_IOC_IBUF_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_CANON_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_OPEND_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_IPEND_GETLIMIT, 0): {
 		size_t value;
 		switch (_IOC_NR(cmd)) {
 
-		case _IOC_NR(TTYIO_IBUF_GETLIMIT):
+		case _IOC_NR(TTY_IOC_IBUF_GETLIMIT):
 			value = atomic_read(&me->t_term.t_ibuf.rb_limit);
 			break;
 
-		case _IOC_NR(TTYIO_CANON_GETLIMIT):
+		case _IOC_NR(TTY_IOC_CANON_GETLIMIT):
 			value = atomic_read(&me->t_term.t_canon.lb_limt);
 			break;
 
-		case _IOC_NR(TTYIO_OPEND_GETLIMIT):
+		case _IOC_NR(TTY_IOC_OPEND_GETLIMIT):
 			value = atomic_read(&me->t_term.t_opend.lb_limt);
 			break;
 
-		case _IOC_NR(TTYIO_IPEND_GETLIMIT):
+		case _IOC_NR(TTY_IOC_IPEND_GETLIMIT):
 			value = atomic_read(&me->t_term.t_ipend.lb_limt);
 			break;
 
@@ -902,17 +902,17 @@ again_TIOCNOTTY:
 		return ioctl_intarg_setsize(cmd, arg, value);
 	}	break;
 
-	case _IO_WITHSIZE(TTYIO_IBUF_SETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_CANON_SETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_OPEND_SETLIMIT, 0):
-	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, 0): {
+	case _IO_WITHSIZE(TTY_IOC_IBUF_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_CANON_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_OPEND_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTY_IOC_IPEND_SETLIMIT, 0): {
 		size_t value;
 		struct linebuffer *lnbuf;
 		require(CAP_SYS_RESOURCE);
 		value = ioctl_intarg_getsize(cmd, arg);
 		switch (_IOC_NR(cmd)) {
 
-		case _IOC_NR(TTYIO_IBUF_SETLIMIT):
+		case _IOC_NR(TTY_IOC_IBUF_SETLIMIT):
 			if (!value) {
 				ringbuffer_close(&me->t_term.t_ibuf);
 			} else {
@@ -920,15 +920,15 @@ again_TIOCNOTTY:
 			}
 			return 0;
 
-		case _IOC_NR(TTYIO_CANON_SETLIMIT):
+		case _IOC_NR(TTY_IOC_CANON_SETLIMIT):
 			lnbuf = &me->t_term.t_canon;
 			break;
 
-		case _IOC_NR(TTYIO_OPEND_SETLIMIT):
+		case _IOC_NR(TTY_IOC_OPEND_SETLIMIT):
 			lnbuf = &me->t_term.t_opend;
 			break;
 
-		case _IOC_NR(TTYIO_IPEND_SETLIMIT):
+		case _IOC_NR(TTY_IOC_IPEND_SETLIMIT):
 			lnbuf = &me->t_term.t_ipend;
 			break;
 

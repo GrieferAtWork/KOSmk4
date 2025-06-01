@@ -2046,14 +2046,14 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 
 		case _PC_MAX_INPUT: {
 			size_t value;
-			result = ioctl(fd, TTYIO_IBUF_GETLIMIT, &value);
+			result = ioctl(fd, TTY_IOC_IBUF_GETLIMIT, &value);
 			if (result >= 0)
 				result = (longptr_t)value;
 		}	break;
 
 		case _PC_MAX_CANON: {
 			size_t value;
-			result = ioctl(fd, TTYIO_CANON_GETLIMIT, &value);
+			result = ioctl(fd, TTY_IOC_CANON_GETLIMIT, &value);
 			if (result >= 0)
 				result = (longptr_t)value;
 		}	break;
@@ -2131,13 +2131,13 @@ libc_do_FPathConf(fd_t fd, __STDC_INT_AS_UINT_T name) THROWS(...) {
 
 		case _PC_MAX_INPUT: {
 			size_t value;
-			Ioctl(fd, TTYIO_IBUF_GETLIMIT, &value);
+			Ioctl(fd, TTY_IOC_IBUF_GETLIMIT, &value);
 			result = (longptr_t)value;
 		}	break;
 
 		case _PC_MAX_CANON: {
 			size_t value;
-			Ioctl(fd, TTYIO_CANON_GETLIMIT, &value);
+			Ioctl(fd, TTY_IOC_CANON_GETLIMIT, &value);
 			result = (longptr_t)value;
 		}	break;
 

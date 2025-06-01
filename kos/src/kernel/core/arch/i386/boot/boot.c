@@ -703,14 +703,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *  #1: Indicate function that should be marked as [kernel] in libc/magic
 	 *  #2: Need to be inlined into .text */
 
-	/* TODO: Refactor all of the ioctls from <kos/ioctl/...> to use the <SYSTEM>_IOC_<COMMAND> format. */
-
-	/* TODO: Add SVGA_IOC_* ioctls for:
-	 *  - sco_setdisplaystart
-	 *  - sco_setlogicalwidth
-	 * Also add corresponding read-ioctls that will read the relevant properties.
-	 */
-
 	/* TODO: `HANDLE_TYPEKIND_MFILE_*' needs to be expanded with all of the new sub-classes of MFILE,
 	 *       as well as all of the subclasses of those types. The system should be designed such that
 	 *       sub-class  type IDs can easily be used to test for parent classes, given a precise child

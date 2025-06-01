@@ -31,17 +31,17 @@
 
 __DECL_BEGIN
 
-#define TTYIO_IBUF_GETLIMIT   _IOR_KOS('T', 0x00, __size_t) /* Get input buffer limit (same as `_PC_MAX_INPUT') */
-#define TTYIO_IBUF_SETLIMIT   _IOW_KOS('T', 0x00, __size_t) /* Set input buffer limit (requires root) */
-#define TTYIO_CANON_GETLIMIT  _IOR_KOS('T', 0x01, __size_t) /* Get canonical line buffer limit (same as `_PC_MAX_CANON') */
-#define TTYIO_CANON_SETLIMIT  _IOW_KOS('T', 0x01, __size_t) /* Set canonical line buffer limit (requires root)
-                                                             * HINT: This buffer may be cleared with `TCFLSH, TCIFLUSH' */
-#define TTYIO_OPEND_GETLIMIT  _IOR_KOS('T', 0x02, __size_t) /* Get pending-output buffer limit (used if `struct termios::c_iflag & IXOFF') */
-#define TTYIO_OPEND_SETLIMIT  _IOW_KOS('T', 0x02, __size_t) /* Set pending-output buffer limit (used if `struct termios::c_iflag & IXOFF') (requires root)
-                                                             * HINT: This buffer may be cleared with `TCFLSH, TCIFLUSH' */
-#define TTYIO_IPEND_GETLIMIT  _IOR_KOS('T', 0x03, __size_t) /* Get pending-input buffer limit (used if `struct termios::c_iflag & __IIOFF') */
-#define TTYIO_IPEND_SETLIMIT  _IOW_KOS('T', 0x03, __size_t) /* Set pending-input buffer limit (used if `struct termios::c_iflag & __IIOFF') (requires root)
-                                                             * HINT: This buffer may be cleared with `TCFLSH, TCOFLUSH' */
+#define TTY_IOC_IBUF_GETLIMIT   _IOR_KOS('T', 0x00, __size_t) /* Get input buffer limit (same as `_PC_MAX_INPUT') */
+#define TTY_IOC_IBUF_SETLIMIT   _IOW_KOS('T', 0x00, __size_t) /* Set input buffer limit (requires root) */
+#define TTY_IOC_CANON_GETLIMIT  _IOR_KOS('T', 0x01, __size_t) /* Get canonical line buffer limit (same as `_PC_MAX_CANON') */
+#define TTY_IOC_CANON_SETLIMIT  _IOW_KOS('T', 0x01, __size_t) /* Set canonical line buffer limit (requires root)
+                                                               * HINT: This buffer may be cleared with `TCFLSH, TCIFLUSH' */
+#define TTY_IOC_OPEND_GETLIMIT  _IOR_KOS('T', 0x02, __size_t) /* Get pending-output buffer limit (used if `struct termios::c_iflag & IXOFF') */
+#define TTY_IOC_OPEND_SETLIMIT  _IOW_KOS('T', 0x02, __size_t) /* Set pending-output buffer limit (used if `struct termios::c_iflag & IXOFF') (requires root)
+                                                               * HINT: This buffer may be cleared with `TCFLSH, TCIFLUSH' */
+#define TTY_IOC_IPEND_GETLIMIT  _IOR_KOS('T', 0x03, __size_t) /* Get pending-input buffer limit (used if `struct termios::c_iflag & __IIOFF') */
+#define TTY_IOC_IPEND_SETLIMIT  _IOW_KOS('T', 0x03, __size_t) /* Set pending-input buffer limit (used if `struct termios::c_iflag & __IIOFF') (requires root)
+                                                               * HINT: This buffer may be cleared with `TCFLSH, TCOFLUSH' */
 
 __DECL_END
 
