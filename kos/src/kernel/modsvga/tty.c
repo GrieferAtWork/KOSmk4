@@ -362,9 +362,11 @@ svga_makettyaccess_txt(struct svgadev *__restrict UNUSED(self),
 	                                                  dispsz, GFP_LOCKED | GFP_PREFLT);
 
 	/* Initialize common fields. */
+	_vidttyaccess_init(result);
 	TRY {
 		svga_ttyaccess_initvmem(result, mode);
 	} EXCEPT {
+		_vidttyaccess_fini(result);
 		kfree(result);
 		RETHROW();
 	}
@@ -552,6 +554,103 @@ NOTHROW(LIBSVGADRV_CC svga_v_hw_async_waitfor_noop)(struct svga_chipset *__restr
 }
 #endif /* SVGA_HAVE_HW_ASYNC_WAITFOR */
 
+
+#if defined(SVGA_HAVE_HW_ASYNC_FILLRECT) && 1
+#define HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx
+#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+
+#ifdef HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx
+#ifndef CELLSIZE_X
+#define CELLSIZE_X 9
+#define CELLSIZE_Y 16
+#endif /* !CELLSIZE_X */
+
+#ifndef CURSOR_Y_OFFSET
+#define CURSOR_X_OFFSET 0          /* X-offset (in pixels) for cursor */
+#define CURSOR_Y_OFFSET 13         /* Y-offset (in pixels) for cursor */
+#define CURSOR_HEIGHT   2          /* Height (in pixels) of cursor */
+#define CURSOR_WIDTH    CELLSIZE_X /* Width (in pixels) of cursor */
+#endif /* !CURSOR_Y_OFFSET */
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_hwgfx)(struct svga_ttyaccess_gfx *__restrict self) {
+	struct svga_rect crect;
+	crect.svr_x = (self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET;
+	crect.svr_y = (self->stx_swcur.vtc_celly * CELLSIZE_Y) + CURSOR_Y_OFFSET;
+	crect.svr_w = CURSOR_WIDTH;
+	crect.svr_h = CURSOR_HEIGHT;
+	(*self->stx_chipset->sc_modeops.sco_hw_async_fillrect)(self->stx_chipset, &crect,
+	                                                       self->stx_ccolor);
+}
+#endif /* HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx */
+
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL svga_ttyaccess_gfx_set_modeops)(struct svga_ttyaccess_gfx *__restrict self,
+                                              struct svga_modeinfo const *__restrict mode) {
+	switch (mode->smi_bits_per_pixel) {
+#ifndef __INTELLISENSE__
+#define SETOPS(bpp)                                                                  \
+	{                                                                                \
+		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp))(struct svga_ttyaccess_gfx *__restrict self, uintptr_t address); \
+		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp))(struct svga_ttyaccess_gfx *__restrict self); \
+		self->stx_redraw_cell   = &PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp);   \
+		self->stx_redraw_cursor = &PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp); \
+	}
+	case 1:
+		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR) {
+			SETOPS(1_p);
+		} else {
+			/* This right here is monochrome! */
+			SETOPS(1);
+		}
+		break;
+
+	case 2:
+		/* 2-bpp non-planar  wouldn't  make  any  sense,  so
+		 * we only support `SVGA_MODEINFO_F_PLANAR'-enabled. */
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_PLANAR))
+			goto notsup;
+		SETOPS(2_p);
+		break;
+
+//TODO:	case 3 ... 4:
+//TODO:		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+//TODO:			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+//TODO:		SETOPS(4);
+//TODO:		break;
+
+	case 5 ... 8:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(8);
+		break;
+
+	case 9 ... 16:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(16);
+		break;
+
+	case 17 ... 24:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		SETOPS(24);
+		break;
+
+	case 25 ... 32:
+		SETOPS(32);
+		break;
+#undef SETOPS
+#endif /* !__INTELLISENSE__ */
+
+	default:
+		/* Unsupported # of bits-per-pixel. */
+notsup:
+		return false;
+	}
+	return true;
+}
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_v_activate_gfx)(struct vidttyaccess *__restrict self) {
 	/* Redraw the entire screen after reactivation. */
@@ -593,10 +692,14 @@ NOTHROW(FCALL svga_ttyaccess_v_activate_gfx)(struct vidttyaccess *__restrict sel
 	}
 
 	/* If available, use hardware-acceleration to draw the cursor overlay. */
-#ifdef SVGA_HAVE_HW_ASYNC_FILLRECT
-//	if (cs->svd_chipset.sc_ops.sco_hw_async_fillrect)
-//		me->stx_redraw_cursor = &svga_ttyaccess_v_redraw_cursor_hwgfx; /* TODO */
-#endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
+#ifdef HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx
+	if (cs->sc_modeops.sco_hw_async_fillrect) {
+		me->stx_redraw_cursor = &svga_ttyaccess_v_redraw_cursor_hwgfx;
+	} else {
+		/* Restore default "stx_redraw_cursor" callback */
+		svga_ttyaccess_gfx_set_modeops(me, me->sta_mode);
+	}
+#endif /* HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx */
 
 	svga_makettyaccess_redraw_cells_gfx(me, 0, me->vta_resx * me->vta_resy);
 
@@ -718,6 +821,7 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 			uint8_t color_index;
 			uint32_t color;
 			struct svga_rect rect;
+			uintptr_t cursor_addr;
 			if (line0 == 0x00 || line0 == 0xff) {
 				unsigned int i;
 				for (i = 1; i < COMPILER_LENOF(src->sgc_lines); ++i) {
@@ -726,40 +830,56 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 				}
 			}
 			end    = start + num_cells;
-			src_x1 = start % self->vta_resx;
-			src_y1 = start / self->vta_resx;
-			src_x2 = end % self->vta_resx;
-			src_y2 = end / self->vta_resx;
+			src_x1 = start % me->vta_resx;
+			src_y1 = start / me->vta_resx;
+			src_x2 = end % me->vta_resx;
+			src_y2 = end / me->vta_resx;
 			if (src_x2 == 0) {
-				src_x2 = self->vta_resx;
+				src_x2 = me->vta_resx;
 				--src_y2;
 			}
 			color_index = line0 ? ((src->sgc_color & 0x0f))
 				                : ((src->sgc_color & 0xf0) >> 4);
 			color = me->stx_colors[color_index];
-#define FILL_RECT(p_rect, color)                                                                      \
+			cursor_addr = me->stx_swcur.vtc_cellx +
+			              me->stx_swcur.vtc_celly *
+			              me->vta_resx;
+			if (!(me->vta_flags & _SVGA_TTYACCESS_F_SWCURON))
+				cursor_addr = (uintptr_t)-1;
+#ifdef HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx
+#define FILL_RECT_DRAW_CURSOR() svga_ttyaccess_v_redraw_cursor_hwgfx(me)
+#else /* HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx */
+#define FILL_RECT_DRAW_CURSOR() (svga_ttyaccess_gfx_hw_async_waitfor(me), (*me->stx_redraw_cursor)(me))
+#endif /* !HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx */
+#define FILL_RECT(p_rect, color, start, count)                                                        \
 			do {                                                                                      \
 				(*me->stx_chipset->sc_modeops.sco_hw_async_fillrect)(me->stx_chipset, p_rect, color); \
+				if (cursor_addr >= (start) && cursor_addr < ((start) + (count)))                      \
+					FILL_RECT_DRAW_CURSOR();                                                          \
 				if (me->stx_chipset->sc_modeops.sco_updaterect)                                       \
 					(*me->stx_chipset->sc_modeops.sco_updaterect)(me->stx_chipset, p_rect);           \
 			}	__WHILE0
 
 			if (src_x1 > 0) {
+				uintptr_half_t line_count = me->vta_resx - src_x1;
 				rect.svr_x = src_x1 * 9;
 				rect.svr_y = src_y1 * 16;
-				rect.svr_w = (me->vta_resx - src_x1) * 9;
+				rect.svr_w = line_count * 9;
 				rect.svr_h = 16;
-				FILL_RECT(&rect, color);
+				FILL_RECT(&rect, color, start, line_count);
 				src_x1 = 0;
+				start += line_count;
+				count -= line_count;
 				++src_y1;
 			}
-			if (src_x2 < self->vta_resx) {
+			if (src_x2 < me->vta_resx) {
 				rect.svr_x = 0;
 				rect.svr_y = src_y2 * 16;
 				rect.svr_w = src_x2 * 9;
 				rect.svr_h = 16;
-				FILL_RECT(&rect, color);
-				src_x2 = self->vta_resx;
+				FILL_RECT(&rect, color, start + count - src_x2, src_x2);
+				count -= src_x2;
+				src_x2 = me->vta_resx;
 				--src_y2;
 			}
 			if (src_y1 <= src_y2) {
@@ -767,10 +887,11 @@ NOTHROW(FCALL svga_ttyaccess_v_fillcells_gfx)(struct vidttyaccess *__restrict se
 				rect.svr_y = src_y1 * 16;
 				rect.svr_w = (src_x2 - src_x1) * 9;
 				rect.svr_h = ((src_y2 - src_y1) + 1) * 16;
-				FILL_RECT(&rect, color);
+				FILL_RECT(&rect, color, start, count);
 			}
 			return;
 #undef FILL_RECT
+#undef FILL_RECT_DRAW_CURSOR
 		}
 do_normal_fill:
 #endif /* SVGA_HAVE_HW_ASYNC_FILLRECT */
@@ -844,12 +965,17 @@ NOTHROW(FCALL svga_ttyaccess_v_copycell_gfx)(struct vidttyaccess *__restrict sel
 				rect.svcr_h  = ((src_y2 - src_y1) + 1) * 16;
 
 				(*me->stx_chipset->sc_modeops.sco_hw_async_copyrect)(me->stx_chipset, &rect);
-				if (me->stx_chipset->sc_modeops.sco_updaterect)
-					(*me->stx_chipset->sc_modeops.sco_updaterect)(me->stx_chipset, &rect.svcr_dest);
 				if (must_hide_cusor) {
-					svga_ttyaccess_gfx_hw_async_waitfor(me); /* TODO: Not needed if `svga_ttyaccess_v_redraw_cursor_hwgfx' is used */
+#ifdef HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx
+					if (me->stx_redraw_cursor != &svga_ttyaccess_v_redraw_cursor_hwgfx)
+#endif /* HAVE_svga_ttyaccess_v_redraw_cursor_hwgfx */
+					{
+						svga_ttyaccess_gfx_hw_async_waitfor(me);
+					}
 					(*me->stx_redraw_cursor)(me);
 				}
+				if (me->stx_chipset->sc_modeops.sco_updaterect)
+					(*me->stx_chipset->sc_modeops.sco_updaterect)(me->stx_chipset, &rect.svcr_dest);
 				return;
 			}
 		}
@@ -945,9 +1071,11 @@ svga_makettyaccess_gfx(struct svgadev *__restrict self,
 	                                                  dispsz, GFP_LOCKED | GFP_PREFLT);
 
 	/* Initialize common fields. */
+	_vidttyaccess_init(result);
 	TRY {
 		svga_ttyaccess_initvmem(result, mode);
 	} EXCEPT {
+		_vidttyaccess_fini(result);
 		kfree(result);
 		RETHROW();
 	}
@@ -976,68 +1104,10 @@ svga_makettyaccess_gfx(struct svgadev *__restrict self,
 	result->stx_chipset        = &self->svd_chipset;
 
 	/* BPP-specific operators. */
-	switch (mode->smi_bits_per_pixel) {
-#ifndef __INTELLISENSE__
-#define SETOPS(bpp)                                                                    \
-	{                                                                                  \
-		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp))(struct svga_ttyaccess_gfx *__restrict self, uintptr_t address); \
-		INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp))(struct svga_ttyaccess_gfx *__restrict self); \
-		result->stx_redraw_cell   = &PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, bpp);   \
-		result->stx_redraw_cursor = &PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, bpp); \
-	}
-	case 1:
-		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR) {
-			SETOPS(1_p);
-		} else {
-			/* This right here is monochrome! */
-			SETOPS(1);
-		}
-		break;
-
-	case 2:
-		/* 2-bpp non-planar  wouldn't  make  any  sense,  so
-		 * we only support `SVGA_MODEINFO_F_PLANAR'-enabled. */
-		if (!(mode->smi_flags & SVGA_MODEINFO_F_PLANAR))
-			goto notsup;
-		SETOPS(2_p);
-		break;
-
-//TODO:	case 3 ... 4:
-//TODO:		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-//TODO:			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
-//TODO:		SETOPS(4);
-//TODO:		break;
-
-	case 5 ... 8:
-		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
-		SETOPS(8);
-		break;
-
-	case 9 ... 16:
-		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
-		SETOPS(16);
-		break;
-
-	case 17 ... 24:
-		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
-		SETOPS(24);
-		break;
-
-	case 25 ... 32:
-		SETOPS(32);
-		break;
-#undef SETOPS
-#endif /* !__INTELLISENSE__ */
-
-	default:
+	if (!svga_ttyaccess_gfx_set_modeops(result, mode)) {
 		/* Unsupported # of bits-per-pixel. */
-notsup:
 		destroy(result);
 		THROW(E_NOT_IMPLEMENTED_UNSUPPORTED);
-		break;
 	}
 
 	/* Precalculate palette colors. */
@@ -1091,14 +1161,10 @@ svgadev_makettyaccess(struct svgadev *__restrict self,
 	}
 
 	/* Fill in missing standard fields. */
-	result->vta_refcnt = 1;
-	atomic_lock_init(&result->vta_lock);
-	result->vta_flags           = VIDTTYACCESS_F_NORMAL;
-	result->vta_cursor.vtc_word = 0;
-	result->vta_cellw           = 9;
-	result->vta_cellh           = 16;
-	result->vta_destroy         = &svga_ttyaccess_destroy;
-	result->sta_mode            = mode;
+	result->vta_cellw   = 9;
+	result->vta_cellh   = 16;
+	result->vta_destroy = &svga_ttyaccess_destroy;
+	result->sta_mode    = mode;
 	return result;
 }
 
