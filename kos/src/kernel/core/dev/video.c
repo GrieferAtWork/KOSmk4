@@ -29,7 +29,6 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
-#include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>
@@ -381,7 +380,7 @@ PUBLIC NONNULL((1)) size_t KCALL
 vidtty_v_write(struct mfile *__restrict self, NCX void const *src,
                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct vidtty *me = mfile_asvidtty(self);
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 	printk(KERN_DEBUG "[vidtty_v_write] %$q\n", num_bytes, src);
 #endif
 
