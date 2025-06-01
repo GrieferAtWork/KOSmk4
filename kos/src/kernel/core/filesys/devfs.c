@@ -1346,8 +1346,11 @@ device_v_tryas(struct mfile *__restrict self,
 	case HANDLE_TYPE_PATH:
 		return vfs_mount_location(THIS_VFS, &devfs.fs_root);
 
-	case HANDLE_TYPE_DIRENT:
-		return device_getdevfsfilename(me);
+	case HANDLE_TYPE_DIRENT: {
+		REF struct devdirent *result;
+		result = device_getdevfsfilename(me);
+		return &result->dd_dirent; /* Important: return pointer to dirent part! */
+	}	break;
 
 	default:
 		break;
