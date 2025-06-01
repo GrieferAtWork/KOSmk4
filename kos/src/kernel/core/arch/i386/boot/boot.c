@@ -795,8 +795,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       change ioctlf() to use the RWF_* flags, rather than `iomode_t'
 	 * Also: When offset=(pos_t)-1 should behave like read(2) / write(2) */
 
-	/* TODO: `file(1)' appears to be broken */
-
 	/* TODO: Support for `__has_c_attribute()' in <__stdinc.h> and <compiler/generic.h> */
 
 	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab77ab93 */
+/* HASH CRC-32:0x71e2c559 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,8 +59,8 @@ __NAMESPACE_LOCAL_END
 #define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size (including space for trailing NUL) */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size (excluding trailing NUL, which only gets added during pack) */
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
@@ -68,7 +68,7 @@ __LOCAL_LIBC(format_aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __AT
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) {
 	/* Free unused buffer memory. */
 	char *__result;
-	if (__self->ap_avail != 0) {
+	if (__self->ap_avail != 1) {
 #if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 		char *__newbuf;
 		__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base,

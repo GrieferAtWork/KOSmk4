@@ -1155,8 +1155,8 @@ $ssize_t format_length(void *arg,
 #define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size (including space for trailing NUL) */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size (excluding trailing NUL, which only gets added during pack) */
 };
 #endif /* !__format_aprintf_data_defined */
 
@@ -1192,8 +1192,8 @@ struct format_aprintf_data {
 #define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
-	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size (including space for trailing NUL) */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size (excluding trailing NUL, which only gets added during pack) */
 };
 @@pp_endif@@
 )]
@@ -1229,7 +1229,7 @@ char *format_aprintf_pack([[inout]] struct format_aprintf_data *__restrict self,
                           [[out_opt]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
 	char *result;
-	if (self->@ap_avail@ != 0) {
+	if (self->@ap_avail@ != 1) {
 @@pp_if $has_function(realloc)@@
 		char *newbuf;
 		newbuf = (char *)realloc(self->@ap_base@,
@@ -1289,22 +1289,23 @@ char *format_aprintf_pack([[inout]] struct format_aprintf_data *__restrict self,
 format_aprintf_alloc:([[inout]] struct format_aprintf_data *__restrict self,
                       $size_t num_chars) -> [[malloc(num_chars)]] char * {
 	char *result;
-	if (self->@ap_avail@ < num_chars) {
+	if (num_chars >= self->@ap_avail@) {
 		char *newbuf;
-		size_t min_alloc = self->@ap_used@ + num_chars;
+		size_t min_alloc = self->@ap_used@ + num_chars + 1;
 		size_t new_alloc = self->@ap_used@ + self->@ap_avail@;
 		if (!new_alloc)
-			new_alloc = 8;
-		while (new_alloc < min_alloc)
+			new_alloc = 4;
+		do {
 			new_alloc *= 2;
-		newbuf = (char *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(char));
+		} while (new_alloc < min_alloc);
+		newbuf = (char *)realloc(self->@ap_base@, new_alloc * sizeof(char));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(char));
+			newbuf    = (char *)realloc(self->@ap_base@, new_alloc * sizeof(char));
 			if unlikely(!newbuf)
 				goto err;
 		}
-		__hybrid_assert(new_alloc >= self->@ap_used@ + num_chars);
+		__hybrid_assert(new_alloc > self->@ap_used@ + num_chars);
 		self->@ap_base@  = newbuf;
 		self->@ap_avail@ = new_alloc - self->@ap_used@;
 	}

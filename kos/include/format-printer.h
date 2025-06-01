@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc18aafba */
+/* HASH CRC-32:0x59bdced6 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -638,8 +638,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_length, __FORCELOCAL __ATTR_ARTIFICIAL __
 #define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size (including space for trailing NUL) */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size (excluding trailing NUL, which only gets added during pack) */
 };
 #endif /* !__format_aprintf_data_defined */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb72b589b */
+/* HASH CRC-32:0x8b21de4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,30 +43,31 @@ __NAMESPACE_LOCAL_END
 #define __format_aprintf_data_defined
 struct format_aprintf_data {
 	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size (including space for trailing NUL) */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size (excluding trailing NUL, which only gets added during pack) */
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_aprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INOUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_alloc))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) {
 	char *__result;
-	if (__self->ap_avail < __num_chars) {
+	if (__num_chars >= __self->ap_avail) {
 		char *__newbuf;
-		__SIZE_TYPE__ __min_alloc = __self->ap_used + __num_chars;
+		__SIZE_TYPE__ __min_alloc = __self->ap_used + __num_chars + 1;
 		__SIZE_TYPE__ __new_alloc = __self->ap_used + __self->ap_avail;
 		if (!__new_alloc)
-			__new_alloc = 8;
-		while (__new_alloc < __min_alloc)
+			__new_alloc = 4;
+		do {
 			__new_alloc *= 2;
-		__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, (__new_alloc + 1) * sizeof(char));
+		} while (__new_alloc < __min_alloc);
+		__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, __new_alloc * sizeof(char));
 		if __unlikely(!__newbuf) {
 			__new_alloc = __min_alloc;
-			__newbuf    = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, (__new_alloc + 1) * sizeof(char));
+			__newbuf    = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, __new_alloc * sizeof(char));
 			if __unlikely(!__newbuf)
 				goto __err;
 		}
-		__hybrid_assert(__new_alloc >= __self->ap_used + __num_chars);
+		__hybrid_assert(__new_alloc > __self->ap_used + __num_chars);
 		__self->ap_base  = __newbuf;
 		__self->ap_avail = __new_alloc - __self->ap_used;
 	}
