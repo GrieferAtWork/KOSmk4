@@ -25,25 +25,35 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/video.h>
 #include <kernel/driver.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/sync.h>
 #include <kernel/mman/unmapped.h>
+#include <kernel/paging.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/list.h>
 #include <hybrid/unaligned.h>
 
 #include <hw/video/vga.h>
 #include <kos/except.h>
+#include <kos/kernel/memory.h>
+#include <kos/kernel/types.h>
+#include <kos/lockop.h>
+#include <kos/types.h>
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
+#include <libansitty/ansitty.h>
+#include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
 #include <libsvgadrv/util/vgaio.h>
 

@@ -170,10 +170,10 @@ INTERN_FUNCTION(_start)
 #elif IS_ALIGNED(SIZEOF_TSS, 2)
 	movl   $(SIZEOF_TSS / 2), %ecx
 	rep    movsw
-#else
+#else /* ... */
 	movl   $(SIZEOF_TSS), %ecx
 	rep    movsb
-#endif
+#endif /* !... */
 #endif /* !CONFIG_NO_SMP */
 
 	/* memcpy(&bootidle, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
@@ -337,8 +337,8 @@ INTERN_FUNCTION(_start)
 	movl   %eax, %cr4
 2:
 
-#if !defined(CONFIG_NO_KERNEL_X86_PAGING_P32) && \
-    !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
+#if (!defined(CONFIG_NO_KERNEL_X86_PAGING_P32) && \
+     !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE))
 #define HYBRID_PAGING_MODE 1
 #endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 

@@ -41,7 +41,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_early)(void
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_stable)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_late)(void);
 
-/* Allocate an set a new mman for /bin/init during booting.
+/* Allocate and set a new mman for /bin/init during booting.
  * This function is used to assign a new mman for the initial user-space process,
  * so-as not to launch that process in the context of the special  `mman_kernel',
  * which shouldn't contain mappings for anything user-space related. */

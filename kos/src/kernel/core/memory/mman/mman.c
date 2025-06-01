@@ -452,14 +452,13 @@ NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 }
 
 
-/* Allocate an set a new mman for /bin/init during booting.
+/* Allocate and set a new mman for /bin/init during booting.
  * This function is used to assign a new mman for the initial user-space process,
  * so-as not to launch that process in the context of the special  `mman_kernel',
  * which shouldn't contain mappings for anything user-space related. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_user_mman)(void) {
-	REF struct mman *umm;
-	umm = mman_new();
+	REF struct mman *umm = mman_new();
 	task_setmman_inherit(umm);
 }
 
