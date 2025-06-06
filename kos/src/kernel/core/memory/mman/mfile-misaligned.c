@@ -45,6 +45,7 @@
 #include <kos/lockop.h>
 #include <kos/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <atomic.h>

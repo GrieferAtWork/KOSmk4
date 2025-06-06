@@ -58,9 +58,9 @@ struct exception;
 #define STRUCT_EXCEPTION struct exception
 #endif /* !__cplusplus */
 
-/* Public API:
+/* Public (user overridable) API:
  *
- * >> int matherr(struct exception *exc);
+ * >> extern int matherr(struct exception *exc);
  * >> extern _LIB_VERSION_TYPE _LIB_VERSION;
  */
 #undef _LIB_VERSION

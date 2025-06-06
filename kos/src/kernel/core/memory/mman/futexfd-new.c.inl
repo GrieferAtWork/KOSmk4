@@ -40,6 +40,7 @@
 #include <hybrid/align.h>
 #include <hybrid/typecore.h>
 
+#include <compat/config.h>
 #include <kos/asm/futex.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>

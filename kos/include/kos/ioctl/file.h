@@ -95,7 +95,7 @@ struct file_blkshift {
  * create a misaligned wrapper for the file. Briefly stated: a mis-
  * aligned  file wrapper behaves the same as the original file, but
  * with the addition that:
- *  - All references to file data have sub-part added of `fmsa_offset' added
+ *  - All references to file data have `fmsa_offset' added to their pos_t
  *    - This  affects `pread(2)', `read(2)' and `mmap(2)', this
  *      last system call being the most important of these when
  *      it comes to uses of misaligned wrappers.
@@ -197,7 +197,7 @@ __DECL_END
 /* Possible values for `struct file_trim::ft_mode' */
 #define FILE_TRIM_MODE_NONE          0 /* Don't trim anything (no-op) */
 #define FILE_TRIM_MODE_UNMAPPED      1 /* Trim unchanged data that's not mapped into memory anywhere */
-#define FILE_TRIM_MODE_UNINITIALIZED 2 /* Trim unchanged data that's not mapped into memory anywhere, or mapped data's not initialized */
+#define FILE_TRIM_MODE_UNINITIALIZED 2 /* Trim unchanged data that's not mapped into memory anywhere, or mapped data that's not initialized */
 #define FILE_TRIM_MODE_UNCHANGED     3 /* Trim data that hasn't been modified since it was initialized */
 #define FILE_TRIM_MODE_SYNC          4 /* Write changes to file buffers to disk (marking them unchanged), then do `FILE_IOC_TRIM_MODE_UNCHANGED' */
 #define FILE_TRIM_MODE_ALL           5 /* As per `FILE_IOC_TRIM_MODE_SYNC', but in case of changed, anonymous memory, (try to) write that memory to swap. */

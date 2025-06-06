@@ -143,6 +143,10 @@ static_assert(alignof(struct mpart) == ALIGNOF_MPART);
  * The caller must be holding a lock to `self'. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
+#if 0
+	(void)self;
+	COMPILER_IMPURE();
+#else
 	size_t size;
 	assert(mpart_lock_acquired(self));
 	assertf((self->mp_flags & MPART_F_COREPART) || kmalloc_islocked(self),
@@ -254,6 +258,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
 			}
 		}
 	}
+#endif
 }
 #endif /* !NDEBUG */
 

@@ -260,7 +260,7 @@ mman_prefaultv(struct iov_buffer const *__restrict buffer,
  *  - Any VIO mappings within the specified range are simply ignored (and will not
  *    count towards the  returned value), unless  `MMAN_FAULT_F_NOVIO' is set,  in
  *    which case such mappings will cause an exception to be thrown.
- *  - This function will automatically wide the given range to encompass whole pages.
+ *  - This function will automatically widen the given range to encompass whole pages.
  *  - This function will also update the page directory mappings for any  mem-parts
  *    that get faulted during its  invocation, meaning that use of  `memcpy_nopf()'
  *    within the indicated address range (whilst  still checking it for errors  for
@@ -629,7 +629,7 @@ _mfault_unlock_and_waitfor_part(struct mfault *__restrict self)
  *   - EXCEPT:           mpart_lock_releases(self->mfl_part);
  *                       mman_lock_release(self->mfl_mman);
  *
- * @param: self:   mem-lock control descriptor.
+ * @param: self:   mem-fault control descriptor.
  * @return: true:  Successfully faulted memory.
  * @return: false: The lock to `self->mfl_mman' was lost, but the  goal
  *                 of faulting memory has gotten closer, and the caller
@@ -752,7 +752,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 					THROW(E_FSERROR_READONLY);
 				}
 				if (file_flags & MFILE_F_DELETING) {
-					/* Now allowed to write-fault a SHARED memory mapping while the file is being deleted.
+					/* Not allowed to write-fault a SHARED memory mapping while the file is being deleted.
 					 * -> Instead, have to wait for this flag to go away. */
 					REF struct mfile *file = incref(part->mp_file);
 					LOCAL_unlock_all();
@@ -827,7 +827,7 @@ done_mark_changed:
 		 * from creating _way_ too  many small node+anon-part pairs,  by
 		 * simply trying to merge nodes after they've been created.
 		 *
-		 * This optimization is performed by a trailing call to `mnode_merge()' */
+		 * This optimization is performed by a trailing call to `mnode_merge*()' */
 
 		if unlikely(node->mn_flags & MNODE_F_NOSPLIT) {
 			/* Must unshare the mem-node as  a whole (that is: fault  the
@@ -1088,7 +1088,7 @@ pcopy_free_unused_block_status:
 
 		/* Try to merge the newly updated node with its successor/predecessor. */
 		{
-			node           = mnode_merge_with_partlock(node);
+			node = mnode_merge_with_partlock(node);
 			self->mfl_node = node;
 			self->mfl_part = node->mn_part;
 			assert(self->mfl_addr >= node->mn_minaddr);
@@ -1125,8 +1125,6 @@ nope:
 	return false;
 #undef LOCAL_unlock_all
 }
-
-
 
 DECL_END
 
