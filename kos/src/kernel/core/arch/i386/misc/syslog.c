@@ -30,6 +30,7 @@
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/vboxgdb.h>
+#include <kernel/x86/cpuid.h>
 #include <sched/task.h>
 
 #include <hybrid/sched/atomic-lock.h>
