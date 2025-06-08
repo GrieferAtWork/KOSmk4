@@ -32,7 +32,6 @@
 
 .section .text.cold
 	.cfi_startproc simple
-	.cfi_signal_frame
 	/* Setup CFI to restore from `x86_dbg_exitstate' */
 	EXTERN(x86_dbg_exitstate_b0)
 	EXTERN(x86_dbg_exitstate_b1)

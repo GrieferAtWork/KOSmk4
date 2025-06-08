@@ -44,7 +44,7 @@
  */
 PUBLIC_FUNCTION(__i386_syscall_iret)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	/* Disable interrupts to prevent any further IRET redirections. */
 	cli

@@ -35,7 +35,6 @@
 .section .text.cold
 PUBLIC_FUNCTION(kernel_panic_here)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -74,7 +73,6 @@ END(kernel_panic_here)
 .section .text.cold
 PUBLIC_FUNCTION(kernel_panic_here_n)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -114,7 +112,6 @@ END(kernel_panic_here_n)
 .section .text.cold
 PUBLIC_FUNCTION(kernel_vpanic)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -153,7 +150,6 @@ END(kernel_vpanic)
 .section .text.cold
 PUBLIC_FUNCTION(kernel_vpanic_n)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -193,7 +189,6 @@ END(kernel_vpanic_n)
 .section .text.cold
 PUBLIC_FUNCTION(kernel_panic)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
@@ -253,7 +248,6 @@ END(kernel_panic)
 .section .text.cold
 PUBLIC_FUNCTION(kernel_panic_n)
 	.cfi_startproc
-	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx

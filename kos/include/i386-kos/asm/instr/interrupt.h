@@ -31,7 +31,7 @@
  * using the macros in this file:
  * >> INTERN_FUNCTION(my_interrupt_handler)
  * >> 	.cfi_startproc simple
- * >> 	.cfi_iret_signal_frame
+ * >> 	.cfi_restore_iret
  * >> 	.cfi_def_cfa %rsp, 0
  * >> 	swapgs_if_user_iret
  * >>

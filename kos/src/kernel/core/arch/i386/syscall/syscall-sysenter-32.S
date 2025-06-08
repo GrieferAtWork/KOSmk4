@@ -52,7 +52,6 @@
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
@@ -114,7 +113,6 @@ END(x86_syscall32_sysenter)
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
@@ -281,7 +279,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_rel_offset %ds, OFFSET_ICPUSTATE_DS
 	.cfi_rel_offset %es, OFFSET_ICPUSTATE_ES
@@ -379,7 +377,6 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	/* Called when the %ebp pointer of a sysenter callback
 	 * is   faulty   (aka:   points   into   kernel-space) */
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
 	.cfi_restore_iret_eflags

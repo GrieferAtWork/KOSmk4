@@ -252,7 +252,7 @@ function i386_printKernelSyscallWrapper_int80(fp: File, f: Function, sysno: int)
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_int80\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
-	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_restore_iret\n";
 	fp << "	.cfi_def_cfa %esp, 0\n";
 	fp << "	pushl_cfi %ds\n";
 	fp << "	.cfi_restore_iret_ds_or_offset -4\n";
@@ -342,7 +342,7 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_sysenter\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
-	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_restore_iret\n";
 	fp << "	.cfi_def_cfa %esp, 0\n";
 	fp << "	pushl_cfi %ds\n";
 	fp << "	.cfi_restore_iret_ds_or_offset -4\n";
@@ -502,7 +502,7 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm64_syscall\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
-	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_restore_iret\n";
 	fp << "	.cfi_def_cfa %rsp, 0\n";
 	fp << "	pushq_cfi_r %rcx\n";
 	fp << "	pushq_cfi_r %rdx\n";
@@ -1052,7 +1052,7 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_int80\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
-	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_restore_iret\n";
 	fp << "	.cfi_def_cfa %rsp, 0\n";
 	/* Preserve callee-clobber registers to prevent
 	 * kernel  data  from leaking  into user-space. */
@@ -1112,7 +1112,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_sysenter\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
-	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_restore_iret\n";
 	fp << "	.cfi_def_cfa %rsp, 0\n";
 	/* Preserve callee-clobber registers to prevent
 	 * kernel  data  from leaking  into user-space. */

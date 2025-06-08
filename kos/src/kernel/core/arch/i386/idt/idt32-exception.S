@@ -31,7 +31,7 @@ IDT_HANDLER_BEGIN
 	.cfi_startproc simple
 #if IDT_VECTOR_ID == 0x08 || defined(__DEEMON__)
 	/* Double Fault */
-	.cfi_signal_frame
+	.cfi_signal_frame__exception
 	.cfi_def_cfa %ebp, 0
 	.cfi_rel_offset %eip, OFFSET_TSS_EIP
 	.cfi_rel_offset %eflags, OFFSET_TSS_EFLAGS
@@ -136,9 +136,10 @@ IDT_HANDLER_BEGIN
 #else /* IDT_VECTOR_ID == 0x08 */
 	/* UGH!  SERIOUS F- YOU  GDB!!!! Like literally,  it just p00ps itself
 	 * because of the `.cfi_adjust_cfa_offset -4' down below. For WHATEVER
-	 * STUPID  REASON, this `.cfi_signal_frame' affects it somehow... WTF? */
+	 * STUPID  REASON,  this  `.cfi_signal_frame__exception'  affects   it
+	 * somehow... WTF? */
 #if IDT_VECTOR_ID != 0x0e
-	.cfi_signal_frame
+	.cfi_signal_frame__exception
 #endif /* IDT_VECTOR_ID != 0x0e */
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs

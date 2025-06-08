@@ -74,7 +74,7 @@
 
 .section .text.cold
 .cfi_startproc
-.cfi_iret_signal_frame
+	.cfi_restore_iret
 PRIVATE_FUNCTION(x86_idt_unused_common)
 	.cfi_def_cfa %rsp, 8
 	popq_cfi -(SIZEOF_GPREGS64 + 8)(%rsp) /* VECNO */

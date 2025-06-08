@@ -51,7 +51,6 @@
 .section .text
 PUBLIC_FUNCTION(kernel_restart_interrupt)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %R_fcall0P, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movP   %R_fcall0P, %Psp

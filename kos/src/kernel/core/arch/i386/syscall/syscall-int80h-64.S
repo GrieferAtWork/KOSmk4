@@ -53,7 +53,7 @@
 INTERN_CONST(x86_idtdpl_syscall, 3)
 PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	/* Because we can assume that we only get here from user-space with #IF disabled,
 	 * we don't have to  swapgs or sti  conditionally, but can  simply always do  so. */
@@ -121,7 +121,7 @@ END(x86_idt_syscall)
 .section .text.hot
 PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	/* Only get here from user-space, so we can do an unconditional swapgs on entry! */
 	swapgs
@@ -234,11 +234,12 @@ END(x86_idt_syscall_traced)
 /* INT 80H EMULATION ENTRY                                              */
 /************************************************************************/
 .section .text
+/* >> FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
+ * >> NOTHROW(FCALL x86_syscall_emulate_int80h_r)(struct icpustate *__restrict state); */
 PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%rdi'
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
@@ -284,7 +285,6 @@ PUBLIC_FUNCTION(x86_syscall_emulate32_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%rdi'
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
@@ -305,7 +305,6 @@ PUBLIC_FUNCTION(x86_syscall_emulate64_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%rdi'
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
@@ -327,7 +326,7 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	/* For `int 80h' system calls:
 	 *   Called when a system call number hasn't been assigned (%rax:sysno) */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 
 	/* Check IRET.EFLAGS.DF if an exception should be thrown */

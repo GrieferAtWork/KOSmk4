@@ -38,7 +38,7 @@
 
 .section .text.crt.sched.signal
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__rpc
 	/* %Pbp:        [1..1] struct ucpustate const        *restore_cpu        CPU context */
 	/* %Pbx:        [0..1] struct fpustate const         *restore_fpu        FPU context */
 	/* [%esi,%r12]: [0..1] struct sigset_with_size const *restore_sigmask    Signal mask */

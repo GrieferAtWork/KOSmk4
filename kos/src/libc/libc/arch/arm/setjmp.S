@@ -47,7 +47,7 @@ DEFINE_PUBLIC_ALIAS(_setjmp3, libc_setjmp)
 .section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_longjmp)
 	.cfi_startproc
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	cmp    r1, #0 /* if (sig == 0) */
 	moveq  r1, #1 /*     sig = 1; */
 INTERN_FUNCTION(libc___fast_longjmp)

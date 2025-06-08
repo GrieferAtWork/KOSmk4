@@ -24,7 +24,8 @@
 
 IDT_HANDLER_BEGIN
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	intr_enter INTR
 

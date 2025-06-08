@@ -81,7 +81,6 @@ DEFINE_PUBLIC_ALIAS(except_rethrow, libc_except_rethrow)
 INTERN_FUNCTION(libc_except_rethrow)
 	/* ATTR_NORETURN void except_rethrow(void) */
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 IU(	INTERN(libc_except_info))
 IU(	call   libc_except_info)
@@ -191,7 +190,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_except_rethrow)
 .section .text
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	goto_Ldo_unwind_rsp
 	.cfi_endproc
@@ -203,7 +201,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* except_register_state_t *__restrict state */
@@ -218,7 +215,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* except_register_state_t *__restrict state */
@@ -233,7 +229,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* except_register_state_t *__restrict state */
@@ -248,7 +243,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume_or_Rethrow, libc_Unwind_Resume_or_Rethrow)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rdx, %rcx /* void *stop_arg */
 	movq   %rsi, %rdx /* _Unwind_Stop_Fn stop */
@@ -266,7 +260,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_ForcedUnwind, libc_Unwind_ForcedUnwind)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
-	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	movq   %rsi, %rdx /* void *arg */
 	movq   %rdi, %rsi /* _Unwind_Trace_Fn func */
@@ -286,7 +279,6 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Backtrace, libc_Unwind_Backtrace)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_except_handler3)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
 	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
 	andq   $-16, %rsp /* Align stack to a 16-byte boundary */
@@ -302,7 +294,6 @@ DEFINE_PUBLIC_ALIAS(except_handler3, libc_except_handler3)
 .section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_except_handler4)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
 	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
 	andq   $-16, %rsp /* Align stack to a 16-byte boundary */

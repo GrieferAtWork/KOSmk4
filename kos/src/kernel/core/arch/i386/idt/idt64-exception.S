@@ -32,7 +32,8 @@ IDT_HANDLER_SETIST(1)
 
 IDT_HANDLER_BEGIN
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__exception
+	.cfi_restore_iret
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	.cfi_def_cfa %rsp, 8 /* Adjust for the error code. */
 	popq_cfi -(SIZEOF_GPREGSNSP + 8)(%rsp) /* ECODE */

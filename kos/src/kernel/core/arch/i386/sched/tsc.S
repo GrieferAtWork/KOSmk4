@@ -269,7 +269,8 @@ END(tsc_getdeadline)
 .section .text
 INTERN_FUNCTION(x86_idt_apic_spurious)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 	SIMPLE_C_INTERRUPT_ENTER
 
@@ -296,7 +297,8 @@ END(x86_idt_apic_spurious)
 .section .text
 INTERN_FUNCTION(x86_idt_specific_07h) /* IDT_X86_f8, X86_INTNO_PIC2_CMOS */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 	SIMPLE_C_INTERRUPT_ENTER
 
@@ -341,7 +343,8 @@ END(call_tsc_deadline)
 .section .text
 INTERN_FUNCTION(x86_idt_preemption)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 #ifdef __x86_64__
 	intr_enter INTR
@@ -772,7 +775,8 @@ END(x86_idt_preemption)
 .section .text.cold
 INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 #ifdef __x86_64__
 	intr_enter INTR

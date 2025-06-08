@@ -79,7 +79,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	/* For `sysenter' system calls:
 	 *   Called when a system call number hasn't been assigned (%rax:sysno) */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 
 	/* Check IRET.EFLAGS.DF if an exception should be thrown */

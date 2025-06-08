@@ -116,7 +116,8 @@ PUBLIC_FUNCTION(cpu_ipi_service_nopr)
 	.cfi_endproc
 INTERN_FUNCTION(x86_idt_apic_ipi)
 	.cfi_startproc
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 #ifdef __x86_64__
 	intr_enter INTR
@@ -262,11 +263,13 @@ END(ipi_action_table)
 
 
 .section .text
+/* >> INTDEF NOBLOCK NONNULL((1, 2)) void
+ * >> NOTHROW(FCALL x86_execute_direct_ipi_nopr)(cpu_ipi_t func,
+ * >>                                            void *args[CPU_IPI_ARGCOUNT]); */
 INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	/* ECX: <cpu_ipi_t func> */
 	/* EDX: <cpu_ipi_t args> */
 	.cfi_startproc
-	.cfi_signal_frame
 	/* Construct an IRET tail. */
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
@@ -299,11 +302,13 @@ END(x86_execute_direct_ipi_nopr)
 
 
 .section .text
+/* >> INTDEF NOBLOCK NONNULL((1, 2)) void
+ * >> NOTHROW(FCALL x86_execute_direct_ipi)(cpu_ipi_t func,
+ * >>                                       void *args[CPU_IPI_ARGCOUNT]); */
 INTERN_FUNCTION(x86_execute_direct_ipi)
 	/* ECX: <cpu_ipi_t func> */
 	/* EDX: <cpu_ipi_t args> */
 	.cfi_startproc
-	.cfi_signal_frame
 	/* Construct an IRET tail. */
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
@@ -1053,7 +1058,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* Set up tracing to appear as though we're nothing but an interrupt originating
 	 * from  whereever  we're  supposed  to  start  executing  the  provided thread. */
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %Psp, OFFSET_SCPUSTATE_IRREGS
 #ifdef __x86_64__
 	ASM_CFI_REL_OFFSET_RESTORE_SGBASE(OFFSET_SCPUSTATE_SGBASE)
@@ -1286,7 +1291,6 @@ END(x86_smp_entry32)
 /* FUNDEF void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller); */
 PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	.cfi_startproc
-	.cfi_signal_frame
 	/* Construct an IRET tail. */
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax

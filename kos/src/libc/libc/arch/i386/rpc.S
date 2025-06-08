@@ -66,7 +66,7 @@
 /* Restorer wrapper function for `rpc_exec_program' and `rpc_interrupt_program' */
 /* INTDEF void ASMCALL libc_x86_rpc_restorer(void); */
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__rpc
 	/* Upon entry, `%Psp' points at a `struct rpc_context *ctx', and we must:
 	 *  - Set-up CFI to restore `ctx->rc_state'
 	 *  - Make a call to `sys_sigreturn(2)' if `ctx->rc_context == RPC_REASONCTX_SYSCALL'

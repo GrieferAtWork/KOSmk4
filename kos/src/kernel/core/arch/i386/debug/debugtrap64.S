@@ -32,7 +32,6 @@ PUBLIC_FUNCTION(kernel_debugtrap)
 	/* PUBLIC void FCALL
 	 * kernel_debugtrap(struct debugtrap_reason *reason); */
 	.cfi_startproc
-	.cfi_signal_frame
 	ret
 	popq_cfi  %rax
 	.cfi_register %rip, %rax

@@ -46,7 +46,7 @@
  */
 PUBLIC_FUNCTION(__x86_32_syscall_iret)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	/* Disable interrupts to prevent any further IRET redirections. */
 	cli
@@ -93,7 +93,7 @@ END(__x86_32_syscall_iret)
  */
 PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	/* Disable interrupts to prevent any further IRET redirections. */
 	cli

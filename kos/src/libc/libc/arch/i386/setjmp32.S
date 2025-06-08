@@ -71,7 +71,7 @@ DEFINE_PUBLIC_ALIAS(_setjmp3, libc_setjmp)
 .section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_longjmp)
 	.cfi_startproc
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	movl   8(%esp), %eax
 	testl  %eax, %eax
 	jnz    1f
@@ -145,7 +145,7 @@ DEFINE_PUBLIC_ALIAS(__libc_siglongjmp, libc_sigsetjmp)
 .section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_siglongjmp)
 	.cfi_startproc
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	movl   4(%esp), %ecx
 	cmpl   $(0), OFFSET_JMPBUF_PA0(%ecx)
 	je     libc_longjmp /* No signal mask */

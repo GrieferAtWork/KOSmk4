@@ -1163,6 +1163,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		if (!mfault_or_unlock(&mf))
 			goto again_lock_mman;
 	} EXCEPT {
+		//asm("call dbg");
 		mfault_fini(&mf);
 		task_popconnections();
 

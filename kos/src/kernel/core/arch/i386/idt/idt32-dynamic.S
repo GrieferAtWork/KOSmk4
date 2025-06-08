@@ -24,7 +24,7 @@
 
 IDT_HANDLER_BEGIN
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 
 	pushl_cfi %ds

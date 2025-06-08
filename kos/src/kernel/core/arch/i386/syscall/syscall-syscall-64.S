@@ -50,7 +50,6 @@
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall64_syscall)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rsp, 0
 	.cfi_register %rip, %rcx
 	.cfi_register %rflags, %r11
@@ -121,7 +120,6 @@ END(x86_syscall64_syscall)
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rsp, 0
 	.cfi_register %rip, %rcx
 	.cfi_register %rflags, %r11

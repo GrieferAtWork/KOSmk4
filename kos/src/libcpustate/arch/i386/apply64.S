@@ -52,7 +52,7 @@
 #ifdef __KERNEL__
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_icpustate)
@@ -73,7 +73,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_icpustate_rsp, libcpu_apply_icpustate_rsp)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, OFFSET_SCPUSTATE_IRREGS
 	ASM_CFI_REL_OFFSET_RESTORE_SCPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_scpustate)
@@ -117,7 +117,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_scpustate_rsp, libcpu_apply_scpustate_rsp)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_ucpustate)
@@ -205,7 +205,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_ucpustate, libcpu_apply_ucpustate)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_kcpustate)
@@ -265,7 +265,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_kcpustate, libcpu_apply_kcpustate)
 
 .section .xdata
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_REL_OFFSET_RESTORE_LCPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_lcpustate)
@@ -294,7 +294,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_lcpustate, libcpu_apply_lcpustate)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_fcpustate)

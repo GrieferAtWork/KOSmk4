@@ -467,61 +467,6 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 	    (self->cs_regs[LOCAL_CFI_UNWIND_COMMON_REGISTER_SP(fde->f_addrsize)].cr_rule == DW_CFA_register_rule_undefined)
 #endif /* ... */
 	    ) {
-		/* Check if we should apply signal frame transformations.
-		 * Note that we only do this if we have a CFA rule and do intend on applying it.
-		 * In  any other case, applying sigframe transformation wouldn't make any sense,
-		 * and would even cause problems by interfering with GDB erroring out with:
-		 *   - Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-		 * This can be caused when one frame's return-SP is greater than it's caller,
-		 * which  should normally never be the case,  but can happen when a custom-SP
-		 * restore rule was defined.
-		 * Right now, GDB allows SP to be any value during unwind when either the called,
-		 * or the calling frame are marked as .cfi_signal_frame.
-		 * In  my opinion, this should be loosened a bit to only stop unwinding if the fully
-		 * unwound frame ends up being a carbon copy of a previous frame, rather than always
-		 * failing when SP isn't where GDB would like it to be at.
-		 * Anyways, what you as a KOS developer should take away from this is:
-		 *   - Any custom assembly  function that  assigns a  new ESP  from either  another
-		 *     stack, or somewhere further up the stack must be marked as .cfi_signal_frame
-		 *   - The KOS unwind mechanism will ignore .cfi_def_cfa and .cfi_signal_frame when
-		 *     another rule  exists  that  assigns explicit  unwinding  behavior  for  %esp
-		 *   - GDB  will _NOT_ working properly unless every  function has a CFA rule defined.
-		 *     For this purpose, you can usually use `.cfi_def_cfa %esp, 0', however be warned
-		 *     that  the value of  this expression is used  as the FRAME-ID  which GDB uses to
-		 *     identify frames, so try to keep its value unique, I guess...
-		 *   - With all of this in mind, a custom register restore function would look like this:
-		 * >>     .cfi_startproc simple
-		 * >>     .cfi_def_cfa %esp, 0
-		 * >>     .cfi_signal_frame
-		 * >> #define DEFINE_REGISTER_ADDRESS(reg) \
-		 * >>     .cfi_escape DW_CFA_expression;   \
-		 * >>     .cfi_escape reg;                 \
-		 * >>     .cfi_escape ...;                 \
-		 * >>     ...;
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EDI)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_ESI)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EBP)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_ESP)  // This rule right here overrides normal CFA unwinding
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EBX)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EDX)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_ECX)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EAX)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EFLAGS)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EIP)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_ES)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_CS)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_SS)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_DS)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_FS)
-		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_GS)
-		 * >> #undef DEFINE_REGISTER_ADDRESS
-		 * >>     nop  // So that a return-pc directed at `MyRegisterUnwindFunction'
-		 * >>          // shows up properly in backtraces
-		 * >> PUBLIC_FUNCTION(MyRegisterUnwindFunction)
-		 * >>     ...
-		 * >>     .cfi_endproc
-		 * >> END(MyRegisterUnwindFunction)
-		 */
 		TRACE("UNWIND(cfa=%p)\n", cfa);
 		result = (*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP(fde->f_addrsize), &cfa);
 		if unlikely(result != UNWIND_SUCCESS)

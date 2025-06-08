@@ -54,7 +54,6 @@
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rsp, 0
 	.cfi_register %rsp, %rbp /* RBP is the designated return-sp register */
 	.cfi_register %rip, %rdi /* RDI is the designated return-pc register */
@@ -123,7 +122,6 @@ END(x86_syscall32_sysenter)
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %rsp, 0
 	.cfi_register %rsp, %rbp /* RBP is the designated return-sp register */
 	.cfi_register %rip, %rdi /* RDI is the designated return-pc register */
@@ -259,7 +257,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%rdi'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rdi, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	cli    /* Prevent corruptions while we're juggling with our stack. */

@@ -458,7 +458,7 @@ DEFINE_PUBLIC_ALIAS(__x86_getcontext_eax, libc_x86_getcontext_eax)
 /* INTERN NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp); */
 .section .text.crt.cpu.ucontext
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	/* Define register unwind rules */
 	.cfi_offset %Pip, OFFSET_UCONTEXT_MCONTEXT+OFFSET_MCONTEXT_CPU+OFFSET_UCPUSTATE_PIP
 	.cfi_offset %Pax, OFFSET_UCONTEXT_MCONTEXT+OFFSET_MCONTEXT_CPU+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_PAX

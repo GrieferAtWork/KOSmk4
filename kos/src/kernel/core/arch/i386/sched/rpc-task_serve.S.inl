@@ -79,7 +79,6 @@
 .section .text
 PUBLIC_FUNCTION(LOCAL_task_serve)
 	.cfi_startproc
-	.cfi_signal_frame
 	.cfi_def_cfa %Psp, SIZEOF_POINTER
 
 	/* Quick check: is there anything to do? */

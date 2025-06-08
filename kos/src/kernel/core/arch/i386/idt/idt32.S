@@ -70,8 +70,8 @@
 
 .section .text.cold
 .cfi_startproc
-.cfi_iret_signal_frame
 PRIVATE_FUNCTION(x86_idt_unused_common)
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 4
 	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* VECNO */
 	pushl_cfi %ds

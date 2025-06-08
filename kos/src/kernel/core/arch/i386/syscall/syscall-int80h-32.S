@@ -46,7 +46,7 @@
 INTERN_CONST(x86_idtdpl_syscall, 3)
 PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
@@ -81,7 +81,7 @@ END(x86_idt_syscall)
 .section .text.hot
 PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	/* Trace this system call invocation! */
 	pushfl_cfi_r
@@ -175,7 +175,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_rel_offset %ds, OFFSET_ICPUSTATE_DS
 	.cfi_rel_offset %es, OFFSET_ICPUSTATE_ES

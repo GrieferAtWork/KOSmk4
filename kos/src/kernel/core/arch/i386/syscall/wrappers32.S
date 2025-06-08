@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52251d7 */
+/* HASH CRC-32:0x9254400 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_restart_syscall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -82,7 +82,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -116,7 +116,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -157,7 +157,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -200,7 +200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -248,7 +248,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -286,7 +286,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -329,7 +329,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitpid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -366,7 +366,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_creat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -403,7 +403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_link)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -440,7 +440,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -479,7 +479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -516,7 +516,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -553,7 +553,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -590,7 +590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -627,7 +627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chmod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -664,7 +664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -701,7 +701,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_break)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -736,7 +736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -773,7 +773,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -810,7 +810,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -845,7 +845,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -886,7 +886,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -927,7 +927,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -966,7 +966,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1001,7 +1001,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1038,7 +1038,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ptrace)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1077,7 +1077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_alarm)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1114,7 +1114,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1152,7 +1152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1188,7 +1188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1225,7 +1225,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1260,7 +1260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gtty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x20
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1296,7 +1296,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_access)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x21
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1333,7 +1333,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x22
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1370,7 +1370,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x23
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1407,7 +1407,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x24
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1442,7 +1442,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x25
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1479,7 +1479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rename)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x26
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1516,7 +1516,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x27
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1553,7 +1553,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rmdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x28
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1590,7 +1590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x29
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1627,7 +1627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1664,7 +1664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_times)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1701,7 +1701,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prof)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1736,7 +1736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_brk)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1777,7 +1777,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1816,7 +1816,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x2f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1851,7 +1851,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x30
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1891,7 +1891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x31
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1929,7 +1929,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x32
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -1964,7 +1964,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_acct)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x33
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2001,7 +2001,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x34
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2038,7 +2038,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x35
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2073,7 +2073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x36
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2110,7 +2110,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x37
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2147,7 +2147,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mpx)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x38
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2182,7 +2182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x39
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2219,7 +2219,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ulimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2254,7 +2254,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldolduname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2291,7 +2291,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2328,7 +2328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chroot)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2365,7 +2365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ustat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2402,7 +2402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x3f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2439,7 +2439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getppid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x40
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2474,7 +2474,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgrp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x41
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2509,7 +2509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x42
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2544,7 +2544,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x43
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2581,7 +2581,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x44
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2616,7 +2616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x45
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2657,7 +2657,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x46
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2698,7 +2698,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x47
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2741,7 +2741,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x48
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2778,7 +2778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigpending)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x49
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2815,7 +2815,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2853,7 +2853,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2891,7 +2891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2929,7 +2929,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -2966,7 +2966,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3003,7 +3003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x4f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3043,7 +3043,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x50
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3080,7 +3080,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x51
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3117,7 +3117,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x52
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3154,7 +3154,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x53
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3191,7 +3191,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldlstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x54
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3228,7 +3228,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x55
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3265,7 +3265,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uselib)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x56
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3303,7 +3303,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapon)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x57
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3341,7 +3341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_reboot)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x58
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3384,7 +3384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x59
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3426,7 +3426,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3468,7 +3468,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munmap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3505,7 +3505,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3542,7 +3542,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3579,7 +3579,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3616,7 +3616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x5f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3654,7 +3654,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x60
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3692,7 +3692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x61
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3729,7 +3729,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x62
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3764,7 +3764,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x63
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3801,7 +3801,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x64
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3838,7 +3838,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x65
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3875,7 +3875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x66
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3912,7 +3912,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x67
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3950,7 +3950,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x68
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -3988,7 +3988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x69
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4025,7 +4025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4062,7 +4062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4099,7 +4099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4136,7 +4136,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_olduname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4173,7 +4173,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_iopl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4210,7 +4210,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vhangup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4245,7 +4245,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_idle)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x70
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4280,7 +4280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x71
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4319,7 +4319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x72
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4358,7 +4358,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x73
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4395,7 +4395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x74
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4432,7 +4432,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ipc)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x75
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4471,7 +4471,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x76
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4508,7 +4508,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x77
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4543,7 +4543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x78
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4584,7 +4584,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setdomainname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x79
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4621,7 +4621,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4658,7 +4658,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4695,7 +4695,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4733,7 +4733,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4771,7 +4771,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4808,7 +4808,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x7f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4852,7 +4852,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x80
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4896,7 +4896,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x81
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4933,7 +4933,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x82
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -4968,7 +4968,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_quotactl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x83
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5005,7 +5005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x84
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5042,7 +5042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x85
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5079,7 +5079,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bdflush)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x86
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5116,7 +5116,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x87
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5153,7 +5153,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x88
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5190,7 +5190,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x89
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5230,7 +5230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5272,7 +5272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5309,7 +5309,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5352,7 +5352,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5389,7 +5389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5430,7 +5430,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5467,7 +5467,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x90
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5512,7 +5512,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x91
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5557,7 +5557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x92
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5594,7 +5594,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x93
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5633,7 +5633,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fdatasync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x94
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5670,7 +5670,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__sysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x95
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5707,7 +5707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x96
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5744,7 +5744,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x97
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5782,7 +5782,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlockall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x98
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5819,7 +5819,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlockall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x99
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5854,7 +5854,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setparam)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5891,7 +5891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getparam)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5930,7 +5930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setscheduler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -5967,7 +5967,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getscheduler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6004,7 +6004,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_yield)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6039,7 +6039,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_max)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x9f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6076,7 +6076,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_min)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6113,7 +6113,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6150,7 +6150,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6188,7 +6188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6233,7 +6233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6273,7 +6273,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6310,7 +6310,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6347,7 +6347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6382,7 +6382,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_poll)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6419,7 +6419,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nfsservctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xa9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6460,7 +6460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xaa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6500,7 +6500,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xab
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6546,7 +6546,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xac
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6587,7 +6587,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xad
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6622,7 +6622,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xae
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6662,7 +6662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigprocmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xaf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6701,7 +6701,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6738,7 +6738,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6783,7 +6783,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6826,7 +6826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigsuspend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6863,7 +6863,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6904,7 +6904,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6945,7 +6945,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -6982,7 +6982,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcwd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7019,7 +7019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7056,7 +7056,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xb9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7093,7 +7093,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xba
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7143,7 +7143,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xbb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7182,7 +7182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xbc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7217,7 +7217,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xbd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7275,7 +7275,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vfork)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xbe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7310,7 +7310,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ugetrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xbf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7347,7 +7347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7389,7 +7389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7426,7 +7426,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7463,7 +7463,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7500,7 +7500,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7537,7 +7537,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7574,7 +7574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7613,7 +7613,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7650,7 +7650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7688,7 +7688,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7726,7 +7726,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xca
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7765,7 +7765,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xcb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7806,7 +7806,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xcc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7846,7 +7846,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xcd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7883,7 +7883,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xce
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7920,7 +7920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xcf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -7961,7 +7961,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8001,7 +8001,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8042,7 +8042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8082,7 +8082,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8119,7 +8119,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8160,7 +8160,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8201,7 +8201,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8243,7 +8243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8285,7 +8285,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8322,7 +8322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pivot_root)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xd9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8359,7 +8359,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mincore)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xda
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8396,7 +8396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_madvise)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xdb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8435,7 +8435,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xdc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8472,7 +8472,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xdd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8509,7 +8509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8544,7 +8544,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8584,7 +8584,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8626,7 +8626,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8668,7 +8668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8709,7 +8709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8748,7 +8748,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lgetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8787,7 +8787,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fgetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8826,7 +8826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8863,7 +8863,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_llistxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xe9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8900,7 +8900,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flistxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xea
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8937,7 +8937,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_removexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xeb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -8974,7 +8974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lremovexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xec
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9011,7 +9011,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xed
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9048,7 +9048,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xee
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9098,7 +9098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xef
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9138,7 +9138,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9180,7 +9180,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setaffinity)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9217,7 +9217,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getaffinity)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9254,7 +9254,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_thread_area)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9291,7 +9291,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_thread_area)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9328,7 +9328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_setup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9365,7 +9365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_destroy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9402,7 +9402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_getevents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9439,7 +9439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_submit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9476,7 +9476,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_cancel)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xf9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9513,7 +9513,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9552,7 +9552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit_group)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9577,7 +9577,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lookup_dcookie)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9618,7 +9618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9668,7 +9668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xff
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9720,7 +9720,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x100
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9759,7 +9759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x101
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9800,7 +9800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_tid_address)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x102
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9837,7 +9837,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x103
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9875,7 +9875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x104
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9914,7 +9914,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x105
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9951,7 +9951,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_getoverrun)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x106
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -9988,7 +9988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_delete)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x107
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10025,7 +10025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x108
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10062,7 +10062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x109
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10099,7 +10099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10136,7 +10136,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10175,7 +10175,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10212,7 +10212,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10249,7 +10249,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10289,7 +10289,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x10f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10326,7 +10326,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x110
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10363,7 +10363,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x111
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10398,7 +10398,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mbind)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x112
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10435,7 +10435,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_mempolicy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x113
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10472,7 +10472,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x114
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10509,7 +10509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x115
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10546,7 +10546,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x116
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10583,7 +10583,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x117
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10624,7 +10624,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x118
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10665,7 +10665,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x119
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10702,7 +10702,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10739,7 +10739,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10778,7 +10778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10819,7 +10819,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_add_key)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10856,7 +10856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_request_key)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x11f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10893,7 +10893,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_keyctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x120
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10932,7 +10932,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x121
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -10971,7 +10971,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x122
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11008,7 +11008,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x123
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11044,7 +11044,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x124
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11082,7 +11082,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x125
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11119,7 +11119,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x126
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11167,7 +11167,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x127
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11206,7 +11206,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x128
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11243,7 +11243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x129
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11283,7 +11283,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11324,7 +11324,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11362,7 +11362,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11402,7 +11402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11439,7 +11439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11479,7 +11479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11520,7 +11520,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x130
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11557,7 +11557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x131
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11597,7 +11597,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x132
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11637,7 +11637,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x133
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11674,7 +11674,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x134
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11716,7 +11716,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x135
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11758,7 +11758,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unshare)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x136
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11795,7 +11795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_robust_list)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x137
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11832,7 +11832,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_robust_list)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x138
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11870,7 +11870,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x139
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11913,7 +11913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11956,7 +11956,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -11996,7 +11996,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12035,7 +12035,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12072,7 +12072,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcpu)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12124,7 +12124,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x13f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12167,7 +12167,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x140
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12208,7 +12208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x141
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12247,7 +12247,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x142
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12284,7 +12284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x143
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12322,7 +12322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x144
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12365,7 +12365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x145
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12405,7 +12405,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x146
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12445,7 +12445,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x147
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12485,7 +12485,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x148
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12528,7 +12528,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x149
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12566,7 +12566,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup3)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12603,7 +12603,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12641,7 +12641,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12681,7 +12681,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12725,7 +12725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12772,7 +12772,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x14f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12811,7 +12811,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x150
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12856,7 +12856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x151
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12897,7 +12897,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_init)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x152
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12934,7 +12934,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_mark)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x153
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -12972,7 +12972,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x154
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13012,7 +13012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x155
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13053,7 +13053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_by_handle_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x156
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13090,7 +13090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x157
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13127,7 +13127,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x158
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13170,7 +13170,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x159
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13209,7 +13209,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13249,7 +13249,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13294,7 +13294,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13338,7 +13338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13388,7 +13388,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13425,7 +13425,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x15f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13462,7 +13462,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x160
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13500,7 +13500,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x161
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13541,7 +13541,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x162
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13579,7 +13579,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x163
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13617,7 +13617,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x164
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13654,7 +13654,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x165
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13694,7 +13694,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x166
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13745,7 +13745,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x167
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13792,7 +13792,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x168
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13838,7 +13838,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x169
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13885,7 +13885,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13930,7 +13930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -13981,7 +13981,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14030,7 +14030,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14079,7 +14079,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14131,7 +14131,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x16f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14176,7 +14176,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x170
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14228,7 +14228,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x171
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14276,7 +14276,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x172
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14328,7 +14328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x173
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14377,7 +14377,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x174
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14420,7 +14420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x175
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14457,7 +14457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x176
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14494,7 +14494,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x177
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14531,7 +14531,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x178
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14568,7 +14568,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_copy_file_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x179
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14605,7 +14605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14642,7 +14642,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14679,7 +14679,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14718,7 +14718,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14755,7 +14755,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14792,7 +14792,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x17f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14837,7 +14837,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x180
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14874,7 +14874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x181
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14911,7 +14911,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rseq)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x182
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14948,7 +14948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x189
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -14985,7 +14985,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15022,7 +15022,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15059,7 +15059,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15096,7 +15096,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15133,7 +15133,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmdt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15170,7 +15170,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x18f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15207,7 +15207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgsnd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x190
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15244,7 +15244,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgrcv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x191
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15281,7 +15281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x192
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15318,7 +15318,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x193
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15355,7 +15355,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x194
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15392,7 +15392,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x195
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15429,7 +15429,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x196
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15466,7 +15466,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x197
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15505,7 +15505,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x198
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15543,7 +15543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x199
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15583,7 +15583,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15624,7 +15624,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15664,7 +15664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15703,7 +15703,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15745,7 +15745,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x19e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15786,7 +15786,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15831,7 +15831,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15872,7 +15872,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15913,7 +15913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15954,7 +15954,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_semtimedop_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -15991,7 +15991,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16031,7 +16031,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16073,7 +16073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16122,7 +16122,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16161,7 +16161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_setup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1a9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16198,7 +16198,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_enter)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1aa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16235,7 +16235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_register)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1ab
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16272,7 +16272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_tree)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1ac
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16309,7 +16309,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_mount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1ad
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16346,7 +16346,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsopen)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1ae
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16383,7 +16383,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsconfig)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1af
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16420,7 +16420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16457,7 +16457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16502,7 +16502,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16539,7 +16539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16577,7 +16577,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16614,7 +16614,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16663,7 +16663,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16702,7 +16702,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1b7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16744,7 +16744,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffeb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16789,7 +16789,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffeb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16831,7 +16831,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffebc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16874,7 +16874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffecf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16916,7 +16916,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffed0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16956,7 +16956,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffed4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -16995,7 +16995,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffed5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17033,7 +17033,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffed7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17075,7 +17075,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffed8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17116,7 +17116,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffedc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17159,7 +17159,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffee4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17203,7 +17203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffef1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17268,7 +17268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffefe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17328,7 +17328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff0f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17390,7 +17390,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff10
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17433,7 +17433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff23
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17476,7 +17476,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff24
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17515,7 +17515,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff3b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17552,7 +17552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff3c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17589,7 +17589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff3d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17626,7 +17626,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff4b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17668,7 +17668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff4c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17717,7 +17717,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff53
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17759,7 +17759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff5e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17811,7 +17811,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve_sysret)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff61
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17858,7 +17858,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff62
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17893,7 +17893,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff6b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17938,7 +17938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff6e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -17985,7 +17985,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff6f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18024,7 +18024,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff72
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18067,7 +18067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff8e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18107,7 +18107,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff97
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18145,7 +18145,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffff98
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18192,7 +18192,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffaa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18233,7 +18233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffb1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18270,7 +18270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18308,7 +18308,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18345,7 +18345,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffc4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18380,7 +18380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffca
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18422,7 +18422,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_test)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffcd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18462,7 +18462,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_abort)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffce
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18503,7 +18503,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_end)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffcf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18557,7 +18557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_begin)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffd0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18592,7 +18592,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffdd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18630,7 +18630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffe2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18667,7 +18667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffe7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18717,7 +18717,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffec
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18754,7 +18754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffed
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18818,7 +18818,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffee
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18870,7 +18870,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffef
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18920,7 +18920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -18968,7 +18968,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19009,7 +19009,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19048,7 +19048,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19084,7 +19084,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19123,7 +19123,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19200,7 +19200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19248,7 +19248,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19338,7 +19338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffff9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19378,7 +19378,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffffa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19418,7 +19418,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffffb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19459,7 +19459,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffffc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19504,7 +19504,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xfffffffd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19552,7 +19552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_restart_syscall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19589,7 +19589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_exit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19623,7 +19623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fork)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19664,7 +19664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_read)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19707,7 +19707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_write)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19755,7 +19755,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19793,7 +19793,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19836,7 +19836,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitpid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19873,7 +19873,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_creat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19910,7 +19910,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_link)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19947,7 +19947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -19986,7 +19986,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20023,7 +20023,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20060,7 +20060,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_time)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20097,7 +20097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mknod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20134,7 +20134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chmod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20171,7 +20171,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lchown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20208,7 +20208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20243,7 +20243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20280,7 +20280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lseek)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20317,7 +20317,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20352,7 +20352,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20395,7 +20395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_umount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20436,7 +20436,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20475,7 +20475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20510,7 +20510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20547,7 +20547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ptrace)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20586,7 +20586,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_alarm)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20623,7 +20623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20661,7 +20661,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pause)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20697,7 +20697,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20734,7 +20734,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20769,7 +20769,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gtty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x20
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20805,7 +20805,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_access)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x21
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20842,7 +20842,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x22
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20879,7 +20879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x23
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20916,7 +20916,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x24
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20951,7 +20951,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x25
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -20988,7 +20988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rename)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x26
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21025,7 +21025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mkdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x27
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21062,7 +21062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rmdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x28
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21099,7 +21099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_dup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x29
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21136,7 +21136,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pipe)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21173,7 +21173,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_times)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21210,7 +21210,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prof)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21245,7 +21245,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_brk)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21286,7 +21286,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21325,7 +21325,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x2f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21360,7 +21360,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signal)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x30
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21400,7 +21400,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x31
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21438,7 +21438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getegid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x32
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21473,7 +21473,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_acct)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x33
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21510,7 +21510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_umount2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x34
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21547,7 +21547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x35
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21582,7 +21582,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x36
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21619,7 +21619,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fcntl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x37
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21656,7 +21656,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mpx)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x38
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21691,7 +21691,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setpgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x39
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21728,7 +21728,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ulimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21763,7 +21763,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldolduname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21800,7 +21800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_umask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21837,7 +21837,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chroot)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21874,7 +21874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ustat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21911,7 +21911,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_dup2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x3f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21948,7 +21948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getppid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x40
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -21983,7 +21983,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpgrp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x41
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22018,7 +22018,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x42
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22053,7 +22053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaction)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x43
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22090,7 +22090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sgetmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x44
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22125,7 +22125,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ssetmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x45
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22166,7 +22166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x46
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22207,7 +22207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setregid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x47
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22250,7 +22250,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigsuspend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x48
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22287,7 +22287,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigpending)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x49
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22324,7 +22324,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sethostname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22362,7 +22362,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22400,7 +22400,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22438,7 +22438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrusage)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22475,7 +22475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22512,7 +22512,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_settimeofday)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x4f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22552,7 +22552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgroups)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x50
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22589,7 +22589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgroups)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x51
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22626,7 +22626,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x52
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22663,7 +22663,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_symlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x53
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22700,7 +22700,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldlstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x54
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22737,7 +22737,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x55
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22774,7 +22774,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_uselib)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x56
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22812,7 +22812,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_swapon)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x57
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22850,7 +22850,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_reboot)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x58
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22893,7 +22893,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x59
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22935,7 +22935,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -22979,7 +22979,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_munmap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23016,7 +23016,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_truncate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23053,7 +23053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftruncate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23090,7 +23090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchmod)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23127,7 +23127,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x5f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23165,7 +23165,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpriority)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x60
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23203,7 +23203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setpriority)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x61
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23240,7 +23240,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_profil)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x62
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23275,7 +23275,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_statfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x63
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23312,7 +23312,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstatfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x64
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23349,7 +23349,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioperm)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x65
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23386,7 +23386,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socketcall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x66
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23423,7 +23423,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_syslog)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x67
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23461,7 +23461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setitimer)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x68
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23499,7 +23499,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x69
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23536,7 +23536,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23573,7 +23573,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23610,7 +23610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23647,7 +23647,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_olduname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23684,7 +23684,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_iopl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23721,7 +23721,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vhangup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23756,7 +23756,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_idle)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x70
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23791,7 +23791,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vm86old)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x71
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23830,7 +23830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x72
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23869,7 +23869,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_swapoff)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x73
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23906,7 +23906,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x74
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23943,7 +23943,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ipc)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x75
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -23982,7 +23982,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x76
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24019,7 +24019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x77
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24054,7 +24054,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x78
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24097,7 +24097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setdomainname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x79
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24134,7 +24134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_uname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24171,7 +24171,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_modify_ldt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24208,7 +24208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_adjtimex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24246,7 +24246,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mprotect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24284,7 +24284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigprocmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24321,7 +24321,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_create_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x7f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24365,7 +24365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_init_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x80
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24409,7 +24409,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_delete_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x81
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24446,7 +24446,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_kernel_syms)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x82
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24481,7 +24481,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_quotactl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x83
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24518,7 +24518,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x84
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24555,7 +24555,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchdir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x85
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24592,7 +24592,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bdflush)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x86
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24629,7 +24629,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x87
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24666,7 +24666,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_personality)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x88
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24703,7 +24703,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_afs_syscall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x89
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24743,7 +24743,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24785,7 +24785,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24822,7 +24822,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24867,7 +24867,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24904,7 +24904,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__newselect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24947,7 +24947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_flock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -24984,7 +24984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x90
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25029,7 +25029,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x91
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25074,7 +25074,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_writev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x92
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25111,7 +25111,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x93
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25150,7 +25150,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fdatasync)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x94
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25187,7 +25187,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__sysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x95
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25224,7 +25224,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x96
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25261,7 +25261,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_munlock)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x97
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25299,7 +25299,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlockall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x98
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25336,7 +25336,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_munlockall)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x99
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25371,7 +25371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_setparam)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25408,7 +25408,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getparam)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25447,7 +25447,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_setscheduler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25484,7 +25484,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getscheduler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25521,7 +25521,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_yield)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25556,7 +25556,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_get_priority_max)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x9f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25593,7 +25593,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_get_priority_min)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25630,7 +25630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_rr_get_interval)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25667,7 +25667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nanosleep)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25705,7 +25705,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25752,7 +25752,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25792,7 +25792,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresuid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25829,7 +25829,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vm86)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25866,7 +25866,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_query_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25901,7 +25901,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_poll)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25938,7 +25938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nfsservctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xa9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -25979,7 +25979,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xaa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26019,7 +26019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresgid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xab
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26065,7 +26065,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xac
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26108,7 +26108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xad
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26143,7 +26143,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigaction)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xae
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26183,7 +26183,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigprocmask)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xaf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26222,7 +26222,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigpending)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26259,7 +26259,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26304,7 +26304,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigqueueinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26347,7 +26347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigsuspend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26384,7 +26384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26427,7 +26427,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26470,7 +26470,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26507,7 +26507,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getcwd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26544,7 +26544,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_capget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26581,7 +26581,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_capset)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xb9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26618,7 +26618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaltstack)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xba
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26668,7 +26668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xbb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26707,7 +26707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xbc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26742,7 +26742,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_putpmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xbd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26800,7 +26800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vfork)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xbe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26835,7 +26835,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ugetrlimit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xbf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26872,7 +26872,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26916,7 +26916,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_truncate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26953,7 +26953,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftruncate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -26990,7 +26990,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27027,7 +27027,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27064,7 +27064,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27101,7 +27101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lchown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27140,7 +27140,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27177,7 +27177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27215,7 +27215,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_geteuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27253,7 +27253,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getegid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xca
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27292,7 +27292,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setreuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xcb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27333,7 +27333,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setregid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xcc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27373,7 +27373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getgroups32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xcd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27410,7 +27410,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgroups32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xce
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27447,7 +27447,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xcf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27488,7 +27488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27528,7 +27528,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27569,7 +27569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setresgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27609,7 +27609,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getresgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27646,7 +27646,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chown32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27687,7 +27687,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27728,7 +27728,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27770,7 +27770,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsuid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27812,7 +27812,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setfsgid32)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27849,7 +27849,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pivot_root)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xd9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27886,7 +27886,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mincore)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xda
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27923,7 +27923,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_madvise)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xdb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27962,7 +27962,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdents64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xdc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -27999,7 +27999,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fcntl64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xdd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28036,7 +28036,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28071,7 +28071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readahead)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28111,7 +28111,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28155,7 +28155,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28199,7 +28199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28242,7 +28242,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28281,7 +28281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lgetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28320,7 +28320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fgetxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28359,7 +28359,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_listxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28396,7 +28396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_llistxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xe9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28433,7 +28433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_flistxattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xea
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28470,7 +28470,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_removexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xeb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28507,7 +28507,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lremovexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xec
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28544,7 +28544,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fremovexattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xed
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28581,7 +28581,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tkill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xee
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28631,7 +28631,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xef
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28671,7 +28671,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28715,7 +28715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_setaffinity)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28752,7 +28752,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getaffinity)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28789,7 +28789,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_thread_area)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28826,7 +28826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_thread_area)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28863,7 +28863,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_setup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28900,7 +28900,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_destroy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28937,7 +28937,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_getevents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -28974,7 +28974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_submit)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29011,7 +29011,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_cancel)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xf9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29048,7 +29048,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fadvise64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29087,7 +29087,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_exit_group)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29112,7 +29112,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lookup_dcookie)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29153,7 +29153,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29203,7 +29203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_ctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xff
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29255,7 +29255,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_wait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x100
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29294,7 +29294,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_remap_file_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x101
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29337,7 +29337,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_tid_address)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x102
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29374,7 +29374,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x103
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29412,7 +29412,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x104
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29451,7 +29451,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x105
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29488,7 +29488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_getoverrun)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x106
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29525,7 +29525,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_delete)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x107
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29562,7 +29562,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x108
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29599,7 +29599,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x109
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29636,7 +29636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_getres)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29673,7 +29673,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_nanosleep)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29712,7 +29712,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_statfs64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29749,7 +29749,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstatfs64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29786,7 +29786,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tgkill)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29826,7 +29826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x10f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29863,7 +29863,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fadvise64_64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x110
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29900,7 +29900,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vserver)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x111
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29935,7 +29935,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mbind)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x112
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -29972,7 +29972,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_mempolicy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x113
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30009,7 +30009,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_mempolicy)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x114
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30046,7 +30046,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x115
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30083,7 +30083,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_unlink)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x116
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30120,7 +30120,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x117
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30163,7 +30163,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x118
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30206,7 +30206,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_notify)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x119
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30243,7 +30243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_getsetattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30280,7 +30280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kexec_load)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30319,7 +30319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30362,7 +30362,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_add_key)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30399,7 +30399,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_request_key)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x11f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30436,7 +30436,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_keyctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x120
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30475,7 +30475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioprio_set)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x121
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30514,7 +30514,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioprio_get)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x122
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30551,7 +30551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x123
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30587,7 +30587,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x124
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30625,7 +30625,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_rm_watch)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x125
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30662,7 +30662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_migrate_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x126
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30710,7 +30710,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x127
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30749,7 +30749,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mkdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x128
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30786,7 +30786,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mknodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x129
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30826,7 +30826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30869,7 +30869,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30907,7 +30907,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstatat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30947,7 +30947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -30984,7 +30984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31024,7 +31024,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31067,7 +31067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_symlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x130
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31104,7 +31104,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x131
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31144,7 +31144,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchmodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x132
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31184,7 +31184,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x133
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31221,7 +31221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x134
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31265,7 +31265,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x135
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31309,7 +31309,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unshare)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x136
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31346,7 +31346,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_robust_list)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x137
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31383,7 +31383,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_robust_list)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x138
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31421,7 +31421,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x139
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31466,7 +31466,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31511,7 +31511,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tee)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31551,7 +31551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vmsplice)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31590,7 +31590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_move_pages)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31627,7 +31627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getcpu)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31679,7 +31679,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x13f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31724,7 +31724,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimensat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x140
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31765,7 +31765,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signalfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x141
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31804,7 +31804,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x142
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31841,7 +31841,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_eventfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x143
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31879,7 +31879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x144
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31922,7 +31922,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_settime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x145
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -31962,7 +31962,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_gettime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x146
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32002,7 +32002,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_signalfd4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x147
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32042,7 +32042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_eventfd2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x148
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32085,7 +32085,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_create1)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x149
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32123,7 +32123,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_dup3)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32160,7 +32160,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pipe2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32198,7 +32198,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init1)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32238,7 +32238,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32284,7 +32284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32333,7 +32333,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_tgsigqueueinfo)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x14f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32372,7 +32372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_perf_event_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x150
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32417,7 +32417,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x151
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32460,7 +32460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fanotify_init)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x152
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32497,7 +32497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fanotify_mark)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x153
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32535,7 +32535,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prlimit64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x154
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32575,7 +32575,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x155
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32618,7 +32618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_open_by_handle_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x156
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32655,7 +32655,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_adjtime)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x157
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32692,7 +32692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_syncfs)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x158
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32735,7 +32735,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendmmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x159
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32774,7 +32774,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setns)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32814,7 +32814,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32861,7 +32861,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32907,7 +32907,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32959,7 +32959,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_finit_module)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -32996,7 +32996,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_setattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x15f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33033,7 +33033,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_getattr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x160
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33071,7 +33071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x161
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33114,7 +33114,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_seccomp)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x162
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33152,7 +33152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrandom)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x163
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33190,7 +33190,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_memfd_create)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x164
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33227,7 +33227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bpf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x165
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33267,7 +33267,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x166
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33320,7 +33320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socket)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x167
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33367,7 +33367,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socketpair)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x168
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33413,7 +33413,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bind)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x169
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33460,7 +33460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_connect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33505,7 +33505,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_listen)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33556,7 +33556,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_accept4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33605,7 +33605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33656,7 +33656,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33710,7 +33710,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockname)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x16f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33755,7 +33755,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpeername)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x170
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33807,7 +33807,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x171
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33857,7 +33857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x172
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33909,7 +33909,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x173
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -33960,7 +33960,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmsg)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x174
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34003,7 +34003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shutdown)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x175
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34040,7 +34040,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userfaultfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x176
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34077,7 +34077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_membarrier)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x177
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34114,7 +34114,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x178
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34151,7 +34151,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_copy_file_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x179
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34188,7 +34188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34225,7 +34225,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34262,7 +34262,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_mprotect)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34301,7 +34301,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_alloc)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34338,7 +34338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_free)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34375,7 +34375,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_statx)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x17f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34420,7 +34420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_arch_prctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x180
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34457,7 +34457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_pgetevents)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x181
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34494,7 +34494,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rseq)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x182
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34531,7 +34531,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x189
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34568,7 +34568,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34605,7 +34605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34642,7 +34642,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34679,7 +34679,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34716,7 +34716,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmdt)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34753,7 +34753,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgget)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x18f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34790,7 +34790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgsnd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x190
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34827,7 +34827,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgrcv)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x191
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34864,7 +34864,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x192
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34901,7 +34901,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x193
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34938,7 +34938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x194
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -34975,7 +34975,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_adjtime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x195
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35012,7 +35012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_getres_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x196
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35049,7 +35049,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_nanosleep_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x197
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35088,7 +35088,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x198
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35126,7 +35126,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x199
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35166,7 +35166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_gettime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19a
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35207,7 +35207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_settime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35247,7 +35247,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimensat_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35286,7 +35286,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35330,7 +35330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x19e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35373,7 +35373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_pgetevents_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35418,7 +35418,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35461,7 +35461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35504,7 +35504,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35547,7 +35547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semtimedop_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35584,7 +35584,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35624,7 +35624,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35668,7 +35668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_rr_get_interval_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35717,7 +35717,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_send_signal)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35756,7 +35756,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_setup)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1a9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35793,7 +35793,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_enter)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1aa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35830,7 +35830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_register)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1ab
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35867,7 +35867,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_open_tree)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1ac
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35904,7 +35904,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_move_mount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1ad
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35941,7 +35941,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsopen)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1ae
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -35978,7 +35978,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsconfig)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1af
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36015,7 +36015,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsmount)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36052,7 +36052,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fspick)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36097,7 +36097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_open)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36134,7 +36134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone3)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36172,7 +36172,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close_range)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36209,7 +36209,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36258,7 +36258,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_getfd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b6
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36297,7 +36297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat2)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1b7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36339,7 +36339,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffeb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36386,7 +36386,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffeb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36430,7 +36430,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffebc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36475,7 +36475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffecf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36519,7 +36519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsymlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffed0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36559,7 +36559,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kfstatat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffed4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36598,7 +36598,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffed5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36636,7 +36636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffed7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36680,7 +36680,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmkdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffed8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36721,7 +36721,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch_at)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffedc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36766,7 +36766,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffee4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36812,7 +36812,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffef1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36877,7 +36877,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_userprocmask_address)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffefe
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -36937,7 +36937,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff0f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37001,7 +37001,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff10
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37046,7 +37046,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff23
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37091,7 +37091,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff24
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37130,7 +37130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff3b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37167,7 +37167,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_klstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff3c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37204,7 +37204,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff3d
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37241,7 +37241,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff4b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37285,7 +37285,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff4c
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37336,7 +37336,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff53
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37380,7 +37380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nanosleep64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff5e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37432,7 +37432,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_serve_sysret)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff61
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37479,7 +37479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_serve)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff62
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37514,7 +37514,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff6b
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37559,7 +37559,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_writevf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff6e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37606,7 +37606,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readvf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff6f
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37645,7 +37645,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff72
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37690,7 +37690,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4_64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff8e
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37730,7 +37730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff97
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37768,7 +37768,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setitimer64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffff98
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37815,7 +37815,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffaa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37858,7 +37858,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_settimeofday64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffb1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37895,7 +37895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffb2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37933,7 +37933,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrusage64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffb3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -37970,7 +37970,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsmode)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffc4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38005,7 +38005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioctlf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffca
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38047,7 +38047,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_test)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffcd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38087,7 +38087,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_abort)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffce
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38128,7 +38128,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_end)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffcf
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38182,7 +38182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_begin)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffd0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38217,7 +38217,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffdd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38255,7 +38255,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffe2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38292,7 +38292,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stime64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffe7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38342,7 +38342,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userviofd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffec
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38379,7 +38379,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lseek64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffed
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38443,7 +38443,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffee
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38497,7 +38497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_debugtrap)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffef
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38547,7 +38547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff0
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38595,7 +38595,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff1
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38636,7 +38636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mktty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff2
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38675,7 +38675,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff3
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38711,7 +38711,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchdirat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff4
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38750,7 +38750,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff5
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38829,7 +38829,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_schedule)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff7
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38879,7 +38879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff8
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -38971,7 +38971,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffff9
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -39011,7 +39011,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpath4)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffffa
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -39051,7 +39051,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdrives)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffffb
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -39092,7 +39092,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_writef)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffffc
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -39137,7 +39137,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xfffffffd
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4

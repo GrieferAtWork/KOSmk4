@@ -376,7 +376,7 @@ __ASM_L(.macro .cfi_restore_iret_ss iret_offset=0)
 __ASM_L(	.cfi_offset %ss, 32+__ASM_ARG(\iret_offset))
 __ASM_L(.endm)
 
-__ASM_L(.macro .cfi_restore_iret reg:req iret_offset=0)
+__ASM_L(.macro .cfi_restore_iret_r reg:req iret_offset=0)
 __ASM_L(.ifc __ASM_ARG(\reg),%rip; .cfi_restore_iret_rip __ASM_ARG(\iret_offset); .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%cs; .cfi_restore_iret_cs __ASM_ARG(\iret_offset); .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%rflags; .cfi_restore_iret_rflags __ASM_ARG(\iret_offset); .else)
@@ -388,6 +388,21 @@ __ASM_L(.endm)
 
 /* Define CFI restore rules to unwind an x86 iret-compatible function:
  * >> .cfi_startproc simple
+ * >> .cfi_restore_iret
+ * >>     ...
+ * >>     iret
+ * >> .cfi_endproc
+ */
+__ASM_L(.macro .cfi_restore_iret iret_offset=0)
+__ASM_L(	.cfi_restore_iret_rip __ASM_ARG(\iret_offset))
+__ASM_L(	.cfi_restore_iret_cs __ASM_ARG(\iret_offset))
+__ASM_L(	.cfi_restore_iret_rflags __ASM_ARG(\iret_offset))
+__ASM_L(	.cfi_restore_iret_rsp __ASM_ARG(\iret_offset))
+__ASM_L(	.cfi_restore_iret_ss __ASM_ARG(\iret_offset))
+__ASM_L(.endm)
+
+/* Define CFI restore rules to unwind an x86 iret-compatible function:
+ * >> .cfi_startproc simple
  * >> .cfi_iret_signal_frame
  * >>     ...
  * >>     iret
@@ -395,11 +410,7 @@ __ASM_L(.endm)
  */
 __ASM_L(.macro .cfi_iret_signal_frame iret_offset=0)
 __ASM_L(	.cfi_signal_frame)
-__ASM_L(	.cfi_restore_iret_rip __ASM_ARG(\iret_offset))
-__ASM_L(	.cfi_restore_iret_cs __ASM_ARG(\iret_offset))
-__ASM_L(	.cfi_restore_iret_rflags __ASM_ARG(\iret_offset))
-__ASM_L(	.cfi_restore_iret_rsp __ASM_ARG(\iret_offset))
-__ASM_L(	.cfi_restore_iret_ss __ASM_ARG(\iret_offset))
+__ASM_L(	.cfi_restore_iret __ASM_ARG(\iret_offset))
 __ASM_L(.endm)
 
 #else /* __x86_64__ */
@@ -1345,7 +1356,7 @@ __ASM_L(.endm)
 
 
 
-__ASM_L(.macro .cfi_restore_iret reg:req iret_offset=0)
+__ASM_L(.macro .cfi_restore_iret_r reg:req iret_offset=0)
 __ASM_L(.ifc __ASM_ARG(\reg),%eip; .cfi_restore_iret_eip __ASM_ARG(\iret_offset); .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%cs; .cfi_restore_iret_cs __ASM_ARG(\iret_offset); .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%eflags; .cfi_restore_iret_eflags __ASM_ARG(\iret_offset); .else)
@@ -1361,13 +1372,12 @@ __ASM_L(.endm)
 
 /* Define CFI restore rules to unwind an x86 iret-compatible function:
  * >> .cfi_startproc simple
- * >> .cfi_iret_signal_frame
+ * >> .cfi_restore_iret
  * >>     ...
  * >>     iret
  * >> .cfi_endproc
  */
-__ASM_L(.macro .cfi_iret_signal_frame iret_offset=0)
-__ASM_L(	.cfi_signal_frame)
+__ASM_L(.macro .cfi_restore_iret iret_offset=0)
 __ASM_L(	.cfi_restore_iret_eip __ASM_ARG(\iret_offset))
 __ASM_L(	.cfi_restore_iret_cs __ASM_ARG(\iret_offset))
 __ASM_L(	.cfi_restore_iret_eflags __ASM_ARG(\iret_offset))
@@ -1377,6 +1387,18 @@ __ASM_L(	.cfi_restore_iret_es __ASM_ARG(\iret_offset))
 __ASM_L(	.cfi_restore_iret_ds __ASM_ARG(\iret_offset))
 __ASM_L(	.cfi_restore_iret_fs __ASM_ARG(\iret_offset))
 __ASM_L(	.cfi_restore_iret_gs __ASM_ARG(\iret_offset))
+__ASM_L(.endm)
+
+/* Define CFI restore rules to unwind an x86 iret-compatible function:
+ * >> .cfi_startproc simple
+ * >> .cfi_iret_signal_frame
+ * >>     ...
+ * >>     iret
+ * >> .cfi_endproc
+ */
+__ASM_L(.macro .cfi_iret_signal_frame iret_offset=0)
+__ASM_L(	.cfi_signal_frame)
+__ASM_L(	.cfi_restore_iret __ASM_ARG(\iret_offset))
 __ASM_L(.endm)
 
 #endif /* !__x86_64__ */

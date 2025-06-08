@@ -266,7 +266,7 @@
 		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_INT80(name), X86_ASMSYSCALL32_SYSENTER(name)); \
 		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL64(name), X86_ASMSYSCALL32_SYSENTER(name));       \
 		.cfi_startproc simple;                                                              \
-		.cfi_iret_signal_frame;                                                             \
+		.cfi_restore_iret;                                                                  \
 		.cfi_def_cfa %Psp, 0
 #else /* __x86_64__ */
 #define SC_BEGIN_ALL_NOTHROW(name)                                                          \
@@ -274,7 +274,7 @@
 	INTERN_FUNCTION(X86_ASMSYSCALL32_SYSENTER(name));                                       \
 		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_INT80(name), X86_ASMSYSCALL32_SYSENTER(name)); \
 		.cfi_startproc simple;                                                              \
-		.cfi_iret_signal_frame;                                                             \
+		.cfi_restore_iret;                                                                  \
 		.cfi_def_cfa %Psp, 0
 #endif /* !__x86_64__ */
 #define SC_END_ALL_NOTHROW(name) \
@@ -297,7 +297,7 @@
 		.cfi_startproc simple;                \
 		.cfi_personality 0, _SYSFAST_PERSO;   \
 		.cfi_lsda 0, _SYSFAST_SYSNO(name);    \
-		.cfi_iret_signal_frame;               \
+		.cfi_restore_iret;                    \
 		.cfi_def_cfa %Psp, 0
 #define SC_END(name)  \
 		.cfi_endproc; \

@@ -69,7 +69,7 @@
 .section .text
 INTERN_FUNCTION(x86_task_asyncrpc_restore)
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__rpc
 /*[[[cfi{register='%cfa'}
 	push   %Psp            # `(struct rpc_context *)%Psp'
 	add    $SIZEOF_POINTER # `&((struct rpc_context *)%Psp)->rc_state'
@@ -105,7 +105,6 @@ END(x86_task_asyncrpc_restore)
 .section .text
 PUBLIC_FUNCTION(task_asyncrpc_execnow)
 	.cfi_startproc
-	.cfi_signal_frame
 	.cfi_def_cfa %Psp, 0
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
@@ -186,7 +185,6 @@ END(task_asyncrpc_execnow)
 /* FUNDEF void ASMCALL x86_userexcept_sysret(void); */
 .section .text
 	.cfi_startproc simple
-	.cfi_signal_frame
 	/* NOTE: No personality function is defined  here, because the only  thing
 	 *       it could ever do is  silently try to use `userexcept_handler'  in
 	 *       order to push the  exception into user-space. However,  knowledge
@@ -379,7 +377,6 @@ END(x86_userexcept_sysret)
 .section .text
 INTERN_FUNCTION(userexcept_handler_ucpustate)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %R_fcall0P, 0
 	ASM_CFI_OFFSET_RESTORE_UCPUSTATE(0)
 

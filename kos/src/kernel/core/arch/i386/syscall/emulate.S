@@ -102,7 +102,6 @@
 	.cfi_startproc simple
 	EXTERN(syscall_emulate_r_personality)
 	.cfi_personality 0, syscall_emulate_r_personality
-	.cfi_signal_frame
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(-OFFSET_ICPUSTATE_IRREGS)
 INTERN_FUNCTION(x86_syscall_emulate_traced_r)
 	.cfi_def_cfa %Pdi, (SIZEOF_POINTER + SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)

@@ -47,7 +47,7 @@
 #ifdef __KERNEL__
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
@@ -89,7 +89,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_icpustate_esp, libcpu_apply_icpustate_esp)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, OFFSET_SCPUSTATE_IRREGS
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
@@ -135,7 +135,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_scpustate_esp, libcpu_apply_scpustate_esp)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, 0
 	.cfi_rel_offset %edi, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
 	.cfi_rel_offset %esi, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
@@ -224,7 +224,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_ucpustate, libcpu_apply_ucpustate)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, 0
 	.cfi_rel_offset %edi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
 	.cfi_rel_offset %esi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
@@ -269,7 +269,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_kcpustate, libcpu_apply_kcpustate)
 
 .section .xdata
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, 0
 	.cfi_rel_offset %edi, OFFSET_LCPUSTATE_EDI
 	.cfi_rel_offset %esi, OFFSET_LCPUSTATE_ESI
@@ -294,7 +294,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_lcpustate, libcpu_apply_lcpustate)
 
 .section TEXT_SECTION
 	.cfi_startproc simple
-	.cfi_signal_frame
+	.cfi_signal_frame__entry
 	.cfi_def_cfa %ecx, 0
 	.cfi_rel_offset %edi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
 	.cfi_rel_offset %esi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI

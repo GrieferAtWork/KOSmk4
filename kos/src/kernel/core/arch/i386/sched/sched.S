@@ -75,7 +75,6 @@ END(task_pause)
 .section .text
 PUBLIC_FUNCTION(task_yield)
 	.cfi_startproc
-	.cfi_signal_frame
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
@@ -204,7 +203,7 @@ DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_INT80(sched_yield), X86_ASMSYSCALL64(sched_
 .section .text
 INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(sched_yield))
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %esp, 0
 
 	xorl   %eax, %eax /* sched_yield() should return 0 to user-space. */
@@ -230,7 +229,6 @@ DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_SYSENTER(sched_yield),
 .section .text
 PUBLIC_FUNCTION(task_yield_nx)
 	.cfi_startproc
-	.cfi_signal_frame
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
@@ -416,7 +414,6 @@ END(task_tryyield)
 PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	/* %R_fcall0P: <struct task *__restrict caller> */
 	.cfi_startproc
-	.cfi_signal_frame
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
@@ -492,7 +489,6 @@ END(x86_kthread_exit)
  * >>                                              void *args[CPU_IPI_ARGCOUNT]);  */
 INTERN_FUNCTION(arch_sched_super_override_ipi)
 	.cfi_startproc
-	.cfi_signal_frame
 	.cfi_def_cfa %R_fcall0P, 0
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movP   %R_fcall0P, %Psp /* Return register state. (as an `icpustate') */

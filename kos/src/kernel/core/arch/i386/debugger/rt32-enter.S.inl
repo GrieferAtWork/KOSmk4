@@ -87,7 +87,6 @@
 PUBLIC_FUNCTION(DEFINE_DBG_ENTER_XCPUSTATE)
 	.cfi_startproc simple
 	.cfi_def_cfa %edx, 0
-	.cfi_signal_frame
 #ifdef DEFINE_DBG_ENTER_ICPUSTATE
 	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 #elif defined(DEFINE_DBG_ENTER_SCPUSTATE)
@@ -141,7 +140,6 @@ END(DEFINE_DBG_ENTER_XCPUSTATE)
 .section .text.cold
 PUBLIC_FUNCTION(DBG_ENTER_NAME)
 	.cfi_startproc simple
-	.cfi_signal_frame
 	.cfi_def_cfa %esp, 4
 	.cfi_rel_offset %eip, 0
 	pushl_cfi_r %eax

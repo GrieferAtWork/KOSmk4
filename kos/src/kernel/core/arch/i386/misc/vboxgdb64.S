@@ -55,7 +55,7 @@ END(_vboxgdb_trapctl)
 .section .text.cold
 INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rax
 	movq   (8 + OFFSET_IRREGS_RIP)(%rsp), %rax
@@ -78,7 +78,7 @@ END(_vboxgdb_breakpoint)
 .section .text.cold
 INTERN_FUNCTION(_vboxgdb_debugtrap) /* int1 */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_restore_iret
 	.cfi_def_cfa %rsp, 0
 	cmpb   $(VBOXGDB_TRAPCTL_SSTEP), (_vboxgdb_trapctl + tc_ctrl)
 	je     _vboxgdb_debugtrap_chk_step

@@ -350,7 +350,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_stru
 		for (; ent->ee_entry != 0; ++ent) {
 			/* NOTE: Compare while keeping in mind that `pc' points
 			 *       _after_  the  faulting /  calling instruction. */
-			if (pc > ent->ee_start && pc <= ent->ee_end) {
+			if (pc >= ent->ee_start && pc <= ent->ee_end) { /* FIXME: Must only use ">=" here  */
 				if (ent->ee_mask != (uintptr_t)-1) {
 					except_code_t code = except_code();
 					if (EXCEPT_SUBCLASS(ent->ee_mask) != 0

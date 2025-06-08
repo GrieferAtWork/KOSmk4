@@ -45,7 +45,6 @@
 .section .text.x86.asmirq.x86_dbgaltcoreidt
 
 .cfi_startproc simple
-.cfi_iret_signal_frame
 .cfi_def_cfa %Psp, 0
 
 #define DEFINE_DBGALTCORE_IDT_OVERRIDE(id)                      \
@@ -376,7 +375,8 @@ END(x86_dbgaltcore_interrupt)
 .section .text.x86.asmirq.x86_dbgidt_apic_ipi
 INTERN_FUNCTION(x86_dbgidt_apic_ipi)
 	.cfi_startproc
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__rpc
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 #ifdef __x86_64__
 	cli
@@ -420,7 +420,8 @@ END(x86_dbgidt_apic_ipi)
 .section .text.x86.asmirq.x86_dbgidt_specific_00h
 INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
-	.cfi_iret_signal_frame
+	.cfi_signal_frame__io
+	.cfi_restore_iret
 	.cfi_def_cfa %Psp, 0
 #ifdef __x86_64__
 	cli

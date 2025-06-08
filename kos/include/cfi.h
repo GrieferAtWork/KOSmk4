@@ -63,6 +63,34 @@ __ASM_L(.macro .cfi_escape args:vararg; .endm)
 __ASM_L(.macro .cfi_val_encoded_addr args:vararg; .endm)
 #endif /* __GCC_HAVE_DWARF2_CFI_ASM */
 
+
+/* Reminder for when to use "cfi_signal_frame":
+ *
+ * `.cfi_signal_frame` must be used during unwinding when the return-pc (after unwinding
+ * of such-marked function) points *BEFORE* the faulting/throwing instruction  (where-as
+ * the usual default is for the instruction to point *AFTER* it)
+ *
+ * Some examples:
+ * - Normal function:     never have this set   (because return-PC points after call-insn)
+ * - User interrupts:     never have this set   (because interrupt was called manually)
+ * - Timer/IO interrupts: always have this set  (because HW-pushed PC points at next insn)
+ * - RPC handlers:        always have this set  (because HW-pushed PC points at next insn)
+ * - Exception handlers:  usually have this set (because HW-pushed PC usually points at fault)
+ * - Entry points:        always have this set  (because the entry is *before* some insn)
+ */
+__ASM_L(.macro .cfi_signal_frame__rpc)
+__ASM_L(	.cfi_signal_frame)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_signal_frame__io)
+__ASM_L(	.cfi_signal_frame)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_signal_frame__exception)
+__ASM_L(	.cfi_signal_frame)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_signal_frame__entry)
+__ASM_L(	.cfi_signal_frame)
+__ASM_L(.endm)
+
 /* NOTE: CFI capsules are currently restricted to KOS+!KERNEL.
  *       s.a.          `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
 #if defined(__KOS__) && !defined(__KERNEL__)
