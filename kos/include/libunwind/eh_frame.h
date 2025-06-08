@@ -207,6 +207,26 @@
 #endif /* !... */
 
 
+#define __OFFSET_UNWIND_FDE_BASES       0
+#define __OFFSET_UNWIND_FDE_TBASE       0
+#define __OFFSET_UNWIND_FDE_DBASE       __SIZEOF_POINTER__
+#define __OFFSET_UNWIND_FDE_PCSTART     (__SIZEOF_POINTER__ * 2)
+#define __OFFSET_UNWIND_FDE_PCEND       (__SIZEOF_POINTER__ * 3)
+#define __OFFSET_UNWIND_FDE_CODEALIGN   (__SIZEOF_POINTER__ * 4)
+#define __OFFSET_UNWIND_FDE_DATAALIGN   (__SIZEOF_POINTER__ * 5)
+#define __OFFSET_UNWIND_FDE_PERSOFUN    (__SIZEOF_POINTER__ * 6)
+#define __OFFSET_UNWIND_FDE_LSDAADDR    (__SIZEOF_POINTER__ * 7)
+#define __OFFSET_UNWIND_FDE_INITTEXT    (__SIZEOF_POINTER__ * 8)
+#define __OFFSET_UNWIND_FDE_INITTEXTEND (__SIZEOF_POINTER__ * 9)
+#define __OFFSET_UNWIND_FDE_EVALTEXT    (__SIZEOF_POINTER__ * 10)
+#define __OFFSET_UNWIND_FDE_EVALTEXTEND (__SIZEOF_POINTER__ * 11)
+#define __OFFSET_UNWIND_FDE_RETREG      (__SIZEOF_POINTER__ * 12)
+#define __OFFSET_UNWIND_FDE_PTRENC      (__SIZEOF_POINTER__ * 12 + __SIZEOF_UNWIND_REGNO_T__)
+#define __OFFSET_UNWIND_FDE_SIGFRAME    (__SIZEOF_POINTER__ * 12 + __SIZEOF_UNWIND_REGNO_T__ + 1)
+#define __OFFSET_UNWIND_FDE_ADDRSIZE    (__SIZEOF_POINTER__ * 12 + __SIZEOF_UNWIND_REGNO_T__ + 2)
+#define __OFFSET_UNWIND_FDE__PAD        (__SIZEOF_POINTER__ * 12 + __SIZEOF_UNWIND_REGNO_T__ + 3)
+#define __SIZEOF_UNWIND_FDE             (__SIZEOF_POINTER__ * 12 + __SIZEOF_UNWIND_REGNO_T__ + 3 + (__SIZEOF_POINTER__ - (((__SIZEOF_POINTER__ / 2) + 3) % __SIZEOF_POINTER__)))
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -238,6 +258,7 @@ typedef struct unwind_fde_struct {
 	__uint8_t                 f_ptrenc;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
 	__uint8_t                 f_sigframe;    /* Non-zero if this is a signal frame. */
 	__uint8_t                 f_addrsize;    /* Size of an address. */
+	__uint8_t                _f_pad[__SIZEOF_POINTER__ - (((__SIZEOF_POINTER__ / 2) + 3) % __SIZEOF_POINTER__)]; /* ... */
 } unwind_fde_t;
 
 

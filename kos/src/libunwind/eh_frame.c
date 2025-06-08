@@ -65,6 +65,27 @@
 
 DECL_BEGIN
 
+static_assert(offsetof(unwind_fde_t, f_bases) == __OFFSET_UNWIND_FDE_BASES);
+static_assert(offsetof(unwind_fde_t, f_tbase) == __OFFSET_UNWIND_FDE_TBASE);
+static_assert(offsetof(unwind_fde_t, f_dbase) == __OFFSET_UNWIND_FDE_DBASE);
+static_assert(offsetof(unwind_fde_t, f_pcstart) == __OFFSET_UNWIND_FDE_PCSTART);
+static_assert(offsetof(unwind_fde_t, f_pcend) == __OFFSET_UNWIND_FDE_PCEND);
+static_assert(offsetof(unwind_fde_t, f_codealign) == __OFFSET_UNWIND_FDE_CODEALIGN);
+static_assert(offsetof(unwind_fde_t, f_dataalign) == __OFFSET_UNWIND_FDE_DATAALIGN);
+static_assert(offsetof(unwind_fde_t, f_persofun) == __OFFSET_UNWIND_FDE_PERSOFUN);
+static_assert(offsetof(unwind_fde_t, f_lsdaaddr) == __OFFSET_UNWIND_FDE_LSDAADDR);
+static_assert(offsetof(unwind_fde_t, f_inittext) == __OFFSET_UNWIND_FDE_INITTEXT);
+static_assert(offsetof(unwind_fde_t, f_inittextend) == __OFFSET_UNWIND_FDE_INITTEXTEND);
+static_assert(offsetof(unwind_fde_t, f_evaltext) == __OFFSET_UNWIND_FDE_EVALTEXT);
+static_assert(offsetof(unwind_fde_t, f_evaltextend) == __OFFSET_UNWIND_FDE_EVALTEXTEND);
+static_assert(offsetof(unwind_fde_t, f_retreg) == __OFFSET_UNWIND_FDE_RETREG);
+static_assert(offsetof(unwind_fde_t, f_ptrenc) == __OFFSET_UNWIND_FDE_PTRENC);
+static_assert(offsetof(unwind_fde_t, f_sigframe) == __OFFSET_UNWIND_FDE_SIGFRAME);
+static_assert(offsetof(unwind_fde_t, f_addrsize) == __OFFSET_UNWIND_FDE_ADDRSIZE);
+static_assert(offsetof(unwind_fde_t, _f_pad) == __OFFSET_UNWIND_FDE__PAD);
+static_assert(sizeof(unwind_fde_t) == __SIZEOF_UNWIND_FDE);
+
+
 static_assert(NBBY == __CHAR_BIT__);
 
 /* Helper macros for working with bitsets */

@@ -473,15 +473,9 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 #endif /* __x86_64__ */
 		PERTASK_SET(this_exception_args.e_segfault.s_context, context);
 	}
+
 	/* Fill in the fault address. */
-	{
-		void const *pc, *next_pc;
-		pc      = icpustate_getpc(self);
-		next_pc = instruction_succ_nx(pc, icpustate_getisa(self));
-		if (next_pc)
-			icpustate_setpc(self, next_pc);
-		PERTASK_SET(this_exception_faultaddr, pc);
-	}
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(self));
 	except_throw_current_at_icpustate(self);
 }
 
@@ -506,13 +500,8 @@ NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict 
                                                    uintptr_t ptr3, uintptr_t ptr4,
                                                    uintptr_t ptr5, uintptr_t ptr6) {
 	unsigned int i;
-	void const *pc, *next_pc;
-	pc      = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(pc, icpustate_getisa(state));
-	if (next_pc)
-		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
-	PERTASK_SET(this_exception_faultaddr, pc);
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, opcode);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 	PERTASK_SET(this_exception_args.e_pointers[2], ptr2);
@@ -533,13 +522,8 @@ NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
                                except_code_t code, uintptr_t ptr0,
                                uintptr_t ptr1) {
 	unsigned int i;
-	void const *pc, *next_pc;
-	pc      = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(pc, icpustate_getisa(state));
-	if (next_pc)
-		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
-	PERTASK_SET(this_exception_faultaddr, pc);
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 	PERTASK_SET(this_exception_args.e_pointers[0], ptr0);
 	PERTASK_SET(this_exception_args.e_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
@@ -1102,14 +1086,23 @@ assert_canonical_pc(struct icpustate *__restrict state,
 			callsite_pc = pc;
 			goto set_noncanon_pc_exception;
 		}
-		icpustate_setpc(state, callsite_pc);
 		icpustate_setsp(state, (void *)sp);
+
+		/* We are an exception handler, meaning we have to make the return-PC
+		 * point  *AT* the instruction that caused all this mess (that instr.
+		 * being the "call" that got us here)
+		 *
+		 * However, the "callsite_pc" we just recovered actually points at the
+		 * instruction *AFTER* that call, so we have to rewind to get what  we
+		 * actually came here for. */
 		{
 			void const *call_instr;
+			/* TODO: Only accept "call" instructions here */
 			call_instr = instruction_pred_nx(callsite_pc,
 			                                 icpustate_getisa(state));
 			if likely(call_instr)
 				callsite_pc = call_instr;
+			icpustate_setpc(state, callsite_pc);
 		}
 set_noncanon_pc_exception:
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);

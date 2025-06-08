@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x447751a5 */
+/* HASH CRC-32:0xe731d4b4 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -281,6 +281,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_info, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * Following this, the  returned register state  should then be  loaded. */
 __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) except_register_state_t *__NOTHROW_NCX(__EXCEPT_UNWIND_CC except_unwind)(except_register_state_t *__restrict __state) __CASMNAME_SAME("except_unwind");
 #endif /* __CRT_HAVE_except_unwind */
+#ifdef __CRT_HAVE_except_unwind_fault
+/* >> except_unwind_fault(3)
+ * Same as `except_unwind(3)',  but the  initial `state' points  *BEFORE* (or  *AT*)
+ * the faulting instruction, rather than *AFTER* (as is expected by "except_unwind") */
+__LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) except_register_state_t *__NOTHROW_NCX(__EXCEPT_UNWIND_CC except_unwind_fault)(except_register_state_t *__restrict __state) __CASMNAME_SAME("except_unwind_fault");
+#endif /* __CRT_HAVE_except_unwind_fault */
 #endif /* __USE_KOS_KERNEL */
 #ifdef __CRT_HAVE_except_throw_current
 /* >> except_throw_current(3)

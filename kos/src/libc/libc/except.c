@@ -281,7 +281,7 @@ libc_get_kos_unwind_exception(void) {
 INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2) {
 	u8 temp, callsite_encoding;
-	byte_t const *landingpad, *pc;
+	byte_t const *landingpad;
 	byte_t const *reader, *callsite_end;
 	size_t callsite_size;
 	ENSURE_LIBUNWIND_LOADED();
@@ -289,7 +289,6 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	/* HINT: `f_lsdaaddr' points into `.gcc_except_table' */
 	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
 	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
-	pc         = except_register_state_getpc(context->uc_state);
 
 	/* HINT: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
@@ -314,14 +313,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_action */
 		startpc = landingpad + start;
 		endpc   = startpc + size;
-
-#if 1 /* Compare  pointers  like  this,  as  `pc'  is  the  _RETURN_  address
-       * (i.e. the address after the piece of code that caused the exception) */
-		if (pc > startpc && pc <= endpc)
-#else
-		if (pc >= startpc && pc < endpc)
-#endif
-		{
+		if (context->uc_adjpc >= startpc && context->uc_adjpc < endpc) {
 			if (handler == 0)
 				return _URC_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 			if (!phase_2)
@@ -541,14 +533,13 @@ try_raise_signal_from_exception(except_register_state_t const *__restrict state,
 
 
 
-DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
-INTERN SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
-NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state) {
+PRIVATE SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind_impl)(except_register_state_t *__restrict state,
+                                                        bool state_pc_before_insn) {
 	unwind_errno_t unwind_error;
 	struct _Unwind_Context context;
 	except_register_state_t orig_state;
 	except_register_state_t oldstate;
-	void const *pc;
 #if EXCEPT_BACKTRACE_SIZE != 0
 	size_t orig_tracecount;
 	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE; ++orig_tracecount) {
@@ -556,30 +547,35 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__re
 			break;
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	memcpy(&orig_state, state, sizeof(*state));
+	memcpy(&orig_state, state, sizeof(orig_state));
 
 	/* Make sure that libunwind has been loaded. */
 	if unlikely(!TRY_ENSURE_LIBUNWIND_LOADED()) {
-		memcpy(&oldstate, state, sizeof(*state));
+		memcpy(&oldstate, state, sizeof(oldstate));
 		unwind_error = UNWIND_USER_DLERROR;
 		goto err;
 	}
 
+	context.uc_state = state;
+	context.uc_pc_before_insn = state_pc_before_insn;
 search_fde:
-	/* unwind `state' until the nearest exception handler,  or until the end of the  stack.
-	 * If the later happens, then we check for an exit-thread exception, but will terminate
-	 * the process due to an unhandled exception if something else went wrong.
-	 * NOTE: PC-1 because the state we're being given has its PC pointer
-	 *       set   to  be  directed   after  the  faulting  instruction. */
-	memcpy(&oldstate, state, sizeof(*state));
-	pc           = except_register_state_getpc(&oldstate) - 1;
-	unwind_error = unwind_fde_find(pc, &context.uc_fde);
+	/* unwind `context.uc_state' until the nearest exception handler, or until
+	 * user-space is reached. If the later happens, then we must propagate the
+	 * exception to it instead. */
+	memcpy(&oldstate, context.uc_state, sizeof(*context.uc_state));
+	context.uc_adjpc = except_register_state_getpc(&oldstate);
+	if (!context.uc_pc_before_insn) {
+		/* Always work with a  PC before (or within)  an
+		 * insn, so we can do `pc >= start && pc < end'. */
+		context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+	}
+
+	unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err;
 	if (context.uc_fde.f_persofun) {
 		/* Invoke the personality function */
 		_Unwind_Reason_Code reason;
-		context.uc_state = state;
 		if ((_Unwind_Personality_Fn)context.uc_fde.f_persofun == &libc_gxx_personality_v0) {
 			reason = libc_gxx_personality_kernexcept(&context, true);
 		} else {
@@ -591,10 +587,10 @@ search_fde:
 		}
 		if (reason == _URC_INSTALL_CONTEXT) {
 			/* Unwind to the landing pad. */
-			unwind_error = unwind_landingpad(&context.uc_fde, state, pc);
+			unwind_error = unwind_landingpad(&context.uc_fde, context.uc_state, context.uc_adjpc);
 			if unlikely(unwind_error != UNWIND_SUCCESS)
 				goto err;
-			return state;
+			return context.uc_state;
 		}
 		if unlikely(reason != _URC_CONTINUE_UNWIND) {
 			unwind_error = reason == _URC_END_OF_STACK
@@ -603,7 +599,10 @@ search_fde:
 			goto err;
 		}
 	}
-	unwind_error = unwind_fde(&context.uc_fde, state, &oldstate, pc);
+
+	context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+	unwind_error = unwind_fde(&context.uc_fde, context.uc_state,
+	                          &oldstate, context.uc_adjpc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err;
 
@@ -616,9 +615,9 @@ search_fde:
 			if (!current.pt_except.ei_trace[i])
 				break;
 		}
-		current.pt_except.ei_trace[i] = except_register_state_getpc(state);
+		current.pt_except.ei_trace[i] = except_register_state_getpc(context.uc_state);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		current.pt_except.ei_trace[0] = except_register_state_getpc(state);
+		current.pt_except.ei_trace[0] = except_register_state_getpc(context.uc_state);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -632,13 +631,13 @@ err:
 			except_register_state_t *new_state;
 
 			/* Try to handle special exceptions (E_EXIT_THREAD and E_EXIT_PROCESS) */
-			new_state = handle_special_exception(state, &info->ei_data);
+			new_state = handle_special_exception(context.uc_state, &info->ei_data);
 			if (new_state != NULL)
 				return new_state;
 
 			/* Try to convert the exception into a signal. */
 			if (info->ei_flags & EXCEPT_FMAYSIGNAL)
-				try_raise_signal_from_exception(state, &info->ei_data);
+				try_raise_signal_from_exception(context.uc_state, &info->ei_data);
 		}
 		{
 			PRIVATE SECTION_EXCEPT_STRING char const message_unwind_failed[] =
@@ -672,6 +671,16 @@ err:
 	}
 }
 
+DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
+DEFINE_PUBLIC_ALIAS(except_unwind_fault, libc_except_unwind_fault);
+INTERN SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state) {
+	return libc_except_unwind_impl(state, false);
+}
+INTERN SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
+NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind_fault)(except_register_state_t *__restrict state) {
+	return libc_except_unwind_impl(state, true);
+}
 
 
 
@@ -692,15 +701,21 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
 	unwind_errno_t unwind_error;
-	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
 	context.uc_state = &newstate;
+	context.uc_pc_before_insn = false;
 	for (;;) {
 		int actions;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = except_register_state_getpc(&oldstate) - 1;
-		unwind_error = unwind_fde_find(pc, &context.uc_fde);
+		context.uc_adjpc = except_register_state_getpc(&oldstate);
+		if (!context.uc_pc_before_insn) {
+			/* Always work with a  PC before (or within)  an
+			 * insn, so we can do `pc >= start && pc < end'. */
+			context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+		}
+
+		unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 		actions = _Unwind_Context_Identify(&context) == exception_object->private_2
@@ -721,13 +736,14 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 		assert(actions == _UA_CLEANUP_PHASE);
 
 		/* Unwind the stack. */
-		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
+		context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, context.uc_adjpc);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 	}
 
 	/* Apply landing pad transformations. */
-	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
+	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, context.uc_adjpc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err_unwind__URC_FATAL_PHASE2_ERROR;
 
@@ -747,18 +763,24 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 	unwind_errno_t unwind_error;
 	_Unwind_Stop_Fn stop;
 	void *stop_argument;
-	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
 	stop             = (_Unwind_Stop_Fn)(_Unwind_Ptr)exception_object->private_1;
 	stop_argument    = (void *)(_Unwind_Ptr)exception_object->private_2;
 	memcpy(&newstate, state, sizeof(newstate));
 	context.uc_state = &newstate;
+	context.uc_pc_before_insn = false;
 	for (;;) {
 		_Unwind_Reason_Code reason;
 		int action;
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = except_register_state_getpc(&oldstate) - 1;
-		unwind_error = unwind_fde_find(pc, &context.uc_fde);
+		context.uc_adjpc = except_register_state_getpc(&oldstate);
+		if (!context.uc_pc_before_insn) {
+			/* Always work with a  PC before (or within)  an
+			 * insn, so we can do `pc >= start && pc < end'. */
+			context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+		}
+
+		unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS && unwind_error != UNWIND_NO_FRAME)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 
@@ -786,7 +808,8 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 		}
 
 		/* Unwind the stack. */
-		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
+		context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, context.uc_adjpc);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
 			if (unwind_error == UNWIND_NO_FRAME)
 				break;
@@ -795,7 +818,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 	}
 
 	/* Apply landing pad transformations. */
-	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
+	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, context.uc_adjpc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		goto err_unwind__URC_FATAL_PHASE2_ERROR;
 
@@ -824,7 +847,6 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 	unwind_errno_t unwind_error;
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
-	void const *pc;
 
 	/* Special case: Raise a KERNKOS exception (with information already stored in `tls.t_except') */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
@@ -834,12 +856,18 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
 	context.uc_state = &newstate;
+	context.uc_pc_before_insn = false;
 
 	/* Phase #1: Search for a viable exception handler. */
 	for (;;) {
 		memcpy(&oldstate, &newstate, sizeof(newstate));
-		pc = except_register_state_getpc(&oldstate) - 1;
-		unwind_error = unwind_fde_find(pc, &context.uc_fde);
+		context.uc_adjpc = except_register_state_getpc(&oldstate);
+		if (!context.uc_pc_before_insn) {
+			/* Always work with a  PC before (or within)  an
+			 * insn, so we can do `pc >= start && pc < end'. */
+			context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+		}
+		unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind;
 		if (context.uc_fde.f_persofun) {
@@ -855,7 +883,8 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 		}
 
 		/* Unwind the stack. */
-		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
+		context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, context.uc_adjpc);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind;
 	}
@@ -905,22 +934,34 @@ libc_Unwind_Backtrace_impl(except_register_state_t *__restrict state,
 	_Unwind_Reason_Code reason;
 	unwind_errno_t unwind_error;
 	context.uc_state = state;
+	context.uc_pc_before_insn = false;
 	for (;;) {
-		void const *pc;
-		memcpy(&oldstate, state, sizeof(oldstate));
-		pc = except_register_state_getpc(&oldstate) - 1;
-		unwind_error = unwind_fde_find(pc, &context.uc_fde);
+		memcpy(&oldstate, context.uc_state, sizeof(oldstate));
+		context.uc_adjpc = except_register_state_getpc(&oldstate);
+		if (!context.uc_pc_before_insn) {
+			/* Always work with a  PC before (or within)  an
+			 * insn, so we can do `pc >= start && pc < end'. */
+			context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+		}
+		unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 		if (unwind_error != UNWIND_SUCCESS) {
 			if unlikely(unwind_error != UNWIND_NO_FRAME)
 				goto err_unwind;
 		}
+
 		/* Call trace function.  */
 		reason = (*func)(&context, arg);
 		if (reason != _URC_NO_REASON)
 			break;
 		if (unwind_error == UNWIND_NO_FRAME)
 			break;
-		memcpy(state, &oldstate, sizeof(oldstate));
+
+		/* Unwind the stack. */
+		context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+		unwind_error = unwind_fde(&context.uc_fde, context.uc_state,
+		                          &oldstate, context.uc_adjpc);
+		if unlikely(unwind_error != UNWIND_SUCCESS)
+			goto err_unwind;
 	}
 	return reason;
 err_unwind:
@@ -1053,7 +1094,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_GetIPInfo, libc_Unwind_GetIPInfo);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1, 2)) uintptr_t
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context,
                                             int *__restrict ip_before_insn) {
-	*ip_before_insn = (int)context->uc_fde.f_sigframe;
+	*ip_before_insn = (int)(context->uc_pc_before_insn ? 1 : 0);
 	return (uintptr_t)except_register_state_getpc(context->uc_state);
 }
 
@@ -1172,7 +1213,11 @@ libc_except_handler3_impl_without_on_entry(except_register_state_t *__restrict s
 	COMPILER_BARRIER();
 
 	/* Perform exception unwinding */
-	state = libc_except_unwind(state);
+	if (error->e_faultaddr == except_register_state_getpc(state)) {
+		state = libc_except_unwind_fault(state);
+	} else {
+		state = libc_except_unwind(state);
+	}
 
 	/* Unset the in-except flag once we've successfully
 	 * unwound  the  stack  up until  a  valid handler. */
@@ -1203,7 +1248,6 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 	struct exception_info *info, saved_info;
 	bool got_first_handler;
 	uintptr_t recursion_flag;
-	void const *pc;
 
 	/* If supported by the architecture, verify the TLS context. */
 	EXCEPT_HANDLER_ON_ENTRY(state, error);
@@ -1245,11 +1289,17 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 		goto do_coredump_with_dlerror;
 	memcpy(&oldstate, state, sizeof(*state));
 	context.uc_state  = &oldstate;
+	context.uc_pc_before_insn = (error->e_faultaddr == except_register_state_getpc(&oldstate));
 	got_first_handler = false;
 	for (;;) {
 		memcpy(&newstate, &oldstate, sizeof(oldstate));
-		pc = except_register_state_getpc(&newstate) - 1;
-		unwind_error = unwind_fde_find(pc, &context.uc_fde);
+		context.uc_adjpc = except_register_state_getpc(&oldstate);
+		if (!context.uc_pc_before_insn) {
+			/* Always work with a  PC before (or within)  an
+			 * insn, so we can do `pc >= start && pc < end'. */
+			context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+		}
+		unwind_error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 		if unlikely(unwind_error != UNWIND_SUCCESS) {
 			if (unwind_error == UNWIND_NO_FRAME)
 				goto raise_signal; /* end-of-stack */
@@ -1266,7 +1316,7 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 				if (!got_first_handler) {
 					/* Calculate the landing pad adjustment */
 					memcpy(&first_handler, &oldstate, sizeof(oldstate));
-					unwind_error = unwind_landingpad(&context.uc_fde, &first_handler, pc);
+					unwind_error = unwind_landingpad(&context.uc_fde, &first_handler, context.uc_adjpc);
 					if unlikely(unwind_error != UNWIND_SUCCESS)
 						goto do_coredump_with_unwind_error;
 					got_first_handler = true;
@@ -1291,8 +1341,10 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 				goto raise_signal;
 			}
 		}
+
 		/* Unwind to the calling frame. */
-		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, pc);
+		context.uc_pc_before_insn = context.uc_fde.f_sigframe;
+		unwind_error = unwind_fde(&context.uc_fde, &newstate, &oldstate, context.uc_adjpc);
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto do_coredump_with_unwind_error;
 #if EXCEPT_BACKTRACE_SIZE != 0

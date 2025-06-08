@@ -44,6 +44,46 @@ DECL_BEGIN
 	 (vector_id) == 0x11 /* #AC  Alignment Check. */ ||          \
 	 (vector_id) == 0x1e /* #SX  Security Exception. */)
 
+/* ISR pushed PC points *at* faulting instruction (requires a signal frame):
+ * [BEFORE] 00 divide_by_zero         #DE  Divide-by-zero           -- Points at `div' or `idiv'
+ * [???   ] 01 debugtrap              #DB  Debug                    -- (Its complicated; can be both a trap and a fault)
+ * [BEFORE] 02 non_maskable_interrupt #NMI Non-maskable Interrupt
+ * [AFTER ] 03 breakpoint             #BP  Breakpoint               -- Points after `int3' or `int $3'
+ * [AFTER ] 04 overflow               #OF  Overflow                 -- Points after `into' or `int $4'
+ * [BEFORE] 05 bound_range            #BR  Bound Range Exceeded     -- Points at `bound'
+ * [BEFORE] 06 illegal_instruction    #UD  Invalid Opcode           -- Points at start of illop
+ * [BEFORE] 07 device_not_available   #NM  Device Not Available     -- Points at start of fpu instr
+ * [???   ] 08 double_fault           #DF  Double Fault             -- Saved PC is undefined
+ * [BEFORE] 09 coprocessor_fault      #CSO Coprocessor Segment Overrun (unused on 486+)
+ * [BEFORE] 0a invalid_tss            #TS  Invalid TSS              -- Points at start-of-task / faulting instr
+ * [BEFORE] 0b segment_not_present    #NP  Segment Not Present      -- Points at faulting instr
+ * [BEFORE] 0c stackfault             #SS  Stack-Segment Fault      -- Points at start-of-task / faulting instr
+ * [BEFORE] 0d gpf                    #GP  General Protection Fault -- Points at faulting instr
+ * [BEFORE] 0e pagefault              #PF  Page Fault               -- Points at faulting instr
+ * [      ] 0f 0fh                    Reserved (exception)...
+ * [BEFORE] 10 fpu_x87                #MF  x87 Floating-Point Exception -- Points at unrelated instr (x87 IP points at faulting instr)
+ * [BEFORE] 11 bad_alignment          #AC  Alignment Check          -- Points at faulting instr
+ * [???   ] 12 machine_check          #MC  Machine Check            -- Saved PC is undefined
+ * [BEFORE] 13 fpu_simd               #XM  SIMD Floating-Point Exception -- Points at faulting instr
+ * [BEFORE] 14 virtualization_error   #VE  Virtualization Exception
+ * [???   ] 15
+ * [???   ] 16
+ * [???   ] 17
+ * [???   ] 18
+ * [???   ] 19
+ * [???   ] 1a
+ * [???   ] 1b
+ * [???   ] 1c
+ * [???   ] 1d
+ * [???   ] 1e security_exception     #SX  Security Exception.
+ * [???   ] 1f
+ *
+ * NOTE: Everything "???" we treat as "BEFORE" */
+#define IDT_CONFIG_POINTS_AT_PC(vector_id)                        \
+	((vector_id) < 0x20  /* All exceptions, except... */ &&       \
+	 (vector_id) != 0x03 /* #BP  Breakpoint  (int3, int $3) */ && \
+	 (vector_id) != 0x04 /* #OF  Overflow    (into, int $4) */)
+
 /* ISR user-space access selector */
 #define IDT_CONFIG_ALLOWUSER(vector_id)                     \
 	((vector_id) == 0x80 /* Syscall */ ||                   \

@@ -282,13 +282,17 @@ struct _Unwind_Exception
 struct _Unwind_Context /* Opaque structure */
 #ifdef __USE_KOS
 {
-	except_register_state_t *uc_state; /* [1..1] The register state that is loaded when resuming execution. */
 #ifdef LIBUNWIND_HAVE_UNWIND_VRS
 	/* TODO: `.ARM.extab' data (and some way of telling if we're not actually using the `uc_fde'-format) */
-	unwind_fde_t uc_fde; /* FDE descriptor. */
+	unwind_fde_t             uc_fde;            /* FDE descriptor. */
 #else /* LIBUNWIND_HAVE_UNWIND_VRS */
-	unwind_fde_t uc_fde; /* FDE descriptor. */
+	unwind_fde_t             uc_fde;            /* FDE descriptor. */
 #endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
+	except_register_state_t *uc_state;          /* [1..1] The register state that is loaded when resuming execution. */
+	void const              *uc_adjpc;          /* Currently relevant program counter. Same as PC in `uc_state',
+	                                             * but already adjusted as per `uc_pc_before_insn' (such that it
+	                                             * can always be used in "uc_adjpc >= start && uc_adjpc < end") */
+	__BOOL                   uc_pc_before_insn; /* Non-zero if the last FDE was a signal frame. */
 }
 #endif /* __USE_KOS */
 ;

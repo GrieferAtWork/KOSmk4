@@ -47,8 +47,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libinstrlen/instrlen.h>
-
 
 /* NOTE: This also prevents `x == NULL', since `ADDR_ISKERN(NULL) == false'! */
 #define VERIFY_ADDR(x) ADDR_ISKERN(x)

@@ -40,6 +40,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/rpc.h>
+#include <libinstrlen/instrlen.h>
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -51,6 +52,60 @@
 #endif /* __x86_64__ */
 
 DECL_BEGIN
+
+LOCAL NOBLOCK NONNULL((1)) uintptr_t FCALL
+userexcept_faultattr_instruction_pred(struct icpustate const *__restrict state,
+                                      uintptr_t pc) {
+	return (uintptr_t)instruction_trypred((void const *)pc, icpustate_getisa(state));
+}
+
+/* Determine the fault address that should be returned to user-space when
+ * writing  information about an exception. Note that `libc' will look at
+ * the relation between the fault address  and the CPU state PC  register
+ * to  determine if the  exception should be treated  as a fault (meaning
+ * that  the CPU state  PC register points  *AT* or *BEFORE* (technically
+ * also *into*) the  faulting instruction),  or a trap  (meaning the  CPU
+ * state PC register points *AFTER* the faulting instruction):
+ * - When `e_faultaddr == CPUSTATE.PC': fault
+ * - When `e_faultaddr != CPUSTATE.PC': trap
+ *
+ * The later is always the case for system calls, while the former  is
+ * normally the case for everything else (exceptions), though here the
+ * actual behavior depends on the exception in question.
+ */
+LOCAL NONNULL((1, 3)) uintptr_t FCALL
+userexcept_faultattr(struct icpustate const *__restrict state,
+                     struct rpc_syscall_info const *sc_info,
+                     struct exception_data const *__restrict error) {
+	if (sc_info != NULL) {
+		/* Figure out the address of the instruction that triggered the syscall */
+		uintptr_t result = (uintptr_t)icpustate_getpc(state);
+#if ((RPC_SYSCALL_INFO_METHOD_INT80H_32 & ~RPC_SYSCALL_INFO_METHOD_F3264) <= 1 &&   \
+     (RPC_SYSCALL_INFO_METHOD_SYSENTER_32 & ~RPC_SYSCALL_INFO_METHOD_F3264) <= 1 && \
+     ((RPC_SYSCALL_INFO_METHOD_INT80H_64 & ~RPC_SYSCALL_INFO_METHOD_F3264) <= 1 || !defined(__x86_64__)))
+		if likely((sc_info->rsi_flags & (RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264)) <= 1) {
+			result -= 2;
+		} else {
+			result = userexcept_faultattr_instruction_pred(state, result);
+		}
+#else /* ... */
+		switch (sc_info->rsi_flags & RPC_SYSCALL_INFO_FMETHOD) {
+		case RPC_SYSCALL_INFO_METHOD_INT80H_32:   /* CD 80  int $0x80 */
+		case RPC_SYSCALL_INFO_METHOD_SYSENTER_32: /* 0F 34  sysenter */
+#ifdef __x86_64__
+		case RPC_SYSCALL_INFO_METHOD_INT80H_64:   /* CD 80  int $0x80     0F 05  syscall */
+#endif /* __x86_64__ */
+			result -= 2;
+			break;
+		default:
+			result = userexcept_faultattr_instruction_pred(state, result);
+			break;
+		}
+#endif /* !... */
+		return result;
+	}
+	return (uintptr_t)error->e_faultaddr;
+}
 
 LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
@@ -199,10 +254,11 @@ userexcept_callhandler(struct icpustate *__restrict state,
 		user_error->e_args.e_pointers[i] = (u32)error->e_args.e_pointers[i];
 
 	/* In case of  a system call,  set the  fault
-	 * address as the system call return address. */
-	user_error->e_faultaddr = sc_info != NULL
-	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getusersp(state)
-	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)error->e_faultaddr;
+	 * address as the system call return address.
+	 *
+	 * NOTE: libc includes special handling
+	 */
+	user_error->e_faultaddr = (__HYBRID_PTR32(void))(u32)userexcept_faultattr(state, sc_info, error);
 	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
 
 	/* Redirect the given CPU state to return to the user-space handler. */
@@ -273,9 +329,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
-	user_error->e_faultaddr = sc_info != NULL
-	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getusersp(state)
-	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)error->e_faultaddr;
+	user_error->e_faultaddr = (__HYBRID_PTR64(void))(u64)userexcept_faultattr(state, sc_info, error);
 	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
 
 	/* Redirect the given CPU state to return to the user-space handler. */

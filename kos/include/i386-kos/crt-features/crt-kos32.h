@@ -3270,6 +3270,7 @@
 #define __CRT_HAVE_except_throw_current
 #define __CRT_HAVE_except_thrown
 #define __CRT_HAVE_except_unwind
+#define __CRT_HAVE_except_unwind_fault
 #define __CRT_HAVE_execl
 #define __CRT_HAVE_execle
 #define __CRT_HAVE_execlp

@@ -90,27 +90,24 @@ NOTHROW(FCALL syscall_info_amend_FEXCEPT)(struct rpc_syscall_info *__restrict se
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC during `userexcept_handler()' */
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind_fde_struct *__restrict fde,
-                                                                   struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct _Unwind_Context *__restrict context) {
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
 	unwind_errno_t error;
-	void const *pc;
-	kcpustate_to_ucpustate(state, &ustate);
-	pc = ucpustate_getpc(&ustate) - 1;
-	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	kcpustate_to_ucpustate(context->uc_state, &ustate);
+	error = unwind_fde_sigframe_exec(&context->uc_fde, &cfa, context->uc_adjpc);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
-	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
-	                                              &unwind_getreg_kcpustate, state,
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &context->uc_fde, context->uc_adjpc,
+	                                              &unwind_getreg_kcpustate, context->uc_state,
 	                                              &unwind_setreg_ucpustate, &ustate);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(&context->uc_fde));
 	rpc_syscall_info_get32_int80h(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
@@ -120,27 +117,24 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC during `userexcept_handler()' */
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unwind_fde_struct *__restrict fde,
-                                                                      struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct _Unwind_Context *__restrict context) {
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
 	unwind_errno_t error;
-	void const *pc;
-	kcpustate_to_ucpustate(state, &ustate);
-	pc = ucpustate_getpc(&ustate) - 1;
-	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	kcpustate_to_ucpustate(context->uc_state, &ustate);
+	error = unwind_fde_sigframe_exec(&context->uc_fde, &cfa, context->uc_adjpc);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
-	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
-	                                              &unwind_getreg_kcpustate, state,
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &context->uc_fde, context->uc_adjpc,
+	                                              &unwind_getreg_kcpustate, context->uc_state,
 	                                              &unwind_setreg_ucpustate, &ustate);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(&context->uc_fde));
 	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
@@ -154,27 +148,24 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC during `userexcept_handler()' */
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwind_fde_struct *__restrict fde,
-                                                                     struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct _Unwind_Context *__restrict context) {
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
 	unwind_errno_t error;
-	void const *pc;
-	kcpustate_to_ucpustate(state, &ustate);
-	pc = ucpustate_getpc(&ustate) - 1;
-	error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+	kcpustate_to_ucpustate(context->uc_state, &ustate);
+	error = unwind_fde_sigframe_exec(&context->uc_fde, &cfa, context->uc_adjpc);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
-	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, fde, pc,
-	                                              &unwind_getreg_kcpustate, state,
+	error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &context->uc_fde, context->uc_adjpc,
+	                                              &unwind_getreg_kcpustate, context->uc_state,
 	                                              &unwind_setreg_ucpustate, &ustate);
 	if unlikely(error != UNWIND_SUCCESS)
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	assert(ucpustate_isuser(&ustate) ||
 	       ucpustate_getpc(&ustate) == (void const *)&x86_userexcept_sysret);
-	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(fde));
+	gpregs_setpax(&ustate.ucs_gpregs, unwind_fde_getsysno(&context->uc_fde));
 	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
@@ -277,50 +268,47 @@ extern void ASMCALL _x86_xintr3_userexcept_unwind(void);
 	}	__WHILE0
 #endif /* !__x86_64__ */
 
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
-                                                                 struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct _Unwind_Context *__restrict context) {
 	struct icpustate *st;
-	st = (struct icpustate *)state->kcs_gpregs.gp_Psp;
+	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 	if (!icpustate_isuser(st))
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
-	x86_xintr1_userexcept_unwind(st, fde->f_lsdaaddr);
+	x86_xintr1_userexcept_unwind(st, context->uc_fde.f_lsdaaddr);
 }
 
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
-                                                                 struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct _Unwind_Context *__restrict context) {
 	struct icpustate *st;
 	uintptr_t ecode;
-	st = (struct icpustate *)state->kcs_gpregs.gp_Psp;
+	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 	if (!icpustate_isuser(st))
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
-	ecode = state->kcs_gpregs.gp_Pbx;
-	x86_xintr2_userexcept_unwind(st, fde->f_lsdaaddr, ecode);
+	ecode = context->uc_state->kcs_gpregs.gp_Pbx;
+	x86_xintr2_userexcept_unwind(st, context->uc_fde.f_lsdaaddr, ecode);
 }
 
-INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
-                                                                 struct kcpustate *__restrict state) {
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct _Unwind_Context *__restrict context) {
 	struct icpustate *st;
 	uintptr_t ecode;
 	void *addr;
 #ifdef __x86_64__
-	st = (struct icpustate *)state->kcs_gpregs.gp_Psp;
+	st = (struct icpustate *)context->uc_state->kcs_gpregs.gp_Psp;
 #else /* __x86_64__ */
-	st = (struct icpustate *)(state->kcs_gpregs.gp_Psp + 4);
+	st = (struct icpustate *)(context->uc_state->kcs_gpregs.gp_Psp + 4);
 #endif /* !__x86_64__ */
 	if (!icpustate_isuser(st))
 		return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 	/* Unwind into user-space. */
 	PREEMPTION_ENABLE();
-	addr  = (void *)state->kcs_gpregs.gp_Pbp;
-	ecode = state->kcs_gpregs.gp_Pbx;
-	x86_xintr3_userexcept_unwind(st, fde->f_lsdaaddr, ecode, addr);
+	addr  = (void *)context->uc_state->kcs_gpregs.gp_Pbp;
+	ecode = context->uc_state->kcs_gpregs.gp_Pbx;
+	x86_xintr3_userexcept_unwind(st, context->uc_fde.f_lsdaaddr, ecode, addr);
 }
 /************************************************************************/
 
@@ -340,17 +328,13 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_f
  *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
  *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
  *       or the specified handler. */
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
-                                                          struct kcpustate *__restrict state) {
+PUBLIC WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context *__restrict context) {
 	struct x86_asm_except_entry const *ent;
-	void const *pc = kcpustate_getpc(state);
-	ent = (struct x86_asm_except_entry const *)fde->f_lsdaaddr;
+	ent = (struct x86_asm_except_entry const *)context->uc_fde.f_lsdaaddr;
 	if (ent) {
 		for (; ent->ee_entry != 0; ++ent) {
-			/* NOTE: Compare while keeping in mind that `pc' points
-			 *       _after_  the  faulting /  calling instruction. */
-			if (pc >= ent->ee_start && pc <= ent->ee_end) { /* FIXME: Must only use ">=" here  */
+			if (context->uc_adjpc >= ent->ee_start && context->uc_adjpc < ent->ee_end) {
 				if (ent->ee_mask != (uintptr_t)-1) {
 					except_code_t code = except_code();
 					if (EXCEPT_SUBCLASS(ent->ee_mask) != 0
@@ -358,14 +342,13 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_stru
 					    : EXCEPT_CLASS(ent->ee_mask) != EXCEPT_CLASS(code))
 						continue; /* Different mask. */
 				}
-				kcpustate_setpc(state, ent->ee_entry);
+				kcpustate_setpc(context->uc_state, ent->ee_entry);
 				return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 			}
 		}
 	}
 	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
 }
-
 
 DECL_END
 

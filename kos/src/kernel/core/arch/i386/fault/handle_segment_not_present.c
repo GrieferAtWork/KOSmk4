@@ -221,9 +221,8 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 	unsigned int i;
 	emu86_opcode_t tiny_opcode;
 	emu86_opflags_t op_flags;
-	byte_t const *pc, *orig_pc;
-	orig_pc = icpustate_getpc(state);
-	pc      = orig_pc;
+	byte_t const *pc;
+	pc = icpustate_getpc(state);
 	/* Check: non-external event -> Analyze the faulting instruction */
 	if (ecode & 1) {
 		tiny_opcode = 0;
@@ -279,7 +278,8 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regval, segment);
 				for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_args.e_pointers[i], 0);
-			}	goto unwind_state;
+				goto unwind_state;
+			}	break;
 
 
 			case EMU86_OPCODE_ENCODE(0xff):
@@ -382,20 +382,17 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 			    PERTASK_GET(this_exception_args.e_illegal_instruction.ii_opcode) == 0) {
 				PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode,
 				            EMU86_OPCODE_DECODE(tiny_opcode));
-				PERTASK_SET(this_exception_faultaddr, orig_pc);
+				PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 			} else if (isuser()) {
-				PERTASK_SET(this_exception_faultaddr, orig_pc);
+				PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 			}
-			icpustate_setpc(state, pc);
 			RETHROW();
 		}
 unsupported_instruction:
-		pc = instruction_succ_nx(orig_pc, icpustate_getisa(state));
-		if (!pc)
-			pc = orig_pc;
 generic_failure:
 		;
 	}
+
 	/* Fallback: Throw an `E_ILLEGAL_INSTRUCTION_REGISTER' exception */
 	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, EMU86_OPCODE_DECODE(tiny_opcode));
@@ -403,6 +400,7 @@ generic_failure:
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_how, E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_regno, X86_REGISTER_SEGMENT);
 	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_register.r_offset, 0);
+
 	/* XXX: Actually, bits from `ecode & 3' have special meaning:
 	 *      0x1: External event
 	 *      0x2: Refers to an IDT entry
@@ -415,8 +413,7 @@ generic_failure:
 	for (i = 6; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
 unwind_state:
-	PERTASK_SET(this_exception_faultaddr, orig_pc);
-	icpustate_setpc(state, pc);
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state));
 	except_throw_current_at_icpustate(state);
 }
 

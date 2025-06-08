@@ -1189,34 +1189,46 @@ INTDEF ATTR_COLD NONNULL((2)) void FCALL /* TODO: Standardize this function! (cu
 halt_unhandled_exception(unwind_errno_t unwind_error,
                          except_register_state_t *__restrict unwind_state);
 
-DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *
-NOTHROW(FCALL libc_except_unwind)(except_register_state_t *__restrict state) {
+static_assert(offsetof(struct _Unwind_Context, uc_fde) == OFFSET__UNWIND_CONTEXT_FDE);
+static_assert(offsetof(struct _Unwind_Context, uc_state) == OFFSET__UNWIND_CONTEXT_STATE);
+static_assert(offsetof(struct _Unwind_Context, uc_adjpc) == OFFSET__UNWIND_CONTEXT_ADJPC);
+static_assert(offsetof(struct _Unwind_Context, uc_pc_before_insn) == OFFSET__UNWIND_CONTEXT_PC_BEFORE_INSN);
+static_assert(sizeof(struct _Unwind_Context) == SIZEOF__UNWIND_CONTEXT);
+
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *
+NOTHROW(FCALL libc_except_unwind_impl)(except_register_state_t *__restrict state,
+                                       bool state_pc_before_insn) {
 	unwind_errno_t error;
-	unwind_fde_t fde;
+	struct _Unwind_Context context;
 	except_register_state_t old_state;
-	void const *pc;
 	assertf(PERTASK_NE(this_exception_info.ei_code, EXCEPT_CODEOF(E_OK)) ||
 	        PERTASK_NE(this_exception_info.ei_nesting, 0),
 	        "In except_unwind(), but no exception set");
+	context.uc_pc_before_insn = state_pc_before_insn;
+	context.uc_state = state;
 
 search_fde:
-	/* unwind `state' until the nearest exception handler, or until user-space is reached.
-	 * If the  later  happens,  then  we  must propagate  the  exception  to  it  instead.
-	 * NOTE: -1 because the state we're being given has its PC pointer
-	 *       set  to  be  directed  after  the  faulting  instruction. */
-	memcpy(&old_state, state, sizeof(old_state));
-	pc    = except_register_state_getpc(&old_state) - 1;
-	error = unwind_fde_find(pc, &fde);
+	/* unwind `context.uc_state' until the nearest exception handler, or until
+	 * user-space is reached. If the later happens, then we must propagate the
+	 * exception to it instead. */
+	memcpy(&old_state, context.uc_state, sizeof(old_state));
+	context.uc_adjpc = except_register_state_getpc(&old_state);
+	if (!context.uc_pc_before_insn) {
+		/* Always work with a  PC before (or within)  an
+		 * insn, so we can do `pc >= start && pc < end'. */
+		context.uc_adjpc = (byte_t const *)context.uc_adjpc - 1;
+	}
+
+	error = unwind_fde_find(context.uc_adjpc, &context.uc_fde);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
 	/* Check if there is a personality function for us to execute. */
-	if (fde.f_persofun != NULL) {
+	if (context.uc_fde.f_persofun != NULL) {
 		unsigned int perso_code;
-		assertf(ADDR_ISKERN(fde.f_persofun),
+		assertf(ADDR_ISKERN(context.uc_fde.f_persofun),
 		        "Not a kernel-space address: %p",
-		        fde.f_persofun);
-		perso_code = (*(except_personality_t)fde.f_persofun)(&fde, state);
+		        context.uc_fde.f_persofun);
+		perso_code = (*(except_personality_t)context.uc_fde.f_persofun)(&context);
 		switch (perso_code) {
 
 		case EXCEPT_PERSONALITY_EXECUTE_HANDLER:
@@ -1224,12 +1236,12 @@ search_fde:
 			 * `DW_CFA_GNU_args_size' instruction.
 			 * If there is, we must add its value to ESP before resuming execution!
 			 * s.a.: https://reviews.llvm.org/D38680 */
-			error = unwind_landingpad(&fde, state, pc);
+			error = unwind_landingpad(&context.uc_fde, context.uc_state, context.uc_adjpc);
 			if unlikely(error != UNWIND_SUCCESS)
 				goto err;
 			ATTR_FALLTHROUGH
 		case EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW:
-			return state; /* Execute a new handler. */
+			return context.uc_state; /* Execute a new handler. */
 
 		case EXCEPT_PERSONALITY_ABORT_SEARCH:
 			error = UNWIND_SUCCESS;
@@ -1238,25 +1250,27 @@ search_fde:
 		default: break;
 		}
 	}
+
+	context.uc_pc_before_insn = context.uc_fde.f_sigframe;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
-	if (fde.f_sigframe) {
+	if (context.uc_fde.f_sigframe) {
 		unwind_cfa_sigframe_state_t cfa;
-		error = unwind_fde_sigframe_exec(&fde, &cfa, pc);
+		error = unwind_fde_sigframe_exec(&context.uc_fde, &cfa, context.uc_adjpc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
-		error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &fde, pc,
+		error = unwind_cfa_sigframe_apply_sysret_safe(&cfa, &context.uc_fde, context.uc_adjpc,
 		                                              &unwind_getreg_except_register_state, &old_state,
-		                                              &unwind_setreg_except_register_state, state);
+		                                              &unwind_setreg_except_register_state, context.uc_state);
 	} else
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 	{
 		unwind_cfa_state_t cfa;
-		error = unwind_fde_exec(&fde, &cfa, pc);
+		error = unwind_fde_exec(&context.uc_fde, &cfa, context.uc_adjpc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
-		error = unwind_cfa_apply_sysret_safe(&cfa, &fde, pc,
+		error = unwind_cfa_apply_sysret_safe(&cfa, &context.uc_fde, context.uc_adjpc,
 		                                     &unwind_getreg_except_register_state, &old_state,
-		                                     &unwind_setreg_except_register_state, state);
+		                                     &unwind_setreg_except_register_state, context.uc_state);
 	}
 
 	/* When unwinding to user-space, we'll get an error `UNWIND_INVALID_REGISTER' */
@@ -1266,10 +1280,10 @@ search_fde:
 		except_register_state_to_ucpustate(&old_state, &ustate);
 
 		/* Assume that we're unwinding a signal frame when returning to user-space. */
-		error = unwind_fde_sigframe_exec(&fde, &sigframe_cfa, pc);
+		error = unwind_fde_sigframe_exec(&context.uc_fde, &sigframe_cfa, context.uc_adjpc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
-		error = unwind_cfa_sigframe_apply_sysret_safe(&sigframe_cfa, &fde, pc,
+		error = unwind_cfa_sigframe_apply_sysret_safe(&sigframe_cfa, &context.uc_fde, context.uc_adjpc,
 		                                              &unwind_getreg_except_register_state, &old_state,
 		                                              &unwind_setreg_ucpustate, &ustate);
 		if unlikely(error != UNWIND_SUCCESS)
@@ -1318,7 +1332,7 @@ search_fde:
 					if (isval != wantval) {                                                 \
 						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: "             \
 						                 "%#" PRIx32 " & 0xffff != %#" PRIx16 " [pc:%p]\n", \
-						       name, isval, wantval, pc);                                   \
+						       name, isval, wantval, context.uc_adjpc);                     \
 					}                                                                       \
 				}	__WHILE0
 #define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                        \
@@ -1326,7 +1340,7 @@ search_fde:
 					if (!isok(isval)) {                                         \
 						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: " \
 						                 "%#" PRIx32 " & 0xffff [pc:%p]\n",     \
-						       name, isval, pc);                                \
+						       name, isval, context.uc_adjpc);                  \
 					}                                                           \
 				}	__WHILE0
 				/* NOTE: Some x86 processors behave kind-of weird:
@@ -1366,7 +1380,7 @@ search_fde:
 			}
 		}
 #endif /* __i386__ || __x86_64__ */
-		except_register_state_from_ucpustate(state, &ustate);
+		except_register_state_from_ucpustate(context.uc_state, &ustate);
 	} else {
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
@@ -1381,9 +1395,9 @@ search_fde:
 			if (!PERTASK_TEST(this_exception_trace[i]))
 				break;
 		}
-		PERTASK_SET(this_exception_trace[i], except_register_state_getpc(state));
+		PERTASK_SET(this_exception_trace[i], except_register_state_getpc(context.uc_state));
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		PERTASK_SET(this_exception_trace[0], except_register_state_getpc(state));
+		PERTASK_SET(this_exception_trace[0], except_register_state_getpc(context.uc_state));
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -1391,10 +1405,21 @@ search_fde:
 	/* Continue searching for handlers. */
 	goto search_fde;
 err_old_state:
-	memcpy(state, &old_state, sizeof(*state));
+	memcpy(context.uc_state, &old_state, sizeof(*context.uc_state));
 err:
-	halt_unhandled_exception(error, state);
-	return state;
+	halt_unhandled_exception(error, context.uc_state);
+	return context.uc_state;
+}
+
+DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
+DEFINE_PUBLIC_ALIAS(except_unwind_fault, libc_except_unwind_fault);
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *
+NOTHROW(FCALL libc_except_unwind)(except_register_state_t *__restrict state) {
+	return libc_except_unwind_impl(state, false);
+}
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) except_register_state_t *
+NOTHROW(FCALL libc_except_unwind_fault)(except_register_state_t *__restrict state) {
+	return libc_except_unwind_impl(state, true);
 }
 
 
@@ -1432,7 +1457,7 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
 
 		/* Do normal unwinding. */
 		memcpy(&st, &info->ei_state, sizeof(except_register_state_t));
-		pst = libc_except_unwind(&st);
+		pst = libc_except_unwind_fault(&st);
 		except_register_state_cpu_apply(pst);
 	}
 }
@@ -1446,24 +1471,23 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
-                                                       except_register_state_t *__restrict state) {
+INTERN WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct _Unwind_Context *__restrict context) {
 	u8 temp, callsite_encoding;
 	byte_t const *reader;
 	byte_t const *landingpad;
 	byte_t const *callsite_end;
 	size_t callsite_size;
 
-	reader     = (byte_t const *)fde->f_lsdaaddr;
-	landingpad = (byte_t const *)fde->f_pcstart;
+	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
+	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
 
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
 		/* gl_landing_pad */
 		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp,
-		                                  sizeof(void *), &fde->f_bases);
+		                                  sizeof(void *), &context->uc_fde.f_bases);
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
@@ -1475,24 +1499,19 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct 
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
 		byte_t const *startpc, *endpc;
-		start   = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_start */
-		size    = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_size */
-		handler = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_handler */
-		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_action */
+		start   = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_start */
+		size    = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_size */
+		handler = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_handler */
+		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_action */
 		startpc = landingpad + start;
 		endpc   = startpc + size;
 
-#if 1 /* Compare pointers like this, as `kcs_eip' is the _RETURN_ address \
-       * (i.e. the address after the piece of code that caused the exception) */
-		if (except_register_state_getpc(state) > startpc && except_register_state_getpc(state) <= endpc)
-#else
-		if (except_register_state_getpc(state) >= startpc && except_register_state_getpc(state) < endpc)
-#endif
-		{
+		if (context->uc_adjpc >= startpc && context->uc_adjpc < endpc) {
 			if (handler == 0)
 				return EXCEPT_PERSONALITY_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
+
 			/* Just to the associated handler */
-			except_register_state_setpc(state, landingpad + handler);
+			except_register_state_setpc(context->uc_state, landingpad + handler);
 			if (action != 0) {
 				/* The ABI wants  us to fill  %eax with  a pointer to  the exception  (`_Unwind_Exception').
 				 * However,  since  KOS exception  is kept  a bit  simpler  (so-as to  allow it  to function
@@ -1500,11 +1519,12 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct 
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
 				 * So while what we  write here really doesn't  matter at all, let's  just put in  something
 				 * that at the very least makes a bit of sense. */
-				except_register_state_set_unwind_exception(state, except_code());
+				except_register_state_set_unwind_exception(context->uc_state, except_code());
 			}
 			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
 		}
 	}
+
 	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
 	return EXCEPT_PERSONALITY_ABORT_SEARCH;
 }

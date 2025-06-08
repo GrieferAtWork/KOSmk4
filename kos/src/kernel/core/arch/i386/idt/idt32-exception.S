@@ -134,13 +134,15 @@ IDT_HANDLER_BEGIN
 	jmp    cpu_apply_ucpustate
 #undef OFFSET_DF_CPUSTATE_REGS
 #else /* IDT_VECTOR_ID == 0x08 */
+
+
 	/* UGH!  SERIOUS F- YOU  GDB!!!! Like literally,  it just p00ps itself
 	 * because of the `.cfi_adjust_cfa_offset -4' down below. For WHATEVER
 	 * STUPID  REASON,  this  `.cfi_signal_frame__exception'  affects   it
 	 * somehow... WTF? */
-#if IDT_VECTOR_ID != 0x0e
+#if IDT_VECTOR_ID != 0x0e && IDT_CONFIG_POINTS_AT_PC(IDT_VECTOR_ID)
 	.cfi_signal_frame__exception
-#endif /* IDT_VECTOR_ID != 0x0e */
+#endif /* IDT_VECTOR_ID != 0x0e && IDT_CONFIG_POINTS_AT_PC(IDT_VECTOR_ID) */
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
 	.cfi_restore_iret_eflags

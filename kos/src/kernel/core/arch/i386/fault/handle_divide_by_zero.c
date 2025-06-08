@@ -32,32 +32,19 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
-#include <assert.h>
-
-#include <libinstrlen/instrlen.h>
-
 DECL_BEGIN
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	static_assert(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
-	byte_t const *curr_pc, *next_pc;
 	unsigned int i;
-	/* NOTE: Must load `next_pc' before setting the exception code,
-	 *       since inspecting program  text may  clobber the  error
-	 *       code when a segfault happens. */
-	curr_pc = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(curr_pc, icpustate_getisa(state));
-
 	/* TODO: This function can also get called due to divide overflow! */
 	/* TODO: This function can also get called due to `aam $0' */
 
 	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_DIVIDE_BY_ZERO));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);
-	PERTASK_SET(this_exception_faultaddr, curr_pc);
-	if (next_pc)
-		icpustate_setpc(state, next_pc);
+	PERTASK_SET(this_exception_faultaddr, icpustate_getpc(state)); /* TODO: Should point at preceding PC */
 	except_throw_current_at_icpustate(state);
 }
 

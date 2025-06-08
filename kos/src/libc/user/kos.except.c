@@ -35,6 +35,7 @@ DECL_BEGIN
 /*[[[skip:libc_except_register_state]]]*/
 /*[[[skip:libc_except_info]]]*/
 /*[[[skip:libc_except_unwind]]]*/
+/*[[[skip:libc_except_unwind_fault]]]*/
 /*[[[skip:libc_except_throw_current]]]*/
 /*[[[skip:libc_except_rethrow]]]*/
 /*[[[skip:libc_except_throw]]]*/

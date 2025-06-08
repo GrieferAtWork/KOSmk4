@@ -70,7 +70,6 @@
 #define EXCEPT_PERSONALITY_CC KCALL
 #endif /* !EXCEPT_PERSONALITY_CC */
 
-
 DECL_BEGIN
 
 struct x86_asm_except_entry {
@@ -79,8 +78,8 @@ struct x86_asm_except_entry {
 	void const      *ee_end;   /* Exception handler end PC */
 	__UINTPTR_TYPE__ ee_mask;  /* Catch mask, or (uintptr_t)-1 to catch anything */
 };
-struct unwind_fde_struct;
-struct kcpustate;
+
+struct _Unwind_Context;
 
 /* A helpful, predefined  personality function  that is meant  to be  used for  assembly
  * function which need to be able to handle exceptions in a fairly user-friendly manner.
@@ -93,9 +92,8 @@ struct kcpustate;
  *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
  *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
  *       or the specified handler. */
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
-                                                          struct kcpustate *__restrict state);
+FUNDEF WUNUSED NONNULL((1)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context *__restrict context);
 
 DECL_END
 #endif /* __CC__ */

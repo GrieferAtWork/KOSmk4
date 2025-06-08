@@ -55,6 +55,7 @@ INTERN_FUNCTION(syscall_emulate_r_personality)
 	 * >>     goto .Loutside_protected_area;
 	 * >> if (kcpustate_getpc(state) > __x86_syscall_emulate_r_protect_end)
 	 * >>     goto .Loutside_protected_area; */
+	movP   OFFSET__UNWIND_CONTEXT_STATE(%R_fcall0P), %R_fcall1P
 	movP   OFFSET_KCPUSTATE_PIP(%R_fcall1P), %Pax
 	EXTERN(__x86_syscall_emulate_r_protect_start)
 	cmpP   $(__x86_syscall_emulate_r_protect_start), %Pax

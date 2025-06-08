@@ -597,6 +597,7 @@
 /* Default value for `ue_bjmprem' */
 #define UNWIND_EMULATOR_BJMPREM_DEFAULT 0x800
 
+#define __SIZEOF_UNWIND_REGNO_T__ __SIZEOF_INTPTR_HALF_T__
 #ifdef __CC__
 __DECL_BEGIN
 

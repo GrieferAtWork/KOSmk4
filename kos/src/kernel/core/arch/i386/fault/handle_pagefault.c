@@ -466,47 +466,6 @@ no:
 
 
 
-/* Don't do anything special here. This is only used to rethrow  exceptions
- * caused by the system itself, rather than the user that caused the #PF to
- * happen in the first place.
- *
- * If we were to change the register state here, we might trash a user-space
- * register state (or similar) if a thread  receives an RPC while it was  in
- * the process of handling a #PF
- *
- * In practice, this revealed itself as sporadic failures of the "timerfd"
- * system-test, which was occasionally handling a harmless (lazy-load) #PF
- * from within libdl.so, where it was loading a page from ".dynstr". Then,
- * while it was doing so, the thread received the RPC set-up to trigger on
- * completion of the timerfd, which then interrupted the #PF handler.
- *
- * This then resulted in the  instructing that was reading from  ".dynstr"
- * getting skipped upon return from the test's "myrpc" handler, which then
- * lead to the test failing with:
- * >> "DL: Unresolved symbol 'futex_waitwhile' in 'system-test'"
- *
- * Since the actual fault happened in "strcmp()", it then skipped the instr
- * that did the load from not-yet-loaded memory, causing it to compare  one
- * properly  loaded char with  whatever random garbage  was in the register
- * prior to the skipped load.
- */
-#if 1
-#define rethrow_system_exception_from_pf_handler(state, pc) RETHROW()
-#else
-PRIVATE ATTR_NORETURN void FCALL
-rethrow_system_exception_from_pf_handler(struct icpustate *__restrict state, void const *pc)
-		THROWS(...) {
-	/* Use the regular `instruction_trysucc()' since we're actually inside
-	 * of a CATCH-block right now, meaning that it will already do all  of
-	 * the necessary work of preserving the old exception for us! */
-	PERTASK_SET(this_exception_faultaddr, pc);
-	pc = instruction_trysucc(pc, icpustate_getisa(state));
-	icpustate_setpc(state, pc);
-	RETHROW();
-}
-#endif
-
-
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state,
                      uintptr_t ecode, void *addr) {
@@ -1163,12 +1122,9 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		if (!mfault_or_unlock(&mf))
 			goto again_lock_mman;
 	} EXCEPT {
-		//asm("call dbg");
 		mfault_fini(&mf);
 		task_popconnections();
-
-		/* Always make the state point to the instruction _after_ the one causing the problem. */
-		rethrow_system_exception_from_pf_handler(state, pc);
+		RETHROW();
 	}
 
 	/* Re-map the freshly faulted memory. */
@@ -1251,7 +1207,7 @@ pop_connections_and_throw_segfault:
 /*throw_segfault:*/
 	if (pc == addr) {
 		/* This can happen when trying to call an invalid function pointer.
-		 * -> Try to unwind this happening. */
+		 * -> Try to unwind when this happens. */
 		IF_X64(bool is_compat;)
 		void const *callsite_pc;
 		byte_t const *sp;
@@ -1276,40 +1232,63 @@ pop_connections_and_throw_segfault:
 			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
-				rethrow_system_exception_from_pf_handler(state, pc);
+				RETHROW();
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
 		if (FAULT_IS_USER ? ((byte_t const *)callsite_pc >= (byte_t const *)USERSPACE_END)
 		                  : ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE))
 			goto not_a_badcall;
-		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, (byte_t *)(is_compat ? sp + 4 : sp + 8));
-#else /* __x86_64__ */
-		if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
-			if ((byte_t const *)callsite_pc >= (byte_t const *)KERNELSPACE_BASE)
-				goto not_a_badcall;
-			icpustate_setpc(state, callsite_pc);
-			state->ics_irregs_u.ir_esp += 4;
-		} else {
-			if ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE)
-				goto not_a_badcall;
-			state->ics_irregs_k.ir_eip = (uintptr_t)callsite_pc;
-			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
-			                                      OFFSET_ICPUSTATE_IRREGS +
-			                                      SIZEOF_IRREGS_KERNEL);
-		}
-#endif /* !__x86_64__ */
 		TRY {
 			void const *call_instr;
+			/* TODO: Only accept "call" instructions here */
 			call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
 			if likely(call_instr)
 				callsite_pc = call_instr;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
-				rethrow_system_exception_from_pf_handler(state, pc);
+				RETHROW();
 			/* Discard read-from-callsite_pc exception... */
 		}
+		icpustate_setpc(state, callsite_pc); /* #PF is faulting, so must point *at* "call" */
+		icpustate_setsp(state, (byte_t *)(is_compat ? sp + 4 : sp + 8));
+#else /* __x86_64__ */
+		if ((void const *)sp != (void const *)(&state->ics_irregs_k + 1) || FAULT_IS_USER) {
+			if ((byte_t const *)callsite_pc >= (byte_t const *)KERNELSPACE_BASE)
+				goto not_a_badcall;
+			TRY {
+				void const *call_instr;
+				/* TODO: Only accept "call" instructions here */
+				call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
+				if likely(call_instr)
+					callsite_pc = call_instr;
+			} EXCEPT {
+				if (!was_thrown(E_SEGFAULT))
+					RETHROW();
+				/* Discard read-from-callsite_pc exception... */
+			}
+			icpustate_setpc(state, callsite_pc); /* #PF is faulting, so must point *at* "call" */
+			state->ics_irregs_u.ir_esp += 4;
+		} else {
+			if ((byte_t const *)callsite_pc < (byte_t const *)KERNELSPACE_BASE)
+				goto not_a_badcall;
+			TRY {
+				void const *call_instr;
+				/* TODO: Only accept "call" instructions here */
+				call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
+				if likely(call_instr)
+					callsite_pc = call_instr;
+			} EXCEPT {
+				if (!was_thrown(E_SEGFAULT))
+					RETHROW();
+				/* Discard read-from-callsite_pc exception... */
+			}
+			state->ics_irregs_k.ir_eip = (uintptr_t)callsite_pc; /* #PF is faulting, so must point *at* "call" */
+			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+			                                      OFFSET_ICPUSTATE_IRREGS +
+			                                      SIZEOF_IRREGS_KERNEL);
+		}
+#endif /* !__x86_64__ */
 		PERTASK_SET(this_exception_faultaddr, callsite_pc);
 		PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_PRESENT)
 		                                 ? EXCEPT_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
@@ -1367,11 +1346,9 @@ handle_noncanon_as_gpf:
 
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
-	pc = instruction_trysucc(pc, icpustate_getisa(state));
-	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
+	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p] [ecode=%#" PRIxPTR "]\n",
 	       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
-	       icpustate_getpc(state), pc, ecode);
-	icpustate_setpc(state, pc);
+	       icpustate_getpc(state), ecode);
 do_unwind_state:
 
 	/* Try to trigger a debugger trap (if enabled) */

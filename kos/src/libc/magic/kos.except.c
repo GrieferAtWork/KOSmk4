@@ -162,7 +162,7 @@ typedef __except_subclass_t except_subclass_t;
 	"except_thrown", "except_throw", "except_throw_current",
 	"except_info", "except_data", "except_register_state",
 	"except_code", "except_active", "except_class", "except_subclass",
-	"except_unwind", "__cxa_begin_catch", "__cxa_end_catch",
+	"except_unwind", "except_unwind_fault", "__cxa_begin_catch", "__cxa_end_catch",
 	"__gxx_personality_v0", "__gcc_personality_v0", "_ZSt9terminatev",
 )]
 
@@ -1804,6 +1804,18 @@ struct exception_info *except_info(void) {
 )]]
 except_register_state_t *except_unwind([[inout]] except_register_state_t *__restrict state);
 
+@@>> except_unwind_fault(3)
+@@Same as `except_unwind(3)',  but the  initial `state' points  *BEFORE* (or  *AT*)
+@@the faulting instruction, rather than *AFTER* (as is expected by "except_unwind")
+[[kernel, cc(__EXCEPT_UNWIND_CC)]]
+[[wunused, nonnull]]
+[[decl_include("<kos/bits/except-register-state.h>")]]
+[[decl_prefix(
+#ifndef __EXCEPT_UNWIND_CC
+#define __EXCEPT_UNWIND_CC __LIBKCALL
+#endif /* !__EXCEPT_UNWIND_CC */
+)]]
+except_register_state_t *except_unwind_fault([[inout]] except_register_state_t *__restrict state);
 %#endif /* __USE_KOS_KERNEL */
 
 

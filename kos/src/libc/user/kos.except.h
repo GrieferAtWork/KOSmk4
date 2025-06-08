@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda458ffa */
+/* HASH CRC-32:0xb2a2c81d */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,10 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCAL
  * Unwind the given register state to propagate the currently set error.
  * Following this, the  returned register state  should then be  loaded. */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) except_register_state_t *NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state);
+/* >> except_unwind_fault(3)
+ * Same as `except_unwind(3)',  but the  initial `state' points  *BEFORE* (or  *AT*)
+ * the faulting instruction, rather than *AFTER* (as is expected by "except_unwind") */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) except_register_state_t *NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind_fault)(except_register_state_t *__restrict state);
 /* >> except_throw_current(3)
  * Throw the currently set (in `except_data()') exception. */
 INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_except_throw_current)(void);

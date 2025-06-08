@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3634903 */
+/* HASH CRC-32:0x350ae842 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5952,6 +5952,7 @@
 #define __CRT_HAVE_except_throw_current
 #define __CRT_HAVE_except_thrown
 #define __CRT_HAVE_except_unwind
+#define __CRT_HAVE_except_unwind_fault
 #ifndef __KERNEL__
 #define __CRT_HAVE_execl
 #define __CRT_HAVE_execle
