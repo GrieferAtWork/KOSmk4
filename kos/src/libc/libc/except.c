@@ -923,7 +923,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 		if (context.uc_fde.f_persofun) {
 			_Unwind_Reason_Code reason;
 			/* Invoke the custom personality function. */
-			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;;
+			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;
 			reason = (*perso)(1, _UA_SEARCH_PHASE,
 			                  exception_object->exception_class,
 			                  exception_object, &context);

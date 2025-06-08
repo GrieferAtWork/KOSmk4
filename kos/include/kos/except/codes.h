@@ -24,13 +24,14 @@
 
 /* NOTE: After making modifications to this file, you must re-run the following commands:
  * $ deemon -F kos/include/kos/bits/exception_data.h
+ * $ deemon -F kos/include/kos/bits/except-catch.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data32.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data64.h
  * $ deemon -F kos/src/libc/magic/kos.except.c
  * $ deemon -F kos/src/libc/hybrid/except.c
  * $ deemon -F kos/include/kos/except/checker.h
  * Or the one-liner
- * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c kos/include/kos/except/checker.h
+ * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/kos/bits/except-catch.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c kos/include/kos/except/checker.h
  */
 
 #include <__stdinc.h>

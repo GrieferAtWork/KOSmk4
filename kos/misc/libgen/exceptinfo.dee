@@ -909,6 +909,41 @@ function printExceptionDataStructs(
 }
 
 
+@@Print specifications for `kos::except::class_filter'
+@@@param: keyStructName: A key function which may be used to skew struct names
+function printExceptionClassFilterSpecifications(
+		fp: File = none,
+		classes: {string: {string: ExceptClass}} = none,
+		keyStructName: Callable with string = none) {
+	if (fp is none)
+		fp = File.stdout;
+	if (classes is none)
+		classes = parseExceptionClasses();
+	if (keyStructName is none)
+		keyStructName = functools.identity;
+	@@List of (ppCond, structName, e_name) for all defined exception data struct names
+	local exceptionDataStructNames: {(string, string, string)...} = [];
+	for (local name: classes.keys.sorted()) {
+		local ppCondToCls = classes[name];
+		for (local ppCond: ppCondToCls.keys.sorted()) {
+			local cls = ppCondToCls[ppCond];
+			if (!cls.hasExceptionDataStruct)
+				continue;
+			local usedStructName = keyStructName(cls.exceptionDataStructName);
+			exceptionDataStructNames.append((
+				ppCond, usedStructName, cls.name));
+		}
+	}
+	for (local ppCond, name, e_name: exceptionDataStructNames) {
+		if (ppCond != "1")
+			printPreprocessorExpressionIf(fp, ppCond);
+		fp << "template<> class class_filter<" << e_name << ">: public ::" << name << " { };\n";
+		if (ppCond != "1")
+			printPreprocessorExpressionEndif(fp, ppCond);
+	}
+}
+
+
 @@Parse additional overrides for exception codes
 @@@param: classes: The class mappings that should be updated to include overrides
 @@@param: files:   The set of files to scan for overrides, given as pairs of (ppCond, filename)
@@ -1405,7 +1440,7 @@ function printExceptNameFunctionBody(
 	 * >> #endif */
 	local assumptions: ppexpr.PPAssume = none;
 	local didEncounter1: bool = false;
-	for (local ppCond, mappings: ppCondMappings) {
+	for (local ppCond, mappings: ppCondMappings.sorted()) {
 		if (didEncounter1) {
 			print File.stderr: ("Warning: Impossible mappings for:", repr ppCond);
 			continue;
@@ -1488,7 +1523,7 @@ function printExceptNameCheckerPragmas(
 	 * >> #endif */
 	local assumptions: ppexpr.PPAssume = none;
 	local didEncounter1: bool = false;
-	for (local ppCond, mappings: ppCondMappings) {
+	for (local ppCond, mappings: ppCondMappings.sorted()) {
 		if (didEncounter1) {
 			print File.stderr: ("Warning: Impossible mappings for:", repr ppCond);
 			continue;

@@ -80,6 +80,7 @@ cxx_std_typeinfo_getname(struct cxx_std_typeinfo *self) {
 }
 
 DEFINE_PUBLIC_ALIAS(_ZTVN10__cxxabiv117__class_type_infoE, cxx_std_typeinfo_vtable);
+DEFINE_PUBLIC_ALIAS(_ZTVN10__cxxabiv120__si_class_type_infoE, cxx_std_typeinfo_vtable);
 INTERN struct cxx_std_typeinfo_vtable_struct cxx_std_typeinfo_vtable = {
 	.tiv_whole_object = 0,
 	.tiv_whole_type   = NULL, /* This would need to be the `&typeinfo(std::type_info)', but we don't care... */
@@ -178,7 +179,7 @@ size_of_encoded_value(unsigned char encoding) {
 
 /* Check if "cxx_typename" is able to handle the currently thrown KOS exception.
  * We recognize the following c++ types:
- * - kos::except::class_filter<except_class_t>: "N3kos6except12class_filterILj<"%d" % except_class()>EEE"
+ * - kos::except::class_filter<except_class_t>: "N3kos6except12class_filterILy<"%d" % except_class()>EEE"
  * - kos::except::code_filter<except_code_t>:   "N3kos6except11code_filterILj<"%d" % except_code()>EEE"
  */
 LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool FCALL
@@ -216,6 +217,14 @@ kos_exceptfilter_matches_current_exception(char const *cxx_typename) {
 	}
 	return false;
 }
+
+
+#ifdef __KERNEL__
+#define except_args() (&PERTASK(__arch_this_exception_data.e_args))
+#endif /* __KERNEL__ */
+#ifndef except_args
+#define except_args() (&except_data()->e_args)
+#endif /* !except_args */
 
 
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
@@ -342,7 +351,7 @@ filtered_match:
 			/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
 			 * However, since KOS exception is  kept a bit simpler (so-as  to allow it to  function
 			 * without the need of dynamic memory allocation), just pass TLS exception data. */
-			except_register_state_set_unwind_exception(context->uc_state, except_data());
+			except_register_state_set_unwind_exception(context->uc_state, except_args());
 		}
 
 		/* Jump to the associated handler */
@@ -411,8 +420,8 @@ libc_gxx_personality_v0(int version /* = 1 */,
 	if likely(version == 1 && exception_class == _UEC_KERNKOS)
 		return libc_gxx_personality_kernexcept(context, (actions & _UA_FORCE_UNWIND) != 0);
 
-	/* Anything else gets forwarded to the next gxx personality as
-	 * per the dynamic linking order. */
+	/* Anything else gets forwarded to the next gxx personality as per
+	 * the dynamic linking order. */
 	{
 		_Unwind_Personality_Fn next = libc_get_next_gxx_personality_v0();
 		if likely(next != NULL)

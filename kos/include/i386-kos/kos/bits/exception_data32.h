@@ -89,7 +89,7 @@ local usedStructNames = [];
 (printExceptionDataStructs from .....misc.libgen.exceptinfo)(
 	fp: tempfp,
 	escapeTypename: x -> "__UINT32_TYPE__ /" "*{}*" "/".format({ x }),
-	keyStructName:  x {
+	keyStructName:  x -> {
 		if (x !in usedStructNames)
 			usedStructNames.append(x);
 		return f"__{x}32";

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe731d4b4 */
+/* HASH CRC-32:0x495eba6b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,7 @@
 #include <kos/except/codes.h>               /* E_OK, ... */
 #include <kos/bits/fastexcept.h>
 #include <bits/crt/format-printer.h>
+#include <kos/bits/except-catch.h>
 
 #ifdef __USE_KOS_KERNEL
 #include <kos/bits/exception_info.h>
@@ -527,6 +528,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_except_check_no_nesting, __FORCELOCAL __ATTR_AR
 #if !defined(EXCEPT) && defined(__EXCEPT)
 #define EXCEPT __EXCEPT
 #endif /* !EXCEPT && __EXCEPT */
+#if !defined(CATCH) && defined(__CATCH)
+#define CATCH __CATCH
+#endif /* !CATCH && __CATCH */
 #if !defined(NESTED_TRY) && defined(__NESTED_TRY)
 #define NESTED_TRY __NESTED_TRY
 #endif /* !NESTED_TRY && __NESTED_TRY */

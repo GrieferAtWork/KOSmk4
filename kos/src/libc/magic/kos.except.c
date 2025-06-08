@@ -105,6 +105,8 @@
 #include <kos/bits/fastexcept.h>
 )]%[insert:prefix(
 #include <bits/crt/format-printer.h>
+)]%[insert:prefix(
+#include <kos/bits/except-catch.h>
 )]%{
 
 #ifdef __USE_KOS_KERNEL
@@ -2200,6 +2202,9 @@ void _except_check_no_nesting(void) {
 #if !defined(EXCEPT) && defined(__EXCEPT)
 #define EXCEPT __EXCEPT
 #endif /* !EXCEPT && __EXCEPT */
+#if !defined(CATCH) && defined(__CATCH)
+#define CATCH __CATCH
+#endif /* !CATCH && __CATCH */
 #if !defined(NESTED_TRY) && defined(__NESTED_TRY)
 #define NESTED_TRY __NESTED_TRY
 #endif /* !NESTED_TRY && __NESTED_TRY */

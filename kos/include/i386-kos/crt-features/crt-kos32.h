@@ -359,6 +359,7 @@
 #define __CRT_HAVE__ZSt15set_new_handlerPFvvE
 #define __CRT_HAVE__ZSt9terminatev
 #define __CRT_HAVE__ZTVN10__cxxabiv117__class_type_infoE
+#define __CRT_HAVE__ZTVN10__cxxabiv120__si_class_type_infoE
 #define __CRT_HAVE__ZdaPv
 #define __CRT_HAVE__ZdaPvRKSt9nothrow_t
 #define __CRT_HAVE__ZdaPvSt11align_val_t

@@ -142,7 +142,7 @@ FUNDEF ATTR_NORETURN void ATTR_CDECL __cxa_rethrow(void);
 
 /* These are generated around catch-blocks. "__cxa_begin_catch" is a
  * no-op that simply re-returns `ptr'. Exception handling will  have
- * previously set-up `ptr' as `except_data()'
+ * previously set-up `ptr' as `&except_data()->e_args'
  *
  * `__cxa_end_catch()' actually serves a purpose however, that purpose
  * being to clear the  thrown exception, unless the  `EXCEPT_FRETHROW'

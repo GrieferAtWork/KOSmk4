@@ -107,11 +107,6 @@ PRIVATE void dump_debuginfo() {
 }
 #endif
 
-extern "C++" {namespace kos {namespace except {
-template<except_class_t> class class_filter {};
-template<except_code_t> class code_filter {};
-}}}
-
 
 INTERN ATTR_FREETEXT struct icpustate *
 NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
@@ -348,15 +343,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	printk(FREESTR(KERN_INFO "Initial jump to user-space [pc=%p] [sp=%p]\n"),
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
-
-	try {
-		THROW(E_INVALID_ARGUMENT);
-	} catch (kos::except::class_filter<EXCEPT_CLASS(E_BADALLOC)>) {
-		printk(KERN_DEBUG "In handler: E_BADALLOC\n");
-	} catch (kos::except::class_filter<EXCEPT_CLASS(E_INVALID_ARGUMENT)>) {
-		printk(KERN_DEBUG "In handler: E_INVALID_ARGUMENT\n");
-	}
-
 
 	/* TODO: libdebuginfo freezes with -gdwarf-2
 	 * TODO: Check if it still does this (it's been quite a while since I wrote that TODO) */
