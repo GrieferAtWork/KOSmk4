@@ -303,6 +303,9 @@ next_handler:
 			byte_t const *action_record;
 			dwarf_sleb128_t ar_filter, ar_disp;
 			action_record = callsite_end + action - 1;
+
+			/* NOTE: The format of GCC type  info in exception handlers  is
+			 *       explained here: https://www.airs.com/blog/archives/464 */
 			for (;;) {
 				byte_t const *action_record_p;
 				ar_filter = dwarf_decode_sleb128((byte_t const **)&action_record);
