@@ -38,8 +38,8 @@
 #define __except_register_state_setsp(x, value)                (void)((x)->kcs_gpregs.gp_rsp = (__u64)(value))
 #define __except_register_state_get_unwind_exception(x)        ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_rax)
 #define __except_register_state_set_unwind_exception(x, value) (void)((x)->kcs_gpregs.gp_rax = (__u64)(value))
-#define __except_register_state_get_unwind_switch(x)           ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_rax)
-#define __except_register_state_set_unwind_switch(x, value)    (void)((x)->kcs_gpregs.gp_rax = (__u32)(value))
+#define __except_register_state_get_unwind_switch(x)           ((__BYTE_TYPE__ const *)(x)->kcs_gpregs.gp_rdx)
+#define __except_register_state_set_unwind_switch(x, value)    (void)((x)->kcs_gpregs.gp_rdx = (__u32)(value))
 #else /* __x86_64__ */
 #define __except_register_state_getpc(x)                       ((__BYTE_TYPE__ const *)(x)->kcs_eip)
 #define __except_register_state_setpc(x, value)                (void)((x)->kcs_eip = (__u32)(value))
