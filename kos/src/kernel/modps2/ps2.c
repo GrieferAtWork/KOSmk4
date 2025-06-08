@@ -264,11 +264,8 @@ ps2_probe_port(struct ps2_probe_data *__restrict probe_data,
 	u8 nid_port, id_port[2];
 	TRY {
 		ps2_probe_run_simple_ack_command(probe_data, portno, PS2_KEYBOARD_CMD_DISABLE_SCANNING);
-	} EXCEPT {
-		if (!was_thrown(E_IOERROR))
-			RETHROW();
-		except_printf(FREESTR("disabling scanning on ps2 port #%u"),
-		              portno + 1);
+	} CATCH (E_IOERROR) {
+		except_printf(FREESTR("disabling scanning on ps2 port #%u"), portno + 1);
 	}
 	nid_port = ps2_run_identify_command(probe_data, portno, id_port);
 	if (nid_port == 0) {
@@ -425,9 +422,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 	for (portno = 0; portno < PS2_PORTCOUNT; ++portno) {
 		TRY {
 			ps2_probe_port(ps2_probe_data_buffer, portno);
-		} EXCEPT {
-			if (!was_thrown(E_IOERROR))
-				RETHROW();
+		} CATCH (E_IOERROR) {
 			except_printf("probing ps/2 port #%u", portno + 1);
 		}
 	}

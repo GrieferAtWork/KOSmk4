@@ -1373,10 +1373,9 @@ again_waitfor:
 		now = (*ct->ct_gettime)(clockid);
 		if (now < *requested_time)
 			goto again_maketimeout;
-	} EXCEPT {
+	} CATCH (E_INTERRUPT_USER_RPC) {
 		if ((write_remaining_arg != NULL) &&
-		    (flags & TIMER_ABSTIME) == 0 &&
-		    (was_thrown(E_INTERRUPT_USER_RPC))) {
+		    (flags & TIMER_ABSTIME) == 0) {
 			struct timespec remaining;
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what

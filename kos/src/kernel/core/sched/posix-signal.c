@@ -232,8 +232,8 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 			struct pending_rpc *rpc;
 			TRY {
 				rpc = pending_rpc_alloc_psig(GFP_NORMAL);
-			} EXCEPT {
-				if (was_thrown(E_BADALLOC) && rpcs_count >= proc_count)
+			} CATCH (E_BADALLOC) {
+				if (rpcs_count >= proc_count)
 					break; /* Try our luck with the RPCs we _did_ manage to allocate. */
 				RETHROW();
 			}

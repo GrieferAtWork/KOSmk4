@@ -1513,9 +1513,7 @@ again:
 				decref_likely(result);
 				goto again;
 			}
-		} EXCEPT {
-			if (!was_thrown(E_FSERROR))
-				RETHROW();
+		} CATCH (E_FSERROR) {
 			result = NULL;
 		}
 	}

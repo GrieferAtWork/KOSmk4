@@ -840,7 +840,7 @@ int __builtin_clrsbimax(/*__INTMAX_TYPE__*/ long long);
 int __builtin_clrsbl(long);
 int __builtin_clrsbll(long long);
 void __builtin_init_heap_trampoline(void *, void *, void *);
-void *__builtin_alloca_with_align(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
+//void *__builtin_alloca_with_align(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
 int __builtin_posix_memalign(void **, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
 void __atomic_feraiseexcept(int);
 void *__builtin_aligned_alloc(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);

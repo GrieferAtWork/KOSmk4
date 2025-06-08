@@ -2561,9 +2561,7 @@ handle_get_fpos(uintptr_half_t typ, void *__restrict ptr)
 		hand = (struct dirhandle *)ptr;
 		TRY {
 			fpos = fdirenum_seekdir(&hand->dh_enum, 0, SEEK_CUR);
-		} EXCEPT {
-			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND))
-				RETHROW();
+		} CATCH (E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 			fpos = 0;
 		}
 	}	break;

@@ -113,10 +113,9 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 		memcpy(&old_error, except_info(), sizeof(old_error));
 		TRY {
 			instr = pc[-1];
-		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT) &&
-			    !was_thrown(E_WOULDBLOCK))
-				RETHROW();
+		} CATCH (E_SEGFAULT) {
+			goto restore_except_and_set_trap;
+		} CATCH (E_WOULDBLOCK) {
 			goto restore_except_and_set_trap;
 		}
 		if (instr == 0xcc) {

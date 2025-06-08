@@ -335,8 +335,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
-	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
+	} CATCH (E_INTERRUPT_USER_RPC) {
+		if (rem != NULL) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -378,8 +378,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
-	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
+	} CATCH (E_INTERRUPT_USER_RPC) {
+		if (rem != NULL) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -421,8 +421,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
-	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
+	} CATCH (E_INTERRUPT_USER_RPC) {
+		if (rem != NULL) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it
@@ -464,8 +464,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 			if (!task_sleep(timeout))
 				break; /* Timeout */
 		}
-	} EXCEPT {
-		if (rem != NULL && was_thrown(E_INTERRUPT_USER_RPC)) {
+	} CATCH (E_INTERRUPT_USER_RPC) {
+		if (rem != NULL) {
 			/* Write back the remaining time to user-space.
 			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
 			 *       will  happen  to  that E_SEGFAULT  exception,  however it

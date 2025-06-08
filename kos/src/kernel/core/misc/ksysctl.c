@@ -118,11 +118,9 @@ load_driver_from_file_handles(fd_t fd_node, fd_t fd_path, fd_t fd_dent,
 			driver_dentry = (REF struct fdirent *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_DIRENT);
 		/* Lookup the actual INode from which to load the driver. */
 		driver_node = handle_as_mfile(nodehand);
-	} EXCEPT {
-		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-			if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
-				PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd_node);
-		}
+	} CATCH (E_INVALID_HANDLE_FILETYPE, e) {
+		if (e.ih_fd == 0)
+			e.ih_fd = fd_node;
 		RETHROW();
 	}
 	require(CAP_SYS_MODULE);

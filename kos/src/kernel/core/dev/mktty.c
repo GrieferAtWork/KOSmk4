@@ -138,10 +138,8 @@ ttyfwd_work(void *__restrict arg) {
 		TRY {
 			count = (*tty->mtd_ihandle_read)(tty->mtd_ihandle_ptr, buf, sizeof(buf),
 			                                 IO_RDONLY | IO_NONBLOCK | IO_NODATAZERO);
-		} EXCEPT {
-			if (was_thrown(E_WOULDBLOCK))
-				goto done;
-			RETHROW();
+		} CATCH (E_WOULDBLOCK) {
+			goto done;
 		}
 		if (!count)
 			break;
@@ -154,9 +152,7 @@ ttyfwd_work(void *__restrict arg) {
 		TRY {
 			terminal_iwrite(&tty->t_term, buf, count,
 			                IO_WRONLY | IO_NONBLOCK | IO_NODATAZERO);
-		} EXCEPT {
-			if (!was_thrown(E_WOULDBLOCK))
-				RETHROW();
+		} CATCH (E_WOULDBLOCK) {
 		}
 	}
 done:
@@ -220,12 +216,11 @@ mkttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		TRY {
 			result = (*handle_type_db.h_ioctl[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr, cmd, arg, mode);
 			return result;
-		} EXCEPT {
+		} CATCH (E_INVALID_ARGUMENT_UNKNOWN_COMMAND, e) {
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
-			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command, cmd))
+			if (e.ia_context != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    e.ia_unknown_command.uc_command != cmd)
 				RETHROW();
 		}
 		/* Try to have the input device handle the command. */
@@ -239,12 +234,11 @@ mkttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 predict_input_device_command:
 		TRY {
 			return (*handle_type_db.h_ioctl[me->mtd_ihandle_typ])(me->mtd_ihandle_ptr, cmd, arg, mode);
-		} EXCEPT {
+		} CATCH (E_INVALID_ARGUMENT_UNKNOWN_COMMAND, e) {
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
-			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command, cmd))
+			if (e.ia_context != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    e.ia_unknown_command.uc_command != cmd)
 				RETHROW();
 		}
 		result = _ttydev_tryioctl(self, cmd, arg, mode);
@@ -258,12 +252,11 @@ predict_input_device_command:
 predict_output_device_command:
 		TRY {
 			return (*handle_type_db.h_ioctl[me->mtd_ohandle_typ])(me->mtd_ohandle_ptr, cmd, arg, mode);
-		} EXCEPT {
+		} CATCH (E_INVALID_ARGUMENT_UNKNOWN_COMMAND, e) {
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
-			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) ||
-			    PERTASK_NE(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command, cmd))
+			if (e.ia_context != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    e.ia_unknown_command.uc_command != cmd)
 				RETHROW();
 		}
 		result = _ttydev_tryioctl(self, cmd, arg, mode);

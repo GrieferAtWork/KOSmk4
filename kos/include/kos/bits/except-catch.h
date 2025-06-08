@@ -117,7 +117,7 @@ template<> class class_filter<E_UNKNOWN_SYSTEMCALL>: public ::exception_unknown_
 #endif /* ... */
 
 #define __PRIVATE_CATCH_1(class_or_code)     catch (__PRIVATE_EXCEPT_CXX_FILTER_CODE class_or_code)
-#define __PRIVATE_CATCH_2(class_or_code, as) catch (__PRIVATE_EXCEPT_CXX_FILTER_CODE class_or_code const &as)
+#define __PRIVATE_CATCH_2(class_or_code, as) catch (__PRIVATE_EXCEPT_CXX_FILTER_CODE class_or_code &as)
 #define __PRIVATE_CATCHN2(n) __PRIVATE_CATCH_##n
 #define __PRIVATE_CATCHN(n)  __PRIVATE_CATCHN2(n)
 

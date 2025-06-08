@@ -165,9 +165,7 @@ do_poll_scan(NCX struct pollfd *fds, size_t nfds) {
 		}
 		TRY {
 			hnd = handles_lookup(pfd.fd);
-		} EXCEPT {
-			if (!was_thrown(E_INVALID_HANDLE))
-				RETHROW();
+		} CATCH (E_INVALID_HANDLE) {
 			fds[i].revents = POLLNVAL; /* Invalid handle. */
 			continue;
 		}

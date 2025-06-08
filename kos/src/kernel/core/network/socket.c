@@ -556,8 +556,8 @@ socket_send(struct socket *__restrict self,
 				RETHROW();
 			}
 		}
-	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+	} CATCH (E_NET_SHUTDOWN) {
+		if (!(msg_flags & MSG_NOSIGNAL) &&
 		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
@@ -603,8 +603,8 @@ socket_sendv(struct socket *__restrict self,
 				RETHROW();
 			}
 		}
-	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+	} CATCH (E_NET_SHUTDOWN) {
+		if (!(msg_flags & MSG_NOSIGNAL) &&
 		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
@@ -911,8 +911,8 @@ socket_sendto(struct socket *__restrict self,
 				RETHROW();
 			}
 		}
-	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+	} CATCH (E_NET_SHUTDOWN) {
+		if (!(msg_flags & MSG_NOSIGNAL) &&
 		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
@@ -959,8 +959,8 @@ socket_sendtov(struct socket *__restrict self,
 				RETHROW();
 			}
 		}
-	} EXCEPT {
-		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL) &&
+	} CATCH (E_NET_SHUTDOWN) {
+		if (!(msg_flags & MSG_NOSIGNAL) &&
 		    !(atomic_read(&self->sk_msgflags) & MSG_NOSIGNAL))
 			raise_sigpipe();
 		RETHROW();
@@ -1602,25 +1602,23 @@ return_intval:
 		TRY {
 			result = (*self->sk_ops->so_getsockopt)(self, level, optname,
 			                                        optval, optlen, mode);
-		} EXCEPT {
-			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
-				result = socket_getsockopt_default(self, level, optname,
-				                                   optval, optlen, mode);
-				if (result != 0)
-					goto done;
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_context))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
-			}
+		} CATCH (E_INVALID_ARGUMENT_SOCKET_OPT, e) {
+			result = socket_getsockopt_default(self, level, optname,
+			                                   optval, optlen, mode);
+			if (result != 0)
+				goto done;
+			if (e.ia_context == 0)
+				e.ia_context = E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT;
+			if (e.ia_socket_opt.so_level == 0)
+				e.ia_socket_opt.so_level = level;
+			if (e.ia_socket_opt.so_optname == 0)
+				e.ia_socket_opt.so_optname = optname;
+			if (e.ia_socket_opt.so_address_family == 0)
+				e.ia_socket_opt.so_address_family = socket_getfamily(self);
+			if (e.ia_socket_opt.so_socket_type == 0)
+				e.ia_socket_opt.so_socket_type = socket_gettype(self);
+			if (e.ia_socket_opt.so_protocol == 0)
+				e.ia_socket_opt.so_protocol = socket_getprotocol(self);
 			RETHROW();
 		}
 		if (!result)
@@ -1845,21 +1843,19 @@ socket_setsockopt(struct socket *__restrict self,
 		TRY {
 			ok = (*self->sk_ops->so_setsockopt)(self, level, optname,
 			                                    optval, optlen, mode);
-		} EXCEPT {
-			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_context))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, level);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, optname);
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, socket_getfamily(self));
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, socket_gettype(self));
-				if (!PERTASK_TEST(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
-					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, socket_getprotocol(self));
-			}
+		} CATCH (E_INVALID_ARGUMENT_SOCKET_OPT, e) {
+			if (e.ia_context == 0)
+				e.ia_context = E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT;
+			if (e.ia_socket_opt.so_level == 0)
+				e.ia_socket_opt.so_level = level;
+			if (e.ia_socket_opt.so_optname == 0)
+				e.ia_socket_opt.so_optname = optname;
+			if (e.ia_socket_opt.so_address_family == 0)
+				e.ia_socket_opt.so_address_family = socket_getfamily(self);
+			if (e.ia_socket_opt.so_socket_type == 0)
+				e.ia_socket_opt.so_socket_type = socket_gettype(self);
+			if (e.ia_socket_opt.so_protocol == 0)
+				e.ia_socket_opt.so_protocol = socket_getprotocol(self);
 			RETHROW();
 		}
 		if unlikely(!ok)

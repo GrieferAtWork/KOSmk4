@@ -207,7 +207,7 @@ typedef size_t mpart_reladdr_t;
 
 struct module;
 struct mnode {
-	/* WARNING: Because  mem-nodes  aren't reference  counter, they  are always
+	/* WARNING: Because  mem-nodes  aren't reference  counted, they  are always
 	 *          implicitly owned by the associated  mman, such that you  really
 	 *          need to be holding a lock to that mman (or some other lock that
 	 *          will prevent the node from being  destroyed, such as a lock  to

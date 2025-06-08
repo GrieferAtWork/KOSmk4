@@ -150,10 +150,8 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 						             args->ea_xpath,
 						             args->ea_xdentry,
 						             (pos_t)(phdr_vector[i].p_offset & ~PAGEMASK));
-					} EXCEPT {
-						if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
-							goto err_overlap;
-						RETHROW();
+					} CATCH (E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
+						goto err_overlap;
 					}
 				}
 				if (mem_bytes > fil_bytes) {
@@ -213,10 +211,8 @@ err_overlap:
 						             mem_bytes - fil_bytes, prot,
 						             MAP_FIXED | MAP_FIXED_NOREPLACE,
 						             &mfile_zero);
-					} EXCEPT {
-						if (was_thrown(E_BADALLOC_ADDRESS_ALREADY_EXISTS))
-							goto err_overlap;
-						RETHROW();
+					} CATCH (E_BADALLOC_ADDRESS_ALREADY_EXISTS) {
+						goto err_overlap;
 					}
 done_PT_LOAD_bss:
 					;

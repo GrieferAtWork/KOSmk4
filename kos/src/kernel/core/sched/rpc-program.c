@@ -2056,13 +2056,11 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			                           cred_allow_eflags_modify_mask());
 		}
 #ifdef __x86_64__
-		EXCEPT {
-			if (was_thrown(E_INVALID_ARGUMENT_BAD_VALUE)) {
-				assert(PERTASK_GET(this_exception_args.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER);
-				assert(PERTASK_GET(this_exception_args.e_pointers[1]) == X86_REGISTER_MISC_RFLAGS);
-				if (icpustate_is32bit(state))
-					PERTASK_SET(this_exception_args.e_pointers[1], X86_REGISTER_MISC_EFLAGS);
-			}
+		CATCH (E_INVALID_ARGUMENT_BAD_VALUE, e) {
+			assert(e.ia_context == E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER);
+			assert(e.ia_bad_value.bv_value == X86_REGISTER_MISC_RFLAGS);
+			if (icpustate_is32bit(state))
+				e.ia_bad_value.bv_value = X86_REGISTER_MISC_EFLAGS;
 			RETHROW();
 		}
 #endif /* __x86_64__ */

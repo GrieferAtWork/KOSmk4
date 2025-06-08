@@ -987,9 +987,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 						} else) {
 							callsite_pc = *(void const *const *)sp;
 						}
-					} EXCEPT {
-						if (!was_thrown(E_SEGFAULT))
-							RETHROW();
+					} CATCH (E_SEGFAULT) {
 						goto do_normal_vio;
 					}
 					/* Unwind the stack, and remember the call-site instruction pointer. */
@@ -1230,9 +1228,7 @@ pop_connections_and_throw_segfault:
 			} else) {
 				callsite_pc = *(void const *const *)sp;
 			}
-		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT))
-				RETHROW();
+		} CATCH (E_SEGFAULT) {
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
@@ -1245,9 +1241,7 @@ pop_connections_and_throw_segfault:
 			call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
 			if likely(call_instr)
 				callsite_pc = call_instr;
-		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT))
-				RETHROW();
+		} CATCH (E_SEGFAULT) {
 			/* Discard read-from-callsite_pc exception... */
 		}
 		icpustate_setpc(state, callsite_pc); /* #PF is faulting, so must point *at* "call" */
@@ -1262,9 +1256,7 @@ pop_connections_and_throw_segfault:
 				call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
 				if likely(call_instr)
 					callsite_pc = call_instr;
-			} EXCEPT {
-				if (!was_thrown(E_SEGFAULT))
-					RETHROW();
+			} CATCH (E_SEGFAULT) {
 				/* Discard read-from-callsite_pc exception... */
 			}
 			icpustate_setpc(state, callsite_pc); /* #PF is faulting, so must point *at* "call" */
@@ -1278,9 +1270,7 @@ pop_connections_and_throw_segfault:
 				call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
 				if likely(call_instr)
 					callsite_pc = call_instr;
-			} EXCEPT {
-				if (!was_thrown(E_SEGFAULT))
-					RETHROW();
+			} CATCH (E_SEGFAULT) {
 				/* Discard read-from-callsite_pc exception... */
 			}
 			state->ics_irregs_k.ir_eip = (uintptr_t)callsite_pc; /* #PF is faulting, so must point *at* "call" */

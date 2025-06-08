@@ -250,17 +250,17 @@ NOTHROW(FCALL forktree_unlock_newmm)(struct forktree *__restrict self) {
  *    try to fork the given `oldtree' of mem-nodes into a copy that will
  *    be stored in `*p_newtree'.
  *  - When `oldtree' is `NULL', simply set `*p_newtree' to `NULL'.
- *  - Otherwise,   use   `mnode_tree_rremove()'   on    `ft_newmm->mm_mappings'
- *    to try to remove  a mem-node already duplicated  during a prior call,  in
- *    which case  check that  attributes (flags,  min/max-addr, part,  partoff,
- *    fsname, fspath) are still up to date. If so, then simply set `*p_newtree'
- *    to that previously duplicated node,  and continue replicating the  child-
+ *  - Otherwise, use `mnode_tree_rremove()' on `ft_newmm->mm_mappings' to try
+ *    to remove a mem-node already duplicated  during a prior call, in  which
+ *    case check that attributes (flags, min/max-addr, part, partoff, fsname,
+ *    fspath) are still up  to date. If so,  then simply set `*p_newtree'  to
+ *    that previously duplicated  node, and continue  replicating the  child-
  *    nodes of `oldtree'
  *  - Otherwise, a new mem-node will be allocated (preferably via `ft_freelist')
  *    and  initialized to replicate  `oldtree' (for this purpose,  a lock to the
  *    backing part of `oldtree' will also be acquired, so that the new  mem-node
- *    can   be   added   to  the   part's   list  of   copy-   or  share-nodes).
- *    Afterwards,  all  sub-trees  of  `oldtree'  will  be  forked  recursively:
+ *    can be added to the part's list of copy- or share-nodes). Afterwards,  all
+ *    sub-trees of `oldtree' will be forked recursively:
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_lhs, oldtree->mn_mement.rb_lhs);
  *    >> forktree_or_unlock(self, &(*p_newtree)->mn_mement.rb_rhs, oldtree->mn_mement.rb_rhs);
  * @return: true:  Success
@@ -484,7 +484,10 @@ NOTHROW(FCALL forktree_clearwrite)(struct mman *__restrict mm) {
 		/* Need to prepare the pagedir for the deny-write first. If this call fails,
 		 * then  simply unmap all  of user-space, thus also  ensuring that any write
 		 * access  goes away (mappings that should be  there will then simply be re-
-		 * created as they are accessed by the original program). */
+		 * created as they are accessed by the original program).
+		 *
+		 * If this looks weird to you, remember that on KOS, the page  directory
+		 * is pretty much just a shadow copy of the associated mman's node tree. */
 		if (!pagedir_prepare(addr, size)) {
 			pagedir_unmap_userspace();
 			iter = next;

@@ -1824,10 +1824,8 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	/* To determine if this really is a tar file, we try to load the first file. */
 	TRY {
 		firstfile = tarfile_new(hdr, &first_filesize);
-	} EXCEPT {
-		if (was_thrown(E_FSERROR_CORRUPTED_FILE_SYSTEM))
-			return NULL; /* Nope: not a tar filesystem! */
-		RETHROW();
+	} CATCH (E_FSERROR_CORRUPTED_FILE_SYSTEM) {
+		return NULL; /* Nope: not a tar filesystem! */
 	}
 
 	/* Seeing how we were able to decode the first file, we'll assume that this

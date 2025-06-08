@@ -742,13 +742,11 @@ again_TIOCNOTTY:
 		REF struct procgrp *grp;
 		TRY {
 			kernel_terminal_check_sigtty(me, SIGTTOU);
-		} EXCEPT {
-			if (was_thrown(E_IOERROR_NODATA)) {
-				struct exception_data *dat = except_data();
-				bzero(&dat->e_args, sizeof(dat->e_args));
-				dat->e_code                               = EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING);
-				dat->e_args.e_invalid_argument.ia_context = E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU;
-			}
+		} CATCH (E_IOERROR_NODATA) {
+			struct exception_data *dat = except_data();
+			bzero(&dat->e_args, sizeof(dat->e_args));
+			dat->e_code = EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING);
+			dat->e_args.e_invalid_argument.ia_context = E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU;
 			RETHROW();
 		}
 		pid   = ioctl_intarg_getpid(cmd, arg);

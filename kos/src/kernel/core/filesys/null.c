@@ -130,10 +130,10 @@ devmem_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__rest
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_copyfromphys(ent.ive_base, (physaddr_t)addr, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}
@@ -155,10 +155,10 @@ devmem_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__res
 	IOV_BUFFER_FOREACH(ent, src) {
 		TRY {
 			result += interruptible_copytophys((physaddr_t)addr, ent.ive_base, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}
@@ -298,10 +298,10 @@ devzero_readv(struct iov_buffer *__restrict dst, size_t UNUSED(num_bytes)) THROW
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_bzero(ent.ive_base, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 	}
 done:
@@ -425,10 +425,10 @@ devkmem_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__res
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_memcpy(ent.ive_base, (UNCHECKED void const *)(uintptr_t)addr, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}
@@ -450,10 +450,10 @@ devkmem_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__re
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_memcpy((UNCHECKED void *)(uintptr_t)addr, ent.ive_base, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}
@@ -588,10 +588,10 @@ devport_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__res
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_insb((port_t)addr, ent.ive_base, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}
@@ -613,10 +613,10 @@ devport_v_pwritev(struct mfile *__restrict UNUSED(self), struct iov_buffer *__re
 	IOV_BUFFER_FOREACH(ent, dst) {
 		TRY {
 			result += interruptible_outsb((port_t)addr, ent.ive_base, ent.ive_size);
-		} EXCEPT {
-			if (was_thrown(E_INTERRUPT_USER_RPC) && result != 0)
-				goto done;
-			RETHROW();
+		} CATCH (E_INTERRUPT_USER_RPC) {
+			if (result == 0)
+				RETHROW();
+			goto done;
 		}
 		addr += ent.ive_size;
 	}

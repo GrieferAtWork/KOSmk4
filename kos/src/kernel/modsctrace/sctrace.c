@@ -142,9 +142,7 @@ sctrace(struct driver *__restrict UNUSED(self),
 			              desc.sc_argv[i].sa_type,
 			              desc.sc_argv[i].sa_value,
 			              desc.sc_argv[i].sa_link);
-		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT))
-				RETHROW();
+		} CATCH (E_SEGFAULT) {
 			printk(KERN_TRACE "<segfault>");
 		}
 	}
