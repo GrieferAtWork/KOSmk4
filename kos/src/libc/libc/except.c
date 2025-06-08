@@ -585,17 +585,22 @@ search_fde:
 			                                                              libc_get_kos_unwind_exception(),
 			                                                              &context);
 		}
-		if (reason == _URC_INSTALL_CONTEXT) {
+		switch (reason) {
+		case _URC_INSTALL_CONTEXT:
 			/* Unwind to the landing pad. */
 			unwind_error = unwind_landingpad(&context.uc_fde, context.uc_state, context.uc_adjpc);
 			if unlikely(unwind_error != UNWIND_SUCCESS)
 				goto err;
+			ATTR_FALLTHROUGH
+		case _URC_INSTALL_CONTEXT_NOW:
 			return context.uc_state;
-		}
-		if unlikely(reason != _URC_CONTINUE_UNWIND) {
-			unwind_error = reason == _URC_END_OF_STACK
-			               ? UNWIND_USER_NOTHROW
-			               : UNWIND_PERSONALITY_ERROR;
+		case _URC_CONTINUE_UNWIND:
+			break;
+		case _URC_END_OF_STACK:
+			unwind_error = UNWIND_USER_NOTHROW;
+			goto err;
+		default:
+			unwind_error = UNWIND_PERSONALITY_ERROR;
 			goto err;
 		}
 	}
@@ -726,7 +731,8 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
 			                                                              exception_object->exception_class,
 			                                                              exception_object, &context);
-			if (reason == _URC_INSTALL_CONTEXT)
+			if (reason == _URC_INSTALL_CONTEXT ||
+			    reason == _URC_INSTALL_CONTEXT_NOW)
 				break;
 			if (reason != _URC_CONTINUE_UNWIND)
 				goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -801,7 +807,8 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
 			                                                              exception_object->exception_class,
 			                                                              exception_object, &context);
-			if (reason == _URC_INSTALL_CONTEXT)
+			if (reason == _URC_INSTALL_CONTEXT ||
+			    reason == _URC_INSTALL_CONTEXT_NOW)
 				break;
 			if (reason != _URC_CONTINUE_UNWIND)
 				goto err_unwind__URC_FATAL_PHASE2_ERROR;
@@ -1042,9 +1049,9 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_DeleteException)(struct _Unwind_Exception *__re
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetGR, libc_Unwind_GetGR);
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict context, int index) {
-	uintptr_t result = 0;
+	_Unwind_Word result = 0;
 	if likely(CFI_REGISTER_SIZE(sizeof(void *), (unwind_regno_t)index) <= sizeof(result)) {
 		ENSURE_LIBUNWIND_LOADED();
 		unwind_getreg_except_register_state(context->uc_state,
@@ -1057,7 +1064,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict
 DEFINE_PUBLIC_ALIAS(_Unwind_SetGR, libc_Unwind_SetGR);
 INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict context,
-                                        int index, uintptr_t value) {
+                                        int index, _Unwind_Word value) {
 	if likely(CFI_REGISTER_SIZE(sizeof(void *), (unwind_regno_t)index) <= sizeof(value)) {
 		ENSURE_LIBUNWIND_LOADED();
 		unwind_setreg_except_register_state(context->uc_state,
@@ -1067,35 +1074,35 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict conte
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetIP, libc_Unwind_GetIP);
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context const *__restrict context) {
-	return (uintptr_t)except_register_state_getpc(context->uc_state);
+	return (_Unwind_Ptr)except_register_state_getpc(context->uc_state);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_SetIP, libc_Unwind_SetIP);
 INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, uintptr_t value) {
+NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, _Unwind_Ptr value) {
 	except_register_state_setpc(context->uc_state, value);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetLanguageSpecificData, libc_Unwind_GetLanguageSpecificData);
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context const *__restrict context) {
-	return (uintptr_t)context->uc_fde.f_lsdaaddr;
+	return (_Unwind_Ptr)context->uc_fde.f_lsdaaddr;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetRegionStart, libc_Unwind_GetRegionStart);
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context const *__restrict context) {
-	return (uintptr_t)context->uc_fde.f_pcstart;
+	return (_Unwind_Ptr)context->uc_fde.f_pcstart;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetIPInfo, libc_Unwind_GetIPInfo);
-INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1, 2)) uintptr_t
+INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1, 2)) _Unwind_Ptr
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context,
                                             int *__restrict ip_before_insn) {
 	*ip_before_insn = (int)(context->uc_pc_before_insn ? 1 : 0);
-	return (uintptr_t)except_register_state_getpc(context->uc_state);
+	return (_Unwind_Ptr)except_register_state_getpc(context->uc_state);
 }
 
 /* Support for NOPF via exception handling. */

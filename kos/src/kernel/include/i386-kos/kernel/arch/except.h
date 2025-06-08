@@ -81,6 +81,11 @@ struct x86_asm_except_entry {
 
 struct _Unwind_Context;
 
+#ifndef ___Unwind_Reason_Code_defined
+#define ___Unwind_Reason_Code_defined
+typedef unsigned int _Unwind_Reason_Code; /* One of `EXCEPT_PERSONALITY_*' */
+#endif /* !___Unwind_Reason_Code_defined */
+
 /* A helpful, predefined  personality function  that is meant  to be  used for  assembly
  * function which need to be able to handle exceptions in a fairly user-friendly manner.
  * NOTE: In order to define handlers, make use of the macros defined above.
@@ -92,7 +97,7 @@ struct _Unwind_Context;
  *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
  *       which  are recognized as adjustments for `%esp'  and are applied prior to execution
  *       or the specified handler. */
-FUNDEF WUNUSED NONNULL((1)) unsigned int
+FUNDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code
 NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context *__restrict context);
 
 DECL_END

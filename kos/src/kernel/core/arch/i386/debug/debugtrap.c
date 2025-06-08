@@ -71,7 +71,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC driver_initializer_personality)(struct _Unwind_Con
 		st = kernel_debugtrap_r(&info->ei_state, si.si_signo);
 		(void)st;
 	}
-	return EXCEPT_PERSONALITY_CONTINUE_UNWIND;
+	return _URC_CONTINUE_UNWIND;
 }
 
 

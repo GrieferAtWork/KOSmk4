@@ -43,6 +43,8 @@
 
 /* Personality function for `syscall_emulate_r' */
 .section .text
+/* >> INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code
+ * >> NOTHROW(EXCEPT_PERSONALITY_CC syscall_emulate_r_personality)(struct _Unwind_Context *__restrict context); */
 INTERN_FUNCTION(syscall_emulate_r_personality)
 	.cfi_startproc
 
@@ -91,7 +93,7 @@ INTERN_FUNCTION(syscall_emulate_r_personality)
 
 	.cfi_restore_state
 .Loutside_protected_area:
-	movP   $(EXCEPT_PERSONALITY_CONTINUE_UNWIND), %Pax
+	movP   $(_URC_CONTINUE_UNWIND), %Pax
 	ret
 	.cfi_endproc
 END(syscall_emulate_r_personality)

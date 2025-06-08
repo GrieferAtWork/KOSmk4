@@ -22,18 +22,19 @@
 
 #include "api.h"
 
-#include <__crt.h>
-#include <features.h>
-
-#include <kos/except.h>
-
+#if defined(__KOS__) && defined(__KERNEL__)
 /* The  KOS kernel  uses a different  exception ABI that  isn't compatible with
  * IA-64, since it doesn't need to ensure binary compatibility with regular C++
  * exceptions, and only needs to support KOS exceptions (<kos/except.h>) */
-#if !defined(__KOS__) || !defined(__KERNEL__)
+#include <kernel/rt/except-personality.h>
+#else /* __KOS__ && __KERNEL__ */
+#include <__crt.h>
+#include <features.h>
+
 #include <hybrid/__wordbits.h>
 
 #include <bits/types.h>
+#include <kos/except.h>
 
 #include <libunwind/asm/features.h>
 
@@ -135,6 +136,10 @@ typedef enum {
 	_URC_OK      = _URC_NO_REASON, /* ARM-specific alias */
 	_URC_FAILURE = 9               /* unspecified failure of some kind */
 #endif /* LIBUNWIND_HAVE_UNWIND_VRS */
+#if defined(__KOS__) && defined(__USE_KOS)
+	,
+	_URC_INSTALL_CONTEXT_NOW = 100, /* During `_UA_CLEANUP_PHASE': Same as `_URC_INSTALL_CONTEXT', but don't adjust for `DW_CFA_GNU_args_size' */
+#endif /* __KOS__ && __USE_KOS */
 } _Unwind_Reason_Code;
 
 
@@ -344,25 +349,25 @@ __CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Resume_
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_DeleteException,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_DeleteException */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetGR)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int __index),(__context,__index))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Word,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int __index),(__context,__index))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetGR)
-__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetGR,(struct _Unwind_Context *__restrict __context, int __index, __uintptr_t __value),(__context,__index,__value))
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetGR,(struct _Unwind_Context *__restrict __context, int __index, _Unwind_Word __value),(__context,__index,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIP)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetIP)
-__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetIP,(struct _Unwind_Context *__restrict __context, __uintptr_t __value),(__context,__value))
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetIP,(struct _Unwind_Context *__restrict __context, _Unwind_Ptr __value),(__context,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetLanguageSpecificData)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetLanguageSpecificData */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetRegionStart)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetRegionStart */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIPInfo)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int *__restrict __p_ip_before_insn),(__context,__p_ip_before_insn))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int *__restrict __p_ip_before_insn),(__context,__p_ip_before_insn))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIPInfo */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_ForcedUnwind)
 __CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_ForcedUnwind,(struct _Unwind_Exception *__restrict __exception_object, _Unwind_Stop_Fn __stop, void *__stop_arg),(__exception_object,__stop,__stop_arg))

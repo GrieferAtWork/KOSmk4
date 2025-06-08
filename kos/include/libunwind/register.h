@@ -174,6 +174,10 @@ for (local state: APPLY_CPUSTATE) {
 		print("#endif /" "* !LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
 		print("#else /" "* ", STATE, "_ALIAS *" "/");
 	}
+	function printSetRegPMacros() {
+		print("#define unwind_setreg_", state, "_p(p_state, regno, src)           unwind_setreg_", state, "(*(struct ", state, " **)(p_state), regno, src) ");
+		print("#define unwind_setreg_", state, "_exclusive_p(p_state, regno, src) unwind_setreg_", state, "_exclusive(*(struct ", state, " **)(p_state), regno, src) ");
+	}
 	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, ")(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
 	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void const *__state, unwind_regno_t __regno, void *__restrict __dst);");
 	print("#ifdef LIBUNWIND_HAVE_GETSETREG_", STATE, "_P");
@@ -182,9 +186,15 @@ for (local state: APPLY_CPUSTATE) {
 	print("#else /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
 	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, ")(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
 	print("LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_", state, "_exclusive)(/" "*struct ", state, "**" "/ void *__state, unwind_regno_t __regno, void const *__restrict __src);");
+	if (!aliases)
+		printSetRegPMacros();
 	print("#endif /" "* !LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
-	if (aliases)
+	if (aliases) {
 		print("#endif /" "* !", STATE, "_ALIAS *" "/");
+		print("#ifndef LIBUNWIND_HAVE_GETSETREG_", STATE, "_P");
+		printSetRegPMacros();
+		print("#endif /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, "_P *" "/");
+	}
 	print("#endif /" "* LIBUNWIND_WANT_PROTOTYPES *" "/");
 	print("#endif /" "* LIBUNWIND_HAVE_GETSETREG_", STATE, " *" "/");
 	print;
@@ -221,6 +231,8 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 #else /* LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive)(/*struct ucpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+#define unwind_setreg_ucpustate_p(p_state, regno, src)           unwind_setreg_ucpustate(*(struct ucpustate **)(p_state), regno, src)
+#define unwind_setreg_ucpustate_exclusive_p(p_state, regno, src) unwind_setreg_ucpustate_exclusive(*(struct ucpustate **)(p_state), regno, src)
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_UCPUSTATE */
@@ -281,6 +293,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive)(/*struct lcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
 #endif /* !LCPUSTATE_ALIAS */
+#ifndef LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P
+#define unwind_setreg_lcpustate_p(p_state, regno, src)           unwind_setreg_lcpustate(*(struct lcpustate **)(p_state), regno, src)
+#define unwind_setreg_lcpustate_exclusive_p(p_state, regno, src) unwind_setreg_lcpustate_exclusive(*(struct lcpustate **)(p_state), regno, src)
+#endif /* LIBUNWIND_HAVE_GETSETREG_LCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_LCPUSTATE */
 
@@ -340,6 +356,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive)(/*struct kcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
 #endif /* !KCPUSTATE_ALIAS */
+#ifndef LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P
+#define unwind_setreg_kcpustate_p(p_state, regno, src)           unwind_setreg_kcpustate(*(struct kcpustate **)(p_state), regno, src)
+#define unwind_setreg_kcpustate_exclusive_p(p_state, regno, src) unwind_setreg_kcpustate_exclusive(*(struct kcpustate **)(p_state), regno, src)
+#endif /* LIBUNWIND_HAVE_GETSETREG_KCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_KCPUSTATE */
 
@@ -399,6 +419,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
 #endif /* !ICPUSTATE_ALIAS */
+#ifndef LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P
+#define unwind_setreg_icpustate_p(p_state, regno, src)           unwind_setreg_icpustate(*(struct icpustate **)(p_state), regno, src)
+#define unwind_setreg_icpustate_exclusive_p(p_state, regno, src) unwind_setreg_icpustate_exclusive(*(struct icpustate **)(p_state), regno, src)
+#endif /* LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_ICPUSTATE */
 
@@ -458,6 +482,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
 #endif /* !SCPUSTATE_ALIAS */
+#ifndef LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P
+#define unwind_setreg_scpustate_p(p_state, regno, src)           unwind_setreg_scpustate(*(struct scpustate **)(p_state), regno, src)
+#define unwind_setreg_scpustate_exclusive_p(p_state, regno, src) unwind_setreg_scpustate_exclusive(*(struct scpustate **)(p_state), regno, src)
+#endif /* LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_SCPUSTATE */
 
@@ -517,6 +545,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive)(/*struct fcpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
 #endif /* !FCPUSTATE_ALIAS */
+#ifndef LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P
+#define unwind_setreg_fcpustate_p(p_state, regno, src)           unwind_setreg_fcpustate(*(struct fcpustate **)(p_state), regno, src)
+#define unwind_setreg_fcpustate_exclusive_p(p_state, regno, src) unwind_setreg_fcpustate_exclusive(*(struct fcpustate **)(p_state), regno, src)
+#endif /* LIBUNWIND_HAVE_GETSETREG_FCPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_FCPUSTATE */
 
@@ -551,6 +583,8 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 #else /* LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext_exclusive)(/*struct mcontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+#define unwind_setreg_mcontext_p(p_state, regno, src)           unwind_setreg_mcontext(*(struct mcontext **)(p_state), regno, src)
+#define unwind_setreg_mcontext_exclusive_p(p_state, regno, src) unwind_setreg_mcontext_exclusive(*(struct mcontext **)(p_state), regno, src)
 #endif /* !LIBUNWIND_HAVE_GETSETREG_MCONTEXT_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_MCONTEXT */
@@ -586,6 +620,8 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 #else /* LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext_exclusive)(/*struct ucontext**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+#define unwind_setreg_ucontext_p(p_state, regno, src)           unwind_setreg_ucontext(*(struct ucontext **)(p_state), regno, src)
+#define unwind_setreg_ucontext_exclusive_p(p_state, regno, src) unwind_setreg_ucontext_exclusive(*(struct ucontext **)(p_state), regno, src)
 #endif /* !LIBUNWIND_HAVE_GETSETREG_UCONTEXT_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_UCONTEXT */
@@ -621,6 +657,8 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC 
 #else /* LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fpustate_exclusive)(/*struct fpustate**/ void *__state, unwind_regno_t __regno, void const *__restrict __src);
+#define unwind_setreg_fpustate_p(p_state, regno, src)           unwind_setreg_fpustate(*(struct fpustate **)(p_state), regno, src)
+#define unwind_setreg_fpustate_exclusive_p(p_state, regno, src) unwind_setreg_fpustate_exclusive(*(struct fpustate **)(p_state), regno, src)
 #endif /* !LIBUNWIND_HAVE_GETSETREG_FPUSTATE_P */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* LIBUNWIND_HAVE_GETSETREG_FPUSTATE */

@@ -124,6 +124,7 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	 * >> }
 	 * The given `ptr' is what `libc_except_unwind()' originally set as value
 	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
+#ifndef NDEBUG
 	struct exception_info *info;
 	info = except_info();
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
@@ -141,6 +142,7 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	                  EXCEPT_CLASS(info->ei_code),
 	                  EXCEPT_SUBCLASS(info->ei_code));
 #endif
+#endif /* !NDEBUG */
 	return ptr;
 }
 
@@ -185,12 +187,8 @@ libc_cxa_end_catch(void) {
 #endif
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
-	if (!(info->ei_flags & EXCEPT_FRETHROW)) {
-		/* TODO: If  `this_exception_code'  is  an RT-level  exception,  then we
-		 *       must set some kind of thread-local flag to have it be re-thrown
-		 *       the next time a call to `task_serve()' is made! */
+	if (!(info->ei_flags & EXCEPT_FRETHROW))
 		info->ei_code = EXCEPT_CODEOF(E_OK);
-	}
 	info->ei_flags &= ~(EXCEPT_FRETHROW);
 }
 

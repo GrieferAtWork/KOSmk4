@@ -180,13 +180,13 @@ END(libc_except_rethrow)
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_except_rethrow)
 
 #ifdef __KERNEL__
-/* NOTE: _Unwind_Resume() is more akin to deemon's `end finally' instruction
-  *      (with the exception of not being invoked when a finally wasn't entered
- *       because of an exception), rather than `except_rethrow()', which is
+/* NOTE: _Unwind_Resume() is more  akin to  deemon's `end finally'  instruction
+ *       (with the exception of not being invoked when a finally wasn't entered
+ *       because of  an exception),  rather than  `except_rethrow()', which  is
  *       equivalent to `throw except'.
- *       However, since kernel exception handling is rather simplistic, we can
- *       simply handle it the same way we handle rethrow, except that we mustn't
- *       set the `EXCEPT_FRETHROW' flag. */
+ * However, since kernel exception handling  is rather simplistic, we  can
+ * simply handle it the same way we handle rethrow, except that we mustn't
+ * set the `EXCEPT_FRETHROW' flag. */
 .section .text
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc

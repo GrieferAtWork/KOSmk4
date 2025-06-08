@@ -35,7 +35,6 @@
 #include <kernel/rt/except-personality.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/types.h>
-#include <sched/arch/task.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/enum.h>
@@ -1224,14 +1223,14 @@ search_fde:
 		goto err;
 	/* Check if there is a personality function for us to execute. */
 	if (context.uc_fde.f_persofun != NULL) {
-		unsigned int perso_code;
+		_Unwind_Reason_Code perso_code;
 		assertf(ADDR_ISKERN(context.uc_fde.f_persofun),
 		        "Not a kernel-space address: %p",
 		        context.uc_fde.f_persofun);
-		perso_code = (*(except_personality_t)context.uc_fde.f_persofun)(&context);
+		perso_code = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(&context);
 		switch (perso_code) {
 
-		case EXCEPT_PERSONALITY_EXECUTE_HANDLER:
+		case _URC_INSTALL_CONTEXT:
 			/* When unwinding a landing pad, we must check if there is an active
 			 * `DW_CFA_GNU_args_size' instruction.
 			 * If there is, we must add its value to ESP before resuming execution!
@@ -1240,10 +1239,10 @@ search_fde:
 			if unlikely(error != UNWIND_SUCCESS)
 				goto err;
 			ATTR_FALLTHROUGH
-		case EXCEPT_PERSONALITY_EXECUTE_HANDLER_NOW:
+		case _URC_INSTALL_CONTEXT_NOW:
 			return context.uc_state; /* Execute a new handler. */
 
-		case EXCEPT_PERSONALITY_ABORT_SEARCH:
+		case _URC_END_OF_STACK:
 			error = UNWIND_SUCCESS;
 			goto err;
 
@@ -1471,7 +1470,7 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
-INTERN WUNUSED NONNULL((1)) unsigned int
+INTERN WUNUSED NONNULL((1)) _Unwind_Reason_Code
 NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct _Unwind_Context *__restrict context) {
 	u8 temp, callsite_encoding;
 	byte_t const *reader;
@@ -1508,25 +1507,22 @@ NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct _Unwind_Context *_
 
 		if (context->uc_adjpc >= startpc && context->uc_adjpc < endpc) {
 			if (handler == 0)
-				return EXCEPT_PERSONALITY_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
+				return _URC_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 
 			/* Just to the associated handler */
 			except_register_state_setpc(context->uc_state, landingpad + handler);
 			if (action != 0) {
-				/* The ABI wants  us to fill  %eax with  a pointer to  the exception  (`_Unwind_Exception').
-				 * However,  since  KOS exception  is kept  a bit  simpler  (so-as to  allow it  to function
-				 * without  the need of dynamic memory allocation),  the current exception isn't an internal
-				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
-				 * So while what we  write here really doesn't  matter at all, let's  just put in  something
-				 * that at the very least makes a bit of sense. */
-				except_register_state_set_unwind_exception(context->uc_state, except_code());
+				/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
+				 * However, since KOS exception is  kept a bit simpler (so-as  to allow it to  function
+				 * without the need of dynamic memory allocation), just pass TLS exception data. */
+				except_register_state_set_unwind_exception(context->uc_state, except_data());
 			}
-			return EXCEPT_PERSONALITY_EXECUTE_HANDLER;
+			return _URC_INSTALL_CONTEXT;
 		}
 	}
 
 	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
-	return EXCEPT_PERSONALITY_ABORT_SEARCH;
+	return _URC_END_OF_STACK;
 }
 
 

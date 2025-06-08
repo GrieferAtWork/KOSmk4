@@ -36,20 +36,25 @@ DECL_BEGIN
 
 struct _Unwind_Context;
 
+#ifndef ___Unwind_Reason_Code_defined
+#define ___Unwind_Reason_Code_defined
+typedef unsigned int _Unwind_Reason_Code; /* One of `EXCEPT_PERSONALITY_*' */
+#endif /* !___Unwind_Reason_Code_defined */
+
 /* Pre-defined personality functions */
 #ifdef BUILDING_KERNEL_CORE
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct _Unwind_Context *__restrict context);
 #ifdef __x86_64__
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct _Unwind_Context *__restrict context);
 #endif /* __x86_64__ */
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC syscall_emulate_r_personality)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC driver_initializer_personality)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC syscall_emulate_r_personality)(struct _Unwind_Context *__restrict context);
+INTDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC driver_initializer_personality)(struct _Unwind_Context *__restrict context);
 #endif /* BUILDING_KERNEL_CORE */
-FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context *__restrict context);
+FUNDEF WUNUSED NONNULL((1)) _Unwind_Reason_Code NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct _Unwind_Context *__restrict context);
 
 DECL_END
 #endif /* __CC__ */
