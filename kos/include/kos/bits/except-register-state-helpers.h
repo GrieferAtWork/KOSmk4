@@ -154,6 +154,10 @@
 #endif /* !__DEEMON__ */
 #define except_register_state_get_unwind_exception __except_register_state_get_unwind_exception
 #define except_register_state_set_unwind_exception __except_register_state_set_unwind_exception
+#ifdef __except_register_state_get_unwind_switch
+#define except_register_state_get_unwind_switch __except_register_state_get_unwind_switch
+#define except_register_state_set_unwind_switch __except_register_state_set_unwind_switch
+#endif /* __except_register_state_get_unwind_switch */
 
 /* Define helper macros */
 /*[[[deemon

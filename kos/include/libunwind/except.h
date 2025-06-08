@@ -90,8 +90,7 @@ struct ATTR_PACKED gcc_lsda_callsite {
 	                            * If there is no handler, this field is ZERO(0)
 	                            * NOTE: Dependent on  architecture, certain  registers must  be filled  with
 	                            *       exception-related data before the runtime may jump to this location. */
-	uintptr_t gcs_action;      /* [ENCODING(:gl_callsite_enc)]
-	                            * The action to take???
+	dwarf_uleb128_t gcs_action;/* The action to take???
 	                            * When zero, don't perform any action. (continue propagating the exception)
 	                            * Otherwise,  this  is   1+  a   byte  offset  into   the  action   table?? */
 };
