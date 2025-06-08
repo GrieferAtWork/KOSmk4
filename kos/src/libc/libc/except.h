@@ -51,7 +51,6 @@
 #define SECTION_EXCEPT_STRING  .rodata.crt.except
 #endif /* !__CC__ */
 
-
 #undef libc_except_info
 #undef libc_except_data
 #undef libc_except_register_state
@@ -59,6 +58,15 @@
 #undef libc_except_active
 #undef libc_except_class
 #undef libc_except_subclass
+#ifdef __KERNEL__
+#define libc_except_info()           except_info()
+#define libc_except_data()           except_data()
+#define libc_except_register_state() except_register_state()
+#define libc_except_code()           except_code()
+#define libc_except_active()         except_active()
+#define libc_except_class()          except_class()
+#define libc_except_subclass()       except_subclass()
+#else /* __KERNEL__ */
 #undef except_info
 #undef except_data
 #undef except_register_state
@@ -82,7 +90,7 @@
 #define except_active()              libc_except_active()
 #define except_class()               libc_except_class()
 #define except_subclass()            libc_except_subclass()
-
+#endif /* !__KERNEL__ */
 
 DECL_BEGIN
 
@@ -151,6 +159,18 @@ INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struc
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context const *__restrict context);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context const *__restrict context);
 INTDEF WUNUSED ATTR_LEAF NONNULL((1, 2)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context, int *__restrict ip_before_insn);
+#undef _Unwind_GetIP
+#undef _Unwind_SetIP
+#undef _Unwind_GetLanguageSpecificData
+#undef _Unwind_GetRegionStart
+#undef _Unwind_GetIPInfo
+#define _Unwind_GetIP(context)                   ((_Unwind_Ptr)except_register_state_getpc((context)->uc_state))
+#define _Unwind_SetIP(context, value)            except_register_state_setpc((context)->uc_state, value)
+#define _Unwind_GetLanguageSpecificData(context) ((_Unwind_Ptr)(context)->uc_fde.f_lsdaaddr)
+#define _Unwind_GetRegionStart(context)          ((_Unwind_Ptr)(context)->uc_fde.f_pcstart)
+#define _Unwind_GetIPInfo(context, ip_before_insn)             \
+	(*(ip_before_insn) = (context)->uc_pc_before_insn ? 1 : 0, \
+	 (_Unwind_Ptr)except_register_state_getpc((context)->uc_state))
 
 #endif /* __CC__ */
 

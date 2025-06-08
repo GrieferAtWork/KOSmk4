@@ -27,6 +27,8 @@
 /**/
 
 #include <hybrid/host.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/bsearch.h>
 
 #include <kos/bits/except-register-state-helpers.h>
 #include <kos/bits/except-register-state.h>
@@ -59,6 +61,7 @@
 #include <libunwind/unwind.h>
 
 #include "dl.h"
+#include "except-libunwind.h"
 #include "except.h"
 #include "globals.h"
 #include "sigreturn.h"
@@ -132,21 +135,22 @@ DEFINE_PUBLIC_ALIAS(except_subclass, libc_except_subclass);
 /* Exception support. */
 
 /* Dynamically loaded dependencies to libunwind.so */
-INTERN SECTION_EXCEPT_BSS void /*                           */ *pdyn_libunwind                           = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND /*               */ pdyn_unwind_fde_find                     = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_EXCEPT_REGISTER_STATE pdyn_unwind_getreg_except_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_EXCEPT_REGISTER_STATE pdyn_unwind_setreg_except_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC /*               */ pdyn_unwind_fde_exec                     = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY /*              */ pdyn_unwind_cfa_apply                    = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA /*           */ pdyn_unwind_fde_exec_cfa                 = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA /*      */ pdyn_unwind_fde_calculate_cfa            = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC /*       */ pdyn_unwind_fde_landing_exec             = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY /*      */ pdyn_unwind_cfa_landing_apply            = NULL;
-PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_POINTER /*          */ pdyn_dwarf_decode_pointer                = NULL;
-PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*          */ pdyn_dwarf_decode_uleb128                = NULL;
+INTERN SECTION_EXCEPT_BSS void /*                          */ *pdyn_libunwind                           = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_FIND /*               */ pdyn_unwind_fde_find                     = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_GETREG_EXCEPT_REGISTER_STATE pdyn_unwind_getreg_except_register_state = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_SETREG_EXCEPT_REGISTER_STATE pdyn_unwind_setreg_except_register_state = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC /*               */ pdyn_unwind_fde_exec                     = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY /*              */ pdyn_unwind_cfa_apply                    = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA /*           */ pdyn_unwind_fde_exec_cfa                 = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA /*      */ pdyn_unwind_fde_calculate_cfa            = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC /*       */ pdyn_unwind_fde_landing_exec             = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY /*      */ pdyn_unwind_cfa_landing_apply            = NULL;
+INTERN SECTION_EXCEPT_BSS PDWARF_DECODE_POINTER /*          */ pdyn_dwarf_decode_pointer                = NULL;
+INTERN SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*          */ pdyn_dwarf_decode_uleb128                = NULL;
+INTERN SECTION_EXCEPT_BSS PDWARF_DECODE_SLEB128 /*          */ pdyn_dwarf_decode_sleb128                = NULL;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*      */ pdyn_unwind_fde_sigframe_exec  = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*     */ pdyn_unwind_cfa_sigframe_apply = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*      */ pdyn_unwind_fde_sigframe_exec  = NULL;
+INTERN SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*     */ pdyn_unwind_cfa_sigframe_apply = NULL;
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
 PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY_NAME;
@@ -161,6 +165,7 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]         
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]            = "unwind_cfa_landing_apply";
 PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]                = "dwarf_decode_pointer";
 PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]                = "dwarf_decode_uleb128";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_sleb128[]                = "dwarf_decode_sleb128";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unwind_fde_sigframe_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
@@ -188,7 +193,7 @@ PRIVATE SECTION_EXCEPT_TEXT ATTR_NORETURN void LIBCCALL libunwind_init_failed(vo
 
 /* Initialize libunwind bindings. */
 INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
-bool LIBCCALL try_initialize_libunwind(void) {
+bool LIBCCALL libc_except_libunwind_tryinitialize(void) {
 	void *handle;
 	handle = dlopen(name_libunwind_so, RTLD_LAZY | RTLD_LOCAL);
 	if unlikely(!handle)
@@ -209,6 +214,7 @@ bool LIBCCALL try_initialize_libunwind(void) {
 	BIND(pdyn_unwind_cfa_landing_apply, name_unwind_cfa_landing_apply);
 	BIND(pdyn_dwarf_decode_pointer, name_dwarf_decode_pointer);
 	BIND(pdyn_dwarf_decode_uleb128, name_dwarf_decode_uleb128);
+	BIND(pdyn_dwarf_decode_sleb128, name_dwarf_decode_sleb128);
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 	/* We can substitute the sigframe variants with the regular ones. */
 	*(void **)&pdyn_unwind_fde_sigframe_exec  = dlsym(handle, name_unwind_fde_sigframe_exec);
@@ -229,32 +235,11 @@ err_init_failed:
 	libunwind_init_failed();
 }
 
-INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
-void LIBCCALL initialize_libunwind(void) {
-	if unlikely(!try_initialize_libunwind())
+INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE void LIBCCALL
+libc_except_libunwind_initialize(void) {
+	if unlikely(!libc_except_libunwind_tryinitialize())
 		libunwind_init_failed();
 }
-
-#define ENSURE_LIBUNWIND_LOADED() \
-	(void)(atomic_read(&pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
-#define TRY_ENSURE_LIBUNWIND_LOADED() \
-	(atomic_read(&pdyn_libunwind) != NULL || try_initialize_libunwind())
-
-
-
-#define unwind_fde_find                     (*pdyn_unwind_fde_find)
-#define unwind_getreg_except_register_state (*pdyn_unwind_getreg_except_register_state)
-#define unwind_setreg_except_register_state (*pdyn_unwind_setreg_except_register_state)
-#define unwind_fde_exec                     (*pdyn_unwind_fde_exec)
-#define unwind_cfa_apply                    (*pdyn_unwind_cfa_apply)
-#define unwind_fde_exec_cfa                 (*pdyn_unwind_fde_exec_cfa)
-#define unwind_fde_calculate_cfa            (*pdyn_unwind_fde_calculate_cfa)
-#define unwind_fde_landing_exec             (*pdyn_unwind_fde_landing_exec)
-#define unwind_cfa_landing_apply            (*pdyn_unwind_cfa_landing_apply)
-#define unwind_fde_sigframe_exec            (*pdyn_unwind_fde_sigframe_exec)
-#define unwind_cfa_sigframe_apply           (*pdyn_unwind_cfa_sigframe_apply)
-#define dwarf_decode_pointer                (*pdyn_dwarf_decode_pointer)
-#define dwarf_decode_uleb128                (*pdyn_dwarf_decode_uleb128)
 
 PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
 kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
@@ -277,62 +262,12 @@ libc_get_kos_unwind_exception(void) {
 
 
 
-
-INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
-libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2) {
-	u8 temp, callsite_encoding;
-	byte_t const *landingpad;
-	byte_t const *reader, *callsite_end;
-	size_t callsite_size;
-	ENSURE_LIBUNWIND_LOADED();
-
-	/* HINT: `f_lsdaaddr' points into `.gcc_except_table' */
-	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
-	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
-
-	/* HINT: `reader' points to a `struct gcc_lsda' */
-	temp = *reader++; /* gl_landing_enc */
-	if (temp != DW_EH_PE_omit) {
-		/* gl_landing_pad */
-		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *),
-		                                  &context->uc_fde.f_bases);
-	}
-	temp = *reader++; /* gl_typetab_enc */
-	if (temp != DW_EH_PE_omit) {
-		dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
-	}
-	callsite_encoding = *reader++; /* gl_callsite_enc */
-	callsite_size     = dwarf_decode_uleb128((byte_t const **)&reader);
-	callsite_end      = reader + callsite_size;
-	while (reader < callsite_end) {
-		uintptr_t start, size, handler, action;
-		byte_t const *startpc, *endpc;
-		start   = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_start */
-		size    = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_size */
-		handler = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_handler */
-		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_action */
-		startpc = landingpad + start;
-		endpc   = startpc + size;
-		if (context->uc_adjpc >= startpc && context->uc_adjpc < endpc) {
-			if (handler == 0)
-				return _URC_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
-			if (!phase_2)
-				return _URC_HANDLER_FOUND;
-			/* Jump to the associated handler */
-			except_register_state_setpc(context->uc_state, landingpad + handler);
-			if (action != 0) {
-				except_register_state_set_unwind_exception(context->uc_state,
-				                                           (uintptr_t)libc_get_kos_unwind_exception());
-			}
-			return _URC_INSTALL_CONTEXT;
-		}
-	}
-	/* Default behavior: abort exception handling (this function was marked as NOTHROW) */
-	return _URC_END_OF_STACK;
-}
+/* Defined in "../hybrid/except-personality.c" */
+INTDEF _Unwind_Reason_Code LIBCCALL
+libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2);
 
 
-/* Defined in "libc/except-personality.c" */
+/* Defined in "./except-personality.c" */
 INTDEF _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_v0(int version /* = 1 */,
                         _Unwind_Action actions,
@@ -532,6 +467,114 @@ try_raise_signal_from_exception(except_register_state_t const *__restrict state,
 }
 
 
+PRIVATE SECTION_EXCEPT_TEXT WUNUSED _Unwind_Personality_Fn
+NOTHROW(LIBCCALL dlmod_get_gcc_personality)(void *handle) {
+	void *result = dlsym(handle, "__gxx_personality_v0");
+	if (result == NULL)
+		result = dlsym(handle, "__gcc_personality_v0");
+	return (_Unwind_Personality_Fn)result;
+}
+
+PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE WUNUSED NONNULL((1)) bool
+NOTHROW(LIBCCALL uncached_is_standard_gcc_except_table_personality)(_Unwind_Personality_Fn fun) {
+	void *libstdcxx;
+	if (fun == &libc_gxx_personality_v0)
+		return true;
+	if (fun == dlmod_get_gcc_personality(RTLD_DEFAULT))
+		return true;
+	if (fun == dlmod_get_gcc_personality(libc_handle()))
+		return true;
+	if (fun == dlmod_get_gcc_personality(dlopen(NULL, 0)))
+		return true;
+
+	/* Check if the given "fun" is the one from "libstdc++" */
+	libstdcxx = dlgetmodule("libstdc++", DLGETHANDLE_FINCREF);
+	if (libstdcxx) {
+		_Unwind_Personality_Fn stdcxx_impl;
+		stdcxx_impl = dlmod_get_gcc_personality(libstdcxx);
+		(void)dlclose(libstdcxx);
+		if (fun == stdcxx_impl)
+			return true;
+	}
+	return false;
+}
+
+
+struct standard_personality_cache_entry {
+	uintptr_t spce_fun; /* Cache function (lowest bit indicates "known=true") */
+};
+
+#define STANDARD_PERSONALITY_CACHE_SIZE 16
+PRIVATE SECTION_EXCEPT_BSS struct standard_personality_cache_entry
+standard_personality_cache[STANDARD_PERSONALITY_CACHE_SIZE] = {};
+PRIVATE SECTION_EXCEPT_BSS size_t standard_personality_cache_size = 0;
+PRIVATE SECTION_EXCEPT_BSS struct atomic_lock standard_personality_cache_wrlock = ATOMIC_LOCK_INIT;
+
+PRIVATE SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW(LIBCCALL standard_personality_cache_lookup)(_Unwind_Personality_Fn fun) {
+	size_t index;
+	size_t count = atomic_read(&standard_personality_cache_size);
+	for (size_t _bs_lo = 0, _bs_hi = count;
+	     index = (_bs_lo + _bs_hi) / 2, _bs_lo < _bs_hi;) {
+		uintptr_t slot = atomic_read(&standard_personality_cache[index].spce_fun);
+		uintptr_t slot_key = slot & ~1;
+		if ((uintptr_t)fun < slot_key) {
+			_bs_hi = (index);
+		} else if ((uintptr_t)fun > slot_key) {
+			_bs_lo = (index) + 1;
+		} else {
+			return slot & 1;
+		}
+	}
+	return -1;
+}
+
+PRIVATE SECTION_EXCEPT_TEXT ATTR_PURE NONNULL((1)) void
+NOTHROW(LIBCCALL standard_personality_cache_insert)(_Unwind_Personality_Fn fun,
+                                                    bool is_standard) {
+	uintptr_t newslot_key = (uintptr_t)fun | (is_standard ? 1 : 0);
+	uintptr_t newslot     = newslot_key & ~1;
+	atomic_lock_acquire(&standard_personality_cache_wrlock);
+	if (standard_personality_cache_size < STANDARD_PERSONALITY_CACHE_SIZE) {
+		size_t index, i;
+		BSEARCH (index, standard_personality_cache,
+		         standard_personality_cache_size, .spce_fun & ~1, newslot) {
+			goto done;
+		}
+		/* word-wise, atomic memmoveup */
+		for (i = standard_personality_cache_size; i > index; --i) {
+			uintptr_t val = atomic_read(&standard_personality_cache[i - 1].spce_fun);
+			atomic_write(&standard_personality_cache[i].spce_fun, val);
+		}
+		atomic_write(&standard_personality_cache[index].spce_fun, newslot_key);
+		atomic_inc(&standard_personality_cache_size);
+	}
+done:
+	atomic_lock_release(&standard_personality_cache_wrlock);
+}
+
+/* Check if `fun' is the `__gxx_personality_v0' from libc or libstdc++
+ *
+ * This check is needed, because when propagating KOS exceptions through
+ * code linked against libstdc++, we sadly can't use its version of that
+ * function. If we did, then custom `kos::except::class_filter' handlers
+ * would  not work properly, so we have  to detect its personality so we
+ * can treat it like we treat our own `__gxx_personality_v0'. */
+PRIVATE SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) bool
+NOTHROW(LIBCCALL is_standard_gcc_except_table_personality)(_Unwind_Personality_Fn fun) {
+	int known;
+	bool result;
+	if likely(fun == &libc_gxx_personality_v0)
+		return true; /* Most likely case: it's our own, built-in one */
+	known = standard_personality_cache_lookup(fun);
+	if (known >= 0)
+		return !!known;
+	result = uncached_is_standard_gcc_except_table_personality(fun);
+	standard_personality_cache_insert(fun, result);
+	return result;
+}
+
+
 
 PRIVATE SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
 NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind_impl)(except_register_state_t *__restrict state,
@@ -576,14 +619,12 @@ search_fde:
 	if (context.uc_fde.f_persofun) {
 		/* Invoke the personality function */
 		_Unwind_Reason_Code reason;
-		if ((_Unwind_Personality_Fn)context.uc_fde.f_persofun == &libc_gxx_personality_v0) {
+		_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;
+		if (is_standard_gcc_except_table_personality(perso)) {
 			reason = libc_gxx_personality_kernexcept(&context, true);
 		} else {
-			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1,
-			                                                              _UA_CLEANUP_PHASE | _UA_FORCE_UNWIND,
-			                                                              _UEC_KERNKOS,
-			                                                              libc_get_kos_unwind_exception(),
-			                                                              &context);
+			reason = (*perso)(1, _UA_CLEANUP_PHASE | _UA_FORCE_UNWIND, _UEC_KERNKOS,
+			                  libc_get_kos_unwind_exception(), &context);
 		}
 		switch (reason) {
 		case _URC_INSTALL_CONTEXT:
@@ -728,9 +769,10 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 		          : _UA_CLEANUP_PHASE | 0;
 		if (context.uc_fde.f_persofun) {
 			_Unwind_Reason_Code reason;
-			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
-			                                                              exception_object->exception_class,
-			                                                              exception_object, &context);
+			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;
+			reason = (*perso)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
+			                  exception_object->exception_class,
+			                  exception_object, &context);
 			if (reason == _URC_INSTALL_CONTEXT ||
 			    reason == _URC_INSTALL_CONTEXT_NOW)
 				break;
@@ -804,9 +846,10 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 		if (unwind_error == UNWIND_NO_FRAME)
 			break;
 		if (context.uc_fde.f_persofun) {
-			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
-			                                                              exception_object->exception_class,
-			                                                              exception_object, &context);
+			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;
+			reason = (*perso)(1, _UA_FORCE_UNWIND | _UA_CLEANUP_PHASE,
+			                  exception_object->exception_class,
+			                  exception_object, &context);
 			if (reason == _URC_INSTALL_CONTEXT ||
 			    reason == _URC_INSTALL_CONTEXT_NOW)
 				break;
@@ -880,9 +923,10 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 		if (context.uc_fde.f_persofun) {
 			_Unwind_Reason_Code reason;
 			/* Invoke the custom personality function. */
-			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_SEARCH_PHASE,
-			                                                              exception_object->exception_class,
-			                                                              exception_object, &context);
+			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;;
+			reason = (*perso)(1, _UA_SEARCH_PHASE,
+			                  exception_object->exception_class,
+			                  exception_object, &context);
 			if (reason == _URC_HANDLER_FOUND)
 				break;
 			if (reason != _URC_CONTINUE_UNWIND)
@@ -1315,8 +1359,13 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 		if (context.uc_fde.f_persofun) {
 			/* Invoke the personality function */
 			_Unwind_Reason_Code reason;
-			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_SEARCH_PHASE, _UEC_KERNKOS,
-			                                                              libc_get_kos_unwind_exception(), &context);
+			_Unwind_Personality_Fn perso = (_Unwind_Personality_Fn)context.uc_fde.f_persofun;
+			if likely(is_standard_gcc_except_table_personality(perso)) {
+				reason = libc_gxx_personality_kernexcept(&context, false);
+			} else {
+				reason = (*perso)(1, _UA_SEARCH_PHASE, _UEC_KERNKOS,
+				                  libc_get_kos_unwind_exception(), &context);
+			}
 			if (reason == _URC_HANDLER_FOUND) {
 				void *handle;
 				int is_aware;

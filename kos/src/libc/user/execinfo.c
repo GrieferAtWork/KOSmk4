@@ -42,6 +42,7 @@
 #include <libunwind/unwind.h>
 
 #include "../libc/dl.h"
+#include "../libc/except-libunwind.h"
 #include "execinfo.h"
 #include "unistd.h"
 
@@ -51,17 +52,18 @@ DECL_BEGIN
 #define SECTION_DEBUG_BSS    ".bss.crt.debug"
 #define SECTION_DEBUG_STRING ".rodata.crt.debug"
 
-INTDEF void *pdyn_libunwind;                     /* From `../libc/except.c' */
-INTDEF void LIBCCALL initialize_libunwind(void); /* From `../libc/except.c' */
-
 PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
 PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_SETREG_LCPUSTATE pdyn_unwind_setreg_lcpustate = NULL;
 PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_unwind_getreg_lcpustate[] = UNWIND_GETREG_LCPUSTATE_NAME;
 PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_unwind_setreg_lcpustate[] = UNWIND_SETREG_LCPUSTATE_NAME;
+#define unwind_getreg_lcpustate (*pdyn_unwind_getreg_lcpustate)
+#define unwind_setreg_lcpustate (*pdyn_unwind_setreg_lcpustate)
+#define ENSURE_LIBUNWIND_LOADED_FORDEBUG() \
+	(atomic_read(&pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
 
 PRIVATE ATTR_SECTION(SECTION_DEBUG_TEXT) bool
 NOTHROW(LIBCCALL initialize_libunwind_debug)(void) {
-	initialize_libunwind();
+	libc_except_libunwind_initialize();
 #define BIND(func, name)                                                 \
 	if unlikely((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
 		goto err_init_failed
@@ -72,12 +74,6 @@ NOTHROW(LIBCCALL initialize_libunwind_debug)(void) {
 err_init_failed:
 	return false;
 }
-
-#define unwind_getreg_lcpustate (*pdyn_unwind_getreg_lcpustate)
-#define unwind_setreg_lcpustate (*pdyn_unwind_setreg_lcpustate)
-
-#define ENSURE_LIBUNWIND_LOADED() \
-	(atomic_read(&pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
 
 
 PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) void *pdyn_libdebuginfo                                               = NULL;
@@ -110,6 +106,11 @@ again:
 	return result;
 }
 
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_unwind_for_debug[] = "unwind_for_debug";
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_debug_addr2line[] = "debug_addr2line";
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_debug_addr2line_sections_unlock[] = "debug_addr2line_sections_unlock";
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_debug_addr2line_sections_lock[] = "debug_addr2line_sections_lock";
+
 PRIVATE ATTR_NOINLINE WUNUSED ATTR_SECTION(SECTION_DEBUG_TEXT) bool
 NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 	void *lib;
@@ -118,17 +119,17 @@ NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 	lib = open_libdebuginfo();
 	if (!lib)
 		return false;
-	*(void **)&pdyn_unwind_for_debug = dlsym(lib, "unwind_for_debug");
+	*(void **)&pdyn_unwind_for_debug = dlsym(lib, name_unwind_for_debug);
 	if unlikely(!pdyn_unwind_for_debug)
 		return false;
-	*(void **)&pdyn_debug_addr2line = dlsym(lib, "debug_addr2line");
+	*(void **)&pdyn_debug_addr2line = dlsym(lib, name_debug_addr2line);
 	if unlikely(!pdyn_debug_addr2line)
 		return false;
-	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(lib, "debug_addr2line_sections_unlock");
+	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(lib, name_debug_addr2line_sections_unlock);
 	if unlikely(!pdyn_debug_addr2line_sections_unlock)
 		return false;
 	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_debug_addr2line_sections_lock = dlsym(lib, "debug_addr2line_sections_lock");
+	*(void **)&pdyn_debug_addr2line_sections_lock = dlsym(lib, name_debug_addr2line_sections_lock);
 	if unlikely(!pdyn_debug_addr2line_sections_lock)
 		return false;
 	return true;
@@ -165,7 +166,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 			return 1;
 		}
 	}
-	if (!ENSURE_LIBUNWIND_LOADED() || !init_libdebuginfo())
+	if (!ENSURE_LIBUNWIND_LOADED_FORDEBUG() || !init_libdebuginfo())
 		return libc_seterrno(ENOENT);
 	lcpustate_current(&st);
 	for (result = 0; result < size; ++result) {

@@ -32,9 +32,9 @@
 	for (__SIZE_TYPE__ _bs_lo = 0, _bs_hi = (count);                 \
 	     __HYBRID_BSEARCH_LOADMID(index, _bs_lo, _bs_hi),            \
 	     _bs_lo < _bs_hi;)                                           \
-		if ((key) < (vector)[index] field_lo)                        \
+		if ((key) < ((vector)[index] field_lo))                      \
 			_bs_hi = (index);                                        \
-		else if ((key) > (vector)[index] field_hi)                   \
+		else if ((key) > ((vector)[index] field_hi))                 \
 			_bs_lo = (index) + 1;                                    \
 		else if ((_bs_lo = _bs_hi, 0))                               \
 			; /* Found it! (element is in `vector[index]') */        \

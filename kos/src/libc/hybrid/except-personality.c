@@ -17,15 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_MISC_EXCEPT_PERSONALITY_C
-#define GUARD_KERNEL_CORE_MISC_EXCEPT_PERSONALITY_C 1
+#ifndef GUARD_LIBC_HYBRID_EXCEPT_PERSONALITY_C
+#define GUARD_LIBC_HYBRID_EXCEPT_PERSONALITY_C 1
 #define _KOS_SOURCE 1
 
-#include <kernel/compiler.h>
-
-#include <kernel/except.h>
-#include <kernel/rt/except-personality.h>
-#include <kernel/types.h>
+#include "../api.h"
+/**/
 
 #include <kos/bits/except-register-state-helpers.h>
 #include <kos/bits/except-register-state.h>
@@ -39,6 +36,17 @@
 
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/except.h>
+
+#include "../libc/except-libunwind.h"
+#include "../libc/except.h"
+#ifndef __KERNEL__
+#include "../libc/dl.h"
+#endif /* !__KERNEL__ */
+
+#ifndef FCALL
+#define FCALL __FCALL
+#endif /* !FCALL */
 
 DECL_BEGIN
 
@@ -55,6 +63,10 @@ struct cxx_std_typeinfo_vtable_struct {
 
 	/* Actual VTable callbacks go here... */
 	char const *(ATTR_CDECL *tiv_getname)(struct cxx_std_typeinfo *self);
+
+#ifndef __KERNEL__
+	/* TODO: Must implement enough stuff to be compatible with libstdc++ */
+#endif /* !__KERNEL__ */
 };
 
 struct cxx_std_typeinfo {
@@ -208,10 +220,16 @@ kos_exceptfilter_matches_current_exception(char const *cxx_typename) {
 
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
+#ifdef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
 INTERN WUNUSED NONNULL((1)) _Unwind_Reason_Code
-NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct _Unwind_Context *__restrict context) {
+NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct _Unwind_Context *__restrict context)
+#else /* __KERNEL__ */
+INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
+libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2)
+#endif /* !__KERNEL__ */
+{
 	byte_t landingpad_encoding;
 	byte_t callsite_encoding;
 	byte_t ttype_encoding;
@@ -260,9 +278,16 @@ next_handler:
 			continue; /* Our handler (if present) is yet-to-come */
 
 		/* Found our handler! */
-
 		if (handler == 0)
 			return _URC_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
+
+		/* Special case for user-space: prior to phase_2, only check if a handler exists. */
+#ifndef __KERNEL__
+		if (!phase_2)
+			return _URC_HANDLER_FOUND;
+#endif /* !__KERNEL__ */
+
+		/* Do action-based filtering. */
 		if (action != 0) {
 			/* Scan the action table on the look-out for c++ typeinfo
 			 * that  may  be specifying  custom KOS  exception masks. */
@@ -329,6 +354,82 @@ filtered_match:
 	return _URC_END_OF_STACK;
 }
 
+
+#ifndef __KERNEL__
+/* Define these functions strongly, since we *always* want to  intercept
+ * call to these **BEFORE** libstdc++ can  see them. This is because  we
+ * need to implement our own, custom handling for "_UEC_KERNKOS" without
+ * libstdc++ being able to see those exception.
+ *
+ * At runtime, we then lazily forward anything that isn't _UEC_KERNKOS
+ * to the next implementation (which should be libstdc++'s if the load
+ * order was set-up correctly)
+ *
+ * When libc ended up being loaded **AFTER** libstdc++, we still have a
+ * bit of the upper hand, since KOS exception throwing always has to go
+ * through libc, and "../libc/except.c" tries  to handle the case of  a
+ * KOS exception, and a personality function originating from libstdc++
+ * (s.a. `is_standard_gcc_except_table_personality()') by ignoring  the
+ * personality function  and calling  `libc_gxx_personality_kernexcept'
+ * instead.
+ *
+ * As such, custom KOS exception handling should always work properly,
+ * even if libstdc++ was loaded, and even if it was loaded before libc
+ * was. */
+DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
+DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
+
+PRIVATE SECTION_EXCEPT_TEXT WUNUSED _Unwind_Personality_Fn LIBCCALL
+libc_get_next_gxx_personality_v0__uncached(void) {
+	/* The perfect usage-example for "RTLD_NEXT" -- find any mention of "__gxx_personality_v0"
+	 * that  appears **AFTER** the calling module (our's;  aka: libc's) in the dynamic linkage
+	 * order.
+	 *
+	 * iow: when libstdc++ was loaded **AFTER** libc, this will return it's impl. */
+	void *result = dlsym(RTLD_NEXT, "__gxx_personality_v0");
+	if (result == NULL)
+		result = dlsym(RTLD_NEXT, "__gcc_personality_v0");
+	return (_Unwind_Personality_Fn)result;
+}
+
+PRIVATE SECTION_EXCEPT_BSS _Unwind_Personality_Fn libc_next_gxx_personality_v0 = NULL;
+PRIVATE SECTION_EXCEPT_TEXT WUNUSED _Unwind_Personality_Fn LIBCCALL
+libc_get_next_gxx_personality_v0(void) {
+	if (libc_next_gxx_personality_v0 == NULL)
+		libc_next_gxx_personality_v0 = libc_get_next_gxx_personality_v0__uncached();
+	return libc_next_gxx_personality_v0;
+}
+
+INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
+libc_gxx_personality_v0(int version /* = 1 */,
+                        _Unwind_Action actions,
+                        _Unwind_Exception_Class exception_class,
+                        struct _Unwind_Exception *ue_header,
+                        struct _Unwind_Context *context) {
+
+	/* Special handling for KOS exceptions... */
+	if likely(version == 1 && exception_class == _UEC_KERNKOS)
+		return libc_gxx_personality_kernexcept(context, (actions & _UA_FORCE_UNWIND) != 0);
+
+	/* Anything else gets forwarded to the next gxx personality as
+	 * per the dynamic linking order. */
+	{
+		_Unwind_Personality_Fn next = libc_get_next_gxx_personality_v0();
+		if likely(next != NULL)
+			return (*next)(version, actions, exception_class, ue_header, context);
+	}
+
+	/* Fallback: no piece of code  that's currently loaded can  handle
+	 * this type of exception using a gcc-compatible exception handler
+	 * table. */
+	(void)actions;
+	(void)exception_class;
+	(void)ue_header;
+	(void)context;
+	return _URC_FATAL_PHASE1_ERROR;
+}
+#endif /* !__KERNEL__ */
+
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_MISC_EXCEPT_PERSONALITY_C */
+#endif /* !GUARD_LIBC_HYBRID_EXCEPT_PERSONALITY_C */
