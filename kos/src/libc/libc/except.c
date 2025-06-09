@@ -253,8 +253,13 @@ PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
 	.exception_cleanup = NULL, /* Filled in lazily */
 };
 
-PRIVATE ATTR_RETNONNULL SECTION_EXCEPT_TEXT WUNUSED struct _Unwind_Exception *LIBCCALL
+INTERN ATTR_RETNONNULL SECTION_EXCEPT_TEXT WUNUSED struct _Unwind_Exception *LIBCCALL
 libc_get_kos_unwind_exception(void) {
+	/* TODO: When a program calls libstdc++'s __cxa_begin_catch(), libstdc++
+	 *       must somehow know that it needs to return `except_args()'.  For
+	 *       this purpose, every thread probably needs its own TLS-allocated
+	 *       "struct _Unwind_Exception",  which in turn always contains this
+	 *       self-pointer needed for libstdc++ */
 	if (!kos_unwind_exception.exception_cleanup)
 		kos_unwind_exception.exception_cleanup = &kos_unwind_exception_cleanup;
 	return &kos_unwind_exception;

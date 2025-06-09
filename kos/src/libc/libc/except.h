@@ -92,12 +92,22 @@
 #define except_subclass()            libc_except_subclass()
 #endif /* !__KERNEL__ */
 
+#ifdef __KERNEL__
+#define except_args() (&PERTASK(__arch_this_exception_data.e_args))
+#endif /* __KERNEL__ */
+#ifndef except_args
+#define except_args() (&except_data()->e_args)
+#endif /* !except_args */
+
 DECL_BEGIN
 
 #ifdef __CC__
 
 struct exception_data;
 struct exception_info;
+
+INTDEF ATTR_RETNONNULL WUNUSED struct _Unwind_Exception *LIBCCALL
+libc_get_kos_unwind_exception(void);
 
 /* Returns non-zero if there is an active exception. */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void);

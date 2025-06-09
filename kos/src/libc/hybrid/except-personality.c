@@ -219,14 +219,6 @@ kos_exceptfilter_matches_current_exception(char const *cxx_typename) {
 }
 
 
-#ifdef __KERNEL__
-#define except_args() (&PERTASK(__arch_this_exception_data.e_args))
-#endif /* __KERNEL__ */
-#ifndef except_args
-#define except_args() (&except_data()->e_args)
-#endif /* !except_args */
-
-
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 #ifdef __KERNEL__
@@ -292,8 +284,11 @@ next_handler:
 
 		/* Special case for user-space: prior to phase_2, only check if a handler exists. */
 #ifndef __KERNEL__
-		if (!phase_2)
+		if (!phase_2) {
+			if (!action)
+				continue; /* Non-catching handlers aren't viable receivers before phase #2 */
 			return _URC_HANDLER_FOUND;
+		}
 #endif /* !__KERNEL__ */
 
 		/* Do action-based filtering. */
@@ -349,13 +344,17 @@ filtered_match:
 					goto next_handler;
 				action_record += ar_disp;
 			}
-
-
-			/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
-			 * However, since KOS exception is  kept a bit simpler (so-as  to allow it to  function
-			 * without the need of dynamic memory allocation), just pass TLS exception data. */
-			except_register_state_set_unwind_exception(context->uc_state, except_args());
 		}
+
+		/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
+		 * However, since KOS exception is  kept a bit simpler (so-as  to allow it to  function
+		 * without the need of dynamic memory allocation), just pass TLS exception data. */
+#ifdef __KERNEL__
+		except_register_state_set_unwind_exception(context->uc_state, except_args());
+#else /* __KERNEL__ */
+		/* Must assign the fake KOS unwind exception so "libc_Unwind_Resume_impl()" works. */
+		except_register_state_set_unwind_exception(context->uc_state, libc_get_kos_unwind_exception());
+#endif /* !__KERNEL__ */
 
 		/* Jump to the associated handler */
 		except_register_state_setpc(context->uc_state, landingpad + handler);

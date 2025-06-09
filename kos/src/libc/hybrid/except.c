@@ -129,6 +129,13 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	info = except_info();
 	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 	        "Exception handler entered, but no exception set");
+#ifdef __KERNEL__
+	assertf(ptr == (void *)&info->ei_data.e_args,
+	        "Exception pointer should be the exception data-area");
+#else /* __KERNEL__ */
+	assertf(ptr == (void *)&info->ei_data.e_args,
+	        "Exception pointer should be ");
+#endif /* !__KERNEL__ */
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
 	                  "__cxa_begin_catch [%#" PRIx8 "] [error=%s ("
@@ -143,7 +150,13 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	                  EXCEPT_SUBCLASS(info->ei_code));
 #endif
 #endif /* !NDEBUG */
+#ifdef __KERNEL__
+	/* In the kernel, "ptr" */
 	return ptr;
+#else /* __KERNEL__ */
+
+	return except_args();
+#endif /* !__KERNEL__ */
 }
 
 INTERN SECTION_EXCEPT_TEXT void CXA_CC
