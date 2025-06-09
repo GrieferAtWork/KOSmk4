@@ -68,7 +68,7 @@ DECL_BEGIN
 #define RAMGFX_DATA   (byte_t *)self->vx_driver[RAMGFX_DRIVER__DATA]
 #define RAMGFX_STRIDE (size_t)self->vx_driver[RAMGFX_DRIVER__STRIDE]
 
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define ASSERT_ABS_COORDS(self, x, y)                    \
 	(assertf((x) >= (self)->vx_bxmin &&                  \
 	         (x) < (self)->vx_bxend,                     \

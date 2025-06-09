@@ -559,7 +559,7 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit *__restrict self,
 		struct video_lock src_lock;
 		struct video_buffer *src_buffer = self->vb_src->vx_buffer;
 		if likely(src_buffer->rlock(src_lock) == 0) {
-			uintptr_t bitskip = bm->vbm_skip;
+			uintptr_t bitskip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
 			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,

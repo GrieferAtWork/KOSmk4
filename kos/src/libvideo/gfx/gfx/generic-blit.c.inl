@@ -54,13 +54,11 @@ DECL_BEGIN
 #endif /* ... */
 
 #ifdef LOCAL_HAVE_BITMASK
-#define LOCAL_IF_HAVE_BITMASK(...) __VA_ARGS__
-#define LOCAL_BITMASK__PARAMS      , struct video_bitmask const *__restrict bm
-#define LOCAL_BITMASK__ARGS        , bm
+#define LOCAL_BITMASK__PARAMS , struct video_bitmask const *__restrict bm
+#define LOCAL_BITMASK__ARGS   , bm
 #else /* LOCAL_HAVE_BITMASK */
-#define LOCAL_IF_HAVE_BITMASK(...) /* nothing */
-#define LOCAL_BITMASK__PARAMS      /* nothing */
-#define LOCAL_BITMASK__ARGS        /* nothing */
+#define LOCAL_BITMASK__PARAMS /* nothing */
+#define LOCAL_BITMASK__ARGS   /* nothing */
 #endif /* !LOCAL_HAVE_BITMASK */
 
 
@@ -73,7 +71,6 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	video_coord_t temp;
-	LOCAL_IF_HAVE_BITMASK(struct video_bitmask fixed_bm);
 	if (!size_x || !size_y)
 		return;
 	dst_x += dst->vx_cxoff;
@@ -84,9 +81,6 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit *__restrict self,
 		dst_x = (video_offset_t)(dst->vx_bxmin - (video_coord_t)dst_x);
 		if unlikely((video_coord_t)dst_x >= size_x)
 			return;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += (video_coord_t)dst_x);
 		src_x += (video_coord_t)dst_x;
 		size_x -= (video_coord_t)dst_x;
 		dst_x = (video_offset_t)dst->vx_bxmin;
@@ -95,9 +89,6 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit *__restrict self,
 		dst_y = (video_offset_t)(dst->vx_bymin - (video_coord_t)dst_y);
 		if unlikely((video_coord_t)dst_y >= size_y)
 			return;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += ((video_coord_t)dst_y) * fixed_bm.vbm_scan);
 		src_y += (video_coord_t)dst_y;
 		size_y -= (video_coord_t)dst_y;
 		dst_y = (video_offset_t)dst->vx_bymin;
@@ -106,9 +97,6 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit *__restrict self,
 		src_x = (video_offset_t)(src->vx_bxmin - (video_coord_t)src_x);
 		if unlikely((video_coord_t)src_x >= size_x)
 			return;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += (video_coord_t)src_x);
 		dst_x += (video_coord_t)src_x;
 		size_x -= (video_coord_t)src_x;
 		src_x = (video_offset_t)src->vx_bxmin;
@@ -117,9 +105,6 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit *__restrict self,
 		src_y = (video_offset_t)(src->vx_bymin - (video_coord_t)src_y);
 		if unlikely((video_coord_t)src_y >= size_y)
 			return;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += ((video_coord_t)src_y) * fixed_bm.vbm_scan);
 		dst_y += (video_coord_t)src_y;
 		size_y -= (video_coord_t)src_y;
 		src_y = (video_offset_t)src->vx_bymin;
@@ -161,7 +146,6 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	video_coord_t temp;
-	LOCAL_IF_HAVE_BITMASK(struct video_bitmask fixed_bm);
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
 		return;
 	dst_x += dst->vx_cxoff;
@@ -178,9 +162,6 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit *__restrict self,
 			return;
 		src_size_x -= srcpart;
 		dst_size_x -= (video_coord_t)dst_x;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += srcpart);
 		src_x += srcpart;
 		dst_x = (video_offset_t)dst->vx_bxmin;
 	}
@@ -194,9 +175,6 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit *__restrict self,
 			return;
 		src_size_y -= srcpart;
 		dst_size_y -= (video_coord_t)dst_y;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += srcpart * fixed_bm.vbm_scan);
 		src_y += srcpart;
 		dst_y = (video_offset_t)dst->vx_bymin;
 	}
@@ -210,9 +188,6 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit *__restrict self,
 			return;
 		dst_size_x -= dstpart;
 		dst_x += dstpart;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += (video_coord_t)src_x);
 		src_size_x -= (video_coord_t)src_x;
 		src_x = (video_offset_t)src->vx_bxmin;
 	}
@@ -227,9 +202,6 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit *__restrict self,
 			return;
 		dst_size_y -= dstpart;
 		dst_y += dstpart;
-		LOCAL_IF_HAVE_BITMASK(fixed_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(bm = &fixed_bm);
-		LOCAL_IF_HAVE_BITMASK(fixed_bm.vbm_skip += ((video_coord_t)-src_y) * fixed_bm.vbm_scan);
 		src_size_y -= (video_coord_t)src_y;
 		src_y = (video_offset_t)src->vx_bymin;
 	}
@@ -371,22 +343,16 @@ LOCAL_libvideo_gfx_generic_blit_wrap(struct video_blit *__restrict self,
 		}
 	}
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += xinb + (yinb * chunk_bm.vbm_scan));
 		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, 0, 0, src_x + xinb, src_y + yinb,
-		                                       xwrap, ywrap LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                       xwrap, ywrap LOCAL_BITMASK__ARGS);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += xinb);
 		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, 0, dst_y, src_x + xinb, src_y,
-		                                       xwrap, size_y LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                       xwrap, size_y LOCAL_BITMASK__ARGS);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += yinb * chunk_bm.vbm_scan);
 		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, dst_x, 0, src_x, src_y + yinb,
-		                                       size_x, ywrap LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                       size_x, ywrap LOCAL_BITMASK__ARGS);
 	}
 	LOCAL_libvideo_gfx_generic_blit_rdwrap(self, dst_x, dst_y, src_x, src_y,
 	                                       xinb, yinb LOCAL_BITMASK__ARGS);
@@ -440,32 +406,26 @@ LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit *__restrict self,
 		size_t chunk_src_y = ydst2src(yinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		size_t chunk_src_size_y = ydst2src(ywrap);
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += chunk_src_x + (chunk_src_y * chunk_bm.vbm_scan));
 		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, 0, 0, xwrap, ywrap,
 		                                          src_x + chunk_src_x, src_y + chunk_src_y,
 		                                          chunk_src_size_x, chunk_src_size_y
-		                                          LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                          LOCAL_BITMASK__ARGS);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		size_t chunk_src_x = xdst2src(xinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += chunk_src_x);
 		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, 0, dst_y, xwrap, dst_size_y,
 		                                          src_x + chunk_src_x, src_y,
 		                                          chunk_src_size_x, src_size_y
-		                                          LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                          LOCAL_BITMASK__ARGS);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		size_t chunk_src_y = ydst2src(yinb);
 		size_t chunk_src_size_y = ydst2src(ywrap);
-		LOCAL_IF_HAVE_BITMASK(struct video_bitmask chunk_bm = *bm);
-		LOCAL_IF_HAVE_BITMASK(chunk_bm.vbm_skip += chunk_src_y * chunk_bm.vbm_scan);
 		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, dst_x, 0, dst_size_x, ywrap,
 		                                          src_x, src_y + chunk_src_y,
 		                                          src_size_x, chunk_src_size_y
-		                                          LOCAL_IF_HAVE_BITMASK(, &chunk_bm));
+		                                          LOCAL_BITMASK__ARGS);
 	}
 	LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                          src_x, src_y, src_size_x, src_size_y
@@ -483,7 +443,6 @@ LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit *__restrict self,
 #undef LOCAL_vbxo_blit
 #undef LOCAL_vbxo_stretch
 #undef LOCAL_HAVE_BITMASK
-#undef LOCAL_IF_HAVE_BITMASK
 #undef LOCAL_BITMASK__PARAMS
 #undef LOCAL_BITMASK__ARGS
 

@@ -79,22 +79,22 @@ static_assert((sizeof(struct video_gfx_xops) - offsetafter(struct video_gfx_xops
 
 #undef ASSERT_ABS_COORDS_IS_NOOP
 #if !defined(NDEBUG) && 0
-#define ASSERT_ABS_COORDS(self, x, y)                   \
+#define ASSERT_ABS_COORDS(self, x, y)                    \
 	(assertf((x) >= (self)->vx_bxmin &&                  \
 	         (x) < (self)->vx_bxend,                     \
-	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n" \
+	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
 	         "vx_bxmin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
 	         "vx_bxend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (x), (x),                                  \
-	         (self)->vx_bxmin, (self)->vx_bxmin,          \
-	         (self)->vx_bxend, (self)->vx_bxend),         \
+	         (x), (x),                                   \
+	         (self)->vx_bxmin, (self)->vx_bxmin,         \
+	         (self)->vx_bxend, (self)->vx_bxend),        \
 	 assertf((y) >= (self)->vx_bymin &&                  \
 	         (y) < (self)->vx_byend,                     \
-	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n" \
+	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
 	         "vx_bymin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
 	         "vx_byend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (y), (y),                                  \
-	         (self)->vx_bymin, (self)->vx_bymin,          \
+	         (y), (y),                                   \
+	         (self)->vx_bymin, (self)->vx_bymin,         \
 	         (self)->vx_byend, (self)->vx_byend))
 #else /* !NDEBUG */
 #define ASSERT_ABS_COORDS(self, x, y) (void)0
@@ -1174,7 +1174,7 @@ libvideo_gfx_generic__bitblit(struct video_blit *__restrict self,
                               video_coord_t src_x, video_coord_t src_y,
                               video_dim_t size_x, video_dim_t size_y,
                               struct video_bitmask const *__restrict bm) {
-	uintptr_t bitskip = bm->vbm_skip;
+	uintptr_t bitskip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 	TRACE_START("generic__bitblit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -1366,7 +1366,7 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit *__restrict self,
                                    video_coord_t src_x_, video_coord_t src_y_,
                                    video_dim_t src_size_x_, video_dim_t src_size_y_,
                                    struct video_bitmask const *__restrict bm) {
-	uintptr_t bitskip = bm->vbm_skip;
+	uintptr_t bitskip = bm->vbm_skip + src_x_ + src_y_ * bm->vbm_scan;
 	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
@@ -1491,6 +1491,7 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
+	uintptr_t bm_skip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 	TRACE_START("generic__bitstretch_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
@@ -1505,7 +1506,7 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit *__restrict self,
 		video_coord_t row_src_y = src_y + STRETCH_FP_WHOLE(src_pos_y);
 		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 		video_dim_t x = 0;
-		uintptr_t row_bitno = bm->vbm_skip + row_src_y * bm->vbm_scan;
+		uintptr_t row_bitno = bm_skip + row_src_y * bm->vbm_scan;
 		src_pos_x += STRETCH_FP(src_x);
 		do {
 			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
