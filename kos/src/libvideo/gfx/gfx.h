@@ -297,6 +297,20 @@ libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
 	}
 }
 
+
+/* Select appropriate operators for a video blit operations */
+LOCAL NONNULL((1)) void CC
+video_blit_setops(struct video_blit *__restrict ctx) {
+	/* Select operators based on wrapping flags of src/dst */
+	if (ctx->vb_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+		ctx->vb_ops = &libvideo_blit_generic_ops_wrap;
+	} else if (ctx->vb_src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
+		ctx->vb_ops = &libvideo_blit_generic_ops_rdwrap;
+	} else {
+		ctx->vb_ops = &libvideo_blit_generic_ops;
+	}
+}
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_H */

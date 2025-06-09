@@ -86,7 +86,10 @@ int main(int argc, char *argv[]) {
 	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDINFO_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    VIDEO_GFX_FNORMAL |
+	                    VIDEO_GFX_FRDXWRAP |
+	                    VIDEO_GFX_FRDYWRAP,
+	                    0);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -129,8 +132,35 @@ int main(int argc, char *argv[]) {
 	printk(KERN_DEBUG "SHOWPIC: BEGIN\n");
 	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	printk(KERN_DEBUG "SHOWPIC: START STRETCH\n");
-	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
-	                  &image_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
+	if (0) { /* Change to "1" to test the tiling engine of the non-stretching blit impl */
+		struct video_gfx sized_gfx;
+		struct video_buffer *sized_buffer;
+#if 0 /* Using this method, pixel conversion only happens once */
+		struct video_buffer *format_buf = screen_buffer_asvideo(screen);
+#else
+		struct video_buffer *format_buf = image;
+#endif
+		sized_buffer = video_buffer_create(VIDEO_BUFFER_AUTO,
+		                                   blit_w / 3,
+		                                   blit_h / 3,
+		                                   format_buf->vb_format.vf_codec,
+		                                   format_buf->vb_format.vf_pal);
+		video_buffer_getgfx(sized_buffer, &sized_gfx, image_gfx.vx_blend,
+		                    image_gfx.vx_flags, image_gfx.vx_colorkey);
+		video_gfx_stretch(&sized_gfx, 0, 0, sized_gfx.vx_cxsiz, sized_gfx.vx_cysiz,
+		                  &image_gfx, 0, 0, image_gfx.vx_cxsiz, image_gfx.vx_cysiz);
+		video_gfx_blit(&screen_gfx, blit_x, blit_y, &sized_gfx,
+		               sized_gfx.vx_cxsiz / 2, sized_gfx.vx_cysiz / 2,
+		               blit_w, blit_h);
+		video_buffer_decref(sized_buffer);
+	} else {
+		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
+		                  &image_gfx,
+		                  video_gfx_getclipw(&image_gfx) / 2,
+		                  video_gfx_getcliph(&image_gfx) / 2,
+		                  video_gfx_getclipw(&image_gfx) * 3,
+		                  video_gfx_getcliph(&image_gfx) * 3);
+	}
 	printk(KERN_DEBUG "SHOWPIC: END\n");
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 

@@ -117,7 +117,7 @@ INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
 LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
-	ctx->vb_ops = &libvideo_blit_generic_ops;
+	video_blit_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {

@@ -279,11 +279,178 @@ LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit *__restrict self,
                                        video_offset_t src_x, video_offset_t src_y,
                                        video_dim_t size_x, video_dim_t size_y
                                        LOCAL_BITMASK__PARAMS) {
+	/* Handle the case where "src" has read-wrapping enabled. */
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	/* TODO */
-	(void)dst;
-	(void)src;
+	video_dim_t src_maxsx = size_x; /* # of pixes after src_x before wrap */
+	video_dim_t src_maxsy = size_y; /* # of pixes after src_y before wrap */
+
+	if (src->vx_flags & VIDEO_GFX_FRDXWRAP) {
+		video_dim_t dst_endx;
+		/* Do some preliminary clamping on destination coords.
+		 * This is needed so  we can properly calculate  tiled
+		 * repeated when wrapping is enabled in "src". */
+		if unlikely(dst_x < 0) {
+			video_dim_t delta = (video_dim_t)-dst_x;
+			if (OVERFLOW_USUB(size_x, delta, &size_x))
+				return;
+			dst_x = 0;
+			src_x += delta;
+		}
+		if unlikely(OVERFLOW_UADD((video_coord_t)dst_x, size_x, &dst_endx) ||
+		            dst_endx > dst->vx_cxsiz) {
+			if unlikely((video_coord_t)dst_x >= dst->vx_cxsiz)
+				return;
+			size_x = dst->vx_cxsiz - (video_coord_t)dst_x;
+		}
+		src_x     = wrap(src_x, src->vx_cxsiz);
+		src_maxsx = src->vx_cxsiz - (video_coord_t)src_x;
+		assert(src_maxsx > 0);
+	}
+
+	if (src->vx_flags & VIDEO_GFX_FRDYWRAP) {
+		video_dim_t dst_endy;
+		/* Do some preliminary clamping on destination coords.
+		 * This is needed so  we can properly calculate  tiled
+		 * repeated when wrapping is enabled in "src". */
+		if unlikely(dst_y < 0) {
+			video_dim_t delta = (video_dim_t)-dst_y;
+			if (OVERFLOW_USUB(size_y, delta, &size_y))
+				return;
+			dst_y = 0;
+			src_y += delta;
+		}
+		if unlikely(OVERFLOW_UADD((video_coord_t)dst_y, size_y, &dst_endy) ||
+		            dst_endy > dst->vx_cysiz) {
+			if unlikely((video_coord_t)dst_y >= dst->vx_cysiz)
+				return;
+			size_y = dst->vx_cysiz - (video_coord_t)dst_y;
+		}
+		src_y     = wrap(src_y, src->vx_cysiz);
+		src_maxsy = src->vx_cysiz - (video_coord_t)src_y;
+		assert(src_maxsy > 0);
+	}
+
+	if ((size_x > src_maxsx) && (size_y > src_maxsy)) {
+		video_dim_t iter_size_x;
+		video_dim_t iter_size_y;
+		video_dim_t iter_dst_x;
+		video_dim_t iter_dst_y;
+		/* Must render the source graphic multiple times */
+
+		/* When  any pixel of "src" is read more than once, and "src" and "dst"
+		 * have different pixel formats, then try to convert the accessed pixel
+		 * area of "src" into the pixel format of "dst" to cut down on the # of
+		 * necessary color format conversions.
+		 *
+		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
+		 *       be accessed below needs to be copied! */
+		if ((size_x > src->vx_cxsiz || size_y > src->vx_cysiz) &&
+		    (src->vx_buffer->vb_format.vf_codec != dst->vx_buffer->vb_format.vf_codec ||
+		     src->vx_buffer->vb_format.vf_pal != dst->vx_buffer->vb_format.vf_pal)) {
+			/* TODO */
+		}
+
+		iter_size_y = size_y;
+		iter_dst_y  = dst_y;
+
+		/* Deal with unaligned tiles near the top */
+		if unlikely(src_maxsy < src->vx_cysiz) {
+			/* Top-left corner */
+			LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, src_y,
+			                                src_maxsx, src_maxsy LOCAL_BITMASK__ARGS);
+
+			/* Top bar */
+			iter_size_x = size_x - src_maxsx;
+			iter_dst_x = dst_x + src_maxsx;
+			while (iter_size_x > src->vx_cxsiz) {
+				LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
+				                                src->vx_cxsiz, src_maxsy LOCAL_BITMASK__ARGS);
+				iter_size_x -= src->vx_cxsiz;
+				iter_dst_x += src->vx_cxsiz;
+			}
+
+			/* Top-right corner */
+			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
+			                                iter_size_x, src_maxsy LOCAL_BITMASK__ARGS);
+			iter_size_y -= src_maxsy;
+			iter_dst_y  += src_maxsy;
+		}
+
+		/* Iterate whole rows */
+		while (iter_size_y >= src->vx_cysiz) {
+			/* Left side */
+			LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
+			                                src_maxsx, src->vx_cysiz LOCAL_BITMASK__ARGS);
+
+			/* Center */
+			iter_size_x = size_x - src_maxsx;
+			iter_dst_x = dst_x + src_maxsx;
+			while (iter_size_x > src->vx_cxsiz) {
+				LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+				                                src->vx_cxsiz, src->vx_cysiz LOCAL_BITMASK__ARGS);
+				iter_size_x -= src->vx_cxsiz;
+				iter_dst_x += src->vx_cxsiz;
+			}
+
+			/* Right side */
+			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+			                                iter_size_x, src->vx_cysiz LOCAL_BITMASK__ARGS);
+
+			iter_size_y -= src->vx_cysiz;
+			iter_dst_y += src->vx_cysiz;
+		}
+
+		if likely(!iter_size_y)
+			return;
+
+		/* Bottom-left corner */
+		LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
+		                                src_maxsx, iter_size_y LOCAL_BITMASK__ARGS);
+
+		/* Bottom bar */
+		iter_size_x = size_x - src_maxsx;
+		iter_dst_x = dst_x + src_maxsx;
+		while (iter_size_x > src->vx_cxsiz) {
+			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+			                                src->vx_cxsiz, iter_size_y LOCAL_BITMASK__ARGS);
+			iter_size_x -= src->vx_cxsiz;
+			iter_dst_x += src->vx_cxsiz;
+		}
+
+		/* Bottom-right corner (render via fallthru) */
+		dst_x  = iter_dst_x;
+		dst_y  = iter_dst_y;
+		src_x  = 0;
+		src_y  = 0;
+		size_x = iter_size_x;
+		size_y = iter_size_y;
+	} else if (size_x > src_maxsx) {
+		LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
+		                                src_maxsx, size_y LOCAL_BITMASK__ARGS);
+		size_x -= src_maxsx;
+		dst_x += src_maxsx;
+		while (size_x > src->vx_cxsiz) {
+			LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, 0, src_y,
+			                                src->vx_cxsiz, size_y LOCAL_BITMASK__ARGS);
+			size_x -= src->vx_cxsiz;
+			dst_x += src->vx_cxsiz;
+		}
+		src_x = 0; /* Fallthru to render the last part */
+	} else if (size_y > src_maxsy) {
+		LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
+		                                size_x, src_maxsy LOCAL_BITMASK__ARGS);
+		size_y -= src_maxsy;
+		dst_y += src_maxsy;
+		while (size_y > src->vx_cysiz) {
+			LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, 0,
+			                                size_x, src->vx_cysiz LOCAL_BITMASK__ARGS);
+			size_y -= src->vx_cysiz;
+			dst_y += src->vx_cysiz;
+		}
+		src_y = 0; /* Fallthru to render the last part */
+	}
+
 	LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
 	                                size_x, size_y LOCAL_BITMASK__ARGS);
 }
@@ -295,14 +462,281 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit *__restrict self,
                                           video_offset_t src_x, video_offset_t src_y,
                                           video_dim_t src_size_x, video_dim_t src_size_y
                                           LOCAL_BITMASK__PARAMS) {
+	/* Handle the case where "src" has read-wrapping enabled. */
+#define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
+#define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
+#define xsrc2dst(x) ((video_coord_t)(((uint64_t)(x) * dst_size_x) / src_size_x))
+#define ysrc2dst(y) ((video_coord_t)(((uint64_t)(y) * dst_size_y) / src_size_y))
 	struct video_gfx *dst = self->vb_dst;
 	struct video_gfx const *src = self->vb_src;
-	/* TODO */
-	(void)dst;
-	(void)src;
+	video_dim_t src_maxsx = src_size_x; /* # of pixes after src_x before wrap */
+	video_dim_t src_maxsy = src_size_y; /* # of pixes after src_y before wrap */
+
+	if (src->vx_flags & VIDEO_GFX_FRDXWRAP) {
+		video_dim_t dst_endx;
+		/* Do some preliminary clamping on destination coords.
+		 * This is needed so  we can properly calculate  tiled
+		 * repeated when wrapping is enabled in "src". */
+		if unlikely(dst_x < 0) {
+			video_dim_t delta = (video_dim_t)-dst_x;
+			video_dim_t new_dst_size_x;
+			if (OVERFLOW_USUB(dst_size_x, delta, &new_dst_size_x))
+				return;
+			src_size_x -= xdst2src(delta);
+			src_x += xdst2src(delta);
+			dst_size_x = new_dst_size_x;
+			dst_x = 0;
+		}
+		if unlikely(OVERFLOW_UADD((video_coord_t)dst_x, dst_size_x, &dst_endx) ||
+		            dst_endx > dst->vx_cxsiz) {
+			video_dim_t new_dst_size_x;
+			if unlikely((video_coord_t)dst_x >= dst->vx_cxsiz)
+				return;
+			new_dst_size_x = dst->vx_cxsiz - (video_coord_t)dst_x;
+			src_size_x -= xdst2src(dst_size_x - new_dst_size_x);
+			dst_size_x = new_dst_size_x;
+		}
+		src_x     = wrap(src_x, src->vx_cxsiz);
+		src_maxsx = src->vx_cxsiz - (video_coord_t)src_x;
+		assert(src_maxsx > 0);
+	}
+
+	if (src->vx_flags & VIDEO_GFX_FRDYWRAP) {
+		video_dim_t dst_endy;
+		/* Do some preliminary clamping on destination coords.
+		 * This is needed so  we can properly calculate  tiled
+		 * repeated when wrapping is enabled in "src". */
+		if unlikely(dst_y < 0) {
+			video_dim_t delta = (video_dim_t)-dst_y;
+			video_dim_t new_dst_size_y;
+			if (OVERFLOW_USUB(dst_size_y, delta, &new_dst_size_y))
+				return;
+			src_size_y -= ydst2src(delta);
+			src_y += ydst2src(delta);
+			dst_size_y = new_dst_size_y;
+			dst_y = 0;
+		}
+		if unlikely(OVERFLOW_UADD((video_coord_t)dst_y, dst_size_y, &dst_endy) ||
+		            dst_endy > dst->vx_cysiz) {
+			video_dim_t new_dst_size_y;
+			if unlikely((video_coord_t)dst_y >= dst->vx_cysiz)
+				return;
+			new_dst_size_y = dst->vx_cysiz - (video_coord_t)dst_y;
+			src_size_y -= ydst2src(dst_size_y - new_dst_size_y);
+			dst_size_y = new_dst_size_y;
+		}
+		src_y     = wrap(src_y, src->vx_cysiz);
+		src_maxsy = src->vx_cysiz - (video_coord_t)src_y;
+		assert(src_maxsy > 0);
+	}
+
+
+	if ((src_size_x > src_maxsx) && (src_size_y > src_maxsy)) {
+		video_dim_t firsttile_dst_size_x = xsrc2dst(src_maxsx);
+		video_dim_t firsttile_dst_size_y = ysrc2dst(src_maxsy);
+		video_coord_t iter_dst_x;
+		video_coord_t iter_dst_size_x;
+		video_coord_t iter_src_size_x;
+		video_coord_t iter_dst_y;
+		video_coord_t iter_dst_size_y;
+		video_coord_t iter_src_size_y;
+		video_dim_t xwholetiles_count = 0;
+		video_dim_t lasttile_dst_size_x = 0;
+		video_dim_t wholetiles_dst_size_x = 0;
+
+		/* When  any pixel of "src" is read more than once, and "src" and "dst"
+		 * have different pixel formats, then try to convert the accessed pixel
+		 * area of "src" into the pixel format of "dst" to cut down on the # of
+		 * necessary color format conversions.
+		 *
+		 * NOTE: Don't convert the entire "src" buffer; only the rect that will
+		 *       be accessed below needs to be copied! */
+		if ((src_size_x > src->vx_cxsiz || src_size_y > src->vx_cysiz) &&
+		    (src->vx_buffer->vb_format.vf_codec != dst->vx_buffer->vb_format.vf_codec ||
+		     src->vx_buffer->vb_format.vf_pal != dst->vx_buffer->vb_format.vf_pal)) {
+			/* TODO */
+		}
+
+		/* Deal with unaligned tiles near the top */
+
+		/* Top-left corner */
+		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, firsttile_dst_size_y,
+		                                   src_x, src_y, src_maxsx, src_maxsy LOCAL_BITMASK__ARGS);
+
+		/* Top bar */
+		iter_src_size_x = src_size_x - src_maxsx;
+		iter_dst_x      = dst_x + firsttile_dst_size_x;
+		iter_dst_size_x = dst_size_x - firsttile_dst_size_x;
+		if (iter_src_size_x > src->vx_cxsiz) {
+			video_coord_t base_dst_x;
+			video_coord_t xwholetiles_i;
+			xwholetiles_count = iter_src_size_x / src->vx_cxsiz;
+			lasttile_dst_size_x = xsrc2dst(iter_src_size_x % src->vx_cxsiz);
+			wholetiles_dst_size_x = iter_dst_size_x - lasttile_dst_size_x;
+			base_dst_x = iter_dst_x;
+			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
+				video_coord_t next_dst_x;
+				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
+				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, dst_y, next_dst_x - iter_dst_x, firsttile_dst_size_y,
+				                                   0, src_y, src->vx_cxsiz, src_maxsy LOCAL_BITMASK__ARGS);
+				iter_dst_x = next_dst_x;
+			}
+			iter_src_size_x %= src->vx_cxsiz;
+			iter_dst_size_x = lasttile_dst_size_x;
+		}
+
+		/* Top-right corner */
+		LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, dst_y, iter_dst_size_x, firsttile_dst_size_y,
+		                                   0, src_y, iter_src_size_x, src_maxsy LOCAL_BITMASK__ARGS);
+
+		/* Iterate whole rows */
+		iter_src_size_y = src_size_y - src_maxsy;
+		iter_dst_y      = dst_y + firsttile_dst_size_y;
+		iter_dst_size_y = dst_size_y - firsttile_dst_size_y;
+		if likely(iter_src_size_y >= src->vx_cysiz) {
+			video_coord_t ywholetiles_i;
+			video_dim_t ywholetiles_count = iter_src_size_y / src->vx_cysiz;
+			video_dim_t lasttile_dst_size_y = ysrc2dst(iter_src_size_y % src->vx_cysiz);
+			video_dim_t wholetiles_dst_size_y = iter_dst_size_y - lasttile_dst_size_y;
+			video_coord_t base_dst_y = iter_dst_y;
+			for (ywholetiles_i = 0; ywholetiles_i < ywholetiles_count; ++ywholetiles_i) {
+				video_coord_t next_dst_y;
+				video_dim_t tile_h;
+				next_dst_y = base_dst_y + (wholetiles_dst_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
+				tile_h = next_dst_y - iter_dst_y;
+
+				/* Left side */
+				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, tile_h,
+				                                   src_x, 0, src_maxsx, src->vx_cysiz LOCAL_BITMASK__ARGS);
+
+				/* Center (whole tiles) */
+				iter_src_size_x = src_size_x - src_maxsx;
+				iter_dst_x      = dst_x + firsttile_dst_size_x;
+				iter_dst_size_x = dst_size_x - firsttile_dst_size_x;
+				if (xwholetiles_count) {
+					video_coord_t base_dst_x = iter_dst_x;
+					video_coord_t xwholetiles_i = 0;
+					do {
+						video_coord_t next_dst_x;
+						next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
+						LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, tile_h,
+						                                   0, 0, src->vx_cxsiz, src->vx_cysiz LOCAL_BITMASK__ARGS);
+						iter_dst_x = next_dst_x;
+					} while (++xwholetiles_i < xwholetiles_count);
+					iter_src_size_x %= src->vx_cxsiz;
+					iter_dst_size_x = lasttile_dst_size_x;
+				}
+
+				/* Right side */
+				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, lasttile_dst_size_x, tile_h,
+				                                   0, 0, src_maxsx, src->vx_cysiz LOCAL_BITMASK__ARGS);
+
+				iter_dst_y = next_dst_y;
+			}
+			iter_src_size_y %= src->vx_cysiz;
+			iter_dst_size_y = lasttile_dst_size_y;
+		}
+		if likely(!iter_src_size_y)
+			return;
+
+		/* Bottom-left corner */
+		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, iter_dst_size_y,
+		                                   src_x, 0, src_maxsx, iter_src_size_y LOCAL_BITMASK__ARGS);
+
+		/* Bottom bar */
+		iter_src_size_x = src_size_x - src_maxsx;
+		iter_dst_x      = dst_x + firsttile_dst_size_x;
+		iter_dst_size_x = dst_size_x - firsttile_dst_size_x;
+		if (iter_src_size_x > src->vx_cxsiz) {
+			video_coord_t base_dst_x;
+			video_coord_t xwholetiles_i;
+			xwholetiles_count = iter_src_size_x / src->vx_cxsiz;
+			lasttile_dst_size_x = xsrc2dst(iter_src_size_x % src->vx_cxsiz);
+			wholetiles_dst_size_x = iter_dst_size_x - lasttile_dst_size_x;
+			base_dst_x = iter_dst_x;
+			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
+				video_coord_t next_dst_x;
+				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
+				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, iter_dst_size_y,
+				                                   0, 0, src->vx_cxsiz, iter_src_size_y LOCAL_BITMASK__ARGS);
+				iter_dst_x = next_dst_x;
+			}
+			iter_src_size_x %= src->vx_cxsiz;
+			iter_dst_size_x = lasttile_dst_size_x;
+		}
+
+		/* Bottom-right corner (render via fallthru) */
+		dst_x = iter_dst_x;
+		dst_y = iter_dst_y;
+		dst_size_x = iter_dst_size_x;
+		dst_size_y = iter_dst_size_y;
+		src_x = 0;
+		src_y = 0;
+		src_size_x = iter_src_size_x;
+		src_size_y = iter_src_size_y;
+	} else if (src_size_x > src_maxsx) {
+		video_dim_t firsttile_dst_size_x = xsrc2dst(src_maxsx);
+		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, dst_size_y,
+		                                   src_x, src_y, src_maxsx, src_size_y
+		                                   LOCAL_BITMASK__ARGS);
+		src_size_x -= src_maxsx;
+		dst_x += firsttile_dst_size_x;
+		dst_size_x -= firsttile_dst_size_x;
+		if (src_size_x > src->vx_cxsiz) {
+			/* Whole tiles */
+			video_coord_t xwholetiles_i;
+			video_dim_t xwholetiles_count = src_size_x / src->vx_cxsiz;
+			video_dim_t lasttile_dst_size_x = xsrc2dst(src_size_x % src->vx_cxsiz);
+			video_dim_t wholetiles_dst_size_x = dst_size_x - lasttile_dst_size_x;
+			video_coord_t base_dst_x = dst_x;
+			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
+				video_coord_t next_dst_x;
+				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
+				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, next_dst_x - dst_x, dst_size_y,
+				                                   0, src_y, src->vx_cxsiz, src_size_y
+				                                   LOCAL_BITMASK__ARGS);
+				dst_x = next_dst_x;
+			}
+			src_size_x %= src->vx_cxsiz;
+			dst_size_x = lasttile_dst_size_x;
+		}
+		src_x = 0; /* Fallthru to render the last part */
+	} else if (src_size_y > src_maxsy) {
+		video_dim_t firsttile_dst_size_y = ysrc2dst(src_maxsy);
+		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, firsttile_dst_size_y,
+		                                   src_x, src_y, src_size_x, src_maxsy
+		                                   LOCAL_BITMASK__ARGS);
+		src_size_y -= src_maxsy;
+		dst_y += firsttile_dst_size_y;
+		dst_size_y -= firsttile_dst_size_y;
+		if (src_size_y > src->vx_cysiz) {
+			/* Whole tiles */
+			video_coord_t ywholetiles_i;
+			video_dim_t ywholetiles_count = src_size_y / src->vx_cysiz;
+			video_dim_t lasttile_dst_size_y = ysrc2dst(src_size_y % src->vx_cysiz);
+			video_dim_t wholetiles_dst_size_y = dst_size_y - lasttile_dst_size_y;
+			video_coord_t base_dst_y = dst_y;
+			for (ywholetiles_i = 0; ywholetiles_i < ywholetiles_count; ++ywholetiles_i) {
+				video_coord_t next_dst_y;
+				next_dst_y = base_dst_y + (wholetiles_dst_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
+				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, next_dst_y - dst_y,
+				                                   src_x, 0, src_size_x, src->vx_cysiz
+				                                   LOCAL_BITMASK__ARGS);
+				dst_y = next_dst_y;
+			}
+			src_size_y %= src->vx_cysiz;
+			dst_size_y = lasttile_dst_size_y;
+		}
+		src_y = 0; /* Fallthru to render the last part */
+	}
+
 	LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                   src_x, src_y, src_size_x, src_size_y
 	                                   LOCAL_BITMASK__ARGS);
+#undef xdst2src
+#undef ydst2src
+#undef xsrc2dst
+#undef ysrc2dst
 }
 
 
@@ -313,6 +747,7 @@ LOCAL_libvideo_gfx_generic_blit_wrap(struct video_blit *__restrict self,
                                      video_offset_t src_x, video_offset_t src_y,
                                      video_dim_t size_x, video_dim_t size_y
                                      LOCAL_BITMASK__PARAMS) {
+	/* Handle the case where "dst" has write-wrapping enabled. */
 	struct video_gfx *dst = self->vb_dst;
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
@@ -365,6 +800,7 @@ LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit *__restrict self,
                                         video_offset_t src_x, video_offset_t src_y,
                                         video_dim_t src_size_x, video_dim_t src_size_y
                                         LOCAL_BITMASK__PARAMS) {
+	/* Handle the case where "dst" has write-wrapping enabled. */
 	struct video_gfx *dst = self->vb_dst;
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
