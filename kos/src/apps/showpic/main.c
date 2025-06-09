@@ -89,38 +89,38 @@ int main(int argc, char *argv[]) {
 	                    VIDEO_GFX_FNORMAL, 0);
 
 	/* Calculate where the image should be displayed */
-	blit_w = video_gfx_sizex(&image_gfx);
-	blit_h = video_gfx_sizey(&image_gfx);
-	if (blit_w > video_gfx_sizex(&screen_gfx)) {
+	blit_w = video_gfx_getclipw(&image_gfx);
+	blit_h = video_gfx_getcliph(&image_gfx);
+	if (blit_w > video_gfx_getclipw(&screen_gfx)) {
 		size_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w / (blit_w / blit_h) = new_blit_h;
 		 * >> new_blit_h = new_blit_w / (blit_w / blit_h);
 		 * >> new_blit_h = (new_blit_w * blit_h) / blit_w; */
-		new_blit_w = video_gfx_sizex(&screen_gfx);
+		new_blit_w = video_gfx_getclipw(&screen_gfx);
 		new_blit_h = ((uint64_t)new_blit_w * blit_h) / blit_w;
 		blit_w = new_blit_w;
 		blit_h = new_blit_h;
 	}
 
-	if (blit_h > video_gfx_sizey(&screen_gfx)) {
+	if (blit_h > video_gfx_getcliph(&screen_gfx)) {
 		size_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w = (blit_w * new_blit_h) / blit_h; */
-		new_blit_h = video_gfx_sizey(&screen_gfx);
+		new_blit_h = video_gfx_getcliph(&screen_gfx);
 		new_blit_w = ((uint64_t)blit_w * new_blit_h) / blit_h;
 		blit_w = new_blit_w;
 		blit_h = new_blit_h;
 	}
 
-	blit_x = (video_gfx_sizex(&screen_gfx) - blit_w) / 2;
-	blit_y = (video_gfx_sizey(&screen_gfx) - blit_h) / 2;
+	blit_x = (video_gfx_getclipw(&screen_gfx) - blit_w) / 2;
+	blit_y = (video_gfx_getcliph(&screen_gfx) - blit_h) / 2;
 
 #if 0
-	blit_w = video_gfx_sizex(&screen_gfx);
-	blit_h = video_gfx_sizey(&screen_gfx);
+	blit_w = video_gfx_getclipw(&screen_gfx);
+	blit_h = video_gfx_getcliph(&screen_gfx);
 	blit_x = 0;
 	blit_y = 0;
 #endif

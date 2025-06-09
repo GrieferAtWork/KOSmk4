@@ -47,9 +47,13 @@
 #define VIDEO_GFX_FNEARESTBLIT 0x0000 /* [WRITE] Use nearest interpolation for stretch() */
 #define VIDEO_GFX_FLINEARBLIT  0x0001 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
 #define VIDEO_GFX_FAALINES     0x0002 /* [WRITE] Render smooth lines. */
-#define VIDEO_GFX_FBLUR        0x0004 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
+#define VIDEO_GFX_FWRXWRAP     0x0004 /* [WRITE] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
+#define VIDEO_GFX_FWRYWRAP     0x0008 /* [WRITE] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
+#define VIDEO_GFX_FBLUR        0x0100 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
                                        *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                        * The behavior is weak undefined if this flag is used alongside a non-zero color key */
+#define VIDEO_GFX_FRDXWRAP     0x0400 /* [READ]  X coords <0 or >=width wrap to the other side during reads (else: coords are clamped) */
+#define VIDEO_GFX_FRDYWRAP     0x0800 /* [READ]  Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
 
 
 #ifdef __CC__
@@ -85,7 +89,7 @@ struct video_blit;
 struct video_bitmask {
 	void const *vbm_mask; /* [1..1] Bitmask base pointer */
 	__uintptr_t vbm_skip; /* # of leading bits to skip */
-	__size_t    vbm_scan; /* # of bits to move ahead */
+	__size_t    vbm_scan; /* # of bits that make up a scanline */
 };
 
 
@@ -491,23 +495,63 @@ struct video_gfx {
 	gfx_blendmode_t             vx_blend;    /* [const] Blending mode. */
 	__uintptr_t                 vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
-	video_offset_t              vx_offt_x;   /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
-	video_offset_t              vx_offt_y;   /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
-	video_coord_t               vx_xmin;     /* [const] == vx_offt_x <= 0 ? 0 : vx_offt_x */
-	video_coord_t               vx_ymin;     /* [const] == vx_offt_y <= 0 ? 0 : vx_offt_y */
-	video_coord_t               vx_xend;     /* [const] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
-	video_coord_t               vx_yend;     /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
+	/* Clip rect area (pixel area used for pixel clamping/wrapping, and accepted):
+	 * >> +---------------------------------+
+	 * >> | Buffer                          |
+	 * >> |                                 |
+	 * >> |   +-----------------------+.......................+
+	 * >> |   | Clip Rect             | Clip Rect             .
+	 * >> |   |                       | (VIDEO_GFX_FRDXWRAP)  .
+	 * >> |   |                       | (VIDEO_GFX_FWRXWRAP)  .
+	 * >> |   |  +-----------------+  |                       .
+	 * >> |   |  | I/O Area        |  |                       .
+	 * >> |   |  |                 |  |                       .
+	 * >> |   |  +-----------------+  |                       .
+	 * >> |   |                       |                       .
+	 * >> |   +-----------------------+.......................+
+	 * >> |                                 |
+	 * >> +---------------------------------+
+	 *
+	 * Coords of these rects are (in absolute "video_coord_t" coords):
+	 * - Buffer:    {xy: {0,0}, wh: {vx_buffer->vb_size_x,vx_buffer->vb_size_y}}
+	 * - Clip Rect: {xy: {vx_cxoff,vx_cyoff}, wh: {vx_cxsiz,vx_cysiz}}
+	 * - I/O Area:  {xy: {vx_bxmin,vx_bymin}, wh: {vx_bxsiz,vx_bysiz}}
+	 *
+	 * When using any of the  publicly exposed functions, you always  operate
+	 * in the coord-space defined by the "Clip Rect", with pixel reads/writes
+	 * restricted to those within the "I/O Area". Pixel coords that go beyond
+	 * the "Clip Rect", are either clamped, or wrapped (based on the size  of
+	 * the "Clip Rect"), before then being  clamped again to the  "I/O Area".
+	 * You might notice that when pixel wrapping is disabled, the first clamp
+	 * can (and is) skipped.
+	 *
+	 * When changing the clip rect, coords are still relative to the old  clip
+	 * rect, but negative  coords can  be given to  make the  clip rect  grow.
+	 * However, the "I/O Area"  is always the  intersection of "Buffer",  with
+	 * any "Clip Rect" ever  set for  the GFX  context, meaning  it cannot  be
+	 * made to grow without obtaining a fresh GFX context (which always starts
+	 * out with all 3 areas set to match each other). */
+	video_offset_t              vx_cxoff;    /* [const] Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
+	video_offset_t              vx_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
+	video_dim_t                 vx_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	video_dim_t                 vx_cysiz;    /* [const] Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
+	/* Buffer I/O area: these values control the (absolute) pixel area where read/writes do something */
+	video_coord_t               vx_bxmin;    /* [const][<= vx_bxend][>= vx_cxoff] Absolute buffer start coord in X (start of acc) */
+	video_coord_t               vx_bymin;    /* [const][<= vx_byend][>= vx_cyoff] Absolute buffer start coord in Y */
+	video_coord_t               vx_bxend;    /* [const][<= vx_buffer->vb_size_x] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
+	video_coord_t               vx_byend;    /* [const][<= vx_buffer->vb_size_y] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
+//	video_dim_t                 vx_bxsiz;    /* [const][== vx_bxend - vx_bxmin][<= vx_cxsiz] Absolute buffer I/O width */
+//	video_dim_t                 vx_bysiz;    /* [const][== vx_byend - vx_bymin][<= vx_cysiz] Absolute buffer I/O height */
 	struct video_gfx_xops       vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
 #define _VIDEO_GFX_N_DRIVER 4
 	void *vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */
 
 	/* Return the API-visible clip rect offset in X or Y */
-#define video_gfx_startx(self) (self)->vx_offt_x
-#define video_gfx_starty(self) (self)->vx_offt_y
+#define video_gfx_getclipx(self) (self)->vx_cxoff
+#define video_gfx_getclipy(self) (self)->vx_cyoff
 	/* Return the API-visible clip rect size in X or Y */
-#define video_gfx_sizex(self)  ((video_dim_t)((video_coord_t)(self)->vx_xend - (self)->vx_offt_x))
-#define video_gfx_sizey(self)  ((video_dim_t)((video_coord_t)(self)->vx_yend - (self)->vx_offt_y))
-
+#define video_gfx_getclipw(self) (self)->vx_cxsiz
+#define video_gfx_getcliph(self) (self)->vx_cysiz
 
 #define video_gfx_clip(self, start_x, start_y, size_x, size_y) \
 	(*(self)->vx_ops->fxo_clip)(self, start_x, start_y, size_x, size_y)

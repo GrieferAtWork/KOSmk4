@@ -20,11 +20,12 @@
 #ifndef _LIBVIDEO_CODEC_TYPES_H
 #define _LIBVIDEO_CODEC_TYPES_H 1
 
+#include "api.h"
+
 #include <__stdinc.h>
 
+#include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
-
-#include "api.h"
 
 /* Sizes of video types. */
 #define __SIZEOF_VIDEO_OFFSET_T__ 4
@@ -37,7 +38,9 @@
  * argument in graphics operations, when the operation
  * should reach the  right/bottom edge  of the  active
  * clip region. */
-#define VIDEO_DIM_MAX ((video_dim_t)-1)
+#define VIDEO_DIM_MAX    __UINT32_MAX__
+#define VIDEO_COORD_MAX  __UINT32_MAX__
+#define VIDEO_OFFSET_MAX __INT32_MAX__
 
 #ifdef __CC__
 __DECL_BEGIN

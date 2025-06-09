@@ -69,23 +69,23 @@ DECL_BEGIN
 #define RAMGFX_STRIDE (size_t)self->vx_driver[RAMGFX_DRIVER__STRIDE]
 
 #if !defined(NDEBUG) && 1
-#define ASSERT_ABS_COORDS(self, x, y)                   \
-	(assertf((x) >= (self)->vx_xmin &&                  \
-	         (x) < (self)->vx_xend,                     \
-	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_xmin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_xend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (x), (x),                                  \
-	         (self)->vx_xmin, (self)->vx_xmin,          \
-	         (self)->vx_xend, (self)->vx_xend),         \
-	 assertf((y) >= (self)->vx_ymin &&                  \
-	         (y) < (self)->vx_yend,                     \
-	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_ymin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_yend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (y), (y),                                  \
-	         (self)->vx_ymin, (self)->vx_ymin,          \
-	         (self)->vx_yend, (self)->vx_yend))
+#define ASSERT_ABS_COORDS(self, x, y)                    \
+	(assertf((x) >= (self)->vx_bxmin &&                  \
+	         (x) < (self)->vx_bxend,                     \
+	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
+	         "vx_bxmin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
+	         "vx_bxend = %" PRIuCRD " (%#" PRIxCRD ")",  \
+	         (x), (x),                                   \
+	         (self)->vx_bxmin, (self)->vx_bxmin,         \
+	         (self)->vx_bxend, (self)->vx_bxend),        \
+	 assertf((y) >= (self)->vx_bymin &&                  \
+	         (y) < (self)->vx_byend,                     \
+	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
+	         "vx_bymin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
+	         "vx_byend = %" PRIuCRD " (%#" PRIxCRD ")",  \
+	         (y), (y),                                   \
+	         (self)->vx_bymin, (self)->vx_bymin,         \
+	         (self)->vx_byend, (self)->vx_byend))
 #else /* !NDEBUG */
 #define ASSERT_ABS_COORDS(self, x, y) (void)0
 #endif /* NDEBUG */
@@ -94,7 +94,7 @@ DECL_BEGIN
 /* GFX functions for memory-based video buffers (without GPU support) */
 INTERN NONNULL((1)) video_color_t CC
 libvideo_ramgfx__getcolor_noblend(struct video_gfx const *__restrict self,
-                                      video_coord_t x, video_coord_t y) {
+                                  video_coord_t x, video_coord_t y) {
 	byte_t *line;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
@@ -103,7 +103,7 @@ libvideo_ramgfx__getcolor_noblend(struct video_gfx const *__restrict self,
 
 INTERN NONNULL((1)) video_color_t CC
 libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self,
-                                       video_coord_t x, video_coord_t y) {
+                                   video_coord_t x, video_coord_t y) {
 	byte_t *line;
 	video_color_t result;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -116,8 +116,8 @@ libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_ramgfx__putcolor(struct video_gfx *__restrict self,
-                              video_coord_t x, video_coord_t y,
-                              video_color_t color) {
+                          video_coord_t x, video_coord_t y,
+                          video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	video_color_t o, n;
@@ -132,8 +132,8 @@ libvideo_ramgfx__putcolor(struct video_gfx *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_ramgfx__putcolor_noblend(struct video_gfx *__restrict self,
-                                      video_coord_t x, video_coord_t y,
-                                      video_color_t color) {
+                                  video_coord_t x, video_coord_t y,
+                                  video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -144,8 +144,8 @@ libvideo_ramgfx__putcolor_noblend(struct video_gfx *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_ramgfx__putcolor_alphablend(struct video_gfx *__restrict self,
-                                         video_coord_t x, video_coord_t y,
-                                         video_color_t color) {
+                                     video_coord_t x, video_coord_t y,
+                                     video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	video_color_t o, n;
@@ -159,7 +159,7 @@ libvideo_ramgfx__putcolor_alphablend(struct video_gfx *__restrict self,
 
 INTERN NONNULL((1)) video_pixel_t CC
 libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
-                              video_coord_t x, video_coord_t y) {
+                          video_coord_t x, video_coord_t y) {
 	byte_t const *line;
 	struct video_buffer *buffer;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -170,8 +170,8 @@ libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_ramgfx__setpixel(struct video_gfx *__restrict self,
-                              video_coord_t x, video_coord_t y,
-                              video_pixel_t pixel) {
+                          video_coord_t x, video_coord_t y,
+                          video_pixel_t pixel) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -182,24 +182,24 @@ libvideo_ramgfx__setpixel(struct video_gfx *__restrict self,
 
 
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
-#define DEFINE_RAMGFX_GETSETPIXELn(n)                                         \
-	INTERN NONNULL((1)) video_pixel_t CC                                      \
+#define DEFINE_RAMGFX_GETSETPIXELn(n)                                     \
+	INTERN NONNULL((1)) video_pixel_t CC                                  \
 	libvideo_ramgfx__getpixel##n(struct video_gfx const *__restrict self, \
-	                                video_coord_t x, video_coord_t y) {       \
-		byte_t *line;                                                         \
-		ASSERT_ABS_COORDS(self, x, y);                                        \
-		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                               \
-		return ((uint##n##_t const *)line)[x];                                \
-	}                                                                         \
-	                                                                          \
-	INTERN NONNULL((1)) void CC                                               \
+	                             video_coord_t x, video_coord_t y) {      \
+		byte_t *line;                                                     \
+		ASSERT_ABS_COORDS(self, x, y);                                    \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                           \
+		return ((uint##n##_t const *)line)[x];                            \
+	}                                                                     \
+	                                                                      \
+	INTERN NONNULL((1)) void CC                                           \
 	libvideo_ramgfx__setpixel##n(struct video_gfx *__restrict self,       \
-	                                video_coord_t x, video_coord_t y,         \
-	                                video_pixel_t pixel) {                    \
-		byte_t *line;                                                         \
-		ASSERT_ABS_COORDS(self, x, y);                                        \
-		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                               \
-		((uint##n##_t *)line)[x] = pixel;                                     \
+	                             video_coord_t x, video_coord_t y,        \
+	                             video_pixel_t pixel) {                   \
+		byte_t *line;                                                     \
+		ASSERT_ABS_COORDS(self, x, y);                                    \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                           \
+		((uint##n##_t *)line)[x] = pixel;                                 \
 	}
 DEFINE_RAMGFX_GETSETPIXELn(8)
 DEFINE_RAMGFX_GETSETPIXELn(16)
@@ -213,7 +213,7 @@ union pixel24 {
 
 INTERN NONNULL((1)) video_pixel_t CC
 libvideo_ramgfx__getpixel24(struct video_gfx const *__restrict self,
-                                video_coord_t x, video_coord_t y) {
+                            video_coord_t x, video_coord_t y) {
 	union pixel24 result;
 	byte_t const *line;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -228,8 +228,8 @@ libvideo_ramgfx__getpixel24(struct video_gfx const *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libvideo_ramgfx__setpixel24(struct video_gfx *__restrict self,
-                                video_coord_t x, video_coord_t y,
-                                video_pixel_t pixel) {
+                            video_coord_t x, video_coord_t y,
+                            video_pixel_t pixel) {
 	union pixel24 data;
 	byte_t *line;
 	ASSERT_ABS_COORDS(self, x, y);
@@ -292,12 +292,7 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	result->vx_colorkey = colorkey;
 	result->vx_driver[RAMGFX_DRIVER__DATA]   = me->vb_data;
 	result->vx_driver[RAMGFX_DRIVER__STRIDE] = (void *)(uintptr_t)me->vb_stride;
-	result->vx_offt_x = 0;
-	result->vx_offt_y = 0;
-	result->vx_xmin   = 0;
-	result->vx_ymin   = 0;
-	result->vx_xend   = me->vb_size_x;
-	result->vx_yend   = me->vb_size_y;
+	libvideo_gfx_init_fullclip(result);
 
 	/* Default pixel accessors */
 	result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel;

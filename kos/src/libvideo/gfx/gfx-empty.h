@@ -80,12 +80,12 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(vo
 /* Assign "empty" operators to "self". Initializes:
  * - self->vx_xops.*
  * - self->vx_ops
- * - self->vx_offt_x
- * - self->vx_offt_y
- * - self->vx_xmin
- * - self->vx_ymin
- * - self->vx_xend
- * - self->vx_yend */
+ * - self->vx_cxoff
+ * - self->vx_cyoff
+ * - self->vx_bxmin
+ * - self->vx_bymin
+ * - self->vx_bxend
+ * - self->vx_byend */
 INTDEF NONNULL((1)) void CC libvideo_gfx_setempty(struct video_gfx *__restrict self);
 
 DECL_END

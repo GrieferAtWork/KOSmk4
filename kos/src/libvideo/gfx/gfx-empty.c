@@ -331,12 +331,12 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(vo
 /* Assign "empty" operators to "self". Initializes:
  * - self->vx_xops.*
  * - self->vx_ops
- * - self->vx_offt_x
- * - self->vx_offt_y
- * - self->vx_xmin
- * - self->vx_ymin
- * - self->vx_xend
- * - self->vx_yend */
+ * - self->vx_cxoff
+ * - self->vx_cyoff
+ * - self->vx_bxmin
+ * - self->vx_bymin
+ * - self->vx_bxend
+ * - self->vx_byend */
 INTERN NONNULL((1)) void CC
 libvideo_gfx_setempty(struct video_gfx *__restrict self) {
 	self->vx_xops.vgxo_blitfrom       = &libvideo_gfx_empty__blitfrom;
@@ -351,14 +351,7 @@ libvideo_gfx_setempty(struct video_gfx *__restrict self) {
 	self->vx_xops.vgxo_absfill        = &libvideo_gfx_empty__absfill;
 	self->vx_xops.vgxo_bitfill        = &libvideo_gfx_empty__bitfill;
 	self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_empty__bitstretchfill;
-
-	self->vx_ops    = &libvideo_gfx_empty_ops;
-	self->vx_offt_x = 0;
-	self->vx_offt_y = 0;
-	self->vx_xmin   = 0;
-	self->vx_ymin   = 0;
-	self->vx_xend   = 0;
-	self->vx_yend   = 0;
+	self->vx_ops = &libvideo_gfx_empty_ops;
 }
 
 DECL_END
