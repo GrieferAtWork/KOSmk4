@@ -3396,9 +3396,9 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 @@functionality, such as deleting  typed characters without relying  on
 @@the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
 @@since it doesn't include support  for _any_ control characters  other
-@@that CR/LF as indicators to stop reading text)
-@@Which of the 2 functions should be used is a matter of taste, but
-@@personally,   I   prefer  this   one   over  `readpassphrase(3)'.
+@@than CR/LF as indicators to stop reading text)
+@@Which of the 2 functions should be used is a matter of taste,
+@@but  personally, I prefer  this one over `readpassphrase(3)'.
 @@@param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
 @@@param: buf:     [0..buflen] Buffer that will receive the user's password.
 @@                             When set to  `NULL', a dynamically  allocated

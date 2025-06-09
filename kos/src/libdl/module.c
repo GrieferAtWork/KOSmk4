@@ -487,7 +487,7 @@ NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(NCX DlModule *self)
 				++result;
 		} else {
 			/* Lastly,  we can figure out the # of symbols by looking
-			 * as  section headers. We only do this as a last resort,
+			 * at  section headers. We only do this as a last resort,
 			 * since  the presence of  section headers isn't actually
 			 * something that would be necessary to parse in a normal
 			 * ELF binary, and as such  KOS's libdl tries to make  as

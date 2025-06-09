@@ -191,7 +191,7 @@ PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *locs = NULL; /* NOTE: N
 
 
 /************************************************************************/
-/* Symbols for compatibility with libc4/5                                */
+/* Symbols for compatibility with libc4/5                               */
 /************************************************************************/
 INTERN ATTR_SECTION(".bss.crt.compat.glibc.regex")
 char const *libc_re_error_msg[__REG_ECOUNT] = {}; /* "libc-5.4.7/libc/regex/rx.c:3922" */

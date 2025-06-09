@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x749206d4 */
+/* HASH CRC-32:0xef844e10 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3938,9 +3938,9 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
  * functionality, such as deleting  typed characters without relying  on
  * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
  * since it doesn't include support  for _any_ control characters  other
- * that CR/LF as indicators to stop reading text)
- * Which of the 2 functions should be used is a matter of taste, but
- * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
+ * than CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste,
+ * but  personally, I prefer  this one over `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
  *                              When set to  `NULL', a dynamically  allocated
@@ -3981,9 +3981,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),ch
  * functionality, such as deleting  typed characters without relying  on
  * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
  * since it doesn't include support  for _any_ control characters  other
- * that CR/LF as indicators to stop reading text)
- * Which of the 2 functions should be used is a matter of taste, but
- * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
+ * than CR/LF as indicators to stop reading text)
+ * Which of the 2 functions should be used is a matter of taste,
+ * but  personally, I prefer  this one over `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
  *                              When set to  `NULL', a dynamically  allocated

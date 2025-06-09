@@ -2823,6 +2823,10 @@
 #define __NRFEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
 #define __NR32FEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
 #define __NR64FEAT_SYSCALL_TABLE_FOREACH(c)c(0)c(1)
+#define REGEX_DATA
+#define REGEX_RODATA
+#define REGEX_BSS
+#define DEFINE_REGEX_BINDING(T,name) T pdyn_##name=0;char const name_##name[]=#name
 
 #define USER_TRY
 #define USER_EXCEPT(x)
