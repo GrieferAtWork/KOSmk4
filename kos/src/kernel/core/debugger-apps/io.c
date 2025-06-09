@@ -395,9 +395,16 @@ DBG_COMMAND(trace,
 #else
 #define SP_ARGS NULL
 #endif
-	dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
-	                                             fcpustate_getisa(&state)),
-	                     fcpustate_getpc(&state), SP_ARGS);
+
+	if (dbg_rt_attrap(DBG_RT_REGLEVEL_VIEW)) {
+		void *nextpc = dbg_instruction_trysucc(fcpustate_getpc(&state), fcpustate_getisa(&state));
+		dbg_addr2line_printf(fcpustate_getpc(&state), nextpc, SP_ARGS);
+		fcpustate_setpc(&state, nextpc);
+	} else {
+		dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
+		                                             fcpustate_getisa(&state)),
+		                     fcpustate_getpc(&state), SP_ARGS);
+	}
 	for (;;) {
 		struct fcpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct fcpustate));
@@ -462,10 +469,13 @@ DBG_COMMAND(u,
             "\tUnwind the current source location to its call-site\n") {
 	struct fcpustate oldstate, newstate;
 	unwind_errno_t error;
-	void const *final_pc;
+	void const *final_pc, *old_pc;
 	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
-	error = unwind_for_debug(fcpustate_getpc(&oldstate) - 1,
+	old_pc = fcpustate_getpc(&oldstate);
+	if (!dbg_rt_attrap(DBG_RT_REGLEVEL_VIEW))
+		old_pc = (byte_t const *)old_pc - 1;
+	error = unwind_for_debug(old_pc,
 	                         &unwind_getreg_fcpustate, &oldstate,
 	                         &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {

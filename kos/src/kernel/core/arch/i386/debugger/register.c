@@ -988,7 +988,7 @@ ok:
 /* Get/set all registers. */
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_rt_getallregs)(unsigned int level,
-                              struct fcpustate *__restrict state) {
+                                 struct fcpustate *__restrict state) {
 	switch (level) {
 
 	case DBG_RT_REGLEVEL_EXIT:

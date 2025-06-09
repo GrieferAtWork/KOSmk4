@@ -114,8 +114,9 @@ FUNDEF unwind_errno_t NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void 
 
 /* Return the fault program counter position
  * That is: the address of the last-executed instruction */
-#define dbg_getfaultpcreg(level) \
-	dbg_instruction_trypred(dbg_getpcreg(level), dbg_rt_getisa(level))
+#define dbg_getfaultpcreg(level)                          \
+	(dbg_rt_attrap(level) ? (byte_t *)dbg_getpcreg(level) \
+	                      : dbg_instruction_trypred(dbg_getpcreg(level), dbg_rt_getisa(level)))
 
 
 LOCAL uintptr_t
@@ -180,6 +181,11 @@ FUNDEF void NOTHROW(KCALL dbg_rt_setallregs)(unsigned int level, struct fcpustat
 FUNDEF ATTR_PURE WUNUSED isa_t
 NOTHROW(KCALL dbg_rt_getisa)(unsigned int level);
 
+/* Check if "level"s PC points *at* the faulting instruction (rather than after it) */
+FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_rt_attrap)(unsigned int level);
+
+
+
 /* Return the page directory of `dbg_current' */
 FUNDEF ATTR_PURE WUNUSED pagedir_phys_t NOTHROW(KCALL dbg_rt_getpagedir)(void);
 
@@ -227,7 +233,6 @@ FUNDEF void NOTHROW(FCALL dbg_rt_applyview)(void);
 
 /* Check if the register view has been changed. */
 FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_rt_changedview)(void);
-
 #endif /* __CC__ */
 
 
@@ -401,6 +406,9 @@ DATDEF void *dbg_rt_trapstate;
 
 /* The kind of state stored in `dbg_rt_trapstate' (one of `DBG_RT_STATEKIND_*') */
 DATDEF unsigned int dbg_rt_trapstatekind;
+
+/* Set to true if `dbg_rt_trapstate' points *at* the faulting instruction */
+DATDEF bool dbg_rt_trapstate_istrap;
 #endif /* __CC__ */
 
 

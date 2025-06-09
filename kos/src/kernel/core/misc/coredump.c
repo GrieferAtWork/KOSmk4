@@ -102,6 +102,16 @@ dbg_coredump(void const *const *traceback_vector,
 	isa_t isa;
 	void const *current_pc;
 	/* We are now in debugger-mode. */
+
+	/* Determine if "unwind_error" / "reason" is indicative of a trap */
+	if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
+		void const *trap_pc  = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
+		void const *fault_pc = reason->ci_except.e_faultaddr;
+		dbg_rt_trapstate_istrap = (trap_pc == fault_pc);
+	} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
+		/* TODO: Signals can trap! */
+	}
+
 	dbg_savecolor();
 	/* If the kernel hasn't been poisoned, tell the user that they are
 	 * free to CTRL+D the debugger to resume normal system operations. */
@@ -186,13 +196,24 @@ dbg_coredump(void const *const *traceback_vector,
 		                     instruction_trysucc(ktraceback_vector[tbi], isa),
 		                     DBGSTR("ktraceback_vector[%" PRIuSIZ "]"), tbi);
 	}
+
 	isa = ucpustate_getisa(orig_ustate);
-	dbg_addr2line_printf(ucpustate_getpc(orig_ustate),
-	                     instruction_trysucc(ucpustate_getpc(orig_ustate), isa),
-	                     DBGSTR("orig_ustate"));
+	{
+		void const *ous_pc = ucpustate_getpc(orig_ustate);
+		if (dbg_rt_trapstate_istrap &&
+		    ous_pc == dbg_getpcreg(DBG_RT_REGLEVEL_TRAP)) {
+			dbg_addr2line_printf(ous_pc,
+			                     instruction_trysucc(ous_pc, isa),
+			                     DBGSTR("orig_ustate"));
+		} else {
+			dbg_addr2line_printf(instruction_trypred(ous_pc, isa),
+			                     ous_pc,
+			                     DBGSTR("orig_ustate"));
+		}
+	}
 	for (tbi = 0; tbi < traceback_length; ++tbi) {
-		dbg_addr2line_printf(traceback_vector[tbi],
-		                     instruction_trysucc(traceback_vector[tbi], isa),
+		dbg_addr2line_printf(instruction_trypred(traceback_vector[tbi], isa),
+		                     traceback_vector[tbi],
 		                     DBGSTR("traceback_vector[%" PRIuSIZ "]"),
 		                     tbi);
 	}

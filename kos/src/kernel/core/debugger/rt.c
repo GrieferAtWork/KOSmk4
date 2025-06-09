@@ -74,6 +74,11 @@ PUBLIC ATTR_DBGBSS struct cpu *dbg_cpu_ = NULL;
 /* DBG trap state information. */
 PUBLIC ATTR_DBGBSS void *dbg_rt_trapstate            = NULL;
 PUBLIC ATTR_DBGBSS unsigned int dbg_rt_trapstatekind = DBG_RT_STATEKIND_NONE;
+PUBLIC ATTR_DBGBSS bool dbg_rt_trapstate_istrap      = false;
+
+DBG_INIT(reset_dbg_rt_trapstate_istrap) {
+	dbg_rt_trapstate_istrap = false;
+}
 
 
 /* Apply changes made to `DBG_RT_REGLEVEL_VIEW' onto `DBG_RT_REGLEVEL_ORIG'. */
@@ -207,6 +212,26 @@ NOTHROW(KCALL dbg_rt_getisa)(unsigned int level) {
 	result = fcpustate_getisa(&cs);
 	return result;
 }
+
+
+/* Check if "level"s PC points *at* the faulting instruction (rather than after it) */
+PUBLIC ATTR_PURE WUNUSED bool
+NOTHROW(FCALL dbg_rt_attrap)(unsigned int level) {
+	if (dbg_current != THIS_TASK)
+		return true; /* All other threads were interrupted -> their PCs point *at* their next instr */
+	switch (level) {
+	case DBG_RT_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_ORIG:
+		return dbg_rt_trapstate_istrap;
+	case DBG_RT_REGLEVEL_VIEW:
+		return dbg_rt_trapstate_istrap && !dbg_rt_changedview();
+	case DBG_RT_REGLEVEL_EXIT:
+	default:
+		return false;
+	}
+	__builtin_unreachable();
+}
+
 
 
 DECL_END
