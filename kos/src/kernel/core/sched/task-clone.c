@@ -757,10 +757,10 @@ again_release_kernel_and_cc:
 		/************************************************************************/
 
 		/* NOTE: The  act of making a new thread visible must be done in such a
-		 *       way that we are holding all  relevant longs at the same  time,
+		 *       way that we are holding all  relevant locks at the same  time,
 		 *       and while still holding all of them, we check for pending RPCs
 		 *       in the calling thread. If there are any, we release all  locks
-		 *       and serve them before starting over from scratch.
+		 *       and serve RPCs before starting over from scratch.
 		 * -> This way of doing things is required to ensure that we'll never
 		 *    spawn additional threads while there might be a signal  pending
 		 *    with the capacity of killing us.
@@ -797,14 +797,15 @@ do_clone_pid:
 				handles_install_rollback(&install);
 				RETHROW();
 			}
+
 			/* NOTE: From this point forth, normally nothing should be able to throw.
 			 *       The  exception to  this is  `CLONE_VFORK', though  even that one
 			 *       shouldn't be able  to fail, unless  the caller receives  SIGKILL
 			 *       (SIGSTOP would be handled without  unwinding), or has a  corrupt
-			 *       userprocmask. The later is userspace's fault, and the for former
+			 *       userprocmask. The later is userspace's fault, and for the former
 			 *       it doesn't matter if  we leak an FD,  since the process dies  no
 			 *       matter  what. (Though this might pose problems if the process is
-			 *       shared is FD-table  with another process...  -- No; it  doens't,
+			 *       sharing its FD-table with another process... -- No; it  doens't,
 			 *       because  if the SIGKILL was received after clone returned in the
 			 *       parent, then  they would  also die  with the  child pidfd  being
 			 *       shared with yet another process) */

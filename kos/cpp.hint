@@ -1364,6 +1364,8 @@
 #define __EXCEPT
 #define RETHROW() throw
 #define THROW(...) except_throw(0)
+#define __CATCH(...)
+#define CATCH(...)
 #define RAII_FINALLY
 #define __RAII_FINALLY
 

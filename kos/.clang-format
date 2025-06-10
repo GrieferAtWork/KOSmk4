@@ -163,6 +163,7 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 ForEachMacros:
   - EXCEPT
+  - CATCH
   - LIST_FOREACH
   - LIST_FOREACH_SAFE
   - LIST_P_FOREACH
