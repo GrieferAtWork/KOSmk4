@@ -52,7 +52,7 @@ DECL_BEGIN
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
 libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx) {
 	ctx->vb_ops = &libvideo_blit_empty_ops;
-	DBG_memset(&ctx->vb_xops, 0xcc, sizeof(ctx->vb_xops));
+	DBG_memset(&ctx->_vb_xops, 0xcc, sizeof(ctx->_vb_xops));
 	return ctx;
 }
 
@@ -212,7 +212,7 @@ libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
 libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self) {
 	video_gfxhdr_setempty(&self->vx_hdr);
-	DBG_memset(&self->vx_xops, 0xcc, sizeof(self->vx_xops));
+	DBG_memset(&self->_vx_xops, 0xcc, sizeof(self->_vx_xops));
 	return self;
 }
 

@@ -644,9 +644,9 @@ struct video_blit {
 	struct video_blit_ops const *vb_ops;  /* Blit operators */
 	struct video_gfx const      *vb_dst;  /* [1..1][const] Destination GFX context */
 	struct video_gfx const      *vb_src;  /* [1..1][const] Source GFX context */
-	struct video_blit_xops       vb_xops; /* Blit operators */
+	struct video_blit_xops      _vb_xops; /* Internal blit operators */
 #define _VIDEO_BLIT_N_DRIVER 6
-	void *vb_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
+	void *_vb_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:
@@ -755,9 +755,9 @@ struct video_gfx {
 	__uintptr_t                 vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 //	video_dim_t                 vx_bysiz;    /* [const][== vx_hdr.vxh_byend - vx_hdr.vxh_bymin][<= vx_hdr.vxh_cysiz] Absolute buffer I/O height */
-	struct video_gfx_xops       vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
+	struct video_gfx_xops      _vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
 #define _VIDEO_GFX_N_DRIVER 4
-	void *vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */
+	void *_vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:

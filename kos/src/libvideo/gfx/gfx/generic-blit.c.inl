@@ -23,7 +23,18 @@
 #define DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch
 #endif /* __INTELLISENSE__ */
 
-#include <sys/param.h>
+#include <hybrid/compiler.h>
+
+#include <hybrid/overflow.h>
+
+#include <stddef.h>
+#include <stdint.h>
+
+#include <libvideo/codec/types.h>
+#include <libvideo/gfx/gfx.h>
+
+#include "../api.h"
+#include "../gfx.h"
 
 #if (defined(DEFINE_libvideo_gfx_generic_blit__and__stretch) + \
      defined(DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch)) != 1
@@ -39,8 +50,8 @@ DECL_BEGIN
 #define LOCAL_libvideo_gfx_generic_stretch        libvideo_gfx_generic_stretch
 #define LOCAL_libvideo_gfx_generic_stretch_rdwrap libvideo_gfx_generic_stretch_rdwrap
 #define LOCAL_libvideo_gfx_generic_stretch_wrap   libvideo_gfx_generic_stretch_wrap
-#define LOCAL_vbxo_blit                           vbxo_blit
-#define LOCAL_vbxo_stretch                        vbxo_stretch
+#define LOCAL_video_blit_x_blit                   video_blit_x_blit
+#define LOCAL_video_blit_x_stretch                video_blit_x_stretch
 #elif defined(DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch)
 #define LOCAL_libvideo_gfx_generic_blit           libvideo_gfx_generic_bitblit
 #define LOCAL_libvideo_gfx_generic_blit_rdwrap    libvideo_gfx_generic_bitblit_rdwrap
@@ -48,8 +59,10 @@ DECL_BEGIN
 #define LOCAL_libvideo_gfx_generic_stretch        libvideo_gfx_generic_bitstretch
 #define LOCAL_libvideo_gfx_generic_stretch_rdwrap libvideo_gfx_generic_bitstretch_rdwrap
 #define LOCAL_libvideo_gfx_generic_stretch_wrap   libvideo_gfx_generic_bitstretch_wrap
-#define LOCAL_vbxo_blit                           vbxo_bitblit
-#define LOCAL_vbxo_stretch                        vbxo_bitstretch
+#define LOCAL_video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm)
+#define LOCAL_video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm)
 #define LOCAL_HAVE_BITMASK
 #endif /* ... */
 
@@ -131,9 +144,9 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit const *__restrict self,
 			return;
 		size_y = src->vx_hdr.vxh_byend - (video_coord_t)src_y;
 	}
-	(*self->vb_xops.LOCAL_vbxo_blit)(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-	                                 (video_coord_t)src_x, (video_coord_t)src_y,
-	                                 size_x, size_y LOCAL_BITMASK__ARGS);
+	LOCAL_video_blit_x_blit(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+	                        (video_coord_t)src_x, (video_coord_t)src_y,
+	                        size_x, size_y);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -258,16 +271,15 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit const *__restrict self,
 
 	if (dst_size_x == src_size_x && dst_size_y == src_size_y) {
 		/* Can use copy-blit */
-		(*self->vb_xops.LOCAL_vbxo_blit)(self,
-		                              (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                              (video_coord_t)src_x, (video_coord_t)src_y,
-		                              dst_size_x, dst_size_y LOCAL_BITMASK__ARGS);
+		LOCAL_video_blit_x_blit(self,
+		                        (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                        (video_coord_t)src_x, (video_coord_t)src_y,
+		                        dst_size_x, dst_size_y);
 	} else {
 		/* Must use stretch-blit */
-		(*self->vb_xops.LOCAL_vbxo_stretch)(self,
-		                                    (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
-		                                    (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y
-		                                    LOCAL_BITMASK__ARGS);
+		LOCAL_video_blit_x_stretch(self,
+		                           (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
+		                           (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y);
 	}
 }
 
@@ -879,8 +891,8 @@ LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit const *__restrict self
 #undef LOCAL_libvideo_gfx_generic_stretch
 #undef LOCAL_libvideo_gfx_generic_stretch_rdwrap
 #undef LOCAL_libvideo_gfx_generic_stretch_wrap
-#undef LOCAL_vbxo_blit
-#undef LOCAL_vbxo_stretch
+#undef LOCAL_video_blit_x_blit
+#undef LOCAL_video_blit_x_stretch
 #undef LOCAL_HAVE_BITMASK
 #undef LOCAL_BITMASK__PARAMS
 #undef LOCAL_BITMASK__ARGS

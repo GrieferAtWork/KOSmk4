@@ -30,9 +30,6 @@
 #include <kos/types.h>
 #include <sys/param.h>
 
-#include <assert.h>
-#include <inttypes.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include <libvideo/codec/api.h>
@@ -46,27 +43,6 @@
 
 DECL_BEGIN
 
-#ifndef PRIdOFF
-#define PRIdOFF PRIdN(__SIZEOF_VIDEO_OFFSET_T__)
-#define PRIxOFF PRIxN(__SIZEOF_VIDEO_OFFSET_T__)
-#define PRIuCRD PRIuN(__SIZEOF_VIDEO_COORD_T__)
-#define PRIxCRD PRIxN(__SIZEOF_VIDEO_COORD_T__)
-#define PRIuDIM PRIuN(__SIZEOF_VIDEO_DIM_T__)
-#define PRIxDIM PRIxN(__SIZEOF_VIDEO_DIM_T__)
-#define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
-#endif /* !PRIdOFF */
-
-#define video_gfx_getabscolor(self, abs_x, abs_y) \
-	(*(self)->vx_xops.vgxo_getcolor)(self, abs_x, abs_y)
-#define video_gfx_putabscolor(self, abs_x, abs_y, color) \
-	(*(self)->vx_xops.vgxo_putcolor)(self, abs_x, abs_y, color)
-
-#define video_gfx_getabspixel(self, abs_x, abs_y) \
-	(*(self)->vx_xops.vgxo_getpixel)(self, abs_x, abs_y)
-#define video_gfx_setabspixel(self, abs_x, abs_y, pixel) \
-	(*(self)->vx_xops.vgxo_setpixel)(self, abs_x, abs_y, pixel)
-
-
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
  * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDMODE_OVERRIDE' */
 
@@ -79,24 +55,21 @@ libvideo_gfx_noblend__absline_llhh__bypixel(struct video_gfx const *__restrict s
 	step = 0;
 	if (size_x > size_y) {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + step,
-			                      dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x),
-			                      pixel);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x);
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
-			                      dst_y + step,
-			                      pixel);
+			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
+			video_coord_t line_y = dst_y + step;
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_y);
 	} else {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + step,
-			                      dst_y + step,
-			                      pixel);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y + step;
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	}
 }
@@ -109,8 +82,8 @@ libvideo_gfx_noblend__absline_llhh(struct video_gfx const *__restrict self,
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	assert(size_x > 0);
-	assert(size_y > 0);
+	gfx_assert(size_x > 0);
+	gfx_assert(size_y > 0);
 	if likely(buffer->wlock(lock) == 0) {
 		video_dim_t step;
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
@@ -162,24 +135,21 @@ libvideo_gfx_noblend__absline_lhhl__bypixel(struct video_gfx const *__restrict s
 	step = 0;
 	if (size_x > size_y) {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + step,
-			                      dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x),
-			                      pixel);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x);
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y),
-			                      dst_y - step,
-			                      pixel);
+			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
+			video_coord_t line_y = dst_y - step;
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_y);
 	} else {
 		do {
-			video_gfx_setabspixel(self,
-			                      dst_x + step,
-			                      dst_y - step,
-			                      pixel);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y - step;
+			video_gfx_x_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	}
 }
@@ -192,8 +162,8 @@ libvideo_gfx_noblend__absline_lhhl(struct video_gfx const *__restrict self,
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	assert(size_x > 0);
-	assert(size_y > 0);
+	gfx_assert(size_x > 0);
+	gfx_assert(size_y > 0);
 	if likely(buffer->wlock(lock) == 0) {
 		video_dim_t step;
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
@@ -241,10 +211,10 @@ PRIVATE ATTR_IN(1) void CC
 libvideo_gfx_noblend__absline_h__bypixel(struct video_gfx const *__restrict self,
                                          video_coord_t dst_x, video_coord_t dst_y,
                                          video_dim_t length, video_pixel_t pixel) {
-	video_coord_t x = 0;
 	do {
-		video_gfx_setabspixel(self, dst_x + x, dst_y, pixel);
-	} while (++x < length);
+		video_gfx_x_setpixel(self, dst_x, dst_y, pixel);
+		++dst_x;
+	} while (--length);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -268,10 +238,10 @@ PRIVATE ATTR_IN(1) void CC
 libvideo_gfx_noblend__absline_v__bypixel(struct video_gfx const *__restrict self,
                                          video_coord_t dst_x, video_coord_t dst_y,
                                          video_dim_t length, video_pixel_t pixel) {
-	video_coord_t y = 0;
 	do {
-		video_gfx_setabspixel(self, dst_x, dst_y + y, pixel);
-	} while (++y < length);
+		video_gfx_x_setpixel(self, dst_x, dst_y, pixel);
+		++dst_y;
+	} while (--length);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -289,9 +259,8 @@ libvideo_gfx_noblend__absline_v(struct video_gfx const *__restrict self,
 		vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
 		do {
 			(*vc_setpixel)(line, dst_x, pixel);
-			--length;
 			line += lock.vl_stride;
-		} while (length);
+		} while (--length);
 		buffer->unlock(lock);
 	} else {
 		/* Use pixel-based rendering */
@@ -304,13 +273,13 @@ libvideo_gfx_noblend__absfill__bypixel(struct video_gfx const *__restrict self,
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_dim_t size_x, video_dim_t size_y,
                                        video_pixel_t pixel) {
-	video_coord_t y = 0;
 	do {
 		video_coord_t x = 0;
 		do {
-			(*self->vx_xops.vgxo_setpixel)(self, dst_x + x, dst_y + y, pixel);
+			video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
 		} while (++x < size_x);
-	} while (++y < size_y);
+		++dst_y;
+	} while (--size_y);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -327,8 +296,8 @@ libvideo_gfx_noblend__absfill(struct video_gfx const *__restrict self,
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
-		assert(size_x > 0);
-		assert(size_y > 0);
+		gfx_assert(size_x > 0);
+		gfx_assert(size_y > 0);
 		do {
 			(*vc_linefill)(line, dst_x, pixel, size_x);
 			line += lock.vl_stride;
@@ -395,7 +364,7 @@ libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx const *__restrict self,
 			}
 
 			do {
-				(*self->vx_xops.vgxo_setpixel)(self, dst_x + x, dst_y, pixel);
+				video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
 				++x;
 			} while (--count);
 		} while (x < size_x);
@@ -424,8 +393,8 @@ libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
 		uintptr_t bitskip = bm->vbm_skip;
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
-		assert(size_x > 0);
-		assert(size_y > 0);
+		gfx_assert(size_x > 0);
+		gfx_assert(size_y > 0);
 		do {
 			video_dim_t x = 0;
 			uintptr_t row_bitskip = bitskip;
@@ -497,8 +466,8 @@ libvideo_gfx_noblend_samefmt__blit__bypixel(struct video_blit const *__restrict 
 	for (y = 0; y < size_y; ++y) {
 		for (x = 0; x < size_x; ++x) {
 			video_pixel_t pixel;
-			pixel = video_gfx_getabspixel(src, src_x + x, src_y + y);
-			video_gfx_setabspixel(dst, dst_x + x, dst_y + y, pixel);
+			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
+			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
 		}
 	}
 }

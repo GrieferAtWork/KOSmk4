@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <libvideo/codec/codecs.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
@@ -121,10 +122,10 @@ LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {
-		ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
-		ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
-		ctx->vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic_samebuf__stretch;
-		ctx->vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic_samebuf__bitstretch;
+		ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
+		ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
+		ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic_samebuf__stretch;
+		ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic_samebuf__bitstretch;
 	} else {
 		if ((ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
@@ -137,16 +138,16 @@ LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 			/* Special optimization when not doing any blending, and both GFX contexts
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
-			ctx->vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
-			ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
-			ctx->vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch;
-			ctx->vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch;
+			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
+			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
+			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch;
+			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch;
 		} else {
 set_generic_operators:
-			ctx->vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
-			ctx->vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
-			ctx->vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch;
-			ctx->vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic__bitstretch;
+			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
+			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
+			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch;
+			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic__bitstretch;
 		}
 	}
 	return ctx;

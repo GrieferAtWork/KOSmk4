@@ -26,13 +26,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <sys/syslog.h>
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
-
-#define BLENDINFO_ALPHA GFX_BLENDMODE_ALPHA
-#define BLENDINFO_ALPHA_PREMULTIPLIED
 
 /* List of blend modes for which we provide dedicated implementations.
  * iow: these are the blend modes that are "fast" */
@@ -44,12 +40,164 @@
 	cb(mod, GFX_BLENDMODE_MOD)                                 \
 	cb(mul, GFX_BLENDMODE_MUL)
 
+#ifndef PRIdOFF
+#include <inttypes.h>
+#define PRIdOFF PRIdN(__SIZEOF_VIDEO_OFFSET_T__)
+#define PRIxOFF PRIxN(__SIZEOF_VIDEO_OFFSET_T__)
+#define PRIuCRD PRIuN(__SIZEOF_VIDEO_COORD_T__)
+#define PRIxCRD PRIxN(__SIZEOF_VIDEO_COORD_T__)
+#define PRIuDIM PRIuN(__SIZEOF_VIDEO_DIM_T__)
+#define PRIxDIM PRIxN(__SIZEOF_VIDEO_DIM_T__)
+#define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
+#endif /* !PRIdOFF */
+
+#if 1
+#include <sys/syslog.h>
+#define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
+#define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
+#else
+#define TRACE_START(...) (void)0
+#define TRACE_END(...)   (void)0
+#endif
+
+#if defined(NDEBUG) || 1
+#if 1 /* Turn GFX assertions into compile-time assumptions for max speed */
+#ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
+#undef __CRT_UBSAN_BUILTIN_UNREACHABLE
+#undef __builtin_unreachable /* Disable binding of "__ubsan_handle_builtin_unreachable" */
+#endif /* __CRT_UBSAN_BUILTIN_UNREACHABLE */
+#define gfx_assert(x)       __builtin_assume(x)
+#define gfx_assertf(x, ...) __builtin_assume(x)
+#else
+#define gfx_assert(x)       (void)0
+#define gfx_assertf(x, ...) (void)0
+#endif
+#else /* ... */
+#include <assert.h>
+#define gfx_assert  assert
+#define gfx_assertf assertf
+#endif /* !... */
+
+#define gfx_assert_absbounds_xmin(self, x) \
+	gfx_assertf((x) >= (self)->vx_hdr.vxh_bxmin, "X coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (x), (self)->vx_hdr.vxh_bxmin)
+#define gfx_assert_absbounds_xend(self, x) \
+	gfx_assertf((x) < (self)->vx_hdr.vxh_bxend, "X coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_hdr.vxh_bxend)
+#define gfx_assert_absbounds_ymin(self, y) \
+	gfx_assertf((y) >= (self)->vx_hdr.vxh_bymin, "Y coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (y), (self)->vx_hdr.vxh_bymin)
+#define gfx_assert_absbounds_yend(self, y) \
+	gfx_assertf((y) < (self)->vx_hdr.vxh_byend, "Y coord escapes to the right (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_hdr.vxh_byend)
+#define gfx_assert_absbounds_sxend(self, x, sx)                                          \
+	(gfx_assert(sx),                                                                     \
+	 gfx_assertf((x) + (sx) > (x), "X+SX overflows (%" PRIuCRD "+%" PRIuDIM ")", x, sx), \
+	 gfx_assertf((x) + (sx) <= (self)->vx_hdr.vxh_bxend, "X+SX coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", x, sx, (x) + (sx), (self)->vx_hdr.vxh_bxend))
+#define gfx_assert_absbounds_syend(self, y, sy)                                          \
+	(gfx_assert(sy),                                                                     \
+	 gfx_assertf((y) + (sy) > (y), "Y+SY overflows (%" PRIuCRD "+%" PRIuDIM ")", y, sy), \
+	 gfx_assertf((y) + (sy) <= (self)->vx_hdr.vxh_byend, "Y+SY coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vx_hdr.vxh_byend))
+#define gfx_assert_absbounds_x(self, x)      (gfx_assert_absbounds_xmin(self, x), gfx_assert_absbounds_xend(self, x))
+#define gfx_assert_absbounds_y(self, y)      (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_yend(self, y))
+#define gfx_assert_absbounds_xy(self, x, y)  (gfx_assert_absbounds_x(self, x), gfx_assert_absbounds_x(self, y))
+#define gfx_assert_absbounds_sx(self, x, sx) (gfx_assert_absbounds_xmin(self, x), gfx_assert_absbounds_sxend(self, x, sx))
+#define gfx_assert_absbounds_sy(self, y, sy) (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_syend(self, y, sy))
+#define gfx_assert_absbounds_sxy(self, x, y, sx, sy) \
+	(gfx_assert_absbounds_sx(self, x, sx), gfx_assert_absbounds_sy(self, y, sy))
+
+/* Video GFX internal API wrappers */
+#define _video_gfx_x_getcolor(self, x, y) \
+	(*(self)->_vx_xops.vgxo_getcolor)(self, x, y)
+#define _video_gfx_x_putcolor(self, x, y, color) \
+	(*(self)->_vx_xops.vgxo_putcolor)(self, x, y, color)
+#define _video_gfx_x_getpixel(self, x, y) \
+	(*(self)->_vx_xops.vgxo_getpixel)(self, x, y)
+#define _video_gfx_x_setpixel(self, x, y, pixel) \
+	(*(self)->_vx_xops.vgxo_setpixel)(self, x, y, pixel)
+#define _video_gfx_x_absline_llhh(self, x, y, size_x, size_y, color) \
+	(*(self)->_vx_xops.vgxo_absline_llhh)(self, x, y, size_x, size_y, color)
+#define _video_gfx_x_absline_lhhl(self, x, y, size_x, size_y, color) \
+	(*(self)->_vx_xops.vgxo_absline_lhhl)(self, x, y, size_x, size_y, color)
+#define _video_gfx_x_absline_h(self, x, y, length, color) \
+	(*(self)->_vx_xops.vgxo_absline_h)(self, x, y, length, color)
+#define _video_gfx_x_absline_v(self, x, y, length, color) \
+	(*(self)->_vx_xops.vgxo_absline_v)(self, x, y, length, color)
+#define _video_gfx_x_absfill(self, x, y, size_x, size_y, color) \
+	(*(self)->_vx_xops.vgxo_absfill)(self, x, y, size_x, size_y, color)
+#define _video_gfx_x_bitfill(self, dst_x, dst_y, size_x, size_y, color, bm) \
+	(*(self)->_vx_xops.vgxo_bitfill)(self, dst_x, dst_y, size_x, size_y, color, bm)
+#define _video_gfx_x_bitstretchfill(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm) \
+	(*(self)->_vx_xops.vgxo_bitstretchfill)(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm)
+
+
+/* Video GFX internal API wrappers (w/ assertions) */
+#define video_gfx_x_getcolor(self, x, y) \
+	(gfx_assert_absbounds_xy(self, x, y), _video_gfx_x_getcolor(self, x, y))
+#define video_gfx_x_putcolor(self, x, y, color) \
+	(gfx_assert_absbounds_xy(self, x, y), _video_gfx_x_putcolor(self, x, y, color))
+#define video_gfx_x_getpixel(self, x, y) \
+	(gfx_assert_absbounds_xy(self, x, y), _video_gfx_x_getpixel(self, x, y))
+#define video_gfx_x_setpixel(self, x, y, pixel) \
+	(gfx_assert_absbounds_xy(self, x, y), _video_gfx_x_setpixel(self, x, y, pixel))
+#define video_gfx_x_absline_llhh(self, x, y, size_x, size_y, color) \
+	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),          \
+	 _video_gfx_x_absline_llhh(self, x, y, size_x, size_y, color))
+#define video_gfx_x_absline_lhhl(self, x, y, size_x, size_y, color)                       \
+	(gfx_assert_absbounds_sx(self, x, size_x),                                            \
+	 gfx_assert_absbounds_ymin(self, y),                                                  \
+	 gfx_assert(size_y),                                                                  \
+	 gfx_assertf(((y) - (self)->vx_hdr.vxh_bymin) >= (size_y) - 1,                        \
+	             "Line escapes to the top (start-y: %" PRIuCRD ", size-y: %" PRIuDIM ", " \
+	             "min-y: %" PRIuCRD ")",                                                  \
+	             (y), size_y, (self)->vx_hdr.vxh_bymin),                                  \
+	 _video_gfx_x_absline_lhhl(self, x, y, size_x, size_y, color))
+#define video_gfx_x_absline_h(self, x, y, length, color)                        \
+	(gfx_assert_absbounds_y(self, y), gfx_assert_absbounds_sx(self, x, length), \
+	 _video_gfx_x_absline_h(self, x, y, length, color))
+#define video_gfx_x_absline_v(self, x, y, length, color)                        \
+	(gfx_assert_absbounds_x(self, x), gfx_assert_absbounds_sy(self, y, length), \
+	 _video_gfx_x_absline_v(self, x, y, length, color))
+#define video_gfx_x_absfill(self, x, y, size_x, size_y, color) \
+	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),     \
+	 _video_gfx_x_absfill(self, x, y, size_x, size_y, color))
+#define video_gfx_x_bitfill(self, dst_x, dst_y, size_x, size_y, color, bm) \
+	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, size_x, size_y),         \
+	 _video_gfx_x_bitfill(self, dst_x, dst_y, size_x, size_y, color, bm))
+#define video_gfx_x_bitstretchfill(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm) \
+	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, dst_size_x, dst_size_y),                                        \
+	 gfx_assert(src_size_x), gfx_assert(src_size_y),                                                              \
+	 gfx_assertf((dst_size_x) != (src_size_x) || (dst_size_y) != (src_size_y),                                    \
+	             "dst/src size identical: {%" PRIuDIM "x%" PRIuDIM "}", dst_size_x, dst_size_y),                  \
+	 _video_gfx_x_bitstretchfill(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm))
+
+
+/* Video BLIT internal API wrappers */
+#define _video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	(*(self)->_vb_xops.vbxo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
+#define _video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	(*(self)->_vb_xops.vbxo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
+#define _video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm) \
+	(*(self)->_vb_xops.vbxo_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm)
+#define _video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm) \
+	(*(self)->_vb_xops.vbxo_bitstretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm)
+
+/* Video BLIT internal API wrappers (w/ assertions) */
+#define video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y)  \
+	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, size_x, size_y), \
+	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, size_x, size_y), \
+	 _video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y))
+#define video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, dst_size_x, dst_size_y),                           \
+	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, src_size_x, src_size_y),                           \
+	 _video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y))
+#define video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm) \
+	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, size_x, size_y),       \
+	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, size_x, size_y),       \
+	 _video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm))
+#define video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm) \
+	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, dst_size_x, dst_size_y),                                  \
+	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, src_size_x, src_size_y),                                  \
+	 _video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm))
 
 
 DECL_BEGIN
-
-#define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
-#define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
 
 
 /* # of bits to use for the fractional part of the fixed-
@@ -201,8 +349,8 @@ libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
  * with generic impls.
  *
  * The caller must have already initialized:
- * - self->vx_xops.vgxo_getpixel
- * - self->vx_xops.vgxo_setpixel
+ * - self->_vx_xops.vgxo_getpixel
+ * - self->_vx_xops.vgxo_setpixel
  * - self->vx_flags
  * - self->vx_colorkey
  * - self->vx_blend
@@ -225,11 +373,11 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 
 	/* Select how colors should be read. */
 	if (self->vx_flags & VIDEO_GFX_FBLUR) {
-		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
 	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
-		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_with_key;
+		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_with_key;
 	} else {
-		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
 	}
 
 	/* Detect special blend modes. */
@@ -237,11 +385,11 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
 	switch (self->vx_blend) {
 	case GFX_BLENDMODE_OVERRIDE:
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+		self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
 		break;
-#define LINK_libvideo_gfx_generic__putcolor_FOO(name, mode)                   \
-	case mode:                                                                \
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_##name; \
+#define LINK_libvideo_gfx_generic__putcolor_FOO(name, mode)                    \
+	case mode:                                                                 \
+		self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_##name; \
 		break;
 	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
 #undef LINK_libvideo_gfx_generic__putcolor_FOO
@@ -252,47 +400,47 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 		    GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
 		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
 		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend))) {
-			self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+			self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
 		} else {
-			self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
+			self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
 		}
 		break;
 	}
 
 	/* Line/fill operators... */
 	if (self->vx_flags & VIDEO_GFX_FAALINES) {
-		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
-		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
 	} else {
-		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
-		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
+		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
+		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
 	}
-	self->vx_xops.vgxo_absline_h = &libvideo_gfx_generic__absline_h;
-	self->vx_xops.vgxo_absline_v = &libvideo_gfx_generic__absline_v;
-	self->vx_xops.vgxo_absfill   = &libvideo_gfx_generic__absfill;
-	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_generic__bitfill;
+	self->_vx_xops.vgxo_absline_h = &libvideo_gfx_generic__absline_h;
+	self->_vx_xops.vgxo_absline_v = &libvideo_gfx_generic__absline_v;
+	self->_vx_xops.vgxo_absfill   = &libvideo_gfx_generic__absfill;
+	self->_vx_xops.vgxo_bitfill   = &libvideo_gfx_generic__bitfill;
 
 	/* Linear vs. Nearest blit */
 	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
 		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_generic__blitfrom_l;
-		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
 	} else {
 		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_generic__blitfrom_n;
-		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
+		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
 	}
 
 	/* Select optimal operator implementations based on requested features. */
-	if (self->vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend) {
+	if (self->_vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend) {
 		/* No blending is being done -> link operators that try to make use of direct memory access. */
-		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
-		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
-		self->vx_xops.vgxo_absline_h    = &libvideo_gfx_noblend__absline_h;
-		self->vx_xops.vgxo_absline_v    = &libvideo_gfx_noblend__absline_v;
-		self->vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
-		self->vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
+		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+		self->_vx_xops.vgxo_absline_h    = &libvideo_gfx_noblend__absline_h;
+		self->_vx_xops.vgxo_absline_v    = &libvideo_gfx_noblend__absline_v;
+		self->_vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
+		self->_vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
 		if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
 			self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_noblend__blitfrom_n;
-			self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+			self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 		} else {
 			self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
 		}
@@ -300,31 +448,31 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
 	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
-		if (self->vx_xops.vgxo_getcolor == &libvideo_gfx_generic__getcolor_noblend)
-			self->vx_xops.vgxo_getcolor = self->vx_xops.vgxo_getpixel;
-		if (self->vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend)
-			self->vx_xops.vgxo_putcolor = self->vx_xops.vgxo_setpixel;
+		if (self->_vx_xops.vgxo_getcolor == &libvideo_gfx_generic__getcolor_noblend)
+			self->_vx_xops.vgxo_getcolor = self->_vx_xops.vgxo_getpixel;
+		if (self->_vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend)
+			self->_vx_xops.vgxo_putcolor = self->_vx_xops.vgxo_setpixel;
 	}
 }
 
 /* Same as `libvideo_gfx_populate_generic()', but load non-blending defaults */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
-	if (self->vx_xops.vgxo_getcolor != self->vx_xops.vgxo_getpixel)
-		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
-	if (self->vx_xops.vgxo_putcolor != self->vx_xops.vgxo_setpixel)
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+	if (self->_vx_xops.vgxo_getcolor != self->_vx_xops.vgxo_getpixel)
+		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+	if (self->_vx_xops.vgxo_putcolor != self->_vx_xops.vgxo_setpixel)
+		self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
 	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
-		self->vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
-		self->vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
 	}
-	self->vx_xops.vgxo_absline_h = &libvideo_gfx_noblend__absline_h;
-	self->vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
-	self->vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
-	self->vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
+	self->_vx_xops.vgxo_absline_h = &libvideo_gfx_noblend__absline_h;
+	self->_vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
+	self->_vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
+	self->_vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
 	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
 		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_noblend__blitfrom_n;
-		self->vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 	} else {
 		self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
 	}

@@ -1199,6 +1199,7 @@ __CDECLARE_VOID(__ATTR_NORETURN,,__ubsan_handle_builtin_unreachable,(void),())
 __DECL_END
 #undef __builtin_unreachable
 #if __has_builtin(__builtin_unreachable)
+#define __CRT_UBSAN_BUILTIN_UNREACHABLE
 #define __builtin_unreachable() (__ubsan_handle_builtin_unreachable(), __builtin_unreachable())
 #else /* __has_builtin(__builtin_unreachable) */
 #define __builtin_unreachable() __ubsan_handle_builtin_unreachable()
