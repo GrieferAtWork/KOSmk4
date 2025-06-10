@@ -55,7 +55,6 @@
 #include <libphys/phys.h>
 #include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
-#include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>

@@ -21,12 +21,15 @@
 #define GUARD_LIBVIDEO_GFX_FONTS_TLFT_H 1
 
 #include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
-#include <uchar.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/fonts/tlft.h>
@@ -43,14 +46,13 @@ struct tlft_font: video_font {
 };
 
 /* Return the V-table used by `struct tlft_font' */
-INTDEF ATTR_RETNONNULL WUNUSED
-struct video_font_ops *CC libvideo_tlft_getops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void);
+#define libvideo_tlft_ops (*_libvideo_tlft_ops())
 
-/* Returns `(__REF struct video_font *)-1'  if not  a tlft  file.
+/* Returns `(REF struct video_font *)-1'  if  not  a  tlft  file.
  * Upon success, the mmap-ed region `base...+=size' is inherited. */
-INTDEF WUNUSED NONNULL((1)) __REF struct video_font *CC
+INTDEF WUNUSED NONNULL((1)) REF struct video_font *CC
 libvideo_font_tryopen_tlft(void *base, size_t size);
-
 
 DECL_END
 

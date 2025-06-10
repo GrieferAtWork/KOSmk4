@@ -28,10 +28,12 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 #include <parts/uchar/format-printer.h> /* C32FORMATPRINTER_CC */
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -44,6 +46,7 @@
 #include <unicode.h>
 #include <unistd.h>
 
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/font.h>
 
 #include "font.h"
@@ -52,11 +55,11 @@
 DECL_BEGIN
 
 
-PRIVATE WUNUSED __REF struct video_font *CC
+PRIVATE WUNUSED REF struct video_font *CC
 libvideo_font_openfd(fd_t fd) {
 	void *base;
 	struct stat st;
-	__REF struct video_font *result;
+	REF struct video_font *result;
 	if unlikely(fstat(fd, &st))
 		goto err;
 #if __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__
@@ -72,22 +75,22 @@ libvideo_font_openfd(fd_t fd) {
 	result = libvideo_font_tryopen_tlft(base, (size_t)st.st_size);
 	if (!result)
 		goto err_unmap;
-	if (result != (__REF struct video_font *)-1)
+	if (result != (REF struct video_font *)-1)
 		return result; /* Success */
 
 	/* Add other file formats here! */
 	/* ... */
 	errno = EINVAL; /* Bad file format. */
 err_unmap:
-	munmap(base, (size_t)st.st_size);
+	(void)munmap(base, (size_t)st.st_size);
 err:
 	return NULL;
 }
 
 
-PRIVATE WUNUSED __REF struct video_font *CC
+PRIVATE WUNUSED REF struct video_font *CC
 libvideo_font_create(char const *__restrict name) {
-	__REF struct video_font *result;
+	REF struct video_font *result;
 	fd_t fd;
 	char *full_name;
 	if (strchr(name, '/')) {
@@ -119,9 +122,9 @@ err:
  * @param: name: The font's name (the name of a file in `/lib/fonts/')
  *               When `NULL', (try to) return the default system font.
  * @return: NULL:errno=ENOENT: Unknown font `name' */
-INTERN WUNUSED __REF struct video_font *CC
+INTERN WUNUSED REF struct video_font *CC
 libvideo_font_lookup(char const *name) {
-	__REF struct video_font *result;
+	REF struct video_font *result;
 	if (VIDEO_FONT_ISPECIAL(name)) {
 		if (name == VIDEO_FONT_DEFAULT ||
 		    name == VIDEO_FONT_FIXEDWIDTH) {
@@ -233,7 +236,6 @@ DEFINE_PUBLIC_ALIAS(video_font_lookup, libvideo_font_lookup);
 DEFINE_PUBLIC_ALIAS(video_fontprinter, libvideo_fontprinter);
 DEFINE_PUBLIC_ALIAS(video_fontprinter32, libvideo_fontprinter32);
 DEFINE_PUBLIC_ALIAS(video_fontprintch, libvideo_fontprintch);
-
 
 DECL_END
 

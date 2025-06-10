@@ -50,21 +50,25 @@ struct video_font_ops {
 	(LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
 
 	/* Draw a single glyph at the given coords and return its width.
-	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__ATTR_NONNULL_T((1, 2)) video_dim_t
-	(LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
-	                                 struct video_gfx *__restrict __gfx,
+	 * If the glyph was not recognized (or when `__height' was `0'), return 0 instead. */
+	__ATTR_IN_T(1) __ATTR_IN_T(2) video_dim_t
+	(LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font const *__restrict __self,
+	                                 struct video_gfx const *__restrict __gfx,
 	                                 video_offset_t __x, video_offset_t __y,
-	                                 video_dim_t __height,
-	                                 __CHAR32_TYPE__ __ord,
+	                                 video_dim_t __height, __CHAR32_TYPE__ __ord,
 	                                 video_color_t __color);
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__ATTR_NONNULL_T((1)) video_dim_t
-	(LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
-	                                 video_dim_t __height,
-	                                 __CHAR32_TYPE__ __ord);
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_dim_t
+	(LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font const *__restrict __self,
+	                                 video_dim_t __height, __CHAR32_TYPE__ __ord);
 };
+
+#define video_font_drawglyph(self, gfx, x, y, height, ord, color) \
+	(*(self)->vf_ops->vfo_drawglyph)(self, gfx, x, y, height, ord, color)
+#define video_font_glyphsize(self, height, ord) \
+	(*(self)->vf_ops->vfo_glyphsize)(self, height, ord)
+
 
 struct video_font {
 	__uintptr_t            vf_refcnt; /* Reference counter. */
@@ -78,17 +82,16 @@ struct video_font {
 #undef drawglyph
 
 	/* Draw a single glyph at the given coords and return its width.
-	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__CXX_CLASSMEMBER video_dim_t LIBVIDEO_GFX_CC
-	drawglyph(struct video_gfx *__restrict __gfx, video_offset_t __x, video_offset_t __y,
-	          video_dim_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
-		return (*vf_ops->vfo_drawglyph)(this, __gfx, __x, __y, __height, __ord, __color);
+	 * If the glyph was not recognized (or when `__height' was `0'), return 0 instead. */
+	__CXX_CLASSMEMBER video_dim_t drawglyph(struct video_gfx const *__restrict __gfx,
+	                                        video_offset_t __x, video_offset_t __y, video_dim_t __height,
+	                                        __CHAR32_TYPE__ __ord, video_color_t __color) const {
+		return video_font_drawglyph(this, __gfx, __x, __y, __height, __ord, __color);
 	}
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__CXX_CLASSMEMBER video_dim_t LIBVIDEO_GFX_CC
-	glyphsize(video_dim_t __height, __CHAR32_TYPE__ __ord) {
-		return (*vf_ops->vfo_glyphsize)(this, __height, __ord);
+	__CXX_CLASSMEMBER video_dim_t glyphsize(video_dim_t __height, __CHAR32_TYPE__ __ord) const {
+		return video_font_glyphsize(this, __height, __ord);
 	}
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -126,16 +129,16 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_
 /* Context descriptor for using the pformatprinter-like `video_fontprinter()'
  * function for rendering text into a graphics context. */
 struct video_fontprinter_data {
-	struct video_font *vfp_font;     /* [1..1][const] The font used for printing. */
-	struct video_gfx  *vfp_gfx;      /* [1..1][const] Target graphics context. */
-	video_dim_t        vfp_height;   /* Glyph height. */
-	video_offset_t     vfp_curx;     /* X coord for the top-left corner of the next glyph */
-	video_offset_t     vfp_cury;     /* Y coord for the top-left corner of the next glyph */
-	video_offset_t     vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
-	video_offset_t     vfp_lnend;    /* Ending  X coord for additional lines (when `> vfp_lnstart',
-	                                  * wrap to a new line when a glyph would exceed this position) */
-	video_color_t      vfp_color;    /* Output color for the next glyph. */
-	struct __mbstate   vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
+	struct video_font const *vfp_font;    /* [1..1][const] The font used for printing. */
+	struct video_gfx  const *vfp_gfx;     /* [1..1][const] Target graphics context. */
+	video_dim_t              vfp_height;  /* Glyph height. */
+	video_offset_t           vfp_curx;    /* X coord for the top-left corner of the next glyph */
+	video_offset_t           vfp_cury;    /* Y coord for the top-left corner of the next glyph */
+	video_offset_t           vfp_lnstart; /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
+	video_offset_t           vfp_lnend;   /* Ending  X coord for additional lines (when `> vfp_lnstart',
+	                                       * wrap to a new line when a glyph would exceed this position) */
+	video_color_t            vfp_color;   /* Output color for the next glyph. */
+	struct __mbstate         vfp_u8word;  /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
 	/* TODO: Special character attribute flags (underline, cross-out, mirrored?, bold?, cursive?) */
 };
 

@@ -78,8 +78,8 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 }
 
 /* Return the width (in pixels) of a glyph, given its height (in pixels). */
-PRIVATE ATTR_PURE NONNULL((1)) video_dim_t CC
-libvideo_tlft_glyphsize(struct video_font *__restrict self,
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_dim_t CC
+libvideo_tlft_glyphsize(struct video_font const *__restrict self,
                         video_dim_t height, char32_t UNUSED(ord)) {
 	struct tlft_font *me;
 	video_dim_t result;
@@ -98,13 +98,11 @@ libvideo_tlft_glyphsize(struct video_font *__restrict self,
 
 /* Draw a single glyph at the given coords and return its width.
  * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-PRIVATE NONNULL((1, 2)) video_dim_t CC
-libvideo_tlft_drawglyph(struct video_font *__restrict self,
-                        struct video_gfx *__restrict gfx,
-                        video_offset_t x,
-                        video_offset_t y,
-                        video_dim_t height,
-                        char32_t ord,
+PRIVATE ATTR_IN(1) ATTR_IN(2) video_dim_t CC
+libvideo_tlft_drawglyph(struct video_font const *__restrict self,
+                        struct video_gfx const *__restrict gfx,
+                        video_offset_t x, video_offset_t y,
+                        video_dim_t height, char32_t ord,
                         video_color_t color) {
 	void *bm;
 	struct video_bitmask bitmask;
@@ -122,12 +120,13 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		/* Can just directly blit the glyph */
 		result = me->tf_hdr->h_chwidth;
 		bitmask.vbm_scan = result;
-		gfx->bitfill(/* x:       */ x,
-		             /* y:       */ y,
-		             /* size_x:  */ result,
-		             /* size_y:  */ height,
-		             /* color:   */ color,
-		             /* bitmask: */ &bitmask);
+		video_gfx_bitfill(/* self:    */ gfx,
+		                  /* x:       */ x,
+		                  /* y:       */ y,
+		                  /* size_x:  */ result,
+		                  /* size_y:  */ height,
+		                  /* color:   */ color,
+		                  /* bitmask: */ &bitmask);
 	} else {
 		/* Must stretch the glyph somehow... */
 		result = ((height * me->tf_hdr->h_chwidth) +
@@ -136,14 +135,15 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		if unlikely(!result)
 			result = 1;
 		bitmask.vbm_scan = me->tf_hdr->h_chwidth;
-		gfx->bitstretchfill(/* dst_x:      */ x,
-		                    /* dst_y:      */ y,
-		                    /* dst_size_x: */ result,
-		                    /* dst_size_y: */ height,
-		                    /* color:      */ color,
-		                    /* src_size_x: */ me->tf_hdr->h_chwidth,
-		                    /* src_size_y: */ me->tf_bestheight,
-		                    /* bitmask:    */ &bitmask);
+		video_gfx_bitstretchfill(/* self:       */ gfx,
+		                         /* dst_x:      */ x,
+		                         /* dst_y:      */ y,
+		                         /* dst_size_x: */ result,
+		                         /* dst_size_y: */ height,
+		                         /* color:      */ color,
+		                         /* src_size_x: */ me->tf_hdr->h_chwidth,
+		                         /* src_size_y: */ me->tf_bestheight,
+		                         /* bitmask:    */ &bitmask);
 	}
 	return result;
 unknown:
@@ -152,11 +152,11 @@ unknown:
 
 
 
-PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
 
 /* Return the V-table used by `struct tlft_font' */
-INTERN ATTR_RETNONNULL WUNUSED
-struct video_font_ops *CC libvideo_tlft_getops(void) {
+#undef libvideo_tlft_ops
+PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
+INTERN ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void) {
 	if unlikely(!libvideo_tlft_ops.vfo_destroy) {
 		libvideo_tlft_ops.vfo_drawglyph = &libvideo_tlft_drawglyph;
 		libvideo_tlft_ops.vfo_glyphsize = &libvideo_tlft_glyphsize;
@@ -166,6 +166,7 @@ struct video_font_ops *CC libvideo_tlft_getops(void) {
 	}
 	return &libvideo_tlft_ops;
 }
+#define libvideo_tlft_ops (*_libvideo_tlft_ops())
 
 
 
@@ -233,7 +234,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 
 	/* All right! everything seems to be ok. -> Fill in V-table and refcnt. */
 	result->vf_refcnt = 1;
-	result->vf_ops    = libvideo_tlft_getops();
+	result->vf_ops    = &libvideo_tlft_ops;
 done:
 	return result;
 err_inval_r:

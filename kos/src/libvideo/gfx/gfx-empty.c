@@ -29,7 +29,6 @@
 #include <kos/types.h>
 
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
