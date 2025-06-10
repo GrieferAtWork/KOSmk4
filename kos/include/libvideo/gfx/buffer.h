@@ -73,30 +73,21 @@ struct video_buffer_ops {
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
-	/* Get graphics functions for use with the given buffer
-	 * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
-	 *                    This  argument   should  be   constructed  using   `GFX_BLENDMODE()'.
-	 *                    Usually, you will want to use `GFX_BLENDMODE_ALPHA' as blending  mode
-	 *                    when you wish to make use of alpha-blending. However, if you know for
-	 *                    certain  that alpha-blending isn't required, graphics performance can
-	 *                    be improved by passing  `GFX_BLENDMODE_OVERRIDE' in order to  prevent
-	 *                    any overhead  that would  normally  incur from  blending  operations.
-	 * @param: flags:     Set of `VIDEO_GFX_F*'
-	 * @param: colorkey:  A specific color that should always return fully opaque when read
-	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or
-	 *                    alternatively, just pass `0' (which would be one such color))
-	 * @return: * : Always re-returns `__result' */
-	__ATTR_RETNONNULL __ATTR_NONNULL_T((1, 2)) struct video_gfx *
-	(LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
-	                             struct video_gfx *__restrict __result,
-	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
-	                             video_color_t __colorkey);
+	/* Initialize a graphics context for use with the linked buffer.
+	 * The caller  of this  operator must  have already  filled  in:
+	 * - __self->vx_buffer  (with the buffer on which this operator is then called)
+	 * - __self->vx_blend
+	 * - __self->vx_flags
+	 * - __self->vx_colorkey
+	 * @return: * : Always re-returns `__self' */
+	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_gfx *
+	(LIBVIDEO_GFX_CC *vi_initgfx)(struct video_gfx *__restrict __self);
 
 	/* Disable blending for `self', which uses this video buffer.
 	 * CAUTION: Only use this operator on a freshly copied/created GFX  context.
 	 *          If the given context is already in use (especially if by another
 	 *          thread), use of this function may result in a crash. */
-	__ATTR_NONNULL_T((1)) struct video_gfx *
+	__ATTR_INOUT_T(1) struct video_gfx *
 	(LIBVIDEO_GFX_CC *vi_gfx_noblend)(struct video_gfx *__restrict __self);
 
 	void (*_vi_pad1[5])(void);
@@ -109,17 +100,17 @@ struct video_buffer_ops {
 	 *          being held!
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
-	__ATTR_NONNULL_T((1, 2)) int
+	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_CC *vi_rlock)(struct video_buffer *__restrict __self,
 	                            struct video_lock *__restrict __result);
 
 	/* Same as `vi_rlock', but also lock for reading+writing */
-	__ATTR_NONNULL_T((1, 2)) int
+	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_CC *vi_wlock)(struct video_buffer *__restrict __self,
 	                            struct video_lock *__restrict __result);
 
 	/* Unlock a video buffer that had previously been mapped into memory. */
-	__ATTR_NONNULL_T((1, 2)) void
+	__ATTR_INOUT_T(1) __ATTR_IN_T(2) void
 	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
 	                                        struct video_lock *__restrict __lock);
 
@@ -148,6 +139,44 @@ video_buffer_convert(struct video_buffer *__restrict __self,
                      unsigned int __type);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
+#ifdef __INTELLISENSE__
+/* Get graphics functions for use with the given buffer
+ * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
+ *                    This  argument   should  be   constructed  using   `GFX_BLENDMODE()'.
+ *                    Usually, you will want to use `GFX_BLENDMODE_ALPHA' as blending  mode
+ *                    when you wish to make use of alpha-blending. However, if you know for
+ *                    certain  that alpha-blending isn't required, graphics performance can
+ *                    be improved by passing  `GFX_BLENDMODE_OVERRIDE' in order to  prevent
+ *                    any overhead  that would  normally  incur from  blending  operations.
+ * @param: flags:     Set of `VIDEO_GFX_F*'
+ * @param: colorkey:  A specific color that should always return fully opaque when read
+ *                    To disable colorkey-ing, simply pass some color with ALPHA=0  (or
+ *                    alternatively, just pass `0' (which would be one such color))
+ * @return: * : Always re-returns `__result' */
+__ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
+video_buffer_getgfx(struct video_buffer *__self, struct video_gfx *__result,
+                    gfx_blendmode_t __blendmode, __uintptr_t __flags,
+                    video_color_t __colorkey);
+
+__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
+video_buffer_rlock(struct video_buffer *__self, struct video_lock *__lock);
+__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
+video_buffer_wlock(struct video_buffer *__self, struct video_lock *__lock);
+__ATTR_INOUT(1) __ATTR_IN(2) void
+video_buffer_unlock(struct video_buffer *__self, struct video_lock *__lock);
+#else /* __INTELLISENSE__ */
+#define video_buffer_getgfx(self, result, blendmode, flags, colorkey)  \
+	((result)->vx_colorkey = (colorkey), (result)->vx_flags = (flags), \
+	 (result)->vx_blend = (blendmode),                                 \
+	 (*((result)->vx_buffer = (self))->vb_ops->vi_initgfx)(result))
+#define video_buffer_rlock(self, lock) \
+	(*(self)->vb_ops->vi_rlock)(self, lock)
+#define video_buffer_wlock(self, lock) \
+	(*(self)->vb_ops->vi_wlock)(self, lock)
+#define video_buffer_unlock(self, lock) \
+	(*(self)->vb_ops->vi_unlock)(self, lock)
+#endif /* !__INTELLISENSE__ */
+
 
 #ifdef __cplusplus
 __CXXDECL_BEGIN
@@ -160,15 +189,6 @@ struct video_buffer {
 	video_dim_t              vb_size_x; /* Buffer size in X (in pixels) */
 	video_dim_t              vb_size_y; /* Buffer size in Y (in pixels) */
 	/* Buffer-specific fields go here */
-
-#define video_buffer_rlock(self, lock) \
-	(*(self)->vb_ops->vi_rlock)(self, lock)
-#define video_buffer_wlock(self, lock) \
-	(*(self)->vb_ops->vi_wlock)(self, lock)
-#define video_buffer_unlock(self, lock) \
-	(*(self)->vb_ops->vi_unlock)(self, lock)
-#define video_buffer_getgfx(self, result, blendmode, flags, colorkey) \
-	(*(self)->vb_ops->vi_getgfx)(self, result, blendmode, flags, colorkey)
 
 #ifdef __cplusplus
 #ifndef GUARD_LIBVIDEO_GFX_API_H
@@ -187,40 +207,35 @@ public:
 	 *          being held!
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
-	__CXX_CLASSMEMBER __ATTR_WUNUSED __ATTR_NONNULL_CXX((1))
-	int LIBVIDEO_GFX_CC rlock(struct video_lock &__lock) {
+	__CXX_CLASSMEMBER __ATTR_WUNUSED int rlock(struct video_lock &__lock) {
 		return video_buffer_rlock(this, &__lock);
 	}
 
 	/* Same as `vi_rlock', but also lock for reading+writing */
-	__CXX_CLASSMEMBER __ATTR_WUNUSED __ATTR_NONNULL_CXX((1))
-	int LIBVIDEO_GFX_CC wlock(struct video_lock &__lock) {
+	__CXX_CLASSMEMBER __ATTR_WUNUSED int wlock(struct video_lock &__lock) {
 		return video_buffer_wlock(this, &__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */
-	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
-	void LIBVIDEO_GFX_CC unlock(struct video_lock &__lock) {
+	__CXX_CLASSMEMBER void unlock(struct video_lock &__lock) {
 		video_buffer_unlock(this, &__lock);
 	}
 
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
-	getgfx(struct video_gfx &__result,
-	       gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	       video_color_t __colorkey    = 0) {
+	__CXX_CLASSMEMBER struct video_gfx &getgfx(struct video_gfx &__result,
+	                                           gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
+	                                           __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	                                           video_color_t __colorkey    = 0) {
 		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 	}
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_gfx LIBVIDEO_GFX_CC
-	getgfx(gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	       video_color_t __colorkey    = 0) {
+	__CXX_CLASSMEMBER struct video_gfx getgfx(gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
+	                                          __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	                                          video_color_t __colorkey    = 0) {
 		struct video_gfx __result;
 		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 		return __result;
@@ -229,19 +244,17 @@ public:
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 	/* Convert `__self' into the specified format.
 	 * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
-	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
-	convert(struct video_codec const *__codec, struct video_palette *__palette,
-	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+	__CXX_CLASSMEMBER __REF struct video_buffer *convert(struct video_codec const *__codec,
+	                                                     struct video_palette *__palette,
+	                                                     unsigned int __type = VIDEO_BUFFER_AUTO) {
 		return video_buffer_convert(this, __codec, __palette, __type);
 	}
-	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
-	convert(struct video_format const *__format,
-	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+	__CXX_CLASSMEMBER __REF struct video_buffer *convert(struct video_format const *__format,
+	                                                     unsigned int __type = VIDEO_BUFFER_AUTO) {
 		return video_buffer_convert(this, __format->vf_codec, __format->vf_pal, __type);
 	}
-	__CXX_CLASSMEMBER __REF struct video_buffer *LIBVIDEO_GFX_CC
-	convert(struct video_buffer const *__buffer_with_wanted_format,
-	        unsigned int __type = VIDEO_BUFFER_AUTO) {
+	__CXX_CLASSMEMBER __REF struct video_buffer *convert(struct video_buffer const *__buffer_with_wanted_format,
+	                                                     unsigned int __type = VIDEO_BUFFER_AUTO) {
 		return video_buffer_convert(this,
 		                            __buffer_with_wanted_format->vb_format.vf_codec,
 		                            __buffer_with_wanted_format->vb_format.vf_pal,

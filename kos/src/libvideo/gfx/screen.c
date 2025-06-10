@@ -532,7 +532,7 @@ find_hinted_mode:
 	result->ss_ops.sbo_video.vi_rlock       = &rambuffer_lock;
 	result->ss_ops.sbo_video.vi_wlock       = &rambuffer_lock;
 	result->ss_ops.sbo_video.vi_unlock      = &rambuffer_unlock;
-	result->ss_ops.sbo_video.vi_getgfx      = &rambuffer_getgfx;
+	result->ss_ops.sbo_video.vi_initgfx     = &rambuffer_initgfx;
 	result->ss_ops.sbo_video.vi_gfx_noblend = &rambuffer_noblend;
 	result->ss_ops.sbo_video.vi_destroy     = &svga_screen_destroy;
 	shared_lock_init(&result->ss_cslock);

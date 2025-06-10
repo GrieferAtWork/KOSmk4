@@ -295,15 +295,15 @@ step:
 			             video_gfx_getclipy(&gfx),
 			             video_gfx_getclipw(&gfx),
 			             video_gfx_getcliph(&gfx));
-			gfx.blit((video_offset_t)x - gfx.vx_cxoff,
-			         (video_offset_t)y - gfx.vx_cyoff,
+			gfx.blit((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
+			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
 			         blurgfx,
-			         (video_offset_t)x - gfx.vx_cxoff,
-			         (video_offset_t)y - gfx.vx_cyoff,
+			         (video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
+			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
 			         dst_size_x,
 			         dst_size_y);
-			gfx.rect((video_offset_t)x - gfx.vx_cxoff,
-			         (video_offset_t)y - gfx.vx_cyoff,
+			gfx.rect((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
+			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
 			         dst_size_x,
 			         dst_size_y,
 			         VIDEO_COLOR_BLACK);

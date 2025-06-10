@@ -59,7 +59,7 @@ DECL_BEGIN
 
 #ifndef DEFINED_noblend_blit_compatible
 #define DEFINED_noblend_blit_compatible
-LOCAL ATTR_PURE NONNULL((1, 2)) bool CC
+LOCAL ATTR_PURE ATTR_IN(1) ATTR_IN(2) bool CC
 noblend_blit_compatible(struct video_codec const *dst,
                         struct video_codec const *src) {
 	if (dst == src)
@@ -113,7 +113,7 @@ noblend_blit_compatible(struct video_codec const *dst,
 }
 #endif /* !DEFINED_noblend_blit_compatible */
 
-INTERN ATTR_RETNONNULL NONNULL((1)) struct video_blit *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
 LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;

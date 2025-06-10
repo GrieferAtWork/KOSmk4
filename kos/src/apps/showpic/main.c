@@ -147,10 +147,10 @@ int main(int argc, char *argv[]) {
 		                                   format_buf->vb_format.vf_pal);
 		video_buffer_getgfx(sized_buffer, &sized_gfx, image_gfx.vx_blend,
 		                    image_gfx.vx_flags, image_gfx.vx_colorkey);
-		video_gfx_stretch(&sized_gfx, 0, 0, sized_gfx.vx_cxsiz, sized_gfx.vx_cysiz,
-		                  &image_gfx, 0, 0, image_gfx.vx_cxsiz, image_gfx.vx_cysiz);
+		video_gfx_stretch(&sized_gfx, 0, 0, sized_gfx.vx_hdr.vxh_cxsiz, sized_gfx.vx_hdr.vxh_cysiz,
+		                  &image_gfx, 0, 0, image_gfx.vx_hdr.vxh_cxsiz, image_gfx.vx_hdr.vxh_cysiz);
 		video_gfx_blit(&screen_gfx, blit_x, blit_y, &sized_gfx,
-		               sized_gfx.vx_cxsiz / 2, sized_gfx.vx_cysiz / 2,
+		               sized_gfx.vx_hdr.vxh_cxsiz / 2, sized_gfx.vx_hdr.vxh_cysiz / 2,
 		               blit_w, blit_h);
 		video_buffer_decref(sized_buffer);
 	} else {

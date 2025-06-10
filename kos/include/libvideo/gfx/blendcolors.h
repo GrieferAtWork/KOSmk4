@@ -207,6 +207,9 @@ gfx_blendcolors(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 #endif /* !__NO_builtin_constant_p */
 	{
 		/* Blending mode isn't known at compile-time: do full clamping */
+		/* TODO: Even when blend mode isn't known, only certain cases of
+		 *       "_GFX_BLENDFUNC_SWITCH" actually need to clamp  (`min',
+		 *       `max', `mul' never need to be clamped) */
 		_gfx_clamp(res_r);
 		_gfx_clamp(res_g);
 		_gfx_clamp(res_b);

@@ -69,42 +69,42 @@ DECL_BEGIN
 #define RAMGFX_STRIDE (size_t)self->vx_driver[RAMGFX_DRIVER__STRIDE]
 
 #if !defined(NDEBUG) && 0
-#define ASSERT_ABS_COORDS(self, x, y)                    \
-	(assertf((x) >= (self)->vx_bxmin &&                  \
-	         (x) < (self)->vx_bxend,                     \
-	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
-	         "vx_bxmin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_bxend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (x), (x),                                   \
-	         (self)->vx_bxmin, (self)->vx_bxmin,         \
-	         (self)->vx_bxend, (self)->vx_bxend),        \
-	 assertf((y) >= (self)->vx_bymin &&                  \
-	         (y) < (self)->vx_byend,                     \
-	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
-	         "vx_bymin = %" PRIuCRD " (%#" PRIxCRD ")\n" \
-	         "vx_byend = %" PRIuCRD " (%#" PRIxCRD ")",  \
-	         (y), (y),                                   \
-	         (self)->vx_bymin, (self)->vx_bymin,         \
-	         (self)->vx_byend, (self)->vx_byend))
+#define ASSERT_ABS_COORDS(self, x, y)                             \
+	(assertf((x) >= (self)->vx_hdr.vxh_bxmin &&                   \
+	         (x) < (self)->vx_hdr.vxh_bxend,                      \
+	         "x       = %" PRIuCRD " (%#" PRIxCRD ")\n"           \
+	         "vx_hdr.vxh_bxmin = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
+	         "vx_hdr.vxh_bxend = %" PRIuCRD " (%#" PRIxCRD ")",   \
+	         (x), (x),                                            \
+	         (self)->vx_hdr.vxh_bxmin, (self)->vx_hdr.vxh_bxmin,  \
+	         (self)->vx_hdr.vxh_bxend, (self)->vx_hdr.vxh_bxend), \
+	 assertf((y) >= (self)->vx_hdr.vxh_bymin &&                   \
+	         (y) < (self)->vx_hdr.vxh_byend,                      \
+	         "y       = %" PRIuCRD " (%#" PRIxCRD ")\n"           \
+	         "vx_hdr.vxh_bymin = %" PRIuCRD " (%#" PRIxCRD ")\n"  \
+	         "vx_hdr.vxh_byend = %" PRIuCRD " (%#" PRIxCRD ")",   \
+	         (y), (y),                                            \
+	         (self)->vx_hdr.vxh_bymin, (self)->vx_hdr.vxh_bymin,  \
+	         (self)->vx_hdr.vxh_byend, (self)->vx_hdr.vxh_byend))
 #else /* !NDEBUG */
 #define ASSERT_ABS_COORDS(self, x, y) (void)0
 #endif /* NDEBUG */
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTERN NONNULL((1)) video_color_t CC
+INTERN ATTR_IN(1) video_color_t CC
 libvideo_ramgfx__getcolor_noblend(struct video_gfx const *__restrict self,
                                   video_coord_t x, video_coord_t y) {
-	byte_t *line;
+	byte_t const *line;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	return self->vx_buffer->vb_format.getcolor(line, x);
 }
 
-INTERN NONNULL((1)) video_color_t CC
+INTERN ATTR_IN(1) video_color_t CC
 libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self,
                                    video_coord_t x, video_coord_t y) {
-	byte_t *line;
+	byte_t const *line;
 	video_color_t result;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
@@ -114,12 +114,12 @@ libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self,
 	return result;
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_ramgfx__putcolor(struct video_gfx *__restrict self,
+INTERN ATTR_IN(1) void CC
+libvideo_ramgfx__putcolor(struct video_gfx const *__restrict self,
                           video_coord_t x, video_coord_t y,
                           video_color_t color) {
 	byte_t *line;
-	struct video_buffer *buffer;
+	struct video_buffer const *buffer;
 	video_color_t o, n;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
@@ -130,37 +130,37 @@ libvideo_ramgfx__putcolor(struct video_gfx *__restrict self,
 	buffer->vb_format.setcolor(line, x, n);
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_ramgfx__putcolor_noblend(struct video_gfx *__restrict self,
+INTERN ATTR_IN(1) void CC
+libvideo_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
                                   video_coord_t x, video_coord_t y,
                                   video_color_t color) {
 	byte_t *line;
-	struct video_buffer *buffer;
+	struct video_buffer const *buffer;
 	ASSERT_ABS_COORDS(self, x, y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	buffer = self->vx_buffer;
 	buffer->vb_format.setcolor(line, x, color);
 }
 
-#define DEFINE_libvideo_ramgfx__putcolor_FOO(name, mode)                \
-	INTERN NONNULL((1)) void CC                                         \
-	libvideo_ramgfx__putcolor_##name(struct video_gfx *__restrict self, \
-	                                 video_coord_t x, video_coord_t y,  \
-	                                 video_color_t color) {             \
-		byte_t *line;                                                   \
-		struct video_buffer *buffer;                                    \
-		video_color_t o, n;                                             \
-		ASSERT_ABS_COORDS(self, x, y);                                  \
-		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                         \
-		buffer = self->vx_buffer;                                       \
-		o = buffer->vb_format.getcolor(line, x);                        \
-		n = gfx_blendcolors(o, color, mode);                            \
-		buffer->vb_format.setcolor(line, x, n);                         \
+#define DEFINE_libvideo_ramgfx__putcolor_FOO(name, mode)                      \
+	INTERN ATTR_IN(1) void CC                                               \
+	libvideo_ramgfx__putcolor_##name(struct video_gfx const *__restrict self, \
+	                                 video_coord_t x, video_coord_t y,        \
+	                                 video_color_t color) {                   \
+		byte_t *line;                                                         \
+		struct video_buffer const *buffer;                                    \
+		video_color_t o, n;                                                   \
+		ASSERT_ABS_COORDS(self, x, y);                                        \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                               \
+		buffer = self->vx_buffer;                                             \
+		o = buffer->vb_format.getcolor(line, x);                              \
+		n = gfx_blendcolors(o, color, mode);                                  \
+		buffer->vb_format.setcolor(line, x, n);                               \
 	}
 GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_ramgfx__putcolor_FOO)
 #undef DEFINE_libvideo_ramgfx__putcolor_FOO
 
-INTERN NONNULL((1)) video_pixel_t CC
+INTERN ATTR_IN(1) video_pixel_t CC
 libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
                           video_coord_t x, video_coord_t y) {
 	byte_t const *line;
@@ -171,8 +171,8 @@ libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
 	return buffer->vb_format.getpixel(line, x);
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_ramgfx__setpixel(struct video_gfx *__restrict self,
+INTERN ATTR_IN(1) void CC
+libvideo_ramgfx__setpixel(struct video_gfx const *__restrict self,
                           video_coord_t x, video_coord_t y,
                           video_pixel_t pixel) {
 	byte_t *line;
@@ -186,7 +186,7 @@ libvideo_ramgfx__setpixel(struct video_gfx *__restrict self,
 
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
 #define DEFINE_RAMGFX_GETSETPIXELn(n)                                     \
-	INTERN NONNULL((1)) video_pixel_t CC                                  \
+	INTERN ATTR_IN(1) video_pixel_t CC                                    \
 	libvideo_ramgfx__getpixel##n(struct video_gfx const *__restrict self, \
 	                             video_coord_t x, video_coord_t y) {      \
 		byte_t *line;                                                     \
@@ -195,8 +195,8 @@ libvideo_ramgfx__setpixel(struct video_gfx *__restrict self,
 		return ((uint##n##_t const *)line)[x];                            \
 	}                                                                     \
 	                                                                      \
-	INTERN NONNULL((1)) void CC                                           \
-	libvideo_ramgfx__setpixel##n(struct video_gfx *__restrict self,       \
+	INTERN ATTR_IN(1) void CC                                             \
+	libvideo_ramgfx__setpixel##n(struct video_gfx const *__restrict self, \
 	                             video_coord_t x, video_coord_t y,        \
 	                             video_pixel_t pixel) {                   \
 		byte_t *line;                                                     \
@@ -214,7 +214,7 @@ union pixel24 {
 	byte_t        bytes[3];
 };
 
-INTERN NONNULL((1)) video_pixel_t CC
+INTERN ATTR_IN(1) video_pixel_t CC
 libvideo_ramgfx__getpixel24(struct video_gfx const *__restrict self,
                             video_coord_t x, video_coord_t y) {
 	union pixel24 result;
@@ -229,8 +229,8 @@ libvideo_ramgfx__getpixel24(struct video_gfx const *__restrict self,
 	return result.pixel;
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_ramgfx__setpixel24(struct video_gfx *__restrict self,
+INTERN ATTR_IN(1) void CC
+libvideo_ramgfx__setpixel24(struct video_gfx const *__restrict self,
                             video_coord_t x, video_coord_t y,
                             video_pixel_t pixel) {
 	union pixel24 data;
@@ -257,7 +257,7 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
-INTERN NONNULL((1, 2)) int CC
+INTERN ATTR_INOUT(1) ATTR_OUT(2) int CC
 rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict result) {
 	struct video_rambuffer *me;
@@ -268,7 +268,7 @@ rambuffer_lock(struct video_buffer *__restrict self,
 	return 0;
 }
 
-INTERN NONNULL((1, 2)) void
+INTERN ATTR_INOUT(1) ATTR_IN(2) void
 NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
                              struct video_lock *__restrict lock) {
 #ifndef NDEBUG
@@ -282,100 +282,92 @@ NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
 	(void)lock;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1, 2)) struct video_gfx *CC
-rambuffer_getgfx(struct video_buffer *__restrict self,
-                 struct video_gfx *__restrict result,
-                 gfx_blendmode_t blendmode, uintptr_t flags,
-                 video_color_t colorkey) {
-	struct video_rambuffer *me;
-	me = (struct video_rambuffer *)self;
-	result->vx_buffer   = me;
-	result->vx_blend    = blendmode;
-	result->vx_flags    = flags;
-	result->vx_colorkey = colorkey;
-	result->vx_driver[RAMGFX_DRIVER__DATA]   = me->vb_data;
-	result->vx_driver[RAMGFX_DRIVER__STRIDE] = (void *)(uintptr_t)me->vb_stride;
-	libvideo_gfx_init_fullclip(result);
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+rambuffer_initgfx(struct video_gfx *__restrict self) {
+	struct video_rambuffer *me = (struct video_rambuffer *)self->vx_buffer;
+	self->vx_driver[RAMGFX_DRIVER__DATA]   = me->vb_data;
+	self->vx_driver[RAMGFX_DRIVER__STRIDE] = (void *)(uintptr_t)me->vb_stride;
+	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
-	result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel;
-	result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel;
+	self->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel;
+	self->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel;
 
 	/* Load optimized pixel accessors if applicable to the loaded format. */
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
 	switch (me->vb_format.vf_codec->vc_specs.vcs_bpp) {
 	case 8:
-		result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel8;
-		result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel8;
+		self->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel8;
+		self->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel8;
 		break;
 	case 16:
-		result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel16;
-		result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel16;
+		self->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel16;
+		self->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel16;
 		break;
 	case 24:
-		result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel24;
-		result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel24;
+		self->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel24;
+		self->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel24;
 		break;
 	case 32:
-		result->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel32;
-		result->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel32;
+		self->vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel32;
+		self->vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel32;
 		break;
 	default: break;
 	}
 #endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
 
 	/* Load generic operator defaults (overwritten as appropriate below) */
-	libvideo_gfx_populate_generic(result);
+	libvideo_gfx_populate_generic(self);
 
 	/* Select how colors should be read. */
-	if (flags & VIDEO_GFX_FBLUR) {
-		result->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
-	} else if (!VIDEO_COLOR_ISTRANSPARENT(colorkey)) {
-		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_with_key;
+	if (self->vx_flags & VIDEO_GFX_FBLUR) {
+		self->vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+		self->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_with_key;
 	} else {
-		result->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
+		self->vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
 	}
 
 	/* Detect special blend modes. */
-	(void)__builtin_expect(blendmode, GFX_BLENDMODE_OVERRIDE);
-	(void)__builtin_expect(blendmode, GFX_BLENDMODE_ALPHA);
-	switch (blendmode) {
+	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
+	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
+	switch (self->vx_blend) {
 	case GFX_BLENDMODE_OVERRIDE:
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+		self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
 		break;
-#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                     \
-	case mode:                                                             \
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_##name; \
+#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                   \
+	case mode:                                                           \
+		self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_##name; \
 		break;
 	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 	default:
-		if (GFX_BLENDMODE_GET_SRCRGB(blendmode) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_SRCA(blendmode) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_DSTRGB(blendmode) == GFX_BLENDDATA_ZERO &&
-		    GFX_BLENDMODE_GET_DSTA(blendmode) == GFX_BLENDDATA_ZERO &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(blendmode)) &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(blendmode))) {
-			result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+		if (GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+		    GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend))) {
+			self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
 		} else {
-			result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
+			self->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
 		}
 		break;
 	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-	if (self->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
-		if (result->vx_xops.vgxo_getcolor == &libvideo_ramgfx__getcolor_noblend)
-			result->vx_xops.vgxo_getcolor = result->vx_xops.vgxo_getpixel;
-		if (result->vx_xops.vgxo_putcolor == &libvideo_ramgfx__putcolor_noblend)
-			result->vx_xops.vgxo_putcolor = result->vx_xops.vgxo_setpixel;
+	if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+		if (self->vx_xops.vgxo_getcolor == &libvideo_ramgfx__getcolor_noblend)
+			self->vx_xops.vgxo_getcolor = self->vx_xops.vgxo_getpixel;
+		if (self->vx_xops.vgxo_putcolor == &libvideo_ramgfx__putcolor_noblend)
+			self->vx_xops.vgxo_putcolor = self->vx_xops.vgxo_setpixel;
 	}
 	/* ... */
 
-	return result;
+	return self;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1)) struct video_gfx *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
 rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
 	self->vx_colorkey = 0;
@@ -395,7 +387,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void) 
 		rambuffer_ops.vi_rlock       = &rambuffer_lock;
 		rambuffer_ops.vi_wlock       = &rambuffer_lock;
 		rambuffer_ops.vi_unlock      = &rambuffer_unlock;
-		rambuffer_ops.vi_getgfx      = &rambuffer_getgfx;
+		rambuffer_ops.vi_initgfx     = &rambuffer_initgfx;
 		rambuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy;
@@ -470,7 +462,7 @@ struct video_buffer_ops *CC membuffer_getops(void) {
 		membuffer_ops.vi_rlock       = &rambuffer_lock;
 		membuffer_ops.vi_wlock       = &rambuffer_lock;
 		membuffer_ops.vi_unlock      = &rambuffer_unlock;
-		membuffer_ops.vi_getgfx      = &rambuffer_getgfx;
+		membuffer_ops.vi_initgfx     = &rambuffer_initgfx;
 		membuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		membuffer_ops.vi_destroy = &membuffer_destroy;
