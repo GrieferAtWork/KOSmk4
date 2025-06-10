@@ -2843,3 +2843,8 @@
 #define DEFINE_RAMGFX_GETSETPIXELn(n)\
 	video_pixel_t libvideo_ramgfx__getpixel##n(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y){}\
 	void libvideo_ramgfx__setpixel##n(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_pixel_t pixel){}
+#define GFX_FOREACH_DEDICATED_BLENDMODE(cb)cb(alpha,0)cb(alpha_premultiplied,0)cb(add,0)cb(add_premultiplied,0)cb(mod,0)cb(mul,0)
+#define DECLARE_libvideo_gfx_generic__putcolor_FOO(name,...) void libvideo_gfx_generic__putcolor_##name(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_color_t color);
+#define DEFINE_libvideo_gfx_generic__putcolor_FOO(name,...) void libvideo_gfx_generic__putcolor_##name(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_color_t color){}
+#define DECLARE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_color_t color);
+#define DEFINE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx*__restrict self,video_coord_t x,video_coord_t y,video_color_t color){}

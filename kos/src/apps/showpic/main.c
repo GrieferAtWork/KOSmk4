@@ -82,10 +82,10 @@ int main(int argc, char *argv[]) {
 
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
-	                    GFX_BLENDINFO_OVERRIDE,
+	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
-	                    GFX_BLENDINFO_OVERRIDE,
+	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_FNORMAL |
 	                    VIDEO_GFX_FRDXWRAP |
 	                    VIDEO_GFX_FRDYWRAP,

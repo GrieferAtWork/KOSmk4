@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->getgfx(gfx,
-	               GFX_BLENDINFO_ALPHA,
+	               GFX_BLENDMODE_ALPHA,
 	               VIDEO_GFX_FLINEARBLIT |
 	               VIDEO_GFX_FRDXWRAP |
 	               VIDEO_GFX_FRDYWRAP |

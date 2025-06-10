@@ -189,7 +189,7 @@ struct video_blit_ops {
 	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, __src_size_x, __src_size_y,
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
-	 * >> temp_gfx  = temp->gfx(GFX_BLENDINFO_OVERRIDE);
+	 * >> temp_gfx  = temp->gfx(GFX_BLENDMODE_OVERRIDE);
 	 * >> temp_blit = temp_gfx.blitfrom(*__self->vb_src);
 	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bm);
 	 * >> temp_blit = temp_gfx.blitto(*__self->vb_dst);
@@ -395,7 +395,7 @@ struct video_gfx_ops {
 	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, src_size_x, src_size_y,
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
-	 * >> temp->gfx(temp_gfx, GFX_BLENDINFO_OVERRIDE);
+	 * >> temp->gfx(temp_gfx, GFX_BLENDMODE_OVERRIDE);
 	 * >> temp_gfx.bitfill(0, 0, src_size_x, src_size_y, color, bitmask);
 	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
 	 * >> self->stretch(dst_x, dst_y, dst_size_x, dst_size_y, &temp_gfx, 0, 0, src_size_x, src_size_y);
@@ -470,7 +470,7 @@ public:
 	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, __src_size_x, __src_size_y,
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
-	 * >> temp_gfx  = temp->gfx(GFX_BLENDINFO_OVERRIDE);
+	 * >> temp_gfx  = temp->gfx(GFX_BLENDMODE_OVERRIDE);
 	 * >> temp_blit = temp_gfx.blitfrom(*__self->vb_src);
 	 * >> temp_blit.bitblit(0, 0, __src_x, __src_y, __src_size_x, __src_size_y, __bm);
 	 * >> temp_blit = temp_gfx.blitto(*__self->vb_dst);

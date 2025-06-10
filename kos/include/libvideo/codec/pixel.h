@@ -112,6 +112,7 @@ typedef __UINT32_TYPE__ video_color_t;  /* General-purpose */
 typedef __UINT32_TYPE__ video_pixel_t;  /* Codec-specific */
 typedef __UINT8_TYPE__ video_channel_t; /* Singular color channel of "video_color_t" */
 typedef __UINT_FAST16_TYPE__ video_twochannels_t; /* Word with sufficient space for 2 color channels */
+typedef __INT_FAST16_TYPE__ video_stwochannels_t; /* Word with sufficient space for 2 color channels */
 #endif /* __CC__ */
 
 __DECL_END

@@ -68,7 +68,7 @@ DECL_BEGIN
 
 
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
- * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDINFO_OVERRIDE' */
+ * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDMODE_OVERRIDE' */
 
 PRIVATE NONNULL((1)) void CC
 libvideo_gfx_noblend__absline_llhh__bypixel(struct video_gfx *__restrict self,

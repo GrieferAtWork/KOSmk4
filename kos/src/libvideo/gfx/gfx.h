@@ -31,6 +31,21 @@
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
 
+#define BLENDINFO_ALPHA GFX_BLENDMODE_ALPHA
+#define BLENDINFO_ALPHA_PREMULTIPLIED
+
+/* List of blend modes for which we provide dedicated implementations.
+ * iow: these are the blend modes that are "fast" */
+#define GFX_FOREACH_DEDICATED_BLENDMODE(cb /*(name, mode)*/)   \
+	cb(alpha, GFX_BLENDMODE_ALPHA)                             \
+	cb(alpha_premultiplied, GFX_BLENDMODE_ALPHA_PREMULTIPLIED) \
+	cb(add, GFX_BLENDMODE_ADD)                                 \
+	cb(add_premultiplied, GFX_BLENDMODE_ADD_PREMULTIPLIED)     \
+	cb(mod, GFX_BLENDMODE_MOD)                                 \
+	cb(mul, GFX_BLENDMODE_MUL)
+
+
+
 DECL_BEGIN
 
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
@@ -54,7 +69,10 @@ INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_generic__getcolor_blur(struct 
 INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_generic__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor_noblend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
-INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor_alphablend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+#define DECLARE_libvideo_gfx_generic__putcolor_FOO(name, mode) \
+	INTDEF NONNULL((1)) void CC libvideo_gfx_generic__putcolor_##name(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+GFX_FOREACH_DEDICATED_BLENDMODE(DECLARE_libvideo_gfx_generic__putcolor_FOO)
+#undef DECLARE_libvideo_gfx_generic__putcolor_FOO
 
 /* Low-level, Generic, always-valid GFX functions (using only `fxo_getcolor' + `fxo_putcolor') */
 INTDEF NONNULL((1)) void CC libvideo_gfx_generic__absline_llhh(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
@@ -86,7 +104,7 @@ INTDEF NONNULL((1, 10)) void CC libvideo_gfx_generic_samebuf__bitstretch_n(struc
 
 
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
- * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDINFO_OVERRIDE' */
+ * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDMODE_OVERRIDE' */
 INTDEF NONNULL((1)) void CC libvideo_gfx_noblend__absline_llhh(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_noblend__absline_lhhl(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_gfx_noblend__absline_h(struct video_gfx *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
@@ -211,19 +229,30 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 	}
 
 	/* Detect special blend modes. */
-	if (self->vx_blend == GFX_BLENDINFO_OVERRIDE) {
+	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
+	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
+	switch (self->vx_blend) {
+	case GFX_BLENDMODE_OVERRIDE:
 		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-	} else if (self->vx_blend == GFX_BLENDINFO_ALPHA) {
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_alphablend;
-	} else if (GFX_BLENDINFO_GET_SRCRGB(self->vx_blend) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_SRCA(self->vx_blend) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_DSTRGB(self->vx_blend) == GFX_BLENDMODE_ZERO &&
-	           GFX_BLENDINFO_GET_DSTA(self->vx_blend) == GFX_BLENDMODE_ZERO &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(self->vx_blend)) &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(self->vx_blend))) {
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-	} else {
-		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
+		break;
+#define LINK_libvideo_gfx_generic__putcolor_FOO(name, mode)                   \
+	case mode:                                                                \
+		self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_##name; \
+		break;
+	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
+#undef LINK_libvideo_gfx_generic__putcolor_FOO
+	default:
+		if (GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+		    GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend))) {
+			self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+		} else {
+			self->vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
+		}
+		break;
 	}
 
 	/* Line/fill operators... */

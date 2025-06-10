@@ -75,11 +75,11 @@ struct video_buffer_ops {
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
-	 *                    This  argument   should  be   constructed  using   `GFX_BLENDINFO()'.
-	 *                    Usually, you will want to use `GFX_BLENDINFO_ALPHA' as blending  mode
+	 *                    This  argument   should  be   constructed  using   `GFX_BLENDMODE()'.
+	 *                    Usually, you will want to use `GFX_BLENDMODE_ALPHA' as blending  mode
 	 *                    when you wish to make use of alpha-blending. However, if you know for
 	 *                    certain  that alpha-blending isn't required, graphics performance can
-	 *                    be improved by passing  `GFX_BLENDINFO_OVERRIDE' in order to  prevent
+	 *                    be improved by passing  `GFX_BLENDMODE_OVERRIDE' in order to  prevent
 	 *                    any overhead  that would  normally  incur from  blending  operations.
 	 * @param: flags:     Set of `VIDEO_GFX_F*'
 	 * @param: colorkey:  A specific color that should always return fully opaque when read
@@ -209,7 +209,7 @@ public:
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
 	getgfx(struct video_gfx &__result,
-	       gfx_blendmode_t __blendmode = GFX_BLENDINFO_OVERRIDE,
+	       gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
 	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
 	       video_color_t __colorkey    = 0) {
 		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
@@ -218,7 +218,7 @@ public:
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx LIBVIDEO_GFX_CC
-	getgfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_OVERRIDE,
+	getgfx(gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
 	       __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
 	       video_color_t __colorkey    = 0) {
 		struct video_gfx __result;

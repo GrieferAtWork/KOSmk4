@@ -142,20 +142,23 @@ libvideo_ramgfx__putcolor_noblend(struct video_gfx *__restrict self,
 	buffer->vb_format.setcolor(line, x, color);
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_ramgfx__putcolor_alphablend(struct video_gfx *__restrict self,
-                                     video_coord_t x, video_coord_t y,
-                                     video_color_t color) {
-	byte_t *line;
-	struct video_buffer *buffer;
-	video_color_t o, n;
-	ASSERT_ABS_COORDS(self, x, y);
-	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	buffer = self->vx_buffer;
-	o = buffer->vb_format.getcolor(line, x);
-	n = gfx_blendcolors(o, color, GFX_BLENDINFO_ALPHA);
-	buffer->vb_format.setcolor(line, x, n);
-}
+#define DEFINE_libvideo_ramgfx__putcolor_FOO(name, mode)                \
+	INTERN NONNULL((1)) void CC                                         \
+	libvideo_ramgfx__putcolor_##name(struct video_gfx *__restrict self, \
+	                                 video_coord_t x, video_coord_t y,  \
+	                                 video_color_t color) {             \
+		byte_t *line;                                                   \
+		struct video_buffer *buffer;                                    \
+		video_color_t o, n;                                             \
+		ASSERT_ABS_COORDS(self, x, y);                                  \
+		line = RAMGFX_DATA + y * RAMGFX_STRIDE;                         \
+		buffer = self->vx_buffer;                                       \
+		o = buffer->vb_format.getcolor(line, x);                        \
+		n = gfx_blendcolors(o, color, mode);                            \
+		buffer->vb_format.setcolor(line, x, n);                         \
+	}
+GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_ramgfx__putcolor_FOO)
+#undef DEFINE_libvideo_ramgfx__putcolor_FOO
 
 INTERN NONNULL((1)) video_pixel_t CC
 libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
@@ -334,19 +337,30 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	}
 
 	/* Detect special blend modes. */
-	if (blendmode == GFX_BLENDINFO_OVERRIDE) {
+	(void)__builtin_expect(blendmode, GFX_BLENDMODE_OVERRIDE);
+	(void)__builtin_expect(blendmode, GFX_BLENDMODE_ALPHA);
+	switch (blendmode) {
+	case GFX_BLENDMODE_OVERRIDE:
 		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
-	} else if (blendmode == GFX_BLENDINFO_ALPHA) {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_alphablend;
-	} else if (GFX_BLENDINFO_GET_SRCRGB(blendmode) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_SRCA(blendmode) == GFX_BLENDMODE_ONE &&
-	           GFX_BLENDINFO_GET_DSTRGB(blendmode) == GFX_BLENDMODE_ZERO &&
-	           GFX_BLENDINFO_GET_DSTA(blendmode) == GFX_BLENDMODE_ZERO &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
-	           _blendinfo__is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
-	} else {
-		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
+		break;
+#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                     \
+	case mode:                                                             \
+		result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_##name; \
+		break;
+	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
+#undef LINK_libvideo_ramgfx__putcolor_FOO
+	default:
+		if (GFX_BLENDMODE_GET_SRCRGB(blendmode) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_SRCA(blendmode) == GFX_BLENDDATA_ONE &&
+		    GFX_BLENDMODE_GET_DSTRGB(blendmode) == GFX_BLENDDATA_ZERO &&
+		    GFX_BLENDMODE_GET_DSTA(blendmode) == GFX_BLENDDATA_ZERO &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(blendmode)) &&
+		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(blendmode))) {
+			result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+		} else {
+			result->vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
+		}
+		break;
 	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */

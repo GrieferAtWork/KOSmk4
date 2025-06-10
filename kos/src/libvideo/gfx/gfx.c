@@ -51,6 +51,23 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ZERO) == GFX_BLENDDATA_ONE);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE) == GFX_BLENDDATA_ZERO);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_SRC_COLOR) == GFX_BLENDDATA_ONE_MINUS_SRC_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_SRC_COLOR) == GFX_BLENDDATA_SRC_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_DST_COLOR) == GFX_BLENDDATA_ONE_MINUS_DST_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_DST_COLOR) == GFX_BLENDDATA_DST_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_SRC_ALPHA) == GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA) == GFX_BLENDDATA_SRC_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_DST_ALPHA) == GFX_BLENDDATA_ONE_MINUS_DST_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_DST_ALPHA) == GFX_BLENDDATA_DST_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_CONSTANT_COLOR) == GFX_BLENDDATA_ONE_MINUS_CONSTANT_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_CONSTANT_COLOR) == GFX_BLENDDATA_CONSTANT_COLOR);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_CONSTANT_ALPHA) == GFX_BLENDDATA_ONE_MINUS_CONSTANT_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_CONSTANT_ALPHA) == GFX_BLENDDATA_CONSTANT_ALPHA);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_SRC_ALPHA_SATURATE) == GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_SATURATE);
+static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_SATURATE) == GFX_BLENDDATA_SRC_ALPHA_SATURATE);
+
 static_assert(sizeof(struct video_blit_xops) ==
               (_VIDEO_BLIT_XOPS__N_INTERNAL * sizeof(void (*)(void))),
               "sizeof(struct video_blit_xops) doesn't match '_VIDEO_BLIT_XOPS__N_INTERNAL'");
@@ -141,14 +158,14 @@ wrap(video_offset_t offset, video_dim_t dim) {
 /************************************************************************/
 
 /* Check if `color' must be blended (false), or blending is optional (true),
- * such that behavior would be  the same when `GFX_BLENDINFO_OVERRIDE'  were
+ * such that behavior would be  the same when `GFX_BLENDMODE_OVERRIDE'  were
  * to be used. */
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool CC
 libvideo_gfx_allow_noblend(struct video_gfx *__restrict self,
                            video_color_t *__restrict p_color) {
 	gfx_blendmode_t mode = self->vx_blend;
 	/* TODO: Do this dynamically for all blending modes */
-	if (mode == GFX_BLENDINFO_ALPHA)
+	if (mode == GFX_BLENDMODE_ALPHA)
 		return VIDEO_COLOR_ISOPAQUE(*p_color);
 	return false;
 }
@@ -737,16 +754,19 @@ libvideo_gfx_generic__putcolor_noblend(struct video_gfx *__restrict self,
 	(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);
 }
 
-INTERN NONNULL((1)) void CC
-libvideo_gfx_generic__putcolor_alphablend(struct video_gfx *__restrict self,
-                                          video_coord_t x, video_coord_t y,
-                                          video_color_t color) {
-	video_pixel_t o_pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);
-	video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel);
-	video_color_t n_color = gfx_blendcolors(o_color, color, GFX_BLENDINFO_ALPHA);
-	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color);
-	(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);
-}
+#define DEFINE_libvideo_gfx_generic__putcolor_FOO(name, mode)                    \
+	INTERN NONNULL((1)) void CC                                                  \
+	libvideo_gfx_generic__putcolor_##name(struct video_gfx *__restrict self,     \
+	                                      video_coord_t x, video_coord_t y,      \
+	                                      video_color_t color) {                 \
+		video_pixel_t o_pixel = (*self->vx_xops.vgxo_getpixel)(self, x, y);      \
+		video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel); \
+		video_color_t n_color = gfx_blendcolors(o_color, color, mode);           \
+		video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color); \
+		(*self->vx_xops.vgxo_setpixel)(self, x, y, n_pixel);                     \
+	}
+GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_gfx_generic__putcolor_FOO)
+#undef DEFINE_libvideo_gfx_generic__putcolor_FOO
 
 
 

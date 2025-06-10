@@ -30,6 +30,7 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "buffer.h"
+#include "gfx.h"
 
 /* Define and link  optimized fast-pass  pixel
  * accessors for 8,16,24,32-bit pixel formats. */
@@ -69,7 +70,10 @@ INTDEF NONNULL((1)) video_color_t CC libvideo_ramgfx__getcolor_noblend(struct vi
 INTDEF NONNULL((1)) video_color_t CC libvideo_ramgfx__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) void CC libvideo_ramgfx__putcolor(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF NONNULL((1)) void CC libvideo_ramgfx__putcolor_noblend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
-INTDEF NONNULL((1)) void CC libvideo_ramgfx__putcolor_alphablend(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+#define DECLARE_libvideo_ramgfx__putcolor_FOO(name, mode) \
+	INTDEF NONNULL((1)) void CC libvideo_ramgfx__putcolor_##name(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+GFX_FOREACH_DEDICATED_BLENDMODE(DECLARE_libvideo_ramgfx__putcolor_FOO)
+#undef DECLARE_libvideo_ramgfx__putcolor_FOO
 INTDEF NONNULL((1)) video_pixel_t CC libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF NONNULL((1)) void CC libvideo_ramgfx__setpixel(struct video_gfx *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
