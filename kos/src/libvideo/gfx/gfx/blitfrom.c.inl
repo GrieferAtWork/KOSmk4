@@ -18,9 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "noblend.c.inl"
-#define DEFINE_libvideo_gfx_noblend__blitfrom_n
-//#define DEFINE_libvideo_gfx_noblend__blitfrom_l
+#include "../gfx.c"
+#define DEFINE_libvideo_gfx__blitfrom_n
+//#define DEFINE_libvideo_gfx__blitfrom_l
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/compiler.h>
@@ -33,30 +33,35 @@
 #include "../api.h"
 #include "../gfx.h"
 
-#if (defined(DEFINE_libvideo_gfx_noblend__blitfrom_n) + \
-     defined(DEFINE_libvideo_gfx_noblend__blitfrom_l)) != 1
+#if (defined(DEFINE_libvideo_gfx__blitfrom_n) + \
+     defined(DEFINE_libvideo_gfx__blitfrom_l)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_gfx_noblend__blitfrom_n
-#define LOCAL_libvideo_gfx_noblend__blitfrom           libvideo_gfx_noblend__blitfrom_n
-#define LOCAL_libvideo_gfx_generic_samebuf__stretch    libvideo_gfx_generic_samebuf__stretch_n
-#define LOCAL_libvideo_gfx_generic_samebuf__bitstretch libvideo_gfx_generic_samebuf__bitstretch_n
-#define LOCAL_libvideo_gfx_noblend_samefmt__stretch    libvideo_gfx_noblend_samefmt__stretch_n
-#define LOCAL_libvideo_gfx_noblend_samefmt__bitstretch libvideo_gfx_noblend_samefmt__bitstretch_n
-#define LOCAL_libvideo_gfx_generic__stretch            libvideo_gfx_generic__stretch_n
-#define LOCAL_libvideo_gfx_generic__bitstretch         libvideo_gfx_generic__bitstretch_n
-#else /* DEFINE_libvideo_gfx_noblend__blitfrom_n */
-#define LOCAL_libvideo_gfx_noblend__blitfrom           libvideo_gfx_noblend__blitfrom_l
-#define LOCAL_libvideo_gfx_generic_samebuf__stretch    libvideo_gfx_generic_samebuf__stretch_l
-#define LOCAL_libvideo_gfx_generic_samebuf__bitstretch libvideo_gfx_generic_samebuf__bitstretch_l
-#define LOCAL_libvideo_gfx_noblend_samefmt__stretch    libvideo_gfx_noblend_samefmt__stretch_l
-#define LOCAL_libvideo_gfx_noblend_samefmt__bitstretch libvideo_gfx_noblend_samefmt__bitstretch_l
-#define LOCAL_libvideo_gfx_generic__stretch            libvideo_gfx_generic__stretch_l
-#define LOCAL_libvideo_gfx_generic__bitstretch         libvideo_gfx_generic__bitstretch_l
-#endif /* !DEFINE_libvideo_gfx_noblend__blitfrom_n */
+#ifdef DEFINE_libvideo_gfx__blitfrom_n
+#define LOCAL_IS_NEAREST
+#elif defined(DEFINE_libvideo_gfx__blitfrom_l)
+#define LOCAL_IS_LINEAR
+#else /* ... */
+#error "Invalid configuration"
+#endif /* !... */
+
+#ifdef LOCAL_IS_NEAREST
+#define LOCAL_Xnl(x) x##_n
+#else /* LOCAL_IS_NEAREST */
+#define LOCAL_Xnl(x) x##_l
+#endif /* !LOCAL_IS_NEAREST */
+
+#define LOCAL_libvideo_gfx_samebuf__stretch_X            LOCAL_Xnl(libvideo_gfx_samebuf__stretch)
+#define LOCAL_libvideo_gfx_samebuf__bitstretch_X         LOCAL_Xnl(libvideo_gfx_samebuf__bitstretch)
+#define LOCAL_libvideo_gfx_noblend_samefmt__stretch_X    LOCAL_Xnl(libvideo_gfx_noblend_samefmt__stretch)
+#define LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X LOCAL_Xnl(libvideo_gfx_noblend_samefmt__bitstretch)
+#define LOCAL_libvideo_gfx_generic__stretch_X            LOCAL_Xnl(libvideo_gfx_generic__stretch)
+#define LOCAL_libvideo_gfx_generic__bitstretch_X         LOCAL_Xnl(libvideo_gfx_generic__bitstretch)
+#define LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap     LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
+#define LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap     LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
 
 #ifndef DEFINED_noblend_blit_compatible
 #define DEFINED_noblend_blit_compatible
@@ -115,17 +120,17 @@ noblend_blit_compatible(struct video_codec const *dst,
 #endif /* !DEFINED_noblend_blit_compatible */
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
-LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
+LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
 	video_blit_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {
-		ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic_samebuf__blit;
-		ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic_samebuf__bitblit;
-		ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic_samebuf__stretch;
-		ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic_samebuf__bitstretch;
+		ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_samebuf__blit;
+		ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_samebuf__bitblit;
+		ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_samebuf__stretch_X;
+		ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_samebuf__bitstretch_X;
 	} else {
 		if ((ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
@@ -140,28 +145,55 @@ LOCAL_libvideo_gfx_noblend__blitfrom(struct video_blit *__restrict ctx) {
 			 * data, either through video locks, or by directly reading/writing pixels */
 			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
 			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
-			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch;
-			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch;
+			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch_X;
+			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X;
 		} else {
 set_generic_operators:
 			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
 			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
-			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch;
-			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic__bitstretch;
+			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch_X;
+			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic__bitstretch_X;
 		}
 	}
 	return ctx;
 }
 
-#undef LOCAL_libvideo_gfx_noblend__blitfrom
-#undef LOCAL_libvideo_gfx_generic_samebuf__stretch
-#undef LOCAL_libvideo_gfx_generic_samebuf__bitstretch
-#undef LOCAL_libvideo_gfx_noblend_samefmt__stretch
-#undef LOCAL_libvideo_gfx_noblend_samefmt__bitstretch
-#undef LOCAL_libvideo_gfx_generic__stretch
-#undef LOCAL_libvideo_gfx_generic__bitstretch
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
+LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) {
+	video_blit_setops(ctx);
+	if (ctx->vb_src->vx_buffer == ctx->vb_dst->vx_buffer) {
+		/* Need to use different impls here that essentially do a "memmove"-style blit,
+		 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
+		 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
+		 * be read) */
+		ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_samebuf__blit;
+		ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_samebuf__bitblit;
+		ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_samebuf__stretch_X;
+		ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_samebuf__bitstretch_X;
+	} else {
+		ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
+		ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
+		ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch_X;
+		ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_generic__bitstretch_X;
+	}
+	return ctx;
+}
+
+#undef LOCAL_libvideo_gfx_samebuf__stretch_X
+#undef LOCAL_libvideo_gfx_samebuf__bitstretch_X
+#undef LOCAL_libvideo_gfx_noblend_samefmt__stretch_X
+#undef LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X
+#undef LOCAL_libvideo_gfx_generic__stretch_X
+#undef LOCAL_libvideo_gfx_generic__bitstretch_X
+#undef LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap
+#undef LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap
+
+#undef LOCAL_Xnl
+
+#undef LOCAL_IS_LINEAR
+#undef LOCAL_IS_NEAREST
 
 DECL_END
 
-#undef DEFINE_libvideo_gfx_noblend__blitfrom_n
-#undef DEFINE_libvideo_gfx_noblend__blitfrom_l
+#undef DEFINE_libvideo_gfx__blitfrom_n
+#undef DEFINE_libvideo_gfx__blitfrom_l

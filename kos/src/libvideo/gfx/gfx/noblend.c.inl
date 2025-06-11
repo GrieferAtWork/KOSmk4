@@ -639,11 +639,4 @@ libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict s
 
 DECL_END
 
-#ifndef __INTELLISENSE__
-#define DEFINE_libvideo_gfx_noblend__blitfrom_n
-#include "noblend-blitfrom.c.inl"
-#define DEFINE_libvideo_gfx_noblend__blitfrom_l
-#include "noblend-blitfrom.c.inl"
-#endif /* !__INTELLISENSE__ */
-
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL */

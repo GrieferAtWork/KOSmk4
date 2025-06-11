@@ -243,12 +243,12 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__stretch_n(struct video_blit cons
 INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic__bitstretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_samebuf__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_samebuf__stretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_samebuf__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic_samebuf__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic_samebuf__bitstretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic_samebuf__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__stretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_samebuf__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_samebuf__bitstretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_samebuf__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 
 
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
@@ -262,9 +262,9 @@ INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_noblend__bitfill(struct video_
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+#define libvideo_gfx_noblend_samefmt__stretch_l libvideo_gfx_generic__stretch_l
 INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-#define libvideo_gfx_noblend_samefmt__stretch_l    libvideo_gfx_generic__stretch_l
 #define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
@@ -422,10 +422,10 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 
 	/* Linear vs. Nearest blit */
 	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
-		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_generic__blitfrom_l;
+		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_l;
 		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
 	} else {
-		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_generic__blitfrom_n;
+		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_n;
 		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
 	}
 
@@ -439,7 +439,7 @@ libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgxo_absfill      = &libvideo_gfx_noblend__absfill;
 		self->_vx_xops.vgxo_bitfill      = &libvideo_gfx_noblend__bitfill;
 		if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
-			self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_noblend__blitfrom_n;
+			self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
 			self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 		} else {
 			self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
@@ -471,7 +471,7 @@ libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
 	self->_vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
 	self->_vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
 	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
-		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_noblend__blitfrom_n;
+		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
 		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
 	} else {
 		self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
