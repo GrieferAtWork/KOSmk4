@@ -248,7 +248,7 @@ kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
 	current.pt_except.ei_code = EXCEPT_CODEOF(E_OK);
 }
 
-PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
+INTERN SECTION_EXCEPT_DATA struct _Unwind_Exception libc_kos_unwind_exception = {
 	.exception_class   = _UEC_KERNKOS,
 	.exception_cleanup = NULL, /* Filled in lazily */
 };
@@ -260,9 +260,9 @@ libc_get_kos_unwind_exception(void) {
 	 *       this purpose, every thread probably needs its own TLS-allocated
 	 *       "struct _Unwind_Exception",  which in turn always contains this
 	 *       self-pointer needed for libstdc++ */
-	if (!kos_unwind_exception.exception_cleanup)
-		kos_unwind_exception.exception_cleanup = &kos_unwind_exception_cleanup;
-	return &kos_unwind_exception;
+	if (!libc_kos_unwind_exception.exception_cleanup)
+		libc_kos_unwind_exception.exception_cleanup = &kos_unwind_exception_cleanup;
+	return &libc_kos_unwind_exception;
 }
 
 

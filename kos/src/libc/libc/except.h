@@ -106,8 +106,8 @@ DECL_BEGIN
 struct exception_data;
 struct exception_info;
 
-INTDEF ATTR_RETNONNULL WUNUSED struct _Unwind_Exception *LIBCCALL
-libc_get_kos_unwind_exception(void);
+INTDEF struct _Unwind_Exception libc_kos_unwind_exception;
+INTDEF ATTR_RETNONNULL WUNUSED struct _Unwind_Exception *LIBCCALL libc_get_kos_unwind_exception(void);
 
 /* Returns non-zero if there is an active exception. */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW_NCX(LIBCCALL libc_except_info)(void);

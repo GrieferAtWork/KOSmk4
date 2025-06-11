@@ -131,10 +131,12 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	        "Exception handler entered, but no exception set");
 #ifdef __KERNEL__
 	assertf(ptr == (void *)&info->ei_data.e_args,
-	        "Exception pointer should be the exception data-area");
+	        "Exception pointer should be %p (the exception data-area), but is %p",
+	        (void *)&info->ei_data.e_args, ptr);
 #else /* __KERNEL__ */
-	assertf(ptr == (void *)&info->ei_data.e_args,
-	        "Exception pointer should be ");
+	assertf(ptr == (void *)&libc_kos_unwind_exception,
+	        "Exception pointer should be %p (libc_kos_unwind_exception), but is %p",
+	        (void *)&libc_kos_unwind_exception, ptr);
 #endif /* !__KERNEL__ */
 #if defined(__KERNEL__) && 0
 	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
