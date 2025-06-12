@@ -105,7 +105,7 @@ again:
 			/* Try to get read-lock and check if this TLS segment even uses `self'
 			 * If not, then we can simply skip it without ever having to acquire a
 			 * write-lock! */
-			if (!dltls_segment_ex_tryread(iter)) {
+			if (dltls_segment_ex_tryread(iter)) {
 				next = dtls_extension_tree_locate(iter->ts_extree, self);
 				dltls_segment_ex_endread(iter);
 				if (!next)
