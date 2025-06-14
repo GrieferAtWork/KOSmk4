@@ -141,7 +141,7 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	ptrdiff_t endptr = 0;
 
 	/* Assign static TLS offsets to all currently loaded modules.
-	 * NOTE: Since we've yet to invoke a  user-defined code (other than IFUNC  selectors),
+	 * NOTE: Since we've yet to invoke any user-defined code (other than IFUNC selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
 	 *       are currently running, meaning we don't have to do any sort of lock for this!
 	 * NOTE: The order of iteration here is important, as we need to assign the TLS offset

@@ -235,6 +235,7 @@ again_font:
 				goto step;
 
 			case 'p':
+				video_buffer_save(screen, "/var/screen.jpg", NULL);
 				video_buffer_save(screen, "/var/screen.png", NULL);
 				break;
 

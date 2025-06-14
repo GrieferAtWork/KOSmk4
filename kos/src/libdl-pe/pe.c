@@ -32,24 +32,40 @@
 #include "pe.h"
 /**/
 
+#include <hybrid/compiler.h>
+
 #include <hybrid/align.h>
+#include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 
 #include <asm/intrin.h>
 #include <kos/dosfs.h>
 #include <kos/except.h>
-#include <kos/exec/bits/peb.h>
+#include <kos/exec/elf.h>
+#include <kos/exec/pe.h>
+#include <kos/exec/peb.h>
+#include <kos/kernel/types.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
+#include <kos/types.h>
+#include <nt/__stdinc.h>
 #include <nt/libloaderapi.h>
+#include <nt/pe.h>
 #include <nt/tib.h>
+#include <nt/types.h>
 #include <sys/ioctl.h>
+#include <sys/syslog.h>
+#include <sys/types.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <atomic.h>
 #include <ctype.h>
 #include <dlfcn.h>
+#include <elf.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -60,9 +76,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <libdl/api.h>
+#include <libdl/extension.h>
+#include <libdl/module.h>
 
 DECL_BEGIN
 

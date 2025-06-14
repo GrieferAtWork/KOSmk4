@@ -56,7 +56,7 @@ struct video_lock {
 	__byte_t *vl_data;      /* [1..vl_size] Memory-mapped video data. */
 	__size_t  vl_size;      /* Total image size (>= vl_stride * :vb_size_y) */
 	__size_t  vl_stride;    /* Scanline width (in bytes) */
-	void     *vl_driver[1]; /* Driver-specific data */
+	void    *_vl_driver[1]; /* Driver-specific data */
 };
 
 struct video_buffer_rect {

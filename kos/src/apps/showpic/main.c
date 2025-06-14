@@ -46,8 +46,8 @@ DECL_BEGIN
 static struct video_buffer_rect const WHOLE_SCREEN = {
 	.vbr_startx = 0,
 	.vbr_starty = 0,
-	.vbr_sizex  = SIZE_MAX,
-	.vbr_sizey  = SIZE_MAX,
+	.vbr_sizex  = VIDEO_DIM_MAX,
+	.vbr_sizey  = VIDEO_DIM_MAX,
 };
 
 int main(int argc, char *argv[]) {
@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
 	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL |
+	                    VIDEO_GFX_FNORMAL/* |
 	                    VIDEO_GFX_FRDXWRAP |
-	                    VIDEO_GFX_FRDYWRAP,
+	                    VIDEO_GFX_FRDYWRAP*/,
 	                    0);
 
 	/* Calculate where the image should be displayed */
@@ -132,6 +132,12 @@ int main(int argc, char *argv[]) {
 	printk(KERN_DEBUG "SHOWPIC: BEGIN\n");
 	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	printk(KERN_DEBUG "SHOWPIC: START STRETCH\n");
+#if 1
+	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
+	                  &image_gfx, 0, 0,
+	                  video_gfx_getclipw(&image_gfx),
+	                  video_gfx_getcliph(&image_gfx));
+#else
 	if (0) { /* Change to "1" to test the tiling engine of the non-stretching blit impl */
 		struct video_gfx sized_gfx;
 		struct video_buffer *sized_buffer;
@@ -161,6 +167,7 @@ int main(int argc, char *argv[]) {
 		                  video_gfx_getclipw(&image_gfx) * 3,
 		                  video_gfx_getcliph(&image_gfx) * 3);
 	}
+#endif
 	printk(KERN_DEBUG "SHOWPIC: END\n");
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
