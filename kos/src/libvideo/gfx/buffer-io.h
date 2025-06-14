@@ -92,9 +92,14 @@ INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);
 
-/* BMP */
+/* BMP
+ * @param: p_mapfile: When  non-NULL, the function is allowed to assume
+ *                    that the given blob is owned by this mapfile, and
+ *                    is also allowed to steal that mapping by doing  a
+ *                    bzero on `*p_mapfile' */
 INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_bmp(void const *blob, size_t blob_size);
+libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
+                         struct mapfile *p_mapfile);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);

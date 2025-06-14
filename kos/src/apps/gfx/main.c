@@ -237,6 +237,7 @@ again_font:
 			case 'p':
 				video_buffer_save(screen, "/var/screen.jpg", NULL);
 				video_buffer_save(screen, "/var/screen.png", NULL);
+				video_buffer_save(screen, "/var/screen.bmp", NULL);
 				break;
 
 			default: break;

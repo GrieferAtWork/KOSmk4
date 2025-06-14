@@ -203,7 +203,7 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 	me = (struct video_rambuffer *)self;
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
-	free(me->vb_data);
+	free(me->rb_data);
 	free(me);
 }
 
@@ -212,9 +212,9 @@ rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict result) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	result->vl_stride = me->vb_stride;
-	result->vl_size   = me->vb_total;
-	result->vl_data   = me->vb_data;
+	result->vl_stride = me->rb_stride;
+	result->vl_size   = me->rb_total;
+	result->vl_data   = me->rb_data;
 	return 0;
 }
 
@@ -224,9 +224,9 @@ NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(lock->vl_stride == me->vb_stride);
-	assert(lock->vl_size == me->vb_total);
-	assert(lock->vl_data == me->vb_data);
+	assert(lock->vl_stride == me->rb_stride);
+	assert(lock->vl_size == me->rb_total);
+	assert(lock->vl_data == me->rb_data);
 #endif /* !NDEBUG */
 	(void)self;
 	(void)lock;
@@ -235,8 +235,8 @@ NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
 rambuffer_initgfx(struct video_gfx *__restrict self) {
 	struct video_rambuffer *me = (struct video_rambuffer *)self->vx_buffer;
-	self->_vx_driver[RAMGFX_DRIVER__DATA]   = me->vb_data;
-	self->_vx_driver[RAMGFX_DRIVER__STRIDE] = (void *)(uintptr_t)me->vb_stride;
+	self->_vx_driver[RAMGFX_DRIVER__DATA]   = me->rb_data;
+	self->_vx_driver[RAMGFX_DRIVER__STRIDE] = (void *)(uintptr_t)me->rb_stride;
 	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
@@ -365,11 +365,11 @@ libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
 	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
-	result->vb_data = (byte_t *)calloc(1, req.vbs_bufsize);
-	if unlikely(!result->vb_data)
+	result->rb_data = (byte_t *)calloc(1, req.vbs_bufsize);
+	if unlikely(!result->rb_data)
 		goto err_result;
-	result->vb_stride          = req.vbs_stride;
-	result->vb_total           = req.vbs_bufsize;
+	result->rb_stride          = req.vbs_stride;
+	result->rb_total           = req.vbs_bufsize;
 	result->vb_refcnt          = 1;
 	result->vb_ops             = &rambuffer_ops;
 	result->vb_format.vf_codec = codec;
@@ -401,7 +401,7 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
 	if (me->vm_release_mem)
-		(*me->vm_release_mem)(me->vm_release_mem_cookie, me->vb_data);
+		(*me->vm_release_mem)(me->vm_release_mem_cookie, me->rb_data);
 	free(me);
 }
 
@@ -468,9 +468,9 @@ libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t
 	result = (REF struct video_membuffer *)malloc(sizeof(struct video_membuffer));
 	if unlikely(!result)
 		goto err;
-	result->vb_stride             = stride;
-	result->vb_total              = stride * size_y;
-	result->vb_data               = (byte_t *)mem;
+	result->rb_stride             = stride;
+	result->rb_total              = stride * size_y;
+	result->rb_data               = (byte_t *)mem;
 	result->vb_refcnt             = 1;
 	result->vb_ops                = membuffer_getops();
 	result->vb_format.vf_codec    = codec;

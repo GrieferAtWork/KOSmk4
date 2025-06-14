@@ -58,6 +58,22 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
+#undef UINT8
+#undef UINT8
+#undef UINT16
+#undef INT16
+#undef INT32
+#undef noreturn_t
+#undef boolean
+#define UINT8      _JPEGLIB_UINT8
+#define UINT8      _JPEGLIB_UINT8
+#define UINT16     _JPEGLIB_UINT16
+#define INT16      _JPEGLIB_INT16
+#define INT32      _JPEGLIB_INT32
+#define noreturn_t _JPEGLIB_noreturn_t
+#define boolean    _JPEGLIB_boolean
+
+
 typedef unsigned int JPEGLIB_JDIMENSION;
 typedef int JPEGLIB_J_COLOR_SPACE;
 typedef byte_t JPEGLIB_JSAMPLE;
@@ -592,6 +608,14 @@ static_assert(offsetof(struct jpeg_decompress_struct, output_height) == JPEGLIB_
 static_assert(offsetof(struct jpeg_decompress_struct, output_scanline) == JPEGLIB_OFFSETOF_jpeg_decompress_struct__output_scanline);
 static_assert(offsetof(struct jpeg_decompress_struct, output_components) == JPEGLIB_OFFSETOF_jpeg_decompress_struct__output_components);
 #endif /* !HAVE_dump_jpeglib_config && __has_include(<jpeglib.h>) */
+
+#undef UINT8
+#undef UINT8
+#undef UINT16
+#undef INT16
+#undef INT32
+#undef noreturn_t
+#undef boolean
 
 DECL_END
 

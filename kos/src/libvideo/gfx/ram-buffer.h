@@ -40,9 +40,9 @@
 DECL_BEGIN
 
 struct video_rambuffer: video_buffer {
-	size_t  vb_stride; /* [const] Buffer stride */
-	size_t  vb_total;  /* [const] Total buffer size */
-	byte_t *vb_data;   /* [1..1][owned][const] Buffer data */
+	size_t  rb_stride; /* [const] Buffer stride */
+	size_t  rb_total;  /* [const] Total buffer size */
+	byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
 };
 
 /* Ram-buffer operator callbacks. */

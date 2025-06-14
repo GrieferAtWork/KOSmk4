@@ -81,7 +81,8 @@ detect_format(char const *name) {
 }
 
 PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_fmt(void const *blob, size_t blob_size, enum fmt fmt) {
+libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
+                         struct mapfile *p_mapfile, enum fmt fmt) {
 	switch (fmt) {
 	case FMT_BAD:
 		break;
@@ -90,7 +91,7 @@ libvideo_buffer_open_fmt(void const *blob, size_t blob_size, enum fmt fmt) {
 	case FMT_JPG:
 		return libvideo_buffer_open_jpg(blob, blob_size);
 	case FMT_BMP:
-		return libvideo_buffer_open_bmp(blob, blob_size);
+		return libvideo_buffer_open_bmp(blob, blob_size, p_mapfile);
 	default: __builtin_unreachable();
 	}
 	errno = ENOTSUP;
@@ -120,13 +121,13 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 
 PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_impl(void const *blob, size_t blob_size,
-                          char const *format_hint) {
+                          char const *format_hint, struct mapfile *p_mapfile) {
 	REF struct video_buffer *result;
 	enum fmt used_format, hinted_format = FMT_BAD;
 	if (format_hint != NULL) {
 		hinted_format = detect_format(format_hint);
 		if (hinted_format != FMT_BAD) {
-			result = libvideo_buffer_open_fmt(blob, blob_size, hinted_format);
+			result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, hinted_format);
 			if (result != VIDEO_BUFFER_WRONG_FMT)
 				return result;
 		}
@@ -134,7 +135,7 @@ libvideo_buffer_open_impl(void const *blob, size_t blob_size,
 	for (used_format = FMT_FIRST;
 	     (unsigned int)used_format <= (unsigned int)FMT_LAST;
 	     used_format = (enum fmt)((unsigned int)used_format + 1)) {
-		result = libvideo_buffer_open_fmt(blob, blob_size, used_format);
+		result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, used_format);
 		if (result != VIDEO_BUFFER_WRONG_FMT)
 			return result;
 	}
@@ -159,7 +160,7 @@ libvideo_buffer_save_impl(struct video_buffer *__restrict self,
 DEFINE_PUBLIC_ALIAS(video_buffer_mopen, libvideo_buffer_mopen);
 INTERN WUNUSED REF struct video_buffer *CC
 libvideo_buffer_mopen(void const *blob, size_t blob_size) {
-	return libvideo_buffer_open_impl(blob, blob_size, NULL);
+	return libvideo_buffer_open_impl(blob, blob_size, NULL, NULL);
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_fopen, libvideo_buffer_fopen);
@@ -179,7 +180,7 @@ libvideo_buffer_fdopen(fd_t fd) {
 	if (fmapfile(&mf, fd, 0, 0,
 	             (size_t)-1, 0, 0))
 		return NULL;
-	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL);
+	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
@@ -196,7 +197,7 @@ libvideo_buffer_open(char const *filename) {
 	format_hint = strrchr(filename, '.');
 	if (format_hint)
 		++format_hint;
-	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, format_hint);
+	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, format_hint, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
