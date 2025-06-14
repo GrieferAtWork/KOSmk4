@@ -283,7 +283,7 @@ NOTHROW(FCALL mfile_tryincref_and_lock_parts_r)(struct mfile *__restrict self,
 		 * reference to one which is currently blocking. */
 		struct mpart *iter, *next;
 		for (iter = mima.mm_min;; iter = next) {
-			next = mpart_tree_nextnode(mima.mm_min);
+			next = mpart_tree_nextnode(iter);
 			if unlikely(!tryincref(iter)) {
 				/* Dead mem-part. (remove from tree) */
 				mpart_tree_removenode(&self->mf_parts, iter);
