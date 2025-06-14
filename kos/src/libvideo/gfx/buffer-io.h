@@ -26,6 +26,7 @@
 
 #include <kos/types.h>
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include <libvideo/gfx/buffer.h>
@@ -72,6 +73,31 @@ INTDEF /*WUNUSED*/ NONNULL((1, 2)) int CC
 libvideo_buffer_save(struct video_buffer *self, char const *filename,
                      char const *options);
 
+
+
+/* Returned by `libvideo_buffer_open_*' when the blob doesn't match the specified format. */
+#define VIDEO_BUFFER_WRONG_FMT ((REF struct video_buffer *)-1)
+
+/* PNG */
+INTDEF WUNUSED REF struct video_buffer *CC
+libvideo_buffer_open_png(void const *blob, size_t blob_size);
+INTERN WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_png(struct video_buffer *__restrict self,
+                         FILE *stream, char const *options);
+
+/* JPG */
+INTDEF WUNUSED REF struct video_buffer *CC
+libvideo_buffer_open_jpg(void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
+                         FILE *stream, char const *options);
+
+/* BMP */
+INTDEF WUNUSED REF struct video_buffer *CC
+libvideo_buffer_open_bmp(void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
+                         FILE *stream, char const *options);
 
 DECL_END
 
