@@ -37,6 +37,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 
+#include <asm/sar.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/param.h>
@@ -109,6 +110,28 @@ union color_data {
 #define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
 #define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
 #endif /* __BYTE_ORDER__ == ... */
+
+
+/* Shift "chan" left "n" times, populating those "n" bits with copies of "chan & 1" */
+LOCAL ATTR_CONST video_channel_t CC
+repeat_lsb(video_channel_t chan, shift_t n) {
+#if 1 /* Same as other impl, but without if-statements */
+	chan = (chan << n) |
+	       ((video_channel_t)(chan & 1) *
+	        (((video_channel_t)1 << n) - 1));
+#else
+	if (n) {
+		if (chan & 1) {
+			chan <<= n;
+			chan |= ((video_channel_t)1 << n) - 1;
+		} else {
+			chan <<= n;
+		}
+	}
+#endif
+	return chan;
+}
+
 
 
 
@@ -1302,39 +1325,73 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 
 
 
-/* Extract 4-bit values from color codes */
-#define COLOR_R4(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 4)) & 0xf)
-#define COLOR_G4(color)	(((color) >> (VIDEO_COLOR_GREEN_SHIFT + 4)) & 0xf)
-#define COLOR_B4(color)	(((color) >> (VIDEO_COLOR_BLUE_SHIFT + 4)) & 0xf)
-#define COLOR_A4(color)	(((color) >> (VIDEO_COLOR_ALPHA_SHIFT + 4)) & 0xf)
+/* Extract N-bit values from color codes */
+#define COLOR_GETR1(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 7)) & 0x1)
+#define COLOR_GETG1(color) (((color) >> (VIDEO_COLOR_GREEN_SHIFT + 7)) & 0x1)
+#define COLOR_GETB1(color) (((color) >> (VIDEO_COLOR_BLUE_SHIFT + 7)) & 0x1)
+#define COLOR_GETA1(color) (((color) >> (VIDEO_COLOR_ALPHA_SHIFT + 7)) & 0x1)
+#define COLOR_GETR4(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 4)) & 0xf)
+#define COLOR_GETG4(color) (((color) >> (VIDEO_COLOR_GREEN_SHIFT + 4)) & 0xf)
+#define COLOR_GETB4(color) (((color) >> (VIDEO_COLOR_BLUE_SHIFT + 4)) & 0xf)
+#define COLOR_GETA4(color) (((color) >> (VIDEO_COLOR_ALPHA_SHIFT + 4)) & 0xf)
+#define COLOR_GETR5(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 3)) & 0x1f)
+#define COLOR_GETG5(color) (((color) >> (VIDEO_COLOR_GREEN_SHIFT + 3)) & 0x1f)
+#define COLOR_GETB5(color) (((color) >> (VIDEO_COLOR_BLUE_SHIFT + 3)) & 0x1f)
+#define COLOR_GETA5(color) (((color) >> (VIDEO_COLOR_ALPHA_SHIFT + 3)) & 0x1f)
+#define COLOR_GETR6(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 2)) & 0x3f)
+#define COLOR_GETG6(color) (((color) >> (VIDEO_COLOR_GREEN_SHIFT + 2)) & 0x3f)
+#define COLOR_GETB6(color) (((color) >> (VIDEO_COLOR_BLUE_SHIFT + 2)) & 0x3f)
+#define COLOR_GETA6(color) (((color) >> (VIDEO_COLOR_ALPHA_SHIFT + 2)) & 0x3f)
 
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union_type) \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                         \
-	name##_color2pixel(struct video_format const *__restrict UNUSED(format),         \
-	                   video_color_t color) {                                        \
-		union_type px;                                                               \
-		px.r = COLOR_R4(color);                                                      \
-		px.g = COLOR_G4(color);                                                      \
-		px.b = COLOR_B4(color);                                                      \
-		px.a = COLOR_A4(color);                                                      \
-		return px.data;                                                              \
-	}                                                                                \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                         \
-	name##_pixel2color(struct video_format const *__restrict UNUSED(format),         \
-	                   video_pixel_t pixel) {                                        \
-		union_type px;                                                               \
-		px.data = (datatype)pixel;                                                   \
-		return VIDEO_COLOR_RGBA(px.r, px.g, px.b, px.a);                             \
+#define COLOR_SETR1(r) ((video_color_t)((r) * 0xff) << VIDEO_COLOR_RED_SHIFT)
+#define COLOR_SETG1(g) ((video_color_t)((g) * 0xff) << VIDEO_COLOR_GREEN_SHIFT)
+#define COLOR_SETB1(b) ((video_color_t)((b) * 0xff) << VIDEO_COLOR_BLUE_SHIFT)
+#define COLOR_SETA1(a) ((video_color_t)((a) * 0xff) << VIDEO_COLOR_ALPHA_SHIFT)
+#define COLOR_SETR4(r) ((video_color_t)repeat_lsb(r, 4) << VIDEO_COLOR_RED_SHIFT)
+#define COLOR_SETG4(g) ((video_color_t)repeat_lsb(g, 4) << VIDEO_COLOR_GREEN_SHIFT)
+#define COLOR_SETB4(b) ((video_color_t)repeat_lsb(b, 4) << VIDEO_COLOR_BLUE_SHIFT)
+#define COLOR_SETA4(a) ((video_color_t)repeat_lsb(a, 4) << VIDEO_COLOR_ALPHA_SHIFT)
+#define COLOR_SETR5(r) ((video_color_t)repeat_lsb(r, 3) << VIDEO_COLOR_RED_SHIFT)
+#define COLOR_SETG5(g) ((video_color_t)repeat_lsb(g, 3) << VIDEO_COLOR_GREEN_SHIFT)
+#define COLOR_SETB5(b) ((video_color_t)repeat_lsb(b, 3) << VIDEO_COLOR_BLUE_SHIFT)
+#define COLOR_SETA5(a) ((video_color_t)repeat_lsb(a, 3) << VIDEO_COLOR_ALPHA_SHIFT)
+#define COLOR_SETR6(r) ((video_color_t)repeat_lsb(r, 2) << VIDEO_COLOR_RED_SHIFT)
+#define COLOR_SETG6(g) ((video_color_t)repeat_lsb(g, 2) << VIDEO_COLOR_GREEN_SHIFT)
+#define COLOR_SETB6(b) ((video_color_t)repeat_lsb(b, 2) << VIDEO_COLOR_BLUE_SHIFT)
+#define COLOR_SETA6(a) ((video_color_t)repeat_lsb(a, 2) << VIDEO_COLOR_ALPHA_SHIFT)
+
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union_type,     \
+                                                         r_bits, g_bits, b_bits, a_bits) \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                             \
+	name##_color2pixel(struct video_format const *__restrict UNUSED(format),             \
+	                   video_color_t color) {                                            \
+		union_type px;                                                                   \
+		px.r = COLOR_GETR##r_bits(color);                                                \
+		px.g = COLOR_GETG##g_bits(color);                                                \
+		px.b = COLOR_GETB##b_bits(color);                                                \
+		px.a = COLOR_GETA##a_bits(color);                                                \
+		return px.data;                                                                  \
+	}                                                                                    \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                             \
+	name##_pixel2color(struct video_format const *__restrict UNUSED(format),             \
+	                   video_pixel_t pixel) {                                            \
+		union_type px;                                                                   \
+		px.data = (datatype)pixel;                                                       \
+		return VIDEO_COLOR_RGBA(COLOR_SETR##r_bits(px.r),                                \
+		                        COLOR_SETR##g_bits(px.g),                                \
+		                        COLOR_SETR##b_bits(px.b),                                \
+		                        COLOR_SETR##a_bits(px.a));                               \
 	}
 
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union_type) \
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union_type, \
+                                                         r_bits, g_bits, b_bits)     \
 	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                         \
 	name##_color2pixel(struct video_format const *__restrict UNUSED(format),         \
 	                   video_color_t color) {                                        \
 		union_type px;                                                               \
-		px.r = COLOR_R4(color);                                                      \
-		px.g = COLOR_G4(color);                                                      \
-		px.b = COLOR_B4(color);                                                      \
+		px.r = COLOR_GETR##r_bits(color);                                            \
+		px.g = COLOR_GETG##g_bits(color);                                            \
+		px.b = COLOR_GETB##b_bits(color);                                            \
 		px.x = 0;                                                                    \
 		return px.data;                                                              \
 	}                                                                                \
@@ -1343,17 +1400,20 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 	                   video_pixel_t pixel) {                                        \
 		union_type px;                                                               \
 		px.data = (datatype)pixel;                                                   \
-		return VIDEO_COLOR_RGB(px.r, px.g, px.b);                                    \
+		return VIDEO_COLOR_RGB(COLOR_SETR##r_bits(px.r),                             \
+		                       COLOR_SETR##g_bits(px.g),                             \
+		                       COLOR_SETR##b_bits(px.b));                            \
 	}
 
-#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union_type) \
+#define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union_type, \
+                                                        r_bits, g_bits, b_bits)     \
 	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                        \
 	name##_color2pixel(struct video_format const *__restrict UNUSED(format),        \
 	                   video_color_t color) {                                       \
 		union_type px;                                                              \
-		px.r = COLOR_R4(color);                                                     \
-		px.g = COLOR_G4(color);                                                     \
-		px.b = COLOR_B4(color);                                                     \
+		px.r = COLOR_GETR##r_bits(color);                                           \
+		px.g = COLOR_GETG##g_bits(color);                                           \
+		px.b = COLOR_GETB##b_bits(color);                                           \
 		return px.data;                                                             \
 	}                                                                               \
 	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                        \
@@ -1361,7 +1421,9 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 	                   video_pixel_t pixel) {                                       \
 		union_type px;                                                              \
 		px.data = (datatype)pixel;                                                  \
-		return VIDEO_COLOR_RGB(px.r, px.g, px.b);                                   \
+		return VIDEO_COLOR_RGB(COLOR_SETR##r_bits(px.r),                            \
+		                       COLOR_SETR##g_bits(px.g),                            \
+		                       COLOR_SETR##b_bits(px.b));                           \
 	}
 
 
@@ -1371,126 +1433,146 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		datatype data;                                 \
 		struct __VA_ARGS__;                            \
 	};
-#define DEFINE_FORMAT_CONVERTER_RGBA(name, datatype, ...)  \
+#define _DEFINE_FORMAT_CONVERTER_RGBA(name, datatype, r_bits, g_bits, b_bits, a_bits, ...) \
 	DEFINE_FORMAT_PIXEL_UNION(name, datatype, __VA_ARGS__) \
-	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union pixel_##name)
-#define DEFINE_FORMAT_CONVERTER_RGBX(name, datatype, ...)  \
+	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union pixel_##name, r_bits, g_bits, b_bits, a_bits)
+#define _DEFINE_FORMAT_CONVERTER_RGBX(name, datatype, r_bits, g_bits, b_bits, ...) \
 	DEFINE_FORMAT_PIXEL_UNION(name, datatype, __VA_ARGS__) \
-	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union pixel_##name)
-#define DEFINE_FORMAT_CONVERTER_RGB(name, datatype, ...)   \
+	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union pixel_##name, r_bits, g_bits, b_bits)
+#define _DEFINE_FORMAT_CONVERTER_RGB(name, datatype, r_bits, g_bits, b_bits, ...)  \
 	DEFINE_FORMAT_PIXEL_UNION(name, datatype, __VA_ARGS__) \
-	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union pixel_##name)
+	DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union pixel_##name, r_bits, g_bits, b_bits)
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+/* Bitfields are allocated  least-significant to  most-significant.
+ * Since LE also sees  the first byte of  input data appear in  the
+ * least significant 8 bits, bitfields must be ordered ascendingly. */
+#define ENDIAN_ORDER3(_1, _2, _3)     _1; _2; _3;
+#define ENDIAN_ORDER4(_1, _2, _3, _4) _1; _2; _3; _4;
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+/* Bitfields are allocated  most-significant to  least-significant.
+ * Since BE also sees  the first byte of  input data appear in  the
+ * most significant 8 bits, bitfields must be ordered descendingly. */
+#define ENDIAN_ORDER3(_1, _2, _3)     _3; _2; _1;
+#define ENDIAN_ORDER4(_1, _2, _3, _4) _4; _3; _2; _1;
+#endif /* __BYTE_ORDER__ == ... */
+
+#define DEFINE_FORMAT_CONVERTER_RGBA(name, datatype, r_bits, g_bits, b_bits, a_bits, fields) \
+	_DEFINE_FORMAT_CONVERTER_RGBA(name, datatype, r_bits, g_bits, b_bits, a_bits, { ENDIAN_ORDER4 fields })
+#define DEFINE_FORMAT_CONVERTER_RGBX(name, datatype, r_bits, g_bits, b_bits, fields) \
+	_DEFINE_FORMAT_CONVERTER_RGBX(name, datatype, r_bits, g_bits, b_bits, { ENDIAN_ORDER4 fields })
+#define DEFINE_FORMAT_CONVERTER_RGB(name, datatype, r_bits, g_bits, b_bits, fields) \
+	_DEFINE_FORMAT_CONVERTER_RGB(name, datatype, r_bits, g_bits, b_bits, { ENDIAN_ORDER3 fields })
+
+DEFINE_FORMAT_CONVERTER_RGBA(rgba4444, u16, 4, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T a : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBX(rgbx4444, u16, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T x : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBA(argb4444, u16, 4, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T a : 4,
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T b : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBX(xrgb4444, u16, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T x : 4,
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T b : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBA(abgr4444, u16, 4, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T a : 4,
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T r : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBX(xbgr4444, u16, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T x : 4,
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T r : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBA(bgra4444, u16, 4, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T a : 4
+));
+DEFINE_FORMAT_CONVERTER_RGBX(bgrx4444, u16, 4, 4, 4, (
+	__HYBRID_BITFIELD8_T b : 4,
+	__HYBRID_BITFIELD8_T g : 4,
+	__HYBRID_BITFIELD8_T r : 4,
+	__HYBRID_BITFIELD8_T x : 4
+));
 
 
-DEFINE_FORMAT_CONVERTER_RGBA(rgba4444, u16, {
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T a : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(rgbx4444, u16, {
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T x : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(argb4444, u16, {
-	__HYBRID_BITFIELD8_T a : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(xrgb4444, u16, {
-	__HYBRID_BITFIELD8_T x : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(abgr4444, u16, {
-	__HYBRID_BITFIELD8_T a : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(xbgr4444, u16, {
-	__HYBRID_BITFIELD8_T x : 4;
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(bgra4444, u16, {
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T a : 4;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(bgrx4444, u16, {
-	__HYBRID_BITFIELD8_T b : 4;
-	__HYBRID_BITFIELD8_T g : 4;
-	__HYBRID_BITFIELD8_T r : 4;
-	__HYBRID_BITFIELD8_T x : 4;
-});
+DEFINE_FORMAT_CONVERTER_RGBA(rgba5551, u16, 5, 5, 5, 1, (
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T a : 1
+));
+DEFINE_FORMAT_CONVERTER_RGBX(rgbx5551, u16, 5, 5, 5, (
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T x : 1
+));
+DEFINE_FORMAT_CONVERTER_RGBA(argb1555, u16, 5, 5, 5, 1, (
+	__HYBRID_BITFIELD8_T a : 1,
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T b : 5
+));
+DEFINE_FORMAT_CONVERTER_RGBX(xrgb1555, u16, 5, 5, 5, (
+	__HYBRID_BITFIELD8_T x : 1,
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T b : 5
+));
+DEFINE_FORMAT_CONVERTER_RGBA(abgr1555, u16, 5, 5, 5, 1, (
+	__HYBRID_BITFIELD8_T a : 1,
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T r : 5
+));
+DEFINE_FORMAT_CONVERTER_RGBX(xbgr1555, u16, 5, 5, 5, (
+	__HYBRID_BITFIELD8_T x : 1,
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T r : 5
+));
+DEFINE_FORMAT_CONVERTER_RGBA(bgra5551, u16, 5, 5, 5, 1, (
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T a : 1
+));
+DEFINE_FORMAT_CONVERTER_RGBX(bgrx5551, u16, 5, 5, 5, (
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T g : 5,
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T x : 1
+));
 
-
-DEFINE_FORMAT_CONVERTER_RGBA(rgba5551, u16, {
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T a : 1;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(rgbx5551, u16, {
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T x : 1;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(argb1555, u16, {
-	__HYBRID_BITFIELD8_T a : 1;
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T b : 5;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(xrgb1555, u16, {
-	__HYBRID_BITFIELD8_T x : 1;
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T b : 5;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(abgr1555, u16, {
-	__HYBRID_BITFIELD8_T a : 1;
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T r : 5;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(xbgr1555, u16, {
-	__HYBRID_BITFIELD8_T x : 1;
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T r : 5;
-});
-DEFINE_FORMAT_CONVERTER_RGBA(bgra5551, u16, {
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T a : 1;
-});
-DEFINE_FORMAT_CONVERTER_RGBX(bgrx5551, u16, {
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T g : 5;
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T x : 1;
-});
-
-DEFINE_FORMAT_CONVERTER_RGB(rgb565, u16, {
-	__HYBRID_BITFIELD8_T r : 5;
-	__HYBRID_BITFIELD8_T g : 6;
-	__HYBRID_BITFIELD8_T b : 5;
-});
-DEFINE_FORMAT_CONVERTER_RGB(bgr565, u16, {
-	__HYBRID_BITFIELD8_T b : 5;
-	__HYBRID_BITFIELD8_T g : 6;
-	__HYBRID_BITFIELD8_T r : 5;
-});
+DEFINE_FORMAT_CONVERTER_RGB(rgb565, u16, 5, 6, 5, (
+	__HYBRID_BITFIELD8_T r : 5,
+	__HYBRID_BITFIELD8_T g : 6,
+	__HYBRID_BITFIELD8_T b : 5
+));
+DEFINE_FORMAT_CONVERTER_RGB(bgr565, u16, 5, 6, 5, (
+	__HYBRID_BITFIELD8_T b : 5,
+	__HYBRID_BITFIELD8_T g : 6,
+	__HYBRID_BITFIELD8_T r : 5
+));
 
 
 
@@ -1807,10 +1889,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
-	                /* vcs_rmask */ MASK4(0xff000000),
-	                /* vcs_gmask */ MASK4(0x00ff0000),
-	                /* vcs_bmask */ MASK4(0x0000ff00),
-	                /* vcs_amask */ MASK4(0x000000ff)),
+	                /* vcs_rmask */ MASK4_LE(0x000000ff),
+	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_amask */ MASK4_LE(0xff000000)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
 	               linecopy32, linefill32,
@@ -1822,9 +1904,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK4(0xff000000),
-	                /* vcs_gmask */ MASK4(0x00ff0000),
-	                /* vcs_bmask */ MASK4(0x0000ff00),
+	                /* vcs_rmask */ MASK4_LE(0x000000ff),
+	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_bmask */ MASK4_LE(0x00ff0000),
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
@@ -1837,10 +1919,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
-	                /* vcs_rmask */ MASK4(0x00ff0000),
-	                /* vcs_gmask */ MASK4(0x0000ff00),
-	                /* vcs_bmask */ MASK4(0x000000ff),
-	                /* vcs_amask */ MASK4(0xff000000)),
+	                /* vcs_rmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_bmask */ MASK4_LE(0xff000000),
+	                /* vcs_amask */ MASK4_LE(0x000000ff)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
 	               linecopy32, linefill32,
@@ -1852,9 +1934,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK4(0x00ff0000),
-	                /* vcs_gmask */ MASK4(0x0000ff00),
-	                /* vcs_bmask */ MASK4(0x000000ff),
+	                /* vcs_rmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_bmask */ MASK4_LE(0xff000000),
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
@@ -1867,10 +1949,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
-	                /* vcs_rmask */ MASK4(0x000000ff),
-	                /* vcs_gmask */ MASK4(0x0000ff00),
-	                /* vcs_bmask */ MASK4(0x00ff0000),
-	                /* vcs_amask */ MASK4(0xff000000)),
+	                /* vcs_rmask */ MASK4_LE(0xff000000),
+	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_amask */ MASK4_LE(0x000000ff)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
 	               linecopy32, linefill32,
@@ -1882,9 +1964,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK4(0x000000ff),
-	                /* vcs_gmask */ MASK4(0x0000ff00),
-	                /* vcs_bmask */ MASK4(0x00ff0000),
+	                /* vcs_rmask */ MASK4_LE(0xff000000),
+	                /* vcs_gmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_bmask */ MASK4_LE(0x0000ff00),
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
@@ -1897,10 +1979,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
-	                /* vcs_rmask */ MASK4(0x0000ff00),
-	                /* vcs_gmask */ MASK4(0x00ff0000),
-	                /* vcs_bmask */ MASK4(0xff000000),
-	                /* vcs_amask */ MASK4(0x000000ff)),
+	                /* vcs_rmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_bmask */ MASK4_LE(0x000000ff),
+	                /* vcs_amask */ MASK4_LE(0xff000000)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
 	               linecopy32, linefill32,
@@ -1912,9 +1994,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK4(0x0000ff00),
-	                /* vcs_gmask */ MASK4(0x00ff0000),
-	                /* vcs_bmask */ MASK4(0xff000000),
+	                /* vcs_rmask */ MASK4_LE(0x00ff0000),
+	                /* vcs_gmask */ MASK4_LE(0x0000ff00),
+	                /* vcs_bmask */ MASK4_LE(0x000000ff),
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
@@ -1930,10 +2012,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0xf000),
-	                /* vcs_gmask */ MASK2(0x0f00),
-	                /* vcs_bmask */ MASK2(0x00f0),
-	                /* vcs_amask */ MASK2(0x000f)),
+	                /* vcs_rmask */ MASK2_LE(0x000f),
+	                /* vcs_gmask */ MASK2_LE(0x00f0),
+	                /* vcs_bmask */ MASK2_LE(0x0f00),
+	                /* vcs_amask */ MASK2_LE(0xf000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -1945,9 +2027,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
-	                /* vcs_rmask */ MASK2(0xf000),
-	                /* vcs_gmask */ MASK2(0x0f00),
-	                /* vcs_bmask */ MASK2(0x00f0),
+	                /* vcs_rmask */ MASK2_LE(0x000f),
+	                /* vcs_gmask */ MASK2_LE(0x00f0),
+	                /* vcs_bmask */ MASK2_LE(0x0f00),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -1960,10 +2042,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x0f00),
-	                /* vcs_gmask */ MASK2(0x00f0),
-	                /* vcs_bmask */ MASK2(0x000f),
-	                /* vcs_amask */ MASK2(0xf000)),
+	                /* vcs_rmask */ MASK2_LE(0x00f0),
+	                /* vcs_gmask */ MASK2_LE(0x0f00),
+	                /* vcs_bmask */ MASK2_LE(0xf000),
+	                /* vcs_amask */ MASK2_LE(0x000f)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -1975,9 +2057,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
-	                /* vcs_rmask */ MASK2(0x0f00),
-	                /* vcs_gmask */ MASK2(0x00f0),
-	                /* vcs_bmask */ MASK2(0x000f),
+	                /* vcs_rmask */ MASK2_LE(0x00f0),
+	                /* vcs_gmask */ MASK2_LE(0x0f00),
+	                /* vcs_bmask */ MASK2_LE(0xf000),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -1990,10 +2072,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x000f),
-	                /* vcs_gmask */ MASK2(0x00f0),
-	                /* vcs_bmask */ MASK2(0x0f00),
-	                /* vcs_amask */ MASK2(0xf000)),
+	                /* vcs_rmask */ MASK2_LE(0xf000),
+	                /* vcs_gmask */ MASK2_LE(0x0f00),
+	                /* vcs_bmask */ MASK2_LE(0x00f0),
+	                /* vcs_amask */ MASK2_LE(0x000f)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2005,9 +2087,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
-	                /* vcs_rmask */ MASK2(0x000f),
-	                /* vcs_gmask */ MASK2(0x00f0),
-	                /* vcs_bmask */ MASK2(0x0f00),
+	                /* vcs_rmask */ MASK2_LE(0xf000),
+	                /* vcs_gmask */ MASK2_LE(0x0f00),
+	                /* vcs_bmask */ MASK2_LE(0x00f0),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2020,10 +2102,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x00f0),
-	                /* vcs_gmask */ MASK2(0x0f00),
-	                /* vcs_bmask */ MASK2(0xf000),
-	                /* vcs_amask */ MASK2(0x000f)),
+	                /* vcs_rmask */ MASK2_LE(0x0f00),
+	                /* vcs_gmask */ MASK2_LE(0x00f0),
+	                /* vcs_bmask */ MASK2_LE(0x000f),
+	                /* vcs_amask */ MASK2_LE(0xf000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2035,9 +2117,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
-	                /* vcs_rmask */ MASK2(0x00f0),
-	                /* vcs_gmask */ MASK2(0x0f00),
-	                /* vcs_bmask */ MASK2(0xf000),
+	                /* vcs_rmask */ MASK2_LE(0x0f00),
+	                /* vcs_gmask */ MASK2_LE(0x00f0),
+	                /* vcs_bmask */ MASK2_LE(0x000f),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2050,10 +2132,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0xf800),
-	                /* vcs_gmask */ MASK2(0x07c0),
-	                /* vcs_bmask */ MASK2(0x003e),
-	                /* vcs_amask */ MASK2(0x0001)),
+	                /* vcs_rmask */ MASK2_LE(0x001f),
+	                /* vcs_gmask */ MASK2_LE(0x03e0),
+	                /* vcs_bmask */ MASK2_LE(0x7c00),
+	                /* vcs_amask */ MASK2_LE(0x8000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2065,9 +2147,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
-	                /* vcs_rmask */ MASK2(0xf800),
-	                /* vcs_gmask */ MASK2(0x07c0),
-	                /* vcs_bmask */ MASK2(0x003e),
+	                /* vcs_rmask */ MASK2_LE(0x001f),
+	                /* vcs_gmask */ MASK2_LE(0x03e0),
+	                /* vcs_bmask */ MASK2_LE(0x7c00),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2080,10 +2162,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x7c00),
-	                /* vcs_gmask */ MASK2(0x03e0),
-	                /* vcs_bmask */ MASK2(0x001f),
-	                /* vcs_amask */ MASK2(0x8000)),
+	                /* vcs_rmask */ MASK2_LE(0x003e),
+	                /* vcs_gmask */ MASK2_LE(0x07c0),
+	                /* vcs_bmask */ MASK2_LE(0xf800),
+	                /* vcs_amask */ MASK2_LE(0x0001)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2095,9 +2177,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
-	                /* vcs_rmask */ MASK2(0x7c00),
-	                /* vcs_gmask */ MASK2(0x03e0),
-	                /* vcs_bmask */ MASK2(0x001f),
+	                /* vcs_rmask */ MASK2_LE(0x003e),
+	                /* vcs_gmask */ MASK2_LE(0x07c0),
+	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2110,10 +2192,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x001f),
-	                /* vcs_gmask */ MASK2(0x03e0),
-	                /* vcs_bmask */ MASK2(0x7c00),
-	                /* vcs_amask */ MASK2(0x8000)),
+	                /* vcs_rmask */ MASK2_LE(0xf800),
+	                /* vcs_gmask */ MASK2_LE(0x07c0),
+	                /* vcs_bmask */ MASK2_LE(0x003e),
+	                /* vcs_amask */ MASK2_LE(0x0001)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2125,9 +2207,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
-	                /* vcs_rmask */ MASK2(0x001f),
-	                /* vcs_gmask */ MASK2(0x03e0),
-	                /* vcs_bmask */ MASK2(0x7c00),
+	                /* vcs_rmask */ MASK2_LE(0xf800),
+	                /* vcs_gmask */ MASK2_LE(0x07c0),
+	                /* vcs_bmask */ MASK2_LE(0x003e),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2140,10 +2222,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x003e),
-	                /* vcs_gmask */ MASK2(0x07c0),
-	                /* vcs_bmask */ MASK2(0xf800),
-	                /* vcs_amask */ MASK2(0x0001)),
+	                /* vcs_rmask */ MASK2_LE(0x7c00),
+	                /* vcs_gmask */ MASK2_LE(0x03e0),
+	                /* vcs_bmask */ MASK2_LE(0x001f),
+	                /* vcs_amask */ MASK2_LE(0x8000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
 	               linecopy16, linefill16,
@@ -2155,9 +2237,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
-	                /* vcs_rmask */ MASK2(0x003e),
-	                /* vcs_gmask */ MASK2(0x07c0),
-	                /* vcs_bmask */ MASK2(0xf800),
+	                /* vcs_rmask */ MASK2_LE(0x7c00),
+	                /* vcs_gmask */ MASK2_LE(0x03e0),
+	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2170,9 +2252,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0xf800),
-	                /* vcs_gmask */ MASK2(0x07e0),
-	                /* vcs_bmask */ MASK2(0x001f),
+	                /* vcs_rmask */ MASK2_LE(0x001f),
+	                /* vcs_gmask */ MASK2_LE(0x07e0),
+	                /* vcs_bmask */ MASK2_LE(0xf800),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2185,9 +2267,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
-	                /* vcs_rmask */ MASK2(0x001f),
-	                /* vcs_gmask */ MASK2(0x07e0),
-	                /* vcs_bmask */ MASK2(0xf800),
+	                /* vcs_rmask */ MASK2_LE(0xf800),
+	                /* vcs_gmask */ MASK2_LE(0x07e0),
+	                /* vcs_bmask */ MASK2_LE(0x001f),
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
@@ -2203,9 +2285,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 24,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK3(0xff0000),
-	                /* vcs_gmask */ MASK3(0x00ff00),
-	                /* vcs_bmask */ MASK3(0x0000ff),
+	                /* vcs_rmask */ MASK3_LE(0x0000ff),
+	                /* vcs_gmask */ MASK3_LE(0x00ff00),
+	                /* vcs_bmask */ MASK3_LE(0xff0000),
 	                /* vcs_amask */ 0),
 	               buffer24_requirements,
 	               getpixel24, setpixel24,
@@ -2216,9 +2298,9 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 24,
 	                /* vcs_cbits */ 24,
-	                /* vcs_rmask */ MASK3(0x0000ff),
-	                /* vcs_gmask */ MASK3(0x00ff00),
-	                /* vcs_bmask */ MASK3(0xff0000),
+	                /* vcs_rmask */ MASK3_LE(0xff0000),
+	                /* vcs_gmask */ MASK3_LE(0x00ff00),
+	                /* vcs_bmask */ MASK3_LE(0x0000ff),
 	                /* vcs_amask */ 0),
 	               buffer24_requirements,
 	               getpixel24, setpixel24,
@@ -2348,26 +2430,6 @@ pdep_pal_color2pixel(struct video_format const *__restrict format,
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
-
-LOCAL ATTR_CONST video_channel_t CC
-repeat_lsb(video_channel_t chan, shift_t n) {
-#if 1 /* Same as other impl, but without if-statements */
-	chan = (chan << n) |
-	       ((video_channel_t)(chan & 1) *
-	        (((video_channel_t)1 << n) - 1));
-#else
-	if (n) {
-		if (chan & 1) {
-			chan <<= n;
-			chan |= ((video_channel_t)1 << n) - 1;
-		} else {
-			chan <<= n;
-		}
-	}
-#endif
-	return chan;
-}
-
 
 LOCAL ATTR_CONST video_channel_t CC
 pext_channel(video_pixel_t pixel,

@@ -35,15 +35,24 @@
 
 DECL_BEGIN
 
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define MASK4(x) __UINT32_C(x)
-#define MASK3(x) __UINT32_C(x)
-#define MASK2(x) __UINT16_C(x)
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-#define MASK4(x) __hybrid_bswap32_c(__UINT32_C(x))
-#define MASK3(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
-#define MASK2(x) __hybrid_bswap16_c(__UINT16_C(x))
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#define MASKn(n) (((video_pixel_t)1 << (n)) - 1)
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define MASK4_BE(x) __hybrid_bswap32_c(__UINT32_C(x))
+#define MASK3_BE(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
+#define MASK2_BE(x) __hybrid_bswap16_c(__UINT16_C(x))
+#define MASK4_LE(x) __UINT32_C(x)
+#define MASK3_LE(x) __UINT32_C(x)
+#define MASK2_LE(x) __UINT16_C(x)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define MASK4_BE(x) __UINT32_C(x)
+#define MASK3_BE(x) __UINT32_C(x)
+#define MASK2_BE(x) __UINT16_C(x)
+#define MASK4_LE(x) __hybrid_bswap32_c(__UINT32_C(x))
+#define MASK3_LE(x) (__hybrid_bswap32_c(__UINT32_C(x)) >> 8)
+#define MASK2_LE(x) __hybrid_bswap16_c(__UINT16_C(x))
+#endif /* __BYTE_ORDER__ == ... */
+
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */

@@ -91,43 +91,43 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 #define SET_CODEC(c) do{codec = (c); goto return_codec;}__WHILE0
 		switch (specs->vcs_bpp) {
 		case 32:
-			if (specs->vcs_rmask == MASK4(0xff000000)) {
-				if (specs->vcs_gmask == MASK4(0x00ff0000) &&
-				    specs->vcs_bmask == MASK4(0x0000ff00)) {
-					if (specs->vcs_amask == MASK4(0x000000ff)) {
+			if (specs->vcs_rmask == MASK4_LE(0x000000ff)) {
+				if (specs->vcs_gmask == MASK4_LE(0x0000ff00) &&
+				    specs->vcs_bmask == MASK4_LE(0x00ff0000)) {
+					if (specs->vcs_amask == MASK4_LE(0xff000000)) {
 						SET_CODEC(VIDEO_CODEC_RGBA8888);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_RGBX8888);
 					}
 				}
-			} else if (specs->vcs_amask == MASK4(0xff000000)) {
-				if (specs->vcs_gmask == MASK4(0x0000ff00)) {
-					if (specs->vcs_rmask == MASK4(0x00ff0000) &&
-					    specs->vcs_bmask == MASK4(0x000000ff)) {
+			} else if (specs->vcs_amask == MASK4_LE(0x000000ff)) {
+				if (specs->vcs_gmask == MASK4_LE(0x00ff0000)) {
+					if (specs->vcs_rmask == MASK4_LE(0x0000ff00) &&
+					    specs->vcs_bmask == MASK4_LE(0xff000000)) {
 						SET_CODEC(VIDEO_CODEC_ARGB8888);
-					} else if (specs->vcs_rmask == MASK4(0x000000ff) &&
-					           specs->vcs_bmask == MASK4(0x00ff0000)) {
+					} else if (specs->vcs_rmask == MASK4_LE(0xff000000) &&
+					           specs->vcs_bmask == MASK4_LE(0x0000ff00)) {
 						SET_CODEC(VIDEO_CODEC_ABGR8888);
 					}
 				}
-			} else if (specs->vcs_bmask == MASK4(0xff000000)) {
-				if (specs->vcs_gmask == MASK4(0x00ff0000) &&
-				    specs->vcs_rmask == MASK4(0x0000ff00)) {
-					if (specs->vcs_amask == MASK4(0x000000ff)) {
+			} else if (specs->vcs_bmask == MASK4_LE(0x000000ff)) {
+				if (specs->vcs_gmask == MASK4_LE(0x0000ff00) &&
+				    specs->vcs_rmask == MASK4_LE(0x00ff0000)) {
+					if (specs->vcs_amask == MASK4_LE(0xff000000)) {
 						SET_CODEC(VIDEO_CODEC_BGRA8888);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_BGRX8888);
 					}
 				}
 			} else {
-				if (specs->vcs_rmask == MASK4(0x00ff0000)) {
-					if (specs->vcs_gmask == MASK4(0x0000ff00) &&
-					    specs->vcs_bmask == MASK4(0x000000ff) &&
+				if (specs->vcs_rmask == MASK4_LE(0x0000ff00)) {
+					if (specs->vcs_gmask == MASK4_LE(0x00ff0000) &&
+					    specs->vcs_bmask == MASK4_LE(0xff000000) &&
 					    specs->vcs_amask == 0)
 						SET_CODEC(VIDEO_CODEC_XRGB8888);
-				} else if (specs->vcs_bmask == MASK4(0x00ff0000)) {
-					if (specs->vcs_gmask == MASK4(0x0000ff00) &&
-					    specs->vcs_rmask == MASK4(0x000000ff) &&
+				} else if (specs->vcs_bmask == MASK4_LE(0x0000ff00)) {
+					if (specs->vcs_gmask == MASK4_LE(0x00ff0000) &&
+					    specs->vcs_rmask == MASK4_LE(0xff000000) &&
 					    specs->vcs_amask == 0)
 						SET_CODEC(VIDEO_CODEC_XBGR8888);
 				}
@@ -136,104 +136,104 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 
 		case 24:
 			if (specs->vcs_amask == 0 &&
-			    specs->vcs_gmask == MASK3(0x00ff00)) {
-				if (specs->vcs_rmask == MASK3(0xff0000) &&
-				    specs->vcs_bmask == MASK3(0x0000ff)) {
+			    specs->vcs_gmask == MASK3_LE(0x00ff00)) {
+				if (specs->vcs_rmask == MASK3_LE(0x0000ff) &&
+				    specs->vcs_bmask == MASK3_LE(0xff0000)) {
 					SET_CODEC(VIDEO_CODEC_RGB888);
-				} else if (specs->vcs_rmask == MASK3(0x0000ff) &&
-				           specs->vcs_bmask == MASK3(0xff0000)) {
+				} else if (specs->vcs_rmask == MASK3_LE(0xff0000) &&
+				           specs->vcs_bmask == MASK3_LE(0x0000ff)) {
 					SET_CODEC(VIDEO_CODEC_BGR888);
 				}
 			}
 			break;
 
 		case 16:
-			if (specs->vcs_rmask == MASK2(0xf000)) {
-				if (specs->vcs_gmask == MASK2(0x0f00) &&
-				    specs->vcs_bmask == MASK2(0x00f0)) {
-					if (specs->vcs_amask == MASK2(0x000f)) {
+			if (specs->vcs_rmask == MASK2_LE(0x000f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x00f0) &&
+				    specs->vcs_bmask == MASK2_LE(0x0f00)) {
+					if (specs->vcs_amask == MASK2_LE(0xf000)) {
 						SET_CODEC(VIDEO_CODEC_RGBA4444);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_RGBX4444);
 					}
 				}
-			} else if (specs->vcs_bmask == MASK2(0xf000)) {
-				if (specs->vcs_gmask == MASK2(0x0f00) &&
-				    specs->vcs_rmask == MASK2(0x00f0)) {
-					if (specs->vcs_amask == MASK2(0x000f)) {
+			} else if (specs->vcs_bmask == MASK2_LE(0x000f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x00f0) &&
+				    specs->vcs_rmask == MASK2_LE(0x0f00)) {
+					if (specs->vcs_amask == MASK2_LE(0xf000)) {
 						SET_CODEC(VIDEO_CODEC_BGRA4444);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_BGRX4444);
 					}
 				}
-			} else if (specs->vcs_amask == MASK2(0xf000)) {
-				if (specs->vcs_gmask == MASK2(0x00f0)) {
-					if (specs->vcs_rmask == MASK2(0x0f00) &&
-					    specs->vcs_bmask == MASK2(0x000f)) {
+			} else if (specs->vcs_amask == MASK2_LE(0x000f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x0f00)) {
+					if (specs->vcs_rmask == MASK2_LE(0x00f0) &&
+					    specs->vcs_bmask == MASK2_LE(0xf000)) {
 						SET_CODEC(VIDEO_CODEC_ARGB4444);
-					} else if (specs->vcs_rmask == MASK2(0x000f) &&
-					           specs->vcs_bmask == MASK2(0x0f00)) {
+					} else if (specs->vcs_rmask == MASK2_LE(0xf000) &&
+					           specs->vcs_bmask == MASK2_LE(0x00f0)) {
 						SET_CODEC(VIDEO_CODEC_ABGR4444);
 					}
 				}
 			} else if (specs->vcs_amask == 0) {
-				if (specs->vcs_gmask == MASK2(0x00f0)) {
-					if (specs->vcs_rmask == MASK2(0x0f00) &&
-					    specs->vcs_bmask == MASK2(0x000f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x0f00)) {
+					if (specs->vcs_rmask == MASK2_LE(0x00f0) &&
+					    specs->vcs_bmask == MASK2_LE(0xf000)) {
 						SET_CODEC(VIDEO_CODEC_XRGB4444);
-					} else if (specs->vcs_rmask == MASK2(0x000f) &&
-					           specs->vcs_bmask == MASK2(0x0f00)) {
+					} else if (specs->vcs_rmask == MASK2_LE(0xf000) &&
+					           specs->vcs_bmask == MASK2_LE(0x00f0)) {
 						SET_CODEC(VIDEO_CODEC_XBGR4444);
 					}
 				}
 			}
 
 			if (specs->vcs_amask == 0 &&
-			    specs->vcs_gmask == MASK2(0x07e0)) {
-				if (specs->vcs_rmask == MASK2(0xf800)) {
-					if (specs->vcs_bmask == MASK2(0x001f))
+			    specs->vcs_gmask == MASK2_LE(0x07e0)) {
+				if (specs->vcs_rmask == MASK2_LE(0x001f)) {
+					if (specs->vcs_bmask == MASK2_LE(0xf800))
 						SET_CODEC(VIDEO_CODEC_RGB565);
-				} else if (specs->vcs_bmask == MASK2(0xf800)) {
-					if (specs->vcs_rmask == MASK2(0x001f))
+				} else if (specs->vcs_bmask == MASK2_LE(0x001f)) {
+					if (specs->vcs_rmask == MASK2_LE(0xf800))
 						SET_CODEC(VIDEO_CODEC_BGR565);
 				}
 			}
 
-			if (specs->vcs_rmask == MASK2(0xf800)) {
-				if (specs->vcs_gmask == MASK2(0x07c0) &&
-				    specs->vcs_bmask == MASK2(0x003e)) {
-					if (specs->vcs_amask == MASK2(0x0001)) {
+			if (specs->vcs_rmask == MASK2_LE(0x001f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x03e0) &&
+				    specs->vcs_bmask == MASK2_LE(0x7c00)) {
+					if (specs->vcs_amask == MASK2_LE(0x8000)) {
 						SET_CODEC(VIDEO_CODEC_RGBA5551);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_RGBX5551);
 					}
 				}
-			} else if (specs->vcs_amask == MASK2(0x8000)) {
-				if (specs->vcs_gmask == MASK2(0x03e0)) {
-					if (specs->vcs_rmask == MASK2(0x7c00) &&
-					    specs->vcs_bmask == MASK2(0x001f)) {
+			} else if (specs->vcs_amask == MASK2_LE(0x0001)) {
+				if (specs->vcs_gmask == MASK2_LE(0x07c0)) {
+					if (specs->vcs_rmask == MASK2_LE(0x003e) &&
+					    specs->vcs_bmask == MASK2_LE(0xf800)) {
 						SET_CODEC(VIDEO_CODEC_ARGB1555);
-					} else if (specs->vcs_bmask == MASK2(0x7c00) &&
-					           specs->vcs_rmask == MASK2(0x001f)) {
+					} else if (specs->vcs_bmask == MASK2_LE(0x003e) &&
+					           specs->vcs_rmask == MASK2_LE(0xf800)) {
 						SET_CODEC(VIDEO_CODEC_ABGR1555);
 					}
 				}
-			} else if (specs->vcs_bmask == MASK2(0xf800)) {
-				if (specs->vcs_gmask == MASK2(0x07c0) &&
-				    specs->vcs_rmask == MASK2(0x003e)) {
-					if (specs->vcs_amask == MASK2(0x0001)) {
+			} else if (specs->vcs_bmask == MASK2_LE(0x001f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x03e0) &&
+				    specs->vcs_rmask == MASK2_LE(0x7c00)) {
+					if (specs->vcs_amask == MASK2_LE(0x8000)) {
 						SET_CODEC(VIDEO_CODEC_BGRA5551);
 					} else if (specs->vcs_amask == 0) {
 						SET_CODEC(VIDEO_CODEC_BGRX5551);
 					}
 				}
 			} else if (specs->vcs_amask == 0) {
-				if (specs->vcs_gmask == MASK2(0x03e0)) {
-					if (specs->vcs_rmask == MASK2(0x7c00) &&
-					    specs->vcs_bmask == MASK2(0x001f)) {
+				if (specs->vcs_gmask == MASK2_LE(0x07c0)) {
+					if (specs->vcs_rmask == MASK2_LE(0x003e) &&
+					    specs->vcs_bmask == MASK2_LE(0xf800)) {
 						SET_CODEC(VIDEO_CODEC_XRGB1555);
-					} else if (specs->vcs_bmask == MASK2(0x7c00) &&
-					           specs->vcs_rmask == MASK2(0x001f)) {
+					} else if (specs->vcs_bmask == MASK2_LE(0x003e) &&
+					           specs->vcs_rmask == MASK2_LE(0xf800)) {
 						SET_CODEC(VIDEO_CODEC_XBGR1555);
 					}
 				}
