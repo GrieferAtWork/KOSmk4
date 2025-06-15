@@ -20,21 +20,27 @@
 #ifndef GUARD_APPS_SHOWPIC_MAIN_C
 #define GUARD_APPS_SHOWPIC_MAIN_C 1
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
 #include <hybrid/minmax.h>
 
 #include <kos/kernel/printk.h>
 #include <sys/syslog.h>
 
 #include <err.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <uchar.h>
 
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
@@ -49,6 +55,88 @@ static struct video_buffer_rect const WHOLE_SCREEN = {
 	.vbr_sizex  = VIDEO_DIM_MAX,
 	.vbr_sizey  = VIDEO_DIM_MAX,
 };
+
+static void
+do_dump_buffer_specs(struct video_buffer *buf,
+                     struct video_fontprinter_data *io) {
+	struct video_codec const *codec;
+	struct video_palette const *palette;
+#define gfx_printf(...) format_printf(&video_fontprinter, io, __VA_ARGS__)
+	gfx_printf("res:   %ux%u\n", (unsigned int)buf->vb_size_x, (unsigned int)buf->vb_size_y);
+	codec = buf->vb_format.vf_codec;
+	gfx_printf("codec: %#x [%ubpp,%c%c%c]\n",
+	           (unsigned int)codec->vc_codec,
+	           (unsigned int)codec->vc_specs.vcs_bpp,
+	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) ? 'P' : '-',
+	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_GRAY) ? 'G' : '-',
+	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LSB) ? 'L' : '-');
+	if (!(codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY))) {
+		gfx_printf("rmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_rmask);
+		gfx_printf("gmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_gmask);
+		gfx_printf("bmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_bmask);
+		if (codec->vc_specs.vcs_amask)
+			gfx_printf("amask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_amask);
+	}
+	palette = buf->vb_format.vf_pal;
+	if (palette) {
+		unsigned int cells_padding     = 2;
+		unsigned int cell_w            = 8;
+		unsigned int cell_h            = 8;
+		unsigned int cells_per_row_max = ((io->vfp_lnend - io->vfp_curx) - (cells_padding * 2)) / cell_w;
+		unsigned int cells_per_row     = cells_per_row_max > 32 ? 32 : cells_per_row_max;
+		unsigned int rows              = CEILDIV(palette->vp_cnt, cells_per_row);
+		unsigned int rows_width        = (cells_per_row * cell_w);
+		unsigned int rows_height       = (rows * cell_h);
+		unsigned int pal_x, pal_y;
+		gfx_printf("Palette (%u):\n", palette->vp_cnt);
+		io->vfp_cury += 2;
+		video_gfx_rect(io->vfp_gfx, io->vfp_curx, io->vfp_cury,
+		               rows_width + cells_padding * 2,
+		               rows_height + cells_padding * 2,
+		               io->vfp_color);
+		io->vfp_cury += cells_padding;
+		for (pal_y = 0; pal_y < rows; ++pal_y) {
+			for (pal_x = 0; pal_x < cells_per_row; ++pal_x) {
+				video_color_t color;
+				size_t index = pal_x + (pal_y * cells_per_row);
+				if (index > palette->vp_cnt)
+					break;
+				color = palette->vp_pal[index];
+				video_gfx_fill(io->vfp_gfx,
+				               io->vfp_curx + cells_padding + (pal_x * cell_w),
+				               io->vfp_cury + (pal_y * cell_h),
+				               cell_w, cell_h, color);
+			}
+		}
+		io->vfp_cury += rows_height;
+		io->vfp_cury += cells_padding;
+	}
+#undef gfx_printf
+}
+
+static void
+dump_buffer_specs(struct video_buffer *buf,
+                  struct video_fontprinter_data *io) {
+	unsigned int padding = 2;
+	video_offset_t start_x, start_y;
+	io->vfp_cury += padding;
+	io->vfp_lnstart += padding;
+	io->vfp_lnend -= padding;
+	start_x = io->vfp_curx;
+	start_y = io->vfp_cury;
+	io->vfp_curx += padding;
+	io->vfp_cury += padding;
+	do_dump_buffer_specs(buf, io);
+	io->vfp_curx -= padding;
+	io->vfp_cury += padding;
+	io->vfp_lnstart -= padding;
+	io->vfp_lnend += padding;
+	video_gfx_rect(io->vfp_gfx, start_x, start_y,
+	               io->vfp_lnend - io->vfp_lnstart,
+	               io->vfp_cury - start_y,
+	               io->vfp_color);
+	io->vfp_cury += padding;
+}
 
 int main(int argc, char *argv[]) {
 	REF struct screen_buffer *screen;
@@ -170,6 +258,46 @@ int main(int argc, char *argv[]) {
 #endif
 	printk(KERN_DEBUG "SHOWPIC: END\n");
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
+
+	struct video_font *font = video_font_lookup(VIDEO_FONT_DEFAULT);
+	if (font) {
+		struct video_fontprinter_data fd;
+		fd.vfp_font    = font;
+		fd.vfp_gfx     = &screen_gfx;
+		fd.vfp_height  = 16;
+		fd.vfp_curx    = 0;
+		fd.vfp_cury    = 0;
+		fd.vfp_lnstart = 0;
+		fd.vfp_lnend   = video_gfx_getclipw(&screen_gfx) / 5;
+		if (fd.vfp_lnend < 150)
+			fd.vfp_lnend = 150;
+		fd.vfp_color = VIDEO_COLOR_WHITE;
+		mbstate_init(&fd.vfp_u8word);
+#define gfx_printf(...) format_printf(&video_fontprinter, &fd, __VA_ARGS__)
+		gfx_printf("Color test: ");
+		fd.vfp_color = VIDEO_COLOR_RGB(0xff, 0, 0);
+		gfx_printf("R");
+		fd.vfp_color = VIDEO_COLOR_RGB(0, 0xff, 0);
+		gfx_printf("G");
+		fd.vfp_color = VIDEO_COLOR_RGB(0, 0, 0xff);
+		gfx_printf("B");
+		fd.vfp_color = VIDEO_COLOR_WHITE;
+		gfx_printf("\n");
+
+		gfx_printf("Image (%q):\n", argv[1]);
+		dump_buffer_specs(image, &fd);
+
+		gfx_printf("Screen:\n");
+		dump_buffer_specs(screen_buffer_asvideo(screen), &fd);
+#undef gfx_printf
+		video_font_decref(font);
+	}
+
+	/* Create screenshots in a couple of file formats. */
+	/*video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.png", NULL);
+	video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.jpg", NULL);
+	video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.bmp", NULL);
+	sync();*/
 
 	/* Wait for user input */
 	getchar();
