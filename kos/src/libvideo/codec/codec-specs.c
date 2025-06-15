@@ -52,22 +52,87 @@ INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
 	if (specs->vcs_flags & VIDEO_CODEC_FLAG_GRAY) {
-		if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
-		    specs->vcs_gmask == specs->vcs_rmask &&
-		    specs->vcs_bmask == specs->vcs_rmask &&
-		    specs->vcs_amask == 0) {
-			switch (specs->vcs_bpp) {
-			case 1: codec = VIDEO_CODEC_L1_MSB; break;
-			case 2: codec = VIDEO_CODEC_L2_MSB; break;
-			case 4: codec = VIDEO_CODEC_L4_MSB; break;
-			case 8: codec = VIDEO_CODEC_L8; break;
-			default: goto nope;
+		if (specs->vcs_gmask == specs->vcs_rmask &&
+		    specs->vcs_bmask == specs->vcs_rmask) {
+			if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) && specs->vcs_amask == 0) {
+				/* No alpha channel */
+				switch (specs->vcs_bpp) {
+				case 1: codec = VIDEO_CODEC_L1_MSB; break;
+				case 2: codec = VIDEO_CODEC_L2_MSB; break;
+				case 4: codec = VIDEO_CODEC_L4_MSB; break;
+				case 8: codec = VIDEO_CODEC_L8; break;
+				default: goto nope;
+				}
+				static_assert((VIDEO_CODEC_L1_MSB + 1) == VIDEO_CODEC_L1_LSB);
+				static_assert((VIDEO_CODEC_L2_MSB + 1) == VIDEO_CODEC_L2_LSB);
+				static_assert((VIDEO_CODEC_L4_MSB + 1) == VIDEO_CODEC_L4_LSB);
+				if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
+					++codec;
+			} else {
+				/* With alpha channel */
+				switch (specs->vcs_bpp) {
+
+				case 2: {
+					if (specs->vcs_rmask == 0x1 && specs->vcs_amask == 0x2) {
+						codec = VIDEO_CODEC_LA11_MSB;
+					} else if (specs->vcs_rmask == 0x2 && specs->vcs_amask == 0x1) {
+						codec = VIDEO_CODEC_AL11_MSB;
+					} else {
+						goto nope;
+					}
+					static_assert((VIDEO_CODEC_AL11_MSB + 1) == VIDEO_CODEC_AL11_LSB);
+					static_assert((VIDEO_CODEC_LA11_MSB + 1) == VIDEO_CODEC_LA11_LSB);
+					if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags))
+						++codec;
+				}	break;
+
+				case 4: {
+					if (specs->vcs_rmask == 0x3 && specs->vcs_amask == 0xc) {
+						codec = VIDEO_CODEC_LA22_MSB;
+					} else if (specs->vcs_rmask == 0xc && specs->vcs_amask == 0x3) {
+						codec = VIDEO_CODEC_AL22_MSB;
+					} else if (specs->vcs_rmask == 0x7 && specs->vcs_amask == 0x8) {
+						codec = VIDEO_CODEC_LA31_MSB;
+					} else if (specs->vcs_rmask == 0xe && specs->vcs_amask == 0x1) {
+						codec = VIDEO_CODEC_AL13_MSB;
+					} else {
+						goto nope;
+					}
+					static_assert((VIDEO_CODEC_LA22_MSB + 1) == VIDEO_CODEC_LA22_LSB);
+					static_assert((VIDEO_CODEC_AL22_MSB + 1) == VIDEO_CODEC_AL22_LSB);
+					static_assert((VIDEO_CODEC_LA31_MSB + 1) == VIDEO_CODEC_LA31_LSB);
+					static_assert((VIDEO_CODEC_AL13_MSB + 1) == VIDEO_CODEC_AL13_LSB);
+					if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags))
+						++codec;
+				}	break;
+
+				case 8: {
+					if (specs->vcs_rmask == 0x0f && specs->vcs_amask == 0xf0) {
+						codec = VIDEO_CODEC_LA44;
+					} else if (specs->vcs_rmask == 0xf0 && specs->vcs_amask == 0x0f) {
+						codec = VIDEO_CODEC_AL44;
+					} else if (specs->vcs_rmask == 0x7f && specs->vcs_amask == 0x80) {
+						codec = VIDEO_CODEC_LA71;
+					} else if (specs->vcs_rmask == 0xfe && specs->vcs_amask == 0x01) {
+						codec = VIDEO_CODEC_AL17;
+					} else {
+						goto nope;
+					}
+				}	break;
+
+				case 16: {
+					if (specs->vcs_rmask == MASK2_LE(0x00ff) && specs->vcs_amask == MASK2_LE(0xff00)) {
+						codec = VIDEO_CODEC_LA88;
+					} else if (specs->vcs_rmask == MASK2_LE(0xff00) && specs->vcs_amask == MASK2_LE(0x00ff)) {
+						codec = VIDEO_CODEC_AL88;
+					} else {
+						goto nope;
+					}
+				}	break;
+
+				default: goto nope;
+				}
 			}
-			static_assert((VIDEO_CODEC_L1_MSB + 1) == VIDEO_CODEC_L1_LSB);
-			static_assert((VIDEO_CODEC_L2_MSB + 1) == VIDEO_CODEC_L2_LSB);
-			static_assert((VIDEO_CODEC_L4_MSB + 1) == VIDEO_CODEC_L4_LSB);
-			if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
-				++codec;
 		}
 	} else if (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL) {
 		if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&

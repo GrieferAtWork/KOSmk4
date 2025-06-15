@@ -297,27 +297,44 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 			result_pal->vp_pal[pal_i] = color;
 		}
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
-		/* Grayscale */
-		if (color_type & LIBPNG_COLOR_MASK_ALPHA) { /* XXX: Support for grayscale w/ alpha codecs */
-			(*pdyn_png_set_gray_to_rgb)(png_ptr);
-			goto do_rgb_format;
-		}
+		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
-		switch (bit_depth) {
-		case 1: result_codec_id = VIDEO_CODEC_L1_MSB; break;
-		case 2: result_codec_id = VIDEO_CODEC_L2_MSB; break;
-		case 4: result_codec_id = VIDEO_CODEC_L4_MSB; break;
-		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
-		case 8: result_codec_id = VIDEO_CODEC_L8; break;
+		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
+			switch (bit_depth) {
+			case 1: result_codec_id = VIDEO_CODEC_LA11_MSB; break;
+			case 2: result_codec_id = VIDEO_CODEC_LA22_MSB; break;
+			case 4: result_codec_id = VIDEO_CODEC_LA44; break;
+			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+			case 8: result_codec_id = VIDEO_CODEC_LA88; break;
+			}
+		} else {
+			switch (bit_depth) {
+			case 1: result_codec_id = VIDEO_CODEC_L1_MSB; break;
+			case 2: result_codec_id = VIDEO_CODEC_L2_MSB; break;
+			case 4: result_codec_id = VIDEO_CODEC_L4_MSB; break;
+			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+			case 8: result_codec_id = VIDEO_CODEC_L8; break;
+			}
 		}
 	} else {
 do_rgb_format:
-		if (bit_depth != 8)
+		switch (bit_depth) {
+		case 4:
+			if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
+				result_codec_id = VIDEO_CODEC_RGBA4444;
+				break;
+			}
+			ATTR_FALLTHROUGH
+		default:
 			(*pdyn_png_set_packing)(png_ptr);
-		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
-			result_codec_id = VIDEO_CODEC_RGBA8888;
-		} else {
-			result_codec_id = VIDEO_CODEC_RGB888;
+			ATTR_FALLTHROUGH
+		case 8:
+			if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
+				result_codec_id = VIDEO_CODEC_RGBA8888;
+			} else {
+				result_codec_id = VIDEO_CODEC_RGB888;
+			}
+			break;
 		}
 	}
 

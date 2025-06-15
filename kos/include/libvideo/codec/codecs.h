@@ -69,14 +69,31 @@
 #define VIDEO_CODEC_BGRX5551 0x0028
 
 /* Gray-scale */
-#define VIDEO_CODEC_L1_MSB 0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
-#define VIDEO_CODEC_L1_LSB 0x1002 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_L2_MSB 0x1003 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
-#define VIDEO_CODEC_L2_LSB 0x1004 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
-#define VIDEO_CODEC_L4_MSB 0x1005 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
-#define VIDEO_CODEC_L4_LSB 0x1006 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
-#define VIDEO_CODEC_L8     0x1007 /* 8-bit-per-pixel, 256-color grayscale (0=black; 255=white) */
-/* TODO: Define built-in luminance w/ alpha codecs */
+#define VIDEO_CODEC_L1_MSB   0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_L1_LSB   0x1002 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_L2_MSB   0x1003 /* 2-bit-per-pixel, 4-level grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_L2_LSB   0x1004 /* 2-bit-per-pixel, 4-level grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_L4_MSB   0x1005 /* 4-bit-per-pixel, 16-level grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_L4_LSB   0x1006 /* 4-bit-per-pixel, 16-level grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_L8       0x1007 /* 1-byte-per-pixel, 256-level grayscale (0=black; 255=white) */
+#define VIDEO_CODEC_LA11_MSB 0x1008 /* 2-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_LA11_LSB 0x1009 /* 2-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_AL11_MSB 0x100a /* 2-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_AL11_LSB 0x100b /* 2-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_LA22_MSB 0x100c /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_LA22_LSB 0x100d /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_AL22_MSB 0x100e /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_AL22_LSB 0x100f /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_LA31_MSB 0x1010 /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_LA31_LSB 0x1011 /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_AL13_MSB 0x1012 /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_AL13_LSB 0x1013 /* 4-bit-per-pixel, 4-level grayscale+alpha (0=black; 3=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_LA44     0x1014 /* 1-byte-per-pixel, 16-level grayscale+alpha (0=black; 15=white) */
+#define VIDEO_CODEC_AL44     0x1015 /* 1-byte-per-pixel, 16-level grayscale+alpha (0=black; 15=white) */
+#define VIDEO_CODEC_LA71     0x1016 /* 1-byte-per-pixel, 128-level grayscale+alpha (0=black; 15=white) */
+#define VIDEO_CODEC_AL17     0x1017 /* 1-byte-per-pixel, 128-level grayscale+alpha (0=black; 15=white) */
+#define VIDEO_CODEC_LA88     0x1018 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
+#define VIDEO_CODEC_AL88     0x1019 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
 
 /* Palette-driven */
 #define VIDEO_CODEC_P1_MSB 0x2001 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */

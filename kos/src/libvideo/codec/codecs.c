@@ -806,66 +806,385 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-gray2_pixel2color(struct video_format const *__restrict UNUSED(format),
-                  video_pixel_t pixel) {
-	return pixel ? __UINT32_C(0xffffffff) : VIDEO_COLOR_ALPHA_MASK;
+l1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((pixel & 1) * ~VIDEO_COLOR_ALPHA_MASK) | VIDEO_COLOR_ALPHA_MASK;
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-gray2_color2pixel(struct video_format const *__restrict UNUSED(format),
-                  video_color_t color) {
+l1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	union color_data data;
 	data.color = color;
 	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 1 : 0;
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-gray4_pixel2color(struct video_format const *__restrict UNUSED(format),
-                  video_pixel_t pixel) {
+l2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK |
 	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
 	        (pixel & 0x3));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-gray4_color2pixel(struct video_format const *__restrict UNUSED(format),
-                  video_color_t color) {
+l2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	union color_data data;
 	data.color = color;
 	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6;
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-gray16_pixel2color(struct video_format const *__restrict UNUSED(format),
-                   video_pixel_t pixel) {
+l4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK |
 	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
 	        (pixel & 0xf));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-gray16_color2pixel(struct video_format const *__restrict UNUSED(format),
-                   video_color_t color) {
+l4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	union color_data data;
 	data.color = color;
 	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4;
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-gray256_pixel2color(struct video_format const *__restrict UNUSED(format),
-                    video_pixel_t pixel) {
+l8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK |
+	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK |
+	                                   VIDEO_COLOR_GREEN_MASK |
+	                                   VIDEO_COLOR_BLUE_MASK)) *
+	        (pixel & 0xff));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3);
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (((pixel >> 1) & 1) * ~VIDEO_COLOR_ALPHA_MASK) |
+	       ((pixel & 1) * VIDEO_COLOR_ALPHA_MASK);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((pixel & 1) * ~VIDEO_COLOR_ALPHA_MASK) |
+	       (((pixel >> 1) & 1) * VIDEO_COLOR_ALPHA_MASK);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 1 : 0) |
+	       (data.a >= 128 ? 2 : 0);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 2 : 0) |
+	       (data.a >= 128 ? 1 : 0);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * (pixel & 3)) |
+	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * ((pixel >> 2) & 3));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (data.a >> 6) |
+	       (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6) << 2);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * ((pixel >> 2) & 3)) |
+	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (pixel & 3));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((data.a >> 6) << 2) |
+	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6);
+}
+
+PRIVATE video_color_t const l3_to_color[8] = {
+/*[[[deemon
+for (local x: [:8]) {
+	local chan = (((x * 255) + (7 / 2)) / 7).hex(2);
+	print("	[", x, "] = VIDEO_COLOR_RGBA(", chan, ", ", chan, ", ", chan, ", 0),");
+}
+]]]*/
+	[0] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0),
+	[1] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0),
+	[2] = VIDEO_COLOR_RGBA(0x49, 0x49, 0x49, 0),
+	[3] = VIDEO_COLOR_RGBA(0x6d, 0x6d, 0x6d, 0),
+	[4] = VIDEO_COLOR_RGBA(0x92, 0x92, 0x92, 0),
+	[5] = VIDEO_COLOR_RGBA(0xb6, 0xb6, 0xb6, 0),
+	[6] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0),
+	[7] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0),
+/*[[[end]]]*/
+};
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al13_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (VIDEO_COLOR_ALPHA_MASK * (pixel & 1)) | l3_to_color[(pixel >> 1) & 7];
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al13_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (data.a >> 7) |
+	       (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 5) << 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la31_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (VIDEO_COLOR_ALPHA_MASK * ((pixel >> 3) & 1)) | l3_to_color[pixel & 7];
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la31_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((data.a >> 7) << 3) |
+	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 5);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * (pixel & 0xf)) |
+	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
+	        ((pixel >> 4) & 0xf));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4) << 4) |
+	       (data.a >> 4);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * ((pixel >> 4) & 0xf)) |
+	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
+	        (pixel & 0xf));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4) |
+	       ((data.a >> 4) << 4);
+}
+
+PRIVATE video_color_t const l7_to_color[128] = {
+/*[[[deemon
+for (local x: [:128]) {
+	local chan = (((x * 255) + (127 / 2)) / 127).hex(2);
+	print("	[", x.hex(2), "] = VIDEO_COLOR_RGBA(", chan, ", ", chan, ", ", chan, ", 0),");
+}
+]]]*/
+	[0x00] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0),
+	[0x01] = VIDEO_COLOR_RGBA(0x02, 0x02, 0x02, 0),
+	[0x02] = VIDEO_COLOR_RGBA(0x04, 0x04, 0x04, 0),
+	[0x03] = VIDEO_COLOR_RGBA(0x06, 0x06, 0x06, 0),
+	[0x04] = VIDEO_COLOR_RGBA(0x08, 0x08, 0x08, 0),
+	[0x05] = VIDEO_COLOR_RGBA(0x0a, 0x0a, 0x0a, 0),
+	[0x06] = VIDEO_COLOR_RGBA(0x0c, 0x0c, 0x0c, 0),
+	[0x07] = VIDEO_COLOR_RGBA(0x0e, 0x0e, 0x0e, 0),
+	[0x08] = VIDEO_COLOR_RGBA(0x10, 0x10, 0x10, 0),
+	[0x09] = VIDEO_COLOR_RGBA(0x12, 0x12, 0x12, 0),
+	[0x0a] = VIDEO_COLOR_RGBA(0x14, 0x14, 0x14, 0),
+	[0x0b] = VIDEO_COLOR_RGBA(0x16, 0x16, 0x16, 0),
+	[0x0c] = VIDEO_COLOR_RGBA(0x18, 0x18, 0x18, 0),
+	[0x0d] = VIDEO_COLOR_RGBA(0x1a, 0x1a, 0x1a, 0),
+	[0x0e] = VIDEO_COLOR_RGBA(0x1c, 0x1c, 0x1c, 0),
+	[0x0f] = VIDEO_COLOR_RGBA(0x1e, 0x1e, 0x1e, 0),
+	[0x10] = VIDEO_COLOR_RGBA(0x20, 0x20, 0x20, 0),
+	[0x11] = VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0),
+	[0x12] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0),
+	[0x13] = VIDEO_COLOR_RGBA(0x26, 0x26, 0x26, 0),
+	[0x14] = VIDEO_COLOR_RGBA(0x28, 0x28, 0x28, 0),
+	[0x15] = VIDEO_COLOR_RGBA(0x2a, 0x2a, 0x2a, 0),
+	[0x16] = VIDEO_COLOR_RGBA(0x2c, 0x2c, 0x2c, 0),
+	[0x17] = VIDEO_COLOR_RGBA(0x2e, 0x2e, 0x2e, 0),
+	[0x18] = VIDEO_COLOR_RGBA(0x30, 0x30, 0x30, 0),
+	[0x19] = VIDEO_COLOR_RGBA(0x32, 0x32, 0x32, 0),
+	[0x1a] = VIDEO_COLOR_RGBA(0x34, 0x34, 0x34, 0),
+	[0x1b] = VIDEO_COLOR_RGBA(0x36, 0x36, 0x36, 0),
+	[0x1c] = VIDEO_COLOR_RGBA(0x38, 0x38, 0x38, 0),
+	[0x1d] = VIDEO_COLOR_RGBA(0x3a, 0x3a, 0x3a, 0),
+	[0x1e] = VIDEO_COLOR_RGBA(0x3c, 0x3c, 0x3c, 0),
+	[0x1f] = VIDEO_COLOR_RGBA(0x3e, 0x3e, 0x3e, 0),
+	[0x20] = VIDEO_COLOR_RGBA(0x40, 0x40, 0x40, 0),
+	[0x21] = VIDEO_COLOR_RGBA(0x42, 0x42, 0x42, 0),
+	[0x22] = VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0),
+	[0x23] = VIDEO_COLOR_RGBA(0x46, 0x46, 0x46, 0),
+	[0x24] = VIDEO_COLOR_RGBA(0x48, 0x48, 0x48, 0),
+	[0x25] = VIDEO_COLOR_RGBA(0x4a, 0x4a, 0x4a, 0),
+	[0x26] = VIDEO_COLOR_RGBA(0x4c, 0x4c, 0x4c, 0),
+	[0x27] = VIDEO_COLOR_RGBA(0x4e, 0x4e, 0x4e, 0),
+	[0x28] = VIDEO_COLOR_RGBA(0x50, 0x50, 0x50, 0),
+	[0x29] = VIDEO_COLOR_RGBA(0x52, 0x52, 0x52, 0),
+	[0x2a] = VIDEO_COLOR_RGBA(0x54, 0x54, 0x54, 0),
+	[0x2b] = VIDEO_COLOR_RGBA(0x56, 0x56, 0x56, 0),
+	[0x2c] = VIDEO_COLOR_RGBA(0x58, 0x58, 0x58, 0),
+	[0x2d] = VIDEO_COLOR_RGBA(0x5a, 0x5a, 0x5a, 0),
+	[0x2e] = VIDEO_COLOR_RGBA(0x5c, 0x5c, 0x5c, 0),
+	[0x2f] = VIDEO_COLOR_RGBA(0x5e, 0x5e, 0x5e, 0),
+	[0x30] = VIDEO_COLOR_RGBA(0x60, 0x60, 0x60, 0),
+	[0x31] = VIDEO_COLOR_RGBA(0x62, 0x62, 0x62, 0),
+	[0x32] = VIDEO_COLOR_RGBA(0x64, 0x64, 0x64, 0),
+	[0x33] = VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0),
+	[0x34] = VIDEO_COLOR_RGBA(0x68, 0x68, 0x68, 0),
+	[0x35] = VIDEO_COLOR_RGBA(0x6a, 0x6a, 0x6a, 0),
+	[0x36] = VIDEO_COLOR_RGBA(0x6c, 0x6c, 0x6c, 0),
+	[0x37] = VIDEO_COLOR_RGBA(0x6e, 0x6e, 0x6e, 0),
+	[0x38] = VIDEO_COLOR_RGBA(0x70, 0x70, 0x70, 0),
+	[0x39] = VIDEO_COLOR_RGBA(0x72, 0x72, 0x72, 0),
+	[0x3a] = VIDEO_COLOR_RGBA(0x74, 0x74, 0x74, 0),
+	[0x3b] = VIDEO_COLOR_RGBA(0x76, 0x76, 0x76, 0),
+	[0x3c] = VIDEO_COLOR_RGBA(0x78, 0x78, 0x78, 0),
+	[0x3d] = VIDEO_COLOR_RGBA(0x7a, 0x7a, 0x7a, 0),
+	[0x3e] = VIDEO_COLOR_RGBA(0x7c, 0x7c, 0x7c, 0),
+	[0x3f] = VIDEO_COLOR_RGBA(0x7e, 0x7e, 0x7e, 0),
+	[0x40] = VIDEO_COLOR_RGBA(0x81, 0x81, 0x81, 0),
+	[0x41] = VIDEO_COLOR_RGBA(0x83, 0x83, 0x83, 0),
+	[0x42] = VIDEO_COLOR_RGBA(0x85, 0x85, 0x85, 0),
+	[0x43] = VIDEO_COLOR_RGBA(0x87, 0x87, 0x87, 0),
+	[0x44] = VIDEO_COLOR_RGBA(0x89, 0x89, 0x89, 0),
+	[0x45] = VIDEO_COLOR_RGBA(0x8b, 0x8b, 0x8b, 0),
+	[0x46] = VIDEO_COLOR_RGBA(0x8d, 0x8d, 0x8d, 0),
+	[0x47] = VIDEO_COLOR_RGBA(0x8f, 0x8f, 0x8f, 0),
+	[0x48] = VIDEO_COLOR_RGBA(0x91, 0x91, 0x91, 0),
+	[0x49] = VIDEO_COLOR_RGBA(0x93, 0x93, 0x93, 0),
+	[0x4a] = VIDEO_COLOR_RGBA(0x95, 0x95, 0x95, 0),
+	[0x4b] = VIDEO_COLOR_RGBA(0x97, 0x97, 0x97, 0),
+	[0x4c] = VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0),
+	[0x4d] = VIDEO_COLOR_RGBA(0x9b, 0x9b, 0x9b, 0),
+	[0x4e] = VIDEO_COLOR_RGBA(0x9d, 0x9d, 0x9d, 0),
+	[0x4f] = VIDEO_COLOR_RGBA(0x9f, 0x9f, 0x9f, 0),
+	[0x50] = VIDEO_COLOR_RGBA(0xa1, 0xa1, 0xa1, 0),
+	[0x51] = VIDEO_COLOR_RGBA(0xa3, 0xa3, 0xa3, 0),
+	[0x52] = VIDEO_COLOR_RGBA(0xa5, 0xa5, 0xa5, 0),
+	[0x53] = VIDEO_COLOR_RGBA(0xa7, 0xa7, 0xa7, 0),
+	[0x54] = VIDEO_COLOR_RGBA(0xa9, 0xa9, 0xa9, 0),
+	[0x55] = VIDEO_COLOR_RGBA(0xab, 0xab, 0xab, 0),
+	[0x56] = VIDEO_COLOR_RGBA(0xad, 0xad, 0xad, 0),
+	[0x57] = VIDEO_COLOR_RGBA(0xaf, 0xaf, 0xaf, 0),
+	[0x58] = VIDEO_COLOR_RGBA(0xb1, 0xb1, 0xb1, 0),
+	[0x59] = VIDEO_COLOR_RGBA(0xb3, 0xb3, 0xb3, 0),
+	[0x5a] = VIDEO_COLOR_RGBA(0xb5, 0xb5, 0xb5, 0),
+	[0x5b] = VIDEO_COLOR_RGBA(0xb7, 0xb7, 0xb7, 0),
+	[0x5c] = VIDEO_COLOR_RGBA(0xb9, 0xb9, 0xb9, 0),
+	[0x5d] = VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0),
+	[0x5e] = VIDEO_COLOR_RGBA(0xbd, 0xbd, 0xbd, 0),
+	[0x5f] = VIDEO_COLOR_RGBA(0xbf, 0xbf, 0xbf, 0),
+	[0x60] = VIDEO_COLOR_RGBA(0xc1, 0xc1, 0xc1, 0),
+	[0x61] = VIDEO_COLOR_RGBA(0xc3, 0xc3, 0xc3, 0),
+	[0x62] = VIDEO_COLOR_RGBA(0xc5, 0xc5, 0xc5, 0),
+	[0x63] = VIDEO_COLOR_RGBA(0xc7, 0xc7, 0xc7, 0),
+	[0x64] = VIDEO_COLOR_RGBA(0xc9, 0xc9, 0xc9, 0),
+	[0x65] = VIDEO_COLOR_RGBA(0xcb, 0xcb, 0xcb, 0),
+	[0x66] = VIDEO_COLOR_RGBA(0xcd, 0xcd, 0xcd, 0),
+	[0x67] = VIDEO_COLOR_RGBA(0xcf, 0xcf, 0xcf, 0),
+	[0x68] = VIDEO_COLOR_RGBA(0xd1, 0xd1, 0xd1, 0),
+	[0x69] = VIDEO_COLOR_RGBA(0xd3, 0xd3, 0xd3, 0),
+	[0x6a] = VIDEO_COLOR_RGBA(0xd5, 0xd5, 0xd5, 0),
+	[0x6b] = VIDEO_COLOR_RGBA(0xd7, 0xd7, 0xd7, 0),
+	[0x6c] = VIDEO_COLOR_RGBA(0xd9, 0xd9, 0xd9, 0),
+	[0x6d] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0),
+	[0x6e] = VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0),
+	[0x6f] = VIDEO_COLOR_RGBA(0xdf, 0xdf, 0xdf, 0),
+	[0x70] = VIDEO_COLOR_RGBA(0xe1, 0xe1, 0xe1, 0),
+	[0x71] = VIDEO_COLOR_RGBA(0xe3, 0xe3, 0xe3, 0),
+	[0x72] = VIDEO_COLOR_RGBA(0xe5, 0xe5, 0xe5, 0),
+	[0x73] = VIDEO_COLOR_RGBA(0xe7, 0xe7, 0xe7, 0),
+	[0x74] = VIDEO_COLOR_RGBA(0xe9, 0xe9, 0xe9, 0),
+	[0x75] = VIDEO_COLOR_RGBA(0xeb, 0xeb, 0xeb, 0),
+	[0x76] = VIDEO_COLOR_RGBA(0xed, 0xed, 0xed, 0),
+	[0x77] = VIDEO_COLOR_RGBA(0xef, 0xef, 0xef, 0),
+	[0x78] = VIDEO_COLOR_RGBA(0xf1, 0xf1, 0xf1, 0),
+	[0x79] = VIDEO_COLOR_RGBA(0xf3, 0xf3, 0xf3, 0),
+	[0x7a] = VIDEO_COLOR_RGBA(0xf5, 0xf5, 0xf5, 0),
+	[0x7b] = VIDEO_COLOR_RGBA(0xf7, 0xf7, 0xf7, 0),
+	[0x7c] = VIDEO_COLOR_RGBA(0xf9, 0xf9, 0xf9, 0),
+	[0x7d] = VIDEO_COLOR_RGBA(0xfb, 0xfb, 0xfb, 0),
+	[0x7e] = VIDEO_COLOR_RGBA(0xfd, 0xfd, 0xfd, 0),
+	[0x7f] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0),
+/*[[[end]]]*/
+};
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al17_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (VIDEO_COLOR_ALPHA_MASK * (pixel & 1)) | l7_to_color[(pixel >> 1) & 127];
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al17_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (data.a >> 7) |
+	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) & 0xfe);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la71_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (VIDEO_COLOR_ALPHA_MASK * ((pixel >> 7) & 1)) | l7_to_color[pixel & 127];
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la71_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (data.a & 0x80) |
+	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return ((pixel & 0xff) << VIDEO_COLOR_ALPHA_SHIFT) |
+	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
+	        ((pixel >> 8) & 0xff));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) << 8) | data.a;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return (((pixel >> 8) & 0xff) << VIDEO_COLOR_ALPHA_SHIFT) |
 	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
 	        (pixel & 0xff));
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-gray256_color2pixel(struct video_format const *__restrict UNUSED(format),
-                    video_color_t color) {
+la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	union color_data data;
 	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3);
+	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) | (data.a << 8);
 }
+
+
 
 
 
@@ -1773,7 +2092,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                      pixel2color, color2pixel);              \
 		result = &_codec_##codec;                                 \
 	}	break
-#define CASE_CODEC_ALX(codec, specs,                              \
+#define CASE_CODEC_ALn(codec, specs,                              \
                        align, rambuffer_requirements,             \
                        getpixel, setpixel, linecopy, linefill,    \
                        unaligned_getpixel, unaligned_setpixel,    \
@@ -1793,7 +2112,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	struct video_codec const *result;
 	switch (codec) {
 
-	/* Grayscale formats. */
+	/* Grayscale (Luminance) formats. */
 	CASE_CODEC_AL1(VIDEO_CODEC_L1_LSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 1,
@@ -1805,7 +2124,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer1_requirements,
 	               getpixel1_lsb, setpixel1_lsb,
 	               linecopy1_lsb, linefill1_lsb,
-	               gray2_pixel2color, gray2_color2pixel);
+	               l1_pixel2color, l1_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L1_MSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
@@ -1818,7 +2137,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer1_requirements,
 	               getpixel1_msb, setpixel1_msb,
 	               linecopy1_msb, linefill1_msb,
-	               gray2_pixel2color, gray2_color2pixel);
+	               l1_pixel2color, l1_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L2_LSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
@@ -1831,7 +2150,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
 	               linecopy2_lsb, linefill2_lsb,
-	               gray4_pixel2color, gray4_color2pixel);
+	               l2_pixel2color, l2_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L2_MSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
@@ -1844,7 +2163,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
 	               linecopy2_msb, linefill2_msb,
-	               gray4_pixel2color, gray4_color2pixel);
+	               l2_pixel2color, l2_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L4_LSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
@@ -1857,7 +2176,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
 	               linecopy4_lsb, linefill4_lsb,
-	               gray16_pixel2color, gray16_color2pixel);
+	               l4_pixel2color, l4_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L4_MSB,
 	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
@@ -1870,7 +2189,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
 	               linecopy4_msb, linefill4_msb,
-	               gray16_pixel2color, gray16_color2pixel);
+	               l4_pixel2color, l4_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L8,
 	               (VIDEO_CODEC_FLAG_GRAY,
@@ -1882,10 +2201,247 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8, linecopy8, linefill8,
-	               gray256_pixel2color, gray256_color2pixel);
+	               l8_pixel2color, l8_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA11_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x2),
+	               buffer2_requirements,
+	               getpixel2_msb, setpixel2_msb,
+	               linecopy2_msb, linefill2_msb,
+	               al11_pixel2color, al11_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA11_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x1,
+	                /* vcs_gmask */ 0x1,
+	                /* vcs_bmask */ 0x1,
+	                /* vcs_amask */ 0x2),
+	               buffer2_requirements,
+	               getpixel2_lsb, setpixel2_lsb,
+	               linecopy2_lsb, linefill2_lsb,
+	               al11_pixel2color, al11_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL11_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x2,
+	                /* vcs_gmask */ 0x2,
+	                /* vcs_bmask */ 0x2,
+	                /* vcs_amask */ 0x1),
+	               buffer2_requirements,
+	               getpixel2_msb, setpixel2_msb,
+	               linecopy2_msb, linefill2_msb,
+	               la11_pixel2color, la11_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL11_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0x2,
+	                /* vcs_gmask */ 0x2,
+	                /* vcs_bmask */ 0x2,
+	                /* vcs_amask */ 0x1),
+	               buffer2_requirements,
+	               getpixel2_lsb, setpixel2_lsb,
+	               linecopy2_lsb, linefill2_lsb,
+	               la11_pixel2color, la11_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA22_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0xc),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               la22_pixel2color, la22_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA22_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0x3,
+	                /* vcs_gmask */ 0x3,
+	                /* vcs_bmask */ 0x3,
+	                /* vcs_amask */ 0xc),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               la22_pixel2color, la22_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL22_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xc,
+	                /* vcs_gmask */ 0xc,
+	                /* vcs_bmask */ 0xc,
+	                /* vcs_amask */ 0x3),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               al22_pixel2color, al22_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL22_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xc,
+	                /* vcs_gmask */ 0xc,
+	                /* vcs_bmask */ 0xc,
+	                /* vcs_amask */ 0x3),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               al22_pixel2color, al22_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA31_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0x7,
+	                /* vcs_gmask */ 0x7,
+	                /* vcs_bmask */ 0x7,
+	                /* vcs_amask */ 0x8),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               la31_pixel2color, la31_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA31_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0x7,
+	                /* vcs_gmask */ 0x7,
+	                /* vcs_bmask */ 0x7,
+	                /* vcs_amask */ 0x8),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               la31_pixel2color, la31_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL13_MSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xe,
+	                /* vcs_gmask */ 0xe,
+	                /* vcs_bmask */ 0xe,
+	                /* vcs_amask */ 0x1),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               linecopy4_msb, linefill4_msb,
+	               al13_pixel2color, al13_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL13_LSB,
+	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0xe,
+	                /* vcs_gmask */ 0xe,
+	                /* vcs_bmask */ 0xe,
+	                /* vcs_amask */ 0x1),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               linecopy4_lsb, linefill4_lsb,
+	               al13_pixel2color, al13_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA44,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x0f,
+	                /* vcs_gmask */ 0x0f,
+	                /* vcs_bmask */ 0x0f,
+	                /* vcs_amask */ 0xf0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8, linecopy8, linefill8,
+	               la44_pixel2color, la44_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL44,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xf0,
+	                /* vcs_gmask */ 0xf0,
+	                /* vcs_bmask */ 0xf0,
+	                /* vcs_amask */ 0x0f),
+	               buffer8_requirements,
+	               getpixel8, setpixel8, linecopy8, linefill8,
+	               al44_pixel2color, al44_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_LA71,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x7f,
+	                /* vcs_gmask */ 0x7f,
+	                /* vcs_bmask */ 0x7f,
+	                /* vcs_amask */ 0x80),
+	               buffer8_requirements,
+	               getpixel8, setpixel8, linecopy8, linefill8,
+	               la71_pixel2color, la71_color2pixel);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_AL17,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xfe,
+	                /* vcs_gmask */ 0xfe,
+	                /* vcs_bmask */ 0xfe,
+	                /* vcs_amask */ 0x01),
+	               buffer8_requirements,
+	               getpixel8, setpixel8, linecopy8, linefill8,
+	               al17_pixel2color, al17_color2pixel);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_LA88,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2_LE(0x00ff),
+	                /* vcs_gmask */ MASK2_LE(0x00ff),
+	                /* vcs_bmask */ MASK2_LE(0x00ff),
+	                /* vcs_amask */ MASK2_LE(0xff00)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               la88_pixel2color, la88_color2pixel);
+
+	CASE_CODEC_ALn(VIDEO_CODEC_AL88,
+	               (VIDEO_CODEC_FLAG_GRAY,
+	                /* vcs_bpp   */ 16,
+	                /* vcs_cbits */ 16,
+	                /* vcs_rmask */ MASK2_LE(0xff00),
+	                /* vcs_gmask */ MASK2_LE(0xff00),
+	                /* vcs_bmask */ MASK2_LE(0xff00),
+	                /* vcs_amask */ MASK2_LE(0x00ff)),
+	               2, buffer16_requirements,
+	               getpixel16, setpixel16,
+	               linecopy16, linefill16,
+	               unaligned_getpixel16, unaligned_setpixel16,
+	               unaligned_linecopy16, unaligned_linefill16,
+	               al88_pixel2color, al88_color2pixel);
+
+
+
 
 	/* 4-byte-per-pixel formats. */
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBA8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
@@ -1900,7 +2456,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               colorpixel_identity, colorpixel_identity);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBX8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
@@ -1915,7 +2471,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               rgbx8888_pixel2color, colorpixel_identity);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_ARGB8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
@@ -1930,7 +2486,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               argb8888_pixel2color, argb8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_XRGB8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
@@ -1945,7 +2501,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               xrgb8888_pixel2color, xrgb8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_ABGR8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
@@ -1960,7 +2516,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               abgr8888_pixel2color, abgr8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_XBGR8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
@@ -1975,7 +2531,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               xbgr8888_pixel2color, xbgr8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRA8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 32,
@@ -1990,7 +2546,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy32, unaligned_linefill32,
 	               bgra8888_pixel2color, bgra8888_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX8888,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRX8888,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 32,
 	                /* vcs_cbits */ 24,
@@ -2008,7 +2564,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 
 
 	/* 2-byte-per-pixel formats. */
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBA4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2023,7 +2579,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               rgba4444_pixel2color, rgba4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBX4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
@@ -2038,7 +2594,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               rgbx4444_pixel2color, rgbx4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_ARGB4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2053,7 +2609,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               argb4444_pixel2color, argb4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_XRGB4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
@@ -2068,7 +2624,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               xrgb4444_pixel2color, xrgb4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_ABGR4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2083,7 +2639,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               abgr4444_pixel2color, abgr4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_XBGR4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
@@ -2098,7 +2654,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               xbgr4444_pixel2color, xbgr4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRA4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2113,7 +2669,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               bgra4444_pixel2color, bgra4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX4444,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRX4444,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 12,
@@ -2128,7 +2684,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               bgrx4444_pixel2color, bgrx4444_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBA5551,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBA5551,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2143,7 +2699,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               rgba5551_pixel2color, rgba5551_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGBX5551,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGBX5551,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
@@ -2158,7 +2714,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               rgbx5551_pixel2color, rgbx5551_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ARGB1555,
+	CASE_CODEC_ALn(VIDEO_CODEC_ARGB1555,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2173,7 +2729,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               argb1555_pixel2color, argb1555_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XRGB1555,
+	CASE_CODEC_ALn(VIDEO_CODEC_XRGB1555,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
@@ -2188,7 +2744,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               xrgb1555_pixel2color, xrgb1555_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_ABGR1555,
+	CASE_CODEC_ALn(VIDEO_CODEC_ABGR1555,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2203,7 +2759,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               abgr1555_pixel2color, abgr1555_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_XBGR1555,
+	CASE_CODEC_ALn(VIDEO_CODEC_XBGR1555,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
@@ -2218,7 +2774,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               xbgr1555_pixel2color, xbgr1555_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRA5551,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRA5551,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2233,7 +2789,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               bgra5551_pixel2color, bgra5551_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGRX5551,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGRX5551,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 15,
@@ -2248,7 +2804,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               bgrx5551_pixel2color, bgrx5551_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_RGB565,
+	CASE_CODEC_ALn(VIDEO_CODEC_RGB565,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2263,7 +2819,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linecopy16, unaligned_linefill16,
 	               rgb565_pixel2color, rgb565_color2pixel);
 
-	CASE_CODEC_ALX(VIDEO_CODEC_BGR565,
+	CASE_CODEC_ALn(VIDEO_CODEC_BGR565,
 	               (VIDEO_CODEC_FLAG_NORMAL,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
@@ -2406,7 +2962,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 		break;
 	}
 	return result;
-#undef CASE_CODEC_ALX
+#undef CASE_CODEC_ALn
 #undef CASE_CODEC_AL1
 #undef _DEFINE_CODEC_ALX
 #undef _DEFINE_CODEC_AL1
@@ -2512,13 +3068,13 @@ pext_gray4_pixel2color(struct video_format const *__restrict format,
                        video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return gray4_pixel2color(format, pixl);
+	return l2_pixel2color(format, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 pdep_gray4_color2pixel(struct video_format const *__restrict format,
                        video_color_t color) {
-	video_pixel_t pixl = gray4_color2pixel(format, color);
+	video_pixel_t pixl = l2_color2pixel(format, color);
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
@@ -2528,13 +3084,13 @@ pext_gray16_pixel2color(struct video_format const *__restrict format,
                         video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return gray16_pixel2color(format, pixl);
+	return l4_pixel2color(format, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 pdep_gray16_color2pixel(struct video_format const *__restrict format,
                         video_color_t color) {
-	video_pixel_t pixl = gray16_color2pixel(format, color);
+	video_pixel_t pixl = l4_color2pixel(format, color);
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
@@ -2544,13 +3100,13 @@ pext_gray256_pixel2color(struct video_format const *__restrict format,
                          video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	video_pixel_t pixl = PEXT(pixel, mask);
-	return gray256_pixel2color(format, pixl);
+	return l8_pixel2color(format, pixl);
 }
 
 PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 pdep_gray256_color2pixel(struct video_format const *__restrict format,
                          video_color_t color) {
-	video_pixel_t pixl = gray256_color2pixel(format, color);
+	video_pixel_t pixl = l8_color2pixel(format, color);
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
 	return PDEP(pixl, mask);
 }
@@ -2562,7 +3118,7 @@ gray2_pixel2color__withalpha(struct video_format const *__restrict format,
                              video_pixel_t pixel) {
 	video_color_t result;
 	struct video_codec_custom const *codec;
-	result = gray2_pixel2color(format, pixel);
+	result = l1_pixel2color(format, pixel);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
@@ -2576,7 +3132,7 @@ gray2_color2pixel__withalpha(struct video_format const *__restrict format,
                              video_color_t color) {
 	video_pixel_t result;
 	struct video_codec_custom const *codec;
-	result = gray2_color2pixel(format, color);
+	result = l1_color2pixel(format, color);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
@@ -2589,7 +3145,7 @@ gray4_pixel2color__withalpha(struct video_format const *__restrict format,
                              video_pixel_t pixel) {
 	video_color_t result;
 	struct video_codec_custom const *codec;
-	result = gray4_pixel2color(format, pixel);
+	result = l2_pixel2color(format, pixel);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
@@ -2617,7 +3173,7 @@ gray4_color2pixel__withalpha(struct video_format const *__restrict format,
                              video_color_t color) {
 	video_pixel_t result;
 	struct video_codec_custom const *codec;
-	result = gray4_color2pixel(format, color);
+	result = l2_color2pixel(format, color);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
@@ -2643,7 +3199,7 @@ gray16_pixel2color__withalpha(struct video_format const *__restrict format,
                               video_pixel_t pixel) {
 	video_color_t result;
 	struct video_codec_custom const *codec;
-	result = gray16_pixel2color(format, pixel);
+	result = l4_pixel2color(format, pixel);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
@@ -2671,7 +3227,7 @@ gray16_color2pixel__withalpha(struct video_format const *__restrict format,
                               video_color_t color) {
 	video_pixel_t result;
 	struct video_codec_custom const *codec;
-	result = gray16_color2pixel(format, color);
+	result = l4_color2pixel(format, color);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
@@ -2697,7 +3253,7 @@ gray256_pixel2color__withalpha(struct video_format const *__restrict format,
                                video_pixel_t pixel) {
 	video_color_t result;
 	struct video_codec_custom const *codec;
-	result = gray256_pixel2color(format, pixel);
+	result = l8_pixel2color(format, pixel);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result &= ~VIDEO_COLOR_ALPHA_MASK;
 	result |= pext_channel(pixel, codec->vcc_used_amask,
@@ -2725,7 +3281,7 @@ gray256_color2pixel__withalpha(struct video_format const *__restrict format,
                                video_color_t color) {
 	video_pixel_t result;
 	struct video_codec_custom const *codec;
-	result = gray256_color2pixel(format, color);
+	result = l8_color2pixel(format, color);
 	codec  = (struct video_codec_custom const *)format->vf_codec;
 	result |= pdep_channel(VIDEO_COLOR_GET_ALPHA(color),
 	                       codec->vcc_used_amask,
@@ -3123,6 +3679,81 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		video_pixel_t cmask = ((video_pixel_t)1 << self->vc_specs.vcs_cbits) - 1;
 		bool need_mask = (self->vc_specs.vcs_rmask & cmask) != cmask;
 		if (self->vcc_used_amask) {
+			shift_t lumen_bits = self->vc_specs.vcs_cbits;
+			if (lumen_bits >= 1 && lumen_bits <= 8) {
+				shift_t alpha_bits = POPCOUNT(self->vcc_used_amask);
+				if (alpha_bits >= 1 && alpha_bits <= 8 && (self->vcc_used_amask & 1)) {
+					bool alpha_first = (self->vcc_used_amask & 1);
+					if (alpha_first) {
+						video_pixel_t cmask_after_alpha = cmask << alpha_bits;
+						if ((self->vc_specs.vcs_rmask & cmask_after_alpha) == cmask_after_alpha) {
+							/* Looks like a usable alpha codec */
+#define AL(n_alpha, n_lum) ((n_alpha - 1) | ((n_lum - 1) << 3))
+							switch (AL(alpha_bits, lumen_bits)) {
+							case AL(1, 1):
+								self->vc_pixel2color = &al11_pixel2color;
+								self->vc_color2pixel = &al11_color2pixel;
+								goto got_p2c;
+							case AL(2, 2):
+								self->vc_pixel2color = &al22_pixel2color;
+								self->vc_color2pixel = &al22_color2pixel;
+								goto got_p2c;
+							case AL(1, 3):
+								self->vc_pixel2color = &al13_pixel2color;
+								self->vc_color2pixel = &al13_color2pixel;
+								goto got_p2c;
+							case AL(4, 4):
+								self->vc_pixel2color = &al44_pixel2color;
+								self->vc_color2pixel = &al44_color2pixel;
+								goto got_p2c;
+							case AL(1, 7):
+								self->vc_pixel2color = &al17_pixel2color;
+								self->vc_color2pixel = &al17_color2pixel;
+								goto got_p2c;
+							case AL(8, 8):
+								self->vc_pixel2color = &al88_pixel2color;
+								self->vc_color2pixel = &al88_color2pixel;
+								goto got_p2c;
+							default: break;
+							}
+#undef AL
+						}
+					} else if (((self->vcc_used_amask >> lumen_bits) << lumen_bits) ==
+					           ((self->vcc_used_amask))) {
+						/* Alpha-after-lumen */
+#define LA(n_lum, n_alpha) ((n_lum - 1) | ((n_alpha - 1) << 3))
+						switch (LA(lumen_bits, alpha_bits)) {
+						case LA(1, 1):
+							self->vc_pixel2color = &la11_pixel2color;
+							self->vc_color2pixel = &la11_color2pixel;
+							goto got_p2c;
+						case LA(2, 2):
+							self->vc_pixel2color = &la22_pixel2color;
+							self->vc_color2pixel = &la22_color2pixel;
+							goto got_p2c;
+						case LA(3, 1):
+							self->vc_pixel2color = &la31_pixel2color;
+							self->vc_color2pixel = &la31_color2pixel;
+							goto got_p2c;
+						case LA(4, 4):
+							self->vc_pixel2color = &la44_pixel2color;
+							self->vc_color2pixel = &la44_color2pixel;
+							goto got_p2c;
+						case LA(7, 1):
+							self->vc_pixel2color = &la71_pixel2color;
+							self->vc_color2pixel = &la71_color2pixel;
+							goto got_p2c;
+						case LA(8, 8):
+							self->vc_pixel2color = &la88_pixel2color;
+							self->vc_color2pixel = &la88_color2pixel;
+							goto got_p2c;
+						default: break;
+						}
+#undef LA
+					}
+				}
+			}
+
 			if (self->vc_specs.vcs_cbits >= 8) {
 				self->vc_pixel2color = need_mask ? &pext_gray256_pixel2color__withalpha : &gray256_pixel2color__withalpha;
 				self->vc_color2pixel = need_mask ? &pdep_gray256_color2pixel__withalpha : &gray256_color2pixel__withalpha;
@@ -3138,17 +3769,17 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			}
 		} else {
 			if (self->vc_specs.vcs_cbits >= 8) {
-				self->vc_pixel2color = need_mask ? &pext_gray256_pixel2color : &gray256_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray256_color2pixel : &gray256_color2pixel;
+				self->vc_pixel2color = need_mask ? &pext_gray256_pixel2color : &l8_pixel2color;
+				self->vc_color2pixel = need_mask ? &pdep_gray256_color2pixel : &l8_color2pixel;
 			} else if (self->vc_specs.vcs_cbits >= 4) {
-				self->vc_pixel2color = need_mask ? &pext_gray16_pixel2color : &gray16_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray16_color2pixel : &gray16_color2pixel;
+				self->vc_pixel2color = need_mask ? &pext_gray16_pixel2color : &l4_pixel2color;
+				self->vc_color2pixel = need_mask ? &pdep_gray16_color2pixel : &l4_color2pixel;
 			} else if (self->vc_specs.vcs_cbits >= 2) {
-				self->vc_pixel2color = need_mask ? &pext_gray4_pixel2color : &gray4_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray4_color2pixel : &gray4_color2pixel;
+				self->vc_pixel2color = need_mask ? &pext_gray4_pixel2color : &l2_pixel2color;
+				self->vc_color2pixel = need_mask ? &pdep_gray4_color2pixel : &l2_color2pixel;
 			} else {
-				self->vc_pixel2color = &gray2_pixel2color;
-				self->vc_color2pixel = &gray2_color2pixel;
+				self->vc_pixel2color = &l1_pixel2color;
+				self->vc_color2pixel = &l1_color2pixel;
 			}
 		}
 	} else {
@@ -3211,6 +3842,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			}
 		}
 	}
+got_p2c:
 
 	if (populate_noalign) {
 		self->vc_nalgn = self;
