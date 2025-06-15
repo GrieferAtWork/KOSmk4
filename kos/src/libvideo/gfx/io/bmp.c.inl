@@ -29,12 +29,15 @@
 
 #include <hybrid/align.h>
 #include <hybrid/bit.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 
 #include <kos/anno.h>
+#include <kos/types.h>
+#include <nt/types.h>
 #include <nt/wingdi.h>
 #include <sys/mman.h>
 #include <sys/param.h>
@@ -51,10 +54,13 @@
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 /**/
 
-#include "../buffer-io.h"
+#include "../io-utils.h"
+#include "../buffer.h"
 #include "../ram-buffer.h"
 
 #ifndef BITSOF

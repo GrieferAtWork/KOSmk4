@@ -22,8 +22,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_BUFFER_IO_C
-#define GUARD_LIBVIDEO_GFX_BUFFER_IO_C 1
+#ifndef GUARD_LIBVIDEO_GFX_IO_C
+#define GUARD_LIBVIDEO_GFX_IO_C 1
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
@@ -31,6 +31,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 #include <sys/mman.h>
 
@@ -46,15 +47,17 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/buffer.h>
 /**/
 
-#include "buffer-io.h"
+#include "io.h"
+#include "io-utils.h"
 
 /**/
 
 /* Pull in individual format I/O impl */
 #ifndef __INTELLISENSE__
-#include "io/png.c.inl"
-#include "io/jpg.c.inl"
 #include "io/bmp.c.inl"
+#include "io/jpg.c.inl"
+#include "io/png-lodepng.c.inl"
+#include "io/png.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
@@ -135,6 +138,8 @@ libvideo_buffer_open_impl(void const *blob, size_t blob_size,
 	for (used_format = FMT_FIRST;
 	     (unsigned int)used_format <= (unsigned int)FMT_LAST;
 	     used_format = (enum fmt)((unsigned int)used_format + 1)) {
+		if (used_format == hinted_format)
+			continue; /* Already tried this one... */
 		result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, used_format);
 		if (result != VIDEO_BUFFER_WRONG_FMT)
 			return result;
@@ -272,4 +277,4 @@ libvideo_buffer_save(struct video_buffer *self,
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_IO_C */
+#endif /* !GUARD_LIBVIDEO_GFX_IO_C */

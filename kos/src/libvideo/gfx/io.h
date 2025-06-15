@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_BUFFER_IO_H
-#define GUARD_LIBVIDEO_GFX_BUFFER_IO_H 1
+#ifndef GUARD_LIBVIDEO_GFX_IO_H
+#define GUARD_LIBVIDEO_GFX_IO_H 1
 
 #include "api.h"
 
@@ -73,37 +73,6 @@ INTDEF /*WUNUSED*/ NONNULL((1, 2)) int CC
 libvideo_buffer_save(struct video_buffer *self, char const *filename,
                      char const *options);
 
-
-
-/* Returned by `libvideo_buffer_open_*' when the blob doesn't match the specified format. */
-#define VIDEO_BUFFER_WRONG_FMT ((REF struct video_buffer *)-1)
-
-/* PNG */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_png(void const *blob, size_t blob_size);
-INTERN WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_png(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
-
-/* JPG */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_jpg(void const *blob, size_t blob_size);
-INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
-
-/* BMP
- * @param: p_mapfile: When  non-NULL, the function is allowed to assume
- *                    that the given blob is owned by this mapfile, and
- *                    is also allowed to steal that mapping by doing  a
- *                    bzero on `*p_mapfile' */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
-                         struct mapfile *p_mapfile);
-INTDEF WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options);
-
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_IO_H */
+#endif /* !GUARD_LIBVIDEO_GFX_IO_H */
