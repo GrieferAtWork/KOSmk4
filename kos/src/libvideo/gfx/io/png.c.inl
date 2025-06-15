@@ -267,17 +267,23 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		unsigned int pal_i;
 
 		/* Palette-driven */
-		if (color_type & LIBPNG_COLOR_MASK_ALPHA) { /* XXX: Support for palette w/ alpha codecs */
-			(*pdyn_png_set_palette_to_rgb)(png_ptr);
-			goto do_rgb_format;
-		}
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
-		switch (bit_depth) {
-		case 1: result_codec_id = VIDEO_CODEC_P1_MSB; break;
-		case 2: result_codec_id = VIDEO_CODEC_P2_MSB; break;
-		case 4: result_codec_id = VIDEO_CODEC_P4_MSB; break;
-		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
-		case 8: result_codec_id = VIDEO_CODEC_P8; break;
+		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
+			switch (bit_depth) {
+			case 1: result_codec_id = VIDEO_CODEC_PA11_MSB; break;
+			case 2: result_codec_id = VIDEO_CODEC_PA22_MSB; break;
+			case 4: result_codec_id = VIDEO_CODEC_PA44; break;
+			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+			case 8: result_codec_id = VIDEO_CODEC_PA88; break;
+			}
+		} else {
+			switch (bit_depth) {
+			case 1: result_codec_id = VIDEO_CODEC_P1_MSB; break;
+			case 2: result_codec_id = VIDEO_CODEC_P2_MSB; break;
+			case 4: result_codec_id = VIDEO_CODEC_P4_MSB; break;
+			default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+			case 8: result_codec_id = VIDEO_CODEC_P8; break;
+			}
 		}
 
 		/* Read palette colors */
@@ -348,10 +354,10 @@ do_rgb_format:
 	/* Figure out required scanline size */
 	(*result_codec->vc_rambuffer_requirements)(width, height, &bufreq);
 	{
-		size_t png_scanline;
-		png_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
-		if (bufreq.vbs_stride < png_scanline) {
-			bufreq.vbs_stride = png_scanline;
+		/* Don't go below whatever scanline requirements libpng has */
+		size_t libpng_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
+		if (bufreq.vbs_stride < libpng_scanline) {
+			bufreq.vbs_stride = libpng_scanline;
 			bufreq.vbs_bufsize = bufreq.vbs_stride * height;
 		}
 	}

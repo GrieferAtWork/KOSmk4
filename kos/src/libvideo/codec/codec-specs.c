@@ -51,7 +51,8 @@ DECL_BEGIN
 INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
-	if (specs->vcs_flags & VIDEO_CODEC_FLAG_GRAY) {
+	if (specs->vcs_flags & (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_PAL)) {
+		/* Grayscale (luminance) or palette */
 		if (specs->vcs_gmask == specs->vcs_rmask &&
 		    specs->vcs_bmask == specs->vcs_rmask) {
 			if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) && specs->vcs_amask == 0) {
@@ -134,23 +135,38 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 				}
 			}
 		}
-	} else if (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL) {
-		if (specs->vcs_rmask == (((uint32_t)1 << specs->vcs_bpp) - 1) &&
-		    specs->vcs_gmask == specs->vcs_rmask &&
-		    specs->vcs_bmask == specs->vcs_rmask &&
-		    specs->vcs_amask == 0) {
-			switch (specs->vcs_bpp) {
-			case 1: codec = VIDEO_CODEC_P1_MSB; break;
-			case 2: codec = VIDEO_CODEC_P2_MSB; break;
-			case 4: codec = VIDEO_CODEC_P4_MSB; break;
-			case 8: codec = VIDEO_CODEC_P8; break;
-			default: goto nope;
-			}
-			static_assert((VIDEO_CODEC_P1_MSB + 1) == VIDEO_CODEC_P1_LSB);
-			static_assert((VIDEO_CODEC_P2_MSB + 1) == VIDEO_CODEC_P2_LSB);
-			static_assert((VIDEO_CODEC_P4_MSB + 1) == VIDEO_CODEC_P4_LSB);
-			if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
-				++codec;
+		if (codec != VIDEO_CODEC_NONE && (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
+			/* Convert luminance codec to its palette equivalent */
+#define LUM2PAL_OFFSET (VIDEO_CODEC_P1_MSB - VIDEO_CODEC_L1_MSB)
+#define LUM2PAL(id)    ((id) + LUM2PAL_OFFSET)
+			static_assert(LUM2PAL(VIDEO_CODEC_L1_MSB) == VIDEO_CODEC_P1_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L1_LSB) == VIDEO_CODEC_P1_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L2_MSB) == VIDEO_CODEC_P2_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L2_LSB) == VIDEO_CODEC_P2_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L4_MSB) == VIDEO_CODEC_P4_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L4_LSB) == VIDEO_CODEC_P4_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_L8) == VIDEO_CODEC_P8);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA11_MSB) == VIDEO_CODEC_PA11_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA11_LSB) == VIDEO_CODEC_PA11_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL11_MSB) == VIDEO_CODEC_AP11_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL11_LSB) == VIDEO_CODEC_AP11_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA22_MSB) == VIDEO_CODEC_PA22_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA22_LSB) == VIDEO_CODEC_PA22_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL22_MSB) == VIDEO_CODEC_AP22_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL22_LSB) == VIDEO_CODEC_AP22_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA31_MSB) == VIDEO_CODEC_PA31_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA31_LSB) == VIDEO_CODEC_PA31_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL13_MSB) == VIDEO_CODEC_AP13_MSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL13_LSB) == VIDEO_CODEC_AP13_LSB);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA44) == VIDEO_CODEC_PA44);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL44) == VIDEO_CODEC_AP44);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA71) == VIDEO_CODEC_PA71);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL17) == VIDEO_CODEC_AP17);
+			static_assert(LUM2PAL(VIDEO_CODEC_LA88) == VIDEO_CODEC_PA88);
+			static_assert(LUM2PAL(VIDEO_CODEC_AL88) == VIDEO_CODEC_AP88);
+			codec = LUM2PAL(codec);
+#undef LUM2PAL_OFFSET
+#undef LUM2PAL
 		}
 	} else {
 #define SET_CODEC(c) do{codec = (c); goto return_codec;}__WHILE0
