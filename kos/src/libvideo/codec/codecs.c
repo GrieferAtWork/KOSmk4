@@ -37,7 +37,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 
-#include <asm/sar.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/param.h>
@@ -64,76 +63,9 @@ union pixelword {
 	byte_t        bytes[4];
 };
 
-union color_data {
-	video_color_t color;
-	struct {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		u8 r;
-		u8 g;
-		u8 b;
-		u8 a;
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		u8 a;
-		u8 b;
-		u8 g;
-		u8 r;
-#endif /* __BYTE_ORDER__ == ... */
-	};
-};
-
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define BIGENDIAN_SHL(x, n) ((x) >> (n))
-#define BIGENDIAN_SHR(x, n) ((x) << (n))
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define BIGENDIAN_SHL(x, n) ((x) << (n))
-#define BIGENDIAN_SHR(x, n) ((x) >> (n))
-#endif
-
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PIXEL_RD0(pixel)         ((pixel) & 0xff)
-#define PIXEL_RD1(pixel)         (((pixel) >> 8) & 0xff)
-#define PIXEL_RD2(pixel)         (((pixel) >> 16) & 0xff)
-#define PIXEL_RD3(pixel)         (((pixel) >> 24) & 0xff)
-#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
-#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
-#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
-#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PIXEL_RD3(pixel)         ((pixel) & 0xff)
-#define PIXEL_RD2(pixel)         (((pixel) >> 8) & 0xff)
-#define PIXEL_RD1(pixel)         (((pixel) >> 16) & 0xff)
-#define PIXEL_RD0(pixel)         (((pixel) >> 24) & 0xff)
-#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
-#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
-#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
-#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
-#endif /* __BYTE_ORDER__ == ... */
-
-
-/* Shift "chan" left "n" times, populating those "n" bits with copies of "chan & 1" */
-LOCAL ATTR_CONST video_channel_t CC
-repeat_lsb(video_channel_t chan, shift_t n) {
-#if 1 /* Same as other impl, but without if-statements */
-	chan = (chan << n) |
-	       ((video_channel_t)(chan & 1) *
-	        (((video_channel_t)1 << n) - 1));
-#else
-	if (n) {
-		if (chan & 1) {
-			chan <<= n;
-			chan |= ((video_channel_t)1 << n) - 1;
-		} else {
-			chan <<= n;
-		}
-	}
-#endif
-	return chan;
-}
-
-
-
+/************************************************************************/
+/* PIXEL OPERATIONS                                                     */
+/************************************************************************/
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_inbyte_lsb(byte_t const *__restrict byte,
@@ -640,555 +572,6 @@ unaligned_linefill32(byte_t *__restrict dst_line, video_coord_t dst_x,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 
-
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) u32 CC
-colorpixel_identity(struct video_format const *__restrict UNUSED(format),
-                    u32 value) {
-	return value;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-rgbx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	return pixel | VIDEO_COLOR_ALPHA_MASK;
-}
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define rgb888_pixel2color   rgbx8888_pixel2color
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                   video_pixel_t pixel) {
-	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
-}
-#endif /* __BYTE_ORDER__ == ... */
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define rgb888_color2pixel  colorpixel_identity
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                   video_color_t color) {
-	return color >> 8;
-}
-#endif /* __BYTE_ORDER__ == ... */
-
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-argb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	return BIGENDIAN_SHL((u32)pixel, 8) | BIGENDIAN_SHR((u32)pixel, 24);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-argb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	return BIGENDIAN_SHR((u32)color, 8) | BIGENDIAN_SHL((u32)color, 24);
-}
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-xrgb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	return BIGENDIAN_SHL((u32)pixel, 8) | VIDEO_COLOR_ALPHA_MASK;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-xrgb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	return BIGENDIAN_SHR((u32)color, 8);
-}
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	union color_data result;
-	result.a = PIXEL_RD0(pixel);
-	result.r = PIXEL_RD1(pixel);
-	result.g = PIXEL_RD2(pixel);
-	result.b = PIXEL_RD3(pixel);
-	return result.color;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	union color_data data;
-	video_pixel_t result = 0;
-	data.color = color;
-	PIXEL_WR0(result, data.a);
-	PIXEL_WR1(result, data.b);
-	PIXEL_WR2(result, data.g);
-	PIXEL_WR3(result, data.r);
-	return result;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	union color_data result;
-	result.a = 0xff;
-	result.b = PIXEL_RD1(pixel);
-	result.g = PIXEL_RD2(pixel);
-	result.r = PIXEL_RD3(pixel);
-	return result.color;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	union color_data data;
-	video_pixel_t result = 0;
-	data.color = color;
-	PIXEL_WR1(result, data.b);
-	PIXEL_WR2(result, data.g);
-	PIXEL_WR3(result, data.r);
-	return result;
-}
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	union color_data result;
-	result.b = PIXEL_RD0(pixel);
-	result.g = PIXEL_RD1(pixel);
-	result.r = PIXEL_RD2(pixel);
-	result.a = PIXEL_RD3(pixel);
-	return result.color;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	union color_data data;
-	video_pixel_t result = 0;
-	data.color = color;
-	PIXEL_WR0(result, data.b);
-	PIXEL_WR1(result, data.g);
-	PIXEL_WR2(result, data.r);
-	PIXEL_WR3(result, data.a);
-	return result;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
-                     video_pixel_t pixel) {
-	union color_data result;
-	result.b = PIXEL_RD0(pixel);
-	result.g = PIXEL_RD1(pixel);
-	result.r = PIXEL_RD2(pixel);
-	result.a = 0xff;
-	return result.color;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
-                     video_color_t color) {
-	union color_data data;
-	video_pixel_t result = 0;
-	data.color = color;
-	PIXEL_WR0(result, data.b);
-	PIXEL_WR1(result, data.g);
-	PIXEL_WR2(result, data.r);
-	return result;
-}
-
-
-#define bgr888_pixel2color bgrx8888_pixel2color
-#define bgr888_color2pixel bgrx8888_color2pixel
-
-
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-l1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((pixel & 1) * ~VIDEO_COLOR_ALPHA_MASK) | VIDEO_COLOR_ALPHA_MASK;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-l1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 1 : 0;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-l2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return VIDEO_COLOR_ALPHA_MASK |
-	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        (pixel & 0x3));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-l2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-l4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return VIDEO_COLOR_ALPHA_MASK |
-	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        (pixel & 0xf));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-l4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-l8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return VIDEO_COLOR_ALPHA_MASK |
-	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK |
-	                                   VIDEO_COLOR_GREEN_MASK |
-	                                   VIDEO_COLOR_BLUE_MASK)) *
-	        (pixel & 0xff));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3);
-}
-
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (((pixel >> 1) & 1) * ~VIDEO_COLOR_ALPHA_MASK) |
-	       ((pixel & 1) * VIDEO_COLOR_ALPHA_MASK);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((pixel & 1) * ~VIDEO_COLOR_ALPHA_MASK) |
-	       (((pixel >> 1) & 1) * VIDEO_COLOR_ALPHA_MASK);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 1 : 0) |
-	       (data.a >= 128 ? 2 : 0);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >= 128 ? 2 : 0) |
-	       (data.a >= 128 ? 1 : 0);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * (pixel & 3)) |
-	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * ((pixel >> 2) & 3));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (data.a >> 6) |
-	       (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6) << 2);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * ((pixel >> 2) & 3)) |
-	       ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (pixel & 3));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((data.a >> 6) << 2) |
-	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 6);
-}
-
-PRIVATE video_color_t const l3_to_color[8] = {
-/*[[[deemon
-for (local x: [:8]) {
-	local chan = (((x * 255) + (7 / 2)) / 7).hex(2);
-	print("	[", x, "] = VIDEO_COLOR_RGBA(", chan, ", ", chan, ", ", chan, ", 0),");
-}
-]]]*/
-	[0] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0),
-	[1] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0),
-	[2] = VIDEO_COLOR_RGBA(0x49, 0x49, 0x49, 0),
-	[3] = VIDEO_COLOR_RGBA(0x6d, 0x6d, 0x6d, 0),
-	[4] = VIDEO_COLOR_RGBA(0x92, 0x92, 0x92, 0),
-	[5] = VIDEO_COLOR_RGBA(0xb6, 0xb6, 0xb6, 0),
-	[6] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0),
-	[7] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0),
-/*[[[end]]]*/
-};
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al13_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (VIDEO_COLOR_ALPHA_MASK * (pixel & 1)) | l3_to_color[(pixel >> 1) & 7];
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al13_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (data.a >> 7) |
-	       (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 5) << 1);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la31_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (VIDEO_COLOR_ALPHA_MASK * ((pixel >> 3) & 1)) | l3_to_color[pixel & 7];
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la31_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((data.a >> 7) << 3) |
-	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 5);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * (pixel & 0xf)) |
-	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        ((pixel >> 4) & 0xf));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4) << 4) |
-	       (data.a >> 4);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * ((pixel >> 4) & 0xf)) |
-	       ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        (pixel & 0xf));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 4) |
-	       ((data.a >> 4) << 4);
-}
-
-PRIVATE video_color_t const l7_to_color[128] = {
-/*[[[deemon
-for (local x: [:128]) {
-	local chan = (((x * 255) + (127 / 2)) / 127).hex(2);
-	print("	[", x.hex(2), "] = VIDEO_COLOR_RGBA(", chan, ", ", chan, ", ", chan, ", 0),");
-}
-]]]*/
-	[0x00] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0),
-	[0x01] = VIDEO_COLOR_RGBA(0x02, 0x02, 0x02, 0),
-	[0x02] = VIDEO_COLOR_RGBA(0x04, 0x04, 0x04, 0),
-	[0x03] = VIDEO_COLOR_RGBA(0x06, 0x06, 0x06, 0),
-	[0x04] = VIDEO_COLOR_RGBA(0x08, 0x08, 0x08, 0),
-	[0x05] = VIDEO_COLOR_RGBA(0x0a, 0x0a, 0x0a, 0),
-	[0x06] = VIDEO_COLOR_RGBA(0x0c, 0x0c, 0x0c, 0),
-	[0x07] = VIDEO_COLOR_RGBA(0x0e, 0x0e, 0x0e, 0),
-	[0x08] = VIDEO_COLOR_RGBA(0x10, 0x10, 0x10, 0),
-	[0x09] = VIDEO_COLOR_RGBA(0x12, 0x12, 0x12, 0),
-	[0x0a] = VIDEO_COLOR_RGBA(0x14, 0x14, 0x14, 0),
-	[0x0b] = VIDEO_COLOR_RGBA(0x16, 0x16, 0x16, 0),
-	[0x0c] = VIDEO_COLOR_RGBA(0x18, 0x18, 0x18, 0),
-	[0x0d] = VIDEO_COLOR_RGBA(0x1a, 0x1a, 0x1a, 0),
-	[0x0e] = VIDEO_COLOR_RGBA(0x1c, 0x1c, 0x1c, 0),
-	[0x0f] = VIDEO_COLOR_RGBA(0x1e, 0x1e, 0x1e, 0),
-	[0x10] = VIDEO_COLOR_RGBA(0x20, 0x20, 0x20, 0),
-	[0x11] = VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0),
-	[0x12] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0),
-	[0x13] = VIDEO_COLOR_RGBA(0x26, 0x26, 0x26, 0),
-	[0x14] = VIDEO_COLOR_RGBA(0x28, 0x28, 0x28, 0),
-	[0x15] = VIDEO_COLOR_RGBA(0x2a, 0x2a, 0x2a, 0),
-	[0x16] = VIDEO_COLOR_RGBA(0x2c, 0x2c, 0x2c, 0),
-	[0x17] = VIDEO_COLOR_RGBA(0x2e, 0x2e, 0x2e, 0),
-	[0x18] = VIDEO_COLOR_RGBA(0x30, 0x30, 0x30, 0),
-	[0x19] = VIDEO_COLOR_RGBA(0x32, 0x32, 0x32, 0),
-	[0x1a] = VIDEO_COLOR_RGBA(0x34, 0x34, 0x34, 0),
-	[0x1b] = VIDEO_COLOR_RGBA(0x36, 0x36, 0x36, 0),
-	[0x1c] = VIDEO_COLOR_RGBA(0x38, 0x38, 0x38, 0),
-	[0x1d] = VIDEO_COLOR_RGBA(0x3a, 0x3a, 0x3a, 0),
-	[0x1e] = VIDEO_COLOR_RGBA(0x3c, 0x3c, 0x3c, 0),
-	[0x1f] = VIDEO_COLOR_RGBA(0x3e, 0x3e, 0x3e, 0),
-	[0x20] = VIDEO_COLOR_RGBA(0x40, 0x40, 0x40, 0),
-	[0x21] = VIDEO_COLOR_RGBA(0x42, 0x42, 0x42, 0),
-	[0x22] = VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0),
-	[0x23] = VIDEO_COLOR_RGBA(0x46, 0x46, 0x46, 0),
-	[0x24] = VIDEO_COLOR_RGBA(0x48, 0x48, 0x48, 0),
-	[0x25] = VIDEO_COLOR_RGBA(0x4a, 0x4a, 0x4a, 0),
-	[0x26] = VIDEO_COLOR_RGBA(0x4c, 0x4c, 0x4c, 0),
-	[0x27] = VIDEO_COLOR_RGBA(0x4e, 0x4e, 0x4e, 0),
-	[0x28] = VIDEO_COLOR_RGBA(0x50, 0x50, 0x50, 0),
-	[0x29] = VIDEO_COLOR_RGBA(0x52, 0x52, 0x52, 0),
-	[0x2a] = VIDEO_COLOR_RGBA(0x54, 0x54, 0x54, 0),
-	[0x2b] = VIDEO_COLOR_RGBA(0x56, 0x56, 0x56, 0),
-	[0x2c] = VIDEO_COLOR_RGBA(0x58, 0x58, 0x58, 0),
-	[0x2d] = VIDEO_COLOR_RGBA(0x5a, 0x5a, 0x5a, 0),
-	[0x2e] = VIDEO_COLOR_RGBA(0x5c, 0x5c, 0x5c, 0),
-	[0x2f] = VIDEO_COLOR_RGBA(0x5e, 0x5e, 0x5e, 0),
-	[0x30] = VIDEO_COLOR_RGBA(0x60, 0x60, 0x60, 0),
-	[0x31] = VIDEO_COLOR_RGBA(0x62, 0x62, 0x62, 0),
-	[0x32] = VIDEO_COLOR_RGBA(0x64, 0x64, 0x64, 0),
-	[0x33] = VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0),
-	[0x34] = VIDEO_COLOR_RGBA(0x68, 0x68, 0x68, 0),
-	[0x35] = VIDEO_COLOR_RGBA(0x6a, 0x6a, 0x6a, 0),
-	[0x36] = VIDEO_COLOR_RGBA(0x6c, 0x6c, 0x6c, 0),
-	[0x37] = VIDEO_COLOR_RGBA(0x6e, 0x6e, 0x6e, 0),
-	[0x38] = VIDEO_COLOR_RGBA(0x70, 0x70, 0x70, 0),
-	[0x39] = VIDEO_COLOR_RGBA(0x72, 0x72, 0x72, 0),
-	[0x3a] = VIDEO_COLOR_RGBA(0x74, 0x74, 0x74, 0),
-	[0x3b] = VIDEO_COLOR_RGBA(0x76, 0x76, 0x76, 0),
-	[0x3c] = VIDEO_COLOR_RGBA(0x78, 0x78, 0x78, 0),
-	[0x3d] = VIDEO_COLOR_RGBA(0x7a, 0x7a, 0x7a, 0),
-	[0x3e] = VIDEO_COLOR_RGBA(0x7c, 0x7c, 0x7c, 0),
-	[0x3f] = VIDEO_COLOR_RGBA(0x7e, 0x7e, 0x7e, 0),
-	[0x40] = VIDEO_COLOR_RGBA(0x81, 0x81, 0x81, 0),
-	[0x41] = VIDEO_COLOR_RGBA(0x83, 0x83, 0x83, 0),
-	[0x42] = VIDEO_COLOR_RGBA(0x85, 0x85, 0x85, 0),
-	[0x43] = VIDEO_COLOR_RGBA(0x87, 0x87, 0x87, 0),
-	[0x44] = VIDEO_COLOR_RGBA(0x89, 0x89, 0x89, 0),
-	[0x45] = VIDEO_COLOR_RGBA(0x8b, 0x8b, 0x8b, 0),
-	[0x46] = VIDEO_COLOR_RGBA(0x8d, 0x8d, 0x8d, 0),
-	[0x47] = VIDEO_COLOR_RGBA(0x8f, 0x8f, 0x8f, 0),
-	[0x48] = VIDEO_COLOR_RGBA(0x91, 0x91, 0x91, 0),
-	[0x49] = VIDEO_COLOR_RGBA(0x93, 0x93, 0x93, 0),
-	[0x4a] = VIDEO_COLOR_RGBA(0x95, 0x95, 0x95, 0),
-	[0x4b] = VIDEO_COLOR_RGBA(0x97, 0x97, 0x97, 0),
-	[0x4c] = VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0),
-	[0x4d] = VIDEO_COLOR_RGBA(0x9b, 0x9b, 0x9b, 0),
-	[0x4e] = VIDEO_COLOR_RGBA(0x9d, 0x9d, 0x9d, 0),
-	[0x4f] = VIDEO_COLOR_RGBA(0x9f, 0x9f, 0x9f, 0),
-	[0x50] = VIDEO_COLOR_RGBA(0xa1, 0xa1, 0xa1, 0),
-	[0x51] = VIDEO_COLOR_RGBA(0xa3, 0xa3, 0xa3, 0),
-	[0x52] = VIDEO_COLOR_RGBA(0xa5, 0xa5, 0xa5, 0),
-	[0x53] = VIDEO_COLOR_RGBA(0xa7, 0xa7, 0xa7, 0),
-	[0x54] = VIDEO_COLOR_RGBA(0xa9, 0xa9, 0xa9, 0),
-	[0x55] = VIDEO_COLOR_RGBA(0xab, 0xab, 0xab, 0),
-	[0x56] = VIDEO_COLOR_RGBA(0xad, 0xad, 0xad, 0),
-	[0x57] = VIDEO_COLOR_RGBA(0xaf, 0xaf, 0xaf, 0),
-	[0x58] = VIDEO_COLOR_RGBA(0xb1, 0xb1, 0xb1, 0),
-	[0x59] = VIDEO_COLOR_RGBA(0xb3, 0xb3, 0xb3, 0),
-	[0x5a] = VIDEO_COLOR_RGBA(0xb5, 0xb5, 0xb5, 0),
-	[0x5b] = VIDEO_COLOR_RGBA(0xb7, 0xb7, 0xb7, 0),
-	[0x5c] = VIDEO_COLOR_RGBA(0xb9, 0xb9, 0xb9, 0),
-	[0x5d] = VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0),
-	[0x5e] = VIDEO_COLOR_RGBA(0xbd, 0xbd, 0xbd, 0),
-	[0x5f] = VIDEO_COLOR_RGBA(0xbf, 0xbf, 0xbf, 0),
-	[0x60] = VIDEO_COLOR_RGBA(0xc1, 0xc1, 0xc1, 0),
-	[0x61] = VIDEO_COLOR_RGBA(0xc3, 0xc3, 0xc3, 0),
-	[0x62] = VIDEO_COLOR_RGBA(0xc5, 0xc5, 0xc5, 0),
-	[0x63] = VIDEO_COLOR_RGBA(0xc7, 0xc7, 0xc7, 0),
-	[0x64] = VIDEO_COLOR_RGBA(0xc9, 0xc9, 0xc9, 0),
-	[0x65] = VIDEO_COLOR_RGBA(0xcb, 0xcb, 0xcb, 0),
-	[0x66] = VIDEO_COLOR_RGBA(0xcd, 0xcd, 0xcd, 0),
-	[0x67] = VIDEO_COLOR_RGBA(0xcf, 0xcf, 0xcf, 0),
-	[0x68] = VIDEO_COLOR_RGBA(0xd1, 0xd1, 0xd1, 0),
-	[0x69] = VIDEO_COLOR_RGBA(0xd3, 0xd3, 0xd3, 0),
-	[0x6a] = VIDEO_COLOR_RGBA(0xd5, 0xd5, 0xd5, 0),
-	[0x6b] = VIDEO_COLOR_RGBA(0xd7, 0xd7, 0xd7, 0),
-	[0x6c] = VIDEO_COLOR_RGBA(0xd9, 0xd9, 0xd9, 0),
-	[0x6d] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0),
-	[0x6e] = VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0),
-	[0x6f] = VIDEO_COLOR_RGBA(0xdf, 0xdf, 0xdf, 0),
-	[0x70] = VIDEO_COLOR_RGBA(0xe1, 0xe1, 0xe1, 0),
-	[0x71] = VIDEO_COLOR_RGBA(0xe3, 0xe3, 0xe3, 0),
-	[0x72] = VIDEO_COLOR_RGBA(0xe5, 0xe5, 0xe5, 0),
-	[0x73] = VIDEO_COLOR_RGBA(0xe7, 0xe7, 0xe7, 0),
-	[0x74] = VIDEO_COLOR_RGBA(0xe9, 0xe9, 0xe9, 0),
-	[0x75] = VIDEO_COLOR_RGBA(0xeb, 0xeb, 0xeb, 0),
-	[0x76] = VIDEO_COLOR_RGBA(0xed, 0xed, 0xed, 0),
-	[0x77] = VIDEO_COLOR_RGBA(0xef, 0xef, 0xef, 0),
-	[0x78] = VIDEO_COLOR_RGBA(0xf1, 0xf1, 0xf1, 0),
-	[0x79] = VIDEO_COLOR_RGBA(0xf3, 0xf3, 0xf3, 0),
-	[0x7a] = VIDEO_COLOR_RGBA(0xf5, 0xf5, 0xf5, 0),
-	[0x7b] = VIDEO_COLOR_RGBA(0xf7, 0xf7, 0xf7, 0),
-	[0x7c] = VIDEO_COLOR_RGBA(0xf9, 0xf9, 0xf9, 0),
-	[0x7d] = VIDEO_COLOR_RGBA(0xfb, 0xfb, 0xfb, 0),
-	[0x7e] = VIDEO_COLOR_RGBA(0xfd, 0xfd, 0xfd, 0),
-	[0x7f] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0),
-/*[[[end]]]*/
-};
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al17_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (VIDEO_COLOR_ALPHA_MASK * (pixel & 1)) | l7_to_color[(pixel >> 1) & 127];
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al17_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (data.a >> 7) |
-	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) & 0xfe);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la71_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (VIDEO_COLOR_ALPHA_MASK * ((pixel >> 7) & 1)) | l7_to_color[pixel & 127];
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la71_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (data.a & 0x80) |
-	       ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) >> 1);
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-al88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return ((pixel & 0xff) << VIDEO_COLOR_ALPHA_SHIFT) |
-	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        ((pixel >> 8) & 0xff));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-al88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return ((((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) << 8) | data.a;
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-la88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
-	return (((pixel >> 8) & 0xff) << VIDEO_COLOR_ALPHA_SHIFT) |
-	       ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) *
-	        (pixel & 0xff));
-}
-
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
-	union color_data data;
-	data.color = color;
-	return (((u32)data.r + (u32)data.g + (u32)data.b + 2) / 3) | (data.a << 8);
-}
-
-
-
-
-
-
 PRIVATE void CC
 linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
@@ -1644,6 +1027,682 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* COLOR CONVERSION                                                     */
+/************************************************************************/
+
+
+union color_data {
+	video_color_t color;
+	struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		u8 r;
+		u8 g;
+		u8 b;
+		u8 a;
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		u8 a;
+		u8 b;
+		u8 g;
+		u8 r;
+#endif /* __BYTE_ORDER__ == ... */
+	};
+};
+
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define BIGENDIAN_SHL(x, n) ((x) >> (n))
+#define BIGENDIAN_SHR(x, n) ((x) << (n))
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define BIGENDIAN_SHL(x, n) ((x) << (n))
+#define BIGENDIAN_SHR(x, n) ((x) >> (n))
+#endif
+
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define PIXEL_RD0(pixel)         ((pixel) & 0xff)
+#define PIXEL_RD1(pixel)         (((pixel) >> 8) & 0xff)
+#define PIXEL_RD2(pixel)         (((pixel) >> 16) & 0xff)
+#define PIXEL_RD3(pixel)         (((pixel) >> 24) & 0xff)
+#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
+#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
+#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
+#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define PIXEL_RD3(pixel)         ((pixel) & 0xff)
+#define PIXEL_RD2(pixel)         (((pixel) >> 8) & 0xff)
+#define PIXEL_RD1(pixel)         (((pixel) >> 16) & 0xff)
+#define PIXEL_RD0(pixel)         (((pixel) >> 24) & 0xff)
+#define PIXEL_WR3(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x000000ff)) | (byte))
+#define PIXEL_WR2(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x0000ff00)) | ((byte) << 8))
+#define PIXEL_WR1(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0x00ff0000)) | ((byte) << 16))
+#define PIXEL_WR0(pixel, byte)   ((pixel) = ((pixel) & ~UINT32_C(0xff000000)) | ((byte) << 24))
+#endif /* __BYTE_ORDER__ == ... */
+
+
+/* Shift "chan" left "n" times, populating those "n" bits with copies of "chan & 1" */
+LOCAL ATTR_CONST video_channel_t CC
+repeat_lsb(video_channel_t chan, shift_t n) {
+#if 1 /* Same as other impl, but without if-statements */
+	chan = (chan << n) |
+	       ((video_channel_t)(chan & 1) *
+	        (((video_channel_t)1 << n) - 1));
+#else
+	if (n) {
+		if (chan & 1) {
+			chan <<= n;
+			chan |= ((video_channel_t)1 << n) - 1;
+		} else {
+			chan <<= n;
+		}
+	}
+#endif
+	return chan;
+}
+
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) u32 CC
+colorpixel_identity(struct video_format const *__restrict UNUSED(format),
+                    u32 value) {
+	return value;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+rgbx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	return pixel | VIDEO_COLOR_ALPHA_MASK;
+}
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define rgb888_pixel2color   rgbx8888_pixel2color
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                   video_pixel_t pixel) {
+	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
+}
+#endif /* __BYTE_ORDER__ == ... */
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define rgb888_color2pixel  colorpixel_identity
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                   video_color_t color) {
+	return color >> 8;
+}
+#endif /* __BYTE_ORDER__ == ... */
+
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+argb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	return BIGENDIAN_SHL((u32)pixel, 8) | BIGENDIAN_SHR((u32)pixel, 24);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+argb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	return BIGENDIAN_SHR((u32)color, 8) | BIGENDIAN_SHL((u32)color, 24);
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+xrgb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	return BIGENDIAN_SHL((u32)pixel, 8) | VIDEO_COLOR_ALPHA_MASK;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+xrgb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	return BIGENDIAN_SHR((u32)color, 8);
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	union color_data result;
+	result.a = PIXEL_RD0(pixel);
+	result.r = PIXEL_RD1(pixel);
+	result.g = PIXEL_RD2(pixel);
+	result.b = PIXEL_RD3(pixel);
+	return result.color;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	union color_data data;
+	video_pixel_t result = 0;
+	data.color = color;
+	PIXEL_WR0(result, data.a);
+	PIXEL_WR1(result, data.b);
+	PIXEL_WR2(result, data.g);
+	PIXEL_WR3(result, data.r);
+	return result;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	union color_data result;
+	result.a = 0xff;
+	result.b = PIXEL_RD1(pixel);
+	result.g = PIXEL_RD2(pixel);
+	result.r = PIXEL_RD3(pixel);
+	return result.color;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	union color_data data;
+	video_pixel_t result = 0;
+	data.color = color;
+	PIXEL_WR1(result, data.b);
+	PIXEL_WR2(result, data.g);
+	PIXEL_WR3(result, data.r);
+	return result;
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	union color_data result;
+	result.b = PIXEL_RD0(pixel);
+	result.g = PIXEL_RD1(pixel);
+	result.r = PIXEL_RD2(pixel);
+	result.a = PIXEL_RD3(pixel);
+	return result.color;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	union color_data data;
+	video_pixel_t result = 0;
+	data.color = color;
+	PIXEL_WR0(result, data.b);
+	PIXEL_WR1(result, data.g);
+	PIXEL_WR2(result, data.r);
+	PIXEL_WR3(result, data.a);
+	return result;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
+                     video_pixel_t pixel) {
+	union color_data result;
+	result.b = PIXEL_RD0(pixel);
+	result.g = PIXEL_RD1(pixel);
+	result.r = PIXEL_RD2(pixel);
+	result.a = 0xff;
+	return result.color;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
+                     video_color_t color) {
+	union color_data data;
+	video_pixel_t result = 0;
+	data.color = color;
+	PIXEL_WR0(result, data.b);
+	PIXEL_WR1(result, data.g);
+	PIXEL_WR2(result, data.r);
+	return result;
+}
+
+
+#define bgr888_pixel2color bgrx8888_pixel2color
+#define bgr888_color2pixel bgrx8888_color2pixel
+
+PRIVATE video_color_t const l3_to_color[8] = {
+/*[[[deemon
+for (local x: [:8]) {
+	local chan = (((x * 255) + (7 / 2)) / 7);
+	local chanH = chan.hex(2);
+	print("	[", x, "] = VIDEO_COLOR_RGBA(", chanH, ", ", chanH, ", ", chanH, ", 0), /" "* ", chan.bin(8), " *" "/");
+}
+]]]*/
+	[0] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0), /* 0b00000000 */
+	[1] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0), /* 0b00100100 */
+	[2] = VIDEO_COLOR_RGBA(0x49, 0x49, 0x49, 0), /* 0b01001001 */
+	[3] = VIDEO_COLOR_RGBA(0x6d, 0x6d, 0x6d, 0), /* 0b01101101 */
+	[4] = VIDEO_COLOR_RGBA(0x92, 0x92, 0x92, 0), /* 0b10010010 */
+	[5] = VIDEO_COLOR_RGBA(0xb6, 0xb6, 0xb6, 0), /* 0b10110110 */
+	[6] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0), /* 0b11011011 */
+	[7] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0), /* 0b11111111 */
+/*[[[end]]]*/
+};
+
+#ifdef __OPTIMIZE_SIZE__
+#define l7_to_color(x)                                       \
+	(((video_color_t)0x01010101 & (VIDEO_COLOR_RED_MASK |    \
+	                               VIDEO_COLOR_GREEN_MASK |  \
+	                               VIDEO_COLOR_BLUE_MASK)) * \
+	 (((x) << 1) | ((x) & 1)))
+#else /* __OPTIMIZE_SIZE__ */
+#define l7_to_color(x) l7_to_color[x]
+PRIVATE video_color_t const l7_to_color[128] = {
+/*[[[deemon
+for (local x: [:128]) {
+	local chan = (((x * 255) + (127 / 2)) / 127);
+	local chanH = chan.hex(2);
+	print("	[", x.hex(2), "] = VIDEO_COLOR_RGBA(", chanH, ", ", chanH, ", ", chanH, ", 0), /" "* 0b", chan.bin(8), " *" "/");
+}
+]]]*/
+	[0x00] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0), /* 0b0b00000000 */
+	[0x01] = VIDEO_COLOR_RGBA(0x02, 0x02, 0x02, 0), /* 0b0b00000010 */
+	[0x02] = VIDEO_COLOR_RGBA(0x04, 0x04, 0x04, 0), /* 0b0b00000100 */
+	[0x03] = VIDEO_COLOR_RGBA(0x06, 0x06, 0x06, 0), /* 0b0b00000110 */
+	[0x04] = VIDEO_COLOR_RGBA(0x08, 0x08, 0x08, 0), /* 0b0b00001000 */
+	[0x05] = VIDEO_COLOR_RGBA(0x0a, 0x0a, 0x0a, 0), /* 0b0b00001010 */
+	[0x06] = VIDEO_COLOR_RGBA(0x0c, 0x0c, 0x0c, 0), /* 0b0b00001100 */
+	[0x07] = VIDEO_COLOR_RGBA(0x0e, 0x0e, 0x0e, 0), /* 0b0b00001110 */
+	[0x08] = VIDEO_COLOR_RGBA(0x10, 0x10, 0x10, 0), /* 0b0b00010000 */
+	[0x09] = VIDEO_COLOR_RGBA(0x12, 0x12, 0x12, 0), /* 0b0b00010010 */
+	[0x0a] = VIDEO_COLOR_RGBA(0x14, 0x14, 0x14, 0), /* 0b0b00010100 */
+	[0x0b] = VIDEO_COLOR_RGBA(0x16, 0x16, 0x16, 0), /* 0b0b00010110 */
+	[0x0c] = VIDEO_COLOR_RGBA(0x18, 0x18, 0x18, 0), /* 0b0b00011000 */
+	[0x0d] = VIDEO_COLOR_RGBA(0x1a, 0x1a, 0x1a, 0), /* 0b0b00011010 */
+	[0x0e] = VIDEO_COLOR_RGBA(0x1c, 0x1c, 0x1c, 0), /* 0b0b00011100 */
+	[0x0f] = VIDEO_COLOR_RGBA(0x1e, 0x1e, 0x1e, 0), /* 0b0b00011110 */
+	[0x10] = VIDEO_COLOR_RGBA(0x20, 0x20, 0x20, 0), /* 0b0b00100000 */
+	[0x11] = VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0), /* 0b0b00100010 */
+	[0x12] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0), /* 0b0b00100100 */
+	[0x13] = VIDEO_COLOR_RGBA(0x26, 0x26, 0x26, 0), /* 0b0b00100110 */
+	[0x14] = VIDEO_COLOR_RGBA(0x28, 0x28, 0x28, 0), /* 0b0b00101000 */
+	[0x15] = VIDEO_COLOR_RGBA(0x2a, 0x2a, 0x2a, 0), /* 0b0b00101010 */
+	[0x16] = VIDEO_COLOR_RGBA(0x2c, 0x2c, 0x2c, 0), /* 0b0b00101100 */
+	[0x17] = VIDEO_COLOR_RGBA(0x2e, 0x2e, 0x2e, 0), /* 0b0b00101110 */
+	[0x18] = VIDEO_COLOR_RGBA(0x30, 0x30, 0x30, 0), /* 0b0b00110000 */
+	[0x19] = VIDEO_COLOR_RGBA(0x32, 0x32, 0x32, 0), /* 0b0b00110010 */
+	[0x1a] = VIDEO_COLOR_RGBA(0x34, 0x34, 0x34, 0), /* 0b0b00110100 */
+	[0x1b] = VIDEO_COLOR_RGBA(0x36, 0x36, 0x36, 0), /* 0b0b00110110 */
+	[0x1c] = VIDEO_COLOR_RGBA(0x38, 0x38, 0x38, 0), /* 0b0b00111000 */
+	[0x1d] = VIDEO_COLOR_RGBA(0x3a, 0x3a, 0x3a, 0), /* 0b0b00111010 */
+	[0x1e] = VIDEO_COLOR_RGBA(0x3c, 0x3c, 0x3c, 0), /* 0b0b00111100 */
+	[0x1f] = VIDEO_COLOR_RGBA(0x3e, 0x3e, 0x3e, 0), /* 0b0b00111110 */
+	[0x20] = VIDEO_COLOR_RGBA(0x40, 0x40, 0x40, 0), /* 0b0b01000000 */
+	[0x21] = VIDEO_COLOR_RGBA(0x42, 0x42, 0x42, 0), /* 0b0b01000010 */
+	[0x22] = VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0), /* 0b0b01000100 */
+	[0x23] = VIDEO_COLOR_RGBA(0x46, 0x46, 0x46, 0), /* 0b0b01000110 */
+	[0x24] = VIDEO_COLOR_RGBA(0x48, 0x48, 0x48, 0), /* 0b0b01001000 */
+	[0x25] = VIDEO_COLOR_RGBA(0x4a, 0x4a, 0x4a, 0), /* 0b0b01001010 */
+	[0x26] = VIDEO_COLOR_RGBA(0x4c, 0x4c, 0x4c, 0), /* 0b0b01001100 */
+	[0x27] = VIDEO_COLOR_RGBA(0x4e, 0x4e, 0x4e, 0), /* 0b0b01001110 */
+	[0x28] = VIDEO_COLOR_RGBA(0x50, 0x50, 0x50, 0), /* 0b0b01010000 */
+	[0x29] = VIDEO_COLOR_RGBA(0x52, 0x52, 0x52, 0), /* 0b0b01010010 */
+	[0x2a] = VIDEO_COLOR_RGBA(0x54, 0x54, 0x54, 0), /* 0b0b01010100 */
+	[0x2b] = VIDEO_COLOR_RGBA(0x56, 0x56, 0x56, 0), /* 0b0b01010110 */
+	[0x2c] = VIDEO_COLOR_RGBA(0x58, 0x58, 0x58, 0), /* 0b0b01011000 */
+	[0x2d] = VIDEO_COLOR_RGBA(0x5a, 0x5a, 0x5a, 0), /* 0b0b01011010 */
+	[0x2e] = VIDEO_COLOR_RGBA(0x5c, 0x5c, 0x5c, 0), /* 0b0b01011100 */
+	[0x2f] = VIDEO_COLOR_RGBA(0x5e, 0x5e, 0x5e, 0), /* 0b0b01011110 */
+	[0x30] = VIDEO_COLOR_RGBA(0x60, 0x60, 0x60, 0), /* 0b0b01100000 */
+	[0x31] = VIDEO_COLOR_RGBA(0x62, 0x62, 0x62, 0), /* 0b0b01100010 */
+	[0x32] = VIDEO_COLOR_RGBA(0x64, 0x64, 0x64, 0), /* 0b0b01100100 */
+	[0x33] = VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0), /* 0b0b01100110 */
+	[0x34] = VIDEO_COLOR_RGBA(0x68, 0x68, 0x68, 0), /* 0b0b01101000 */
+	[0x35] = VIDEO_COLOR_RGBA(0x6a, 0x6a, 0x6a, 0), /* 0b0b01101010 */
+	[0x36] = VIDEO_COLOR_RGBA(0x6c, 0x6c, 0x6c, 0), /* 0b0b01101100 */
+	[0x37] = VIDEO_COLOR_RGBA(0x6e, 0x6e, 0x6e, 0), /* 0b0b01101110 */
+	[0x38] = VIDEO_COLOR_RGBA(0x70, 0x70, 0x70, 0), /* 0b0b01110000 */
+	[0x39] = VIDEO_COLOR_RGBA(0x72, 0x72, 0x72, 0), /* 0b0b01110010 */
+	[0x3a] = VIDEO_COLOR_RGBA(0x74, 0x74, 0x74, 0), /* 0b0b01110100 */
+	[0x3b] = VIDEO_COLOR_RGBA(0x76, 0x76, 0x76, 0), /* 0b0b01110110 */
+	[0x3c] = VIDEO_COLOR_RGBA(0x78, 0x78, 0x78, 0), /* 0b0b01111000 */
+	[0x3d] = VIDEO_COLOR_RGBA(0x7a, 0x7a, 0x7a, 0), /* 0b0b01111010 */
+	[0x3e] = VIDEO_COLOR_RGBA(0x7c, 0x7c, 0x7c, 0), /* 0b0b01111100 */
+	[0x3f] = VIDEO_COLOR_RGBA(0x7e, 0x7e, 0x7e, 0), /* 0b0b01111110 */
+	[0x40] = VIDEO_COLOR_RGBA(0x81, 0x81, 0x81, 0), /* 0b0b10000001 */
+	[0x41] = VIDEO_COLOR_RGBA(0x83, 0x83, 0x83, 0), /* 0b0b10000011 */
+	[0x42] = VIDEO_COLOR_RGBA(0x85, 0x85, 0x85, 0), /* 0b0b10000101 */
+	[0x43] = VIDEO_COLOR_RGBA(0x87, 0x87, 0x87, 0), /* 0b0b10000111 */
+	[0x44] = VIDEO_COLOR_RGBA(0x89, 0x89, 0x89, 0), /* 0b0b10001001 */
+	[0x45] = VIDEO_COLOR_RGBA(0x8b, 0x8b, 0x8b, 0), /* 0b0b10001011 */
+	[0x46] = VIDEO_COLOR_RGBA(0x8d, 0x8d, 0x8d, 0), /* 0b0b10001101 */
+	[0x47] = VIDEO_COLOR_RGBA(0x8f, 0x8f, 0x8f, 0), /* 0b0b10001111 */
+	[0x48] = VIDEO_COLOR_RGBA(0x91, 0x91, 0x91, 0), /* 0b0b10010001 */
+	[0x49] = VIDEO_COLOR_RGBA(0x93, 0x93, 0x93, 0), /* 0b0b10010011 */
+	[0x4a] = VIDEO_COLOR_RGBA(0x95, 0x95, 0x95, 0), /* 0b0b10010101 */
+	[0x4b] = VIDEO_COLOR_RGBA(0x97, 0x97, 0x97, 0), /* 0b0b10010111 */
+	[0x4c] = VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0), /* 0b0b10011001 */
+	[0x4d] = VIDEO_COLOR_RGBA(0x9b, 0x9b, 0x9b, 0), /* 0b0b10011011 */
+	[0x4e] = VIDEO_COLOR_RGBA(0x9d, 0x9d, 0x9d, 0), /* 0b0b10011101 */
+	[0x4f] = VIDEO_COLOR_RGBA(0x9f, 0x9f, 0x9f, 0), /* 0b0b10011111 */
+	[0x50] = VIDEO_COLOR_RGBA(0xa1, 0xa1, 0xa1, 0), /* 0b0b10100001 */
+	[0x51] = VIDEO_COLOR_RGBA(0xa3, 0xa3, 0xa3, 0), /* 0b0b10100011 */
+	[0x52] = VIDEO_COLOR_RGBA(0xa5, 0xa5, 0xa5, 0), /* 0b0b10100101 */
+	[0x53] = VIDEO_COLOR_RGBA(0xa7, 0xa7, 0xa7, 0), /* 0b0b10100111 */
+	[0x54] = VIDEO_COLOR_RGBA(0xa9, 0xa9, 0xa9, 0), /* 0b0b10101001 */
+	[0x55] = VIDEO_COLOR_RGBA(0xab, 0xab, 0xab, 0), /* 0b0b10101011 */
+	[0x56] = VIDEO_COLOR_RGBA(0xad, 0xad, 0xad, 0), /* 0b0b10101101 */
+	[0x57] = VIDEO_COLOR_RGBA(0xaf, 0xaf, 0xaf, 0), /* 0b0b10101111 */
+	[0x58] = VIDEO_COLOR_RGBA(0xb1, 0xb1, 0xb1, 0), /* 0b0b10110001 */
+	[0x59] = VIDEO_COLOR_RGBA(0xb3, 0xb3, 0xb3, 0), /* 0b0b10110011 */
+	[0x5a] = VIDEO_COLOR_RGBA(0xb5, 0xb5, 0xb5, 0), /* 0b0b10110101 */
+	[0x5b] = VIDEO_COLOR_RGBA(0xb7, 0xb7, 0xb7, 0), /* 0b0b10110111 */
+	[0x5c] = VIDEO_COLOR_RGBA(0xb9, 0xb9, 0xb9, 0), /* 0b0b10111001 */
+	[0x5d] = VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0), /* 0b0b10111011 */
+	[0x5e] = VIDEO_COLOR_RGBA(0xbd, 0xbd, 0xbd, 0), /* 0b0b10111101 */
+	[0x5f] = VIDEO_COLOR_RGBA(0xbf, 0xbf, 0xbf, 0), /* 0b0b10111111 */
+	[0x60] = VIDEO_COLOR_RGBA(0xc1, 0xc1, 0xc1, 0), /* 0b0b11000001 */
+	[0x61] = VIDEO_COLOR_RGBA(0xc3, 0xc3, 0xc3, 0), /* 0b0b11000011 */
+	[0x62] = VIDEO_COLOR_RGBA(0xc5, 0xc5, 0xc5, 0), /* 0b0b11000101 */
+	[0x63] = VIDEO_COLOR_RGBA(0xc7, 0xc7, 0xc7, 0), /* 0b0b11000111 */
+	[0x64] = VIDEO_COLOR_RGBA(0xc9, 0xc9, 0xc9, 0), /* 0b0b11001001 */
+	[0x65] = VIDEO_COLOR_RGBA(0xcb, 0xcb, 0xcb, 0), /* 0b0b11001011 */
+	[0x66] = VIDEO_COLOR_RGBA(0xcd, 0xcd, 0xcd, 0), /* 0b0b11001101 */
+	[0x67] = VIDEO_COLOR_RGBA(0xcf, 0xcf, 0xcf, 0), /* 0b0b11001111 */
+	[0x68] = VIDEO_COLOR_RGBA(0xd1, 0xd1, 0xd1, 0), /* 0b0b11010001 */
+	[0x69] = VIDEO_COLOR_RGBA(0xd3, 0xd3, 0xd3, 0), /* 0b0b11010011 */
+	[0x6a] = VIDEO_COLOR_RGBA(0xd5, 0xd5, 0xd5, 0), /* 0b0b11010101 */
+	[0x6b] = VIDEO_COLOR_RGBA(0xd7, 0xd7, 0xd7, 0), /* 0b0b11010111 */
+	[0x6c] = VIDEO_COLOR_RGBA(0xd9, 0xd9, 0xd9, 0), /* 0b0b11011001 */
+	[0x6d] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0), /* 0b0b11011011 */
+	[0x6e] = VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0), /* 0b0b11011101 */
+	[0x6f] = VIDEO_COLOR_RGBA(0xdf, 0xdf, 0xdf, 0), /* 0b0b11011111 */
+	[0x70] = VIDEO_COLOR_RGBA(0xe1, 0xe1, 0xe1, 0), /* 0b0b11100001 */
+	[0x71] = VIDEO_COLOR_RGBA(0xe3, 0xe3, 0xe3, 0), /* 0b0b11100011 */
+	[0x72] = VIDEO_COLOR_RGBA(0xe5, 0xe5, 0xe5, 0), /* 0b0b11100101 */
+	[0x73] = VIDEO_COLOR_RGBA(0xe7, 0xe7, 0xe7, 0), /* 0b0b11100111 */
+	[0x74] = VIDEO_COLOR_RGBA(0xe9, 0xe9, 0xe9, 0), /* 0b0b11101001 */
+	[0x75] = VIDEO_COLOR_RGBA(0xeb, 0xeb, 0xeb, 0), /* 0b0b11101011 */
+	[0x76] = VIDEO_COLOR_RGBA(0xed, 0xed, 0xed, 0), /* 0b0b11101101 */
+	[0x77] = VIDEO_COLOR_RGBA(0xef, 0xef, 0xef, 0), /* 0b0b11101111 */
+	[0x78] = VIDEO_COLOR_RGBA(0xf1, 0xf1, 0xf1, 0), /* 0b0b11110001 */
+	[0x79] = VIDEO_COLOR_RGBA(0xf3, 0xf3, 0xf3, 0), /* 0b0b11110011 */
+	[0x7a] = VIDEO_COLOR_RGBA(0xf5, 0xf5, 0xf5, 0), /* 0b0b11110101 */
+	[0x7b] = VIDEO_COLOR_RGBA(0xf7, 0xf7, 0xf7, 0), /* 0b0b11110111 */
+	[0x7c] = VIDEO_COLOR_RGBA(0xf9, 0xf9, 0xf9, 0), /* 0b0b11111001 */
+	[0x7d] = VIDEO_COLOR_RGBA(0xfb, 0xfb, 0xfb, 0), /* 0b0b11111011 */
+	[0x7e] = VIDEO_COLOR_RGBA(0xfd, 0xfd, 0xfd, 0), /* 0b0b11111101 */
+	[0x7f] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0), /* 0b0b11111111 */
+/*[[[end]]]*/
+};
+#endif /* !__OPTIMIZE_SIZE__ */
+
+
+
+#define alpha1_tocolor(v) ((video_color_t)(VIDEO_COLOR_ALPHA_MASK) * (v))
+#define alpha2_tocolor(v) ((video_color_t)(__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * (v))
+#define alpha4_tocolor(v) ((video_color_t)(__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * (v))
+#define alpha8_tocolor(v) ((video_color_t)(v) << VIDEO_COLOR_ALPHA_SHIFT)
+
+#define lumen1_tocolor(v) ((VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK) * (v))
+#define lumen2_tocolor(v) ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen3_tocolor(v) l3_to_color[v]
+#define lumen4_tocolor(v) ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen7_tocolor(v) l7_to_color(v)
+#define lumen8_tocolor(v) ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+
+#define rgb_getlumen8(r, g, b)      (video_pixel_t)((uint8_t)((uint_fast16_t)((uint_fast16_t)r + g + b + 2) / 3))
+#define rgb_getlumen1(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 7)
+#define rgb_getlumen2(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 6)
+#define rgb_getlumen3(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 5)
+#define rgb_getlumen4(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 4)
+#define rgb_getlumen7_shl1(r, g, b) (video_pixel_t)(rgb_getlumen8(r, g, b) & 0xfe)
+#define rgb_getlumen7(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 1)
+
+#define color_getlumen1(c)      rgb_getlumen1(c.r, c.g, c.b)
+#define color_getlumen2(c)      rgb_getlumen2(c.r, c.g, c.b)
+#define color_getlumen3(c)      rgb_getlumen3(c.r, c.g, c.b)
+#define color_getlumen4(c)      rgb_getlumen4(c.r, c.g, c.b)
+#define color_getlumen7_shl1(c) rgb_getlumen7_shl1(c.r, c.g, c.b)
+#define color_getlumen7(c)      rgb_getlumen7(c.r, c.g, c.b)
+#define color_getlumen8(c)      rgb_getlumen8(c.r, c.g, c.b)
+#define color_getalpha1_shl7(c) (video_pixel_t)(c.a & 0x80)
+#define color_getalpha1(c)      (video_pixel_t)(c.a >> 7)
+#define color_getalpha2(c)      (video_pixel_t)(c.a >> 6)
+#define color_getalpha3(c)      (video_pixel_t)(c.a >> 5)
+#define color_getalpha4(c)      (video_pixel_t)(c.a >> 4)
+#define color_getalpha8(c)      (video_pixel_t)(c.a)
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+l1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return VIDEO_COLOR_ALPHA_MASK | lumen1_tocolor(pixel & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+l1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return color_getlumen1(data);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+l2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return VIDEO_COLOR_ALPHA_MASK | lumen2_tocolor(pixel & 0x3);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+l2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return rgb_getlumen2(data.r, data.g, data.b);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+l4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return VIDEO_COLOR_ALPHA_MASK | lumen4_tocolor(pixel & 0xf);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+l4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return rgb_getlumen4(data.r, data.g, data.b);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+l8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return VIDEO_COLOR_ALPHA_MASK | lumen8_tocolor(pixel & 0xff);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return rgb_getlumen8(data.r, data.g, data.b);
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha1_tocolor((pixel) & 1) |
+	       lumen1_tocolor((pixel >> 1) & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha1(data)) |
+	       (color_getlumen1(data) << 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen1_tocolor((pixel) & 1) |
+	       alpha1_tocolor((pixel >> 1) & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getlumen1(data)) |
+	       (color_getalpha1(data) << 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha2_tocolor((pixel) & 3) |
+	       lumen2_tocolor((pixel >> 2) & 3);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha2(data)) |
+	       (color_getlumen2(data) << 2);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen2_tocolor((pixel) & 3) |
+	       alpha2_tocolor((pixel >> 2) & 3);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha2(data) << 2) |
+	       (color_getlumen2(data));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al13_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha1_tocolor((pixel) & 1) |
+	       lumen3_tocolor((pixel >> 1) & 7);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al13_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha1(data)) |
+	       (color_getlumen3(data) << 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la31_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen3_tocolor((pixel) & 7) |
+	       alpha1_tocolor((pixel >> 3) & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la31_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha1(data) << 3) |
+	       (color_getlumen3(data));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha4_tocolor((pixel) & 0xf) |
+	       lumen4_tocolor((pixel >> 4) & 0xf);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha4(data)) |
+	       (color_getlumen4(data) << 4);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen4_tocolor((pixel) & 0xf) |
+	       alpha4_tocolor((pixel >> 4) & 0xf);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getlumen4(data)) |
+	       (color_getalpha4(data) << 4);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al17_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha1_tocolor((pixel) & 1) |
+	       lumen7_tocolor((pixel >> 1) & 127);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al17_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha1(data)) |
+	       (color_getlumen7_shl1(data));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la71_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen7_tocolor((pixel) & 127) |
+	       alpha1_tocolor((pixel >> 7) & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la71_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getlumen7(data)) |
+	       (color_getalpha1_shl7(data));
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+al88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha8_tocolor((pixel) & 0xff) |
+	       lumen8_tocolor((pixel >> 8) & 0xff);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+al88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getalpha8(data)) |
+	       (color_getlumen8(data) << 8);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+la88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return lumen8_tocolor((pixel) & 0xff) |
+	       alpha8_tocolor((pixel >> 8) & 0xff);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	union color_data data;
+	data.color = color;
+	return (color_getlumen8(data)) |
+	       (color_getalpha8(data) << 8);
+}
+
+
+
 /* Extract N-bit values from color codes */
 #define COLOR_GETR1(color) (((color) >> (VIDEO_COLOR_RED_SHIFT + 7)) & 0x1)
 #define COLOR_GETG1(color) (((color) >> (VIDEO_COLOR_GREEN_SHIFT + 7)) & 0x1)
@@ -1916,6 +1975,10 @@ pal_color2pixel(struct video_format const *__restrict format,
 	assert(pal);
 	return libvideo_palette_getpixel(pal, color);
 }
+
+
+
+
 
 
 PRIVATE NONNULL((3)) void CC
