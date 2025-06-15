@@ -1,8 +1,3 @@
-/*[[[magic
-local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
-]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +23,12 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #define _KOS_SOURCE 1
 
 #include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
-
+#include <kos/anno.h>
 #include <kos/types.h>
-#include <sys/mman.h>
 #include <sys/syslog.h>
 
 #include <assert.h>
@@ -44,15 +39,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
-#include <libiberty.h>
+#include <libvideo/codec/codecs.h>
 #include <libvideo/gfx/buffer.h>
 /**/
 
 #include "../buffer.h"
-#include "../buffer-io.h"
+#include "../io-utils.h"
 
 /**/
 
@@ -279,29 +272,29 @@ struct ATTR_ALIGNED(JPEGLIB_ALIGNOF_jpeg_decompress_struct) minimal_jpeg_decompr
 	(void)(*(JPEGLIB_J_COLOR_SPACE *)((byte_t *)(self) + JPEGLIB_OFFSETOF_jpeg_decompress_struct__output_components) = (v))
 
 
-#define DEFINEJPEGLIB_API(Treturn, name, params) \
+#define DEFINE_JPEGLIB_API(Treturn, name, params) \
 	typedef Treturn(*P##name) params;             \
 	PRIVATE P##name pdyn_##name = NULL
 /* Common */
-DEFINEJPEGLIB_API(struct minimal_jpeg_error_mgr *, jpeg_std_error, (struct minimal_jpeg_error_mgr *err));
+DEFINE_JPEGLIB_API(struct minimal_jpeg_error_mgr *, jpeg_std_error, (struct minimal_jpeg_error_mgr *err));
 /* Decompress */
-DEFINEJPEGLIB_API(void, jpeg_CreateDecompress, (struct minimal_jpeg_decompress_struct *cinfo, int version, size_t structsize));
-DEFINEJPEGLIB_API(void, jpeg_mem_src, (struct minimal_jpeg_decompress_struct *cinfo, byte_t const *inbuffer, size_t insize));
-DEFINEJPEGLIB_API(int, jpeg_read_header, (struct minimal_jpeg_decompress_struct *cinfo, JPEGLIB_boolean require_image));
-DEFINEJPEGLIB_API(JPEGLIB_boolean, jpeg_start_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
-DEFINEJPEGLIB_API(JPEGLIB_JDIMENSION, jpeg_read_scanlines, (struct minimal_jpeg_decompress_struct *cinfo, JPEGLIB_JSAMPARRAY scanlines, JPEGLIB_JDIMENSION max_lines));
-DEFINEJPEGLIB_API(JPEGLIB_boolean, jpeg_finish_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
-DEFINEJPEGLIB_API(void, jpeg_destroy_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
+DEFINE_JPEGLIB_API(void, jpeg_CreateDecompress, (struct minimal_jpeg_decompress_struct *cinfo, int version, size_t structsize));
+DEFINE_JPEGLIB_API(void, jpeg_mem_src, (struct minimal_jpeg_decompress_struct *cinfo, byte_t const *inbuffer, size_t insize));
+DEFINE_JPEGLIB_API(int, jpeg_read_header, (struct minimal_jpeg_decompress_struct *cinfo, JPEGLIB_boolean require_image));
+DEFINE_JPEGLIB_API(JPEGLIB_boolean, jpeg_start_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
+DEFINE_JPEGLIB_API(JPEGLIB_JDIMENSION, jpeg_read_scanlines, (struct minimal_jpeg_decompress_struct *cinfo, JPEGLIB_JSAMPARRAY scanlines, JPEGLIB_JDIMENSION max_lines));
+DEFINE_JPEGLIB_API(JPEGLIB_boolean, jpeg_finish_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
+DEFINE_JPEGLIB_API(void, jpeg_destroy_decompress, (struct minimal_jpeg_decompress_struct *cinfo));
 /* Compress */
-DEFINEJPEGLIB_API(void, jpeg_CreateCompress, (struct minimal_jpeg_compress_struct *cinfo, int version, size_t structsize));
-DEFINEJPEGLIB_API(void, jpeg_stdio_dest, (struct minimal_jpeg_compress_struct *cinfo, FILE *outfile));
-DEFINEJPEGLIB_API(void, jpeg_set_defaults, (struct minimal_jpeg_compress_struct *cinfo));
-DEFINEJPEGLIB_API(void, jpeg_set_quality, (struct minimal_jpeg_compress_struct *cinfo, int quality, JPEGLIB_boolean force_baseline));
-DEFINEJPEGLIB_API(void, jpeg_start_compress, (struct minimal_jpeg_compress_struct *cinfo, JPEGLIB_boolean write_all_tables));
-DEFINEJPEGLIB_API(JPEGLIB_JDIMENSION, jpeg_write_scanlines, (struct minimal_jpeg_compress_struct *cinfo, JPEGLIB_JSAMPARRAY scanlines, JPEGLIB_JDIMENSION num_lines));
-DEFINEJPEGLIB_API(void, jpeg_finish_compress, (struct minimal_jpeg_compress_struct *cinfo));
-DEFINEJPEGLIB_API(void, jpeg_destroy_compress, (struct minimal_jpeg_compress_struct *cinfo));
-#undef DEFINEJPEGLIB_API
+DEFINE_JPEGLIB_API(void, jpeg_CreateCompress, (struct minimal_jpeg_compress_struct *cinfo, int version, size_t structsize));
+DEFINE_JPEGLIB_API(void, jpeg_stdio_dest, (struct minimal_jpeg_compress_struct *cinfo, FILE *outfile));
+DEFINE_JPEGLIB_API(void, jpeg_set_defaults, (struct minimal_jpeg_compress_struct *cinfo));
+DEFINE_JPEGLIB_API(void, jpeg_set_quality, (struct minimal_jpeg_compress_struct *cinfo, int quality, JPEGLIB_boolean force_baseline));
+DEFINE_JPEGLIB_API(void, jpeg_start_compress, (struct minimal_jpeg_compress_struct *cinfo, JPEGLIB_boolean write_all_tables));
+DEFINE_JPEGLIB_API(JPEGLIB_JDIMENSION, jpeg_write_scanlines, (struct minimal_jpeg_compress_struct *cinfo, JPEGLIB_JSAMPARRAY scanlines, JPEGLIB_JDIMENSION num_lines));
+DEFINE_JPEGLIB_API(void, jpeg_finish_compress, (struct minimal_jpeg_compress_struct *cinfo));
+DEFINE_JPEGLIB_API(void, jpeg_destroy_compress, (struct minimal_jpeg_compress_struct *cinfo));
+#undef DEFINE_JPEGLIB_API
 
 
 PRIVATE void *CC dlsym2(void *handle, char const *name1, char const *name2) {
@@ -341,7 +334,7 @@ PRIVATE void __LIBCCALL jpeglib_loadapi_impl(void) {
 
 	COMPILER_BARRIER();
 	LOADSYM2(jpeg_std_error, jStdError);
-#undef LOADSYM
+#undef LOADSYM2
 	return;
 fail:
 	syslog(LOG_WARN, "[libvideo-gfx][jpeglib] Failed to load API: %s\n", dlerror());
@@ -540,9 +533,15 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	minimal_jpeg_compress_struct__set_in_color_space(&comp, comp_in_color_space);
 	(void)(*pdyn_jpeg_set_defaults)(&comp);
 
-	/* "quality" is a parameter between 0 (terrible) and 100 (very good)
-	 * TODO: Read this parameter from "options" */
-	(void)(*pdyn_jpeg_set_quality)(&comp, 50, 1 /* limit to baseline-JPEG values */);
+	/* "quality" is a parameter between 0 (terrible) and 100 (very good) */
+	{
+		int qual = (int)libvideo_io_getoptl(options, "quality", 50);
+		if (qual < 0)
+			qual = 0;
+		if (qual > 100)
+			qual = 100;
+		(void)(*pdyn_jpeg_set_quality)(&comp, qual, 1 /* limit to baseline-JPEG values */);
+	}
 
 	/* Start compression */
 	(void)(*pdyn_jpeg_start_compress)(&comp, 1);

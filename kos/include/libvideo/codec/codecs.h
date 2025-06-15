@@ -46,6 +46,8 @@
 #define VIDEO_CODEC_GRAY16_LSB 0x1005 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
 #define VIDEO_CODEC_GRAY16_MSB 0x1006 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
 #define VIDEO_CODEC_GRAY256    0x1007 /* 8-bit-per-pixel, 256-color grayscale (0=black; 255=white) */
+/* TODO: Rename the `VIDEO_CODEC_GRAY*' to `VIDEO_CODEC_Ln' (where "L" stands for luminance) */
+/* TODO: Define built-in luminance w/ alpha codecs */
 
 /* Full-color */
 #define VIDEO_CODEC_RGBA8888   0x2001 /* Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
@@ -85,6 +87,7 @@
 #define VIDEO_CODEC_PAL16_LSB  0xf005 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
 #define VIDEO_CODEC_PAL16_MSB  0xf006 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
 #define VIDEO_CODEC_PAL256     0xf007 /* 256-color palette (8-bit pixels) */
+/* TODO: Define built-in palette w/ alpha codecs */
 
 
 

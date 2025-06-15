@@ -1,8 +1,3 @@
-/*[[[magic
-local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
-]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,330 +27,392 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/align.h>
-#include <hybrid/minmax.h>
+#include <kos/anno.h>
+#include <sys/syslog.h>
 
-#include <kos/types.h>
-
+#include <dlfcn.h>
 #include <errno.h>
-#include <malloc.h>
+#include <pthread.h>
+#include <setjmp.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include <libvideo/gfx/buffer.h>
 /**/
 
+#include "../io-utils.h"
 #include "../ram-buffer.h"
-
-/**/
-
-/* Configure lodepng */
-//#define LODEPNG_NO_COMPILE_ZLIB /* TODO: Load libzlib and use *it* to off-load compression out-of our lib */
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_ERROR_TEXT
-#define LODEPNG_NO_COMPILE_CPP
-
-/* Pull in lodepng */
-__pragma_GCC_diagnostic_push
-__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_const)
-__pragma_GCC_diagnostic_ignored(Wsuggest_attribute_pure)
-__pragma_GCC_diagnostic_ignored(Wstringop_overflow)
-#pragma GCC visibility push(hidden) /* Don't export any of this stuff... */
-#include "lodepng/lodepng.h"
-#include "lodepng/lodepng.c"
-#include <kos/anno.h>
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
-#include <libvideo/gfx/blend.h>
-#include <libvideo/gfx/gfx.h>
-#pragma GCC visibility pop
-__pragma_GCC_diagnostic_pop
 
 DECL_BEGIN
 
-PRIVATE void CC
-release_mem_free(void *cookie, void *mem) {
-	(void)cookie;
-	free(mem);
+#ifndef LIBPNGCAPI
+#define LIBPNGCAPI
+#endif /* !LIBPNGCAPI */
+#ifndef LIBPNGCBAPI
+#define LIBPNGCBAPI LIBPNGCAPI
+#endif /* !LIBPNGCBAPI */
+#ifndef LIBPNGAPI
+#define LIBPNGAPI LIBPNGCAPI
+#endif
+#define LIBPNG_CALLBACK(type, name, args) type(LIBPNGCBAPI name) args
+
+#ifndef LIBPNG_LIBPNG_VER_STRING
+#define LIBPNG_LIBPNG_VER_STRING "1.6.49"
+#endif /* !LIBPNG_LIBPNG_VER_STRING */
+
+#define LIBPNG_INFO_tRNS 0x0010U
+
+#define LIBPNG_COLOR_MASK_PALETTE    1
+#define LIBPNG_COLOR_MASK_COLOR      2
+#define LIBPNG_COLOR_MASK_ALPHA      4
+#define LIBPNG_COLOR_TYPE_GRAY       0
+#define LIBPNG_COLOR_TYPE_PALETTE    (LIBPNG_COLOR_MASK_COLOR | LIBPNG_COLOR_MASK_PALETTE)
+#define LIBPNG_COLOR_TYPE_RGB        (LIBPNG_COLOR_MASK_COLOR)
+#define LIBPNG_COLOR_TYPE_RGB_ALPHA  (LIBPNG_COLOR_MASK_COLOR | LIBPNG_COLOR_MASK_ALPHA)
+#define LIBPNG_COLOR_TYPE_GRAY_ALPHA (LIBPNG_COLOR_MASK_ALPHA)
+#define LIBPNG_COLOR_TYPE_RGBA       LIBPNG_COLOR_TYPE_RGB_ALPHA
+#define LIBPNG_COLOR_TYPE_GA         LIBPNG_COLOR_TYPE_GRAY_ALPHA
+
+
+typedef __UINT32_TYPE__ libpng_uint_32;
+typedef struct libpng_struct_def libpng_struct;
+typedef libpng_struct const *libpng_const_structp;
+typedef libpng_struct *libpng_structp;
+typedef libpng_struct **libpng_structpp;
+typedef char const *libpng_const_charp;
+typedef libpng_struct *__restrict libpng_structrp;
+typedef libpng_struct const *__restrict libpng_const_structrp;
+typedef void (LIBPNGCBAPI *libpng_error_ptr)(libpng_structp, libpng_const_charp);
+typedef void *libpng_voidp;
+typedef struct libpng_info_def libpng_info;
+typedef libpng_info *libpng_infop;
+typedef libpng_info const *libpng_const_infop;
+typedef libpng_info **libpng_infopp;
+typedef libpng_info *__restrict libpng_inforp;
+typedef libpng_info const *__restrict libpng_const_inforp;
+typedef void (LIBPNGCAPI *libpng_longjmp_ptr)(jmp_buf, int);
+typedef byte_t libpng_byte;
+typedef libpng_byte *libpng_bytep;
+typedef LIBPNG_CALLBACK(void, *libpng_rw_ptr, (libpng_structp, libpng_bytep, size_t));
+
+typedef struct libpng_color_struct {
+	libpng_byte red;
+	libpng_byte green;
+	libpng_byte blue;
+} libpng_color;
+typedef libpng_color *libpng_colorp;
+typedef libpng_color const *libpng_const_colorp;
+typedef libpng_color **libpng_colorpp;
+
+
+
+
+#define DEFINE_LIBPNG_API(Treturn, name, params) \
+	typedef Treturn(LIBPNGAPI *P##name) params;            \
+	PRIVATE P##name pdyn_##name = NULL
+/* "libpng_image"  doesn't offer access  to the *true* bitdepth  of the image. As
+ * such, don't use the "simplified" API, and instead use "png_create_read_struct" */
+DEFINE_LIBPNG_API(libpng_structp, png_create_read_struct, (libpng_const_charp user_png_ver, libpng_voidp error_ptr, libpng_error_ptr error_fn, libpng_error_ptr warn_fn));
+DEFINE_LIBPNG_API(libpng_infop, png_create_info_struct, (libpng_const_structrp png_ptr));
+DEFINE_LIBPNG_API(void, png_destroy_read_struct, (libpng_structpp png_ptr_ptr, libpng_infopp info_ptr_ptr, libpng_infopp end_info_ptr_ptr));
+DEFINE_LIBPNG_API(jmp_buf *, png_set_longjmp_fn, (libpng_structrp png_ptr, libpng_longjmp_ptr longjmp_fn, size_t jmp_buf_size));
+DEFINE_LIBPNG_API(void, png_set_read_fn, (libpng_structrp png_ptr, libpng_voidp io_ptr, libpng_rw_ptr read_data_fn));
+DEFINE_LIBPNG_API(libpng_voidp, png_get_io_ptr, (libpng_const_structrp png_ptr));
+DEFINE_LIBPNG_API(ATTR_NORETURN_T void, png_error, (libpng_const_structrp png_ptr, libpng_const_charp error_message));
+DEFINE_LIBPNG_API(void, png_read_info, (libpng_structrp png_ptr, libpng_inforp info_ptr));
+DEFINE_LIBPNG_API(libpng_uint_32, png_get_IHDR, (libpng_const_structrp png_ptr, libpng_const_inforp info_ptr, libpng_uint_32 *width, libpng_uint_32 *height, int *bit_depth, int *color_type, int *interlace_method, int *compression_method, int *filter_method));
+DEFINE_LIBPNG_API(void, png_set_scale_16, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(void, png_set_packing, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(libpng_uint_32, png_get_valid, (libpng_const_structrp png_ptr, libpng_const_inforp info_ptr, libpng_uint_32 flag));
+DEFINE_LIBPNG_API(void, png_set_tRNS_to_alpha, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(void, png_set_palette_to_rgb, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(void, png_set_gray_to_rgb, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(size_t, png_get_rowbytes, (libpng_const_structrp png_ptr, libpng_const_inforp info_ptr));
+DEFINE_LIBPNG_API(libpng_uint_32, png_get_PLTE, (libpng_const_structrp png_ptr, libpng_inforp info_ptr, libpng_colorp *palette, int *num_palette));
+DEFINE_LIBPNG_API(void, png_read_end, (libpng_structrp png_ptr, libpng_inforp info_ptr));
+DEFINE_LIBPNG_API(int, png_set_interlace_handling, (libpng_structrp png_ptr));
+DEFINE_LIBPNG_API(void, png_read_row, (libpng_structrp png_ptr, libpng_bytep row, libpng_bytep display_row));
+#undef DEFINE_LIBPNG_API
+
+PRIVATE void __LIBCCALL libpng_loadapi_impl(void) {
+	void *libpng_so = dlopen("libpng16.so.16", RTLD_LOCAL);
+	if unlikely(!libpng_so)
+		return;
+#define LOADSYM(name)                                               \
+	if ((*(void **)&pdyn_##name = dlsym(libpng_so, #name)) == NULL) \
+		goto fail
+#define LOADSYM2(name, name2)                                         \
+	if ((*(void **)&pdyn_##name = dlsym(libpng_so, #name)) == NULL && \
+	    (*(void **)&pdyn_##name = dlsym(libpng_so, #name2)) == NULL)  \
+		goto fail
+	LOADSYM(png_create_info_struct);
+	LOADSYM(png_destroy_read_struct);
+	LOADSYM(png_set_longjmp_fn);
+	LOADSYM(png_set_read_fn);
+	LOADSYM(png_get_io_ptr);
+	LOADSYM(png_error);
+	LOADSYM(png_read_info);
+	LOADSYM(png_get_IHDR);
+	LOADSYM2(png_set_scale_16, png_set_strip_16);
+	LOADSYM(png_set_packing);
+	LOADSYM(png_get_valid);
+	LOADSYM(png_set_tRNS_to_alpha);
+	LOADSYM(png_set_palette_to_rgb);
+	LOADSYM(png_set_gray_to_rgb);
+	LOADSYM(png_get_rowbytes);
+	LOADSYM(png_get_PLTE);
+	LOADSYM(png_read_end);
+	LOADSYM(png_set_interlace_handling);
+	LOADSYM(png_read_row);
+	COMPILER_WRITE_BARRIER();
+	LOADSYM(png_create_read_struct);
+#undef LOADSYM
+#undef LOADSYM2
+	return;
+fail:
+	syslog(LOG_WARN, "[libvideo-gfx][libpng] Failed to load API: %s\n", dlerror());
+	dlclose(libpng_so);
+	pdyn_png_create_read_struct = NULL;
 }
 
-/* Returned by `libvideo_buffer_open_*' when the blob doesn't match the specified format. */
-#define VIDEO_BUFFER_WRONG_FMT ((REF struct video_buffer *)-1)
+PRIVATE pthread_once_t libpng_loadapi_done = PTHREAD_ONCE_INIT;
+PRIVATE bool CC libpng_loadapi(void) {
+	pthread_once(&libpng_loadapi_done,
+	             &libpng_loadapi_impl);
+	return pdyn_png_create_read_struct != NULL;
+}
 
-/************************************************************************/
-/* PNG                                                                  */
-/************************************************************************/
+struct libpng_mem_reader_data {
+	byte_t const *mrd_ptr; /* Pointer to remaining data */
+	size_t        mrd_rem; /* # of remaining bytes */
+};
 
-PRIVATE ATTR_CONST unsigned int CC
-get_lodepng_stride(unsigned int w,
-                   LodePNGColorType colortype,
-                   unsigned int bitdepth) {
-	unsigned int stride;
-	switch (colortype) {
-	case LCT_GREY:
-	case LCT_PALETTE:
-		switch (bitdepth) {
-		case 1: stride = CEILDIV(w, 8); break;
-		case 2: stride = CEILDIV(w, 4); break;
-		case 4: stride = CEILDIV(w, 2); break;
-		case 8: stride = w; break;
-		default: __builtin_unreachable();
-		}
-		break;
-	case LCT_GREY_ALPHA:
-		stride = w * 2;
-		break;
-	case LCT_RGB:
-		stride = w * 3;
-		break;
-	case LCT_RGBA:
-		stride = w * 4;
-		break;
-	default: __builtin_unreachable();
+PRIVATE void LIBPNGCBAPI
+libpng_mem_reader_cb(libpng_structp png_ptr, libpng_bytep p, size_t n) {
+	struct libpng_mem_reader_data *data;
+	data = (struct libpng_mem_reader_data *)(*pdyn_png_get_io_ptr)(png_ptr);
+	if (n > data->mrd_rem) {
+		(*pdyn_png_error)(png_ptr, "read beyond end of data");
+		abort();
 	}
-	return stride;
+	memcpy(p, data->mrd_ptr, n);
+	data->mrd_ptr += n;
+	data->mrd_rem -= n;
 }
 
 
-INTERN ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
+INTERN WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_png(void const *blob, size_t blob_size) {
-	LodePNGState state;
-	unsigned int w, h, error, stride;
-	unsigned char *out;
-	REF struct video_buffer *result;
-	struct video_codec const *codec;
-	video_codec_t codec_name;
-	struct video_palette *palette;
-	bzero(&state, sizeof(state));
-	error = lodepng_inspect(&w, &h, &state, (unsigned char const *)blob, blob_size);
-	if (error != 0)
-		goto handle_error;
+	libpng_structp png_ptr;
+	libpng_infop info_ptr;
+	struct libpng_mem_reader_data rdat;
+	libpng_uint_32 width, height;
+	int bit_depth, color_type;
+	video_codec_t result_codec_id;
+	struct video_codec const *result_codec;
+	struct video_rambuffer *result;
+	REF struct video_palette *result_pal;
+	struct video_rambuffer_requirements bufreq;
 
-	/* Determine preferred code based on the PNG's native format.
-	 * If the caller wants to use a custom codec, they'll need to
-	 * blit the PNG buffer into another buffer of their choosing. */
-	palette = NULL;
-	switch (state.info_png.color.colortype) {
-	case LCT_GREY:
-		switch (state.info_png.color.bitdepth) {
-		case 1: codec_name = VIDEO_CODEC_GRAY2_LSB; break;
-		case 2: codec_name = VIDEO_CODEC_GRAY4_LSB; break;
-		case 4: codec_name = VIDEO_CODEC_GRAY16_LSB; break;
-		default:
-			state.info_png.color.bitdepth = 8;
-			ATTR_FALLTHROUGH
-		case 8:
-			codec_name = VIDEO_CODEC_GRAY256;
-			break;
+	if (!libpng_loadapi())
+		return libvideo_buffer_open_lodepng(blob, blob_size);
+	png_ptr = (*pdyn_png_create_read_struct)(LIBPNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if unlikely(!png_ptr)
+		goto err_nomem;
+	info_ptr = (*pdyn_png_create_info_struct)(png_ptr);
+	if unlikely(!info_ptr)
+		goto err_nomem_png_ptr;
+	result     = NULL;
+	result_pal = NULL;
+	if (setjmp(*(*pdyn_png_set_longjmp_fn)(png_ptr, &longjmp, sizeof(jmp_buf)))) {
+		if (result) {
+			free(result->rb_data);
+			free(result);
 		}
-		break;
-	case LCT_RGB:
-		codec_name = VIDEO_CODEC_RGB888;
-		state.info_png.color.bitdepth = 8;
-		break;
-	/* TODO: LCT_PALETTE */
-	default:
-		state.info_png.color.colortype = LCT_RGBA;
-		state.info_png.color.bitdepth  = 8;
-		codec_name = VIDEO_CODEC_RGBA8888;
-		break;
-	}
-	codec = video_codec_lookup(codec_name);
-	if unlikely(!codec)
-		goto err;
-	error = lodepng_decode_memory(&out, &w, &h, (unsigned char const *)blob,
-	                              blob_size, state.info_png.color.colortype,
-	                              state.info_png.color.bitdepth);
-	if (error != 0)
-		goto handle_error;
-	stride = get_lodepng_stride(w, state.info_png.color.colortype,
-	                            state.info_png.color.bitdepth);
-	result = libvideo_buffer_formem(out, w, h, stride, codec, palette,
-	                                &release_mem_free, NULL);
-	if unlikely(!result)
-		free(out);
-	return result;
-handle_error:
-	switch (error) {
-	case 27: /* File too small */
-	case 28: /* Wrong header (not a PNG file) */
-	case 94: /* Wrong header size */
-	case 29: /* Wrong first chunk type */
+		if (result_pal)
+			video_palette_decref(result_pal);
+		(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 		return VIDEO_BUFFER_WRONG_FMT;
-	case 83: /* OOM */
-		errno = ENOMEM;
-		return NULL;
-	default: break;
 	}
-err:
-	errno = EINVAL; /* Malformed PNG file. */
+
+	/* Setup I/O */
+	rdat.mrd_ptr = (byte_t const *)blob;
+	rdat.mrd_rem = blob_size;
+	(*pdyn_png_set_read_fn)(png_ptr, &rdat, &libpng_mem_reader_cb);
+
+	/* Reader header */
+	(*pdyn_png_read_info)(png_ptr, info_ptr);
+
+	/* Reader image info */
+	(*pdyn_png_get_IHDR)(png_ptr, info_ptr,
+	                     &width, &height, &bit_depth,
+	                     &color_type, NULL, NULL, NULL);
+
+	/* Configure image transformation */
+	if (bit_depth > 8) {
+		(*pdyn_png_set_scale_16)(png_ptr); /* Scale down to at most 8-bit-per-channel */
+		bit_depth = 8;
+	}
+
+	/* If a stand-alone alpha channel is present, include it in the result */
+	if ((*pdyn_png_get_valid)(png_ptr, info_ptr, LIBPNG_INFO_tRNS) != 0) {
+		(*pdyn_png_set_tRNS_to_alpha)(png_ptr);
+		color_type |= LIBPNG_COLOR_MASK_ALPHA;
+	}
+
+	if (color_type & LIBPNG_COLOR_MASK_PALETTE) {
+		libpng_colorp png_palette;
+		int png_num_palette;
+		unsigned int pal_i;
+
+		/* Palette-driven */
+		if (color_type & LIBPNG_COLOR_MASK_ALPHA) { /* XXX: Support for palette w/ alpha codecs */
+			(*pdyn_png_set_palette_to_rgb)(png_ptr);
+			goto do_rgb_format;
+		}
+		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
+		switch (bit_depth) {
+		case 1: result_codec_id = VIDEO_CODEC_PAL2_MSB; break;
+		case 2: result_codec_id = VIDEO_CODEC_PAL4_MSB; break;
+		case 4: result_codec_id = VIDEO_CODEC_PAL16_MSB; break;
+		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+		case 8: result_codec_id = VIDEO_CODEC_PAL256; break;
+		}
+
+		/* Read palette colors */
+		if ((*pdyn_png_get_PLTE)(png_ptr, info_ptr, &png_palette, &png_num_palette) == 0) {
+			(*pdyn_png_set_palette_to_rgb)(png_ptr);
+			goto do_rgb_format;
+		}
+
+		/* Construct palette */
+		result_pal = video_palette_create((unsigned int)png_num_palette);
+		if unlikely(!result_pal)
+			goto err_png_ptr_info_ptr;
+		for (pal_i = 0; pal_i < (unsigned int)png_num_palette; ++pal_i) {
+			video_color_t color = VIDEO_COLOR_RGB(png_palette[pal_i].red,
+			                                      png_palette[pal_i].green,
+			                                      png_palette[pal_i].blue);
+			result_pal->vp_pal[pal_i] = color;
+		}
+	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
+		/* Grayscale */
+		if (color_type & LIBPNG_COLOR_MASK_ALPHA) { /* XXX: Support for grayscale w/ alpha codecs */
+			(*pdyn_png_set_gray_to_rgb)(png_ptr);
+			goto do_rgb_format;
+		}
+		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
+		switch (bit_depth) {
+		case 1: result_codec_id = VIDEO_CODEC_GRAY2_MSB; break;
+		case 2: result_codec_id = VIDEO_CODEC_GRAY4_MSB; break;
+		case 4: result_codec_id = VIDEO_CODEC_GRAY16_MSB; break;
+		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
+		case 8: result_codec_id = VIDEO_CODEC_GRAY256; break;
+		}
+	} else {
+do_rgb_format:
+		if (bit_depth != 8)
+			(*pdyn_png_set_packing)(png_ptr);
+		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
+			result_codec_id = VIDEO_CODEC_RGBA8888;
+		} else {
+			result_codec_id = VIDEO_CODEC_RGB888;
+		}
+	}
+
+	/* Lookup needed codec. */
+	result_codec = video_codec_lookup(result_codec_id);
+	if unlikely(!result_codec) {
+		errno = ENODEV;
+		goto err_png_ptr_info_ptr_pal;
+	}
+
+	/* Figure out required scanline size */
+	(*result_codec->vc_rambuffer_requirements)(width, height, &bufreq);
+	{
+		size_t png_scanline;
+		png_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
+		if (bufreq.vbs_stride < png_scanline) {
+			bufreq.vbs_stride = png_scanline;
+			bufreq.vbs_bufsize = bufreq.vbs_stride * height;
+		}
+	}
+
+	/* Allocate result video buffer. */
+	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
+	if unlikely(!result)
+		goto err_png_ptr_info_ptr;
+	result->rb_data = (byte_t *)malloc(bufreq.vbs_bufsize);
+	if unlikely(!result->rb_data)
+		goto err_png_ptr_info_ptr_pal_r;
+	result->rb_stride          = bufreq.vbs_stride;
+	result->rb_total           = bufreq.vbs_bufsize;
+	result->vb_refcnt          = 1;
+	result->vb_ops             = &rambuffer_ops;
+	result->vb_format.vf_codec = result_codec;
+	result->vb_format.vf_pal   = result_pal; /* Inherit reference */
+	result->vb_size_x          = width;
+	result->vb_size_y          = height;
+
+	/* Read image data from PNG file */
+	{
+		int pass, passes = (*pdyn_png_set_interlace_handling)(png_ptr);
+		for (pass = 0; pass < passes; ++pass) {
+			byte_t *dst = result->rb_data;
+			libpng_uint_32 y;
+			for (y = 0; y < height; ++y) {
+				(*pdyn_png_read_row)(png_ptr, dst, NULL);
+				dst += result->rb_stride;
+			}
+		}
+	}
+
+	/* Cleanup... */
+	(*pdyn_png_read_end)(png_ptr, info_ptr);
+	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
+	return result;
+/*
+err_png_ptr_info_ptr_pal_r_data:
+	free(result->rb_data);*/
+err_png_ptr_info_ptr_pal_r:
+	free(result);
+err_png_ptr_info_ptr_pal:
+	if (result_pal)
+		video_palette_decref(result_pal);
+err_png_ptr_info_ptr:
+	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 	return NULL;
+err_png_ptr:
+	(*pdyn_png_destroy_read_struct)(&png_ptr, NULL, NULL);
+err:
+	return NULL;
+err_nomem_png_ptr:
+	errno = ENOMEM;
+	goto err_png_ptr;
+err_nomem:
+	errno = ENOMEM;
+	goto err;
 }
 
-PRIVATE unsigned
-my_lodepng_encode_memory(unsigned char **out, size_t *outsize, unsigned char const *image,
-                         unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth,
-                         char const *options) {
-	(void)options; /* TODO (stuff like additional meta-data to embed) */
-	return lodepng_encode_memory(out, outsize, image, w, h, colortype, bitdepth);
-}
-
-PRIVATE WUNUSED NONNULL((1)) byte_t *CC
-video_lock_convert_stride(struct video_lock *__restrict self,
-                          size_t new_stride, unsigned int h) {
-	byte_t *result = (byte_t *)malloc(new_stride, h);
-	if likely(result) {
-		unsigned int y;
-		byte_t const *src = self->vl_data;
-		byte_t *dst = result;
-		size_t common = MIN(new_stride, self->vl_stride);
-		for (y = 0; y < h; ++y, src += self->vl_stride, dst += new_stride)
-			memcpy(dst, src, common);
-	}
-	return result;
-}
-
-/* Convert "self" into a RGB/RGBA buffer. */
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
-libvideo_buffer_convert_to_rgb(struct video_buffer *__restrict self) {
-	REF struct video_buffer *rgb_buffer;
-	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
-	struct video_codec const *codec;
-	codec = video_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888
-	                                     : VIDEO_CODEC_RGB888);
-	if unlikely(!codec) {
-		errno = ENOTSUP;
-		return NULL;
-	}
-	rgb_buffer = libvideo_rambuffer_create(self->vb_size_x,
-	                                       self->vb_size_y,
-	                                       codec, NULL);
-	if likely(rgb_buffer) {
-		/* Do a blit of "self" into "rgb_buffer" */
-		struct video_gfx dst_gfx;
-		struct video_gfx src_gfx;
-		struct video_blit blit;
-		video_buffer_getgfx(rgb_buffer, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
-		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
-		video_gfx_blitfrom(&dst_gfx, &src_gfx, &blit);
-		video_blit_blit(&blit, 0, 0, 0, 0, self->vb_size_x, self->vb_size_y);
-	}
-	return rgb_buffer;
-}
-
-PRIVATE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_convert_and_save_png(struct video_buffer *__restrict self,
-                                     FILE *stream, char const *options) {
-	int result;
-	REF struct video_buffer *rgb_buffer;
-	rgb_buffer = libvideo_buffer_convert_to_rgb(self);
-	if unlikely(!rgb_buffer)
-		return -1;
-	result = libvideo_buffer_save_png(rgb_buffer, stream, options);
-	video_buffer_decref(rgb_buffer);
-	return result;
-}
-
-INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
+INTERN WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_png(struct video_buffer *__restrict self,
                          FILE *stream, char const *options) {
-	int result;
-	LodePNGColorType colortype;
-	unsigned int bitdepth;
-	unsigned int error;
-	unsigned int lodepng_stride;
-	unsigned char *out;
-	size_t out_size;
-	struct video_lock lock;
-	switch (self->vb_format.vf_codec->vc_codec) {
-	case VIDEO_CODEC_GRAY2_LSB:
-		colortype = LCT_GREY;
-		bitdepth  = 1;
-		break;
-	case VIDEO_CODEC_GRAY4_LSB:
-		colortype = LCT_GREY;
-		bitdepth  = 2;
-		break;
-	case VIDEO_CODEC_GRAY16_LSB:
-		colortype = LCT_GREY;
-		bitdepth  = 4;
-		break;
-	case VIDEO_CODEC_GRAY256:
-		colortype = LCT_GREY;
-		bitdepth  = 8;
-		break;
-	case VIDEO_CODEC_RGBA8888:
-		colortype = LCT_RGBA;
-		bitdepth  = 8;
-		break;
-	case VIDEO_CODEC_RGB888:
-		colortype = LCT_RGB;
-		bitdepth  = 8;
-		break;
-
-	default:
-		/* Convert "self" into a supported codec */
-		return libvideo_buffer_convert_and_save_png(self, stream, options);
+	if (libpng_loadapi()) {
+		/* TODO: Use libpng */
 	}
-
-	result = (*self->vb_ops->vi_rlock)(self, &lock);
-	if unlikely(result)
-		return result;
-	lodepng_stride = get_lodepng_stride(self->vb_size_x,
-	                                    colortype, bitdepth);
-	if likely(lodepng_stride == lock.vl_stride) {
-		error = my_lodepng_encode_memory(&out, &out_size,
-		                                 (unsigned char const *)lock.vl_data,
-		                                 self->vb_size_x, self->vb_size_y,
-		                                 colortype, bitdepth, options);
-	} else {
-		byte_t *fixed_stride;
-		fixed_stride = video_lock_convert_stride(&lock,
-		                                         lodepng_stride,
-		                                         self->vb_size_y);
-		if unlikely(!fixed_stride) {
-			error = 83; /* OOM */
-		} else {
-			error = my_lodepng_encode_memory(&out, &out_size,
-			                                 (unsigned char const *)fixed_stride,
-			                                 self->vb_size_x, self->vb_size_y,
-			                                 colortype, bitdepth, options);
-			free(fixed_stride);
-		}
-	}
-	(*self->vb_ops->vi_unlock)(self, &lock);
-	switch (error) {
-	case 0:
-		result = 0;
-		break;
-	case 83: /* OOM */
-		errno  = ENOMEM;
-		result = -1;
-		break;
-	default:
-		errno  = EINVAL; /* Something was invalid... */
-		result = -1;
-		break;
-	}
-
-	/* On success, write lodepng's buffer to the output stream. */
-	if likely(result == 0) {
-		int old_errno = errno;
-		errno = 0;
-		if (fwrite(out, 1, out_size, stream) != out_size) {
-			if (errno == 0)
-				errno = ENOSPC;
-			result = -1;
-		} else {
-			errno = old_errno;
-		}
-		free(out);
-	}
-	return result;
+	return libvideo_buffer_save_lodepng(self, stream, options);
 }
+
+
+
+
+/* Assert that bindings above match those from the relevant 3rd party header. */
+#if __has_include(<libpng/png.h>)
+DECL_END
+#include <libpng/png.h>
+DECL_BEGIN
+#endif /* __has_include(<libpng/png.h>) */
 
 DECL_END
 
