@@ -21,24 +21,26 @@
 # use of GNU autoconf+automake
 
 # Extract the package filename from the URL
-_PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
-if test -z "$_PACKAGE_URL_FILENAME"; then
-	_PACKAGE_URL_FILENAME="${PACKAGE_GIT_URL##*/}"
+if test -z "$PACKAGE_URL_FILENAME"; then
+	PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
+	if test -z "$PACKAGE_URL_FILENAME"; then
+		PACKAGE_URL_FILENAME="${PACKAGE_GIT_URL##*/}"
+	fi
 fi
 
 # Extract the package name from its filename
 if test -z "$PACKAGE_NAME"; then
-	PACKAGE_NAME="$_PACKAGE_URL_FILENAME"
+	PACKAGE_NAME="$PACKAGE_URL_FILENAME"
 	if [[ "$PACKAGE_NAME" == *".tar"* ]]; then
 		PACKAGE_NAME="${PACKAGE_NAME%.tar*}"
 	elif [[ "$PACKAGE_NAME" == *".git"* ]]; then
 		PACKAGE_NAME="${PACKAGE_NAME%.git*}"
 	fi
-	if test "$PACKAGE_NAME" == "$_PACKAGE_URL_FILENAME"; then
+	if test "$PACKAGE_NAME" == "$PACKAGE_URL_FILENAME"; then
 		echo -e "\e[${UI_COLCFG_ERR}mUnable to determine PACKAGE_NAME\e[m from" >&2
 		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
 		echo -e "	PACKAGE_GIT_URL:       '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_URL\e[m'" >&2
-		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
+		echo -e "	PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$PACKAGE_URL_FILENAME\e[m'" >&2
 		exit 1
 	fi
 fi
@@ -53,7 +55,7 @@ if test -z "$PACKAGE_RAWNAME"; then
 #		echo -e "	PACKAGE_NAME:          '\e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m'" >&2
 #		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
 #		echo -e "	PACKAGE_GIT_URL:       '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_URL\e[m'" >&2
-#		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
+#		echo -e "	PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$PACKAGE_URL_FILENAME\e[m'" >&2
 #		exit 1
 #	fi
 fi
@@ -68,7 +70,7 @@ if test -z "${PACKAGE_VERSION+x}"; then
 #		echo "Unable to determine PACKAGE_VERSION from" >&2
 #		echo -e "	PACKAGE_NAME:          '\e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m'" >&2
 #		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
-#		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
+#		echo -e "	PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$PACKAGE_URL_FILENAME\e[m'" >&2
 #		exit 1
 	fi
 fi
@@ -167,18 +169,18 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 					cmd mkdir -p "$BINUTILS_SOURCES"
 					cmd cd "$BINUTILS_SOURCES"
 					if ! test -z "$PACKAGE_URL"; then
-						_PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
+						#PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
 						# Figure out how to download+unpack the package
-						if [[ "$_PACKAGE_URL_FILENAME" == *.tar* ]]; then
+						if [[ "$PACKAGE_URL_FILENAME" == *.tar* ]]; then
 							# Tar archive. Extract the filename of the file that will be downloaded
 							# After downloading, make sure that filename becomes "$PACKAGE_NAME.tar[.gz|.xz|...]"
-							_PACKAGE_URL_NAME="${_PACKAGE_URL_FILENAME%.tar*}"
-							_PACKAGE_URL_FILENAME_EXT=".tar${_PACKAGE_URL_FILENAME#*.tar}"
-							_PACKAGE_URL_WANTED_FILENAME="${PACKAGE_NAME}.tar${_PACKAGE_URL_FILENAME#*.tar}"
+							_PACKAGE_URL_NAME="${PACKAGE_URL_FILENAME%.tar*}"
+							PACKAGE_URL_FILENAME_EXT=".tar${PACKAGE_URL_FILENAME#*.tar}"
+							_PACKAGE_URL_WANTED_FILENAME="${PACKAGE_NAME}.tar${PACKAGE_URL_FILENAME#*.tar}"
 							if ! [ -f "$_PACKAGE_URL_WANTED_FILENAME" ]; then
-								download_file "$_PACKAGE_URL_FILENAME" "$PACKAGE_URL"
-								if [ "$_PACKAGE_URL_WANTED_FILENAME" != "$_PACKAGE_URL_FILENAME" ]; then
-									cmd mv "$_PACKAGE_URL_FILENAME" "$_PACKAGE_URL_WANTED_FILENAME"
+								download_file "$PACKAGE_URL_FILENAME" "$PACKAGE_URL"
+								if [ "$_PACKAGE_URL_WANTED_FILENAME" != "$PACKAGE_URL_FILENAME" ]; then
+									cmd mv "$PACKAGE_URL_FILENAME" "$_PACKAGE_URL_WANTED_FILENAME"
 								fi
 							fi
 							rm -r "./$_PACKAGE_URL_NAME" > /dev/null 2>&1
@@ -186,7 +188,7 @@ if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
 							cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME" -C "$SRCPATH"
 						else
 							# Unrecognized package distribution format
-							echo -e "\e[${UI_COLCFG_ERR}mNo known way of extracting files\e[m from: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
+							echo -e "\e[${UI_COLCFG_ERR}mNo known way of extracting files\e[m from: '\e[${UI_COLCFG_NAME}m$PACKAGE_URL_FILENAME\e[m'" >&2
 							exit 1
 						fi
 					elif ! test -z "$PACKAGE_GIT_URL"; then
