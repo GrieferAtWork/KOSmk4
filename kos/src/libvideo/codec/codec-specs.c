@@ -51,7 +51,7 @@ DECL_BEGIN
 INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
-	if (specs->vcs_flags & (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_PAL)) {
+	if (specs->vcs_flags & (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_PAL)) {
 		/* Grayscale (luminance) or palette */
 		if (specs->vcs_gmask == specs->vcs_rmask &&
 		    specs->vcs_bmask == specs->vcs_rmask) {

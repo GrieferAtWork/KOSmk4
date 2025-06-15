@@ -2379,7 +2379,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 
 	/* Grayscale (Luminance) formats. */
 	CASE_CODEC_AL1(VIDEO_CODEC_L1_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 1,
 	                /* vcs_cbits */ 1,
 	                /* vcs_rmask */ 0x1,
@@ -2392,7 +2392,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l1_pixel2color, l1_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L1_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 1,
 	                /* vcs_cbits */ 1,
 	                /* vcs_rmask */ 0x1,
@@ -2405,7 +2405,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l1_pixel2color, l1_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L2_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x3,
@@ -2418,7 +2418,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l2_pixel2color, l2_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L2_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x3,
@@ -2431,7 +2431,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l2_pixel2color, l2_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L4_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xf,
@@ -2444,7 +2444,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l4_pixel2color, l4_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L4_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xf,
@@ -2457,7 +2457,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l4_pixel2color, l4_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_L8,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0xff,
@@ -2469,7 +2469,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               l8_pixel2color, l8_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA11_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x1,
@@ -2482,7 +2482,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al11_pixel2color, al11_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA11_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x1,
@@ -2495,7 +2495,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al11_pixel2color, al11_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL11_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x2,
@@ -2508,7 +2508,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la11_pixel2color, la11_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL11_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 2,
 	                /* vcs_cbits */ 2,
 	                /* vcs_rmask */ 0x2,
@@ -2521,7 +2521,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la11_pixel2color, la11_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA22_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0x3,
@@ -2534,7 +2534,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la22_pixel2color, la22_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA22_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0x3,
@@ -2547,7 +2547,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la22_pixel2color, la22_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL22_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xc,
@@ -2560,7 +2560,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al22_pixel2color, al22_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL22_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xc,
@@ -2573,7 +2573,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al22_pixel2color, al22_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA31_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0x7,
@@ -2586,7 +2586,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la31_pixel2color, la31_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA31_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0x7,
@@ -2599,7 +2599,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la31_pixel2color, la31_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL13_MSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xe,
@@ -2612,7 +2612,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al13_pixel2color, al13_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL13_LSB,
-	               (VIDEO_CODEC_FLAG_GRAY | VIDEO_CODEC_FLAG_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
 	                /* vcs_bpp   */ 4,
 	                /* vcs_cbits */ 4,
 	                /* vcs_rmask */ 0xe,
@@ -2625,7 +2625,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al13_pixel2color, al13_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA44,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0x0f,
@@ -2637,7 +2637,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la44_pixel2color, la44_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL44,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0xf0,
@@ -2649,7 +2649,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al44_pixel2color, al44_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_LA71,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0x7f,
@@ -2661,7 +2661,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la71_pixel2color, la71_color2pixel);
 
 	CASE_CODEC_AL1(VIDEO_CODEC_AL17,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 8,
 	                /* vcs_cbits */ 8,
 	                /* vcs_rmask */ 0xfe,
@@ -2673,7 +2673,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               al17_pixel2color, al17_color2pixel);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_LA88,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
 	                /* vcs_rmask */ MASK2_LE(0x00ff),
@@ -2688,7 +2688,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               la88_pixel2color, la88_color2pixel);
 
 	CASE_CODEC_ALn(VIDEO_CODEC_AL88,
-	               (VIDEO_CODEC_FLAG_GRAY,
+	               (VIDEO_CODEC_FLAG_LUM,
 	                /* vcs_bpp   */ 16,
 	                /* vcs_cbits */ 16,
 	                /* vcs_rmask */ MASK2_LE(0xff00),
@@ -4127,7 +4127,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		cmask = self->vc_specs.vcs_rmask |
 		        self->vc_specs.vcs_gmask |
 		        self->vc_specs.vcs_bmask;
-		if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
+		if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM)) {
 			self->vc_specs.vcs_rmask = cmask;
 			self->vc_specs.vcs_gmask = cmask;
 			self->vc_specs.vcs_bmask = cmask;
@@ -4162,7 +4162,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	                                   &self->vcc_shft_amask);
 
 	/* Select color <=> pixel conversion algorithm */
-	if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
+	if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM)) {
 		/* cmask: Canonical mask */
 		video_pixel_t cmask = ((video_pixel_t)1 << self->vc_specs.vcs_cbits) - 1;
 		bool need_mask = (self->vc_specs.vcs_rmask & cmask) != cmask;

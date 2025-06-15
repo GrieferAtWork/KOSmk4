@@ -237,10 +237,10 @@ svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
 	if (self->smi_flags & SVGA_MODEINFO_F_PAL)
 		result->vcs_flags |= VIDEO_CODEC_FLAG_PAL;
 	if (self->smi_flags & SVGA_MODEINFO_F_BW)
-		result->vcs_flags |= VIDEO_CODEC_FLAG_GRAY;
+		result->vcs_flags |= VIDEO_CODEC_FLAG_LUM;
 
 	result->vcs_bpp = self->smi_bits_per_pixel;
-	if (result->vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY)) {
+	if (result->vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM)) {
 		result->vcs_rmask = ((video_pixel_t)1 << self->smi_colorbits) - 1;
 		result->vcs_gmask = result->vcs_rmask;
 		result->vcs_bmask = result->vcs_rmask;

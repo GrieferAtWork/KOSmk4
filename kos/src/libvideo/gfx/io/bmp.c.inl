@@ -697,7 +697,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 
 
 	/* Check for codec types that cannot be written as-it into a BMP file */
-	if ((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY))
+	if ((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))
 	    ? (codec->vc_specs.vcs_bpp > 8 || codec->vc_specs.vcs_amask || (pal && pal->vp_cnt > 255))
 	    : (codec->vc_specs.vcs_bpp <= 8)) {
 		/* Codecs with BPP <= 8 **MUST** use a palette (or the emulated grayscale palette).
@@ -707,7 +707,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		video_codec_t preferred_codec_id;
 		struct video_codec const *preferred_codec;
 		if (codec->vc_specs.vcs_amask) {
-			if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY))) {
+			if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))) {
 				preferred_codec_id = VIDEO_CODEC_BGRA8888;
 			} else {
 				unsigned int n_alpha = POPCOUNT(codec->vc_specs.vcs_amask);
@@ -719,7 +719,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 					preferred_codec_id = VIDEO_CODEC_BGRA8888;
 				}
 			}
-		} else if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY))) {
+		} else if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))) {
 			preferred_codec_id = VIDEO_CODEC_BGR888;
 		} else if (codec->vc_specs.vcs_bpp <= 16) {
 			preferred_codec_id = VIDEO_CODEC_BGR565;

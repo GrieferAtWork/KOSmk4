@@ -68,9 +68,9 @@ do_dump_buffer_specs(struct video_buffer *buf,
 	           (unsigned int)codec->vc_codec,
 	           (unsigned int)codec->vc_specs.vcs_bpp,
 	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) ? 'P' : '-',
-	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_GRAY) ? 'G' : '-',
+	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM) ? 'G' : '-',
 	           (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LSB) ? 'L' : '-');
-	if (!(codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_GRAY))) {
+	if (!(codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))) {
 		gfx_printf("rmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_rmask);
 		gfx_printf("gmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_gmask);
 		gfx_printf("bmask: %#.8I32x\n", (uint32_t)codec->vc_specs.vcs_bmask);

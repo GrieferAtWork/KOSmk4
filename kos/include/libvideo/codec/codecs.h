@@ -128,7 +128,14 @@
 #define VIDEO_CODEC_LA88     0x1018 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
 #define VIDEO_CODEC_AL88     0x1019 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
 
-/* Palette-driven */
+/* Palette-driven:
+ * - In those cases where only a palette is used (without a dedicated
+ *   alpha channel), the alpha value of pixel colors is read from the
+ *   palette.
+ * - When there is a dedicated alpha channel within pixel data, alpha
+ *   values from the  palette are ignored,  and **ONLY** values  from
+ *   pixel data are used.
+ */
 #define VIDEO_CODEC_P1_MSB   0x2001 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
 #define VIDEO_CODEC_P1_LSB   0x2002 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
 #define VIDEO_CODEC_P2_MSB   0x2003 /* 4-color palette, (2-bit pixels), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
@@ -158,10 +165,10 @@
 
 
 
-/* Normal codec flags. */
+/* Video codec flags (bits for `struct video_codec_specs::vcs_flags') */
 #define VIDEO_CODEC_FLAG_NORMAL 0x00 /* Normal flags */
-#define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? */
-#define VIDEO_CODEC_FLAG_GRAY   0x02 /* Is this a grayscale-mode (luminance) codec? */
+#define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? (do not combine with `VIDEO_CODEC_FLAG_LUM') */
+#define VIDEO_CODEC_FLAG_LUM    0x02 /* Is this a grayscale-only (luminance) codec? (do not combine with `VIDEO_CODEC_FLAG_PAL') */
 #define VIDEO_CODEC_FLAG_MSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
 #define VIDEO_CODEC_FLAG_LSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
 #define VIDEO_CODEC_FLAG_ISLSB(x) ((x) & VIDEO_CODEC_FLAG_LSB)
