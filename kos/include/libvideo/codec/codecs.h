@@ -38,17 +38,50 @@
 #define VIDEO_CODEC_USER   0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */
 #define VIDEO_CODEC_CUSTOM 0xffff /* Custom codec (not one of the built-in ones) */
 
+/* Notation:
+ * >> VIDEO_CODEC_{CHANNELS}{CHANNEL_BITS}{SUFFIX}
+ *
+ * CHANNELS:
+ * - Color/data channels used by the codec, written in order:
+ *   >> byte ASC, bit ASC
+ *   iow: channels that appear in bytes at lower memory addresses
+ *        are listed first, and channels that appear in the  same
+ *        byte are listed from least-to-most significant bit.
+ * - P: Palette index
+ * - L: Luminance / brightness (0: black; 1: white)
+ * - R: Red color component/intensity   (direct color codecs only)
+ * - G: Green color component/intensity (direct color codecs only)
+ * - B: Blue color component/intensity  (direct color codecs only)
+ * - A: Alpha component/intensity
+ * - X: Ignored/unused
+ *
+ * CHANNEL_BITS:
+ * - # of bits used by this channel. The starting bit of any
+ *   channel is the # of  bits from all preceding  channels.
+ * - The sum of these values always adds up to a multiple of 8,
+ *   or  will be equal to 1, 2 or 4 (in these last 3 cases, the
+ *   codec stores multiple pixels per byte)
+ *
+ * SUFFIX:
+ * - Only relevant when a single byte can hold more than 1 pixel,
+ *   in which case "_MSB" means that the first pixel is stored at
+ *   greater bits than pixels that follow thereafter.
+ * - "_LSB" means the opposite, meaning the bit=0 belongs to the
+ *   first pixel (as opposed to the last)
+ */
+
 /* Full-color */
-#define VIDEO_CODEC_RGBA8888 0x0001 /* Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
-#define VIDEO_CODEC_RGBX8888 0x0002
-#define VIDEO_CODEC_ARGB8888 0x0003
-#define VIDEO_CODEC_XRGB8888 0x0004
-#define VIDEO_CODEC_ABGR8888 0x0005
-#define VIDEO_CODEC_XBGR8888 0x0006
-#define VIDEO_CODEC_BGRA8888 0x0007
-#define VIDEO_CODEC_BGRX8888 0x0008
-#define VIDEO_CODEC_RGB888   0x0009
-#define VIDEO_CODEC_BGR888   0x000a
+#define VIDEO_CODEC_RGBA8888 0x0001 /* >> struct { uint8_t r; uint8_t g; uint8_t b; uint8_t a; }
+                                     * Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
+#define VIDEO_CODEC_RGBX8888 0x0002 /* >> struct { uint8_t r; uint8_t g; uint8_t b; uint8_t x; } */
+#define VIDEO_CODEC_ARGB8888 0x0003 /* >> struct { uint8_t a; uint8_t r; uint8_t g; uint8_t b; } */
+#define VIDEO_CODEC_XRGB8888 0x0004 /* >> struct { uint8_t x; uint8_t r; uint8_t g; uint8_t b; } */
+#define VIDEO_CODEC_ABGR8888 0x0005 /* >> struct { uint8_t a; uint8_t b; uint8_t g; uint8_t r; } */
+#define VIDEO_CODEC_XBGR8888 0x0006 /* >> struct { uint8_t x; uint8_t b; uint8_t g; uint8_t r; } */
+#define VIDEO_CODEC_BGRA8888 0x0007 /* >> struct { uint8_t b; uint8_t g; uint8_t r; uint8_t a; } */
+#define VIDEO_CODEC_BGRX8888 0x0008 /* >> struct { uint8_t b; uint8_t g; uint8_t r; uint8_t x; } */
+#define VIDEO_CODEC_RGB888   0x0009 /* >> struct { uint8_t r; uint8_t g; uint8_t b; } */
+#define VIDEO_CODEC_BGR888   0x000a /* >> struct { uint8_t b; uint8_t g; uint8_t r; } */
 #define VIDEO_CODEC_RGBA4444 0x0011
 #define VIDEO_CODEC_RGBX4444 0x0012
 #define VIDEO_CODEC_ARGB4444 0x0013
