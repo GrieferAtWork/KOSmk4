@@ -75,8 +75,8 @@ struct video_blit;
  * the corresponding bit is "1"  in the used bitmask will  be
  * copied/filled.
  *
- * Bitmasks are expected to encode their bits similar  to
- * `VIDEO_CODEC_GRAY2_MSB', except that `vbm_skip' allows
+ * Bitmasks are expected to encode their bits similar to
+ * `VIDEO_CODEC_L1_MSB', except  that `vbm_skip'  allows
  * the user to specify a bit-perfect starting offset.
  *
  * USAGE:

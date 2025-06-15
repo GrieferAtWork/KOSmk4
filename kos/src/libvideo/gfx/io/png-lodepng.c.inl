@@ -135,14 +135,14 @@ libvideo_buffer_open_lodepng(void const *blob, size_t blob_size) {
 	switch (state.info_png.color.colortype) {
 	case LCT_GREY:
 		switch (state.info_png.color.bitdepth) {
-		case 1: codec_name = VIDEO_CODEC_GRAY2_LSB; break;
-		case 2: codec_name = VIDEO_CODEC_GRAY4_LSB; break;
-		case 4: codec_name = VIDEO_CODEC_GRAY16_LSB; break;
+		case 1: codec_name = VIDEO_CODEC_L1_LSB; break;
+		case 2: codec_name = VIDEO_CODEC_L2_LSB; break;
+		case 4: codec_name = VIDEO_CODEC_L4_LSB; break;
 		default:
 			state.info_png.color.bitdepth = 8;
 			ATTR_FALLTHROUGH
 		case 8:
-			codec_name = VIDEO_CODEC_GRAY256;
+			codec_name = VIDEO_CODEC_L8;
 			break;
 		}
 		break;
@@ -265,19 +265,19 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 	size_t out_size;
 	struct video_lock lock;
 	switch (self->vb_format.vf_codec->vc_codec) {
-	case VIDEO_CODEC_GRAY2_LSB:
+	case VIDEO_CODEC_L1_LSB:
 		colortype = LCT_GREY;
 		bitdepth  = 1;
 		break;
-	case VIDEO_CODEC_GRAY4_LSB:
+	case VIDEO_CODEC_L2_LSB:
 		colortype = LCT_GREY;
 		bitdepth  = 2;
 		break;
-	case VIDEO_CODEC_GRAY16_LSB:
+	case VIDEO_CODEC_L4_LSB:
 		colortype = LCT_GREY;
 		bitdepth  = 4;
 		break;
-	case VIDEO_CODEC_GRAY256:
+	case VIDEO_CODEC_L8:
 		colortype = LCT_GREY;
 		bitdepth  = 8;
 		break;

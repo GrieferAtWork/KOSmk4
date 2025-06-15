@@ -273,11 +273,11 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		}
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
 		switch (bit_depth) {
-		case 1: result_codec_id = VIDEO_CODEC_PAL2_MSB; break;
-		case 2: result_codec_id = VIDEO_CODEC_PAL4_MSB; break;
-		case 4: result_codec_id = VIDEO_CODEC_PAL16_MSB; break;
+		case 1: result_codec_id = VIDEO_CODEC_P1_MSB; break;
+		case 2: result_codec_id = VIDEO_CODEC_P2_MSB; break;
+		case 4: result_codec_id = VIDEO_CODEC_P4_MSB; break;
 		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
-		case 8: result_codec_id = VIDEO_CODEC_PAL256; break;
+		case 8: result_codec_id = VIDEO_CODEC_P8; break;
 		}
 
 		/* Read palette colors */
@@ -304,11 +304,11 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		}
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
 		switch (bit_depth) {
-		case 1: result_codec_id = VIDEO_CODEC_GRAY2_MSB; break;
-		case 2: result_codec_id = VIDEO_CODEC_GRAY4_MSB; break;
-		case 4: result_codec_id = VIDEO_CODEC_GRAY16_MSB; break;
+		case 1: result_codec_id = VIDEO_CODEC_L1_MSB; break;
+		case 2: result_codec_id = VIDEO_CODEC_L2_MSB; break;
+		case 4: result_codec_id = VIDEO_CODEC_L4_MSB; break;
 		default: (*pdyn_png_set_packing)(png_ptr); ATTR_FALLTHROUGH
-		case 8: result_codec_id = VIDEO_CODEC_GRAY256; break;
+		case 8: result_codec_id = VIDEO_CODEC_L8; break;
 		}
 	} else {
 do_rgb_format:

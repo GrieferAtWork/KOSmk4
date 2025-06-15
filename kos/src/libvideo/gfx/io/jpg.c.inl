@@ -474,7 +474,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	in_codec_id = self->vb_format.vf_codec->vc_codec;
 	switch (in_codec_id) {
 
-	case VIDEO_CODEC_GRAY256:
+	case VIDEO_CODEC_L8:
 		comp_in_color_space   = JPEGLIB_JCS_GRAYSCALE;
 		comp_input_components = 1;
 		break;
@@ -490,7 +490,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 		struct video_codec const *in_codec;
 		struct video_buffer *conv_buffer;
 		in_codec_id = (self->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_GRAY)
-		           ? VIDEO_CODEC_GRAY256
+		           ? VIDEO_CODEC_L8
 		           : VIDEO_CODEC_RGB888;
 		in_codec = video_codec_lookup(in_codec_id);
 		if unlikely(!in_codec) {

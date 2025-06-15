@@ -57,16 +57,16 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 		    specs->vcs_bmask == specs->vcs_rmask &&
 		    specs->vcs_amask == 0) {
 			switch (specs->vcs_bpp) {
-			case 1: codec = VIDEO_CODEC_GRAY2_LSB; break;
-			case 2: codec = VIDEO_CODEC_GRAY4_LSB; break;
-			case 4: codec = VIDEO_CODEC_GRAY16_LSB; break;
-			case 8: codec = VIDEO_CODEC_GRAY256; break;
+			case 1: codec = VIDEO_CODEC_L1_MSB; break;
+			case 2: codec = VIDEO_CODEC_L2_MSB; break;
+			case 4: codec = VIDEO_CODEC_L4_MSB; break;
+			case 8: codec = VIDEO_CODEC_L8; break;
 			default: goto nope;
 			}
-			static_assert(VIDEO_CODEC_GRAY2_MSB == (VIDEO_CODEC_GRAY2_LSB + 1));
-			static_assert(VIDEO_CODEC_GRAY4_MSB == (VIDEO_CODEC_GRAY4_LSB + 1));
-			static_assert(VIDEO_CODEC_GRAY16_MSB == (VIDEO_CODEC_GRAY16_LSB + 1));
-			if (VIDEO_CODEC_FLAG_ISMSB(specs->vcs_flags) && specs->vcs_bpp < 8)
+			static_assert((VIDEO_CODEC_L1_MSB + 1) == VIDEO_CODEC_L1_LSB);
+			static_assert((VIDEO_CODEC_L2_MSB + 1) == VIDEO_CODEC_L2_LSB);
+			static_assert((VIDEO_CODEC_L4_MSB + 1) == VIDEO_CODEC_L4_LSB);
+			if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
 				++codec;
 		}
 	} else if (specs->vcs_flags & VIDEO_CODEC_FLAG_PAL) {
@@ -75,16 +75,16 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 		    specs->vcs_bmask == specs->vcs_rmask &&
 		    specs->vcs_amask == 0) {
 			switch (specs->vcs_bpp) {
-			case 1: codec = VIDEO_CODEC_PAL2_LSB; break;
-			case 2: codec = VIDEO_CODEC_PAL4_LSB; break;
-			case 4: codec = VIDEO_CODEC_PAL16_LSB; break;
-			case 8: codec = VIDEO_CODEC_PAL256; break;
+			case 1: codec = VIDEO_CODEC_P1_MSB; break;
+			case 2: codec = VIDEO_CODEC_P2_MSB; break;
+			case 4: codec = VIDEO_CODEC_P4_MSB; break;
+			case 8: codec = VIDEO_CODEC_P8; break;
 			default: goto nope;
 			}
-			static_assert(VIDEO_CODEC_PAL2_MSB == (VIDEO_CODEC_PAL2_LSB + 1));
-			static_assert(VIDEO_CODEC_PAL4_MSB == (VIDEO_CODEC_PAL4_LSB + 1));
-			static_assert(VIDEO_CODEC_PAL16_MSB == (VIDEO_CODEC_PAL16_LSB + 1));
-			if (VIDEO_CODEC_FLAG_ISMSB(specs->vcs_flags) && specs->vcs_bpp < 8)
+			static_assert((VIDEO_CODEC_P1_MSB + 1) == VIDEO_CODEC_P1_LSB);
+			static_assert((VIDEO_CODEC_P2_MSB + 1) == VIDEO_CODEC_P2_LSB);
+			static_assert((VIDEO_CODEC_P4_MSB + 1) == VIDEO_CODEC_P4_LSB);
+			if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
 				++codec;
 		}
 	} else {

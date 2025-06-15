@@ -34,59 +34,58 @@
 #include "pixel.h"
 #include "types.h"
 
-#define VIDEO_CODEC_NONE       0x0000 /* Invalid codec. */
-#define VIDEO_CODEC_USER       0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */
-#define VIDEO_CODEC_CUSTOM     0xffff /* Custom codec (not one of the built-in ones) */
-
-/* Gray-scale */
-#define VIDEO_CODEC_GRAY2_LSB  0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_GRAY2_MSB  0x1002 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
-#define VIDEO_CODEC_GRAY4_LSB  0x1003 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
-#define VIDEO_CODEC_GRAY4_MSB  0x1004 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
-#define VIDEO_CODEC_GRAY16_LSB 0x1005 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
-#define VIDEO_CODEC_GRAY16_MSB 0x1006 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
-#define VIDEO_CODEC_GRAY256    0x1007 /* 8-bit-per-pixel, 256-color grayscale (0=black; 255=white) */
-/* TODO: Rename the `VIDEO_CODEC_GRAY*' to `VIDEO_CODEC_Ln' (where "L" stands for luminance) */
-/* TODO: Define built-in luminance w/ alpha codecs */
+#define VIDEO_CODEC_NONE   0x0000 /* Invalid codec. */
+#define VIDEO_CODEC_USER   0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */
+#define VIDEO_CODEC_CUSTOM 0xffff /* Custom codec (not one of the built-in ones) */
 
 /* Full-color */
-#define VIDEO_CODEC_RGBA8888   0x2001 /* Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
-#define VIDEO_CODEC_RGBX8888   0x2002
-#define VIDEO_CODEC_ARGB8888   0x2003
-#define VIDEO_CODEC_XRGB8888   0x2004
-#define VIDEO_CODEC_ABGR8888   0x2005
-#define VIDEO_CODEC_XBGR8888   0x2006
-#define VIDEO_CODEC_BGRA8888   0x2007
-#define VIDEO_CODEC_BGRX8888   0x2008
-#define VIDEO_CODEC_RGB888     0x2009
-#define VIDEO_CODEC_BGR888     0x200a
-#define VIDEO_CODEC_RGBA4444   0x2011
-#define VIDEO_CODEC_RGBX4444   0x2012
-#define VIDEO_CODEC_ARGB4444   0x2013
-#define VIDEO_CODEC_XRGB4444   0x2014
-#define VIDEO_CODEC_ABGR4444   0x2015
-#define VIDEO_CODEC_XBGR4444   0x2016
-#define VIDEO_CODEC_BGRA4444   0x2017
-#define VIDEO_CODEC_BGRX4444   0x2018
-#define VIDEO_CODEC_RGB565     0x2019
-#define VIDEO_CODEC_BGR565     0x201a
-#define VIDEO_CODEC_RGBA5551   0x2021
-#define VIDEO_CODEC_RGBX5551   0x2022
-#define VIDEO_CODEC_ARGB1555   0x2023
-#define VIDEO_CODEC_XRGB1555   0x2024
-#define VIDEO_CODEC_ABGR1555   0x2025
-#define VIDEO_CODEC_XBGR1555   0x2026
-#define VIDEO_CODEC_BGRA5551   0x2027
-#define VIDEO_CODEC_BGRX5551   0x2028
+#define VIDEO_CODEC_RGBA8888 0x0001 /* Hint: in this codec, "video_pixel_t" and "video_color_t" are identical */
+#define VIDEO_CODEC_RGBX8888 0x0002
+#define VIDEO_CODEC_ARGB8888 0x0003
+#define VIDEO_CODEC_XRGB8888 0x0004
+#define VIDEO_CODEC_ABGR8888 0x0005
+#define VIDEO_CODEC_XBGR8888 0x0006
+#define VIDEO_CODEC_BGRA8888 0x0007
+#define VIDEO_CODEC_BGRX8888 0x0008
+#define VIDEO_CODEC_RGB888   0x0009
+#define VIDEO_CODEC_BGR888   0x000a
+#define VIDEO_CODEC_RGBA4444 0x0011
+#define VIDEO_CODEC_RGBX4444 0x0012
+#define VIDEO_CODEC_ARGB4444 0x0013
+#define VIDEO_CODEC_XRGB4444 0x0014
+#define VIDEO_CODEC_ABGR4444 0x0015
+#define VIDEO_CODEC_XBGR4444 0x0016
+#define VIDEO_CODEC_BGRA4444 0x0017
+#define VIDEO_CODEC_BGRX4444 0x0018
+#define VIDEO_CODEC_RGB565   0x0019
+#define VIDEO_CODEC_BGR565   0x001a
+#define VIDEO_CODEC_RGBA5551 0x0021
+#define VIDEO_CODEC_RGBX5551 0x0022
+#define VIDEO_CODEC_ARGB1555 0x0023
+#define VIDEO_CODEC_XRGB1555 0x0024
+#define VIDEO_CODEC_ABGR1555 0x0025
+#define VIDEO_CODEC_XBGR1555 0x0026
+#define VIDEO_CODEC_BGRA5551 0x0027
+#define VIDEO_CODEC_BGRX5551 0x0028
+
+/* Gray-scale */
+#define VIDEO_CODEC_L1_MSB 0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_L1_LSB 0x1002 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_L2_MSB 0x1003 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_L2_LSB 0x1004 /* 2-bit-per-pixel, 4-color grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_L4_MSB 0x1005 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_L4_LSB 0x1006 /* 4-bit-per-pixel, 16-color grayscale (0=black; 15=white), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_L8     0x1007 /* 8-bit-per-pixel, 256-color grayscale (0=black; 255=white) */
+/* TODO: Define built-in luminance w/ alpha codecs */
 
 /* Palette-driven */
-#define VIDEO_CODEC_PAL2_LSB   0xf001 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
-#define VIDEO_CODEC_PAL2_MSB   0xf002 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
-#define VIDEO_CODEC_PAL4_LSB   0xf003 /* 4-color palette, (2-bit pixels), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
-#define VIDEO_CODEC_PAL4_MSB   0xf004 /* 4-color palette, (2-bit pixels), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
-#define VIDEO_CODEC_PAL16_LSB  0xf005 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
-#define VIDEO_CODEC_PAL16_MSB  0xf006 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
-#define VIDEO_CODEC_PAL256     0xf007 /* 256-color palette (8-bit pixels) */
+#define VIDEO_CODEC_P1_MSB 0x2001 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_P1_LSB 0x2002 /* 2-color palette, (1-bit pixels), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_P2_MSB 0x2003 /* 4-color palette, (2-bit pixels), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_P2_LSB 0x2004 /* 4-color palette, (2-bit pixels), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_P4_MSB 0x2005 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_P4_LSB 0x2006 /* 16-color palette, (4-bit pixels), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_P8     0x2007 /* 256-color palette (8-bit pixels) */
 /* TODO: Define built-in palette w/ alpha codecs */
 
 
@@ -95,7 +94,7 @@
 /* Normal codec flags. */
 #define VIDEO_CODEC_FLAG_NORMAL 0x00 /* Normal flags */
 #define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? */
-#define VIDEO_CODEC_FLAG_GRAY   0x02 /* Is this a grayscale-mode codec? */
+#define VIDEO_CODEC_FLAG_GRAY   0x02 /* Is this a grayscale-mode (luminance) codec? */
 #define VIDEO_CODEC_FLAG_MSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
 #define VIDEO_CODEC_FLAG_LSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
 #define VIDEO_CODEC_FLAG_ISLSB(x) ((x) & VIDEO_CODEC_FLAG_LSB)
