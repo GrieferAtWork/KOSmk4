@@ -98,8 +98,8 @@ do_dump_buffer_specs(struct video_buffer *buf,
 		for (pal_y = 0; pal_y < rows; ++pal_y) {
 			for (pal_x = 0; pal_x < cells_per_row; ++pal_x) {
 				video_color_t color;
-				size_t index = pal_x + (pal_y * cells_per_row);
-				if (index > palette->vp_cnt)
+				video_pixel_t index = pal_x + (pal_y * cells_per_row);
+				if (index >= palette->vp_cnt)
 					break;
 				color = palette->vp_pal[index];
 				video_gfx_fill(io->vfp_gfx,
