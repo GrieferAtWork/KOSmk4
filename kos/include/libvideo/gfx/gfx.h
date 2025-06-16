@@ -395,6 +395,39 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Possible values for `video_gfx_palettize()'s `__method' argument.
+ * - "n": # of pixels in clip region
+ * - "k": The given `__palsize' */
+#define VIDEO_GFX_PALETTIZE_METHOD_AUTO       0x0000 /* Automatically determine palettization method */
+#define VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM  0x0001 /* Fastest (O(n + k)), but very bad results when `self' uses many different colors */
+#define VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT 0x0002 /* Medium-speed (O(n log n)), but good enough decent results for most cases */
+#define VIDEO_GFX_PALETTIZE_METHOD_K_MEANS    0x0a03 /* Slowest (O(n * k * max_iters=10)), but best results; Never used automatically */
+#define VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA    0x0080 /* Flag: Include  alpha  values in  the  produced palette.
+                                                      * Not supported by `VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM' */
+
+
+/* Construct a (visually pleasing) palette from the pixel area  denoted
+ * by the I/O region of `__self'. The produced palette is stored in the
+ * provided buffer `__pal' and consists of exactly `__palsize' colors.
+ * @param: __method: How to calculate the palette
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Insufficient memory for temporaries needed during calculation
+ * @return: -1: [errno=EINVAL] Attempted to use "VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA" with
+ *                             a  palettization method that doesn't support alpha values.
+ * @return: -1: [errno=EINVAL] Invalid `method' */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUTS_T(3, 2) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_PALETTIZE)(struct video_gfx const *__restrict __self,
+                                        video_pixel_t __palsize, video_color_t *__pal,
+                                        unsigned int __method);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUTS(3, 2) int LIBVIDEO_GFX_CC
+video_gfx_palettize(struct video_gfx const *__restrict __self,
+                    video_pixel_t __palsize, video_color_t *__pal,
+                    unsigned int __method);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
 #ifdef __INTELLISENSE__
 
 /************************************************************************/

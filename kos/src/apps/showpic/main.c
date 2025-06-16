@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_APPS_SHOWPIC_MAIN_C
 #define GUARD_APPS_SHOWPIC_MAIN_C 1
+#define LIBVIDEO_CODEC_WANT_PROTOTYPES
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 #define _KOS_SOURCE 1
 
@@ -34,6 +35,7 @@
 #include <format-printer.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,6 +140,72 @@ dump_buffer_specs(struct video_buffer *buf,
 	io->vfp_cury += padding;
 }
 
+static REF struct video_buffer *
+palettize(struct video_buffer *self, video_pixel_t num_colors) {
+	struct video_gfx gfx;
+	struct video_gfx result_gfx;
+	REF struct video_palette *pal;
+	REF struct video_buffer *result;
+	struct video_codec const *result_codec;
+	video_codec_t result_codec_id;
+
+	/* Create palette with the requested # of colors */
+	pal = video_palette_create(num_colors);
+	if unlikely(!pal)
+		goto err;
+
+	/* Acquire GFX context for source video buffer */
+	video_buffer_getgfx(self, &gfx,
+	                    GFX_BLENDMODE_OVERRIDE,
+	                    VIDEO_GFX_FNORMAL, 0);
+
+	/* Palettize source video buffer and store results in "pal" */
+	if unlikely(video_gfx_palettize(&gfx, num_colors, pal->vp_pal,
+	                                 VIDEO_GFX_PALETTIZE_METHOD_AUTO))
+		goto err_pal;
+	pal = video_palette_optimize(pal);
+
+	/* Figure out appropriate codec for result buffer */
+	if (num_colors <= 2) {
+		result_codec_id = VIDEO_CODEC_P1_MSB;
+	} else if (num_colors <= 4) {
+		result_codec_id = VIDEO_CODEC_P2_MSB;
+	} else if (num_colors <= 16) {
+		result_codec_id = VIDEO_CODEC_P4_MSB;
+	} else {
+		result_codec_id = VIDEO_CODEC_P8;
+	}
+	result_codec = video_codec_lookup(result_codec_id);
+	if unlikely(!result_codec)
+		goto err_pal;
+
+	/* Allocate result buffer */
+	result = video_buffer_create(VIDEO_BUFFER_AUTO,
+	                             video_gfx_getclipw(&gfx),
+	                             video_gfx_getcliph(&gfx),
+	                             result_codec, pal);
+	if unlikely(!result)
+		goto err_pal;
+	video_palette_decref(pal);
+
+	/* Blit source GFX context onto result video_buffer. */
+	video_buffer_getgfx(result, &result_gfx,
+	                    GFX_BLENDMODE_OVERRIDE,
+	                    VIDEO_GFX_FNORMAL, 0);
+	video_gfx_blit(&result_gfx, 0, 0, &gfx, 0, 0,
+	               video_gfx_getclipw(&gfx),
+	               video_gfx_getcliph(&gfx));
+	return result;
+/*
+err_pal_r:
+	video_buffer_decref(result);*/
+err_pal:
+	video_palette_decref(pal);
+err:
+	return NULL;
+}
+
+
 int main(int argc, char *argv[]) {
 	REF struct screen_buffer *screen;
 	REF struct video_buffer *image;
@@ -161,12 +229,25 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
+#if 1
+	/* Palettize "image" */
+	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
+		struct video_buffer *new_image;
+		new_image = palettize(image, 256);
+		if likely(new_image) {
+			video_buffer_decref(image);
+			image = new_image;
+		}
+	}
+#endif
+
 #if 0 /* For debugging the same-format blit-scretch function */
 	image = video_buffer_convert(image,
 	                             screen_buffer_asvideo(screen)->vb_format.vf_codec,
 	                             screen_buffer_asvideo(screen)->vb_format.vf_pal,
 	                             VIDEO_BUFFER_AUTO);
 #endif
+
 
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
