@@ -576,6 +576,23 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
 	jna    1f /* if (!(STATE.EFLAGS > 0x10000000)) goto 1f; */
 	int3
+/* FIXME: This int3 got hit randomly one time:
+/kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0] [[97mint3[39m]
+> trace
+/kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0]
+FFFFFFFF+1
+Analyzing remainder of stack:
+/kos/src/kernel/core/sched/scheduler.c(333,33) : C03017E7+5[/os/kernel.bin][sched_intern_loadpending+40] [pc@C091AF18]
+/kos/src/kernel/core/arch/i386/sched/smp.S(192) : C0101D35+5[/os/kernel.bin][???+0] [pc@C091AF34]
+/kos/src/kernel/core/sched/scheduler.c(1709,2) : C0305191+1[/os/kernel.bin][cpu_deepsleep+1848] [pc@C091AF68]
+/kos/src/kernel/core/dev/interrupt.c(1219,5) : C0363211+5[/os/kernel.bin][isr_handler+3] [pc@C091AFC8]
+/kos/src/kernel/core/dev/interrupt.c(1237,1) : C0363201+32[/os/kernel.bin][kernel_isr_specific_0dh+13] [pc@C091AFC8]
+/kos/src/kernel/core/sched/cpu.c(72,16) : C02E8D26+5[/os/kernel.bin][cpu_idlemain+3] [pc@C091AFF8]
+[2025-06-16T18:57:27.654406308:crit  ][2][except] Inconsistent unwind %cs: 0x0 & 0xffff [pc:C0102032]
+[2025-06-16T18:57:27.654655103:crit  ][2][except] Inconsistent unwind %gs: 0xa070 & 0xffff != 0x33 [pc:C0102032]
+[2025-06-16T18:57:27.654963198:crit  ][2][except] Inconsistent unwind %fs: 0x24cd & 0xffff != 0x20 [pc:C0102032]
+[2025-06-16T18:57:27.655183862:crit  ][2][except] Inconsistent unwind %es: 0x4 & 0xffff != 0x53 [pc:C0102032]
+[2025-06-16T18:57:27.655602345:crit  ][2][except] Inconsistent unwind %ds: 0xc000 & 0xffff != 0x53 [pc:C0102032]*/
 1:
 #endif /* !NDEBUG */
 
