@@ -1,8 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-// TODO: Enable optimizations
-//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -27,12 +26,20 @@ gcc_opt.removeif(x -> x.startswith("-O"));
 #define GUARD_LIBVIDEO_GFX_GFX_PALETTIZE_C 1
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
+#include <hybrid/bit.h>
+#include <hybrid/overflow.h>
+
+#include <kos/types.h>
+
+#include <assert.h>
 #include <errno.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -40,9 +47,12 @@ gcc_opt.removeif(x -> x.startswith("-O"));
 #include <string.h>
 
 #include <libvideo/codec/types.h>
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
 #include "gfx-palettize.h"
+#include "gfx.h"
+#include "ram-buffer.h"
 
 
 #undef HAVE_LOG
@@ -65,6 +75,8 @@ union color {
 		video_channel_t a;
 	};
 };
+
+#define round_div(x, y) (((x) + ((y) >> 1)) / (y))
 
 
 
@@ -188,7 +200,6 @@ hist_palettize(struct video_gfx const *__restrict self,
 				for (b = 0; b < HIST_BCOUNT; ++b) {
 					struct hist_bin *bin = &h->h_bins[r][g][b];
 					if (bin->hb_count) {
-#define round_div(x, y) (((x) + ((y) >> 1)) / (y))
 						video_channel_t rlost_avg = round_div(bin->hb_rsum, bin->hb_count);
 						video_channel_t glost_avg = round_div(bin->hb_gsum, bin->hb_count);
 						video_channel_t blost_avg = round_div(bin->hb_bsum, bin->hb_count);
@@ -196,7 +207,6 @@ hist_palettize(struct video_gfx const *__restrict self,
 						video_channel_t final_g = hist_dequantize_g(g) | glost_avg;
 						video_channel_t final_b = hist_dequantize_b(b) | blost_avg;
 						bin->hb_color = VIDEO_COLOR_RGB(final_r, final_g, final_b);
-#undef round_div
 					}
 				}
 			}
@@ -210,6 +220,13 @@ hist_palettize(struct video_gfx const *__restrict self,
 	/* The first "palsize" entries of the histogram are now the palette */
 	if (palsize > (HIST_RCOUNT * HIST_GCOUNT * HIST_BCOUNT))
 		palsize = (HIST_RCOUNT * HIST_GCOUNT * HIST_BCOUNT);
+
+	/* XXX: For small palette sizes, I feel like it would be better
+	 *      to  not  just pick  the  first N  colors,  but instead:
+	 * - Restrict ourselves to the colors that make up the first 75% (or less) of all pixels
+	 * -
+	 *
+	 */
 
 	/* Check if the histogram is usable */
 	if (fail_if_too_many_bins) {
@@ -276,6 +293,247 @@ hist_palettize(struct video_gfx const *__restrict self,
 /************************************************************************/
 /* MEADIAN-CUT PALETTIZATION                                            */
 /************************************************************************/
+#if 1
+typedef uint32_t mc_index_t;
+#else
+typedef size_t mc_index_t;
+#endif
+
+struct median_io {
+	video_color_t (LIBVIDEO_CODEC_CC *mio_getcolor)(void const *cookie, mc_index_t i);
+	void const                       *mio_cookie;
+};
+
+#define median_io_getcolor(self, i) (*(self)->mio_getcolor)((self)->mio_cookie, i)
+
+PRIVATE WUNUSED NONNULL((1, 2)) int __LIBCCALL
+median_cmp_r(void const *_a, void const *_b, void *cookie) {
+	struct median_io const *io = (struct median_io const *)cookie;
+	video_color_t ca = median_io_getcolor(io, *(mc_index_t const *)_a);
+	video_color_t cb = median_io_getcolor(io, *(mc_index_t const *)_b);
+	return (int)VIDEO_COLOR_GET_RED(ca) - (int)VIDEO_COLOR_GET_RED(cb);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) int __LIBCCALL
+median_cmp_g(void const *_a, void const *_b, void *cookie) {
+	struct median_io const *io = (struct median_io const *)cookie;
+	video_color_t ca = median_io_getcolor(io, *(mc_index_t const *)_a);
+	video_color_t cb = median_io_getcolor(io, *(mc_index_t const *)_b);
+	return (int)VIDEO_COLOR_GET_GREEN(ca) - (int)VIDEO_COLOR_GET_GREEN(cb);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) int __LIBCCALL
+median_cmp_b(void const *_a, void const *_b, void *cookie) {
+	struct median_io const *io = (struct median_io const *)cookie;
+	video_color_t ca = median_io_getcolor(io, *(mc_index_t const *)_a);
+	video_color_t cb = median_io_getcolor(io, *(mc_index_t const *)_b);
+	return (int)VIDEO_COLOR_GET_BLUE(ca) - (int)VIDEO_COLOR_GET_BLUE(cb);
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) int __LIBCCALL
+median_cmp_a(void const *_a, void const *_b, void *cookie) {
+	struct median_io const *io = (struct median_io const *)cookie;
+	video_color_t ca = median_io_getcolor(io, *(mc_index_t const *)_a);
+	video_color_t cb = median_io_getcolor(io, *(mc_index_t const *)_b);
+	return (int)VIDEO_COLOR_GET_ALPHA(ca) - (int)VIDEO_COLOR_GET_ALPHA(cb);
+}
+
+PRIVATE ATTR_IN(1) NONNULL((2, 5)) void
+median_cut(struct median_io const *io,
+           mc_index_t *gfx_indices, mc_index_t gfx_start, mc_index_t gfx_end,
+           video_color_t *pal, video_pixel_t pal_index, shift_t depth, shift_t max_depth,
+           video_color_t constant_alpha) {
+	int (__LIBCCALL *compar)(void const *_a, void const *_b, void *cookie);
+	video_channel_t rmin = VIDEO_CHANNEL_MAX, rmax = VIDEO_CHANNEL_MIN;
+	video_channel_t gmin = VIDEO_CHANNEL_MAX, gmax = VIDEO_CHANNEL_MIN;
+	video_channel_t bmin = VIDEO_CHANNEL_MAX, bmax = VIDEO_CHANNEL_MIN;
+	video_channel_t amin = VIDEO_CHANNEL_MAX, amax = VIDEO_CHANNEL_MIN;
+	video_channel_t rrange, grange, brange, arange;
+	uint_fast32_t rsum, gsum, bsum, asum;
+	mc_index_t i, gfx_count, median;
+	if (pal_index >= ((video_pixel_t)1 << max_depth))
+		return;
+	assert(gfx_end >= gfx_start);
+	gfx_count = gfx_end - gfx_start;
+	if (gfx_count <= 0)
+		return;
+
+	/* Calculate average of colors from specified index-range. */
+	rsum = gsum = bsum = asum = 0;
+	LOG("median_cut(%u, %u, %u, %u): START sum\n", gfx_start, gfx_end, pal_index, depth);
+	for (i = gfx_start; i < gfx_end; ++i) {
+		mc_index_t trans_i = gfx_indices[i];
+		video_color_t gfx_color = median_io_getcolor(io, trans_i) | constant_alpha;
+		video_channel_t r = VIDEO_COLOR_GET_RED(gfx_color);
+		video_channel_t g = VIDEO_COLOR_GET_GREEN(gfx_color);
+		video_channel_t b = VIDEO_COLOR_GET_BLUE(gfx_color);
+		video_channel_t a = VIDEO_COLOR_GET_ALPHA(gfx_color);
+#define HANDLE_CHANNEL(x) \
+		if (x##min > x)   \
+			x##min = x;   \
+		if (x##max < x)   \
+			x##max = x;   \
+		x##sum += x
+		HANDLE_CHANNEL(r);
+		HANDLE_CHANNEL(g);
+		HANDLE_CHANNEL(b);
+		HANDLE_CHANNEL(a);
+#undef HANDLE_CHANNEL
+	}
+	LOG("median_cut(%u, %u, %u, %u): END sum\n", gfx_start, gfx_end, pal_index, depth);
+
+	/* Fill in the next palette entry as the average of this range. */
+	{
+		video_channel_t r = round_div(rsum, gfx_count);
+		video_channel_t g = round_div(gsum, gfx_count);
+		video_channel_t b = round_div(bsum, gfx_count);
+		video_channel_t a = round_div(asum, gfx_count);
+		pal[pal_index] = VIDEO_COLOR_RGBA(r, g, b, a);
+	}
+
+	/* Check if we're done now. */
+	if (depth >= max_depth || gfx_count <= 1)
+		return;
+
+	/* Sort indices based on most dominant color channel. */
+	rrange = rmax - rmin;
+	grange = gmax - gmin;
+	brange = bmax - bmin;
+	arange = amax - amin;
+	if (rrange >= grange && rrange >= brange && rrange >= arange) {
+		compar = &median_cmp_r;
+	} else if (grange >= brange && grange >= arange) {
+		compar = &median_cmp_g;
+	} else if (brange >= arange) {
+		compar = &median_cmp_b;
+	} else {
+		compar = &median_cmp_a;
+	}
+
+	LOG("median_cut(%u, %u, %u, %u): START qsort\n", gfx_start, gfx_end, pal_index, depth);
+	qsort_r(gfx_indices + gfx_start, gfx_count,
+	        sizeof(mc_index_t), compar, (void *)io);
+	LOG("median_cut(%u, %u, %u, %u): END qsort\n", gfx_start, gfx_end, pal_index, depth);
+
+	/* Partition at the median and recursive */
+	median = gfx_start + (gfx_count >> 1);
+	median_cut(io, gfx_indices, gfx_start, median, pal,
+	           pal_index * 2 + 1, depth + 1, max_depth, constant_alpha);
+	median_cut(io, gfx_indices, median, gfx_end, pal,
+	           pal_index * 2 + 2, depth + 1, max_depth, constant_alpha);
+}
+
+PRIVATE ATTR_IN(1) NONNULL((2)) void CC
+median_cut_start_impl(struct median_io const *__restrict io,
+                      mc_index_t *gfx_indices, mc_index_t io_pixels,
+                      video_color_t *pal, shift_t pal_depth,
+                      video_color_t constant_alpha) {
+	median_cut(io, gfx_indices, 0, io_pixels, pal,
+	           0, 0, pal_depth, constant_alpha);
+}
+
+PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
+median_io_gfx(void const *cookie, mc_index_t i) {
+	/* Fallback median-cut I/O callback using direct GFX color reads (slow) */
+	struct video_gfx const *self = (struct video_gfx const *)cookie;
+	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
+	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
+	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
+	return (*self->_vx_xops.vgxo_getcolor)(self, x, y);
+}
+
+PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
+median_io_buf(void const *cookie, mc_index_t i) {
+	return ((video_color_t const *)cookie)[i];
+}
+
+PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_CODEC_CC
+video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
+                             struct video_gfx const *__restrict self) {
+	struct video_codec const *result_codec;
+	struct video_gfx gfx = *self;
+	struct video_gfx result_gfx;
+	size_t stride, total;
+	libvideo_gfxhdr_clip(&gfx.vx_hdr, /* Set clip rect to I/O area */
+	                     (video_offset_t)gfx.vx_hdr.vxh_bxmin - video_gfx_getclipx(&gfx),
+	                     (video_offset_t)gfx.vx_hdr.vxh_bymin - video_gfx_getclipy(&gfx),
+	                     gfx.vx_hdr.vxh_bxend - gfx.vx_hdr.vxh_bxmin,
+	                     gfx.vx_hdr.vxh_byend - gfx.vx_hdr.vxh_bymin);
+	result_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
+	if unlikely(!result_codec)
+		goto err;
+	stride = video_gfx_getclipw(&gfx) * 4;
+	total  = video_gfx_getcliph(&gfx) * stride;
+	result->rb_data = (byte_t *)malloc(total);
+	if unlikely(!result->rb_data)
+		goto err;
+	result->rb_stride          = stride;
+	result->rb_total           = total;
+/*	result->vb_refcnt          = 1;*/ /* Unused */
+	result->vb_ops             = &rambuffer_ops;
+	result->vb_format.vf_codec = result_codec;
+	result->vb_format.vf_pal   = NULL;
+	result->vb_size_x          = video_gfx_getclipw(&gfx);
+	result->vb_size_y          = video_gfx_getcliph(&gfx);
+	video_buffer_getgfx(result, &result_gfx,
+	                    GFX_BLENDMODE_OVERRIDE,
+	                    VIDEO_GFX_FNORMAL, 0);
+	video_gfx_blit(&result_gfx, 0, 0, &gfx, 0, 0,
+	               video_gfx_getclipw(&gfx),
+	               video_gfx_getcliph(&gfx));
+	return 0;
+err:
+	return -1;
+}
+
+PRIVATE ATTR_IN(1) NONNULL((2)) void CC
+median_cut_start(struct video_gfx const *__restrict self,
+                 mc_index_t *gfx_indices, mc_index_t io_pixels,
+                 video_color_t *pal, shift_t pal_depth,
+                 video_color_t constant_alpha) {
+	struct median_io io;
+	struct video_rambuffer rgba_buf;
+	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
+	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
+	     *       "self->vx_buffer->vb_format.vf_codec->vc_color2pixel" the
+	     *       produced  palette entries afterwards, and always pass the
+	     *       codec's alpha-mask instead of "constant_alpha". */
+	    self->vx_hdr.vxh_bxmin == 0 &&
+	    self->vx_hdr.vxh_bymin == 0 &&
+	    self->vx_hdr.vxh_bxend == self->vx_buffer->vb_size_x &&
+	    self->vx_hdr.vxh_byend == self->vx_buffer->vb_size_y) {
+		struct video_lock lock;
+		if (video_buffer_rlock(self->vx_buffer, &lock) == 0) {
+			if (lock.vl_stride == (self->vx_hdr.vxh_byend * 4)) {
+				io.mio_cookie = lock.vl_data;
+				io.mio_getcolor = &median_io_buf;
+				median_cut_start_impl(&io, gfx_indices, io_pixels,
+				                      pal, pal_depth, constant_alpha);
+				video_buffer_unlock(self->vx_buffer, &lock);
+				return;
+			}
+			video_buffer_unlock(self->vx_buffer, &lock);
+		}
+	}
+
+	/* Try to convert the I/O area into an RGBA8888 buffer, so we
+	 * can do faster I/O when  it comes to accessing pixel  data. */
+	if (video_gfx_iorect_as_rgba8888(&rgba_buf, self) == 0) {
+		assert(rgba_buf.rb_stride == rgba_buf.vb_size_x * 4);
+		assert(io_pixels == rgba_buf.vb_size_x * rgba_buf.vb_size_y);
+		io.mio_cookie   = rgba_buf.rb_data;
+		io.mio_getcolor = &median_io_buf;
+		median_cut_start_impl(&io, gfx_indices, io_pixels,
+		                      pal, pal_depth, constant_alpha);
+		free(rgba_buf.rb_data);
+		return;
+	}
+
+	io.mio_cookie = self;
+	io.mio_getcolor = &median_io_gfx;
+	median_cut_start_impl(&io, gfx_indices, io_pixels,
+	                      pal, pal_depth, constant_alpha);
+}
 
 /* @param: constant_alpha: Constant alpha addend. Either 0 (include alpha in palette),  or
  *                         `VIDEO_COLOR_ALPHA_MASK' (all palette colors have this as their
@@ -284,9 +542,49 @@ PRIVATE ATTR_NOINLINE WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
 median_cut_palettize(struct video_gfx const *__restrict self,
                      video_pixel_t palsize, video_color_t *pal,
                      video_color_t constant_alpha) {
-	(void)constant_alpha;
-	/* TODO */
-	return hist_palettize(self, palsize, pal, false);
+	/* This works, and it /is/ technically O(n log n), but JEESH; this is still **really** slow...
+	 * XXX: It seems like most time is spent inside qsort() -- given that our libc is still  using
+	 *      a qsort-compatible sorting function (rather than the *real* qsort), replace qsort with
+	 *      a real, compliant impl and see if that speeds things up.
+	 * XXX: If that doesn't end up helping, might just have to live with median_cut being slow,
+	 *      and adjust documentation accordingly. */
+	mc_index_t i, io_pixels, *gfx_indices;
+	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
+	video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
+	shift_t pal_depth;
+	if (OVERFLOW_UMUL(io_sx, io_sy, &io_pixels)) {
+		errno = EOVERFLOW;
+		return -1;
+	}
+
+	/* Figure out how many index bits can fit into the palette.
+	 *
+	 * This may cause some trailing palette entries to go  unused,
+	 * only using those masked by the greatest power-of-2(-1) that
+	 * is still smaller than "palsize" */
+	for (pal_depth = 0; palsize > ((video_pixel_t)1 << pal_depth); ++pal_depth)
+		;
+
+	/* Color index table */
+	gfx_indices = (mc_index_t *)malloc(io_pixels, sizeof(mc_index_t));
+	if unlikely(!gfx_indices)
+		return -1;
+	for (i = 0; i < io_pixels; ++i)
+		gfx_indices[i] = i;
+
+	/* Clear unused palette entries. */
+	{
+		video_pixel_t pal_used = (video_pixel_t)1 << pal_depth;
+		assert(pal_used <= palsize);
+		bzero(pal + pal_used, palsize - pal_used, sizeof(*pal));
+	}
+
+	/* Start doing the median-cut. */
+	median_cut_start(self, gfx_indices, io_pixels, pal,
+	                 pal_depth, constant_alpha);
+
+	free(gfx_indices);
+	return 0;
 }
 
 
@@ -323,7 +621,7 @@ k_means_palettize(struct video_gfx const *__restrict self,
  * @return: -1: [errno=ENOMEM] Insufficient memory for temporaries needed during calculation
  * @return: -1: [errno=EINVAL] Attempted to use "VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA" with
  *                             a  palettization method that doesn't support alpha values.
- * @return: -1: [errno=EINVAL] Invalid `method' */
+ * @return: -1: [errno=EINVAL] Invalid `method' and/or `palsize' */
 INTERN WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
 libvideo_gfx_palettize(struct video_gfx const *__restrict self,
                        video_pixel_t palsize, video_color_t *pal,

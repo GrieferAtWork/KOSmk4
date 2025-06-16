@@ -365,7 +365,7 @@ libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
 	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
-	result->rb_data = (byte_t *)calloc(1, req.vbs_bufsize);
+	result->rb_data = (byte_t *)calloc(req.vbs_bufsize);
 	if unlikely(!result->rb_data)
 		goto err_result;
 	result->rb_stride          = req.vbs_stride;

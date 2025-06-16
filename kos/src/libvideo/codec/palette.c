@@ -431,6 +431,8 @@ libvideo_palette_optimize(REF struct video_palette *__restrict self) {
 		goto done;
 	}
 
+	/* TODO: When "n_chans == 3", it might be even faster to use an "oct-tree" */
+
 	/* Build the K/D tree */
 	p_alloc = self->_vp_tree;
 	root = vp_build_kd_tree(&p_alloc, items, count, 0, n_chans);

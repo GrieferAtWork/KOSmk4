@@ -37,7 +37,7 @@ DECL_BEGIN
  * @return: -1: [errno=ENOMEM] Insufficient memory for temporaries needed during calculation
  * @return: -1: [errno=EINVAL] Attempted to use "VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA" with
  *                             a  palettization method that doesn't support alpha values.
- * @return: -1: [errno=EINVAL] Invalid `method' */
+ * @return: -1: [errno=EINVAL] Invalid `method' and/or `palsize' */
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
 libvideo_gfx_palettize(struct video_gfx const *__restrict self,
                        video_pixel_t palsize, video_color_t *pal,

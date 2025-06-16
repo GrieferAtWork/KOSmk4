@@ -400,7 +400,7 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
  * - "k": The given `__palsize' */
 #define VIDEO_GFX_PALETTIZE_METHOD_AUTO       0x0000 /* Automatically determine palettization method */
 #define VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM  0x0001 /* Fastest (O(n + k)), but very bad results when `self' uses many different colors */
-#define VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT 0x0002 /* Medium-speed (O(n log n)), but good enough decent results for most cases */
+#define VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT 0x0002 /* Medium-speed (O(n log n)), but good enough decent results for most cases; Only usable for 2^N palette sizes */
 #define VIDEO_GFX_PALETTIZE_METHOD_K_MEANS    0x0a03 /* Slowest (O(n * k * max_iters=10)), but best results; Never used automatically */
 #define VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA    0x0080 /* Flag: Include  alpha  values in  the  produced palette.
                                                       * Not supported by `VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM' */
@@ -414,7 +414,7 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
  * @return: -1: [errno=ENOMEM] Insufficient memory for temporaries needed during calculation
  * @return: -1: [errno=EINVAL] Attempted to use "VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA" with
  *                             a  palettization method that doesn't support alpha values.
- * @return: -1: [errno=EINVAL] Invalid `method' */
+ * @return: -1: [errno=EINVAL] Invalid `method' and/or `palsize' */
 typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUTS_T(3, 2) int
 (LIBVIDEO_GFX_CC *PVIDEO_GFX_PALETTIZE)(struct video_gfx const *__restrict __self,
                                         video_pixel_t __palsize, video_color_t *__pal,

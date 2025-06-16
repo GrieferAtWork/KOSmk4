@@ -141,7 +141,7 @@ dump_buffer_specs(struct video_buffer *buf,
 }
 
 static REF struct video_buffer *
-palettize(struct video_buffer *self, video_pixel_t num_colors) {
+palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int method) {
 	struct video_gfx gfx;
 	struct video_gfx result_gfx;
 	REF struct video_palette *pal;
@@ -160,8 +160,7 @@ palettize(struct video_buffer *self, video_pixel_t num_colors) {
 	                    VIDEO_GFX_FNORMAL, 0);
 
 	/* Palettize source video buffer and store results in "pal" */
-	if unlikely(video_gfx_palettize(&gfx, num_colors, pal->vp_pal,
-	                                 VIDEO_GFX_PALETTIZE_METHOD_AUTO))
+	if unlikely(video_gfx_palettize(&gfx, num_colors, pal->vp_pal, method))
 		goto err_pal;
 	pal = video_palette_optimize(pal);
 
@@ -233,7 +232,8 @@ int main(int argc, char *argv[]) {
 	/* Palettize "image" */
 	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
 		struct video_buffer *new_image;
-		new_image = palettize(image, 256);
+//		new_image = palettize(image, 16, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
+		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
 		if likely(new_image) {
 			video_buffer_decref(image);
 			image = new_image;
@@ -241,7 +241,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0 /* For debugging the same-format blit-scretch function */
+#if 0 /* For debugging the same-format blit-stretch function */
 	image = video_buffer_convert(image,
 	                             screen_buffer_asvideo(screen)->vb_format.vf_codec,
 	                             screen_buffer_asvideo(screen)->vb_format.vf_pal,
