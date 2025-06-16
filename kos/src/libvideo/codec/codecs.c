@@ -113,7 +113,7 @@ LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel2_inbyte_msb(byte_t const *__restrict byte,
                      shift_t shift) {
 	assert(shift < 4);
-	return (*byte >> (7 - (shift * 2))) & 3;
+	return (*byte >> (6 - (shift * 2))) & 3;
 }
 
 LOCAL NONNULL((1)) void CC
@@ -136,7 +136,7 @@ setpixel2_inbyte_msb(byte_t *__restrict byte,
 	byte_t newbyte;
 	assert(shift < 4);
 	newbyte = *byte;
-	shift = (shift_t)(7 - (shift * 2));
+	shift = (shift_t)(6 - (shift * 2));
 	newbyte &= ~(3 << shift);
 	newbyte |= ((u8)(pixel & 3) << shift);
 	*byte = newbyte;
@@ -153,7 +153,7 @@ LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel4_inbyte_msb(byte_t const *__restrict byte,
                      shift_t shift) {
 	assert(shift < 2);
-	return (*byte >> (7 - (shift * 4))) & 7;
+	return (*byte >> (4 - (shift * 4))) & 7;
 }
 
 LOCAL NONNULL((1)) void CC
@@ -176,7 +176,7 @@ setpixel4_inbyte_msb(byte_t *__restrict byte,
 	byte_t newbyte;
 	assert(shift < 2);
 	newbyte = *byte;
-	shift = (shift_t)(7 - (shift * 4));
+	shift = (shift_t)(4 - (shift * 4));
 	newbyte &= ~(7 << shift);
 	newbyte |= ((u8)(pixel & 7) << shift);
 	*byte = newbyte;
