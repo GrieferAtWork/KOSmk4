@@ -33,9 +33,11 @@ gcc_opt.removeif(x -> x.startswith("-O"));
 
 #include <hybrid/compiler.h>
 
+#include <errno.h>
 #include <malloc.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
@@ -264,6 +266,50 @@ hist_palettize(struct video_gfx const *__restrict self,
 
 
 
+
+
+/************************************************************************/
+/* MEADIAN-CUT PALETTIZATION                                            */
+/************************************************************************/
+
+/* @param: constant_alpha: Constant alpha addend. Either 0 (include alpha in palette),  or
+ *                         `VIDEO_COLOR_ALPHA_MASK' (all palette colors have this as their
+ *                         alpha) */
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
+median_cut_palettize(struct video_gfx const *__restrict self,
+                     video_pixel_t palsize, video_color_t *pal,
+                     video_color_t constant_alpha) {
+	(void)constant_alpha;
+	/* TODO */
+	return hist_palettize(self, palsize, pal, false);
+}
+
+
+
+
+
+
+/************************************************************************/
+/* K-MEANS PALETTIZATION                                                */
+/************************************************************************/
+
+/* @param: constant_alpha: Constant alpha addend. Either 0 (include alpha in palette),  or
+ *                         `VIDEO_COLOR_ALPHA_MASK' (all palette colors have this as their
+ *                         alpha) */
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
+k_means_palettize(struct video_gfx const *__restrict self,
+                  video_pixel_t palsize, video_color_t *pal,
+                  video_color_t constant_alpha) {
+	(void)constant_alpha;
+	/* TODO */
+	return hist_palettize(self, palsize, pal, false);
+}
+
+
+
+
+
+
 /* Construct a (visually pleasing) palette from the pixel area denoted
  * by the I/O region of `self'. The produced palette is stored in  the
  * provided buffer `pal' and consists of exactly `palsize' colors.
@@ -277,17 +323,52 @@ INTERN WUNUSED ATTR_IN(1) ATTR_OUTS(3, 2) int CC
 libvideo_gfx_palettize(struct video_gfx const *__restrict self,
                        video_pixel_t palsize, video_color_t *pal,
                        unsigned int method) {
-	/* NOTE: when "method" is "AUTO", do this:
-	 * - Try to use "VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM"
-	 * - Move on to "VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT" if
-	 *   it turns out the histogram  covers too little of  the
-	 *   image's color space. */
+	/* Check for special case: empty palette / GFX I/O area */
+	if unlikely(!palsize)
+		goto empty_pal;
+	if unlikely(self->vx_hdr.vxh_bxmin >= self->vx_hdr.vxh_bxend)
+		goto empty_io;
+	if unlikely(self->vx_hdr.vxh_bymin >= self->vx_hdr.vxh_byend)
+		goto empty_io;
 
-	(void)method;
-	/* TODO: median-cut impl */
-	/* TODO: k-means impl */
+	switch (method) {
+	case VIDEO_GFX_PALETTIZE_METHOD_AUTO: {
+		/* When "method" is "AUTO", do this:
+		 * - Try to use "VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM"
+		 * - Move on to "VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT" if
+		 *   it turns out the histogram  covers too little of  the
+		 *   image's color space. */
+		int hist_status = hist_palettize(self, palsize, pal, true);
+		if (hist_status != 1)
+			return hist_status;
+	}	ATTR_FALLTHROUGH
+	case VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT:
+		return median_cut_palettize(self, palsize, pal, VIDEO_COLOR_ALPHA_MASK);
 
-	return hist_palettize(self, palsize, pal, false);
+	case VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM:
+		return hist_palettize(self, palsize, pal, false);
+
+		/* Since HIST doesn't support alpha, treat AUTO+ALPHA like MEDIAN_CUT+ALPHA */
+	case VIDEO_GFX_PALETTIZE_METHOD_AUTO | VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA:
+	case VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT | VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA:
+		return median_cut_palettize(self, palsize, pal, 0);
+
+	case VIDEO_GFX_PALETTIZE_METHOD_K_MEANS:
+		return k_means_palettize(self, palsize, pal, VIDEO_COLOR_ALPHA_MASK);
+
+	case VIDEO_GFX_PALETTIZE_METHOD_K_MEANS | VIDEO_GFX_PALETTIZE_METHOD_F_ALPHA:
+		return k_means_palettize(self, palsize, pal, 0);
+
+	default: break;
+	}
+
+	/* Unsupported palettization method. */
+	errno = EINVAL;
+	return -1;
+empty_io:
+	bzero(pal, palsize, sizeof(*pal));
+empty_pal:
+	return 0;
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_palettize, libvideo_gfx_palettize);
