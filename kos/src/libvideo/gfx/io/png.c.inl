@@ -302,6 +302,7 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 			                                      png_palette[pal_i].blue);
 			result_pal->vp_pal[pal_i] = color;
 		}
+		result_pal = video_palette_optimize(result_pal);
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */

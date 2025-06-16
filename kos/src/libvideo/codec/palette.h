@@ -51,16 +51,18 @@ INTDEF WUNUSED REF struct video_palette *CC
 libvideo_palette_create(size_t count);
 
 
-/* Return the best-matching pixel for a given color.
- * For  the purpose  of determining  the best  match, this algorithm
- * leans towards emphasizing  colors best viewed  by the human  eye,
- * thus producing the best-looking results for those bipedal fellas.
- * NOTE: This function may lazily allocate `self->vp_cache', meaning
- *       that once  used, the  caller is  responsible to  eventually
- *       cleanup that field using `free(self->vp_cache)'. */
-INTDEF WUNUSED NONNULL((1)) video_pixel_t CC
-libvideo_palette_getpixel(struct video_palette *__restrict self,
-                          video_color_t color);
+/* Optimize lookup times for `self', making `self->vp_color2pixel'
+ * execute in sub-linear time (if possible). This function must be
+ * called whenever `vp_pal' was  modified, and was called  before.
+ * Prior  to being called, `self->vp_color2pixel' still works, but
+ * executed in linear time (so you really want to call this one to
+ * speed up palette lookups)
+ *
+ * This  function  is NOT  thread-safe,  so `self->vp_color2pixel'
+ * must not be called by other threads until this function returns
+ * @return: * : The optimized color palette */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *CC
+libvideo_palette_optimize(REF struct video_palette *__restrict self);
 
 
 DECL_END

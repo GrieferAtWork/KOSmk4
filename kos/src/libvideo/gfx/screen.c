@@ -204,7 +204,7 @@ svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 		result->vp_pal[i] = vcolor;
 	}
 	freea(colors);
-	return result;
+	return video_palette_optimize(result);
 err:
 	return NULL;
 }

@@ -564,6 +564,7 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 				result_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		}
+		result_pal = video_palette_optimize(result_pal);
 	} else {
 		/* Color-mask-driven format */
 		out_specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;

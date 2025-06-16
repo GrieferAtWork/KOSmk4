@@ -34,14 +34,18 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-struct video_palette_cache;
+struct video_palette_tree;
 struct video_palette {
+	/* [1..1][const] Translate a color into the closest palette index. */
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
+	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_color2pixel)(struct video_palette const *__restrict self,
+	                                               video_color_t color);
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
 	__ATTR_NONNULL_T((1)) void
 	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                            vp_refcnt; /* Reference counter. */
-	struct video_palette_cache            *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
-	__size_t                               vp_cnt;    /* [const] # of colors (must be >= what is required by the associated codec) */
+	struct video_palette_tree            *_vp_tree;   /* [0..1] Internal cache used by `video_palette_optimize()' */
+	video_pixel_t                          vp_cnt;    /* [const] # of colors (must be >= what is required by the associated codec) */
 	COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [vp_cnt] Palette colors */
 };
 
@@ -77,19 +81,30 @@ LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __REF struct video_palette *
 LIBVIDEO_CODEC_CC video_palette_create(__size_t __count);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
+/* Optimize lookup times for `self', making `self->vp_color2pixel'
+ * execute in sub-linear time (if possible). This function must be
+ * called whenever `vp_pal' was  modified, and was called  before.
+ * Prior  to being called, `self->vp_color2pixel' still works, but
+ * executed in linear time (so you really want to call this one to
+ * speed up palette lookups)
+ *
+ * This  function  is NOT  thread-safe,  so `self->vp_color2pixel'
+ * must not be called by other threads until this function returns
+ * @return: * : The optimized color palette */
+typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_palette *
+(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_OPTIMIZE)(__REF struct video_palette *__restrict self);
+#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
+LIBVIDEO_CODEC_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_palette *LIBVIDEO_CODEC_CC
+video_palette_optimize(__REF struct video_palette *__restrict self);
+#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+
 /* Return the best-matching pixel for a given color.
  * For  the purpose  of determining  the best  match, this algorithm
  * leans towards emphasizing  colors best viewed  by the human  eye,
- * thus producing the best-looking results for those bipedal fellas.
- * NOTE: This function may lazily allocate `self->vp_cache', meaning
- *       that once  used, the  caller is  responsible to  eventually
- *       cleanup that field using `free(self->vp_cache)'. */
-typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_GETPIXEL)(struct video_palette *__restrict self, video_color_t color);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t LIBVIDEO_CODEC_CC
-video_palette_getpixel(struct video_palette *__restrict self, video_color_t color);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+ * thus producing the best-looking results for those bipedal fellas. */
+#define video_palette_getpixel(self, color) \
+	((*(self)->vp_color2pixel)(self, color))
+
 
 __DECL_END
 #endif /* __CC__ */

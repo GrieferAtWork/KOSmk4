@@ -1966,15 +1966,14 @@ pal_pixel2color(struct video_format const *__restrict format,
 	return pal->vp_pal[pixel];
 }
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-pal_color2pixel(struct video_format const *__restrict format,
-                video_color_t color) {
-	struct video_palette *pal;
-	assert(format);
-	pal = format->vf_pal;
-	assert(pal);
-	return libvideo_palette_getpixel(pal, color);
+#define pal_color2pixel(format, color) \
+	video_palette_getpixel(format->vf_pal, color)
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
+(CC pal_color2pixel)(struct video_format const *__restrict format,
+                     video_color_t color) {
+	return video_palette_getpixel(format->vf_pal, color);
 }
+
 
 #define paletN_tocolor(v, n) (pal_pixel2color(format, v) & ~VIDEO_COLOR_ALPHA_MASK)
 #define palet1_tocolor(v)    paletN_tocolor(v, 1)
