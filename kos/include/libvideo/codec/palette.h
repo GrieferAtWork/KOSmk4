@@ -58,6 +58,16 @@ struct video_palette {
 __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy)
 
 
+/* Return the best-matching pixel for a given color.
+ * For  the purpose  of determining  the best  match, this algorithm
+ * leans towards emphasizing  colors best viewed  by the human  eye,
+ * thus producing the best-looking results for those bipedal fellas. */
+#define video_palette_getpixel(self, color) \
+	((*(self)->vp_color2pixel)(self, color))
+#define video_palette_getcolor(self, pixel) \
+	(__likely((pixel) < (self)->vp_cnt) ? (self)->vp_pal[pixel] : VIDEO_COLOR_RGB(0, 0, 0))
+
+
 /* Create a new (uninitialized) palette for `__count' colors.
  *
  * This function is allowed to allocate a larger palette  than
@@ -75,10 +85,10 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy
  * @return: * :   The newly created palette
  * @return: NULL: Out of memory */
 typedef __ATTR_WUNUSED __REF struct video_palette *
-(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_CREATE)(__size_t __count);
+(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_CREATE)(video_pixel_t __count);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __REF struct video_palette *
-LIBVIDEO_CODEC_CC video_palette_create(__size_t __count);
+LIBVIDEO_CODEC_CC video_palette_create(video_pixel_t __count);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
 
 /* Optimize lookup times for `self', making `self->vp_color2pixel'
@@ -97,13 +107,6 @@ typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct vide
 LIBVIDEO_CODEC_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_palette *LIBVIDEO_CODEC_CC
 video_palette_optimize(__REF struct video_palette *__restrict self);
 #endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
-
-/* Return the best-matching pixel for a given color.
- * For  the purpose  of determining  the best  match, this algorithm
- * leans towards emphasizing  colors best viewed  by the human  eye,
- * thus producing the best-looking results for those bipedal fellas. */
-#define video_palette_getpixel(self, color) \
-	((*(self)->vp_color2pixel)(self, color))
 
 
 __DECL_END

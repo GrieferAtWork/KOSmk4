@@ -1957,13 +1957,8 @@ DEFINE_FORMAT_CONVERTER_RGB(bgr565, u16, 5, 6, 5, (
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
 pal_pixel2color(struct video_format const *__restrict format,
                 video_pixel_t pixel) {
-	struct video_palette *pal;
-	assert(format);
-	pal = format->vf_pal;
-	assert(pal);
-	if unlikely(pixel >= pal->vp_cnt)
-		return VIDEO_COLOR_RGB(0, 0, 0);
-	return pal->vp_pal[pixel];
+	struct video_palette *pal = format->vf_pal;
+	return video_palette_getcolor(pal, pixel);
 }
 
 #define pal_color2pixel(format, color) \

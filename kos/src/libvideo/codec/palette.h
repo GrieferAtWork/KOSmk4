@@ -48,7 +48,7 @@ DECL_BEGIN
  * @return: * :   The newly created palette
  * @return: NULL: Out of memory */
 INTDEF WUNUSED REF struct video_palette *CC
-libvideo_palette_create(size_t count);
+libvideo_palette_create(video_pixel_t count);
 
 
 /* Optimize lookup times for `self', making `self->vp_color2pixel'
