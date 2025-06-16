@@ -77,19 +77,22 @@ union color {
 #define HIST_USE_32BIT_COUNT
 #endif
 
+/* # of color bits encoded as index into histogram */
 #define HIST_RBITS 5
 #define HIST_GBITS 5
 #define HIST_BBITS 5
 
+/* # of color bits lost during histogram index encode (aka. quantization) */
 #define HIST_RLOST (8 - HIST_RBITS)
 #define HIST_GLOST (8 - HIST_GBITS)
 #define HIST_BLOST (8 - HIST_BBITS)
 
+/* # of distinct channel values representable in histogram indices. */
 #define HIST_RCOUNT (1 << HIST_RBITS)
 #define HIST_GCOUNT (1 << HIST_GBITS)
 #define HIST_BCOUNT (1 << HIST_BBITS)
 
-/* Quantize / dequantize color channels */
+/* Quantize / de-quantize color channels */
 #define hist_quantize_r(r)   ((r) >> HIST_RLOST)
 #define hist_quantize_g(g)   ((g) >> HIST_RLOST)
 #define hist_quantize_b(b)   ((b) >> HIST_RLOST)
@@ -155,8 +158,10 @@ hist_palettize(struct video_gfx const *__restrict self,
 	struct hist *h = (struct hist *)calloc(sizeof(struct hist));
 	if unlikely(!h)
 		return -1;
-	for (y = self->vx_hdr.vxh_bymin; y < self->vx_hdr.vxh_byend; ++y) {
-		for (x = self->vx_hdr.vxh_bxmin; x < self->vx_hdr.vxh_bxend; ++x) {
+	y = self->vx_hdr.vxh_bymin;
+	do {
+		x = self->vx_hdr.vxh_bxmin;
+		do {
 			struct hist_bin *bin;
 			union color c;
 			c.c = (*self->_vx_xops.vgxo_getcolor)(self, x, y);
@@ -167,8 +172,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 			bin->hb_rsum += hist_remainder_r(c.r);
 			bin->hb_gsum += hist_remainder_r(c.g);
 			bin->hb_bsum += hist_remainder_r(c.b);
-		}
-	}
+		} while (++x < self->vx_hdr.vxh_bxend);
+	} while (++y < self->vx_hdr.vxh_byend);
 
 	/* Finalize histogram (re-add lost color bits).
 	 *
