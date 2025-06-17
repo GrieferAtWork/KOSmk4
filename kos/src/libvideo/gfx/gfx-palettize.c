@@ -223,10 +223,18 @@ hist_palettize(struct video_gfx const *__restrict self,
 
 	/* XXX: For small palette sizes, I feel like it would be better
 	 *      to  not  just pick  the  first N  colors,  but instead:
-	 * - Restrict ourselves to the colors that make up the first 75% (or less) of all pixels
-	 * -
+	 * #1 Take the most prominent color from the histogram and add it to the palette.
+	 * #2 while the palette isn't full:
+	 *    #2.1 Find  the  color "h"  from  the histogram  with  the greatest
+	 *         >> h.hb_count * min(for (c: palette) distance(c, h.hb_color))
+	 *    #2.2 Add this color "h" to the palette
 	 *
-	 */
+	 * Possibly do something to the "h.hb_count" in the above  multiply,
+	 * as it is the weight by how often a color is used, and I feel like
+	 * this can be made better  by a curve with  a ceiling equal to  the
+	 * number of pixels within the image's  I/O region. iow: a bin  with
+	 * a count of  100 should maybe  only multiply the  value by 2x  the
+	 * factor of a bin with a count of 10. */
 
 	/* Check if the histogram is usable */
 	if (fail_if_too_many_bins) {
@@ -360,7 +368,7 @@ median_cut(struct median_io const *io,
 
 	/* Calculate average of colors from specified index-range. */
 	rsum = gsum = bsum = asum = 0;
-	LOG("median_cut(%u, %u, %u, %u): START sum\n", gfx_start, gfx_end, pal_index, depth);
+//	LOG("median_cut(%u, %u, %u, %u): START sum\n", gfx_start, gfx_end, pal_index, depth);
 	for (i = gfx_start; i < gfx_end; ++i) {
 		mc_index_t trans_i = gfx_indices[i];
 		video_color_t gfx_color = median_io_getcolor(io, trans_i) | constant_alpha;
@@ -380,7 +388,7 @@ median_cut(struct median_io const *io,
 		HANDLE_CHANNEL(a);
 #undef HANDLE_CHANNEL
 	}
-	LOG("median_cut(%u, %u, %u, %u): END sum\n", gfx_start, gfx_end, pal_index, depth);
+//	LOG("median_cut(%u, %u, %u, %u): END sum\n", gfx_start, gfx_end, pal_index, depth);
 
 	/* Fill in the next palette entry as the average of this range. */
 	{
@@ -410,10 +418,10 @@ median_cut(struct median_io const *io,
 		compar = &median_cmp_a;
 	}
 
-	LOG("median_cut(%u, %u, %u, %u): START qsort\n", gfx_start, gfx_end, pal_index, depth);
+//	LOG("median_cut(%u, %u, %u, %u): START qsort\n", gfx_start, gfx_end, pal_index, depth);
 	qsort_r(gfx_indices + gfx_start, gfx_count,
 	        sizeof(mc_index_t), compar, (void *)io);
-	LOG("median_cut(%u, %u, %u, %u): END qsort\n", gfx_start, gfx_end, pal_index, depth);
+//	LOG("median_cut(%u, %u, %u, %u): END qsort\n", gfx_start, gfx_end, pal_index, depth);
 
 	/* Partition at the median and recursive */
 	median = gfx_start + (gfx_count >> 1);
@@ -428,8 +436,28 @@ median_cut_start_impl(struct median_io const *__restrict io,
                       mc_index_t *gfx_indices, mc_index_t io_pixels,
                       video_color_t *pal, shift_t pal_depth,
                       video_color_t constant_alpha) {
+#if 1
 	median_cut(io, gfx_indices, 0, io_pixels, pal,
 	           0, 0, pal_depth, constant_alpha);
+#else
+	for (;;) {
+		struct timeval start, end;
+		mc_index_t i;
+		for (i = 0; i < io_pixels; ++i)
+			gfx_indices[i] = i;
+		gettimeofday(&start, NULL);
+		median_cut(io, gfx_indices, 0, io_pixels, pal,
+		           0, 0, pal_depth, constant_alpha);
+		gettimeofday(&end, NULL);
+		uint64_t total = end.tv_sec - start.tv_sec;
+		total *= 1000000;
+		total += end.tv_usec;
+		total -= start.tv_usec;
+		syslog(LOG_DEBUG, "runtime: %u.%06u\n",
+		       (unsigned int)(total / 1000000),
+		       (unsigned int)(total % 1000000));
+	}
+#endif
 }
 
 PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
@@ -543,11 +571,19 @@ median_cut_palettize(struct video_gfx const *__restrict self,
                      video_pixel_t palsize, video_color_t *pal,
                      video_color_t constant_alpha) {
 	/* This works, and it /is/ technically O(n log n), but JEESH; this is still **really** slow...
-	 * XXX: It seems like most time is spent inside qsort() -- given that our libc is still  using
-	 *      a qsort-compatible sorting function (rather than the *real* qsort), replace qsort with
-	 *      a real, compliant impl and see if that speeds things up.
-	 * XXX: If that doesn't end up helping, might just have to live with median_cut being slow,
-	 *      and adjust documentation accordingly. */
+	 * Q: It seems like most time is spent inside qsort() -- given that our libc is still  using
+	 *    a qsort-compatible sorting function (rather than the *real* qsort), replace qsort with
+	 *    a real, compliant impl and see if that speeds things up.
+	 * A: I tried by briefly copying some other qsort impls and pasting them at the top of  this
+	 *    file, but that didn't end up making this any faster. For my test image (1431x2048) and
+	 *    a  palette size of 64 colors, this **always** takes ~2.75sec, no matter what I do with
+	 *    qsort...
+	 *
+	 * TODO: Do a more scientific test of performance by comparing my qsort against
+	 *       glibc, both running on an actual linux machine, rather than within KOS
+	 * TODO: See if I can dig up someone else's median-cut impl somewhere and compare
+	 *       its speed against mine (maybe mine just sucks?)
+	 * TODO: Live with median_cut being slow, and adjust documentation accordingly. */
 	mc_index_t i, io_pixels, *gfx_indices;
 	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
 	video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
