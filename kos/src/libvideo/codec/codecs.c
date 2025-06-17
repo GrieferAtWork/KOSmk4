@@ -2227,8 +2227,9 @@ buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
 }
 
 
-/* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-INTERN ATTR_CONST WUNUSED struct video_codec const *CC
+/* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
+ * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
+INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec) {
 #define UNPACK_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
 	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, rmask, gmask, bmask, amask }

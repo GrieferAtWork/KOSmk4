@@ -42,7 +42,16 @@
 #include <__stdcxx.h>
 #endif /* __cplusplus */
 
-/* Video buffer types. */
+/* Video buffer types:
+ * AUTO: Type doesn't matter, and is even allowed to change randomly
+ * RAM:  Ram buffer. GFX ops are software-driven, and execute synchronously
+ * GPU:  V-RAM backed, or  otherwise hardware accelerated  (or maybe  not).
+ *       The big  semantic difference  is that  GPU operations  can  happen
+ *       asynchronously  (and possibly using  hardware). This usually never
+ *       shows itself in APIs, since all pixel read-operations will  always
+ *       block until any pending writes of that pixel (or buffer) are done,
+ *       though since special V-RAM may be used, acquiring a video lock  to
+ *       the underlying  memory may  arbitrarily fail  for various  reason. */
 #define VIDEO_BUFFER_AUTO 0x0000 /* Type doesn't matter. */
 #define VIDEO_BUFFER_RAM  0x0001 /* RAM buffer. */
 #define VIDEO_BUFFER_GPU  0x0002 /* GPU buffer. */
