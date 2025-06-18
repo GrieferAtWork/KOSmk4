@@ -317,59 +317,36 @@ libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx const *__restrict self,
                                        video_pixel_t pixel,
                                        struct video_bitmask const *__restrict bm) {
 	uintptr_t bitskip = bm->vbm_skip;
+	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
+	bitmask += bitskip / NBBY;
+	bitskip = bitskip % NBBY;
 	do {
-		video_dim_t x = 0;
-		uintptr_t row_bitskip = bitskip;
-		byte_t const *row = (byte_t const *)bm->vbm_mask;
-		do {
-			video_dim_t count;
-			byte_t byte;
-			shift_t bits;
-			if (row_bitskip >= NBBY) {
-				row += row_bitskip / NBBY;
-				row_bitskip %= NBBY;
-			}
-			byte = *row;
-			bits = NBBY - row_bitskip;
-
-			/* Skip over 0-bits */
-			for (;;) {
-				--bits;
-				++row_bitskip;
-				if (byte & ((byte_t)1 << bits))
-					break;
-				++x;
-				if (x >= size_x)
-					goto next_row;
-				if (!bits) {
-					++row;
-					row_bitskip = 0;
-					bits = NBBY;
-				}
-			}
-
-			/* Count consecutive 1-bits */
-			count = 1;
-			while ((x + count) < size_x) {
-				if (!bits) {
-					++row;
-					row_bitskip = 0;
-					bits = NBBY;
-				}
-				--bits;
-				if (!(byte & ((byte_t)1 << bits)))
-					break;
-				++row_bitskip;
-				++count;
-			}
-
-			do {
+		video_dim_t x;
+		uintptr_t row_bitskip;
+		byte_t const *row;
+		byte_t byte;
+		shift_t bits;
+		row_bitskip = bitskip;
+		row = bitmask;
+		byte = *row;
+		bits = NBBY - row_bitskip;
+		for (x = 0;;) {
+			--bits;
+			++row_bitskip;
+			if (byte & ((byte_t)1 << bits))
 				video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
-				++x;
-			} while (--count);
-		} while (x < size_x);
-next_row:
+			++x;
+			if (x >= size_x)
+				break;
+			if (!bits) {
+				byte = *++row;
+				row_bitskip = 0;
+				bits = NBBY;
+			}
+		}
 		bitskip += bm->vbm_scan;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
 		++dst_y;
 	} while (--size_y);
 }
