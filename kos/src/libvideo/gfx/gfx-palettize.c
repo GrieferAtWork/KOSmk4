@@ -255,29 +255,25 @@ hist_palettize(struct video_gfx const *__restrict self,
 		}
 	}
 
-	/* Write the histogram to the output palette */
+	/* Log info about how good the histogram is */
+#ifdef HAVE_LOG
 	{
 		video_pixel_t i;
-#ifdef HAVE_LOG
 		uint64_t pal_pixels_adj;
 		size_t pal_pixels = 0;
 		video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
 		video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
 		size_t io_pixels  = (size_t)io_sx * io_sy;
-#endif /* HAVE_LOG */
 		for (i = 0; i < palsize; ++i) {
-			pal[i] = h->h_colors[i].hb_color;
+			video_color_t c = h->h_colors[i].hb_color;
 			LOG("hist[%3u] = {%#.2I8x,%#.2I8x,%#.2I8x} x%u\n",
 			    (unsigned int)i,
-			    VIDEO_COLOR_GET_RED(pal[i]),
-			    VIDEO_COLOR_GET_GREEN(pal[i]),
-			    VIDEO_COLOR_GET_BLUE(pal[i]),
+			    VIDEO_COLOR_GET_RED(c),
+			    VIDEO_COLOR_GET_GREEN(c),
+			    VIDEO_COLOR_GET_BLUE(c),
 			    (unsigned int)h->h_colors[i].hb_count);
-#ifdef HAVE_LOG
 			pal_pixels += h->h_colors[i].hb_count;
-#endif /* HAVE_LOG */
 		}
-#ifdef HAVE_LOG
 		pal_pixels_adj = pal_pixels;
 		pal_pixels_adj *= 100 * 10000;
 		pal_pixels_adj /= io_pixels;
@@ -286,7 +282,14 @@ hist_palettize(struct video_gfx const *__restrict self,
 		    (unsigned int)(pal_pixels_adj % 10000),
 		    (unsigned int)pal_pixels,
 		    (unsigned int)io_pixels);
+	}
 #endif /* HAVE_LOG */
+
+	/* Write the histogram to the output palette */
+	{
+		video_pixel_t i;
+		for (i = 0; i < palsize; ++i)
+			pal[i] = h->h_colors[i].hb_color;
 	}
 
 	free(h);

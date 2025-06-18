@@ -232,8 +232,8 @@ int main(int argc, char *argv[]) {
 	/* Palettize "image" */
 	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
 		struct video_buffer *new_image;
-//		new_image = palettize(image, 16, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
-		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
+		new_image = palettize(image, 128, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
+//		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
 		if likely(new_image) {
 			video_buffer_decref(image);
 			image = new_image;

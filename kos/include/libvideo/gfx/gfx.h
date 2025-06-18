@@ -368,6 +368,8 @@ struct video_gfx_ops {
 	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                      struct video_bitmask const *__restrict __bm);
 
+	/* TODO: Operators for doing color gradient fills (with up to 4 different colors for every corner) */
+
 	/* More driver-specific operators go here... */
 };
 
