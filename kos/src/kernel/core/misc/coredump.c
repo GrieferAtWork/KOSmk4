@@ -104,12 +104,14 @@ dbg_coredump(void const *const *traceback_vector,
 	/* We are now in debugger-mode. */
 
 	/* Determine if "unwind_error" / "reason" is indicative of a trap */
-	if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
-		void const *trap_pc  = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
-		void const *fault_pc = reason->ci_except.e_faultaddr;
-		dbg_rt_trapstate_istrap = (trap_pc == fault_pc);
-	} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
-		/* TODO: Signals can trap! */
+	if (reason) {
+		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
+			void const *trap_pc  = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
+			void const *fault_pc = reason->ci_except.e_faultaddr;
+			dbg_rt_trapstate_istrap = (trap_pc == fault_pc);
+		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
+			/* TODO: Signals can trap! */
+		}
 	}
 
 	dbg_savecolor();
