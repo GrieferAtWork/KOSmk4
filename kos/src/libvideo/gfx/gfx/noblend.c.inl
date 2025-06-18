@@ -362,8 +362,9 @@ libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self,
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
 	TRACE_START("noblend__bitfill("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "color: %#" PRIxCOL ", bm: %p)\n",
-	            dst_x, dst_y, size_x, size_y, color, bm);
+	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR "\n",
+	            dst_x, dst_y, size_x, size_y, color,
+	            bm->vbm_mask, bm->vbm_skip);
 	if likely(buffer->wlock(lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
@@ -499,8 +500,9 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 	TRACE_START("noblend_samefmt__bitblit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
-	            dst_x, dst_y, src_x, src_y, size_x, size_y, bm);
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR "\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y,
+	            bm->vbm_mask, bm->vbm_skip);
 	if likely(dst_buffer->wlock(dst_lock) == 0) {
 		struct video_lock src_lock;
 		struct video_buffer *src_buffer = self->vb_src->vx_buffer;

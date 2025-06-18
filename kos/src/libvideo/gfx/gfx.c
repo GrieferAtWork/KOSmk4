@@ -908,8 +908,8 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
 	}
 	TRACE_START("generic__bitfill("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "color: %#" PRIxCOL ", bm: %p)\n",
-	            dst_x, dst_y, size_x, size_y, color, bm);
+	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ")\n",
+	            dst_x, dst_y, size_x, size_y, color, bm->vbm_mask, bm->vbm_skip);
 	bitskip = bm->vbm_skip;
 	do {
 		video_dim_t x = 0;
@@ -1038,9 +1038,9 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
 	TRACE_START("generic__bitstretchfill_l("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", "
-	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
-	            color, src_size_x_, src_size_y_, bm);
+	            color, src_size_x_, src_size_y_, bm->vbm_mask, bm->vbm_skip);
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   bitskip_, 0, src_size_x_, src_size_y_,
 	                   bitmask_blend_xmin_ymin,
@@ -1090,9 +1090,9 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self,
 	TRACE_START("generic__bitstretchfill_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", "
-	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
-	            color, src_size_x, src_size_y, bm);
+	            color, src_size_x, src_size_y, bm->vbm_mask, bm->vbm_skip);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
@@ -1154,8 +1154,9 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
 	TRACE_START("generic__bitblit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
-	            dst_x, dst_y, src_x, src_y, size_x, size_y, bm);
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y,
+	            bm->vbm_mask, bm->vbm_skip);
 	do {
 		video_dim_t x = 0;
 		uintptr_t row_bitskip = bitskip;
@@ -1426,9 +1427,10 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit const *__restrict self,
 
 	TRACE_START("generic__bitstretch_l("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
-	            src_x_, src_y_, src_size_x_, src_size_y_, bm);
+	            src_x_, src_y_, src_size_x_, src_size_y_,
+	            bm->vbm_mask, bm->vbm_skip);
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   src_x_, src_y_, src_size_x_, src_size_y_,
 	                   bitstretch_blend_xmin_ymin,
@@ -1470,9 +1472,10 @@ libvideo_gfx_generic__bitstretch_n(struct video_blit const *__restrict self,
 	uintptr_t bm_skip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 	TRACE_START("generic__bitstretch_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p)\n",
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
-	            src_x, src_y, src_size_x, src_size_y, bm);
+	            src_x, src_y, src_size_x, src_size_y,
+	            bm->vbm_mask, bm->vbm_skip);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
