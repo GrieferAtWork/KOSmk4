@@ -936,7 +936,7 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
 				if (x >= size_x)
 					goto next_row;
 				if (!bits) {
-					++row;
+					byte = *++row;
 					row_bitskip = 0;
 					bits = NBBY;
 				}
@@ -946,7 +946,7 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
 			count = 1;
 			while ((x + count) < size_x) {
 				if (!bits) {
-					++row;
+					byte = *++row;
 					row_bitskip = 0;
 					bits = NBBY;
 				}
@@ -1182,7 +1182,7 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
 				if (x >= size_x)
 					goto next_row;
 				if (!bits) {
-					++row;
+					byte = *++row;
 					row_bitskip = 0;
 					bits = NBBY;
 				}
@@ -1192,7 +1192,7 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
 			count = 1;
 			while ((x + count) < size_x) {
 				if (!bits) {
-					++row;
+					byte = *++row;
 					row_bitskip = 0;
 					bits = NBBY;
 				}
