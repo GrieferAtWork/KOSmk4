@@ -51,7 +51,7 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 1
+#if 0
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
