@@ -27,6 +27,9 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/bit.h>
+#include <hybrid/unaligned.h>
+
 #include <kos/types.h>
 #include <sys/param.h>
 
@@ -370,23 +373,64 @@ libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self,
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
 		uintptr_t bitskip = bm->vbm_skip;
+		byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
 		gfx_assert(size_x > 0);
 		gfx_assert(size_y > 0);
+#ifndef __OPTIMIZE_SIZE__
+		if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
+			size_t bm_scanline = bm->vbm_scan >> 3;
+			switch (size_x) {
+#define DO_FIXED_WORD_RENDER(N)                                   \
+				do {                                              \
+					video_dim_t x = dst_x;                        \
+					uint##N##_t word = UNALIGNED_GET##N(bitmask); \
+					while (word) {                                \
+						shift_t bits;                             \
+						bits = CLZ((uint##N##_t)word);            \
+						x += bits;                                \
+						word <<= bits;                            \
+						bits = CLZ((uint##N##_t)~word);           \
+						gfx_assert(bits > 0);                     \
+						(*vc_linefill)(line, x, pixel, bits);     \
+						x += bits;                                \
+						word <<= bits;                            \
+					}                                             \
+					line += lock.vl_stride;                       \
+					bitmask += bm_scanline;                       \
+				} while (--size_y)
+			case 0 ... 8:
+				DO_FIXED_WORD_RENDER(8);
+				goto done;
+			case 9 ... 16:
+				DO_FIXED_WORD_RENDER(16);
+				goto done;
+			case 17 ... 32:
+				DO_FIXED_WORD_RENDER(32);
+				goto done;
+#if __SIZEOF_REGISTER__ >= 8
+			case 33 ... 64:
+				DO_FIXED_WORD_RENDER(64);
+				goto done;
+#endif /* __SIZEOF_REGISTER__ >= 8 */
+			default: break;
+#undef DO_FIXED_WORD_RENDER
+			}
+		}
+#endif /* !__OPTIMIZE_SIZE__ */
 		do {
-			video_dim_t x = 0;
-			uintptr_t row_bitskip = bitskip;
-			byte_t const *row = (byte_t const *)bm->vbm_mask;
+			video_dim_t x;
+			uintptr_t row_bitskip;
+			byte_t const *row;
+			x = 0;
+			row_bitskip = bitskip;
+			row = bitmask;
 			do {
 				video_dim_t count;
-				byte_t byte;
-				shift_t bits;
-				if (row_bitskip >= NBBY) {
-					row += row_bitskip / NBBY;
-					row_bitskip %= NBBY;
-				}
-				byte = *row;
-				bits = NBBY - row_bitskip;
+				byte_t byte = *row;
+				shift_t bits = NBBY - row_bitskip;
 
 				/* Skip over 0-bits */
 				for (;;) {
@@ -424,12 +468,15 @@ libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self,
 next_row:
 			bitskip += bm->vbm_scan;
 			line += lock.vl_stride;
+			bitmask += bitskip / NBBY;
+			bitskip = bitskip % NBBY;
 		} while (--size_y);
 		buffer->unlock(lock);
-	} else {
-		/* Use pixel-based rendering */
-		libvideo_gfx_noblend__bitfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
+		goto done;
 	}
+	/* Use pixel-based rendering */
+	libvideo_gfx_noblend__bitfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
+done:
 	TRACE_END("noblend__bitfill()\n");
 }
 
@@ -510,14 +557,63 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 			uintptr_t bitskip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
+			byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
 			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
 			                                      byte_t const *__restrict src_line, video_coord_t src_x,
 			                                      video_dim_t num_pixels);
+			bitmask += bitskip / NBBY;
+			bitskip = bitskip % NBBY;
 			vc_linecopy = dst_buffer->vb_format.vf_codec->vc_linecopy;
+#ifndef __OPTIMIZE_SIZE__
+			if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
+				size_t bm_scanline = bm->vbm_scan >> 3;
+				switch (size_x) {
+#define DO_FIXED_WORD_RENDER(N)                                        \
+					do {                                               \
+						video_dim_t x = 0;                             \
+						uint##N##_t word = UNALIGNED_GET##N(bitmask);  \
+						while (word) {                                 \
+							shift_t bits;                              \
+							bits = CLZ((uint##N##_t)word);             \
+							x += bits;                                 \
+							word <<= bits;                             \
+							bits = CLZ((uint##N##_t)~word);            \
+							gfx_assert(bits > 0);                      \
+							(*vc_linecopy)(dst_line, dst_x + x,        \
+							               src_line, src_x + x, bits); \
+							x += bits;                                 \
+							word <<= bits;                             \
+						}                                              \
+						dst_line += dst_lock.vl_stride;                \
+						src_line += src_lock.vl_stride;                \
+						bitmask += bm_scanline;                        \
+					} while (--size_y)
+				case 0 ... 8:
+					DO_FIXED_WORD_RENDER(8);
+					goto done;
+				case 9 ... 16:
+					DO_FIXED_WORD_RENDER(16);
+					goto done;
+				case 17 ... 32:
+					DO_FIXED_WORD_RENDER(32);
+					goto done;
+#if __SIZEOF_REGISTER__ >= 8
+				case 33 ... 64:
+					DO_FIXED_WORD_RENDER(64);
+					goto done;
+#endif /* __SIZEOF_REGISTER__ >= 8 */
+				default: break;
+#undef DO_FIXED_WORD_RENDER
+				}
+			}
+#endif /* !__OPTIMIZE_SIZE__ */
 			do {
-				video_dim_t x = 0;
-				uintptr_t row_bitskip = bitskip;
-				byte_t const *row = (byte_t const *)bm->vbm_mask;
+				video_dim_t x;
+				uintptr_t row_bitskip;
+				byte_t const *row;
+				x = 0;
+				row_bitskip = bitskip;
+				row = bitmask;
 				do {
 					video_dim_t count;
 					byte_t byte;
@@ -564,6 +660,8 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 				} while (x < size_x);
 next_row:
 				bitskip += bm->vbm_scan;
+				bitmask += bitskip / NBBY;
+				bitskip = bitskip % NBBY;
 				dst_line += dst_lock.vl_stride;
 				src_line += src_lock.vl_stride;
 			} while (--size_y);

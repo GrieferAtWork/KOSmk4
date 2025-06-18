@@ -31,7 +31,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/bit.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 #include <sys/param.h>
@@ -897,6 +899,7 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
                               video_dim_t size_x, video_dim_t size_y,
                               video_color_t color,
                               struct video_bitmask const *__restrict bm) {
+	byte_t const *bitmask;
 	uintptr_t bitskip;
 	struct video_gfx noblend;
 	if (libvideo_gfx_allow_noblend(self, &color)) {
@@ -910,21 +913,62 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, size_x, size_y, color, bm->vbm_mask, bm->vbm_skip);
+	bitmask = (byte_t const *)bm->vbm_mask;
 	bitskip = bm->vbm_skip;
+	bitmask += bitskip / NBBY;
+	bitskip = bitskip % NBBY;
+#ifndef __OPTIMIZE_SIZE__
+	if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
+		size_t bm_scanline = bm->vbm_scan >> 3;
+		switch (size_x) {
+#define DO_FIXED_WORD_RENDER(N)                                         \
+			do {                                                        \
+				video_dim_t x = dst_x;                                  \
+				uint##N##_t word = UNALIGNED_GET##N(bitmask);           \
+				while (word) {                                          \
+					shift_t bits;                                       \
+					bits = CLZ((uint##N##_t)word);                      \
+					x += bits;                                          \
+					word <<= bits;                                      \
+					bits = CLZ((uint##N##_t) ~word);                    \
+					gfx_assert(bits > 0);                               \
+					video_gfx_x_absline_h(self, x, dst_y, bits, color); \
+					x += bits;                                          \
+					word <<= bits;                                      \
+				}                                                       \
+				++dst_y;                                                \
+				bitmask += bm_scanline;                                 \
+			} while (--size_y)
+		case 0 ... 8:
+			DO_FIXED_WORD_RENDER(8);
+			goto done;
+		case 9 ... 16:
+			DO_FIXED_WORD_RENDER(16);
+			goto done;
+		case 17 ... 32:
+			DO_FIXED_WORD_RENDER(32);
+			goto done;
+#if __SIZEOF_REGISTER__ >= 8
+		case 33 ... 64:
+			DO_FIXED_WORD_RENDER(64);
+			goto done;
+#endif /* __SIZEOF_REGISTER__ >= 8 */
+		default: break;
+#undef DO_FIXED_WORD_RENDER
+		}
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
 	do {
-		video_dim_t x = 0;
-		uintptr_t row_bitskip = bitskip;
-		byte_t const *row = (byte_t const *)bm->vbm_mask;
+		video_dim_t x;
+		uintptr_t row_bitskip;
+		byte_t const *row;
+		x = 0;
+		row_bitskip = bitskip;
+		row = bitmask;
 		do {
 			video_dim_t count;
-			byte_t byte;
-			shift_t bits;
-			if (row_bitskip >= NBBY) {
-				row += row_bitskip / NBBY;
-				row_bitskip %= NBBY;
-			}
-			byte = *row;
-			bits = NBBY - row_bitskip;
+			byte_t byte = *row;
+			shift_t bits = NBBY - row_bitskip;
 
 			/* Skip over 0-bits */
 			for (;;) {
@@ -961,8 +1005,13 @@ libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
 		} while (x < size_x);
 next_row:
 		bitskip += bm->vbm_scan;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
 		++dst_y;
 	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+done:
+#endif /* !__OPTIMIZE_SIZE__ */
 	TRACE_END("generic__bitfill()\n");
 }
 
@@ -979,10 +1028,8 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
 	channel_t raw_alpha = VIDEO_COLOR_GET_ALPHA(color);
 #define makealpha(alpha_chan) (channel_t)(((twochannels_t)raw_alpha * (alpha_chan)) / CHANNEL_MAX)
 #define makecolor(alpha_chan) (raw_color | ((video_color_t)makealpha(alpha_chan) << VIDEO_COLOR_ALPHA_SHIFT))
-	if (bitskip_ > NBBY) {
-		bitmask += bitskip_ / NBBY;
-		bitskip_ = bitskip_ % NBBY;
-	}
+	bitmask += bitskip_ / NBBY;
+	bitskip_ = bitskip_ % NBBY;
 
 #define getbit(src_x, src_y) bitmask2d_getbit(bitmask, bm->vbm_scan, src_x, src_y)
 
@@ -1150,6 +1197,7 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
                               video_coord_t src_x, video_coord_t src_y,
                               video_dim_t size_x, video_dim_t size_y,
                               struct video_bitmask const *__restrict bm) {
+	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
 	uintptr_t bitskip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
 	TRACE_START("generic__bitblit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -1157,20 +1205,64 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y,
 	            bm->vbm_mask, bm->vbm_skip);
+	bitmask += bitskip / NBBY;
+	bitskip = bitskip % NBBY;
+#ifndef __OPTIMIZE_SIZE__
+	if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
+		size_t bm_scanline = bm->vbm_scan >> 3;
+		switch (size_x) {
+#define DO_FIXED_WORD_RENDER(N)                                   \
+			do {                                                  \
+				video_dim_t x = 0;                                \
+				uint##N##_t word = UNALIGNED_GET##N(bitmask);     \
+				while (word) {                                    \
+					shift_t bits;                                 \
+					bits = CLZ((uint##N##_t)word);                \
+					x += bits;                                    \
+					word <<= bits;                                \
+					bits = CLZ((uint##N##_t) ~word);              \
+					gfx_assert(bits > 0);                         \
+					(*self->_vb_xops.vbxo_blit)(self,             \
+					                            dst_x + x, dst_y, \
+					                            src_x + x, src_y, \
+					                            bits, 1);         \
+					x += bits;                                    \
+					word <<= bits;                                \
+				}                                                 \
+				++dst_y;                                          \
+				++src_y;                                          \
+				bitmask += bm_scanline;                           \
+			} while (--size_y)
+		case 0 ... 8:
+			DO_FIXED_WORD_RENDER(8);
+			goto done;
+		case 9 ... 16:
+			DO_FIXED_WORD_RENDER(16);
+			goto done;
+		case 17 ... 32:
+			DO_FIXED_WORD_RENDER(32);
+			goto done;
+#if __SIZEOF_REGISTER__ >= 8
+		case 33 ... 64:
+			DO_FIXED_WORD_RENDER(64);
+			goto done;
+#endif /* __SIZEOF_REGISTER__ >= 8 */
+		default: break;
+#undef DO_FIXED_WORD_RENDER
+		}
+	}
+#endif /* !__OPTIMIZE_SIZE__ */
 	do {
-		video_dim_t x = 0;
-		uintptr_t row_bitskip = bitskip;
-		byte_t const *row = (byte_t const *)bm->vbm_mask;
+		video_dim_t x;
+		uintptr_t row_bitskip;
+		byte_t const *row;
+		x = 0;
+		row_bitskip = bitskip;
+		row = bitmask;
 		do {
 			video_dim_t count;
-			byte_t byte;
-			shift_t bits;
-			if (row_bitskip >= NBBY) {
-				row += row_bitskip / NBBY;
-				row_bitskip %= NBBY;
-			}
-			byte = *row;
-			bits = NBBY - row_bitskip;
+			byte_t byte = *row;
+			shift_t bits = NBBY - row_bitskip;
 
 			/* Skip over 0-bits */
 			for (;;) {
@@ -1210,10 +1302,14 @@ libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self,
 		} while (x < size_x);
 next_row:
 		bitskip += bm->vbm_scan;
-		--size_y;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
 		++dst_y;
 		++src_y;
-	} while (size_y);
+	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+done:
+#endif /* !__OPTIMIZE_SIZE__ */
 	TRACE_END("generic__bitblit()\n");
 }
 
@@ -1352,10 +1448,8 @@ libvideo_gfx_generic__bitstretch_l(struct video_blit const *__restrict self,
 #define makecolor(color, alpha_chan)       \
 	(((color) & ~VIDEO_COLOR_ALPHA_MASK) | \
 	 ((video_color_t)makealpha(VIDEO_COLOR_GET_ALPHA(color), alpha_chan) << VIDEO_COLOR_ALPHA_SHIFT))
-	if (bitskip > NBBY) {
-		bitmask += bitskip / NBBY;
-		bitskip = bitskip % NBBY;
-	}
+	bitmask += bitskip / NBBY;
+	bitskip = bitskip % NBBY;
 
 #define getbit(src_x, src_y)   bitmask2d_getbit(bitmask, bm->vbm_scan, (video_coord_t)bitskip + src_x, src_y)
 #define getcolor(src_x, src_y) video_gfx_x_getcolor(src, src_x, src_y)
