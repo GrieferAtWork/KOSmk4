@@ -130,7 +130,7 @@ DEFINE_LIBPNG_API(void, png_set_palette_to_rgb, (libpng_structrp png_ptr));
 DEFINE_LIBPNG_API(void, png_set_gray_to_rgb, (libpng_structrp png_ptr));
 DEFINE_LIBPNG_API(size_t, png_get_rowbytes, (libpng_const_structrp png_ptr, libpng_const_inforp info_ptr));
 DEFINE_LIBPNG_API(libpng_uint_32, png_get_PLTE, (libpng_const_structrp png_ptr, libpng_inforp info_ptr, libpng_colorp *palette, int *num_palette));
-DEFINE_LIBPNG_API(void, png_read_end, (libpng_structrp png_ptr, libpng_inforp info_ptr));
+//DEFINE_LIBPNG_API(void, png_read_end, (libpng_structrp png_ptr, libpng_inforp info_ptr));
 DEFINE_LIBPNG_API(int, png_set_interlace_handling, (libpng_structrp png_ptr));
 DEFINE_LIBPNG_API(void, png_read_row, (libpng_structrp png_ptr, libpng_bytep row, libpng_bytep display_row));
 #undef DEFINE_LIBPNG_API
@@ -162,7 +162,7 @@ PRIVATE void __LIBCCALL libpng_loadapi_impl(void) {
 	LOADSYM(png_set_gray_to_rgb);
 	LOADSYM(png_get_rowbytes);
 	LOADSYM(png_get_PLTE);
-	LOADSYM(png_read_end);
+//	LOADSYM(png_read_end);
 	LOADSYM(png_set_interlace_handling);
 	LOADSYM(png_read_row);
 	COMPILER_WRITE_BARRIER();
@@ -393,7 +393,7 @@ do_rgb_format:
 	}
 
 	/* Cleanup... */
-	(*pdyn_png_read_end)(png_ptr, info_ptr);
+//	(*pdyn_png_read_end)(png_ptr, info_ptr);
 	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 	return result;
 /*
