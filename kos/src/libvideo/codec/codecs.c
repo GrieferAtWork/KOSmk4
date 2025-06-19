@@ -1476,152 +1476,343 @@ rectcopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_strid
 
 
 PRIVATE NONNULL((1)) void CC
-linefill1_lsb(byte_t *__restrict line, video_coord_t dst_x,
+linefill1_lsb(byte_t *__restrict line, video_coord_t x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 8;
-	dst_x %= 8;
-	if (dst_x & 7) {
-		do {
-			setpixel1_inbyte_lsb(line, dst_x, pixel);
-			--num_pixels;
-			if (!num_pixels)
-				return;
-		} while ((++dst_x) & 7);
+	line += x >> 3;
+	x &= 7;
+	if (x) {
+		shift_t max_write = 8 - x;
+		byte_t mask;
+		if (max_write >= num_pixels) {
+			/* All pixels to write are within the first byte */
+			mask = (((byte_t)1 << num_pixels) - 1);
+			mask = mask << x;
+			if (pixel) {
+				*line |= mask;
+			} else {
+				*line &= ~mask;
+			}
+			return;
+		}
+		/* All bits from the first byte are part of the pixel */
+		mask = 0xff << x;
+		if (pixel) {
+			*line |= mask;
+		} else {
+			*line &= ~mask;
+		}
+		/*x += max_write;*/
+		num_pixels -= max_write;
 		++line;
 	}
 	codec_assert(num_pixels > 0);
-	line = mempsetb(line,
-	                    0xff * (pixel & 0x1),
-	                    num_pixels / 4);
-	if (num_pixels & 7) {
-		num_pixels &= 7;
-		for (dst_x = 0; dst_x < num_pixels; ++dst_x)
-			setpixel1_inbyte_lsb(line, dst_x, pixel);
+	line = mempsetb(line, 0xff * (pixel & 0x1), num_pixels >> 3);
+	num_pixels &= 7;
+	if (num_pixels) {
+		/* Write leading bits of last byte */
+		byte_t mask = ((byte_t)1 << num_pixels) - 1;
+		if (pixel) {
+			*line |= mask;
+		} else {
+			*line &= ~mask;
+		}
 	}
 }
 
 PRIVATE NONNULL((1)) void CC
-linefill1_msb(byte_t *__restrict line, video_coord_t dst_x,
+linefill1_msb(byte_t *__restrict line, video_coord_t x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 8;
-	dst_x %= 8;
-	if (dst_x & 7) {
-		do {
-			setpixel1_inbyte_msb(line, dst_x, pixel);
-			--num_pixels;
-			if (!num_pixels)
-				return;
-		} while ((++dst_x) & 7);
+	line += x >> 3;
+	x &= 7;
+	if (x) {
+		shift_t max_write = 8 - x;
+		byte_t mask;
+		if (max_write >= num_pixels) {
+			/* All pixels to write are within the first byte */
+			mask = (((byte_t)1 << num_pixels) - 1);
+			mask = mask << (8 - (x + num_pixels));
+			if (pixel) {
+				*line |= mask;
+			} else {
+				*line &= ~mask;
+			}
+			return;
+		}
+		/* All bits from the first byte are part of the pixel */
+		mask = 0xff >> x;
+		if (pixel) {
+			*line |= mask;
+		} else {
+			*line &= ~mask;
+		}
+		/*x += max_write;*/
+		num_pixels -= max_write;
 		++line;
 	}
 	codec_assert(num_pixels > 0);
-	line = mempsetb(line, 0xff * (pixel & 0x1), num_pixels / 4);
-	if (num_pixels & 7) {
-		num_pixels &= 7;
-		for (dst_x = 0; dst_x < num_pixels; ++dst_x)
-			setpixel1_inbyte_msb(line, dst_x, pixel);
+	line = mempsetb(line, 0xff * (pixel & 0x1), num_pixels >> 3);
+	num_pixels &= 7;
+	if (num_pixels) {
+		/* Write trailing bits of last byte */
+		byte_t mask = 0xff << (8 - num_pixels);
+		if (pixel) {
+			*line |= mask;
+		} else {
+			*line &= ~mask;
+		}
 	}
 }
 
 PRIVATE NONNULL((1)) void CC
 vertfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
-	do {
-		setpixel1_lsb(line, x, pixel);
-		line += stride;
-	} while (--num_pixels);
+	byte_t mask;
+	line += x >> 3;
+	mask = (byte_t)1 << (x & 7);
+	if (pixel) {
+		do {
+			*line |= mask;
+			line += stride;
+		} while (--num_pixels);
+	} else {
+		mask = ~mask;
+		do {
+			*line &= mask;
+			line += stride;
+		} while (--num_pixels);
+	}
 }
 
 PRIVATE NONNULL((1)) void CC
 vertfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
-	do {
-		setpixel1_msb(line, x, pixel);
-		line += stride;
-	} while (--num_pixels);
+	byte_t mask;
+	line += x >> 3;
+	mask = (byte_t)1 << (7 - (x & 7));
+	if (pixel) {
+		do {
+			*line |= mask;
+			line += stride;
+		} while (--num_pixels);
+	} else {
+		mask = ~mask;
+		do {
+			*line &= mask;
+			line += stride;
+		} while (--num_pixels);
+	}
 }
 
 PRIVATE NONNULL((1)) void CC
 rectfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
-	/* TODO: Re-use byte-masks across lines */
-	do {
-		linefill1_lsb(line, x, pixel, size_x);
-		line += stride;
-	} while (--size_y);
+	byte_t head_mask;
+	byte_t head_word;
+	byte_t full_word;
+	byte_t tail_mask;
+	byte_t tail_word;
+	shift_t head_skip; /* # of bits to skip in the first byte */
+	shift_t head_fill; /* # of bits to fill in the first byte */
+	shift_t tail_fill; /* # of bits to fill in the last byte */
+	video_dim_t full_words;
+	video_dim_t after_head; /* # of pixels after */
+	pixel &= 1;
+	line += x >> 3;
+	head_skip = x & 7;
+	if (size_x <= (video_dim_t)(8 - head_skip)) {
+		/* Head only */
+		head_mask = ((1 << size_x) - 1) << head_skip;
+		head_word = head_mask * pixel;
+		head_mask = ~head_mask;
+		do {
+			*line &= head_mask;
+			*line |= head_word;
+			line += stride;
+		} while (--size_y);
+		return;
+	}
+
+	head_fill  = (8 - head_skip) & 7;
+	head_mask  = 0xff << head_skip;
+	head_word  = head_mask * pixel;
+	head_mask  = ~head_mask;
+	full_word  = 0xff * pixel;
+	after_head = size_x - head_fill;
+	full_words = after_head >> 3;
+	tail_fill  = after_head & 7;
+	tail_mask  = ((byte_t)1 << tail_fill) - 1;
+	tail_word  = tail_mask * pixel;
+	tail_mask  = ~tail_mask;
+
+	if (head_skip && tail_fill) {
+		stride -= (full_words + 1);
+		do {
+			*line = (*line & head_mask) | head_word;
+			++line;
+			line = mempsetb(line, full_word, full_words);
+			*line = (*line & tail_mask) | tail_word;
+			line += stride;
+		} while (--size_y);
+	} else if (head_skip) {
+		stride -= (full_words + 1);
+		do {
+			*line = (*line & head_mask) | head_word;
+			++line;
+			line = mempsetb(line, full_word, full_words);
+			line += stride;
+		} while (--size_y);
+	} else if (tail_fill) {
+		stride -= full_words;
+		do {
+			line = mempsetb(line, full_word, full_words);
+			*line = (*line & tail_mask) | tail_word;
+			line += stride;
+		} while (--size_y);
+	} else {
+		stride -= full_words;
+		do {
+			line = mempsetb(line, full_word, full_words);
+			line += stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1)) void CC
 rectfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
-	/* TODO: Re-use byte-masks across lines */
-	do {
-		linefill1_msb(line, x, pixel, size_x);
-		line += stride;
-	} while (--size_y);
+	byte_t head_mask;
+	byte_t head_word;
+	byte_t full_word;
+	byte_t tail_mask;
+	byte_t tail_word;
+	shift_t head_skip; /* # of bits to skip in the first byte */
+	shift_t head_fill; /* # of bits to fill in the first byte */
+	shift_t tail_fill; /* # of bits to fill in the last byte */
+	video_dim_t full_words;
+	video_dim_t after_head; /* # of pixels after */
+	pixel &= 1;
+	line += x >> 3;
+	head_skip = x & 7;
+	if (size_x <= (video_dim_t)(8 - head_skip)) {
+		/* Head only */
+		head_mask = ((1 << size_x) - 1) << (8 - (head_skip + size_x));
+		head_word = head_mask * pixel;
+		head_mask = ~head_mask;
+		do {
+			*line &= head_mask;
+			*line |= head_word;
+			line += stride;
+		} while (--size_y);
+		return;
+	}
+
+	head_fill  = (8 - head_skip) & 7;
+	head_mask  = 0xff >> head_skip;
+	head_word  = head_mask * pixel;
+	head_mask  = ~head_mask;
+	full_word  = 0xff * pixel;
+	after_head = size_x - head_fill;
+	full_words = after_head >> 3;
+	tail_fill  = after_head & 7;
+	tail_mask  = 0xff >> (8 - tail_fill);
+	tail_word  = tail_mask * pixel;
+	tail_mask  = ~tail_mask;
+
+	if (head_skip && tail_fill) {
+		stride -= (full_words + 1);
+		do {
+			*line = (*line & head_mask) | head_word;
+			++line;
+			line = mempsetb(line, full_word, full_words);
+			*line = (*line & tail_mask) | tail_word;
+			line += stride;
+		} while (--size_y);
+	} else if (head_skip) {
+		stride -= (full_words + 1);
+		do {
+			*line = (*line & head_mask) | head_word;
+			++line;
+			line = mempsetb(line, full_word, full_words);
+			line += stride;
+		} while (--size_y);
+	} else if (tail_fill) {
+		stride -= full_words;
+		do {
+			line = mempsetb(line, full_word, full_words);
+			*line = (*line & tail_mask) | tail_word;
+			line += stride;
+		} while (--size_y);
+	} else {
+		stride -= full_words;
+		do {
+			line = mempsetb(line, full_word, full_words);
+			line += stride;
+		} while (--size_y);
+	}
 }
 
 
 PRIVATE NONNULL((1)) void CC
-linefill2_lsb(byte_t *__restrict line, video_coord_t dst_x,
+linefill2_lsb(byte_t *__restrict line, video_coord_t x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 4;
-	dst_x %= 4;
-	if (dst_x & 3) {
+	line += x >> 2;
+	x &= 3;
+	if (x) {
+		/* TODO: Write bytes as a whole */
 		do {
-			setpixel2_inbyte_lsb(line, dst_x, pixel);
+			setpixel2_inbyte_lsb(line, x, pixel);
 			--num_pixels;
 			if (!num_pixels)
 				return;
-		} while ((++dst_x) & 3);
+		} while ((++x) & 3);
 		++line;
 	}
 	codec_assert(num_pixels > 0);
 	line = mempsetb(line, 0x55 * (pixel & 0x3), num_pixels / 4);
-	if (num_pixels & 3) {
-		num_pixels &= 3;
-		for (dst_x = 0; dst_x < num_pixels; ++dst_x)
-			setpixel2_inbyte_lsb(line, dst_x, pixel);
-	}
+	num_pixels &= 3;
+	for (x = 0; x < num_pixels; ++x) /* TODO: Write bytes as a whole */
+		setpixel2_inbyte_lsb(line, x, pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
-linefill2_msb(byte_t *__restrict line, video_coord_t dst_x,
+linefill2_msb(byte_t *__restrict line, video_coord_t x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 4;
-	dst_x %= 4;
-	if (dst_x & 3) {
+	line += x >> 2;
+	x &= 3;
+	if (x) {
+		/* TODO: Write bytes as a whole */
 		do {
-			setpixel2_inbyte_msb(line, dst_x, pixel);
+			setpixel2_inbyte_msb(line, x, pixel);
 			--num_pixels;
 			if (!num_pixels)
 				return;
-		} while ((++dst_x) & 3);
+		} while ((++x) & 3);
 		++line;
 	}
 	codec_assert(num_pixels > 0);
 	line = mempsetb(line,
 	                    0x55 * (pixel & 0x3),
 	                    num_pixels / 4);
-	if (num_pixels & 3) {
-		num_pixels &= 3;
-		for (dst_x = 0; dst_x < num_pixels; ++dst_x)
-			setpixel2_inbyte_msb(line, dst_x, pixel);
-	}
+	num_pixels &= 3;
+	for (x = 0; x < num_pixels; ++x) /* TODO: Write bytes as a whole */
+		setpixel2_inbyte_msb(line, x, pixel);
 }
 
 PRIVATE NONNULL((1)) void CC
 vertfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
+	byte_t mask, word;
+	shift_t base;
+	line += x >> 2;
+	base = (x & 3) << 1;
+	mask = ~((byte_t)3 << base);
+	word = (byte_t)(pixel & 3) << base;
 	do {
-		setpixel2_lsb(line, x, pixel);
+		*line = (*line & mask) | word;
 		line += stride;
 	} while (--num_pixels);
 }
@@ -1629,9 +1820,14 @@ vertfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
 PRIVATE NONNULL((1)) void CC
 vertfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
+	byte_t mask, word;
+	shift_t base;
+	line += x >> 2;
+	base = (3 - (x & 3)) << 1;
+	mask = ~((byte_t)3 << base);
+	word = (byte_t)(pixel & 3) << base;
 	do {
-		setpixel2_msb(line, x, pixel);
+		*line = (*line & mask) | word;
 		line += stride;
 	} while (--num_pixels);
 }
@@ -1661,9 +1857,9 @@ PRIVATE NONNULL((1)) void CC
 linefill4_lsb(byte_t *__restrict line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 2;
-	dst_x %= 2;
-	if (dst_x & 1) {
+	line += dst_x >> 1;
+	dst_x &= 1;
+	if (dst_x) {
 		setpixel4_inbyte_lsb(line, 1, pixel);
 		++line;
 		--num_pixels;
@@ -1681,9 +1877,9 @@ PRIVATE NONNULL((1)) void CC
 linefill4_msb(byte_t *__restrict line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
 	codec_assert(num_pixels > 0);
-	line += dst_x / 2;
-	dst_x %= 2;
-	if (dst_x & 1) {
+	line += dst_x >> 1;
+	dst_x &= 1;
+	if (dst_x) {
 		setpixel4_inbyte_msb(line, 1, pixel);
 		++line;
 		--num_pixels;
@@ -1700,9 +1896,14 @@ linefill4_msb(byte_t *__restrict line, video_coord_t dst_x,
 PRIVATE NONNULL((1)) void CC
 vertfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
+	byte_t mask, word;
+	shift_t base;
+	line += x >> 1;
+	base = (x & 1) << 4;
+	mask = ~((byte_t)0xf << base);
+	word = (byte_t)(pixel & 0xf) << base;
 	do {
-		setpixel4_lsb(line, x, pixel);
+		*line = (*line & mask) | word;
 		line += stride;
 	} while (--num_pixels);
 }
@@ -1710,9 +1911,14 @@ vertfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride,
 PRIVATE NONNULL((1)) void CC
 vertfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	/* TODO: Re-use byte-masks across lines */
+	byte_t mask, word;
+	shift_t base;
+	line += x >> 1;
+	base = (1 - (x & 1)) << 4;
+	mask = ~((byte_t)0xf << base);
+	word = (byte_t)(pixel & 0xf) << base;
 	do {
-		setpixel4_msb(line, x, pixel);
+		*line = (*line & mask) | word;
 		line += stride;
 	} while (--num_pixels);
 }
