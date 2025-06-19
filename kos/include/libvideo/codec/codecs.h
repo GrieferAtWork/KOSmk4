@@ -249,7 +249,7 @@ struct video_codec {
 	 * @assume(__num_pixels > 0);
 	 * @assume(IS_ALIGNED(__src_stride, vc_align));
 	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
-	__ATTR_NONNULL_T((1, 4)) void /* TODO */
+	__ATTR_NONNULL_T((1, 4)) void
 	(LIBVIDEO_CODEC_CC *vc_vertcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
 	                                 video_dim_t __num_pixels);
@@ -263,7 +263,7 @@ struct video_codec {
 	 * @assume(__size_y > 0);
 	 * @assume(IS_ALIGNED(__src_stride, vc_align));
 	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
-	__ATTR_NONNULL_T((1, 4)) void /* TODO */
+	__ATTR_NONNULL_T((1, 4)) void
 	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
 	                                 video_dim_t __size_x, video_dim_t __size_y);
@@ -281,7 +281,7 @@ struct video_codec {
 	 * >> } while (--__num_pixels);
 	 * @assume(__num_pixels > 0);
 	 * @assume(IS_ALIGNED(__stride, vc_align)); */
-	__ATTR_NONNULL_T((1)) void /* TODO */
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_vertfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
 	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
 
@@ -293,7 +293,7 @@ struct video_codec {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0);
 	 * @assume(IS_ALIGNED(__stride, vc_align)); */
-	__ATTR_NONNULL_T((1)) void /* TODO */
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_rectfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
 	                                 video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 

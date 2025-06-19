@@ -257,14 +257,10 @@ libvideo_gfx_noblend__absline_v(struct video_gfx const *__restrict self,
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
 	if likely(buffer->wlock(lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
-		void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line,
-		                                      video_coord_t dst_x,
-		                                      video_pixel_t pixel);
-		vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
-		do {
-			(*vc_setpixel)(line, dst_x, pixel);
-			line += lock.vl_stride;
-		} while (--length);
+		void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
+		(*vc_vertfill)(line, dst_x, lock.vl_stride, pixel, length);
 		buffer->unlock(lock);
 	} else {
 		/* Use pixel-based rendering */
@@ -297,15 +293,12 @@ libvideo_gfx_noblend__absfill(struct video_gfx const *__restrict self,
 	if likely(buffer->wlock(lock) == 0) {
 		/* Use the low-level linefill operator from the video codec */
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
-		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
-		                                      video_pixel_t pixel, video_dim_t num_pixels);
-		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
+		void (LIBVIDEO_CODEC_CC *vc_rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+		vc_rectfill = buffer->vb_format.vf_codec->vc_rectfill;
 		gfx_assert(size_x > 0);
 		gfx_assert(size_y > 0);
-		do {
-			(*vc_linefill)(line, dst_x, pixel, size_x);
-			line += lock.vl_stride;
-		} while (--size_y);
+		(*vc_rectfill)(line, dst_x, lock.vl_stride, pixel, size_x, size_y);
 		buffer->unlock(lock);
 	} else {
 		/* Use pixel-based rendering */
@@ -417,20 +410,22 @@ libvideo_gfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict 
 		                                      video_pixel_t pixel);
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		void (LIBVIDEO_CODEC_CC *vc_rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 		vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
+		vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
+		vc_rectfill = buffer->vb_format.vf_codec->vc_rectfill;
 #define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
 #define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
 #define pixel_blend_xmax_ymax pixel_blend_xmin_ymin
-#define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y) \
-		{                                                                         \
-			video_pixel_t out = pixels[src_y][src_x];                             \
-			video_coord_t y_iter = dst_size_y;                                    \
-			byte_t *line = base + dst_y * lock.vl_stride;                         \
-			do {                                                                  \
-				(*vc_linefill)(line, dst_x, out, dst_size_x);                     \
-				line += lock.vl_stride;                                           \
-			} while (--y_iter);                                                   \
+#define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)     \
+		{                                                                             \
+			video_pixel_t out = pixels[src_y][src_x];                                 \
+			byte_t *line = base + dst_y * lock.vl_stride;                             \
+			(*vc_rectfill)(line, dst_x, lock.vl_stride, out, dst_size_x, dst_size_y); \
 		}
 
 #define pixel_blend_ymax pixel_blend_ymin
@@ -440,11 +435,7 @@ libvideo_gfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict 
 			video_pixel_t src_y0_x1 = pixels[src_y][src_x1];                                \
 			video_pixel_t out = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);     \
 			byte_t *line = base + dst_y * lock.vl_stride;                                   \
-			video_coord_t y_iter = dst_size_y;                                              \
-			do {                                                                            \
-				(*vc_setpixel)(line, dst_x, out);                                           \
-				line += lock.vl_stride;                                                     \
-			} while (--y_iter);                                                             \
+			(*vc_vertfill)(line, dst_x, lock.vl_stride, out, dst_size_y);                   \
 		}
 
 #define pixel_blend_xmax pixel_blend_xmin
@@ -551,45 +542,27 @@ libvideo_gfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restric
 	hipixel = buffer->vb_format.color2pixel(hicolor);
 	if likely(buffer->wlock(lock) == 0) {
 		byte_t *base = lock.vl_data + dst_y * lock.vl_stride;
-		video_dim_t iter_size_y;
-		void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line, video_coord_t dst_x,
-		                                      video_pixel_t pixel);
-		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
+		void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
-		vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
-		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
+		void (LIBVIDEO_CODEC_CC *vc_rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+		vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
+		vc_rectfill = buffer->vb_format.vf_codec->vc_rectfill;
 		if (pad_xmin) {
-			byte_t *line = base;
-			iter_size_y = size_y;
-			do {
-				(*vc_linefill)(line, dst_x, lopixel, pad_xmin);
-				line += lock.vl_stride;
-			} while (--iter_size_y);
+			(*vc_rectfill)(base, dst_x, lock.vl_stride, lopixel, pad_xmin, size_y);
 			dst_x += pad_xmin;
 			size_x -= pad_xmin;
 			fp_src_x += pad_xmin * fp_step_x;
 		}
 		if (pad_xmax) {
-			byte_t *line = base;
-			video_coord_t pad_x;
 			size_x -= pad_xmax;
-			pad_x = dst_x + size_x;
-			iter_size_y = size_y;
-			do {
-				(*vc_linefill)(line, pad_x, hipixel, pad_xmax);
-				line += lock.vl_stride;
-			} while (--iter_size_y);
+			(*vc_rectfill)(base, dst_x + size_x, lock.vl_stride, hipixel, pad_xmax, size_y);
 		}
 		for (; size_x; --size_x, ++dst_x, fp_src_x += fp_step_x) {
 			linear_fp_blend_t frac0 = STRETCH_FP_BLEND_FRAC(fp_src_x);
 			linear_fp_blend_t frac1 = LINEAR_FP_BLEND(1) - frac0;
 			video_pixel_t pixel = interpolate_1d(lopixel, hipixel, frac0, frac1);
-			byte_t *line = base;
-			iter_size_y = size_y;
-			do {
-				(*vc_setpixel)(line, dst_x, pixel);
-				line += lock.vl_stride;
-			} while (--iter_size_y);
+			(*vc_vertfill)(base, dst_x, lock.vl_stride, pixel, size_y);
 		}
 	} else {
 		libvideo_gfx_noblend_interp8888__absgradient_h__bypixel(self, dst_x, dst_y, size_x, size_y,
@@ -656,23 +629,21 @@ libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restric
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		void (LIBVIDEO_CODEC_CC *vc_rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+		                                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
+		vc_rectfill = buffer->vb_format.vf_codec->vc_rectfill;
 		if (pad_ymin) {
 			size_y -= pad_ymin;
 			fp_src_y += pad_ymin * fp_step_y;
-			do {
-				(*vc_linefill)(line, dst_x, lopixel, size_x);
-				line += lock.vl_stride;
-			} while (--pad_ymin);
+			(*vc_rectfill)(line, dst_x, lock.vl_stride, lopixel, size_x, pad_ymin);
+			line += pad_ymin * lock.vl_stride;
 		}
 		if (pad_ymax) {
-			byte_t *iter;
+			byte_t *tail;
 			size_y -= pad_ymax;
-			iter = line + size_y * lock.vl_stride;
-			do {
-				(*vc_linefill)(line, dst_x, hipixel, size_x);
-				iter += lock.vl_stride;
-			} while (--pad_ymax);
+			tail = line + size_y * lock.vl_stride;
+			(*vc_rectfill)(tail, dst_x, lock.vl_stride, hipixel, size_x, pad_ymax);
 		}
 		for (; size_y; --size_y, fp_src_y += fp_step_y) {
 			linear_fp_blend_t frac0 = STRETCH_FP_BLEND_FRAC(fp_src_y);
@@ -892,15 +863,13 @@ libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self,
 		if likely(src_buffer->rlock(src_lock) == 0) {
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
-			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
-			                                      byte_t const *__restrict src_line, video_coord_t src_x,
-			                                      video_dim_t num_pixels);
-			vc_linecopy = dst_buffer->vb_format.vf_codec->vc_linecopy;
-			do {
-				(*vc_linecopy)(dst_line, dst_x, src_line, src_x, size_x);
-				dst_line += dst_lock.vl_stride;
-				src_line += src_lock.vl_stride;
-			} while (--size_y);
+			void (LIBVIDEO_CODEC_CC *vc_rectcopy)(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+			                                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+			                                      video_dim_t size_x, video_dim_t size_y);
+			vc_rectcopy = dst_buffer->vb_format.vf_codec->vc_rectcopy;
+			(*vc_rectcopy)(dst_line, dst_x, dst_lock.vl_stride,
+			               src_line, src_x, src_lock.vl_stride,
+			               size_x, size_y);
 			src_buffer->unlock(src_lock);
 			dst_buffer->unlock(dst_lock);
 			goto done;

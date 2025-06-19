@@ -57,6 +57,24 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "codecs.h"
 #include "palette.h"
 
+#if defined(NDEBUG) || 1
+#if 1 /* Turn codec assertions into compile-time assumptions for max speed */
+#ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
+#undef __CRT_UBSAN_BUILTIN_UNREACHABLE
+#undef __builtin_unreachable /* Disable binding of "__ubsan_handle_builtin_unreachable" */
+#endif /* __CRT_UBSAN_BUILTIN_UNREACHABLE */
+#define codec_assert(x)       __builtin_assume(x)
+#define codec_assertf(x, ...) __builtin_assume(x)
+#else
+#define codec_assert(x)       (void)0
+#define codec_assertf(x, ...) (void)0
+#endif
+#else /* ... */
+#include <assert.h>
+#define codec_assert  assert
+#define codec_assertf assertf
+#endif /* !... */
+
 DECL_BEGIN
 
 union word32 {
@@ -347,7 +365,7 @@ linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
           video_dim_t num_pixels) {
 	dst_line += dst_x;
 	src_line += src_x;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memcpyb(dst_line, src_line, num_pixels);
 }
 
@@ -357,7 +375,7 @@ vertcopy8(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
           video_dim_t num_pixels) {
 	dst_line += dst_x;
 	src_line += src_x;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		*(uint8_t *)dst_line = *(uint8_t const *)src_line;
 		dst_line += dst_stride;
@@ -371,8 +389,8 @@ rectcopy8(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
           video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x;
 	src_line += src_x;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	do {
 		memcpyb(dst_line, src_line, size_x);
 		dst_line += dst_stride;
@@ -388,10 +406,10 @@ linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_dim_t num_pixels) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!((uintptr_t)dst_line & 1));
-	__builtin_assume(!((uintptr_t)src_line & 1));
+	codec_assert(!((uintptr_t)dst_line & 1));
+	codec_assert(!((uintptr_t)src_line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	memcpyw(dst_line, src_line, num_pixels);
 }
@@ -402,12 +420,12 @@ vertcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t num_pixels) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(dst_stride & 1));
-	__builtin_assume(!(src_stride & 1));
-	__builtin_assume(!((uintptr_t)dst_line & 1));
-	__builtin_assume(!((uintptr_t)src_line & 1));
+	codec_assert(!(dst_stride & 1));
+	codec_assert(!(src_stride & 1));
+	codec_assert(!((uintptr_t)dst_line & 1));
+	codec_assert(!((uintptr_t)src_line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint16_t *)dst_line = *(uint16_t const *)src_line;
@@ -422,13 +440,13 @@ rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(dst_stride & 1));
-	__builtin_assume(!(src_stride & 1));
-	__builtin_assume(!((uintptr_t)dst_line & 1));
-	__builtin_assume(!((uintptr_t)src_line & 1));
+	codec_assert(!(dst_stride & 1));
+	codec_assert(!(src_stride & 1));
+	codec_assert(!((uintptr_t)dst_line & 1));
+	codec_assert(!((uintptr_t)src_line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		memcpyw(dst_line, src_line, size_x);
@@ -445,7 +463,7 @@ linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_dim_t num_pixels) {
 	dst_line += dst_x * 3;
 	src_line += src_x * 3;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memcpy(dst_line, src_line, num_pixels * 3);
 }
 
@@ -455,7 +473,7 @@ vertcopy24(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t num_pixels) {
 	dst_line += dst_x * 3;
 	src_line += src_x * 3;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		dst_line[0] = src_line[0];
 		dst_line[1] = src_line[1];
@@ -471,8 +489,8 @@ rectcopy24(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x * 3;
 	src_line += src_x * 3;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	size_x *= 3;
 	do {
 		memcpy(dst_line, src_line, size_x);
@@ -489,10 +507,10 @@ linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
            video_dim_t num_pixels) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!((uintptr_t)dst_line & 3));
-	__builtin_assume(!((uintptr_t)src_line & 3));
+	codec_assert(!((uintptr_t)dst_line & 3));
+	codec_assert(!((uintptr_t)src_line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	memcpyl(dst_line, src_line, num_pixels);
 }
@@ -503,12 +521,12 @@ vertcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t num_pixels) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(dst_stride & 3));
-	__builtin_assume(!(src_stride & 3));
-	__builtin_assume(!((uintptr_t)dst_line & 3));
-	__builtin_assume(!((uintptr_t)src_line & 3));
+	codec_assert(!(dst_stride & 3));
+	codec_assert(!(src_stride & 3));
+	codec_assert(!((uintptr_t)dst_line & 3));
+	codec_assert(!((uintptr_t)src_line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint32_t *)dst_line = *(uint32_t const *)src_line;
@@ -523,13 +541,13 @@ rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(dst_stride & 3));
-	__builtin_assume(!(src_stride & 3));
-	__builtin_assume(!((uintptr_t)dst_line & 3));
-	__builtin_assume(!((uintptr_t)src_line & 3));
+	codec_assert(!(dst_stride & 3));
+	codec_assert(!(src_stride & 3));
+	codec_assert(!((uintptr_t)dst_line & 3));
+	codec_assert(!((uintptr_t)src_line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		memcpyl(dst_line, src_line, size_x);
@@ -552,7 +570,7 @@ unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
                      video_dim_t num_pixels) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memcpy(dst_line, src_line, num_pixels << 1);
 }
 
@@ -562,7 +580,7 @@ unaligned_vertcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
                      video_dim_t num_pixels) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		uint16_t pixel = UNALIGNED_GET16(src_line);
 		UNALIGNED_SET16(dst_line, pixel);
@@ -577,8 +595,8 @@ unaligned_rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
                      video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x << 1;
 	src_line += src_x << 1;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	size_x <<= 1;
 	do {
 		memcpy(dst_line, src_line, size_x);
@@ -594,7 +612,7 @@ unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
                      video_dim_t num_pixels) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memcpy(dst_line, src_line, num_pixels << 2);
 }
 
@@ -604,7 +622,7 @@ unaligned_vertcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
                      video_dim_t num_pixels) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		uint32_t pixel = UNALIGNED_GET32(src_line);
 		UNALIGNED_SET32(dst_line, pixel);
@@ -619,8 +637,8 @@ unaligned_rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
                      video_dim_t size_x, video_dim_t size_y) {
 	dst_line += dst_x << 2;
 	src_line += src_x << 2;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	size_x <<= 2;
 	do {
 		memcpy(dst_line, src_line, size_x);
@@ -637,7 +655,7 @@ PRIVATE NONNULL((1)) void CC
 linefill8(byte_t *__restrict line, video_coord_t x,
           video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memsetb(line, (uint8_t)pixel, num_pixels);
 }
 
@@ -645,7 +663,7 @@ PRIVATE NONNULL((1)) void CC
 vertfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
           video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		*(uint8_t *)line = (uint8_t)pixel;
 		line += stride;
@@ -656,8 +674,8 @@ PRIVATE NONNULL((1)) void CC
 rectfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
           video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	do {
 		memset(line, (uint8_t)pixel, size_x);
 		line += stride;
@@ -670,7 +688,7 @@ PRIVATE NONNULL((1)) void CC
 linefill16(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memsetw(line, (uint16_t)pixel, num_pixels);
 }
 
@@ -678,10 +696,10 @@ PRIVATE NONNULL((1)) void CC
 vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(stride & 1));
-	__builtin_assume(!((uintptr_t)line & 1));
+	codec_assert(!(stride & 1));
+	codec_assert(!((uintptr_t)line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint16_t *)line = (uint16_t)pixel;
@@ -693,11 +711,11 @@ PRIVATE NONNULL((1)) void CC
 rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x << 1;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(stride & 1));
-	__builtin_assume(!((uintptr_t)line & 1));
+	codec_assert(!(stride & 1));
+	codec_assert(!((uintptr_t)line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		memsetw(line, (uint16_t)pixel, size_x);
@@ -714,7 +732,7 @@ linefill24(byte_t *__restrict line, video_coord_t x,
 	union word32 data;
 	data.dword = pixel;
 	line += x * 3;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		line[0] = data.bytes[0];
 		line[1] = data.bytes[1];
@@ -724,7 +742,7 @@ linefill24(byte_t *__restrict line, video_coord_t x,
 #else /* __OPTIMIZE_SIZE__ */
 	union word32 data, abc[3];
 	data.dword = pixel;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 
 	/* Try to write in chunks of 4 pixels, by having 3 control words A,B and C:
 	 * >>  111222333444
@@ -805,7 +823,7 @@ vertfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 	union word32 data;
 	data.dword = pixel;
 	line += x * 3;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		line[0] = data.bytes[0];
 		line[1] = data.bytes[1];
@@ -821,8 +839,8 @@ rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 	union word32 data;
 	data.dword = pixel;
 	line += x * 3;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 	stride -= size_x * 3;
 	do {
 		video_dim_t iter_x = size_x;
@@ -838,15 +856,15 @@ rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 	video_dim_t dword_x;
 	union word32 data, abc[3];
 	data.dword = pixel;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 
 	line += x * 3;
 	dword_x = size_x >> 2;
 	if (!dword_x) {
 		/* Special case: lines consist of **ONLY** trailing, unaligned data.
 		 * In this case, we are unable to write pixels in chunks of  dwords. */
-		__builtin_assume(size_x >= 1 && size_x <= 3);
+		codec_assert(size_x >= 1 && size_x <= 3);
 		switch (size_x) {
 
 		case 1: {
@@ -1029,7 +1047,7 @@ rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} else {
 		/* Lines have trailing, unaligned data */
 		uint_fast8_t tail = size_x & 3;
-		__builtin_assume(tail >= 1 && tail <= 3);
+		codec_assert(tail >= 1 && tail <= 3);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if ((uintptr_t)line & 3) {
 			do {
@@ -1103,28 +1121,6 @@ rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 			} while (--size_y);
 		}
 	}
-
-	/* Write remaining pixels */
-	switch (size_x) {
-	case 3:
-		*line++ = data.bytes[0];
-		*line++ = data.bytes[1];
-		*line++ = data.bytes[2];
-		ATTR_FALLTHROUGH
-	case 2:
-		*line++ = data.bytes[0];
-		*line++ = data.bytes[1];
-		*line++ = data.bytes[2];
-		ATTR_FALLTHROUGH
-	case 1:
-		*line++ = data.bytes[0];
-		*line++ = data.bytes[1];
-		*line++ = data.bytes[2];
-		ATTR_FALLTHROUGH
-	case 0:
-		break;
-	default: __builtin_unreachable();
-	}
 #endif /* !__OPTIMIZE_SIZE__ */
 }
 
@@ -1134,7 +1130,7 @@ PRIVATE NONNULL((1)) void CC
 linefill32(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	memsetl(line, (uint32_t)pixel, num_pixels);
 }
 
@@ -1142,10 +1138,10 @@ PRIVATE NONNULL((1)) void CC
 vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(stride & 3));
-	__builtin_assume(!((uintptr_t)line & 3));
+	codec_assert(!(stride & 3));
+	codec_assert(!((uintptr_t)line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		*(uint32_t *)line = (uint32_t)pixel;
@@ -1157,11 +1153,11 @@ PRIVATE NONNULL((1)) void CC
 rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x << 2;
-	__builtin_assume(size_x > 0);
-	__builtin_assume(size_y > 0);
+	codec_assert(size_x > 0);
+	codec_assert(size_y > 0);
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	__builtin_assume(!(stride & 3));
-	__builtin_assume(!((uintptr_t)line & 3));
+	codec_assert(!(stride & 3));
+	codec_assert(!((uintptr_t)line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
 		memsetl(line, (uint16_t)pixel, size_x);
@@ -1200,7 +1196,7 @@ PRIVATE NONNULL((1)) void CC
 unaligned_vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		UNALIGNED_SET16(line, (uint16_t)pixel);
 		line += stride;
@@ -1250,7 +1246,7 @@ PRIVATE NONNULL((1)) void CC
 unaligned_vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	do {
 		UNALIGNED_SET32(line, (uint32_t)pixel);
 		line += stride;
@@ -1282,7 +1278,7 @@ PRIVATE NONNULL((1, 3)) void CC
 linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -1303,7 +1299,7 @@ linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 8);
 		src_x += num_pixels & ~(8 - 1);
 		dst_x += num_pixels & ~(8 - 1);
@@ -1333,7 +1329,7 @@ PRIVATE NONNULL((1, 3)) void CC
 linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 8;
 	src_line += src_x / 8;
 	dst_x %= 8;
@@ -1354,7 +1350,7 @@ linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 8);
 		src_x += num_pixels & ~(8 - 1);
 		dst_x += num_pixels & ~(8 - 1);
@@ -1434,7 +1430,7 @@ PRIVATE void CC
 linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -1455,7 +1451,7 @@ linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 4);
 		src_x += num_pixels & ~(4 - 1);
 		dst_x += num_pixels & ~(4 - 1);
@@ -1485,7 +1481,7 @@ PRIVATE void CC
 linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 4;
 	src_line += src_x / 4;
 	dst_x %= 4;
@@ -1506,7 +1502,7 @@ linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 4);
 		src_x += num_pixels & ~(4 - 1);
 		dst_x += num_pixels & ~(4 - 1);
@@ -1585,7 +1581,7 @@ PRIVATE void CC
 linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -1605,7 +1601,7 @@ linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 2);
 		src_x += num_pixels & ~(2 - 1);
 		dst_x += num_pixels & ~(2 - 1);
@@ -1635,7 +1631,7 @@ PRIVATE void CC
 linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               byte_t const *__restrict src_line, video_coord_t src_x,
               video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 2;
 	src_line += src_x / 2;
 	dst_x %= 2;
@@ -1655,7 +1651,7 @@ linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 
 		/* Directly copy pixel data. */
-		__builtin_assume(num_pixels > 0);
+		codec_assert(num_pixels > 0);
 		memcpy(dst_line, src_line, num_pixels / 2);
 		src_x += num_pixels & ~(2 - 1);
 		dst_x += num_pixels & ~(2 - 1);
@@ -1734,7 +1730,7 @@ rectcopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_strid
 PRIVATE void CC
 linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
@@ -1746,7 +1742,7 @@ linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		} while ((++dst_x) & 7);
 		++dst_line;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0xff * (pixel & 0x1),
 	                    num_pixels / 4);
@@ -1760,7 +1756,7 @@ linefill1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 8;
 	dst_x %= 8;
 	if (dst_x & 7) {
@@ -1772,7 +1768,7 @@ linefill1_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		} while ((++dst_x) & 7);
 		++dst_line;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0xff * (pixel & 0x1),
 	                    num_pixels / 4);
@@ -1827,7 +1823,7 @@ rectfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
 PRIVATE void CC
 linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
@@ -1839,7 +1835,7 @@ linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		} while ((++dst_x) & 3);
 		++dst_line;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0x55 * (pixel & 0x3),
 	                    num_pixels / 4);
@@ -1853,7 +1849,7 @@ linefill2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 4;
 	dst_x %= 4;
 	if (dst_x & 3) {
@@ -1865,7 +1861,7 @@ linefill2_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		} while ((++dst_x) & 3);
 		++dst_line;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line,
 	                    0x55 * (pixel & 0x3),
 	                    num_pixels / 4);
@@ -1920,7 +1916,7 @@ rectfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride,
 PRIVATE void CC
 linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
@@ -1930,7 +1926,7 @@ linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (!num_pixels)
 			return;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line, pixel | (pixel << 4), num_pixels / 2);
 	if (num_pixels & 1) {
 		setpixel4_inbyte_lsb(dst_line, 0, pixel);
@@ -1940,7 +1936,7 @@ linefill4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x,
 PRIVATE void CC
 linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
               video_pixel_t pixel, video_dim_t num_pixels) {
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line += dst_x / 2;
 	dst_x %= 2;
 	if (dst_x & 1) {
@@ -1950,7 +1946,7 @@ linefill4_msb(byte_t *__restrict dst_line, video_coord_t dst_x,
 		if (!num_pixels)
 			return;
 	}
-	__builtin_assume(num_pixels > 0);
+	codec_assert(num_pixels > 0);
 	dst_line = mempsetb(dst_line, pixel | (pixel << 4), num_pixels / 2);
 	if (num_pixels & 1) {
 		setpixel4_inbyte_msb(dst_line, 0, pixel);
