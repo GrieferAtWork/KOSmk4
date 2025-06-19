@@ -22,7 +22,7 @@ require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 PACKAGE_URL="https://sourceforge.net/projects/libpng/files/libpng16/1.6.49/libpng-1.6.49.tar.gz/download"
 PACKAGE_URL_FILENAME="libpng-1.6.49.tar.gz"
-PACKAGE_NAME="libpng-1.6.35"
+PACKAGE_NAME="libpng-1.6.49"
 VERSION="16"
 
 CONFIGURE=(
