@@ -166,11 +166,14 @@
 
 
 /* Video codec flags (bits for `struct video_codec_specs::vcs_flags') */
-#define VIDEO_CODEC_FLAG_NORMAL 0x00 /* Normal flags */
-#define VIDEO_CODEC_FLAG_PAL    0x01 /* Does this codec use a palette? (do not combine with `VIDEO_CODEC_FLAG_LUM') */
-#define VIDEO_CODEC_FLAG_LUM    0x02 /* Is this a grayscale-only (luminance) codec? (do not combine with `VIDEO_CODEC_FLAG_PAL') */
-#define VIDEO_CODEC_FLAG_MSB    0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
-#define VIDEO_CODEC_FLAG_LSB    0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_FLAG_NORMAL     0x00 /* Normal flags */
+#define VIDEO_CODEC_FLAG_PAL        0x01 /* Does this codec use a palette? (do not combine with `VIDEO_CODEC_FLAG_LUM') */
+#define VIDEO_CODEC_FLAG_LUM        0x02 /* Is this a grayscale-only (luminance) codec? (do not combine with `VIDEO_CODEC_FLAG_PAL') */
+#define VIDEO_CODEC_FLAG_MSB        0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_FLAG_LSB        0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_FLAG_INTERP8888 0x08 /* When interpreted as uint8_t[4], pixel values can be interpolated directly (as opposed to converting to colors, interpolating,
+                                          * then converting back)  This applies  to all  codecs supporting linear  blending, that  also make  use of  8-bits-per-channel.
+                                          * The caller need not pre-calculate this flag for `video_codec_fromspecs' */
 #define VIDEO_CODEC_FLAG_ISLSB(x) ((x) & VIDEO_CODEC_FLAG_LSB)
 #define VIDEO_CODEC_FLAG_ISMSB(x) (!((x) & VIDEO_CODEC_FLAG_LSB))
 
@@ -237,12 +240,63 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x,
 	                                 video_dim_t __num_pixels);
+	/* Copy a vertical line of pixels. Same as:
+	 * >> do {
+	 * >>     (*vc_setpixel)(__dst_line, __dst_x, (*vc_getpixel)(__src_line, __src_x));
+	 * >>     __dst_line += __dst_stride;
+	 * >>     __src_line += __src_stride;
+	 * >> } while (--__num_pixels);
+	 * @assume(__num_pixels > 0);
+	 * @assume(IS_ALIGNED(__src_stride, vc_align));
+	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
+	__ATTR_NONNULL_T((1, 4)) void /* TODO */
+	(LIBVIDEO_CODEC_CC *vc_vertcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
+	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
+	                                 video_dim_t __num_pixels);
+	/* Copy a rect of pixels. Same as:
+	 * >> do {
+	 * >>     (*vc_linecopy)(__dst_line, __dst_x, __src_line, __src_x, __size_x);
+	 * >>     __dst_line += __dst_stride;
+	 * >>     __src_line += __src_stride;
+	 * >> } while (--__size_y);
+	 * @assume(__size_x > 0);
+	 * @assume(__size_y > 0);
+	 * @assume(IS_ALIGNED(__src_stride, vc_align));
+	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
+	__ATTR_NONNULL_T((1, 4)) void /* TODO */
+	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
+	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
+	                                 video_dim_t __size_x, video_dim_t __size_y);
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds)
 	 * @assume(__num_pixels > 0); */
 	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict __line, video_coord_t __dst_x,
+	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict __line, video_coord_t __x,
 	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
+
+	/* Fill a vertical line of pixels. Same as:
+	 * >> do {
+	 * >>     (*vc_setpixel)(__line, __x, __pixel);
+	 * >>     __line += __stride;
+	 * >> } while (--__num_pixels);
+	 * @assume(__num_pixels > 0);
+	 * @assume(IS_ALIGNED(__stride, vc_align)); */
+	__ATTR_NONNULL_T((1)) void /* TODO */
+	(LIBVIDEO_CODEC_CC *vc_vertfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
+
+	/* Fill a rect of pixels. Same as:
+	 * >> do {
+	 * >>     (*vc_linefill)(__line, __x, __pixel, __size_x);
+	 * >>     __line += __stride;
+	 * >> } while (--__size_y);
+	 * @assume(__size_x > 0);
+	 * @assume(__size_y > 0);
+	 * @assume(IS_ALIGNED(__stride, vc_align)); */
+	__ATTR_NONNULL_T((1)) void /* TODO */
+	(LIBVIDEO_CODEC_CC *vc_rectfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+	                                 video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
+
 
 	/* Convert between color and pixel values. */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t

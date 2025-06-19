@@ -90,7 +90,11 @@ struct video_codec_custom: video_codec {
  * - vc_getpixel
  * - vc_setpixel
  * - vc_linecopy
+ * - vc_vertcopy
+ * - vc_rectcopy
  * - vc_linefill
+ * - vc_vertfill
+ * - vc_rectfill
  * - vc_pixel2color
  * - vc_color2pixel
  * - vcc_*
