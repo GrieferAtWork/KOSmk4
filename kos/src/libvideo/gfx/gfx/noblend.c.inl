@@ -882,6 +882,37 @@ done:
 	TRACE_END("noblend_samefmt__blit()\n");
 }
 
+static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blit *)0)->_vb_driver),
+              "This relation is required because `libvideo_gfx_generic__*' require driver-"
+              "specific data to be set-up as a pixel format converter");
+
+INTERN ATTR_IN(1) void CC
+libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self,
+                                   video_coord_t dst_x, video_coord_t dst_y,
+                                   video_coord_t src_x, video_coord_t src_y,
+                                   video_dim_t size_x, video_dim_t size_y) {
+	video_dim_t x, y;
+	struct video_gfx const *src = self->vb_src;
+	struct video_gfx const *dst = self->vb_dst;
+	struct video_converter *conv = libvideo_blit_generic__conv(self);
+	TRACE_START("noblend_difffmt__blit("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}) "
+	            "[method: %[vinfo:%n]]\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y, conv->vcv_mappixel);
+	/* Blit per-pixel, with pixel format converter */
+	for (y = 0; y < size_y; ++y) {
+		for (x = 0; x < size_x; ++x) {
+			video_pixel_t pixel;
+			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
+			pixel = video_converter_mappixel(conv, pixel);
+			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
+		}
+	}
+	TRACE_END("noblend_difffmt__blit()\n");
+}
+
 INTERN ATTR_IN(1) ATTR_IN(8) void CC
 libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
                                       video_coord_t dst_x, video_coord_t dst_y,
@@ -890,12 +921,6 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
                                       struct video_bitmask const *__restrict bm) {
 	struct video_lock dst_lock;
 	struct video_buffer *dst_buffer = self->vb_dst->vx_buffer;
-	TRACE_START("noblend_samefmt__bitblit("
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR "\n",
-	            dst_x, dst_y, src_x, src_y, size_x, size_y,
-	            bm->vbm_mask, bm->vbm_skip);
 	if likely(dst_buffer->wlock(dst_lock) == 0) {
 		struct video_lock src_lock;
 		struct video_buffer *src_buffer = self->vb_src->vx_buffer;
@@ -907,6 +932,12 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
 			                                      byte_t const *__restrict src_line, video_coord_t src_x,
 			                                      video_dim_t num_pixels);
+			TRACE_START("noblend_samefmt__bitblit("
+			            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+			            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+			            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR "\n",
+			            dst_x, dst_y, src_x, src_y, size_x, size_y,
+			            bm->vbm_mask, bm->vbm_skip);
 			bitmask += bitskip / NBBY;
 			bitskip = bitskip % NBBY;
 			vc_linecopy = dst_buffer->vb_format.vf_codec->vc_linecopy;
@@ -1013,14 +1044,16 @@ next_row:
 			} while (--size_y);
 			src_buffer->unlock(src_lock);
 			dst_buffer->unlock(dst_lock);
-			goto done;
+#ifndef __OPTIMIZE_SIZE__
+done:
+#endif /* !__OPTIMIZE_SIZE__ */
+			TRACE_END("noblend_samefmt__bitblit()\n");
+			return;
 		}
 		dst_buffer->unlock(dst_lock);
 	}
 	libvideo_gfx_generic__bitblit(self, dst_x, dst_y, src_x, src_y,
 	                              size_x, size_y, bm);
-done:
-	TRACE_END("noblend_samefmt__bitblit()\n");
 }
 
 
@@ -1048,8 +1081,31 @@ libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit const *__restrict self
 	                                src_x, src_y, src_size_x, src_size_y);
 }
 
+INTERN ATTR_IN(1) void CC
+libvideo_gfx_noblend_difffmt__stretch_n(struct video_blit const *__restrict self,
+                                        video_coord_t dst_x, video_coord_t dst_y,
+                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                        video_coord_t src_x, video_coord_t src_y,
+                                        video_dim_t src_size_x, video_dim_t src_size_y) {
+	/* TODO */
+	libvideo_gfx_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                src_x, src_y, src_size_x, src_size_y);
+}
+
 INTERN ATTR_IN(1) ATTR_IN(10) void CC
 libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict self,
+                                           video_coord_t dst_x, video_coord_t dst_y,
+                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                           video_coord_t src_x, video_coord_t src_y,
+                                           video_dim_t src_size_x, video_dim_t src_size_y,
+                                           struct video_bitmask const *__restrict bm) {
+	/* TODO */
+	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                   src_x, src_y, src_size_x, src_size_y, bm);
+}
+
+INTERN ATTR_IN(1) ATTR_IN(10) void CC
+libvideo_gfx_noblend_difffmt__bitstretch_n(struct video_blit const *__restrict self,
                                            video_coord_t dst_x, video_coord_t dst_y,
                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
                                            video_coord_t src_x, video_coord_t src_y,

@@ -187,6 +187,7 @@ struct video_rambuffer_requirements {
 	__size_t vbs_stride;  /* Minimal scanline stride (in bytes) */
 };
 
+struct video_converter;
 struct video_codec_specs {
 	__uint8_t      vcs_flags; /* Set of `VIDEO_CODEC_FLAG_*' */
 	__uint8_t      vcs_pxsz;  /* [== CEILDIV(vcs_bpp, NBBY)] # of bytes per pixel (rounded up) */
@@ -232,6 +233,19 @@ struct video_codec {
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict __self,
 	                                    video_color_t __color);
+
+	/* Initialize a pixel format converter `__self' by:
+	 * - Filling in `__self->vcv_mappixel'
+	 * - Optionally filling in `__self->_vcv_driver'
+	 *
+	 * The caller must have already filled in:
+	 * - `__self->vcv_from'
+	 * - `__self->vcv_to'
+	 *
+	 * This operator must be called as `(*__self->vcv_from.vf_codec->vc_initconverter)(__self)'
+	 * @return: * : Always re-returns `__self' */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_converter *
+	(LIBVIDEO_CODEC_CC *vc_initconverter)(struct video_converter *__restrict __self);
 
 	/* Get a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t

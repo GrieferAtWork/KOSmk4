@@ -88,6 +88,47 @@ public: /* Low-level, memory-based pixel accessor functions. */
 #endif /* __cplusplus */
 };
 
+
+
+/* Helper structure for directly converting from 1 pixel format to another.  */
+struct video_converter;
+struct video_converter {
+	/* [1..1] Map pixel from `vcv_from' into the format used by `vcv_to'.
+	 * Same as the following (but faster in many cases):
+	 * >> video_color_t color = vcv_from.pixel2color(__from_pixel);
+	 * >> video_pixel_t to_pixel = vcv_to.color2pixel(color); */
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
+	(LIBVIDEO_CODEC_CC *vcv_mappixel)(struct video_converter const *__restrict __self,
+	                                  video_pixel_t __from_pixel);
+	struct video_format vcv_from;      /* [OVERRIDE(.vf_pal, [NOT(REF)])] Source video format */
+	struct video_format vcv_to;        /* [OVERRIDE(.vf_pal, [NOT(REF)])] Target video format */
+	void              *_vcv_driver[1]; /* Driver-specific data */
+};
+
+
+#ifdef __INTELLISENSE__
+/* Initialize a video pixel format converter */
+extern __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3, 4, 5)) struct video_converter *
+video_converter_init(struct video_converter *__restrict __self,
+                     struct video_codec const *__from_codec, struct video_palette *__from_pal,
+                     struct video_codec const *__to_codec, struct video_palette *__to_pal);
+
+/* Map a given `__from_pixel' (as read from a GFX using `__self->vcv_from')
+ * into  the pixel format described by `__self->vcv_to', and return the new
+ * pixel. */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_pixel_t
+video_converter_mappixel(struct video_converter const *__restrict __self,
+                         video_pixel_t __from_pixel);
+#else /* __INTELLISENSE__ */
+#define video_converter_init(self, from_codec, from_pal, to_codec, to_pal)   \
+	((self)->vcv_to.vf_pal = (to_pal), (self)->vcv_to.vf_codec = (to_codec), \
+	 (self)->vcv_from.vf_pal = (from_pal),                                   \
+	 (*((self)->vcv_from.vf_codec = (from_codec))->vc_initconverter)(self))
+#define video_converter_mappixel(self, from_pixel) \
+	(*(self)->vcv_mappixel)(self, from_pixel)
+#endif /* !__INTELLISENSE__ */
+
+
 #endif /* __CC__ */
 
 

@@ -140,7 +140,7 @@ dump_buffer_specs(struct video_buffer *buf,
 	io->vfp_cury += padding;
 }
 
-static REF struct video_buffer *
+static ATTR_UNUSED REF struct video_buffer *
 palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int method) {
 	struct video_gfx gfx;
 	struct video_gfx result_gfx;
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
-#if 1
+#if 0
 	/* Palettize "image" */
 	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
 		struct video_buffer *new_image;

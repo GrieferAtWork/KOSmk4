@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_GFX_H
 #define GUARD_LIBVIDEO_GFX_GFX_H 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include "api.h"
 
@@ -29,6 +30,7 @@
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/buffer.h>
 
 /* List of blend modes for which we provide dedicated implementations.
  * iow: these are the blend modes that are "fast" */
@@ -289,6 +291,14 @@ INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_samefmt__bitstretch_n
 #define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
+/* The *_difffmt_* operators here "libvideo_blit_generic__conv" to be initialized */
+#define libvideo_blit_generic__conv(self) ((struct video_converter *)(self)->_vb_driver)
+INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_difffmt__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+#define libvideo_gfx_noblend_difffmt__stretch_l libvideo_gfx_generic__stretch_l
+#define libvideo_gfx_noblend_difffmt__bitblit   libvideo_gfx_generic__bitblit
+INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_difffmt__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+#define libvideo_gfx_noblend_difffmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
 
 
 /* Generic GFX operators */
@@ -348,14 +358,6 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_ge
 
 
 
-LOCAL ATTR_CONST WUNUSED bool CC
-_blendinfo__is_add_or_subtract_or_max(unsigned int func) {
-	return func == GFX_BLENDFUNC_ADD ||
-	       func == GFX_BLENDFUNC_SUBTRACT ||
-	       func == GFX_BLENDFUNC_MAX;
-}
-
-
 
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfxhdr *CC
 libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
@@ -369,6 +371,13 @@ libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
 	self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_size_x;
 	self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_size_y;
+}
+
+LOCAL ATTR_CONST WUNUSED bool CC
+_blendinfo__is_add_or_subtract_or_max(unsigned int func) {
+	return func == GFX_BLENDFUNC_ADD ||
+	       func == GFX_BLENDFUNC_SUBTRACT ||
+	       func == GFX_BLENDFUNC_MAX;
 }
 
 /* libvideo_gfx_populate_generic: fill in all

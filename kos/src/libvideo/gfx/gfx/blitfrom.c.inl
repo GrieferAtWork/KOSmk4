@@ -58,10 +58,12 @@ DECL_BEGIN
 #define LOCAL_libvideo_gfx_samebuf__bitstretch_X         LOCAL_Xnl(libvideo_gfx_samebuf__bitstretch)
 #define LOCAL_libvideo_gfx_noblend_samefmt__stretch_X    LOCAL_Xnl(libvideo_gfx_noblend_samefmt__stretch)
 #define LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X LOCAL_Xnl(libvideo_gfx_noblend_samefmt__bitstretch)
+#define LOCAL_libvideo_gfx_noblend_difffmt__stretch_X    LOCAL_Xnl(libvideo_gfx_noblend_difffmt__stretch)
+#define LOCAL_libvideo_gfx_noblend_difffmt__bitstretch_X LOCAL_Xnl(libvideo_gfx_noblend_difffmt__bitstretch)
 #define LOCAL_libvideo_gfx_generic__stretch_X            LOCAL_Xnl(libvideo_gfx_generic__stretch)
 #define LOCAL_libvideo_gfx_generic__bitstretch_X         LOCAL_Xnl(libvideo_gfx_generic__bitstretch)
-#define LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap     LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
-#define LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap     LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
+#define LOCAL_libvideo_gfx_noblend__blitfrom_X           LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
+#define LOCAL_libvideo_gfx_generic__blitfrom_X           LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
 
 #ifndef DEFINED_noblend_blit_compatible
 #define DEFINED_noblend_blit_compatible
@@ -120,7 +122,7 @@ noblend_blit_compatible(struct video_codec const *dst,
 #endif /* !DEFINED_noblend_blit_compatible */
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
-LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) {
+LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blit *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
 	video_blit_setops(ctx);
@@ -134,21 +136,31 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) 
 	} else {
 		if ((ctx->vb_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vb_src->vx_colorkey)) {
-			if (src_buffer->vb_format.vf_pal != dst_buffer->vb_format.vf_pal)
-				goto set_generic_operators;
-			if (!noblend_blit_compatible(dst_buffer->vb_format.vf_codec,
-			                             src_buffer->vb_format.vf_codec))
-				goto set_generic_operators;
-
-			/* Special optimization when not doing any blending, and both GFX contexts
-			 * share the same codec: in this case,  we can try to directly copy  pixel
-			 * data, either through video locks, or by directly reading/writing pixels */
-			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
-			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
-			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch_X;
-			ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X;
+			if (noblend_blit_compatible(dst_buffer->vb_format.vf_codec,
+			                             src_buffer->vb_format.vf_codec) &&
+			    src_buffer->vb_format.vf_pal == dst_buffer->vb_format.vf_pal) {
+				/* Special optimization when not doing any blending, and both GFX contexts
+				 * share the same codec: in this case,  we can try to directly copy  pixel
+				 * data, either through video locks, or by directly reading/writing pixels */
+				ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_samefmt__blit;
+				ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_samefmt__bitblit;
+				ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_samefmt__stretch_X;
+				ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X;
+			} else {
+				/* Special optimization when not doing any blending, and both GFX contexts
+				 * share the same codec: in this case,  we can try to directly copy  pixel
+				 * data, either through video locks, or by directly reading/writing pixels */
+				video_converter_init(libvideo_blit_generic__conv(ctx),
+				                     src_buffer->vb_format.vf_codec,
+				                     src_buffer->vb_format.vf_pal,
+				                     dst_buffer->vb_format.vf_codec,
+				                     dst_buffer->vb_format.vf_pal);
+				ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_difffmt__blit;
+				ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_difffmt__bitblit;
+				ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_difffmt__stretch_X;
+				ctx->_vb_xops.vbxo_bitstretch = &LOCAL_libvideo_gfx_noblend_difffmt__bitstretch_X;
+			}
 		} else {
-set_generic_operators:
 			ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_generic__blit;
 			ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_generic__bitblit;
 			ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_generic__stretch_X;
@@ -159,9 +171,11 @@ set_generic_operators:
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
-LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) {
+LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blit *__restrict ctx) {
+	struct video_buffer const *src_buffer = ctx->vb_src->vx_buffer;
+	struct video_buffer const *dst_buffer = ctx->vb_dst->vx_buffer;
 	video_blit_setops(ctx);
-	if (ctx->vb_src->vx_buffer == ctx->vb_dst->vx_buffer) {
+	if (src_buffer == dst_buffer) {
 		/* Need to use different impls here that essentially do a "memmove"-style blit,
 		 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
 		 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
@@ -183,10 +197,12 @@ LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap(struct video_blit *__restrict ctx) 
 #undef LOCAL_libvideo_gfx_samebuf__bitstretch_X
 #undef LOCAL_libvideo_gfx_noblend_samefmt__stretch_X
 #undef LOCAL_libvideo_gfx_noblend_samefmt__bitstretch_X
+#undef LOCAL_libvideo_gfx_noblend_difffmt__stretch_X
+#undef LOCAL_libvideo_gfx_noblend_difffmt__bitstretch_X
 #undef LOCAL_libvideo_gfx_generic__stretch_X
 #undef LOCAL_libvideo_gfx_generic__bitstretch_X
-#undef LOCAL_libvideo_gfx_noblend__blitfrom_X_Xwrap
-#undef LOCAL_libvideo_gfx_generic__blitfrom_X_Xwrap
+#undef LOCAL_libvideo_gfx_noblend__blitfrom_X
+#undef LOCAL_libvideo_gfx_generic__blitfrom_X
 
 #undef LOCAL_Xnl
 

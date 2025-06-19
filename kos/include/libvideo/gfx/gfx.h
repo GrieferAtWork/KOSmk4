@@ -30,6 +30,7 @@
 
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
+#include <libvideo/codec/format.h>
 
 #include "blend.h" /* gfx_blendmode_t */
 
