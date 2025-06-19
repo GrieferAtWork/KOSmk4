@@ -929,9 +929,9 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
 			byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
-			void (LIBVIDEO_CODEC_CC *vc_linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
-			                                      byte_t const *__restrict src_line, video_coord_t src_x,
-			                                      video_dim_t num_pixels);
+			void (LIBVIDEO_CODEC_CC *vc_rectcopy)(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
+			                                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
+			                                      video_dim_t size_x, video_dim_t size_y);
 			TRACE_START("noblend_samefmt__bitblit("
 			            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 			            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -940,7 +940,7 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 			            bm->vbm_mask, bm->vbm_skip);
 			bitmask += bitskip / NBBY;
 			bitskip = bitskip % NBBY;
-			vc_linecopy = dst_buffer->vb_format.vf_codec->vc_linecopy;
+			vc_rectcopy = dst_buffer->vb_format.vf_codec->vc_rectcopy;
 #ifndef __OPTIMIZE_SIZE__
 			if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
 				size_t bm_scanline = bm->vbm_scan >> 3;
@@ -956,8 +956,9 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 							word <<= bits;                             \
 							bits = CLZ((uint##N##_t)~word);            \
 							gfx_assert(bits > 0);                      \
-							(*vc_linecopy)(dst_line, dst_x + x,        \
-							               src_line, src_x + x, bits); \
+							(*vc_rectcopy)(dst_line, dst_x + x, 0,     \
+							               src_line, src_x + x, 0,     \
+							               bits, 1);                   \
 							x += bits;                                 \
 							word <<= bits;                             \
 						}                                              \
@@ -1032,7 +1033,9 @@ libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
 						++row_bitskip;
 						++count;
 					}
-					(*vc_linecopy)(dst_line, dst_x + x, src_line, src_x + x, count);
+					(*vc_rectcopy)(dst_line, dst_x + x, 0,
+					               src_line, src_x + x, 0,
+					               count, 1);
 					x += count;
 				} while (x < size_x);
 next_row:

@@ -151,10 +151,8 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blit *__restrict ctx) {
 				 * share the same codec: in this case,  we can try to directly copy  pixel
 				 * data, either through video locks, or by directly reading/writing pixels */
 				video_converter_init(libvideo_blit_generic__conv(ctx),
-				                     src_buffer->vb_format.vf_codec,
-				                     src_buffer->vb_format.vf_pal,
-				                     dst_buffer->vb_format.vf_codec,
-				                     dst_buffer->vb_format.vf_pal);
+				                     &src_buffer->vb_format,
+				                     &dst_buffer->vb_format);
 				ctx->_vb_xops.vbxo_blit       = &libvideo_gfx_noblend_difffmt__blit;
 				ctx->_vb_xops.vbxo_bitblit    = &libvideo_gfx_noblend_difffmt__bitblit;
 				ctx->_vb_xops.vbxo_stretch    = &LOCAL_libvideo_gfx_noblend_difffmt__stretch_X;

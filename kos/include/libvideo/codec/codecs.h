@@ -256,41 +256,21 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict __line,
 	                                 video_coord_t __x, video_pixel_t __pixel);
 
-	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds)
-	 * @assume(__num_pixels > 0); */
-	__ATTR_NONNULL_T((1, 3)) void
-	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
-	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x,
-	                                 video_dim_t __num_pixels);
-	/* Copy a vertical line of pixels. Same as:
-	 * >> do {
-	 * >>     (*vc_setpixel)(__dst_line, __dst_x, (*vc_getpixel)(__src_line, __src_x));
-	 * >>     __dst_line += __dst_stride;
-	 * >>     __src_line += __src_stride;
-	 * >> } while (--__num_pixels);
-	 * @assume(__num_pixels > 0);
+	/* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
+	 * @assume(IS_ALIGNED(__dst_line, vc_align));
+	 * @assume(IS_ALIGNED(__src_line, vc_align));
+	 * @assume(IS_ALIGNED(__dst_stride, vc_align));
 	 * @assume(IS_ALIGNED(__src_stride, vc_align));
-	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
-	__ATTR_NONNULL_T((1, 4)) void
-	(LIBVIDEO_CODEC_CC *vc_vertcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
-	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
-	                                 video_dim_t __num_pixels);
-	/* Copy a rect of pixels. Same as:
-	 * >> do {
-	 * >>     (*vc_linecopy)(__dst_line, __dst_x, __src_line, __src_x, __size_x);
-	 * >>     __dst_line += __dst_stride;
-	 * >>     __src_line += __src_stride;
-	 * >> } while (--__size_y);
 	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0);
-	 * @assume(IS_ALIGNED(__src_stride, vc_align));
-	 * @assume(IS_ALIGNED(__dst_stride, vc_align)); */
+	 * @assume(__size_y > 0); */
 	__ATTR_NONNULL_T((1, 4)) void
 	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
 	                                 video_dim_t __size_x, video_dim_t __size_y);
 
-	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds)
+	/* Fill `num_pixels'  neighboring  pixels  horizontally.
+	 * The caller must ensure that all coords are in-bounds.
+	 * @assume(IS_ALIGNED(__line, vc_align));
 	 * @assume(__num_pixels > 0); */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict __line, video_coord_t __x,
@@ -301,8 +281,9 @@ struct video_codec {
 	 * >>     (*vc_setpixel)(__line, __x, __pixel);
 	 * >>     __line += __stride;
 	 * >> } while (--__num_pixels);
-	 * @assume(__num_pixels > 0);
-	 * @assume(IS_ALIGNED(__stride, vc_align)); */
+	 * @assume(IS_ALIGNED(__line, vc_align));
+	 * @assume(IS_ALIGNED(__stride, vc_align));
+	 * @assume(__num_pixels > 0); */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_vertfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
 	                                 video_pixel_t __pixel, video_dim_t __num_pixels);
@@ -314,6 +295,7 @@ struct video_codec {
 	 * >> } while (--__size_y);
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0);
+	 * @assume(IS_ALIGNED(__line, vc_align));
 	 * @assume(IS_ALIGNED(__stride, vc_align)); */
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_rectfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
