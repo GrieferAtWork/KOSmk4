@@ -73,6 +73,34 @@ INTDEF /*WUNUSED*/ NONNULL((1, 2)) int CC
 libvideo_buffer_save(struct video_buffer *self, char const *filename,
                      char const *options);
 
+
+
+/* Create a single-frame video animation from a given buffer.
+ * The  returned  animation object  always  re-return `frame'
+ * when a call is made to `video_anim_firstframe', and trying
+ * to load any  other frame via  `video_anim_nextframe' is  a
+ * no-op.
+ * @return: * :   The controller for the single-frame video animation
+ * @return: NULL: Out of memory. */
+INTDEF WUNUSED ATTR_INOUT(1) REF struct video_anim *CC
+libvideo_anim_fromframe(struct video_buffer *__restrict frame);
+
+/* Various functions for opening a file/stream/blob as an animation file.
+ * The actual file format is auto-detected, and supported formats  depend
+ * on installed 3rd party libraries. By default, GIF is supported.
+ *
+ * If the specified blob isn't for an animated video format, the file  is
+ * instead opened using `video_buffer_open()', and the returned animation
+ * will only have a single frame. */
+INTDEF WUNUSED REF struct video_anim *CC
+libvideo_anim_mopen(void const *blob, size_t blob_size);
+INTDEF WUNUSED REF struct video_anim *CC
+libvideo_anim_fopen(FILE *__restrict fp);
+INTDEF WUNUSED REF struct video_anim *CC
+libvideo_anim_fdopen(fd_t fd);
+INTDEF WUNUSED REF struct video_anim *CC
+libvideo_anim_open(char const *filename);
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_IO_H */

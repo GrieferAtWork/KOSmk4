@@ -22,28 +22,32 @@
 #define LIBVIDEO_CODEC_WANT_PROTOTYPES
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#define _TIME_T_BITS 64
 
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
-#include <hybrid/minmax.h>
 
 #include <kos/kernel/printk.h>
-#include <sys/syslog.h>
+#include <sys/time.h>
 
 #include <err.h>
 #include <format-printer.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <assert.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <timeval-utils.h>
 #include <uchar.h>
+#include <unistd.h>
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
+#include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
@@ -205,29 +209,15 @@ err:
 }
 
 
-int main(int argc, char *argv[]) {
-	REF struct screen_buffer *screen;
-	REF struct video_buffer *image;
+static void
+do_showpic(struct screen_buffer *screen,
+           struct video_buffer *image,
+           struct video_font *font,
+           char const *filename) {
 	struct video_gfx screen_gfx;
 	struct video_gfx image_gfx;
 	size_t blit_w, blit_h;
 	size_t blit_x, blit_y;
-
-	if (argc != 2) {
-		printf("Update: showpic FILE\n");
-		return 1;
-	}
-
-	/* Load the named file as a video buffer. */
-	image = video_buffer_open(argv[1]);
-	if unlikely(!image)
-		err(EXIT_FAILURE, "Failed to open image");
-
-	/* Bind the screen buffer. */
-	screen = screen_buffer_create(NULL);
-	if (!screen)
-		err(EXIT_FAILURE, "Failed to load screen buffer");
-
 #if 0
 	/* Palettize "image" */
 	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
@@ -235,19 +225,12 @@ int main(int argc, char *argv[]) {
 		new_image = palettize(image, 128, VIDEO_GFX_PALETTIZE_METHOD_HISTOGRAM);
 //		new_image = palettize(image, 32, VIDEO_GFX_PALETTIZE_METHOD_MEDIAN_CUT);
 		if likely(new_image) {
-			video_buffer_decref(image);
-			image = new_image;
+			do_showpic(new_image);
+			video_buffer_decref(new_image);
+			return;
 		}
 	}
 #endif
-
-#if 0 /* For debugging the same-format blit-stretch function */
-	image = video_buffer_convert(image,
-	                             screen_buffer_asvideo(screen)->vb_format.vf_codec,
-	                             screen_buffer_asvideo(screen)->vb_format.vf_pal,
-	                             VIDEO_BUFFER_AUTO);
-#endif
-
 
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
@@ -338,9 +321,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 	printk(KERN_DEBUG "SHOWPIC: END\n");
-	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
-	struct video_font *font = video_font_lookup(VIDEO_FONT_DEFAULT);
 	if (font) {
 		struct video_fontprinter_data fd;
 		fd.vfp_font    = font;
@@ -365,27 +346,97 @@ int main(int argc, char *argv[]) {
 		fd.vfp_color = VIDEO_COLOR_WHITE;
 		gfx_printf("\n");
 
-		gfx_printf("Image (%q):\n", argv[1]);
+		gfx_printf("Image (%q):\n", filename);
 		dump_buffer_specs(image, &fd);
 
 		gfx_printf("Screen:\n");
 		dump_buffer_specs(screen_buffer_asvideo(screen), &fd);
 #undef gfx_printf
-		video_font_decref(font);
 	}
 
-	/* Create screenshots in a couple of file formats. */
-	/*video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.png", NULL);
-	video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.jpg", NULL);
-	video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.bmp", NULL);
-	sync();*/
+	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
+}
 
-	/* Wait for user input */
-	getchar();
+
+int main(int argc, char *argv[]) {
+	bool firsttime = true;
+	REF struct video_font *font;
+	REF struct screen_buffer *screen;
+	REF struct video_buffer *frame;
+	REF struct video_anim *anim;
+	struct video_anim_frameinfo frame_info;
+	struct video_anim_frameinfo frame_nextinfo;
+	struct timeval frame_start, frame_end;
+
+	if (argc != 2) {
+		printf("Update: showpic FILE\n");
+		return 1;
+	}
+
+	/* Load default system font */
+	font = video_font_lookup(VIDEO_FONT_DEFAULT);
+	if unlikely(!font)
+		err(EXIT_FAILURE, "Failed to load default font");
+
+	/* Load the named file as a video buffer. */
+	anim = video_anim_open(argv[1]);
+	if unlikely(!anim)
+		err(EXIT_FAILURE, "Failed to open image");
+
+	/* Load first frame of a potentially animated image */
+	frame = video_anim_firstframe(anim, &frame_info);
+	if unlikely(!frame)
+		err(EXIT_FAILURE, "Failed to load frame");
+
+	/* Bind the screen buffer. */
+	screen = screen_buffer_create(NULL);
+	if (!screen)
+		err(EXIT_FAILURE, "Failed to load screen buffer");
+
+	/* Render loop */
+	gettimeofday(&frame_start, NULL);
+	for (;;) {
+		struct timeval tv_delay, tv_spent;
+		struct timespec ts_delay;
+
+		/* Render frame */
+		do_showpic(screen, frame, font, argv[1]);
+		if (firsttime) {
+			firsttime = false;
+			/* Create screenshots in a couple of file formats. */
+			/*video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.png", NULL);
+			video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.jpg", NULL);
+			video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.bmp", NULL);
+			sync();
+			getchar();*/
+		}
+
+		/* Load next frame as part of render delay */
+		frame_nextinfo = frame_info;
+		frame = video_anim_nextframe(anim, frame, &frame_nextinfo);
+		if (!frame) {
+			/* NOTE: Technically would need to decref the "frame" passed
+			 *       as parameter, but we  don't care about leaks  since
+			 *       everything gets cleaned up when we exit anyways. */
+			err(EXIT_FAILURE, "Failed to load frame after %u",
+			    (unsigned int)frame_info.vafi_frameid);
+		}
+
+		/* Wait until the next frame should be rendered */
+		gettimeofday(&frame_end, NULL);
+		timeval_sub(&tv_spent, &frame_end, &frame_start);
+		timeval_sub(&tv_delay, &frame_info.vafi_showfor, &tv_spent);
+		TIMEVAL_TO_TIMESPEC(&tv_delay, &ts_delay);
+		frame_start = frame_end;
+		frame_info  = frame_nextinfo;
+		if (ts_delay.tv_sec >= 0)
+			nanosleep(&ts_delay, NULL);
+	}
 
 #if 0 /* Not necessary; we're about to exit, so this happens automatically */
-	video_buffer_decref(image);
 	video_buffer_decref(screen_buffer_asvideo(screen));
+	video_buffer_decref(image);
+	video_font_decref(font);
 #endif
 	return 0;
 }

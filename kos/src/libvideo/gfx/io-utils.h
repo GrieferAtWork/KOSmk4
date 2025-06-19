@@ -31,12 +31,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
 
 DECL_BEGIN
 
 /* Returned by `libvideo_buffer_open_*' when the blob doesn't match the specified format. */
 #define VIDEO_BUFFER_WRONG_FMT ((REF struct video_buffer *)-1)
+#define VIDEO_ANIM_WRONG_FMT   ((REF struct video_anim *)-1)
+
+
 
 /* PNG */
 INTDEF WUNUSED REF struct video_buffer *CC
@@ -50,12 +54,16 @@ INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
                              FILE *stream, char const *options);
 
+
+
 /* JPG */
 INTDEF WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_jpg(void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);
+
+
 
 /* BMP
  * @param: p_mapfile: When  non-NULL, the function is allowed to assume
@@ -68,6 +76,14 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);
+
+
+
+/* GIF */
+INTDEF WUNUSED REF struct video_anim *CC
+libvideo_anim_open_gif(void const *blob, size_t blob_size,
+                       struct mapfile *p_mapfile);
+
 
 /* Lookup a named option "name" in a ','-separated options string "options" */
 PRIVATE WUNUSED NONNULL((2)) long CC
