@@ -299,7 +299,28 @@ struct video_gfx_xops {
 	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                       struct video_bitmask const *__restrict __bm);
 
-	void (*_vbxo_pad[4])(void);
+	/* Same as `vgxo_absfill', but do so via gradient with colors[y][x] being used
+	 * to essentially do a  VIDEO_GFX_FLINEARBLIT stretch-blit into the  specified
+	 * destination rect.
+	 * @assume(__size_x > 0);
+	 * @assume(__size_y > 0); */
+	__ATTR_IN_T(1) __ATTR_IN_T(6) void
+	(LIBVIDEO_GFX_CC *vgxo_absgradient)(struct video_gfx const *__restrict __self,
+	                                    video_coord_t __x, video_coord_t __y,
+	                                    video_dim_t __size_x, video_dim_t __size_y,
+	                                    video_color_t __colors[2][2]);
+	__ATTR_IN_T(1) void
+	(LIBVIDEO_GFX_CC *vgxo_absgradient_h)(struct video_gfx const *__restrict __self,
+	                                      video_coord_t __x, video_coord_t __y,
+	                                      video_dim_t __size_x, video_dim_t __size_y,
+	                                      video_color_t __locolor, video_color_t __hicolor);
+	__ATTR_IN_T(1) void
+	(LIBVIDEO_GFX_CC *vgxo_absgradient_v)(struct video_gfx const *__restrict __self,
+	                                      video_coord_t __x, video_coord_t __y,
+	                                      video_dim_t __size_x, video_dim_t __size_y,
+	                                      video_color_t __locolor, video_color_t __hicolor);
+
+	void (*_vbxo_pad[1])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
@@ -368,7 +389,24 @@ struct video_gfx_ops {
 	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                      struct video_bitmask const *__restrict __bm);
 
-	/* TODO: Operators for doing color gradient fills (with up to 4 different colors for every corner) */
+	/* Same as `fxo_fill', but do so  via gradient with colors[y][x] being  used
+	 * to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into the specified
+	 * destination rect. */
+	__ATTR_IN_T(1) __ATTR_IN_T(6) void
+	(LIBVIDEO_GFX_CC *fxo_gradient)(struct video_gfx const *__restrict __self,
+	                                    video_offset_t __x, video_offset_t __y,
+	                                    video_dim_t __size_x, video_dim_t __size_y,
+	                                    video_color_t __colors[2][2]);
+	__ATTR_IN_T(1) void
+	(LIBVIDEO_GFX_CC *fxo_hgradient)(struct video_gfx const *__restrict __self,
+			                         video_offset_t __x, video_offset_t __y,
+			                         video_dim_t __size_x, video_dim_t __size_y,
+			                         video_color_t __locolor, video_color_t __hicolor);
+	__ATTR_IN_T(1) void
+	(LIBVIDEO_GFX_CC *fxo_vgradient)(struct video_gfx const *__restrict __self,
+			                         video_offset_t __x, video_offset_t __y,
+			                         video_dim_t __size_x, video_dim_t __size_y,
+			                         video_color_t __locolor, video_color_t __hicolor);
 
 	/* More driver-specific operators go here... */
 };
@@ -587,6 +625,25 @@ video_gfx_bitstretchfill(struct video_gfx const *__restrict __self,
                          video_dim_t __src_size_x, video_dim_t __src_size_y,
                          struct video_bitmask const *__restrict __bm);
 
+/* Same as `video_gfx_fill', but do so via gradient with colors[y][x] being
+ * used to  essentially do  a VIDEO_GFX_FLINEARBLIT  stretch-blit into  the
+ * specified destination rect. */
+extern __ATTR_IN(1) __ATTR_IN(6) void
+video_gfx_gradient(struct video_gfx const *__restrict __self,
+                   video_offset_t __x, video_offset_t __y,
+                   video_dim_t __size_x, video_dim_t __size_y,
+                   video_color_t __colors[2][2]);
+extern __ATTR_IN(1) void
+video_gfx_hgradient(struct video_gfx const *__restrict __self,
+                    video_offset_t __x, video_offset_t __y,
+                    video_dim_t __size_x, video_dim_t __size_y,
+                    video_color_t __locolor, video_color_t __hicolor);
+extern __ATTR_IN(1) void
+video_gfx_vgradient(struct video_gfx const *__restrict __self,
+                    video_offset_t __x, video_offset_t __y,
+                    video_dim_t __size_x, video_dim_t __size_y,
+                    video_color_t __locolor, video_color_t __hicolor);
+
 /* Initialize bitting contexts to rendering between 2 given GFX contexts. */
 extern __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) void
 video_gfx_blitfrom(struct video_gfx const *__dst,
@@ -655,6 +712,12 @@ video_gfx_bitstretch(struct video_gfx const *__dst, video_offset_t __dst_x, vide
 	(*(self)->vx_hdr.vxh_ops->fxo_bitfill)(self, x, y, size_x, size_y, color, bigtmask)
 #define video_gfx_bitstretchfill(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask) \
 	(*(self)->vx_hdr.vxh_ops->fxo_bitstretchfill)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
+#define video_gfx_gradient(self, x, y, size_x, size_y, colors) \
+	(*(self)->vx_hdr.vxh_ops->fxo_gradient)(self, x, y, size_x, size_y, colors)
+#define video_gfx_hgradient(self, x, y, size_x, size_y, locolor, hicolor) \
+	(*(self)->vx_hdr.vxh_ops->fxo_hgradient)(self, x, y, size_x, size_y, locolor, hicolor)
+#define video_gfx_vgradient(self, x, y, size_x, size_y, locolor, hicolor) \
+	(*(self)->vx_hdr.vxh_ops->fxo_vgradient)(self, x, y, size_x, size_y, locolor, hicolor)
 #define video_gfx_blitfrom(dst, src, ctx) \
 	((ctx)->vb_src = (src), (*((ctx)->vb_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
 #define video_gfx_blitto(src, dst, ctx) \
@@ -852,6 +915,25 @@ public:
 	/* Fill the entire clip-area with a solid color. */
 	__CXX_CLASSMEMBER void fill(video_color_t __color) const {
 		video_gfx_fillall(this, __color);
+	}
+
+	/* Same as `fill', but do  so via gradient with colors[y][x]  being
+	 * used to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into
+	 * the specified destination rect. */
+	__CXX_CLASSMEMBER void gradient(video_offset_t __x, video_offset_t __y,
+	                                video_dim_t __size_x, video_dim_t __size_y,
+	                                video_color_t __colors[2][2]) const {
+		video_gfx_gradient(this, __x, __y, __size_x, __size_y, __colors);
+	}
+	__CXX_CLASSMEMBER void hgradient(video_offset_t __x, video_offset_t __y,
+	                                 video_dim_t __size_x, video_dim_t __size_y,
+	                                 video_color_t __locolor, video_color_t __hicolor) const {
+		video_gfx_hgradient(this, __x, __y, __size_x, __size_y, __locolor, __hicolor);
+	}
+	__CXX_CLASSMEMBER void vgradient(video_offset_t __x, video_offset_t __y,
+	                                 video_dim_t __size_x, video_dim_t __size_y,
+	                                 video_color_t __locolor, video_color_t __hicolor) const {
+		video_gfx_vgradient(this, __x, __y, __size_x, __size_y, __locolor, __hicolor);
 	}
 
 	/* Outline an area with a rectangle. */

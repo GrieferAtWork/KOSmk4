@@ -246,7 +246,7 @@ again_font:
 		if (is_blocking)
 			continue;
 random_step:
-		action = rand() % 5;
+		action = rand() % 8;
 step:
 		color = VIDEO_COLOR_RGBA(rand() % 256,
 		                         rand() % 256,
@@ -284,11 +284,10 @@ step:
 
 		case 3: {
 			struct video_gfx blurgfx;
-			size_t dst_size_x, dst_size_y;
 			video_offset_t x = (rand() % screen->vb_size_x) - 16;
 			video_offset_t y = (rand() % screen->vb_size_y) - 16;
-			dst_size_x = rand() % screen->vb_size_x;
-			dst_size_y = rand() % screen->vb_size_y;
+			video_coord_t size_x = rand() % screen->vb_size_x;
+			video_coord_t size_y = rand() % screen->vb_size_y;
 			screen->getgfx(blurgfx,
 			               gfx.vx_blend,
 			               gfx.vx_flags | VIDEO_GFX_FBLUR,
@@ -302,13 +301,46 @@ step:
 			         blurgfx,
 			         (video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
 			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
-			         dst_size_x,
-			         dst_size_y);
+			         size_x,
+			         size_y);
 			gfx.rect((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
 			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
-			         dst_size_x,
-			         dst_size_y,
+			         size_x,
+			         size_y,
 			         VIDEO_COLOR_BLACK);
+		}	break;
+
+		case 4: {
+			video_offset_t x = (rand() % screen->vb_size_x) - 16;
+			video_offset_t y = (rand() % screen->vb_size_y) - 16;
+			video_coord_t size_x = rand() % screen->vb_size_x;
+			video_coord_t size_y = rand() % screen->vb_size_y;
+			video_color_t colors[2][2];
+			colors[0][0] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			colors[0][1] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			colors[1][0] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			colors[1][1] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			gfx.gradient(x, y, size_x, size_y, colors);
+		}	break;
+
+		case 5: {
+			video_offset_t x = (rand() % screen->vb_size_x) - 16;
+			video_offset_t y = (rand() % screen->vb_size_y) - 16;
+			video_coord_t size_x = rand() % screen->vb_size_x;
+			video_coord_t size_y = rand() % screen->vb_size_y;
+			video_color_t locolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			video_color_t hicolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			gfx.hgradient(x, y, size_x, size_y, locolor, hicolor);
+		}	break;
+
+		case 6: {
+			video_offset_t x = (rand() % screen->vb_size_x) - 16;
+			video_offset_t y = (rand() % screen->vb_size_y) - 16;
+			video_coord_t size_x = rand() % screen->vb_size_x;
+			video_coord_t size_y = rand() % screen->vb_size_y;
+			video_color_t locolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			video_color_t hicolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			gfx.vgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 
 		default:
