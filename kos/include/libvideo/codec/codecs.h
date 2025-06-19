@@ -225,6 +225,14 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
 	                                               struct video_rambuffer_requirements *__restrict __result);
 
+	/* Convert between color and pixel values. */
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
+	(LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict __self,
+	                                    video_pixel_t __pixel);
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
+	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict __self,
+	                                    video_color_t __color);
+
 	/* Get a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 	(LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict __line, video_coord_t __x);
@@ -296,15 +304,6 @@ struct video_codec {
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_rectfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
 	                                 video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
-
-
-	/* Convert between color and pixel values. */
-	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
-	(LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict __self,
-	                                    video_pixel_t __pixel);
-	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict __self,
-	                                    video_color_t __color);
 
 	/* Extra implementation-specific operators/fields go here... */
 };
