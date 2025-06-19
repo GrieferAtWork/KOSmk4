@@ -171,10 +171,13 @@ libvideo_buffer_mopen(void const *blob, size_t blob_size) {
 DEFINE_PUBLIC_ALIAS(video_buffer_fopen, libvideo_buffer_fopen);
 INTERN WUNUSED REF struct video_buffer *CC
 libvideo_buffer_fopen(FILE *__restrict fp) {
-	/* TODO: Allow use of `FILE' with mapfile */
-	(void)fp;
-	errno = ENOSYS;
-	return NULL;
+	struct mapfile mf;
+	REF struct video_buffer *result;
+	if (ffmapfile(&mf, fp, 0, 0, (size_t)-1, 0, 0))
+		return NULL;
+	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
+	(void)unmapfile(&mf);
+	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_fdopen, libvideo_buffer_fdopen);
@@ -182,8 +185,7 @@ INTERN WUNUSED REF struct video_buffer *CC
 libvideo_buffer_fdopen(fd_t fd) {
 	struct mapfile mf;
 	REF struct video_buffer *result;
-	if (fmapfile(&mf, fd, 0, 0,
-	             (size_t)-1, 0, 0))
+	if (fmapfile(&mf, fd, 0, 0, (size_t)-1, 0, 0))
 		return NULL;
 	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
