@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6182c242 */
+/* HASH CRC-32:0xfe94c493 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1008,6 +1008,24 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfi
  *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL fmapfile)(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __min_bytes, size_t __max_bytes, size_t __num_trailing_nulbytes, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__mapping, __fd, __offset, __min_bytes, __max_bytes, __num_trailing_nulbytes, __flags); })
+#endif /* ... */
+#ifdef __CRT_HAVE_ffmapfile
+/* >> ffmapfile(3)
+ * Read all data from `stream' and map the contents into memory. s.a. `fmapfile(3)'
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=...]     s.a. `fmapfile(3)'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
+ * @return: -1: [errno=*]       Read error */
+__CDECLARE(__ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1),int,__NOTHROW_NCX,ffmapfile,(struct mapfile *__restrict __mapping, __FILE *__stream, __pos64_t __offset, size_t __min_bytes, size_t __max_bytes, size_t __num_trailing_nulbytes, unsigned int __flags),(__mapping,__stream,__offset,__min_bytes,__max_bytes,__num_trailing_nulbytes,__flags))
+#elif (defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_feof) || defined(__CRT_HAVE__IO_feof) || defined(__CRT_HAVE_feof_unlocked)) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE___fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/sys.mman/ffmapfile.h>
+/* >> ffmapfile(3)
+ * Read all data from `stream' and map the contents into memory. s.a. `fmapfile(3)'
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=...]     s.a. `fmapfile(3)'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
+ * @return: -1: [errno=*]       Read error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ffmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_FDARG(2) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL ffmapfile)(struct mapfile *__restrict __mapping, __FILE *__stream, __pos64_t __offset, size_t __min_bytes, size_t __max_bytes, size_t __num_trailing_nulbytes, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffmapfile))(__mapping, __stream, __offset, __min_bytes, __max_bytes, __num_trailing_nulbytes, __flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fmapfileat
 /* >> fmapfileat(3)

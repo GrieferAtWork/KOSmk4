@@ -3078,6 +3078,7 @@
 #define __CRT_HAVE_fflush
 #define __CRT_HAVE_fflush_locked
 #define __CRT_HAVE_fflush_unlocked
+#define __CRT_HAVE_ffmapfile
 #define __CRT_HAVE_ffs
 #define __CRT_HAVE_ffsl
 #define __CRT_HAVE_ffsll
@@ -9148,6 +9149,7 @@
 #define __CRT_HAVE_KOS$fflush
 #define __CRT_HAVE_KOS$fflush_locked
 #define __CRT_HAVE_KOS$fflush_unlocked
+#define __CRT_HAVE_KOS$ffmapfile
 #define __CRT_HAVE_KOS$ffs
 #define __CRT_HAVE_KOS$ffsl
 #define __CRT_HAVE_KOS$ffsll
@@ -14016,6 +14018,7 @@
 #define __CRT_HAVE_DOS$fflush
 #define __CRT_HAVE_DOS$fflush_locked
 #define __CRT_HAVE_DOS$fflush_unlocked
+#define __CRT_HAVE_DOS$ffmapfile
 #define __CRT_HAVE_DOS$ffs
 #define __CRT_HAVE_DOS$ffsl
 #define __CRT_HAVE_DOS$ffsll

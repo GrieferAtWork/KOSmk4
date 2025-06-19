@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8631e2f */
+/* HASH CRC-32:0xcb5dec47 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/sys.mman.h"
 #include "../user/fcntl.h"
+#include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "string.h"
 #include "../user/sys.stat.h"
@@ -375,10 +376,10 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 
 	/* Check for special case: map an empty portion of the file. */
 	if unlikely(max_bytes == 0) {
-#ifndef __REALLOC_ZERO_IS_NONNULL
+#ifndef __MALLOC_ZERO_IS_NONNULL
 		if (num_trailing_nulbytes == 0)
 			num_trailing_nulbytes = 1;
-#endif /* !__REALLOC_ZERO_IS_NONNULL */
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
 		buf = (byte_t *)libc_calloc(1, num_trailing_nulbytes);
 		if unlikely(!buf)
 			return -1;
@@ -757,6 +758,233 @@ err_buf:
 
 	return -1;
 }
+#include <bits/os/stat.h>
+#include <bits/crt/mapfile.h>
+#include <asm/os/mman.h>
+#include <libc/errno.h>
+#include <asm/os/stdio.h>
+#include <hybrid/__overflow.h>
+#include <asm/crt/malloc.h>
+/* >> ffmapfile(3)
+ * Read all data from `stream' and map the contents into memory. s.a. `fmapfile(3)'
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=...]     s.a. `fmapfile(3)'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
+ * @return: -1: [errno=*]       Read error */
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int
+NOTHROW_NCX(LIBCCALL libc_ffmapfile)(struct mapfile *__restrict mapping,
+                                     FILE *stream,
+                                     pos64_t offset,
+                                     size_t min_bytes,
+                                     size_t max_bytes,
+                                     size_t num_trailing_nulbytes,
+                                     unsigned int flags) {
+	byte_t *buf;
+	size_t bufsize;
+	size_t bufused;
+	size_t buffree;
+
+	/* Helper macro that makes sure `errno(3)' is preserved across `expr' */
+
+#define __LOCAL_preserve_errno(expr)              \
+	do {                                          \
+		errno_t _saved_errno = __libc_geterrno(); \
+		expr;                                     \
+		__libc_seterrno(_saved_errno);            \
+	}	__WHILE0
+
+
+
+
+	/* Validate the given `flags' */
+	if unlikely(flags & ~(__FMAPFILE_READALL | __FMAPFILE_MUSTMMAP |
+	                      __FMAPFILE_MAPSHARED | __FMAPFILE_ATSTART)) {
+
+		return __libc_seterrno(EINVAL);
+
+
+
+	}
+
+	/* Check for special case: map an empty portion of the file. */
+	if unlikely(max_bytes == 0) {
+#ifndef __MALLOC_ZERO_IS_NONNULL
+		if (num_trailing_nulbytes == 0)
+			num_trailing_nulbytes = 1;
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
+		buf = (byte_t *)libc_calloc(1, num_trailing_nulbytes);
+		if unlikely(!buf)
+			return -1;
+		mapping->mf_addr = buf;
+		mapping->mf_size = 0;
+		mapping->__mf_mapsize = 0;
+		return 0;
+	}
+
+	/* See if the stream has a file descriptor.
+	 * If so: use `fmapfile(3)' to map the file */
+
+	{
+		fd_t fd = libc_fileno(stream);
+		if (fd != -1) {
+			if (!(flags & __FMAPFILE_ATSTART))
+				offset += libc_ftello64(stream);
+			return libc_fmapfile(mapping, fd, offset, min_bytes, max_bytes, num_trailing_nulbytes, flags);
+		}
+	}
+
+
+	/* Check if we're to error out if mmap can't be used */
+	if (flags & __FMAPFILE_MUSTMMAP) {
+
+		return __libc_seterrno(ENOTSUP);
+
+
+
+
+
+	}
+
+	/* Allocate a heap buffer. */
+	bufsize = max_bytes;
+	if (bufsize > 0x10000)
+		bufsize = 0x10000;
+	if (bufsize < min_bytes)
+		bufsize = min_bytes;
+	{
+		size_t alcsize;
+		if unlikely(__hybrid_overflow_uadd(bufsize, num_trailing_nulbytes, &alcsize))
+			goto err_2big;
+		__LOCAL_preserve_errno(buf = (byte_t *)libc_malloc(alcsize));
+	}
+	if unlikely(!buf) {
+		bufsize = 1;
+		if (bufsize < min_bytes)
+			bufsize = min_bytes;
+		buf = (byte_t *)libc_malloc(bufsize + num_trailing_nulbytes);
+		if unlikely(!buf)
+			return -1;
+	}
+	bufused = 0;
+	buffree = bufsize;
+
+	/* For a custom offset, try to use fseeko64() */
+	if (offset != (pos64_t)-1 && (offset != 0 || !(flags & __FMAPFILE_ATSTART))) {
+		if (libc_fseeko64(stream, (off64_t)offset, __SEEK_SET))
+			goto err_buf;
+	}
+
+	/* Use fread(3) to read data from the stream */
+	for (;;) {
+		size_t error = libc_fread(buf + bufused, 1, buffree, stream);
+		if (error <= 0 || (!(flags & __FMAPFILE_READALL) && (size_t)error < buffree)) {
+			if (error >= 0 || libc_feof(stream)) {
+				/* End-of-file! */
+				byte_t *newbuf;
+				size_t used_nulbytes;
+				bufused += (size_t)error;
+				used_nulbytes = num_trailing_nulbytes;
+				if (min_bytes > bufused)
+					used_nulbytes += min_bytes - bufused;
+				__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, bufused + used_nulbytes));
+				if likely(newbuf)
+					buf = newbuf;
+				libc_bzero(buf + bufused, used_nulbytes); /* Trailing NUL-bytes */
+				mapping->mf_addr = buf;
+				mapping->mf_size = bufused;
+				mapping->__mf_mapsize = 0;
+				return 0;
+			}
+			/* Read error */
+			goto err_buf;
+		}
+		bufused += (size_t)error;
+		buffree -= (size_t)error;
+		if (buffree < 1024) {
+			byte_t *newbuf;
+			size_t newsize, alcsize;
+			if unlikely(__hybrid_overflow_umul(bufsize, 2, &newsize))
+				newsize = (size_t)-1;
+			if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+				alcsize = (size_t)-1;
+			__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
+			if (!newbuf) {
+				if unlikely(__hybrid_overflow_uadd(bufsize, 1024, &newsize))
+					newsize = (size_t)-1;
+				if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+					alcsize = (size_t)-1;
+				__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, alcsize));
+				if (!newbuf) {
+					if (!buffree) {
+						if unlikely(__hybrid_overflow_uadd(bufsize, 1, &newsize))
+							goto err_buf_2big;
+						if unlikely(__hybrid_overflow_uadd(newsize, num_trailing_nulbytes, &alcsize))
+							goto err_buf_2big;
+						newbuf = (byte_t *)libc_realloc(buf, alcsize);
+						if unlikely(!newbuf)
+							goto err_buf;
+					} else {
+						newsize = bufsize;
+						newbuf  = buf;
+					}
+				}
+			}
+			buffree += newsize - bufsize;
+			bufsize = newsize;
+			buf     = newbuf;
+		}
+	}
+
+	/*--------------------------------------------------------------------*/
+	{
+		byte_t *newbuf;
+		size_t used_nulbytes;
+		/* Because of how large our original buffer was, and because at this
+		 * point all  we want  to do  is return  a  `num_trailing_nulbytes'-
+		 * large buffer of  all NUL-bytes, it's  probably more efficient  to
+		 * allocate a new  (small) buffer,  than trying to  realloc the  old
+		 * buffer. If we try  to do realloc(), the  heap might see that  all
+		 * we're  trying to do  is truncate the buffer,  and so might choose
+		 * not to alter its base  address, which (if done repeatedly)  might
+		 * lead to memory becoming very badly fragmented. */
+		used_nulbytes = min_bytes + num_trailing_nulbytes;
+		__LOCAL_preserve_errno(newbuf = (byte_t *)libc_calloc(1, used_nulbytes));
+		if likely(newbuf) {
+
+			libc_free(buf);
+
+		} else {
+#ifndef __REALLOC_ZERO_IS_NONNULL
+			if unlikely(!used_nulbytes)
+				used_nulbytes = 1;
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+			__LOCAL_preserve_errno(newbuf = (byte_t *)libc_realloc(buf, used_nulbytes));
+			if (!newbuf)
+				newbuf = buf;
+			libc_bzero(newbuf, used_nulbytes);
+		}
+		mapping->mf_addr = newbuf;
+		mapping->mf_size = 0;
+		mapping->__mf_mapsize = 0;
+	}
+#undef __LOCAL_preserve_errno
+	return 0;
+err_2big:
+
+	buf = NULL;
+
+err_buf_2big:
+
+	__libc_seterrno(ENOMEM);
+
+
+
+err_buf:
+
+	libc_free(buf);
+
+	return -1;
+}
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
@@ -913,6 +1141,7 @@ DEFINE_PUBLIC_ALIAS_P(pkey_get,libc_pkey_get,,int,NOTHROW_NCX,LIBCCALL,(int pkey
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS_P(fmapfile,libc_fmapfile,WUNUSED ATTR_FDARG(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,fd,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
+DEFINE_PUBLIC_ALIAS_P(ffmapfile,libc_ffmapfile,WUNUSED ATTR_FDARG(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,stream,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));
 DEFINE_PUBLIC_ALIAS_P(DOS$fmapfileat,libd_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
 DEFINE_PUBLIC_ALIAS_P(fmapfileat,libc_fmapfileat,WUNUSED ATTR_IN(3) ATTR_OUT(1),int,NOTHROW_NCX,LIBCCALL,(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags),(mapping,dirfd,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags,atflags));
 DEFINE_PUBLIC_ALIAS_P(DOS$mapfile,libd_mapfile,WUNUSED ATTR_IN(2) ATTR_OUT(1),int,NOTHROW_NCX,LIBDCALL,(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags),(mapping,filename,offset,min_bytes,max_bytes,num_trailing_nulbytes,flags));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x350ae842 */
+/* HASH CRC-32:0x9fc584a9 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1565,6 +1565,7 @@
 #define __CRT_HAVE_DOS$fexecve
 #define __CRT_HAVE_DOS$fflush
 #define __CRT_HAVE_DOS$fflush_unlocked
+#define __CRT_HAVE_DOS$ffmapfile
 #define __CRT_HAVE_DOS$ffs
 #define __CRT_HAVE_DOS$ffsl
 #define __CRT_HAVE_DOS$ffsll
@@ -6033,6 +6034,7 @@
 #define __CRT_HAVE_fexecve
 #define __CRT_HAVE_fflush
 #define __CRT_HAVE_fflush_unlocked
+#define __CRT_HAVE_ffmapfile
 #define __CRT_HAVE_ffs
 #define __CRT_HAVE_ffsl
 #define __CRT_HAVE_ffsll

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ee95637 */
+/* HASH CRC-32:0x7971f319 */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -385,10 +385,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 
 	/* Check for special case: map an empty portion of the file. */
 	if __unlikely(__max_bytes == 0) {
-#ifndef __REALLOC_ZERO_IS_NONNULL
+#ifndef __MALLOC_ZERO_IS_NONNULL
 		if (__num_trailing_nulbytes == 0)
 			__num_trailing_nulbytes = 1;
-#endif /* !__REALLOC_ZERO_IS_NONNULL */
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
 		__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __num_trailing_nulbytes);
 		if __unlikely(!__buf)
 			return -1;

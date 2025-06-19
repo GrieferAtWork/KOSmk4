@@ -3358,6 +3358,7 @@
 #define __CRT_HAVE_fflush
 #define __CRT_HAVE_fflush_locked
 #define __CRT_HAVE_fflush_unlocked
+#define __CRT_HAVE_ffmapfile
 #define __CRT_HAVE_ffs
 #define __CRT_HAVE_ffsl
 #define __CRT_HAVE_ffsll

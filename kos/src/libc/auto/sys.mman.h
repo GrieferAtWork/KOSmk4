@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab84fe0c */
+/* HASH CRC-32:0x5786738b */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include <stdio.h>
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
@@ -250,6 +251,24 @@ INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)
  *                              that you are trying to map is larger than the entirety of your address space.
  * @return: -1: [errno=*]       Read error */
 INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> ffmapfile(3)
+ * Read all data from `stream' and map the contents into memory. s.a. `fmapfile(3)'
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=...]     s.a. `fmapfile(3)'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
+ * @return: -1: [errno=*]       Read error */
+INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ffmapfile(3)
+ * Read all data from `stream' and map the contents into memory. s.a. `fmapfile(3)'
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=...]     s.a. `fmapfile(3)'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and `fileno(stream)' didn't yield a valid file descriptor
+ * @return: -1: [errno=*]       Read error */
+INTDEF WUNUSED ATTR_FDARG(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_ffmapfile)(struct mapfile *__restrict mapping, FILE *stream, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
