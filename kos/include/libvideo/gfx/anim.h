@@ -74,7 +74,6 @@ struct video_anim_ops {
 	 * >> REF struct video_buffer *frame = video_anim_firstframe(anim, &info);
 	 * >> struct video_gfx screen_gfx;
 	 * >> struct video_gfx frame_gfx;
-	 * >> struct video_blit frame_blit;
 	 * >> struct timeval frame_start, frame_end;
 	 * >> struct timeval tv_delay, tv_spent;
 	 * >> struct timespec ts_delay;
@@ -86,10 +85,8 @@ struct video_anim_ops {
 	 * >>     // Display current frame on-screen (here: stretched)
 	 * >>     video_buffer_getgfx(frame, &frame_gfx,
 	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
-	 * >>     video_gfx_blitfrom(&screen_gfx, &frame_gfx, &frame_blit);
-	 * >>     video_blit_stretch(&frame_blit,
-	 * >>                        0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
-	 * >>                        0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
+	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
+	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
 	 * >>     struct video_buffer_rect update_rect = { 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX };
 	 * >>     screen_buffer_updaterect(screen, &update_rect);
 	 * >>
@@ -108,6 +105,7 @@ struct video_anim_ops {
 	 * >>     if (ts_delay.tv_sec >= 0)
 	 * >>         nanosleep(&ts_delay, NULL);
 	 * >> }
+	 *
 	 * @return: * : A video buffer containing the  first frame of the  animation
 	 *              If  you do not intend to render  any of the other frame, you
 	 *              can simply decref() the animation and use this buffer as you

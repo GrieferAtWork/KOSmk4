@@ -28,16 +28,25 @@
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
+#include <kos/types.h>
 #include <sys/mman.h>
 #include <sys/syslog.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h> /* EOF */
+#include <string.h>
 
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/anim.h>
+#include <libvideo/gfx/buffer.h>
 /**/
 
 #include "../io-utils.h"
@@ -138,10 +147,11 @@ fail:
 /* GIF LWZ DECOMPRESSER                                                 */
 /************************************************************************/
 typedef uint_fast16_t lwz_code_t;
+typedef uint_least16_t lwz_scode_t;
 #define LWZ_EOF       ((lwz_code_t)-1)
 #define LWZ_MAX_BITS  12
 #define LWZ_MAX_CODES (1 << LWZ_MAX_BITS)
-#define LWZ_NULL_CODE 0xFFFF
+#define LWZ_NULL_CODE ((lwz_code_t)0xffff)
 
 typedef struct {
 	/* Code size configs */
@@ -153,7 +163,7 @@ typedef struct {
 	lwz_code_t     lwz_codecount;    /* # of codes for the current code size (aka. first invalid code) */
 
 	/* Decompression dicts */
-	lwz_code_t     lwz_prefix[LWZ_MAX_CODES]; /* Code prefix map */
+	lwz_scode_t    lwz_prefix[LWZ_MAX_CODES]; /* Code prefix map */
 	byte_t         lwz_suffix[LWZ_MAX_CODES]; /* Code suffix map */
 	byte_t         lwz_stack[LWZ_MAX_CODES];  /* [0..lwz_stacksize] Temp. buffer for decompressed data */
 	uint_fast16_t  lwz_stacksize;             /* Length of `lwz_stack' */
@@ -714,8 +724,11 @@ read_frame_at_header:
 	result->gb_reader = reader;
 	return result;
 rewind:
-	if (!result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS)
+	if (!result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS) {
 		me->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS = true;
+		free(result->gb_restore); /* Will no longer be needed during next iteration... */
+		result->gb_restore = NULL;
+	}
 	info->vafi_frameid = 0;
 	result->gb_cfg = me->ga_cfg;
 	reader = me->ga_frame1;
