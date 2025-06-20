@@ -213,7 +213,8 @@ static void
 do_showpic(struct screen_buffer *screen,
            struct video_buffer *image,
            struct video_font *font,
-           char const *filename) {
+           char const *filename,
+           struct video_anim_frameinfo *frameinfo) {
 	struct video_gfx screen_gfx;
 	struct video_gfx image_gfx;
 	size_t blit_w, blit_h;
@@ -282,8 +283,6 @@ do_showpic(struct screen_buffer *screen,
 
 	/* Display the image */
 	printk(KERN_DEBUG "SHOWPIC: BEGIN\n");
-	video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
-	printk(KERN_DEBUG "SHOWPIC: START STRETCH\n");
 #if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
@@ -346,7 +345,7 @@ do_showpic(struct screen_buffer *screen,
 		fd.vfp_color = VIDEO_COLOR_WHITE;
 		gfx_printf("\n");
 
-		gfx_printf("Image (%q):\n", filename);
+		gfx_printf("%s#%u\n", filename, (unsigned int)frameinfo->vafi_frameid);
 		dump_buffer_specs(image, &fd);
 
 		gfx_printf("Screen:\n");
@@ -393,6 +392,14 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
+	/* Clear screen */
+	{
+		struct video_gfx screen_gfx;
+		video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
+		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
+	}
+
 	/* Render loop */
 	gettimeofday(&frame_start, NULL);
 	for (;;) {
@@ -400,7 +407,7 @@ int main(int argc, char *argv[]) {
 		struct timespec ts_delay;
 
 		/* Render frame */
-		do_showpic(screen, frame, font, argv[1]);
+		do_showpic(screen, frame, font, argv[1], &frame_info);
 		if (firsttime) {
 			firsttime = false;
 			/* Create screenshots in a couple of file formats. */
@@ -423,14 +430,19 @@ int main(int argc, char *argv[]) {
 		}
 
 		/* Wait until the next frame should be rendered */
+#if 0
+		getchar();
+#else
 		gettimeofday(&frame_end, NULL);
 		timeval_sub(&tv_spent, &frame_end, &frame_start);
 		timeval_sub(&tv_delay, &frame_info.vafi_showfor, &tv_spent);
+		timeval_add(&frame_end, &frame_end, &tv_delay);
 		TIMEVAL_TO_TIMESPEC(&tv_delay, &ts_delay);
 		frame_start = frame_end;
 		frame_info  = frame_nextinfo;
 		if (ts_delay.tv_sec >= 0)
 			nanosleep(&ts_delay, NULL);
+#endif
 	}
 
 #if 0 /* Not necessary; we're about to exit, so this happens automatically */

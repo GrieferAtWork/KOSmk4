@@ -115,8 +115,6 @@ PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
                          struct mapfile *p_mapfile, enum fmt fmt) {
 	switch (fmt) {
-	case FMT_BAD:
-		break;
 	case FMT_PNG:
 		return libvideo_buffer_open_png(blob, blob_size);
 	case FMT_JPG:
@@ -125,7 +123,7 @@ libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
 		return libvideo_buffer_open_bmp(blob, blob_size, p_mapfile);
 	case FMT_GIF:
 		return anim2frame(libvideo_anim_open_gif(blob, blob_size, p_mapfile));
-	default: __builtin_unreachable();
+	default: break;
 	}
 	errno = ENOTSUP;
 	return NULL;
@@ -135,11 +133,8 @@ PRIVATE ATTR_NOINLINE WUNUSED REF struct video_anim *CC
 libvideo_anim_open_fmt(void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile, enum fmt fmt) {
 	switch (fmt) {
-	case FMT_BAD:
-		break;
 	case FMT_PNG:
-		/* TODO: PNG files also support animations now, and I'm sure there's
-		 *       a way for libpng16.so.16 to give us those animation frames! */
+		/* TODO: Use the (now-apng-patched) libpng to support animated PNG files */
 		return frame2anim(libvideo_buffer_open_png(blob, blob_size));
 	case FMT_JPG:
 		return frame2anim(libvideo_buffer_open_jpg(blob, blob_size));
@@ -147,7 +142,7 @@ libvideo_anim_open_fmt(void const *blob, size_t blob_size,
 		return frame2anim(libvideo_buffer_open_bmp(blob, blob_size, p_mapfile));
 	case FMT_GIF:
 		return libvideo_anim_open_gif(blob, blob_size, p_mapfile);
-	default: __builtin_unreachable();
+	default: break;
 	}
 	errno = ENOTSUP;
 	return NULL;
@@ -158,8 +153,6 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
                          FILE *stream, char const *options,
                          enum fmt fmt) {
 	switch (fmt) {
-	case FMT_BAD:
-		break;
 	case FMT_PNG:
 		return libvideo_buffer_save_png(self, stream, options);
 	case FMT_JPG:
@@ -384,7 +377,7 @@ oneframe_anim_firstframe(struct video_anim const *__restrict self,
 	return me->ofa_frame;
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_OUT(3) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
 oneframe_anim_nextframe(struct video_anim const *__restrict self,
                         /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
                         struct video_anim_frameinfo *__restrict info) {

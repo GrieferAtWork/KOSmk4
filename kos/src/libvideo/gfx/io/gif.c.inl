@@ -29,7 +29,11 @@
 
 #include <kos/anno.h>
 #include <sys/mman.h>
+#include <sys/syslog.h>
 
+#include <assert.h>
+#include <errno.h>
+#include <malloc.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -37,18 +41,830 @@
 /**/
 
 #include "../io-utils.h"
+#include "../ram-buffer.h"
 
 DECL_BEGIN
+
+/* Based on information found here: https://en.wikipedia.org/wiki/GIF
+ * Also somewhat derived from SDL-image,  but not enough to point  at
+ * anything  and  say "Hey! I've seen that one"  (because  I re-wrote
+ * everything myself) */
+#define GET_LE16(p) (((p)[0]) | ((p)[1] << 8))
+
+struct ATTR_PACKED GIF_header {
+	byte_t gh_magic[6];
+	byte_t gh_lscr_width[2];    /* "Logical screen" width */
+	byte_t gh_lscr_height[2];   /* "Logical screen" height */
+	byte_t gh_ctrl;             /* Control  byte:  use  "2 << (gh_ctrl & 0x07)"  as  default  size  for  palettes;
+	                             * Control byte: mask "0x80" indicates presence of global GCT (global color table) */
+	byte_t gh_lscr_background;  /* "Logical screen" background (ignored) */
+	byte_t gh_lscr_aspectratio; /* "Logical screen" aspect ratio (ignored) */
+	/* Global color (if present) is here */
+};
+
+struct ATTR_PACKED GIF_FRAME_header {
+	byte_t gfh_magic[1]; /* "," */
+	byte_t gfh_x[2];     /* X offset */
+	byte_t gfh_y[2];     /* Y offset */
+	byte_t gfh_w[2];     /* Width */
+	byte_t gfh_h[2];     /* Height */
+	byte_t gfh_ctrl;     /* Control   byte:  use  "2 << (gh_ctrl & 0x07)"  as  size  for  palette;
+	                      * Control byte: mask "0x80" indicates presence of local CT (color table)
+	                      * Control byte: mask "0x40" indicates use of interlacing */
+};
+
+/* GIF disposal effects */
+#define GIF_DISPOSE_NA                 0 /* No disposal specified */
+#define GIF_DISPOSE_NONE               1 /* Do not dispose */
+#define GIF_DISPOSE_RESTORE_BACKGROUND 2 /* Restore to background */
+#define GIF_DISPOSE_RESTORE_PREVIOUS   3 /* Restore to previous */
+
+struct gif_config {
+	video_pixel_t gc_trans;   /* Color key for transparency */
+	byte_t        gc_dispose; /* Disposal effect (one of `GIF_DISPOSE_*') */
+	uint16_t      gc_delay;   /* Delay time between frames (in 1/100th seconds) default is 10 */
+};
+
+PRIVATE NONNULL((1, 2)) void CC
+gif_config_populate_showfor(struct gif_config *__restrict self,
+                            struct video_anim_frameinfo *__restrict info) {
+	if (self->gc_delay < 2) {
+		info->vafi_showfor.tv_sec  = 0;
+		info->vafi_showfor.tv_usec = 100000; /* 1/10'th of a second */
+	} else {
+		info->vafi_showfor.tv_sec  = (self->gc_delay / 100);
+		info->vafi_showfor.tv_usec = (self->gc_delay % 100) * 10000;
+	}
+}
+
+
+/* Call after reading the '!' used to start a gif "extension" block
+ * @return: * :   New read pointer
+ * @return: NULL: gif file is corrupted */
+PRIVATE WUNUSED NONNULL((1, 2)) byte_t const *CC
+gif_config_parse_extension(struct gif_config *__restrict self,
+                           byte_t const *reader, byte_t const *eof) {
+	byte_t id  = *reader++;
+	byte_t len = *reader++;
+	if ((reader + len) >= eof)
+		goto fail;
+	switch (id) {
+
+	case 0xf9: /* Graphic Control Extension */
+		if (len < 4)
+			break;
+		self->gc_dispose = (reader[0] >> 2) & 0x7;
+		self->gc_delay   = GET_LE16(reader + 1);
+		if (reader[0] & 1) {
+			self->gc_trans = reader[3];
+		}
+		break;
+
+	default: break;
+	}
+	while (len) {
+		reader += len;
+		len = *reader++;
+		if ((reader + len) >= eof)
+			goto fail;
+	}
+	return reader;
+fail:
+	return NULL;
+}
+
+
+/************************************************************************/
+/* GIF LWZ DECOMPRESSER                                                 */
+/************************************************************************/
+typedef uint_fast16_t lwz_code_t;
+#define LWZ_EOF       ((lwz_code_t)-1)
+#define LWZ_MAX_BITS  12
+#define LWZ_MAX_CODES (1 << LWZ_MAX_BITS)
+#define LWZ_NULL_CODE 0xFFFF
+
+typedef struct {
+	/* Code size configs */
+	uint_fast8_t   lwz_min_codesize; /* Minimum code size (first byte of the stream) */
+	uint_fast8_t   lwz_codesize;     /* [>= lwz_min_code_size + 1] Current code size */
+	lwz_code_t     lwz_clearcode;    /* Clear code value (resets the decompresser) */
+	lwz_code_t     lwz_eofcode;      /* EOF code (causes decompression to halt) */
+	lwz_code_t     lwz_nextcode;     /* The next available code for the dictionary (starts after EOI) */
+	lwz_code_t     lwz_codecount;    /* # of codes for the current code size (aka. first invalid code) */
+
+	/* Decompression dicts */
+	lwz_code_t     lwz_prefix[LWZ_MAX_CODES]; /* Code prefix map */
+	byte_t         lwz_suffix[LWZ_MAX_CODES]; /* Code suffix map */
+	byte_t         lwz_stack[LWZ_MAX_CODES];  /* [0..lwz_stacksize] Temp. buffer for decompressed data */
+	uint_fast16_t  lwz_stacksize;             /* Length of `lwz_stack' */
+
+	/* Decompression state */
+	lwz_code_t     lwz_prevcode;  /* Last-read code */
+	byte_t         lwz_firstbyte; /* First byte of decompressed data (for repeats) */
+	shift_t        lwz_bitoff;    /* Bit-offset into `lwz_blockptr' for next byte to read */
+
+	/* I/O state */
+	byte_t const  *lwz_eof;        /* [const] Hard EOF pointer */
+	byte_t const  *lwz_reader;     /* [<= lwz_eof] To to start of next block yet-to-be processed */
+	byte_t const  *lwz_blockptr;   /* [<= lwz_reader] Next byte in the current block to be read */
+
+	bool lwz_empty_block_encountered; /* True if an empty block was encountered */
+} LWZ_state;
+
+
+/* Load next block of GIF image data */
+PRIVATE WUNUSED NONNULL((1)) bool CC
+_LWZ_load_next_block(LWZ_state *self) {
+	byte_t size;
+
+	/* After an empty block was encountered, there will be no more data */
+	if (self->lwz_empty_block_encountered)
+		return false;
+
+	/* Check for hard EOF */
+	if unlikely(self->lwz_reader >= self->lwz_eof)
+		return false;
+
+	/* Read size of next block */
+	size = *self->lwz_reader++;
+	if (size == 0) {
+		self->lwz_empty_block_encountered = true;
+		return false;
+	}
+
+	/* Set-up pointer for processing the block, but
+	 * enforce  the hard EOF of the memory mapping. */
+	self->lwz_blockptr = self->lwz_reader;
+	self->lwz_reader += size;
+	if unlikely(self->lwz_reader > self->lwz_eof)
+		self->lwz_reader = self->lwz_eof;
+	return true;
+}
+
+/* Read the next couple of bits from the compressed
+ * stream as a code,  which is then returned.  Upon
+ * some sort of EOF, return "LWZ_EOF" instead. */
+PRIVATE WUNUSED NONNULL((1)) lwz_code_t CC
+_LWZ_read_code(LWZ_state *__restrict self) {
+	lwz_code_t code = 0;
+	shift_t read_bits = 0;
+	do {
+		/* Check for EOF */
+		if (self->lwz_blockptr >= self->lwz_reader) {
+			if (!_LWZ_load_next_block(self))
+				return LWZ_EOF;
+		}
+
+		/* Read 1 bit */
+		byte_t byte = *self->lwz_blockptr;
+		byte_t bit  = (byte >> self->lwz_bitoff) & 1;
+
+		/* Add bit to result */
+		code |= bit << read_bits;
+		++read_bits;
+		++self->lwz_bitoff;
+
+		/* Move to next byte if need be */
+		if (self->lwz_bitoff >= 8) {
+			++self->lwz_blockptr;
+			self->lwz_bitoff = 0;
+		}
+	} while (read_bits < self->lwz_codesize);
+	return code;
+}
+
+/* Initialize the LWZ decompresser
+ * @return: 0 : Success
+ * @return: -1: Corrupted stream (`errno' was already modified) */
+PRIVATE WUNUSED NONNULL((1, 2, 3)) int CC
+LWZ_state_init(LWZ_state *self, byte_t const *data, byte_t const *eof) {
+	lwz_code_t i;
+	/* Ensure that we're not already at EOF */
+	if unlikely(data >= eof)
+		goto fail;
+
+	/* Read code size config byte */
+	self->lwz_min_codesize = *data;
+	if unlikely(self->lwz_min_codesize > LWZ_MAX_BITS)
+		goto fail;
+
+	/* Initialize code controls based on "lwz_min_codesize" */
+	self->lwz_clearcode = 1 << self->lwz_min_codesize;
+	self->lwz_eofcode   = self->lwz_clearcode + 1;
+	self->lwz_nextcode  = self->lwz_eofcode + 1;
+	self->lwz_codesize  = self->lwz_min_codesize + 1;
+	self->lwz_codecount = 1 << self->lwz_codesize;
+
+	/* Initialize dicts. */
+	for (i = 0; i < self->lwz_clearcode; ++i) {
+		self->lwz_prefix[i] = LWZ_NULL_CODE;
+		self->lwz_suffix[i] = (byte_t)i;
+	}
+
+	/* First block starts after the "lwz_min_codesize" byte */
+	self->lwz_reader    = data + 1;
+	self->lwz_eof       = eof;
+	self->lwz_stacksize = 0;
+	self->lwz_prevcode  = LWZ_EOF;
+	self->lwz_firstbyte = 0;
+	self->lwz_bitoff    = 0;
+	self->lwz_empty_block_encountered = false;
+
+	/* Load the first block */
+	if unlikely(!_LWZ_load_next_block(self))
+		goto fail;
+	return 0;
+fail:
+	errno = EINVAL;
+	return -1;
+}
+
+/* Read next decompressed byte, or return "EOF" once all have been read.
+ * In  the later case,  `self->lwz_reader' will point  at the first byte
+ * that comes after the end of the compressed block-stream. */
+PRIVATE WUNUSED NONNULL((1)) int CC
+LWZ_state_getc(LWZ_state *__restrict self) {
+#define stack_push(v)                                               \
+	do {                                                            \
+		if (self->lwz_stacksize >= COMPILER_LENOF(self->lwz_stack)) \
+			return EOF;                                             \
+		self->lwz_stack[self->lwz_stacksize++] = (v);               \
+	}	__WHILE0
+	while (self->lwz_stacksize == 0) {
+		lwz_code_t adj_code, code = _LWZ_read_code(self);
+		if (code == LWZ_EOF)
+			return EOF;
+		if (code == self->lwz_clearcode) {
+			self->lwz_codesize  = self->lwz_min_codesize + 1;
+			self->lwz_nextcode  = self->lwz_eofcode + 1;
+			self->lwz_codecount = 1 << self->lwz_codesize;
+			self->lwz_prevcode  = LWZ_EOF;
+			continue;
+		}
+		if (code == self->lwz_eofcode) { /* EOF code encountered */
+			/* Skip any additional blocks that might be there */
+			while (_LWZ_load_next_block(self))
+				;
+			return EOF;
+		}
+		if (self->lwz_prevcode == LWZ_EOF) {
+			stack_push(self->lwz_suffix[code]);
+			self->lwz_prevcode  = code;
+			self->lwz_firstbyte = self->lwz_suffix[code];
+			break;
+		}
+		adj_code = code;
+		if (adj_code >= self->lwz_nextcode) {
+			stack_push(self->lwz_firstbyte);
+			adj_code = self->lwz_prevcode;
+		}
+		while (adj_code >= self->lwz_clearcode && self->lwz_prefix[adj_code] != LWZ_NULL_CODE) {
+			stack_push(self->lwz_suffix[adj_code]);
+			adj_code = self->lwz_prefix[adj_code];
+		}
+		self->lwz_firstbyte = self->lwz_suffix[adj_code];
+		stack_push(self->lwz_firstbyte);
+		if (self->lwz_nextcode < LWZ_MAX_CODES) {
+			self->lwz_prefix[self->lwz_nextcode] = self->lwz_prevcode;
+			self->lwz_suffix[self->lwz_nextcode] = self->lwz_firstbyte;
+			++self->lwz_nextcode;
+			if (self->lwz_nextcode >= self->lwz_codecount && self->lwz_codesize < LWZ_MAX_BITS) {
+				++self->lwz_codesize;
+				self->lwz_codecount = 1 << self->lwz_codesize;
+			}
+		}
+		self->lwz_prevcode = code;
+	}
+	return self->lwz_stack[--self->lwz_stacksize];
+#undef stack_push
+}
+
+
+struct gif_anim;
+struct gif_buffer: video_rambuffer {
+	struct gif_config gb_cfg;     /* [const] Default config */
+	byte_t           *gb_scratch; /* [0..1][owned] Scratch buffer for doing frame I/O */
+	byte_t           *gb_restore; /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
+	byte_t const     *gb_reader;  /* [1..1] Pointer at ';' if last frame rendered, or ',' if there is more */
+	LWZ_state         gb_lzw;     /* LZW reader used to decompress frame data */
+	bool gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS; /* True if "GIF_DISPOSE_RESTORE_PREVIOUS" was encountered */
+};
+
+PRIVATE NONNULL((1)) void CC
+gifbuffer_destroy(struct video_buffer *__restrict self) {
+	struct gif_buffer *me = (struct gif_buffer *)self;
+	free(me->gb_scratch);
+	free(me->gb_restore);
+	rambuffer_destroy(me);
+}
+
+#undef gifbuffer_ops
+PRIVATE struct video_buffer_ops gifbuffer_ops = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gifbuffer_ops(void) {
+	if unlikely(!gifbuffer_ops.vi_destroy) {
+		gifbuffer_ops.vi_rlock       = &rambuffer_lock;
+		gifbuffer_ops.vi_wlock       = &rambuffer_lock;
+		gifbuffer_ops.vi_unlock      = &rambuffer_unlock;
+		gifbuffer_ops.vi_initgfx     = &rambuffer_initgfx;
+		gifbuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
+		COMPILER_WRITE_BARRIER();
+		gifbuffer_ops.vi_destroy = &gifbuffer_destroy;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &gifbuffer_ops;
+}
+#define gifbuffer_ops (*_gifbuffer_ops())
+
+
+struct gif_anim: video_anim {
+	struct mapfile            ga_file;    /* [const][owned] Memory-mapping for the gif file */
+	struct video_codec const *ga_cdc;     /* [1..1][const] Codec for `VIDEO_CODEC_RGB{AX}8888' */
+	byte_t const             *ga_gct;     /* [0..ga_gct_len][const] Global color table */
+	unsigned int              ga_gct_len; /* [const] Global color table length */
+	byte_t const             *ga_frame1;  /* [1..1][const] Points after the ',' of the first frame */
+	byte_t const             *ga_eof;     /* [1..1][const] to the end of the GIF file (== ga_file.mf_addr + ga_file.mf_size) */
+	struct gif_config         ga_cfg;     /* [const] Default config */
+	bool ga_no_GIF_DISPOSE_RESTORE_PREVIOUS; /* True if "GIF_DISPOSE_RESTORE_PREVIOUS" never appears */
+};
+
+PRIVATE NONNULL((1)) void CC
+gif_anim_destroy(struct video_anim *__restrict self) {
+	struct gif_anim *me = (struct gif_anim *)self;
+	(void)unmapfile(&me->ga_file);
+	free(me);
+}
+
+/* @param: ctrl_byte: `struct GIF_FRAME_header::gfh_ctrl'
+ * @return: * :   New reader pointer
+ * @return: NULL: I/O error (corrupt data; `errno' was modified) */
+PRIVATE WUNUSED NONNULL((1, 2, 5, 6)) byte_t const *CC
+gif_read_frame(struct gif_buffer *__restrict self,
+               byte_t *__restrict dst, uint16_t w, uint16_t h,
+               byte_t const *reader, byte_t const *eof,
+               byte_t ctrl_byte) {
+	int byte;
+	LWZ_state *lwz = &self->gb_lzw;
+
+	/* Initialize LWZ reader */
+	if unlikely(LWZ_state_init(lwz, reader, eof))
+		goto fail;
+
+	/* Read pixel data and populate "dst" buffer */
+	if (ctrl_byte & 0x40) {
+		uint16_t x, y;
+		/* Interlaced... */
+		for (y = 0; y < h; y += 8) { /* L0 */
+			byte_t *line = dst + y * w;
+			for (x = 0; x < w; ++x) {
+				byte = LWZ_state_getc(lwz);
+				if unlikely(byte == EOF)
+					goto done;
+				*line++ = (byte_t)byte;
+			}
+		}
+		for (y = 4; y < h; y += 8) { /* L4 */
+			byte_t *line = dst + y * w;
+			for (x = 0; x < w; ++x) {
+				byte = LWZ_state_getc(lwz);
+				if unlikely(byte == EOF)
+					goto done;
+				*line++ = (byte_t)byte;
+			}
+		}
+		for (y = 2; y < h; y += 4) { /* L2+6 */
+			byte_t *line = dst + y * w;
+			for (x = 0; x < w; ++x) {
+				byte = LWZ_state_getc(lwz);
+				if unlikely(byte == EOF)
+					goto done;
+				*line++ = (byte_t)byte;
+			}
+		}
+		for (y = 1; y < h; y += 2) { /* L1+3+5+7 */
+			byte_t *line = dst + y * w;
+			for (x = 0; x < w; ++x) {
+				byte = LWZ_state_getc(lwz);
+				if unlikely(byte == EOF)
+					goto done;
+				*line++ = (byte_t)byte;
+			}
+		}
+	} else {
+		/* Non-interlaced... */
+		byte_t *img_end = dst + w * h;
+		do {
+			byte = LWZ_state_getc(lwz);
+			if unlikely(byte == EOF)
+				goto done;
+			*dst++ = (byte_t)byte;
+		} while (dst < img_end);
+	}
+
+	/* Read any remaining data... (there shouldn't be any, but better be safe...) */
+	while (byte != EOF)
+		byte = LWZ_state_getc(lwz);
+done:
+	return lwz->lwz_reader;
+fail:
+	return NULL;
+}
+
+/* Called with "reader" pointing after the ',' of the frame to paint */
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) byte_t const *CC
+gif_anim_paintframe(struct gif_anim const *__restrict anim,
+                    struct gif_buffer *__restrict self,
+                    byte_t const *reader,
+                    byte_t const *eof) {
+	byte_t ctrl;
+	byte_t const *lct;
+	unsigned int lct_len;
+	uint16_t frame_x, frame_y;
+	uint16_t frame_w, frame_h;
+
+	/* Apply dispose effects */
+	switch (self->gb_cfg.gc_dispose) {
+
+	case GIF_DISPOSE_RESTORE_BACKGROUND:
+		/* Backup previous frame & clear background for new frame */
+		if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
+			bzero(self->rb_data, self->rb_total);
+		} else if (!self->gb_restore) {
+			byte_t *backup = (byte_t *)calloc(self->rb_total);
+			if unlikely(!backup)
+				goto err;
+			self->gb_restore = self->rb_data;
+			self->rb_data = backup;
+		} else {
+			byte_t *backup = self->gb_restore;
+			self->gb_restore = self->rb_data;
+			self->rb_data = backup;
+			bzero(backup, self->rb_total);
+		}
+		break;
+
+	case GIF_DISPOSE_RESTORE_PREVIOUS:
+		self->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = true;
+		/* Restore previous frame */
+		if (self->gb_restore)
+			memcpy(self->rb_data, self->gb_restore, self->rb_total);
+		break;
+
+	default:
+		/* Backup current frame in case "GIF_DISPOSE_RESTORE_PREVIOUS" ever gets used */
+		if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS)
+			break;
+		if (!self->gb_restore) {
+			self->gb_restore = (byte_t *)malloc(self->rb_total);
+			if unlikely(!self->gb_restore)
+				goto err;
+		}
+		memcpy(self->gb_restore, self->rb_data, self->rb_total);
+		break;
+	}
+
+	/* Read frame position and dimensions */
+	frame_x = GET_LE16(reader + 0); /* struct GIF_FRAME_header::gfh_x */
+	frame_y = GET_LE16(reader + 2); /* struct GIF_FRAME_header::gfh_y */
+	frame_w = GET_LE16(reader + 4); /* struct GIF_FRAME_header::gfh_w */
+	frame_h = GET_LE16(reader + 6); /* struct GIF_FRAME_header::gfh_h */
+	reader += 8; /* Point "reader" at `struct GIF_FRAME_header::gfh_ctrl' */
+
+	/* Make sure there is enough space in the scratch-buffer to hold this frame. */
+	{
+		size_t reqsize = frame_w * frame_h * 1;
+		size_t avlsize = malloc_usable_size(self->gb_scratch);
+		if (reqsize > avlsize) {
+			byte_t *newbuf = (byte_t *)realloc(self->gb_scratch, reqsize);
+			if unlikely(!newbuf)
+				goto err;
+			self->gb_scratch = newbuf;
+		}
+	}
+
+	/* Read frame control byte */
+	ctrl = *reader++;
+	if (ctrl & 0x80) {
+		static_assert((2 << (0xff & 0x07)) <= 256);
+		lct_len = 2 << (ctrl & 0x07);
+		if ((reader + (lct_len * 3)) >= eof)
+			goto fail;
+		lct = reader;
+		reader += lct_len * 3;
+	} else {
+		lct     = anim->ga_gct;
+		lct_len = anim->ga_gct_len;
+		if unlikely(!lct)
+			goto fail;
+	}
+
+	/* Read frame into buffer */
+	reader = gif_read_frame(self, self->gb_scratch,
+	                        frame_w, frame_h,
+	                        reader, eof, ctrl);
+	if unlikely(!reader)
+		goto fail;
+
+	/* Force-clamp frame coords to valid coords.
+	 * These should never point out-of-bounds, but better be safe than sorry. */
+	{
+		video_coord_t frame_endx = (video_coord_t)frame_x + frame_w;
+		video_coord_t frame_endy = (video_coord_t)frame_y + frame_h;
+		if unlikely(frame_endx > self->vb_size_x) {
+			if (frame_w > self->vb_size_x)
+				frame_w = self->vb_size_x;
+			frame_x = self->vb_size_x - frame_w;
+		}
+		if unlikely(frame_endy > self->vb_size_y) {
+			if (frame_h > self->vb_size_y)
+				frame_h = self->vb_size_y;
+			frame_y = self->vb_size_y - frame_h;
+		}
+	}
+
+	/* Render scratch buffer onto frame and translate palette
+	 * indices.  This is why we're using RGBX8888 by-the-way. */
+	{
+		byte_t *dst = self->rb_data + frame_x * 4 + frame_y * self->rb_stride;
+		byte_t *src = self->gb_scratch;
+		uint16_t x, y;
+		for (y = 0; y < frame_h; ++y) {
+			byte_t *line = dst;
+			for (x = 0; x < frame_w; ++x) {
+				byte_t pixel = *src++;
+				if (pixel != self->gb_cfg.gc_trans) {
+					video_color_t color;
+					if (pixel >= lct_len) {
+						color = 0;
+					} else {
+						uint8_t r = lct[pixel * 3 + 0];
+						uint8_t g = lct[pixel * 3 + 1];
+						uint8_t b = lct[pixel * 3 + 2];
+						color = VIDEO_COLOR_RGB(r, g, b);
+					}
+					*(uint32_t *)line = color;
+				}
+				line += 4;
+			}
+			dst += self->rb_stride;
+		}
+	}
+
+	return reader;
+fail:
+	errno = EINVAL;
+err:
+	return NULL;
+}
+
+
+PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) REF struct video_buffer *CC
+gif_anim_firstframe(struct video_anim const *__restrict self,
+                    struct video_anim_frameinfo *__restrict info) {
+	struct gif_anim *me = (struct gif_anim *)self;
+	REF struct gif_buffer *result;
+	byte_t const *reader = me->ga_frame1;
+	byte_t const *eof = me->ga_eof;
+
+	/* Create main animation frame buffer */
+	result = (REF struct gif_buffer *)malloc(sizeof(struct gif_buffer));
+	if unlikely(!result)
+		goto err;
+
+	result->vb_refcnt          = 1;
+	result->vb_ops             = &gifbuffer_ops;
+	result->vb_format.vf_codec = me->ga_cdc;
+	result->vb_format.vf_pal   = NULL;
+	result->vb_size_x          = me->va_size_x;
+	result->vb_size_y          = me->va_size_y;
+	result->rb_stride          = me->va_size_x * 4;
+	result->rb_total           = me->va_size_x * 4 * me->va_size_y;
+	result->rb_data = (byte_t *)malloc(result->rb_total);
+	if unlikely(!result->rb_data)
+		goto err_r;
+	result->gb_cfg     = me->ga_cfg;
+	result->gb_restore = NULL;
+	result->gb_scratch = NULL;
+	result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = false;
+
+	/* Paint the first frame */
+	reader = gif_anim_paintframe(me, result, reader, eof);
+	if unlikely(!reader)
+		goto err_r_data;
+
+	/* Fill in frame info */
+	info->vafi_frameid = 0;
+	gif_config_populate_showfor(&result->gb_cfg, info);
+	result->gb_reader = reader;
+	return result;
+err_r_data:
+	free(result->gb_restore);
+	free(result->gb_scratch);
+	free(result->rb_data);
+err_r:
+	free(result);
+err:
+	return NULL;
+}
+
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
+gif_anim_nextframe(struct video_anim const *__restrict self,
+                   /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
+                   struct video_anim_frameinfo *__restrict info) {
+	struct gif_anim *me = (struct gif_anim *)self;
+	REF struct gif_buffer *result = (REF struct gif_buffer *)buf;
+	byte_t const *reader, *eof;
+	byte_t ctrl;
+	assert(result->vb_ops == &gifbuffer_ops);
+
+	/* Indicate next frame in caller-given "info" */
+	++info->vafi_frameid;
+
+	/* Start reading blocks until we hit another frame */
+	reader = result->gb_reader;
+	eof    = me->ga_eof;
+	for (;;) {
+		if unlikely(reader >= eof)
+			goto rewind;
+		ctrl = *reader++;
+		if (ctrl == ';')
+			goto rewind;
+		if (ctrl == '!') {
+			reader = gif_config_parse_extension(&result->gb_cfg, reader, eof);
+			if unlikely(!reader)
+				goto fail;
+			continue;
+		}
+		if (ctrl == ',')
+			break; /* Got start of first frame! */
+		syslog(LOG_WARN, "[libvideo-gfx][gif] Unexpected block indicator: %#" PRIx8 "\n", ctrl);
+	}
+
+	/* Now after ',' of next frame */
+	if ((reader + 10) >= eof)
+		goto fail;
+
+read_frame_at_header:
+	/* Paint the next frame */
+	reader = gif_anim_paintframe(me, result, reader, eof);
+	if unlikely(!reader)
+		goto err;
+
+	/* Fill in frame info */
+	gif_config_populate_showfor(&result->gb_cfg, info);
+	result->gb_reader = reader;
+	return result;
+rewind:
+	if (!result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS)
+		me->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS = true;
+	info->vafi_frameid = 0;
+	result->gb_cfg = me->ga_cfg;
+	reader = me->ga_frame1;
+	goto read_frame_at_header;
+fail:
+	errno = EINVAL;
+err:
+	return NULL;
+}
+
+
+
+#undef gif_anim_ops
+PRIVATE struct video_anim_ops gif_anim_ops = {};
+PRIVATE struct video_anim_ops *CC _gif_anim_ops(void) {
+	if (!gif_anim_ops.vao_destroy) {
+		gif_anim_ops.vao_nextframe  = &gif_anim_nextframe;
+		gif_anim_ops.vao_firstframe = &gif_anim_firstframe;
+		COMPILER_WRITE_BARRIER();
+		gif_anim_ops.vao_destroy = &gif_anim_destroy;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &gif_anim_ops;
+}
+#define gif_anim_ops (*_gif_anim_ops())
+
 
 /* GIF */
 INTERN WUNUSED REF struct video_anim *CC
 libvideo_anim_open_gif(void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile) {
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)blob;
-	(void)blob_size;
-	(void)p_mapfile;
+	REF struct gif_anim *result;
+	struct GIF_header const *header;
+	byte_t const *reader, *eof;
+	eof    = (byte_t const *)blob + blob_size;
+	header = (struct GIF_header const *)blob;
+	if (blob_size <= sizeof(struct GIF_header))
+		goto fail;
+	if (header->gh_magic[0] != 'G')
+		goto fail;
+	if (header->gh_magic[1] != 'I')
+		goto fail;
+	if (header->gh_magic[2] != 'F')
+		goto fail;
+	if (header->gh_magic[3] != '8')
+		goto fail;
+	if ((header->gh_magic[4] != '7' || header->gh_magic[5] != 'a') &&
+	    (header->gh_magic[4] != '9' || header->gh_magic[5] != 'a'))
+		goto fail;
+	reader = (byte_t const *)header + 13;
+
+	/* Allocate gif buffer */
+	result = (REF struct gif_anim *)malloc(sizeof(struct gif_anim));
+	if unlikely(!result)
+		goto err;
+
+	/* Read global color table */
+	result->ga_gct = NULL;
+	result->ga_gct_len = 0;
+	if (header->gh_ctrl & 0x80) {
+		unsigned int gct_entries;
+		static_assert((2 << (0xff & 0x07)) <= 256);
+		gct_entries = 2 << (header->gh_ctrl & 0x07);
+		if ((reader + (gct_entries * 3)) >= eof)
+			goto err_r;
+		result->ga_gct     = reader;
+		result->ga_gct_len = gct_entries;
+		reader += gct_entries * 3;
+	}
+
+	/* Default init config */
+	result->ga_cfg.gc_trans   = (video_pixel_t)-1;
+	result->ga_cfg.gc_dispose = GIF_DISPOSE_NA;
+	result->ga_cfg.gc_delay   = 10;
+	result->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS = false;
+
+	/* Read blocks until we hit the first frame */
+	for (;;) {
+		byte_t ctrl;
+		if (reader >= eof)
+			goto fail_r;
+		ctrl = *reader++;
+		if (ctrl == ';')
+			goto fail_r; /* EOF-marker before first frame? */
+		if (ctrl == '!') {
+			reader = gif_config_parse_extension(&result->ga_cfg, reader, eof);
+			if unlikely(!reader)
+				goto fail_r;
+			/* Restoring the previous image at the start would just re-restore the background. */
+			if (result->ga_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS)
+				result->ga_cfg.gc_dispose = GIF_DISPOSE_RESTORE_BACKGROUND;
+			continue;
+		}
+		if (ctrl == ',')
+			break; /* Got start of first frame! */
+		syslog(LOG_WARN, "[libvideo-gfx][gif] Unexpected block indicator: %#" PRIx8 "\n", ctrl);
+	}
+
+	/* Ensure that there is enough data for the first frame's header */
+	if ((reader + 10) >= eof)
+		goto fail_r;
+
+	/* Fill in standard fields of "result" */
+	result->va_refcnt = 1;
+	result->va_ops    = &gif_anim_ops;
+	result->va_size_x = GET_LE16(header->gh_lscr_width);
+	result->va_size_y = GET_LE16(header->gh_lscr_height);
+	if (result->va_size_x < ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4)))
+		result->va_size_x = ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4));
+	if (result->va_size_y < ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6)))
+		result->va_size_y = ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6));
+	result->ga_cdc = video_codec_lookup(result->ga_cfg.gc_trans == (video_pixel_t)-1
+	                                    ? VIDEO_CODEC_RGBA8888
+	                                    : VIDEO_CODEC_RGBX8888);
+	if unlikely(!result->ga_cdc) {
+		errno = ENODEV;
+		goto err_r;
+	}
+
+	/* Fill in "result" */
+	if (p_mapfile) {
+		result->ga_file = *p_mapfile;
+		bzero(p_mapfile, sizeof(*p_mapfile)); /* Steal */
+		result->ga_frame1 = reader;
+		result->ga_eof    = eof;
+	} else {
+		uintptr_t frame1_offset;
+		byte_t const *copy_base = reader;
+		if (result->ga_gct_len)
+			copy_base = result->ga_gct;
+		frame1_offset = (uintptr_t)(reader - copy_base);
+		result->ga_file.mf_size = (size_t)(eof - copy_base);
+		result->ga_file.mf_addr = (byte_t *)memdup(copy_base, result->ga_file.mf_size);
+		if unlikely(!result->ga_file.mf_addr)
+			goto err_r;
+		__mapfile_setheap(&result->ga_file);
+		result->ga_gct    = result->ga_file.mf_addr;
+		result->ga_frame1 = result->ga_file.mf_addr + frame1_offset;
+		result->ga_eof    = result->ga_file.mf_addr + result->ga_file.mf_size;
+	}
+
+	return result;
+err_r:
+	free(result);
+err:
+	return NULL;
+fail_r:
+	free(result);
+fail:
 	return VIDEO_ANIM_WRONG_FMT;
 }
 

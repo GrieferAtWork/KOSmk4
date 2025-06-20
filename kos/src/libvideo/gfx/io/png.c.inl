@@ -267,7 +267,7 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		unsigned int pal_i;
 
 		/* Palette-driven */
-		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
+		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
 		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
 			switch (bit_depth) {
 			case 1: result_codec_id = VIDEO_CODEC_PA11_MSB; break;
@@ -305,7 +305,7 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		result_pal = video_palette_optimize(result_pal);
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
-		/*png_set_packswap(png_ptr);*/ /* If we called this, below would below *_LSB */
+		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
 		if (color_type & LIBPNG_COLOR_MASK_ALPHA) {
 			switch (bit_depth) {
 			case 1: result_codec_id = VIDEO_CODEC_LA11_MSB; break;

@@ -94,13 +94,14 @@ struct video_anim_ops {
 	 * >>     screen_buffer_updaterect(screen, &update_rect);
 	 * >>
 	 * >>     // Load next frame as part of render delay
-	 * >>     nextinfo = frame;
+	 * >>     nextinfo = info;
 	 * >>     video_anim_nextframe(&anim, frame, &nextinfo);
 	 * >>
 	 * >>     // Wait until the next frame should be rendered
 	 * >>     gettimeofday(&frame_end, NULL);
 	 * >>     timeval_sub(&tv_spent, &frame_end, &frame_start);
 	 * >>     timeval_sub(&tv_delay, &info.vafi_showfor, &tv_spent);
+	 * >>     timeval_add(&frame_end, &frame_end, &tv_delay);
 	 * >>     TIMEVAL_TO_TIMESPEC(&tv_delay, &ts_delay);
 	 * >>     frame_start = frame_end;
 	 * >>     info = nextinfo;
@@ -133,6 +134,12 @@ struct video_anim_ops {
 	 *          memory  used to back any potential video  lock). The only thing it is
 	 *          not allowed to changed are the buffer's dimensions.
 	 *
+	 * CAUTION: The video buffer returned by `vao_firstframe' might contain some extra
+	 *          out-of-band data that is then  needed/used by this function to  render
+	 *          the next frame. Do **NOT** pass a video buffer that wasn't returned by
+	 *          `vao_firstframe',  and do **NOT**  try to skip  frames by changing the
+	 *          value in `__info->vafi_frameid' between calls.
+	 *
 	 * @return: * :   A video buffer with the  same resolution as `__buf' (or  possibly
 	 *                just  `__buf' again), that  contains a render  of the next frame.
 	 *                In this case,  this function semantically  inherited a  reference
@@ -143,7 +150,7 @@ struct video_anim_ops {
 	 *                contents  of `__buf' may have been modified and may even look
 	 *                corrupted now (though semantically speaking, `__buf' is still
 	 *                guarantied to be in a consistent state). */
-	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_INOUT_T(2) __ATTR_OUT_T(3) __REF struct video_buffer *
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_INOUT_T(2) __ATTR_INOUT_T(3) __REF struct video_buffer *
 	(LIBVIDEO_GFX_CC *vao_nextframe)(struct video_anim const *__restrict __self,
 	                                 /*inherit(on_success)*/ __REF struct video_buffer *__restrict __buf,
 	                                 struct video_anim_frameinfo *__restrict __info);
