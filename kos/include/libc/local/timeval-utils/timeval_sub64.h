@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4b01b5d */
+/* HASH CRC-32:0x71d3f0cd */
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __LOCAL_LIBC(timeval_sub64) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timeval_sub64))(struct __timeval64 *__result, struct __timeval64 const *__lhs, struct __timeval64 const *__rhs) {
 	__result->tv_sec  = __lhs->tv_sec  - __rhs->tv_sec;
 	__result->tv_usec = __lhs->tv_usec - __rhs->tv_usec;
-	if ((__suseconds_t)__result->tv_usec < (__suseconds_t)__UINT32_C(1000000)) {
+	if ((__suseconds_t)__result->tv_usec < 0) {
 		__result->tv_usec += __UINT32_C(1000000);
 		--__result->tv_sec;
 	}
