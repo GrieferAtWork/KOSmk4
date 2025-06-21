@@ -34,6 +34,7 @@
 #include <sys/param.h>
 
 #include <stdint.h>
+#include <string.h>
 
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/format.h>
@@ -42,8 +43,8 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "../gfx.h"
 #include "../gfx-utils.h"
+#include "../gfx.h"
 
 DECL_BEGIN
 

@@ -300,6 +300,7 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
 	                                 video_dim_t __size_x, video_dim_t __size_y);
+	/* TODO: "vc_rectmove" (same as `vc_rectcopy', but dst_line/src_line aren't __restrict) */
 
 	/* Extra implementation-specific operators/fields go here... */
 };

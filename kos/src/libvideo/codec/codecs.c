@@ -366,11 +366,19 @@ rectcopy8(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	src_line += src_x;
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
-	do {
-		memcpyb(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpyb(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpyb(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
@@ -387,11 +395,19 @@ rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	codec_assert(!((uintptr_t)dst_line & 1));
 	codec_assert(!((uintptr_t)src_line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	do {
-		memcpyw(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == (size_x << 1)) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpyw(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpyw(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
@@ -403,11 +419,19 @@ rectcopy24(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 	size_x *= 3;
-	do {
-		memcpy(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
@@ -424,11 +448,19 @@ rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	codec_assert(!((uintptr_t)dst_line & 3));
 	codec_assert(!((uintptr_t)src_line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	do {
-		memcpyl(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpyl(dst_line, src_line, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpyl(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -444,11 +476,19 @@ unaligned_rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 	size_x <<= 1;
-	do {
-		memcpy(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, dst_stride * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
@@ -460,11 +500,19 @@ unaligned_rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
 	size_x <<= 2;
-	do {
-		memcpy(dst_line, src_line, size_x);
-		dst_line += dst_stride;
-		src_line += src_stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (dst_stride == src_stride && dst_stride == size_x) {
+		/* Special case: can memcpy **all** pixel data in a single go */
+		memcpy(dst_line, src_line, dst_stride * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memcpy(dst_line, src_line, size_x);
+			dst_line += dst_stride;
+			src_line += src_stride;
+		} while (--size_y);
+	}
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
