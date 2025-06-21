@@ -28,7 +28,6 @@
 #include <kos/refptr.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <kos/kernel/printk.h>
 
 #include <err.h>
 #include <errno.h>
@@ -95,11 +94,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->getgfx(gfx,
 	               GFX_BLENDMODE_ALPHA,
-	               VIDEO_GFX_FLINEARBLIT |
-	               VIDEO_GFX_FRDXWRAP |
-	               VIDEO_GFX_FRDYWRAP |
-	               VIDEO_GFX_FWRXWRAP |
-	               VIDEO_GFX_FWRYWRAP);
+	               VIDEO_GFX_FLINEARBLIT);
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;
@@ -109,6 +104,7 @@ int main(int argc, char *argv[]) {
 	fontprinter_data.vfp_bg_fg_colors[1] = VIDEO_COLOR_BLACK;
 	mbstate_init(&fontprinter_data.vfp_u8word);
 
+	gfx.fill(fontprinter_data.vfp_bg_fg_colors[0]);
 	int render_mode = 0;
 again_font:
 
@@ -116,27 +112,26 @@ again_font:
 	fontgfx = gfx;
 	if (render_mode == 0) {
 		/* Upper half + lower half */
-		fontgfx.clip(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
+		fontgfx.clip(0, 0, screen->vb_xdim, screen->vb_ydim);
 		fontprinter_data.vfp_cury = 0;
 	} else if (render_mode == 1) {
 		/* lower half only (plus additional lines) */
 		fontgfx.clip(0,
 		             fontprinter_data.vfp_height / 2,
-		             VIDEO_DIM_MAX,
-		             VIDEO_DIM_MAX);
+		             screen->vb_xdim,
+		             screen->vb_ydim - (fontprinter_data.vfp_height / 2));
 		fontprinter_data.vfp_cury = -(video_offset_t)(fontprinter_data.vfp_height / 2);
 	} else {
 		/* upper half only */
-		fontgfx.clip(0, 0, VIDEO_DIM_MAX, fontprinter_data.vfp_height / 2);
+		fontgfx.clip(0, 0,
+		             screen->vb_xdim,
+		             fontprinter_data.vfp_height / 2);
 		fontprinter_data.vfp_cury = 0;
 	}
 	fontprinter_data.vfp_gfx   = &fontgfx;
 	fontprinter_data.vfp_lnend = video_gfx_getclipw(&fontgfx);
 	fontprinter_data.vfp_curx  = 0;
 
-	printk(KERN_DEBUG "GFX: BEGIN RENDER\n");
-	gfx.fill(VIDEO_COLOR_WHITE);
-	printk(KERN_DEBUG "GFX: AFTER FILL\n");
 	format_printf(&video_fontprinter,
 	              &fontprinter_data,
 //	              "Hello World!\n"
@@ -153,7 +148,11 @@ again_font:
 
 	              "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏\n"
 	              "▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟\n");
-	printk(KERN_DEBUG "GFX: DONE RENDER\n");
+	/* Clear screen beyond text area */
+	fontgfx.fill(fontprinter_data.vfp_curx, fontprinter_data.vfp_cury,
+	             video_gfx_getclipw(&fontgfx) - fontprinter_data.vfp_curx,
+	             video_gfx_getcliph(&fontgfx) - fontprinter_data.vfp_cury,
+	             fontprinter_data.vfp_bg_fg_colors[0]);
 
 	for (;;) {
 		char buf[1];
@@ -167,14 +166,12 @@ again_font:
 		} else if (buf[0] == 'm') {
 			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
-			screen->getgfx(gfx, gfx.vx_blend,
-			               gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT);
+			uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FLINEARBLIT);
+			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'd') {
-			screen->getgfx(gfx, gfx.vx_blend,
-			               gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP |
-			                               VIDEO_GFX_FRDYWRAP |
-			                               VIDEO_GFX_FWRXWRAP |
-			                               VIDEO_GFX_FWRYWRAP));
+			uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
+			                                  VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
@@ -224,13 +221,11 @@ again_font:
 			case 's':
 				goto random_step;
 
-			case 'd':
-				screen->getgfx(gfx, gfx.vx_blend,
-				               gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP |
-				                               VIDEO_GFX_FRDYWRAP |
-				                               VIDEO_GFX_FWRXWRAP |
-				                               VIDEO_GFX_FWRYWRAP));
-				break;
+			case 'd': {
+				uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
+				                                  VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+				video_gfx_setflags(&gfx, flags);
+			}	break;
 
 			case '0' ... '9':
 				action = buf[0] - '0';
@@ -290,14 +285,8 @@ step:
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
-			screen->getgfx(blurgfx,
-			               gfx.vx_blend,
-			               gfx.vx_flags | VIDEO_GFX_FBLUR,
-			               gfx.vx_colorkey);
-			blurgfx.clip(video_gfx_getclipx(&gfx),
-			             video_gfx_getclipy(&gfx),
-			             video_gfx_getclipw(&gfx),
-			             video_gfx_getcliph(&gfx));
+			blurgfx = gfx;
+			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_FBLUR);
 			gfx.bitblit((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
 			            (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
 			            blurgfx,

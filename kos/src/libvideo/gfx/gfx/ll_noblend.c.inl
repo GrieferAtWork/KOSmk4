@@ -703,7 +703,7 @@ libvideo_gfx_noblend__fillmask1__bypixel(struct video_gfx const *__restrict self
 	} while (--size_y);
 }
 
-INTERN ATTR_IN(1) ATTR_IN(7) void CC
+INTERN ATTR_NOINLINE ATTR_IN(1) ATTR_IN(7) void CC
 libvideo_gfx_noblend__fillmask1(struct video_gfx const *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
                                 video_dim_t size_x, video_dim_t size_y,

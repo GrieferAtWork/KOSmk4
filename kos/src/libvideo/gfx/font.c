@@ -48,6 +48,7 @@
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/font.h>
+#include <libvideo/gfx/gfx.h>
 
 #include "font.h"
 #include "fonts/tlft.h"
@@ -194,6 +195,12 @@ libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
 		break;
 
 	case '\n':
+		/* Fill remainder of line with the current background color. */
+		if (self->vfp_curx < self->vfp_lnend) {
+			video_gfx_fill(self->vfp_gfx, self->vfp_curx, self->vfp_cury,
+			               self->vfp_lnend - self->vfp_curx, self->vfp_height,
+			               self->vfp_bg_fg_colors[0]);
+		}
 		self->vfp_curx = self->vfp_lnstart;
 		self->vfp_cury += self->vfp_height;
 		result = 0;

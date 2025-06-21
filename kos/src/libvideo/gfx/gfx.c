@@ -400,6 +400,9 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx const *__restrict self,
 		libvideo_gfx_noblend__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
+
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
@@ -437,6 +440,8 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 		libvideo_gfx_noblend__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
@@ -492,6 +497,8 @@ libvideo_gfx_generic__absline_h(struct video_gfx const *__restrict self,
 		libvideo_gfx_noblend__absline_h(self, dst_x, dst_y, length, color);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	do {
 		video_gfx_x_putcolor(self, dst_x, dst_y, color);
 		++dst_x;
@@ -509,6 +516,8 @@ libvideo_gfx_generic__absline_v(struct video_gfx const *__restrict self,
 		libvideo_gfx_noblend__absline_v(self, dst_x, dst_y, length, color);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	do {
 		video_gfx_x_putcolor(self, dst_x, dst_y, color);
 		++dst_y;
@@ -527,6 +536,8 @@ libvideo_gfx_generic__absfill(struct video_gfx const *__restrict self,
 		libvideo_gfx_noblend__absfill(self, dst_x, dst_y, size_x, size_y, color);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	do {
 		video_gfx_x_absline_h(self, dst_x, dst_y, size_x, color);
 		++dst_y;
@@ -551,6 +562,11 @@ libvideo_gfx_generic__absgradient(struct video_gfx const *__restrict self,
 		                                    colors[0][0], colors[0][1]);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, colors[0][0]) &&
+	    libvideo_gfx_allow_ignore(self, colors[0][1]) &&
+	    libvideo_gfx_allow_ignore(self, colors[1][0]) &&
+	    libvideo_gfx_allow_ignore(self, colors[1][1]))
+		return;
 
 	/* Check for special case: can blending be disabled? */
 	if ((self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&
@@ -647,6 +663,9 @@ libvideo_gfx_generic__absgradient_h(struct video_gfx const *__restrict self,
 		libvideo_gfx_generic__absfill(self, dst_x, dst_y, size_x, size_y, locolor);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, locolor) &&
+	    libvideo_gfx_allow_ignore(self, hicolor))
+		return;
 
 	/* Check for special case: can blending be disabled? */
 	if ((self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&
@@ -699,6 +718,9 @@ libvideo_gfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 		libvideo_gfx_generic__absfill(self, dst_x, dst_y, size_x, size_y, locolor);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, locolor) &&
+	    libvideo_gfx_allow_ignore(self, hicolor))
+		return;
 
 	/* Check for special case: can blending be disabled? */
 	if ((self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) &&
@@ -742,7 +764,7 @@ libvideo_gfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 /* BIT-MASKED FILL                                                      */
 /************************************************************************/
 
-INTERN ATTR_IN(1) ATTR_IN(7) void CC
+PRIVATE ATTR_NOINLINE ATTR_IN(1) ATTR_IN(7) void CC
 libvideo_gfx_generic__fillmask1(struct video_gfx const *__restrict self,
                                 video_coord_t dst_x, video_coord_t dst_y,
                                 video_dim_t size_x, video_dim_t size_y,
@@ -751,6 +773,8 @@ libvideo_gfx_generic__fillmask1(struct video_gfx const *__restrict self,
                                 __REGISTER_TYPE__ bm_xor) {
 	byte_t const *bitmask;
 	uintptr_t bitskip;
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	TRACE_START("generic__fillmask1("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ", "
@@ -1024,7 +1048,7 @@ done:
 	TRACE_END("generic__fillmask()\n");
 }
 
-PRIVATE ATTR_IN(1) ATTR_IN(9) void CC
+PRIVATE ATTR_NOINLINE ATTR_IN(1) ATTR_IN(9) void CC
 libvideo_gfx_generic__fillstretchmask_l__alpha_only(struct video_gfx const *__restrict self,
                                                     video_coord_t dst_x_, video_coord_t dst_y_,
                                                     video_dim_t dst_size_x_, video_dim_t dst_size_y_,
@@ -1032,10 +1056,16 @@ libvideo_gfx_generic__fillstretchmask_l__alpha_only(struct video_gfx const *__re
                                                     video_dim_t src_size_x_, video_dim_t src_size_y_,
                                                     struct video_bitmask const *__restrict bm,
                                                     __REGISTER_TYPE__ bm_xor) {
-	uintptr_t bitskip_ = bm->vbm_skip;
-	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
-	video_color_t raw_color = color & ~VIDEO_COLOR_ALPHA_MASK;
-	channel_t raw_alpha = VIDEO_COLOR_GET_ALPHA(color);
+	uintptr_t bitskip_;
+	byte_t const *bitmask;
+	video_color_t raw_color;
+	channel_t raw_alpha;
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
+	bitskip_  = bm->vbm_skip;
+	bitmask   = (byte_t const *)bm->vbm_mask;
+	raw_color = color & ~VIDEO_COLOR_ALPHA_MASK;
+	raw_alpha = VIDEO_COLOR_GET_ALPHA(color);
 #define makealpha(alpha_chan) (channel_t)(((twochannels_t)raw_alpha * (alpha_chan)) / CHANNEL_MAX)
 #define makecolor(alpha_chan) (raw_color | ((video_color_t)makealpha(alpha_chan) << VIDEO_COLOR_ALPHA_SHIFT))
 	bitmask += bitskip_ / NBBY;
@@ -1153,6 +1183,9 @@ libvideo_gfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self,
 			return;
 		}
 	}
+	if (libvideo_gfx_allow_ignore(self, bg_fg_colors[0]) &&
+	    libvideo_gfx_allow_ignore(self, bg_fg_colors[1]))
+		return;
 
 	/* Need to do full blending of colors */
 	bitskip_ = bm->vbm_skip;
@@ -1247,6 +1280,8 @@ libvideo_gfx_generic__fillstretchmask1_n(struct video_gfx const *__restrict self
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
 	}
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
 	if ((src_size_x < (dst_size_x >> 1)) &&
 	    (src_size_y < (dst_size_y >> 1))) {
 		/* TODO: Iterate across "src"  and use  "video_gfx_x_absfill"
@@ -1305,6 +1340,9 @@ libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self,
 		                                         (__REGISTER_TYPE__)-1);
 		return;
 	}
+	if (libvideo_gfx_allow_ignore(self, bg_fg_colors[0]) &&
+	    libvideo_gfx_allow_ignore(self, bg_fg_colors[1]))
+		return;
 
 	/* Check if blending can be disabled... */
 	if ((noblend_colors[0] = bg_fg_colors[0], libvideo_gfx_allow_noblend(self, &noblend_colors[0])) &&
