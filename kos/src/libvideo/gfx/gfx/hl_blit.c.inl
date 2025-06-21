@@ -605,7 +605,7 @@ libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict s
 
 				/* Right side */
 				libvideo_blitter_generic_stretch(self, iter_dst_x, iter_dst_y, lasttile_dst_size_x, tile_h,
-				                                 0, 0, src_maxsx, src->vx_hdr.vxh_cysiz);
+				                                 0, 0, iter_src_size_x, src->vx_hdr.vxh_cysiz);
 
 				iter_dst_y = next_dst_y;
 			}

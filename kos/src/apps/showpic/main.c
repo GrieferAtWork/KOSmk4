@@ -284,6 +284,15 @@ do_showpic(struct screen_buffer *screen,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
 #else
+	/* Enable read-tiling in X and Y for the image */
+	video_gfx_setflags(&image_gfx,
+	                   video_gfx_getflags(&image_gfx) |
+	                   VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP);
+
+	int tiles_x = 3;
+	int tiles_y = 3;
+	static video_offset_t dst_offset = 0;
+
 	if (0) { /* Change to "1" to test the tiling engine of the non-stretching blit impl */
 		struct video_gfx sized_gfx;
 		struct video_buffer *sized_buffer;
@@ -293,26 +302,30 @@ do_showpic(struct screen_buffer *screen,
 		struct video_buffer *format_buf = image;
 #endif
 		sized_buffer = video_buffer_create(VIDEO_BUFFER_AUTO,
-		                                   blit_w / 3,
-		                                   blit_h / 3,
+		                                   blit_w / tiles_x,
+		                                   blit_h / tiles_y,
 		                                   format_buf->vb_format.vf_codec,
 		                                   format_buf->vb_format.vf_pal);
-		video_buffer_getgfx(sized_buffer, &sized_gfx, image_gfx.vx_blend,
-		                    image_gfx.vx_flags, image_gfx.vx_colorkey);
-		video_gfx_stretch(&sized_gfx, 0, 0, sized_gfx.vx_hdr.vxh_cxsiz, sized_gfx.vx_hdr.vxh_cysiz,
-		                  &image_gfx, 0, 0, image_gfx.vx_hdr.vxh_cxsiz, image_gfx.vx_hdr.vxh_cysiz);
+		video_buffer_getgfx(sized_buffer, &sized_gfx,
+		                    video_gfx_getblend(&image_gfx),
+		                    video_gfx_getflags(&image_gfx),
+		                    video_gfx_getcolorkey(&image_gfx));
+		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
+		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
 		video_gfx_bitblit(&screen_gfx, blit_x, blit_y, &sized_gfx,
-		                  sized_gfx.vx_hdr.vxh_cxsiz / 2, sized_gfx.vx_hdr.vxh_cysiz / 2,
+		                  dst_offset + (video_gfx_getclipw(&sized_gfx) / 2),
+		                  dst_offset + (video_gfx_getcliph(&sized_gfx) / 2),
 		                  blit_w, blit_h);
 		video_buffer_decref(sized_buffer);
 	} else {
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
-		                  video_gfx_getclipw(&image_gfx) / 2,
-		                  video_gfx_getcliph(&image_gfx) / 2,
-		                  video_gfx_getclipw(&image_gfx) * 3,
-		                  video_gfx_getcliph(&image_gfx) * 3);
+		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
+		                  (video_gfx_getcliph(&image_gfx) / 2) + dst_offset * tiles_y,
+		                  video_gfx_getclipw(&image_gfx) * tiles_x,
+		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}
+	++dst_offset;
 #endif
 	printk(KERN_DEBUG "SHOWPIC: END\n");
 
