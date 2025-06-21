@@ -217,8 +217,8 @@ do_showpic(struct screen_buffer *screen,
            struct video_anim_frameinfo *frameinfo) {
 	struct video_gfx screen_gfx;
 	struct video_gfx image_gfx;
-	size_t blit_w, blit_h;
-	size_t blit_x, blit_y;
+	video_dim_t blit_w, blit_h;
+	video_coord_t blit_x, blit_y;
 #if 0
 	/* Palettize "image" */
 	if (!(image->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL)) {
@@ -248,7 +248,7 @@ do_showpic(struct screen_buffer *screen,
 	blit_w = video_gfx_getclipw(&image_gfx);
 	blit_h = video_gfx_getcliph(&image_gfx);
 	if (blit_w > video_gfx_getclipw(&screen_gfx)) {
-		size_t new_blit_w, new_blit_h;
+		video_dim_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w / (blit_w / blit_h) = new_blit_h;
@@ -261,7 +261,7 @@ do_showpic(struct screen_buffer *screen,
 	}
 
 	if (blit_h > video_gfx_getcliph(&screen_gfx)) {
-		size_t new_blit_w, new_blit_h;
+		video_dim_t new_blit_w, new_blit_h;
 		/* >> new_blit_w / new_blit_h = blit_w / blit_h;
 		 * >> new_blit_w = (blit_w / blit_h) * new_blit_h;
 		 * >> new_blit_w = (blit_w * new_blit_h) / blit_h; */
@@ -333,6 +333,10 @@ do_showpic(struct screen_buffer *screen,
 		if (fd.vfp_lnend < 150)
 			fd.vfp_lnend = 150;
 		fd.vfp_color = VIDEO_COLOR_WHITE;
+		video_gfx_fill(&screen_gfx, 0, 0,
+		               blit_x < (video_dim_t)fd.vfp_lnend ? blit_x : (video_dim_t)fd.vfp_lnend,
+		               VIDEO_DIM_MAX, VIDEO_COLOR_BLACK);
+
 		mbstate_init(&fd.vfp_u8word);
 #define gfx_printf(...) format_printf(&video_fontprinter, &fd, __VA_ARGS__)
 		gfx_printf("Color test: ");
