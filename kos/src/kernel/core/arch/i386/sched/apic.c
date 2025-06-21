@@ -70,6 +70,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+#include <kos/kernel/cpu-state-compat.h>
+#endif
 
 DECL_BEGIN
 
@@ -689,6 +692,9 @@ i386_allocate_secondary_cores(void) {
 			init_state->scs_sgregs.sg_gs    = SEGMENT_USER_GSBASE_RPL;
 #endif /* !__x86_64__ */
 			_task_init_arch_sstate(altidle, &boottask, &init_state);
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+			assert(init_state->scs_irregs.ir_Pflags <= 0x10000000);
+#endif
 			FORTASK(altidle, this_sstate) = init_state;
 		}
 

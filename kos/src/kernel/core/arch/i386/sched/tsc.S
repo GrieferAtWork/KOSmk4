@@ -540,6 +540,12 @@ INTERN_FUNCTION(x86_idt_preemption)
 #endif /* !__x86_64__ */
 	/* Deadline has expired (and the current time is now stored in %rax / %edx:%eax) */
 
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_sstate)
 	movP   %Psp, this_sstate(%Pbp)
 
@@ -558,6 +564,15 @@ INTERN_FUNCTION(x86_idt_preemption)
 	.cfi_adjust_cfa_offset -8
 #endif /* !__x86_64__ */
 
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
+
 	/* Check if we should actually switch threads */
 	cmpP   %Pbp, %Pax
 	je32   x86_unwind_scpustate_Psp
@@ -566,7 +581,26 @@ INTERN_FUNCTION(x86_idt_preemption)
 	EXTERN(thiscpu_sched_current)
 	movP   %Pax, thiscpu_sched_current(%Pbx)
 
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
+
 INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
+
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
+
 	/* Primary entry point for loading a new thread-context for
 	 * some thread `%Pax',  whilst running on  some cpu  `%Pbx' */
 	EXTERN(this_sstate)
@@ -574,9 +608,9 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 
 #ifndef NDEBUG
 	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    1f /* if (!(STATE.EFLAGS > 0x10000000)) goto 1f; */
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
 	int3
-/* FIXME: This int3 got hit randomly one time:
+/* tsc.S: FIXME: This int3 got hit randomly one time:
 /kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0] [[97mint3[39m]
 > trace
 /kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0]
@@ -593,7 +627,7 @@ Analyzing remainder of stack:
 [2025-06-16T18:57:27.654963198:crit  ][2][except] Inconsistent unwind %fs: 0x24cd & 0xffff != 0x20 [pc:C0102032]
 [2025-06-16T18:57:27.655183862:crit  ][2][except] Inconsistent unwind %es: 0x4 & 0xffff != 0x53 [pc:C0102032]
 [2025-06-16T18:57:27.655602345:crit  ][2][except] Inconsistent unwind %ds: 0xc000 & 0xffff != 0x53 [pc:C0102032]*/
-1:
+771:
 #endif /* !NDEBUG */
 
 	/* Load other scheduler-related register values. */

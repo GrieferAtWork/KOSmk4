@@ -118,6 +118,13 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 .Ltask_yield_with_saved_scpustate:
 
 	/* Remember the current scheduler state. */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+#include <kos/kernel/cpu-state-compat.h>
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_sstate)
 	movP   %Psp, %segtls:this_sstate
 
@@ -136,6 +143,15 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	/* Load the new CPU state */
 	EXTERN(thiscpu_sched_current)
 	movP   %Pax, thiscpu_sched_current(%Pbx)
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+#include <kos/kernel/cpu-state-compat.h>
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 .Lyield_same_target:
@@ -364,6 +380,12 @@ PUBLIC_FUNCTION(task_tryyield)
 	movP   %segtls:this_task, %Pbp
 
 	/* Remember the current scheduler state. */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_sstate)
 	movP   %Psp, this_sstate(%Pbp)
 	movP   %Pbp, %R_fcall1P
@@ -433,6 +455,12 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
 
 	/* Remember the current scheduler state. */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_sstate)
 	movP   %Psp, this_sstate(%R_fcall0P)
 	EXTERN(this_cpu)
@@ -441,6 +469,14 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	movP   thiscpu_sched_current(%Pbx), %Pax
 
 	/* Load the new CPU state */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
@@ -460,6 +496,14 @@ PUBLIC_FUNCTION(cpu_run_current_nopr)
 	EXTERN(thiscpu_sched_current)
 	movP   thiscpu_sched_current(%Pbx), %Pax
 	/* Load the new CPU state */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
@@ -522,6 +566,12 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	 * %Pbp = struct task *old_sched_override; */
 
 	/* Save the current register state. */
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_sstate)
 	movP   %Psp, %segtls:this_sstate
 
@@ -540,6 +590,14 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	 * check if that thread differs from our current  thread. */
 	EXTERN(thiscpu_sched_current)
 	movP   thiscpu_sched_current(%Pbx), %Pax
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	EXTERN(this_sstate)
+	movP   this_sstate(%Pax), %Pcx
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 	EXTERN(this_task)
 	cmpP   %Pax, %segtls:this_task
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
@@ -548,6 +606,12 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	/* Resume execution by re-loading `this_sstate' */
 	EXTERN(this_sstate)
 	movP   %segtls:this_sstate, %Psp
+#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	int3
+771:
+#endif
 
 	EXTERN(libcpu_apply_scpustate_Psp)
 	jmp    libcpu_apply_scpustate_Psp

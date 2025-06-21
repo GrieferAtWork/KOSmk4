@@ -1179,9 +1179,9 @@ done:
 }
 
 
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
-                                             struct scpustate *__restrict context) {
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) size_t
+NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task const *__restrict thread,
+                                             struct scpustate const *__restrict context) {
 	size_t result = 0;
 
 	/* Search the registers of this thread. */
