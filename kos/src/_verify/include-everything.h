@@ -811,6 +811,7 @@ incdir("");
 #include <kos/asm/syscall.h>
 #include <kos/bits/coredump.h>
 #include <kos/bits/debugtrap.h>
+#include <kos/bits/except-catch.h>
 #include <kos/bits/except-compiler.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except-register-state-helpers.h>
@@ -1207,6 +1208,7 @@ incdir("");
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
+#include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
@@ -1368,6 +1370,7 @@ incdir("");
 #include <nt/timezoneapi.h>
 #include <nt/types.h>
 #include <nt/wincon.h>
+#include <nt/wingdi.h>
 #include <nt/winnls.h>
 #include <objalloc.h>
 #include <obstack.h>
