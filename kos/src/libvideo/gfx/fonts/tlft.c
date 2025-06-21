@@ -120,13 +120,13 @@ libvideo_tlft_drawglyph(struct video_font const *__restrict self,
 		/* Can just directly blit the glyph */
 		result = me->tf_hdr->h_chwidth;
 		bitmask.vbm_scan = result;
-		video_gfx_bitfill(/* self:    */ gfx,
-		                  /* x:       */ x,
-		                  /* y:       */ y,
-		                  /* size_x:  */ result,
-		                  /* size_y:  */ height,
-		                  /* color:   */ color,
-		                  /* bitmask: */ &bitmask);
+		video_gfx_absfillmask(/* self:    */ gfx,
+		                      /* x:       */ x,
+		                      /* y:       */ y,
+		                      /* size_x:  */ result,
+		                      /* size_y:  */ height,
+		                      /* color:   */ color,
+		                      /* bitmask: */ &bitmask);
 	} else {
 		/* Must stretch the glyph somehow... */
 		result = ((height * me->tf_hdr->h_chwidth) +
@@ -135,15 +135,15 @@ libvideo_tlft_drawglyph(struct video_font const *__restrict self,
 		if unlikely(!result)
 			result = 1;
 		bitmask.vbm_scan = me->tf_hdr->h_chwidth;
-		video_gfx_bitstretchfill(/* self:       */ gfx,
-		                         /* dst_x:      */ x,
-		                         /* dst_y:      */ y,
-		                         /* dst_size_x: */ result,
-		                         /* dst_size_y: */ height,
-		                         /* color:      */ color,
-		                         /* src_size_x: */ me->tf_hdr->h_chwidth,
-		                         /* src_size_y: */ me->tf_bestheight,
-		                         /* bitmask:    */ &bitmask);
+		video_gfx_absfillstretchmask(/* self:       */ gfx,
+		                             /* dst_x:      */ x,
+		                             /* dst_y:      */ y,
+		                             /* dst_size_x: */ result,
+		                             /* dst_size_y: */ height,
+		                             /* color:      */ color,
+		                             /* src_size_x: */ me->tf_hdr->h_chwidth,
+		                             /* src_size_y: */ me->tf_bestheight,
+		                             /* bitmask:    */ &bitmask);
 	}
 	return result;
 unknown:

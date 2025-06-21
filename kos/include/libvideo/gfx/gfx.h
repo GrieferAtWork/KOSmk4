@@ -246,11 +246,11 @@ struct video_gfx_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *vgxo_bitfill)(struct video_gfx const *__restrict __self,
-	                                video_coord_t __dst_x, video_coord_t __dst_y,
-	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                video_color_t __color,
-	                                struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *vgxo_absfillmask)(struct video_gfx const *__restrict __self,
+	                                    video_coord_t __dst_x, video_coord_t __dst_y,
+	                                    video_dim_t __size_x, video_dim_t __size_y,
+	                                    video_color_t __color,
+	                                    struct video_bitmask const *__restrict __bm);
 
 	/* Stretch and paint masked pixels
 	 * @assume(__dst_size_x > 0);
@@ -260,12 +260,12 @@ struct video_gfx_xops {
 	 * @assume(__dst_size_x != __src_size_x);
 	 * @assume(__dst_size_y != __src_size_y); */
 	__ATTR_IN_T(1) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *vgxo_bitstretchfill)(struct video_gfx const *__restrict __self,
-	                                       video_coord_t __dst_x, video_coord_t __dst_y,
-	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                       video_color_t __color,
-	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                       struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *vgxo_absfillstretchmask)(struct video_gfx const *__restrict __self,
+	                                           video_coord_t __dst_x, video_coord_t __dst_y,
+	                                           video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                           video_color_t __color,
+	                                           video_dim_t __src_size_x, video_dim_t __src_size_y,
+	                                           struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vgxo_absfill', but do so via gradient with colors[y][x] being used
 	 * to essentially do a  VIDEO_GFX_FLINEARBLIT stretch-blit into the  specified
@@ -342,22 +342,22 @@ struct video_gfx_ops {
 	/* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h)
 	 * TODO: This function should take 2 colors: foreground/background. Same also goes
-	 *       for `fxo_bitstretchfill' */
+	 *       for `fxo_fillstretchmask' */
 	__ATTR_IN_T(1) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx const *__restrict __self,
-	                               video_offset_t __x, video_offset_t __y,
-	                               video_dim_t __size_x, video_dim_t __size_y,
-	                               video_color_t __color,
-	                               struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *fxo_fillmask)(struct video_gfx const *__restrict __self,
+	                                video_offset_t __x, video_offset_t __y,
+	                                video_dim_t __size_x, video_dim_t __size_y,
+	                                video_color_t __color,
+	                                struct video_bitmask const *__restrict __bm);
 
-	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
+	/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
 	__ATTR_IN_T(1) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *fxo_bitstretchfill)(struct video_gfx const *__restrict __self,
-	                                      video_offset_t __dst_x, video_offset_t __dst_y,
-	                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                      video_color_t __color,
-	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                      struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *fxo_fillstretchmask)(struct video_gfx const *__restrict __self,
+	                                       video_offset_t __dst_x, video_offset_t __dst_y,
+	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                       video_color_t __color,
+	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
+	                                       struct video_bitmask const *__restrict __bm);
 
 	/* Same as `fxo_fill', but do so  via gradient with colors[y][x] being  used
 	 * to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into the specified
@@ -584,20 +584,20 @@ video_gfx_rect(struct video_gfx const *__restrict __self,
 /* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
  * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 extern __ATTR_IN(1) __ATTR_IN(7) void
-video_gfx_bitfill(struct video_gfx const *__restrict __self,
-                  video_offset_t __x, video_offset_t __y,
-                  video_dim_t __size_x, video_dim_t __size_y,
-                  video_color_t __color,
-                  struct video_bitmask const *__restrict __bm);
+video_gfx_absfillmask(struct video_gfx const *__restrict __self,
+                   video_offset_t __x, video_offset_t __y,
+                   video_dim_t __size_x, video_dim_t __size_y,
+                   video_color_t __color,
+                   struct video_bitmask const *__restrict __bm);
 
-/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
+/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
 extern __ATTR_IN(1) __ATTR_IN(9) void
-video_gfx_bitstretchfill(struct video_gfx const *__restrict __self,
-                         video_offset_t __dst_x, video_offset_t __dst_y,
-                         video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-                         video_color_t __color,
-                         video_dim_t __src_size_x, video_dim_t __src_size_y,
-                         struct video_bitmask const *__restrict __bm);
+video_gfx_absfillstretchmask(struct video_gfx const *__restrict __self,
+                          video_offset_t __dst_x, video_offset_t __dst_y,
+                          video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+                          video_color_t __color,
+                          video_dim_t __src_size_x, video_dim_t __src_size_y,
+                          struct video_bitmask const *__restrict __bm);
 
 /* Same as `video_gfx_fill', but do so via gradient with colors[y][x] being
  * used to  essentially do  a VIDEO_GFX_FLINEARBLIT  stretch-blit into  the
@@ -678,10 +678,10 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 	video_gfx_fill(self, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \
 	(*(self)->vx_hdr.vxh_ops->fxo_rect)(self, x, y, size_x, size_y, color)
-#define video_gfx_bitfill(self, x, y, size_x, size_y, color, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->fxo_bitfill)(self, x, y, size_x, size_y, color, bigtmask)
-#define video_gfx_bitstretchfill(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->fxo_bitstretchfill)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
+#define video_gfx_absfillmask(self, x, y, size_x, size_y, color, bigtmask) \
+	(*(self)->vx_hdr.vxh_ops->fxo_fillmask)(self, x, y, size_x, size_y, color, bigtmask)
+#define video_gfx_absfillstretchmask(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask) \
+	(*(self)->vx_hdr.vxh_ops->fxo_fillstretchmask)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
 #define video_gfx_gradient(self, x, y, size_x, size_y, colors) \
 	(*(self)->vx_hdr.vxh_ops->fxo_gradient)(self, x, y, size_x, size_y, colors)
 #define video_gfx_hgradient(self, x, y, size_x, size_y, locolor, hicolor) \
@@ -890,21 +890,21 @@ public:
 	}
 
 	/* Fill an area with a solid color. */
-	__CXX_CLASSMEMBER void bitfill(video_offset_t __x, video_offset_t __y,
+	__CXX_CLASSMEMBER void fillmask(video_offset_t __x, video_offset_t __y,
 	                               video_dim_t __size_x, video_dim_t __size_y,
 	                               video_color_t __color,
 	                               struct video_bitmask const *__restrict __bm) const {
-		video_gfx_bitfill(this, __x, __y, __size_x, __size_y, __color, __bm);
+		video_gfx_absfillmask(this, __x, __y, __size_x, __size_y, __color, __bm);
 	}
 
-	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
-	__CXX_CLASSMEMBER void bitstretchfill(video_offset_t __dst_x, video_offset_t __dst_y,
-	                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                      video_color_t __color,
-	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                      struct video_bitmask const *__restrict __bm) const {
-		video_gfx_bitstretchfill(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                         __color, __src_size_x, __src_size_y, __bm);
+	/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
+	__CXX_CLASSMEMBER void fillstretchmask(video_offset_t __dst_x, video_offset_t __dst_y,
+	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                       video_color_t __color,
+	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
+	                                       struct video_bitmask const *__restrict __bm) const {
+		video_gfx_absfillstretchmask(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                          __color, __src_size_x, __src_size_y, __bm);
 	}
 
 

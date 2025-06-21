@@ -96,7 +96,7 @@ libvideo_gfx_empty_fill(struct video_gfx const *__restrict UNUSED(self),
 }
 
 INTERN ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_empty_bitfill(struct video_gfx const *__restrict UNUSED(self),
+libvideo_gfx_empty_fillmask(struct video_gfx const *__restrict UNUSED(self),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
                            video_color_t UNUSED(color),
@@ -105,27 +105,27 @@ libvideo_gfx_empty_bitfill(struct video_gfx const *__restrict UNUSED(self),
 }
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_empty_bitstretchfill(struct video_gfx const *__restrict UNUSED(self),
-                                  video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                                  video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                                  video_color_t UNUSED(color),
-                                  video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                                  struct video_bitmask const *__restrict UNUSED(bm)) {
+libvideo_gfx_empty_fillstretchmask(struct video_gfx const *__restrict UNUSED(self),
+                                   video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                                   video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                                   video_color_t UNUSED(color),
+                                   video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
+                                   struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
 #undef libvideo_gfx_empty_ops
 PRIVATE struct video_gfx_ops libvideo_gfx_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empty_ops(void) {
-	if unlikely(!libvideo_gfx_empty_ops.fxo_bitstretchfill) {
-		libvideo_gfx_empty_ops.fxo_line    = &libvideo_gfx_empty_line;
-		libvideo_gfx_empty_ops.fxo_hline   = &libvideo_gfx_empty_hline;
-		libvideo_gfx_empty_ops.fxo_vline   = &libvideo_gfx_empty_vline;
-		libvideo_gfx_empty_ops.fxo_fill    = &libvideo_gfx_empty_fill;
-		libvideo_gfx_empty_ops.fxo_rect    = &libvideo_gfx_empty_rect;
-		libvideo_gfx_empty_ops.fxo_bitfill = &libvideo_gfx_empty_bitfill;
+	if unlikely(!libvideo_gfx_empty_ops.fxo_fillstretchmask) {
+		libvideo_gfx_empty_ops.fxo_line     = &libvideo_gfx_empty_line;
+		libvideo_gfx_empty_ops.fxo_hline    = &libvideo_gfx_empty_hline;
+		libvideo_gfx_empty_ops.fxo_vline    = &libvideo_gfx_empty_vline;
+		libvideo_gfx_empty_ops.fxo_fill     = &libvideo_gfx_empty_fill;
+		libvideo_gfx_empty_ops.fxo_rect     = &libvideo_gfx_empty_rect;
+		libvideo_gfx_empty_ops.fxo_fillmask = &libvideo_gfx_empty_fillmask;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_empty_ops.fxo_bitstretchfill = &libvideo_gfx_empty_bitstretchfill;
+		libvideo_gfx_empty_ops.fxo_fillstretchmask = &libvideo_gfx_empty_fillstretchmask;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_empty_ops;

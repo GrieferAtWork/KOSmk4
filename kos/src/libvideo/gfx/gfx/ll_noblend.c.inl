@@ -662,11 +662,11 @@ libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restric
 
 
 PRIVATE ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx const *__restrict self,
-                                       video_coord_t dst_x, video_coord_t dst_y,
-                                       video_dim_t size_x, video_dim_t size_y,
-                                       video_pixel_t pixel,
-                                       struct video_bitmask const *__restrict bm) {
+libvideo_gfx_noblend__fillmask__bypixel(struct video_gfx const *__restrict self,
+                                        video_coord_t dst_x, video_coord_t dst_y,
+                                        video_dim_t size_x, video_dim_t size_y,
+                                        video_pixel_t pixel,
+                                        struct video_bitmask const *__restrict bm) {
 	uintptr_t bitskip = bm->vbm_skip;
 	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
 	bitmask += bitskip / NBBY;
@@ -703,15 +703,15 @@ libvideo_gfx_noblend__bitfill__bypixel(struct video_gfx const *__restrict self,
 }
 
 INTERN ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self,
-                              video_coord_t dst_x, video_coord_t dst_y,
-                              video_dim_t size_x, video_dim_t size_y,
-                              video_color_t color,
-                              struct video_bitmask const *__restrict bm) {
+libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
+                               video_coord_t dst_x, video_coord_t dst_y,
+                               video_dim_t size_x, video_dim_t size_y,
+                               video_color_t color,
+                               struct video_bitmask const *__restrict bm) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	TRACE_START("noblend__bitfill("
+	TRACE_START("noblend__fillmask("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR "\n",
 	            dst_x, dst_y, size_x, size_y, color,
@@ -823,9 +823,9 @@ next_row:
 		goto done;
 	}
 	/* Use pixel-based rendering */
-	libvideo_gfx_noblend__bitfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
+	libvideo_gfx_noblend__fillmask__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
 done:
-	TRACE_END("noblend__bitfill()\n");
+	TRACE_END("noblend__fillmask()\n");
 }
 
 PRIVATE ATTR_IN(1) void CC
@@ -916,15 +916,15 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx const *__restrict self,
-                                       video_coord_t dst_x, video_coord_t dst_y,
-                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                       video_color_t color,
-                                       video_dim_t src_size_x, video_dim_t src_size_y,
-                                       struct video_bitmask const *__restrict bm) {
+libvideo_gfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self,
+                                        video_coord_t dst_x, video_coord_t dst_y,
+                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                        video_color_t color,
+                                        video_dim_t src_size_x, video_dim_t src_size_y,
+                                        struct video_bitmask const *__restrict bm) {
 	/* TODO */
-	libvideo_gfx_generic__bitstretchfill_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                       color, src_size_x, src_size_y, bm);
+	libvideo_gfx_generic__fillstretchmask_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                        color, src_size_x, src_size_y, bm);
 }
 
 INTERN ATTR_IN(1) void CC

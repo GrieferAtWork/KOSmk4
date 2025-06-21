@@ -743,22 +743,21 @@ libvideo_gfx_generic__absgradient_v(struct video_gfx const *__restrict self,
 /************************************************************************/
 
 INTERN ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self,
-                              video_coord_t dst_x, video_coord_t dst_y,
-                              video_dim_t size_x, video_dim_t size_y,
-                              video_color_t color,
-                              struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic__fillmask(struct video_gfx const *__restrict self,
+                               video_coord_t dst_x, video_coord_t dst_y,
+                               video_dim_t size_x, video_dim_t size_y,
+                               video_color_t color,
+                               struct video_bitmask const *__restrict bm) {
 	byte_t const *bitmask;
 	uintptr_t bitskip;
 	struct video_gfx noblend;
 	if (libvideo_gfx_allow_noblend(self, &color)) {
 		noblend = *self;
 		self = video_gfx_noblend(&noblend);
-		libvideo_gfx_noblend__bitfill(self, dst_x, dst_y, size_x, size_y,
-		                              color, bm);
+		libvideo_gfx_noblend__fillmask(self, dst_x, dst_y, size_x, size_y, color, bm);
 		return;
 	}
-	TRACE_START("generic__bitfill("
+	TRACE_START("generic__fillmask("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, size_x, size_y, color, bm->vbm_mask, bm->vbm_skip);
@@ -861,16 +860,16 @@ next_row:
 #ifndef __OPTIMIZE_SIZE__
 done:
 #endif /* !__OPTIMIZE_SIZE__ */
-	TRACE_END("generic__bitfill()\n");
+	TRACE_END("generic__fillmask()\n");
 }
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
-                                       video_coord_t dst_x_, video_coord_t dst_y_,
-                                       video_dim_t dst_size_x_, video_dim_t dst_size_y_,
-                                       video_color_t color,
-                                       video_dim_t src_size_x_, video_dim_t src_size_y_,
-                                       struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self,
+                                        video_coord_t dst_x_, video_coord_t dst_y_,
+                                        video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                        video_color_t color,
+                                        video_dim_t src_size_x_, video_dim_t src_size_y_,
+                                        struct video_bitmask const *__restrict bm) {
 	uintptr_t bitskip_ = bm->vbm_skip;
 	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
 	video_color_t raw_color = color & ~VIDEO_COLOR_ALPHA_MASK;
@@ -931,7 +930,7 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
 		}                                                                                               \
 	}
 
-	TRACE_START("generic__bitstretchfill_l("
+	TRACE_START("generic__fillstretchmask_l("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", "
 	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
@@ -948,7 +947,7 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
 	                   bitmask_blend_xmin_ymax,
 	                   bitmask_blend_ymax,
 	                   bitmask_blend_xmax_ymax);
-	TRACE_END("generic__bitstretchfill_l()\n");
+	TRACE_END("generic__fillstretchmask_l()\n");
 #undef bitmask_blend_xmin_ymin
 #undef bitmask_blend_ymin
 #undef bitmask_blend_xmax_ymin
@@ -965,12 +964,12 @@ libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self,
 }
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self,
-                                       video_coord_t dst_x, video_coord_t dst_y,
-                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                       video_color_t color,
-                                       video_dim_t src_size_x, video_dim_t src_size_y,
-                                       struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self,
+                                        video_coord_t dst_x, video_coord_t dst_y,
+                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                        video_color_t color,
+                                        video_dim_t src_size_x, video_dim_t src_size_y,
+                                        struct video_bitmask const *__restrict bm) {
 	video_dim_t y;
 	stretch_fp_t step_x, step_y, src_pos_y;
 	struct video_gfx noblend;
@@ -983,7 +982,7 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self,
 		/* TODO: Iterate across "src"  and use  "video_gfx_x_absfill"
 		 *       to fill rects associated with visible source pixels. */
 	}
-	TRACE_START("generic__bitstretchfill_n("
+	TRACE_START("generic__fillstretchmask_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", "
 	            "src: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR ")\n",
@@ -1010,7 +1009,7 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self,
 		++y;
 		src_pos_y += step_y;
 	} while (y < dst_size_y);
-	TRACE_END("generic__bitstretchfill_n()\n");
+	TRACE_END("generic__fillstretchmask_n()\n");
 }
 
 /************************************************************************/
@@ -1018,9 +1017,9 @@ libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self,
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__blit(struct video_blitter const *__restrict self,
-                           video_coord_t dst_x, video_coord_t dst_y,
-                           video_coord_t src_x, video_coord_t src_y,
-                           video_dim_t size_x, video_dim_t size_y) {
+                               video_coord_t dst_x, video_coord_t dst_y,
+                               video_coord_t src_x, video_coord_t src_y,
+                               video_dim_t size_x, video_dim_t size_y) {
 	video_dim_t x, y;
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
@@ -2106,11 +2105,11 @@ libvideo_gfx_generic_vgradient_wrwrap(struct video_gfx const *__restrict self,
 /************************************************************************/
 
 INTERN ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_generic_bitfill(struct video_gfx const *__restrict self,
-                             video_offset_t dst_x, video_offset_t dst_y,
-                             video_dim_t size_x, video_dim_t size_y,
-                             video_color_t color,
-                             struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self,
+                              video_offset_t dst_x, video_offset_t dst_y,
+                              video_dim_t size_x, video_dim_t size_y,
+                              video_color_t color,
+                              struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if (!size_x || !size_y)
@@ -2148,18 +2147,18 @@ libvideo_gfx_generic_bitfill(struct video_gfx const *__restrict self,
 			return;
 		size_y = GFX_BYEND - (video_coord_t)dst_y;
 	}
-	video_gfx_x_bitfill(self,
-	                    (video_coord_t)dst_x,
-	                    (video_coord_t)dst_y,
-	                    size_x, size_y, color, bm);
+	video_gfx_x_absfillmask(self,
+	                        (video_coord_t)dst_x,
+	                        (video_coord_t)dst_y,
+	                        size_x, size_y, color, bm);
 }
 
 INTERN ATTR_IN(1) ATTR_IN(7) void CC
-libvideo_gfx_generic_bitfill_wrwrap(struct video_gfx const *__restrict self,
-                                    video_offset_t dst_x, video_offset_t dst_y,
-                                    video_dim_t size_x, video_dim_t size_y,
-                                    video_color_t color,
-                                    struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic_fillmask_wrwrap(struct video_gfx const *__restrict self,
+                                     video_offset_t dst_x, video_offset_t dst_y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t color,
+                                     struct video_bitmask const *__restrict bm) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
@@ -2191,28 +2190,28 @@ libvideo_gfx_generic_bitfill_wrwrap(struct video_gfx const *__restrict self,
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb + (yinb * chunk_bm.vbm_scan);
-		libvideo_gfx_generic_bitfill(self, 0, 0, xwrap, ywrap, color, &chunk_bm);
+		libvideo_gfx_generic_fillmask(self, 0, 0, xwrap, ywrap, color, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb;
-		libvideo_gfx_generic_bitfill(self, 0, dst_y, xwrap, size_y, color, &chunk_bm);
+		libvideo_gfx_generic_fillmask(self, 0, dst_y, xwrap, size_y, color, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += yinb * chunk_bm.vbm_scan;
-		libvideo_gfx_generic_bitfill(self, dst_x, 0, size_x, ywrap, color, &chunk_bm);
+		libvideo_gfx_generic_fillmask(self, dst_x, 0, size_x, ywrap, color, &chunk_bm);
 	}
-	libvideo_gfx_generic_bitfill(self, dst_x, dst_y, xinb, yinb, color, bm);
+	libvideo_gfx_generic_fillmask(self, dst_x, dst_y, xinb, yinb, color, bm);
 }
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_generic_bitstretchfill(struct video_gfx const *__restrict self,
-                                    video_offset_t dst_x, video_offset_t dst_y,
-                                    video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                    video_color_t color,
-                                    video_dim_t src_size_x, video_dim_t src_size_y,
-                                    struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self,
+                                     video_offset_t dst_x, video_offset_t dst_y,
+                                     video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                     video_color_t color,
+                                     video_dim_t src_size_x, video_dim_t src_size_y,
+                                     struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
@@ -2277,23 +2276,23 @@ libvideo_gfx_generic_bitstretchfill(struct video_gfx const *__restrict self,
 	}
 	if (dst_size_x == src_size_x && dst_size_y == src_size_y) {
 		/* Can use copy-blit */
-		video_gfx_x_bitfill(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                    dst_size_x, dst_size_y, color, bm);
+		video_gfx_x_absfillmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                        dst_size_x, dst_size_y, color, bm);
 	} else {
 		/* Must use stretch-blit */
-		video_gfx_x_bitstretchfill(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                           dst_size_x, dst_size_y, color,
-		                           src_size_x, src_size_y, bm);
+		video_gfx_x_absfillstretchmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                               dst_size_x, dst_size_y, color,
+		                               src_size_x, src_size_y, bm);
 	}
 }
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
-libvideo_gfx_generic_bitstretchfill_wrwrap(struct video_gfx const *__restrict self,
-                                           video_offset_t dst_x, video_offset_t dst_y,
-                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                           video_color_t color,
-                                           video_dim_t src_size_x, video_dim_t src_size_y,
-                                           struct video_bitmask const *__restrict bm) {
+libvideo_gfx_generic_fillstretchmask_wrwrap(struct video_gfx const *__restrict self,
+                                            video_offset_t dst_x, video_offset_t dst_y,
+                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                            video_color_t color,
+                                            video_dim_t src_size_x, video_dim_t src_size_y,
+                                            struct video_bitmask const *__restrict bm) {
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
 	video_dim_t xwrap = 0;
@@ -2336,27 +2335,27 @@ libvideo_gfx_generic_bitstretchfill_wrwrap(struct video_gfx const *__restrict se
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_x + (chunk_src_y * chunk_bm.vbm_scan);
-		libvideo_gfx_generic_bitstretchfill(self, 0, 0, xwrap, ywrap, color,
-		                                    chunk_src_size_x, chunk_src_size_y, &chunk_bm);
+		libvideo_gfx_generic_fillstretchmask(self, 0, 0, xwrap, ywrap, color,
+		                                     chunk_src_size_x, chunk_src_size_y, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_x = xdst2src(xinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		chunk_bm.vbm_skip += chunk_src_x;
-		libvideo_gfx_generic_bitstretchfill(self, 0, dst_y, xwrap, dst_size_y, color,
-		                                    chunk_src_size_x, src_size_y, &chunk_bm);
+		libvideo_gfx_generic_fillstretchmask(self, 0, dst_y, xwrap, dst_size_y, color,
+		                                     chunk_src_size_x, src_size_y, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_y = ydst2src(yinb);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_y * chunk_bm.vbm_scan;
-		libvideo_gfx_generic_bitstretchfill(self, dst_x, 0, dst_size_x, ywrap, color,
-		                                    src_size_x, chunk_src_size_y, &chunk_bm);
+		libvideo_gfx_generic_fillstretchmask(self, dst_x, 0, dst_size_x, ywrap, color,
+		                                     src_size_x, chunk_src_size_y, &chunk_bm);
 	}
-	libvideo_gfx_generic_bitstretchfill(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                    color, src_size_x, src_size_y, bm);
+	libvideo_gfx_generic_fillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                     color, src_size_x, src_size_y, bm);
 #undef xdst2src
 #undef ydst2src
 }
@@ -2373,17 +2372,17 @@ PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_wrwrap = {};
 PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_rdwrwrap = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops(void) {
 	if unlikely(!libvideo_gfx_generic_ops.fxo_getcolor) {
-		libvideo_gfx_generic_ops.fxo_vgradient      = &libvideo_gfx_generic_vgradient;
-		libvideo_gfx_generic_ops.fxo_hgradient      = &libvideo_gfx_generic_hgradient;
-		libvideo_gfx_generic_ops.fxo_gradient       = &libvideo_gfx_generic_gradient;
-		libvideo_gfx_generic_ops.fxo_bitstretchfill = &libvideo_gfx_generic_bitstretchfill;
-		libvideo_gfx_generic_ops.fxo_bitfill        = &libvideo_gfx_generic_bitfill;
-		libvideo_gfx_generic_ops.fxo_rect           = &libvideo_gfx_generic_rect;
-		libvideo_gfx_generic_ops.fxo_fill           = &libvideo_gfx_generic_fill;
-		libvideo_gfx_generic_ops.fxo_vline          = &libvideo_gfx_generic_vline;
-		libvideo_gfx_generic_ops.fxo_hline          = &libvideo_gfx_generic_hline;
-		libvideo_gfx_generic_ops.fxo_line           = &libvideo_gfx_generic_line;
-		libvideo_gfx_generic_ops.fxo_putcolor       = &libvideo_gfx_generic_putcolor;
+		libvideo_gfx_generic_ops.fxo_vgradient       = &libvideo_gfx_generic_vgradient;
+		libvideo_gfx_generic_ops.fxo_hgradient       = &libvideo_gfx_generic_hgradient;
+		libvideo_gfx_generic_ops.fxo_gradient        = &libvideo_gfx_generic_gradient;
+		libvideo_gfx_generic_ops.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
+		libvideo_gfx_generic_ops.fxo_fillmask        = &libvideo_gfx_generic_fillmask;
+		libvideo_gfx_generic_ops.fxo_rect            = &libvideo_gfx_generic_rect;
+		libvideo_gfx_generic_ops.fxo_fill            = &libvideo_gfx_generic_fill;
+		libvideo_gfx_generic_ops.fxo_vline           = &libvideo_gfx_generic_vline;
+		libvideo_gfx_generic_ops.fxo_hline           = &libvideo_gfx_generic_hline;
+		libvideo_gfx_generic_ops.fxo_line            = &libvideo_gfx_generic_line;
+		libvideo_gfx_generic_ops.fxo_putcolor        = &libvideo_gfx_generic_putcolor;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_generic_ops.fxo_getcolor = &libvideo_gfx_generic_getcolor;
 		COMPILER_WRITE_BARRIER();
@@ -2392,17 +2391,17 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_rdwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_rdwrap.fxo_vgradient      = &libvideo_gfx_generic_vgradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_hgradient      = &libvideo_gfx_generic_hgradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_gradient       = &libvideo_gfx_generic_gradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_bitstretchfill = &libvideo_gfx_generic_bitstretchfill;
-		libvideo_gfx_generic_ops_rdwrap.fxo_bitfill        = &libvideo_gfx_generic_bitfill;
-		libvideo_gfx_generic_ops_rdwrap.fxo_rect           = &libvideo_gfx_generic_rect;
-		libvideo_gfx_generic_ops_rdwrap.fxo_fill           = &libvideo_gfx_generic_fill;
-		libvideo_gfx_generic_ops_rdwrap.fxo_vline          = &libvideo_gfx_generic_vline;
-		libvideo_gfx_generic_ops_rdwrap.fxo_hline          = &libvideo_gfx_generic_hline;
-		libvideo_gfx_generic_ops_rdwrap.fxo_line           = &libvideo_gfx_generic_line;
-		libvideo_gfx_generic_ops_rdwrap.fxo_putcolor       = &libvideo_gfx_generic_putcolor;
+		libvideo_gfx_generic_ops_rdwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient;
+		libvideo_gfx_generic_ops_rdwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient;
+		libvideo_gfx_generic_ops_rdwrap.fxo_gradient        = &libvideo_gfx_generic_gradient;
+		libvideo_gfx_generic_ops_rdwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
+		libvideo_gfx_generic_ops_rdwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask;
+		libvideo_gfx_generic_ops_rdwrap.fxo_rect            = &libvideo_gfx_generic_rect;
+		libvideo_gfx_generic_ops_rdwrap.fxo_fill            = &libvideo_gfx_generic_fill;
+		libvideo_gfx_generic_ops_rdwrap.fxo_vline           = &libvideo_gfx_generic_vline;
+		libvideo_gfx_generic_ops_rdwrap.fxo_hline           = &libvideo_gfx_generic_hline;
+		libvideo_gfx_generic_ops_rdwrap.fxo_line            = &libvideo_gfx_generic_line;
+		libvideo_gfx_generic_ops_rdwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_generic_ops_rdwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
 		COMPILER_WRITE_BARRIER();
@@ -2411,17 +2410,17 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_wrwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_wrwrap.fxo_vgradient      = &libvideo_gfx_generic_vgradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_hgradient      = &libvideo_gfx_generic_hgradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_gradient       = &libvideo_gfx_generic_gradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_bitstretchfill = &libvideo_gfx_generic_bitstretchfill_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_bitfill        = &libvideo_gfx_generic_bitfill_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_rect           = &libvideo_gfx_generic_rect_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_fill           = &libvideo_gfx_generic_fill_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_vline          = &libvideo_gfx_generic_vline_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_hline          = &libvideo_gfx_generic_hline_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_line           = &libvideo_gfx_generic_line_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_putcolor       = &libvideo_gfx_generic_putcolor_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_rect            = &libvideo_gfx_generic_rect_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_fill            = &libvideo_gfx_generic_fill_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_vline           = &libvideo_gfx_generic_vline_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_hline           = &libvideo_gfx_generic_hline_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_line            = &libvideo_gfx_generic_line_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_generic_ops_wrwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor;
 		COMPILER_WRITE_BARRIER();
@@ -2430,17 +2429,17 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_rdwrwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_vgradient      = &libvideo_gfx_generic_vgradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_hgradient      = &libvideo_gfx_generic_hgradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_gradient       = &libvideo_gfx_generic_gradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_bitstretchfill = &libvideo_gfx_generic_bitstretchfill_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_bitfill        = &libvideo_gfx_generic_bitfill_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_rect           = &libvideo_gfx_generic_rect_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_fill           = &libvideo_gfx_generic_fill_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_vline          = &libvideo_gfx_generic_vline_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_hline          = &libvideo_gfx_generic_hline_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_line           = &libvideo_gfx_generic_line_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_putcolor       = &libvideo_gfx_generic_putcolor_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_rect            = &libvideo_gfx_generic_rect_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_fill            = &libvideo_gfx_generic_fill_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_vline           = &libvideo_gfx_generic_vline_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_hline           = &libvideo_gfx_generic_hline_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_line            = &libvideo_gfx_generic_line_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_generic_ops_rdwrwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
 		COMPILER_WRITE_BARRIER();
