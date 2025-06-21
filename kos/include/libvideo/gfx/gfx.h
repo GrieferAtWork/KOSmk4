@@ -367,14 +367,14 @@ struct video_gfx_ops {
 	                                 video_color_t const __colors[2][2]);
 	__ATTR_IN_T(1) void
 	(LIBVIDEO_GFX_CC *vgfo_hgradient)(struct video_gfx const *__restrict __self,
-			                          video_offset_t __x, video_offset_t __y,
-			                          video_dim_t __size_x, video_dim_t __size_y,
-			                          video_color_t __locolor, video_color_t __hicolor);
+	                                  video_offset_t __x, video_offset_t __y,
+	                                  video_dim_t __size_x, video_dim_t __size_y,
+	                                  video_color_t __locolor, video_color_t __hicolor);
 	__ATTR_IN_T(1) void
 	(LIBVIDEO_GFX_CC *vgfo_vgradient)(struct video_gfx const *__restrict __self,
-			                          video_offset_t __x, video_offset_t __y,
-			                          video_dim_t __size_x, video_dim_t __size_y,
-			                          video_color_t __locolor, video_color_t __hicolor);
+	                                  video_offset_t __x, video_offset_t __y,
+	                                  video_dim_t __size_x, video_dim_t __size_y,
+	                                  video_color_t __locolor, video_color_t __hicolor);
 
 	/* More driver-specific operators go here... */
 };
@@ -445,17 +445,17 @@ video_gfx_palettize(struct video_gfx const *__restrict __self,
 /* Blit the contents of another video buffer into this one. */
 extern __ATTR_IN(1) void
 video_blitter_bitblit(struct video_blitter const *__restrict __self,
-                video_offset_t __dst_x, video_offset_t __dst_y,
-                video_offset_t __src_x, video_offset_t __src_y,
-                video_dim_t __size_x, video_dim_t __size_y);
+                      video_offset_t __dst_x, video_offset_t __dst_y,
+                      video_offset_t __src_x, video_offset_t __src_y,
+                      video_dim_t __size_x, video_dim_t __size_y);
 
 /* Same as `vbto_bitblit', but stretch the contents */
 extern __ATTR_IN(1) void
 video_blitter_stretch(struct video_blitter const *__restrict __self,
-                   video_offset_t __dst_x, video_offset_t __dst_y,
-                   video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-                   video_offset_t __src_x, video_offset_t __src_y,
-                   video_dim_t __src_size_x, video_dim_t __src_size_y);
+                      video_offset_t __dst_x, video_offset_t __dst_y,
+                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+                      video_offset_t __src_x, video_offset_t __src_y,
+                      video_dim_t __src_size_x, video_dim_t __src_size_y);
 
 
 
@@ -464,13 +464,13 @@ video_blitter_stretch(struct video_blitter const *__restrict __self,
 /* VIDEO_GFX                                                            */
 /************************************************************************/
 
-/* Return the API-visible clip rect offset in X or Y */
+/* Return the API-visible Clip Rect offset in X or Y */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
 video_gfx_getclipx(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
 video_gfx_getclipy(struct video_gfx const *__restrict __self);
 
-/* Return the API-visible clip rect size in X or Y */
+/* Return the API-visible Clip Rect size in X or Y */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
 video_gfx_getclipw(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
@@ -491,7 +491,7 @@ video_gfx_clip(struct video_gfx *__restrict __self,
                video_dim_t __size_x, video_dim_t __size_y);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-/* Backup/restore the current clip rect of `self' */
+/* Backup/restore the current Clip Rect of `self' */
 extern __ATTR_IN(1) __ATTR_OUT(2) void
 video_gfx_saveclip(struct video_gfx const *__restrict self,
                    video_gfx_clipinfo_t *__restrict backup);
@@ -741,39 +741,59 @@ struct video_gfxhdr {
 	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blitter *
 	(LIBVIDEO_GFX_FCC *vxh_blitfrom)(struct video_blitter *__restrict __ctx);
 
-	/* Clip rect area (pixel area used for pixel clamping/wrapping, and accepted):
-	 * >> +---------------------------------+
-	 * >> | Buffer                          |
-	 * >> |                                 |
-	 * >> |   +-----------------------+.......................+
-	 * >> |   | Clip Rect             | Clip Rect             .
-	 * >> |   |                       | (VIDEO_GFX_FRDXWRAP)  .
-	 * >> |   |                       | (VIDEO_GFX_FWRXWRAP)  .
-	 * >> |   |  +-----------------+  |                       .
-	 * >> |   |  | I/O Area        |  |                       .
-	 * >> |   |  |                 |  |                       .
-	 * >> |   |  +-----------------+  |                       .
-	 * >> |   |                       |                       .
-	 * >> |   +-----------------------+.......................+
-	 * >> |                                 |
-	 * >> +---------------------------------+
+	/* Clip Rect area (pixel area used for pixel clamping/wrapping, and accepted):
+	 *
+	 ***********************************************************************************
+	 *  ╔═════════════════════════════════╗─────────────────────────────────┐          *
+	 *  ║ Buffer                          ║ Buffer                          │          *
+	 *  ║                                 ║                                 │          *
+	 *  ║   ╔═══════════════════════╗─────╫─────────────────┬───────────────┼───────┐  *
+	 *  ║   ║ Clip Rect             ║ Clip Rect X+1         │ Clip Rect X+2 │       │  *
+	 *  ║   ║                       ║ (VIDEO_GFX_FRDXWRAP)  │               │       │  *
+	 *  ║   ║                       ║ (VIDEO_GFX_FWRXWRAP)  │               │       │  *
+	 *  ║   ║  ╔═════════════════╗  ║     ║      ┌──────────┼──────┐        │       │  *
+	 *  ║   ║  ║ I/O Rect        ║  ║     ║      │ I/O Rect │      │        │       │  *
+	 *  ║   ║  ║                 ║  ║     ║      │          │      │        │       │  *
+	 *  ║   ║  ╚═════════════════╝  ║     ║      └──────────┼──────┘        │       │  *
+	 *  ║   ║                       ║     ║                 │               │       │  *
+	 *  ║   ╚═══════════════════════╝─────╫─────────────────┴───────────────┼───────┘  *
+	 *  ║   │                       │     ║                 ·               │       ·  *
+	 *  ╚═══╪═══════════════════════╪═════╝─────────────────────────────────┘       ·  *
+	 *  │ B │                       │     │                 ·               ·       ·  *
+	 *  │ u │ Clip Rect Y+1         │     │                 ·               ·       ·  *
+	 *  │ f │ (VIDEO_GFX_FRDYWRAP)  │     │                 ·               ·       ·  *
+	 *  │ f │ (VIDEO_GFX_FWRYWRAP)  │     │                 ·               ·       ·  *
+	 *  │ e │                       │     │                 ·               ·       ·  *
+	 *  │ r │                       │     │                 ·               ·       ·  *
+	 *  │   ├──╤═════════════════╤──┤·····│··········································  *
+	 *  │   │  │ I/O Rect        │  │     │      ·          ·     ·         ·       ·  *
+	 *  │   │  │                 │  │     │      ·          ·     ·         ·       ·  *
+	 *  │   │  └─────────────────┘  │     │      ··················         ·       ·  *
+	 *  │   │ Clip Rect Y+2         │     │                 ·               ·       ·  *
+	 *  │   │                       │     │                 ·               ·       ·  *
+	 *  │   │                       │     │                 ·               ·       ·  *
+	 *  └───┼───────────────────────┼─────┘··································       ·  *
+	 *      │                       │                       ·                       ·  *
+	 *      └───────────────────────┘················································  *
+	 *                                                                                 *
+	 ***********************************************************************************
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
-	 * - Buffer:    {xy: {0,0}, wh: {vxh_buffer->vb_xdim,vxh_buffer->vb_ydim}}
+	 * - Buffer:    {xy: {0,0}, wh: {vx_buffer->vb_xdim,vx_buffer->vb_ydim}}
 	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxsiz,vxh_cysiz}}
-	 * - I/O Area:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
+	 * - I/O Rect:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
 	 *
 	 * When using any of the  publicly exposed functions, you always  operate
 	 * in the coord-space defined by the "Clip Rect", with pixel reads/writes
-	 * restricted to those within the "I/O Area". Pixel coords that go beyond
+	 * restricted to those within the "I/O Rect". Pixel coords that go beyond
 	 * the "Clip Rect", are either clamped, or wrapped (based on the size  of
-	 * the "Clip Rect"), before then being  clamped again to the  "I/O Area".
+	 * the "Clip Rect"), before then being  clamped again to the  "I/O Rect".
 	 * You might notice that when pixel wrapping is disabled, the first clamp
 	 * can (and is) skipped.
 	 *
-	 * When changing the clip rect, coords are still relative to the old  clip
-	 * rect, but negative  coords can  be given to  make the  clip rect  grow.
-	 * However, the "I/O Area"  is always the  intersection of "Buffer",  with
+	 * When changing the Clip Rect, coords are still relative to the old  clip
+	 * rect, but negative  coords can  be given to  make the  Clip Rect  grow.
+	 * However, the "I/O Rect"  is always the  intersection of "Buffer",  with
 	 * any "Clip Rect" ever  set for  the GFX  context, meaning  it cannot  be
 	 * made to grow without obtaining a fresh GFX context (which always starts
 	 * out with all 3 areas set to match each other). */
@@ -781,22 +801,21 @@ struct video_gfxhdr {
 	video_offset_t              vxh_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_dim_t                 vxh_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	video_dim_t                 vxh_cysiz;    /* [const] Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
-	/* Buffer I/O area: these values control the (absolute) pixel area where read/writes do something */
+	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something */
 	video_coord_t               vxh_bxmin;    /* [const][<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vxh_bymin;    /* [const][<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
-	video_coord_t               vxh_bxend;    /* [const][<= vxh_buffer->vb_xdim] Absolute buffer end coord in X (<= `vxh_buffer->vb_xdim') */
-	video_coord_t               vxh_byend;    /* [const][<= vxh_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vxh_buffer->vb_ydim') */
-//	video_dim_t                 vxh_bxsiz;    /* [const][== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] Absolute buffer I/O width */
-//	video_dim_t                 vxh_bysiz;    /* [const][== vxh_byend - vxh_bymin][<= vxh_cysiz] Absolute buffer I/O height */
+	video_coord_t               vxh_bxend;    /* [const][<= vx_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_buffer->vb_xdim') */
+	video_coord_t               vxh_byend;    /* [const][<= vx_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vx_buffer->vb_ydim') */
+//	video_dim_t                 vxh_bxsiz;    /* [const][== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] I/O Rect width */
+//	video_dim_t                 vxh_bysiz;    /* [const][== vxh_byend - vxh_bymin][<= vxh_cysiz] I/O Rect height */
 };
 
 struct video_gfx {
-	struct video_gfxhdr         vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old clip rects) */
+	struct video_gfxhdr         vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
 	struct video_buffer        *vx_buffer;   /* [1..1][const] The associated buffer. */
 	gfx_blendmode_t             vx_blend;    /* [const] Blending mode. */
 	__uintptr_t                 vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
-//	video_dim_t                 vx_bysiz;    /* [const][== vx_hdr.vxh_byend - vx_hdr.vxh_bymin][<= vx_hdr.vxh_cysiz] Absolute buffer I/O height */
 	struct video_gfx_xops      _vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
 #define _VIDEO_GFX_N_DRIVER 4
 	void *_vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */

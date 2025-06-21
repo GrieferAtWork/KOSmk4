@@ -75,9 +75,13 @@ wrap(video_offset_t offset, video_dim_t dim) {
 /* BLENDING HELPERS                                                     */
 /************************************************************************/
 
-/* Check if `color' must be blended (false), or blending is optional (true),
- * such that behavior would be  the same when `GFX_BLENDMODE_OVERRIDE'  were
- * to be used. */
+/* Check if `*p_color' must be blended (false), or blending is optional (true),
+ * such that behavior would be  the same when `GFX_BLENDMODE_OVERRIDE' were  to
+ * be  used. If `*p_color'  has to be modified  before OVERRIDE-blending can be
+ * done, then this is done prior to `true' being returned
+ *
+ * iow: Returns true iff:
+ * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, IN(*p_color), self->vx_blend) == OUT(*p_color) */
 LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_INOUT(2) bool CC
 libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
                            video_color_t *__restrict p_color) {
@@ -89,11 +93,15 @@ libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
 }
 
 /* Check if  trying to  blend  `color' is  a  no-op.
- * (e.g. for ALPHA-blending, "color" is transparent) */
+ * (e.g. for ALPHA-blending, "color" is transparent)
+ *
+ * iow: Returns true iff:
+ * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, color, self->vx_blend) == c */
 LOCAL ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
                           video_color_t color) {
 	gfx_blendmode_t mode = self->vx_blend;
+
 	/* TODO: Do this dynamically for all blending modes */
 	if (mode == GFX_BLENDMODE_ALPHA)
 		return VIDEO_COLOR_ISTRANSPARENT(color);
@@ -386,7 +394,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 
 
 /* Returns 0 or 1 */
-LOCAL ATTR_PURE WUNUSED byte_t
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) byte_t CC
 bitmask2d_getbit(byte_t const *__restrict bitmask, size_t bitscan,
                  video_coord_t x, video_coord_t y) {
 	uintptr_t bitno = (uintptr_t)x + y * bitscan;
@@ -397,7 +405,7 @@ bitmask2d_getbit(byte_t const *__restrict bitmask, size_t bitscan,
 }
 
 /* Returns 0 or 255 */
-LOCAL ATTR_PURE WUNUSED channel_t
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) channel_t CC
 bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
                          video_coord_t x, video_coord_t y) {
 	uintptr_t bitno = (uintptr_t)x + y * bitscan;
