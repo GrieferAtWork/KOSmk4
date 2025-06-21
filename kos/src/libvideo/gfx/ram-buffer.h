@@ -51,6 +51,8 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int CC rambuffer_lock(struct video_buffer *__re
 INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC rambuffer_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC rambuffer_noblend(struct video_gfx *__restrict self);
+#define rambuffer_rlock rambuffer_lock
+#define rambuffer_wlock rambuffer_lock
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void);
 #define rambuffer_ops (*_rambuffer_ops())

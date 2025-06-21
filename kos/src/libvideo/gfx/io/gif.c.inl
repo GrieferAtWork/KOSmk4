@@ -372,8 +372,8 @@ gifbuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE struct video_buffer_ops gifbuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gifbuffer_ops(void) {
 	if unlikely(!gifbuffer_ops.vi_destroy) {
-		gifbuffer_ops.vi_rlock       = &rambuffer_lock;
-		gifbuffer_ops.vi_wlock       = &rambuffer_lock;
+		gifbuffer_ops.vi_rlock       = &rambuffer_rlock;
+		gifbuffer_ops.vi_wlock       = &rambuffer_wlock;
 		gifbuffer_ops.vi_unlock      = &rambuffer_unlock;
 		gifbuffer_ops.vi_initgfx     = &rambuffer_initgfx;
 		gifbuffer_ops.vi_gfx_noblend = &rambuffer_noblend;

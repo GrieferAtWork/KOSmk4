@@ -334,8 +334,8 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 PRIVATE struct video_buffer_ops rambuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_rlock       = &rambuffer_lock;
-		rambuffer_ops.vi_wlock       = &rambuffer_lock;
+		rambuffer_ops.vi_rlock       = &rambuffer_rlock;
+		rambuffer_ops.vi_wlock       = &rambuffer_wlock;
 		rambuffer_ops.vi_unlock      = &rambuffer_unlock;
 		rambuffer_ops.vi_initgfx     = &rambuffer_initgfx;
 		rambuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
@@ -409,8 +409,8 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC membuffer_getops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
-		membuffer_ops.vi_rlock       = &rambuffer_lock;
-		membuffer_ops.vi_wlock       = &rambuffer_lock;
+		membuffer_ops.vi_rlock       = &rambuffer_rlock;
+		membuffer_ops.vi_wlock       = &rambuffer_wlock;
 		membuffer_ops.vi_unlock      = &rambuffer_unlock;
 		membuffer_ops.vi_initgfx     = &rambuffer_initgfx;
 		membuffer_ops.vi_gfx_noblend = &rambuffer_noblend;

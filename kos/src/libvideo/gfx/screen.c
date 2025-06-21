@@ -528,8 +528,8 @@ find_hinted_mode:
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
-	result->ss_ops.sbo_video.vi_rlock       = &rambuffer_lock;
-	result->ss_ops.sbo_video.vi_wlock       = &rambuffer_lock;
+	result->ss_ops.sbo_video.vi_rlock       = &rambuffer_rlock;
+	result->ss_ops.sbo_video.vi_wlock       = &rambuffer_wlock;
 	result->ss_ops.sbo_video.vi_unlock      = &rambuffer_unlock;
 	result->ss_ops.sbo_video.vi_initgfx     = &rambuffer_initgfx;
 	result->ss_ops.sbo_video.vi_gfx_noblend = &rambuffer_noblend;
