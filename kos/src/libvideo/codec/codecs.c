@@ -3169,10 +3169,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &getpixel,               \
 			/* .vc_setpixel               = */ &setpixel,               \
-			/* .vc_rectcopy               = */ &rectcopy,               \
 			/* .vc_linefill               = */ &linefill,               \
 			/* .vc_vertfill               = */ &vertfill,               \
 			/* .vc_rectfill               = */ &rectfill,               \
+			/* .vc_rectcopy               = */ &rectcopy,               \
 		}
 #define _DEFINE_CODEC_ALX(name, codec, specs,                           \
                           align, rambuffer_requirements,                \
@@ -3194,10 +3194,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &unaligned_getpixel,     \
 			/* .vc_setpixel               = */ &unaligned_setpixel,     \
-			/* .vc_rectcopy               = */ &unaligned_rectcopy,     \
 			/* .vc_linefill               = */ &unaligned_linefill,     \
 			/* .vc_vertfill               = */ &unaligned_vertfill,     \
 			/* .vc_rectfill               = */ &unaligned_rectfill,     \
+			/* .vc_rectcopy               = */ &unaligned_rectcopy,     \
 		};                                                              \
 		PRIVATE struct video_codec const name = {                       \
 			/* .vc_codec                  = */ codec,                   \
@@ -3210,10 +3210,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &getpixel,               \
 			/* .vc_setpixel               = */ &setpixel,               \
-			/* .vc_rectcopy               = */ &rectcopy,               \
 			/* .vc_linefill               = */ &linefill,               \
 			/* .vc_vertfill               = */ &vertfill,               \
 			/* .vc_rectfill               = */ &rectfill,               \
+			/* .vc_rectcopy               = */ &rectcopy,               \
 		}
 #else /* __KERNEL__ || !__pic__ */
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
@@ -3232,10 +3232,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_initconverter = &initconverter;                     \
 			name.vc_getpixel      = &getpixel;                          \
 			name.vc_setpixel      = &setpixel;                          \
-			name.vc_rectcopy      = &rectcopy;                          \
 			name.vc_linefill      = &linefill;                          \
 			name.vc_vertfill      = &vertfill;                          \
 			name.vc_rectfill      = &rectfill;                          \
+			name.vc_rectcopy      = &rectcopy;                          \
 			COMPILER_WRITE_BARRIER();                                   \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;   \
 			COMPILER_WRITE_BARRIER();                                   \
@@ -3267,20 +3267,20 @@ libvideo_codec_lookup(video_codec_t codec) {
 			unaligned_##name.vc_initconverter          = &initconverter;          \
 			unaligned_##name.vc_getpixel               = &unaligned_getpixel;     \
 			unaligned_##name.vc_setpixel               = &unaligned_setpixel;     \
-			unaligned_##name.vc_rectcopy               = &unaligned_rectcopy;     \
 			unaligned_##name.vc_linefill               = &unaligned_linefill;     \
 			unaligned_##name.vc_vertfill               = &unaligned_vertfill;     \
 			unaligned_##name.vc_rectfill               = &unaligned_rectfill;     \
+			unaligned_##name.vc_rectcopy               = &unaligned_rectcopy;     \
 			name.vc_nalgn                              = &unaligned_##name;       \
 			name.vc_pixel2color                        = &pixel2color;            \
 			name.vc_color2pixel                        = &color2pixel;            \
 			name.vc_initconverter                      = &initconverter;          \
 			name.vc_getpixel                           = &getpixel;               \
 			name.vc_setpixel                           = &setpixel;               \
-			name.vc_rectcopy                           = &rectcopy;               \
 			name.vc_linefill                           = &linefill;               \
 			name.vc_vertfill                           = &vertfill;               \
 			name.vc_rectfill                           = &rectfill;               \
+			name.vc_rectcopy                           = &rectcopy;               \
 			COMPILER_WRITE_BARRIER();                                             \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;             \
 			COMPILER_WRITE_BARRIER();                                             \
@@ -5018,17 +5018,17 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel1_lsb;
 			self->vc_setpixel = &setpixel1_lsb;
-			self->vc_rectcopy = &rectcopy1_lsb;
 			self->vc_linefill = &linefill1_lsb;
 			self->vc_vertfill = &vertfill1_lsb;
 			self->vc_rectfill = &rectfill1_lsb;
+			self->vc_rectcopy = &rectcopy1_lsb;
 		} else {
 			self->vc_getpixel = &getpixel1_msb;
 			self->vc_setpixel = &setpixel1_msb;
-			self->vc_rectcopy = &rectcopy1_msb;
 			self->vc_linefill = &linefill1_msb;
 			self->vc_vertfill = &vertfill1_msb;
 			self->vc_rectfill = &rectfill1_msb;
+			self->vc_rectcopy = &rectcopy1_msb;
 		}
 		break;
 	case 2:
@@ -5037,17 +5037,17 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel2_lsb;
 			self->vc_setpixel = &setpixel2_lsb;
-			self->vc_rectcopy = &rectcopy2_lsb;
 			self->vc_linefill = &linefill2_lsb;
 			self->vc_vertfill = &vertfill2_lsb;
 			self->vc_rectfill = &rectfill2_lsb;
+			self->vc_rectcopy = &rectcopy2_lsb;
 		} else {
 			self->vc_getpixel = &getpixel2_msb;
 			self->vc_setpixel = &setpixel2_msb;
-			self->vc_rectcopy = &rectcopy2_msb;
 			self->vc_linefill = &linefill2_msb;
 			self->vc_vertfill = &vertfill2_msb;
 			self->vc_rectfill = &rectfill2_msb;
+			self->vc_rectcopy = &rectcopy2_msb;
 		}
 		break;
 	case 4:
@@ -5056,17 +5056,17 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel4_lsb;
 			self->vc_setpixel = &setpixel4_lsb;
-			self->vc_rectcopy = &rectcopy4_lsb;
 			self->vc_linefill = &linefill4_lsb;
 			self->vc_vertfill = &vertfill4_lsb;
 			self->vc_rectfill = &rectfill4_lsb;
+			self->vc_rectcopy = &rectcopy4_lsb;
 		} else {
 			self->vc_getpixel = &getpixel4_msb;
 			self->vc_setpixel = &setpixel4_msb;
-			self->vc_rectcopy = &rectcopy4_msb;
 			self->vc_linefill = &linefill4_msb;
 			self->vc_vertfill = &vertfill4_msb;
 			self->vc_rectfill = &rectfill4_msb;
+			self->vc_rectcopy = &rectcopy4_msb;
 		}
 		break;
 	case 8:
@@ -5074,10 +5074,10 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rambuffer_requirements = &buffer8_requirements;
 		self->vc_getpixel = &getpixel8;
 		self->vc_setpixel = &setpixel8;
-		self->vc_rectcopy = &rectcopy8;
 		self->vc_linefill = &linefill8;
 		self->vc_vertfill = &vertfill8;
 		self->vc_rectfill = &rectfill8;
+		self->vc_rectcopy = &rectcopy8;
 		break;
 	case 16:
 		self->vc_align = 2;
@@ -5086,19 +5086,19 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel16;
 			self->vc_setpixel = &unaligned_setpixel16;
-			self->vc_rectcopy = &unaligned_rectcopy16;
 			self->vc_linefill = &unaligned_linefill16;
 			self->vc_vertfill = &unaligned_vertfill16;
 			self->vc_rectfill = &unaligned_rectfill16;
+			self->vc_rectcopy = &unaligned_rectcopy16;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
 			self->vc_getpixel = &getpixel16;
 			self->vc_setpixel = &setpixel16;
-			self->vc_rectcopy = &rectcopy16;
 			self->vc_linefill = &linefill16;
 			self->vc_vertfill = &vertfill16;
 			self->vc_rectfill = &rectfill16;
+			self->vc_rectcopy = &rectcopy16;
 		}
 		break;
 	case 24:
@@ -5106,10 +5106,10 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rambuffer_requirements = &buffer24_requirements;
 		self->vc_getpixel = &getpixel24;
 		self->vc_setpixel = &setpixel24;
-		self->vc_rectcopy = &rectcopy24;
 		self->vc_linefill = &linefill24;
 		self->vc_vertfill = &vertfill24;
 		self->vc_rectfill = &rectfill24;
+		self->vc_rectcopy = &rectcopy24;
 		break;
 	case 32:
 		self->vc_align = 4;
@@ -5118,19 +5118,19 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel32;
 			self->vc_setpixel = &unaligned_setpixel32;
-			self->vc_rectcopy = &unaligned_rectcopy32;
 			self->vc_linefill = &unaligned_linefill32;
 			self->vc_vertfill = &unaligned_vertfill32;
 			self->vc_rectfill = &unaligned_rectfill32;
+			self->vc_rectcopy = &unaligned_rectcopy32;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
 			self->vc_getpixel = &getpixel32;
 			self->vc_setpixel = &setpixel32;
-			self->vc_rectcopy = &rectcopy32;
 			self->vc_linefill = &linefill32;
 			self->vc_vertfill = &vertfill32;
 			self->vc_rectfill = &rectfill32;
+			self->vc_rectcopy = &rectcopy32;
 		}
 		break;
 	default:

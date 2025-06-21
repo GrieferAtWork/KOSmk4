@@ -217,7 +217,7 @@ struct video_codec {
 	struct video_codec_specs  vc_specs; /* [const] Video format flags (Set of `VIDEO_CODEC_FLAG_*') */
 	__uint32_t                vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
 	struct video_codec const *vc_nalgn; /* [1..1][const] Codec identical to this one, except with `vc_align == 1' */
-	/* NOTE: _ALL_ Callbacks are always [1..1] */
+	/* NOTE: _ALL_ Callbacks are always [1..1][const] */
 
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes,
@@ -256,18 +256,6 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict __line,
 	                                 video_coord_t __x, video_pixel_t __pixel);
 
-	/* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
-	 * @assume(IS_ALIGNED(__dst_line, vc_align));
-	 * @assume(IS_ALIGNED(__src_line, vc_align));
-	 * @assume(IS_ALIGNED(__dst_stride, vc_align));
-	 * @assume(IS_ALIGNED(__src_stride, vc_align));
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_NONNULL_T((1, 4)) void
-	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
-	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
-	                                 video_dim_t __size_x, video_dim_t __size_y);
-
 	/* Fill `num_pixels'  neighboring  pixels  horizontally.
 	 * The caller must ensure that all coords are in-bounds.
 	 * @assume(IS_ALIGNED(__line, vc_align));
@@ -300,6 +288,18 @@ struct video_codec {
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_rectfill)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
 	                                 video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
+
+	/* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
+	 * @assume(IS_ALIGNED(__dst_line, vc_align));
+	 * @assume(IS_ALIGNED(__src_line, vc_align));
+	 * @assume(IS_ALIGNED(__dst_stride, vc_align));
+	 * @assume(IS_ALIGNED(__src_stride, vc_align));
+	 * @assume(__size_x > 0);
+	 * @assume(__size_y > 0); */
+	__ATTR_NONNULL_T((1, 4)) void
+	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
+	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
+	                                 video_dim_t __size_x, video_dim_t __size_y);
 
 	/* Extra implementation-specific operators/fields go here... */
 };
