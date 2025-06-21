@@ -426,6 +426,10 @@ bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
 }
 
 
+/* Check if {x1,y1} <= {x2,y2} */
+#define xy_before_or_equal(x1, y1, x2, y2) ((y1) < (y2) || ((y1) == (y2) && (x1) <= (x2)))
+
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_UTILS_H */

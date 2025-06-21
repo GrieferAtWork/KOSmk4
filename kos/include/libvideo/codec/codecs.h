@@ -300,7 +300,14 @@ struct video_codec {
 	(LIBVIDEO_CODEC_CC *vc_rectcopy)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
 	                                 __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
 	                                 video_dim_t __size_x, video_dim_t __size_y);
-	/* TODO: "vc_rectmove" (same as `vc_rectcopy', but dst_line/src_line aren't __restrict) */
+
+	/* Same as `vc_rectcopy', but able to deal with the actual memory of __dst_line/__src_line
+	 * overlapping, whilst properly dealing with that being the case without producing corrupt
+	 * results (iow: this is "memmove", and `vc_rectcopy' is "memcpy") */
+	__ATTR_NONNULL_T((1, 3)) void
+	(LIBVIDEO_CODEC_CC *vc_rectmove)(__byte_t *__dst_line, video_coord_t __dst_x,
+	                                 __byte_t const *__src_line, video_coord_t __src_x,
+	                                 __size_t __stride, video_dim_t __size_x, video_dim_t __size_y);
 
 	/* Extra implementation-specific operators/fields go here... */
 };

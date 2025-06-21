@@ -1026,13 +1026,36 @@ libvideo_blitter_noblend_samefmt__blit__bypixel(struct video_blitter const *__re
 	video_dim_t x, y;
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
-	for (y = 0; y < size_y; ++y) {
-		for (x = 0; x < size_x; ++x) {
+	y = 0;
+	do {
+		x = 0;
+		do {
 			video_pixel_t pixel;
 			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
 			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
-		}
-	}
+		} while (++x < size_x);
+	} while (++y < size_y);
+}
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_samefmt__blit__bypixel__rev(struct video_blitter const *__restrict self,
+                                                     video_coord_t dst_x, video_coord_t dst_y,
+                                                     video_coord_t src_x, video_coord_t src_y,
+                                                     video_dim_t size_x, video_dim_t size_y) {
+	video_dim_t x, y;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	y = size_y;
+	do {
+		--y;
+		x = size_x;
+		do {
+			video_pixel_t pixel;
+			--x;
+			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
+			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
+		} while (x);
+	} while (y);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1070,6 +1093,42 @@ libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict se
 	libvideo_blitter_noblend_samefmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 done:
 	TRACE_END("noblend_samefmt__blit()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict self,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_coord_t src_x, video_coord_t src_y,
+                                       video_dim_t size_x, video_dim_t size_y) {
+	struct video_lock vlock;
+	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
+	TRACE_START("noblend_samebuf__blit("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y);
+	if likely(dst_buffer->wlock(vlock) == 0) {
+		byte_t *dst_line = vlock.vl_data + dst_y * vlock.vl_stride;
+		byte_t const *src_line = vlock.vl_data + src_y * vlock.vl_stride;
+		void (LIBVIDEO_CODEC_CC *vc_rectmove)(byte_t *__restrict dst_line, video_coord_t dst_x,
+		                                      byte_t const *__restrict src_line, video_coord_t src_x,
+		                                      size_t stride, video_dim_t size_x, video_dim_t size_y);
+		/* Make use of the special "vc_rectmove" operator */
+		vc_rectmove = dst_buffer->vb_format.vf_codec->vc_rectmove;
+		(*vc_rectmove)(dst_line, dst_x, src_line, src_x,
+		               vlock.vl_stride, size_x, size_y);
+		dst_buffer->unlock(vlock);
+		goto done;
+	}
+
+	/* Use pixel-based rendering */
+	if (xy_before_or_equal(dst_x, dst_y, src_x, src_y)) {
+		libvideo_blitter_noblend_samefmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	} else {
+		libvideo_blitter_noblend_samefmt__blit__bypixel__rev(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	}
+done:
+	TRACE_END("noblend_samebuf__blit()\n");
 }
 
 static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)0)->_vbt_driver),

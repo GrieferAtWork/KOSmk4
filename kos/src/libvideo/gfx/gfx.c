@@ -31,14 +31,17 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
 #include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 #include <sys/param.h>
+#include <sys/syslog.h>
 
 #include <inttypes.h>
+#include <malloca.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -52,6 +55,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "gfx-empty.h"
 #include "gfx-utils.h"
 #include "gfx.h"
+#include "ram-buffer.h"
 
 DECL_BEGIN
 
@@ -1415,6 +1419,33 @@ libvideo_blitter_generic__blit(struct video_blitter const *__restrict self,
 	TRACE_END("generic__blit()\n");
 }
 
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_generic__blit__rev(struct video_blitter const *__restrict self,
+                                    video_coord_t dst_x, video_coord_t dst_y,
+                                    video_coord_t src_x, video_coord_t src_y,
+                                    video_dim_t size_x, video_dim_t size_y) {
+	video_dim_t x, y;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	TRACE_START("generic__blit__rev("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y);
+	y = size_y;
+	do {
+		--y;
+		x = size_x;
+		do {
+			video_color_t color;
+			--x;
+			color = video_gfx_x_getcolor(src, src_x + x, src_y + y);
+			video_gfx_x_putcolor(dst, dst_x + x, dst_y + y, color);
+		} while (x);
+	} while (y);
+	TRACE_END("generic__blit__rev()\n");
+}
+
 
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__stretch_l(struct video_blitter const *__restrict self,
@@ -1492,6 +1523,18 @@ libvideo_blitter_generic__stretch_l(struct video_blitter const *__restrict self,
 #undef pixel_blend_xmax_ymax
 }
 
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_generic__stretch_l__rev(struct video_blitter const *__restrict self,
+                                         video_coord_t dst_x_, video_coord_t dst_y_,
+                                         video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                         video_coord_t src_x_, video_coord_t src_y_,
+                                         video_dim_t src_size_x_, video_dim_t src_size_y_) {
+	/* TODO */
+	libvideo_blitter_generic__stretch_l(self,
+	                                    dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                                    src_x_, src_y_, src_size_x_, src_size_y_);
+}
+
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__stretch_n(struct video_blitter const *__restrict self,
                                     video_coord_t dst_x, video_coord_t dst_y,
@@ -1532,14 +1575,130 @@ libvideo_blitter_generic__stretch_n(struct video_blitter const *__restrict self,
 }
 
 
+INTERN ATTR_IN(1) void CC
+libvideo_blitter_generic__stretch_n__rev(struct video_blitter const *__restrict self,
+                                         video_coord_t dst_x, video_coord_t dst_y,
+                                         video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                         video_coord_t src_x, video_coord_t src_y,
+                                         video_dim_t src_size_x, video_dim_t src_size_y) {
+	video_dim_t y;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
+	stretch_fp_t step_x, step_y, src_pos_y;
+	TRACE_START("generic__stretch_n__rev("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y);
+	step_x = STRETCH_FP(src_size_x) / dst_size_x;
+	step_y = STRETCH_FP(src_size_y) / dst_size_y;
+	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	src_pos_y += dst_size_y * step_y;
+	y = dst_size_y;
+	do {
+		video_coord_t row_dst_y;
+		video_coord_t row_src_y;
+		stretch_fp_t src_pos_x;
+		video_dim_t x;
+		--y;
+		src_pos_y -= step_y;
+		row_dst_y = dst_y + y;
+		row_src_y = src_y + STRETCH_FP_WHOLE(src_pos_y);
+		src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+		src_pos_x += STRETCH_FP(src_x);
+		src_pos_x += dst_size_x * step_x;
+		x = dst_size_x;
+		do {
+			video_color_t color;
+			video_coord_t row_src_x;
+			--x;
+			src_pos_x -= step_x;
+			row_src_x = STRETCH_FP_WHOLE(src_pos_x);
+			color = video_gfx_x_getcolor(src, row_src_x, row_src_y);
+			video_gfx_x_putcolor(dst, dst_x + x, row_dst_y, color);
+		} while (x);
+	} while (y);
+	TRACE_END("generic__stretch_n__rev()\n");
+}
+
+
 /* Special impls for when the blit src/dst are identical */
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_samebuf__blit(struct video_blitter const *__restrict self,
                                video_coord_t dst_x, video_coord_t dst_y,
                                video_coord_t src_x, video_coord_t src_y,
                                video_dim_t size_x, video_dim_t size_y) {
-	/* TODO */
-	libvideo_blitter_generic__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	if (xy_before_or_equal(dst_x, dst_y, src_x, src_y)) {
+		libvideo_blitter_generic__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	} else {
+		libvideo_blitter_generic__blit__rev(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	}
+}
+
+PRIVATE ATTR_NOINLINE ATTR_IN(1) void CC
+libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__restrict self,
+                                                  video_coord_t dst_x, video_coord_t dst_y,
+                                                  video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                                  video_coord_t src_x, video_coord_t src_y,
+                                                  video_dim_t src_size_x, video_dim_t src_size_y) {
+	struct video_buffer const *srcbuf = self->vbt_src->vx_buffer;
+	struct video_rambuffer rb;
+	struct video_blitter blitter;
+	struct video_gfx rb_gfx;
+
+	/*rb.vb_refcnt = 1;*/
+	rb.vb_ops    = &rambuffer_ops;
+	rb.vb_format.vf_codec = srcbuf->vb_format.vf_codec;
+	rb.vb_format.vf_pal   = srcbuf->vb_format.vf_pal;
+	rb.vb_xdim   = __hybrid_min2(dst_size_x, src_size_x);
+	rb.vb_ydim   = __hybrid_min2(dst_size_y, src_size_y);
+	rb.rb_stride = rb.vb_xdim * rb.vb_format.vf_codec->vc_specs.vcs_pxsz;
+	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_format.vf_codec->vc_align);
+	rb.rb_total  = rb.rb_stride * rb.vb_ydim;
+	rb.rb_data   = (byte_t *)malloca(rb.rb_total);
+	if unlikely(!rb.rb_data) {
+		/* Well... Nothing we can do about it... :( */
+		syslog(LOG_WARN, "[libvideo-gfx] Failed to allocate %" PRIuSIZ " bytes for temporary buffer\n",
+		       rb.rb_total);
+		return;
+	}
+	rb_gfx.vx_buffer   = &rb;
+	rb_gfx.vx_blend    = GFX_BLENDMODE_OVERRIDE;
+	rb_gfx.vx_flags    = self->vbt_dst->vx_flags;
+	rb_gfx.vx_colorkey = 0;
+	blitter.vbt_src = self->vbt_src;
+	blitter.vbt_dst = rambuffer_initgfx(&rb_gfx);
+	/*(*rb_gfx.vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
+
+	/* Blit source into temporary buffer... */
+	if (src_size_x == rb.vb_xdim && src_size_y == rb.vb_ydim) {
+		libvideo_blitter_noblend_samefmt__blit(&blitter, 0, 0,
+		                                       src_x, src_y, src_size_x, src_size_y);
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_FLINEARBLIT) {
+		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
+		                                            src_x, src_y, src_size_x, src_size_y);
+	} else {
+		libvideo_blitter_noblend_samefmt__stretch_n(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
+		                                            src_x, src_y, src_size_x, src_size_y);
+	}
+
+	/* Blit temporary buffer into target... */
+	blitter.vbt_src = blitter.vbt_dst;
+	blitter.vbt_dst = self->vbt_dst;
+	/*(*rb_gfx.vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
+	if (dst_size_x == rb.vb_xdim && dst_size_y == rb.vb_ydim) {
+		libvideo_blitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,
+		                                       0, 0, dst_size_x, dst_size_y);
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_FLINEARBLIT) {
+		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
+		                                            0, 0, rb.vb_xdim, rb.vb_ydim);
+	} else {
+		libvideo_blitter_noblend_samefmt__stretch_n(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
+		                                            0, 0, rb.vb_xdim, rb.vb_ydim);
+	}
+
+	/* Free temporary buffer... */
+	freea(rb.rb_data);
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1548,8 +1707,24 @@ libvideo_blitter_samebuf__stretch_l(struct video_blitter const *__restrict self,
                                     video_dim_t dst_size_x, video_dim_t dst_size_y,
                                     video_coord_t src_x, video_coord_t src_y,
                                     video_dim_t src_size_x, video_dim_t src_size_y) {
-	/* TODO */
-	libvideo_blitter_generic__stretch_l(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	video_coord_t dst_xend = dst_x + dst_size_x;
+	video_coord_t dst_yend = dst_y + dst_size_y;
+	video_coord_t src_xend = src_x + src_size_x;
+	video_coord_t src_yend = src_y + src_size_y;
+	bool dst_xymin_before_src_xymin = xy_before_or_equal(dst_x, dst_y, src_x, src_y);
+	bool dst_xyend_before_src_xyend = xy_before_or_equal(dst_xend, dst_yend, src_xend, src_yend);
+	if (dst_xymin_before_src_xymin && dst_xyend_before_src_xyend) {
+		libvideo_blitter_generic__stretch_l(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else if (!dst_xymin_before_src_xymin && !dst_xyend_before_src_xyend) {
+		libvideo_blitter_generic__stretch_l__rev(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else if (dst_xend <= src_x || dst_yend <= src_y || dst_x >= src_xend || dst_y >= src_yend) {
+		libvideo_blitter_generic__stretch_l(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else {
+		/* Special case: destination- and source-rect overlap in such a way that
+		 * we need a temporary copy of the source rect so-as not to clobber data
+		 * that has yet to be read. */
+		libvideo_blitter_samebuf__stretch__with_temporary(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	}
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1558,8 +1733,24 @@ libvideo_blitter_samebuf__stretch_n(struct video_blitter const *__restrict self,
                                     video_dim_t dst_size_x, video_dim_t dst_size_y,
                                     video_coord_t src_x, video_coord_t src_y,
                                     video_dim_t src_size_x, video_dim_t src_size_y) {
-	/* TODO */
-	libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	video_coord_t dst_xend = dst_x + dst_size_x;
+	video_coord_t dst_yend = dst_y + dst_size_y;
+	video_coord_t src_xend = src_x + src_size_x;
+	video_coord_t src_yend = src_y + src_size_y;
+	bool dst_xymin_before_src_xymin = xy_before_or_equal(dst_x, dst_y, src_x, src_y);
+	bool dst_xyend_before_src_xyend = xy_before_or_equal(dst_xend, dst_yend, src_xend, src_yend);
+	if (dst_xymin_before_src_xymin && dst_xyend_before_src_xyend) {
+		libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else if (!dst_xymin_before_src_xymin && !dst_xyend_before_src_xyend) {
+		libvideo_blitter_generic__stretch_n__rev(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else if (dst_xend <= src_x || dst_yend <= src_y || dst_x >= src_xend || dst_y >= src_yend) {
+		libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	} else {
+		/* Special case: destination- and source-rect overlap in such a way that
+		 * we need a temporary copy of the source rect so-as not to clobber data
+		 * that has yet to be read. */
+		libvideo_blitter_samebuf__stretch__with_temporary(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y);
+	}
 }
 
 

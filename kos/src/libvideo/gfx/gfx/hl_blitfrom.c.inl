@@ -125,8 +125,13 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {
-		ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_samebuf__blit;
 		ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_samebuf__stretch_X;
+		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
+		    VIDEO_COLOR_ISTRANSPARENT(ctx->vbt_src->vx_colorkey)) {
+			ctx->_vbt_xops.vbtx_blit = &libvideo_blitter_noblend_samebuf__blit;
+		} else {
+			ctx->_vbt_xops.vbtx_blit = &libvideo_blitter_samebuf__blit;
+		}
 	} else {
 		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vbt_src->vx_colorkey)) {
