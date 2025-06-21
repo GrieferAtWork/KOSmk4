@@ -60,6 +60,7 @@
 __DECL_BEGIN
 
 struct video_format;
+struct video_gfx;
 
 struct video_lock {
 	__byte_t *vl_data;      /* [1..vl_size] Memory-mapped video data. */
@@ -80,7 +81,7 @@ struct video_buffer_ops {
 
 	/* Buffer finalization. */
 	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
+	(LIBVIDEO_GFX_FCC *vi_destroy)(struct video_buffer *__restrict __self);
 
 	/* Initialize a graphics context for use with the linked buffer.
 	 * The caller  of this  operator must  have already  filled  in:
@@ -89,17 +90,31 @@ struct video_buffer_ops {
 	 * - __self->vx_flags
 	 * - __self->vx_colorkey
 	 * @return: * : Always re-returns `__self' */
-	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_gfx *
-	(LIBVIDEO_GFX_CC *vi_initgfx)(struct video_gfx *__restrict __self);
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
+	(LIBVIDEO_GFX_FCC *vi_initgfx)(struct video_gfx *__restrict __self);
 
-	/* Disable blending for `self', which uses this video buffer.
-	 * CAUTION: Only use this operator on a freshly copied/created GFX  context.
-	 *          If the given context is already in use (especially if by another
-	 *          thread), use of this function may result in a crash. */
-	__ATTR_INOUT_T(1) struct video_gfx *
-	(LIBVIDEO_GFX_CC *vi_gfx_noblend)(struct video_gfx *__restrict __self);
+	/* Update operators of `__self' after certain behavioral flags were changed:
+	 * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
+	 * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_flags' may have changed
+	 * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_colorkey' may have changed
+	 * @param: __what: Set of `VIDEO_GFX_UPDATE_*'
+	 *
+	 * CAUTION: Do not use this operator when `__self' may be used by other threads! */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
+	(LIBVIDEO_GFX_FCC *vi_updategfx)(struct video_gfx *__restrict __self,
+	                                 unsigned int __what);
 
-	void (*_vi_pad1[5])(void);
+	/* Disable blending for `__self', which uses this video buffer. Same as:
+	 * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
+	 * >> __self->vx_flags &= ~VIDEO_GFX_FBLUR;
+	 * >> __self->vx_colorkey = 0;
+	 * >> (*vi_updategfx)(__self, VIDEO_GFX_UPDATE_ALL);
+	 *
+	 * CAUTION: Do not use this operator when `__self' may be used by other threads! */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
+	(LIBVIDEO_GFX_FCC *vi_noblendgfx)(struct video_gfx *__restrict __self);
+
+	void (*_vi_pad1[4])(void);
 
 	/* Lock the video buffer into memory for reading.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding
@@ -110,18 +125,18 @@ struct video_buffer_ops {
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
-	(LIBVIDEO_GFX_CC *vi_rlock)(struct video_buffer *__restrict __self,
+	(LIBVIDEO_GFX_FCC *vi_rlock)(struct video_buffer *__restrict __self,
 	                            struct video_lock *__restrict __result);
 
 	/* Same as `vi_rlock', but also lock for reading+writing */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
-	(LIBVIDEO_GFX_CC *vi_wlock)(struct video_buffer *__restrict __self,
-	                            struct video_lock *__restrict __result);
+	(LIBVIDEO_GFX_FCC *vi_wlock)(struct video_buffer *__restrict __self,
+	                             struct video_lock *__restrict __result);
 
 	/* Unlock a video buffer that had previously been mapped into memory. */
 	__ATTR_INOUT_T(1) __ATTR_IN_T(2) void
-	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
-	                                        struct video_lock *__restrict __lock);
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_unlock)(struct video_buffer *__restrict __self,
+	                                         struct video_lock *__restrict __lock);
 
 	void (*_vi_pad2[3])(void);
 };
@@ -401,9 +416,11 @@ video_buffer_save(struct video_buffer *__self, char const *__filename,
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
-typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
+typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *
+(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
+LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *
+LIBVIDEO_GFX_CC video_preferred_format(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

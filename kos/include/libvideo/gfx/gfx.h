@@ -61,6 +61,16 @@
 #define VIDEO_GFX_FRDYWRAP     0x0800 /* [READ]  Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
 
 
+/* Flags for `video_gfx_update()' */
+#define VIDEO_GFX_UPDATE_NOTHING  0 /* Nothing was changed */
+#define VIDEO_GFX_UPDATE_BLEND    1 /* `struct video_gfx::vx_blend' might have been changed */
+#define VIDEO_GFX_UPDATE_FLAGS    2 /* `struct video_gfx::vx_flags' might have been changed */
+#define VIDEO_GFX_UPDATE_COLORKEY 4 /* `struct video_gfx::vx_colorkey' might have been changed */
+#define VIDEO_GFX_UPDATE_ALL     \
+	(VIDEO_GFX_UPDATE_COLORKEY | \
+	 VIDEO_GFX_UPDATE_FLAGS |    \
+	 VIDEO_GFX_UPDATE_BLEND)
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -551,13 +561,35 @@ video_gfx_loadclip(struct video_gfx *__restrict self,
                    video_gfx_clipinfo_t const *__restrict backup);
 
 
-/* Disable blending for `__self', which uses this video buffer.
- * CAUTION: Only use this operator on a freshly copied/created GFX  context.
- *          If the given context is already in use (especially if by another
- *          thread), use of this function may result in a crash. */
-extern __ATTR_INOUT(1) struct video_gfx *
-video_gfx_noblend(struct video_gfx *__restrict __self);
+/* Update operators of `__self' after certain behavioral flags were changed:
+ * - VIDEO_GFX_UPDATE_BLEND:    `__self->vx_blend' may have changed
+ * - VIDEO_GFX_UPDATE_FLAGS:    `__self->vx_flags' may have changed
+ * - VIDEO_GFX_UPDATE_COLORKEY: `__self->vx_colorkey' may have changed
+ * @param: __what: Set of `VIDEO_GFX_UPDATE_*'
+ *
+ * CAUTION: Do not use this operator when `__self' may be used by other threads! */
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_update(struct video_gfx *__restrict __self, unsigned int __what);
 
+/* Set GFX modes for `__self'. If you want to set multiple of these at once,
+ * you should directly assign the respective  members, and then make a  call
+ * to `video_gfx_update()' specifying exactly what changed. */
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_setflags(struct video_gfx *__restrict __self, __uintptr_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
+
+/* Disable  blending  for  `__self'.  Same   as:
+ * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
+ * >> __self->vx_flags &= ~VIDEO_GFX_FBLUR;
+ * >> __self->vx_colorkey = 0;
+ * >> video_gfx_update(__self, VIDEO_GFX_UPDATE_ALL);
+ *
+ * CAUTION: Do not use this operator when `__self' may be used by other threads! */
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_noblend(struct video_gfx *__restrict __self);
 
 /* Get/put(blend) the color of a singular pixel */
 extern __ATTR_WUNUSED __ATTR_IN(1) video_color_t
@@ -691,8 +723,16 @@ video_gfx_bitstretch(struct video_gfx const *__dst, video_offset_t __dst_x, vide
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 #define video_gfx_saveclip(self, backup) (void)__libc_memcpy(backup, &(self)->vx_hdr, sizeof(video_gfx_clipinfo_t))
 #define video_gfx_loadclip(self, backup) (void)__libc_memcpy(&(self)->vx_hdr, backup, sizeof(video_gfx_clipinfo_t))
+#define video_gfx_update(self, what) \
+	(*(self)->vx_buffer->vb_ops->vi_updategfx)(self, what)
+#define video_gfx_setblend(self, mode) \
+	((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
+#define video_gfx_setflags(self, flags) \
+	((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_setcolorkey(self, colorkey) \
+	((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
 #define video_gfx_noblend(self) \
-	(*(self)->vx_buffer->vb_ops->vi_gfx_noblend)(self)
+	(*(self)->vx_buffer->vb_ops->vi_noblendgfx)(self)
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_hdr.vxh_ops->fxo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \
@@ -796,7 +836,7 @@ struct video_gfxhdr {
 	 * operator here must be the one of `__ctx->vb_dst'
 	 * @return: * : Always re-returns `__ctx' */
 	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blit *
-	(LIBVIDEO_GFX_CC *vxh_blitfrom)(struct video_blit *__restrict __ctx);
+	(LIBVIDEO_GFX_FCC *vxh_blitfrom)(struct video_blit *__restrict __ctx);
 
 	/* Clip rect area (pixel area used for pixel clamping/wrapping, and accepted):
 	 * >> +---------------------------------+

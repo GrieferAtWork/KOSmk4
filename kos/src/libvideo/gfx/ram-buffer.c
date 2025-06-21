@@ -197,7 +197,7 @@ libvideo_ramgfx__setpixel24(struct video_gfx const *__restrict self,
 
 
 
-INTERN NONNULL((1)) void CC
+INTERN NONNULL((1)) void FCC
 rambuffer_destroy(struct video_buffer *__restrict self) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
@@ -207,7 +207,7 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
-INTERN ATTR_INOUT(1) ATTR_OUT(2) int CC
+INTERN ATTR_INOUT(1) ATTR_OUT(2) int FCC
 rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict result) {
 	struct video_rambuffer *me;
@@ -219,8 +219,8 @@ rambuffer_lock(struct video_buffer *__restrict self,
 }
 
 INTERN ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
-                             struct video_lock *__restrict lock) {
+NOTHROW(FCC rambuffer_unlock)(struct video_buffer *__restrict self,
+                              struct video_lock *__restrict lock) {
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
@@ -232,7 +232,7 @@ NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
 	(void)lock;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_initgfx(struct video_gfx *__restrict self) {
 	struct video_rambuffer *me = (struct video_rambuffer *)self->vx_buffer;
 	self->_vx_driver[RAMGFX_DRIVER__DATA]   = me->rb_data;
@@ -267,7 +267,7 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 #endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
 
 	/* Load generic operator defaults (overwritten as appropriate below) */
-	libvideo_gfx_populate_generic(self);
+	libvideo_gfx_generic_populate(self);
 
 	/* Select how colors should be read. */
 	if (self->vx_flags & VIDEO_GFX_FBLUR) {
@@ -292,16 +292,7 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 	default:
-		if (GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-		    GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend))) {
-			self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
-		} else {
-			self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
-		}
+		self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
 		break;
 	}
 
@@ -317,11 +308,17 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+	libvideo_gfx_generic_update(self, what);
+	return self;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
 	self->vx_colorkey = 0;
-	libvideo_gfx_populate_noblend(self);
+	libvideo_gfx_generic_populate_noblend(self);
 	if (self->_vx_xops.vgxo_getcolor != self->_vx_xops.vgxo_getpixel)
 		self->_vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
 	if (self->_vx_xops.vgxo_putcolor != self->_vx_xops.vgxo_setpixel)
@@ -334,11 +331,12 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 PRIVATE struct video_buffer_ops rambuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_rlock       = &rambuffer_rlock;
-		rambuffer_ops.vi_wlock       = &rambuffer_wlock;
-		rambuffer_ops.vi_unlock      = &rambuffer_unlock;
-		rambuffer_ops.vi_initgfx     = &rambuffer_initgfx;
-		rambuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
+		rambuffer_ops.vi_rlock      = &rambuffer_rlock;
+		rambuffer_ops.vi_wlock      = &rambuffer_wlock;
+		rambuffer_ops.vi_unlock     = &rambuffer_unlock;
+		rambuffer_ops.vi_initgfx    = &rambuffer_initgfx;
+		rambuffer_ops.vi_updategfx  = &rambuffer_updategfx;
+		rambuffer_ops.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -394,7 +392,7 @@ struct video_membuffer: video_rambuffer {
 
 PRIVATE struct video_buffer_ops membuffer_ops = {};
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 membuffer_destroy(struct video_buffer *__restrict self) {
 	struct video_membuffer *me = (struct video_membuffer *)self;
 	assert(me->vb_ops == &membuffer_ops);
@@ -409,11 +407,12 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC membuffer_getops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
-		membuffer_ops.vi_rlock       = &rambuffer_rlock;
-		membuffer_ops.vi_wlock       = &rambuffer_wlock;
-		membuffer_ops.vi_unlock      = &rambuffer_unlock;
-		membuffer_ops.vi_initgfx     = &rambuffer_initgfx;
-		membuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
+		membuffer_ops.vi_rlock      = &rambuffer_rlock;
+		membuffer_ops.vi_wlock      = &rambuffer_wlock;
+		membuffer_ops.vi_unlock     = &rambuffer_unlock;
+		membuffer_ops.vi_initgfx    = &rambuffer_initgfx;
+		membuffer_ops.vi_updategfx  = &rambuffer_updategfx;
+		membuffer_ops.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		membuffer_ops.vi_destroy = &membuffer_destroy;
 		COMPILER_WRITE_BARRIER();

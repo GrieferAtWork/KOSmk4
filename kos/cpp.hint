@@ -1068,7 +1068,9 @@
 #define __VLIBDCALL
 #define __LIBC
 #define CC
+#define FCC
 #define __CC
+#define __FCC
 #define VCC
 #define __VCC
 #define FORMATPRINTER_CC

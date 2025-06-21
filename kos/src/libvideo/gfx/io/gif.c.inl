@@ -366,14 +366,14 @@ struct gif_buffer: video_rambuffer {
 	bool gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS; /* True if "GIF_DISPOSE_RESTORE_PREVIOUS" was encountered */
 };
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gifbuffer_initgfx__with_colorkey(struct video_gfx *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self->vx_buffer;
 	self->vx_colorkey = me->gb_colorkey;
 	return rambuffer_initgfx(self);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 gifbuffer_destroy(struct video_buffer *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self;
 	free(me->gb_scratch);
@@ -385,11 +385,12 @@ gifbuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE struct video_buffer_ops gifbuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gifbuffer_ops(void) {
 	if unlikely(!gifbuffer_ops.vi_destroy) {
-		gifbuffer_ops.vi_rlock       = &rambuffer_rlock;
-		gifbuffer_ops.vi_wlock       = &rambuffer_wlock;
-		gifbuffer_ops.vi_unlock      = &rambuffer_unlock;
-		gifbuffer_ops.vi_initgfx     = &rambuffer_initgfx;
-		gifbuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
+		gifbuffer_ops.vi_rlock      = &rambuffer_rlock;
+		gifbuffer_ops.vi_wlock      = &rambuffer_wlock;
+		gifbuffer_ops.vi_unlock     = &rambuffer_unlock;
+		gifbuffer_ops.vi_initgfx    = &rambuffer_initgfx;
+		gifbuffer_ops.vi_updategfx  = &rambuffer_updategfx;
+		gifbuffer_ops.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -402,11 +403,12 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gifbuffer_ops(void) 
 PRIVATE struct video_buffer_ops gifbuffer_ops__with_color_key = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gifbuffer_ops__with_color_key(void) {
 	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
-		gifbuffer_ops__with_color_key.vi_rlock       = &rambuffer_rlock;
-		gifbuffer_ops__with_color_key.vi_wlock       = &rambuffer_wlock;
-		gifbuffer_ops__with_color_key.vi_unlock      = &rambuffer_unlock;
-		gifbuffer_ops__with_color_key.vi_initgfx     = &gifbuffer_initgfx__with_colorkey;
-		gifbuffer_ops__with_color_key.vi_gfx_noblend = &rambuffer_noblend;
+		gifbuffer_ops__with_color_key.vi_rlock      = &rambuffer_rlock;
+		gifbuffer_ops__with_color_key.vi_wlock      = &rambuffer_wlock;
+		gifbuffer_ops__with_color_key.vi_unlock     = &rambuffer_unlock;
+		gifbuffer_ops__with_color_key.vi_initgfx    = &gifbuffer_initgfx__with_colorkey;
+		gifbuffer_ops__with_color_key.vi_updategfx  = &rambuffer_updategfx;
+		gifbuffer_ops__with_color_key.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops__with_color_key.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();

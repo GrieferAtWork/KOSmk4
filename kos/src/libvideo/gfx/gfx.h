@@ -253,8 +253,8 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absgradient_v(struct video_gfx c
 INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_generic__blitfrom_l(struct video_blit *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_generic__blitfrom_n(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_generic__blitfrom_l(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_generic__blitfrom_n(struct video_blit *__restrict ctx);
 
 /* Low-level, Generic, always-valid Blit functions (using only `fxo_getcolor' + `fxo_putcolor') */
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
@@ -289,8 +289,8 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_samefmt__stretch_n(struct video_b
 INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 #define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
 /* The *_difffmt_* operators here "libvideo_blit_generic__conv" to be initialized */
 #define libvideo_blit_generic__conv(self) ((struct video_converter *)(self)->_vb_driver)
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
@@ -380,7 +380,150 @@ _blendinfo__is_add_or_subtract_or_max(unsigned int func) {
 	       func == GFX_BLENDFUNC_MAX;
 }
 
-/* libvideo_gfx_populate_generic: fill in all
+/* Update operator callbacks after the caller changed `what' */
+LOCAL ATTR_INOUT(1) void CC
+libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what) {
+	/* Update:
+	 * - vx_hdr.vxh_ops */
+	if (what & VIDEO_GFX_UPDATE_FLAGS) {
+		/* Select generic operators based on wrapping rules */
+		if (self->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
+			if (self->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+				self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_rdwrwrap;
+			} else {
+				self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_rdwrap;
+			}
+		} else if (self->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+			self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_wrwrap;
+		} else {
+			self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops;
+		}
+	}
+
+	/* Update:
+	 * - _vx_xops.vgxo_getcolor */
+	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
+		/* Select how colors should be read. */
+		if (self->vx_flags & VIDEO_GFX_FBLUR) {
+			self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+		} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+			self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_with_key;
+		} else if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+			self->_vx_xops.vgxo_getcolor = self->_vx_xops.vgxo_getpixel;
+		} else {
+			self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
+		}
+	}
+
+	/* Update:
+	 * - _vx_xops.vgxo_putcolor
+	 * - _vx_xops.vgxo_absline_h
+	 * - _vx_xops.vgxo_absline_v
+	 * - _vx_xops.vgxo_absfill
+	 * - _vx_xops.vgxo_bitfill
+	 * - _vx_xops.vgxo_absgradient
+	 * - _vx_xops.vgxo_absgradient_h
+	 * - _vx_xops.vgxo_absgradient_v */
+	if (what & VIDEO_GFX_UPDATE_BLEND) {
+		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
+
+		/* Detect special blend modes. */
+		switch (self->vx_blend) {
+		default:
+			if (!(GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
+			      GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
+			      GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+			      GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
+			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
+			      _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend)))) {
+				/* Actual, custom blending */
+				self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
+				break;
+			}
+			self->vx_blend = GFX_BLENDMODE_OVERRIDE; /* It essentially behaves the same, so... */
+			ATTR_FALLTHROUGH
+		case GFX_BLENDMODE_OVERRIDE:
+			/* No blending is being done -> link operators that try to make use of direct memory access. */
+
+			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+			if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
+				self->_vx_xops.vgxo_putcolor = self->_vx_xops.vgxo_setpixel;
+			} else {
+				self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
+			}
+			self->_vx_xops.vgxo_absline_h = &libvideo_gfx_noblend__absline_h;
+			self->_vx_xops.vgxo_absline_v = &libvideo_gfx_noblend__absline_v;
+			self->_vx_xops.vgxo_absfill   = &libvideo_gfx_noblend__absfill;
+			self->_vx_xops.vgxo_bitfill   = &libvideo_gfx_noblend__bitfill;
+			if (self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+				self->_vx_xops.vgxo_absgradient   = &libvideo_gfx_noblend_interp8888__absgradient;
+				self->_vx_xops.vgxo_absgradient_h = &libvideo_gfx_noblend_interp8888__absgradient_h;
+				self->_vx_xops.vgxo_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
+			} else {
+				self->_vx_xops.vgxo_absgradient   = &libvideo_gfx_generic__absgradient;
+				self->_vx_xops.vgxo_absgradient_h = &libvideo_gfx_generic__absgradient_h;
+				self->_vx_xops.vgxo_absgradient_v = &libvideo_gfx_generic__absgradient_v;
+			}
+			goto after_blend;
+
+#define LINK_libvideo_gfx_generic__putcolor_FOO(name, mode)                        \
+		case mode:                                                                 \
+			self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_##name; \
+			break;
+		GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
+#undef LINK_libvideo_gfx_generic__putcolor_FOO
+		}
+		self->_vx_xops.vgxo_absline_h     = &libvideo_gfx_generic__absline_h;
+		self->_vx_xops.vgxo_absline_v     = &libvideo_gfx_generic__absline_v;
+		self->_vx_xops.vgxo_absfill       = &libvideo_gfx_generic__absfill;
+		self->_vx_xops.vgxo_bitfill       = &libvideo_gfx_generic__bitfill;
+		self->_vx_xops.vgxo_absgradient   = &libvideo_gfx_generic__absgradient;
+		self->_vx_xops.vgxo_absgradient_h = &libvideo_gfx_generic__absgradient_h;
+		self->_vx_xops.vgxo_absgradient_v = &libvideo_gfx_generic__absgradient_v;
+after_blend:;
+	}
+
+	/* Update:
+	 * - _vx_xops.vxh_blitfrom
+	 * - _vx_xops.vgxo_bitstretchfill
+	 * - _vx_xops.vgxo_absline_llhh
+	 * - _vx_xops.vgxo_absline_lhhl */
+	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
+		/* Linear vs. Nearest blit */
+		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
+			if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
+				self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
+				self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
+			} else {
+				self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_l;
+				self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+			}
+		} else {
+			if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
+				self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_l;
+				self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
+			} else {
+				self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_n;
+				self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
+			}
+		}
+		/* Diagonal line drawing functions */
+		if (self->vx_flags & VIDEO_GFX_FAALINES) {
+			self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
+			self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
+		} else if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
+			self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
+			self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
+		} else {
+			self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
+			self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
+		}
+	}
+}
+
+/* libvideo_gfx_generic_populate: fill in all
  * operators (except the get/set pixel)  ones
  * with generic impls.
  *
@@ -390,118 +533,16 @@ _blendinfo__is_add_or_subtract_or_max(unsigned int func) {
  * - self->vx_flags
  * - self->vx_colorkey
  * - self->vx_blend
- * - self->vx_buffer
- */
+ * - self->vx_buffer */
 LOCAL ATTR_INOUT(1) void CC
-libvideo_gfx_populate_generic(struct video_gfx *__restrict self) {
-	/* Select generic operators based on wrapping rules */
-	if (self->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
-		if (self->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
-			self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_rdwrwrap;
-		} else {
-			self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_rdwrap;
-		}
-	} else if (self->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
-		self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops_wrwrap;
-	} else {
-		self->vx_hdr.vxh_ops = &libvideo_gfx_generic_ops;
-	}
-
-	/* Select how colors should be read. */
-	if (self->vx_flags & VIDEO_GFX_FBLUR) {
-		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
-	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
-		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_with_key;
-	} else {
-		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
-	}
-
-	/* Detect special blend modes. */
-	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
-	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
-	switch (self->vx_blend) {
-	case GFX_BLENDMODE_OVERRIDE:
-		self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-		break;
-#define LINK_libvideo_gfx_generic__putcolor_FOO(name, mode)                    \
-	case mode:                                                                 \
-		self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_##name; \
-		break;
-	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
-#undef LINK_libvideo_gfx_generic__putcolor_FOO
-	default:
-		if (GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
-		    GFX_BLENDMODE_GET_DSTRGB(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-		    GFX_BLENDMODE_GET_DSTA(self->vx_blend) == GFX_BLENDDATA_ZERO &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNRGB(self->vx_blend)) &&
-		    _blendinfo__is_add_or_subtract_or_max(GFX_BLENDMODE_GET_FUNA(self->vx_blend))) {
-			self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-		} else {
-			self->_vx_xops.vgxo_putcolor = &libvideo_gfx_generic__putcolor;
-		}
-		break;
-	}
-
+libvideo_gfx_generic_populate(struct video_gfx *__restrict self) {
 	/* Line/fill operators... */
-	if (self->vx_flags & VIDEO_GFX_FAALINES) {
-		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
-		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
-	} else {
-		self->_vx_xops.vgxo_absline_llhh = &libvideo_gfx_generic__absline_llhh;
-		self->_vx_xops.vgxo_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
-	}
-	self->_vx_xops.vgxo_absline_h     = &libvideo_gfx_generic__absline_h;
-	self->_vx_xops.vgxo_absline_v     = &libvideo_gfx_generic__absline_v;
-	self->_vx_xops.vgxo_absfill       = &libvideo_gfx_generic__absfill;
-	self->_vx_xops.vgxo_bitfill       = &libvideo_gfx_generic__bitfill;
-	self->_vx_xops.vgxo_absgradient   = &libvideo_gfx_generic__absgradient;
-	self->_vx_xops.vgxo_absgradient_h = &libvideo_gfx_generic__absgradient_h;
-	self->_vx_xops.vgxo_absgradient_v = &libvideo_gfx_generic__absgradient_v;
-
-	/* Linear vs. Nearest blit */
-	if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
-		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_l;
-		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_l;
-	} else {
-		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_generic__blitfrom_n;
-		self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_generic__bitstretchfill_n;
-	}
-
-	/* Select optimal operator implementations based on requested features. */
-	if (self->_vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend) {
-		/* No blending is being done -> link operators that try to make use of direct memory access. */
-		self->_vx_xops.vgxo_absline_llhh  = &libvideo_gfx_noblend__absline_llhh;
-		self->_vx_xops.vgxo_absline_lhhl  = &libvideo_gfx_noblend__absline_lhhl;
-		self->_vx_xops.vgxo_absline_h     = &libvideo_gfx_noblend__absline_h;
-		self->_vx_xops.vgxo_absline_v     = &libvideo_gfx_noblend__absline_v;
-		self->_vx_xops.vgxo_absfill       = &libvideo_gfx_noblend__absfill;
-		self->_vx_xops.vgxo_bitfill       = &libvideo_gfx_noblend__bitfill;
-		if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
-			self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
-			self->_vx_xops.vgxo_bitstretchfill = &libvideo_gfx_noblend__bitstretchfill_n;
-		} else {
-			self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;
-		}
-		if (self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
-			self->_vx_xops.vgxo_absgradient   = &libvideo_gfx_noblend_interp8888__absgradient;
-			self->_vx_xops.vgxo_absgradient_h = &libvideo_gfx_noblend_interp8888__absgradient_h;
-			self->_vx_xops.vgxo_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
-		}
-	}
-
-	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
-	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
-		if (self->_vx_xops.vgxo_getcolor == &libvideo_gfx_generic__getcolor_noblend)
-			self->_vx_xops.vgxo_getcolor = self->_vx_xops.vgxo_getpixel;
-		if (self->_vx_xops.vgxo_putcolor == &libvideo_gfx_generic__putcolor_noblend)
-			self->_vx_xops.vgxo_putcolor = self->_vx_xops.vgxo_setpixel;
-	}
+	libvideo_gfx_generic_update(self, VIDEO_GFX_UPDATE_ALL);
 }
 
-/* Same as `libvideo_gfx_populate_generic()', but load non-blending defaults */
+/* Same as `libvideo_gfx_generic_populate()', but load non-blending defaults */
 LOCAL ATTR_INOUT(1) void CC
-libvideo_gfx_populate_noblend(struct video_gfx *__restrict self) {
+libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 	if (self->_vx_xops.vgxo_getcolor != self->_vx_xops.vgxo_getpixel)
 		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_noblend;
 	if (self->_vx_xops.vgxo_putcolor != self->_vx_xops.vgxo_setpixel)

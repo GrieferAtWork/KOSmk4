@@ -48,7 +48,7 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC
 libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx) {
 	ctx->vb_ops = &libvideo_blit_empty_ops;
 	DBG_memset(&ctx->_vb_xops, 0xcc, sizeof(ctx->_vb_xops));
@@ -187,7 +187,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_em
 
 
 /* Empty video buffer. */
-INTERN WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int CC
+INTERN WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 libvideo_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
                            struct video_lock *__restrict result) {
 	result->vl_data   = (byte_t *)result;
@@ -197,21 +197,28 @@ libvideo_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
 }
 
 INTERN ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(CC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict UNUSED(self),
+NOTHROW(FCC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict UNUSED(self),
                                          struct video_lock *__restrict UNUSED(lock)) {
 	COMPILER_IMPURE();
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
-libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self) {
+	video_gfxhdr_setempty(&self->vx_hdr);
+	DBG_memset(&self->_vx_xops, 0xcc, sizeof(self->_vx_xops));
+	return self;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_empty_updategfx(struct video_gfx *__restrict self,
+                                unsigned int UNUSED(what)) {
 	COMPILER_IMPURE();
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
-libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self) {
-	video_gfxhdr_setempty(&self->vx_hdr);
-	DBG_memset(&self->_vx_xops, 0xcc, sizeof(self->_vx_xops));
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
+	COMPILER_IMPURE();
 	return self;
 }
 
@@ -219,13 +226,14 @@ libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self) {
 #undef libvideo_buffer_empty_ops
 PRIVATE struct video_buffer_ops libvideo_buffer_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void) {
-	if (!libvideo_buffer_empty_ops.vi_initgfx) {
-		libvideo_buffer_empty_ops.vi_gfx_noblend = &libvideo_buffer_empty_noblend;
-		libvideo_buffer_empty_ops.vi_rlock       = &libvideo_buffer_empty_lock;
-		libvideo_buffer_empty_ops.vi_wlock       = &libvideo_buffer_empty_lock;
-		libvideo_buffer_empty_ops.vi_unlock      = &libvideo_buffer_empty_unlock;
+	if (!libvideo_buffer_empty_ops.vi_rlock) {
+		libvideo_buffer_empty_ops.vi_wlock      = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_unlock     = &libvideo_buffer_empty_unlock;
+		libvideo_buffer_empty_ops.vi_initgfx    = &libvideo_buffer_empty_initgfx;
+		libvideo_buffer_empty_ops.vi_updategfx  = &libvideo_buffer_empty_updategfx;
+		libvideo_buffer_empty_ops.vi_noblendgfx = &libvideo_buffer_empty_noblend;
 		COMPILER_WRITE_BARRIER();
-		libvideo_buffer_empty_ops.vi_initgfx = &libvideo_buffer_empty_initgfx;
+		libvideo_buffer_empty_ops.vi_rlock = &libvideo_buffer_empty_lock;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_buffer_empty_ops;

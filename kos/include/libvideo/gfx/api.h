@@ -26,9 +26,11 @@
 /*#define LIBVIDEO_GFX_EXPOSE_INTERNALS*/
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIDEO_GFX_CC __ATTR_STDCALL
+#define LIBVIDEO_GFX_CC  __ATTR_STDCALL
+#define LIBVIDEO_GFX_FCC __ATTR_FASTCALL
 #else /* ... */
-#define LIBVIDEO_GFX_CC /* nothing */
+#define LIBVIDEO_GFX_CC  /* nothing */
+#define LIBVIDEO_GFX_FCC /* nothing */
 #endif /* !... */
 
 #if (!defined(LIBVIDEO_GFX_WANT_PROTOTYPES) && \

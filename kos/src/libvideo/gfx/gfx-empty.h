@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *CC
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC
 libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx);
 
 /* Empty GFX operators */
@@ -54,10 +54,11 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_em
 #define libvideo_blit_empty_ops (*_libvideo_blit_empty_ops())
 
 /* Empty video buffer. */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int CC libvideo_buffer_empty_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
-INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(CC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC libvideo_buffer_empty_noblend(struct video_gfx *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC libvideo_buffer_empty_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_updategfx(struct video_gfx *__restrict self, unsigned int what);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_noblend(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void);
 #define libvideo_buffer_empty_ops (*_libvideo_buffer_empty_ops())
 

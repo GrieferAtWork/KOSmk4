@@ -80,7 +80,7 @@ struct bmpbuffer_with_mapfile: bmpbuffer {
 	struct mapfile bbwm_map; /* [const] Mapfile that owns the pixel buffer */
 };
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 bmpbuffer_destroy(struct video_buffer *__restrict self) {
 	struct bmpbuffer *me = (struct bmpbuffer *)self;
 	if (me->vb_format.vf_pal)
@@ -90,7 +90,7 @@ bmpbuffer_destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 bmpbuffer_with_mapfile_destroy(struct video_buffer *__restrict self) {
 	struct bmpbuffer_with_mapfile *me = (struct bmpbuffer_with_mapfile *)self;
 	if (me->vb_format.vf_pal)
@@ -106,11 +106,12 @@ PRIVATE struct video_buffer_ops bmpbuffer_ops = {};
 PRIVATE struct video_buffer_ops bmpbuffer_with_mapfile_ops = {};
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_ops(void) {
 	if unlikely(!bmpbuffer_ops.vi_destroy) {
-		bmpbuffer_ops.vi_rlock       = &rambuffer_rlock;
-		bmpbuffer_ops.vi_wlock       = &rambuffer_wlock;
-		bmpbuffer_ops.vi_unlock      = &rambuffer_unlock;
-		bmpbuffer_ops.vi_initgfx     = &rambuffer_initgfx;
-		bmpbuffer_ops.vi_gfx_noblend = &rambuffer_noblend;
+		bmpbuffer_ops.vi_rlock      = &rambuffer_rlock;
+		bmpbuffer_ops.vi_wlock      = &rambuffer_wlock;
+		bmpbuffer_ops.vi_unlock     = &rambuffer_unlock;
+		bmpbuffer_ops.vi_initgfx    = &rambuffer_initgfx;
+		bmpbuffer_ops.vi_updategfx  = &rambuffer_updategfx;
+		bmpbuffer_ops.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		bmpbuffer_ops.vi_destroy = &bmpbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -119,11 +120,12 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_ops(void)
 }
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_with_mapfile_ops(void) {
 	if unlikely(!bmpbuffer_with_mapfile_ops.vi_destroy) {
-		bmpbuffer_with_mapfile_ops.vi_rlock       = &rambuffer_rlock;
-		bmpbuffer_with_mapfile_ops.vi_wlock       = &rambuffer_wlock;
-		bmpbuffer_with_mapfile_ops.vi_unlock      = &rambuffer_unlock;
-		bmpbuffer_with_mapfile_ops.vi_initgfx     = &rambuffer_initgfx;
-		bmpbuffer_with_mapfile_ops.vi_gfx_noblend = &rambuffer_noblend;
+		bmpbuffer_with_mapfile_ops.vi_rlock      = &rambuffer_rlock;
+		bmpbuffer_with_mapfile_ops.vi_wlock      = &rambuffer_wlock;
+		bmpbuffer_with_mapfile_ops.vi_unlock     = &rambuffer_unlock;
+		bmpbuffer_with_mapfile_ops.vi_initgfx    = &rambuffer_initgfx;
+		bmpbuffer_with_mapfile_ops.vi_updategfx  = &rambuffer_updategfx;
+		bmpbuffer_with_mapfile_ops.vi_noblendgfx = &rambuffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		bmpbuffer_with_mapfile_ops.vi_destroy = &bmpbuffer_with_mapfile_destroy;
 		COMPILER_WRITE_BARRIER();
