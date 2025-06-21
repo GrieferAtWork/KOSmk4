@@ -679,8 +679,8 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		/* Allocate new buffer for direct-color mode */
 		assert(codec->vc_specs.vcs_pxsz == 3 ||
 		       codec->vc_specs.vcs_pxsz == 4);
-		dcol_stride = self->vb_size_x * codec->vc_specs.vcs_pxsz;
-		dcol_total  = dcol_stride * self->vb_size_y;
+		dcol_stride = self->vb_xdim * codec->vc_specs.vcs_pxsz;
+		dcol_total  = dcol_stride * self->vb_ydim;
 		dcol_buf = (byte_t *)malloc(dcol_total);
 		if unlikely(!dcol_buf)
 			goto err;
@@ -795,7 +795,7 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	/* Check if we can directly render into the frame buffer, or if we have
 	 * to  go through the  extra work of using  a temporary scratch buffer. */
 	if ((codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
-	    likely(frame_endx <= self->vb_size_x && frame_endy <= self->vb_size_y)) {
+	    likely(frame_endx <= self->vb_xdim && frame_endy <= self->vb_ydim)) {
 		/* Can render directly into the frame buffer (no scratch buffer needed) */
 		byte_t *dst;
 		dst = self->rb_data + frame_x + frame_y * self->rb_stride;
@@ -810,7 +810,7 @@ check_for_global_transparency:
 			/* When  the background (all-transparent) was restored, there is
 			 * always some transparency if the frame doesn't cover the whole
 			 * canvas. */
-			if (frame_x > 0 || frame_y > 0 || frame_w < self->vb_size_x || frame_h < self->vb_size_y) {
+			if (frame_x > 0 || frame_y > 0 || frame_w < self->vb_xdim || frame_h < self->vb_ydim) {
 set_has_global_transparency:
 				self->gb_colorkey = self->vb_format.vf_pal->vp_pal[anim->ga_cfg.gc_trans];
 				self->vb_ops = &gifbuffer_ops__with_color_key;
@@ -851,15 +851,15 @@ set_has_global_transparency:
 
 		/* Force-clamp frame coords to valid coords.
 		 * These should never point out-of-bounds, but better be safe than sorry. */
-		if unlikely(frame_endx > self->vb_size_x) {
-			if (frame_w > self->vb_size_x)
-				frame_w = self->vb_size_x;
-			frame_x = self->vb_size_x - frame_w;
+		if unlikely(frame_endx > self->vb_xdim) {
+			if (frame_w > self->vb_xdim)
+				frame_w = self->vb_xdim;
+			frame_x = self->vb_xdim - frame_w;
 		}
-		if unlikely(frame_endy > self->vb_size_y) {
-			if (frame_h > self->vb_size_y)
-				frame_h = self->vb_size_y;
-			frame_y = self->vb_size_y - frame_h;
+		if unlikely(frame_endy > self->vb_ydim) {
+			if (frame_h > self->vb_ydim)
+				frame_h = self->vb_ydim;
+			frame_y = self->vb_ydim - frame_h;
 		}
 
 		/* Render scratch buffer onto frame and translate palette indices. */
@@ -963,8 +963,8 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		goto err;
 	result->vb_refcnt   = 1;
 	result->vb_ops      = &gifbuffer_ops;
-	result->vb_size_x   = me->va_size_x;
-	result->vb_size_y   = me->va_size_y;
+	result->vb_xdim   = me->va_size_x;
+	result->vb_ydim   = me->va_size_y;
 	result->rb_stride   = me->va_size_x * 1;
 	result->rb_total    = me->va_size_x * 1 * me->va_size_y;
 	result->gb_cfg      = me->ga_cfg;
@@ -1038,15 +1038,15 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	 * These should never point out-of-bounds, but better be safe than sorry. */
 	frame_endx = (video_coord_t)frame_x + frame_w;
 	frame_endy = (video_coord_t)frame_y + frame_h;
-	if unlikely(frame_endx > result->vb_size_x) {
-		if (frame_w > result->vb_size_x)
-			frame_w = result->vb_size_x;
-		frame_x = result->vb_size_x - frame_w;
+	if unlikely(frame_endx > result->vb_xdim) {
+		if (frame_w > result->vb_xdim)
+			frame_w = result->vb_xdim;
+		frame_x = result->vb_xdim - frame_w;
 	}
-	if unlikely(frame_endy > result->vb_size_y) {
-		if (frame_h > result->vb_size_y)
-			frame_h = result->vb_size_y;
-		frame_y = result->vb_size_y - frame_h;
+	if unlikely(frame_endy > result->vb_ydim) {
+		if (frame_h > result->vb_ydim)
+			frame_h = result->vb_ydim;
+		frame_y = result->vb_ydim - frame_h;
 	}
 
 	/* Read frame into buffer */
@@ -1064,7 +1064,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		/* Check if frame has "transparent" pixels:
 		 * - First frame does not paint whole image -> everything outside is global transparency!
 		 * - If pixel data contains a "transparent" pixel, then frame1 also needs global transparency */
-		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_size_x || frame_h < result->vb_size_y ||
+		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_xdim || frame_h < result->vb_ydim ||
 		    memchr(result->rb_data, me->ga_cfg.gc_trans, result->rb_total)) {
 			me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__YES;
 			goto have_global_trans;

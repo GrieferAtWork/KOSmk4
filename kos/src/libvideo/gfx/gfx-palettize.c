@@ -504,8 +504,8 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	result->vb_ops             = &rambuffer_ops;
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = NULL;
-	result->vb_size_x          = video_gfx_getclipw(&gfx);
-	result->vb_size_y          = video_gfx_getcliph(&gfx);
+	result->vb_xdim          = video_gfx_getclipw(&gfx);
+	result->vb_ydim          = video_gfx_getcliph(&gfx);
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_FNORMAL, 0);
@@ -531,8 +531,8 @@ median_cut_start(struct video_gfx const *__restrict self,
 	     *       codec's alpha-mask instead of "constant_alpha". */
 	    self->vx_hdr.vxh_bxmin == 0 &&
 	    self->vx_hdr.vxh_bymin == 0 &&
-	    self->vx_hdr.vxh_bxend == self->vx_buffer->vb_size_x &&
-	    self->vx_hdr.vxh_byend == self->vx_buffer->vb_size_y) {
+	    self->vx_hdr.vxh_bxend == self->vx_buffer->vb_xdim &&
+	    self->vx_hdr.vxh_byend == self->vx_buffer->vb_ydim) {
 		struct video_lock lock;
 		if (video_buffer_rlock(self->vx_buffer, &lock) == 0) {
 			if (lock.vl_stride == (self->vx_hdr.vxh_byend * 4)) {
@@ -550,8 +550,8 @@ median_cut_start(struct video_gfx const *__restrict self,
 	/* Try to convert the I/O area into an RGBA8888 buffer, so we
 	 * can do faster I/O when  it comes to accessing pixel  data. */
 	if (video_gfx_iorect_as_rgba8888(&rgba_buf, self) == 0) {
-		assert(rgba_buf.rb_stride == rgba_buf.vb_size_x * 4);
-		assert(io_pixels == rgba_buf.vb_size_x * rgba_buf.vb_size_y);
+		assert(rgba_buf.rb_stride == rgba_buf.vb_xdim * 4);
+		assert(io_pixels == rgba_buf.vb_xdim * rgba_buf.vb_ydim);
 		io.mio_cookie   = rgba_buf.rb_data;
 		io.mio_getcolor = &median_io_buf;
 		median_cut_start_impl(&io, gfx_indices, io_pixels,

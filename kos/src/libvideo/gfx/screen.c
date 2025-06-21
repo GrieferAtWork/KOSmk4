@@ -96,7 +96,7 @@ struct svga_screen: video_rambuffer {
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterect_noop(struct screen_buffer *__restrict self,
-                            struct video_buffer_rect const *__restrict rect) {
+                            struct screen_rect const *__restrict rect) {
 	(void)self;
 	(void)rect;
 	COMPILER_IMPURE();
@@ -104,7 +104,7 @@ svga_screen_updaterect_noop(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterects_noop(struct screen_buffer *__restrict self,
-                             struct video_buffer_rect const *__restrict rects,
+                             struct screen_rect const *__restrict rects,
                              size_t n_rects) {
 	(void)self;
 	(void)rects;
@@ -114,33 +114,19 @@ svga_screen_updaterects_noop(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
-                          struct video_buffer_rect const *__restrict rect) {
+                          struct screen_rect const *__restrict rect) {
 	struct svga_screen *me = (struct svga_screen *)self;
 	struct svga_rect cs_rect;
-	if unlikely(rect->vbr_startx <= 0) {
-		cs_rect.svr_x = 0;
-		if (OVERFLOW_USUB(rect->vbr_sizex, -rect->vbr_sizex, &cs_rect.svr_w) ||
-		    cs_rect.svr_w > self->vb_size_x)
-			cs_rect.svr_w = self->vb_size_x;
-	} else {
-		if (OVERFLOW_UCAST((video_coord_t)rect->vbr_startx, &cs_rect.svr_x) ||
-		    cs_rect.svr_x >= self->vb_size_x)
-			return;
-		if (OVERFLOW_USUB(self->vb_size_x, cs_rect.svr_x, &cs_rect.svr_w))
-			return;
-	}
-	if unlikely(rect->vbr_starty <= 0) {
-		cs_rect.svr_y = 0;
-		if (OVERFLOW_USUB(rect->vbr_sizey, -rect->vbr_sizey, &cs_rect.svr_h) ||
-		    cs_rect.svr_h > self->vb_size_y)
-			cs_rect.svr_h = self->vb_size_y;
-	} else {
-		if (OVERFLOW_UCAST((video_coord_t)rect->vbr_starty, &cs_rect.svr_y) ||
-		    cs_rect.svr_y >= self->vb_size_y)
-			return;
-		if (OVERFLOW_USUB(self->vb_size_y, cs_rect.svr_y, &cs_rect.svr_h))
-			return;
-	}
+	if (OVERFLOW_UCAST(rect->sr_xmin, &cs_rect.svr_x) || cs_rect.svr_x >= self->vb_xdim)
+		return;
+	if (OVERFLOW_UCAST(rect->sr_ymin, &cs_rect.svr_y) || cs_rect.svr_y >= self->vb_ydim)
+		return;
+	if (OVERFLOW_UCAST(rect->sr_xdim, &cs_rect.svr_w) ||
+	    cs_rect.svr_w > (self->vb_xdim - cs_rect.svr_x))
+		cs_rect.svr_w = (self->vb_xdim - cs_rect.svr_x);
+	if (OVERFLOW_UCAST(rect->sr_ydim, &cs_rect.svr_h) ||
+	    cs_rect.svr_h > (self->vb_ydim - cs_rect.svr_y))
+		cs_rect.svr_h = (self->vb_ydim - cs_rect.svr_y);
 	svga_screen_cs_acquire(me);
 	(*me->ss_cs.sc_modeops.sco_updaterect)(&me->ss_cs, &cs_rect);
 	svga_screen_cs_release(me);
@@ -148,7 +134,7 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterects_cs(struct screen_buffer *__restrict self,
-                           struct video_buffer_rect const *__restrict rects,
+                           struct screen_rect const *__restrict rects,
                            size_t n_rects) {
 	size_t i;
 	for (i = 0; i < n_rects; ++i)
@@ -499,8 +485,8 @@ find_hinted_mode:
 	/* Fill in remaining fields of "result" */
 	result->vb_refcnt     = 1;
 	result->vb_ops        = &result->ss_ops.sbo_video;
-	result->vb_size_x     = mode->smi_resx;
-	result->vb_size_y     = mode->smi_resy;
+	result->vb_xdim     = mode->smi_resx;
+	result->vb_ydim     = mode->smi_resy;
 	result->ss_vdlck      = vdlck.of_hint;
 	result->ss_libsvgadrv = libsvgadrv;
 	result->ss_drv        = driver;
@@ -517,7 +503,7 @@ find_hinted_mode:
 	shared_lock_init(&result->ss_cslock);
 
 	/* Define the updaterects operators if needed by the chipset */
-	if (result->ss_cs.sc_modeops.sco_updaterect) { /* FIXME: "sc_modeops" is only supposed to be valid after a mode was set! */
+	if (result->ss_cs.sc_modeops.sco_updaterect) {
 		result->ss_ops.sbo_updaterect  = &svga_screen_updaterect_cs;
 		result->ss_ops.sbo_updaterects = &svga_screen_updaterects_cs;
 	} else {

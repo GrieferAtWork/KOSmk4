@@ -420,8 +420,8 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame) {
 		goto err;
 	result->va_refcnt = 1;
 	result->va_ops    = &oneframe_anim_ops;
-	result->va_size_x = frame->vb_size_x;
-	result->va_size_y = frame->vb_size_y;
+	result->va_size_x = frame->vb_xdim;
+	result->va_size_y = frame->vb_ydim;
 	result->ofa_frame = frame;
 	video_buffer_incref(frame);
 	return result;

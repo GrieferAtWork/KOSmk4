@@ -17,11 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __INTELLISENSE__
-#include "../gfx.c"
-//#define DEFINE_libvideo_gfx_generic_blit__and__stretch
-#define DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch
-#endif /* __INTELLISENSE__ */
+#ifndef GUARD_LIBVIDEO_GFX_GFX_HL_BLIT_C_INL
+#define GUARD_LIBVIDEO_GFX_GFX_HL_BLIT_C_INL 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
+#define _KOS_SOURCE 1
+
+#include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -32,57 +34,20 @@
 
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
+/**/
 
-#include "../api.h"
+#include "../gfx-utils.h"
 #include "../gfx.h"
-
-#if (defined(DEFINE_libvideo_gfx_generic_blit__and__stretch) + \
-     defined(DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch)) != 1
-#error "Must #define exactly one of these macros"
-#endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_gfx_generic_blit__and__stretch
-#define LOCAL_libvideo_gfx_generic_blit           libvideo_gfx_generic_blit
-#define LOCAL_libvideo_gfx_generic_blit_rdwrap    libvideo_gfx_generic_blit_rdwrap
-#define LOCAL_libvideo_gfx_generic_blit_wrap      libvideo_gfx_generic_blit_wrap
-#define LOCAL_libvideo_gfx_generic_stretch        libvideo_gfx_generic_stretch
-#define LOCAL_libvideo_gfx_generic_stretch_rdwrap libvideo_gfx_generic_stretch_rdwrap
-#define LOCAL_libvideo_gfx_generic_stretch_wrap   libvideo_gfx_generic_stretch_wrap
-#define LOCAL_video_blit_x_blit                   video_blit_x_blit
-#define LOCAL_video_blit_x_stretch                video_blit_x_stretch
-#elif defined(DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch)
-#define LOCAL_libvideo_gfx_generic_blit           libvideo_gfx_generic_bitblit
-#define LOCAL_libvideo_gfx_generic_blit_rdwrap    libvideo_gfx_generic_bitblit_rdwrap
-#define LOCAL_libvideo_gfx_generic_blit_wrap      libvideo_gfx_generic_bitblit_wrap
-#define LOCAL_libvideo_gfx_generic_stretch        libvideo_gfx_generic_bitstretch
-#define LOCAL_libvideo_gfx_generic_stretch_rdwrap libvideo_gfx_generic_bitstretch_rdwrap
-#define LOCAL_libvideo_gfx_generic_stretch_wrap   libvideo_gfx_generic_bitstretch_wrap
-#define LOCAL_video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
-	video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm)
-#define LOCAL_video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
-	video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm)
-#define LOCAL_HAVE_BITMASK
-#endif /* ... */
-
-#ifdef LOCAL_HAVE_BITMASK
-#define LOCAL_BITMASK__PARAMS , struct video_bitmask const *__restrict bm
-#define LOCAL_BITMASK__ARGS   , bm
-#else /* LOCAL_HAVE_BITMASK */
-#define LOCAL_BITMASK__PARAMS /* nothing */
-#define LOCAL_BITMASK__ARGS   /* nothing */
-#endif /* !LOCAL_HAVE_BITMASK */
-
-
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_blit(struct video_blit const *__restrict self,
-                                video_offset_t dst_x, video_offset_t dst_y,
-                                video_offset_t src_x, video_offset_t src_y,
-                                video_dim_t size_x, video_dim_t size_y
-                                LOCAL_BITMASK__PARAMS) {
-	struct video_gfx const *dst = self->vb_dst;
-	struct video_gfx const *src = self->vb_src;
+libvideo_blitter_generic_blit(struct video_blitter const *__restrict self,
+                              video_offset_t dst_x, video_offset_t dst_y,
+                              video_offset_t src_x, video_offset_t src_y,
+                              video_dim_t size_x, video_dim_t size_y) {
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
 	if (!size_x || !size_y)
 		return;
@@ -144,20 +109,19 @@ LOCAL_libvideo_gfx_generic_blit(struct video_blit const *__restrict self,
 			return;
 		size_y = src->vx_hdr.vxh_byend - (video_coord_t)src_y;
 	}
-	LOCAL_video_blit_x_blit(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-	                        (video_coord_t)src_x, (video_coord_t)src_y,
-	                        size_x, size_y);
+	video_blitter_x_blit(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+	                     (video_coord_t)src_x, (video_coord_t)src_y,
+	                     size_x, size_y);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_stretch(struct video_blit const *__restrict self,
-                                   video_offset_t dst_x, video_offset_t dst_y,
-                                   video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                   video_offset_t src_x, video_offset_t src_y,
-                                   video_dim_t src_size_x, video_dim_t src_size_y
-                                   LOCAL_BITMASK__PARAMS) {
-	struct video_gfx const *dst = self->vb_dst;
-	struct video_gfx const *src = self->vb_src;
+libvideo_blitter_generic_stretch(struct video_blitter const *__restrict self,
+                                 video_offset_t dst_x, video_offset_t dst_y,
+                                 video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                 video_offset_t src_x, video_offset_t src_y,
+                                 video_dim_t src_size_x, video_dim_t src_size_y) {
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
 		return;
@@ -271,29 +235,28 @@ LOCAL_libvideo_gfx_generic_stretch(struct video_blit const *__restrict self,
 
 	if (dst_size_x == src_size_x && dst_size_y == src_size_y) {
 		/* Can use copy-blit */
-		LOCAL_video_blit_x_blit(self,
-		                        (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                        (video_coord_t)src_x, (video_coord_t)src_y,
-		                        dst_size_x, dst_size_y);
+		video_blitter_x_blit(self,
+		                     (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                     (video_coord_t)src_x, (video_coord_t)src_y,
+		                     dst_size_x, dst_size_y);
 	} else {
 		/* Must use stretch-blit */
-		LOCAL_video_blit_x_stretch(self,
-		                           (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
-		                           (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y);
+		video_blitter_x_stretch(self,
+		                        (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
+		                        (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y);
 	}
 }
 
 
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self,
-                                       video_offset_t dst_x, video_offset_t dst_y,
-                                       video_offset_t src_x, video_offset_t src_y,
-                                       video_dim_t size_x, video_dim_t size_y
-                                       LOCAL_BITMASK__PARAMS) {
+libvideo_blitter_generic_blit_rdwrap(struct video_blitter const *__restrict self,
+                                     video_offset_t dst_x, video_offset_t dst_y,
+                                     video_offset_t src_x, video_offset_t src_y,
+                                     video_dim_t size_x, video_dim_t size_y) {
 	/* Handle the case where "src" has read-wrapping enabled. */
-	struct video_gfx const *dst = self->vb_dst;
-	struct video_gfx const *src = self->vb_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
 	video_dim_t src_maxsx = size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = size_y; /* # of pixes after src_y before wrap */
 
@@ -371,22 +334,22 @@ LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self,
 		/* Deal with unaligned tiles near the top */
 		if unlikely(src_maxsy < src->vx_hdr.vxh_cysiz) {
 			/* Top-left corner */
-			LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, src_y,
-			                                src_maxsx, src_maxsy LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, dst_x, iter_dst_y, src_x, src_y,
+			                              src_maxsx, src_maxsy);
 
 			/* Top bar */
 			iter_size_x = size_x - src_maxsx;
 			iter_dst_x = dst_x + src_maxsx;
 			while (iter_size_x > src->vx_hdr.vxh_cxsiz) {
-				LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
-				                                src->vx_hdr.vxh_cxsiz, src_maxsy LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
+				                              src->vx_hdr.vxh_cxsiz, src_maxsy);
 				iter_size_x -= src->vx_hdr.vxh_cxsiz;
 				iter_dst_x += src->vx_hdr.vxh_cxsiz;
 			}
 
 			/* Top-right corner */
-			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
-			                                iter_size_x, src_maxsy LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, iter_dst_x, iter_dst_y, 0, src_y,
+			                              iter_size_x, src_maxsy);
 			iter_size_y -= src_maxsy;
 			iter_dst_y  += src_maxsy;
 		}
@@ -394,22 +357,22 @@ LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self,
 		/* Iterate whole rows */
 		while (iter_size_y >= src->vx_hdr.vxh_cysiz) {
 			/* Left side */
-			LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
-			                                src_maxsx, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
+			                              src_maxsx, src->vx_hdr.vxh_cysiz);
 
 			/* Center */
 			iter_size_x = size_x - src_maxsx;
 			iter_dst_x = dst_x + src_maxsx;
 			while (iter_size_x > src->vx_hdr.vxh_cxsiz) {
-				LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
-				                                src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+				                              src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);
 				iter_size_x -= src->vx_hdr.vxh_cxsiz;
 				iter_dst_x += src->vx_hdr.vxh_cxsiz;
 			}
 
 			/* Right side */
-			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
-			                                iter_size_x, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+			                              iter_size_x, src->vx_hdr.vxh_cysiz);
 
 			iter_size_y -= src->vx_hdr.vxh_cysiz;
 			iter_dst_y += src->vx_hdr.vxh_cysiz;
@@ -419,15 +382,15 @@ LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self,
 			return;
 
 		/* Bottom-left corner */
-		LOCAL_libvideo_gfx_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
-		                                src_maxsx, iter_size_y LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit(self, dst_x, iter_dst_y, src_x, 0,
+		                              src_maxsx, iter_size_y);
 
 		/* Bottom bar */
 		iter_size_x = size_x - src_maxsx;
 		iter_dst_x = dst_x + src_maxsx;
 		while (iter_size_x > src->vx_hdr.vxh_cxsiz) {
-			LOCAL_libvideo_gfx_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
-			                                src->vx_hdr.vxh_cxsiz, iter_size_y LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, iter_dst_x, iter_dst_y, 0, 0,
+			                              src->vx_hdr.vxh_cxsiz, iter_size_y);
 			iter_size_x -= src->vx_hdr.vxh_cxsiz;
 			iter_dst_x += src->vx_hdr.vxh_cxsiz;
 		}
@@ -440,49 +403,47 @@ LOCAL_libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self,
 		size_x = iter_size_x;
 		size_y = iter_size_y;
 	} else if (size_x > src_maxsx) {
-		LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
-		                                src_maxsx, size_y LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit(self, dst_x, dst_y, src_x, src_y,
+		                              src_maxsx, size_y);
 		size_x -= src_maxsx;
 		dst_x += src_maxsx;
 		while (size_x > src->vx_hdr.vxh_cxsiz) {
-			LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, 0, src_y,
-			                                src->vx_hdr.vxh_cxsiz, size_y LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, dst_x, dst_y, 0, src_y,
+			                              src->vx_hdr.vxh_cxsiz, size_y);
 			size_x -= src->vx_hdr.vxh_cxsiz;
 			dst_x += src->vx_hdr.vxh_cxsiz;
 		}
 		src_x = 0; /* Fallthru to render the last part */
 	} else if (size_y > src_maxsy) {
-		LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
-		                                size_x, src_maxsy LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit(self, dst_x, dst_y, src_x, src_y,
+		                              size_x, src_maxsy);
 		size_y -= src_maxsy;
 		dst_y += src_maxsy;
 		while (size_y > src->vx_hdr.vxh_cysiz) {
-			LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, 0,
-			                                size_x, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+			libvideo_blitter_generic_blit(self, dst_x, dst_y, src_x, 0,
+			                              size_x, src->vx_hdr.vxh_cysiz);
 			size_y -= src->vx_hdr.vxh_cysiz;
 			dst_y += src->vx_hdr.vxh_cysiz;
 		}
 		src_y = 0; /* Fallthru to render the last part */
 	}
 
-	LOCAL_libvideo_gfx_generic_blit(self, dst_x, dst_y, src_x, src_y,
-	                                size_x, size_y LOCAL_BITMASK__ARGS);
+	libvideo_blitter_generic_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict self,
-                                          video_offset_t dst_x, video_offset_t dst_y,
-                                          video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                          video_offset_t src_x, video_offset_t src_y,
-                                          video_dim_t src_size_x, video_dim_t src_size_y
-                                          LOCAL_BITMASK__PARAMS) {
+libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict self,
+                                        video_offset_t dst_x, video_offset_t dst_y,
+                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                        video_offset_t src_x, video_offset_t src_y,
+                                        video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* Handle the case where "src" has read-wrapping enabled. */
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
 #define xsrc2dst(x) ((video_coord_t)(((uint64_t)(x) * dst_size_x) / src_size_x))
 #define ysrc2dst(y) ((video_coord_t)(((uint64_t)(y) * dst_size_y) / src_size_y))
-	struct video_gfx const *dst = self->vb_dst;
-	struct video_gfx const *src = self->vb_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
 	video_dim_t src_maxsx = src_size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = src_size_y; /* # of pixes after src_y before wrap */
 
@@ -575,8 +536,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 		/* Deal with unaligned tiles near the top */
 
 		/* Top-left corner */
-		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, firsttile_dst_size_y,
-		                                   src_x, src_y, src_maxsx, src_maxsy LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, firsttile_dst_size_y,
+		                                 src_x, src_y, src_maxsx, src_maxsy);
 
 		/* Top bar */
 		iter_src_size_x = src_size_x - src_maxsx;
@@ -592,8 +553,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
 				video_coord_t next_dst_x;
 				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
-				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, dst_y, next_dst_x - iter_dst_x, firsttile_dst_size_y,
-				                                   0, src_y, src->vx_hdr.vxh_cxsiz, src_maxsy LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, iter_dst_x, dst_y, next_dst_x - iter_dst_x, firsttile_dst_size_y,
+				                                 0, src_y, src->vx_hdr.vxh_cxsiz, src_maxsy);
 				iter_dst_x = next_dst_x;
 			}
 			iter_src_size_x %= src->vx_hdr.vxh_cxsiz;
@@ -601,8 +562,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 		}
 
 		/* Top-right corner */
-		LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, dst_y, iter_dst_size_x, firsttile_dst_size_y,
-		                                   0, src_y, iter_src_size_x, src_maxsy LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch(self, iter_dst_x, dst_y, iter_dst_size_x, firsttile_dst_size_y,
+		                                 0, src_y, iter_src_size_x, src_maxsy);
 
 		/* Iterate whole rows */
 		iter_src_size_y = src_size_y - src_maxsy;
@@ -621,8 +582,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 				tile_h = next_dst_y - iter_dst_y;
 
 				/* Left side */
-				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, tile_h,
-				                                   src_x, 0, src_maxsx, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, tile_h,
+				                                 src_x, 0, src_maxsx, src->vx_hdr.vxh_cysiz);
 
 				/* Center (whole tiles) */
 				iter_src_size_x = src_size_x - src_maxsx;
@@ -634,8 +595,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 					do {
 						video_coord_t next_dst_x;
 						next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
-						LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, tile_h,
-						                                   0, 0, src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+						libvideo_blitter_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, tile_h,
+						                                 0, 0, src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);
 						iter_dst_x = next_dst_x;
 					} while (++xwholetiles_i < xwholetiles_count);
 					iter_src_size_x %= src->vx_hdr.vxh_cxsiz;
@@ -643,8 +604,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 				}
 
 				/* Right side */
-				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, lasttile_dst_size_x, tile_h,
-				                                   0, 0, src_maxsx, src->vx_hdr.vxh_cysiz LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, iter_dst_x, iter_dst_y, lasttile_dst_size_x, tile_h,
+				                                 0, 0, src_maxsx, src->vx_hdr.vxh_cysiz);
 
 				iter_dst_y = next_dst_y;
 			}
@@ -655,8 +616,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 			return;
 
 		/* Bottom-left corner */
-		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, iter_dst_size_y,
-		                                   src_x, 0, src_maxsx, iter_src_size_y LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch(self, dst_x, iter_dst_y, firsttile_dst_size_x, iter_dst_size_y,
+		                                 src_x, 0, src_maxsx, iter_src_size_y);
 
 		/* Bottom bar */
 		iter_src_size_x = src_size_x - src_maxsx;
@@ -672,8 +633,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
 				video_coord_t next_dst_x;
 				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
-				LOCAL_libvideo_gfx_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, iter_dst_size_y,
-				                                   0, 0, src->vx_hdr.vxh_cxsiz, iter_src_size_y LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, iter_dst_x, iter_dst_y, next_dst_x - iter_dst_x, iter_dst_size_y,
+				                                 0, 0, src->vx_hdr.vxh_cxsiz, iter_src_size_y);
 				iter_dst_x = next_dst_x;
 			}
 			iter_src_size_x %= src->vx_hdr.vxh_cxsiz;
@@ -691,9 +652,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 		src_size_y = iter_src_size_y;
 	} else if (src_size_x > src_maxsx) {
 		video_dim_t firsttile_dst_size_x = xsrc2dst(src_maxsx);
-		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, dst_size_y,
-		                                   src_x, src_y, src_maxsx, src_size_y
-		                                   LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch(self, dst_x, dst_y, firsttile_dst_size_x, dst_size_y,
+		                                 src_x, src_y, src_maxsx, src_size_y);
 		src_size_x -= src_maxsx;
 		dst_x += firsttile_dst_size_x;
 		dst_size_x -= firsttile_dst_size_x;
@@ -707,9 +667,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
 				video_coord_t next_dst_x;
 				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
-				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, next_dst_x - dst_x, dst_size_y,
-				                                   0, src_y, src->vx_hdr.vxh_cxsiz, src_size_y
-				                                   LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, dst_x, dst_y, next_dst_x - dst_x, dst_size_y,
+				                                 0, src_y, src->vx_hdr.vxh_cxsiz, src_size_y);
 				dst_x = next_dst_x;
 			}
 			src_size_x %= src->vx_hdr.vxh_cxsiz;
@@ -718,9 +677,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 		src_x = 0; /* Fallthru to render the last part */
 	} else if (src_size_y > src_maxsy) {
 		video_dim_t firsttile_dst_size_y = ysrc2dst(src_maxsy);
-		LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, firsttile_dst_size_y,
-		                                   src_x, src_y, src_size_x, src_maxsy
-		                                   LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch(self, dst_x, dst_y, dst_size_x, firsttile_dst_size_y,
+		                                 src_x, src_y, src_size_x, src_maxsy);
 		src_size_y -= src_maxsy;
 		dst_y += firsttile_dst_size_y;
 		dst_size_y -= firsttile_dst_size_y;
@@ -734,9 +692,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 			for (ywholetiles_i = 0; ywholetiles_i < ywholetiles_count; ++ywholetiles_i) {
 				video_coord_t next_dst_y;
 				next_dst_y = base_dst_y + (wholetiles_dst_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
-				LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, next_dst_y - dst_y,
-				                                   src_x, 0, src_size_x, src->vx_hdr.vxh_cysiz
-				                                   LOCAL_BITMASK__ARGS);
+				libvideo_blitter_generic_stretch(self, dst_x, dst_y, dst_size_x, next_dst_y - dst_y,
+				                                 src_x, 0, src_size_x, src->vx_hdr.vxh_cysiz);
 				dst_y = next_dst_y;
 			}
 			src_size_y %= src->vx_hdr.vxh_cysiz;
@@ -745,9 +702,8 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 		src_y = 0; /* Fallthru to render the last part */
 	}
 
-	LOCAL_libvideo_gfx_generic_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                   src_x, src_y, src_size_x, src_size_y
-	                                   LOCAL_BITMASK__ARGS);
+	libvideo_blitter_generic_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                 src_x, src_y, src_size_x, src_size_y);
 #undef xdst2src
 #undef ydst2src
 #undef xsrc2dst
@@ -757,13 +713,12 @@ LOCAL_libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict se
 
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_blit_wrap(struct video_blit const *__restrict self,
-                                     video_offset_t dst_x, video_offset_t dst_y,
-                                     video_offset_t src_x, video_offset_t src_y,
-                                     video_dim_t size_x, video_dim_t size_y
-                                     LOCAL_BITMASK__PARAMS) {
+libvideo_blitter_generic_blit_wrap(struct video_blitter const *__restrict self,
+                                   video_offset_t dst_x, video_offset_t dst_y,
+                                   video_offset_t src_x, video_offset_t src_y,
+                                   video_dim_t size_x, video_dim_t size_y) {
 	/* Handle the case where "dst" has write-wrapping enabled. */
-	struct video_gfx const *dst = self->vb_dst;
+	struct video_gfx const *dst = self->vbt_dst;
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
@@ -793,30 +748,29 @@ LOCAL_libvideo_gfx_generic_blit_wrap(struct video_blit const *__restrict self,
 		}
 	}
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
-		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, 0, 0, src_x + xinb, src_y + yinb,
-		                                       xwrap, ywrap LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit_rdwrap(self, 0, 0, src_x + xinb, src_y + yinb,
+		                                     xwrap, ywrap);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
-		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, 0, dst_y, src_x + xinb, src_y,
-		                                       xwrap, size_y LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit_rdwrap(self, 0, dst_y, src_x + xinb, src_y,
+		                                     xwrap, size_y);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
-		LOCAL_libvideo_gfx_generic_blit_rdwrap(self, dst_x, 0, src_x, src_y + yinb,
-		                                       size_x, ywrap LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_blit_rdwrap(self, dst_x, 0, src_x, src_y + yinb,
+		                                     size_x, ywrap);
 	}
-	LOCAL_libvideo_gfx_generic_blit_rdwrap(self, dst_x, dst_y, src_x, src_y,
-	                                       xinb, yinb LOCAL_BITMASK__ARGS);
+	libvideo_blitter_generic_blit_rdwrap(self, dst_x, dst_y, src_x, src_y,
+	                                     xinb, yinb);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit const *__restrict self,
-                                        video_offset_t dst_x, video_offset_t dst_y,
-                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                        video_offset_t src_x, video_offset_t src_y,
-                                        video_dim_t src_size_x, video_dim_t src_size_y
-                                        LOCAL_BITMASK__PARAMS) {
+libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict self,
+                                      video_offset_t dst_x, video_offset_t dst_y,
+                                      video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                      video_offset_t src_x, video_offset_t src_y,
+                                      video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* Handle the case where "dst" has write-wrapping enabled. */
-	struct video_gfx const *dst = self->vb_dst;
+	struct video_gfx const *dst = self->vbt_dst;
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
 	video_dim_t xwrap = 0;
@@ -853,51 +807,34 @@ LOCAL_libvideo_gfx_generic_stretch_wrap(struct video_blit const *__restrict self
 	}
 
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
-		size_t chunk_src_x = xdst2src(xinb);
-		size_t chunk_src_y = ydst2src(yinb);
+		size_t chunk_src_x      = xdst2src(xinb);
+		size_t chunk_src_y      = ydst2src(yinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		size_t chunk_src_size_y = ydst2src(ywrap);
-		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, 0, 0, xwrap, ywrap,
-		                                          src_x + chunk_src_x, src_y + chunk_src_y,
-		                                          chunk_src_size_x, chunk_src_size_y
-		                                          LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch_rdwrap(self, 0, 0, xwrap, ywrap,
+		                                        src_x + chunk_src_x, src_y + chunk_src_y,
+		                                        chunk_src_size_x, chunk_src_size_y);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
-		size_t chunk_src_x = xdst2src(xinb);
+		size_t chunk_src_x      = xdst2src(xinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
-		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, 0, dst_y, xwrap, dst_size_y,
-		                                          src_x + chunk_src_x, src_y,
-		                                          chunk_src_size_x, src_size_y
-		                                          LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch_rdwrap(self, 0, dst_y, xwrap, dst_size_y,
+		                                        src_x + chunk_src_x, src_y,
+		                                        chunk_src_size_x, src_size_y);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
-		size_t chunk_src_y = ydst2src(yinb);
+		size_t chunk_src_y      = ydst2src(yinb);
 		size_t chunk_src_size_y = ydst2src(ywrap);
-		LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, dst_x, 0, dst_size_x, ywrap,
-		                                          src_x, src_y + chunk_src_y,
-		                                          src_size_x, chunk_src_size_y
-		                                          LOCAL_BITMASK__ARGS);
+		libvideo_blitter_generic_stretch_rdwrap(self, dst_x, 0, dst_size_x, ywrap,
+		                                        src_x, src_y + chunk_src_y,
+		                                        src_size_x, chunk_src_size_y);
 	}
-	LOCAL_libvideo_gfx_generic_stretch_rdwrap(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                          src_x, src_y, src_size_x, src_size_y
-	                                          LOCAL_BITMASK__ARGS);
+	libvideo_blitter_generic_stretch_rdwrap(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                        src_x, src_y, src_size_x, src_size_y);
 #undef xdst2src
 #undef ydst2src
 }
 
-#undef LOCAL_libvideo_gfx_generic_blit
-#undef LOCAL_libvideo_gfx_generic_blit_rdwrap
-#undef LOCAL_libvideo_gfx_generic_blit_wrap
-#undef LOCAL_libvideo_gfx_generic_stretch
-#undef LOCAL_libvideo_gfx_generic_stretch_rdwrap
-#undef LOCAL_libvideo_gfx_generic_stretch_wrap
-#undef LOCAL_video_blit_x_blit
-#undef LOCAL_video_blit_x_stretch
-#undef LOCAL_HAVE_BITMASK
-#undef LOCAL_BITMASK__PARAMS
-#undef LOCAL_BITMASK__ARGS
-
 DECL_END
 
-#undef DEFINE_libvideo_gfx_generic_blit__and__stretch
-#undef DEFINE_libvideo_gfx_generic_bitblit__and__bitstretch
+#endif /* !GUARD_LIBVIDEO_GFX_GFX_HL_BLIT_C_INL */

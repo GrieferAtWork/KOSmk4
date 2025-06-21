@@ -224,18 +224,18 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 		errno = ENOTSUP;
 		return NULL;
 	}
-	rgb_buffer = libvideo_rambuffer_create(self->vb_size_x,
-	                                       self->vb_size_y,
+	rgb_buffer = libvideo_rambuffer_create(self->vb_xdim,
+	                                       self->vb_ydim,
 	                                       codec, NULL);
 	if likely(rgb_buffer) {
 		/* Do a blit of "self" into "rgb_buffer" */
 		struct video_gfx dst_gfx;
 		struct video_gfx src_gfx;
-		struct video_blit blit;
+		struct video_blitter blit;
 		video_buffer_getgfx(rgb_buffer, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
 		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
 		video_gfx_blitfrom(&dst_gfx, &src_gfx, &blit);
-		video_blit_blit(&blit, 0, 0, 0, 0, self->vb_size_x, self->vb_size_y);
+		video_blitter_blit(&blit, 0, 0, 0, 0, self->vb_xdim, self->vb_ydim);
 	}
 	return rgb_buffer;
 }
@@ -298,24 +298,24 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 	result = (*self->vb_ops->vi_rlock)(self, &lock);
 	if unlikely(result)
 		return result;
-	lodepng_stride = get_lodepng_stride(self->vb_size_x,
+	lodepng_stride = get_lodepng_stride(self->vb_xdim,
 	                                    colortype, bitdepth);
 	if likely(lodepng_stride == lock.vl_stride) {
 		error = my_lodepng_encode_memory(&out, &out_size,
 		                                 (unsigned char const *)lock.vl_data,
-		                                 self->vb_size_x, self->vb_size_y,
+		                                 self->vb_xdim, self->vb_ydim,
 		                                 colortype, bitdepth, options);
 	} else {
 		byte_t *fixed_stride;
 		fixed_stride = video_lock_convert_stride(&lock,
 		                                         lodepng_stride,
-		                                         self->vb_size_y);
+		                                         self->vb_ydim);
 		if unlikely(!fixed_stride) {
 			error = 83; /* OOM */
 		} else {
 			error = my_lodepng_encode_memory(&out, &out_size,
 			                                 (unsigned char const *)fixed_stride,
-			                                 self->vb_size_x, self->vb_size_y,
+			                                 self->vb_xdim, self->vb_ydim,
 			                                 colortype, bitdepth, options);
 			free(fixed_stride);
 		}

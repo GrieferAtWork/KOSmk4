@@ -29,8 +29,8 @@
 
 DECL_BEGIN
 
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC
-libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
+libvideo_gfx_empty__blitfrom(struct video_blitter *__restrict ctx);
 
 /* Empty GFX operators */
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_empty_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
@@ -46,11 +46,9 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empt
 #define libvideo_gfx_empty_ops (*_libvideo_gfx_empty_ops())
 
 /* Empty blit operators */
-INTDEF ATTR_IN(1) void CC libvideo_gfx_empty_blit(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_empty_stretch(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_empty_bitblit(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_empty_bitstretch(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_empty_ops(void);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_empty_blit(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_empty_stretch(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_empty_ops(void);
 #define libvideo_blit_empty_ops (*_libvideo_blit_empty_ops())
 
 /* Empty video buffer. */

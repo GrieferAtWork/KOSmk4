@@ -55,12 +55,7 @@
 
 DECL_BEGIN
 
-static struct video_buffer_rect const WHOLE_SCREEN = {
-	.vbr_startx = 0,
-	.vbr_starty = 0,
-	.vbr_sizex  = VIDEO_DIM_MAX,
-	.vbr_sizey  = VIDEO_DIM_MAX,
-};
+static struct screen_rect const WHOLE_SCREEN = SCREEN_RECT_INIT_WHOLE_SCREEN;
 
 static void
 do_dump_buffer_specs(struct video_buffer *buf,
@@ -68,7 +63,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 	struct video_codec const *codec;
 	struct video_palette const *palette;
 #define gfx_printf(...) format_printf(&video_fontprinter, io, __VA_ARGS__)
-	gfx_printf("res:   %ux%u\n", (unsigned int)buf->vb_size_x, (unsigned int)buf->vb_size_y);
+	gfx_printf("res:   %ux%u\n", (unsigned int)buf->vb_xdim, (unsigned int)buf->vb_ydim);
 	codec = buf->vb_format.vf_codec;
 	gfx_printf("codec: %#x [%ubpp,%c%c%c]\n",
 	           (unsigned int)codec->vc_codec,

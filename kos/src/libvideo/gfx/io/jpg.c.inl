@@ -422,8 +422,8 @@ err_wrong_fmt:
 		goto err_errno;
 	if unlikely(video_buffer_wlock(result, &vid_lock) != 0)
 		goto err_errno_r;
-	__builtin_assume(result_size_x == result->vb_size_x);
-	__builtin_assume(result_size_y == result->vb_size_y);
+	__builtin_assume(result_size_x == result->vb_xdim);
+	__builtin_assume(result_size_y == result->vb_ydim);
 
 	/* Read scanlines... */
 	for (;;) {
@@ -527,8 +527,8 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 	(void)(*pdyn_jpeg_CreateCompress)(&comp, JPEGLIB_JPEG_LIB_VERSION,
 	                                  JPEGLIB_SIZEOF_jpeg_compress_struct);
 	(void)(*pdyn_jpeg_stdio_dest)(&comp, stream);
-	minimal_jpeg_compress_struct__set_image_width(&comp, self->vb_size_x);
-	minimal_jpeg_compress_struct__set_image_height(&comp, self->vb_size_y);
+	minimal_jpeg_compress_struct__set_image_width(&comp, self->vb_xdim);
+	minimal_jpeg_compress_struct__set_image_height(&comp, self->vb_ydim);
 	minimal_jpeg_compress_struct__set_input_components(&comp, comp_input_components);
 	minimal_jpeg_compress_struct__set_in_color_space(&comp, comp_in_color_space);
 	(void)(*pdyn_jpeg_set_defaults)(&comp);

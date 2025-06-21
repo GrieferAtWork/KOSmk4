@@ -372,8 +372,8 @@ libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
 	result->vb_ops             = &rambuffer_ops;
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;
-	result->vb_size_x          = size_x;
-	result->vb_size_y          = size_y;
+	result->vb_xdim          = size_x;
+	result->vb_ydim          = size_y;
 	if (palette)
 		video_palette_incref(palette);
 	return result;
@@ -474,8 +474,8 @@ libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t
 	result->vb_ops                = membuffer_getops();
 	result->vb_format.vf_codec    = codec;
 	result->vb_format.vf_pal      = palette;
-	result->vb_size_x             = size_x;
-	result->vb_size_y             = size_y;
+	result->vb_xdim             = size_x;
+	result->vb_ydim             = size_y;
 	result->vm_release_mem        = release_mem;
 	result->vm_release_mem_cookie = release_mem_cookie;
 	if (palette)

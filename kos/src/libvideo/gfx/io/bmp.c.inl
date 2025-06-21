@@ -268,10 +268,10 @@ fix_missing_alpha_channel(struct bmpbuffer *__restrict self) {
 	video_coord_t y;
 	assert(self->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
 	assert(self->vb_format.vf_pal == NULL);
-	for (y = 0; y < self->vb_size_y; ++y) {
+	for (y = 0; y < self->vb_ydim; ++y) {
 		struct pixel *iter, *end;
 		iter = (struct pixel *)(self->rb_data + y * self->rb_stride);
-		end  = iter + self->vb_size_x;
+		end  = iter + self->vb_xdim;
 		do {
 			if (iter->a != 0)
 				return; /* Got actual alpha values! */
@@ -593,8 +593,8 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 		resultwm->vb_ops             = &bmpbuffer_with_mapfile_ops;
 		resultwm->vb_format.vf_codec = result_codec;
 		resultwm->vb_format.vf_pal   = result_pal;
-		resultwm->vb_size_x          = (size_t)(ULONG)biWidth;
-		resultwm->vb_size_y          = (size_t)(ULONG)biHeight;
+		resultwm->vb_xdim          = (size_t)(ULONG)biWidth;
+		resultwm->vb_ydim          = (size_t)(ULONG)biHeight;
 		resultwm->rb_data            = bPixelData;
 		resultwm->rb_total           = szPixelDataSize;
 		resultwm->rb_stride          = dwPixelScanline;
@@ -614,8 +614,8 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	result->vb_ops             = &bmpbuffer_ops;
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = result_pal;
-	result->vb_size_x          = (size_t)(ULONG)biWidth;
-	result->vb_size_y          = (size_t)(ULONG)biHeight;
+	result->vb_xdim          = (size_t)(ULONG)biWidth;
+	result->vb_ydim          = (size_t)(ULONG)biHeight;
 	result->rb_total           = szPixelDataSize;
 	result->rb_stride          = dwPixelScanline;
 	result->bb_codec_handle    = result_codec_handle;
@@ -637,7 +637,7 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 
 	case BI_RLE4:
 	case BI_RLE8:
-		rle_decode(result->rb_data, dwPixelScanline, result->vb_size_y,
+		rle_decode(result->rb_data, dwPixelScanline, result->vb_ydim,
 		           bPixelData, blobEOF, biCompression == BI_RLE4);
 		break;
 
@@ -648,7 +648,7 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	if (out_vflipped) {
 		vflip_scanlines(result->rb_data,
 		                result->rb_stride,
-		                result->vb_size_y);
+		                result->vb_ydim);
 	}
 	if (out_hasalpha_if_nonzero)
 		fix_missing_alpha_channel(result);
@@ -693,7 +693,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	struct video_lock vid_lock;
 	struct video_codec const *codec = self->vb_format.vf_codec;
 	struct video_palette const *pal = self->vb_format.vf_pal;
-	DWORD dwPixelScanline = CEILDIV(self->vb_size_x * codec->vc_specs.vcs_bpp, NBBY);
+	DWORD dwPixelScanline = CEILDIV(self->vb_xdim * codec->vc_specs.vcs_bpp, NBBY);
 
 	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
 	dwPixelScanline = CEIL_ALIGN(dwPixelScanline, 4);
@@ -749,11 +749,11 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	bzero(&hdr, sizeof(hdr));
 	hdr.bmFile.bfType      = ENCODE_INT16('B', 'M');
 	hdr.bmFile.bfSize      = sizeof(hdr.bmFile);
-	hdr.bmInfo.biWidth     = self->vb_size_x;
-	hdr.bmInfo.biHeight    = -(LONG)self->vb_size_y;
+	hdr.bmInfo.biWidth     = self->vb_xdim;
+	hdr.bmInfo.biHeight    = -(LONG)self->vb_ydim;
 	hdr.bmInfo.biPlanes    = 1;
 	hdr.bmInfo.biBitCount  = codec->vc_specs.vcs_bpp;
-	hdr.bmInfo.biSizeImage = dwPixelScanline * self->vb_size_y;
+	hdr.bmInfo.biSizeImage = dwPixelScanline * self->vb_ydim;
 	hdr.bmColorMasks[0]    = codec->vc_specs.vcs_rmask;
 	hdr.bmColorMasks[1]    = codec->vc_specs.vcs_gmask;
 	hdr.bmColorMasks[2]    = codec->vc_specs.vcs_bmask;
@@ -807,12 +807,12 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	/* Write pixel data */
 	if likely(vid_lock.vl_stride == dwPixelScanline) {
 		/* Can write data without any need for padding or-the-like */
-		size_t n_bytes = vid_lock.vl_stride * self->vb_size_y;
+		size_t n_bytes = vid_lock.vl_stride * self->vb_ydim;
 		if (fwrite(vid_lock.vl_data, 1, n_bytes, stream) != n_bytes)
 			goto err_unlock;
 	} else if (vid_lock.vl_stride > dwPixelScanline) {
 		video_coord_t y;
-		for (y = 0; y < self->vb_size_y; ++y) {
+		for (y = 0; y < self->vb_ydim; ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
 			if (fwrite(src, 1, dwPixelScanline, stream) != dwPixelScanline)
 				goto err_unlock;
@@ -820,7 +820,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 	} else {
 		size_t n_skip = dwPixelScanline - vid_lock.vl_stride;
 		video_coord_t y;
-		for (y = 0; y < self->vb_size_y; ++y) {
+		for (y = 0; y < self->vb_ydim; ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
 			if (fwrite(src, 1, dwPixelScanline, stream) != dwPixelScanline)
 				goto err_unlock;

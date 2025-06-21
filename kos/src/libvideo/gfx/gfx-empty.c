@@ -48,10 +48,10 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC
-libvideo_gfx_empty__blitfrom(struct video_blit *__restrict ctx) {
-	ctx->vb_ops = &libvideo_blit_empty_ops;
-	DBG_memset(&ctx->_vb_xops, 0xcc, sizeof(ctx->_vb_xops));
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
+libvideo_gfx_empty__blitfrom(struct video_blitter *__restrict ctx) {
+	ctx->vbt_ops = &libvideo_blit_empty_ops;
+	DBG_memset(&ctx->_vbt_xops, 0xcc, sizeof(ctx->_vbt_xops));
 	return ctx;
 }
 
@@ -134,7 +134,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empt
 
 /* Empty blit operators */
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_empty_blit(struct video_blit const *__restrict UNUSED(self),
+libvideo_blitter_empty_blit(struct video_blitter const *__restrict UNUSED(self),
                         video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                         video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
                         video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
@@ -142,7 +142,7 @@ libvideo_gfx_empty_blit(struct video_blit const *__restrict UNUSED(self),
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_empty_stretch(struct video_blit const *__restrict UNUSED(self),
+libvideo_blitter_empty_stretch(struct video_blitter const *__restrict UNUSED(self),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
@@ -150,34 +150,13 @@ libvideo_gfx_empty_stretch(struct video_blit const *__restrict UNUSED(self),
 	COMPILER_IMPURE();
 }
 
-INTERN ATTR_IN(1) ATTR_IN(8) void CC
-libvideo_gfx_empty_bitblit(struct video_blit const *__restrict UNUSED(self),
-                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                           video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                           struct video_bitmask const *__restrict UNUSED(bm)) {
-	COMPILER_IMPURE();
-}
-
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
-libvideo_gfx_empty_bitstretch(struct video_blit const *__restrict UNUSED(self),
-                              video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                              video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                              video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                              video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
-                              struct video_bitmask const *__restrict UNUSED(bm)) {
-	COMPILER_IMPURE();
-}
-
 #undef libvideo_blit_empty_ops
-PRIVATE struct video_blit_ops libvideo_blit_empty_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_empty_ops(void) {
-	if unlikely(!libvideo_blit_empty_ops.vbo_bitstretch) {
-		libvideo_blit_empty_ops.vbo_blit    = &libvideo_gfx_empty_blit;
-		libvideo_blit_empty_ops.vbo_stretch = &libvideo_gfx_empty_stretch;
-		libvideo_blit_empty_ops.vbo_bitblit = &libvideo_gfx_empty_bitblit;
+PRIVATE struct video_blitter_ops libvideo_blit_empty_ops = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_empty_ops(void) {
+	if unlikely(!libvideo_blit_empty_ops.vbo_blit) {
+		libvideo_blit_empty_ops.vbo_stretch = &libvideo_blitter_empty_stretch;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_empty_ops.vbo_bitstretch = &libvideo_gfx_empty_bitstretch;
+		libvideo_blit_empty_ops.vbo_blit = &libvideo_blitter_empty_blit;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_blit_empty_ops;
@@ -249,8 +228,8 @@ PRIVATE struct video_buffer libvideo_buffer_empty = {
 		.vf_codec = NULL, /* Initialized lazily */
 		.vf_pal   = NULL,
 	},
-	.vb_size_x = 0,
-	.vb_size_y = 0,
+	.vb_xdim = 0,
+	.vb_ydim = 0,
 };
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(void) {

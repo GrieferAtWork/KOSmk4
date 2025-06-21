@@ -77,7 +77,7 @@ __DECL_BEGIN
 struct video_buffer;
 struct video_gfxhdr;
 struct video_gfx;
-struct video_blit;
+struct video_blitter;
 
 /* Video bitmask descriptor.
  *
@@ -109,7 +109,7 @@ struct video_bitmask {
 };
 
 
-struct video_blit_xops {
+struct video_blitter_xops {
 	/* All of the following callbacks are [1..1]
 	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
 	 *          as well as always  assume that the given  coords are in-bounds of  the
@@ -124,7 +124,7 @@ struct video_blit_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbxo_blit)(struct video_blit const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbxo_blit)(struct video_blitter const *__restrict __self,
 	                             video_coord_t __dst_x, video_coord_t __dst_y,
 	                             video_coord_t __src_x, video_coord_t __src_y,
 	                             video_dim_t __size_x, video_dim_t __size_y);
@@ -137,74 +137,31 @@ struct video_blit_xops {
 	 * @assume(__dst_size_x != __src_size_x);
 	 * @assume(__dst_size_y != __src_size_y); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbxo_stretch)(struct video_blit const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbxo_stretch)(struct video_blitter const *__restrict __self,
 	                                video_coord_t __dst_x, video_coord_t __dst_y,
 	                                video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                video_coord_t __src_x, video_coord_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	/* Same as `vbxo_blit()', but only copy bit-masked pixels
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) __ATTR_IN_T(8) void
-	(LIBVIDEO_GFX_CC *vbxo_bitblit)(struct video_blit const *__restrict __self,
-	                                video_coord_t __dst_x, video_coord_t __dst_y,
-	                                video_coord_t __src_x, video_coord_t __src_y,
-	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                struct video_bitmask const *__restrict __bm);
-
-	/* Same as `vbxo_stretch()', but only copy bit-masked pixels
-	 * @assume(__dst_size_x > 0);
-	 * @assume(__dst_size_y > 0);
-	 * @assume(__src_size_x > 0);
-	 * @assume(__src_size_y > 0);
-	 * @assume(__dst_size_x != __src_size_x);
-	 * @assume(__dst_size_y != __src_size_y); */
-	__ATTR_IN_T(1) __ATTR_IN_T(10) void
-	(LIBVIDEO_GFX_CC *vbxo_bitstretch)(struct video_blit const *__restrict __self,
-	                                   video_coord_t __dst_x, video_coord_t __dst_y,
-	                                   video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                   video_coord_t __src_x, video_coord_t __src_y,
-	                                   video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                   struct video_bitmask const *__restrict __bm);
-
-	void (*_vbxo_pad[4])(void);
+	void (*_vbxo_pad[6])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
-struct video_blit_ops {
+struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbo_blit)(struct video_blit const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbo_blit)(struct video_blitter const *__restrict __self,
 	                            video_offset_t __dst_x, video_offset_t __dst_y,
 	                            video_offset_t __src_x, video_offset_t __src_y,
 	                            video_dim_t __size_x, video_dim_t __size_y);
 
 	/* Same as `vbo_blit', but stretch the contents */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbo_stretch)(struct video_blit const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbo_stretch)(struct video_blitter const *__restrict __self,
 	                               video_offset_t __dst_x, video_offset_t __dst_y,
 	                               video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                               video_offset_t __src_x, video_offset_t __src_y,
 	                               video_dim_t __src_size_x, video_dim_t __src_size_y);
-
-	/* Same as `vbo_blit()', but only copy a pixel if masked by `__bm'
-	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-	__ATTR_IN_T(1) __ATTR_IN_T(8) void
-	(LIBVIDEO_GFX_CC *vbo_bitblit)(struct video_blit const *__restrict __self,
-	                               video_offset_t __dst_x, video_offset_t __dst_y,
-	                               video_offset_t __src_x, video_offset_t __src_y,
-	                               video_dim_t __size_x, video_dim_t __size_y,
-	                               struct video_bitmask const *__restrict __bm);
-
-	/* Same as `vbo_stretch()', however perform the blit while also up-scaling the given bitmask. */
-	__ATTR_IN_T(1) __ATTR_IN_T(10) void
-	(LIBVIDEO_GFX_CC *vbo_bitstretch)(struct video_blit const *__restrict __self,
-	                                  video_offset_t __dst_x, video_offset_t __dst_y,
-	                                  video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                  video_offset_t __src_x, video_offset_t __src_y,
-	                                  video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                  struct video_bitmask const *__restrict __bm);
 
 	/* More driver-specific operators go here... */
 };
@@ -383,7 +340,9 @@ struct video_gfx_ops {
 	                            video_color_t __color);
 
 	/* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
-	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
+	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h)
+	 * TODO: This function should take 2 colors: foreground/background. Same also goes
+	 *       for `fxo_bitstretchfill' */
 	__ATTR_IN_T(1) __ATTR_IN_T(7) void
 	(LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx const *__restrict __self,
 	                               video_offset_t __x, video_offset_t __y,
@@ -487,36 +446,18 @@ video_gfx_palettize(struct video_gfx const *__restrict __self,
 
 /* Blit the contents of another video buffer into this one. */
 extern __ATTR_IN(1) void
-video_blit_blit(struct video_blit const *__restrict __self,
+video_blitter_blit(struct video_blitter const *__restrict __self,
                 video_offset_t __dst_x, video_offset_t __dst_y,
                 video_offset_t __src_x, video_offset_t __src_y,
                 video_dim_t __size_x, video_dim_t __size_y);
 
 /* Same as `vbo_blit', but stretch the contents */
 extern __ATTR_IN(1) void
-video_blit_stretch(struct video_blit const *__restrict __self,
+video_blitter_stretch(struct video_blitter const *__restrict __self,
                    video_offset_t __dst_x, video_offset_t __dst_y,
                    video_dim_t __dst_size_x, video_dim_t __dst_size_y,
                    video_offset_t __src_x, video_offset_t __src_y,
                    video_dim_t __src_size_x, video_dim_t __src_size_y);
-
-/* Same as `vbo_blit()', but only copy a pixel if masked by `__bm'
- * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-extern __ATTR_IN(1) __ATTR_IN(8) void
-video_blit_bitblit(struct video_blit const *__restrict __self,
-                   video_offset_t __dst_x, video_offset_t __dst_y,
-                   video_offset_t __src_x, video_offset_t __src_y,
-                   video_dim_t __size_x, video_dim_t __size_y,
-                   struct video_bitmask const *__restrict __bm);
-
-/* Same as `vbo_stretch()', however perform the blit while also up-scaling the given bitmask. */
-extern __ATTR_IN(1) __ATTR_IN(10) void
-video_blit_bitstretch(struct video_blit const *__restrict __self,
-                      video_offset_t __dst_x, video_offset_t __dst_y,
-                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-                      video_offset_t __src_x, video_offset_t __src_y,
-                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-                      struct video_bitmask const *__restrict __bm);
 
 
 
@@ -678,16 +619,16 @@ video_gfx_vgradient(struct video_gfx const *__restrict __self,
                     video_color_t __locolor, video_color_t __hicolor);
 
 /* Initialize bitting contexts to rendering between 2 given GFX contexts. */
-extern __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) void
+extern __ATTR_RETNONNULL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) struct video_blitter *
 video_gfx_blitfrom(struct video_gfx const *__dst,
                    struct video_gfx const *__src,
-                   struct video_blit *__ctx);
-extern __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) void
+                   struct video_blitter *__ctx);
+extern __ATTR_RETNONNULL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) struct video_blitter *
 video_gfx_blitto(struct video_gfx const *__src,
                  struct video_gfx const *__dst,
-                 struct video_blit *__ctx);
+                 struct video_blitter *__ctx);
 
-/* Directly do blitting between 2 GFX contexts (helpers to wrap "struct video_blit") */
+/* Directly do blitting between 2 GFX contexts (helpers to wrap "struct video_blitter") */
 extern __ATTR_IN(1) __ATTR_IN(4) void
 video_gfx_blit(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y,
                struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y,
@@ -695,23 +636,11 @@ video_gfx_blit(struct video_gfx const *__dst, video_offset_t __dst_x, video_offs
 extern __ATTR_IN(1) __ATTR_IN(6) void
 video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y, video_dim_t __dst_size_x, video_dim_t __dst_size_y,
                   struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y, video_dim_t __src_size_x, video_dim_t __src_size_y);
-extern __ATTR_IN(1) __ATTR_IN(4) __ATTR_IN(9) void
-video_gfx_bitblit(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y,
-                  struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y,
-                  video_dim_t __size_x, video_dim_t __size_y, struct video_bitmask const *__restrict __bm);
-extern __ATTR_IN(1) __ATTR_IN(6) __ATTR_IN(11) void
-video_gfx_bitstretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y, video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-                     struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y, video_dim_t __src_size_x, video_dim_t __src_size_y,
-                     struct video_bitmask const *__restrict __bm);
 #else /* __INTELLISENSE__ */
-#define video_blit_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
-	(*(self)->vb_ops->vbo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
-#define video_blit_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
-	(*(self)->vb_ops->vbo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
-#define video_blit_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm) \
-	(*(self)->vb_ops->vbo_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm)
-#define video_blit_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask) \
-	(*(self)->vb_ops->vbo_bitstretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bitmask)
+#define video_blitter_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	(*(self)->vbt_ops->vbo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
+#define video_blitter_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	(*(self)->vbt_ops->vbo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
 #define video_gfx_getclipx(self) (self)->vx_hdr.vxh_cxoff
 #define video_gfx_getclipy(self) (self)->vx_hdr.vxh_cyoff
@@ -760,17 +689,13 @@ video_gfx_bitstretch(struct video_gfx const *__dst, video_offset_t __dst_x, vide
 #define video_gfx_vgradient(self, x, y, size_x, size_y, locolor, hicolor) \
 	(*(self)->vx_hdr.vxh_ops->fxo_vgradient)(self, x, y, size_x, size_y, locolor, hicolor)
 #define video_gfx_blitfrom(dst, src, ctx) \
-	((ctx)->vb_src = (src), (*((ctx)->vb_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
+	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
 #define video_gfx_blitto(src, dst, ctx) \
-	((ctx)->vb_src = (src), (*((ctx)->vb_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
+	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
 #define video_gfx_blit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
-	__XBLOCK({ struct video_blit _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgb_blit); video_blit_blit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
+	__XBLOCK({ struct video_blitter _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgb_blit); video_blitter_blit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
 #define video_gfx_stretch(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
-	__XBLOCK({ struct video_blit _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(dst, src, &_vgs_blit); video_blit_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
-#define video_gfx_bitblit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y, bm) \
-	__XBLOCK({ struct video_blit _vgbb_blit, *_vgbb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgbb_blit); video_blit_bitblit(_vgbb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y, bm); })
-#define video_gfx_bitstretch(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y, bm) \
-	__XBLOCK({ struct video_blit _vgbs_blit, *_vgbs_blit_ptr = video_gfx_blitfrom(dst, src, &_vgbs_blit); video_blit_bitstretch(_vgbs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm); })
+	__XBLOCK({ struct video_blitter _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(dst, src, &_vgs_blit); video_blitter_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
 #endif /* !__INTELLISENSE__ */
 
 
@@ -779,13 +704,13 @@ video_gfx_bitstretch(struct video_gfx const *__dst, video_offset_t __dst_x, vide
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
-struct video_blit {
-	struct video_blit_ops const *vb_ops;  /* Blit operators */
-	struct video_gfx const      *vb_dst;  /* [1..1][const] Destination GFX context */
-	struct video_gfx const      *vb_src;  /* [1..1][const] Source GFX context */
-	struct video_blit_xops      _vb_xops; /* Internal blit operators */
+struct video_blitter {
+	struct video_blitter_ops const *vbt_ops;  /* Blitter operators */
+	struct video_gfx const         *vbt_dst;  /* [1..1][const] Destination GFX context */
+	struct video_gfx const         *vbt_src;  /* [1..1][const] Source GFX context */
+	struct video_blitter_xops      _vbt_xops; /* Internal blit operators */
 #define _VIDEO_BLIT_N_DRIVER 6
-	void *_vb_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
+	void *_vbt_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:
@@ -793,7 +718,7 @@ public:
 	__CXX_CLASSMEMBER void blit(video_offset_t __dst_x, video_offset_t __dst_y,
 	                            video_offset_t __src_x, video_offset_t __src_y,
 	                            video_dim_t __size_x, video_dim_t __size_y) const {
-		video_blit_blit(this, __dst_x, __dst_y, __src_x, __src_y, __size_x, __size_y);
+		video_blitter_blit(this, __dst_x, __dst_y, __src_x, __src_y, __size_x, __size_y);
 	}
 
 	/* Same as `blit', but stretch the contents */
@@ -801,28 +726,8 @@ public:
 	                               video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                               video_offset_t __src_x, video_offset_t __src_y,
 	                               video_dim_t __src_size_x, video_dim_t __src_size_y) const {
-		video_blit_stretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
-		                   __src_x, __src_y, __src_size_y, __src_size_y);
-	}
-
-	/* Same as `blit()', but only copy a pixel if masked by `__bm'.
-	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-	__CXX_CLASSMEMBER void bitblit(video_offset_t __dst_x, video_offset_t __dst_y,
-	                               video_offset_t __src_x, video_offset_t __src_y,
-	                               video_dim_t __size_x, video_dim_t __size_y,
-	                               struct video_bitmask const *__restrict __bm) const {
-		video_blit_bitblit(this, __dst_x, __dst_y, __src_x, __src_y,
-		                   __size_x, __size_y, __bm);
-	}
-
-	/* Same as `stretch()', however perform the blit while also up-scaling the given bitmask. */
-	__CXX_CLASSMEMBER void bitstretchblit(video_offset_t __dst_x, video_offset_t __dst_y,
-	                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                      video_offset_t __src_x, video_offset_t __src_y,
-	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                      struct video_bitmask const *__restrict __bm) const {
-		video_blit_bitstretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
-		                      __src_x, __src_y, __src_size_y, __src_size_y, __bm);
+		video_blitter_stretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
+		                      __src_x, __src_y, __src_size_y, __src_size_y);
 	}
 #endif /* __cplusplus */
 };
@@ -831,12 +736,12 @@ struct video_gfxhdr {
 	struct video_gfx_ops const *vxh_ops; /* [1..1][const] GFX operations (use these) */
 
 	/* [1..1][const]
-	 * Initialize a blitting context that reads from `__ctx->vb_src' and writes to  `__ctx->vb_dst'.
-	 * The caller must have already initialized `__ctx->vb_src' and `__ctx->vb_dst', and the invoked
-	 * operator here must be the one of `__ctx->vb_dst'
+	 * Initialize a blitting context that reads from `__ctx->vbt_src' and writes to  `__ctx->vbt_dst'.
+	 * The caller must have already initialized `__ctx->vbt_src' and `__ctx->vbt_dst', and the invoked
+	 * operator here must be the one of `__ctx->vbt_dst'
 	 * @return: * : Always re-returns `__ctx' */
-	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blit *
-	(LIBVIDEO_GFX_FCC *vxh_blitfrom)(struct video_blit *__restrict __ctx);
+	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blitter *
+	(LIBVIDEO_GFX_FCC *vxh_blitfrom)(struct video_blitter *__restrict __ctx);
 
 	/* Clip rect area (pixel area used for pixel clamping/wrapping, and accepted):
 	 * >> +---------------------------------+
@@ -856,7 +761,7 @@ struct video_gfxhdr {
 	 * >> +---------------------------------+
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
-	 * - Buffer:    {xy: {0,0}, wh: {vxh_buffer->vb_size_x,vxh_buffer->vb_size_y}}
+	 * - Buffer:    {xy: {0,0}, wh: {vxh_buffer->vb_xdim,vxh_buffer->vb_ydim}}
 	 * - Clip Rect: {xy: {vxh_cxoff,vxh_cyoff}, wh: {vxh_cxsiz,vxh_cysiz}}
 	 * - I/O Area:  {xy: {vxh_bxmin,vxh_bymin}, wh: {vxh_bxsiz,vxh_bysiz}}
 	 *
@@ -881,8 +786,8 @@ struct video_gfxhdr {
 	/* Buffer I/O area: these values control the (absolute) pixel area where read/writes do something */
 	video_coord_t               vxh_bxmin;    /* [const][<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vxh_bymin;    /* [const][<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
-	video_coord_t               vxh_bxend;    /* [const][<= vxh_buffer->vb_size_x] Absolute buffer end coord in X (<= `vxh_buffer->vb_size_x') */
-	video_coord_t               vxh_byend;    /* [const][<= vxh_buffer->vb_size_y] Absolute buffer end coord in Y (<= `vxh_buffer->vb_size_y') */
+	video_coord_t               vxh_bxend;    /* [const][<= vxh_buffer->vb_xdim] Absolute buffer end coord in X (<= `vxh_buffer->vb_xdim') */
+	video_coord_t               vxh_byend;    /* [const][<= vxh_buffer->vb_ydim] Absolute buffer end coord in Y (<= `vxh_buffer->vb_ydim') */
 //	video_dim_t                 vxh_bxsiz;    /* [const][== vxh_bxend - vxh_bxmin][<= vxh_cxsiz] Absolute buffer I/O width */
 //	video_dim_t                 vxh_bysiz;    /* [const][== vxh_byend - vxh_bymin][<= vxh_cysiz] Absolute buffer I/O height */
 };
@@ -1006,26 +911,26 @@ public:
 	/************************************************************************/
 	/* GFX->GFX blitting via context                                        */
 	/************************************************************************/
-	__CXX_CLASSMEMBER struct video_blit &blitfrom(struct video_gfx const &__src,
-	                                              struct video_blit &__ctx) const {
+	__CXX_CLASSMEMBER struct video_blitter &blitfrom(struct video_gfx const &__src,
+	                                                 struct video_blitter &__ctx) const {
 		video_gfx_blitfrom(this, &__src, &__ctx);
 		return __ctx;
 	}
 
-	__CXX_CLASSMEMBER struct video_blit blitfrom(struct video_gfx const &__src) const {
-		struct video_blit __result;
+	__CXX_CLASSMEMBER struct video_blitter blitfrom(struct video_gfx const &__src) const {
+		struct video_blitter __result;
 		video_gfx_blitfrom(this, &__src, &__result);
 		return __result;
 	}
 
-	__CXX_CLASSMEMBER struct video_blit &blitto(struct video_gfx const &__dst,
-	                                            struct video_blit &__ctx) const {
+	__CXX_CLASSMEMBER struct video_blitter &blitto(struct video_gfx const &__dst,
+	                                            struct video_blitter &__ctx) const {
 		video_gfx_blitto(this, &__dst, &__ctx);
 		return __ctx;
 	}
 
-	__CXX_CLASSMEMBER struct video_blit blitto(struct video_gfx const &__dst) const {
-		struct video_blit __result;
+	__CXX_CLASSMEMBER struct video_blitter blitto(struct video_gfx const &__dst) const {
+		struct video_blitter __result;
 		video_gfx_blitto(this, &__dst, &__result);
 		return __result;
 	}
@@ -1043,7 +948,7 @@ public:
 		video_gfx_blit(this, __dst_x, __dst_y, &__src, __src_x, __src_y, __size_x, __size_y);
 	}
 
-	/* Same as `fxo_blitfrom', but stretch the contents */
+	/* Stretch the contents of another video buffer into this one. */
 	__CXX_CLASSMEMBER void stretch(video_offset_t __dst_x, video_offset_t __dst_y,
 	                               video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                               struct video_gfx const &__src,
@@ -1051,26 +956,6 @@ public:
 	                               video_dim_t __src_size_x, video_dim_t __src_size_y) const {
 		video_gfx_stretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
 		                  &__src, __src_x, __src_y, __src_size_y, __src_size_y);
-	}
-
-	/* Blit the contents of another video buffer into this one. */
-	__CXX_CLASSMEMBER void bitblit(video_offset_t __dst_x, video_offset_t __dst_y,
-	                               struct video_gfx const &__src,
-	                               video_offset_t __src_x, video_offset_t __src_y,
-	                               video_dim_t __size_x, video_dim_t __size_y,
-	                               struct video_bitmask const *__restrict __bm) const {
-		video_gfx_bitblit(this, __dst_x, __dst_y, &__src, __src_x, __src_y, __size_x, __size_y, __bm);
-	}
-
-	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
-	__CXX_CLASSMEMBER void bitstretchblit(video_offset_t __dst_x, video_offset_t __dst_y,
-	                                      video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                      struct video_gfx const &__src,
-	                                      video_offset_t __src_x, video_offset_t __src_y,
-	                                      video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                      struct video_bitmask const *__restrict __bm) const {
-		video_gfx_bitstretch(this, __dst_x, __dst_y, __dst_size_y, __dst_size_y,
-		                     &__src, __src_x, __src_y, __src_size_y, __src_size_y, __bm);
 	}
 #endif /* __cplusplus */
 };

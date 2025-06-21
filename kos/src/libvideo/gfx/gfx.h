@@ -186,32 +186,20 @@
 
 
 /* Video BLIT internal API wrappers */
-#define _video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
-	(*(self)->_vb_xops.vbxo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
-#define _video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
-	(*(self)->_vb_xops.vbxo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
-#define _video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm) \
-	(*(self)->_vb_xops.vbxo_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm)
-#define _video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm) \
-	(*(self)->_vb_xops.vbxo_bitstretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm)
+#define _video_blitter_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	(*(self)->_vbt_xops.vbxo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
+#define _video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	(*(self)->_vbt_xops.vbxo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
 /* Video BLIT internal API wrappers (w/ assertions) */
-#define video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y)  \
-	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, size_x, size_y), \
-	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, size_x, size_y), \
-	 _video_blit_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y))
-#define video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
-	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, dst_size_x, dst_size_y),                           \
-	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, src_size_x, src_size_y),                           \
-	 _video_blit_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y))
-#define video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm) \
-	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, size_x, size_y),       \
-	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, size_x, size_y),       \
-	 _video_blit_x_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y, bm))
-#define video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm) \
-	(gfx_assert_absbounds_sxy((self)->vb_dst, dst_x, dst_y, dst_size_x, dst_size_y),                                  \
-	 gfx_assert_absbounds_sxy((self)->vb_src, src_x, src_y, src_size_x, src_size_y),                                  \
-	 _video_blit_x_bitstretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, bm))
+#define video_blitter_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	(gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, size_x, size_y),  \
+	 gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, size_x, size_y),  \
+	 _video_blitter_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y))
+#define video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
+	(gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, dst_size_x, dst_size_y),                             \
+	 gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, src_size_x, src_size_y),                             \
+	 _video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y))
 
 
 DECL_BEGIN
@@ -253,22 +241,16 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absgradient_v(struct video_gfx c
 INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic__bitfill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__bitstretchfill_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__bitstretchfill_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_generic__blitfrom_l(struct video_blit *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_generic__blitfrom_n(struct video_blit *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitfrom_l(struct video_blitter *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitfrom_n(struct video_blitter *__restrict ctx);
 
 /* Low-level, Generic, always-valid Blit functions (using only `fxo_getcolor' + `fxo_putcolor') */
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__stretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic__bitstretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__stretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_samebuf__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_samebuf__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_samebuf__bitstretch_l(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_samebuf__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic__stretch_l(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_samebuf__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_samebuf__stretch_l(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_samebuf__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 
 
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
@@ -283,22 +265,16 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_interp8888__absgradient_h(struct 
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_noblend__bitfill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-#define libvideo_gfx_noblend_samefmt__stretch_l libvideo_gfx_generic__stretch_l
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-#define libvideo_gfx_noblend_samefmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_noblend__blitfrom_n(struct video_blit *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blit *FCC libvideo_gfx_noblend__blitfrom_l(struct video_blit *__restrict ctx);
-/* The *_difffmt_* operators here "libvideo_blit_generic__conv" to be initialized */
-#define libvideo_blit_generic__conv(self) ((struct video_converter *)(self)->_vb_driver)
-INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_difffmt__stretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-#define libvideo_gfx_noblend_difffmt__stretch_l libvideo_gfx_generic__stretch_l
-#define libvideo_gfx_noblend_difffmt__bitblit   libvideo_gfx_generic__bitblit
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_noblend_difffmt__bitstretch_n(struct video_blit const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-#define libvideo_gfx_noblend_difffmt__bitstretch_l libvideo_gfx_generic__bitstretch_l
+INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+#define libvideo_blitter_noblend_samefmt__stretch_l libvideo_blitter_generic__stretch_l
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitfrom_n(struct video_blitter *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitfrom_l(struct video_blitter *__restrict ctx);
+/* The *_difffmt_* operators here "libvideo_blitter_generic__conv" to be initialized */
+#define libvideo_blitter_generic__conv(self) ((struct video_converter *)(self)->_vbt_driver)
+INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+#define libvideo_blitter_noblend_difffmt__stretch_l libvideo_blitter_generic__stretch_l
 
 
 /* Generic GFX operators */
@@ -337,21 +313,15 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 #define libvideo_gfx_generic_ops_rdwrwrap (*_libvideo_gfx_generic_ops_rdwrwrap())
 
 /* Generic blit operators */
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_blit(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_blit_rdwrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_blit_wrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_stretch(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_stretch_rdwrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_stretch_wrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic_bitblit(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic_bitblit_rdwrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(8) void CC libvideo_gfx_generic_bitblit_wrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic_bitstretch(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic_bitstretch_rdwrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_gfx_generic_bitstretch_wrap(struct video_blit const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_generic_ops(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_generic_ops_rdwrap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blit_ops const *CC _libvideo_blit_generic_ops_wrap(void);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_rdwrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_wrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdwrap(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_wrap(void);
 #define libvideo_blit_generic_ops        (*_libvideo_blit_generic_ops())
 #define libvideo_blit_generic_ops_rdwrap (*_libvideo_blit_generic_ops_rdwrap())
 #define libvideo_blit_generic_ops_wrap   (*_libvideo_blit_generic_ops_wrap())
@@ -369,8 +339,8 @@ LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
 	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
-	self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_size_x;
-	self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_size_y;
+	self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_xdim;
+	self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_ydim;
 }
 
 LOCAL ATTR_CONST WUNUSED bool CC
@@ -571,14 +541,14 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 
 /* Select appropriate operators for a video blit operations */
 LOCAL ATTR_INOUT(1) void CC
-video_blit_setops(struct video_blit *__restrict ctx) {
+video_blit_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	if (ctx->vb_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
-		ctx->vb_ops = &libvideo_blit_generic_ops_wrap;
-	} else if (ctx->vb_src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
-		ctx->vb_ops = &libvideo_blit_generic_ops_rdwrap;
+	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_wrap;
+	} else if (ctx->vbt_src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_rdwrap;
 	} else {
-		ctx->vb_ops = &libvideo_blit_generic_ops;
+		ctx->vbt_ops = &libvideo_blit_generic_ops;
 	}
 }
 

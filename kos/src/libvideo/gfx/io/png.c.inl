@@ -376,8 +376,8 @@ do_rgb_format:
 	result->vb_ops             = &rambuffer_ops;
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = result_pal; /* Inherit reference */
-	result->vb_size_x          = width;
-	result->vb_size_y          = height;
+	result->vb_xdim          = width;
+	result->vb_ydim          = height;
 
 	/* Read image data from PNG file */
 	{

@@ -65,17 +65,17 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
 	}
 
 	/* Create a new video buffer */
-	result = libvideo_buffer_create(type, self->vb_size_x, self->vb_size_y, codec, palette);
+	result = libvideo_buffer_create(type, self->vb_xdim, self->vb_ydim, codec, palette);
 	if likely(result) {
 		struct video_gfx src_gfx;
 		struct video_gfx dst_gfx;
-		struct video_blit blit;
+		struct video_blitter blit;
 
 		/* Blit the entirety of the source buffer into the target buffer. */
 		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
 		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
 		video_gfx_blitfrom(&dst_gfx, &src_gfx, &blit);
-		(*blit._vb_xops.vbxo_blit)(&blit, 0, 0, 0, 0, self->vb_size_x, self->vb_size_y);
+		(*blit._vbt_xops.vbxo_blit)(&blit, 0, 0, 0, 0, self->vb_xdim, self->vb_ydim);
 	}
 	return result;
 }

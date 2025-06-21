@@ -64,16 +64,9 @@ struct video_gfx;
 
 struct video_lock {
 	__byte_t *vl_data;      /* [1..vl_size] Memory-mapped video data. */
-	__size_t  vl_size;      /* Total image size (>= vl_stride * :vb_size_y) */
+	__size_t  vl_size;      /* Total image size (>= vl_stride * :vb_ydim) */
 	__size_t  vl_stride;    /* Scanline width (in bytes) */
 	void    *_vl_driver[1]; /* Driver-specific data */
-};
-
-struct video_buffer_rect {
-	video_offset_t vbr_startx; /* Starting X coord */
-	video_offset_t vbr_starty; /* Starting Y coord */
-	video_dim_t    vbr_sizex;  /* Rect size in X */
-	video_dim_t    vbr_sizey;  /* Rect size in Y */
 };
 
 struct video_buffer_ops {
@@ -210,8 +203,8 @@ struct video_buffer {
 	__uintptr_t              vb_refcnt; /* Reference counter. */
 	struct video_buffer_ops *vb_ops;    /* [1..1][const] Buffer operations. */
 	struct video_format      vb_format; /* [const] Buffer format. */
-	video_dim_t              vb_size_x; /* Buffer size in X (in pixels) */
-	video_dim_t              vb_size_y; /* Buffer size in Y (in pixels) */
+	video_dim_t              vb_xdim;   /* Buffer dimension in X (in pixels) */
+	video_dim_t              vb_ydim;   /* Buffer dimension in Y (in pixels) */
 	/* Buffer-specific fields go here */
 
 #ifdef __cplusplus

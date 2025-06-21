@@ -87,7 +87,7 @@ struct video_anim_ops {
 	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
 	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
 	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
-	 * >>     struct video_buffer_rect update_rect = { 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX };
+	 * >>     struct screen_rect update_rect = SCREEN_RECT_INIT_WHOLE_SCREEN;
 	 * >>     screen_buffer_updaterect(screen, &update_rect);
 	 * >>
 	 * >>     // Load next frame as part of render delay

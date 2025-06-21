@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL
-#define GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL 1
+#ifndef GUARD_LIBVIDEO_GFX_GFX_LL_NOBLEND_C_INL
+#define GUARD_LIBVIDEO_GFX_GFX_LL_NOBLEND_C_INL 1
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
@@ -829,13 +829,13 @@ done:
 }
 
 PRIVATE ATTR_IN(1) void CC
-libvideo_gfx_noblend_samefmt__blit__bypixel(struct video_blit const *__restrict self,
-                                            video_coord_t dst_x, video_coord_t dst_y,
-                                            video_coord_t src_x, video_coord_t src_y,
-                                            video_dim_t size_x, video_dim_t size_y) {
+libvideo_blitter_noblend_samefmt__blit__bypixel(struct video_blitter const *__restrict self,
+                                                video_coord_t dst_x, video_coord_t dst_y,
+                                                video_coord_t src_x, video_coord_t src_y,
+                                                video_dim_t size_x, video_dim_t size_y) {
 	video_dim_t x, y;
-	struct video_gfx const *src = self->vb_src;
-	struct video_gfx const *dst = self->vb_dst;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
 	for (y = 0; y < size_y; ++y) {
 		for (x = 0; x < size_x; ++x) {
 			video_pixel_t pixel;
@@ -846,12 +846,12 @@ libvideo_gfx_noblend_samefmt__blit__bypixel(struct video_blit const *__restrict 
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self,
-                                   video_coord_t dst_x, video_coord_t dst_y,
-                                   video_coord_t src_x, video_coord_t src_y,
-                                   video_dim_t size_x, video_dim_t size_y) {
+libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict self,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_coord_t src_x, video_coord_t src_y,
+                                       video_dim_t size_x, video_dim_t size_y) {
 	struct video_lock dst_lock;
-	struct video_buffer *dst_buffer = self->vb_dst->vx_buffer;
+	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
 	TRACE_START("noblend_samefmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -859,7 +859,7 @@ libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self,
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	if likely(dst_buffer->wlock(dst_lock) == 0) {
 		struct video_lock src_lock;
-		struct video_buffer *src_buffer = self->vb_src->vx_buffer;
+		struct video_buffer *src_buffer = self->vbt_src->vx_buffer;
 		if likely(src_buffer->rlock(src_lock) == 0) {
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
@@ -877,24 +877,24 @@ libvideo_gfx_noblend_samefmt__blit(struct video_blit const *__restrict self,
 		dst_buffer->unlock(dst_lock);
 	}
 	/* Use pixel-based rendering */
-	libvideo_gfx_noblend_samefmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	libvideo_blitter_noblend_samefmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 done:
 	TRACE_END("noblend_samefmt__blit()\n");
 }
 
-static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blit *)0)->_vb_driver),
+static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)0)->_vbt_driver),
               "This relation is required because `libvideo_gfx_generic__*' require driver-"
               "specific data to be set-up as a pixel format converter");
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self,
-                                   video_coord_t dst_x, video_coord_t dst_y,
-                                   video_coord_t src_x, video_coord_t src_y,
-                                   video_dim_t size_x, video_dim_t size_y) {
+libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict self,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_coord_t src_x, video_coord_t src_y,
+                                       video_dim_t size_x, video_dim_t size_y) {
 	video_dim_t x, y;
-	struct video_gfx const *src = self->vb_src;
-	struct video_gfx const *dst = self->vb_dst;
-	struct video_converter *conv = libvideo_blit_generic__conv(self);
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_converter *conv = libvideo_blitter_generic__conv(self);
 	TRACE_START("noblend_difffmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -913,152 +913,6 @@ libvideo_gfx_noblend_difffmt__blit(struct video_blit const *__restrict self,
 	TRACE_END("noblend_difffmt__blit()\n");
 }
 
-INTERN ATTR_IN(1) ATTR_IN(8) void CC
-libvideo_gfx_noblend_samefmt__bitblit(struct video_blit const *__restrict self,
-                                      video_coord_t dst_x, video_coord_t dst_y,
-                                      video_coord_t src_x, video_coord_t src_y,
-                                      video_dim_t size_x, video_dim_t size_y,
-                                      struct video_bitmask const *__restrict bm) {
-	struct video_lock dst_lock;
-	struct video_buffer *dst_buffer = self->vb_dst->vx_buffer;
-	if likely(dst_buffer->wlock(dst_lock) == 0) {
-		struct video_lock src_lock;
-		struct video_buffer *src_buffer = self->vb_src->vx_buffer;
-		if likely(src_buffer->rlock(src_lock) == 0) {
-			uintptr_t bitskip = bm->vbm_skip + src_x + src_y * bm->vbm_scan;
-			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
-			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
-			byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
-			void (LIBVIDEO_CODEC_CC *vc_rectcopy)(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
-			                                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
-			                                      video_dim_t size_x, video_dim_t size_y);
-			TRACE_START("noblend_samefmt__bitblit("
-			            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-			            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-			            "dim: {%" PRIuDIM "x%" PRIuDIM "}, bm: %p+%" PRIuPTR "\n",
-			            dst_x, dst_y, src_x, src_y, size_x, size_y,
-			            bm->vbm_mask, bm->vbm_skip);
-			bitmask += bitskip / NBBY;
-			bitskip = bitskip % NBBY;
-			vc_rectcopy = dst_buffer->vb_format.vf_codec->vc_rectcopy;
-#ifndef __OPTIMIZE_SIZE__
-			if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
-				size_t bm_scanline = bm->vbm_scan >> 3;
-				switch (size_x) {
-#define DO_FIXED_WORD_RENDER(N)                                        \
-					do {                                               \
-						video_dim_t x = 0;                             \
-						uint##N##_t word = UNALIGNED_GET##N(bitmask);  \
-						while (word) {                                 \
-							shift_t bits;                              \
-							bits = CLZ((uint##N##_t)word);             \
-							x += bits;                                 \
-							word <<= bits;                             \
-							bits = CLZ((uint##N##_t)~word);            \
-							gfx_assert(bits > 0);                      \
-							(*vc_rectcopy)(dst_line, dst_x + x, 0,     \
-							               src_line, src_x + x, 0,     \
-							               bits, 1);                   \
-							x += bits;                                 \
-							word <<= bits;                             \
-						}                                              \
-						dst_line += dst_lock.vl_stride;                \
-						src_line += src_lock.vl_stride;                \
-						bitmask += bm_scanline;                        \
-					} while (--size_y)
-				case 0 ... 8:
-					DO_FIXED_WORD_RENDER(8);
-					goto done;
-				case 9 ... 16:
-					DO_FIXED_WORD_RENDER(16);
-					goto done;
-				case 17 ... 32:
-					DO_FIXED_WORD_RENDER(32);
-					goto done;
-#if __SIZEOF_REGISTER__ >= 8
-				case 33 ... 64:
-					DO_FIXED_WORD_RENDER(64);
-					goto done;
-#endif /* __SIZEOF_REGISTER__ >= 8 */
-				default: break;
-#undef DO_FIXED_WORD_RENDER
-				}
-			}
-#endif /* !__OPTIMIZE_SIZE__ */
-			do {
-				video_dim_t x;
-				uintptr_t row_bitskip;
-				byte_t const *row;
-				x = 0;
-				row_bitskip = bitskip;
-				row = bitmask;
-				do {
-					video_dim_t count;
-					byte_t byte;
-					shift_t bits;
-					if (row_bitskip >= NBBY) {
-						row += row_bitskip / NBBY;
-						row_bitskip %= NBBY;
-					}
-					byte = *row;
-					bits = NBBY - row_bitskip;
-
-					/* Skip over 0-bits */
-					for (;;) {
-						--bits;
-						++row_bitskip;
-						if (byte & ((byte_t)1 << bits))
-							break;
-						++x;
-						if (x >= size_x)
-							goto next_row;
-						if (!bits) {
-							byte = *++row;
-							row_bitskip = 0;
-							bits = NBBY;
-						}
-					}
-
-					/* Count consecutive 1-bits */
-					count = 1;
-					while ((x + count) < size_x) {
-						if (!bits) {
-							byte = *++row;
-							row_bitskip = 0;
-							bits = NBBY;
-						}
-						--bits;
-						if (!(byte & ((byte_t)1 << bits)))
-							break;
-						++row_bitskip;
-						++count;
-					}
-					(*vc_rectcopy)(dst_line, dst_x + x, 0,
-					               src_line, src_x + x, 0,
-					               count, 1);
-					x += count;
-				} while (x < size_x);
-next_row:
-				bitskip += bm->vbm_scan;
-				bitmask += bitskip / NBBY;
-				bitskip = bitskip % NBBY;
-				dst_line += dst_lock.vl_stride;
-				src_line += src_lock.vl_stride;
-			} while (--size_y);
-			src_buffer->unlock(src_lock);
-			dst_buffer->unlock(dst_lock);
-#ifndef __OPTIMIZE_SIZE__
-done:
-#endif /* !__OPTIMIZE_SIZE__ */
-			TRACE_END("noblend_samefmt__bitblit()\n");
-			return;
-		}
-		dst_buffer->unlock(dst_lock);
-	}
-	libvideo_gfx_generic__bitblit(self, dst_x, dst_y, src_x, src_y,
-	                              size_x, size_y, bm);
-}
-
 
 
 INTERN ATTR_IN(1) ATTR_IN(9) void CC
@@ -1074,51 +928,27 @@ libvideo_gfx_noblend__bitstretchfill_n(struct video_gfx const *__restrict self,
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_noblend_samefmt__stretch_n(struct video_blit const *__restrict self,
-                                        video_coord_t dst_x, video_coord_t dst_y,
-                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                        video_coord_t src_x, video_coord_t src_y,
-                                        video_dim_t src_size_x, video_dim_t src_size_y) {
+libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restrict self,
+                                            video_coord_t dst_x, video_coord_t dst_y,
+                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                            video_coord_t src_x, video_coord_t src_y,
+                                            video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* TODO */
-	libvideo_gfx_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                src_x, src_y, src_size_x, src_size_y);
+	libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                    src_x, src_y, src_size_x, src_size_y);
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_noblend_difffmt__stretch_n(struct video_blit const *__restrict self,
-                                        video_coord_t dst_x, video_coord_t dst_y,
-                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                        video_coord_t src_x, video_coord_t src_y,
-                                        video_dim_t src_size_x, video_dim_t src_size_y) {
+libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restrict self,
+                                            video_coord_t dst_x, video_coord_t dst_y,
+                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                            video_coord_t src_x, video_coord_t src_y,
+                                            video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* TODO */
-	libvideo_gfx_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                src_x, src_y, src_size_x, src_size_y);
-}
-
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
-libvideo_gfx_noblend_samefmt__bitstretch_n(struct video_blit const *__restrict self,
-                                           video_coord_t dst_x, video_coord_t dst_y,
-                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                           video_coord_t src_x, video_coord_t src_y,
-                                           video_dim_t src_size_x, video_dim_t src_size_y,
-                                           struct video_bitmask const *__restrict bm) {
-	/* TODO */
-	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                   src_x, src_y, src_size_x, src_size_y, bm);
-}
-
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
-libvideo_gfx_noblend_difffmt__bitstretch_n(struct video_blit const *__restrict self,
-                                           video_coord_t dst_x, video_coord_t dst_y,
-                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                           video_coord_t src_x, video_coord_t src_y,
-                                           video_dim_t src_size_x, video_dim_t src_size_y,
-                                           struct video_bitmask const *__restrict bm) {
-	/* TODO */
-	libvideo_gfx_generic__bitstretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                   src_x, src_y, src_size_x, src_size_y, bm);
+	libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                    src_x, src_y, src_size_x, src_size_y);
 }
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_NOBLEND_C_INL */
+#endif /* !GUARD_LIBVIDEO_GFX_GFX_LL_NOBLEND_C_INL */
