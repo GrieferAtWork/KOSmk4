@@ -94,7 +94,7 @@ do_dump_buffer_specs(struct video_buffer *buf,
 		video_gfx_rect(io->vfp_gfx, io->vfp_curx, io->vfp_cury,
 		               rows_width + cells_padding * 2,
 		               rows_height + cells_padding * 2,
-		               io->vfp_color);
+		               io->vfp_bg_fg_colors[1]);
 		io->vfp_cury += cells_padding;
 		for (pal_y = 0; pal_y < rows; ++pal_y) {
 			for (pal_x = 0; pal_x < cells_per_row; ++pal_x) {
@@ -135,7 +135,7 @@ dump_buffer_specs(struct video_buffer *buf,
 	video_gfx_rect(io->vfp_gfx, start_x, start_y,
 	               io->vfp_lnend - io->vfp_lnstart,
 	               io->vfp_cury - start_y,
-	               io->vfp_color);
+	               io->vfp_bg_fg_colors[1]);
 	io->vfp_cury += padding;
 }
 
@@ -327,21 +327,19 @@ do_showpic(struct screen_buffer *screen,
 		fd.vfp_lnend   = video_gfx_getclipw(&screen_gfx) / 5;
 		if (fd.vfp_lnend < 150)
 			fd.vfp_lnend = 150;
-		fd.vfp_color = VIDEO_COLOR_WHITE;
-		video_gfx_fill(&screen_gfx, 0, 0,
-		               blit_x < (video_dim_t)fd.vfp_lnend ? blit_x : (video_dim_t)fd.vfp_lnend,
-		               VIDEO_DIM_MAX, VIDEO_COLOR_BLACK);
+		fd.vfp_bg_fg_colors[0] = VIDEO_COLOR_BLACK;
+		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_WHITE;
 
 		mbstate_init(&fd.vfp_u8word);
 #define gfx_printf(...) format_printf(&video_fontprinter, &fd, __VA_ARGS__)
 		gfx_printf("Color test: ");
-		fd.vfp_color = VIDEO_COLOR_RGB(0xff, 0, 0);
+		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_RGB(0xff, 0, 0);
 		gfx_printf("R");
-		fd.vfp_color = VIDEO_COLOR_RGB(0, 0xff, 0);
+		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_RGB(0, 0xff, 0);
 		gfx_printf("G");
-		fd.vfp_color = VIDEO_COLOR_RGB(0, 0, 0xff);
+		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_RGB(0, 0, 0xff);
 		gfx_printf("B");
-		fd.vfp_color = VIDEO_COLOR_WHITE;
+		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_WHITE;
 		gfx_printf("\n");
 
 		gfx_printf("%s#%u\n", filename, (unsigned int)frameinfo->vafi_frameid);

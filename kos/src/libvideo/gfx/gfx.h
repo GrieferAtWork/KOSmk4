@@ -53,7 +53,7 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 0
+#if 1
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
@@ -123,10 +123,10 @@
 	(*(self)->_vx_xops.vgfx_absline_v)(self, x, y, length, color)
 #define _video_gfx_x_absfill(self, x, y, size_x, size_y, color) \
 	(*(self)->_vx_xops.vgfx_absfill)(self, x, y, size_x, size_y, color)
-#define _video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, color, bm) \
-	(*(self)->_vx_xops.vgfx_absfillmask)(self, dst_x, dst_y, size_x, size_y, color, bm)
-#define _video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm) \
-	(*(self)->_vx_xops.vgfx_absfillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm)
+#define _video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
+	(*(self)->_vx_xops.vgfx_absfillmask)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm)
+#define _video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
+	(*(self)->_vx_xops.vgfx_absfillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm)
 #define _video_gfx_x_absgradient(self, x, y, size_x, size_y, colors) \
 	(*(self)->_vx_xops.vgfx_absgradient)(self, x, y, size_x, size_y, colors)
 #define _video_gfx_x_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor) \
@@ -165,15 +165,15 @@
 #define video_gfx_x_absfill(self, x, y, size_x, size_y, color) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),     \
 	 _video_gfx_x_absfill(self, x, y, size_x, size_y, color))
-#define video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, color, bm) \
-	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, size_x, size_y),             \
-	 _video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, color, bm))
-#define video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm) \
-	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, dst_size_x, dst_size_y),                                            \
-	 gfx_assert(src_size_x), gfx_assert(src_size_y),                                                                  \
-	 gfx_assertf((dst_size_x) != (src_size_x) || (dst_size_y) != (src_size_y),                                        \
-	             "dst/src size identical: {%" PRIuDIM "x%" PRIuDIM "}", dst_size_x, dst_size_y),                      \
-	 _video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, color, src_size_x, src_size_y, bm))
+#define video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
+	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, size_x, size_y),                          \
+	 _video_gfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm))
+#define video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
+	(gfx_assert_absbounds_sxy(self, dst_x, dst_y, dst_size_x, dst_size_y),                                                         \
+	 gfx_assert(src_size_x), gfx_assert(src_size_y),                                                                               \
+	 gfx_assertf((dst_size_x) != (src_size_x) || (dst_size_y) != (src_size_y),                                                     \
+	             "dst/src size identical: {%" PRIuDIM "x%" PRIuDIM "}", dst_size_x, dst_size_y),                                   \
+	 _video_gfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm))
 #define video_gfx_x_absgradient(self, x, y, size_x, size_y, colors) \
 	(gfx_assert_absbounds_sxy(self, x, y, size_x, size_y),          \
 	 _video_gfx_x_absgradient(self, x, y, size_x, size_y, colors))
@@ -238,9 +238,10 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absfill(struct video_gfx const *
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic__absgradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absgradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absgradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic__fillmask1(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm, __REGISTER_TYPE__ bm_xor);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitfrom_l(struct video_blitter *__restrict ctx);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitfrom_n(struct video_blitter *__restrict ctx);
 
@@ -263,8 +264,9 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend__absfill(struct video_gfx const *
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_noblend__fillmask1(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm, __REGISTER_TYPE__ bm_xor);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 #define libvideo_blitter_noblend_samefmt__stretch_l libvideo_blitter_generic__stretch_l
@@ -299,10 +301,10 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient(struct video_gfx const 
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t color, video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap(void);

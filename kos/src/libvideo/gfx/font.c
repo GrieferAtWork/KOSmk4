@@ -211,12 +211,11 @@ again_do_render:
 		}
 
 		/* Can just render text without worrying about anything! */
-		result = self->vfp_font->drawglyph(self->vfp_gfx,
-		                                   self->vfp_curx,
-		                                   self->vfp_cury,
-		                                   self->vfp_height,
-		                                   ch,
-		                                   self->vfp_color);
+		result = self->vfp_font->drawglyph2(self->vfp_gfx,
+		                                    self->vfp_curx,
+		                                    self->vfp_cury,
+		                                    self->vfp_height, ch,
+		                                    self->vfp_bg_fg_colors);
 		if (!result && self->vfp_height != 0) {
 			/* Try a bunch of substitution characters */
 			switch (ch) {
@@ -231,6 +230,25 @@ again_do_render:
 	}
 	return result;
 }
+
+
+
+
+/* Generic implementation for `vfo_drawglyph' that calls `vfo_drawglyph2' */
+INTERN ATTR_IN(1) ATTR_IN(2) video_dim_t CC
+libvideo_font__drawglyph__with__drawglyph2(struct video_font const *__restrict self,
+                                           struct video_gfx const *__restrict gfx,
+                                           video_offset_t x, video_offset_t y,
+                                           video_dim_t height, char32_t ord,
+                                           video_color_t color) {
+	video_color_t bg_fg_colors[2];
+	bg_fg_colors[0] = color & ~VIDEO_COLOR_ALPHA_MASK;
+	bg_fg_colors[1] = color;
+	return (*self->vf_ops->vfo_drawglyph2)(self, gfx, x, y, height, ord, bg_fg_colors);
+}
+
+
+
 
 DEFINE_PUBLIC_ALIAS(video_font_lookup, libvideo_font_lookup);
 DEFINE_PUBLIC_ALIAS(video_fontprinter, libvideo_fontprinter);

@@ -60,6 +60,16 @@ libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
                      char32_t ch);
 
 
+
+
+/* Generic implementation for `vfo_drawglyph' that calls `vfo_drawglyph2' */
+INTDEF ATTR_IN(1) ATTR_IN(2) video_dim_t CC
+libvideo_font__drawglyph__with__drawglyph2(struct video_font const *__restrict self,
+                                           struct video_gfx const *__restrict gfx,
+                                           video_offset_t x, video_offset_t y,
+                                           video_dim_t height, char32_t ord,
+                                           video_color_t color);
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_FONT_H */

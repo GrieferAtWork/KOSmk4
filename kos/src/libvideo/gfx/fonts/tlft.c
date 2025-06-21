@@ -44,6 +44,7 @@
 #include <libvideo/gfx/gfx.h>
 
 /**/
+#include "../font.h"
 #include "tlft.h"
 
 DECL_BEGIN
@@ -98,12 +99,12 @@ libvideo_tlft_glyphsize(struct video_font const *__restrict self,
 
 /* Draw a single glyph at the given coords and return its width.
  * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-PRIVATE ATTR_IN(1) ATTR_IN(2) video_dim_t CC
-libvideo_tlft_drawglyph(struct video_font const *__restrict self,
-                        struct video_gfx const *__restrict gfx,
-                        video_offset_t x, video_offset_t y,
-                        video_dim_t height, char32_t ord,
-                        video_color_t color) {
+PRIVATE ATTR_IN(1) ATTR_IN(2) ATTR_IN(7) video_dim_t CC
+libvideo_tlft_drawglyph2(struct video_font const *__restrict self,
+                         struct video_gfx const *__restrict gfx,
+                         video_offset_t x, video_offset_t y,
+                         video_dim_t height, char32_t ord,
+                         video_color_t const bg_fg_colors[2]) {
 	void *bm;
 	struct video_bitmask bitmask;
 	video_dim_t result;
@@ -120,13 +121,13 @@ libvideo_tlft_drawglyph(struct video_font const *__restrict self,
 		/* Can just directly blit the glyph */
 		result = me->tf_hdr->h_chwidth;
 		bitmask.vbm_scan = result;
-		video_gfx_absfillmask(/* self:    */ gfx,
-		                      /* x:       */ x,
-		                      /* y:       */ y,
-		                      /* size_x:  */ result,
-		                      /* size_y:  */ height,
-		                      /* color:   */ color,
-		                      /* bitmask: */ &bitmask);
+		video_gfx_absfillmask(/* self:         */ gfx,
+		                      /* x:            */ x,
+		                      /* y:            */ y,
+		                      /* size_x:       */ result,
+		                      /* size_y:       */ height,
+		                      /* bg_fg_colors: */ bg_fg_colors,
+		                      /* bitmask:      */ &bitmask);
 	} else {
 		/* Must stretch the glyph somehow... */
 		result = ((height * me->tf_hdr->h_chwidth) +
@@ -135,15 +136,15 @@ libvideo_tlft_drawglyph(struct video_font const *__restrict self,
 		if unlikely(!result)
 			result = 1;
 		bitmask.vbm_scan = me->tf_hdr->h_chwidth;
-		video_gfx_absfillstretchmask(/* self:       */ gfx,
-		                             /* dst_x:      */ x,
-		                             /* dst_y:      */ y,
-		                             /* dst_size_x: */ result,
-		                             /* dst_size_y: */ height,
-		                             /* color:      */ color,
-		                             /* src_size_x: */ me->tf_hdr->h_chwidth,
-		                             /* src_size_y: */ me->tf_bestheight,
-		                             /* bitmask:    */ &bitmask);
+		video_gfx_absfillstretchmask(/* self:         */ gfx,
+		                             /* dst_x:        */ x,
+		                             /* dst_y:        */ y,
+		                             /* dst_size_x:   */ result,
+		                             /* dst_size_y:   */ height,
+		                             /* bg_fg_colors: */ bg_fg_colors,
+		                             /* src_size_x:   */ me->tf_hdr->h_chwidth,
+		                             /* src_size_y:   */ me->tf_bestheight,
+		                             /* bitmask:      */ &bitmask);
 	}
 	return result;
 unknown:
@@ -158,8 +159,9 @@ unknown:
 PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
 INTERN ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void) {
 	if unlikely(!libvideo_tlft_ops.vfo_destroy) {
-		libvideo_tlft_ops.vfo_drawglyph = &libvideo_tlft_drawglyph;
-		libvideo_tlft_ops.vfo_glyphsize = &libvideo_tlft_glyphsize;
+		libvideo_tlft_ops.vfo_drawglyph  = &libvideo_font__drawglyph__with__drawglyph2;
+		libvideo_tlft_ops.vfo_drawglyph2 = &libvideo_tlft_drawglyph2;
+		libvideo_tlft_ops.vfo_glyphsize  = &libvideo_tlft_glyphsize;
 		COMPILER_WRITE_BARRIER();
 		libvideo_tlft_ops.vfo_destroy = &libvideo_tlft_destroy;
 		COMPILER_WRITE_BARRIER();

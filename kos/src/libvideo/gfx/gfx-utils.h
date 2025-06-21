@@ -78,13 +78,25 @@ wrap(video_offset_t offset, video_dim_t dim) {
 /* Check if `color' must be blended (false), or blending is optional (true),
  * such that behavior would be  the same when `GFX_BLENDMODE_OVERRIDE'  were
  * to be used. */
-LOCAL ATTR_PURE WUNUSED ATTR_IN(1) bool CC
+LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_INOUT(2) bool CC
 libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
                            video_color_t *__restrict p_color) {
 	gfx_blendmode_t mode = self->vx_blend;
 	/* TODO: Do this dynamically for all blending modes */
 	if (mode == GFX_BLENDMODE_ALPHA)
 		return VIDEO_COLOR_ISOPAQUE(*p_color);
+	return false;
+}
+
+/* Check if  trying to  blend  `color' is  a  no-op.
+ * (e.g. for ALPHA-blending, "color" is transparent) */
+LOCAL ATTR_PURE WUNUSED ATTR_IN(1) bool CC
+libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
+                          video_color_t color) {
+	gfx_blendmode_t mode = self->vx_blend;
+	/* TODO: Do this dynamically for all blending modes */
+	if (mode == GFX_BLENDMODE_ALPHA)
+		return VIDEO_COLOR_ISTRANSPARENT(color);
 	return false;
 }
 
@@ -373,9 +385,21 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 
 
 
-LOCAL ATTR_PURE WUNUSED channel_t
+/* Returns 0 or 1 */
+LOCAL ATTR_PURE WUNUSED byte_t
 bitmask2d_getbit(byte_t const *__restrict bitmask, size_t bitscan,
                  video_coord_t x, video_coord_t y) {
+	uintptr_t bitno = (uintptr_t)x + y * bitscan;
+	byte_t byte;
+	byte  = bitmask[bitno / NBBY];
+	bitno = bitno % NBBY;
+	return (byte >> ((NBBY - 1) - bitno)) & 1;
+}
+
+/* Returns 0 or 255 */
+LOCAL ATTR_PURE WUNUSED channel_t
+bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
+                         video_coord_t x, video_coord_t y) {
 	uintptr_t bitno = (uintptr_t)x + y * bitscan;
 	byte_t byte;
 	byte  = bitmask[bitno / NBBY];

@@ -101,10 +101,12 @@ int main(int argc, char *argv[]) {
 	               VIDEO_GFX_FWRXWRAP |
 	               VIDEO_GFX_FWRYWRAP);
 
-	fontprinter_data.vfp_height  = 16;
-	fontprinter_data.vfp_font    = font;
-	fontprinter_data.vfp_lnstart = 0;
-	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
+	fontprinter_data.vfp_height          = 16;
+	fontprinter_data.vfp_font            = font;
+	fontprinter_data.vfp_lnstart         = 0;
+//	fontprinter_data.vfp_bg_fg_colors[0] = VIDEO_COLOR_BLACK & ~VIDEO_COLOR_ALPHA_MASK;
+	fontprinter_data.vfp_bg_fg_colors[0] = VIDEO_COLOR_WHITE;
+	fontprinter_data.vfp_bg_fg_colors[1] = VIDEO_COLOR_BLACK;
 	mbstate_init(&fontprinter_data.vfp_u8word);
 
 	int render_mode = 0;

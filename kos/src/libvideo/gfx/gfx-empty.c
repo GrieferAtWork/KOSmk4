@@ -95,20 +95,20 @@ libvideo_gfx_empty_fill(struct video_gfx const *__restrict UNUSED(self),
 	COMPILER_IMPURE();
 }
 
-INTERN ATTR_IN(1) ATTR_IN(7) void CC
+INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
 libvideo_gfx_empty_fillmask(struct video_gfx const *__restrict UNUSED(self),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                           video_color_t UNUSED(color),
+                           video_color_t const UNUSED2(bg_fg_colors, [2]),
                            struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
-INTERN ATTR_IN(1) ATTR_IN(9) void CC
+INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
 libvideo_gfx_empty_fillstretchmask(struct video_gfx const *__restrict UNUSED(self),
                                    video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                                    video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                                   video_color_t UNUSED(color),
+                                   video_color_t const UNUSED2(bg_fg_colors, [2]),
                                    video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y),
                                    struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();

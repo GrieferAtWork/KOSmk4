@@ -662,10 +662,183 @@ libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restric
 
 
 PRIVATE ATTR_IN(1) ATTR_IN(7) void CC
+libvideo_gfx_noblend__fillmask1__bypixel(struct video_gfx const *__restrict self,
+                                         video_coord_t dst_x, video_coord_t dst_y,
+                                         video_dim_t size_x, video_dim_t size_y,
+                                         video_pixel_t pixel,
+                                         struct video_bitmask const *__restrict bm,
+                                         __REGISTER_TYPE__ bm_xor) {
+	uintptr_t bitskip = bm->vbm_skip;
+	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
+	bitmask += bitskip / NBBY;
+	bitskip = bitskip % NBBY;
+	do {
+		video_dim_t x;
+		uintptr_t row_bitskip;
+		byte_t const *row;
+		byte_t byte;
+		shift_t bits;
+		row_bitskip = bitskip;
+		row = bitmask;
+		byte = (*row) ^ (byte_t)bm_xor;
+		bits = NBBY - row_bitskip;
+		for (x = 0;;) {
+			--bits;
+			++row_bitskip;
+			if ((byte >> bits) & 1)
+				video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
+			++x;
+			if (x >= size_x)
+				break;
+			if (!bits) {
+				byte = (*++row) ^ (byte_t)bm_xor;
+				row_bitskip = 0;
+				bits = NBBY;
+			}
+		}
+		bitskip += bm->vbm_scan;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
+		++dst_y;
+	} while (--size_y);
+}
+
+INTERN ATTR_IN(1) ATTR_IN(7) void CC
+libvideo_gfx_noblend__fillmask1(struct video_gfx const *__restrict self,
+                                video_coord_t dst_x, video_coord_t dst_y,
+                                video_dim_t size_x, video_dim_t size_y,
+                                video_color_t color,
+                                struct video_bitmask const *__restrict bm,
+                                __REGISTER_TYPE__ bm_xor) {
+	struct video_lock lock;
+	struct video_buffer *buffer = self->vx_buffer;
+	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
+	TRACE_START("noblend__fillmask1("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ", "
+	            "bm_xor: %#" PRIxN(__SIZEOF_REGISTER__) ")\n",
+	            dst_x, dst_y, size_x, size_y, color,
+	            bm->vbm_mask, bm->vbm_skip, bm_xor);
+	if likely(buffer->wlock(lock) == 0) {
+		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
+		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
+		                                      video_pixel_t pixel, video_dim_t num_pixels);
+		uintptr_t bitskip = bm->vbm_skip;
+		byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
+		bitmask += bitskip / NBBY;
+		bitskip = bitskip % NBBY;
+		vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
+		gfx_assert(size_x > 0);
+		gfx_assert(size_y > 0);
+#ifndef __OPTIMIZE_SIZE__
+		if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
+			size_t bm_scanline = bm->vbm_scan >> 3;
+			switch (size_x) {
+#define DO_FIXED_WORD_RENDER(N)                                    \
+				do {                                               \
+					video_dim_t x = dst_x;                         \
+					uint##N##_t word = UNALIGNED_GET##N(bitmask) ^ \
+					                   (uint##N##_t)bm_xor;        \
+					while (word) {                                 \
+						shift_t bits;                              \
+						bits = CLZ((uint##N##_t)word);             \
+						x += bits;                                 \
+						word <<= bits;                             \
+						bits = CLZ((uint##N##_t)~word);            \
+						gfx_assert(bits > 0);                      \
+						(*vc_linefill)(line, x, pixel, bits);      \
+						x += bits;                                 \
+						word <<= bits;                             \
+					}                                              \
+					line += lock.vl_stride;                        \
+					bitmask += bm_scanline;                        \
+				} while (--size_y)
+			case 0 ... 8:
+				DO_FIXED_WORD_RENDER(8);
+				goto done;
+			case 9 ... 16:
+				DO_FIXED_WORD_RENDER(16);
+				goto done;
+			case 17 ... 32:
+				DO_FIXED_WORD_RENDER(32);
+				goto done;
+#if __SIZEOF_REGISTER__ >= 8
+			case 33 ... 64:
+				DO_FIXED_WORD_RENDER(64);
+				goto done;
+#endif /* __SIZEOF_REGISTER__ >= 8 */
+			default: break;
+#undef DO_FIXED_WORD_RENDER
+			}
+		}
+#endif /* !__OPTIMIZE_SIZE__ */
+		do {
+			video_dim_t x;
+			uintptr_t row_bitskip;
+			byte_t const *row;
+			x = 0;
+			row_bitskip = bitskip;
+			row = bitmask;
+			do {
+				video_dim_t count;
+				byte_t byte = (*row) ^ (byte_t)bm_xor;
+				shift_t bits = NBBY - row_bitskip;
+
+				/* Skip over 0-bits */
+				for (;;) {
+					--bits;
+					++row_bitskip;
+					if (byte & ((byte_t)1 << bits))
+						break;
+					++x;
+					if (x >= size_x)
+						goto next_row;
+					if (!bits) {
+						byte = (*++row) ^ (byte_t)bm_xor;
+						row_bitskip = 0;
+						bits = NBBY;
+					}
+				}
+
+				/* Count consecutive 1-bits */
+				count = 1;
+				while ((x + count) < size_x) {
+					if (!bits) {
+						byte = (*++row) ^ (byte_t)bm_xor;
+						row_bitskip = 0;
+						bits = NBBY;
+					}
+					--bits;
+					if (!(byte & ((byte_t)1 << bits)))
+						break;
+					++row_bitskip;
+					++count;
+				}
+				(*vc_linefill)(line, dst_x + x, pixel, count);
+				x += count;
+			} while (x < size_x);
+next_row:
+			bitskip += bm->vbm_scan;
+			line += lock.vl_stride;
+			bitmask += bitskip / NBBY;
+			bitskip = bitskip % NBBY;
+		} while (--size_y);
+		buffer->unlock(lock);
+		goto done;
+	}
+	/* Use pixel-based rendering */
+	libvideo_gfx_noblend__fillmask1__bypixel(self, dst_x, dst_y,
+	                                         size_x, size_y,
+	                                         pixel, bm, bm_xor);
+done:
+	TRACE_END("noblend__fillmask1()\n");
+}
+
+PRIVATE ATTR_IN(1) ATTR_IN(7) void CC
 libvideo_gfx_noblend__fillmask__bypixel(struct video_gfx const *__restrict self,
                                         video_coord_t dst_x, video_coord_t dst_y,
                                         video_dim_t size_x, video_dim_t size_y,
-                                        video_pixel_t pixel,
+                                        video_pixel_t const bg_fg_pixels[2],
                                         struct video_bitmask const *__restrict bm) {
 	uintptr_t bitskip = bm->vbm_skip;
 	byte_t const *bitmask = (byte_t const *)bm->vbm_mask;
@@ -684,8 +857,8 @@ libvideo_gfx_noblend__fillmask__bypixel(struct video_gfx const *__restrict self,
 		for (x = 0;;) {
 			--bits;
 			++row_bitskip;
-			if (byte & ((byte_t)1 << bits))
-				video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
+			video_gfx_x_setpixel(self, dst_x + x, dst_y,
+			                     bg_fg_pixels[(byte >> bits) & 1]);
 			++x;
 			if (x >= size_x)
 				break;
@@ -702,19 +875,21 @@ libvideo_gfx_noblend__fillmask__bypixel(struct video_gfx const *__restrict self,
 	} while (--size_y);
 }
 
-INTERN ATTR_IN(1) ATTR_IN(7) void CC
+INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
 libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
                                video_coord_t dst_x, video_coord_t dst_y,
                                video_dim_t size_x, video_dim_t size_y,
-                               video_color_t color,
+                               video_color_t const bg_fg_colors[2],
                                struct video_bitmask const *__restrict bm) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
+	video_pixel_t bg_fg_pixel[2];
+	bg_fg_pixel[0] = buffer->vb_format.color2pixel(bg_fg_colors[0]);
+	bg_fg_pixel[1] = buffer->vb_format.color2pixel(bg_fg_colors[1]);
 	TRACE_START("noblend__fillmask("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR "\n",
-	            dst_x, dst_y, size_x, size_y, color,
+	            "bg_fg_colors: {%#" PRIxCOL ", %#" PRIxCOL "}, bm: %p+%" PRIuPTR ")\n",
+	            dst_x, dst_y, size_x, size_y, bg_fg_colors[0], bg_fg_colors[1],
 	            bm->vbm_mask, bm->vbm_skip);
 	if likely(buffer->wlock(lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
@@ -730,24 +905,31 @@ libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
 #ifndef __OPTIMIZE_SIZE__
 		if likely(bitskip == 0 && !(bm->vbm_scan & 7)) {
 			size_t bm_scanline = bm->vbm_scan >> 3;
+			video_coord_t dst_endx = dst_x + size_x;
 			switch (size_x) {
-#define DO_FIXED_WORD_RENDER(N)                                   \
-				do {                                              \
-					video_dim_t x = dst_x;                        \
-					uint##N##_t word = UNALIGNED_GET##N(bitmask); \
-					while (word) {                                \
-						shift_t bits;                             \
-						bits = CLZ((uint##N##_t)word);            \
-						x += bits;                                \
-						word <<= bits;                            \
-						bits = CLZ((uint##N##_t)~word);           \
-						gfx_assert(bits > 0);                     \
-						(*vc_linefill)(line, x, pixel, bits);     \
-						x += bits;                                \
-						word <<= bits;                            \
-					}                                             \
-					line += lock.vl_stride;                       \
-					bitmask += bm_scanline;                       \
+				/* XXX: I feel like this can be done with less if-statements. */
+#define DO_FIXED_WORD_RENDER(N)                                                \
+				do {                                                           \
+					video_dim_t x = dst_x;                                     \
+					uint##N##_t word = UNALIGNED_GET##N(bitmask);              \
+					while (word) {                                             \
+						shift_t bits;                                          \
+						bits = CLZ((uint##N##_t)word);                         \
+						if (bits) {                                            \
+							(*vc_linefill)(line, x, bg_fg_pixel[0], bits);     \
+							x += bits;                                         \
+						}                                                      \
+						word <<= bits;                                         \
+						bits = CLZ((uint##N##_t)~word);                        \
+						gfx_assert(bits > 0);                                  \
+						(*vc_linefill)(line, x, bg_fg_pixel[1], bits);         \
+						x += bits;                                             \
+						word <<= bits;                                         \
+					}                                                          \
+					if (x < dst_endx)                                          \
+						(*vc_linefill)(line, x, bg_fg_pixel[0], dst_endx - x); \
+					line += lock.vl_stride;                                    \
+					bitmask += bm_scanline;                                    \
 				} while (--size_y)
 			case 0 ... 8:
 				DO_FIXED_WORD_RENDER(8);
@@ -780,20 +962,27 @@ libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
 				byte_t byte = *row;
 				shift_t bits = NBBY - row_bitskip;
 
-				/* Skip over 0-bits */
+				/* Count 0-bits */
+				count = 0;
 				for (;;) {
 					--bits;
 					++row_bitskip;
 					if (byte & ((byte_t)1 << bits))
 						break;
-					++x;
-					if (x >= size_x)
-						goto next_row;
+					++count;
+					if ((x + count) >= size_x)
+						break;
 					if (!bits) {
 						byte = *++row;
 						row_bitskip = 0;
 						bits = NBBY;
 					}
+				}
+				if (count) {
+					(*vc_linefill)(line, dst_x + x, bg_fg_pixel[0], count);
+					x += count;
+					if (x >= size_x)
+						break;
 				}
 
 				/* Count consecutive 1-bits */
@@ -810,10 +999,10 @@ libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
 					++row_bitskip;
 					++count;
 				}
-				(*vc_linefill)(line, dst_x + x, pixel, count);
+				(*vc_linefill)(line, dst_x + x, bg_fg_pixel[1], count);
 				x += count;
 			} while (x < size_x);
-next_row:
+/*next_row:*/
 			bitskip += bm->vbm_scan;
 			line += lock.vl_stride;
 			bitmask += bitskip / NBBY;
@@ -823,7 +1012,7 @@ next_row:
 		goto done;
 	}
 	/* Use pixel-based rendering */
-	libvideo_gfx_noblend__fillmask__bypixel(self, dst_x, dst_y, size_x, size_y, pixel, bm);
+	libvideo_gfx_noblend__fillmask__bypixel(self, dst_x, dst_y, size_x, size_y, bg_fg_pixel, bm);
 done:
 	TRACE_END("noblend__fillmask()\n");
 }
@@ -915,16 +1104,16 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 
 
 
-INTERN ATTR_IN(1) ATTR_IN(9) void CC
+INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
 libvideo_gfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self,
                                         video_coord_t dst_x, video_coord_t dst_y,
                                         video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                        video_color_t color,
+                                        video_color_t const bg_fg_colors[2],
                                         video_dim_t src_size_x, video_dim_t src_size_y,
                                         struct video_bitmask const *__restrict bm) {
 	/* TODO */
 	libvideo_gfx_generic__fillstretchmask_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                        color, src_size_x, src_size_y, bm);
+	                                        bg_fg_colors, src_size_x, src_size_y, bm);
 }
 
 INTERN ATTR_IN(1) void CC
