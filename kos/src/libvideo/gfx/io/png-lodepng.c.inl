@@ -231,11 +231,15 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 		/* Do a blit of "self" into "rgb_buffer" */
 		struct video_gfx dst_gfx;
 		struct video_gfx src_gfx;
-		struct video_blitter blit;
-		video_buffer_getgfx(rgb_buffer, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
-		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
-		video_gfx_blitfrom(&dst_gfx, &src_gfx, &blit);
-		video_blitter_blit(&blit, 0, 0, 0, 0, self->vb_xdim, self->vb_ydim);
+		video_buffer_getgfx(rgb_buffer, &dst_gfx,
+		                    GFX_BLENDMODE_OVERRIDE,
+		                    VIDEO_GFX_FNORMAL, 0);
+		video_buffer_getgfx(self, &src_gfx,
+		                    GFX_BLENDMODE_OVERRIDE,
+		                    VIDEO_GFX_FNORMAL, 0);
+		video_gfx_bitblit(&dst_gfx, 0, 0,
+		                  &src_gfx, 0, 0,
+		                  self->vb_xdim, self->vb_ydim);
 	}
 	return rgb_buffer;
 }

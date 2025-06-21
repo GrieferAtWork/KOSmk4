@@ -117,15 +117,15 @@ libvideo_gfx_empty_fillstretchmask(struct video_gfx const *__restrict UNUSED(sel
 #undef libvideo_gfx_empty_ops
 PRIVATE struct video_gfx_ops libvideo_gfx_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empty_ops(void) {
-	if unlikely(!libvideo_gfx_empty_ops.fxo_fillstretchmask) {
-		libvideo_gfx_empty_ops.fxo_line     = &libvideo_gfx_empty_line;
-		libvideo_gfx_empty_ops.fxo_hline    = &libvideo_gfx_empty_hline;
-		libvideo_gfx_empty_ops.fxo_vline    = &libvideo_gfx_empty_vline;
-		libvideo_gfx_empty_ops.fxo_fill     = &libvideo_gfx_empty_fill;
-		libvideo_gfx_empty_ops.fxo_rect     = &libvideo_gfx_empty_rect;
-		libvideo_gfx_empty_ops.fxo_fillmask = &libvideo_gfx_empty_fillmask;
+	if unlikely(!libvideo_gfx_empty_ops.vgfo_fillstretchmask) {
+		libvideo_gfx_empty_ops.vgfo_line     = &libvideo_gfx_empty_line;
+		libvideo_gfx_empty_ops.vgfo_hline    = &libvideo_gfx_empty_hline;
+		libvideo_gfx_empty_ops.vgfo_vline    = &libvideo_gfx_empty_vline;
+		libvideo_gfx_empty_ops.vgfo_fill     = &libvideo_gfx_empty_fill;
+		libvideo_gfx_empty_ops.vgfo_rect     = &libvideo_gfx_empty_rect;
+		libvideo_gfx_empty_ops.vgfo_fillmask = &libvideo_gfx_empty_fillmask;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_empty_ops.fxo_fillstretchmask = &libvideo_gfx_empty_fillstretchmask;
+		libvideo_gfx_empty_ops.vgfo_fillstretchmask = &libvideo_gfx_empty_fillstretchmask;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_empty_ops;
@@ -153,10 +153,10 @@ libvideo_blitter_empty_stretch(struct video_blitter const *__restrict UNUSED(sel
 #undef libvideo_blit_empty_ops
 PRIVATE struct video_blitter_ops libvideo_blit_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_empty_ops(void) {
-	if unlikely(!libvideo_blit_empty_ops.vbo_blit) {
-		libvideo_blit_empty_ops.vbo_stretch = &libvideo_blitter_empty_stretch;
+	if unlikely(!libvideo_blit_empty_ops.vbto_bitblit) {
+		libvideo_blit_empty_ops.vbto_stretch = &libvideo_blitter_empty_stretch;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_empty_ops.vbo_blit = &libvideo_blitter_empty_blit;
+		libvideo_blit_empty_ops.vbto_bitblit = &libvideo_blitter_empty_blit;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_blit_empty_ops;

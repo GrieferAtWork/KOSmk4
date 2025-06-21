@@ -109,7 +109,7 @@ static_assert(sizeof(struct video_gfx_xops) == (_VIDEO_GFX_XOPS__N_INTERNAL * si
 /************************************************************************/
 
 
-/* Low-level, Generic, always-valid GFX color functions (using only `vgxo_getpixel' + `vgxo_setpixel') */
+/* Low-level, Generic, always-valid GFX color functions (using only `vgfx_getpixel' + `vgfx_setpixel') */
 INTERN ATTR_IN(1) video_color_t CC
 libvideo_gfx_generic__getcolor_noblend(struct video_gfx const *__restrict self,
                                        video_coord_t x, video_coord_t y) {
@@ -537,7 +537,7 @@ INTERN ATTR_IN(1) ATTR_IN(6) void CC
 libvideo_gfx_generic__absgradient(struct video_gfx const *__restrict self,
                                   video_coord_t dst_x_, video_coord_t dst_y_,
                                   video_dim_t size_x_, video_dim_t size_y_,
-                                  video_color_t colors[2][2]) {
+                                  video_color_t const colors[2][2]) {
 	struct video_gfx noblend;
 	video_color_t noblend_colors[2][2];
 
@@ -1761,7 +1761,7 @@ INTERN ATTR_IN(1) void CC
 libvideo_gfx_generic_gradient(struct video_gfx const *__restrict self,
                               video_offset_t x, video_offset_t y,
                               video_dim_t size_x, video_dim_t size_y,
-                              video_color_t colors[2][2]) {
+                              video_color_t const colors[2][2]) {
 	video_coord_t temp;
 	video_color_t fixed_colors[2][2];
 	if unlikely(!size_x || !size_y)
@@ -1828,7 +1828,7 @@ INTERN ATTR_IN(1) void CC
 libvideo_gfx_generic_gradient_wrwrap(struct video_gfx const *__restrict self,
                                      video_offset_t x, video_offset_t y,
                                      video_dim_t size_x, video_dim_t size_y,
-                                     video_color_t colors[2][2]) {
+                                     video_color_t const colors[2][2]) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (self->vx_flags & VIDEO_GFX_FWRXWRAP) {
@@ -2371,77 +2371,77 @@ PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_rdwrap = {};
 PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_wrwrap = {};
 PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_rdwrwrap = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops(void) {
-	if unlikely(!libvideo_gfx_generic_ops.fxo_getcolor) {
-		libvideo_gfx_generic_ops.fxo_vgradient       = &libvideo_gfx_generic_vgradient;
-		libvideo_gfx_generic_ops.fxo_hgradient       = &libvideo_gfx_generic_hgradient;
-		libvideo_gfx_generic_ops.fxo_gradient        = &libvideo_gfx_generic_gradient;
-		libvideo_gfx_generic_ops.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
-		libvideo_gfx_generic_ops.fxo_fillmask        = &libvideo_gfx_generic_fillmask;
-		libvideo_gfx_generic_ops.fxo_rect            = &libvideo_gfx_generic_rect;
-		libvideo_gfx_generic_ops.fxo_fill            = &libvideo_gfx_generic_fill;
-		libvideo_gfx_generic_ops.fxo_vline           = &libvideo_gfx_generic_vline;
-		libvideo_gfx_generic_ops.fxo_hline           = &libvideo_gfx_generic_hline;
-		libvideo_gfx_generic_ops.fxo_line            = &libvideo_gfx_generic_line;
-		libvideo_gfx_generic_ops.fxo_putcolor        = &libvideo_gfx_generic_putcolor;
+	if unlikely(!libvideo_gfx_generic_ops.vgfo_getcolor) {
+		libvideo_gfx_generic_ops.vgfo_vgradient       = &libvideo_gfx_generic_vgradient;
+		libvideo_gfx_generic_ops.vgfo_hgradient       = &libvideo_gfx_generic_hgradient;
+		libvideo_gfx_generic_ops.vgfo_gradient        = &libvideo_gfx_generic_gradient;
+		libvideo_gfx_generic_ops.vgfo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
+		libvideo_gfx_generic_ops.vgfo_fillmask        = &libvideo_gfx_generic_fillmask;
+		libvideo_gfx_generic_ops.vgfo_rect            = &libvideo_gfx_generic_rect;
+		libvideo_gfx_generic_ops.vgfo_fill            = &libvideo_gfx_generic_fill;
+		libvideo_gfx_generic_ops.vgfo_vline           = &libvideo_gfx_generic_vline;
+		libvideo_gfx_generic_ops.vgfo_hline           = &libvideo_gfx_generic_hline;
+		libvideo_gfx_generic_ops.vgfo_line            = &libvideo_gfx_generic_line;
+		libvideo_gfx_generic_ops.vgfo_putcolor        = &libvideo_gfx_generic_putcolor;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_generic_ops.fxo_getcolor = &libvideo_gfx_generic_getcolor;
+		libvideo_gfx_generic_ops.vgfo_getcolor = &libvideo_gfx_generic_getcolor;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_generic_ops;
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap(void) {
-	if unlikely(!libvideo_gfx_generic_ops_rdwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_rdwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_gradient        = &libvideo_gfx_generic_gradient;
-		libvideo_gfx_generic_ops_rdwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
-		libvideo_gfx_generic_ops_rdwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask;
-		libvideo_gfx_generic_ops_rdwrap.fxo_rect            = &libvideo_gfx_generic_rect;
-		libvideo_gfx_generic_ops_rdwrap.fxo_fill            = &libvideo_gfx_generic_fill;
-		libvideo_gfx_generic_ops_rdwrap.fxo_vline           = &libvideo_gfx_generic_vline;
-		libvideo_gfx_generic_ops_rdwrap.fxo_hline           = &libvideo_gfx_generic_hline;
-		libvideo_gfx_generic_ops_rdwrap.fxo_line            = &libvideo_gfx_generic_line;
-		libvideo_gfx_generic_ops_rdwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor;
+	if unlikely(!libvideo_gfx_generic_ops_rdwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_rdwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_fillmask        = &libvideo_gfx_generic_fillmask;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_rect            = &libvideo_gfx_generic_rect;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_fill            = &libvideo_gfx_generic_fill;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_vline           = &libvideo_gfx_generic_vline;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_hline           = &libvideo_gfx_generic_hline;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_line            = &libvideo_gfx_generic_line;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_putcolor        = &libvideo_gfx_generic_putcolor;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_generic_ops_rdwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_generic_ops_rdwrap;
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap(void) {
-	if unlikely(!libvideo_gfx_generic_ops_wrwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_wrwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_rect            = &libvideo_gfx_generic_rect_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_fill            = &libvideo_gfx_generic_fill_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_vline           = &libvideo_gfx_generic_vline_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_hline           = &libvideo_gfx_generic_hline_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_line            = &libvideo_gfx_generic_line_wrwrap;
-		libvideo_gfx_generic_ops_wrwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
+	if unlikely(!libvideo_gfx_generic_ops_wrwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_wrwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_rect            = &libvideo_gfx_generic_rect_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_fill            = &libvideo_gfx_generic_fill_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_vline           = &libvideo_gfx_generic_vline_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_hline           = &libvideo_gfx_generic_hline_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_line            = &libvideo_gfx_generic_line_wrwrap;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_generic_ops_wrwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_getcolor = &libvideo_gfx_generic_getcolor;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_generic_ops_wrwrap;
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrwrap(void) {
-	if unlikely(!libvideo_gfx_generic_ops_rdwrwrap.fxo_getcolor) {
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_rect            = &libvideo_gfx_generic_rect_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_fill            = &libvideo_gfx_generic_fill_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_vline           = &libvideo_gfx_generic_vline_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_hline           = &libvideo_gfx_generic_hline_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_line            = &libvideo_gfx_generic_line_wrwrap;
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
+	if unlikely(!libvideo_gfx_generic_ops_rdwrwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_fillstretchmask = &libvideo_gfx_generic_fillstretchmask_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_fillmask        = &libvideo_gfx_generic_fillmask_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_rect            = &libvideo_gfx_generic_rect_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_fill            = &libvideo_gfx_generic_fill_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_vline           = &libvideo_gfx_generic_vline_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_hline           = &libvideo_gfx_generic_hline_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_line            = &libvideo_gfx_generic_line_wrwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_putcolor        = &libvideo_gfx_generic_putcolor_wrwrap;
 		COMPILER_WRITE_BARRIER();
-		libvideo_gfx_generic_ops_rdwrwrap.fxo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_getcolor = &libvideo_gfx_generic_getcolor_rdwrap;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_generic_ops_rdwrwrap;
@@ -2464,28 +2464,28 @@ PRIVATE struct video_blitter_ops libvideo_blit_generic_ops = {};
 PRIVATE struct video_blitter_ops libvideo_blit_generic_ops_rdwrap = {};
 PRIVATE struct video_blitter_ops libvideo_blit_generic_ops_wrap = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops(void) {
-	if unlikely(!libvideo_blit_generic_ops.vbo_blit) {
-		libvideo_blit_generic_ops.vbo_stretch = &libvideo_blitter_generic_stretch;
+	if unlikely(!libvideo_blit_generic_ops.vbto_bitblit) {
+		libvideo_blit_generic_ops.vbto_stretch = &libvideo_blitter_generic_stretch;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_generic_ops.vbo_blit = &libvideo_blitter_generic_blit;
+		libvideo_blit_generic_ops.vbto_bitblit = &libvideo_blitter_generic_blit;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_blit_generic_ops;
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdwrap(void) {
-	if unlikely(!libvideo_blit_generic_ops_rdwrap.vbo_blit) {
-		libvideo_blit_generic_ops_rdwrap.vbo_stretch = &libvideo_blitter_generic_stretch_rdwrap;
+	if unlikely(!libvideo_blit_generic_ops_rdwrap.vbto_bitblit) {
+		libvideo_blit_generic_ops_rdwrap.vbto_stretch = &libvideo_blitter_generic_stretch_rdwrap;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_generic_ops_rdwrap.vbo_blit = &libvideo_blitter_generic_blit_rdwrap;
+		libvideo_blit_generic_ops_rdwrap.vbto_bitblit = &libvideo_blitter_generic_blit_rdwrap;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_blit_generic_ops_rdwrap;
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_wrap(void) {
-	if unlikely(!libvideo_blit_generic_ops_wrap.vbo_blit) {
-		libvideo_blit_generic_ops_wrap.vbo_stretch = &libvideo_blitter_generic_stretch_wrap;
+	if unlikely(!libvideo_blit_generic_ops_wrap.vbto_bitblit) {
+		libvideo_blit_generic_ops_wrap.vbto_stretch = &libvideo_blitter_generic_stretch_wrap;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_generic_ops_wrap.vbo_blit = &libvideo_blitter_generic_blit_wrap;
+		libvideo_blit_generic_ops_wrap.vbto_bitblit = &libvideo_blitter_generic_blit_wrap;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_blit_generic_ops_wrap;

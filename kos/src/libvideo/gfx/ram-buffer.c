@@ -240,27 +240,27 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
-	self->_vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel;
-	self->_vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel;
+	self->_vx_xops.vgfx_getpixel = &libvideo_ramgfx__getpixel;
+	self->_vx_xops.vgfx_setpixel = &libvideo_ramgfx__setpixel;
 
 	/* Load optimized pixel accessors if applicable to the loaded format. */
 #ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
 	switch (me->vb_format.vf_codec->vc_specs.vcs_bpp) {
 	case 8:
-		self->_vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel8;
-		self->_vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel8;
+		self->_vx_xops.vgfx_setpixel = &libvideo_ramgfx__setpixel8;
+		self->_vx_xops.vgfx_getpixel = &libvideo_ramgfx__getpixel8;
 		break;
 	case 16:
-		self->_vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel16;
-		self->_vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel16;
+		self->_vx_xops.vgfx_setpixel = &libvideo_ramgfx__setpixel16;
+		self->_vx_xops.vgfx_getpixel = &libvideo_ramgfx__getpixel16;
 		break;
 	case 24:
-		self->_vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel24;
-		self->_vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel24;
+		self->_vx_xops.vgfx_setpixel = &libvideo_ramgfx__setpixel24;
+		self->_vx_xops.vgfx_getpixel = &libvideo_ramgfx__getpixel24;
 		break;
 	case 32:
-		self->_vx_xops.vgxo_setpixel = &libvideo_ramgfx__setpixel32;
-		self->_vx_xops.vgxo_getpixel = &libvideo_ramgfx__getpixel32;
+		self->_vx_xops.vgfx_setpixel = &libvideo_ramgfx__setpixel32;
+		self->_vx_xops.vgfx_getpixel = &libvideo_ramgfx__getpixel32;
 		break;
 	default: break;
 	}
@@ -271,11 +271,11 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 
 	/* Select how colors should be read. */
 	if (self->vx_flags & VIDEO_GFX_FBLUR) {
-		self->_vx_xops.vgxo_getcolor = &libvideo_gfx_generic__getcolor_blur;
+		self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_blur;
 	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
-		self->_vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_with_key;
+		self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_with_key;
 	} else {
-		self->_vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
+		self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_noblend;
 	}
 
 	/* Detect special blend modes. */
@@ -283,25 +283,25 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
 	switch (self->vx_blend) {
 	case GFX_BLENDMODE_OVERRIDE:
-		self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_noblend;
 		break;
 #define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                    \
 	case mode:                                                            \
-		self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_##name; \
+		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
 		break;
 	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 	default:
-		self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor;
+		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor;
 		break;
 	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
 	if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
-		if (self->_vx_xops.vgxo_getcolor == &libvideo_ramgfx__getcolor_noblend)
-			self->_vx_xops.vgxo_getcolor = self->_vx_xops.vgxo_getpixel;
-		if (self->_vx_xops.vgxo_putcolor == &libvideo_ramgfx__putcolor_noblend)
-			self->_vx_xops.vgxo_putcolor = self->_vx_xops.vgxo_setpixel;
+		if (self->_vx_xops.vgfx_getcolor == &libvideo_ramgfx__getcolor_noblend)
+			self->_vx_xops.vgfx_getcolor = self->_vx_xops.vgfx_getpixel;
+		if (self->_vx_xops.vgfx_putcolor == &libvideo_ramgfx__putcolor_noblend)
+			self->_vx_xops.vgfx_putcolor = self->_vx_xops.vgfx_setpixel;
 	}
 	/* ... */
 
@@ -319,10 +319,10 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
 	self->vx_colorkey = 0;
 	libvideo_gfx_generic_populate_noblend(self);
-	if (self->_vx_xops.vgxo_getcolor != self->_vx_xops.vgxo_getpixel)
-		self->_vx_xops.vgxo_getcolor = &libvideo_ramgfx__getcolor_noblend;
-	if (self->_vx_xops.vgxo_putcolor != self->_vx_xops.vgxo_setpixel)
-		self->_vx_xops.vgxo_putcolor = &libvideo_ramgfx__putcolor_noblend;
+	if (self->_vx_xops.vgfx_getcolor != self->_vx_xops.vgfx_getpixel)
+		self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_noblend;
+	if (self->_vx_xops.vgfx_putcolor != self->_vx_xops.vgfx_setpixel)
+		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_noblend;
 	return self;
 }
 

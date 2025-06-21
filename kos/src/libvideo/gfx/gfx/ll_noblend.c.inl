@@ -376,7 +376,7 @@ INTERN ATTR_IN(1) ATTR_IN(6) void CC
 libvideo_gfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict self,
                                              video_coord_t dst_x_, video_coord_t dst_y_,
                                              video_dim_t size_x_, video_dim_t size_y_,
-                                             video_color_t colors[2][2]) {
+                                             video_color_t const colors[2][2]) {
 	struct video_lock lock;
 	struct video_buffer *buffer;
 	video_color_t pixels[2][2];

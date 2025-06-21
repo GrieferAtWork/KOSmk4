@@ -118,18 +118,18 @@ struct video_blitter_xops {
 
 #define _VIDEO_BLIT_XOPS__N_INTERNAL 8
 #ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
-	void (*_vbxo_internal[_VIDEO_BLIT_XOPS__N_INTERNAL])(void);
+	void (*_vbtx_internal[_VIDEO_BLIT_XOPS__N_INTERNAL])(void);
 #else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
 	/* Blit the contents of another video buffer into this one.
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbxo_blit)(struct video_blitter const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbtx_blit)(struct video_blitter const *__restrict __self,
 	                             video_coord_t __dst_x, video_coord_t __dst_y,
 	                             video_coord_t __src_x, video_coord_t __src_y,
 	                             video_dim_t __size_x, video_dim_t __size_y);
 
-	/* Same as `vbxo_blit', but stretch the contents
+	/* Same as `vbtx_blit', but stretch the contents
 	 * @assume(__dst_size_x > 0);
 	 * @assume(__dst_size_y > 0);
 	 * @assume(__src_size_x > 0);
@@ -137,31 +137,31 @@ struct video_blitter_xops {
 	 * @assume(__dst_size_x != __src_size_x);
 	 * @assume(__dst_size_y != __src_size_y); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbxo_stretch)(struct video_blitter const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vbtx_stretch)(struct video_blitter const *__restrict __self,
 	                                video_coord_t __dst_x, video_coord_t __dst_y,
 	                                video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                video_coord_t __src_x, video_coord_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	void (*_vbxo_pad[6])(void);
+	void (*_vbtx_pad[6])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbo_blit)(struct video_blitter const *__restrict __self,
-	                            video_offset_t __dst_x, video_offset_t __dst_y,
-	                            video_offset_t __src_x, video_offset_t __src_y,
-	                            video_dim_t __size_x, video_dim_t __size_y);
+	(LIBVIDEO_GFX_CC *vbto_bitblit)(struct video_blitter const *__restrict __self,
+	                                video_offset_t __dst_x, video_offset_t __dst_y,
+	                                video_offset_t __src_x, video_offset_t __src_y,
+	                                video_dim_t __size_x, video_dim_t __size_y);
 
-	/* Same as `vbo_blit', but stretch the contents */
+	/* Same as `vbto_bitblit', but stretch the contents */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbo_stretch)(struct video_blitter const *__restrict __self,
-	                               video_offset_t __dst_x, video_offset_t __dst_y,
-	                               video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                               video_offset_t __src_x, video_offset_t __src_y,
-	                               video_dim_t __src_size_x, video_dim_t __src_size_y);
+	(LIBVIDEO_GFX_CC *vbto_stretch)(struct video_blitter const *__restrict __self,
+	                                video_offset_t __dst_x, video_offset_t __dst_y,
+	                                video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                video_offset_t __src_x, video_offset_t __src_y,
+	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
 	/* More driver-specific operators go here... */
 };
@@ -171,7 +171,7 @@ struct video_blitter_ops {
 struct video_gfx_xops {
 #define _VIDEO_GFX_XOPS__N_INTERNAL 15
 #ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
-	void (*_vbxo_internal[_VIDEO_GFX_XOPS__N_INTERNAL])(void);
+	void (*_vgfx_internal[_VIDEO_GFX_XOPS__N_INTERNAL])(void);
 #else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
 	/* All of the following callbacks are [1..1]
 	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
@@ -181,23 +181,23 @@ struct video_gfx_xops {
 
 	/* Get the color of a pixel */
 	__ATTR_IN_T(1) video_color_t
-	(LIBVIDEO_GFX_CC *vgxo_getcolor)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_getcolor)(struct video_gfx const *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y);
 
 	/* Place a colored pixel ontop of the graphic (whilst also performing blending) */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_putcolor)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_putcolor)(struct video_gfx const *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y,
 	                                 video_color_t __color);
 
 	/* Get the raw data of a pixel (no blending is done) */
 	__ATTR_IN_T(1) video_pixel_t
-	(LIBVIDEO_GFX_CC *vgxo_getpixel)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_getpixel)(struct video_gfx const *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y);
 
 	/* Set the raw data of a pixel (no blending is done) */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_setpixel)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_setpixel)(struct video_gfx const *__restrict __self,
 	                                 video_coord_t __abs_x, video_coord_t __abs_y,
 	                                 video_pixel_t __pixel);
 
@@ -205,7 +205,7 @@ struct video_gfx_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absline_llhh)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absline_llhh)(struct video_gfx const *__restrict __self,
 	                                     video_coord_t __x, video_coord_t y,
 	                                     video_dim_t __size_x, video_dim_t __size_y,
 	                                     video_color_t __color);
@@ -214,7 +214,7 @@ struct video_gfx_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absline_lhhl)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absline_lhhl)(struct video_gfx const *__restrict __self,
 	                                     video_coord_t __x, video_coord_t __y,
 	                                     video_dim_t __size_x, video_dim_t __size_y,
 	                                     video_color_t __color);
@@ -222,14 +222,14 @@ struct video_gfx_xops {
 	/* Horizontal line
 	 * @assume(__length > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absline_h)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absline_h)(struct video_gfx const *__restrict __self,
 	                                  video_coord_t __x, video_coord_t __y,
 		                              video_dim_t __length, video_color_t __color);
 
 	/* Vertical line
 	 * @assume(__length > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absline_v)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absline_v)(struct video_gfx const *__restrict __self,
 		                              video_coord_t __x, video_coord_t __y,
 		                              video_dim_t __length, video_color_t __color);
 
@@ -237,7 +237,7 @@ struct video_gfx_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absfill)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absfill)(struct video_gfx const *__restrict __self,
 	                                video_coord_t __x, video_coord_t __y,
 	                                video_dim_t __size_x, video_dim_t __size_y,
 	                                video_color_t __color);
@@ -246,7 +246,7 @@ struct video_gfx_xops {
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *vgxo_absfillmask)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absfillmask)(struct video_gfx const *__restrict __self,
 	                                    video_coord_t __dst_x, video_coord_t __dst_y,
 	                                    video_dim_t __size_x, video_dim_t __size_y,
 	                                    video_color_t __color,
@@ -260,35 +260,35 @@ struct video_gfx_xops {
 	 * @assume(__dst_size_x != __src_size_x);
 	 * @assume(__dst_size_y != __src_size_y); */
 	__ATTR_IN_T(1) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *vgxo_absfillstretchmask)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absfillstretchmask)(struct video_gfx const *__restrict __self,
 	                                           video_coord_t __dst_x, video_coord_t __dst_y,
 	                                           video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                           video_color_t __color,
 	                                           video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                           struct video_bitmask const *__restrict __bm);
 
-	/* Same as `vgxo_absfill', but do so via gradient with colors[y][x] being used
+	/* Same as `vgfx_absfill', but do so via gradient with colors[y][x] being used
 	 * to essentially do a  VIDEO_GFX_FLINEARBLIT stretch-blit into the  specified
 	 * destination rect.
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) void
-	(LIBVIDEO_GFX_CC *vgxo_absgradient)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absgradient)(struct video_gfx const *__restrict __self,
 	                                    video_coord_t __x, video_coord_t __y,
 	                                    video_dim_t __size_x, video_dim_t __size_y,
-	                                    video_color_t __colors[2][2]);
+	                                    video_color_t const __colors[2][2]);
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absgradient_h)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absgradient_h)(struct video_gfx const *__restrict __self,
 	                                      video_coord_t __x, video_coord_t __y,
 	                                      video_dim_t __size_x, video_dim_t __size_y,
 	                                      video_color_t __locolor, video_color_t __hicolor);
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgxo_absgradient_v)(struct video_gfx const *__restrict __self,
+	(LIBVIDEO_GFX_CC *vgfx_absgradient_v)(struct video_gfx const *__restrict __self,
 	                                      video_coord_t __x, video_coord_t __y,
 	                                      video_dim_t __size_x, video_dim_t __size_y,
 	                                      video_color_t __locolor, video_color_t __hicolor);
 
-	void (*_vbxo_pad[1])(void);
+	void (*_vbtx_pad[1])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 
@@ -297,86 +297,86 @@ struct video_gfx_ops {
 
 	/* Get the color of a pixel */
 	__ATTR_IN_T(1) video_color_t
-	(LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_gfx const *__restrict __self,
-	                                video_offset_t __x, video_offset_t __y);
+	(LIBVIDEO_GFX_CC *vgfo_getcolor)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __x, video_offset_t __y);
 
 	/* Place a colored pixel ontop of the graphic */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_putcolor)(struct video_gfx const *__restrict __self,
-	                                video_offset_t __x, video_offset_t __y,
-	                                video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_putcolor)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __x, video_offset_t __y,
+	                                 video_color_t __color);
 
 	/* Draw a line */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_line)(struct video_gfx const *__restrict __self,
-	                            video_offset_t __x1, video_offset_t __y1,
-	                            video_offset_t __x2, video_offset_t __y2,
-	                            video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_line)(struct video_gfx const *__restrict __self,
+	                             video_offset_t __x1, video_offset_t __y1,
+	                             video_offset_t __x2, video_offset_t __y2,
+	                             video_color_t __color);
 
 	/* Horizontal line */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_hline)(struct video_gfx const *__restrict __self,
-	                             video_offset_t __x, video_offset_t __y,
-	                             video_dim_t __length, video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_hline)(struct video_gfx const *__restrict __self,
+	                              video_offset_t __x, video_offset_t __y,
+	                              video_dim_t __length, video_color_t __color);
 
 	/* Vertical line */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_vline)(struct video_gfx const *__restrict __self,
-	                             video_offset_t __x, video_offset_t __y,
-	                             video_dim_t __length, video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_vline)(struct video_gfx const *__restrict __self,
+	                              video_offset_t __x, video_offset_t __y,
+	                              video_dim_t __length, video_color_t __color);
 
 	/* Fill an area with a solid color. */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_fill)(struct video_gfx const *__restrict __self,
-	                            video_offset_t __x, video_offset_t __y,
-	                            video_dim_t __size_x, video_dim_t __size_y,
-	                            video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_fill)(struct video_gfx const *__restrict __self,
+	                             video_offset_t __x, video_offset_t __y,
+	                             video_dim_t __size_x, video_dim_t __size_y,
+	                             video_color_t __color);
 
 	/* Outline an area with a rectangle. */
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_rect)(struct video_gfx const *__restrict __self,
-	                            video_offset_t __x, video_offset_t __y,
-	                            video_dim_t __size_x, video_dim_t __size_y,
-	                            video_color_t __color);
+	(LIBVIDEO_GFX_CC *vgfo_rect)(struct video_gfx const *__restrict __self,
+	                             video_offset_t __x, video_offset_t __y,
+	                             video_dim_t __size_x, video_dim_t __size_y,
+	                             video_color_t __color);
 
-	/* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
+	/* Same as `vgfo_fill()', but only fill in a pixel if masked by `__bm'
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h)
 	 * TODO: This function should take 2 colors: foreground/background. Same also goes
-	 *       for `fxo_fillstretchmask' */
+	 *       for `vgfo_fillstretchmask' */
 	__ATTR_IN_T(1) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *fxo_fillmask)(struct video_gfx const *__restrict __self,
-	                                video_offset_t __x, video_offset_t __y,
-	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                video_color_t __color,
-	                                struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *vgfo_fillmask)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __x, video_offset_t __y,
+	                                 video_dim_t __size_x, video_dim_t __size_y,
+	                                 video_color_t __color,
+	                                 struct video_bitmask const *__restrict __bm);
 
-	/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
+	/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
 	__ATTR_IN_T(1) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *fxo_fillstretchmask)(struct video_gfx const *__restrict __self,
-	                                       video_offset_t __dst_x, video_offset_t __dst_y,
-	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                       video_color_t __color,
-	                                       video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                       struct video_bitmask const *__restrict __bm);
+	(LIBVIDEO_GFX_CC *vgfo_fillstretchmask)(struct video_gfx const *__restrict __self,
+	                                        video_offset_t __dst_x, video_offset_t __dst_y,
+	                                        video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                        video_color_t __color,
+	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
+	                                        struct video_bitmask const *__restrict __bm);
 
-	/* Same as `fxo_fill', but do so  via gradient with colors[y][x] being  used
+	/* Same as `vgfo_fill', but do so via gradient with colors[y][x] being  used
 	 * to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into the specified
 	 * destination rect. */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) void
-	(LIBVIDEO_GFX_CC *fxo_gradient)(struct video_gfx const *__restrict __self,
-	                                    video_offset_t __x, video_offset_t __y,
-	                                    video_dim_t __size_x, video_dim_t __size_y,
-	                                    video_color_t __colors[2][2]);
+	(LIBVIDEO_GFX_CC *vgfo_gradient)(struct video_gfx const *__restrict __self,
+	                                 video_offset_t __x, video_offset_t __y,
+	                                 video_dim_t __size_x, video_dim_t __size_y,
+	                                 video_color_t const __colors[2][2]);
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_hgradient)(struct video_gfx const *__restrict __self,
-			                         video_offset_t __x, video_offset_t __y,
-			                         video_dim_t __size_x, video_dim_t __size_y,
-			                         video_color_t __locolor, video_color_t __hicolor);
+	(LIBVIDEO_GFX_CC *vgfo_hgradient)(struct video_gfx const *__restrict __self,
+			                          video_offset_t __x, video_offset_t __y,
+			                          video_dim_t __size_x, video_dim_t __size_y,
+			                          video_color_t __locolor, video_color_t __hicolor);
 	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *fxo_vgradient)(struct video_gfx const *__restrict __self,
-			                         video_offset_t __x, video_offset_t __y,
-			                         video_dim_t __size_x, video_dim_t __size_y,
-			                         video_color_t __locolor, video_color_t __hicolor);
+	(LIBVIDEO_GFX_CC *vgfo_vgradient)(struct video_gfx const *__restrict __self,
+			                          video_offset_t __x, video_offset_t __y,
+			                          video_dim_t __size_x, video_dim_t __size_y,
+			                          video_color_t __locolor, video_color_t __hicolor);
 
 	/* More driver-specific operators go here... */
 };
@@ -446,12 +446,12 @@ video_gfx_palettize(struct video_gfx const *__restrict __self,
 
 /* Blit the contents of another video buffer into this one. */
 extern __ATTR_IN(1) void
-video_blitter_blit(struct video_blitter const *__restrict __self,
+video_blitter_bitblit(struct video_blitter const *__restrict __self,
                 video_offset_t __dst_x, video_offset_t __dst_y,
                 video_offset_t __src_x, video_offset_t __src_y,
                 video_dim_t __size_x, video_dim_t __size_y);
 
-/* Same as `vbo_blit', but stretch the contents */
+/* Same as `vbto_bitblit', but stretch the contents */
 extern __ATTR_IN(1) void
 video_blitter_stretch(struct video_blitter const *__restrict __self,
                    video_offset_t __dst_x, video_offset_t __dst_y,
@@ -581,7 +581,7 @@ video_gfx_rect(struct video_gfx const *__restrict __self,
                video_dim_t __size_x, video_dim_t __size_y,
                video_color_t __color);
 
-/* Same as `fxo_fill()', but only fill in a pixel if masked by `__bm'
+/* Same as `vgfo_fill()', but only fill in a pixel if masked by `__bm'
  * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 extern __ATTR_IN(1) __ATTR_IN(7) void
 video_gfx_absfillmask(struct video_gfx const *__restrict __self,
@@ -590,7 +590,7 @@ video_gfx_absfillmask(struct video_gfx const *__restrict __self,
                    video_color_t __color,
                    struct video_bitmask const *__restrict __bm);
 
-/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
+/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
 extern __ATTR_IN(1) __ATTR_IN(9) void
 video_gfx_absfillstretchmask(struct video_gfx const *__restrict __self,
                           video_offset_t __dst_x, video_offset_t __dst_y,
@@ -606,7 +606,7 @@ extern __ATTR_IN(1) __ATTR_IN(6) void
 video_gfx_gradient(struct video_gfx const *__restrict __self,
                    video_offset_t __x, video_offset_t __y,
                    video_dim_t __size_x, video_dim_t __size_y,
-                   video_color_t __colors[2][2]);
+                   video_color_t const __colors[2][2]);
 extern __ATTR_IN(1) void
 video_gfx_hgradient(struct video_gfx const *__restrict __self,
                     video_offset_t __x, video_offset_t __y,
@@ -630,17 +630,17 @@ video_gfx_blitto(struct video_gfx const *__src,
 
 /* Directly do blitting between 2 GFX contexts (helpers to wrap "struct video_blitter") */
 extern __ATTR_IN(1) __ATTR_IN(4) void
-video_gfx_blit(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y,
-               struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y,
-               video_dim_t __size_x, video_dim_t __size_y);
+video_gfx_bitblit(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y,
+                  struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y,
+                  video_dim_t __size_x, video_dim_t __size_y);
 extern __ATTR_IN(1) __ATTR_IN(6) void
 video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_offset_t __dst_y, video_dim_t __dst_size_x, video_dim_t __dst_size_y,
                   struct video_gfx const *__src, video_offset_t __src_x, video_offset_t __src_y, video_dim_t __src_size_x, video_dim_t __src_size_y);
 #else /* __INTELLISENSE__ */
-#define video_blitter_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
-	(*(self)->vbt_ops->vbo_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
+#define video_blitter_bitblit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
+	(*(self)->vbt_ops->vbto_bitblit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
 #define video_blitter_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
-	(*(self)->vbt_ops->vbo_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
+	(*(self)->vbt_ops->vbto_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
 #define video_gfx_getclipx(self) (self)->vx_hdr.vxh_cxoff
 #define video_gfx_getclipy(self) (self)->vx_hdr.vxh_cyoff
@@ -663,37 +663,37 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_gfx_noblend(self) \
 	(*(self)->vx_buffer->vb_ops->vi_noblendgfx)(self)
 #define video_gfx_getcolor(self, x, y) \
-	(*(self)->vx_hdr.vxh_ops->fxo_getcolor)(self, x, y)
+	(*(self)->vx_hdr.vxh_ops->vgfo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_putcolor)(self, x, y, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_putcolor)(self, x, y, color)
 #define video_gfx_line(self, x1, y1, x2, y2, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_line)(self, x1, y1, x2, y2, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_line)(self, x1, y1, x2, y2, color)
 #define video_gfx_hline(self, x, y, length, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_hline)(self, x, y, length, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_hline)(self, x, y, length, color)
 #define video_gfx_vline(self, x, y, length, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_vline)(self, x, y, length, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_vline)(self, x, y, length, color)
 #define video_gfx_fill(self, x, y, size_x, size_y, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_fill)(self, x, y, size_x, size_y, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_fill)(self, x, y, size_x, size_y, color)
 #define video_gfx_fillall(self, color) \
 	video_gfx_fill(self, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX, color)
 #define video_gfx_rect(self, x, y, size_x, size_y, color) \
-	(*(self)->vx_hdr.vxh_ops->fxo_rect)(self, x, y, size_x, size_y, color)
+	(*(self)->vx_hdr.vxh_ops->vgfo_rect)(self, x, y, size_x, size_y, color)
 #define video_gfx_absfillmask(self, x, y, size_x, size_y, color, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->fxo_fillmask)(self, x, y, size_x, size_y, color, bigtmask)
+	(*(self)->vx_hdr.vxh_ops->vgfo_fillmask)(self, x, y, size_x, size_y, color, bigtmask)
 #define video_gfx_absfillstretchmask(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask) \
-	(*(self)->vx_hdr.vxh_ops->fxo_fillstretchmask)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
+	(*(self)->vx_hdr.vxh_ops->vgfo_fillstretchmask)(self, dst_x, dst_y, dst_sizex, dst_sizey, color, src_size_x, src_size_y, bigtmask)
 #define video_gfx_gradient(self, x, y, size_x, size_y, colors) \
-	(*(self)->vx_hdr.vxh_ops->fxo_gradient)(self, x, y, size_x, size_y, colors)
+	(*(self)->vx_hdr.vxh_ops->vgfo_gradient)(self, x, y, size_x, size_y, colors)
 #define video_gfx_hgradient(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*(self)->vx_hdr.vxh_ops->fxo_hgradient)(self, x, y, size_x, size_y, locolor, hicolor)
+	(*(self)->vx_hdr.vxh_ops->vgfo_hgradient)(self, x, y, size_x, size_y, locolor, hicolor)
 #define video_gfx_vgradient(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*(self)->vx_hdr.vxh_ops->fxo_vgradient)(self, x, y, size_x, size_y, locolor, hicolor)
+	(*(self)->vx_hdr.vxh_ops->vgfo_vgradient)(self, x, y, size_x, size_y, locolor, hicolor)
 #define video_gfx_blitfrom(dst, src, ctx) \
 	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
 #define video_gfx_blitto(src, dst, ctx) \
 	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
-#define video_gfx_blit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
-	__XBLOCK({ struct video_blitter _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgb_blit); video_blitter_blit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
+#define video_gfx_bitblit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
+	__XBLOCK({ struct video_blitter _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgb_blit); video_blitter_bitblit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
 #define video_gfx_stretch(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
 	__XBLOCK({ struct video_blitter _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(dst, src, &_vgs_blit); video_blitter_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
 #endif /* !__INTELLISENSE__ */
@@ -718,7 +718,7 @@ public:
 	__CXX_CLASSMEMBER void blit(video_offset_t __dst_x, video_offset_t __dst_y,
 	                            video_offset_t __src_x, video_offset_t __src_y,
 	                            video_dim_t __size_x, video_dim_t __size_y) const {
-		video_blitter_blit(this, __dst_x, __dst_y, __src_x, __src_y, __size_x, __size_y);
+		video_blitter_bitblit(this, __dst_x, __dst_y, __src_x, __src_y, __size_x, __size_y);
 	}
 
 	/* Same as `blit', but stretch the contents */
@@ -868,7 +868,7 @@ public:
 	 * the specified destination rect. */
 	__CXX_CLASSMEMBER void gradient(video_offset_t __x, video_offset_t __y,
 	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                video_color_t __colors[2][2]) const {
+	                                video_color_t const __colors[2][2]) const {
 		video_gfx_gradient(this, __x, __y, __size_x, __size_y, __colors);
 	}
 	__CXX_CLASSMEMBER void hgradient(video_offset_t __x, video_offset_t __y,
@@ -897,7 +897,7 @@ public:
 		video_gfx_absfillmask(this, __x, __y, __size_x, __size_y, __color, __bm);
 	}
 
-	/* Same as `fxo_fillmask()', however perform the blit while up-scaling the given bitmask. */
+	/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
 	__CXX_CLASSMEMBER void fillstretchmask(video_offset_t __dst_x, video_offset_t __dst_y,
 	                                       video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                       video_color_t __color,
@@ -941,11 +941,11 @@ public:
 	/************************************************************************/
 
 	/* Blit the contents of another video buffer into this one. */
-	__CXX_CLASSMEMBER void blit(video_offset_t __dst_x, video_offset_t __dst_y,
-	                            struct video_gfx const &__src,
-	                            video_offset_t __src_x, video_offset_t __src_y,
-	                            video_dim_t __size_x, video_dim_t __size_y) const {
-		video_gfx_blit(this, __dst_x, __dst_y, &__src, __src_x, __src_y, __size_x, __size_y);
+	__CXX_CLASSMEMBER void bitblit(video_offset_t __dst_x, video_offset_t __dst_y,
+	                               struct video_gfx const &__src,
+	                               video_offset_t __src_x, video_offset_t __src_y,
+	                               video_dim_t __size_x, video_dim_t __size_y) const {
+		video_gfx_bitblit(this, __dst_x, __dst_y, &__src, __src_x, __src_y, __size_x, __size_y);
 	}
 
 	/* Stretch the contents of another video buffer into this one. */

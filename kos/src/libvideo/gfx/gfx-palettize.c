@@ -176,7 +176,7 @@ hist_palettize(struct video_gfx const *__restrict self,
 		do {
 			struct hist_bin *bin;
 			union color c;
-			c.c = (*self->_vx_xops.vgxo_getcolor)(self, x, y);
+			c.c = (*self->_vx_xops.vgfx_getcolor)(self, x, y);
 			bin = &h->h_bins[hist_quantize_r(c.r)]
 			                [hist_quantize_g(c.g)]
 			                [hist_quantize_b(c.b)];
@@ -470,7 +470,7 @@ median_io_gfx(void const *cookie, mc_index_t i) {
 	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
 	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
 	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
-	return (*self->_vx_xops.vgxo_getcolor)(self, x, y);
+	return (*self->_vx_xops.vgfx_getcolor)(self, x, y);
 }
 
 PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
@@ -509,7 +509,7 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_FNORMAL, 0);
-	video_gfx_blit(&result_gfx, 0, 0, &gfx, 0, 0,
+	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
 	               video_gfx_getclipw(&gfx),
 	               video_gfx_getcliph(&gfx));
 	return 0;
