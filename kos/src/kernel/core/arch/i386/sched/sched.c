@@ -95,9 +95,6 @@ kernel_initialize_threadstack(struct task *__restrict thread,
 #endif /* !__x86_64__ */
 	init_state->scs_irregs.ir_Pip    = (uintptr_t)(void *)entry;
 	init_state->scs_irregs.ir_Pflags = EFLAGS_IF;
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	assert(init_state->scs_irregs.ir_Pflags <= 0x10000000);
-#endif
 	FORTASK(thread, this_sstate) = init_state;
 }
 

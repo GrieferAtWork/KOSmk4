@@ -667,9 +667,6 @@ again_release_kernel_and_cc:
 			_task_init_arch_sstate(result, caller, &child_state);
 
 			/* Save the CPU context with which the child will launch */
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-			assert(child_state->scs_irregs.ir_Pflags <= 0x10000000);
-#endif
 			FORTASK(result, this_sstate) = child_state;
 		}
 

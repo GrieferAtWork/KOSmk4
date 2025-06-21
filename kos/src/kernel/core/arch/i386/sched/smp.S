@@ -244,18 +244,14 @@ INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 	movP   %segtls:this_cpu, %Pbx
 #endif /* !__x86_64__ */
 
+	/* Save the caller's CPU state */
+	EXTERN(this_sstate)
+	movP   %Psp, %segtls:this_sstate
+
 	EXTERN(thiscpu_sched_current)
 	movP   thiscpu_sched_current(%Pbx), %Pax
 
 	/* Load the new CPU state */
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	EXTERN(this_sstate)
-	movP   this_sstate(%Pax), %Pcx
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
@@ -892,12 +888,6 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   thiscpu_sched_current(R_CPU), R_TASK /* TARGET task. */
 	EXTERN(this_sstate)
 	movP   this_sstate(R_TASK), %Psp            /* stack */
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
 
 	/* Load the GDT of our new CPU */
 	EXTERN(thiscpu_x86_saved_gdtr)
@@ -1255,12 +1245,6 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   %Pax, thiscpu_sched_current(R_CPU)
 	movP   %Pax, R_TASK
 	movP   this_sstate(%Pax), %Psp /* stack */
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
 	jmp    .Ldo_init_with_task_and_stack
 1:
 
@@ -1383,12 +1367,6 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	EXTERN(cpu_online_count)
 	lock   decl cpu_online_count
 
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
 	EXTERN(thiscpu_idle_sstate)
 	movP   %Psp, thiscpu_idle_sstate(%R_fcall0P)
 

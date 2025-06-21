@@ -330,9 +330,6 @@ do_normal_unscheduled_thread:
 		if (sst) {
 			sst = (struct scpustate *)((byte_t *) + scpustate_sizeof(sst));
 			sst = fcpustate_to_scpustate_p(&x86_dbg_origstate, sst);
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-			assert(sst->scs_irregs.ir_Pflags <= 0x10000000);
-#endif
 			FORTASK(dbg_current, this_sstate) = sst;
 		}
 		/* Fill in missing registers. */

@@ -540,12 +540,6 @@ INTERN_FUNCTION(x86_idt_preemption)
 #endif /* !__x86_64__ */
 	/* Deadline has expired (and the current time is now stored in %rax / %edx:%eax) */
 
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
 	EXTERN(this_sstate)
 	movP   %Psp, this_sstate(%Pbp)
 
@@ -564,15 +558,6 @@ INTERN_FUNCTION(x86_idt_preemption)
 	.cfi_adjust_cfa_offset -8
 #endif /* !__x86_64__ */
 
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	EXTERN(this_sstate)
-	movP   this_sstate(%Pax), %Pcx
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
-
 	/* Check if we should actually switch threads */
 	cmpP   %Pbp, %Pax
 	je32   x86_unwind_scpustate_Psp
@@ -581,53 +566,40 @@ INTERN_FUNCTION(x86_idt_preemption)
 	EXTERN(thiscpu_sched_current)
 	movP   %Pax, thiscpu_sched_current(%Pbx)
 
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	EXTERN(this_sstate)
-	movP   this_sstate(%Pax), %Pcx
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
-
 INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
-
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	EXTERN(this_sstate)
-	movP   this_sstate(%Pax), %Pcx
-	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Pcx)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
-	int3
-771:
-#endif
-
 	/* Primary entry point for loading a new thread-context for
 	 * some thread `%Pax',  whilst running on  some cpu  `%Pbx' */
 	EXTERN(this_sstate)
 	movP   this_sstate(%Pax), %Psp
 
+	/* If this check fails (again), try the following:
+	 * - Repeat changes made by "c245c4a658b2df3ef5a58548b98aebe51170a43f" for extra checks
+	 * - Check that all code-paths related to task switching...
+	 *   - ... generate a correct `struct scpustate' on-stack
+	 *   - ... actually write said `struct scpustate' to `%segtls:this_sstate`
+	 * - Check any part of the kernel that interacts with:
+	 *   - `struct task::t_state'
+	 *   - `this_sstate'
+	 *   - `thiscpu_idle_sstate'
+	 *
+	 * In the end, this check failing means that something has caused the target
+	 * task's register-state (which we would have linked to switch to) to become
+	 * corrupted (either because it wasn't  written completely, or because  some
+	 * piece of code failed to update it)
+	 *
+	 * At this part of the code, the current register state is:
+	 * - %Pax:      `struct task *'      Target thread
+	 * - %Pbx:      `struct cpu *'       Current cpu
+	 * - %Psp:      `struct scpustate *' The target thread's scheduler state (the thing that is corrupt)
+	 *
+	 * The following is probably true as well:
+	 * - %segtls:   `struct task *' Source thread   (though not necessarily; e.g. task_exit() goes here, but has no source)
+	 */
 #ifndef NDEBUG
 	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    771f /* if (!(STATE.EFLAGS > 0x10000000)) goto 771f; */
+	jna    1f /* if (!(STATE.EFLAGS > 0x10000000)) goto 1f; */
 	int3
-/* tsc.S: FIXME: This int3 got hit randomly one time:
-/kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0] [[97mint3[39m]
-> trace
-/kos/src/kernel/core/arch/i386/sched/tsc.S(578) : C0101F08+1[/os/kernel.bin][???+0]
-FFFFFFFF+1
-Analyzing remainder of stack:
-/kos/src/kernel/core/sched/scheduler.c(333,33) : C03017E7+5[/os/kernel.bin][sched_intern_loadpending+40] [pc@C091AF18]
-/kos/src/kernel/core/arch/i386/sched/smp.S(192) : C0101D35+5[/os/kernel.bin][???+0] [pc@C091AF34]
-/kos/src/kernel/core/sched/scheduler.c(1709,2) : C0305191+1[/os/kernel.bin][cpu_deepsleep+1848] [pc@C091AF68]
-/kos/src/kernel/core/dev/interrupt.c(1219,5) : C0363211+5[/os/kernel.bin][isr_handler+3] [pc@C091AFC8]
-/kos/src/kernel/core/dev/interrupt.c(1237,1) : C0363201+32[/os/kernel.bin][kernel_isr_specific_0dh+13] [pc@C091AFC8]
-/kos/src/kernel/core/sched/cpu.c(72,16) : C02E8D26+5[/os/kernel.bin][cpu_idlemain+3] [pc@C091AFF8]
-[2025-06-16T18:57:27.654406308:crit  ][2][except] Inconsistent unwind %cs: 0x0 & 0xffff [pc:C0102032]
-[2025-06-16T18:57:27.654655103:crit  ][2][except] Inconsistent unwind %gs: 0xa070 & 0xffff != 0x33 [pc:C0102032]
-[2025-06-16T18:57:27.654963198:crit  ][2][except] Inconsistent unwind %fs: 0x24cd & 0xffff != 0x20 [pc:C0102032]
-[2025-06-16T18:57:27.655183862:crit  ][2][except] Inconsistent unwind %es: 0x4 & 0xffff != 0x53 [pc:C0102032]
-[2025-06-16T18:57:27.655602345:crit  ][2][except] Inconsistent unwind %ds: 0xc000 & 0xffff != 0x53 [pc:C0102032]*/
-771:
+1:
 #endif /* !NDEBUG */
 
 	/* Load other scheduler-related register values. */

@@ -37,10 +37,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-#include <assert.h>
-#include <kos/kernel/cpu-state-compat.h>
-#endif
 
 #ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 #include <kernel/rand.h>
@@ -156,9 +152,6 @@ NOTHROW(FCALL task_clone_setup_kthread)(struct task *__restrict thread, void *ks
 	result->scs_sgregs.sg_es       = SEGMENT_USER_DATA_RPL;
 	result->scs_sgregs.sg_ds       = SEGMENT_USER_DATA_RPL;
 #endif /* !__x86_64__ */
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	assert(result->scs_irregs.ir_Pflags <= 0x10000000);
-#endif
 	return result;
 }
 

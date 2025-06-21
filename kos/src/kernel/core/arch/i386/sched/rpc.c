@@ -139,9 +139,6 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	rc->rc_state   = rc_state;
 	rc->rc_context = isuser ? RPC_REASONCTX_SYSRET
 	                        : RPC_REASONCTX_ASYNC_KERN;
-#ifndef NDEBUG /* TODO: REMOVE ME (>> tsc.S: FIXME: This int3 got hit randomly one time) */
-	assert(result_sstate->scs_irregs.ir_Pflags <= 0x10000000);
-#endif
 	return result_sstate;
 }
 
