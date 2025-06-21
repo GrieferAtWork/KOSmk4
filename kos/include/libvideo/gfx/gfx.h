@@ -74,6 +74,10 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+
+/* Set of `VIDEO_GFX_F*' */
+typedef __UINT32_TYPE__ gfx_flag_t;
+
 struct video_buffer;
 struct video_gfxhdr;
 struct video_gfx;
@@ -510,15 +514,15 @@ video_gfx_loadclip(struct video_gfx *__restrict self,
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
 video_gfx_update(struct video_gfx *__restrict __self, unsigned int __what);
 
-/* Set GFX modes for `__self'. If you want to set multiple of these at once,
- * you should directly assign the respective  members, and then make a  call
- * to `video_gfx_update()' specifying exactly what changed. */
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
-video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
-video_gfx_setflags(struct video_gfx *__restrict __self, __uintptr_t __flags);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
-video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
+/* Get/set GFX modes for `__self'. If you want to set multiple of these at once,
+ * you should directly assign  the respective members, and  then make a call  to
+ * `video_gfx_update()' specifying exactly what changed. */
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_blendmode_t video_gfx_getblend(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_flag_t video_gfx_getflags(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_color_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
 
 /* Disable  blending  for  `__self'.  Same   as:
  * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
@@ -652,12 +656,12 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_gfx_loadclip(self, backup) (void)__libc_memcpy(&(self)->vx_hdr, backup, sizeof(video_gfx_clipinfo_t))
 #define video_gfx_update(self, what) \
 	(*(self)->vx_buffer->vb_ops->vi_updategfx)(self, what)
-#define video_gfx_setblend(self, mode) \
-	((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
-#define video_gfx_setflags(self, flags) \
-	((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
-#define video_gfx_setcolorkey(self, colorkey) \
-	((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
+#define video_gfx_getblend(self)              ((self)->vx_blend)
+#define video_gfx_getflags(self)              ((self)->vx_flags)
+#define video_gfx_getcolorkey(self)           ((self)->vx_colorkey)
+#define video_gfx_setblend(self, mode)        ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
+#define video_gfx_setflags(self, flags)       ((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_setcolorkey(self, colorkey) ((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
 #define video_gfx_noblend(self) \
 	(*(self)->vx_buffer->vb_ops->vi_noblendgfx)(self)
 #define video_gfx_getcolor(self, x, y) \
@@ -814,7 +818,7 @@ struct video_gfx {
 	struct video_gfxhdr         vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
 	struct video_buffer        *vx_buffer;   /* [1..1][const] The associated buffer. */
 	gfx_blendmode_t             vx_blend;    /* [const] Blending mode. */
-	__uintptr_t                 vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	gfx_flag_t                  vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 	struct video_gfx_xops      _vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
 #define _VIDEO_GFX_N_DRIVER 4

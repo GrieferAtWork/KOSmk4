@@ -166,11 +166,11 @@ again_font:
 		} else if (buf[0] == 'm') {
 			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
-			uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FLINEARBLIT);
+			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FLINEARBLIT);
 			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'd') {
-			uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-			                                  VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
+			                                   VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
 			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
@@ -222,8 +222,8 @@ again_font:
 				goto random_step;
 
 			case 'd': {
-				uintptr_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-				                                  VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+				gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
+				                                   VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
 				video_gfx_setflags(&gfx, flags);
 			}	break;
 
@@ -287,15 +287,15 @@ step:
 			video_coord_t size_y = rand() % screen->vb_ydim;
 			blurgfx = gfx;
 			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_FBLUR);
-			gfx.bitblit((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
-			            (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
+			gfx.bitblit((video_offset_t)x - video_gfx_getclipx(&gfx),
+			            (video_offset_t)y - video_gfx_getclipy(&gfx),
 			            blurgfx,
-			            (video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
-			            (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
+			            (video_offset_t)x - video_gfx_getclipx(&gfx),
+			            (video_offset_t)y - video_gfx_getclipy(&gfx),
 			            size_x,
 			            size_y);
-			gfx.rect((video_offset_t)x - gfx.vx_hdr.vxh_cxoff,
-			         (video_offset_t)y - gfx.vx_hdr.vxh_cyoff,
+			gfx.rect((video_offset_t)x - video_gfx_getclipx(&gfx),
+			         (video_offset_t)y - video_gfx_getclipy(&gfx),
 			         size_x,
 			         size_y,
 			         VIDEO_COLOR_BLACK);

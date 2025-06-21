@@ -172,7 +172,7 @@ video_buffer_convert(struct video_buffer *__restrict __self,
  * @return: * : Always re-returns `__result' */
 __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
 video_buffer_getgfx(struct video_buffer *__self, struct video_gfx *__result,
-                    gfx_blendmode_t __blendmode, __uintptr_t __flags,
+                    gfx_blendmode_t __blendmode, gfx_flag_t __flags,
                     video_color_t __colorkey);
 
 __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
