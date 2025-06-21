@@ -1829,6 +1829,9 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		}
 		/* Unconditionally mask mode flags. */
 		mode &= 07777;
+
+		/* Apply calling process's UMASK */
+		mode &= ~atomic_read_relaxed(&THIS_FS->fs_umask);
 	}
 
 #ifdef __O_ACCMODE_INVALID
