@@ -25,12 +25,18 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/typecore.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
+#include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
-#include <libvideo/gfx/gfx.h>
+#include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
 
 /* List of blend modes for which we provide dedicated implementations.
  * iow: these are the blend modes that are "fast" */
@@ -446,6 +452,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 		GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
 #undef LINK_libvideo_gfx_generic__putcolor_FOO
 		}
+		/* Generic GFX operators that **do** have support for blending */
 		self->_vx_xops.vgfx_absline_h     = &libvideo_gfx_generic__absline_h;
 		self->_vx_xops.vgfx_absline_v     = &libvideo_gfx_generic__absline_v;
 		self->_vx_xops.vgfx_absfill       = &libvideo_gfx_generic__absfill;

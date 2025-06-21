@@ -29,7 +29,6 @@
 
 #include <hybrid/align.h>
 
-#include <kos/kernel/printk.h>
 #include <sys/time.h>
 
 #include <err.h>
@@ -234,10 +233,7 @@ do_showpic(struct screen_buffer *screen,
 	                    VIDEO_GFX_FLINEARBLIT, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL/* |
-	                    VIDEO_GFX_FRDXWRAP |
-	                    VIDEO_GFX_FRDYWRAP*/,
-	                    0);
+	                    VIDEO_GFX_FNORMAL, 0);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -277,7 +273,6 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-	printk(KERN_DEBUG "SHOWPIC: BEGIN\n");
 #if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
@@ -327,7 +322,6 @@ do_showpic(struct screen_buffer *screen,
 	}
 	++dst_offset;
 #endif
-	printk(KERN_DEBUG "SHOWPIC: END\n");
 
 	if (font) {
 		struct video_fontprinter_data fd;
@@ -384,8 +378,6 @@ int main(int argc, char *argv[]) {
 
 	/* Load default system font */
 	font = video_font_lookup(VIDEO_FONT_DEFAULT);
-	if unlikely(!font)
-		err(EXIT_FAILURE, "Failed to load default font");
 
 	/* Load the named file as a video buffer. */
 	anim = video_anim_open(argv[1]);
@@ -406,7 +398,8 @@ int main(int argc, char *argv[]) {
 	{
 		struct video_gfx screen_gfx;
 		video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
-		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+		                    GFX_BLENDMODE_OVERRIDE,
+		                    VIDEO_GFX_FNORMAL, 0);
 		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	}
 
@@ -458,7 +451,8 @@ int main(int argc, char *argv[]) {
 #if 0 /* Not necessary; we're about to exit, so this happens automatically */
 	video_buffer_decref(screen_buffer_asvideo(screen));
 	video_buffer_decref(image);
-	video_font_decref(font);
+	if (font)
+		video_font_decref(font);
 #endif
 	return 0;
 }
