@@ -212,27 +212,6 @@ err:
 PRIVATE NONNULL((1, 2)) void CC
 svga_modeinfo_to_codec_specs(struct svga_modeinfo const *__restrict self,
                              struct video_codec_specs *__restrict result) {
-	syslog(LOG_DEBUG,
-	       "Video mode:\n"
-	       "self->smi_flags          = %#x\n"
-	       "self->smi_bits_per_pixel = %u\n"
-	       "self->smi_colorbits      = %u\n"
-	       "self->smi_rshift         = %u\n"
-	       "self->smi_rbits          = %u\n"
-	       "self->smi_gshift         = %u\n"
-	       "self->smi_gbits          = %u\n"
-	       "self->smi_bshift         = %u\n"
-	       "self->smi_bbits          = %u\n"
-	       "",
-	       (unsigned int)self->smi_flags,
-	       (unsigned int)self->smi_bits_per_pixel,
-	       (unsigned int)self->smi_colorbits,
-	       (unsigned int)self->smi_rshift,
-	       (unsigned int)self->smi_rbits,
-	       (unsigned int)self->smi_gshift,
-	       (unsigned int)self->smi_gbits,
-	       (unsigned int)self->smi_bshift,
-	       (unsigned int)self->smi_bbits);
 	bzero(result, sizeof(*result));
 	if (self->smi_flags & SVGA_MODEINFO_F_PAL)
 		result->vcs_flags |= VIDEO_CODEC_FLAG_PAL;

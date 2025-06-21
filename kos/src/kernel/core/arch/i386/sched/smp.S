@@ -868,7 +868,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movl   APIC_ID(%Psp), %esp
 	shrl   $(APIC_ID_FSHIFT), %esp
 
-	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
+	/* Find the CPU who's APIC_ID matches `%sp' (and that'll be us then) */
 	EXTERN(cpu_count)
 	movzlP cpu_count, %Pcx
 	decP   %Pcx
@@ -1410,7 +1410,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	 * s.a.: Intel manual Volume #3: 10.4.7.2      Local APIC State After It Has Been Software Disabled
 	 * "The local APIC will respond normally to INIT, NMI, SMI, and SIPI messages"
 	 * -> In other words,  it will  still be  able to  respond to  the INIT  IPI
-	 *    send by other  cores, however  we can  conserve power  by turning  off
+	 *    sent by other  cores, however  we can  conserve power  by turning  off
 	 *    a  majority of  its other functions.  -> After all:  we're routing all
 	 *    hardware interrupts to CPU#0, so if we can still handle INIT normally,
 	 *    there's no reason to stay alive in order to do all of the other stuff! */
