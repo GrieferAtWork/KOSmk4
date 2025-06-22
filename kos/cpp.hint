@@ -2757,6 +2757,7 @@
 #define LOCAL_IF_DECODE_ELSE(a,b) a
 #define LOCAL_IF_NX_ELSE(a,b) a
 #define LOCAL_NOTHROW(x) x
+#define LOCAL_FUNC(x)x
 #define DEFINE_LIBRARY_OPEN(open_libname,...) void *open_libname(void);
 #define BUILTIN_GLOBALS_ENUMERATE(cb) cb(__gxx_personality_v0) cb(__cxa_begin_catch) cb(__cxa_end_catch) cb(__cxa_rethrow) cb(_Unwind_Resume)
 #define POINTER_SET_FOREACH(...) for(;;)
