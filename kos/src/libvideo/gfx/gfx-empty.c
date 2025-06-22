@@ -95,12 +95,29 @@ libvideo_gfx_empty_fill(struct video_gfx const *__restrict UNUSED(self),
 	COMPILER_IMPURE();
 }
 
+INTERN ATTR_IN(1) ATTR_IN(6) void CC
+libvideo_gfx_empty_gradient(struct video_gfx const *__restrict UNUSED(self),
+                            video_offset_t UNUSED(x), video_offset_t UNUSED(y),
+                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
+                            video_color_t const UNUSED2(colors, [2][2])) {
+	COMPILER_IMPURE();
+}
+
+DEFINE_INTERN_ALIAS(libvideo_gfx_empty_vgradient, libvideo_gfx_empty_hgradient);
+INTERN ATTR_IN(1) void CC
+libvideo_gfx_empty_hgradient(struct video_gfx const *__restrict UNUSED(self),
+                             video_offset_t UNUSED(x), video_offset_t UNUSED(y),
+                             video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
+                             video_color_t UNUSED(locolor), video_color_t UNUSED(hicolor)) {
+	COMPILER_IMPURE();
+}
+
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
 libvideo_gfx_empty_fillmask(struct video_gfx const *__restrict UNUSED(self),
-                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                           video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
-                           video_color_t const UNUSED2(bg_fg_colors, [2]),
-                           struct video_bitmask const *__restrict UNUSED(bm)) {
+                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y),
+                            video_color_t const UNUSED2(bg_fg_colors, [2]),
+                            struct video_bitmask const *__restrict UNUSED(bm)) {
 	COMPILER_IMPURE();
 }
 
@@ -114,18 +131,45 @@ libvideo_gfx_empty_fillstretchmask(struct video_gfx const *__restrict UNUSED(sel
 	COMPILER_IMPURE();
 }
 
+INTERN ATTR_IN(1) ATTR_IN(4) void CC
+libvideo_gfx_empty_bitblit(struct video_gfx const *__restrict UNUSED(dst),
+                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                           struct video_gfx const *__restrict UNUSED(src),
+                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                           video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
+	COMPILER_IMPURE();
+}
+
+INTERN ATTR_IN(1) ATTR_IN(6) void CC
+libvideo_gfx_empty_stretch(struct video_gfx const *__restrict UNUSED(dst),
+                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                           video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                           struct video_gfx const *__restrict UNUSED(src),
+                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                           video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
+	COMPILER_IMPURE();
+}
+
+
 #undef libvideo_gfx_empty_ops
 PRIVATE struct video_gfx_ops libvideo_gfx_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empty_ops(void) {
-	if unlikely(!libvideo_gfx_empty_ops.vgfo_fillstretchmask) {
-		libvideo_gfx_empty_ops.vgfo_line     = &libvideo_gfx_empty_line;
-		libvideo_gfx_empty_ops.vgfo_hline    = &libvideo_gfx_empty_hline;
-		libvideo_gfx_empty_ops.vgfo_vline    = &libvideo_gfx_empty_vline;
-		libvideo_gfx_empty_ops.vgfo_fill     = &libvideo_gfx_empty_fill;
-		libvideo_gfx_empty_ops.vgfo_rect     = &libvideo_gfx_empty_rect;
-		libvideo_gfx_empty_ops.vgfo_fillmask = &libvideo_gfx_empty_fillmask;
-		COMPILER_WRITE_BARRIER();
+	if unlikely(!libvideo_gfx_empty_ops.vgfo_getcolor) {
+		libvideo_gfx_empty_ops.vgfo_bitblit         = &libvideo_gfx_empty_bitblit;
+		libvideo_gfx_empty_ops.vgfo_stretch         = &libvideo_gfx_empty_stretch;
+		libvideo_gfx_empty_ops.vgfo_vgradient       = &libvideo_gfx_empty_vgradient;
+		libvideo_gfx_empty_ops.vgfo_hgradient       = &libvideo_gfx_empty_hgradient;
+		libvideo_gfx_empty_ops.vgfo_gradient        = &libvideo_gfx_empty_gradient;
 		libvideo_gfx_empty_ops.vgfo_fillstretchmask = &libvideo_gfx_empty_fillstretchmask;
+		libvideo_gfx_empty_ops.vgfo_fillmask        = &libvideo_gfx_empty_fillmask;
+		libvideo_gfx_empty_ops.vgfo_rect            = &libvideo_gfx_empty_rect;
+		libvideo_gfx_empty_ops.vgfo_fill            = &libvideo_gfx_empty_fill;
+		libvideo_gfx_empty_ops.vgfo_vline           = &libvideo_gfx_empty_vline;
+		libvideo_gfx_empty_ops.vgfo_hline           = &libvideo_gfx_empty_hline;
+		libvideo_gfx_empty_ops.vgfo_line            = &libvideo_gfx_empty_line;
+		libvideo_gfx_empty_ops.vgfo_putcolor        = &libvideo_gfx_empty_putcolor;
+		COMPILER_WRITE_BARRIER();
+		libvideo_gfx_empty_ops.vgfo_getcolor = &libvideo_gfx_empty_getcolor;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_empty_ops;
@@ -135,18 +179,18 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empt
 /* Empty blit operators */
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_empty_blit(struct video_blitter const *__restrict UNUSED(self),
-                        video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                        video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                        video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
+                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
 	COMPILER_IMPURE();
 }
 
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_empty_stretch(struct video_blitter const *__restrict UNUSED(self),
-                           video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                           video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
-                           video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
+                               video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
+                               video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                               video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                               video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
 	COMPILER_IMPURE();
 }
 

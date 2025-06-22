@@ -199,6 +199,13 @@ public: /* Low-level, memory-based pixel accessor functions. */
 
 
 
+#define _VIDEO_CONVERTER_N_YDRIVER ((256 * __SIZEOF_VIDEO_PIXEL_T__) / __SIZEOF_POINTER__)
+#if _VIDEO_CONVERTER_N_YDRIVER < 5
+#undef _VIDEO_CONVERTER_N_YDRIVER
+#define _VIDEO_CONVERTER_N_YDRIVER 5
+#endif /* _VIDEO_CONVERTER_N_YDRIVER < 5 */
+#define _VIDEO_CONVERTER_N_XDRIVER (_VIDEO_CONVERTER_N_YDRIVER - 4)
+
 /* Helper structure for directly converting from 1 pixel format to another.  */
 struct video_converter;
 struct video_converter {
@@ -209,9 +216,14 @@ struct video_converter {
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
 	(LIBVIDEO_CODEC_CC *vcv_mappixel)(struct video_converter const *__restrict __self,
 	                                  video_pixel_t __from_pixel);
-	struct video_format vcv_from;      /* [OVERRIDE(.vf_pal, [NOT(REF)])] Source video format */
-	struct video_format vcv_to;        /* [OVERRIDE(.vf_pal, [NOT(REF)])] Target video format */
-	void              *_vcv_driver[1]; /* Driver-specific data */
+	union {
+		struct {
+			struct video_format vcv_from; /* [OVERRIDE(.vf_pal, [NOT(REF)])] Source video format (may be invalid after init) */
+			struct video_format vcv_to;   /* [OVERRIDE(.vf_pal, [NOT(REF)])] Target video format (may be invalid after init) */
+			void *_vcv_xdriver[_VIDEO_CONVERTER_N_XDRIVER]; /* Driver-specific data */
+		};
+		void *_vcv_ydriver[_VIDEO_CONVERTER_N_YDRIVER]; /* Driver-specific data */
+	};
 };
 
 

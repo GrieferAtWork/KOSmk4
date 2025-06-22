@@ -1902,9 +1902,9 @@ libvideo_gfx_generic_line(struct video_gfx const *__restrict self,
 			y1   = temp;
 		} else if (y1 == y2) {
 			video_gfx_x_putcolor(self,
-			                      (video_coord_t)x1,
-			                      (video_coord_t)y1,
-			                      color);
+			                     (video_coord_t)x1,
+			                     (video_coord_t)y1,
+			                     color);
 			return;
 		}
 		video_gfx_x_absline_v(self, (video_coord_t)x1, (video_coord_t)y1,
@@ -2930,6 +2930,33 @@ libvideo_gfx_generic_fillstretchmask_wrwrap(struct video_gfx const *__restrict s
 }
 
 
+INTERN ATTR_IN(1) ATTR_IN(4) void CC
+libvideo_gfx_generic_bitblit(struct video_gfx const *__restrict dst,
+                             video_offset_t dst_x, video_offset_t dst_y,
+                             struct video_gfx const *__restrict src,
+                             video_offset_t src_x, video_offset_t src_y,
+                             video_dim_t size_x, video_dim_t size_y) {
+	struct video_blitter blitter, *p_blitter;
+	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
+	video_blitter_bitblit(p_blitter, dst_x, dst_y,
+	                      src_x, src_y, size_x, size_y);
+}
+
+INTERN ATTR_IN(1) ATTR_IN(6) void CC
+libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst,
+                             video_offset_t dst_x, video_offset_t dst_y,
+                             video_dim_t dst_size_x, video_dim_t dst_size_y,
+                             struct video_gfx const *__restrict src,
+                             video_offset_t src_x, video_offset_t src_y,
+                             video_dim_t src_size_x, video_dim_t src_size_y) {
+	struct video_blitter blitter, *p_blitter;
+	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
+	video_blitter_stretch(p_blitter,
+	                      dst_x, dst_y, dst_size_x, dst_size_y,
+	                      src_x, src_y, src_size_x, src_size_y);
+}
+
+
 
 #undef libvideo_gfx_generic_ops
 #undef libvideo_gfx_generic_ops_rdwrap
@@ -2941,6 +2968,8 @@ PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_wrwrap = {};
 PRIVATE struct video_gfx_ops libvideo_gfx_generic_ops_rdwrwrap = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops(void) {
 	if unlikely(!libvideo_gfx_generic_ops.vgfo_getcolor) {
+		libvideo_gfx_generic_ops.vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
+		libvideo_gfx_generic_ops.vgfo_stretch         = &libvideo_gfx_generic_stretch;
 		libvideo_gfx_generic_ops.vgfo_vgradient       = &libvideo_gfx_generic_vgradient;
 		libvideo_gfx_generic_ops.vgfo_hgradient       = &libvideo_gfx_generic_hgradient;
 		libvideo_gfx_generic_ops.vgfo_gradient        = &libvideo_gfx_generic_gradient;
@@ -2960,6 +2989,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_rdwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_rdwrap.vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
+		libvideo_gfx_generic_ops_rdwrap.vgfo_stretch         = &libvideo_gfx_generic_stretch;
 		libvideo_gfx_generic_ops_rdwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient;
 		libvideo_gfx_generic_ops_rdwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient;
 		libvideo_gfx_generic_ops_rdwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient;
@@ -2979,6 +3010,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_wrwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_wrwrap.vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
+		libvideo_gfx_generic_ops_wrwrap.vgfo_stretch         = &libvideo_gfx_generic_stretch;
 		libvideo_gfx_generic_ops_wrwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
 		libvideo_gfx_generic_ops_wrwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
 		libvideo_gfx_generic_ops_wrwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;
@@ -2998,6 +3031,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 }
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrwrap(void) {
 	if unlikely(!libvideo_gfx_generic_ops_rdwrwrap.vgfo_getcolor) {
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
+		libvideo_gfx_generic_ops_rdwrwrap.vgfo_stretch         = &libvideo_gfx_generic_stretch;
 		libvideo_gfx_generic_ops_rdwrwrap.vgfo_vgradient       = &libvideo_gfx_generic_vgradient_wrwrap;
 		libvideo_gfx_generic_ops_rdwrwrap.vgfo_hgradient       = &libvideo_gfx_generic_hgradient_wrwrap;
 		libvideo_gfx_generic_ops_rdwrwrap.vgfo_gradient        = &libvideo_gfx_generic_gradient_wrwrap;

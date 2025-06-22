@@ -380,6 +380,23 @@ struct video_gfx_ops {
 	                                  video_dim_t __size_x, video_dim_t __size_y,
 	                                  video_color_t __locolor, video_color_t __hicolor);
 
+	/* Helper wrapper that creates a temporary blitter and then does a blit */
+	__ATTR_IN_T(1) __ATTR_IN_T(4) void
+	(LIBVIDEO_GFX_CC *vgfo_bitblit)(struct video_gfx const *__restrict __dst,
+	                                video_offset_t __dst_x, video_offset_t __dst_y,
+	                                struct video_gfx const *__restrict __src,
+	                                video_offset_t __src_x, video_offset_t __src_y,
+	                                video_dim_t __size_x, video_dim_t __size_y);
+
+	/* Helper wrapper that creates a temporary blitter and then does a stretch */
+	__ATTR_IN_T(1) __ATTR_IN_T(6) void
+	(LIBVIDEO_GFX_CC *vgfo_stretch)(struct video_gfx const *__restrict __dst,
+	                                video_offset_t __dst_x, video_offset_t __dst_y,
+	                                video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                struct video_gfx const *__restrict __src,
+	                                video_offset_t __src_x, video_offset_t __src_y,
+	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
+
 	/* More driver-specific operators go here... */
 };
 
@@ -695,9 +712,9 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_gfx_blitto(src, dst, ctx) \
 	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
 #define video_gfx_bitblit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
-	__XBLOCK({ struct video_blitter _vgb_blit, *_vgb_blit_ptr = video_gfx_blitfrom(dst, src, &_vgb_blit); video_blitter_bitblit(_vgb_blit_ptr, dst_x, dst_y, src_x, src_y, size_x, size_y); })
+	(*(dst)->vx_hdr.vxh_ops->vgfo_bitblit)(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y)
 #define video_gfx_stretch(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
-	__XBLOCK({ struct video_blitter _vgs_blit, *_vgs_blit_ptr = video_gfx_blitfrom(dst, src, &_vgs_blit); video_blitter_stretch(_vgs_blit_ptr, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y); })
+	(*(dst)->vx_hdr.vxh_ops->vgfo_stretch)(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y)
 #endif /* !__INTELLISENSE__ */
 
 
@@ -706,12 +723,17 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
+#define _VIDEO_BLIT_N_DRIVER (_VIDEO_CONVERTER_N_YDRIVER + 1)
+#if _VIDEO_BLIT_N_DRIVER < 6
+#undef _VIDEO_BLIT_N_DRIVER
+#define _VIDEO_BLIT_N_DRIVER 6
+#endif /* _VIDEO_BLIT_N_DRIVER < 6 */
+
 struct video_blitter {
 	struct video_blitter_ops const *vbt_ops;  /* Blitter operators */
 	struct video_gfx const         *vbt_dst;  /* [1..1][const] Destination GFX context */
 	struct video_gfx const         *vbt_src;  /* [1..1][const] Source GFX context */
 	struct video_blitter_xops      _vbt_xops; /* Internal blit operators */
-#define _VIDEO_BLIT_N_DRIVER 6
 	void *_vbt_driver[_VIDEO_BLIT_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
