@@ -167,6 +167,8 @@ struct video_blitter_ops {
 	                                video_offset_t __src_x, video_offset_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
+	/* TODO: Some way to rotate and flip pixels during blits */
+
 	/* More driver-specific operators go here... */
 };
 

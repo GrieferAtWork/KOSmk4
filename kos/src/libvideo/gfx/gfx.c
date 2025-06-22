@@ -118,7 +118,7 @@ INTERN ATTR_IN(1) video_color_t CC
 libvideo_gfx_generic__getcolor_noblend(struct video_gfx const *__restrict self,
                                        video_coord_t x, video_coord_t y) {
 	video_pixel_t pixel = _video_gfx_x_getpixel(self, x, y);
-	return self->vx_buffer->vb_format.pixel2color(pixel);
+	return video_format_pixel2color(&self->vx_buffer->vb_format, pixel);
 }
 
 INTERN ATTR_IN(1) video_color_t CC
@@ -347,7 +347,7 @@ INTERN ATTR_IN(1) video_color_t CC
 libvideo_gfx_generic__getcolor_with_key(struct video_gfx const *__restrict self,
                                         video_coord_t x, video_coord_t y) {
 	video_pixel_t pixel = _video_gfx_x_getpixel(self, x, y);
-	video_color_t result = self->vx_buffer->vb_format.pixel2color(pixel);
+	video_color_t result = video_format_pixel2color(&self->vx_buffer->vb_format, pixel);
 	if (result == self->vx_colorkey)
 		result = 0;
 	return result;
@@ -358,9 +358,9 @@ libvideo_gfx_generic__putcolor(struct video_gfx const *__restrict self,
                                video_coord_t x, video_coord_t y,
                                video_color_t color) {
 	video_pixel_t o_pixel = _video_gfx_x_getpixel(self, x, y);
-	video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel);
+	video_color_t o_color = video_format_pixel2color(&self->vx_buffer->vb_format, o_pixel);
 	video_color_t n_color = gfx_blendcolors(o_color, color, self->vx_blend);
-	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color);
+	video_pixel_t n_pixel = video_format_color2pixel(&self->vx_buffer->vb_format, n_color);
 	_video_gfx_x_setpixel(self, x, y, n_pixel);
 }
 
@@ -368,20 +368,20 @@ INTERN ATTR_IN(1) void CC
 libvideo_gfx_generic__putcolor_noblend(struct video_gfx const *__restrict self,
                                        video_coord_t x, video_coord_t y,
                                        video_color_t color) {
-	video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(color);
+	video_pixel_t n_pixel = video_format_color2pixel(&self->vx_buffer->vb_format, color);
 	_video_gfx_x_setpixel(self, x, y, n_pixel);
 }
 
-#define DEFINE_libvideo_gfx_generic__putcolor_FOO(name, mode)                      \
-	INTERN ATTR_IN(1) void CC                                                      \
-	libvideo_gfx_generic__putcolor_##name(struct video_gfx const *__restrict self, \
-	                                      video_coord_t x, video_coord_t y,        \
-	                                      video_color_t color) {                   \
-		video_pixel_t o_pixel = _video_gfx_x_getpixel(self, x, y);                 \
-		video_color_t o_color = self->vx_buffer->vb_format.pixel2color(o_pixel);   \
-		video_color_t n_color = gfx_blendcolors(o_color, color, mode);             \
-		video_pixel_t n_pixel = self->vx_buffer->vb_format.color2pixel(n_color);   \
-		_video_gfx_x_setpixel(self, x, y, n_pixel);                                \
+#define DEFINE_libvideo_gfx_generic__putcolor_FOO(name, mode)                                   \
+	INTERN ATTR_IN(1) void CC                                                                   \
+	libvideo_gfx_generic__putcolor_##name(struct video_gfx const *__restrict self,              \
+	                                      video_coord_t x, video_coord_t y,                     \
+	                                      video_color_t color) {                                \
+		video_pixel_t o_pixel = _video_gfx_x_getpixel(self, x, y);                              \
+		video_color_t o_color = video_format_pixel2color(&self->vx_buffer->vb_format, o_pixel); \
+		video_color_t n_color = gfx_blendcolors(o_color, color, mode);                          \
+		video_pixel_t n_pixel = video_format_color2pixel(&self->vx_buffer->vb_format, n_color); \
+		_video_gfx_x_setpixel(self, x, y, n_pixel);                                             \
 	}
 GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_gfx_generic__putcolor_FOO)
 #undef DEFINE_libvideo_gfx_generic__putcolor_FOO

@@ -284,7 +284,7 @@ __ASM_L(	.cfi_escape 45,0)
 	nop /* Required to allow for detection during unwinding. */
 PUBLIC_FUNCTION(x86_userexcept_sysret)
 
-	/* Entry point for redirected system return paths */
+	/* Entry point for redirected syscall return paths */
 
 	/* Construct an IRET tail with information from `this_x86_sysret_iret' */
 #ifdef __x86_64__

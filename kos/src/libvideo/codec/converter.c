@@ -106,7 +106,7 @@ map_p_to_p(struct video_converter const *__restrict self, video_pixel_t from_pix
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
 map_p_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
-	return self->vcv_to.color2pixel(color);
+	return video_format_color2pixel(&self->vcv_to, color);
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC

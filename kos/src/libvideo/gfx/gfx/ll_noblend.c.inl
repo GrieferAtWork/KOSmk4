@@ -86,10 +86,10 @@ libvideo_gfx_noblend__absline_llhh(struct video_gfx const *__restrict self,
                                    video_color_t color) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
-	if likely(buffer->wlock(lock) == 0) {
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		video_dim_t step;
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		step = 0;
@@ -124,7 +124,7 @@ libvideo_gfx_noblend__absline_llhh(struct video_gfx const *__restrict self,
 				} while (++step != size_y);
 			}
 		}
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 	} else {
 		/* Use pixel-based rendering */
 		libvideo_gfx_noblend__absline_llhh__bypixel(self, dst_x, dst_y, size_x, size_y, pixel);
@@ -166,10 +166,10 @@ libvideo_gfx_noblend__absline_lhhl(struct video_gfx const *__restrict self,
                                    video_color_t color) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
-	if likely(buffer->wlock(lock) == 0) {
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		video_dim_t step;
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		step = 0;
@@ -204,7 +204,7 @@ libvideo_gfx_noblend__absline_lhhl(struct video_gfx const *__restrict self,
 				} while (++step != size_y);
 			}
 		}
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 	} else {
 		/* Use pixel-based rendering */
 		libvideo_gfx_noblend__absline_lhhl__bypixel(self, dst_x, dst_y, size_x, size_y, pixel);
@@ -228,11 +228,11 @@ libvideo_gfx_noblend__absline_h(struct video_gfx const *__restrict self,
                                 video_dim_t length, video_color_t color) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	if likely(buffer->wlock(lock) == 0) {
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
-		buffer->vb_format.linefill(line, dst_x, pixel, length);
-		buffer->unlock(lock);
+		(*buffer->vb_format.vf_codec->vc_linefill)(line, dst_x, pixel, length);
+		video_buffer_unlock(buffer, &lock);
 	} else {
 		/* Use pixel-based rendering */
 		libvideo_gfx_noblend__absline_h__bypixel(self, dst_x, dst_y, length, pixel);
@@ -255,14 +255,14 @@ libvideo_gfx_noblend__absline_v(struct video_gfx const *__restrict self,
                                 video_dim_t length, video_color_t color) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	if likely(buffer->wlock(lock) == 0) {
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
 		vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
 		(*vc_vertfill)(line, dst_x, lock.vl_stride, pixel, length);
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 	} else {
 		/* Use pixel-based rendering */
 		libvideo_gfx_noblend__absline_v__bypixel(self, dst_x, dst_y, length, pixel);
@@ -290,8 +290,8 @@ libvideo_gfx_noblend__absfill(struct video_gfx const *__restrict self,
                               video_color_t color) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
-	if likely(buffer->wlock(lock) == 0) {
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		/* Use the low-level linefill operator from the video codec */
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
@@ -300,7 +300,7 @@ libvideo_gfx_noblend__absfill(struct video_gfx const *__restrict self,
 		gfx_assert(size_x > 0);
 		gfx_assert(size_y > 0);
 		(*vc_rectfill)(line, dst_x, lock.vl_stride, pixel, size_x, size_y);
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 	} else {
 		/* Use pixel-based rendering */
 		libvideo_gfx_noblend__absfill__bypixel(self, dst_x, dst_y, size_x, size_y, pixel);
@@ -395,17 +395,17 @@ libvideo_gfx_noblend_interp8888__absgradient(struct video_gfx const *__restrict 
 
 	/* Convert colors to pixels */
 	buffer = self->vx_buffer;
-	pixels[0][0] = buffer->vb_format.color2pixel(colors[0][0]);
-	pixels[0][1] = buffer->vb_format.color2pixel(colors[0][1]);
-	pixels[1][0] = buffer->vb_format.color2pixel(colors[1][0]);
-	pixels[1][1] = buffer->vb_format.color2pixel(colors[1][1]);
+	pixels[0][0] = video_format_color2pixel(&buffer->vb_format, colors[0][0]);
+	pixels[0][1] = video_format_color2pixel(&buffer->vb_format, colors[0][1]);
+	pixels[1][0] = video_format_color2pixel(&buffer->vb_format, colors[1][0]);
+	pixels[1][1] = video_format_color2pixel(&buffer->vb_format, colors[1][1]);
 
 	TRACE_START("noblend_interp8888__absgradient("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "colors: {{%#" PRIxCOL ", %#" PRIxCOL "}, {%#" PRIxCOL ", %#" PRIxCOL "}})\n",
 	            dst_x_, dst_y_, size_x_, size_y_,
 	            colors[0][0], colors[0][1], colors[1][0], colors[1][1]);
-	if likely(buffer->wlock(lock) == 0) {
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *base = lock.vl_data + dst_y_ * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel);
@@ -539,9 +539,9 @@ libvideo_gfx_noblend_interp8888__absgradient_h(struct video_gfx const *__restric
 	            locolor, hicolor);
 	calc_linear_stretch_dim(2, size_x, &fp_src_x, &fp_step_x, &pad_xmin, &pad_xmax);
 	buffer = self->vx_buffer;
-	lopixel = buffer->vb_format.color2pixel(locolor);
-	hipixel = buffer->vb_format.color2pixel(hicolor);
-	if likely(buffer->wlock(lock) == 0) {
+	lopixel = video_format_color2pixel(&buffer->vb_format, locolor);
+	hipixel = video_format_color2pixel(&buffer->vb_format, hicolor);
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *base = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
@@ -624,9 +624,9 @@ libvideo_gfx_noblend_interp8888__absgradient_v(struct video_gfx const *__restric
 	            locolor, hicolor);
 	calc_linear_stretch_dim(2, size_y, &fp_src_y, &fp_step_y, &pad_ymin, &pad_ymax);
 	buffer = self->vx_buffer;
-	lopixel = buffer->vb_format.color2pixel(locolor);
-	hipixel = buffer->vb_format.color2pixel(hicolor);
-	if likely(buffer->wlock(lock) == 0) {
+	lopixel = video_format_color2pixel(&buffer->vb_format, locolor);
+	hipixel = video_format_color2pixel(&buffer->vb_format, hicolor);
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
@@ -713,14 +713,14 @@ libvideo_gfx_noblend__fillmask1(struct video_gfx const *__restrict self,
                                 __REGISTER_TYPE__ bm_xor) {
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
-	video_pixel_t pixel = buffer->vb_format.color2pixel(color);
+	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
 	TRACE_START("noblend__fillmask1("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ", bm: %p+%" PRIuPTR ", "
 	            "bm_xor: %#" PRIxN(__SIZEOF_REGISTER__) ")\n",
 	            dst_x, dst_y, size_x, size_y, color,
 	            bm->vbm_mask, bm->vbm_skip, bm_xor);
-	if likely(buffer->wlock(lock) == 0) {
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
@@ -824,7 +824,7 @@ next_row:
 			bitmask += bitskip / NBBY;
 			bitskip = bitskip % NBBY;
 		} while (--size_y);
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 		goto done;
 	}
 	/* Use pixel-based rendering */
@@ -885,14 +885,14 @@ libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t bg_fg_pixel[2];
-	bg_fg_pixel[0] = buffer->vb_format.color2pixel(bg_fg_colors[0]);
-	bg_fg_pixel[1] = buffer->vb_format.color2pixel(bg_fg_colors[1]);
+	bg_fg_pixel[0] = video_format_color2pixel(&buffer->vb_format, bg_fg_colors[0]);
+	bg_fg_pixel[1] = video_format_color2pixel(&buffer->vb_format, bg_fg_colors[1]);
 	TRACE_START("noblend__fillmask("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "bg_fg_colors: {%#" PRIxCOL ", %#" PRIxCOL "}, bm: %p+%" PRIuPTR ")\n",
 	            dst_x, dst_y, size_x, size_y, bg_fg_colors[0], bg_fg_colors[1],
 	            bm->vbm_mask, bm->vbm_skip);
-	if likely(buffer->wlock(lock) == 0) {
+	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 		                                      video_pixel_t pixel, video_dim_t num_pixels);
@@ -1009,7 +1009,7 @@ libvideo_gfx_noblend__fillmask(struct video_gfx const *__restrict self,
 			bitmask += bitskip / NBBY;
 			bitskip = bitskip % NBBY;
 		} while (--size_y);
-		buffer->unlock(lock);
+		video_buffer_unlock(buffer, &lock);
 		goto done;
 	}
 	/* Use pixel-based rendering */
@@ -1070,10 +1070,10 @@ libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict se
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
-	if likely(dst_buffer->wlock(dst_lock) == 0) {
+	if likely(video_buffer_wlock(dst_buffer, &dst_lock) == 0) {
 		struct video_lock src_lock;
 		struct video_buffer *src_buffer = self->vbt_src->vx_buffer;
-		if likely(src_buffer->rlock(src_lock) == 0) {
+		if likely(video_buffer_rlock(src_buffer, &src_lock) == 0) {
 			byte_t *dst_line = dst_lock.vl_data + dst_y * dst_lock.vl_stride;
 			byte_t const *src_line = src_lock.vl_data + src_y * src_lock.vl_stride;
 			void (LIBVIDEO_CODEC_CC *vc_rectcopy)(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
@@ -1083,11 +1083,11 @@ libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict se
 			(*vc_rectcopy)(dst_line, dst_x, dst_lock.vl_stride,
 			               src_line, src_x, src_lock.vl_stride,
 			               size_x, size_y);
-			src_buffer->unlock(src_lock);
-			dst_buffer->unlock(dst_lock);
+			video_buffer_unlock(src_buffer, &src_lock);
+			video_buffer_unlock(dst_buffer, &dst_lock);
 			goto done;
 		}
-		dst_buffer->unlock(dst_lock);
+		video_buffer_unlock(dst_buffer, &dst_lock);
 	}
 	/* Use pixel-based rendering */
 	libvideo_blitter_noblend_samefmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
@@ -1107,7 +1107,7 @@ libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict se
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
-	if likely(dst_buffer->wlock(vlock) == 0) {
+	if likely(video_buffer_wlock(dst_buffer, &vlock) == 0) {
 		byte_t *dst_line = vlock.vl_data + dst_y * vlock.vl_stride;
 		byte_t const *src_line = vlock.vl_data + src_y * vlock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_rectmove)(byte_t *__restrict dst_line, video_coord_t dst_x,
@@ -1117,7 +1117,7 @@ libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict se
 		vc_rectmove = dst_buffer->vb_format.vf_codec->vc_rectmove;
 		(*vc_rectmove)(dst_line, dst_x, src_line, src_x,
 		               vlock.vl_stride, size_x, size_y);
-		dst_buffer->unlock(vlock);
+		video_buffer_unlock(dst_buffer, &vlock);
 		goto done;
 	}
 

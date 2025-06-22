@@ -121,9 +121,10 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
 
 
 /* Lookup and return a reference to a video font, given its name.
- * @param: name: The font's name (the name of a file in `/lib/fonts/')
- *               Else,    you   may   pass   one   of   `VIDEO_FONT_*'
- * @return: NULL:errno=ENOENT: Unknown font `name' */
+ * @param: name: The font's name (the name of a file in `/lib/fonts/',
+ *               or  an absolute path if it contains a `/'). Else, you
+ *               may also pass one of `VIDEO_FONT_*'
+ * @return: NULL: [errno=ENOENT] Unknown font `name' */
 typedef __ATTR_WUNUSED_T __REF struct video_font *(LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(char const *__name);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_font_lookup(char const *__name);
