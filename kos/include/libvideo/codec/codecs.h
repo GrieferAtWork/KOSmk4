@@ -100,8 +100,23 @@
 #define VIDEO_CODEC_XBGR1555 0x0026
 #define VIDEO_CODEC_BGRA5551 0x0027
 #define VIDEO_CODEC_BGRX5551 0x0028
+/* TODO: Single-byte direct color codecs */
+/*      VIDEO_CODEC_RGB332           TODO */
+/*      VIDEO_CODEC_RGB323           TODO */
+/*      VIDEO_CODEC_RGB233           TODO */
+/*      VIDEO_CODEC_BGR332           TODO */
+/*      VIDEO_CODEC_BGR323           TODO */
+/*      VIDEO_CODEC_BGR233           TODO */
+/*      VIDEO_CODEC_RGBA2222         TODO */
+/*      VIDEO_CODEC_RGBX2222         TODO */
+/*      VIDEO_CODEC_ARGB2222         TODO */
+/*      VIDEO_CODEC_XRGB2222         TODO */
+/*      VIDEO_CODEC_BGRA2222         TODO */
+/*      VIDEO_CODEC_BGRX2222         TODO */
+/*      VIDEO_CODEC_ABGR2222         TODO */
+/*      VIDEO_CODEC_XBGR2222         TODO */
 
-/* Gray-scale */
+/* Gray-scale (Luminance) */
 #define VIDEO_CODEC_L1_MSB   0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
 #define VIDEO_CODEC_L1_LSB   0x1002 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
 #define VIDEO_CODEC_L2_MSB   0x1003 /* 2-bit-per-pixel, 4-level grayscale (0=black; 3=white), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */

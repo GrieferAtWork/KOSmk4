@@ -27,8 +27,8 @@
 #include <hybrid/__minmax.h>
 
 #ifndef min
-#define min(a, b) __hybrid_min(a, b)
-#define max(a, b) __hybrid_max(a, b)
+#define min(a, b) __hybrid_min2(a, b)
+#define max(a, b) __hybrid_max2(a, b)
 #endif /* !min */
 
 #endif /* !_MINMAX_H */

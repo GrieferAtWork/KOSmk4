@@ -42,6 +42,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <inttypes.h>
 #include <malloca.h>
+#include <minmax.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -1650,8 +1651,8 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	rb.vb_ops    = &rambuffer_ops;
 	rb.vb_format.vf_codec = srcbuf->vb_format.vf_codec;
 	rb.vb_format.vf_pal   = srcbuf->vb_format.vf_pal;
-	rb.vb_xdim   = __hybrid_min2(dst_size_x, src_size_x);
-	rb.vb_ydim   = __hybrid_min2(dst_size_y, src_size_y);
+	rb.vb_xdim   = min(dst_size_x, src_size_x);
+	rb.vb_ydim   = min(dst_size_y, src_size_y);
 	rb.rb_stride = rb.vb_xdim * rb.vb_format.vf_codec->vc_specs.vcs_pxsz;
 	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_format.vf_codec->vc_align);
 	rb.rb_total  = rb.rb_stride * rb.vb_ydim;
