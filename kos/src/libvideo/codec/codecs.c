@@ -1498,173 +1498,140 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 #define bgr888_pixel2color bgrx8888_pixel2color
 #define bgr888_color2pixel bgrx8888_color2pixel
 
-PRIVATE video_color_t const l3_to_color[8] = {
-/*[[[deemon
-for (local x: [:8]) {
-	local chan = (((x * 255) + (7 / 2)) / 7);
-	local chanH = chan.hex(2);
-	print("	[", x, "] = VIDEO_COLOR_RGBA(", chanH, ", ", chanH, ", ", chanH, ", 0), /" "* ", chan.bin(8), " *" "/");
-}
-]]]*/
-	[0] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0), /* 0b00000000 */
-	[1] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0), /* 0b00100100 */
-	[2] = VIDEO_COLOR_RGBA(0x49, 0x49, 0x49, 0), /* 0b01001001 */
-	[3] = VIDEO_COLOR_RGBA(0x6d, 0x6d, 0x6d, 0), /* 0b01101101 */
-	[4] = VIDEO_COLOR_RGBA(0x92, 0x92, 0x92, 0), /* 0b10010010 */
-	[5] = VIDEO_COLOR_RGBA(0xb6, 0xb6, 0xb6, 0), /* 0b10110110 */
-	[6] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0), /* 0b11011011 */
-	[7] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0), /* 0b11111111 */
-/*[[[end]]]*/
-};
 
-#ifdef __OPTIMIZE_SIZE__
-#define l7_to_color(x)                                       \
-	(((video_color_t)0x01010101 & (VIDEO_COLOR_RED_MASK |    \
-	                               VIDEO_COLOR_GREEN_MASK |  \
-	                               VIDEO_COLOR_BLUE_MASK)) * \
-	 (((x) << 1) | ((x) & 1)))
-#else /* __OPTIMIZE_SIZE__ */
-#define l7_to_color(x) l7_to_color[x]
-PRIVATE video_color_t const l7_to_color[128] = {
-/*[[[deemon
-for (local x: [:128]) {
-	local chan = (((x * 255) + (127 / 2)) / 127);
-	local chanH = chan.hex(2);
-	print("	[", x.hex(2), "] = VIDEO_COLOR_RGBA(", chanH, ", ", chanH, ", ", chanH, ", 0), /" "* 0b", chan.bin(8), " *" "/");
-}
-]]]*/
-	[0x00] = VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0), /* 0b0b00000000 */
-	[0x01] = VIDEO_COLOR_RGBA(0x02, 0x02, 0x02, 0), /* 0b0b00000010 */
-	[0x02] = VIDEO_COLOR_RGBA(0x04, 0x04, 0x04, 0), /* 0b0b00000100 */
-	[0x03] = VIDEO_COLOR_RGBA(0x06, 0x06, 0x06, 0), /* 0b0b00000110 */
-	[0x04] = VIDEO_COLOR_RGBA(0x08, 0x08, 0x08, 0), /* 0b0b00001000 */
-	[0x05] = VIDEO_COLOR_RGBA(0x0a, 0x0a, 0x0a, 0), /* 0b0b00001010 */
-	[0x06] = VIDEO_COLOR_RGBA(0x0c, 0x0c, 0x0c, 0), /* 0b0b00001100 */
-	[0x07] = VIDEO_COLOR_RGBA(0x0e, 0x0e, 0x0e, 0), /* 0b0b00001110 */
-	[0x08] = VIDEO_COLOR_RGBA(0x10, 0x10, 0x10, 0), /* 0b0b00010000 */
-	[0x09] = VIDEO_COLOR_RGBA(0x12, 0x12, 0x12, 0), /* 0b0b00010010 */
-	[0x0a] = VIDEO_COLOR_RGBA(0x14, 0x14, 0x14, 0), /* 0b0b00010100 */
-	[0x0b] = VIDEO_COLOR_RGBA(0x16, 0x16, 0x16, 0), /* 0b0b00010110 */
-	[0x0c] = VIDEO_COLOR_RGBA(0x18, 0x18, 0x18, 0), /* 0b0b00011000 */
-	[0x0d] = VIDEO_COLOR_RGBA(0x1a, 0x1a, 0x1a, 0), /* 0b0b00011010 */
-	[0x0e] = VIDEO_COLOR_RGBA(0x1c, 0x1c, 0x1c, 0), /* 0b0b00011100 */
-	[0x0f] = VIDEO_COLOR_RGBA(0x1e, 0x1e, 0x1e, 0), /* 0b0b00011110 */
-	[0x10] = VIDEO_COLOR_RGBA(0x20, 0x20, 0x20, 0), /* 0b0b00100000 */
-	[0x11] = VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0), /* 0b0b00100010 */
-	[0x12] = VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0), /* 0b0b00100100 */
-	[0x13] = VIDEO_COLOR_RGBA(0x26, 0x26, 0x26, 0), /* 0b0b00100110 */
-	[0x14] = VIDEO_COLOR_RGBA(0x28, 0x28, 0x28, 0), /* 0b0b00101000 */
-	[0x15] = VIDEO_COLOR_RGBA(0x2a, 0x2a, 0x2a, 0), /* 0b0b00101010 */
-	[0x16] = VIDEO_COLOR_RGBA(0x2c, 0x2c, 0x2c, 0), /* 0b0b00101100 */
-	[0x17] = VIDEO_COLOR_RGBA(0x2e, 0x2e, 0x2e, 0), /* 0b0b00101110 */
-	[0x18] = VIDEO_COLOR_RGBA(0x30, 0x30, 0x30, 0), /* 0b0b00110000 */
-	[0x19] = VIDEO_COLOR_RGBA(0x32, 0x32, 0x32, 0), /* 0b0b00110010 */
-	[0x1a] = VIDEO_COLOR_RGBA(0x34, 0x34, 0x34, 0), /* 0b0b00110100 */
-	[0x1b] = VIDEO_COLOR_RGBA(0x36, 0x36, 0x36, 0), /* 0b0b00110110 */
-	[0x1c] = VIDEO_COLOR_RGBA(0x38, 0x38, 0x38, 0), /* 0b0b00111000 */
-	[0x1d] = VIDEO_COLOR_RGBA(0x3a, 0x3a, 0x3a, 0), /* 0b0b00111010 */
-	[0x1e] = VIDEO_COLOR_RGBA(0x3c, 0x3c, 0x3c, 0), /* 0b0b00111100 */
-	[0x1f] = VIDEO_COLOR_RGBA(0x3e, 0x3e, 0x3e, 0), /* 0b0b00111110 */
-	[0x20] = VIDEO_COLOR_RGBA(0x40, 0x40, 0x40, 0), /* 0b0b01000000 */
-	[0x21] = VIDEO_COLOR_RGBA(0x42, 0x42, 0x42, 0), /* 0b0b01000010 */
-	[0x22] = VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0), /* 0b0b01000100 */
-	[0x23] = VIDEO_COLOR_RGBA(0x46, 0x46, 0x46, 0), /* 0b0b01000110 */
-	[0x24] = VIDEO_COLOR_RGBA(0x48, 0x48, 0x48, 0), /* 0b0b01001000 */
-	[0x25] = VIDEO_COLOR_RGBA(0x4a, 0x4a, 0x4a, 0), /* 0b0b01001010 */
-	[0x26] = VIDEO_COLOR_RGBA(0x4c, 0x4c, 0x4c, 0), /* 0b0b01001100 */
-	[0x27] = VIDEO_COLOR_RGBA(0x4e, 0x4e, 0x4e, 0), /* 0b0b01001110 */
-	[0x28] = VIDEO_COLOR_RGBA(0x50, 0x50, 0x50, 0), /* 0b0b01010000 */
-	[0x29] = VIDEO_COLOR_RGBA(0x52, 0x52, 0x52, 0), /* 0b0b01010010 */
-	[0x2a] = VIDEO_COLOR_RGBA(0x54, 0x54, 0x54, 0), /* 0b0b01010100 */
-	[0x2b] = VIDEO_COLOR_RGBA(0x56, 0x56, 0x56, 0), /* 0b0b01010110 */
-	[0x2c] = VIDEO_COLOR_RGBA(0x58, 0x58, 0x58, 0), /* 0b0b01011000 */
-	[0x2d] = VIDEO_COLOR_RGBA(0x5a, 0x5a, 0x5a, 0), /* 0b0b01011010 */
-	[0x2e] = VIDEO_COLOR_RGBA(0x5c, 0x5c, 0x5c, 0), /* 0b0b01011100 */
-	[0x2f] = VIDEO_COLOR_RGBA(0x5e, 0x5e, 0x5e, 0), /* 0b0b01011110 */
-	[0x30] = VIDEO_COLOR_RGBA(0x60, 0x60, 0x60, 0), /* 0b0b01100000 */
-	[0x31] = VIDEO_COLOR_RGBA(0x62, 0x62, 0x62, 0), /* 0b0b01100010 */
-	[0x32] = VIDEO_COLOR_RGBA(0x64, 0x64, 0x64, 0), /* 0b0b01100100 */
-	[0x33] = VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0), /* 0b0b01100110 */
-	[0x34] = VIDEO_COLOR_RGBA(0x68, 0x68, 0x68, 0), /* 0b0b01101000 */
-	[0x35] = VIDEO_COLOR_RGBA(0x6a, 0x6a, 0x6a, 0), /* 0b0b01101010 */
-	[0x36] = VIDEO_COLOR_RGBA(0x6c, 0x6c, 0x6c, 0), /* 0b0b01101100 */
-	[0x37] = VIDEO_COLOR_RGBA(0x6e, 0x6e, 0x6e, 0), /* 0b0b01101110 */
-	[0x38] = VIDEO_COLOR_RGBA(0x70, 0x70, 0x70, 0), /* 0b0b01110000 */
-	[0x39] = VIDEO_COLOR_RGBA(0x72, 0x72, 0x72, 0), /* 0b0b01110010 */
-	[0x3a] = VIDEO_COLOR_RGBA(0x74, 0x74, 0x74, 0), /* 0b0b01110100 */
-	[0x3b] = VIDEO_COLOR_RGBA(0x76, 0x76, 0x76, 0), /* 0b0b01110110 */
-	[0x3c] = VIDEO_COLOR_RGBA(0x78, 0x78, 0x78, 0), /* 0b0b01111000 */
-	[0x3d] = VIDEO_COLOR_RGBA(0x7a, 0x7a, 0x7a, 0), /* 0b0b01111010 */
-	[0x3e] = VIDEO_COLOR_RGBA(0x7c, 0x7c, 0x7c, 0), /* 0b0b01111100 */
-	[0x3f] = VIDEO_COLOR_RGBA(0x7e, 0x7e, 0x7e, 0), /* 0b0b01111110 */
-	[0x40] = VIDEO_COLOR_RGBA(0x81, 0x81, 0x81, 0), /* 0b0b10000001 */
-	[0x41] = VIDEO_COLOR_RGBA(0x83, 0x83, 0x83, 0), /* 0b0b10000011 */
-	[0x42] = VIDEO_COLOR_RGBA(0x85, 0x85, 0x85, 0), /* 0b0b10000101 */
-	[0x43] = VIDEO_COLOR_RGBA(0x87, 0x87, 0x87, 0), /* 0b0b10000111 */
-	[0x44] = VIDEO_COLOR_RGBA(0x89, 0x89, 0x89, 0), /* 0b0b10001001 */
-	[0x45] = VIDEO_COLOR_RGBA(0x8b, 0x8b, 0x8b, 0), /* 0b0b10001011 */
-	[0x46] = VIDEO_COLOR_RGBA(0x8d, 0x8d, 0x8d, 0), /* 0b0b10001101 */
-	[0x47] = VIDEO_COLOR_RGBA(0x8f, 0x8f, 0x8f, 0), /* 0b0b10001111 */
-	[0x48] = VIDEO_COLOR_RGBA(0x91, 0x91, 0x91, 0), /* 0b0b10010001 */
-	[0x49] = VIDEO_COLOR_RGBA(0x93, 0x93, 0x93, 0), /* 0b0b10010011 */
-	[0x4a] = VIDEO_COLOR_RGBA(0x95, 0x95, 0x95, 0), /* 0b0b10010101 */
-	[0x4b] = VIDEO_COLOR_RGBA(0x97, 0x97, 0x97, 0), /* 0b0b10010111 */
-	[0x4c] = VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0), /* 0b0b10011001 */
-	[0x4d] = VIDEO_COLOR_RGBA(0x9b, 0x9b, 0x9b, 0), /* 0b0b10011011 */
-	[0x4e] = VIDEO_COLOR_RGBA(0x9d, 0x9d, 0x9d, 0), /* 0b0b10011101 */
-	[0x4f] = VIDEO_COLOR_RGBA(0x9f, 0x9f, 0x9f, 0), /* 0b0b10011111 */
-	[0x50] = VIDEO_COLOR_RGBA(0xa1, 0xa1, 0xa1, 0), /* 0b0b10100001 */
-	[0x51] = VIDEO_COLOR_RGBA(0xa3, 0xa3, 0xa3, 0), /* 0b0b10100011 */
-	[0x52] = VIDEO_COLOR_RGBA(0xa5, 0xa5, 0xa5, 0), /* 0b0b10100101 */
-	[0x53] = VIDEO_COLOR_RGBA(0xa7, 0xa7, 0xa7, 0), /* 0b0b10100111 */
-	[0x54] = VIDEO_COLOR_RGBA(0xa9, 0xa9, 0xa9, 0), /* 0b0b10101001 */
-	[0x55] = VIDEO_COLOR_RGBA(0xab, 0xab, 0xab, 0), /* 0b0b10101011 */
-	[0x56] = VIDEO_COLOR_RGBA(0xad, 0xad, 0xad, 0), /* 0b0b10101101 */
-	[0x57] = VIDEO_COLOR_RGBA(0xaf, 0xaf, 0xaf, 0), /* 0b0b10101111 */
-	[0x58] = VIDEO_COLOR_RGBA(0xb1, 0xb1, 0xb1, 0), /* 0b0b10110001 */
-	[0x59] = VIDEO_COLOR_RGBA(0xb3, 0xb3, 0xb3, 0), /* 0b0b10110011 */
-	[0x5a] = VIDEO_COLOR_RGBA(0xb5, 0xb5, 0xb5, 0), /* 0b0b10110101 */
-	[0x5b] = VIDEO_COLOR_RGBA(0xb7, 0xb7, 0xb7, 0), /* 0b0b10110111 */
-	[0x5c] = VIDEO_COLOR_RGBA(0xb9, 0xb9, 0xb9, 0), /* 0b0b10111001 */
-	[0x5d] = VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0), /* 0b0b10111011 */
-	[0x5e] = VIDEO_COLOR_RGBA(0xbd, 0xbd, 0xbd, 0), /* 0b0b10111101 */
-	[0x5f] = VIDEO_COLOR_RGBA(0xbf, 0xbf, 0xbf, 0), /* 0b0b10111111 */
-	[0x60] = VIDEO_COLOR_RGBA(0xc1, 0xc1, 0xc1, 0), /* 0b0b11000001 */
-	[0x61] = VIDEO_COLOR_RGBA(0xc3, 0xc3, 0xc3, 0), /* 0b0b11000011 */
-	[0x62] = VIDEO_COLOR_RGBA(0xc5, 0xc5, 0xc5, 0), /* 0b0b11000101 */
-	[0x63] = VIDEO_COLOR_RGBA(0xc7, 0xc7, 0xc7, 0), /* 0b0b11000111 */
-	[0x64] = VIDEO_COLOR_RGBA(0xc9, 0xc9, 0xc9, 0), /* 0b0b11001001 */
-	[0x65] = VIDEO_COLOR_RGBA(0xcb, 0xcb, 0xcb, 0), /* 0b0b11001011 */
-	[0x66] = VIDEO_COLOR_RGBA(0xcd, 0xcd, 0xcd, 0), /* 0b0b11001101 */
-	[0x67] = VIDEO_COLOR_RGBA(0xcf, 0xcf, 0xcf, 0), /* 0b0b11001111 */
-	[0x68] = VIDEO_COLOR_RGBA(0xd1, 0xd1, 0xd1, 0), /* 0b0b11010001 */
-	[0x69] = VIDEO_COLOR_RGBA(0xd3, 0xd3, 0xd3, 0), /* 0b0b11010011 */
-	[0x6a] = VIDEO_COLOR_RGBA(0xd5, 0xd5, 0xd5, 0), /* 0b0b11010101 */
-	[0x6b] = VIDEO_COLOR_RGBA(0xd7, 0xd7, 0xd7, 0), /* 0b0b11010111 */
-	[0x6c] = VIDEO_COLOR_RGBA(0xd9, 0xd9, 0xd9, 0), /* 0b0b11011001 */
-	[0x6d] = VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0), /* 0b0b11011011 */
-	[0x6e] = VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0), /* 0b0b11011101 */
-	[0x6f] = VIDEO_COLOR_RGBA(0xdf, 0xdf, 0xdf, 0), /* 0b0b11011111 */
-	[0x70] = VIDEO_COLOR_RGBA(0xe1, 0xe1, 0xe1, 0), /* 0b0b11100001 */
-	[0x71] = VIDEO_COLOR_RGBA(0xe3, 0xe3, 0xe3, 0), /* 0b0b11100011 */
-	[0x72] = VIDEO_COLOR_RGBA(0xe5, 0xe5, 0xe5, 0), /* 0b0b11100101 */
-	[0x73] = VIDEO_COLOR_RGBA(0xe7, 0xe7, 0xe7, 0), /* 0b0b11100111 */
-	[0x74] = VIDEO_COLOR_RGBA(0xe9, 0xe9, 0xe9, 0), /* 0b0b11101001 */
-	[0x75] = VIDEO_COLOR_RGBA(0xeb, 0xeb, 0xeb, 0), /* 0b0b11101011 */
-	[0x76] = VIDEO_COLOR_RGBA(0xed, 0xed, 0xed, 0), /* 0b0b11101101 */
-	[0x77] = VIDEO_COLOR_RGBA(0xef, 0xef, 0xef, 0), /* 0b0b11101111 */
-	[0x78] = VIDEO_COLOR_RGBA(0xf1, 0xf1, 0xf1, 0), /* 0b0b11110001 */
-	[0x79] = VIDEO_COLOR_RGBA(0xf3, 0xf3, 0xf3, 0), /* 0b0b11110011 */
-	[0x7a] = VIDEO_COLOR_RGBA(0xf5, 0xf5, 0xf5, 0), /* 0b0b11110101 */
-	[0x7b] = VIDEO_COLOR_RGBA(0xf7, 0xf7, 0xf7, 0), /* 0b0b11110111 */
-	[0x7c] = VIDEO_COLOR_RGBA(0xf9, 0xf9, 0xf9, 0), /* 0b0b11111001 */
-	[0x7d] = VIDEO_COLOR_RGBA(0xfb, 0xfb, 0xfb, 0), /* 0b0b11111011 */
-	[0x7e] = VIDEO_COLOR_RGBA(0xfd, 0xfd, 0xfd, 0), /* 0b0b11111101 */
-	[0x7f] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0), /* 0b0b11111111 */
-/*[[[end]]]*/
-};
-#endif /* !__OPTIMIZE_SIZE__ */
+/* >> channel_t c3_to_c8(channel_t c);
+ * Upscape a 3-bit color channel to 8 bits
+ *
+ * >> in  = [0,8);
+ * >> out = (((in * 255) + (7 / 2)) / 7);
+ *
+ * in:  0b{a}{b}{c}
+ * out: 0b{A}{B}{C}{D}{E}{F}{G}{H}
+ *
+ * | --------- | ----------------- |
+ * | in        |  out              |
+ * | --------- | ----------------- |
+ * |   abc     |   ABCDEFGH        |
+ * | 0b000 (0) | 0b00000000 (0x00) |
+ * | 0b001 (1) | 0b00100100 (0x24) |
+ * | 0b010 (2) | 0b01001001 (0x49) |
+ * | 0b011 (3) | 0b01101101 (0x6d) |
+ * | 0b100 (4) | 0b10010010 (0x92) |
+ * | 0b101 (5) | 0b10110110 (0xb6) |
+ * | 0b110 (6) | 0b11011011 (0xdb) |
+ * | 0b111 (7) | 0b11111111 (0xff) |
+ * | --------- | ----------------- |
+ *
+ * Logic-mapping:
+ * >> A = a
+ * >> B = b
+ * >> C = c
+ * >> D = a
+ * >> E = b
+ * >> F = c
+ * >> G = a
+ * >> H = b
+ */
+#define c3_to_c8(c)                      \
+	(uint8_t)(((c) >> 1) | /* GH=ab */   \
+	          ((c) << 2) | /* DEF=abc */ \
+	          ((c) << 5))  /* ABC=abc */
 
+
+/* >> channel_t c7_to_c8(channel_t c);
+ * Upscape a 7-bit color channel to 8 bits
+ *
+ * >> in  = [0,128);
+ * >> out = (((in * 255) + (127 / 2)) / 127);
+ *
+ * in:  0b{a}{b}{c}{d}{e}{f}{g}
+ * out: 0b{A}{B}{C}{D}{E}{F}{G}{H}
+ *
+ * | in              |  out              | in              |  out              |
+ * | --------------- | ----------------- | --------------- | ----------------- |
+ * |   abcdefg       |   ABCDEFGH        |   abcdefg       |   ABCDEFGH        |
+ * | 0b0000000 (  0) | 0b00000000 (0x00) | 0b1000000 ( 64) | 0b10000001 (0x81) |
+ * | 0b0000001 (  1) | 0b00000010 (0x02) | 0b1000001 ( 65) | 0b10000011 (0x83) |
+ * | 0b0000010 (  2) | 0b00000100 (0x04) | 0b1000010 ( 66) | 0b10000101 (0x85) |
+ * | 0b0000011 (  3) | 0b00000110 (0x06) | 0b1000011 ( 67) | 0b10000111 (0x87) |
+ * | 0b0000100 (  4) | 0b00001000 (0x08) | 0b1000100 ( 68) | 0b10001001 (0x89) |
+ * | 0b0000101 (  5) | 0b00001010 (0x0a) | 0b1000101 ( 69) | 0b10001011 (0x8b) |
+ * | 0b0000110 (  6) | 0b00001100 (0x0c) | 0b1000110 ( 70) | 0b10001101 (0x8d) |
+ * | 0b0000111 (  7) | 0b00001110 (0x0e) | 0b1000111 ( 71) | 0b10001111 (0x8f) |
+ * | 0b0001000 (  8) | 0b00010000 (0x10) | 0b1001000 ( 72) | 0b10010001 (0x91) |
+ * | 0b0001001 (  9) | 0b00010010 (0x12) | 0b1001001 ( 73) | 0b10010011 (0x93) |
+ * | 0b0001010 ( 10) | 0b00010100 (0x14) | 0b1001010 ( 74) | 0b10010101 (0x95) |
+ * | 0b0001011 ( 11) | 0b00010110 (0x16) | 0b1001011 ( 75) | 0b10010111 (0x97) |
+ * | 0b0001100 ( 12) | 0b00011000 (0x18) | 0b1001100 ( 76) | 0b10011001 (0x99) |
+ * | 0b0001101 ( 13) | 0b00011010 (0x1a) | 0b1001101 ( 77) | 0b10011011 (0x9b) |
+ * | 0b0001110 ( 14) | 0b00011100 (0x1c) | 0b1001110 ( 78) | 0b10011101 (0x9d) |
+ * | 0b0001111 ( 15) | 0b00011110 (0x1e) | 0b1001111 ( 79) | 0b10011111 (0x9f) |
+ * | 0b0010000 ( 16) | 0b00100000 (0x20) | 0b1010000 ( 80) | 0b10100001 (0xa1) |
+ * | 0b0010001 ( 17) | 0b00100010 (0x22) | 0b1010001 ( 81) | 0b10100011 (0xa3) |
+ * | 0b0010010 ( 18) | 0b00100100 (0x24) | 0b1010010 ( 82) | 0b10100101 (0xa5) |
+ * | 0b0010011 ( 19) | 0b00100110 (0x26) | 0b1010011 ( 83) | 0b10100111 (0xa7) |
+ * | 0b0010100 ( 20) | 0b00101000 (0x28) | 0b1010100 ( 84) | 0b10101001 (0xa9) |
+ * | 0b0010101 ( 21) | 0b00101010 (0x2a) | 0b1010101 ( 85) | 0b10101011 (0xab) |
+ * | 0b0010110 ( 22) | 0b00101100 (0x2c) | 0b1010110 ( 86) | 0b10101101 (0xad) |
+ * | 0b0010111 ( 23) | 0b00101110 (0x2e) | 0b1010111 ( 87) | 0b10101111 (0xaf) |
+ * | 0b0011000 ( 24) | 0b00110000 (0x30) | 0b1011000 ( 88) | 0b10110001 (0xb1) |
+ * | 0b0011001 ( 25) | 0b00110010 (0x32) | 0b1011001 ( 89) | 0b10110011 (0xb3) |
+ * | 0b0011010 ( 26) | 0b00110100 (0x34) | 0b1011010 ( 90) | 0b10110101 (0xb5) |
+ * | 0b0011011 ( 27) | 0b00110110 (0x36) | 0b1011011 ( 91) | 0b10110111 (0xb7) |
+ * | 0b0011100 ( 28) | 0b00111000 (0x38) | 0b1011100 ( 92) | 0b10111001 (0xb9) |
+ * | 0b0011101 ( 29) | 0b00111010 (0x3a) | 0b1011101 ( 93) | 0b10111011 (0xbb) |
+ * | 0b0011110 ( 30) | 0b00111100 (0x3c) | 0b1011110 ( 94) | 0b10111101 (0xbd) |
+ * | 0b0011111 ( 31) | 0b00111110 (0x3e) | 0b1011111 ( 95) | 0b10111111 (0xbf) |
+ * | 0b0100000 ( 32) | 0b01000000 (0x40) | 0b1100000 ( 96) | 0b11000001 (0xc1) |
+ * | 0b0100001 ( 33) | 0b01000010 (0x42) | 0b1100001 ( 97) | 0b11000011 (0xc3) |
+ * | 0b0100010 ( 34) | 0b01000100 (0x44) | 0b1100010 ( 98) | 0b11000101 (0xc5) |
+ * | 0b0100011 ( 35) | 0b01000110 (0x46) | 0b1100011 ( 99) | 0b11000111 (0xc7) |
+ * | 0b0100100 ( 36) | 0b01001000 (0x48) | 0b1100100 (100) | 0b11001001 (0xc9) |
+ * | 0b0100101 ( 37) | 0b01001010 (0x4a) | 0b1100101 (101) | 0b11001011 (0xcb) |
+ * | 0b0100110 ( 38) | 0b01001100 (0x4c) | 0b1100110 (102) | 0b11001101 (0xcd) |
+ * | 0b0100111 ( 39) | 0b01001110 (0x4e) | 0b1100111 (103) | 0b11001111 (0xcf) |
+ * | 0b0101000 ( 40) | 0b01010000 (0x50) | 0b1101000 (104) | 0b11010001 (0xd1) |
+ * | 0b0101001 ( 41) | 0b01010010 (0x52) | 0b1101001 (105) | 0b11010011 (0xd3) |
+ * | 0b0101010 ( 42) | 0b01010100 (0x54) | 0b1101010 (106) | 0b11010101 (0xd5) |
+ * | 0b0101011 ( 43) | 0b01010110 (0x56) | 0b1101011 (107) | 0b11010111 (0xd7) |
+ * | 0b0101100 ( 44) | 0b01011000 (0x58) | 0b1101100 (108) | 0b11011001 (0xd9) |
+ * | 0b0101101 ( 45) | 0b01011010 (0x5a) | 0b1101101 (109) | 0b11011011 (0xdb) |
+ * | 0b0101110 ( 46) | 0b01011100 (0x5c) | 0b1101110 (110) | 0b11011101 (0xdd) |
+ * | 0b0101111 ( 47) | 0b01011110 (0x5e) | 0b1101111 (111) | 0b11011111 (0xdf) |
+ * | 0b0110000 ( 48) | 0b01100000 (0x60) | 0b1110000 (112) | 0b11100001 (0xe1) |
+ * | 0b0110001 ( 49) | 0b01100010 (0x62) | 0b1110001 (113) | 0b11100011 (0xe3) |
+ * | 0b0110010 ( 50) | 0b01100100 (0x64) | 0b1110010 (114) | 0b11100101 (0xe5) |
+ * | 0b0110011 ( 51) | 0b01100110 (0x66) | 0b1110011 (115) | 0b11100111 (0xe7) |
+ * | 0b0110100 ( 52) | 0b01101000 (0x68) | 0b1110100 (116) | 0b11101001 (0xe9) |
+ * | 0b0110101 ( 53) | 0b01101010 (0x6a) | 0b1110101 (117) | 0b11101011 (0xeb) |
+ * | 0b0110110 ( 54) | 0b01101100 (0x6c) | 0b1110110 (118) | 0b11101101 (0xed) |
+ * | 0b0110111 ( 55) | 0b01101110 (0x6e) | 0b1110111 (119) | 0b11101111 (0xef) |
+ * | 0b0111000 ( 56) | 0b01110000 (0x70) | 0b1111000 (120) | 0b11110001 (0xf1) |
+ * | 0b0111001 ( 57) | 0b01110010 (0x72) | 0b1111001 (121) | 0b11110011 (0xf3) |
+ * | 0b0111010 ( 58) | 0b01110100 (0x74) | 0b1111010 (122) | 0b11110101 (0xf5) |
+ * | 0b0111011 ( 59) | 0b01110110 (0x76) | 0b1111011 (123) | 0b11110111 (0xf7) |
+ * | 0b0111100 ( 60) | 0b01111000 (0x78) | 0b1111100 (124) | 0b11111001 (0xf9) |
+ * | 0b0111101 ( 61) | 0b01111010 (0x7a) | 0b1111101 (125) | 0b11111011 (0xfb) |
+ * | 0b0111110 ( 62) | 0b01111100 (0x7c) | 0b1111110 (126) | 0b11111101 (0xfd) |
+ * | 0b0111111 ( 63) | 0b01111110 (0x7e) | 0b1111111 (127) | 0b11111111 (0xff) |
+ * | --------------- | ----------------- | --------------- | ----------------- |
+ *
+ * Logic-mapping:
+ * >> A = a
+ * >> B = b
+ * >> C = c
+ * >> D = d
+ * >> E = e
+ * >> F = f
+ * >> G = g
+ * >> H = a
+ */
+#define c7_to_c8(c)                              \
+	(uint8_t)(((c) << 1) | /* ABCDEFG=abcdefg */ \
+	          ((c) >> 6))  /* H=a */
+
+#define RGB_MULTIPILER \
+	(__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK))
 
 
 #define alpha1_tocolor(v) ((video_color_t)(VIDEO_COLOR_ALPHA_MASK) * (v))
@@ -1674,12 +1641,12 @@ for (local x: [:128]) {
 
 #define lumen1_tocolor(v) ((VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK) * (v))
 #define lumen2_tocolor(v) ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
-#define lumen3_tocolor(v) l3_to_color[v]
+#define lumen3_tocolor(v) (RGB_MULTIPILER * c3_to_c8(v))
 #define lumen4_tocolor(v) ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
-#define lumen7_tocolor(v) l7_to_color(v)
-#define lumen8_tocolor(v) ((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen7_tocolor(v) (RGB_MULTIPILER * c7_to_c8(v))
+#define lumen8_tocolor(v) (RGB_MULTIPILER * (v))
 
-#define rgb_getlumen8(r, g, b)      (video_pixel_t)((uint8_t)((uint_fast16_t)((uint_fast16_t)r + g + b + 2) / 3))
+#define rgb_getlumen8(r, g, b)      (video_pixel_t)((uint8_t)((uint_fast16_t)((uint_fast16_t)r + g + b + (3 / 2)) / 3))
 #define rgb_getlumen1(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 7)
 #define rgb_getlumen2(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 6)
 #define rgb_getlumen3(r, g, b)      (video_pixel_t)(rgb_getlumen8(r, g, b) >> 5)
