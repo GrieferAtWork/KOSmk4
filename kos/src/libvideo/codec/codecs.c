@@ -1635,12 +1635,12 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 
 
 #define alpha1_tocolor(v) ((video_color_t)(VIDEO_COLOR_ALPHA_MASK) * (v))
-#define alpha2_tocolor(v) ((video_color_t)(__UINT32_C(0x22222222) & (VIDEO_COLOR_ALPHA_MASK)) * (v))
+#define alpha2_tocolor(v) ((video_color_t)(__UINT32_C(0x55555555) & (VIDEO_COLOR_ALPHA_MASK)) * (v))
 #define alpha4_tocolor(v) ((video_color_t)(__UINT32_C(0x11111111) & (VIDEO_COLOR_ALPHA_MASK)) * (v))
 #define alpha8_tocolor(v) ((video_color_t)(v) << VIDEO_COLOR_ALPHA_SHIFT)
 
 #define lumen1_tocolor(v) ((VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK) * (v))
-#define lumen2_tocolor(v) ((__UINT32_C(0x22222222) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen2_tocolor(v) ((__UINT32_C(0x55555555) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
 #define lumen3_tocolor(v) (RGB_MULTIPILER * c3_to_c8(v))
 #define lumen4_tocolor(v) ((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
 #define lumen7_tocolor(v) (RGB_MULTIPILER * c7_to_c8(v))
@@ -1667,6 +1667,198 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 #define color_getalpha3(c)      (video_pixel_t)(c.a >> 5)
 #define color_getalpha4(c)      (video_pixel_t)(c.a >> 4)
 #define color_getalpha8(c)      (video_pixel_t)(c.a)
+
+
+/************************************************************************/
+/* Assert that conversion from fixed-length alpha/lumen works           */
+static_assert(alpha1_tocolor(0) == VIDEO_COLOR_RGBA(0, 0, 0, 0x00));
+static_assert(alpha1_tocolor(1) == VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
+
+static_assert(alpha2_tocolor(0) == VIDEO_COLOR_RGBA(0, 0, 0, 0x00));
+static_assert(alpha2_tocolor(1) == VIDEO_COLOR_RGBA(0, 0, 0, 0x55));
+static_assert(alpha2_tocolor(2) == VIDEO_COLOR_RGBA(0, 0, 0, 0xaa));
+static_assert(alpha2_tocolor(3) == VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
+
+static_assert(alpha4_tocolor(0x0) == VIDEO_COLOR_RGBA(0, 0, 0, 0x00));
+static_assert(alpha4_tocolor(0x1) == VIDEO_COLOR_RGBA(0, 0, 0, 0x11));
+static_assert(alpha4_tocolor(0x2) == VIDEO_COLOR_RGBA(0, 0, 0, 0x22));
+static_assert(alpha4_tocolor(0x3) == VIDEO_COLOR_RGBA(0, 0, 0, 0x33));
+static_assert(alpha4_tocolor(0x4) == VIDEO_COLOR_RGBA(0, 0, 0, 0x44));
+static_assert(alpha4_tocolor(0x5) == VIDEO_COLOR_RGBA(0, 0, 0, 0x55));
+static_assert(alpha4_tocolor(0x6) == VIDEO_COLOR_RGBA(0, 0, 0, 0x66));
+static_assert(alpha4_tocolor(0x7) == VIDEO_COLOR_RGBA(0, 0, 0, 0x77));
+static_assert(alpha4_tocolor(0x8) == VIDEO_COLOR_RGBA(0, 0, 0, 0x88));
+static_assert(alpha4_tocolor(0x9) == VIDEO_COLOR_RGBA(0, 0, 0, 0x99));
+static_assert(alpha4_tocolor(0xa) == VIDEO_COLOR_RGBA(0, 0, 0, 0xaa));
+static_assert(alpha4_tocolor(0xb) == VIDEO_COLOR_RGBA(0, 0, 0, 0xbb));
+static_assert(alpha4_tocolor(0xc) == VIDEO_COLOR_RGBA(0, 0, 0, 0xcc));
+static_assert(alpha4_tocolor(0xd) == VIDEO_COLOR_RGBA(0, 0, 0, 0xdd));
+static_assert(alpha4_tocolor(0xe) == VIDEO_COLOR_RGBA(0, 0, 0, 0xee));
+static_assert(alpha4_tocolor(0xf) == VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
+
+static_assert(lumen1_tocolor(0) == VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0));
+static_assert(lumen1_tocolor(1) == VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0));
+
+static_assert(lumen2_tocolor(0) == VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0));
+static_assert(lumen2_tocolor(1) == VIDEO_COLOR_RGBA(0x55, 0x55, 0x55, 0));
+static_assert(lumen2_tocolor(2) == VIDEO_COLOR_RGBA(0xaa, 0xaa, 0xaa, 0));
+static_assert(lumen2_tocolor(3) == VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0));
+
+static_assert(lumen3_tocolor(0) == VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0));
+static_assert(lumen3_tocolor(1) == VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0));
+static_assert(lumen3_tocolor(2) == VIDEO_COLOR_RGBA(0x49, 0x49, 0x49, 0));
+static_assert(lumen3_tocolor(3) == VIDEO_COLOR_RGBA(0x6d, 0x6d, 0x6d, 0));
+static_assert(lumen3_tocolor(4) == VIDEO_COLOR_RGBA(0x92, 0x92, 0x92, 0));
+static_assert(lumen3_tocolor(5) == VIDEO_COLOR_RGBA(0xb6, 0xb6, 0xb6, 0));
+static_assert(lumen3_tocolor(6) == VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0));
+static_assert(lumen3_tocolor(7) == VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0));
+
+static_assert(lumen4_tocolor(0x0) == VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0));
+static_assert(lumen4_tocolor(0x1) == VIDEO_COLOR_RGBA(0x11, 0x11, 0x11, 0));
+static_assert(lumen4_tocolor(0x2) == VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0));
+static_assert(lumen4_tocolor(0x3) == VIDEO_COLOR_RGBA(0x33, 0x33, 0x33, 0));
+static_assert(lumen4_tocolor(0x4) == VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0));
+static_assert(lumen4_tocolor(0x5) == VIDEO_COLOR_RGBA(0x55, 0x55, 0x55, 0));
+static_assert(lumen4_tocolor(0x6) == VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0));
+static_assert(lumen4_tocolor(0x7) == VIDEO_COLOR_RGBA(0x77, 0x77, 0x77, 0));
+static_assert(lumen4_tocolor(0x8) == VIDEO_COLOR_RGBA(0x88, 0x88, 0x88, 0));
+static_assert(lumen4_tocolor(0x9) == VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0));
+static_assert(lumen4_tocolor(0xa) == VIDEO_COLOR_RGBA(0xaa, 0xaa, 0xaa, 0));
+static_assert(lumen4_tocolor(0xb) == VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0));
+static_assert(lumen4_tocolor(0xc) == VIDEO_COLOR_RGBA(0xcc, 0xcc, 0xcc, 0));
+static_assert(lumen4_tocolor(0xd) == VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0));
+static_assert(lumen4_tocolor(0xe) == VIDEO_COLOR_RGBA(0xee, 0xee, 0xee, 0));
+static_assert(lumen4_tocolor(0xf) == VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0));
+
+static_assert(lumen7_tocolor(0) == VIDEO_COLOR_RGBA(0x00, 0x00, 0x00, 0));
+static_assert(lumen7_tocolor(1) == VIDEO_COLOR_RGBA(0x02, 0x02, 0x02, 0));
+static_assert(lumen7_tocolor(2) == VIDEO_COLOR_RGBA(0x04, 0x04, 0x04, 0));
+static_assert(lumen7_tocolor(3) == VIDEO_COLOR_RGBA(0x06, 0x06, 0x06, 0));
+static_assert(lumen7_tocolor(4) == VIDEO_COLOR_RGBA(0x08, 0x08, 0x08, 0));
+static_assert(lumen7_tocolor(5) == VIDEO_COLOR_RGBA(0x0a, 0x0a, 0x0a, 0));
+static_assert(lumen7_tocolor(6) == VIDEO_COLOR_RGBA(0x0c, 0x0c, 0x0c, 0));
+static_assert(lumen7_tocolor(7) == VIDEO_COLOR_RGBA(0x0e, 0x0e, 0x0e, 0));
+static_assert(lumen7_tocolor(8) == VIDEO_COLOR_RGBA(0x10, 0x10, 0x10, 0));
+static_assert(lumen7_tocolor(9) == VIDEO_COLOR_RGBA(0x12, 0x12, 0x12, 0));
+static_assert(lumen7_tocolor(10) == VIDEO_COLOR_RGBA(0x14, 0x14, 0x14, 0));
+static_assert(lumen7_tocolor(11) == VIDEO_COLOR_RGBA(0x16, 0x16, 0x16, 0));
+static_assert(lumen7_tocolor(12) == VIDEO_COLOR_RGBA(0x18, 0x18, 0x18, 0));
+static_assert(lumen7_tocolor(13) == VIDEO_COLOR_RGBA(0x1a, 0x1a, 0x1a, 0));
+static_assert(lumen7_tocolor(14) == VIDEO_COLOR_RGBA(0x1c, 0x1c, 0x1c, 0));
+static_assert(lumen7_tocolor(15) == VIDEO_COLOR_RGBA(0x1e, 0x1e, 0x1e, 0));
+static_assert(lumen7_tocolor(16) == VIDEO_COLOR_RGBA(0x20, 0x20, 0x20, 0));
+static_assert(lumen7_tocolor(17) == VIDEO_COLOR_RGBA(0x22, 0x22, 0x22, 0));
+static_assert(lumen7_tocolor(18) == VIDEO_COLOR_RGBA(0x24, 0x24, 0x24, 0));
+static_assert(lumen7_tocolor(19) == VIDEO_COLOR_RGBA(0x26, 0x26, 0x26, 0));
+static_assert(lumen7_tocolor(20) == VIDEO_COLOR_RGBA(0x28, 0x28, 0x28, 0));
+static_assert(lumen7_tocolor(21) == VIDEO_COLOR_RGBA(0x2a, 0x2a, 0x2a, 0));
+static_assert(lumen7_tocolor(22) == VIDEO_COLOR_RGBA(0x2c, 0x2c, 0x2c, 0));
+static_assert(lumen7_tocolor(23) == VIDEO_COLOR_RGBA(0x2e, 0x2e, 0x2e, 0));
+static_assert(lumen7_tocolor(24) == VIDEO_COLOR_RGBA(0x30, 0x30, 0x30, 0));
+static_assert(lumen7_tocolor(25) == VIDEO_COLOR_RGBA(0x32, 0x32, 0x32, 0));
+static_assert(lumen7_tocolor(26) == VIDEO_COLOR_RGBA(0x34, 0x34, 0x34, 0));
+static_assert(lumen7_tocolor(27) == VIDEO_COLOR_RGBA(0x36, 0x36, 0x36, 0));
+static_assert(lumen7_tocolor(28) == VIDEO_COLOR_RGBA(0x38, 0x38, 0x38, 0));
+static_assert(lumen7_tocolor(29) == VIDEO_COLOR_RGBA(0x3a, 0x3a, 0x3a, 0));
+static_assert(lumen7_tocolor(30) == VIDEO_COLOR_RGBA(0x3c, 0x3c, 0x3c, 0));
+static_assert(lumen7_tocolor(31) == VIDEO_COLOR_RGBA(0x3e, 0x3e, 0x3e, 0));
+static_assert(lumen7_tocolor(32) == VIDEO_COLOR_RGBA(0x40, 0x40, 0x40, 0));
+static_assert(lumen7_tocolor(33) == VIDEO_COLOR_RGBA(0x42, 0x42, 0x42, 0));
+static_assert(lumen7_tocolor(34) == VIDEO_COLOR_RGBA(0x44, 0x44, 0x44, 0));
+static_assert(lumen7_tocolor(35) == VIDEO_COLOR_RGBA(0x46, 0x46, 0x46, 0));
+static_assert(lumen7_tocolor(36) == VIDEO_COLOR_RGBA(0x48, 0x48, 0x48, 0));
+static_assert(lumen7_tocolor(37) == VIDEO_COLOR_RGBA(0x4a, 0x4a, 0x4a, 0));
+static_assert(lumen7_tocolor(38) == VIDEO_COLOR_RGBA(0x4c, 0x4c, 0x4c, 0));
+static_assert(lumen7_tocolor(39) == VIDEO_COLOR_RGBA(0x4e, 0x4e, 0x4e, 0));
+static_assert(lumen7_tocolor(40) == VIDEO_COLOR_RGBA(0x50, 0x50, 0x50, 0));
+static_assert(lumen7_tocolor(41) == VIDEO_COLOR_RGBA(0x52, 0x52, 0x52, 0));
+static_assert(lumen7_tocolor(42) == VIDEO_COLOR_RGBA(0x54, 0x54, 0x54, 0));
+static_assert(lumen7_tocolor(43) == VIDEO_COLOR_RGBA(0x56, 0x56, 0x56, 0));
+static_assert(lumen7_tocolor(44) == VIDEO_COLOR_RGBA(0x58, 0x58, 0x58, 0));
+static_assert(lumen7_tocolor(45) == VIDEO_COLOR_RGBA(0x5a, 0x5a, 0x5a, 0));
+static_assert(lumen7_tocolor(46) == VIDEO_COLOR_RGBA(0x5c, 0x5c, 0x5c, 0));
+static_assert(lumen7_tocolor(47) == VIDEO_COLOR_RGBA(0x5e, 0x5e, 0x5e, 0));
+static_assert(lumen7_tocolor(48) == VIDEO_COLOR_RGBA(0x60, 0x60, 0x60, 0));
+static_assert(lumen7_tocolor(49) == VIDEO_COLOR_RGBA(0x62, 0x62, 0x62, 0));
+static_assert(lumen7_tocolor(50) == VIDEO_COLOR_RGBA(0x64, 0x64, 0x64, 0));
+static_assert(lumen7_tocolor(51) == VIDEO_COLOR_RGBA(0x66, 0x66, 0x66, 0));
+static_assert(lumen7_tocolor(52) == VIDEO_COLOR_RGBA(0x68, 0x68, 0x68, 0));
+static_assert(lumen7_tocolor(53) == VIDEO_COLOR_RGBA(0x6a, 0x6a, 0x6a, 0));
+static_assert(lumen7_tocolor(54) == VIDEO_COLOR_RGBA(0x6c, 0x6c, 0x6c, 0));
+static_assert(lumen7_tocolor(55) == VIDEO_COLOR_RGBA(0x6e, 0x6e, 0x6e, 0));
+static_assert(lumen7_tocolor(56) == VIDEO_COLOR_RGBA(0x70, 0x70, 0x70, 0));
+static_assert(lumen7_tocolor(57) == VIDEO_COLOR_RGBA(0x72, 0x72, 0x72, 0));
+static_assert(lumen7_tocolor(58) == VIDEO_COLOR_RGBA(0x74, 0x74, 0x74, 0));
+static_assert(lumen7_tocolor(59) == VIDEO_COLOR_RGBA(0x76, 0x76, 0x76, 0));
+static_assert(lumen7_tocolor(60) == VIDEO_COLOR_RGBA(0x78, 0x78, 0x78, 0));
+static_assert(lumen7_tocolor(61) == VIDEO_COLOR_RGBA(0x7a, 0x7a, 0x7a, 0));
+static_assert(lumen7_tocolor(62) == VIDEO_COLOR_RGBA(0x7c, 0x7c, 0x7c, 0));
+static_assert(lumen7_tocolor(63) == VIDEO_COLOR_RGBA(0x7e, 0x7e, 0x7e, 0));
+static_assert(lumen7_tocolor(64) == VIDEO_COLOR_RGBA(0x81, 0x81, 0x81, 0));
+static_assert(lumen7_tocolor(65) == VIDEO_COLOR_RGBA(0x83, 0x83, 0x83, 0));
+static_assert(lumen7_tocolor(66) == VIDEO_COLOR_RGBA(0x85, 0x85, 0x85, 0));
+static_assert(lumen7_tocolor(67) == VIDEO_COLOR_RGBA(0x87, 0x87, 0x87, 0));
+static_assert(lumen7_tocolor(68) == VIDEO_COLOR_RGBA(0x89, 0x89, 0x89, 0));
+static_assert(lumen7_tocolor(69) == VIDEO_COLOR_RGBA(0x8b, 0x8b, 0x8b, 0));
+static_assert(lumen7_tocolor(70) == VIDEO_COLOR_RGBA(0x8d, 0x8d, 0x8d, 0));
+static_assert(lumen7_tocolor(71) == VIDEO_COLOR_RGBA(0x8f, 0x8f, 0x8f, 0));
+static_assert(lumen7_tocolor(72) == VIDEO_COLOR_RGBA(0x91, 0x91, 0x91, 0));
+static_assert(lumen7_tocolor(73) == VIDEO_COLOR_RGBA(0x93, 0x93, 0x93, 0));
+static_assert(lumen7_tocolor(74) == VIDEO_COLOR_RGBA(0x95, 0x95, 0x95, 0));
+static_assert(lumen7_tocolor(75) == VIDEO_COLOR_RGBA(0x97, 0x97, 0x97, 0));
+static_assert(lumen7_tocolor(76) == VIDEO_COLOR_RGBA(0x99, 0x99, 0x99, 0));
+static_assert(lumen7_tocolor(77) == VIDEO_COLOR_RGBA(0x9b, 0x9b, 0x9b, 0));
+static_assert(lumen7_tocolor(78) == VIDEO_COLOR_RGBA(0x9d, 0x9d, 0x9d, 0));
+static_assert(lumen7_tocolor(79) == VIDEO_COLOR_RGBA(0x9f, 0x9f, 0x9f, 0));
+static_assert(lumen7_tocolor(80) == VIDEO_COLOR_RGBA(0xa1, 0xa1, 0xa1, 0));
+static_assert(lumen7_tocolor(81) == VIDEO_COLOR_RGBA(0xa3, 0xa3, 0xa3, 0));
+static_assert(lumen7_tocolor(82) == VIDEO_COLOR_RGBA(0xa5, 0xa5, 0xa5, 0));
+static_assert(lumen7_tocolor(83) == VIDEO_COLOR_RGBA(0xa7, 0xa7, 0xa7, 0));
+static_assert(lumen7_tocolor(84) == VIDEO_COLOR_RGBA(0xa9, 0xa9, 0xa9, 0));
+static_assert(lumen7_tocolor(85) == VIDEO_COLOR_RGBA(0xab, 0xab, 0xab, 0));
+static_assert(lumen7_tocolor(86) == VIDEO_COLOR_RGBA(0xad, 0xad, 0xad, 0));
+static_assert(lumen7_tocolor(87) == VIDEO_COLOR_RGBA(0xaf, 0xaf, 0xaf, 0));
+static_assert(lumen7_tocolor(88) == VIDEO_COLOR_RGBA(0xb1, 0xb1, 0xb1, 0));
+static_assert(lumen7_tocolor(89) == VIDEO_COLOR_RGBA(0xb3, 0xb3, 0xb3, 0));
+static_assert(lumen7_tocolor(90) == VIDEO_COLOR_RGBA(0xb5, 0xb5, 0xb5, 0));
+static_assert(lumen7_tocolor(91) == VIDEO_COLOR_RGBA(0xb7, 0xb7, 0xb7, 0));
+static_assert(lumen7_tocolor(92) == VIDEO_COLOR_RGBA(0xb9, 0xb9, 0xb9, 0));
+static_assert(lumen7_tocolor(93) == VIDEO_COLOR_RGBA(0xbb, 0xbb, 0xbb, 0));
+static_assert(lumen7_tocolor(94) == VIDEO_COLOR_RGBA(0xbd, 0xbd, 0xbd, 0));
+static_assert(lumen7_tocolor(95) == VIDEO_COLOR_RGBA(0xbf, 0xbf, 0xbf, 0));
+static_assert(lumen7_tocolor(96) == VIDEO_COLOR_RGBA(0xc1, 0xc1, 0xc1, 0));
+static_assert(lumen7_tocolor(97) == VIDEO_COLOR_RGBA(0xc3, 0xc3, 0xc3, 0));
+static_assert(lumen7_tocolor(98) == VIDEO_COLOR_RGBA(0xc5, 0xc5, 0xc5, 0));
+static_assert(lumen7_tocolor(99) == VIDEO_COLOR_RGBA(0xc7, 0xc7, 0xc7, 0));
+static_assert(lumen7_tocolor(100) == VIDEO_COLOR_RGBA(0xc9, 0xc9, 0xc9, 0));
+static_assert(lumen7_tocolor(101) == VIDEO_COLOR_RGBA(0xcb, 0xcb, 0xcb, 0));
+static_assert(lumen7_tocolor(102) == VIDEO_COLOR_RGBA(0xcd, 0xcd, 0xcd, 0));
+static_assert(lumen7_tocolor(103) == VIDEO_COLOR_RGBA(0xcf, 0xcf, 0xcf, 0));
+static_assert(lumen7_tocolor(104) == VIDEO_COLOR_RGBA(0xd1, 0xd1, 0xd1, 0));
+static_assert(lumen7_tocolor(105) == VIDEO_COLOR_RGBA(0xd3, 0xd3, 0xd3, 0));
+static_assert(lumen7_tocolor(106) == VIDEO_COLOR_RGBA(0xd5, 0xd5, 0xd5, 0));
+static_assert(lumen7_tocolor(107) == VIDEO_COLOR_RGBA(0xd7, 0xd7, 0xd7, 0));
+static_assert(lumen7_tocolor(108) == VIDEO_COLOR_RGBA(0xd9, 0xd9, 0xd9, 0));
+static_assert(lumen7_tocolor(109) == VIDEO_COLOR_RGBA(0xdb, 0xdb, 0xdb, 0));
+static_assert(lumen7_tocolor(110) == VIDEO_COLOR_RGBA(0xdd, 0xdd, 0xdd, 0));
+static_assert(lumen7_tocolor(111) == VIDEO_COLOR_RGBA(0xdf, 0xdf, 0xdf, 0));
+static_assert(lumen7_tocolor(112) == VIDEO_COLOR_RGBA(0xe1, 0xe1, 0xe1, 0));
+static_assert(lumen7_tocolor(113) == VIDEO_COLOR_RGBA(0xe3, 0xe3, 0xe3, 0));
+static_assert(lumen7_tocolor(114) == VIDEO_COLOR_RGBA(0xe5, 0xe5, 0xe5, 0));
+static_assert(lumen7_tocolor(115) == VIDEO_COLOR_RGBA(0xe7, 0xe7, 0xe7, 0));
+static_assert(lumen7_tocolor(116) == VIDEO_COLOR_RGBA(0xe9, 0xe9, 0xe9, 0));
+static_assert(lumen7_tocolor(117) == VIDEO_COLOR_RGBA(0xeb, 0xeb, 0xeb, 0));
+static_assert(lumen7_tocolor(118) == VIDEO_COLOR_RGBA(0xed, 0xed, 0xed, 0));
+static_assert(lumen7_tocolor(119) == VIDEO_COLOR_RGBA(0xef, 0xef, 0xef, 0));
+static_assert(lumen7_tocolor(120) == VIDEO_COLOR_RGBA(0xf1, 0xf1, 0xf1, 0));
+static_assert(lumen7_tocolor(121) == VIDEO_COLOR_RGBA(0xf3, 0xf3, 0xf3, 0));
+static_assert(lumen7_tocolor(122) == VIDEO_COLOR_RGBA(0xf5, 0xf5, 0xf5, 0));
+static_assert(lumen7_tocolor(123) == VIDEO_COLOR_RGBA(0xf7, 0xf7, 0xf7, 0));
+static_assert(lumen7_tocolor(124) == VIDEO_COLOR_RGBA(0xf9, 0xf9, 0xf9, 0));
+static_assert(lumen7_tocolor(125) == VIDEO_COLOR_RGBA(0xfb, 0xfb, 0xfb, 0));
+static_assert(lumen7_tocolor(126) == VIDEO_COLOR_RGBA(0xfd, 0xfd, 0xfd, 0));
+static_assert(lumen7_tocolor(127) == VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0));
+
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC

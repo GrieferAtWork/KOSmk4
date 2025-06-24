@@ -59,6 +59,10 @@
                                        * The behavior is weak undefined if this flag is used alongside a non-zero color key */
 #define VIDEO_GFX_FRDXWRAP     0x0400 /* [READ]  X coords <0 or >=width wrap to the other side during reads (else: coords are clamped) */
 #define VIDEO_GFX_FRDYWRAP     0x0800 /* [READ]  Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
+/* TODO: RDXFLIP -- When combined with RDXWRAP, OOB x coords don't just wrap, but flip, such that every odd wrap yields horizontally flipped images */
+/* TODO: RDYFLIP -- ... */
+/* TODO: WRXFLIP -- ... */
+/* TODO: WRYFLIP -- ... */
 
 
 /* Flags for `video_gfx_update()' */
