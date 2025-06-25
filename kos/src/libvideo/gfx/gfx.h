@@ -104,11 +104,19 @@
 	 gfx_assertf((y) + (sy) <= (self)->vx_hdr.vxh_byend, "Y+SY coord escapes to the right (%" PRIuCRD "+%" PRIuCRD "{%" PRIuCRD "} >= %" PRIuCRD ")", y, sy, (y) + (sy), (self)->vx_hdr.vxh_byend))
 #define gfx_assert_absbounds_x(self, x)      (gfx_assert_absbounds_xmin(self, x), gfx_assert_absbounds_xend(self, x))
 #define gfx_assert_absbounds_y(self, y)      (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_yend(self, y))
-#define gfx_assert_absbounds_xy(self, x, y)  (gfx_assert_absbounds_x(self, x), gfx_assert_absbounds_x(self, y))
+#define gfx_assert_absbounds_xy(self, x, y)  (gfx_assert_absbounds_x(self, x), gfx_assert_absbounds_y(self, y))
 #define gfx_assert_absbounds_sx(self, x, sx) (gfx_assert_absbounds_xmin(self, x), gfx_assert_absbounds_sxend(self, x, sx))
 #define gfx_assert_absbounds_sy(self, y, sy) (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_syend(self, y, sy))
 #define gfx_assert_absbounds_sxy(self, x, y, sx, sy) \
 	(gfx_assert_absbounds_sx(self, x, sx), gfx_assert_absbounds_sy(self, y, sy))
+
+#define gfx_assert_absbounds_buffer_x(self, x) \
+	gfx_assertf((x) < (self)->vx_buffer->vb_xdim, "X coord is greater than buffer (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_buffer->vb_xdim)
+#define gfx_assert_absbounds_buffer_y(self, y) \
+	gfx_assertf((y) < (self)->vx_buffer->vb_ydim, "Y coord is greater than buffer (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_buffer->vb_ydim)
+#define gfx_assert_absbounds_buffer(self, x, y) \
+	(gfx_assert_absbounds_buffer_x(self, x),    \
+	 gfx_assert_absbounds_buffer_y(self, y))
 
 #define gfx_assert_imatrix2d(m)                     \
 	(gfx_assert((m)[0][0] >= -1 && (m)[0][0] <= 1), \
@@ -279,6 +287,10 @@
 	(*(self)->_vbt_xops.vbtx_blit)(self, dst_x, dst_y, src_x, src_y, size_x, size_y)
 #define _video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
 	(*(self)->_vbt_xops.vbtx_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
+#define _video_blitter_x_blit_imatrix(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix) \
+	(*(self)->_vbt_xops.vbtx_blit_imatrix)(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix)
+#define _video_blitter_x_stretch_imatrix(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, src_matrix) \
+	(*(self)->_vbt_xops.vbtx_stretch_imatrix)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, src_matrix)
 
 /* Video BLIT internal API wrappers (w/ assertions) */
 #define video_blitter_x_blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y) \
@@ -289,6 +301,14 @@
 	(gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, dst_size_x, dst_size_y),                             \
 	 gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, src_size_x, src_size_y),                             \
 	 _video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y))
+#define video_blitter_x_blit_imatrix(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix) \
+	(/*gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, size_x, size_y),*/                  \
+	 /*gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, size_x, size_y),*/                  \
+	 _video_blitter_x_blit_imatrix(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix))
+#define video_blitter_x_stretch_imatrix(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, src_matrix) \
+	(/*gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, dst_size_x, dst_size_y),*/                                             \
+	 /*gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, src_size_x, src_size_y),*/                                             \
+	 _video_blitter_x_stretch_imatrix(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y, src_matrix))
 
 
 DECL_BEGIN
@@ -485,16 +505,23 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_gene
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_rdwrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_wrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_mirror(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y); /* XYSWAP + RD/WR-XY-FLIP */
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit_mirror(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_stretch_mirror(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdwrap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_wrap(void);
-#define libvideo_blit_generic_ops        (*_libvideo_blit_generic_ops())
-#define libvideo_blit_generic_ops_rdwrap (*_libvideo_blit_generic_ops_rdwrap())
-#define libvideo_blit_generic_ops_wrap   (*_libvideo_blit_generic_ops_wrap())
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdmirror(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_mirror(void);
+#define libvideo_blit_generic_ops          (*_libvideo_blit_generic_ops())          /* Support: - */
+#define libvideo_blit_generic_ops_rdwrap   (*_libvideo_blit_generic_ops_rdwrap())   /* Support: RD-XY-WRAP */
+#define libvideo_blit_generic_ops_wrap     (*_libvideo_blit_generic_ops_wrap())     /* Support: RD/WR-XY-WRAP */
+#define libvideo_blit_generic_ops_rdmirror (*_libvideo_blit_generic_ops_rdmirror()) /* Support: src:XYSWAP + RD-XY-FLIP/WRAP */
+#define libvideo_blit_generic_ops_mirror   (*_libvideo_blit_generic_ops_mirror())   /* Support: src/dst:XYSWAP + RD/WR-XY-FLIP/WRAP */
 
 
 
@@ -750,8 +777,12 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 LOCAL ATTR_INOUT(1) void CC
 video_blit_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	/* TODO: Support for XYSWAP and RDFLIP/WRFLIP */
-	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_mirror;
+	} else if ((ctx->vbt_src->vx_flags & (VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR | VIDEO_GFX_FXYSWAP)) ||
+	           (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FXYSWAP))) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_rdmirror;
+	} else if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
 		ctx->vbt_ops = &libvideo_blit_generic_ops_wrap;
 	} else if (ctx->vbt_src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
 		ctx->vbt_ops = &libvideo_blit_generic_ops_rdwrap;

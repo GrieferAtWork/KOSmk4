@@ -51,6 +51,7 @@
 #define VIDEO_GFX_FNORMAL      0x00000000 /* Normal render flags. */
 #define VIDEO_GFX_FNEARESTBLIT 0x00000000 /* [w] Use nearest interpolation for stretch() */
 #define VIDEO_GFX_FLINEARBLIT  0x00000001 /* [w] Use linear interpolation for stretch() (else: use nearest) */
+/* TODO: "VIDEO_GFX_FLINEARBLIT" should be a read-flag */
 #define VIDEO_GFX_FAALINES     0x00000002 /* [w] Render smooth lines. */
 #define VIDEO_GFX_FWRXWRAP     0x00000010 /* [w] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
 #define VIDEO_GFX_FWRYWRAP     0x00000020 /* [w] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
@@ -68,6 +69,9 @@
                                            *          Only set this flag when  initializing a new GFX  context!
                                            * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
                                            *       though **does** affect both the clip rect, as well as I/O region. */
+
+/* TODO: Merge FWR*WRAP with FRD*WRAP */
+/* TODO: Merge FWR*MIRROR with FRD*MIRROR */
 /* TODO: Implement support for these flags:
  * - VIDEO_GFX_FWRXMIRROR
  * - VIDEO_GFX_FWRYMIRROR
@@ -134,7 +138,9 @@ struct video_bitmask {
  * Only allowed to  hold values -1,  0, or  1
  *
  * Vector is only applied to relative coords (never absolute ones). */
-typedef __INT_FAST8_TYPE__ const video_imatrix2d_t[2][2];
+typedef __INT_FAST8_TYPE__ video_imatrix2d_word_t;
+typedef video_imatrix2d_word_t video_imatrix2d_row_t[2];
+typedef video_imatrix2d_row_t video_imatrix2d_t[2];
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 

@@ -35,6 +35,7 @@
 #include <err.h>
 #include <format-printer.h>
 #include <stdbool.h>
+#include <syslog.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -233,9 +234,12 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FLINEARBLIT, 0);
+	                    VIDEO_GFX_FXYSWAP |
+	                    VIDEO_GFX_FLINEARBLIT |
+	                    VIDEO_GFX_FNORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
+	                    VIDEO_GFX_FXYSWAP |
 	                    VIDEO_GFX_FNORMAL, 0);
 
 	/* Calculate where the image should be displayed */
@@ -276,7 +280,7 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 1
+#if 0
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
@@ -306,7 +310,9 @@ do_showpic(struct screen_buffer *screen,
 		                                   format_buf->vb_format.vf_pal);
 		video_buffer_getgfx(sized_buffer, &sized_gfx,
 		                    video_gfx_getblend(&image_gfx),
-		                    video_gfx_getflags(&image_gfx),
+		                    (video_gfx_getflags(&image_gfx) |
+		                     VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR) &
+		                    ~VIDEO_GFX_FXYSWAP,
 		                    video_gfx_getcolorkey(&image_gfx));
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
@@ -316,6 +322,9 @@ do_showpic(struct screen_buffer *screen,
 		                  blit_w, blit_h);
 		video_buffer_decref(sized_buffer);
 	} else {
+		video_gfx_setflags(&image_gfx,
+		                   video_gfx_getflags(&image_gfx) |
+		                   VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR);
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
 		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
@@ -323,7 +332,7 @@ do_showpic(struct screen_buffer *screen,
 		                  video_gfx_getclipw(&image_gfx) * tiles_x,
 		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}
-	++dst_offset;
+	dst_offset += 3;
 #endif
 
 	if (font) {

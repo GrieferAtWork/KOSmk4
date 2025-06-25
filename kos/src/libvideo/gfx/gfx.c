@@ -1423,12 +1423,15 @@ libvideo_blitter_generic__blit_imatrix(struct video_blitter const *__restrict se
 		video_offset_t delta_src_x = src_x + src_matrix[0][1] * y;
 		video_offset_t delta_src_y = src_y + src_matrix[1][1] * y;
 		for (x = 0; x < size_x; ++x) {
+			video_color_t color;
 			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * x;
 			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * x;
 			video_coord_t used_dst_x = dst_x + x;
 			video_coord_t used_dst_y = dst_y + y;
-			video_color_t color = video_gfx_x_getcolor(src, used_src_x, used_src_y);
-			video_gfx_x_putcolor(dst, used_dst_x, used_dst_y, color);
+			gfx_assert_absbounds_buffer(src, used_src_x, used_src_y);
+			gfx_assert_absbounds_buffer(dst, used_dst_x, used_dst_y);
+			color = _video_gfx_x_getcolor(src, used_src_x, used_src_y);
+			_video_gfx_x_putcolor(dst, used_dst_x, used_dst_y, color);
 		}
 	}
 	TRACE_END("generic__blit_imatrix()\n");
@@ -1521,7 +1524,7 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 	({                                                                                   \
 		video_coord_t used_src_x = src_x_ + src_matrix[0][0] * x + src_matrix[0][1] * y; \
 		video_coord_t used_src_y = src_y_ + src_matrix[1][0] * x + src_matrix[1][1] * y; \
-		video_gfx_x_getcolor(src, used_src_x, used_src_y);                               \
+		_video_gfx_x_getcolor(src, used_src_x, used_src_y);                              \
 	})
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
@@ -1531,7 +1534,7 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 #define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y) \
 	{                                                                             \
 		video_color_t out = LOCAL_getcolor(src_x, src_y);                         \
-		video_gfx_x_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);      \
+		_video_gfx_x_absfill(dst, dst_x, dst_y, dst_size_x, dst_size_y, out);     \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
@@ -1540,7 +1543,7 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 		video_color_t src_y0_x0 = LOCAL_getcolor(src_x0, src_y);                            \
 		video_color_t src_y0_x1 = LOCAL_getcolor(src_x1, src_y);                            \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);   \
-		video_gfx_x_absline_v(dst, dst_x, dst_y, dst_size_y, out);                          \
+		_video_gfx_x_absline_v(dst, dst_x, dst_y, dst_size_y, out);                         \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
@@ -1549,7 +1552,7 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 		video_color_t src_y0_x0 = LOCAL_getcolor(src_x, src_y0);                            \
 		video_color_t src_y1_x0 = LOCAL_getcolor(src_x, src_y1);                            \
 		video_color_t out       = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);   \
-		video_gfx_x_absline_h(dst, dst_x, dst_y, dst_size_x, out);                          \
+		_video_gfx_x_absline_h(dst, dst_x, dst_y, dst_size_x, out);                         \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -1562,13 +1565,13 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 		                                   src_y1_x0, src_y1_x1,                                      \
 		                                   frac_x0, frac_x1,                                          \
 		                                   frac_y0, frac_y1);                                         \
-		video_gfx_x_putcolor(dst, dst_x, dst_y, out);                                                 \
+		_video_gfx_x_putcolor(dst, dst_x, dst_y, out);                                                \
 	}
 
 	gfx_assert_imatrix2d(src_matrix);
 	TRACE_START("generic__stretch_imatrix_l("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}"
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_,
@@ -1615,7 +1618,7 @@ libvideo_blitter_generic__stretch_n(struct video_blitter const *__restrict self,
 	            src_x, src_y, src_size_x, src_size_y);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
-	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
@@ -1652,12 +1655,15 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 	gfx_assert_imatrix2d(src_matrix);
 	TRACE_START("generic__stretch_imatrix_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
-	            src_x, src_y, src_size_x, src_size_y);
+	            src_x, src_y, src_size_x, src_size_y,
+	            (int)src_matrix[0][0], (int)src_matrix[0][1],
+	            (int)src_matrix[1][0], (int)src_matrix[1][1]);
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
-	src_pos_y  = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
+	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
 	y = 0;
 	do {
 		video_coord_t row_dst_y = dst_y + y;
@@ -1671,8 +1677,10 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
 			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * row_src_x;
 			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * row_src_x;
-			color = video_gfx_x_getcolor(src, used_src_x, used_src_y);
-			video_gfx_x_putcolor(dst, dst_x + x, row_dst_y, color);
+			gfx_assert_absbounds_buffer(src, used_src_x, used_src_y);
+			gfx_assert_absbounds_buffer(dst, dst_x + x, row_dst_y);
+			color = _video_gfx_x_getcolor(src, used_src_x, used_src_y);
+			_video_gfx_x_putcolor(dst, dst_x + x, row_dst_y, color);
 			src_pos_x += step_x;
 			++x;
 		} while (x < dst_size_x);

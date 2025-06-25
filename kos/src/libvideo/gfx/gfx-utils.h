@@ -104,6 +104,21 @@ umirror(video_coord_t offset, video_dim_t dim) {
 	return uwrap_or_mirror(offset, dim, true);
 }
 
+LOCAL WUNUSED ATTR_INOUT(4) video_coord_t CC
+wrap_or_mirror_imatrix(video_offset_t offset, video_dim_t dim,
+                       bool should_mirror, video_imatrix2d_word_t *p_word) {
+	unsigned int mirror;
+	mirror = (offset / dim) & 1;
+	offset %= dim;
+	if (offset < 0)
+		offset += dim - 1;
+	if (mirror && should_mirror)
+		*p_word = -1;
+	return (video_coord_t)offset;
+}
+
+
+
 
 
 /************************************************************************/
