@@ -54,12 +54,16 @@ DECL_BEGIN
 #define LOCAL_Xnl(x) x##_l
 #endif /* !LOCAL_IS_NEAREST */
 
-#define LOCAL_libvideo_blitter_samebuf__stretch_X         LOCAL_Xnl(libvideo_blitter_samebuf__stretch)
-#define LOCAL_libvideo_blitter_noblend_samefmt__stretch_X LOCAL_Xnl(libvideo_blitter_noblend_samefmt__stretch)
-#define LOCAL_libvideo_blitter_noblend_difffmt__stretch_X LOCAL_Xnl(libvideo_blitter_noblend_difffmt__stretch)
-#define LOCAL_libvideo_blitter_generic__stretch_X         LOCAL_Xnl(libvideo_blitter_generic__stretch)
-#define LOCAL_libvideo_gfx_noblend__blitfrom_X            LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
-#define LOCAL_libvideo_gfx_generic__blitfrom_X            LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
+#define LOCAL_libvideo_blitter_samebuf__stretch_X                 LOCAL_Xnl(libvideo_blitter_samebuf__stretch)
+#define LOCAL_libvideo_blitter_noblend_samefmt__stretch_X         LOCAL_Xnl(libvideo_blitter_noblend_samefmt__stretch)
+#define LOCAL_libvideo_blitter_noblend_difffmt__stretch_X         LOCAL_Xnl(libvideo_blitter_noblend_difffmt__stretch)
+#define LOCAL_libvideo_blitter_generic__stretch_X                 LOCAL_Xnl(libvideo_blitter_generic__stretch)
+#define LOCAL_libvideo_blitter_samebuf__stretch_imatrix_X         LOCAL_Xnl(libvideo_blitter_samebuf__stretch_imatrix)
+#define LOCAL_libvideo_blitter_noblend_samefmt__stretch_imatrix_X LOCAL_Xnl(libvideo_blitter_noblend_samefmt__stretch_imatrix)
+#define LOCAL_libvideo_blitter_noblend_difffmt__stretch_imatrix_X LOCAL_Xnl(libvideo_blitter_noblend_difffmt__stretch_imatrix)
+#define LOCAL_libvideo_blitter_generic__stretch_imatrix_X         LOCAL_Xnl(libvideo_blitter_generic__stretch_imatrix)
+#define LOCAL_libvideo_gfx_noblend__blitfrom_X                    LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
+#define LOCAL_libvideo_gfx_generic__blitfrom_X                    LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
 
 #ifndef DEFINED_noblend_blit_compatible
 #define DEFINED_noblend_blit_compatible
@@ -125,12 +129,15 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {
-		ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_samebuf__stretch_X;
+		ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_samebuf__stretch_X;
+		ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_samebuf__stretch_imatrix_X;
 		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vbt_src->vx_colorkey)) {
-			ctx->_vbt_xops.vbtx_blit = &libvideo_blitter_noblend_samebuf__blit;
+			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_noblend_samebuf__blit;
+			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_noblend_samebuf__blit_imatrix;
 		} else {
-			ctx->_vbt_xops.vbtx_blit = &libvideo_blitter_samebuf__blit;
+			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_samebuf__blit;
+			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_samebuf__blit_imatrix;
 		}
 	} else {
 		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
@@ -141,8 +148,10 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 				/* Special optimization when not doing any blending, and both GFX contexts
 				 * share the same codec: in this case,  we can try to directly copy  pixel
 				 * data, either through video locks, or by directly reading/writing pixels */
-				ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_noblend_samefmt__blit;
-				ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_noblend_samefmt__stretch_X;
+				ctx->_vbt_xops.vbtx_blit            = &libvideo_blitter_noblend_samefmt__blit;
+				ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_noblend_samefmt__stretch_X;
+				ctx->_vbt_xops.vbtx_blit_imatrix    = &libvideo_blitter_noblend_samefmt__blit_imatrix;
+				ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_noblend_samefmt__stretch_imatrix_X;
 			} else {
 				/* Special optimization when not doing any blending, and both GFX contexts
 				 * share the same codec: in this case,  we can try to directly copy  pixel
@@ -150,12 +159,16 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 				video_converter_init(libvideo_blitter_generic__conv(ctx),
 				                     &src_buffer->vb_format,
 				                     &dst_buffer->vb_format);
-				ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_noblend_difffmt__blit;
-				ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_noblend_difffmt__stretch_X;
+				ctx->_vbt_xops.vbtx_blit            = &libvideo_blitter_noblend_difffmt__blit;
+				ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_noblend_difffmt__stretch_X;
+				ctx->_vbt_xops.vbtx_blit_imatrix    = &libvideo_blitter_noblend_difffmt__blit_imatrix;
+				ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_noblend_difffmt__stretch_imatrix_X;
 			}
 		} else {
-			ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_generic__blit;
-			ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_generic__stretch_X;
+			ctx->_vbt_xops.vbtx_blit            = &libvideo_blitter_generic__blit;
+			ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_generic__stretch_X;
+			ctx->_vbt_xops.vbtx_blit_imatrix    = &libvideo_blitter_generic__blit_imatrix;
+			ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_generic__stretch_imatrix_X;
 		}
 	}
 	return ctx;
@@ -171,11 +184,15 @@ LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blitter *__restrict ctx) {
 		 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
 		 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
 		 * be read) */
-		ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_samebuf__blit;
-		ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_samebuf__stretch_X;
+		ctx->_vbt_xops.vbtx_blit            = &libvideo_blitter_samebuf__blit;
+		ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_samebuf__stretch_X;
+		ctx->_vbt_xops.vbtx_blit_imatrix    = &libvideo_blitter_samebuf__blit_imatrix;
+		ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_samebuf__stretch_imatrix_X;
 	} else {
-		ctx->_vbt_xops.vbtx_blit    = &libvideo_blitter_generic__blit;
-		ctx->_vbt_xops.vbtx_stretch = &LOCAL_libvideo_blitter_generic__stretch_X;
+		ctx->_vbt_xops.vbtx_blit            = &libvideo_blitter_generic__blit;
+		ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_generic__stretch_X;
+		ctx->_vbt_xops.vbtx_blit_imatrix    = &libvideo_blitter_generic__blit_imatrix;
+		ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_generic__stretch_imatrix_X;
 	}
 	return ctx;
 }
@@ -184,6 +201,10 @@ LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blitter *__restrict ctx) {
 #undef LOCAL_libvideo_blitter_noblend_samefmt__stretch_X
 #undef LOCAL_libvideo_blitter_noblend_difffmt__stretch_X
 #undef LOCAL_libvideo_blitter_generic__stretch_X
+#undef LOCAL_libvideo_blitter_samebuf__stretch_imatrix_X
+#undef LOCAL_libvideo_blitter_noblend_samefmt__stretch_imatrix_X
+#undef LOCAL_libvideo_blitter_noblend_difffmt__stretch_imatrix_X
+#undef LOCAL_libvideo_blitter_generic__stretch_imatrix_X
 #undef LOCAL_libvideo_gfx_noblend__blitfrom_X
 #undef LOCAL_libvideo_gfx_generic__blitfrom_X
 

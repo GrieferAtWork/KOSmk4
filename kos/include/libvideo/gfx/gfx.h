@@ -43,26 +43,39 @@
 #endif /* !__INTELLISENSE__ */
 
 /* Video graphic flags.
- * [READ]:  Indicates a flag that affects the results when the associated
- *          GFX  context is used  as source, or  when reading pixel data.
- * [WRITE]: Indicates a flag that affects the results of graphics operations
- *          that use  the associated  GFX context  as destination,  or  when
- *          writing pixel data. */
-#define VIDEO_GFX_FNORMAL      0x0000 /* Normal render flags. */
-#define VIDEO_GFX_FNEARESTBLIT 0x0000 /* [WRITE] Use nearest interpolation for stretch() */
-#define VIDEO_GFX_FLINEARBLIT  0x0001 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
-#define VIDEO_GFX_FAALINES     0x0002 /* [WRITE] Render smooth lines. */
-#define VIDEO_GFX_FWRXWRAP     0x0004 /* [WRITE] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
-#define VIDEO_GFX_FWRYWRAP     0x0008 /* [WRITE] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
-#define VIDEO_GFX_FBLUR        0x0100 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
-                                       *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
-                                       * The behavior is weak undefined if this flag is used alongside a non-zero color key */
-#define VIDEO_GFX_FRDXWRAP     0x0400 /* [READ]  X coords <0 or >=width wrap to the other side during reads (else: coords are clamped) */
-#define VIDEO_GFX_FRDYWRAP     0x0800 /* [READ]  Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
-/* TODO: RDXFLIP -- When combined with RDXWRAP, OOB x coords don't just wrap, but flip, such that every odd wrap yields horizontally flipped images */
-/* TODO: RDYFLIP -- ... */
-/* TODO: WRXFLIP -- ... */
-/* TODO: WRYFLIP -- ... */
+ * [r]: Indicates a flag that affects the results when the associated
+ *      GFX  context is used  as source, or  when reading pixel data.
+ * [w]: Indicates a flag that affects the results of graphics operations
+ *      that use  the associated  GFX context  as destination,  or  when
+ *      writing pixel data. */
+#define VIDEO_GFX_FNORMAL      0x00000000 /* Normal render flags. */
+#define VIDEO_GFX_FNEARESTBLIT 0x00000000 /* [w] Use nearest interpolation for stretch() */
+#define VIDEO_GFX_FLINEARBLIT  0x00000001 /* [w] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FAALINES     0x00000002 /* [w] Render smooth lines. */
+#define VIDEO_GFX_FWRXWRAP     0x00000010 /* [w] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
+#define VIDEO_GFX_FWRYWRAP     0x00000020 /* [w] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
+#define VIDEO_GFX_FWRXMIRROR   0x00000040 /* [w] When combined with VIDEO_GFX_FWRXWRAP, OOB x coords are mirrored instead of wrapped */
+#define VIDEO_GFX_FWRYMIRROR   0x00000080 /* [w] When combined with VIDEO_GFX_FWRYWRAP, OOB y coords are mirrored instead of wrapped */
+#define VIDEO_GFX_FBLUR        0x00000100 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
+                                           *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
+                                           *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
+#define VIDEO_GFX_FRDXWRAP     0x00001000 /* [r] X coords <0 or >=width wrap to the other side during reads (else: coords are clamped) */
+#define VIDEO_GFX_FRDYWRAP     0x00002000 /* [r] Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
+#define VIDEO_GFX_FRDXMIRROR   0x00004000 /* [r] When combined with VIDEO_GFX_FRDXWRAP, OOB x coords are mirrored instead of wrapped */
+#define VIDEO_GFX_FRDYMIRROR   0x00008000 /* [r] When combined with VIDEO_GFX_FRDYWRAP, OOB y coords are mirrored instead of wrapped */
+#define VIDEO_GFX_FXYSWAP      0x00010000 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
+                                           * WARNING: Do not alter this flag on an already-created GFX context.
+                                           *          Only set this flag when  initializing a new GFX  context!
+                                           * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
+                                           *       though **does** affect both the clip rect, as well as I/O region. */
+/* TODO: Implement support for these flags:
+ * - VIDEO_GFX_FWRXMIRROR
+ * - VIDEO_GFX_FWRYMIRROR
+ * - VIDEO_GFX_FRDXMIRROR
+ * - VIDEO_GFX_FRDYMIRROR
+ * - VIDEO_GFX_FXYSWAP
+ */
+
 
 
 /* Flags for `video_gfx_update()' */
@@ -116,6 +129,14 @@ struct video_bitmask {
 	__size_t    vbm_scan; /* # of bits that make up a scanline */
 };
 
+#ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
+/* 2d integer matrix video_imatrix2d_t[y][x].
+ * Only allowed to  hold values -1,  0, or  1
+ *
+ * Vector is only applied to relative coords (never absolute ones). */
+typedef __INT_FAST8_TYPE__ const video_imatrix2d_t[2][2];
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
+
 
 struct video_blitter_xops {
 	/* All of the following callbacks are [1..1]
@@ -151,7 +172,39 @@ struct video_blitter_xops {
 	                                video_coord_t __src_x, video_coord_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	void (*_vbtx_pad[6])(void);
+	/* Same as "vbtx_blit", but uses a matrix to calculate source pixel locations:
+	 * >> for (video_coord_t y = 0; y < __size_y; ++y) {
+	 * >>     for (video_coord_t x = 0; x < __size_x; ++x) {
+	 * >>         video_coord_t used_src_x = __src_x + __src_matrix[0][0] * x + __src_matrix[0][1] * y;
+	 * >>         video_coord_t used_src_y = __src_y + __src_matrix[1][0] * x + __src_matrix[1][1] * y;
+	 * >>         video_coord_t used_dst_x = __dst_x + x;
+	 * >>         video_coord_t used_dst_y = __dst_y + y;
+	 * >>         video_color_t color = (*__self->vbt_src->_vx_xops.vgfx_getcolor)(__self->vbt_src, used_src_x, used_src_y);
+	 * >>         (*__self->vbt_dst->_vx_xops.vgfx_putcolor)(__self->vbt_dst, used_dst_x, used_dst_y, color);
+	 * >>     }
+	 * >> }
+	 *
+	 * The given "__src_matrix" is assumed to only contain values -1, 0 or 1,
+	 * meaning  it can only be used to do 90° rotation, as well as mirroring.
+	 *
+	 * When values outside this range are used, results are undefined. */
+	__ATTR_IN_T(1) __ATTR_IN_T(8) void
+	(LIBVIDEO_GFX_CC *vbtx_blit_imatrix)(struct video_blitter const *__restrict __self,
+	                                     video_coord_t __dst_x, video_coord_t __dst_y,
+	                                     video_coord_t __src_x, video_coord_t __src_y,
+	                                     video_dim_t __size_x, video_dim_t __size_y,
+	                                     video_imatrix2d_t const __src_matrix);
+
+	/* Same as "vbtx_stretch", but uses a matrix to calculate source pixel locations. */
+	__ATTR_IN_T(1) __ATTR_IN_T(10) void
+	(LIBVIDEO_GFX_CC *vbtx_stretch_imatrix)(struct video_blitter const *__restrict __self,
+	                                        video_coord_t __dst_x, video_coord_t __dst_y,
+	                                        video_dim_t __dst_size_x, video_dim_t __dst_size_y,
+	                                        video_coord_t __src_x, video_coord_t __src_y,
+	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
+	                                        video_imatrix2d_t const __src_matrix);
+
+	void (*_vbtx_pad[4])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };
 

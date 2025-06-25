@@ -1183,7 +1183,8 @@ libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restri
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* TODO */
-	libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	libvideo_blitter_generic__stretch_n(self,
+	                                    dst_x, dst_y, dst_size_x, dst_size_y,
 	                                    src_x, src_y, src_size_x, src_size_y);
 }
 
@@ -1194,8 +1195,61 @@ libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restri
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y) {
 	/* TODO */
-	libvideo_blitter_generic__stretch_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	libvideo_blitter_generic__stretch_n(self,
+	                                    dst_x, dst_y, dst_size_x, dst_size_y,
 	                                    src_x, src_y, src_size_x, src_size_y);
+}
+
+
+INTERN ATTR_IN(1) ATTR_IN(8) void CC
+libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__restrict self,
+                                               video_coord_t dst_x, video_coord_t dst_y,
+                                               video_coord_t src_x, video_coord_t src_y,
+                                               video_dim_t size_x, video_dim_t size_y,
+                                               video_imatrix2d_t const src_matrix) {
+	video_dim_t x, y;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_converter *conv = libvideo_blitter_generic__conv(self);
+	gfx_assert_imatrix2d(src_matrix);
+	TRACE_START("noblend_difffmt__blit_imatrix("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "matrix: {{%d,%d},{%d,%d}})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y,
+	            (int)src_matrix[0][0], (int)src_matrix[0][1],
+	            (int)src_matrix[1][0], (int)src_matrix[1][1]);
+	/* Blit per-pixel, with pixel format converter */
+	for (y = 0; y < size_y; ++y) {
+		video_offset_t delta_src_x = src_x + src_matrix[0][1] * y;
+		video_offset_t delta_src_y = src_y + src_matrix[1][1] * y;
+		for (x = 0; x < size_x; ++x) {
+			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * x;
+			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * x;
+			video_coord_t used_dst_x = dst_x + x;
+			video_coord_t used_dst_y = dst_y + y;
+			video_pixel_t pixel;
+			pixel = video_gfx_x_getpixel(src, used_src_x, used_src_y);
+			pixel = video_converter_mappixel(conv, pixel);
+			video_gfx_x_setpixel(dst, used_dst_x, used_dst_y, pixel);
+		}
+	}
+	TRACE_END("noblend_difffmt__blit_imatrix()\n");
+}
+
+INTERN ATTR_IN(1) ATTR_IN(10) void CC
+libvideo_blitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const *__restrict self,
+                                                    video_coord_t dst_x, video_coord_t dst_y,
+                                                    video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                                    video_coord_t src_x, video_coord_t src_y,
+                                                    video_dim_t src_size_x, video_dim_t src_size_y,
+                                                    video_imatrix2d_t const src_matrix) {
+	/* TODO */
+	libvideo_blitter_generic__stretch_imatrix_n(self,
+	                                            dst_x, dst_y, dst_size_x, dst_size_y,
+	                                            src_x, src_y, src_size_x, src_size_y,
+	                                            src_matrix);
 }
 
 DECL_END

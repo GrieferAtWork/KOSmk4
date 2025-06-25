@@ -48,7 +48,9 @@ DECL_BEGIN
 /* CLAMPING / WRAPPING HELPERS                                          */
 /************************************************************************/
 
-/* @assume(dim > 0); */
+/* Wrap  a given "offset" such that values <0
+ * or >= dim end up back in the range [0,dim)
+ * @assume(dim > 0); */
 LOCAL ATTR_CONST WUNUSED video_coord_t CC
 wrap(video_offset_t offset, video_dim_t dim) {
 #if 1
@@ -67,6 +69,39 @@ wrap(video_offset_t offset, video_dim_t dim) {
 	}
 	return (video_coord_t)offset;
 #endif
+}
+
+/* Similar to `wrap', but every even wrap causes returned coords to be mirrored */
+LOCAL ATTR_CONST WUNUSED video_coord_t CC
+wrap_or_mirror(video_offset_t offset, video_dim_t dim, bool should_mirror) {
+	unsigned int mirror;
+	mirror = (offset / dim) & 1;
+	offset %= dim;
+	if (offset < 0)
+		offset += dim - 1;
+	if (mirror && should_mirror)
+		offset = (dim - 1) - offset;
+	return (video_coord_t)offset;
+}
+
+LOCAL ATTR_CONST WUNUSED video_coord_t CC
+uwrap_or_mirror(video_coord_t coord, video_dim_t dim, bool should_mirror) {
+	unsigned int mirror;
+	mirror = (coord / dim) & 1;
+	coord %= dim;
+	if (mirror && should_mirror)
+		coord = (dim - 1) - coord;
+	return (video_coord_t)coord;
+}
+
+LOCAL ATTR_CONST WUNUSED video_coord_t CC
+mirror(video_offset_t offset, video_dim_t dim) {
+	return wrap_or_mirror(offset, dim, true);
+}
+
+LOCAL ATTR_CONST WUNUSED video_coord_t CC
+umirror(video_coord_t offset, video_dim_t dim) {
+	return uwrap_or_mirror(offset, dim, true);
 }
 
 
@@ -429,6 +464,15 @@ bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
 /* Check if {x1,y1} <= {x2,y2} */
 #define xy_before_or_equal(x1, y1, x2, y2) ((y1) < (y2) || ((y1) == (y2) && (x1) <= (x2)))
 
+
+/* Helpers for I/O Area limits */
+#define _GFX_SELF self
+#define GFX_BXMIN _GFX_SELF->vx_hdr.vxh_bxmin
+#define GFX_BYMIN _GFX_SELF->vx_hdr.vxh_bymin
+#define GFX_BXEND _GFX_SELF->vx_hdr.vxh_bxend
+#define GFX_BYEND _GFX_SELF->vx_hdr.vxh_byend
+#define GFX_BXMAX (_GFX_SELF->vx_hdr.vxh_bxend - 1)
+#define GFX_BYMAX (_GFX_SELF->vx_hdr.vxh_byend - 1)
 
 DECL_END
 

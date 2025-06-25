@@ -835,6 +835,49 @@ libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict sel
 #undef ydst2src
 }
 
+
+
+/************************************************************************/
+/* GENERIC BLIT OPERATORS                                               */
+/************************************************************************/
+
+#undef libvideo_blit_generic_ops
+#undef libvideo_blit_generic_ops_rdwrap
+#undef libvideo_blit_generic_ops_wrap
+PRIVATE struct video_blitter_ops libvideo_blit_generic_ops = {};
+PRIVATE struct video_blitter_ops libvideo_blit_generic_ops_rdwrap = {};
+PRIVATE struct video_blitter_ops libvideo_blit_generic_ops_wrap = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops(void) {
+	if unlikely(!libvideo_blit_generic_ops.vbto_bitblit) {
+		libvideo_blit_generic_ops.vbto_stretch = &libvideo_blitter_generic_stretch;
+		COMPILER_WRITE_BARRIER();
+		libvideo_blit_generic_ops.vbto_bitblit = &libvideo_blitter_generic_blit;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &libvideo_blit_generic_ops;
+}
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdwrap(void) {
+	if unlikely(!libvideo_blit_generic_ops_rdwrap.vbto_bitblit) {
+		libvideo_blit_generic_ops_rdwrap.vbto_stretch = &libvideo_blitter_generic_stretch_rdwrap;
+		COMPILER_WRITE_BARRIER();
+		libvideo_blit_generic_ops_rdwrap.vbto_bitblit = &libvideo_blitter_generic_blit_rdwrap;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &libvideo_blit_generic_ops_rdwrap;
+}
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_wrap(void) {
+	if unlikely(!libvideo_blit_generic_ops_wrap.vbto_bitblit) {
+		libvideo_blit_generic_ops_wrap.vbto_stretch = &libvideo_blitter_generic_stretch_wrap;
+		COMPILER_WRITE_BARRIER();
+		libvideo_blit_generic_ops_wrap.vbto_bitblit = &libvideo_blitter_generic_blit_wrap;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &libvideo_blit_generic_ops_wrap;
+}
+#define libvideo_blit_generic_ops        (*_libvideo_blit_generic_ops())
+#define libvideo_blit_generic_ops_rdwrap (*_libvideo_blit_generic_ops_rdwrap())
+#define libvideo_blit_generic_ops_wrap   (*_libvideo_blit_generic_ops_wrap())
+
 DECL_END
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_HL_BLIT_C_INL */
