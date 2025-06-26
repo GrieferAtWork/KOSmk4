@@ -55,18 +55,14 @@ DECL_BEGIN
 
 #ifdef DEFINE_libvideo_blitter_generic_blit
 #define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit
-#define LOCAL_DECL                          INTERN
 #elif defined(DEFINE_libvideo_blitter_generic_stretch)
 #define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch
-#define LOCAL_DECL                          INTERN
 #define LOCAL_IS_STRETCH
 #elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix)
 #define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit_imatrix
-#define LOCAL_DECL                          PRIVATE
 #define LOCAL_HAS_IMATRIX
 #elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)
 #define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch_imatrix
-#define LOCAL_DECL                          PRIVATE
 #define LOCAL_HAS_IMATRIX
 #define LOCAL_IS_STRETCH
 #else /* ... */
@@ -82,21 +78,19 @@ DECL_BEGIN
 #endif /* !LOCAL_IS_STRETCH */
 
 #ifdef LOCAL_HAS_IMATRIX
+#define LOCAL_DECL                    PRIVATE
 #define LOCAL_IF_IMATRIX(x)           x
 #define LOCAL_IF_IMATRIX_ELSE(tt, ff) tt
-#else /* LOCAL_HAS_IMATRIX */
-#define LOCAL_IF_IMATRIX(x)           /* nothing */
-#define LOCAL_IF_IMATRIX_ELSE(tt, ff) ff
-#endif /* !LOCAL_HAS_IMATRIX */
-
-#ifdef LOCAL_HAS_IMATRIX
 #ifdef LOCAL_IS_STRETCH
 #define LOCAL_ATTR ATTR_IN(10)
 #else /* LOCAL_IS_STRETCH */
 #define LOCAL_ATTR ATTR_IN(8)
 #endif /* !LOCAL_IS_STRETCH */
 #else /* LOCAL_HAS_IMATRIX */
-#define LOCAL_ATTR /* nothing */
+#define LOCAL_DECL                    INTERN
+#define LOCAL_IF_IMATRIX(x)           /* nothing */
+#define LOCAL_IF_IMATRIX_ELSE(tt, ff) ff
+#define LOCAL_ATTR                    /* nothing */
 #endif /* !LOCAL_HAS_IMATRIX */
 
 INTERN ATTR_IN(1) LOCAL_ATTR void CC
@@ -450,10 +444,10 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #undef LOCAL_IF_IMATRIX
 #undef LOCAL_IF_IMATRIX_ELSE
 #undef LOCAL_ATTR
+#undef LOCAL_DECL
 #undef LOCAL_HAS_IMATRIX
 #undef LOCAL_IS_STRETCH
 #undef LOCAL_libvideo_blitter_generic_blit
-#undef LOCAL_DECL
 
 DECL_END
 
