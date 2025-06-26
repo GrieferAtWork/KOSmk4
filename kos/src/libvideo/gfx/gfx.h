@@ -551,8 +551,8 @@ INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot(struct video_gfx *_
 /* Initialize the clip / I/O rects of `self' to fully represent the underlying buffer fully. */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
-	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
-	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
+	self->vx_hdr.vxh_txoff = self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
+	self->vx_hdr.vxh_tyoff = self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
 	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_ydim;
 		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_xdim;

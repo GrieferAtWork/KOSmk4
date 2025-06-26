@@ -479,7 +479,7 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
 
 
 /* Perform geometric  transformations on  `__self'. These  functions
- * may alter flags or the clip rect of `__self' in order to  achieve
+ * may  alter flags  and/or translate  `__self' in  order to achieve
  * their  goal. Note that  none of these  functions alter pixel data
  * of the underlying buffer; they only affect how the given `__self'
  * interacts with pixel data of the underlying buffer.
@@ -912,8 +912,8 @@ struct video_gfxhdr {
 	 * any "Clip Rect" ever  set for  the GFX  context, meaning  it cannot  be
 	 * made to grow without obtaining a fresh GFX context (which always starts
 	 * out with all 3 areas set to match each other). */
-//	video_offset_t              vxh_txoff;    /* [const] Delta added to all X coords (prior to "vxh_cxoff") */
-//	video_offset_t              vxh_tyoff;    /* [const] Delta added to all Y coords (prior to "vxh_cxoff") */
+	video_offset_t              vxh_txoff;    /* [const] Delta added to all X coords (prior to "vxh_cxoff") */
+	video_offset_t              vxh_tyoff;    /* [const] Delta added to all Y coords (prior to "vxh_cxoff") */
 	video_offset_t              vxh_cxoff;    /* [const] Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_offset_t              vxh_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_dim_t                 vxh_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */

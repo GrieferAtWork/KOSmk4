@@ -21,10 +21,10 @@
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
-//#define         DEFINE_libvideo_blitter_generic_blit
-//#define      DEFINE_libvideo_blitter_generic_stretch
-//#define DEFINE_libvideo_blitter_generic_blit_imatrix
-#define DEFINE_libvideo_blitter_generic_stretch_imatrix
+//#define         DEFINE_libvideo_blitter_generic_blit_impl
+//#define      DEFINE_libvideo_blitter_generic_stretch_impl
+//#define DEFINE_libvideo_blitter_generic_blit_imatrix_impl
+#define DEFINE_libvideo_blitter_generic_stretch_imatrix_impl
 #endif /* __INTELLISENSE__ */
 
 #include "../api.h"
@@ -44,25 +44,25 @@
 #include "../gfx-utils.h"
 #include "../gfx.h"
 
-#if (defined(DEFINE_libvideo_blitter_generic_blit) +         \
-     defined(DEFINE_libvideo_blitter_generic_stretch) +      \
-     defined(DEFINE_libvideo_blitter_generic_blit_imatrix) + \
-     defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)) != 1
+#if (defined(DEFINE_libvideo_blitter_generic_blit_impl) +         \
+     defined(DEFINE_libvideo_blitter_generic_stretch_impl) +      \
+     defined(DEFINE_libvideo_blitter_generic_blit_imatrix_impl) + \
+     defined(DEFINE_libvideo_blitter_generic_stretch_imatrix_impl)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_blitter_generic_blit
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit
-#elif defined(DEFINE_libvideo_blitter_generic_stretch)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch
+#ifdef DEFINE_libvideo_blitter_generic_blit_impl
+#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_blit_impl
+#elif defined(DEFINE_libvideo_blitter_generic_stretch_impl)
+#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_stretch_impl
 #define LOCAL_IS_STRETCH
-#elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit_imatrix
+#elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix_impl)
+#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_blit_imatrix_impl
 #define LOCAL_HAS_IMATRIX
-#elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch_imatrix
+#elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix_impl)
+#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_stretch_imatrix_impl
 #define LOCAL_HAS_IMATRIX
 #define LOCAL_IS_STRETCH
 #else /* ... */
@@ -78,7 +78,6 @@ DECL_BEGIN
 #endif /* !LOCAL_IS_STRETCH */
 
 #ifdef LOCAL_HAS_IMATRIX
-#define LOCAL_DECL                    PRIVATE
 #define LOCAL_IF_IMATRIX(x)           x
 #define LOCAL_IF_IMATRIX_ELSE(tt, ff) tt
 #ifdef LOCAL_IS_STRETCH
@@ -87,28 +86,27 @@ DECL_BEGIN
 #define LOCAL_ATTR ATTR_IN(8)
 #endif /* !LOCAL_IS_STRETCH */
 #else /* LOCAL_HAS_IMATRIX */
-#define LOCAL_DECL                    INTERN
 #define LOCAL_IF_IMATRIX(x)           /* nothing */
 #define LOCAL_IF_IMATRIX_ELSE(tt, ff) ff
 #define LOCAL_ATTR                    /* nothing */
 #endif /* !LOCAL_HAS_IMATRIX */
 
-INTERN ATTR_IN(1) LOCAL_ATTR void CC
-LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
-                                    , video_offset_t dst_x, video_offset_t dst_y
+PRIVATE LOCAL_ATTR ATTR_IN(1) void CC
+LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict self
+                                         , video_offset_t dst_x, video_offset_t dst_y
 #ifdef LOCAL_IS_STRETCH
-                                    , video_dim_t dst_size_x, video_dim_t dst_size_y
+                                         , video_dim_t dst_size_x, video_dim_t dst_size_y
 #endif /* LOCAL_IS_STRETCH */
-                                    , video_offset_t src_x, video_offset_t src_y
+                                         , video_offset_t src_x, video_offset_t src_y
 #ifdef LOCAL_IS_STRETCH
-                                    , video_dim_t src_size_x, video_dim_t src_size_y
+                                         , video_dim_t src_size_x, video_dim_t src_size_y
 #else /* LOCAL_IS_STRETCH */
-                                    , video_dim_t size_x, video_dim_t size_y
+                                         , video_dim_t size_x, video_dim_t size_y
 #endif /* !LOCAL_IS_STRETCH */
 #ifdef LOCAL_HAS_IMATRIX
-                                    , video_imatrix2d_row_t const src_diag
+                                         , video_imatrix2d_row_t const src_diag
 #endif /* !LOCAL_HAS_IMATRIX */
-                                    ) {
+                                         ) {
 #ifdef LOCAL_IS_STRETCH
 #define LOCAL_dst_size_x dst_size_x
 #define LOCAL_dst_size_y dst_size_y
@@ -134,7 +132,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
 #if 0
-	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit) "("
+	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit_impl) "("
 #ifdef LOCAL_IS_STRETCH
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}"
 #else /* LOCAL_IS_STRETCH */
@@ -444,14 +442,13 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #undef LOCAL_IF_IMATRIX
 #undef LOCAL_IF_IMATRIX_ELSE
 #undef LOCAL_ATTR
-#undef LOCAL_DECL
 #undef LOCAL_HAS_IMATRIX
 #undef LOCAL_IS_STRETCH
-#undef LOCAL_libvideo_blitter_generic_blit
+#undef LOCAL_libvideo_blitter_generic_blit_impl
 
 DECL_END
 
-#undef DEFINE_libvideo_blitter_generic_stretch_imatrix
-#undef DEFINE_libvideo_blitter_generic_blit_imatrix
-#undef DEFINE_libvideo_blitter_generic_stretch
-#undef DEFINE_libvideo_blitter_generic_blit
+#undef DEFINE_libvideo_blitter_generic_stretch_imatrix_impl
+#undef DEFINE_libvideo_blitter_generic_blit_imatrix_impl
+#undef DEFINE_libvideo_blitter_generic_stretch_impl
+#undef DEFINE_libvideo_blitter_generic_blit_impl
