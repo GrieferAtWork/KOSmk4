@@ -63,6 +63,12 @@
 #define VIDEO_GFX_F_AALINES     0x4000 /* [w] Render smooth lines. */
 #define VIDEO_GFX_F_NEARESTBLIT 0x0000 /* [w] Use nearest interpolation for stretch() */
 #define VIDEO_GFX_F_LINEARBLIT  0x8000 /* [w] Use linear interpolation for stretch() (else: use nearest) */
+/* TODO: Get rid vxh_txoff/vxh_tyoff */
+/* TODO: VIDEO_GFX_F_XMIRROR on its own should not enable wrapping, but just mirror pixel data within the base rect */
+/* TODO: VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_XMIRROR should do that VIDEO_GFX_F_XMIRROR currently does on its own,
+ *                                             except that the primary clip rect should already be mirrored.
+ *       XXX: Think about if this behavior of alternating mirrors should really be happening (I can't think
+ *            of  any  proper use  cases for  it, and  it  makes the  impl unnecessarily  more complicated) */
 
 
 

@@ -2098,6 +2098,7 @@ empty_clip:
  * - video_gfx_rot180:  Rotate pixel data 180°
  * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
  * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
+DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 #define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
@@ -2110,26 +2111,43 @@ libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_hmirror, libvideo_gfx_hmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
 	if (!(self->vx_flags & VIDEO_GFX_F_XMIRROR)) {
 		self->vx_flags |= VIDEO_GFX_F_XMIRROR;
 		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 	}
-	/* TODO: translate */
+
+	/* Adjust X translation offset */
+	if (self->vx_hdr.vxh_cxsiz) {
+		self->vx_hdr.vxh_txoff += self->vx_hdr.vxh_cxsiz;
+		self->vx_hdr.vxh_txoff %= self->vx_hdr.vxh_cxsiz * 2;
+		if (self->vx_hdr.vxh_txoff < 0)
+			self->vx_hdr.vxh_txoff += (self->vx_hdr.vxh_cxsiz * 2) - 1;
+	}
 	return self;
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_vmirror, libvideo_gfx_vmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
 	if (!(self->vx_flags & VIDEO_GFX_F_YMIRROR)) {
 		self->vx_flags |= VIDEO_GFX_F_YMIRROR;
 		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 	}
-	/* TODO: translate */
+
+	/* Adjust Y translation offset */
+	if (self->vx_hdr.vxh_cysiz) {
+		self->vx_hdr.vxh_tyoff += self->vx_hdr.vxh_cysiz;
+		self->vx_hdr.vxh_tyoff %= self->vx_hdr.vxh_cysiz * 2;
+		if (self->vx_hdr.vxh_tyoff < 0)
+			self->vx_hdr.vxh_tyoff += (self->vx_hdr.vxh_cysiz * 2) - 1;
+	}
 	return self;
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	self = libvideo_gfx_xyswap(self);
@@ -2137,6 +2155,7 @@ libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	return self;
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_rrot90, libvideo_gfx_rrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	self = libvideo_gfx_xyswap(self);
@@ -2144,6 +2163,7 @@ libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	return self;
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_rot180, libvideo_gfx_rot180);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rot180(struct video_gfx *__restrict self) {
 	self = libvideo_gfx_vmirror(self);
@@ -2151,22 +2171,9 @@ libvideo_gfx_rot180(struct video_gfx *__restrict self) {
 	return self;
 }
 
+DEFINE_PUBLIC_ALIAS(video_gfx_lrot, libvideo_gfx_lrot);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot(struct video_gfx *__restrict self, int n) {
-	n %= 4;
-	if (n < 0)
-		n += 3;
-	switch (n) {
-	case 0: return self;
-	case 1: return libvideo_gfx_rrot90(self);
-	case 2: return libvideo_gfx_rot180(self);
-	case 3: return libvideo_gfx_lrot90(self);
-	default: __builtin_unreachable();
-	}
-}
-
-INTERN ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
 	n %= 4;
 	if (n < 0)
 		n += 3;
@@ -2175,6 +2182,21 @@ libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
 	case 1: return libvideo_gfx_lrot90(self);
 	case 2: return libvideo_gfx_rot180(self);
 	case 3: return libvideo_gfx_rrot90(self);
+	default: __builtin_unreachable();
+	}
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_rrot, libvideo_gfx_rrot);
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
+	n %= 4;
+	if (n < 0)
+		n += 3;
+	switch (n) {
+	case 0: return self;
+	case 1: return libvideo_gfx_rrot90(self);
+	case 2: return libvideo_gfx_rot180(self);
+	case 3: return libvideo_gfx_lrot90(self);
 	default: __builtin_unreachable();
 	}
 }
