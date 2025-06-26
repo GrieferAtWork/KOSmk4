@@ -59,7 +59,7 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 0
+#if 1
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
@@ -68,7 +68,7 @@
 #define TRACE_END(...)   (void)0
 #endif
 
-#if defined(NDEBUG) || 1
+#if defined(NDEBUG) || 0
 #if 1 /* Turn GFX assertions into compile-time assumptions for max speed */
 #ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
 #undef __CRT_UBSAN_BUILTIN_UNREACHABLE
@@ -385,8 +385,8 @@ INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samebuf__blit(struct video_bl
 INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_coord_t src_x, video_coord_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 #define libvideo_blitter_noblend_samefmt__stretch_l         libvideo_blitter_generic__stretch_l
-#define libvideo_blitter_noblend_samebuf__blit_imatrix      libvideo_blitter_samebuf__blit_imatrix
-#define libvideo_blitter_noblend_samefmt__blit_imatrix      libvideo_blitter_generic__blit_imatrix
+#define libvideo_blitter_noblend_samebuf__blit_imatrix      libvideo_blitter_samebuf__blit_imatrix /* TODO */
+#define libvideo_blitter_noblend_samefmt__blit_imatrix      libvideo_blitter_generic__blit_imatrix /* TODO */
 #define libvideo_blitter_noblend_samefmt__stretch_imatrix_n libvideo_blitter_generic__stretch_imatrix_n
 #define libvideo_blitter_noblend_samefmt__stretch_imatrix_l libvideo_blitter_generic__stretch_imatrix_l
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitfrom_n(struct video_blitter *__restrict ctx);

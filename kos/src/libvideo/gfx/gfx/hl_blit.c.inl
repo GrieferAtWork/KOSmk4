@@ -845,9 +845,9 @@ libvideo_blitter_generic_blit_imatrix(struct video_blitter const *__restrict sel
 	video_imatrix2d_t src_matrix;
 	video_offset_t lo_src_x;
 	video_offset_t lo_src_y;
-	/*syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_imatrix("
+	syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_imatrix("
 	                  "dst: {%dx%d}, src: {%dx%d}, dim: {%ux%u}, {%d,%d})\n",
-	       dst_x, dst_y, src_x, src_y, size_x, size_y, src_diag[0], src_diag[1]);*/
+	       dst_x, dst_y, src_x, src_y, size_x, size_y, src_diag[0], src_diag[1]);
 	if (!size_x || !size_y)
 		return;
 	dst_x += dst->vx_hdr.vxh_cxoff;
@@ -855,21 +855,21 @@ libvideo_blitter_generic_blit_imatrix(struct video_blitter const *__restrict sel
 	src_x += src->vx_hdr.vxh_cxoff;
 	src_y += src->vx_hdr.vxh_cyoff;
 	if unlikely(dst_x < (video_offset_t)dst->vx_hdr.vxh_bxmin) {
-		dst_x = (video_offset_t)(dst->vx_hdr.vxh_bxmin - (video_coord_t)dst_x);
-		if unlikely((video_coord_t)dst_x >= size_x)
+		video_dim_t delta = dst->vx_hdr.vxh_bxmin - (video_coord_t)dst_x;
+		if unlikely(delta >= size_x)
 			return;
 		if (src_diag[0] >= 0)
-			src_x += (video_coord_t)dst_x;
-		size_x -= (video_coord_t)dst_x;
+			src_x += delta;
+		size_x -= delta;
 		dst_x = (video_offset_t)dst->vx_hdr.vxh_bxmin;
 	}
 	if unlikely(dst_y < (video_offset_t)dst->vx_hdr.vxh_bymin) {
-		dst_y = (video_offset_t)(dst->vx_hdr.vxh_bymin - (video_coord_t)dst_y);
-		if unlikely((video_coord_t)dst_y >= size_y)
+		video_dim_t delta = dst->vx_hdr.vxh_bymin - (video_coord_t)dst_y;
+		if unlikely(delta >= size_y)
 			return;
 		if (src_diag[1] >= 0)
-			src_y += (video_coord_t)dst_y;
-		size_y -= (video_coord_t)dst_y;
+			src_y += delta;
+		size_y -= delta;
 		dst_y = (video_offset_t)dst->vx_hdr.vxh_bymin;
 	}
 
@@ -880,24 +880,24 @@ libvideo_blitter_generic_blit_imatrix(struct video_blitter const *__restrict sel
 	if (src_diag[1] < 0)
 		lo_src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 	if unlikely(lo_src_x < (video_offset_t)src->vx_hdr.vxh_bxmin) {
-		lo_src_x = (video_offset_t)(src->vx_hdr.vxh_bxmin - (video_coord_t)lo_src_x);
-		if unlikely((video_coord_t)lo_src_x >= size_x)
+		video_dim_t delta = src->vx_hdr.vxh_bxmin - (video_coord_t)lo_src_x;
+		if unlikely(delta >= size_x)
 			return;
-		dst_x += (video_coord_t)lo_src_x;
-		size_x -= (video_coord_t)lo_src_x;
+		dst_x += delta;
+		size_x -= delta;
 		src_x = lo_src_x = (video_offset_t)src->vx_hdr.vxh_bxmin;
 		if (src_diag[0] < 0)
-			src_x = (src->vx_hdr.vxh_cxsiz - 1) - lo_src_x;
+			src_x = src->vx_hdr.vxh_bxend - 1;
 	}
 	if unlikely(lo_src_y < (video_offset_t)src->vx_hdr.vxh_bymin) {
-		lo_src_y = (video_offset_t)(src->vx_hdr.vxh_bymin - (video_coord_t)lo_src_y);
-		if unlikely((video_coord_t)lo_src_y >= size_y)
+		video_dim_t delta = src->vx_hdr.vxh_bymin - (video_coord_t)lo_src_y;
+		if unlikely(delta >= size_y)
 			return;
-		dst_y += (video_coord_t)lo_src_y;
-		size_y -= (video_coord_t)lo_src_y;
+		dst_y += delta;
+		size_y -= delta;
 		lo_src_y = src_y = (video_offset_t)src->vx_hdr.vxh_bymin;
 		if (src_diag[0] < 0)
-			src_y = (src->vx_hdr.vxh_cysiz - 1) - lo_src_y;
+			src_y = src->vx_hdr.vxh_byend - 1;
 	}
 
 	/* Truncate copy-rect to src/dst buffer limits (out-of-bounds pixels aren't rendered) */
@@ -963,10 +963,10 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 	video_dim_t src_maxsx = size_x;     /* # of pixes after src_x before wrap/tiled */
 	video_dim_t src_maxsy = size_y;     /* # of pixes after src_y before wrap/tiled */
 	video_imatrix2d_row_t src_diag;     /* Matrix-diagonal for source pixel transformations */
-	/*syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_rdmirror("
+	syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_rdmirror("
 	                  "dst: {%dx%d}, src: {%dx%d}, dim: {%ux%u}) [src.clip: {%ux%u}]\n",
 	       dst_x, dst_y, src_x, src_y, size_x, size_y,
-	       src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);*/
+	       src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);
 	src_diag[0] = 1;
 	src_diag[1] = 1;
 
@@ -1209,81 +1209,86 @@ libvideo_blitter_generic_stretch_imatrix(struct video_blitter const *__restrict 
 	video_imatrix2d_t src_matrix;
 	video_offset_t lo_src_x;
 	video_offset_t lo_src_y;
-	/*syslog(LOG_DEBUG, "libvideo_blitter_generic_stretch_imatrix("
+	syslog(LOG_DEBUG, "libvideo_blitter_generic_stretch_imatrix("
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}, diag: {%d,%d})\n",
 	       dst_x, dst_y, dst_size_x, dst_size_y,
 	       src_x, src_y, src_size_x, src_size_y,
-	       src_diag[0], src_diag[1]);*/
+	       src_diag[0], src_diag[1]);
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
 		return;
 	dst_x += dst->vx_hdr.vxh_cxoff;
 	dst_y += dst->vx_hdr.vxh_cyoff;
-	src_x += src->vx_hdr.vxh_cxoff;
-	src_y += src->vx_hdr.vxh_cyoff;
 	if unlikely(dst_x < (video_offset_t)dst->vx_hdr.vxh_bxmin) {
-		video_dim_t srcpart;
-		dst_x = (video_offset_t)(dst->vx_hdr.vxh_bxmin - (video_coord_t)dst_x);
-		if unlikely((video_coord_t)dst_x >= dst_size_x)
+		video_dim_t srcpart, dstpart;
+		dstpart = dst->vx_hdr.vxh_bxmin - (video_coord_t)dst_x;
+		if unlikely(dstpart >= dst_size_x)
 			return;
-		srcpart = ((video_coord_t)dst_x * src_size_x) / dst_size_x;
+		srcpart = (dstpart * src_size_x) / dst_size_x;
 		if unlikely(srcpart >= src_size_x)
 			return;
 		src_size_x -= srcpart;
-		dst_size_x -= (video_coord_t)dst_x;
+		dst_size_x -= dstpart;
 		if (src_diag[0] >= 0)
 			src_x += srcpart;
 		dst_x = (video_offset_t)dst->vx_hdr.vxh_bxmin;
 	}
 	if unlikely(dst_y < (video_offset_t)dst->vx_hdr.vxh_bymin) {
-		video_dim_t srcpart;
-		dst_y = (video_offset_t)(dst->vx_hdr.vxh_bymin - (video_coord_t)dst_y);
-		if unlikely((video_coord_t)dst_y >= dst_size_y)
+		video_dim_t srcpart, dstpart;
+		dstpart = dst->vx_hdr.vxh_bymin - (video_coord_t)dst_y;
+		if unlikely(dstpart >= dst_size_y)
 			return;
-		srcpart = ((video_coord_t)dst_y * src_size_y) / dst_size_y;
+		srcpart = (dstpart * src_size_y) / dst_size_y;
 		if unlikely(srcpart >= src_size_y)
 			return;
 		src_size_y -= srcpart;
-		dst_size_y -= (video_coord_t)dst_y;
+		dst_size_y -= dstpart;
 		if (src_diag[1] >= 0)
 			src_y += srcpart;
 		dst_y = (video_offset_t)dst->vx_hdr.vxh_bymin;
 	}
 
+	src_x += src->vx_hdr.vxh_cxoff;
+	src_y += src->vx_hdr.vxh_cyoff;
 	lo_src_x = src_x;
 	lo_src_y = src_y;
-	if (src_diag[0] < 0)
+	if (src_diag[0] < 0) {
+		src_x -= 2 * src->vx_hdr.vxh_cxoff;
 		lo_src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
-	if (src_diag[1] < 0)
+	}
+	if (src_diag[1] < 0) {
+		src_y -= 2 * src->vx_hdr.vxh_cyoff;
 		lo_src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
+	}
+
 	if unlikely(lo_src_x < (video_offset_t)src->vx_hdr.vxh_bxmin) {
-		video_dim_t dstpart;
-		lo_src_x = (video_offset_t)(src->vx_hdr.vxh_bxmin - (video_coord_t)lo_src_x);
-		if unlikely((video_coord_t)lo_src_x >= src_size_x)
+		video_dim_t dstpart, srcpart;
+		srcpart = src->vx_hdr.vxh_bxmin - (video_coord_t)lo_src_x;
+		if unlikely(srcpart >= src_size_x)
 			return;
-		dstpart = ((video_coord_t)lo_src_x * dst_size_x) / src_size_x;
+		dstpart = (srcpart * dst_size_x) / src_size_x;
 		if unlikely(dstpart >= dst_size_x)
 			return;
 		dst_size_x -= dstpart;
 		dst_x += dstpart;
-		src_size_x -= (video_coord_t)lo_src_x;
+		src_size_x -= srcpart;
 		src_x = lo_src_x = (video_offset_t)src->vx_hdr.vxh_bxmin;
 		if (src_diag[0] < 0)
-			src_x = (src->vx_hdr.vxh_cxsiz - 1) - lo_src_x;
+			src_x = src->vx_hdr.vxh_bxend - 1;
 	}
 	if unlikely(lo_src_y < (video_offset_t)src->vx_hdr.vxh_bymin) {
-		video_dim_t dstpart;
-		lo_src_y = (video_offset_t)(src->vx_hdr.vxh_bymin - (video_coord_t)lo_src_y);
-		if unlikely((video_coord_t)lo_src_y >= src_size_y)
+		video_dim_t dstpart, srcpart;
+		srcpart = src->vx_hdr.vxh_bymin - (video_coord_t)lo_src_y;
+		if unlikely(srcpart >= src_size_y)
 			return;
-		dstpart = ((video_coord_t)lo_src_y * dst_size_y) / src_size_y;
+		dstpart = (srcpart * dst_size_y) / src_size_y;
 		if unlikely(dstpart >= dst_size_y)
 			return;
 		dst_size_y -= dstpart;
 		dst_y += dstpart;
-		src_size_y -= (video_coord_t)lo_src_y;
+		src_size_y -= srcpart;
 		src_y = lo_src_y = (video_offset_t)src->vx_hdr.vxh_bymin;
 		if (src_diag[1] < 0)
-			src_y = (src->vx_hdr.vxh_cysiz - 1) - lo_src_y;
+			src_y = src->vx_hdr.vxh_byend - 1;
 	}
 
 	/* Truncate copy-rect to src/dst buffer limits (out-of-bounds pixels aren't rendered) */

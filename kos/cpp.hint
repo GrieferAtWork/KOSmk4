@@ -2852,3 +2852,4 @@
 #define DECLARE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y,video_color_t color);
 #define DEFINE_libvideo_ramgfx__putcolor_FOO(name,...) void libvideo_ramgfx__putcolor_##name(struct video_gfx const*__restrict self,video_coord_t x,video_coord_t y,video_color_t color){}
 #define DEFINE_vp_kd_treeN_find(N)void vp_kd_tree##N##_find(struct video_palette_tree const*node,video_color_t color,unsigned int chan_id,struct kd_tree_result*result){}
+#define LOCAL_IF_IMATRIX(x)

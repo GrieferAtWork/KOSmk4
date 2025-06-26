@@ -55,8 +55,8 @@
 #define VIDEO_GFX_FAALINES     0x00000002 /* [w] Render smooth lines. */
 #define VIDEO_GFX_FWRXWRAP     0x00000010 /* [w] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
 #define VIDEO_GFX_FWRYWRAP     0x00000020 /* [w] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
-#define VIDEO_GFX_FWRXMIRROR   0x00000040 /* [w] When combined with VIDEO_GFX_FWRXWRAP, OOB x coords are mirrored instead of wrapped */
-#define VIDEO_GFX_FWRYMIRROR   0x00000080 /* [w] When combined with VIDEO_GFX_FWRYWRAP, OOB y coords are mirrored instead of wrapped */
+#define VIDEO_GFX_FWRXMIRROR   0x00000040 /* [w] X coords <0 or >=width are mirrored and bounce of the clip rect edges */
+#define VIDEO_GFX_FWRYMIRROR   0x00000080 /* [w] X coords <0 or >=height are mirrored and bounce of the clip rect edges */
 #define VIDEO_GFX_FBLUR        0x00000100 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
                                            *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                            *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
@@ -141,6 +141,10 @@ struct video_bitmask {
 typedef __INT_FAST8_TYPE__ video_imatrix2d_word_t;
 typedef video_imatrix2d_word_t video_imatrix2d_row_t[2];
 typedef video_imatrix2d_row_t video_imatrix2d_t[2];
+/* TODO: Instead of "video_imatrix2d_t" being i8[4],
+ *       it should be u32 with macros to get/set the
+ *       individual  words. - That  way, we can more
+ *       efficiently pass it around via  parameters. */
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 

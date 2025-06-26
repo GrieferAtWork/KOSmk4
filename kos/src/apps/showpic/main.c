@@ -234,7 +234,7 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FXYSWAP |
+	                    /*VIDEO_GFX_FXYSWAP |*/
 	                    VIDEO_GFX_FLINEARBLIT |
 	                    VIDEO_GFX_FNORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
@@ -290,10 +290,14 @@ do_showpic(struct screen_buffer *screen,
 	video_gfx_setflags(&image_gfx,
 	                   video_gfx_getflags(&image_gfx) |
 	                   VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP);
+	/*video_gfx_clip(&image_gfx, -50, -50,
+	               video_gfx_getclipw(&image_gfx) + 100,
+	               video_gfx_getcliph(&image_gfx) + 100);*/
 
 	int tiles_x = 3;
 	int tiles_y = 3;
 	static video_offset_t dst_offset = 0;
+
 
 	if (0) { /* Change to "1" to test the tiling engine of the non-stretching blit impl */
 		struct video_gfx sized_gfx;

@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -1270,8 +1270,8 @@ libvideo_gfx_generic__fillstretchmask1_n(struct video_gfx const *__restrict self
 		return;
 	if ((src_size_x < (dst_size_x >> 1)) &&
 	    (src_size_y < (dst_size_y >> 1))) {
-		/* TODO: Iterate across "src"  and use  "video_gfx_x_absfill"
-		 *       to fill rects associated with visible source pixels. */
+		/* XXX: Iterate across "src"  and use  "video_gfx_x_absfill"
+		 *      to fill rects associated with visible source pixels. */
 	}
 	TRACE_START("generic__fillstretchmask1_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
@@ -1340,8 +1340,8 @@ libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self,
 
 	if ((src_size_x < (dst_size_x >> 1)) &&
 	    (src_size_y < (dst_size_y >> 1))) {
-		/* TODO: Iterate across "src"  and use  "video_gfx_x_absfill"
-		 *       to fill rects associated with visible source pixels. */
+		/* XXX: Iterate across "src"  and use  "video_gfx_x_absfill"
+		 *      to fill rects associated with visible source pixels. */
 	}
 	TRACE_START("generic__fillstretchmask_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
@@ -1411,6 +1411,16 @@ libvideo_blitter_generic__blit_imatrix(struct video_blitter const *__restrict se
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
 	gfx_assert_imatrix2d(src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+		libvideo_blitter_generic__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+		return;
+	}
+
+	/* TODO: More optimizations for known rotation/mirror matrices */
+
 	TRACE_START("generic__blit_imatrix("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -1528,6 +1538,17 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 	})
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
+	gfx_assert_imatrix2d(src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+		libvideo_blitter_generic__stretch_l(self,
+		                                    dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+		                                    src_x_, src_y_, src_size_x_, src_size_y_);
+		return;
+	}
+
 #define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
 #define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
 #define pixel_blend_xmax_ymax pixel_blend_xmin_ymin
@@ -1567,8 +1588,6 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 		                                   frac_y0, frac_y1);                                         \
 		_video_gfx_x_putcolor(dst, dst_x, dst_y, out);                                                \
 	}
-
-	gfx_assert_imatrix2d(src_matrix);
 	TRACE_START("generic__stretch_imatrix_l("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
@@ -1653,6 +1672,16 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 	struct video_gfx const *src = self->vbt_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
 	gfx_assert_imatrix2d(src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+		libvideo_blitter_generic__stretch_n(self,
+		                                    dst_x, dst_y, dst_size_x, dst_size_y,
+		                                    src_x, src_y, src_size_x, src_size_y);
+		return;
+	}
+
 	TRACE_START("generic__stretch_imatrix_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
@@ -1677,10 +1706,12 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
 			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * row_src_x;
 			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * row_src_x;
+			video_coord_t used_dst_x = dst_x + x;
+			video_coord_t used_dst_y = row_dst_y;
 			gfx_assert_absbounds_buffer(src, used_src_x, used_src_y);
-			gfx_assert_absbounds_buffer(dst, dst_x + x, row_dst_y);
+			gfx_assert_absbounds_buffer(dst, used_dst_x, used_dst_y);
 			color = _video_gfx_x_getcolor(src, used_src_x, used_src_y);
-			_video_gfx_x_putcolor(dst, dst_x + x, row_dst_y, color);
+			_video_gfx_x_putcolor(dst, used_dst_x, used_dst_y, color);
 			src_pos_x += step_x;
 			++x;
 		} while (x < dst_size_x);

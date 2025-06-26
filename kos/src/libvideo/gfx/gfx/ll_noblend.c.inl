@@ -1171,7 +1171,7 @@ libvideo_gfx_noblend__fillstretchmask_n(struct video_gfx const *__restrict self,
                                         video_color_t const bg_fg_colors[2],
                                         video_dim_t src_size_x, video_dim_t src_size_y,
                                         struct video_bitmask const *__restrict bm) {
-	/* TODO */
+	/* XXX: Fast-pass? */
 	libvideo_gfx_generic__fillstretchmask_n(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                                        bg_fg_colors, src_size_x, src_size_y, bm);
 }
@@ -1182,7 +1182,7 @@ libvideo_blitter_noblend_samefmt__stretch_n(struct video_blitter const *__restri
                                             video_dim_t dst_size_x, video_dim_t dst_size_y,
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y) {
-	/* TODO */
+	/* XXX: Fast-pass? */
 	libvideo_blitter_generic__stretch_n(self,
 	                                    dst_x, dst_y, dst_size_x, dst_size_y,
 	                                    src_x, src_y, src_size_x, src_size_y);
@@ -1194,7 +1194,7 @@ libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restri
                                             video_dim_t dst_size_x, video_dim_t dst_size_y,
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y) {
-	/* TODO */
+	/* XXX: Fast-pass? */
 	libvideo_blitter_generic__stretch_n(self,
 	                                    dst_x, dst_y, dst_size_x, dst_size_y,
 	                                    src_x, src_y, src_size_x, src_size_y);
@@ -1212,6 +1212,16 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_converter *conv = libvideo_blitter_generic__conv(self);
 	gfx_assert_imatrix2d(src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+		libvideo_blitter_noblend_difffmt__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+		return;
+	}
+
+	/* TODO: More optimizations for known rotation/mirror matrices */
+
 	TRACE_START("noblend_difffmt__blit_imatrix("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -1230,9 +1240,11 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 			video_coord_t used_dst_x = dst_x + x;
 			video_coord_t used_dst_y = dst_y + y;
 			video_pixel_t pixel;
-			pixel = video_gfx_x_getpixel(src, used_src_x, used_src_y);
+			gfx_assert_absbounds_buffer(src, used_src_x, used_src_y);
+			gfx_assert_absbounds_buffer(dst, used_dst_x, used_dst_y);
+			pixel = _video_gfx_x_getpixel(src, used_src_x, used_src_y);
 			pixel = video_converter_mappixel(conv, pixel);
-			video_gfx_x_setpixel(dst, used_dst_x, used_dst_y, pixel);
+			_video_gfx_x_setpixel(dst, used_dst_x, used_dst_y, pixel);
 		}
 	}
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");
@@ -1245,7 +1257,7 @@ libvideo_blitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const *
                                                     video_coord_t src_x, video_coord_t src_y,
                                                     video_dim_t src_size_x, video_dim_t src_size_y,
                                                     video_imatrix2d_t const src_matrix) {
-	/* TODO */
+	/* XXX: Fast-pass? */
 	libvideo_blitter_generic__stretch_imatrix_n(self,
 	                                            dst_x, dst_y, dst_size_x, dst_size_y,
 	                                            src_x, src_y, src_size_x, src_size_y,
