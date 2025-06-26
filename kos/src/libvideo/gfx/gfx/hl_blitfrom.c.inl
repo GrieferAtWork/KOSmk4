@@ -131,7 +131,7 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 	if (src_buffer == dst_buffer) {
 		ctx->_vbt_xops.vbtx_stretch         = &LOCAL_libvideo_blitter_samebuf__stretch_X;
 		ctx->_vbt_xops.vbtx_stretch_imatrix = &LOCAL_libvideo_blitter_samebuf__stretch_imatrix_X;
-		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
+		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_F_BLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vbt_src->vx_colorkey)) {
 			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_noblend_samebuf__blit;
 			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_noblend_samebuf__blit_imatrix;
@@ -140,7 +140,7 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_samebuf__blit_imatrix;
 		}
 	} else {
-		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_FBLUR) == 0 &&
+		if ((ctx->vbt_src->vx_flags & VIDEO_GFX_F_BLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(ctx->vbt_src->vx_colorkey)) {
 			if (noblend_blit_compatible(dst_buffer->vb_format.vf_codec,
 			                            src_buffer->vb_format.vf_codec) &&

@@ -159,7 +159,7 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	/* Acquire GFX context for source video buffer */
 	video_buffer_getgfx(self, &gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    VIDEO_GFX_F_NORMAL, 0);
 
 	/* Palettize source video buffer and store results in "pal" */
 	if unlikely(video_gfx_palettize(&gfx, num_colors, pal->vp_pal, method))
@@ -192,7 +192,7 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	/* Blit source GFX context onto result video_buffer. */
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    VIDEO_GFX_F_NORMAL, 0);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
 	                  video_gfx_getclipw(&gfx),
 	                  video_gfx_getcliph(&gfx));
@@ -234,13 +234,13 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    /*VIDEO_GFX_FXYSWAP |*/
-	                    VIDEO_GFX_FLINEARBLIT |
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    /*VIDEO_GFX_F_XYSWAP |*/
+	                    VIDEO_GFX_F_LINEARBLIT |
+	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FXYSWAP |
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    VIDEO_GFX_F_XYSWAP |
+	                    VIDEO_GFX_F_NORMAL, 0);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -289,7 +289,7 @@ do_showpic(struct screen_buffer *screen,
 	/* Enable read-tiling in X and Y for the image */
 	video_gfx_setflags(&image_gfx,
 	                   video_gfx_getflags(&image_gfx) |
-	                   VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP);
+	                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 	/*video_gfx_clip(&image_gfx, -50, -50,
 	               video_gfx_getclipw(&image_gfx) + 100,
 	               video_gfx_getcliph(&image_gfx) + 100);*/
@@ -315,8 +315,8 @@ do_showpic(struct screen_buffer *screen,
 		video_buffer_getgfx(sized_buffer, &sized_gfx,
 		                    video_gfx_getblend(&image_gfx),
 		                    (video_gfx_getflags(&image_gfx) |
-		                     VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR) &
-		                    ~VIDEO_GFX_FXYSWAP,
+		                     VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR) &
+		                    ~VIDEO_GFX_F_XYSWAP,
 		                    video_gfx_getcolorkey(&image_gfx));
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
@@ -328,7 +328,7 @@ do_showpic(struct screen_buffer *screen,
 	} else {
 		video_gfx_setflags(&image_gfx,
 		                   video_gfx_getflags(&image_gfx) |
-		                   VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR);
+		                   VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
 		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
@@ -415,7 +415,7 @@ int main(int argc, char *argv[]) {
 		struct video_gfx screen_gfx;
 		video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_FNORMAL, 0);
+		                    VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
 	}
 

@@ -99,7 +99,7 @@ struct video_buffer_ops {
 
 	/* Disable blending for `__self', which uses this video buffer. Same as:
 	 * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
-	 * >> __self->vx_flags &= ~VIDEO_GFX_FBLUR;
+	 * >> __self->vx_flags &= ~VIDEO_GFX_F_BLUR;
 	 * >> __self->vx_colorkey = 0;
 	 * >> (*vi_updategfx)(__self, VIDEO_GFX_UPDATE_ALL);
 	 *
@@ -243,7 +243,7 @@ public:
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx &getgfx(struct video_gfx &__result,
 	                                           gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	                                           __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	                                           __uintptr_t __flags         = VIDEO_GFX_F_NORMAL,
 	                                           video_color_t __colorkey    = 0) {
 		return *video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);
 	}
@@ -251,7 +251,7 @@ public:
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_gfx getgfx(gfx_blendmode_t __blendmode = GFX_BLENDMODE_OVERRIDE,
-	                                          __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	                                          __uintptr_t __flags         = VIDEO_GFX_F_NORMAL,
 	                                          video_color_t __colorkey    = 0) {
 		struct video_gfx __result;
 		video_buffer_getgfx(this, &__result, __blendmode, __flags, __colorkey);

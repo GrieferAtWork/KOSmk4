@@ -73,10 +73,10 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
 		/* Blit the entirety of the source buffer into the target buffer. */
 		video_buffer_getgfx(self, &src_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_FNORMAL, 0);
+		                    VIDEO_GFX_F_NORMAL, 0);
 		video_buffer_getgfx(result, &dst_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_FNORMAL, 0);
+		                    VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_bitblit(&dst_gfx, 0, 0,
 		                  &src_gfx, 0, 0,
 		                  self->vb_xdim, self->vb_ydim);

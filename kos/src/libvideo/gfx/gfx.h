@@ -406,100 +406,84 @@ INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_blitter_noblend_difffmt__stretch_
 INTDEF ATTR_RETNONNULL ATTR_IN(1) struct video_gfx const *CC libvideo_gfx_generic_noblend(struct video_gfx const *__restrict self);
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_rdwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_rdmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_rdwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_rdmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_xyswap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrwrap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrmirror(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_mirror(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_line_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x1, video_offset_t y1, video_offset_t x2, video_offset_t y2, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hline_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vline_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_fill_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_rect_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
-INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
-INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
-INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
-INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
+INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
+INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
+INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
+INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_gradient_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t const colors[2][2]);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_hgradient_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrwrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrwrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrmirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrmirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_vgradient_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_dim_t size_x, video_dim_t size_y, video_color_t locolor, video_color_t hicolor);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_wrmirror(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_wrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic_fillmask_mirror(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_wrwrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_wrmirror(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_wrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
+INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic_fillstretchmask_mirror(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(4) void CC libvideo_gfx_generic_bitblit(struct video_gfx const *__restrict dst, video_offset_t dst_x, video_offset_t dst_y, struct video_gfx const *__restrict src, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, struct video_gfx const *__restrict src, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrap_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdmirror(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdmirror_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrwrap_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrmirror(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrmirror_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrwrap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrwrap_xyswap(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrmirror(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_rdwrmirror_xyswap(void);
-#define libvideo_gfx_generic_ops                   (*_libvideo_gfx_generic_ops())
-#define libvideo_gfx_generic_ops_xyswap            (*_libvideo_gfx_generic_ops_xyswap())
-#define libvideo_gfx_generic_ops_rdwrap            (*_libvideo_gfx_generic_ops_rdwrap())
-#define libvideo_gfx_generic_ops_rdwrap_xyswap     (*_libvideo_gfx_generic_ops_rdwrap_xyswap())
-#define libvideo_gfx_generic_ops_rdmirror          (*_libvideo_gfx_generic_ops_rdmirror())
-#define libvideo_gfx_generic_ops_rdmirror_xyswap   (*_libvideo_gfx_generic_ops_rdmirror_xyswap())
-#define libvideo_gfx_generic_ops_wrwrap            (*_libvideo_gfx_generic_ops_wrwrap())
-#define libvideo_gfx_generic_ops_wrwrap_xyswap     (*_libvideo_gfx_generic_ops_wrwrap_xyswap())
-#define libvideo_gfx_generic_ops_wrmirror          (*_libvideo_gfx_generic_ops_wrmirror())
-#define libvideo_gfx_generic_ops_wrmirror_xyswap   (*_libvideo_gfx_generic_ops_wrmirror_xyswap())
-#define libvideo_gfx_generic_ops_rdwrwrap          (*_libvideo_gfx_generic_ops_rdwrwrap())
-#define libvideo_gfx_generic_ops_rdwrwrap_xyswap   (*_libvideo_gfx_generic_ops_rdwrwrap_xyswap())
-#define libvideo_gfx_generic_ops_rdwrmirror        (*_libvideo_gfx_generic_ops_rdwrmirror())
-#define libvideo_gfx_generic_ops_rdwrmirror_xyswap (*_libvideo_gfx_generic_ops_rdwrmirror_xyswap())
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrap(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_wrap_xyswap(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_mirror(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_generic_ops_mirror_xyswap(void);
+#define libvideo_gfx_generic_ops                 (*_libvideo_gfx_generic_ops())
+#define libvideo_gfx_generic_ops_xyswap          (*_libvideo_gfx_generic_ops_xyswap())
+#define libvideo_gfx_generic_ops_wrap            (*_libvideo_gfx_generic_ops_wrap())
+#define libvideo_gfx_generic_ops_wrap_xyswap     (*_libvideo_gfx_generic_ops_wrap_xyswap())
+#define libvideo_gfx_generic_ops_mirror          (*_libvideo_gfx_generic_ops_mirror())
+#define libvideo_gfx_generic_ops_mirror_xyswap   (*_libvideo_gfx_generic_ops_mirror_xyswap())
 
 /* Generic blit operators */
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic_blit(struct video_blitter const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
@@ -518,25 +502,58 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_rdmirror(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_generic_ops_mirror(void);
 #define libvideo_blit_generic_ops          (*_libvideo_blit_generic_ops())          /* Support: - */
-#define libvideo_blit_generic_ops_rdwrap   (*_libvideo_blit_generic_ops_rdwrap())   /* Support: RD-XY-WRAP */
-#define libvideo_blit_generic_ops_wrap     (*_libvideo_blit_generic_ops_wrap())     /* Support: RD/WR-XY-WRAP */
-#define libvideo_blit_generic_ops_rdmirror (*_libvideo_blit_generic_ops_rdmirror()) /* Support: src:XYSWAP + RD-XY-FLIP/WRAP */
-#define libvideo_blit_generic_ops_mirror   (*_libvideo_blit_generic_ops_mirror())   /* Support: src/dst:XYSWAP + RD/WR-XY-FLIP/WRAP */
+#define libvideo_blit_generic_ops_rdwrap   (*_libvideo_blit_generic_ops_rdwrap())   /* Support: src:XY-WRAP */
+#define libvideo_blit_generic_ops_wrap     (*_libvideo_blit_generic_ops_wrap())     /* Support: src/dst:XY-WRAP */
+#define libvideo_blit_generic_ops_rdmirror (*_libvideo_blit_generic_ops_rdmirror()) /* Support: src:XYSWAP + src:XY-FLIP/WRAP */
+#define libvideo_blit_generic_ops_mirror   (*_libvideo_blit_generic_ops_mirror())   /* Support: src/dst:XYSWAP + src/dst:XY-FLIP/WRAP */
 
 
 
-
+/* Apply a clipping  rect to "self",  shrinking the  pixel
+ * area relative to offsets specified by the given coords.
+ *
+ * Note that the clip area can  only ever be shrunk. To  go
+ * back to the initial clip area, either keep a copy of the
+ * original GFX  context, or  create a  new context  (which
+ * always starts  out with  its clipping  area set  to  the
+ * associated buffer's entire surface) */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfxhdr *CC
 libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
                      video_offset_t clip_x, video_offset_t clip_y,
                      video_dim_t size_x, video_dim_t size_y);
+
+/* Perform geometric  transformations on  `self'. These  functions
+ * may alter flags or the clip rect of `self' in order to  achieve
+ * their  goal. Note that none of these functions alter pixel data
+ * of the underlying buffer; they only affect how the given `self'
+ * interacts with pixel data of the underlying buffer.
+ *
+ * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
+ * - video_gfx_hmirror: Mirror pixel data horizontally
+ * - video_gfx_vmirror: Mirror pixel data vertically
+ * - video_gfx_lrot90:  Rotate pixel data left 90°
+ * - video_gfx_rrot90:  Rotate pixel data right 90°
+ * - video_gfx_rot180:  Rotate pixel data 180°
+ * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
+ * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_xyswap(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_hmirror(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_vmirror(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rot180(struct video_gfx *__restrict self);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot(struct video_gfx *__restrict self, int n);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot(struct video_gfx *__restrict self, int n);
+
+
+
 
 /* Initialize the clip / I/O rects of `self' to fully represent the underlying buffer fully. */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bxmin = self->vx_hdr.vxh_cxoff = 0;
 	self->vx_hdr.vxh_bymin = self->vx_hdr.vxh_cyoff = 0;
-	if (self->vx_flags & VIDEO_GFX_FXYSWAP) {
+	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_ydim;
 		self->vx_hdr.vxh_byend = self->vx_hdr.vxh_cysiz = self->vx_buffer->vb_xdim;
 	} else {
@@ -547,41 +564,17 @@ libvideo_gfx_init_fullclip(struct video_gfx *__restrict self) {
 
 LOCAL ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
 libvideo_gfx_generic_ops_of(gfx_flag_t flags) {
-	if (flags & VIDEO_GFX_FXYSWAP) {
-		if (flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-		             VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR)) {
-			if (flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP |
-			             VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
-				if (flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR))
-					return &libvideo_gfx_generic_ops_rdwrmirror;
-				return &libvideo_gfx_generic_ops_rdwrwrap_xyswap;
-			}
-			return &libvideo_gfx_generic_ops_rdwrap_xyswap;
-		}
-		if (flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP |
-		             VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
-			if (flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR))
-				return &libvideo_gfx_generic_ops_wrmirror_xyswap;
-			return &libvideo_gfx_generic_ops_wrwrap_xyswap;
-		}
+	if (flags & VIDEO_GFX_F_XYSWAP) {
+		if (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
+			return &libvideo_gfx_generic_ops_mirror_xyswap;
+		if (flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP))
+			return &libvideo_gfx_generic_ops_wrap_xyswap;
 		return &libvideo_gfx_generic_ops_xyswap;
 	}
-	if (flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-	             VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR)) {
-		if (flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP |
-		             VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
-			if (flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR))
-				return &libvideo_gfx_generic_ops_rdwrmirror;
-			return &libvideo_gfx_generic_ops_rdwrwrap;
-		}
-		return &libvideo_gfx_generic_ops_rdwrap;
-	}
-	if (flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP |
-	             VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
-		if (flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR))
-			return &libvideo_gfx_generic_ops_wrmirror;
-		return &libvideo_gfx_generic_ops_wrwrap;
-	}
+	if (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
+		return &libvideo_gfx_generic_ops_mirror;
+	if (flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP))
+		return &libvideo_gfx_generic_ops_wrap;
 	return &libvideo_gfx_generic_ops;
 }
 
@@ -606,7 +599,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 	 * - _vx_xops.vgfx_getcolor */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
 		/* Select how colors should be read. */
-		if (self->vx_flags & VIDEO_GFX_FBLUR) {
+		if (self->vx_flags & VIDEO_GFX_F_BLUR) {
 			self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_blur;
 		} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
 			self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_with_key;
@@ -696,7 +689,7 @@ after_blend:;
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
 		/* Linear vs. Nearest blit */
 		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
-			if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
+			if (!(self->vx_flags & VIDEO_GFX_F_LINEARBLIT)) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_noblend__blitfrom_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 			} else {
@@ -704,7 +697,7 @@ after_blend:;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 			}
 		} else {
-			if (self->vx_flags & VIDEO_GFX_FLINEARBLIT) {
+			if (self->vx_flags & VIDEO_GFX_F_LINEARBLIT) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_generic__blitfrom_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 			} else {
@@ -714,7 +707,7 @@ after_blend:;
 		}
 
 		/* Diagonal line drawing functions */
-		if (self->vx_flags & VIDEO_GFX_FAALINES) {
+		if (self->vx_flags & VIDEO_GFX_F_AALINES) {
 			self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
 			self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
 		} else if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
@@ -751,7 +744,7 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_noblend;
 	if (self->_vx_xops.vgfx_putcolor != self->_vx_xops.vgfx_setpixel)
 		self->_vx_xops.vgfx_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-	if (!(self->vx_flags & VIDEO_GFX_FAALINES)) {
+	if (!(self->vx_flags & VIDEO_GFX_F_AALINES)) {
 		self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
 		self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
 	}
@@ -764,7 +757,7 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_absgradient_h = &libvideo_gfx_noblend_interp8888__absgradient_h;
 		self->_vx_xops.vgfx_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
 	}
-	if (!(self->vx_flags & VIDEO_GFX_FLINEARBLIT)) {
+	if (!(self->vx_flags & VIDEO_GFX_F_LINEARBLIT)) {
 		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
 		self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 	} else {
@@ -777,15 +770,15 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 LOCAL ATTR_INOUT(1) void CC
 video_blit_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXMIRROR | VIDEO_GFX_FWRYMIRROR)) {
+	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR)) {
 		ctx->vbt_ops = &libvideo_blit_generic_ops_mirror;
-	} else if ((ctx->vbt_src->vx_flags & (VIDEO_GFX_FRDXMIRROR | VIDEO_GFX_FRDYMIRROR | VIDEO_GFX_FXYSWAP)) ||
-	           (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FXYSWAP))) {
-		ctx->vbt_ops = &libvideo_blit_generic_ops_rdmirror;
-	} else if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP)) {
+	} else if ((ctx->vbt_src->vx_flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP)) ||
+	           (ctx->vbt_dst->vx_flags & (VIDEO_GFX_F_XYSWAP))) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_mirror;
+	} else if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = &libvideo_blit_generic_ops_wrap;
-	} else if (ctx->vbt_src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP)) {
-		ctx->vbt_ops = &libvideo_blit_generic_ops_rdwrap;
+	} else if (ctx->vbt_src->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+		ctx->vbt_ops = &libvideo_blit_generic_ops_wrap;
 	} else {
 		ctx->vbt_ops = &libvideo_blit_generic_ops;
 	}

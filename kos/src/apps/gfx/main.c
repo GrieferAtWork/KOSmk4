@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->getgfx(gfx,
 	               GFX_BLENDMODE_ALPHA,
-	               VIDEO_GFX_FLINEARBLIT);
+	               VIDEO_GFX_F_LINEARBLIT);
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;
@@ -166,11 +166,11 @@ again_font:
 		} else if (buf[0] == 'm') {
 			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
-			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FLINEARBLIT);
+			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_LINEARBLIT);
 			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'd') {
-			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-			                                   VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP |
+			                                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 			video_gfx_setflags(&gfx, flags);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
@@ -222,8 +222,8 @@ again_font:
 				goto random_step;
 
 			case 'd': {
-				gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDYWRAP |
-				                                   VIDEO_GFX_FWRXWRAP | VIDEO_GFX_FWRYWRAP);
+				gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP |
+				                                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 				video_gfx_setflags(&gfx, flags);
 			}	break;
 
@@ -286,7 +286,7 @@ step:
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
 			blurgfx = gfx;
-			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_FBLUR);
+			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_F_BLUR);
 			gfx.bitblit((video_offset_t)x - video_gfx_getclipx(&gfx),
 			            (video_offset_t)y - video_gfx_getclipy(&gfx),
 			            blurgfx,

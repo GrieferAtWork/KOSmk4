@@ -78,13 +78,13 @@ struct video_anim_ops {
 	 * >> struct timeval tv_delay, tv_spent;
 	 * >> struct timespec ts_delay;
 	 * >> video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
-	 * >>                     GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+	 * >>                     GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	 * >> gettimeofday(&frame_start, NULL);
 	 * >> for (;;) {
 	 * >>
 	 * >>     // Display current frame on-screen (here: stretched)
 	 * >>     video_buffer_getgfx(frame, &frame_gfx,
-	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_FNORMAL, 0);
+	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
 	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
 	 * >>     struct screen_rect update_rect = SCREEN_RECT_INIT_WHOLE_SCREEN;

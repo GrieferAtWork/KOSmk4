@@ -1801,7 +1801,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	if (src_size_x == rb.vb_xdim && src_size_y == rb.vb_ydim) {
 		libvideo_blitter_noblend_samefmt__blit(&blitter, 0, 0,
 		                                       src_x, src_y, src_size_x, src_size_y);
-	} else if (rb_gfx.vx_flags & VIDEO_GFX_FLINEARBLIT) {
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEARBLIT) {
 		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
 		                                            src_x, src_y, src_size_x, src_size_y);
 	} else {
@@ -1816,7 +1816,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	if (dst_size_x == rb.vb_xdim && dst_size_y == rb.vb_ydim) {
 		libvideo_blitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,
 		                                       0, 0, dst_size_x, dst_size_y);
-	} else if (rb_gfx.vx_flags & VIDEO_GFX_FLINEARBLIT) {
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEARBLIT) {
 		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
 		                                            0, 0, rb.vb_xdim, rb.vb_ydim);
 	} else {
@@ -2025,6 +2025,15 @@ libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst,
 /************************************************************************/
 /* CLIP()                                                               */
 /************************************************************************/
+
+/* Apply a clipping  rect to "self",  shrinking the  pixel
+ * area relative to offsets specified by the given coords.
+ *
+ * Note that the clip area can  only ever be shrunk. To  go
+ * back to the initial clip area, either keep a copy of the
+ * original GFX  context, or  create a  new context  (which
+ * always starts  out with  its clipping  area set  to  the
+ * associated buffer's entire surface) */
 DEFINE_PUBLIC_ALIAS(video_gfxhdr_clip, libvideo_gfxhdr_clip);
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfxhdr *CC
 libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
@@ -2073,6 +2082,104 @@ empty_clip:
 	video_gfxhdr_setempty(self);
 	return self;
 }
+
+
+/* Perform geometric  transformations on  `self'. These  functions
+ * may alter flags or the clip rect of `self' in order to  achieve
+ * their  goal. Note that none of these functions alter pixel data
+ * of the underlying buffer; they only affect how the given `self'
+ * interacts with pixel data of the underlying buffer.
+ *
+ * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
+ * - video_gfx_hmirror: Mirror pixel data horizontally
+ * - video_gfx_vmirror: Mirror pixel data vertically
+ * - video_gfx_lrot90:  Rotate pixel data left 90°
+ * - video_gfx_rrot90:  Rotate pixel data right 90°
+ * - video_gfx_rot180:  Rotate pixel data 180°
+ * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
+ * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
+#define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
+	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
+	Tswap(video_dim_t, self->vx_hdr.vxh_cxsiz, self->vx_hdr.vxh_cysiz);
+	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
+	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
+#undef Tswap
+	self->vx_flags ^= VIDEO_GFX_F_XYSWAP;
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
+	if (!(self->vx_flags & VIDEO_GFX_F_XMIRROR)) {
+		self->vx_flags |= VIDEO_GFX_F_XMIRROR;
+		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
+	}
+	/* TODO: translate */
+	return self;
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
+	if (!(self->vx_flags & VIDEO_GFX_F_YMIRROR)) {
+		self->vx_flags |= VIDEO_GFX_F_YMIRROR;
+		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
+	}
+	/* TODO: translate */
+	return self;
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
+	self = libvideo_gfx_xyswap(self);
+	self = libvideo_gfx_vmirror(self);
+	return self;
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
+	self = libvideo_gfx_xyswap(self);
+	self = libvideo_gfx_hmirror(self);
+	return self;
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_rot180(struct video_gfx *__restrict self) {
+	self = libvideo_gfx_vmirror(self);
+	self = libvideo_gfx_hmirror(self);
+	return self;
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_lrot(struct video_gfx *__restrict self, int n) {
+	n %= 4;
+	if (n < 0)
+		n += 3;
+	switch (n) {
+	case 0: return self;
+	case 1: return libvideo_gfx_rrot90(self);
+	case 2: return libvideo_gfx_rot180(self);
+	case 3: return libvideo_gfx_lrot90(self);
+	default: __builtin_unreachable();
+	}
+}
+
+INTERN ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
+	n %= 4;
+	if (n < 0)
+		n += 3;
+	switch (n) {
+	case 0: return self;
+	case 1: return libvideo_gfx_lrot90(self);
+	case 2: return libvideo_gfx_rot180(self);
+	case 3: return libvideo_gfx_rrot90(self);
+	default: __builtin_unreachable();
+	}
+}
+
+
 
 DECL_END
 

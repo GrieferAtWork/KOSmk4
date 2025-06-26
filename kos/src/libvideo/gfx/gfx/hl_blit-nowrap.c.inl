@@ -383,12 +383,12 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	src_matrix[1][0] = 0;
 	src_matrix[1][1] = src_diag[1];
 #define Tswap(T, a, b) ({ typeof(a) _temp = (a); (a) = (b); (b) = _temp; })
-	if (src->vx_flags & VIDEO_GFX_FXYSWAP) {
+	if (src->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		Tswap(video_imatrix2d_word_t, src_matrix[0][1], src_matrix[1][1]);
 		Tswap(video_imatrix2d_word_t, src_matrix[1][0], src_matrix[0][0]);
 		Tswap(video_offset_t, src_x, src_y);
 	}
-	if unlikely(dst->vx_flags & VIDEO_GFX_FXYSWAP) {
+	if unlikely(dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		Tswap(video_imatrix2d_word_t, src_matrix[0][1], src_matrix[0][0]);
 		Tswap(video_imatrix2d_word_t, src_matrix[1][0], src_matrix[1][1]);
 		Tswap(video_offset_t, dst_x, dst_y);

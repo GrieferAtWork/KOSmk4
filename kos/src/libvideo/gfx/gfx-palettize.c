@@ -508,7 +508,7 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	result->vb_ydim          = video_gfx_getcliph(&gfx);
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_FNORMAL, 0);
+	                    VIDEO_GFX_F_NORMAL, 0);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
 	               video_gfx_getclipw(&gfx),
 	               video_gfx_getcliph(&gfx));

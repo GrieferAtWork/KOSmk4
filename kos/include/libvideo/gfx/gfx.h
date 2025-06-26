@@ -48,37 +48,22 @@
  * [w]: Indicates a flag that affects the results of graphics operations
  *      that use  the associated  GFX context  as destination,  or  when
  *      writing pixel data. */
-#define VIDEO_GFX_FNORMAL      0x00000000 /* Normal render flags. */
-#define VIDEO_GFX_FNEARESTBLIT 0x00000000 /* [w] Use nearest interpolation for stretch() */
-#define VIDEO_GFX_FLINEARBLIT  0x00000001 /* [w] Use linear interpolation for stretch() (else: use nearest) */
-/* TODO: "VIDEO_GFX_FLINEARBLIT" should be a read-flag */
-#define VIDEO_GFX_FAALINES     0x00000002 /* [w] Render smooth lines. */
-#define VIDEO_GFX_FWRXWRAP     0x00000010 /* [w] X coords <0 or >=width wrap to the other side during writes (else: coords are clamped) */
-#define VIDEO_GFX_FWRYWRAP     0x00000020 /* [w] Y coords <0 or >=height wrap to the other side during writes (else: coords are clamped) */
-#define VIDEO_GFX_FWRXMIRROR   0x00000040 /* [w] X coords <0 or >=width are mirrored and bounce of the clip rect edges */
-#define VIDEO_GFX_FWRYMIRROR   0x00000080 /* [w] X coords <0 or >=height are mirrored and bounce of the clip rect edges */
-#define VIDEO_GFX_FBLUR        0x00000100 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
-                                           *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
-                                           *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
-#define VIDEO_GFX_FRDXWRAP     0x00001000 /* [r] X coords <0 or >=width wrap to the other side during reads (else: coords are clamped) */
-#define VIDEO_GFX_FRDYWRAP     0x00002000 /* [r] Y coords <0 or >=height wrap to the other side during reads (else: coords are clamped) */
-#define VIDEO_GFX_FRDXMIRROR   0x00004000 /* [r] When combined with VIDEO_GFX_FRDXWRAP, OOB x coords are mirrored instead of wrapped */
-#define VIDEO_GFX_FRDYMIRROR   0x00008000 /* [r] When combined with VIDEO_GFX_FRDYWRAP, OOB y coords are mirrored instead of wrapped */
-#define VIDEO_GFX_FXYSWAP      0x00010000 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
-                                           * WARNING: Do not alter this flag on an already-created GFX context.
-                                           *          Only set this flag when  initializing a new GFX  context!
-                                           * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
-                                           *       though **does** affect both the clip rect, as well as I/O region. */
+#define VIDEO_GFX_F_NORMAL      0x0000 /* Normal render flags. */
+#define VIDEO_GFX_F_XWRAP       0x0001 /* [rw] X coords <0 or >=width wrap to the other side (else: coords are clamped) */
+#define VIDEO_GFX_F_YWRAP       0x0002 /* [rw] Y coords <0 or >=height wrap to the other side (else: coords are clamped) */
+#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords <0 or >=width are mirrored and bounce of the clip rect edges */
+#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] X coords <0 or >=height are mirrored and bounce of the clip rect edges */
+#define VIDEO_GFX_F_XYSWAP      0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
+                                        * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
+                                        * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
+                                        *       though **does** affect both the clip rect, as well as I/O region. */
+#define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
+                                        *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
+                                        *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
+#define VIDEO_GFX_F_AALINES     0x4000 /* [w] Render smooth lines. */
+#define VIDEO_GFX_F_NEARESTBLIT 0x0000 /* [w] Use nearest interpolation for stretch() */
+#define VIDEO_GFX_F_LINEARBLIT  0x8000 /* [w] Use linear interpolation for stretch() (else: use nearest) */
 
-/* TODO: Merge FWR*WRAP with FRD*WRAP */
-/* TODO: Merge FWR*MIRROR with FRD*MIRROR */
-/* TODO: Implement support for these flags:
- * - VIDEO_GFX_FWRXMIRROR
- * - VIDEO_GFX_FWRYMIRROR
- * - VIDEO_GFX_FRDXMIRROR
- * - VIDEO_GFX_FRDYMIRROR
- * - VIDEO_GFX_FXYSWAP
- */
 
 
 
@@ -341,7 +326,7 @@ struct video_gfx_xops {
 	                                           struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vgfx_absfill', but do so via gradient with colors[y][x] being used
-	 * to essentially do a  VIDEO_GFX_FLINEARBLIT stretch-blit into the  specified
+	 * to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into the  specified
 	 * destination rect.
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
@@ -430,8 +415,8 @@ struct video_gfx_ops {
 	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                        struct video_bitmask const *__restrict __bm);
 
-	/* Same as `vgfo_fill', but do so via gradient with colors[y][x] being  used
-	 * to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into the specified
+	/* Same as `vgfo_fill', but do so  via gradient with colors[y][x] being  used
+	 * to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into the specified
 	 * destination rect. */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) void
 	(LIBVIDEO_GFX_CC *vgfo_gradient)(struct video_gfx const *__restrict __self,
@@ -491,6 +476,41 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
                   video_offset_t __clip_x, video_offset_t __clip_y,
                   video_dim_t __size_x, video_dim_t __size_y);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+/* Perform geometric  transformations on  `__self'. These  functions
+ * may alter flags or the clip rect of `__self' in order to  achieve
+ * their  goal. Note that  none of these  functions alter pixel data
+ * of the underlying buffer; they only affect how the given `__self'
+ * interacts with pixel data of the underlying buffer.
+ *
+ * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
+ * - video_gfx_hmirror: Mirror pixel data horizontally
+ * - video_gfx_vmirror: Mirror pixel data vertically
+ * - video_gfx_lrot90:  Rotate pixel data left 90°
+ * - video_gfx_rrot90:  Rotate pixel data right 90°
+ * - video_gfx_rot180:  Rotate pixel data 180°
+ * - video_gfx_nrot:    Rotate pixel data by left by 90*__n°
+ * - video_gfx_rrot:    Rotate pixel data by right by 90*__n° */
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_XYSWAP)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_HMIRROR)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_VMIRROR)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_LROT90)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RROT90)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_ROT180)(struct video_gfx *__restrict __self);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_LROT)(struct video_gfx *__restrict __self, int __n);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RROT)(struct video_gfx *__restrict __self, int __n);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_xyswap(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_hmirror(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_vmirror(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_lrot90(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rrot90(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rot180(struct video_gfx *__restrict __self);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_lrot(struct video_gfx *__restrict __self, int __n);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rrot(struct video_gfx *__restrict __self, int __n);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 
 
 /* Possible values for `video_gfx_palettize()'s `__method' argument.
@@ -612,7 +632,7 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey
 
 /* Disable  blending  for  `__self'.  Same   as:
  * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
- * >> __self->vx_flags &= ~VIDEO_GFX_FBLUR;
+ * >> __self->vx_flags &= ~VIDEO_GFX_F_BLUR;
  * >> __self->vx_colorkey = 0;
  * >> video_gfx_update(__self, VIDEO_GFX_UPDATE_ALL);
  *
@@ -688,7 +708,7 @@ video_gfx_absfillstretchmask(struct video_gfx const *__restrict __self,
                              struct video_bitmask const *__restrict __bm);
 
 /* Same as `video_gfx_fill', but do so via gradient with colors[y][x] being
- * used to  essentially do  a VIDEO_GFX_FLINEARBLIT  stretch-blit into  the
+ * used to essentially  do a VIDEO_GFX_F_LINEARBLIT  stretch-blit into  the
  * specified destination rect. */
 extern __ATTR_IN(1) __ATTR_IN(6) void
 video_gfx_gradient(struct video_gfx const *__restrict __self,
@@ -844,8 +864,8 @@ struct video_gfxhdr {
 	 *  ║                                 ║                                 │          *
 	 *  ║   ╔═══════════════════════╗─────╫─────────────────┬───────────────┼───────┐  *
 	 *  ║   ║ Clip Rect             ║ Clip Rect X+1         │ Clip Rect X+2 │       │  *
-	 *  ║   ║                       ║ (VIDEO_GFX_FRDXWRAP)  │               │       │  *
-	 *  ║   ║                       ║ (VIDEO_GFX_FWRXWRAP)  │               │       │  *
+	 *  ║   ║                       ║ (VIDEO_GFX_F_XWRAP)   │               │       │  *
+	 *  ║   ║                       ║     ║                 │               │       │  *
 	 *  ║   ║  ╔═════════════════╗  ║     ║      ┌──────────┼──────┐        │       │  *
 	 *  ║   ║  ║ I/O Rect        ║  ║     ║      │ I/O Rect │      │        │       │  *
 	 *  ║   ║  ║                 ║  ║     ║      │          │      │        │       │  *
@@ -856,8 +876,8 @@ struct video_gfxhdr {
 	 *  ╚═══╪═══════════════════════╪═════╝─────────────────────────────────┘       ·  *
 	 *  │ B │                       │     │                 ·               ·       ·  *
 	 *  │ u │ Clip Rect Y+1         │     │                 ·               ·       ·  *
-	 *  │ f │ (VIDEO_GFX_FRDYWRAP)  │     │                 ·               ·       ·  *
-	 *  │ f │ (VIDEO_GFX_FWRYWRAP)  │     │                 ·               ·       ·  *
+	 *  │ f │ (VIDEO_GFX_F_YWRAP)   │     │                 ·               ·       ·  *
+	 *  │ f │                       │     │                 ·               ·       ·  *
 	 *  │ e │                       │     │                 ·               ·       ·  *
 	 *  │ r │                       │     │                 ·               ·       ·  *
 	 *  │   ├──╤═════════════════╤──┤·····│··········································  *
@@ -892,6 +912,8 @@ struct video_gfxhdr {
 	 * any "Clip Rect" ever  set for  the GFX  context, meaning  it cannot  be
 	 * made to grow without obtaining a fresh GFX context (which always starts
 	 * out with all 3 areas set to match each other). */
+//	video_offset_t              vxh_txoff;    /* [const] Delta added to all X coords (prior to "vxh_cxoff") */
+//	video_offset_t              vxh_tyoff;    /* [const] Delta added to all Y coords (prior to "vxh_cxoff") */
 	video_offset_t              vxh_cxoff;    /* [const] Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_offset_t              vxh_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_dim_t                 vxh_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
@@ -975,8 +997,8 @@ public:
 		video_gfx_fillall(this, __color);
 	}
 
-	/* Same as `fill', but do  so via gradient with colors[y][x]  being
-	 * used to essentially do a VIDEO_GFX_FLINEARBLIT stretch-blit into
+	/* Same  as `fill', but  do so via  gradient with colors[y][x] being
+	 * used to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into
 	 * the specified destination rect. */
 	__CXX_CLASSMEMBER void gradient(video_offset_t __x, video_offset_t __y,
 	                                video_dim_t __size_x, video_dim_t __size_y,

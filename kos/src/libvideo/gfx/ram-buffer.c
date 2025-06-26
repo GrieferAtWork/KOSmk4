@@ -270,7 +270,7 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	libvideo_gfx_generic_populate(self);
 
 	/* Select how colors should be read. */
-	if (self->vx_flags & VIDEO_GFX_FBLUR) {
+	if (self->vx_flags & VIDEO_GFX_F_BLUR) {
 		self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_blur;
 	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
 		self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_with_key;
@@ -316,7 +316,7 @@ rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_noblend(struct video_gfx *__restrict self) {
-	self->vx_flags &= ~(VIDEO_GFX_FBLUR);
+	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
 	self->vx_colorkey = 0;
 	libvideo_gfx_generic_populate_noblend(self);
 	if (self->_vx_xops.vgfx_getcolor != self->_vx_xops.vgfx_getpixel)

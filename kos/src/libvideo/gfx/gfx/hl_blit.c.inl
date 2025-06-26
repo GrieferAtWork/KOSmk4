@@ -81,7 +81,7 @@ libvideo_blitter_generic_blit_rdwrap(struct video_blitter const *__restrict self
 	video_dim_t src_maxsx = size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = size_y; /* # of pixes after src_y before wrap */
 
-	if (src->vx_flags & VIDEO_GFX_FRDXWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -103,7 +103,7 @@ libvideo_blitter_generic_blit_rdwrap(struct video_blitter const *__restrict self
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 	}
 
-	if (src->vx_flags & VIDEO_GFX_FRDYWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -264,7 +264,7 @@ libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict s
 	video_dim_t src_maxsx = src_size_x; /* # of pixes after src_x before wrap */
 	video_dim_t src_maxsy = src_size_y; /* # of pixes after src_y before wrap */
 
-	if (src->vx_flags & VIDEO_GFX_FRDXWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -292,7 +292,7 @@ libvideo_blitter_generic_stretch_rdwrap(struct video_blitter const *__restrict s
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 	}
 
-	if (src->vx_flags & VIDEO_GFX_FRDYWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -536,7 +536,7 @@ libvideo_blitter_generic_blit_wrap(struct video_blitter const *__restrict self,
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
 	video_dim_t yinb = size_y;
-	if (dst->vx_flags & VIDEO_GFX_FWRXWRAP) {
+	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, dst->vx_hdr.vxh_cxsiz);
 		if (size_x > dst->vx_hdr.vxh_cxsiz)
@@ -548,7 +548,7 @@ libvideo_blitter_generic_blit_wrap(struct video_blitter const *__restrict self,
 			xinb = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (dst->vx_flags & VIDEO_GFX_FWRYWRAP) {
+	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, dst->vx_hdr.vxh_cysiz);
 		if (size_y > dst->vx_hdr.vxh_cysiz)
@@ -590,7 +590,7 @@ libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict sel
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = dst_size_x;
 	video_dim_t yinb = dst_size_y;
-	if (dst->vx_flags & VIDEO_GFX_FWRXWRAP) {
+	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_coord_t cxend;
 		dst_x = wrap(dst_x, dst->vx_hdr.vxh_cxsiz);
 		if (dst_size_x > dst->vx_hdr.vxh_cxsiz) {
@@ -604,7 +604,7 @@ libvideo_blitter_generic_stretch_wrap(struct video_blitter const *__restrict sel
 			xinb = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 	}
-	if (dst->vx_flags & VIDEO_GFX_FWRYWRAP) {
+	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_coord_t cyend;
 		dst_y = wrap(dst_y, dst->vx_hdr.vxh_cysiz);
 		if (dst_size_y > dst->vx_hdr.vxh_cysiz) {
@@ -673,7 +673,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 	src_diag[0] = 1;
 	src_diag[1] = 1;
 
-	if (src->vx_flags & (VIDEO_GFX_FRDXWRAP | VIDEO_GFX_FRDXMIRROR)) {
+	if (src->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -692,14 +692,14 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 			size_x = dst->vx_hdr.vxh_cxsiz - (video_coord_t)dst_x;
 		}
 		src_x = wrap_or_mirror_imatrix(src_x, src->vx_hdr.vxh_cxsiz,
-		                               (src->vx_flags & VIDEO_GFX_FRDXMIRROR) != 0,
+		                               (src->vx_flags & VIDEO_GFX_F_XMIRROR) != 0,
 		                               &src_diag[0]);
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 		if (src_diag[0] < 0)
 			src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 	}
 
-	if (src->vx_flags & (VIDEO_GFX_FRDYWRAP | VIDEO_GFX_FRDYMIRROR)) {
+	if (src->vx_flags & (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -718,7 +718,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 			size_y = dst->vx_hdr.vxh_cysiz - (video_coord_t)dst_y;
 		}
 		src_y = wrap_or_mirror_imatrix(src_y, src->vx_hdr.vxh_cysiz,
-		                               (src->vx_flags & VIDEO_GFX_FRDYMIRROR) != 0,
+		                               (src->vx_flags & VIDEO_GFX_F_YMIRROR) != 0,
 		                               &src_diag[1]);
 		src_maxsy = src->vx_hdr.vxh_cysiz - (video_coord_t)src_y;
 		if (src_diag[1] < 0)
@@ -741,7 +741,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 		libvideo_blitter_generic_blit_imatrix(self, iter_dst_x, dst_y, src_x, src_y,
 		                                      src_maxsx, src_maxsy, tile_src_diag);
 		tile_src_x = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 			tile_src_diag[0] = -tile_src_diag[0];
 			if (tile_src_diag[0] < 0)
 				tile_src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -755,7 +755,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 			                                      src->vx_hdr.vxh_cxsiz, src_maxsy, tile_src_diag);
 			iter_size_x -= src->vx_hdr.vxh_cxsiz;
 			iter_dst_x += src->vx_hdr.vxh_cxsiz;
-			if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 				tile_src_diag[0] = -tile_src_diag[0];
 				tile_src_x = (src->vx_hdr.vxh_cxsiz - 1) - tile_src_x;
 			}
@@ -767,7 +767,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 		size_y -= src_maxsy;
 		dst_y  += src_maxsy;
 		src_y = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 			src_diag[1] = -src_diag[1];
 			if (src_diag[1] < 0)
 				src_y = src->vx_hdr.vxh_cysiz - 1;
@@ -782,7 +782,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 			libvideo_blitter_generic_blit_imatrix(self, dst_x, dst_y, tile_src_x, src_y,
 			                                      src_maxsx, src->vx_hdr.vxh_cysiz, tile_src_diag);
 			tile_src_x = 0;
-			if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 				tile_src_diag[0] = -tile_src_diag[0];
 				if (tile_src_diag[0] < 0)
 					tile_src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -797,7 +797,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 				                                      tile_src_diag);
 				iter_size_x -= src->vx_hdr.vxh_cxsiz;
 				iter_dst_x += src->vx_hdr.vxh_cxsiz;
-				if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 					tile_src_diag[0] = -tile_src_diag[0];
 					tile_src_x = (src->vx_hdr.vxh_cxsiz - 1) - tile_src_x;
 				}
@@ -809,7 +809,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 
 			size_y -= src->vx_hdr.vxh_cysiz;
 			dst_y += src->vx_hdr.vxh_cysiz;
-			if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 				src_diag[1] = -src_diag[1];
 				src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 			}
@@ -824,7 +824,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 		size_x -= src_maxsx;
 		dst_x += src_maxsx;
 		src_x = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 			src_diag[0] = -src_diag[0];
 			if (src_diag[0] < 0)
 				src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -836,7 +836,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 			                                      src->vx_hdr.vxh_cxsiz, size_y, src_diag);
 			size_x -= src->vx_hdr.vxh_cxsiz;
 			dst_x += src->vx_hdr.vxh_cxsiz;
-			if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 				src_diag[0] = -src_diag[0];
 				src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 			}
@@ -850,7 +850,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 		dst_x += src_maxsx;
 		src_x = 0;
 		for (;;) {
-			if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 				src_diag[0] = -src_diag[0];
 				src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 			}
@@ -870,7 +870,7 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 		dst_y += src_maxsy;
 		src_y = 0;
 		for (;;) {
-			if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+			if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 				src_diag[1] = -src_diag[1];
 				src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 			}
@@ -918,7 +918,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 	src_diag[0] = 1;
 	src_diag[1] = 1;
 
-	if (src->vx_flags & VIDEO_GFX_FRDXWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_dim_t dst_endx;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -943,14 +943,14 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			dst_size_x = new_dst_size_x;
 		}
 		src_x = wrap_or_mirror_imatrix(src_x, src->vx_hdr.vxh_cxsiz,
-		                               (src->vx_flags & VIDEO_GFX_FRDXMIRROR) != 0,
+		                               (src->vx_flags & VIDEO_GFX_F_XMIRROR) != 0,
 		                               &src_diag[0]);
 		src_maxsx = src->vx_hdr.vxh_cxsiz - (video_coord_t)src_x;
 		if (src_diag[0] < 0)
 			src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 	}
 
-	if (src->vx_flags & VIDEO_GFX_FRDYWRAP) {
+	if (src->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_dim_t dst_endy;
 		/* Do some preliminary clamping on destination coords.
 		 * This is needed so  we can properly calculate  tiled
@@ -975,7 +975,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			dst_size_y = new_dst_size_y;
 		}
 		src_y = wrap_or_mirror_imatrix(src_y, src->vx_hdr.vxh_cysiz,
-		                               (src->vx_flags & VIDEO_GFX_FRDYMIRROR) != 0,
+		                               (src->vx_flags & VIDEO_GFX_F_YMIRROR) != 0,
 		                               &src_diag[1]);
 		src_maxsy = src->vx_hdr.vxh_cysiz - (video_coord_t)src_y;
 		if (src_diag[1] < 0)
@@ -1003,7 +1003,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 		libvideo_blitter_generic_stretch_imatrix(self, iter_dst_x, dst_y, firsttile_dst_size_x, firsttile_dst_size_y,
 		                                         src_x, src_y, src_maxsx, src_maxsy, tile_src_diag);
 		tile_src_x = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 			tile_src_diag[0] = -tile_src_diag[0];
 			if (tile_src_diag[0] < 0)
 				tile_src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -1026,7 +1026,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 				next_dst_x = base_dst_x + (wholetiles_dst_size_x * (xwholetiles_i + 1)) / xwholetiles_count;
 				libvideo_blitter_generic_stretch_imatrix(self, iter_dst_x, dst_y, next_dst_x - iter_dst_x, firsttile_dst_size_y,
 				                                         tile_src_x, src_y, src->vx_hdr.vxh_cxsiz, src_maxsy, tile_src_diag);
-				if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 					tile_src_diag[0] = -tile_src_diag[0];
 					tile_src_x = (src->vx_hdr.vxh_cxsiz - 1) - tile_src_x;
 				}
@@ -1045,7 +1045,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 		dst_y += firsttile_dst_size_y;
 		dst_size_y -= firsttile_dst_size_y;
 		src_y = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 			src_diag[1] = -src_diag[1];
 			if (src_diag[1] < 0)
 				src_y = src->vx_hdr.vxh_cysiz - 1;
@@ -1069,7 +1069,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 				                                         src_x, src_y, src_maxsx, src->vx_hdr.vxh_cysiz,
 				                                         tile_src_diag);
 				tile_src_x = 0;
-				if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 					tile_src_diag[0] = -tile_src_diag[0];
 					if (tile_src_diag[0] < 0)
 						tile_src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -1089,7 +1089,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 						                                         tile_src_x, src_y, src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz,
 						                                         tile_src_diag);
 						iter_dst_x = next_dst_x;
-						if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+						if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 							tile_src_diag[0] = -tile_src_diag[0];
 							tile_src_x = (src->vx_hdr.vxh_cxsiz - 1) - tile_src_x;
 						}
@@ -1104,7 +1104,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 				                                         tile_src_diag);
 
 				dst_y = next_dst_y;
-				if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 					src_diag[1] = -src_diag[1];
 					src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 				}
@@ -1119,7 +1119,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 		libvideo_blitter_generic_stretch_imatrix(self, dst_x, dst_y, firsttile_dst_size_x, dst_size_y,
 		                                         src_x, src_y, src_maxsx, src_size_y, src_diag);
 		src_x = 0;
-		if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 			src_diag[0] = -src_diag[0];
 			if (src_diag[0] < 0)
 				src_x = src->vx_hdr.vxh_cxsiz - 1;
@@ -1142,7 +1142,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 				libvideo_blitter_generic_stretch_imatrix(self, dst_x, dst_y, next_dst_x - dst_x, dst_size_y,
 				                                         src_x, src_y, src->vx_hdr.vxh_cxsiz, src_size_y, src_diag);
 				dst_x = next_dst_x;
-				if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 					src_diag[0] = -src_diag[0];
 					src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 				}
@@ -1169,7 +1169,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			video_coord_t base_dst_x = dst_x;
 			for (xwholetiles_i = 0; xwholetiles_i < xwholetiles_count; ++xwholetiles_i) {
 				video_coord_t next_dst_x;
-				if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 					src_diag[0] = -src_diag[0];
 					src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 				}
@@ -1182,7 +1182,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			src_size_x %= src->vx_hdr.vxh_cxsiz;
 			dst_size_x = lasttile_dst_size_x;
 		}
-		if (src->vx_flags & VIDEO_GFX_FRDXMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 			src_diag[0] = -src_diag[0];
 			src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
 		}
@@ -1205,7 +1205,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			for (ywholetiles_i = 0; ywholetiles_i < ywholetiles_count; ++ywholetiles_i) {
 				video_coord_t next_dst_y;
 				next_dst_y = base_dst_y + (wholetiles_dst_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
-				if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+				if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 					src_diag[0] = -src_diag[0];
 					src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 				}
@@ -1216,7 +1216,7 @@ libvideo_blitter_generic_stretch_rdmirror(struct video_blitter const *__restrict
 			src_size_y %= src->vx_hdr.vxh_cysiz;
 			dst_size_y = lasttile_dst_size_y;
 		}
-		if (src->vx_flags & VIDEO_GFX_FRDYMIRROR) {
+		if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 			src_diag[0] = -src_diag[0];
 			src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
 		}
@@ -1308,10 +1308,10 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
 	return &libvideo_blit_generic_ops_mirror;
 }
 #define libvideo_blit_generic_ops          (*_libvideo_blit_generic_ops())          /* Support: - */
-#define libvideo_blit_generic_ops_rdwrap   (*_libvideo_blit_generic_ops_rdwrap())   /* Support: RD-XY-WRAP */
-#define libvideo_blit_generic_ops_wrap     (*_libvideo_blit_generic_ops_wrap())     /* Support: RD/WR-XY-WRAP */
-#define libvideo_blit_generic_ops_rdmirror (*_libvideo_blit_generic_ops_rdmirror()) /* Support: src:XYSWAP + RD-XY-FLIP/WRAP */
-#define libvideo_blit_generic_ops_mirror   (*_libvideo_blit_generic_ops_mirror())   /* Support: src/dst:XYSWAP + RD/WR-XY-FLIP/WRAP */
+#define libvideo_blit_generic_ops_rdwrap   (*_libvideo_blit_generic_ops_rdwrap())   /* Support: src:XY-WRAP */
+#define libvideo_blit_generic_ops_wrap     (*_libvideo_blit_generic_ops_wrap())     /* Support: src/dst:XY-WRAP */
+#define libvideo_blit_generic_ops_rdmirror (*_libvideo_blit_generic_ops_rdmirror()) /* Support: src:XYSWAP + src:XY-FLIP/WRAP */
+#define libvideo_blit_generic_ops_mirror   (*_libvideo_blit_generic_ops_mirror())   /* Support: src/dst:XYSWAP + src/dst:XY-FLIP/WRAP */
 
 DECL_END
 

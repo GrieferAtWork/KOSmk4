@@ -233,10 +233,10 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 		struct video_gfx src_gfx;
 		video_buffer_getgfx(rgb_buffer, &dst_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_FNORMAL, 0);
+		                    VIDEO_GFX_F_NORMAL, 0);
 		video_buffer_getgfx(self, &src_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_FNORMAL, 0);
+		                    VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_bitblit(&dst_gfx, 0, 0,
 		                  &src_gfx, 0, 0,
 		                  self->vb_xdim, self->vb_ydim);
