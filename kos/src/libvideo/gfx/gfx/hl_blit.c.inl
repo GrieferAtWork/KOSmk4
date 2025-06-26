@@ -666,10 +666,10 @@ libvideo_blitter_generic_blit_rdmirror(struct video_blitter const *__restrict se
 	video_dim_t src_maxsx = size_x;     /* # of pixes after src_x before wrap/tiled */
 	video_dim_t src_maxsy = size_y;     /* # of pixes after src_y before wrap/tiled */
 	video_imatrix2d_row_t src_diag;     /* Matrix-diagonal for source pixel transformations */
-	syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_rdmirror("
+	/*syslog(LOG_DEBUG, "libvideo_blitter_generic_blit_rdmirror("
 	                  "dst: {%dx%d}, src: {%dx%d}, dim: {%ux%u}) [src.clip: {%ux%u}]\n",
 	       dst_x, dst_y, src_x, src_y, size_x, size_y,
-	       src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);
+	       src->vx_hdr.vxh_cxsiz, src->vx_hdr.vxh_cysiz);*/
 	src_diag[0] = 1;
 	src_diag[1] = 1;
 

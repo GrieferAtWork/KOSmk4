@@ -59,7 +59,7 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 1
+#if 0
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
@@ -68,7 +68,7 @@
 #define TRACE_END(...)   (void)0
 #endif
 
-#if defined(NDEBUG) || 0
+#if defined(NDEBUG) || 1
 #if 1 /* Turn GFX assertions into compile-time assumptions for max speed */
 #ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
 #undef __CRT_UBSAN_BUILTIN_UNREACHABLE

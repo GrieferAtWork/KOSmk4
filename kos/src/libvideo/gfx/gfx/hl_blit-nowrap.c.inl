@@ -139,7 +139,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
-#if 1
+#if 0
 	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit) "("
 #ifdef LOCAL_IS_STRETCH
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}"
