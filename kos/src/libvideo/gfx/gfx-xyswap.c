@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -31,6 +31,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 /**/
 
 #ifndef __INTELLISENSE__
+#define DEFINE_libvideo_blitter_generic_blit_imatrix
+#include "gfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_blitter_generic_stretch_imatrix
+#include "gfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_blitter_generic_blit_wrap_imatrix
+#include "gfx/hl_blit.c.inl"
+
 #define DEFINE_libvideo_gfx_generic_XXX_xyswap
 #include "gfx/hl_generic.c.inl"
 #endif /* !__INTELLISENSE__ */

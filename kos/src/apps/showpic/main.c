@@ -242,7 +242,8 @@ do_showpic(struct screen_buffer *screen,
 	                    /*VIDEO_GFX_F_XYSWAP |*/
 	                    VIDEO_GFX_F_NORMAL, 0);
 
-	video_gfx_hmirror(&image_gfx);
+	/*video_gfx_hmirror(&image_gfx);*/
+	video_gfx_rot180(&screen_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -294,12 +295,12 @@ do_showpic(struct screen_buffer *screen,
 	                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 
 	/* TODO: After "video_gfx_rot180", this cases some pixels to be incorrectly rendered on the top/left */
-	/*video_gfx_clip(&image_gfx, -50, -50,
-	               video_gfx_getclipw(&image_gfx) + 100,
-	               video_gfx_getcliph(&image_gfx) + 100);*/
+	video_gfx_clip(&image_gfx, -50, -50,
+	               video_gfx_getclipw(&image_gfx) + 500,
+	               video_gfx_getcliph(&image_gfx) + 500);
 
-	int tiles_x = 1;
-	int tiles_y = 1;
+	int tiles_x = 3;
+	int tiles_y = 3;
 	static video_offset_t dst_offset = 0;
 
 
@@ -335,8 +336,8 @@ do_showpic(struct screen_buffer *screen,
 		                   VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR*/);
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
-		                  /*(video_gfx_getclipw(&image_gfx) / 2) + */dst_offset * tiles_x,
-		                  /*(video_gfx_getcliph(&image_gfx) / 2) + */dst_offset * tiles_y,
+		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
+		                  (video_gfx_getcliph(&image_gfx) / 2) + dst_offset * tiles_y,
 		                  video_gfx_getclipw(&image_gfx) * tiles_x,
 		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}

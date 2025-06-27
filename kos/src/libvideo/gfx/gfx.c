@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -2084,11 +2084,21 @@ empty_clip:
 }
 
 
-/* Perform geometric  transformations on  `self'. These  functions
- * may alter flags or the clip rect of `self' in order to  achieve
- * their  goal. Note that none of these functions alter pixel data
- * of the underlying buffer; they only affect how the given `self'
- * interacts with pixel data of the underlying buffer.
+
+
+LOCAL ATTR_INOUT(1) void FCC
+_libvideo_gfxhdr_xyswap(struct video_gfxhdr *__restrict self) {
+#define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
+	Tswap(video_offset_t, self->vxh_cxoff, self->vxh_cyoff);
+	Tswap(video_dim_t, self->vxh_cxsiz, self->vxh_cysiz);
+	Tswap(video_coord_t, self->vxh_bxmin, self->vxh_bymin);
+	Tswap(video_coord_t, self->vxh_bxend, self->vxh_byend);
+#undef Tswap
+}
+
+/* Perform  geometric transformations  on `self'.  Note that  none of these
+ * functions  alter pixel data  of the underlying  buffer; they only affect
+ * how the given `self' interacts with pixel data of the underlying buffer.
  *
  * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
  * - video_gfx_hmirror: Mirror pixel data horizontally
@@ -2101,12 +2111,7 @@ empty_clip:
 DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
-#define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
-	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
-	Tswap(video_dim_t, self->vx_hdr.vxh_cxsiz, self->vx_hdr.vxh_cysiz);
-	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
-	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
-#undef Tswap
+	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
 	self->vx_flags ^= VIDEO_GFX_F_XYSWAP;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
@@ -2114,61 +2119,38 @@ libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 DEFINE_PUBLIC_ALIAS(video_gfx_hmirror, libvideo_gfx_hmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_hmirror(struct video_gfx *__restrict self) {
-	if (!(self->vx_flags & VIDEO_GFX_F_XMIRROR)) {
-		self->vx_flags |= VIDEO_GFX_F_XMIRROR;
-		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
-	}
-
-	/* Adjust X translation offset */
-	if (self->vx_hdr.vxh_cxsiz) {
-		self->vx_hdr.vxh_txoff += self->vx_hdr.vxh_cxsiz;
-		self->vx_hdr.vxh_txoff %= self->vx_hdr.vxh_cxsiz * 2;
-		if (self->vx_hdr.vxh_txoff < 0)
-			self->vx_hdr.vxh_txoff += (self->vx_hdr.vxh_cxsiz * 2) - 1;
-	}
-	return self;
+	self->vx_flags ^= VIDEO_GFX_F_XMIRROR;
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_vmirror, libvideo_gfx_vmirror);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
-	if (!(self->vx_flags & VIDEO_GFX_F_YMIRROR)) {
-		self->vx_flags |= VIDEO_GFX_F_YMIRROR;
-		self = video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
-	}
-
-	/* Adjust Y translation offset */
-	if (self->vx_hdr.vxh_cysiz) {
-		self->vx_hdr.vxh_tyoff += self->vx_hdr.vxh_cysiz;
-		self->vx_hdr.vxh_tyoff %= self->vx_hdr.vxh_cysiz * 2;
-		if (self->vx_hdr.vxh_tyoff < 0)
-			self->vx_hdr.vxh_tyoff += (self->vx_hdr.vxh_cysiz * 2) - 1;
-	}
-	return self;
+	self->vx_flags ^= VIDEO_GFX_F_YMIRROR;
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
-	self = libvideo_gfx_xyswap(self);
-	self = libvideo_gfx_vmirror(self);
-	return self;
+	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rrot90, libvideo_gfx_rrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
-	self = libvideo_gfx_xyswap(self);
-	self = libvideo_gfx_hmirror(self);
-	return self;
+	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rot180, libvideo_gfx_rot180);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rot180(struct video_gfx *__restrict self) {
-	self = libvideo_gfx_vmirror(self);
-	self = libvideo_gfx_hmirror(self);
-	return self;
+	self->vx_flags ^= (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR);
+	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_lrot, libvideo_gfx_lrot);
@@ -2201,19 +2183,23 @@ libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
 	}
 }
 
-
-
 DECL_END
 
 #ifndef __INTELLISENSE__
+#define DEFINE_libvideo_blitter_generic_blit
+#include "gfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_blitter_generic_stretch
+#include "gfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_blitter_generic_blit_wrap
 #include "gfx/hl_blit.c.inl"
-#include "gfx/ll_noblend.c.inl"
-/**/
 
 #define DEFINE_libvideo_gfx__blitfrom_n
 #include "gfx/hl_blitfrom.c.inl"
 #define DEFINE_libvideo_gfx__blitfrom_l
 #include "gfx/hl_blitfrom.c.inl"
+
+/**/
+#include "gfx/ll_noblend.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_C */

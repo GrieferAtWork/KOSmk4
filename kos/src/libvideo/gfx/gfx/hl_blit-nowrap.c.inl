@@ -21,10 +21,10 @@
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
-//#define         DEFINE_libvideo_blitter_generic_blit_impl
-//#define      DEFINE_libvideo_blitter_generic_stretch_impl
-//#define DEFINE_libvideo_blitter_generic_blit_imatrix_impl
-#define DEFINE_libvideo_blitter_generic_stretch_imatrix_impl
+//#define         DEFINE_libvideo_blitter_generic_blit
+//#define      DEFINE_libvideo_blitter_generic_stretch
+//#define DEFINE_libvideo_blitter_generic_blit_imatrix
+#define DEFINE_libvideo_blitter_generic_stretch_imatrix
 #endif /* __INTELLISENSE__ */
 
 #include "../api.h"
@@ -44,26 +44,26 @@
 #include "../gfx-utils.h"
 #include "../gfx.h"
 
-#if (defined(DEFINE_libvideo_blitter_generic_blit_impl) +         \
-     defined(DEFINE_libvideo_blitter_generic_stretch_impl) +      \
-     defined(DEFINE_libvideo_blitter_generic_blit_imatrix_impl) + \
-     defined(DEFINE_libvideo_blitter_generic_stretch_imatrix_impl)) != 1
+#if (defined(DEFINE_libvideo_blitter_generic_blit) +         \
+     defined(DEFINE_libvideo_blitter_generic_stretch) +      \
+     defined(DEFINE_libvideo_blitter_generic_blit_imatrix) + \
+     defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_blitter_generic_blit_impl
-#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_blit_impl
-#elif defined(DEFINE_libvideo_blitter_generic_stretch_impl)
-#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_stretch_impl
+#ifdef DEFINE_libvideo_blitter_generic_blit
+#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit
+#elif defined(DEFINE_libvideo_blitter_generic_stretch)
+#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch
 #define LOCAL_IS_STRETCH
-#elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix_impl)
-#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_blit_imatrix_impl
-#define LOCAL_HAS_IMATRIX
-#elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix_impl)
-#define LOCAL_libvideo_blitter_generic_blit_impl libvideo_blitter_generic_stretch_imatrix_impl
-#define LOCAL_HAS_IMATRIX
+#elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix)
+#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit_imatrix
+#define LOCAL_USE_IMATRIX
+#elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)
+#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch_imatrix
+#define LOCAL_USE_IMATRIX
 #define LOCAL_IS_STRETCH
 #else /* ... */
 #error "Invalid configuration"
@@ -77,36 +77,27 @@ DECL_BEGIN
 #define LOCAL_IF_STRETCH_ELSE(tt, ff) ff
 #endif /* !LOCAL_IS_STRETCH */
 
-#ifdef LOCAL_HAS_IMATRIX
+#ifdef LOCAL_USE_IMATRIX
 #define LOCAL_IF_IMATRIX(x)           x
 #define LOCAL_IF_IMATRIX_ELSE(tt, ff) tt
-#ifdef LOCAL_IS_STRETCH
-#define LOCAL_ATTR ATTR_IN(10)
-#else /* LOCAL_IS_STRETCH */
-#define LOCAL_ATTR ATTR_IN(8)
-#endif /* !LOCAL_IS_STRETCH */
-#else /* LOCAL_HAS_IMATRIX */
+#else /* LOCAL_USE_IMATRIX */
 #define LOCAL_IF_IMATRIX(x)           /* nothing */
 #define LOCAL_IF_IMATRIX_ELSE(tt, ff) ff
-#define LOCAL_ATTR                    /* nothing */
-#endif /* !LOCAL_HAS_IMATRIX */
+#endif /* !LOCAL_USE_IMATRIX */
 
-PRIVATE LOCAL_ATTR ATTR_IN(1) void CC
-LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict self
-                                         , video_offset_t dst_x, video_offset_t dst_y
+INTERN ATTR_IN(1) void CC
+LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
+                                    , video_offset_t dst_x, video_offset_t dst_y
 #ifdef LOCAL_IS_STRETCH
-                                         , video_dim_t dst_size_x, video_dim_t dst_size_y
+                                    , video_dim_t dst_size_x, video_dim_t dst_size_y
 #endif /* LOCAL_IS_STRETCH */
-                                         , video_offset_t src_x, video_offset_t src_y
+                                    , video_offset_t src_x, video_offset_t src_y
 #ifdef LOCAL_IS_STRETCH
-                                         , video_dim_t src_size_x, video_dim_t src_size_y
+                                    , video_dim_t src_size_x, video_dim_t src_size_y
 #else /* LOCAL_IS_STRETCH */
-                                         , video_dim_t size_x, video_dim_t size_y
+                                    , video_dim_t size_x, video_dim_t size_y
 #endif /* !LOCAL_IS_STRETCH */
-#ifdef LOCAL_HAS_IMATRIX
-                                         , video_imatrix2d_row_t const src_diag
-#endif /* !LOCAL_HAS_IMATRIX */
-                                         ) {
+                                    ) {
 #ifdef LOCAL_IS_STRETCH
 #define LOCAL_dst_size_x dst_size_x
 #define LOCAL_dst_size_y dst_size_y
@@ -118,29 +109,19 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 #define LOCAL_src_size_x size_x
 #define LOCAL_src_size_y size_y
 #endif /* !LOCAL_IS_STRETCH */
-#ifdef LOCAL_HAS_IMATRIX
+#ifdef LOCAL_USE_IMATRIX
 	video_imatrix2d_t src_matrix;
-	video_offset_t lo_src_x;
-	video_offset_t lo_src_y;
-#define LOCAL_lo_src_x lo_src_x
-#define LOCAL_lo_src_y lo_src_y
-#else /* LOCAL_HAS_IMATRIX */
-#define LOCAL_lo_src_x src_x
-#define LOCAL_lo_src_y src_y
-#endif /* LOCAL_HAS_IMATRIX */
+#endif /* LOCAL_USE_IMATRIX */
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
 #if 0
-	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit_impl) "("
+	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit) "("
 #ifdef LOCAL_IS_STRETCH
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}"
 #else /* LOCAL_IS_STRETCH */
 	                  "dst: {%dx%d}, src: {%dx%d}, dim: {%ux%u}"
 #endif /* !LOCAL_IS_STRETCH */
-#ifdef LOCAL_HAS_IMATRIX
-	                  ", diag: {%d,%d}"
-#endif /* LOCAL_HAS_IMATRIX */
 	                  ")\n",
 #ifdef LOCAL_IS_STRETCH
 	       dst_x, dst_y, dst_size_x, dst_size_y,
@@ -148,9 +129,6 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 #else /* LOCAL_IS_STRETCH */
 	       dst_x, dst_y, src_x, src_y, size_x, size_y
 #endif /* !LOCAL_IS_STRETCH */
-#ifdef LOCAL_HAS_IMATRIX
-	       , src_diag[0], src_diag[1]
-#endif /* LOCAL_HAS_IMATRIX */
 	       );
 #endif
 
@@ -176,7 +154,7 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 		LOCAL_IF_STRETCH(src_size_x -= srcpart);
 		LOCAL_dst_size_x -= dstpart;
 		dst_x = (video_offset_t)dst->vx_hdr.vxh_bxmin;
-		LOCAL_IF_IMATRIX(if (src_diag[0] >= 0)) {
+		LOCAL_IF_IMATRIX(if (!(src->vx_flags & VIDEO_GFX_F_XMIRROR))) {
 			src_x += LOCAL_IF_STRETCH_ELSE(srcpart, dstpart);
 		}
 	}
@@ -193,7 +171,7 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 		LOCAL_IF_STRETCH(src_size_y -= srcpart);
 		LOCAL_dst_size_y -= dstpart;
 		dst_y = (video_offset_t)dst->vx_hdr.vxh_bymin;
-		LOCAL_IF_IMATRIX(if (src_diag[0] >= 0)) {
+		LOCAL_IF_IMATRIX(if (!(src->vx_flags & VIDEO_GFX_F_YMIRROR))) {
 			src_y += LOCAL_IF_STRETCH_ELSE(srcpart, dstpart);
 		}
 	}
@@ -201,24 +179,12 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 	/* Apply source clip rect offsets */
 	src_x += src->vx_hdr.vxh_cxoff;
 	src_y += src->vx_hdr.vxh_cyoff;
-#ifdef LOCAL_HAS_IMATRIX
-	lo_src_x = src_x;
-	lo_src_y = src_y;
-	if (src_diag[0] < 0) {
-		src_x -= 2 * src->vx_hdr.vxh_cxoff;
-		lo_src_x = (src->vx_hdr.vxh_cxsiz - 1) - src_x;
-	}
-	if (src_diag[1] < 0) {
-		src_y -= 2 * src->vx_hdr.vxh_cyoff;
-		lo_src_y = (src->vx_hdr.vxh_cysiz - 1) - src_y;
-	}
-#endif /* LOCAL_HAS_IMATRIX */
 
 	/* Clamp source I/O rect x.min */
-	if unlikely(LOCAL_lo_src_x < (video_offset_t)src->vx_hdr.vxh_bxmin) {
+	if unlikely(src_x < (video_offset_t)src->vx_hdr.vxh_bxmin) {
 		video_dim_t srcpart;
 		LOCAL_IF_STRETCH(video_dim_t dstpart);
-		srcpart = src->vx_hdr.vxh_bxmin - (video_coord_t)LOCAL_lo_src_x;
+		srcpart = src->vx_hdr.vxh_bxmin - (video_coord_t)src_x;
 		if unlikely(srcpart >= LOCAL_src_size_x)
 			return;
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_x) / src_size_x);
@@ -226,20 +192,14 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 		LOCAL_IF_STRETCH(dst_size_x -= dstpart);
 		dst_x += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		LOCAL_src_size_x -= srcpart;
-#ifdef LOCAL_HAS_IMATRIX
-		src_x = lo_src_x = (video_offset_t)src->vx_hdr.vxh_bxmin;
-		if (src_diag[0] < 0)
-			src_x = src->vx_hdr.vxh_bxend - 1;
-#else /* LOCAL_HAS_IMATRIX */
 		src_x = (video_offset_t)src->vx_hdr.vxh_bxmin;
-#endif /* !LOCAL_HAS_IMATRIX */
 	}
 
 	/* Clamp source I/O rect y.min */
-	if unlikely(LOCAL_lo_src_y < (video_offset_t)src->vx_hdr.vxh_bymin) {
+	if unlikely(src_y < (video_offset_t)src->vx_hdr.vxh_bymin) {
 		video_dim_t srcpart;
 		LOCAL_IF_STRETCH(video_dim_t dstpart);
-		srcpart = src->vx_hdr.vxh_bymin - (video_coord_t)LOCAL_lo_src_y;
+		srcpart = src->vx_hdr.vxh_bymin - (video_coord_t)src_y;
 		if unlikely(srcpart >= LOCAL_src_size_y)
 			return;
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_y) / src_size_y);
@@ -247,13 +207,7 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 		LOCAL_IF_STRETCH(dst_size_y -= dstpart);
 		dst_y += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		LOCAL_src_size_y -= srcpart;
-#ifdef LOCAL_HAS_IMATRIX
-		src_y = lo_src_y = (video_offset_t)src->vx_hdr.vxh_bymin;
-		if (src_diag[1] < 0)
-			src_y = src->vx_hdr.vxh_byend - 1;
-#else /* LOCAL_HAS_IMATRIX */
 		src_y = (video_offset_t)src->vx_hdr.vxh_bymin;
-#endif /* !LOCAL_HAS_IMATRIX */
 	}
 
 	/* Clamp destination I/O rect x.end */
@@ -271,17 +225,9 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 			if unlikely(overflow >= src_size_x)
 				return;
 			src_size_x -= overflow;
-#ifdef LOCAL_HAS_IMATRIX
-			if (src_diag[0] < 0)
-				src_x -= overflow;
-#endif /* LOCAL_HAS_IMATRIX */
 		}
 #else /* LOCAL_IS_STRETCH */
 		size_x = dst->vx_hdr.vxh_bxend - (video_coord_t)dst_x;
-#ifdef LOCAL_HAS_IMATRIX
-		if (src_diag[0] < 0)
-			src_x -= (temp - dst->vx_hdr.vxh_bxend);
-#endif /* LOCAL_HAS_IMATRIX */
 #endif /* !LOCAL_IS_STRETCH */
 	}
 
@@ -301,92 +247,89 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 			if unlikely(overflow >= src_size_y)
 				return;
 			src_size_y -= overflow;
-#ifdef LOCAL_HAS_IMATRIX
-			if (src_diag[1] < 0)
-				src_y -= overflow;
-#endif /* LOCAL_HAS_IMATRIX */
 		}
 #else /* LOCAL_IS_STRETCH */
 		size_y = dst->vx_hdr.vxh_byend - (video_coord_t)dst_y;
-#ifdef LOCAL_HAS_IMATRIX
-		if (src_diag[1] < 0)
-			src_y -= (temp - dst->vx_hdr.vxh_byend);
-#endif /* LOCAL_HAS_IMATRIX */
 #endif /* !LOCAL_IS_STRETCH */
 	}
 
 	/* Clamp source I/O rect x.end */
-	if unlikely(OVERFLOW_UADD((video_coord_t)LOCAL_lo_src_x, LOCAL_src_size_x, &temp) ||
+	if unlikely(OVERFLOW_UADD((video_coord_t)src_x, LOCAL_src_size_x, &temp) ||
 	            temp > src->vx_hdr.vxh_bxend) {
-		if unlikely((video_coord_t)LOCAL_lo_src_x >= src->vx_hdr.vxh_bxend)
+		if unlikely((video_coord_t)src_x >= src->vx_hdr.vxh_bxend)
 			return;
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newsrcsize, overflow;
-			newsrcsize = src->vx_hdr.vxh_bxend - (video_coord_t)LOCAL_lo_src_x;
+			newsrcsize = src->vx_hdr.vxh_bxend - (video_coord_t)src_x;
 			overflow   = src_size_x - newsrcsize;
 			overflow   = (overflow * dst_size_x) / src_size_x;
 			src_size_x = newsrcsize;
 			if unlikely(overflow >= dst_size_x)
 				return;
 			dst_size_x -= overflow;
-#ifdef LOCAL_HAS_IMATRIX
-			if (src_diag[0] < 0)
-				src_x = src->vx_hdr.vxh_bxend - 1;
-#endif /* LOCAL_HAS_IMATRIX */
 		}
 #else /* LOCAL_IS_STRETCH */
 		size_x = src->vx_hdr.vxh_bxend - (video_coord_t)src_x;
-#ifdef LOCAL_HAS_IMATRIX
-		if (src_diag[0] < 0)
-			src_x = src->vx_hdr.vxh_bxend - 1;
-#endif /* LOCAL_HAS_IMATRIX */
 #endif /* !LOCAL_IS_STRETCH */
 	}
 
 
 	/* Clamp source I/O rect y.end */
-	if unlikely(OVERFLOW_UADD((video_coord_t)LOCAL_lo_src_y, LOCAL_src_size_y, &temp) ||
+	if unlikely(OVERFLOW_UADD((video_coord_t)src_y, LOCAL_src_size_y, &temp) ||
 	            temp > src->vx_hdr.vxh_byend) {
-		if unlikely((video_coord_t)LOCAL_lo_src_y >= src->vx_hdr.vxh_byend)
+		if unlikely((video_coord_t)src_y >= src->vx_hdr.vxh_byend)
 			return;
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newsrcsize, overflow;
-			newsrcsize = src->vx_hdr.vxh_byend - (video_coord_t)LOCAL_lo_src_y;
+			newsrcsize = src->vx_hdr.vxh_byend - (video_coord_t)src_y;
 			overflow   = src_size_y - newsrcsize;
 			overflow   = (overflow * dst_size_y) / src_size_y;
 			src_size_y = newsrcsize;
 			if unlikely(overflow >= dst_size_y)
 				return;
 			dst_size_y -= overflow;
-#ifdef LOCAL_HAS_IMATRIX
-			if (src_diag[1] < 0)
-				src_y = src->vx_hdr.vxh_byend - 1;
-#endif /* LOCAL_HAS_IMATRIX */
 		}
 #else /* LOCAL_IS_STRETCH */
 		size_y = src->vx_hdr.vxh_byend - (video_coord_t)src_y;
-#ifdef LOCAL_HAS_IMATRIX
-		if (src_diag[1] < 0)
-			src_y = src->vx_hdr.vxh_byend - 1;
-#endif /* LOCAL_HAS_IMATRIX */
 #endif /* !LOCAL_IS_STRETCH */
 	}
 
 	/* Construct source pixel transformation matrix, and apply X/Y-swap rules */
-#ifdef LOCAL_HAS_IMATRIX
-	src_matrix[0][0] = src_diag[0];
+#ifdef LOCAL_USE_IMATRIX
+	src_matrix[0][0] = 1;
 	src_matrix[0][1] = 0;
 	src_matrix[1][0] = 0;
-	src_matrix[1][1] = src_diag[1];
+	src_matrix[1][1] = 1;
+	if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
+		src_x = (src->vx_hdr.vxh_bxend - src->vx_hdr.vxh_bxmin - 1) - src_x;
+		src_matrix[0][0] = -1;
+	}
+	if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
+		src_y = (src->vx_hdr.vxh_byend - src->vx_hdr.vxh_bymin - 1) - src_y;
+		src_matrix[1][1] = -1;
+	}
+	if (dst->vx_flags & VIDEO_GFX_F_XMIRROR) {
+		dst_x = (dst->vx_hdr.vxh_bxend - dst->vx_hdr.vxh_bxmin) - dst_x;
+		dst_x -= LOCAL_dst_size_x;
+		src_x += (LOCAL_src_size_x - 1);
+		src_matrix[0][0] = -src_matrix[0][0];
+	}
+	if (dst->vx_flags & VIDEO_GFX_F_YMIRROR) {
+		dst_y = (dst->vx_hdr.vxh_byend - dst->vx_hdr.vxh_bymin) - dst_y;
+		dst_y -= LOCAL_dst_size_y;
+		src_y += (LOCAL_src_size_y - 1);
+		src_matrix[1][1] = -src_matrix[1][1];
+	}
+
 #define Tswap(T, a, b) ({ typeof(a) _temp = (a); (a) = (b); (b) = _temp; })
 	if (src->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		Tswap(video_imatrix2d_word_t, src_matrix[0][1], src_matrix[1][1]);
 		Tswap(video_imatrix2d_word_t, src_matrix[1][0], src_matrix[0][0]);
 		Tswap(video_offset_t, src_x, src_y);
 	}
-	if unlikely(dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
+	if (dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		Tswap(video_imatrix2d_word_t, src_matrix[0][1], src_matrix[0][0]);
 		Tswap(video_imatrix2d_word_t, src_matrix[1][0], src_matrix[1][1]);
 		Tswap(video_offset_t, dst_x, dst_y);
@@ -396,39 +339,39 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 #endif /* LOCAL_IS_STRETCH */
 	}
 #undef Tswap
-#endif /* LOCAL_HAS_IMATRIX */
+#endif /* LOCAL_USE_IMATRIX */
 
 
 	/* Check if we have to use stretch-blitting */
 #ifdef LOCAL_IS_STRETCH
 	if (dst_size_x != src_size_x || dst_size_y != src_size_y) {
-#ifdef LOCAL_HAS_IMATRIX
+#ifdef LOCAL_USE_IMATRIX
 		video_blitter_x_stretch_imatrix(self,
 		                                (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
 		                                (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y,
 		                                src_matrix);
-#else /* LOCAL_HAS_IMATRIX */
+#else /* LOCAL_USE_IMATRIX */
 		video_blitter_x_stretch(self,
 		                        (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
 		                        (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y);
-#endif /* !LOCAL_HAS_IMATRIX */
+#endif /* !LOCAL_USE_IMATRIX */
 		return;
 	}
 #endif /* LOCAL_IS_STRETCH */
 
 	/* Can use copy-blit */
-#ifdef LOCAL_HAS_IMATRIX
+#ifdef LOCAL_USE_IMATRIX
 	video_blitter_x_blit_imatrix(self,
 	                             (video_coord_t)dst_x, (video_coord_t)dst_y,
 	                             (video_coord_t)src_x, (video_coord_t)src_y,
 	                             LOCAL_dst_size_x, LOCAL_dst_size_y,
 	                             src_matrix);
-#else /* LOCAL_HAS_IMATRIX */
+#else /* LOCAL_USE_IMATRIX */
 	video_blitter_x_blit(self,
 	                     (video_coord_t)dst_x, (video_coord_t)dst_y,
 	                     (video_coord_t)src_x, (video_coord_t)src_y,
 	                     LOCAL_dst_size_x, LOCAL_dst_size_y);
-#endif /* !LOCAL_HAS_IMATRIX */
+#endif /* !LOCAL_USE_IMATRIX */
 #undef LOCAL_dst_size_x
 #undef LOCAL_dst_size_y
 #undef LOCAL_src_size_x
@@ -441,14 +384,13 @@ LOCAL_libvideo_blitter_generic_blit_impl(struct video_blitter const *__restrict 
 #undef LOCAL_IF_STRETCH_ELSE
 #undef LOCAL_IF_IMATRIX
 #undef LOCAL_IF_IMATRIX_ELSE
-#undef LOCAL_ATTR
-#undef LOCAL_HAS_IMATRIX
+#undef LOCAL_USE_IMATRIX
 #undef LOCAL_IS_STRETCH
-#undef LOCAL_libvideo_blitter_generic_blit_impl
+#undef LOCAL_libvideo_blitter_generic_blit
 
 DECL_END
 
-#undef DEFINE_libvideo_blitter_generic_stretch_imatrix_impl
-#undef DEFINE_libvideo_blitter_generic_blit_imatrix_impl
-#undef DEFINE_libvideo_blitter_generic_stretch_impl
-#undef DEFINE_libvideo_blitter_generic_blit_impl
+#undef DEFINE_libvideo_blitter_generic_stretch_imatrix
+#undef DEFINE_libvideo_blitter_generic_blit_imatrix
+#undef DEFINE_libvideo_blitter_generic_stretch
+#undef DEFINE_libvideo_blitter_generic_blit
