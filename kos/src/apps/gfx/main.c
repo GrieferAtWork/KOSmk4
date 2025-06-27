@@ -287,18 +287,8 @@ step:
 			video_coord_t size_y = rand() % screen->vb_ydim;
 			blurgfx = gfx;
 			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_F_BLUR);
-			gfx.bitblit((video_offset_t)x - video_gfx_getclipx(&gfx),
-			            (video_offset_t)y - video_gfx_getclipy(&gfx),
-			            blurgfx,
-			            (video_offset_t)x - video_gfx_getclipx(&gfx),
-			            (video_offset_t)y - video_gfx_getclipy(&gfx),
-			            size_x,
-			            size_y);
-			gfx.rect((video_offset_t)x - video_gfx_getclipx(&gfx),
-			         (video_offset_t)y - video_gfx_getclipy(&gfx),
-			         size_x,
-			         size_y,
-			         VIDEO_COLOR_BLACK);
+			gfx.bitblit(x, y, blurgfx, x, y, size_x, size_y);
+			gfx.rect(x, y, size_x, size_y, VIDEO_COLOR_BLACK);
 		}	break;
 
 		case 4: {

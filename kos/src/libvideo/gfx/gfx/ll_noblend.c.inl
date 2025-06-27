@@ -1214,11 +1214,13 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	gfx_assert_imatrix2d(src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+#if 0 /* TODO: Breaks assertions for double-rotation blits */
+	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
 		libvideo_blitter_noblend_difffmt__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 		return;
 	}
+#endif
 
 	/* TODO: More optimizations for known rotation/mirror matrices */
 

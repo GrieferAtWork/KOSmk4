@@ -59,7 +59,7 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 1
+#if 0
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
@@ -68,7 +68,7 @@
 #define TRACE_END(...)   (void)0
 #endif
 
-#if defined(NDEBUG) || 0
+#if defined(NDEBUG) || 1
 #if 1 /* Turn GFX assertions into compile-time assumptions for max speed */
 #ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
 #undef __CRT_UBSAN_BUILTIN_UNREACHABLE
@@ -519,15 +519,49 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
  * back to the initial clip area, either keep a copy of the
  * original GFX  context, or  create a  new context  (which
  * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface) */
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfxhdr *CC
-libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
-                     video_offset_t clip_x, video_offset_t clip_y,
-                     video_dim_t size_x, video_dim_t size_y);
+ * associated buffer's entire surface)
+ *
+ * @param: clip_x: Delta to add to the Clip Rect starting X coord.
+ *                 When negative, extend clip rect with void-pixels to the left
+ * @param: clip_y: Delta to add to the Clip Rect starting Y coord.
+ *                 When negative, extend clip rect with void-pixels to the top
+ * @param: size_x: New width of the clip rect. When greater than the old  clip
+ *                 rect width, extend clip rect with void-pixels to the right.
+ * @param: size_y: New height of the clip rect.  When greater than the old  clip
+ *                 rect height, extend clip rect with void-pixels to the bottom.
+ * @return: * : Always re-returns `self' */
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+libvideo_gfx_clip(struct video_gfx *__restrict self,
+                  video_offset_t clip_x, video_offset_t clip_y,
+                  video_dim_t size_x, video_dim_t size_y);
 
-/* Perform  geometric transformations  on `self'.  Note that  none of these
- * functions  alter pixel data  of the underlying  buffer; they only affect
- * how the given `self' interacts with pixel data of the underlying buffer.
+/* Translate virtual (offset) pixel coords to physical (coord) coords.
+ * @param: x:      Virtual pixel X offset
+ * @param: y:      Virtual pixel Y offset
+ * @param: coords: The absolute (physical) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given x/y lie outside the I/O Rect of `self' */
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
+libvideo_gfx_offset2coord(struct video_gfx const *__restrict self,
+                          video_offset_t x, video_offset_t y,
+                          video_coord_t coords[2]);
+
+/* Translate physical (coord) pixel coords to virtual (offset) coords.
+ * @param: x:       Physical pixel X coord
+ * @param: y:       Physical pixel Y coord
+ * @param: offsets: The offset (virtual) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given x/y lie outside the I/O Rect of `self' */
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
+libvideo_gfx_coord2offset(struct video_gfx const *__restrict self,
+                          video_coord_t x, video_coord_t y,
+                          video_offset_t offsets[2]);
+
+
+/* Perform geometric transformations on the contents of the current  clip
+ * rect of `self'. Note that none of these functions alter pixel data  of
+ * the underlying buffer; they only affect how the given `self' interacts
+ * with pixel data of the underlying buffer.
  *
  * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
  * - video_gfx_hmirror: Mirror pixel data horizontally
@@ -535,16 +569,16 @@ libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
  * - video_gfx_lrot90:  Rotate pixel data left 90°
  * - video_gfx_rrot90:  Rotate pixel data right 90°
  * - video_gfx_rot180:  Rotate pixel data 180°
- * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
- * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
+ * - video_gfx_nrot90n: Rotate pixel data by left by 90*n°
+ * - video_gfx_rrot90n: Rotate pixel data by right by 90*n° */
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_xyswap(struct video_gfx *__restrict self);
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_hmirror(struct video_gfx *__restrict self);
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_vmirror(struct video_gfx *__restrict self);
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90(struct video_gfx *__restrict self);
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90(struct video_gfx *__restrict self);
 INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rot180(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot(struct video_gfx *__restrict self, int n);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot(struct video_gfx *__restrict self, int n);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90n(struct video_gfx *__restrict self, int n);
+INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n);
 
 
 

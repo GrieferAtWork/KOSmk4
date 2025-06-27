@@ -234,16 +234,26 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    /*VIDEO_GFX_F_XYSWAP |*/
 	                    VIDEO_GFX_F_LINEARBLIT |
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    /*VIDEO_GFX_F_XYSWAP |*/
 	                    VIDEO_GFX_F_NORMAL, 0);
 
-	/*video_gfx_hmirror(&image_gfx);*/
-	video_gfx_rot180(&screen_gfx);
+	/*video_gfx_clip(&image_gfx,
+	               video_gfx_getclipw(&image_gfx) / 2, 0,
+	               video_gfx_getclipw(&image_gfx) / 2,
+	               video_gfx_getcliph(&image_gfx) / 2);*/
+	video_gfx_clip(&image_gfx, 200, 200,
+	               video_gfx_getclipw(&image_gfx) / 2,
+	               video_gfx_getcliph(&image_gfx) / 2);
+	video_gfx_clip(&image_gfx, -80, -80,
+	               video_gfx_getclipw(&image_gfx) + 80,
+	               video_gfx_getcliph(&image_gfx) + 80);
+
+	video_gfx_lrot90(&screen_gfx);
+	video_gfx_hmirror(&image_gfx);
+	/*video_gfx_rrot90(&screen_gfx);*/
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -294,13 +304,8 @@ do_showpic(struct screen_buffer *screen,
 	                   video_gfx_getflags(&image_gfx) |
 	                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 
-	/* TODO: After "video_gfx_rot180", this cases some pixels to be incorrectly rendered on the top/left */
-	video_gfx_clip(&image_gfx, -50, -50,
-	               video_gfx_getclipw(&image_gfx) + 500,
-	               video_gfx_getcliph(&image_gfx) + 500);
-
-	int tiles_x = 3;
-	int tiles_y = 3;
+	unsigned int tiles_x = 3;
+	unsigned int tiles_y = 3;
 	static video_offset_t dst_offset = 0;
 
 
@@ -341,6 +346,22 @@ do_showpic(struct screen_buffer *screen,
 		                  video_gfx_getclipw(&image_gfx) * tiles_x,
 		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}
+
+#if 0
+	for (unsigned int tile_y = 0; tile_y < tiles_y + 1; ++tile_y) {
+		for (unsigned int tile_x = 0; tile_x < tiles_x + 1; ++tile_x) {
+			video_dim_t r_w = blit_w / tiles_x;
+			video_dim_t r_h = blit_h / tiles_y;
+			video_offset_t r_x = blit_x + (tile_x - 2) * r_w;
+			video_offset_t r_y = blit_y + (tile_y - 2) * r_h;
+			r_x += (((video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x) * blit_w) / video_gfx_getclipw(&image_gfx);
+			r_y += (((video_gfx_getcliph(&image_gfx) / 2) + dst_offset * tiles_y) * blit_h) / video_gfx_getcliph(&image_gfx);
+			video_gfx_rect(&screen_gfx, r_x, r_y, r_w, r_h, VIDEO_COLOR_WHITE);
+		}
+	}
+	video_gfx_rect(&screen_gfx, blit_x, blit_y, blit_w, blit_h, VIDEO_COLOR_AQUA);
+#endif
+
 	dst_offset += 3;
 #endif
 

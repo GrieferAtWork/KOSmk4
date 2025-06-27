@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -1413,11 +1413,13 @@ libvideo_blitter_generic__blit_imatrix(struct video_blitter const *__restrict se
 	gfx_assert_imatrix2d(src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+#if 0 /* TODO: Breaks assertions for double-rotation blits */
+	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
 		libvideo_blitter_generic__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 		return;
 	}
+#endif
 
 	/* TODO: More optimizations for known rotation/mirror matrices */
 
@@ -1541,13 +1543,15 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 	gfx_assert_imatrix2d(src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+#if 0 /* TODO: Breaks assertions for double-rotation blits */
+	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
 		libvideo_blitter_generic__stretch_l(self,
 		                                    dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 		                                    src_x_, src_y_, src_size_x_, src_size_y_);
 		return;
 	}
+#endif
 
 #define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
 #define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
@@ -1674,13 +1678,15 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 	gfx_assert_imatrix2d(src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][0] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][0] == 1) {
+#if 0 /* TODO: Breaks assertions for double-rotation blits */
+	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
+	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
 		libvideo_blitter_generic__stretch_n(self,
 		                                    dst_x, dst_y, dst_size_x, dst_size_y,
 		                                    src_x, src_y, src_size_x, src_size_y);
 		return;
 	}
+#endif
 
 	TRACE_START("generic__stretch_imatrix_n("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
@@ -2033,54 +2039,145 @@ libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst,
  * back to the initial clip area, either keep a copy of the
  * original GFX  context, or  create a  new context  (which
  * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface) */
-DEFINE_PUBLIC_ALIAS(video_gfxhdr_clip, libvideo_gfxhdr_clip);
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfxhdr *CC
-libvideo_gfxhdr_clip(struct video_gfxhdr *__restrict self,
-                     video_offset_t clip_x, video_offset_t clip_y,
-                     video_dim_t size_x, video_dim_t size_y) {
+ * associated buffer's entire surface)
+ *
+ * @param: clip_x: Delta to add to the Clip Rect starting X coord.
+ *                 When negative, extend clip rect with void-pixels to the left
+ * @param: clip_y: Delta to add to the Clip Rect starting Y coord.
+ *                 When negative, extend clip rect with void-pixels to the top
+ * @param: size_x: New width of the clip rect. When greater than the old  clip
+ *                 rect width, extend clip rect with void-pixels to the right.
+ * @param: size_y: New height of the clip rect.  When greater than the old  clip
+ *                 rect height, extend clip rect with void-pixels to the bottom.
+ * @return: * : Always re-returns `self' */
+DEFINE_PUBLIC_ALIAS(video_gfx_clip, libvideo_gfx_clip);
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+libvideo_gfx_clip(struct video_gfx *__restrict self,
+                  video_offset_t clip_x, video_offset_t clip_y,
+                  video_dim_t size_x, video_dim_t size_y) {
 	video_offset_t cxend, cyend;
 	if unlikely(!size_x || !size_y)
 		goto empty_clip;
 
 	/* Adjust clip rect */
-	self->vxh_cxoff += clip_x;
-	self->vxh_cyoff += clip_y;
-	self->vxh_cxsiz = size_x;
-	self->vxh_cysiz = size_y;
+	self->vx_hdr.vxh_cxoff += clip_x;
+	self->vx_hdr.vxh_cyoff += clip_y;
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
+	self->vx_hdr.vxh_cxsiz = size_x;
+	self->vx_hdr.vxh_cysiz = size_y;
 
 	/* Clamp buffer rect according to new clip rect */
-	if ((video_offset_t)self->vxh_bxmin < self->vxh_cxoff) {
-		self->vxh_bxmin = (video_coord_t)self->vxh_cxoff;
-		if (self->vxh_bxend <= self->vxh_bxmin)
+	if ((video_offset_t)self->vx_hdr.vxh_bxmin < self->vx_hdr.vxh_cxoff) {
+		self->vx_hdr.vxh_bxmin = (video_coord_t)self->vx_hdr.vxh_cxoff;
+		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
 			goto empty_clip;
-//		self->vxh_bxsiz = self->vxh_bxend - self->vxh_bxmin;
+//		self->vx_hdr.vxh_bxsiz = self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin;
 	}
-	if ((video_offset_t)self->vxh_bymin < self->vxh_cyoff) {
-		self->vxh_bymin = (video_coord_t)self->vxh_cyoff;
-		if (self->vxh_byend <= self->vxh_bymin)
+	if ((video_offset_t)self->vx_hdr.vxh_bymin < self->vx_hdr.vxh_cyoff) {
+		self->vx_hdr.vxh_bymin = (video_coord_t)self->vx_hdr.vxh_cyoff;
+		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
 			goto empty_clip;
-//		self->vxh_bysiz = self->vxh_byend - self->vxh_bymin;
+//		self->vx_hdr.vxh_bysiz = self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin;
 	}
 
-	if (!OVERFLOW_SADD(self->vxh_cxoff, size_x, &cxend) &&
-	    self->vxh_bxend > (video_coord_t)cxend && cxend > 0) {
-		self->vxh_bxend = (video_coord_t)cxend;
-		if (self->vxh_bxend <= self->vxh_bxmin)
+	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cxoff, size_x, &cxend) &&
+	    self->vx_hdr.vxh_bxend > (video_coord_t)cxend && cxend > 0) {
+		self->vx_hdr.vxh_bxend = (video_coord_t)cxend;
+		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
 			goto empty_clip;
-//		self->vxh_bxsiz = self->vxh_bxend - self->vxh_bxmin;
+//		self->vx_hdr.vxh_bxsiz = self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin;
 	}
-	if (!OVERFLOW_SADD(self->vxh_cyoff, size_y, &cyend) &&
-	    self->vxh_byend > (video_coord_t)cyend && cyend > 0) {
-		self->vxh_byend = (video_coord_t)cyend;
-		if (self->vxh_byend <= self->vxh_bymin)
+	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cyoff, size_y, &cyend) &&
+	    self->vx_hdr.vxh_byend > (video_coord_t)cyend && cyend > 0) {
+		self->vx_hdr.vxh_byend = (video_coord_t)cyend;
+		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
 			goto empty_clip;
-//		self->vxh_bysiz = self->vxh_byend - self->vxh_bymin;
+//		self->vx_hdr.vxh_bysiz = self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin;
 	}
 	return self;
 empty_clip:
-	video_gfxhdr_setempty(self);
+	video_gfxhdr_setempty(&self->vx_hdr);
 	return self;
+}
+
+
+
+
+/* Translate virtual (offset) pixel coords to physical (coord) coords.
+ * @param: x:      Virtual pixel X offset
+ * @param: y:      Virtual pixel Y offset
+ * @param: coords: The absolute (physical) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given x/y lie outside the I/O Rect of `self' */
+DEFINE_PUBLIC_ALIAS(video_gfx_offset2coord, libvideo_gfx_offset2coord);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
+libvideo_gfx_offset2coord(struct video_gfx const *__restrict self,
+                          video_offset_t x, video_offset_t y,
+                          video_coord_t coords[2]) {
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
+		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
+		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+	x += self->vx_hdr.vxh_cxoff;
+	y += self->vx_hdr.vxh_cyoff;
+	if unlikely((video_coord_t)x < self->vx_hdr.vxh_bxmin)
+		goto fail;
+	if unlikely((video_coord_t)y < self->vx_hdr.vxh_bymin)
+		goto fail;
+	if unlikely((video_coord_t)x >= self->vx_hdr.vxh_bxend)
+		goto fail;
+	if unlikely((video_coord_t)y >= self->vx_hdr.vxh_byend)
+		goto fail;
+	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
+		video_offset_t temp;
+		temp = x;
+		x    = y;
+		y    = temp;
+	}
+	coords[0] = (video_coord_t)x;
+	coords[1] = (video_coord_t)y;
+	return true;
+fail:
+	return false;
+}
+
+/* Translate physical (coord) pixel coords to virtual (offset) coords.
+ * @param: x:       Physical pixel X coord
+ * @param: y:       Physical pixel Y coord
+ * @param: offsets: The offset (virtual) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given x/y lie outside the I/O Rect of `self' */
+DEFINE_PUBLIC_ALIAS(video_gfx_coord2offset, libvideo_gfx_coord2offset);
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
+libvideo_gfx_coord2offset(struct video_gfx const *__restrict self,
+                          video_coord_t x, video_coord_t y,
+                          video_offset_t offsets[2]) {
+	if unlikely(x < self->vx_hdr.vxh_bxmin)
+		goto fail;
+	if unlikely(y < self->vx_hdr.vxh_bymin)
+		goto fail;
+	if unlikely(x >= self->vx_hdr.vxh_bxend)
+		goto fail;
+	if unlikely(y >= self->vx_hdr.vxh_byend)
+		goto fail;
+	x -= self->vx_hdr.vxh_cxoff;
+	y -= self->vx_hdr.vxh_cyoff;
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+		y = (self->vx_hdr.vxh_cysiz - 1) - y;
+	offsets[0] = (video_offset_t)x;
+	offsets[1] = (video_offset_t)y;
+	return true;
+fail:
+	return false;
 }
 
 
@@ -2096,9 +2193,10 @@ _libvideo_gfxhdr_xyswap(struct video_gfxhdr *__restrict self) {
 #undef Tswap
 }
 
-/* Perform  geometric transformations  on `self'.  Note that  none of these
- * functions  alter pixel data  of the underlying  buffer; they only affect
- * how the given `self' interacts with pixel data of the underlying buffer.
+/* Perform geometric transformations on the contents of the current  clip
+ * rect of `self'. Note that none of these functions alter pixel data  of
+ * the underlying buffer; they only affect how the given `self' interacts
+ * with pixel data of the underlying buffer.
  *
  * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
  * - video_gfx_hmirror: Mirror pixel data horizontally
@@ -2134,7 +2232,7 @@ DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
 	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -2142,7 +2240,7 @@ DEFINE_PUBLIC_ALIAS(video_gfx_rrot90, libvideo_gfx_rrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
 	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
@@ -2153,12 +2251,12 @@ libvideo_gfx_rot180(struct video_gfx *__restrict self) {
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
-DEFINE_PUBLIC_ALIAS(video_gfx_lrot, libvideo_gfx_lrot);
+DEFINE_PUBLIC_ALIAS(video_gfx_lrot90n, libvideo_gfx_lrot90n);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_gfx_lrot(struct video_gfx *__restrict self, int n) {
+libvideo_gfx_lrot90n(struct video_gfx *__restrict self, int n) {
 	n %= 4;
 	if (n < 0)
-		n += 3;
+		n += 4;
 	switch (n) {
 	case 0: return self;
 	case 1: return libvideo_gfx_lrot90(self);
@@ -2168,12 +2266,12 @@ libvideo_gfx_lrot(struct video_gfx *__restrict self, int n) {
 	}
 }
 
-DEFINE_PUBLIC_ALIAS(video_gfx_rrot, libvideo_gfx_rrot);
+DEFINE_PUBLIC_ALIAS(video_gfx_rrot90n, libvideo_gfx_rrot90n);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_gfx_rrot(struct video_gfx *__restrict self, int n) {
+libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n) {
 	n %= 4;
 	if (n < 0)
-		n += 3;
+		n += 4;
 	switch (n) {
 	case 0: return self;
 	case 1: return libvideo_gfx_rrot90(self);

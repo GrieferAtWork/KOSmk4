@@ -49,14 +49,15 @@
  *      that use  the associated  GFX context  as destination,  or  when
  *      writing pixel data. */
 #define VIDEO_GFX_F_NORMAL      0x0000 /* Normal render flags. */
-#define VIDEO_GFX_F_XWRAP       0x0001 /* [rw] X coords <0 or >=width wrap to the other side (else: coords are clamped) */
-#define VIDEO_GFX_F_YWRAP       0x0002 /* [rw] Y coords <0 or >=height wrap to the other side (else: coords are clamped) */
-#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords within the I/O rect are mirrored */
-#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords within the I/O rect are mirrored */
+#define VIDEO_GFX_F_XWRAP       0x0001 /* [rw] OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
+#define VIDEO_GFX_F_YWRAP       0x0002 /* [rw] OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
+#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords within the Clip Rect are mirrored */
+#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords within the Clip Rect are mirrored */
 #define VIDEO_GFX_F_XYSWAP      0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
                                         * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
                                         * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
-                                        *       though **does** affect both the clip rect, as well as I/O region. */
+                                        *       though **does** affect both the Clip Rect, as well as I/O region.
+                                        * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
 #define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
                                         *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                         *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
@@ -466,22 +467,69 @@ typedef struct video_gfxhdr video_gfx_clipinfo_t;
  * back to the initial clip area, either keep a copy of the
  * original GFX  context, or  create a  new context  (which
  * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface) */
-typedef __ATTR_INOUT_T(1) struct video_gfxhdr *
-(LIBVIDEO_GFX_CC *PVIDEO_GFXHDR_CLIP)(struct video_gfxhdr *__restrict __self,
-                                      video_offset_t __clip_x, video_offset_t __clip_y,
-                                      video_dim_t __size_x, video_dim_t __size_y);
+ * associated buffer's entire surface)
+ *
+ * @param: __clip_x: Delta to add to the Clip Rect starting X coord.
+ *                   When negative, extend clip rect with void-pixels to the left
+ * @param: __clip_y: Delta to add to the Clip Rect starting Y coord.
+ *                   When negative, extend clip rect with void-pixels to the top
+ * @param: __size_x: New width of the clip rect. When greater than the old  clip
+ *                   rect width, extend clip rect with void-pixels to the right.
+ * @param: __size_y: New height of the clip rect.  When greater than the old  clip
+ *                   rect height, extend clip rect with void-pixels to the bottom.
+ * @return: * : Always re-returns `__self' */
+typedef __ATTR_INOUT_T(1) struct video_gfx *
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_CLIP)(struct video_gfx *__restrict __self,
+                                   video_offset_t __clip_x, video_offset_t __clip_y,
+                                   video_dim_t __size_x, video_dim_t __size_y);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfxhdr *LIBVIDEO_GFX_CC
-video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
-                  video_offset_t __clip_x, video_offset_t __clip_y,
-                  video_dim_t __size_x, video_dim_t __size_y);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_CC
+video_gfx_clip(struct video_gfx *__restrict __self,
+               video_offset_t __clip_x, video_offset_t __clip_y,
+               video_dim_t __size_x, video_dim_t __size_y);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
-/* Perform  geometric transformations  on `self'.  Note that  none of these
- * functions  alter pixel data  of the underlying  buffer; they only affect
- * how the given `self' interacts with pixel data of the underlying buffer.
+/* Translate virtual (offset) pixel coords to physical (coord) coords.
+ * @param: __x:      Virtual pixel X offset
+ * @param: __y:      Virtual pixel Y offset
+ * @param: __coords: The absolute (physical) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_OFFSET2COORD)(struct video_gfx const *__restrict __self,
+                                           video_offset_t __x, video_offset_t __y,
+                                           video_coord_t __coords[2]);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL LIBVIDEO_GFX_CC
+video_gfx_offset2coord(struct video_gfx const *__restrict __self,
+                       video_offset_t __x, video_offset_t __y,
+                       video_coord_t __coords[2]);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+/* Translate physical (coord) pixel coords to virtual (offset) coords.
+ * @param: __x:       Physical pixel X coord
+ * @param: __y:       Physical pixel Y coord
+ * @param: __offsets: The offset (virtual) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_COORD2OFFSET)(struct video_gfx const *__restrict __self,
+                                           video_offset_t __x, video_offset_t __y,
+                                           video_offset_t __offsets[2]);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL LIBVIDEO_GFX_CC
+video_gfx_coord2offset(struct video_gfx const *__restrict __self,
+                       video_coord_t __x, video_coord_t __y,
+                       video_offset_t __offsets[2]);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
+/* Perform geometric transformations on the contents of the current  clip
+ * rect of `self'. Note that none of these functions alter pixel data  of
+ * the underlying buffer; they only affect how the given `self' interacts
+ * with pixel data of the underlying buffer.
  *
  * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
  * - video_gfx_hmirror: Mirror pixel data horizontally
@@ -489,16 +537,16 @@ video_gfxhdr_clip(struct video_gfxhdr *__restrict __self,
  * - video_gfx_lrot90:  Rotate pixel data left 90°
  * - video_gfx_rrot90:  Rotate pixel data right 90°
  * - video_gfx_rot180:  Rotate pixel data 180°
- * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
- * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
+ * - video_gfx_nrot90n: Rotate pixel data by left by 90*n°
+ * - video_gfx_rrot90n: Rotate pixel data by right by 90*n° */
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_XYSWAP)(struct video_gfx *__restrict __self);
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_HMIRROR)(struct video_gfx *__restrict __self);
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_VMIRROR)(struct video_gfx *__restrict __self);
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_LROT90)(struct video_gfx *__restrict __self);
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RROT90)(struct video_gfx *__restrict __self);
 typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_ROT180)(struct video_gfx *__restrict __self);
-typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_LROT)(struct video_gfx *__restrict __self, int __n);
-typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RROT)(struct video_gfx *__restrict __self, int __n);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_LROT90N)(struct video_gfx *__restrict __self, int __n);
+typedef __ATTR_INOUT_T(1) struct video_gfx *(LIBVIDEO_GFX_FCC *PVIDEO_GFX_RROT90N)(struct video_gfx *__restrict __self, int __n);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_xyswap(struct video_gfx *__restrict __self);
 LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_hmirror(struct video_gfx *__restrict __self);
@@ -506,8 +554,8 @@ LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_v
 LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_lrot90(struct video_gfx *__restrict __self);
 LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rrot90(struct video_gfx *__restrict __self);
 LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rot180(struct video_gfx *__restrict __self);
-LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_lrot(struct video_gfx *__restrict __self, int __n);
-LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rrot(struct video_gfx *__restrict __self, int __n);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_lrot90n(struct video_gfx *__restrict __self, int __n);
+LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_FCC video_gfx_rrot90n(struct video_gfx *__restrict __self, int __n);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
@@ -573,32 +621,11 @@ video_blitter_stretch(struct video_blitter const *__restrict __self,
 /* VIDEO_GFX                                                            */
 /************************************************************************/
 
-/* Return the API-visible Clip Rect offset in X or Y */
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
-video_gfx_getclipx(struct video_gfx const *__restrict __self);
-extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_offset_t
-video_gfx_getclipy(struct video_gfx const *__restrict __self);
-
 /* Return the API-visible Clip Rect size in X or Y */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
 video_gfx_getclipw(struct video_gfx const *__restrict __self);
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) video_dim_t
 video_gfx_getcliph(struct video_gfx const *__restrict __self);
-
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-/* Apply a clipping  rect to "self",  shrinking the  pixel
- * area relative to offsets specified by the given coords.
- *
- * Note that the clip area can  only ever be shrunk. To  go
- * back to the initial clip area, either keep a copy of the
- * original GFX  context, or  create a  new context  (which
- * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface) */
-extern __ATTR_INOUT(1) struct video_gfx *
-video_gfx_clip(struct video_gfx *__restrict __self,
-               video_offset_t __clip_x, video_offset_t __clip_y,
-               video_dim_t __size_x, video_dim_t __size_y);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Backup/restore the current Clip Rect of `self' */
 extern __ATTR_IN(1) __ATTR_OUT(2) void
@@ -749,14 +776,8 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_blitter_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y) \
 	(*(self)->vbt_ops->vbto_stretch)(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y)
 
-#define video_gfx_getclipx(self) (self)->vx_hdr.vxh_cxoff
-#define video_gfx_getclipy(self) (self)->vx_hdr.vxh_cyoff
 #define video_gfx_getclipw(self) (self)->vx_hdr.vxh_cxsiz
 #define video_gfx_getcliph(self) (self)->vx_hdr.vxh_cysiz
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-#define video_gfx_clip(self, start_x, start_y, size_x, size_y) \
-	((struct video_gfx *)video_gfxhdr_clip(&(self)->vx_hdr, start_x, start_y, size_x, size_y))
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 #define video_gfx_saveclip(self, backup) (void)__libc_memcpy(backup, &(self)->vx_hdr, sizeof(video_gfx_clipinfo_t))
 #define video_gfx_loadclip(self, backup) (void)__libc_memcpy(&(self)->vx_hdr, backup, sizeof(video_gfx_clipinfo_t))
 #define video_gfx_update(self, what) \
@@ -910,12 +931,42 @@ struct video_gfxhdr {
 	 * However, the "I/O Rect"  is always the  intersection of "Buffer",  with
 	 * any "Clip Rect" ever  set for  the GFX  context, meaning  it cannot  be
 	 * made to grow without obtaining a fresh GFX context (which always starts
-	 * out with all 3 areas set to match each other). */
+	 * out with all 3 areas set to match each other).
+	 *
+	 * Virtual -> Physical coord translation (currently) happens as follows.
+	 * Do no rely on this translation behavior; always use APIs to modify or
+	 * otherwise interact with Clip Rect infos.
+	 * >> if (vx_flags & VIDEO_GFX_F_XMIRROR)
+	 * >>     x = (vxh_cxsiz - 1) - x;
+	 * >> if (vx_flags & VIDEO_GFX_F_YMIRROR)
+	 * >>     y = (vxh_cysiz - 1) - y;
+	 * >> if (vx_flags & VIDEO_GFX_F_XWRAP)
+	 * >>     x = wrap(x, vxh_cxsiz); // wrap(x, dim) = ((x % dim) + dim) % dim
+	 * >> if (vx_flags & VIDEO_GFX_F_YWRAP)
+	 * >>     x = wrap(x, vxh_cxsiz); // ...
+	 * >> x += vxh_cxoff;
+	 * >> y += vxh_cyoff;
+	 * >> if (x < vxh_bxmin)
+	 * >>     return VOID;
+	 * >> if (y < vxh_bymin)
+	 * >>     return VOID;
+	 * >> if (x >= vxh_bxend)
+	 * >>     return VOID;
+	 * >> if (y >= vxh_byend)
+	 * >>     return VOID;
+	 * >> if (vx_flags & VIDEO_GFX_F_XYSWAP) {
+	 * >>     temp = x;
+	 * >>     x = y;
+	 * >>     y = temp;
+	 * >> }
+	 * >> return {x,y};
+	 */
 	video_offset_t              vxh_cxoff;    /* [const] Delta added to all X coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_offset_t              vxh_cyoff;    /* [const] Delta added to all Y coords (as per clip-rect) to turn "video_offset_t" into "video_coord_t" */
 	video_dim_t                 vxh_cxsiz;    /* [const] Absolute width of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
 	video_dim_t                 vxh_cysiz;    /* [const] Absolute height of the clip-rect (only relevant for `VIDEO_GFX_F*RAP') */
-	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something */
+	/* I/O Rect: these values control the (absolute) pixel area where read/writes do something
+	 * NOTE: The I/O Rect is already pre-adjusted for VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR */
 	video_coord_t               vxh_bxmin;    /* [const][<= vxh_bxend][>= vxh_cxoff] Absolute buffer start coord in X (start of acc) */
 	video_coord_t               vxh_bymin;    /* [const][<= vxh_byend][>= vxh_cyoff] Absolute buffer start coord in Y */
 	video_coord_t               vxh_bxend;    /* [const][<= vx_buffer->vb_xdim] Absolute buffer end coord in X (<= `vx_buffer->vb_xdim') */

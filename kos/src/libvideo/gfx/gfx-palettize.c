@@ -485,11 +485,11 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	struct video_gfx gfx = *self;
 	struct video_gfx result_gfx;
 	size_t stride, total;
-	libvideo_gfxhdr_clip(&gfx.vx_hdr, /* Set clip rect to I/O area */
-	                     (video_offset_t)gfx.vx_hdr.vxh_bxmin - video_gfx_getclipx(&gfx),
-	                     (video_offset_t)gfx.vx_hdr.vxh_bymin - video_gfx_getclipy(&gfx),
-	                     gfx.vx_hdr.vxh_bxend - gfx.vx_hdr.vxh_bxmin,
-	                     gfx.vx_hdr.vxh_byend - gfx.vx_hdr.vxh_bymin);
+	libvideo_gfx_clip(&gfx, /* Set clip rect to I/O area */
+	                  (video_offset_t)gfx.vx_hdr.vxh_bxmin - gfx.vx_hdr.vxh_cxoff,
+	                  (video_offset_t)gfx.vx_hdr.vxh_bymin - gfx.vx_hdr.vxh_cyoff,
+	                  gfx.vx_hdr.vxh_bxend - gfx.vx_hdr.vxh_bxmin,
+	                  gfx.vx_hdr.vxh_byend - gfx.vx_hdr.vxh_bymin);
 	result_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
 	if unlikely(!result_codec)
 		goto err;

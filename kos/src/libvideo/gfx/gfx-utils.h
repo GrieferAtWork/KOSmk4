@@ -56,7 +56,7 @@ wrap(video_offset_t offset, video_dim_t dim) {
 #if 1
 	offset %= dim;
 	if (offset < 0)
-		offset += dim - 1;
+		offset += dim;
 	return (video_coord_t)offset;
 #else
 	if unlikely(offset < 0) {
