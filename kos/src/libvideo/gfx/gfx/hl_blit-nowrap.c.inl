@@ -116,7 +116,12 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
 	video_coord_t temp;
-#if 1
+#if defined(GFX_DEBUG) && 0
+#define LOCAL_TRACE_CLAMP()                                            \
+	syslog(LOG_DEBUG, "CLAMP: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",    \
+	       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y, \
+	       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y)
+
 	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit) "("
 #ifdef LOCAL_IS_STRETCH
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}"
@@ -131,7 +136,9 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	       dst_x, dst_y, src_x, src_y, size_x, size_y
 #endif /* !LOCAL_IS_STRETCH */
 	       );
-#endif
+#else /* ... */
+#define LOCAL_TRACE_CLAMP() (void)0
+#endif /* !... */
 
 	/* Check for empty blit source/destination */
 	if unlikely(LOCAL_IF_STRETCH_ELSE(!dst_size_x || !dst_size_y ||
@@ -155,9 +162,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	if unlikely(dst_x < (video_offset_t)dst->vx_hdr.vxh_bxmin) {
 		video_dim_t dstpart;
 		LOCAL_IF_STRETCH(video_dim_t srcpart);
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 		dstpart = dst->vx_hdr.vxh_bxmin - (video_coord_t)dst_x;
 		if unlikely(dstpart >= LOCAL_dst_size_x)
 			return;
@@ -173,9 +178,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	if unlikely(dst_y < (video_offset_t)dst->vx_hdr.vxh_bymin) {
 		video_dim_t dstpart;
 		LOCAL_IF_STRETCH(video_dim_t srcpart);
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 		dstpart = dst->vx_hdr.vxh_bymin - (video_coord_t)dst_y;
 		if unlikely(dstpart >= LOCAL_dst_size_y)
 			return;
@@ -192,9 +195,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	            temp > dst->vx_hdr.vxh_bxend) {
 		if unlikely((video_coord_t)dst_x >= dst->vx_hdr.vxh_bxend)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newdstsize, overflow;
@@ -216,9 +217,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	            temp > dst->vx_hdr.vxh_byend) {
 		if unlikely((video_coord_t)dst_y >= dst->vx_hdr.vxh_byend)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newdstsize, overflow;
@@ -247,9 +246,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 		srcpart = src->vx_hdr.vxh_bxmin - (video_coord_t)src_x;
 		if unlikely(srcpart >= LOCAL_src_size_x)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_x) / src_size_x);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_x) return);
 		LOCAL_IF_STRETCH(dst_size_x -= dstpart);
@@ -270,9 +267,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 		srcpart = src->vx_hdr.vxh_bymin - (video_coord_t)src_y;
 		if unlikely(srcpart >= LOCAL_src_size_y)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_y) / src_size_y);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_y) return);
 		LOCAL_IF_STRETCH(dst_size_y -= dstpart);
@@ -291,9 +286,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	            temp > src->vx_hdr.vxh_bxend) {
 		if unlikely((video_coord_t)src_x >= src->vx_hdr.vxh_bxend)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newsrcsize, overflow;
@@ -315,9 +308,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	            temp > src->vx_hdr.vxh_byend) {
 		if unlikely((video_coord_t)src_y >= src->vx_hdr.vxh_byend)
 			return;
-		syslog(LOG_DEBUG, "MODIFY: %d: {%dx%d, %dx%d} {%dx%d, %dx%d}\n",
-		       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y,
-		       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y);
+		LOCAL_TRACE_CLAMP();
 #ifdef LOCAL_IS_STRETCH
 		{
 			video_dim_t newsrcsize, overflow;
@@ -438,6 +429,8 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #undef LOCAL_src_size_y
 #undef LOCAL_lo_src_x
 #undef LOCAL_lo_src_y
+
+#undef LOCAL_TRACE_CLAMP
 }
 
 #undef LOCAL_IF_STRETCH
