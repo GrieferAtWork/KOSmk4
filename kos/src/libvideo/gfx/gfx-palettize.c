@@ -238,8 +238,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 
 	/* Check if the histogram is usable */
 	if (fail_if_too_many_bins) {
-		video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
-		video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
+		video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
+		video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
 		size_t io_pixels  = (size_t)io_sx * io_sy;
 		video_pixel_t i;
 		size_t pal_pixels = 0;
@@ -261,8 +261,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 		video_pixel_t i;
 		uint64_t pal_pixels_adj;
 		size_t pal_pixels = 0;
-		video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
-		video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
+		video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
+		video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
 		size_t io_pixels  = (size_t)io_sx * io_sy;
 		for (i = 0; i < palsize; ++i) {
 			video_color_t c = h->h_colors[i].hb_color;
@@ -467,7 +467,7 @@ PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
 median_io_gfx(void const *cookie, mc_index_t i) {
 	/* Fallback median-cut I/O callback using direct GFX color reads (slow) */
 	struct video_gfx const *self = (struct video_gfx const *)cookie;
-	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
+	video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
 	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
 	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
 	return (*self->_vx_xops.vgfx_getcolor)(self, x, y);
@@ -488,8 +488,8 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	libvideo_gfx_clip(&gfx, /* Set clip rect to I/O area */
 	                  (video_offset_t)gfx.vx_hdr.vxh_bxmin - gfx.vx_hdr.vxh_cxoff,
 	                  (video_offset_t)gfx.vx_hdr.vxh_bymin - gfx.vx_hdr.vxh_cyoff,
-	                  gfx.vx_hdr.vxh_bxend - gfx.vx_hdr.vxh_bxmin,
-	                  gfx.vx_hdr.vxh_byend - gfx.vx_hdr.vxh_bymin);
+	                  _video_gfxhdr_bxsiz(&gfx.vx_hdr),
+	                  _video_gfxhdr_bysiz(&gfx.vx_hdr));
 	result_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
 	if unlikely(!result_codec)
 		goto err;
@@ -588,8 +588,8 @@ median_cut_palettize(struct video_gfx const *__restrict self,
 	 *       its speed against mine (maybe mine just sucks?)
 	 * TODO: Live with median_cut being slow, and adjust documentation accordingly. */
 	mc_index_t i, io_pixels, *gfx_indices;
-	video_dim_t io_sx = (self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin);
-	video_dim_t io_sy = (self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin);
+	video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
+	video_dim_t io_sy = _video_gfxhdr_bysiz(&self->vx_hdr);
 	shift_t pal_depth;
 	if (OVERFLOW_UMUL(io_sx, io_sy, &io_pixels)) {
 		errno = EOVERFLOW;

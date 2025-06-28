@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif(x -> x.startswith("-O"));
-gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
+//gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2025 Griefer@Work                                       *
  *                                                                            *
@@ -2185,7 +2185,7 @@ fail:
 
 LOCAL ATTR_INOUT(1) void FCC
 _libvideo_gfxhdr_xyswap(struct video_gfxhdr *__restrict self) {
-#define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
+#define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
 	Tswap(video_offset_t, self->vxh_cxoff, self->vxh_cyoff);
 	Tswap(video_dim_t, self->vxh_cxsiz, self->vxh_cysiz);
 	Tswap(video_coord_t, self->vxh_bxmin, self->vxh_bymin);

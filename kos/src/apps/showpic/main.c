@@ -240,6 +240,20 @@ do_showpic(struct screen_buffer *screen,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_F_NORMAL, 0);
 
+#if 1
+	/*video_gfx_clip(&image_gfx, 200, 200,
+	               video_gfx_getclipw(&image_gfx) / 2,
+	               video_gfx_getcliph(&image_gfx) / 2);*/
+	video_gfx_clip(&screen_gfx, 20, 20,
+	               video_gfx_getclipw(&screen_gfx) - 40,
+	               video_gfx_getcliph(&screen_gfx) - 40);
+	video_gfx_clip(&screen_gfx, -20, -20,
+	               video_gfx_getclipw(&screen_gfx) + 40,
+	               video_gfx_getcliph(&screen_gfx) + 40);
+	/*video_gfx_hmirror(&screen_gfx);*/
+//	video_gfx_vmirror(&screen_gfx);
+	video_gfx_rrot90(&screen_gfx);
+#else
 	/*video_gfx_clip(&image_gfx,
 	               video_gfx_getclipw(&image_gfx) / 2, 0,
 	               video_gfx_getclipw(&image_gfx) / 2,
@@ -252,8 +266,9 @@ do_showpic(struct screen_buffer *screen,
 	               video_gfx_getcliph(&image_gfx) + 80);
 
 	video_gfx_lrot90(&screen_gfx);
-	video_gfx_hmirror(&image_gfx);
+	/*video_gfx_hmirror(&image_gfx);*/
 	/*video_gfx_rrot90(&screen_gfx);*/
+#endif
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -347,7 +362,7 @@ do_showpic(struct screen_buffer *screen,
 		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}
 
-#if 0
+#if 1
 	for (unsigned int tile_y = 0; tile_y < tiles_y + 1; ++tile_y) {
 		for (unsigned int tile_x = 0; tile_x < tiles_x + 1; ++tile_x) {
 			video_dim_t r_w = blit_w / tiles_x;

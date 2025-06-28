@@ -324,10 +324,8 @@ INTERN ATTR_IN(1) void CC
 LOCAL_FUNC(libvideo_gfx_generic_hline_mirror)(struct video_gfx const *__restrict self,
                                               video_offset_t x, video_offset_t y,
                                               video_dim_t length, video_color_t color) {
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= length;
-	}
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+		x = (self->vx_hdr.vxh_cxsiz - length) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
 	LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(self, x, y, length, color);
@@ -389,10 +387,8 @@ LOCAL_FUNC(libvideo_gfx_generic_vline_mirror)(struct video_gfx const *__restrict
                                               video_dim_t length, video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= length;
-	}
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+		y = (self->vx_hdr.vxh_cysiz - length) - y;
 	LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(self, x, y, length, color);
 }
 
@@ -485,12 +481,10 @@ LOCAL_FUNC(libvideo_gfx_generic_fill_mirror)(struct video_gfx const *__restrict 
                                              video_dim_t size_x, video_dim_t size_y,
                                              video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
 	LOCAL_FUNC(libvideo_gfx_generic_fill_wrap)(self, x, y, size_x, size_y, color);
 }
@@ -693,12 +687,10 @@ LOCAL_FUNC(libvideo_gfx_generic_rect_mirror)(struct video_gfx const *__restrict 
                                              video_dim_t size_x, video_dim_t size_y,
                                              video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
 	LOCAL_FUNC(libvideo_gfx_generic_rect_wrap)(self, x, y, size_x, size_y, color);
 }
@@ -854,28 +846,24 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror)(struct video_gfx const *__restr
                                                  video_color_t const colors[2][2]) {
 	video_color_t fixed_colors[2][2];
 	switch (self->vx_flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR)) {
-#define Tswap(T, a, b) { T __temp = a; a = b; b = __temp; }
+#define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
 	case 0:
 		break;
 	case VIDEO_GFX_F_XMIRROR:
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[0][1]);
 		Tswap(video_color_t, fixed_colors[1][0], fixed_colors[1][1]);
 		break;
 	case VIDEO_GFX_F_YMIRROR:
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[1][0]);
 		Tswap(video_color_t, fixed_colors[0][1], fixed_colors[1][1]);
 		break;
 	case VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR:
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 		colors = (video_color_t const (*)[2])memcpy(fixed_colors, colors, 4, sizeof(video_color_t));
 		Tswap(video_color_t, fixed_colors[0][0], fixed_colors[1][1]);
 		Tswap(video_color_t, fixed_colors[0][1], fixed_colors[1][0]);
@@ -999,15 +987,13 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror)(struct video_gfx const *__rest
                                                   video_color_t locolor, video_color_t hicolor) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		video_color_t temp;
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 		temp = locolor;
 		locolor = hicolor;
 		hicolor = temp;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
 	LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)(self, x, y, size_x, size_y, locolor, hicolor);
 }
@@ -1124,13 +1110,11 @@ LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror)(struct video_gfx const *__rest
                                                   video_dim_t size_x, video_dim_t size_y,
                                                   video_color_t locolor, video_color_t hicolor) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
-		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
-		x -= size_x;
+		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		video_color_t temp;
-		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-		y -= size_y;
+		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 		temp = locolor;
 		locolor = hicolor;
 		hicolor = temp;
@@ -1255,13 +1239,11 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror)(struct video_gfx const *__restr
                                                  video_color_t const bg_fg_colors[2],
                                                  struct video_bitmask const *__restrict bm) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
-		dst_x = (self->vx_hdr.vxh_cxsiz - 1) - dst_x;
-		dst_x -= size_x;
+		dst_x = (self->vx_hdr.vxh_cxsiz - size_x) - dst_x;
 		/* TODO: Mirror "bm"? */
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
-		dst_y = (self->vx_hdr.vxh_cysiz - 1) - dst_y;
-		dst_y -= size_y;
+		dst_y = (self->vx_hdr.vxh_cysiz - size_y) - dst_y;
 		/* TODO: Mirror "bm"? */
 	}
 	LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm);

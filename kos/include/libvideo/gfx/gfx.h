@@ -488,6 +488,7 @@ video_gfx_clip(struct video_gfx *__restrict __self,
                video_offset_t __clip_x, video_offset_t __clip_y,
                video_dim_t __size_x, video_dim_t __size_y);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+/* TODO: Change "video_gfx_clip" into an operator in "struct video_gfx_ops" */
 
 
 /* Translate virtual (offset) pixel coords to physical (coord) coords.
@@ -506,6 +507,7 @@ video_gfx_offset2coord(struct video_gfx const *__restrict __self,
                        video_offset_t __x, video_offset_t __y,
                        video_coord_t __coords[2]);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+/* TODO: Change "video_gfx_offset2coord" into an operator in "struct video_gfx_ops" */
 
 /* Translate physical (coord) pixel coords to virtual (offset) coords.
  * @param: __x:       Physical pixel X coord
@@ -523,6 +525,7 @@ video_gfx_coord2offset(struct video_gfx const *__restrict __self,
                        video_coord_t __x, video_coord_t __y,
                        video_offset_t __offsets[2]);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+/* TODO: Change "video_gfx_coord2offset" into an operator in "struct video_gfx_ops" */
 
 
 
@@ -879,39 +882,45 @@ struct video_gfxhdr {
 	/* Clip Rect area (pixel area used for pixel clamping/wrapping, and accepted):
 	 *
 	 ***********************************************************************************
-	 *  ╔═════════════════════════════════╗─────────────────────────────────┐          *
-	 *  ║ Buffer                          ║ Buffer                          │          *
-	 *  ║                                 ║                                 │          *
-	 *  ║   ╔═══════════════════════╗─────╫─────────────────┬───────────────┼───────┐  *
-	 *  ║   ║ Clip Rect             ║ Clip Rect X+1         │ Clip Rect X+2 │       │  *
-	 *  ║   ║                       ║ (VIDEO_GFX_F_XWRAP)   │               │       │  *
-	 *  ║   ║                       ║     ║                 │               │       │  *
-	 *  ║   ║  ╔═════════════════╗  ║     ║      ┌──────────┼──────┐        │       │  *
-	 *  ║   ║  ║ I/O Rect        ║  ║     ║      │ I/O Rect │      │        │       │  *
-	 *  ║   ║  ║                 ║  ║     ║      │          │      │        │       │  *
-	 *  ║   ║  ╚═════════════════╝  ║     ║      └──────────┼──────┘        │       │  *
-	 *  ║   ║                       ║     ║                 │               │       │  *
-	 *  ║   ╚═══════════════════════╝─────╫─────────────────┴───────────────┼───────┘  *
-	 *  ║   │                       │     ║                 ·               │       ·  *
-	 *  ╚═══╪═══════════════════════╪═════╝─────────────────────────────────┘       ·  *
-	 *  │ B │                       │     │                 ·               ·       ·  *
-	 *  │ u │ Clip Rect Y+1         │     │                 ·               ·       ·  *
-	 *  │ f │ (VIDEO_GFX_F_YWRAP)   │     │                 ·               ·       ·  *
-	 *  │ f │                       │     │                 ·               ·       ·  *
-	 *  │ e │                       │     │                 ·               ·       ·  *
-	 *  │ r │                       │     │                 ·               ·       ·  *
-	 *  │   ├──╤═════════════════╤──┤·····│··········································  *
-	 *  │   │  │ I/O Rect        │  │     │      ·          ·     ·         ·       ·  *
-	 *  │   │  │                 │  │     │      ·          ·     ·         ·       ·  *
-	 *  │   │  └─────────────────┘  │     │      ··················         ·       ·  *
-	 *  │   │ Clip Rect Y+2         │     │                 ·               ·       ·  *
-	 *  │   │                       │     │                 ·               ·       ·  *
-	 *  │   │                       │     │                 ·               ·       ·  *
-	 *  └───┼───────────────────────┼─────┘··································       ·  *
+	 *  ╔═════════════════════════════════╗                                            *
+	 *  ║ Buffer                          ║                                            *
+	 *  ║                                 ║                                            *
+	 *  ║   ╔═══════════════════════╗─────╫─────────────────┬───────────────────────┐  *
+	 *  ║   ║ Clip Rect             ║ Clip Rect             │ Clip Rect             │  *
+	 *  ║   ║                       ║     ║                 │                       │  *
+	 *  ║   ║                       ║     ║                 │                       │  *
+	 *  ║   ║  ╔═════════════════╗  ║  ┌─────────────────┐  │  ┌─────────────────┐  │  *
+	 *  ║   ║  ║ I/O Rect        ║  ║  │ I/O Rect        │  │  │ I/O Rect        │  │  *
+	 *  ║   ║  ║                 ║  ║  │  ║              │  │  │                 │  │  *
+	 *  ║   ║  ╚═════════════════╝  ║  └─────────────────┘  │  └─────────────────┘  │  *
+	 *  ║   ║                       ║     ║                 │                       │  *
+	 *  ║   ╚═══════════════════════╝─────╫─────────────────┴───────────────────────┘  *
+	 *  ║   │ Clip Rect             │     ║                 ·                       ·  *
+	 *  ╚═══╪═══════════════════════╪═════╝                 ·                       ·  *
+	 *      │                       │                       ·                       ·  *
+	 *      │  ┌─────────────────┐  │  ···················  ·  ···················  ·  *
+	 *      │  │ I/O Rect        │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  │                 │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  └─────────────────┘  │  ···················  ·  ···················  ·  *
+	 *      │                       │                       ·                       ·  *
+	 *      ├───────────────────────┤················································  *
+	 *      │ Clip Rect             │                       ·                       ·  *
+	 *      │                       │                       ·                       ·  *
+	 *      │                       │                       ·                       ·  *
+	 *      │  ┌─────────────────┐  │  ···················  ·  ···················  ·  *
+	 *      │  │ I/O Rect        │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  │                 │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  └─────────────────┘  │  ···················  ·  ···················  ·  *
 	 *      │                       │                       ·                       ·  *
 	 *      └───────────────────────┘················································  *
 	 *                                                                                 *
 	 ***********************************************************************************
+	 *
+	 * Invariants:
+	 * - "I/O Rect" ⊆ "Clip Rect" ⊆ "Buffer"
+	 * - VIDEO_GFX_F_XWRAP/*Y are wrapped around "Clip Rect"
+	 * - Only pixels within the "I/O Rect" can be read/written
+	 * - VIDEO_GFX_F_XMIRROR/*Y mirror the "I/O Rect"
 	 *
 	 * Coords of these rects are (in absolute "video_coord_t" coords):
 	 * - Buffer:    {xy: {0,0}, wh: {vx_buffer->vb_xdim,vx_buffer->vb_ydim}}
@@ -921,10 +930,10 @@ struct video_gfxhdr {
 	 * When using any of the  publicly exposed functions, you always  operate
 	 * in the coord-space defined by the "Clip Rect", with pixel reads/writes
 	 * restricted to those within the "I/O Rect". Pixel coords that go beyond
-	 * the "Clip Rect", are either clamped, or wrapped (based on the size  of
-	 * the "Clip Rect"), before then being  clamped again to the  "I/O Rect".
-	 * You might notice that when pixel wrapping is disabled, the first clamp
-	 * can (and is) skipped.
+	 * the  "Clip Rect", are either clamped, or wrapped (based on GFX flags),
+	 * before  then being clamped  again to the  "I/O Rect". You might notice
+	 * that  when pixel  wrapping is disabled,  the first clamp  can (and is)
+	 * skipped.
 	 *
 	 * When changing the Clip Rect, coords are still relative to the old  clip
 	 * rect, but negative  coords can  be given to  make the  Clip Rect  grow.
@@ -975,6 +984,9 @@ struct video_gfxhdr {
 //	video_dim_t                 vxh_bysiz;    /* [const][== vxh_byend - vxh_bymin][<= vxh_cysiz] I/O Rect height */
 };
 
+#define _video_gfxhdr_bxsiz(self) ((self)->vxh_bxend - (self)->vxh_bxmin)
+#define _video_gfxhdr_bysiz(self) ((self)->vxh_byend - (self)->vxh_bymin)
+
 struct video_gfx {
 	struct video_gfxhdr         vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
 	struct video_buffer        *vx_buffer;   /* [1..1][const] The associated buffer. */
@@ -983,7 +995,7 @@ struct video_gfx {
 	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 	struct video_gfx_xops      _vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
 #define _VIDEO_GFX_N_DRIVER 4
-	void *_vx_driver[_VIDEO_GFX_N_DRIVER];    /* [?..?] Driver-specific graphics data. */
+	void *_vx_driver[_VIDEO_GFX_N_DRIVER];   /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:

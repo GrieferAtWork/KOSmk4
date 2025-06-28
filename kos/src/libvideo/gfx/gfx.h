@@ -59,7 +59,12 @@
 #define PRIxCOL PRIxN(__SIZEOF_VIDEO_COLOR_T__)
 #endif /* !PRIdOFF */
 
-#if 0
+#undef GFX_DEBUG
+#if !defined(NDEBUG) && 1
+#define GFX_DEBUG
+#endif
+
+#ifdef GFX_DEBUG
 #include <sys/syslog.h>
 #define TRACE_START(...) syslog(LOG_DEBUG, "[gfx] start: " __VA_ARGS__)
 #define TRACE_END(...)   syslog(LOG_DEBUG, "[gfx] end: " __VA_ARGS__)
@@ -68,7 +73,7 @@
 #define TRACE_END(...)   (void)0
 #endif
 
-#if defined(NDEBUG) || 1
+#ifndef GFX_DEBUG
 #if 1 /* Turn GFX assertions into compile-time assumptions for max speed */
 #ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
 #undef __CRT_UBSAN_BUILTIN_UNREACHABLE
@@ -80,11 +85,11 @@
 #define gfx_assert(x)       (void)0
 #define gfx_assertf(x, ...) (void)0
 #endif
-#else /* ... */
+#else /* GFX_DEBUG */
 #include <assert.h>
 #define gfx_assert  assert
 #define gfx_assertf assertf
-#endif /* !... */
+#endif /* !GFX_DEBUG */
 
 #define gfx_assert_absbounds_xmin(self, x) \
 	gfx_assertf((x) >= (self)->vx_hdr.vxh_bxmin, "X coord escapes to the left (%" PRIuCRD " < %" PRIuCRD ")", (x), (self)->vx_hdr.vxh_bxmin)
