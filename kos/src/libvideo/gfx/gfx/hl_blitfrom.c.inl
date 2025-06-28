@@ -17,20 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
+#define _KOS_SOURCE 1
+
 #ifdef __INTELLISENSE__
-#include "../gfx.c"
 #define DEFINE_libvideo_gfx__blitfrom_n
 //#define DEFINE_libvideo_gfx__blitfrom_l
 #endif /* __INTELLISENSE__ */
 
+#include "../api.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "../api.h"
 #include "../gfx.h"
 
 #if (defined(DEFINE_libvideo_gfx__blitfrom_n) + \

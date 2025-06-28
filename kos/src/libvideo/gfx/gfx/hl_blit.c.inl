@@ -17,9 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __INTELLISENSE__
 #define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
+
+#ifdef __INTELLISENSE__
 //#define DEFINE_libvideo_blitter_generic_blit_wrap
 #define DEFINE_libvideo_blitter_generic_blit_wrap_imatrix
 #endif /* __INTELLISENSE__ */

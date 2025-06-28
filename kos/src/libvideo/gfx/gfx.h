@@ -323,6 +323,15 @@ typedef uint_fast16_t stretch_fp_frac_t; /* uint_fast{STRETCH_FP_NFRAC}_t */
 #define STRETCH_FP_FRAC(fp)  ((stretch_fp_frac_t)(fp) & (stretch_fp_frac_t)(STRETCH_FP(1) - 1))
 
 
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
+/* GENERIC, LOW-LEVEL                                                   */
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
+
 /* Low-level, Generic, always-valid GFX color functions (using only `vgfx_getpixel' + `vgfx_setpixel') */
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic__getcolor_blur(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
@@ -399,6 +408,19 @@ INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_blitter_noblend_difffmt__stretch_
 #define libvideo_blitter_noblend_difffmt__stretch_l         libvideo_blitter_generic__stretch_l
 #define libvideo_blitter_noblend_difffmt__stretch_imatrix_l libvideo_blitter_generic__stretch_imatrix_l
 
+
+
+
+
+
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
+/* GENERIC, HIGH-LEVEL                                                  */
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 /* Generic GFX operators */
 INTDEF ATTR_RETNONNULL ATTR_IN(1) struct video_gfx const *CC libvideo_gfx_generic_noblend(struct video_gfx const *__restrict self);
@@ -508,6 +530,10 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
 #define libvideo_blit_generic_ops_rdwrap_imatrix (*_libvideo_blit_generic_ops_rdwrap_imatrix()) /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+dst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
 #define libvideo_blit_generic_ops_wrap           (*_libvideo_blit_generic_ops_wrap())           /* Support: src+dst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
 #define libvideo_blit_generic_ops_wrap_imatrix   (*_libvideo_blit_generic_ops_wrap_imatrix())   /* Support: src+dst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+dst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+
+
+
+
 
 
 /* Apply a clipping  rect to "self",  shrinking the  pixel
