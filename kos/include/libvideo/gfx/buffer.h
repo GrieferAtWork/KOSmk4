@@ -372,6 +372,58 @@ video_buffer_forbitmask(video_dim_t __size_x, video_dim_t __size_y,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Callback prototypes for operators accepted by `video_buffer_forcustom()' */
+typedef void (LIBVIDEO_GFX_CC *video_buffer_custom_destroy_t)(void *__cookie);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T video_pixel_t (LIBVIDEO_GFX_CC *video_buffer_custom_getpixel_t)(void *__cookie, video_coord_t __x, video_coord_t __y);
+typedef void (LIBVIDEO_GFX_CC *video_buffer_custom_setpixel_t)(void *__cookie, video_coord_t __x, video_coord_t __y, video_pixel_t __pixel);
+typedef __ATTR_OUT_T(2) int (LIBVIDEO_GFX_CC *video_buffer_custom_lock_t)(void *__cookie, struct video_lock *__restrict __result);
+typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unlock_t)(void *__cookie, struct video_lock *__restrict __result);
+
+
+/* Construct a special video buffer which, rather than being backed by memory
+ * or implemented using hardware acceleration,  does all its pixel I/O  using
+ * the provided function pointers.
+ *
+ * WARNING: The  given `__getpixel' / `__setpixel' callbacks better be
+ *          fast, or any GFX on the returned buffer will take forever!
+ *
+ * @param: __size_x:   X dimension of the returned video buffer
+ * @param: __size_y:   Y dimension of the returned video buffer
+ * @param: __codec:    [1..1] Video codec used for color<=>pixel conversion, as
+ *                            well  as pixel I/O (when __rlock/__wlock is given
+ *                            and returns `0')
+ * @param: __palette:  [0..1] Palette to-be used with `__codec' (if needed)
+ * @param: __getpixel: [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
+ * @param: __setpixel: [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
+ * @param: __destroy:  [0..1] Optional callback invoked when the returned buffer is destroyed
+ * @param: __rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `__getpixel' is used)
+ * @param: __wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `__setpixel' is used)
+ * @param: __unlock:   [0..1] Optional callback invoked to release video locks previously acquired by `__rlock' or `__wlock'
+ * @param: __cookie:   [?..?] Cookie argument passed to all user-supplied operators */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 5, 6)) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORCUSTOM)(video_dim_t __size_x, video_dim_t __size_y,
+                                           struct video_codec const *__codec, struct video_palette *__palette,
+                                           video_buffer_custom_getpixel_t __getpixel,
+                                           video_buffer_custom_setpixel_t __setpixel,
+                                           video_buffer_custom_destroy_t __destroy,
+                                           video_buffer_custom_lock_t __rlock,
+                                           video_buffer_custom_lock_t __wlock,
+                                           video_buffer_custom_unlock_t __unlock,
+                                           void *__cookie);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED NONNULL((3, 5, 6)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
+                       struct video_codec const *__codec, struct video_palette *__palette,
+                       video_buffer_custom_getpixel_t __getpixel,
+                       video_buffer_custom_setpixel_t __setpixel,
+                       video_buffer_custom_destroy_t __destroy,
+                       video_buffer_custom_lock_t __rlock,
+                       video_buffer_custom_lock_t __wlock,
+                       video_buffer_custom_unlock_t __unlock,
+                       void *__cookie);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */
