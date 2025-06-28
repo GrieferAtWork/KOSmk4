@@ -234,7 +234,7 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_LINEARBLIT |
+	                    VIDEO_GFX_F_LINEAR |
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,

@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 	screen->getgfx(gfx,
 	               GFX_BLENDMODE_ALPHA,
-	               VIDEO_GFX_F_LINEARBLIT);
+	               VIDEO_GFX_F_LINEAR);
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;
@@ -166,12 +166,9 @@ again_font:
 		} else if (buf[0] == 'm') {
 			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
-			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_LINEARBLIT);
-			video_gfx_setflags(&gfx, flags);
+			video_gfx_toggleflags(&gfx, VIDEO_GFX_F_LINEAR);
 		} else if (buf[0] == 'd') {
-			gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP |
-			                                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
-			video_gfx_setflags(&gfx, flags);
+			video_gfx_toggleflags(&gfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 		} else if (buf[0] == 'p') {
 			video_buffer_save(screen, "/var/screen.png", NULL);
 		} else if (buf[0] == 'q') {
@@ -186,8 +183,8 @@ again_font:
 
 	gfx.clip(-16,
 	         -16,
-	         VIDEO_DIM_MAX,
-	         VIDEO_DIM_MAX);
+	         video_gfx_getclipw(&gfx) + 32,
+	         video_gfx_getcliph(&gfx) + 32);
 
 	for (;;) {
 		unsigned int action;
@@ -221,11 +218,9 @@ again_font:
 			case 's':
 				goto random_step;
 
-			case 'd': {
-				gfx_flag_t flags = gfx.vx_flags ^ (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP |
-				                                   VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
-				video_gfx_setflags(&gfx, flags);
-			}	break;
+			case 'd':
+				video_gfx_toggleflags(&gfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
+				break;
 
 			case '0' ... '9':
 				action = buf[0] - '0';
@@ -286,7 +281,7 @@ step:
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
 			blurgfx = gfx;
-			video_gfx_setflags(&blurgfx, blurgfx.vx_flags | VIDEO_GFX_F_BLUR);
+			video_gfx_enableflags(&blurgfx, VIDEO_GFX_F_BLUR);
 			gfx.bitblit(x, y, blurgfx, x, y, size_x, size_y);
 			gfx.rect(x, y, size_x, size_y, VIDEO_COLOR_BLACK);
 		}	break;

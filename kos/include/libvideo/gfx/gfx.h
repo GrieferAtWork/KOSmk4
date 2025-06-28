@@ -62,9 +62,9 @@
                                         *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                         *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
 #define VIDEO_GFX_F_AALINES     0x4000 /* [w] Render smooth lines. */
-#define VIDEO_GFX_F_NEARESTBLIT 0x0000 /* [w] Use nearest interpolation for stretch() */
-/* TODO: "VIDEO_GFX_F_LINEARBLIT" should be an r-flag */
-#define VIDEO_GFX_F_LINEARBLIT  0x8000 /* [w] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_F_NEAREST     0x0000 /* [w] Use nearest interpolation for stretch(), lines, and floating-point pixel accesses */
+#define VIDEO_GFX_F_LINEAR      0x8000 /* [w] Use linear interpolation for stretch(), lines, and floating-point pixel accesses */
+/* TODO: "VIDEO_GFX_F_LINEAR" should be an r-flag when it comes to stretch() */
 
 
 
@@ -328,7 +328,7 @@ struct video_gfx_xops {
 	                                           struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vgfx_absfill', but do so via gradient with colors[y][x] being used
-	 * to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into the  specified
+	 * to essentially  do a  VIDEO_GFX_F_LINEAR  stretch-blit into  the  specified
 	 * destination rect.
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
@@ -417,8 +417,8 @@ struct video_gfx_ops {
 	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
 	                                        struct video_bitmask const *__restrict __bm);
 
-	/* Same as `vgfo_fill', but do so  via gradient with colors[y][x] being  used
-	 * to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into the specified
+	/* Same as `vgfo_fill', but do so via gradient with colors[y][x] being used
+	 * to essentially do a  VIDEO_GFX_F_LINEAR stretch-blit into the  specified
 	 * destination rect. */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) void
 	(LIBVIDEO_GFX_CC *vgfo_gradient)(struct video_gfx const *__restrict __self,
@@ -656,6 +656,9 @@ extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_blendmode_t video_gfx_getb
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
 extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_flag_t video_gfx_getflags(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_toggleflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_enableflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disableflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
 extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_color_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
 
@@ -737,7 +740,7 @@ video_gfx_absfillstretchmask(struct video_gfx const *__restrict __self,
                              struct video_bitmask const *__restrict __bm);
 
 /* Same as `video_gfx_fill', but do so via gradient with colors[y][x] being
- * used to essentially  do a VIDEO_GFX_F_LINEARBLIT  stretch-blit into  the
+ * used to  essentially  do  a  VIDEO_GFX_F_LINEAR  stretch-blit  into  the
  * specified destination rect. */
 extern __ATTR_IN(1) __ATTR_IN(6) void
 video_gfx_gradient(struct video_gfx const *__restrict __self,
@@ -790,6 +793,9 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_gfx_getcolorkey(self)           ((self)->vx_colorkey)
 #define video_gfx_setblend(self, mode)        ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
 #define video_gfx_setflags(self, flags)       ((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_toggleflags(self, flags)    ((self)->vx_flags ^= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_enableflags(self, flags)    ((self)->vx_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
+#define video_gfx_disableflags(self, flags)   ((self)->vx_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
 #define video_gfx_setcolorkey(self, colorkey) ((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
 #define video_gfx_noblend(self) \
 	(*(self)->vx_buffer->vb_ops->vi_noblendgfx)(self)
@@ -1057,8 +1063,8 @@ public:
 		video_gfx_fillall(this, __color);
 	}
 
-	/* Same  as `fill', but  do so via  gradient with colors[y][x] being
-	 * used to essentially do a VIDEO_GFX_F_LINEARBLIT stretch-blit into
+	/* Same as `fill', but do so via gradient with colors[y][x] being
+	 * used  to essentially do a VIDEO_GFX_F_LINEAR stretch-blit into
 	 * the specified destination rect. */
 	__CXX_CLASSMEMBER void gradient(video_offset_t __x, video_offset_t __y,
 	                                video_dim_t __size_x, video_dim_t __size_y,

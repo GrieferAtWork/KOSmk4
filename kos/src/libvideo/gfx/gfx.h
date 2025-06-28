@@ -722,7 +722,7 @@ after_blend:;
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
 		/* Linear vs. Nearest blit */
 		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
-			if (!(self->vx_flags & VIDEO_GFX_F_LINEARBLIT)) {
+			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_noblend__blitfrom_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 			} else {
@@ -730,7 +730,7 @@ after_blend:;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 			}
 		} else {
-			if (self->vx_flags & VIDEO_GFX_F_LINEARBLIT) {
+			if (self->vx_flags & VIDEO_GFX_F_LINEAR) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_generic__blitfrom_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 			} else {
@@ -790,7 +790,7 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_absgradient_h = &libvideo_gfx_noblend_interp8888__absgradient_h;
 		self->_vx_xops.vgfx_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
 	}
-	if (!(self->vx_flags & VIDEO_GFX_F_LINEARBLIT)) {
+	if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
 		self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 	} else {

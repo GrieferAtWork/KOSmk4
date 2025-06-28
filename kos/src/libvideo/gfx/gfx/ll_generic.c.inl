@@ -1768,7 +1768,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	if (src_size_x == rb.vb_xdim && src_size_y == rb.vb_ydim) {
 		libvideo_blitter_noblend_samefmt__blit(&blitter, 0, 0,
 		                                       src_x, src_y, src_size_x, src_size_y);
-	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEARBLIT) {
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEAR) {
 		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, 0, 0, rb.vb_xdim, rb.vb_ydim,
 		                                            src_x, src_y, src_size_x, src_size_y);
 	} else {
@@ -1783,7 +1783,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	if (dst_size_x == rb.vb_xdim && dst_size_y == rb.vb_ydim) {
 		libvideo_blitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,
 		                                       0, 0, dst_size_x, dst_size_y);
-	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEARBLIT) {
+	} else if (rb_gfx.vx_flags & VIDEO_GFX_F_LINEAR) {
 		libvideo_blitter_noblend_samefmt__stretch_l(&blitter, dst_x, dst_y, dst_size_x, dst_size_y,
 		                                            0, 0, rb.vb_xdim, rb.vb_ydim);
 	} else {
