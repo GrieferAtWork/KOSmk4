@@ -459,6 +459,8 @@ struct video_gfx_ops {
 	                                video_offset_t __src_x, video_offset_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
+	/* TODO: Repeats of all above operators, using floats instead of "video_offset_t" */
+
 	/* More driver-specific operators go here... */
 };
 

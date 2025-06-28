@@ -250,10 +250,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_x) / src_size_x);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_x) return);
 		LOCAL_IF_STRETCH(dst_size_x -= dstpart);
-#ifdef LOCAL_USE_IMATRIX
-		if (!(dst->vx_flags & VIDEO_GFX_F_XMIRROR))
-#endif /* LOCAL_USE_IMATRIX */
-		{
+		LOCAL_IF_IMATRIX(if (!(dst->vx_flags & VIDEO_GFX_F_XMIRROR))) {
 			dst_x += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 		LOCAL_src_size_x -= srcpart;
@@ -271,10 +268,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 		LOCAL_IF_STRETCH(dstpart = (srcpart * dst_size_y) / src_size_y);
 		LOCAL_IF_STRETCH(if unlikely(dstpart >= dst_size_y) return);
 		LOCAL_IF_STRETCH(dst_size_y -= dstpart);
-#ifdef LOCAL_USE_IMATRIX
-		if (!(dst->vx_flags & VIDEO_GFX_F_YMIRROR))
-#endif /* LOCAL_USE_IMATRIX */
-		{
+		LOCAL_IF_IMATRIX(if (!(dst->vx_flags & VIDEO_GFX_F_YMIRROR))) {
 			dst_y += LOCAL_IF_STRETCH_ELSE(dstpart, srcpart);
 		}
 		LOCAL_src_size_y -= srcpart;
