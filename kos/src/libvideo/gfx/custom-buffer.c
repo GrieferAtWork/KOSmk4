@@ -69,7 +69,7 @@ NOTHROW(FCC custom_unlock)(struct video_buffer *__restrict self,
 #define CUSTOM_GFX_GETPIXEL 0
 #define CUSTOM_GFX_SETPIXEL 1
 #define CUSTOM_GFX_COOKIE   2
-
+static_assert(_VIDEO_GFX_N_DRIVER >= 3);
 
 PRIVATE ATTR_IN(1) video_pixel_t CC
 custom_gfx__getpixel(struct video_gfx const *__restrict self,

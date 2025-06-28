@@ -111,6 +111,47 @@ bitmask_gfx__setpixel(struct video_gfx const *__restrict self,
 	*bm = (*bm & ~mask) | value;
 }
 
+#ifndef __OPTIMIZE_SIZE__
+static_assert(_VIDEO_GFX_N_DRIVER >= 2);
+
+PRIVATE ATTR_IN(1) video_color_t CC
+bitmask_gfx__getcolor(struct video_gfx const *__restrict self,
+                      video_coord_t x, video_coord_t y) {
+	video_pixel_t pixel = bitmask_gfx__getpixel(self, x, y);
+	return ((video_color_t *)self->_vx_driver)[pixel];
+}
+
+PRIVATE ATTR_INOUT(1) void CC
+bitmask_gfx_optimize(struct video_gfx *__restrict self) {
+	/* When no blending is being done, speed up color lookup by directly translating bits */
+	if likely(self->_vx_xops.vgfx_getcolor == &libvideo_gfx_generic__getcolor_noblend) {
+		struct bitmask_buffer *me    = (struct bitmask_buffer *)self->vx_buffer;
+		self->_vx_xops.vgfx_getcolor = &bitmask_gfx__getcolor;
+		((video_color_t *)self->_vx_driver)[0] = me->bmb_pal.vp_pal[0];
+		((video_color_t *)self->_vx_driver)[1] = me->bmb_pal.vp_pal[1];
+	}
+}
+
+PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+bitmask_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+	self = libvideo_buffer_generic_updategfx(self, what);
+	bitmask_gfx_optimize(self);
+	return self;
+}
+
+PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+bitmask_noblend(struct video_gfx *__restrict self) {
+	self = libvideo_buffer_generic_noblend(self);
+	bitmask_gfx_optimize(self);
+	return self;
+}
+#else /* !__OPTIMIZE_SIZE__ */
+#define bitmask_gfx_optimize(self) (void)0
+#define bitmask_updategfx          libvideo_buffer_generic_updategfx
+#define bitmask_noblend            libvideo_buffer_generic_noblend
+#endif /* __OPTIMIZE_SIZE__ */
+
+
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bitmask_initgfx(struct video_gfx *__restrict self) {
@@ -122,6 +163,9 @@ bitmask_initgfx(struct video_gfx *__restrict self) {
 
 	/* Load generic operator defaults */
 	libvideo_gfx_generic_populate(self);
+
+	/* Optimizations for color reads */
+	bitmask_gfx_optimize(self);
 	return self;
 }
 
@@ -136,8 +180,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bitmask_ops(vo
 		bitmask_ops.vi_wlock      = &bitmask_wlock;
 		bitmask_ops.vi_unlock     = &bitmask_unlock;
 		bitmask_ops.vi_initgfx    = &bitmask_initgfx;
-		bitmask_ops.vi_updategfx  = &libvideo_buffer_generic_updategfx;
-		bitmask_ops.vi_noblendgfx = &libvideo_buffer_generic_noblend;
+		bitmask_ops.vi_updategfx  = &bitmask_updategfx;
+		bitmask_ops.vi_noblendgfx = &bitmask_noblend;
 		COMPILER_WRITE_BARRIER();
 		bitmask_ops.vi_destroy = &bitmask_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -166,7 +210,7 @@ bitmask_buffer_init(struct bitmask_buffer *__restrict self,
 	self->vb_ydim = size_y;
 #ifndef NDEBUG
 	self->vb_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
-	self->bmb_pal.vp_refcnt = 0;
+	self->bmb_pal.vp_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
 	memset(&self->bmb_pal._vp_tree, 0xcc, sizeof(self->bmb_pal._vp_tree));
 	memset(&self->bmb_pal.vp_destroy, 0xcc, sizeof(self->bmb_pal.vp_destroy));
 #endif /* !NDEBUG */
