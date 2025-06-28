@@ -720,35 +720,31 @@ after_blend:;
 	 * - _vx_xops.vgfx_absline_llhh
 	 * - _vx_xops.vgfx_absline_lhhl */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
-		/* Linear vs. Nearest blit */
+		/* Select based on linear vs. Nearest interpolation, and blending */
 		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
 			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_noblend__blitfrom_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_aa;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_aa;
 			} else {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_noblend__blitfrom_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_noblend__absline_llhh;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_noblend__absline_lhhl;
 			}
 		} else {
 			if (self->vx_flags & VIDEO_GFX_F_LINEAR) {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_generic__blitfrom_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_aa;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_aa;
 			} else {
 				self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_generic__blitfrom_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_n;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl;
 			}
-		}
-
-		/* Diagonal line drawing functions */
-		if (self->vx_flags & VIDEO_GFX_F_AALINES) {
-			self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_generic__absline_llhh_aa;
-			self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_generic__absline_lhhl_aa;
-		} else if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
-			self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
-			self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
-		} else {
-			self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_generic__absline_llhh;
-			self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_generic__absline_lhhl;
 		}
 	}
 }
@@ -777,10 +773,6 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_noblend;
 	if (self->_vx_xops.vgfx_putcolor != self->_vx_xops.vgfx_setpixel)
 		self->_vx_xops.vgfx_putcolor = &libvideo_gfx_generic__putcolor_noblend;
-	if (!(self->vx_flags & VIDEO_GFX_F_AALINES)) {
-		self->_vx_xops.vgfx_absline_llhh = &libvideo_gfx_noblend__absline_llhh;
-		self->_vx_xops.vgfx_absline_lhhl = &libvideo_gfx_noblend__absline_lhhl;
-	}
 	self->_vx_xops.vgfx_absline_h   = &libvideo_gfx_noblend__absline_h;
 	self->_vx_xops.vgfx_absline_v   = &libvideo_gfx_noblend__absline_v;
 	self->_vx_xops.vgfx_absfill     = &libvideo_gfx_noblend__absfill;
@@ -791,7 +783,9 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
 	}
 	if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
-		self->vx_hdr.vxh_blitfrom          = &libvideo_gfx_noblend__blitfrom_n;
+		self->vx_hdr.vxh_blitfrom              = &libvideo_gfx_noblend__blitfrom_n;
+		self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_noblend__absline_llhh;
+		self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_noblend__absline_lhhl;
 		self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 	} else {
 		self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitfrom_l;

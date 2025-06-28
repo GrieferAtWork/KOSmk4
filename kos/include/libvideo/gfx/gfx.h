@@ -61,7 +61,6 @@
 #define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
                                         *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                         *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
-#define VIDEO_GFX_F_AALINES     0x4000 /* [w] Render smooth lines. */
 #define VIDEO_GFX_F_NEAREST     0x0000 /* [w] Use nearest interpolation for stretch(), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_LINEAR      0x8000 /* [w] Use linear interpolation for stretch(), lines, and floating-point pixel accesses */
 /* TODO: "VIDEO_GFX_F_LINEAR" should be an r-flag when it comes to stretch() */
