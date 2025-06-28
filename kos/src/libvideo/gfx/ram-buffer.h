@@ -55,7 +55,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_noblend(str
 #define rambuffer_rlock rambuffer_lock
 #define rambuffer_wlock rambuffer_lock
 
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void);
 #define rambuffer_ops (*_rambuffer_ops())
 
 

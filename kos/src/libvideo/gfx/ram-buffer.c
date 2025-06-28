@@ -310,12 +310,54 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+	struct video_rambuffer *me = (struct video_rambuffer *)self->vx_buffer;
+
+	/* Updated generic operators */
 	libvideo_gfx_generic_update(self, what);
+
+	/* Select how colors should be read. */
+	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
+		if (self->vx_flags & VIDEO_GFX_F_BLUR) {
+			self->_vx_xops.vgfx_getcolor = &libvideo_gfx_generic__getcolor_blur;
+		} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+			self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_with_key;
+		} else {
+			self->_vx_xops.vgfx_getcolor = &libvideo_ramgfx__getcolor_noblend;
+			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+			if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888)
+				self->_vx_xops.vgfx_getcolor = self->_vx_xops.vgfx_getpixel;
+		}
+	}
+
+	/* Detect special blend modes. */
+	if (what & VIDEO_GFX_UPDATE_BLEND) {
+		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
+		switch (self->vx_blend) {
+		case GFX_BLENDMODE_OVERRIDE:
+			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_noblend;
+			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
+			if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888)
+				self->_vx_xops.vgfx_putcolor = self->_vx_xops.vgfx_setpixel;
+			break;
+#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                    \
+	case mode:                                                            \
+		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
+		break;
+			GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
+#undef LINK_libvideo_ramgfx__putcolor_FOO
+		default:
+			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor;
+			break;
+		}
+	}
+
 	return self;
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_noblend(struct video_gfx *__restrict self) {
+	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
 	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
 	self->vx_colorkey = 0;
 	libvideo_gfx_generic_populate_noblend(self);
@@ -329,7 +371,7 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 
 #undef rambuffer_ops
 PRIVATE struct video_buffer_ops rambuffer_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _rambuffer_ops(void) {
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
 		rambuffer_ops.vi_rlock      = &rambuffer_rlock;
 		rambuffer_ops.vi_wlock      = &rambuffer_wlock;

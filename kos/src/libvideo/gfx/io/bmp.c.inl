@@ -104,7 +104,7 @@ bmpbuffer_with_mapfile_destroy(struct video_buffer *__restrict self) {
 #undef bmpbuffer_with_mapfile_ops
 PRIVATE struct video_buffer_ops bmpbuffer_ops = {};
 PRIVATE struct video_buffer_ops bmpbuffer_with_mapfile_ops = {};
-PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_ops(void) {
+PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_ops(void) {
 	if unlikely(!bmpbuffer_ops.vi_destroy) {
 		bmpbuffer_ops.vi_rlock      = &rambuffer_rlock;
 		bmpbuffer_ops.vi_wlock      = &rambuffer_wlock;
@@ -118,7 +118,7 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_ops(void)
 	}
 	return &bmpbuffer_ops;
 }
-PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bmpbuffer_with_mapfile_ops(void) {
+PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_with_mapfile_ops(void) {
 	if unlikely(!bmpbuffer_with_mapfile_ops.vi_destroy) {
 		bmpbuffer_with_mapfile_ops.vi_rlock      = &rambuffer_rlock;
 		bmpbuffer_with_mapfile_ops.vi_wlock      = &rambuffer_wlock;
@@ -593,8 +593,8 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 		resultwm->vb_ops             = &bmpbuffer_with_mapfile_ops;
 		resultwm->vb_format.vf_codec = result_codec;
 		resultwm->vb_format.vf_pal   = result_pal;
-		resultwm->vb_xdim          = (size_t)(ULONG)biWidth;
-		resultwm->vb_ydim          = (size_t)(ULONG)biHeight;
+		resultwm->vb_xdim            = (size_t)(ULONG)biWidth;
+		resultwm->vb_ydim            = (size_t)(ULONG)biHeight;
 		resultwm->rb_data            = bPixelData;
 		resultwm->rb_total           = szPixelDataSize;
 		resultwm->rb_stride          = dwPixelScanline;
@@ -614,8 +614,8 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	result->vb_ops             = &bmpbuffer_ops;
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = result_pal;
-	result->vb_xdim          = (size_t)(ULONG)biWidth;
-	result->vb_ydim          = (size_t)(ULONG)biHeight;
+	result->vb_xdim            = (size_t)(ULONG)biWidth;
+	result->vb_ydim            = (size_t)(ULONG)biHeight;
 	result->rb_total           = szPixelDataSize;
 	result->rb_stride          = dwPixelScanline;
 	result->bb_codec_handle    = result_codec_handle;

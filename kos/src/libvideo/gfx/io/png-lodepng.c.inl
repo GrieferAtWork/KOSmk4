@@ -299,7 +299,7 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 		return libvideo_buffer_convert_and_save_lodepng(self, stream, options);
 	}
 
-	result = (*self->vb_ops->vi_rlock)(self, &lock);
+	result = video_buffer_rlock(self, &lock);
 	if unlikely(result)
 		return result;
 	lodepng_stride = get_lodepng_stride(self->vb_xdim,
@@ -324,7 +324,7 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 			free(fixed_stride);
 		}
 	}
-	(*self->vb_ops->vi_unlock)(self, &lock);
+	video_buffer_unlock(self, &lock);
 	switch (error) {
 	case 0:
 		result = 0;

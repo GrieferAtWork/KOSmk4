@@ -42,7 +42,27 @@
 
 DECL_BEGIN
 
-/* Convert `__self' into the specified format.
+/* Generic implementations for video buffer operators. */
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_generic_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+	libvideo_gfx_generic_update(self, what);
+	return self;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_generic_noblend(struct video_gfx *__restrict self) {
+	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
+	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
+	self->vx_colorkey = 0;
+	libvideo_gfx_generic_populate_noblend(self);
+	return self;
+}
+
+
+
+
+
+/* Convert `self' into the specified format.
  * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
 DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
 INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC

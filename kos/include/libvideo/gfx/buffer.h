@@ -119,7 +119,7 @@ struct video_buffer_ops {
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_FCC *vi_rlock)(struct video_buffer *__restrict __self,
-	                            struct video_lock *__restrict __result);
+	                             struct video_lock *__restrict __result);
 
 	/* Same as `vi_rlock', but also lock for reading+writing */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
@@ -200,11 +200,11 @@ __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
 struct video_buffer {
-	__uintptr_t              vb_refcnt; /* Reference counter. */
-	struct video_buffer_ops *vb_ops;    /* [1..1][const] Buffer operations. */
-	struct video_format      vb_format; /* [const] Buffer format. */
-	video_dim_t              vb_xdim;   /* Buffer dimension in X (in pixels) */
-	video_dim_t              vb_ydim;   /* Buffer dimension in Y (in pixels) */
+	__uintptr_t                    vb_refcnt; /* Reference counter. */
+	struct video_buffer_ops const *vb_ops;    /* [1..1][const] Buffer operations. */
+	struct video_format            vb_format; /* [const] Buffer format. */
+	video_dim_t                    vb_xdim;   /* Buffer dimension in X (in pixels) */
+	video_dim_t                    vb_ydim;   /* Buffer dimension in Y (in pixels) */
 	/* Buffer-specific fields go here */
 
 #ifdef __cplusplus
@@ -342,6 +342,35 @@ video_buffer_formem(void *__mem, video_dim_t __size_x, video_dim_t __size_y, __s
                     void (LIBVIDEO_GFX_CC *__release_mem)(void *__cookie, void *__mem),
                     void *__release_mem_cookie);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
+
+/* Create a video buffer that represents the pixel data defined by  a
+ * given `__bm' (bitmask). This function is primarily used internally
+ * by `video_gfx_absfillmask()' and  `video_gfx_absfillstretchmask()'
+ * to deal with  GFX contexts  where the bitmask  cannot be  rendered
+ * using  the default method,  but has to be  rendered by being blit.
+ *
+ * @param: __size_x:       Width of the given `__bm' (in pixels)
+ * @param: __size_y:       Height of the given `__bm' (in pixels)
+ * @param: __bm:           Bitmask whose data should be referenced interpreted
+ * @param: __bg_fg_colors: Colors that 0/1 bits of `__bm' should map to
+ * @return: * :   The newly created video buffer
+ * @return: NULL: [errno=ENOMEM] Insufficient memory (won't happen when
+ *                               used internally, where struct is  just
+ *                               allocated on-stack) */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(3) __ATTR_IN_T(4) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORBITMASK)(video_dim_t __size_x, video_dim_t __size_y,
+                                            struct video_bitmask const *__restrict __bm,
+                                            video_color_t const __bg_fg_colors[2]);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN(4) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_forbitmask(video_dim_t __size_x, video_dim_t __size_y,
+                        struct video_bitmask const *__restrict __bm,
+                        video_color_t const __bg_fg_colors[2]);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend

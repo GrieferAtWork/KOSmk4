@@ -354,6 +354,8 @@ struct video_gfx_xops {
 	                                      video_dim_t __size_x, video_dim_t __size_y,
 	                                      video_color_t __locolor, video_color_t __hicolor);
 
+	/* TODO: Group related (and always set all-at-once) operators above into sub-structs */
+
 	void (*_vbtx_pad[1])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 };

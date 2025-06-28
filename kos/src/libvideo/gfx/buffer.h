@@ -32,7 +32,15 @@
 
 DECL_BEGIN
 
-/* Convert `__self' into the specified format.
+/* Generic implementations for video buffer operators. */
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_generic_updategfx(struct video_gfx *__restrict self, unsigned int what);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+libvideo_buffer_generic_noblend(struct video_gfx *__restrict self);
+
+
+
+/* Convert `self' into the specified format.
  * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
 INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
 libvideo_buffer_convert(struct video_buffer *__restrict self,
