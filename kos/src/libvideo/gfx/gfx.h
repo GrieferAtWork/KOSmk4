@@ -60,7 +60,7 @@
 #endif /* !PRIdOFF */
 
 #undef GFX_DEBUG
-#if !defined(NDEBUG) && 0
+#if !defined(NDEBUG) && 1
 #define GFX_DEBUG
 #endif
 
@@ -114,14 +114,6 @@
 #define gfx_assert_absbounds_sy(self, y, sy) (gfx_assert_absbounds_ymin(self, y), gfx_assert_absbounds_syend(self, y, sy))
 #define gfx_assert_absbounds_sxy(self, x, y, sx, sy) \
 	(gfx_assert_absbounds_sx(self, x, sx), gfx_assert_absbounds_sy(self, y, sy))
-
-#define gfx_assert_absbounds_buffer_x(self, x) \
-	gfx_assertf((x) < (self)->vx_buffer->vb_xdim, "X coord is greater than buffer (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_buffer->vb_xdim)
-#define gfx_assert_absbounds_buffer_y(self, y) \
-	gfx_assertf((y) < (self)->vx_buffer->vb_ydim, "Y coord is greater than buffer (%" PRIuCRD " >= %" PRIuCRD ")", (y), (self)->vx_buffer->vb_ydim)
-#define gfx_assert_absbounds_buffer(self, x, y) \
-	(gfx_assert_absbounds_buffer_x(self, x),    \
-	 gfx_assert_absbounds_buffer_y(self, y))
 
 #define gfx_assert_imatrix2d(m)                     \
 	(gfx_assert((m)[0][0] >= -1 && (m)[0][0] <= 1), \
@@ -306,6 +298,7 @@
 	(gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, dst_size_x, dst_size_y),                             \
 	 gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, src_size_x, src_size_y),                             \
 	 _video_blitter_x_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y, src_size_x, src_size_y))
+/* TODO: Re-enable these assertions, accounting for "src_matrix" */
 #define video_blitter_x_blit_imatrix(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix) \
 	(/*gfx_assert_absbounds_sxy((self)->vbt_dst, dst_x, dst_y, size_x, size_y),*/                  \
 	 /*gfx_assert_absbounds_sxy((self)->vbt_src, src_x, src_y, size_x, size_y),*/                  \

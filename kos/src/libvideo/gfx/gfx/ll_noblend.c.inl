@@ -28,13 +28,15 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/bit.h>
+#include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 #include <sys/param.h>
 
+#include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/format.h>
@@ -45,8 +47,13 @@
 
 #include "../gfx-utils.h"
 #include "../gfx.h"
+#include "ll.h"
 
 DECL_BEGIN
+
+/************************************************************************/
+/* INTERNAL API                                                         */
+/************************************************************************/
 
 /* Low-level, optimized GFX functions using `struct video_lock' (if available):
  * - *noblend*: Usable only when the relevant GFX's blend-mode is `GFX_BLENDMODE_OVERRIDE' */
@@ -62,19 +69,19 @@ libvideo_gfx_noblend__absline_llhh__bypixel(struct video_gfx const *__restrict s
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
 			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
 			video_coord_t line_y = dst_y + step;
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_y);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y + step;
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	}
 }
@@ -142,19 +149,19 @@ libvideo_gfx_noblend__absline_lhhl__bypixel(struct video_gfx const *__restrict s
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	} else if (size_x < size_y) {
 		do {
 			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
 			video_coord_t line_y = dst_y - step;
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_y);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y - step;
-			video_gfx_x_setpixel(self, line_x, line_y, pixel);
+			LL_setpixel(self, line_x, line_y, pixel);
 		} while (++step != size_x);
 	}
 }
@@ -217,7 +224,7 @@ libvideo_gfx_noblend__absline_h__bypixel(struct video_gfx const *__restrict self
                                          video_coord_t dst_x, video_coord_t dst_y,
                                          video_dim_t length, video_pixel_t pixel) {
 	do {
-		video_gfx_x_setpixel(self, dst_x, dst_y, pixel);
+		LL_setpixel(self, dst_x, dst_y, pixel);
 		++dst_x;
 	} while (--length);
 }
@@ -244,7 +251,7 @@ libvideo_gfx_noblend__absline_v__bypixel(struct video_gfx const *__restrict self
                                          video_coord_t dst_x, video_coord_t dst_y,
                                          video_dim_t length, video_pixel_t pixel) {
 	do {
-		video_gfx_x_setpixel(self, dst_x, dst_y, pixel);
+		LL_setpixel(self, dst_x, dst_y, pixel);
 		++dst_y;
 	} while (--length);
 }
@@ -277,7 +284,7 @@ libvideo_gfx_noblend__absfill__bypixel(struct video_gfx const *__restrict self,
 	do {
 		video_coord_t x = 0;
 		do {
-			video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
+			LL_setpixel(self, dst_x + x, dst_y, pixel);
 		} while (++x < size_x);
 		++dst_y;
 	} while (--size_y);
@@ -318,7 +325,7 @@ libvideo_gfx_noblend_interp8888__absgradient__bypixel(struct video_gfx const *__
 #define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y) \
 	{                                                                             \
 		video_pixel_t out = pixels[src_y][src_x];                                 \
-		video_gfx_x_absfill(self, dst_x, dst_y, dst_size_x, dst_size_y, out);     \
+		LL_absfill(self, dst_x, dst_y, dst_size_x, dst_size_y, out);              \
 	}
 
 #define pixel_blend_ymax pixel_blend_ymin
@@ -327,7 +334,7 @@ libvideo_gfx_noblend_interp8888__absgradient__bypixel(struct video_gfx const *__
 		video_pixel_t src_y0_x0 = pixels[src_y][src_x0];                                    \
 		video_pixel_t src_y0_x1 = pixels[src_y][src_x1];                                    \
 		video_pixel_t out       = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);   \
-		video_gfx_x_absline_v(self, dst_x, dst_y, dst_size_y, out);                         \
+		LL_absline_v(self, dst_x, dst_y, dst_size_y, out);                                  \
 	}
 
 #define pixel_blend_xmax pixel_blend_xmin
@@ -336,7 +343,7 @@ libvideo_gfx_noblend_interp8888__absgradient__bypixel(struct video_gfx const *__
 		video_pixel_t src_y0_x0 = pixels[src_y0][src_x];                                    \
 		video_pixel_t src_y1_x0 = pixels[src_y1][src_x];                                    \
 		video_pixel_t out       = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);   \
-		video_gfx_x_absline_h(self, dst_x, dst_y, dst_size_x, out);                         \
+		LL_absline_h(self, dst_x, dst_y, dst_size_x, out);                                  \
 	}
 
 #define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
@@ -349,7 +356,7 @@ libvideo_gfx_noblend_interp8888__absgradient__bypixel(struct video_gfx const *__
 		                                   src_y1_x0, src_y1_x1,                                      \
 		                                   frac_x0, frac_x1,                                          \
 		                                   frac_y0, frac_y1);                                         \
-		video_gfx_x_setpixel(self, dst_x, dst_y, out);                                                \
+		LL_setpixel(self, dst_x, dst_y, out);                                                         \
 	}
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, size_x_, size_y_,
 	                   0, 0, 2, 2,
@@ -687,7 +694,7 @@ libvideo_gfx_noblend__fillmask1__bypixel(struct video_gfx const *__restrict self
 			--bits;
 			++row_bitskip;
 			if ((byte >> bits) & 1)
-				video_gfx_x_setpixel(self, dst_x + x, dst_y, pixel);
+				LL_setpixel(self, dst_x + x, dst_y, pixel);
 			++x;
 			if (x >= size_x)
 				break;
@@ -858,8 +865,7 @@ libvideo_gfx_noblend__fillmask__bypixel(struct video_gfx const *__restrict self,
 		for (x = 0;;) {
 			--bits;
 			++row_bitskip;
-			video_gfx_x_setpixel(self, dst_x + x, dst_y,
-			                     bg_fg_pixels[(byte >> bits) & 1]);
+			LL_setpixel(self, dst_x + x, dst_y, bg_fg_pixels[(byte >> bits) & 1]);
 			++x;
 			if (x >= size_x)
 				break;
@@ -1031,8 +1037,8 @@ libvideo_blitter_noblend_samefmt__blit__bypixel(struct video_blitter const *__re
 		x = 0;
 		do {
 			video_pixel_t pixel;
-			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
-			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
+			pixel = LL_getpixel(src, src_x + x, src_y + y);
+			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
 		} while (++x < size_x);
 	} while (++y < size_y);
 }
@@ -1052,8 +1058,8 @@ libvideo_blitter_noblend_samefmt__blit__bypixel__rev(struct video_blitter const 
 		do {
 			video_pixel_t pixel;
 			--x;
-			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
-			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
+			pixel = LL_getpixel(src, src_x + x, src_y + y);
+			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
 		} while (x);
 	} while (y);
 }
@@ -1154,9 +1160,9 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 	for (y = 0; y < size_y; ++y) {
 		for (x = 0; x < size_x; ++x) {
 			video_pixel_t pixel;
-			pixel = video_gfx_x_getpixel(src, src_x + x, src_y + y);
+			pixel = LL_getpixel(src, src_x + x, src_y + y);
 			pixel = video_converter_mappixel(conv, pixel);
-			video_gfx_x_setpixel(dst, dst_x + x, dst_y + y, pixel);
+			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
 		}
 	}
 	TRACE_END("noblend_difffmt__blit()\n");
@@ -1214,13 +1220,11 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	gfx_assert_imatrix2d(src_matrix);
 
 	/* Fast-pass for known matrices */
-#if 0 /* TODO: Breaks assertions for double-rotation blits */
 	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
 	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
 		libvideo_blitter_noblend_difffmt__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 		return;
 	}
-#endif
 
 	/* TODO: More optimizations for known rotation/mirror matrices */
 
@@ -1237,16 +1241,14 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 		video_offset_t delta_src_x = src_x + src_matrix[0][1] * y;
 		video_offset_t delta_src_y = src_y + src_matrix[1][1] * y;
 		for (x = 0; x < size_x; ++x) {
+			video_pixel_t pixel;
 			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * x;
 			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * x;
 			video_coord_t used_dst_x = dst_x + x;
 			video_coord_t used_dst_y = dst_y + y;
-			video_pixel_t pixel;
-			gfx_assert_absbounds_buffer(src, used_src_x, used_src_y);
-			gfx_assert_absbounds_buffer(dst, used_dst_x, used_dst_y);
-			pixel = _video_gfx_x_getpixel(src, used_src_x, used_src_y);
+			pixel = LL_getpixel(src, used_src_x, used_src_y);
 			pixel = video_converter_mappixel(conv, pixel);
-			_video_gfx_x_setpixel(dst, used_dst_x, used_dst_y, pixel);
+			LL_setpixel(dst, used_dst_x, used_dst_y, pixel);
 		}
 	}
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");

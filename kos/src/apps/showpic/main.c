@@ -244,15 +244,16 @@ do_showpic(struct screen_buffer *screen,
 	/*video_gfx_clip(&image_gfx, 200, 200,
 	               video_gfx_getclipw(&image_gfx) / 2,
 	               video_gfx_getcliph(&image_gfx) / 2);*/
-	video_gfx_clip(&screen_gfx, 20, 20,
+	/*video_gfx_clip(&screen_gfx, 20, 20,
 	               video_gfx_getclipw(&screen_gfx) - 40,
 	               video_gfx_getcliph(&screen_gfx) - 40);
 	video_gfx_clip(&screen_gfx, -20, -20,
 	               video_gfx_getclipw(&screen_gfx) + 40,
-	               video_gfx_getcliph(&screen_gfx) + 40);
+	               video_gfx_getcliph(&screen_gfx) + 40);*/
 	/*video_gfx_hmirror(&screen_gfx);*/
 //	video_gfx_vmirror(&screen_gfx);
 	video_gfx_rrot90(&screen_gfx);
+	video_gfx_lrot90(&image_gfx);
 #else
 	/*video_gfx_clip(&image_gfx,
 	               video_gfx_getclipw(&image_gfx) / 2, 0,
