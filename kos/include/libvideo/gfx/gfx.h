@@ -355,7 +355,7 @@ struct video_gfx_ops {
 	/* All of the following callbacks are [1..1] */
 
 	/* Get the color of a pixel */
-	__ATTR_IN_T(1) video_color_t
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_color_t
 	(LIBVIDEO_GFX_CC *vgfo_getcolor)(struct video_gfx const *__restrict __self,
 	                                 video_offset_t __x, video_offset_t __y);
 

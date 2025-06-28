@@ -57,40 +57,114 @@ DECL_BEGIN
 #define LOCAL_FUNC(x) x
 #endif /* !DEFINE_libvideo_gfx_generic_XXX_xyswap */
 
+#define LOCAL_libvideo_gfx_generic_getcolor               LOCAL_FUNC(libvideo_gfx_generic_getcolor)
+#define LOCAL_libvideo_gfx_generic_getcolor_wrap          LOCAL_FUNC(libvideo_gfx_generic_getcolor_wrap)
+#define LOCAL_libvideo_gfx_generic_getcolor_mirror        LOCAL_FUNC(libvideo_gfx_generic_getcolor_mirror)
+#define LOCAL_libvideo_gfx_generic_putcolor               LOCAL_FUNC(libvideo_gfx_generic_putcolor)
+#define LOCAL_libvideo_gfx_generic_putcolor_wrap          LOCAL_FUNC(libvideo_gfx_generic_putcolor_wrap)
+#define LOCAL_libvideo_gfx_generic_putcolor_mirror        LOCAL_FUNC(libvideo_gfx_generic_putcolor_mirror)
+#define LOCAL_libvideo_gfx_generic_line                   LOCAL_FUNC(libvideo_gfx_generic_line)
+#define LOCAL_libvideo_gfx_generic_line_wrap              LOCAL_FUNC(libvideo_gfx_generic_line_wrap)
+#define LOCAL_libvideo_gfx_generic_line_mirror            LOCAL_FUNC(libvideo_gfx_generic_line_mirror)
+#define LOCAL_libvideo_gfx_generic_hline                  LOCAL_FUNC(libvideo_gfx_generic_hline)
+#define LOCAL_libvideo_gfx_generic_hline_wrap             LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)
+#define LOCAL_libvideo_gfx_generic_hline_mirror           LOCAL_FUNC(libvideo_gfx_generic_hline_mirror)
+#define LOCAL_libvideo_gfx_generic_vline                  LOCAL_FUNC(libvideo_gfx_generic_vline)
+#define LOCAL_libvideo_gfx_generic_vline_wrap             LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)
+#define LOCAL_libvideo_gfx_generic_vline_mirror           LOCAL_FUNC(libvideo_gfx_generic_vline_mirror)
+#define LOCAL_libvideo_gfx_generic_fill                   LOCAL_FUNC(libvideo_gfx_generic_fill)
+#define LOCAL_libvideo_gfx_generic_fill_wrap              LOCAL_FUNC(libvideo_gfx_generic_fill_wrap)
+#define LOCAL_libvideo_gfx_generic_fill_mirror            LOCAL_FUNC(libvideo_gfx_generic_fill_mirror)
+#define LOCAL_libvideo_gfx_generic_rect                   LOCAL_FUNC(libvideo_gfx_generic_rect)
+#define LOCAL_libvideo_gfx_generic_rect_wrap              LOCAL_FUNC(libvideo_gfx_generic_rect_wrap)
+#define LOCAL_libvideo_gfx_generic_rect_mirror            LOCAL_FUNC(libvideo_gfx_generic_rect_mirror)
+#define LOCAL_libvideo_gfx_generic_gradient               LOCAL_FUNC(libvideo_gfx_generic_gradient)
+#define LOCAL_libvideo_gfx_generic_gradient_wrap          LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)
+#define LOCAL_libvideo_gfx_generic_gradient_mirror        LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror)
+#define LOCAL_libvideo_gfx_generic_hgradient              LOCAL_FUNC(libvideo_gfx_generic_hgradient)
+#define LOCAL_libvideo_gfx_generic_hgradient_wrap         LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)
+#define LOCAL_libvideo_gfx_generic_hgradient_mirror       LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror)
+#define LOCAL_libvideo_gfx_generic_vgradient              LOCAL_FUNC(libvideo_gfx_generic_vgradient)
+#define LOCAL_libvideo_gfx_generic_vgradient_wrap         LOCAL_FUNC(libvideo_gfx_generic_vgradient_wrap)
+#define LOCAL_libvideo_gfx_generic_vgradient_mirror       LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror)
+#define LOCAL_libvideo_gfx_generic_fillmask               LOCAL_FUNC(libvideo_gfx_generic_fillmask)
+#define LOCAL_libvideo_gfx_generic_fillmask_wrap          LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap)
+#define LOCAL_libvideo_gfx_generic_fillmask_mirror        LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror)
+#define LOCAL_libvideo_gfx_generic_fillstretchmask        LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)
+#define LOCAL_libvideo_gfx_generic_fillstretchmask_wrap   LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_wrap)
+#define LOCAL_libvideo_gfx_generic_fillstretchmask_mirror LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_mirror)
+
+#define LOCAL__video_gfx_x_getcolor           LOCAL_FUNC(_video_gfx_x_getcolor)
+#define LOCAL__video_gfx_x_putcolor           LOCAL_FUNC(_video_gfx_x_putcolor)
+#define LOCAL__video_gfx_x_getpixel           LOCAL_FUNC(_video_gfx_x_getpixel)
+#define LOCAL__video_gfx_x_setpixel           LOCAL_FUNC(_video_gfx_x_setpixel)
+#define LOCAL__video_gfx_x_absline_llhh       LOCAL_FUNC(_video_gfx_x_absline_llhh)
+#define LOCAL__video_gfx_x_absline_lhhl       LOCAL_FUNC(_video_gfx_x_absline_lhhl)
+#define LOCAL__video_gfx_x_absline_h          LOCAL_FUNC(_video_gfx_x_absline_h)
+#define LOCAL__video_gfx_x_absline_v          LOCAL_FUNC(_video_gfx_x_absline_v)
+#define LOCAL__video_gfx_x_absfill            LOCAL_FUNC(_video_gfx_x_absfill)
+#define LOCAL__video_gfx_x_absfillmask        LOCAL_FUNC(_video_gfx_x_absfillmask)
+#define LOCAL__video_gfx_x_absfillstretchmask LOCAL_FUNC(_video_gfx_x_absfillstretchmask)
+#define LOCAL__video_gfx_x_absgradient        LOCAL_FUNC(_video_gfx_x_absgradient)
+#define LOCAL__video_gfx_x_absgradient_h      LOCAL_FUNC(_video_gfx_x_absgradient_h)
+#define LOCAL__video_gfx_x_absgradient_v      LOCAL_FUNC(_video_gfx_x_absgradient_v)
+
+#define LOCAL_video_gfx_x_getcolor           LOCAL_FUNC(video_gfx_x_getcolor)
+#define LOCAL_video_gfx_x_putcolor           LOCAL_FUNC(video_gfx_x_putcolor)
+#define LOCAL_video_gfx_x_getpixel           LOCAL_FUNC(video_gfx_x_getpixel)
+#define LOCAL_video_gfx_x_setpixel           LOCAL_FUNC(video_gfx_x_setpixel)
+#define LOCAL_video_gfx_x_absline_llhh       LOCAL_FUNC(video_gfx_x_absline_llhh)
+#define LOCAL_video_gfx_x_absline_lhhl       LOCAL_FUNC(video_gfx_x_absline_lhhl)
+#define LOCAL_video_gfx_x_absline_h          LOCAL_FUNC(video_gfx_x_absline_h)
+#define LOCAL_video_gfx_x_absline_v          LOCAL_FUNC(video_gfx_x_absline_v)
+#define LOCAL_video_gfx_x_absfill            LOCAL_FUNC(video_gfx_x_absfill)
+#define LOCAL_video_gfx_x_absfillmask        LOCAL_FUNC(video_gfx_x_absfillmask)
+#define LOCAL_video_gfx_x_absfillstretchmask LOCAL_FUNC(video_gfx_x_absfillstretchmask)
+#define LOCAL_video_gfx_x_absgradient        LOCAL_FUNC(video_gfx_x_absgradient)
+#define LOCAL_video_gfx_x_absgradient_h      LOCAL_FUNC(video_gfx_x_absgradient_h)
+#define LOCAL_video_gfx_x_absgradient_v      LOCAL_FUNC(video_gfx_x_absgradient_v)
+
+#define LOCAL_libvideo_gfx_generic_ops         LOCAL_FUNC(libvideo_gfx_generic_ops)
+#define LOCAL_libvideo_gfx_generic_ops_wrap    LOCAL_FUNC(libvideo_gfx_generic_ops_wrap)
+#define LOCAL_libvideo_gfx_generic_ops_mirror  LOCAL_FUNC(libvideo_gfx_generic_ops_mirror)
+#define LOCAL__libvideo_gfx_generic_ops        LOCAL_FUNC(_libvideo_gfx_generic_ops)
+#define LOCAL__libvideo_gfx_generic_ops_wrap   LOCAL_FUNC(_libvideo_gfx_generic_ops_wrap)
+#define LOCAL__libvideo_gfx_generic_ops_mirror LOCAL_FUNC(_libvideo_gfx_generic_ops_mirror)
+
 
 /************************************************************************/
 /* GETCOLOR()                                                           */
 /************************************************************************/
-INTERN ATTR_IN(1) video_color_t CC
-LOCAL_FUNC(libvideo_gfx_generic_getcolor)(struct video_gfx const *__restrict self,
-                                          video_offset_t x, video_offset_t y) {
+INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC
+LOCAL_libvideo_gfx_generic_getcolor(struct video_gfx const *__restrict self,
+                                    video_offset_t x, video_offset_t y) {
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
 	if likely((video_coord_t)x >= GFX_BXMIN && (video_coord_t)x < GFX_BXEND &&
 	          (video_coord_t)y >= GFX_BYMIN && (video_coord_t)y < GFX_BYEND) {
-		return LOCAL_FUNC(_video_gfx_x_getcolor)(self, (video_coord_t)x, (video_coord_t)y);
+		return LOCAL__video_gfx_x_getcolor(self, (video_coord_t)x, (video_coord_t)y);
 	}
 	return 0;
 }
 
-INTERN ATTR_IN(1) video_color_t CC
-LOCAL_FUNC(libvideo_gfx_generic_getcolor_wrap)(struct video_gfx const *__restrict self,
-                                               video_offset_t x, video_offset_t y) {
+INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC
+LOCAL_libvideo_gfx_generic_getcolor_wrap(struct video_gfx const *__restrict self,
+                                         video_offset_t x, video_offset_t y) {
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
 		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
 		y = wrap(y, self->vx_hdr.vxh_cysiz);
-	return libvideo_gfx_generic_getcolor(self, x, y);
+	return LOCAL_libvideo_gfx_generic_getcolor(self, x, y);
 }
 
-INTERN ATTR_IN(1) video_color_t CC
-LOCAL_FUNC(libvideo_gfx_generic_getcolor_mirror)(struct video_gfx const *__restrict self,
-                                                 video_offset_t x, video_offset_t y) {
+INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC
+LOCAL_libvideo_gfx_generic_getcolor_mirror(struct video_gfx const *__restrict self,
+                                           video_offset_t x, video_offset_t y) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-	return libvideo_gfx_generic_getcolor_wrap(self, x, y);
+	return LOCAL_libvideo_gfx_generic_getcolor_wrap(self, x, y);
 }
 
 
@@ -99,36 +173,36 @@ LOCAL_FUNC(libvideo_gfx_generic_getcolor_mirror)(struct video_gfx const *__restr
 /* PUTCOLOR()                                                           */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_putcolor)(struct video_gfx const *__restrict self,
-                                          video_offset_t x, video_offset_t y,
-                                          video_color_t color) {
+LOCAL_libvideo_gfx_generic_putcolor(struct video_gfx const *__restrict self,
+                                    video_offset_t x, video_offset_t y,
+                                    video_color_t color) {
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
 	if likely((video_coord_t)x >= GFX_BXMIN && (video_coord_t)x < GFX_BXEND &&
 	          (video_coord_t)y >= GFX_BYMIN && (video_coord_t)y < GFX_BYEND)
-		LOCAL_FUNC(_video_gfx_x_putcolor)(self, (video_coord_t)x, (video_coord_t)y, color);
+		LOCAL__video_gfx_x_putcolor(self, (video_coord_t)x, (video_coord_t)y, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_putcolor_wrap)(struct video_gfx const *__restrict self,
-                                               video_offset_t x, video_offset_t y,
-                                               video_color_t color) {
+LOCAL_libvideo_gfx_generic_putcolor_wrap(struct video_gfx const *__restrict self,
+                                         video_offset_t x, video_offset_t y,
+                                         video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
 		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
 		y = wrap(y, self->vx_hdr.vxh_cysiz);
-	LOCAL_FUNC(libvideo_gfx_generic_putcolor)(self, x, y, color);
+	LOCAL_libvideo_gfx_generic_putcolor(self, x, y, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_putcolor_mirror)(struct video_gfx const *__restrict self,
-                                                 video_offset_t x, video_offset_t y,
-                                                 video_color_t color) {
+LOCAL_libvideo_gfx_generic_putcolor_mirror(struct video_gfx const *__restrict self,
+                                           video_offset_t x, video_offset_t y,
+                                           video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-	LOCAL_FUNC(libvideo_gfx_generic_putcolor_wrap)(self, x, y, color);
+	LOCAL_libvideo_gfx_generic_putcolor_wrap(self, x, y, color);
 }
 
 
@@ -139,10 +213,10 @@ LOCAL_FUNC(libvideo_gfx_generic_putcolor_mirror)(struct video_gfx const *__restr
 /* LINE()                                                               */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_line)(struct video_gfx const *__restrict self,
-                                      video_offset_t x1, video_offset_t y1,
-                                      video_offset_t x2, video_offset_t y2,
-                                      video_color_t color) {
+LOCAL_libvideo_gfx_generic_line(struct video_gfx const *__restrict self,
+                                video_offset_t x1, video_offset_t y1,
+                                video_offset_t x2, video_offset_t y2,
+                                video_color_t color) {
 	/* >> Cohen-Sutherland algorithm
 	 * https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm */
 	int outcode0, outcode1, outcodeOut;
@@ -212,26 +286,26 @@ LOCAL_FUNC(libvideo_gfx_generic_line)(struct video_gfx const *__restrict self,
 			y2   = y1;
 			y1   = temp;
 		} else if (y1 == y2) {
-			LOCAL_FUNC(video_gfx_x_putcolor)(self, (video_coord_t)x1, (video_coord_t)y1, color);
+			LOCAL_video_gfx_x_putcolor(self, (video_coord_t)x1, (video_coord_t)y1, color);
 			return;
 		}
-		LOCAL_FUNC(video_gfx_x_absline_v)(self, (video_coord_t)x1, (video_coord_t)y1,
-		                                  (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1,
-		                                  color);
+		LOCAL_video_gfx_x_absline_v(self, (video_coord_t)x1, (video_coord_t)y1,
+		                            (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1,
+		                            color);
 		return;
 	}
 	gfx_assert(x2 > x1);
 	if (y2 > y1) {
 		video_dim_t sx = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
 		video_dim_t sy = (video_dim_t)((video_coord_t)y2 - (video_coord_t)y1) + 1;
-		LOCAL_FUNC(video_gfx_x_absline_llhh)(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
+		LOCAL_video_gfx_x_absline_llhh(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
 	} else if (y2 < y1) {
 		video_dim_t sx = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
 		video_dim_t sy = (video_dim_t)((video_coord_t)y1 - (video_coord_t)y2) + 1;
-		LOCAL_FUNC(video_gfx_x_absline_lhhl)(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
+		LOCAL_video_gfx_x_absline_lhhl(self, (video_coord_t)x1, (video_coord_t)y1, sx, sy, color);
 	} else {
 		video_dim_t length = (video_dim_t)((video_coord_t)x2 - (video_coord_t)x1) + 1;
-		LOCAL_FUNC(video_gfx_x_absline_h)(self, (video_coord_t)x1, (video_coord_t)y1, length, color);
+		LOCAL_video_gfx_x_absline_h(self, (video_coord_t)x1, (video_coord_t)y1, length, color);
 	}
 #undef COHSUTH_COMPUTEOUTCODE
 #undef COHSUTH_INSIDE
@@ -242,19 +316,19 @@ LOCAL_FUNC(libvideo_gfx_generic_line)(struct video_gfx const *__restrict self,
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_line_wrap)(struct video_gfx const *__restrict self,
-                                           video_offset_t x1, video_offset_t y1,
-                                           video_offset_t x2, video_offset_t y2,
-                                           video_color_t color) {
+LOCAL_libvideo_gfx_generic_line_wrap(struct video_gfx const *__restrict self,
+                                     video_offset_t x1, video_offset_t y1,
+                                     video_offset_t x2, video_offset_t y2,
+                                     video_color_t color) {
 	/* TODO */
-	LOCAL_FUNC(libvideo_gfx_generic_line)(self, x1, y1, x2, y2, color);
+	LOCAL_libvideo_gfx_generic_line(self, x1, y1, x2, y2, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_line_mirror)(struct video_gfx const *__restrict self,
-                                             video_offset_t x1, video_offset_t y1,
-                                             video_offset_t x2, video_offset_t y2,
-                                             video_color_t color) {
+LOCAL_libvideo_gfx_generic_line_mirror(struct video_gfx const *__restrict self,
+                                       video_offset_t x1, video_offset_t y1,
+                                       video_offset_t x2, video_offset_t y2,
+                                       video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		x1 = (self->vx_hdr.vxh_cxsiz - 1) - x1;
 		x2 = (self->vx_hdr.vxh_cxsiz - 1) - x2;
@@ -263,7 +337,7 @@ LOCAL_FUNC(libvideo_gfx_generic_line_mirror)(struct video_gfx const *__restrict 
 		y1 = (self->vx_hdr.vxh_cysiz - 1) - y1;
 		y2 = (self->vx_hdr.vxh_cysiz - 1) - y2;
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_line_wrap)(self, x1, y1, x2, y2, color);
+	LOCAL_libvideo_gfx_generic_line_wrap(self, x1, y1, x2, y2, color);
 }
 
 
@@ -275,9 +349,9 @@ LOCAL_FUNC(libvideo_gfx_generic_line_mirror)(struct video_gfx const *__restrict 
 /* HLINE()                                                              */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hline)(struct video_gfx const *__restrict self,
-                                       video_offset_t x, video_offset_t y,
-                                       video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_hline(struct video_gfx const *__restrict self,
+                                 video_offset_t x, video_offset_t y,
+                                 video_dim_t length, video_color_t color) {
 	video_coord_t temp;
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
@@ -298,13 +372,13 @@ LOCAL_FUNC(libvideo_gfx_generic_hline)(struct video_gfx const *__restrict self,
 		length = GFX_BXEND - (video_coord_t)x;
 	}
 
-	LOCAL_FUNC(video_gfx_x_absline_h)(self, (video_coord_t)x, (video_coord_t)y, length, color);
+	LOCAL_video_gfx_x_absline_h(self, (video_coord_t)x, (video_coord_t)y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(struct video_gfx const *__restrict self,
-                                            video_offset_t x, video_offset_t y,
-                                            video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_hline_wrap(struct video_gfx const *__restrict self,
+                                      video_offset_t x, video_offset_t y,
+                                      video_dim_t length, video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
 		y = wrap(y, self->vx_hdr.vxh_cysiz);
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
@@ -314,21 +388,21 @@ LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(struct video_gfx const *__restrict s
 			x = 0;
 			length = self->vx_hdr.vxh_cxsiz;
 		} else if (cxend > self->vx_hdr.vxh_cxsiz) {
-			LOCAL_FUNC(libvideo_gfx_generic_hline)(self, 0, y, cxend - self->vx_hdr.vxh_cxsiz, color);
+			LOCAL_libvideo_gfx_generic_hline(self, 0, y, cxend - self->vx_hdr.vxh_cxsiz, color);
 		}
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_hline)(self, x, y, length, color);
+	LOCAL_libvideo_gfx_generic_hline(self, x, y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hline_mirror)(struct video_gfx const *__restrict self,
-                                              video_offset_t x, video_offset_t y,
-                                              video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_hline_mirror(struct video_gfx const *__restrict self,
+                                        video_offset_t x, video_offset_t y,
+                                        video_dim_t length, video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - length) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
-	LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(self, x, y, length, color);
+	LOCAL_libvideo_gfx_generic_hline_wrap(self, x, y, length, color);
 }
 
 
@@ -337,9 +411,9 @@ LOCAL_FUNC(libvideo_gfx_generic_hline_mirror)(struct video_gfx const *__restrict
 /* VLINE()                                                              */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vline)(struct video_gfx const *__restrict self,
-                                       video_offset_t x, video_offset_t y,
-                                       video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_vline(struct video_gfx const *__restrict self,
+                                 video_offset_t x, video_offset_t y,
+                                 video_dim_t length, video_color_t color) {
 	video_coord_t temp;
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
@@ -359,13 +433,13 @@ LOCAL_FUNC(libvideo_gfx_generic_vline)(struct video_gfx const *__restrict self,
 			return;
 		length = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_FUNC(video_gfx_x_absline_v)(self, (video_coord_t)x, (video_coord_t)y, length, color);
+	LOCAL_video_gfx_x_absline_v(self, (video_coord_t)x, (video_coord_t)y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(struct video_gfx const *__restrict self,
-                                            video_offset_t x, video_offset_t y,
-                                            video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_vline_wrap(struct video_gfx const *__restrict self,
+                                      video_offset_t x, video_offset_t y,
+                                      video_dim_t length, video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
 		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP) {
@@ -375,21 +449,21 @@ LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(struct video_gfx const *__restrict s
 			y = 0;
 			length = self->vx_hdr.vxh_cysiz;
 		} else if (cyend > self->vx_hdr.vxh_cysiz) {
-			LOCAL_FUNC(libvideo_gfx_generic_vline)(self, x, 0, cyend - self->vx_hdr.vxh_cysiz, color);
+			LOCAL_libvideo_gfx_generic_vline(self, x, 0, cyend - self->vx_hdr.vxh_cysiz, color);
 		}
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_vline)(self, x, y, length, color);
+	LOCAL_libvideo_gfx_generic_vline(self, x, y, length, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vline_mirror)(struct video_gfx const *__restrict self,
-                                              video_offset_t x, video_offset_t y,
-                                              video_dim_t length, video_color_t color) {
+LOCAL_libvideo_gfx_generic_vline_mirror(struct video_gfx const *__restrict self,
+                                        video_offset_t x, video_offset_t y,
+                                        video_dim_t length, video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - length) - y;
-	LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(self, x, y, length, color);
+	LOCAL_libvideo_gfx_generic_vline_wrap(self, x, y, length, color);
 }
 
 
@@ -398,10 +472,10 @@ LOCAL_FUNC(libvideo_gfx_generic_vline_mirror)(struct video_gfx const *__restrict
 /* FILL()                                                               */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fill)(struct video_gfx const *__restrict self,
-                                      video_offset_t x, video_offset_t y,
-                                      video_dim_t size_x, video_dim_t size_y,
-                                      video_color_t color) {
+LOCAL_libvideo_gfx_generic_fill(struct video_gfx const *__restrict self,
+                                video_offset_t x, video_offset_t y,
+                                video_dim_t size_x, video_dim_t size_y,
+                                video_color_t color) {
 	video_coord_t temp;
 	if unlikely(!size_x || !size_y)
 		return;
@@ -431,15 +505,15 @@ LOCAL_FUNC(libvideo_gfx_generic_fill)(struct video_gfx const *__restrict self,
 			return;
 		size_y = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_FUNC(video_gfx_x_absfill)(self, (video_coord_t)x, (video_coord_t)y,
+	LOCAL_video_gfx_x_absfill(self, (video_coord_t)x, (video_coord_t)y,
 	                                size_x, size_y, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fill_wrap)(struct video_gfx const *__restrict self,
-                                           video_offset_t x, video_offset_t y,
-                                           video_dim_t size_x, video_dim_t size_y,
-                                           video_color_t color) {
+LOCAL_libvideo_gfx_generic_fill_wrap(struct video_gfx const *__restrict self,
+                                     video_offset_t x, video_offset_t y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t color) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
@@ -467,26 +541,26 @@ LOCAL_FUNC(libvideo_gfx_generic_fill_wrap)(struct video_gfx const *__restrict se
 		}
 	}
 	if (xwrap && ywrap) /* Must do a partial fill at the top-left */
-		LOCAL_FUNC(libvideo_gfx_generic_fill)(self, 0, 0, xwrap, ywrap, color);
+		LOCAL_libvideo_gfx_generic_fill(self, 0, 0, xwrap, ywrap, color);
 	if (xwrap) /* Must do a partial fill at the left */
-		LOCAL_FUNC(libvideo_gfx_generic_fill)(self, 0, y, xwrap, size_y, color);
+		LOCAL_libvideo_gfx_generic_fill(self, 0, y, xwrap, size_y, color);
 	if (ywrap) /* Must do a partial fill at the top */
-		LOCAL_FUNC(libvideo_gfx_generic_fill)(self, x, 0, size_x, ywrap, color);
-	LOCAL_FUNC(libvideo_gfx_generic_fill)(self, x, y, size_x, size_y, color);
+		LOCAL_libvideo_gfx_generic_fill(self, x, 0, size_x, ywrap, color);
+	LOCAL_libvideo_gfx_generic_fill(self, x, y, size_x, size_y, color);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fill_mirror)(struct video_gfx const *__restrict self,
-                                             video_offset_t x, video_offset_t y,
-                                             video_dim_t size_x, video_dim_t size_y,
-                                             video_color_t color) {
+LOCAL_libvideo_gfx_generic_fill_mirror(struct video_gfx const *__restrict self,
+                                       video_offset_t x, video_offset_t y,
+                                       video_dim_t size_x, video_dim_t size_y,
+                                       video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_fill_wrap)(self, x, y, size_x, size_y, color);
+	LOCAL_libvideo_gfx_generic_fill_wrap(self, x, y, size_x, size_y, color);
 }
 
 
@@ -495,10 +569,10 @@ LOCAL_FUNC(libvideo_gfx_generic_fill_mirror)(struct video_gfx const *__restrict 
 /* RECT()                                                               */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_rect)(struct video_gfx const *__restrict self,
-                                      video_offset_t x, video_offset_t y,
-                                      video_dim_t size_x, video_dim_t size_y,
-                                      video_color_t color) {
+LOCAL_libvideo_gfx_generic_rect(struct video_gfx const *__restrict self,
+                                video_offset_t x, video_offset_t y,
+                                video_dim_t size_x, video_dim_t size_y,
+                                video_color_t color) {
 	video_dim_t temp;
 #define LINE_XMIN 0x1
 #define LINE_YMIN 0x2
@@ -538,8 +612,8 @@ LOCAL_FUNC(libvideo_gfx_generic_rect)(struct video_gfx const *__restrict self,
 		size_y = GFX_BYEND - (video_coord_t)y;
 		draw_lines &= ~LINE_YMAX;
 	}
-#define HLINE(x, y, length) LOCAL_FUNC(video_gfx_x_absline_h)(self, x, y, length, color)
-#define VLINE(x, y, length) LOCAL_FUNC(video_gfx_x_absline_v)(self, x, y, length, color)
+#define HLINE(x, y, length) LOCAL_video_gfx_x_absline_h(self, x, y, length, color)
+#define VLINE(x, y, length) LOCAL_video_gfx_x_absline_v(self, x, y, length, color)
 	switch (draw_lines) {
 
 		/* All 4 lines */
@@ -657,42 +731,42 @@ LOCAL_FUNC(libvideo_gfx_generic_rect)(struct video_gfx const *__restrict self,
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_rect_wrap)(struct video_gfx const *__restrict self,
-                                           video_offset_t x, video_offset_t y,
-                                           video_dim_t size_x, video_dim_t size_y,
-                                           video_color_t color) {
+LOCAL_libvideo_gfx_generic_rect_wrap(struct video_gfx const *__restrict self,
+                                     video_offset_t x, video_offset_t y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t color) {
 	if (size_x <= 1) {
 		if unlikely(!size_x)
 			return;
-		LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(self, x, y, size_y, color);
+		LOCAL_libvideo_gfx_generic_vline_wrap(self, x, y, size_y, color);
 	} else if (size_y <= 1) {
 		if unlikely(!size_y)
 			return;
-		LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(self, x, y, size_x, color);
+		LOCAL_libvideo_gfx_generic_hline_wrap(self, x, y, size_x, color);
 	} else {
 		video_offset_t ymax = y + size_y - 1;
-		LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(self, x, y, size_x, color);
-		LOCAL_FUNC(libvideo_gfx_generic_hline_wrap)(self, x, ymax, size_x, color);
+		LOCAL_libvideo_gfx_generic_hline_wrap(self, x, y, size_x, color);
+		LOCAL_libvideo_gfx_generic_hline_wrap(self, x, ymax, size_x, color);
 		if (size_y > 2) {
 			video_offset_t xmax = x + size_x - 1;
-			LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(self, x, y + 1, size_y - 2, color);
-			LOCAL_FUNC(libvideo_gfx_generic_vline_wrap)(self, xmax, y + 1, size_y - 2, color);
+			LOCAL_libvideo_gfx_generic_vline_wrap(self, x, y + 1, size_y - 2, color);
+			LOCAL_libvideo_gfx_generic_vline_wrap(self, xmax, y + 1, size_y - 2, color);
 		}
 	}
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_rect_mirror)(struct video_gfx const *__restrict self,
-                                             video_offset_t x, video_offset_t y,
-                                             video_dim_t size_x, video_dim_t size_y,
-                                             video_color_t color) {
+LOCAL_libvideo_gfx_generic_rect_mirror(struct video_gfx const *__restrict self,
+                                       video_offset_t x, video_offset_t y,
+                                       video_dim_t size_x, video_dim_t size_y,
+                                       video_color_t color) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_rect_wrap)(self, x, y, size_x, size_y, color);
+	LOCAL_libvideo_gfx_generic_rect_wrap(self, x, y, size_x, size_y, color);
 }
 
 
@@ -702,10 +776,10 @@ LOCAL_FUNC(libvideo_gfx_generic_rect_mirror)(struct video_gfx const *__restrict 
 /* GRADIENT()                                                           */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_gradient)(struct video_gfx const *__restrict self,
-                                          video_offset_t x, video_offset_t y,
-                                          video_dim_t size_x, video_dim_t size_y,
-                                          video_color_t const colors[2][2]) {
+LOCAL_libvideo_gfx_generic_gradient(struct video_gfx const *__restrict self,
+                                    video_offset_t x, video_offset_t y,
+                                    video_dim_t size_x, video_dim_t size_y,
+                                    video_color_t const colors[2][2]) {
 	video_coord_t temp;
 	video_color_t fixed_colors[2][2];
 	if unlikely(!size_x || !size_y)
@@ -764,15 +838,15 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient)(struct video_gfx const *__restrict sel
 		fixed_colors[1][0] = interpolate_1d(fixed_colors[0][0], fixed_colors[1][0], frac1, frac0);
 		fixed_colors[1][1] = interpolate_1d(fixed_colors[0][1], fixed_colors[1][1], frac1, frac0);
 	}
-	LOCAL_FUNC(video_gfx_x_absgradient)(self, (video_coord_t)x, (video_coord_t)y,
+	LOCAL_video_gfx_x_absgradient(self, (video_coord_t)x, (video_coord_t)y,
 	                                    size_x, size_y, colors);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)(struct video_gfx const *__restrict self,
-                                               video_offset_t x, video_offset_t y,
-                                               video_dim_t size_x, video_dim_t size_y,
-                                               video_color_t const colors[2][2]) {
+LOCAL_libvideo_gfx_generic_gradient_wrap(struct video_gfx const *__restrict self,
+                                         video_offset_t x, video_offset_t y,
+                                         video_dim_t size_x, video_dim_t size_y,
+                                         video_color_t const colors[2][2]) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
@@ -812,7 +886,7 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)(struct video_gfx const *__restric
 		fixed_colors[1][0] = interpolate_1d(colors[1][0], colors[1][1], xfrac1, xfrac0);
 		fixed_colors[0][1] = interpolate_1d(colors[0][1], colors[1][1], yfrac1, yfrac0);
 		fixed_colors[1][1] = colors[1][1];
-		LOCAL_FUNC(libvideo_gfx_generic_gradient)(self, 0, 0, xwrap, ywrap, fixed_colors);
+		LOCAL_libvideo_gfx_generic_gradient(self, 0, 0, xwrap, ywrap, fixed_colors);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		linear_fp_blend_t xfrac0, xfrac1;
@@ -823,7 +897,7 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)(struct video_gfx const *__restric
 		fixed_colors[1][0] = interpolate_1d(colors[1][0], colors[1][1], xfrac1, xfrac0);
 		fixed_colors[0][1] = colors[0][1];
 		fixed_colors[1][1] = colors[1][1];
-		LOCAL_FUNC(libvideo_gfx_generic_gradient)(self, 0, y, xwrap, size_y, fixed_colors);
+		LOCAL_libvideo_gfx_generic_gradient(self, 0, y, xwrap, size_y, fixed_colors);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		linear_fp_blend_t yfrac0, yfrac1;
@@ -834,16 +908,16 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)(struct video_gfx const *__restric
 		fixed_colors[1][0] = colors[1][0];
 		fixed_colors[0][1] = interpolate_1d(colors[0][1], colors[1][1], yfrac1, yfrac0);
 		fixed_colors[1][1] = colors[1][1];
-		LOCAL_FUNC(libvideo_gfx_generic_gradient)(self, x, 0, size_x, ywrap, fixed_colors);
+		LOCAL_libvideo_gfx_generic_gradient(self, x, 0, size_x, ywrap, fixed_colors);
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_gradient)(self, x, y, size_x, size_y, colors);
+	LOCAL_libvideo_gfx_generic_gradient(self, x, y, size_x, size_y, colors);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror)(struct video_gfx const *__restrict self,
-                                                 video_offset_t x, video_offset_t y,
-                                                 video_dim_t size_x, video_dim_t size_y,
-                                                 video_color_t const colors[2][2]) {
+LOCAL_libvideo_gfx_generic_gradient_mirror(struct video_gfx const *__restrict self,
+                                           video_offset_t x, video_offset_t y,
+                                           video_dim_t size_x, video_dim_t size_y,
+                                           video_color_t const colors[2][2]) {
 	video_color_t fixed_colors[2][2];
 	switch (self->vx_flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR)) {
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
@@ -871,7 +945,7 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror)(struct video_gfx const *__restr
 	default: __builtin_unreachable();
 #undef Tswap
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap)(self, x, y, size_x, size_y, colors);
+	LOCAL_libvideo_gfx_generic_gradient_wrap(self, x, y, size_x, size_y, colors);
 }
 
 
@@ -881,10 +955,10 @@ LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror)(struct video_gfx const *__restr
 /* H-GRADIENT()                                                         */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hgradient)(struct video_gfx const *__restrict self,
-                                           video_offset_t x, video_offset_t y,
-                                           video_dim_t size_x, video_dim_t size_y,
-                                           video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_hgradient(struct video_gfx const *__restrict self,
+                                     video_offset_t x, video_offset_t y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t locolor, video_color_t hicolor) {
 	video_coord_t temp;
 	if unlikely(!size_x || !size_y)
 		return;
@@ -924,15 +998,15 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient)(struct video_gfx const *__restrict se
 			return;
 		size_y = GFX_BYEND - (video_coord_t)y;
 	}
-	LOCAL_FUNC(video_gfx_x_absgradient_h)(self, (video_coord_t)x, (video_coord_t)y,
+	LOCAL_video_gfx_x_absgradient_h(self, (video_coord_t)x, (video_coord_t)y,
 	                                      size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)(struct video_gfx const *__restrict self,
-                                                video_offset_t x, video_offset_t y,
-                                                video_dim_t size_x, video_dim_t size_y,
-                                                video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_hgradient_wrap(struct video_gfx const *__restrict self,
+                                          video_offset_t x, video_offset_t y,
+                                          video_dim_t size_x, video_dim_t size_y,
+                                          video_color_t locolor, video_color_t hicolor) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
@@ -965,7 +1039,7 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)(struct video_gfx const *__restri
 		xfrac0 = (xwrap * LINEAR_FP_BLEND(1)) / size_x;
 		xfrac1 = LINEAR_FP_BLEND(1) - xfrac0;
 		fixed_locolor = interpolate_1d(locolor, hicolor, xfrac1, xfrac0);
-		LOCAL_FUNC(libvideo_gfx_generic_hgradient)(self, 0, 0, xwrap, ywrap, fixed_locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_hgradient(self, 0, 0, xwrap, ywrap, fixed_locolor, hicolor);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		linear_fp_blend_t xfrac0, xfrac1;
@@ -973,18 +1047,18 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)(struct video_gfx const *__restri
 		xfrac0 = (xwrap * LINEAR_FP_BLEND(1)) / size_x;
 		xfrac1 = LINEAR_FP_BLEND(1) - xfrac0;
 		fixed_locolor = interpolate_1d(locolor, hicolor, xfrac1, xfrac0);
-		LOCAL_FUNC(libvideo_gfx_generic_hgradient)(self, 0, y, xwrap, size_y, fixed_locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_hgradient(self, 0, y, xwrap, size_y, fixed_locolor, hicolor);
 	}
 	if (ywrap) /* Must do a partial fill at the top */
-		LOCAL_FUNC(libvideo_gfx_generic_hgradient)(self, x, 0, size_x, ywrap, locolor, hicolor);
-	LOCAL_FUNC(libvideo_gfx_generic_hgradient)(self, x, y, size_x, size_y, locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_hgradient(self, x, 0, size_x, ywrap, locolor, hicolor);
+	LOCAL_libvideo_gfx_generic_hgradient(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror)(struct video_gfx const *__restrict self,
-                                                  video_offset_t x, video_offset_t y,
-                                                  video_dim_t size_x, video_dim_t size_y,
-                                                  video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_hgradient_mirror(struct video_gfx const *__restrict self,
+                                            video_offset_t x, video_offset_t y,
+                                            video_dim_t size_x, video_dim_t size_y,
+                                            video_color_t locolor, video_color_t hicolor) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		video_color_t temp;
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
@@ -995,7 +1069,7 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror)(struct video_gfx const *__rest
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap)(self, x, y, size_x, size_y, locolor, hicolor);
+	LOCAL_libvideo_gfx_generic_hgradient_wrap(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
 
@@ -1005,10 +1079,10 @@ LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror)(struct video_gfx const *__rest
 /* V-GRADIENT()                                                         */
 /************************************************************************/
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vgradient)(struct video_gfx const *__restrict self,
-                                           video_offset_t x, video_offset_t y,
-                                           video_dim_t size_x, video_dim_t size_y,
-                                           video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_vgradient(struct video_gfx const *__restrict self,
+                                     video_offset_t x, video_offset_t y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t locolor, video_color_t hicolor) {
 	video_coord_t temp;
 	if unlikely(!size_x || !size_y)
 		return;
@@ -1048,15 +1122,15 @@ LOCAL_FUNC(libvideo_gfx_generic_vgradient)(struct video_gfx const *__restrict se
 		size_y = GFX_BYEND - (video_coord_t)y;
 		hicolor = interpolate_1d(locolor, hicolor, frac1, frac0);
 	}
-	LOCAL_FUNC(video_gfx_x_absgradient_v)(self, (video_coord_t)x, (video_coord_t)y,
+	LOCAL_video_gfx_x_absgradient_v(self, (video_coord_t)x, (video_coord_t)y,
 	                                      size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vgradient_wrap)(struct video_gfx const *__restrict self,
-                                                video_offset_t x, video_offset_t y,
-                                                video_dim_t size_x, video_dim_t size_y,
-                                                video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_vgradient_wrap(struct video_gfx const *__restrict self,
+                                          video_offset_t x, video_offset_t y,
+                                          video_dim_t size_x, video_dim_t size_y,
+                                          video_color_t locolor, video_color_t hicolor) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP) {
@@ -1089,26 +1163,26 @@ LOCAL_FUNC(libvideo_gfx_generic_vgradient_wrap)(struct video_gfx const *__restri
 		yfrac0 = (ywrap * LINEAR_FP_BLEND(1)) / size_y;
 		yfrac1 = LINEAR_FP_BLEND(1) - yfrac0;
 		fixed_locolor = interpolate_1d(locolor, hicolor, yfrac1, yfrac0);
-		LOCAL_FUNC(libvideo_gfx_generic_vgradient)(self, 0, 0, xwrap, ywrap, fixed_locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_vgradient(self, 0, 0, xwrap, ywrap, fixed_locolor, hicolor);
 	}
 	if (xwrap) /* Must do a partial fill at the left */
-		LOCAL_FUNC(libvideo_gfx_generic_vgradient)(self, 0, y, xwrap, size_y, locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_vgradient(self, 0, y, xwrap, size_y, locolor, hicolor);
 	if (ywrap) { /* Must do a partial fill at the top */
 		linear_fp_blend_t yfrac0, yfrac1;
 		video_color_t fixed_locolor;
 		yfrac0 = (ywrap * LINEAR_FP_BLEND(1)) / size_y;
 		yfrac1 = LINEAR_FP_BLEND(1) - yfrac0;
 		fixed_locolor = interpolate_1d(locolor, hicolor, yfrac1, yfrac0);
-		LOCAL_FUNC(libvideo_gfx_generic_vgradient)(self, x, 0, size_x, ywrap, fixed_locolor, hicolor);
+		LOCAL_libvideo_gfx_generic_vgradient(self, x, 0, size_x, ywrap, fixed_locolor, hicolor);
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_vgradient)(self, x, y, size_x, size_y, locolor, hicolor);
+	LOCAL_libvideo_gfx_generic_vgradient(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
 INTERN ATTR_IN(1) void CC
-LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror)(struct video_gfx const *__restrict self,
-                                                  video_offset_t x, video_offset_t y,
-                                                  video_dim_t size_x, video_dim_t size_y,
-                                                  video_color_t locolor, video_color_t hicolor) {
+LOCAL_libvideo_gfx_generic_vgradient_mirror(struct video_gfx const *__restrict self,
+                                            video_offset_t x, video_offset_t y,
+                                            video_dim_t size_x, video_dim_t size_y,
+                                            video_color_t locolor, video_color_t hicolor) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
 	}
@@ -1119,7 +1193,7 @@ LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror)(struct video_gfx const *__rest
 		locolor = hicolor;
 		hicolor = temp;
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_vgradient_wrap)(self, x, y, size_x, size_y, locolor, hicolor);
+	LOCAL_libvideo_gfx_generic_vgradient_wrap(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
 
@@ -1130,11 +1204,11 @@ LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror)(struct video_gfx const *__rest
 /* BIT-MASKED FILL                                                      */
 /************************************************************************/
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillmask)(struct video_gfx const *__restrict self,
-                                          video_offset_t dst_x, video_offset_t dst_y,
-                                          video_dim_t size_x, video_dim_t size_y,
-                                          video_color_t const bg_fg_colors[2],
-                                          struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self,
+                                    video_offset_t dst_x, video_offset_t dst_y,
+                                    video_dim_t size_x, video_dim_t size_y,
+                                    video_color_t const bg_fg_colors[2],
+                                    struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if (!size_x || !size_y)
@@ -1173,7 +1247,7 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask)(struct video_gfx const *__restrict sel
 			return;
 		size_y = GFX_BYEND - (video_coord_t)dst_y;
 	}
-	LOCAL_FUNC(video_gfx_x_absfillmask)(self,
+	LOCAL_video_gfx_x_absfillmask(self,
 	                                    (video_coord_t)dst_x,
 	                                    (video_coord_t)dst_y,
 	                                    size_x, size_y,
@@ -1181,11 +1255,11 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask)(struct video_gfx const *__restrict sel
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap)(struct video_gfx const *__restrict self,
-                                               video_offset_t dst_x, video_offset_t dst_y,
-                                               video_dim_t size_x, video_dim_t size_y,
-                                               video_color_t const bg_fg_colors[2],
-                                               struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillmask_wrap(struct video_gfx const *__restrict self,
+                                         video_offset_t dst_x, video_offset_t dst_y,
+                                         video_dim_t size_x, video_dim_t size_y,
+                                         video_color_t const bg_fg_colors[2],
+                                         struct video_bitmask const *__restrict bm) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
@@ -1217,27 +1291,27 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap)(struct video_gfx const *__restric
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb + (yinb * chunk_bm.vbm_scan);
-		LOCAL_FUNC(libvideo_gfx_generic_fillmask)(self, 0, 0, xwrap, ywrap, bg_fg_colors, &chunk_bm);
+		LOCAL_libvideo_gfx_generic_fillmask(self, 0, 0, xwrap, ywrap, bg_fg_colors, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb;
-		LOCAL_FUNC(libvideo_gfx_generic_fillmask)(self, 0, dst_y, xwrap, size_y, bg_fg_colors, &chunk_bm);
+		LOCAL_libvideo_gfx_generic_fillmask(self, 0, dst_y, xwrap, size_y, bg_fg_colors, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += yinb * chunk_bm.vbm_scan;
-		LOCAL_FUNC(libvideo_gfx_generic_fillmask)(self, dst_x, 0, size_x, ywrap, bg_fg_colors, &chunk_bm);
+		LOCAL_libvideo_gfx_generic_fillmask(self, dst_x, 0, size_x, ywrap, bg_fg_colors, &chunk_bm);
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_fillmask)(self, dst_x, dst_y, xinb, yinb, bg_fg_colors, bm);
+	LOCAL_libvideo_gfx_generic_fillmask(self, dst_x, dst_y, xinb, yinb, bg_fg_colors, bm);
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror)(struct video_gfx const *__restrict self,
-                                                 video_offset_t dst_x, video_offset_t dst_y,
-                                                 video_dim_t size_x, video_dim_t size_y,
-                                                 video_color_t const bg_fg_colors[2],
-                                                 struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillmask_mirror(struct video_gfx const *__restrict self,
+                                           video_offset_t dst_x, video_offset_t dst_y,
+                                           video_dim_t size_x, video_dim_t size_y,
+                                           video_color_t const bg_fg_colors[2],
+                                           struct video_bitmask const *__restrict bm) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		dst_x = (self->vx_hdr.vxh_cxsiz - size_x) - dst_x;
 		/* TODO: Mirror "bm"? */
@@ -1246,7 +1320,7 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror)(struct video_gfx const *__restr
 		dst_y = (self->vx_hdr.vxh_cysiz - size_y) - dst_y;
 		/* TODO: Mirror "bm"? */
 	}
-	LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm);
+	LOCAL_libvideo_gfx_generic_fillmask_wrap(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm);
 }
 
 
@@ -1257,12 +1331,12 @@ LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror)(struct video_gfx const *__restr
 /* BIT-MASKED STRETCH FILL                                              */
 /************************************************************************/
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(struct video_gfx const *__restrict self,
-                                                 video_offset_t dst_x, video_offset_t dst_y,
-                                                 video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                                 video_color_t const bg_fg_colors[2],
-                                                 video_dim_t src_size_x, video_dim_t src_size_y,
-                                                 struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self,
+                                           video_offset_t dst_x, video_offset_t dst_y,
+                                           video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                           video_color_t const bg_fg_colors[2],
+                                           video_dim_t src_size_x, video_dim_t src_size_y,
+                                           struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
@@ -1327,23 +1401,23 @@ LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(struct video_gfx const *__restr
 	}
 	if (dst_size_x == src_size_x && dst_size_y == src_size_y) {
 		/* Can use copy-blit */
-		LOCAL_FUNC(video_gfx_x_absfillmask)(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                                    dst_size_x, dst_size_y, bg_fg_colors, bm);
+		LOCAL_video_gfx_x_absfillmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                              dst_size_x, dst_size_y, bg_fg_colors, bm);
 	} else {
 		/* Must use stretch-blit */
-		LOCAL_FUNC(video_gfx_x_absfillstretchmask)(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                                           dst_size_x, dst_size_y, bg_fg_colors,
-		                                           src_size_x, src_size_y, bm);
+		LOCAL_video_gfx_x_absfillstretchmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                                     dst_size_x, dst_size_y, bg_fg_colors,
+		                                     src_size_x, src_size_y, bm);
 	}
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_wrap)(struct video_gfx const *__restrict self,
-                                                      video_offset_t dst_x, video_offset_t dst_y,
-                                                      video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                                      video_color_t const bg_fg_colors[2],
-                                                      video_dim_t src_size_x, video_dim_t src_size_y,
-                                                      struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillstretchmask_wrap(struct video_gfx const *__restrict self,
+                                                video_offset_t dst_x, video_offset_t dst_y,
+                                                video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                                video_color_t const bg_fg_colors[2],
+                                                video_dim_t src_size_x, video_dim_t src_size_y,
+                                                struct video_bitmask const *__restrict bm) {
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
 	video_dim_t xwrap = 0;
@@ -1386,38 +1460,38 @@ LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_wrap)(struct video_gfx const *__
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_x + (chunk_src_y * chunk_bm.vbm_scan);
-		(LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(self, 0, 0, xwrap, ywrap, bg_fg_colors,
-		                                                  chunk_src_size_x, chunk_src_size_y, &chunk_bm));
+		LOCAL_libvideo_gfx_generic_fillstretchmask(self, 0, 0, xwrap, ywrap, bg_fg_colors,
+		                                           chunk_src_size_x, chunk_src_size_y, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_x = xdst2src(xinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		chunk_bm.vbm_skip += chunk_src_x;
-		(LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(self, 0, dst_y, xwrap, dst_size_y, bg_fg_colors,
-		                                                  chunk_src_size_x, src_size_y, &chunk_bm));
+		LOCAL_libvideo_gfx_generic_fillstretchmask(self, 0, dst_y, xwrap, dst_size_y, bg_fg_colors,
+		                                           chunk_src_size_x, src_size_y, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_y = ydst2src(yinb);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_y * chunk_bm.vbm_scan;
-		(LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(self, dst_x, 0, dst_size_x, ywrap, bg_fg_colors,
-		                                                  src_size_x, chunk_src_size_y, &chunk_bm));
+		LOCAL_libvideo_gfx_generic_fillstretchmask(self, dst_x, 0, dst_size_x, ywrap, bg_fg_colors,
+		                                           src_size_x, chunk_src_size_y, &chunk_bm);
 	}
-	(LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                                  bg_fg_colors, src_size_x, src_size_y, bm));
+	LOCAL_libvideo_gfx_generic_fillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                           bg_fg_colors, src_size_x, src_size_y, bm);
 #undef xdst2src
 #undef ydst2src
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_mirror)(struct video_gfx const *__restrict self,
-                                                        video_offset_t dst_x, video_offset_t dst_y,
-                                                        video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                                        video_color_t const bg_fg_colors[2],
-                                                        video_dim_t src_size_x, video_dim_t src_size_y,
-                                                        struct video_bitmask const *__restrict bm) {
+LOCAL_libvideo_gfx_generic_fillstretchmask_mirror(struct video_gfx const *__restrict self,
+                                                  video_offset_t dst_x, video_offset_t dst_y,
+                                                  video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                                  video_color_t const bg_fg_colors[2],
+                                                  video_dim_t src_size_x, video_dim_t src_size_y,
+                                                  struct video_bitmask const *__restrict bm) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		dst_x = (self->vx_hdr.vxh_cxsiz - 1) - dst_x;
 		dst_x -= dst_size_x;
@@ -1428,8 +1502,8 @@ LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_mirror)(struct video_gfx const *
 		dst_y -= dst_size_y;
 		/* TODO: Mirror "bm"? */
 	}
-	(LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_wrap)(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                                       bg_fg_colors, src_size_x, src_size_y, bm));
+	LOCAL_libvideo_gfx_generic_fillstretchmask_wrap(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                                                bg_fg_colors, src_size_x, src_size_y, bm);
 }
 
 
@@ -1439,77 +1513,83 @@ LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_mirror)(struct video_gfx const *
 #undef libvideo_gfx_generic_ops_wrap_xyswap
 #undef libvideo_gfx_generic_ops_mirror
 #undef libvideo_gfx_generic_ops_mirror_xyswap
-PRIVATE struct video_gfx_ops LOCAL_FUNC(libvideo_gfx_generic_ops) = {};
-PRIVATE struct video_gfx_ops LOCAL_FUNC(libvideo_gfx_generic_ops_wrap) = {};
-PRIVATE struct video_gfx_ops LOCAL_FUNC(libvideo_gfx_generic_ops_mirror) = {};
+PRIVATE struct video_gfx_ops LOCAL_libvideo_gfx_generic_ops = {};
+PRIVATE struct video_gfx_ops LOCAL_libvideo_gfx_generic_ops_wrap = {};
+PRIVATE struct video_gfx_ops LOCAL_libvideo_gfx_generic_ops_mirror = {};
+
+#ifndef DEFINED_libvideo_gfx_ops_setcommon
+#define DEFINED_libvideo_gfx_ops_setcommon
+PRIVATE ATTR_INOUT(1) void CC
+libvideo_gfx_ops_setcommon(struct video_gfx_ops *__restrict self) {
+	self->vgfo_bitblit = &libvideo_gfx_generic_bitblit;
+	self->vgfo_stretch = &libvideo_gfx_generic_stretch;
+}
+#endif /* !DEFINED_libvideo_gfx_ops_setcommon */
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
-LOCAL_FUNC(_libvideo_gfx_generic_ops)(void) {
-	if unlikely(!LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_getcolor) {
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_stretch         = &libvideo_gfx_generic_stretch;
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_vgradient       = &LOCAL_FUNC(libvideo_gfx_generic_vgradient);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_hgradient       = &LOCAL_FUNC(libvideo_gfx_generic_hgradient);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_gradient        = &LOCAL_FUNC(libvideo_gfx_generic_gradient);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_fillstretchmask = &LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_fillmask        = &LOCAL_FUNC(libvideo_gfx_generic_fillmask);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_rect            = &LOCAL_FUNC(libvideo_gfx_generic_rect);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_fill            = &LOCAL_FUNC(libvideo_gfx_generic_fill);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_vline           = &LOCAL_FUNC(libvideo_gfx_generic_vline);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_hline           = &LOCAL_FUNC(libvideo_gfx_generic_hline);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_line            = &LOCAL_FUNC(libvideo_gfx_generic_line);
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_putcolor        = &LOCAL_FUNC(libvideo_gfx_generic_putcolor);
+LOCAL__libvideo_gfx_generic_ops(void) {
+	if unlikely(!LOCAL_libvideo_gfx_generic_ops.vgfo_getcolor) {
+		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_gfx_generic_ops);
+		LOCAL_libvideo_gfx_generic_ops.vgfo_vgradient       = &LOCAL_libvideo_gfx_generic_vgradient;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_hgradient       = &LOCAL_libvideo_gfx_generic_hgradient;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_gradient        = &LOCAL_libvideo_gfx_generic_gradient;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_fillstretchmask = &LOCAL_libvideo_gfx_generic_fillstretchmask;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_fillmask        = &LOCAL_libvideo_gfx_generic_fillmask;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_rect            = &LOCAL_libvideo_gfx_generic_rect;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_fill            = &LOCAL_libvideo_gfx_generic_fill;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_vline           = &LOCAL_libvideo_gfx_generic_vline;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_hline           = &LOCAL_libvideo_gfx_generic_hline;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_line            = &LOCAL_libvideo_gfx_generic_line;
+		LOCAL_libvideo_gfx_generic_ops.vgfo_putcolor        = &LOCAL_libvideo_gfx_generic_putcolor;
 		COMPILER_WRITE_BARRIER();
-		LOCAL_FUNC(libvideo_gfx_generic_ops).vgfo_getcolor = &LOCAL_FUNC(libvideo_gfx_generic_getcolor);
+		LOCAL_libvideo_gfx_generic_ops.vgfo_getcolor = &LOCAL_libvideo_gfx_generic_getcolor;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &LOCAL_FUNC(libvideo_gfx_generic_ops);
+	return &LOCAL_libvideo_gfx_generic_ops;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
-LOCAL_FUNC(_libvideo_gfx_generic_ops_wrap)(void) {
-	if unlikely(!LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_getcolor) {
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_stretch         = &libvideo_gfx_generic_stretch;
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_vgradient       = &LOCAL_FUNC(libvideo_gfx_generic_vgradient_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_hgradient       = &LOCAL_FUNC(libvideo_gfx_generic_hgradient_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_gradient        = &LOCAL_FUNC(libvideo_gfx_generic_gradient_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_fillstretchmask = &LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_fillmask        = &LOCAL_FUNC(libvideo_gfx_generic_fillmask_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_rect            = &LOCAL_FUNC(libvideo_gfx_generic_rect_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_fill            = &LOCAL_FUNC(libvideo_gfx_generic_fill_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_vline           = &LOCAL_FUNC(libvideo_gfx_generic_vline_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_hline           = &LOCAL_FUNC(libvideo_gfx_generic_hline_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_line            = &LOCAL_FUNC(libvideo_gfx_generic_line_wrap);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_putcolor        = &LOCAL_FUNC(libvideo_gfx_generic_putcolor_wrap);
+LOCAL__libvideo_gfx_generic_ops_wrap(void) {
+	if unlikely(!LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_getcolor) {
+		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_gfx_generic_ops_wrap);
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_vgradient       = &LOCAL_libvideo_gfx_generic_vgradient_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_hgradient       = &LOCAL_libvideo_gfx_generic_hgradient_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_gradient        = &LOCAL_libvideo_gfx_generic_gradient_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_fillstretchmask = &LOCAL_libvideo_gfx_generic_fillstretchmask_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_fillmask        = &LOCAL_libvideo_gfx_generic_fillmask_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_rect            = &LOCAL_libvideo_gfx_generic_rect_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_fill            = &LOCAL_libvideo_gfx_generic_fill_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_vline           = &LOCAL_libvideo_gfx_generic_vline_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_hline           = &LOCAL_libvideo_gfx_generic_hline_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_line            = &LOCAL_libvideo_gfx_generic_line_wrap;
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_putcolor        = &LOCAL_libvideo_gfx_generic_putcolor_wrap;
 		COMPILER_WRITE_BARRIER();
-		LOCAL_FUNC(libvideo_gfx_generic_ops_wrap).vgfo_getcolor = &LOCAL_FUNC(libvideo_gfx_generic_getcolor_wrap);
+		LOCAL_libvideo_gfx_generic_ops_wrap.vgfo_getcolor = &LOCAL_libvideo_gfx_generic_getcolor_wrap;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &LOCAL_FUNC(libvideo_gfx_generic_ops_wrap);
+	return &LOCAL_libvideo_gfx_generic_ops_wrap;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
-LOCAL_FUNC(_libvideo_gfx_generic_ops_mirror)(void) {
-	if unlikely(!LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_getcolor) {
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_bitblit         = &libvideo_gfx_generic_bitblit;
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_stretch         = &libvideo_gfx_generic_stretch;
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_vgradient       = &LOCAL_FUNC(libvideo_gfx_generic_vgradient_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_hgradient       = &LOCAL_FUNC(libvideo_gfx_generic_hgradient_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_gradient        = &LOCAL_FUNC(libvideo_gfx_generic_gradient_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_fillstretchmask = &LOCAL_FUNC(libvideo_gfx_generic_fillstretchmask_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_fillmask        = &LOCAL_FUNC(libvideo_gfx_generic_fillmask_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_rect            = &LOCAL_FUNC(libvideo_gfx_generic_rect_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_fill            = &LOCAL_FUNC(libvideo_gfx_generic_fill_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_vline           = &LOCAL_FUNC(libvideo_gfx_generic_vline_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_hline           = &LOCAL_FUNC(libvideo_gfx_generic_hline_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_line            = &LOCAL_FUNC(libvideo_gfx_generic_line_mirror);
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_putcolor        = &LOCAL_FUNC(libvideo_gfx_generic_putcolor_mirror);
+LOCAL__libvideo_gfx_generic_ops_mirror(void) {
+	if unlikely(!LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_getcolor) {
+		libvideo_gfx_ops_setcommon(&LOCAL_libvideo_gfx_generic_ops_mirror);
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_vgradient       = &LOCAL_libvideo_gfx_generic_vgradient_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_hgradient       = &LOCAL_libvideo_gfx_generic_hgradient_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_gradient        = &LOCAL_libvideo_gfx_generic_gradient_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_fillstretchmask = &LOCAL_libvideo_gfx_generic_fillstretchmask_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_fillmask        = &LOCAL_libvideo_gfx_generic_fillmask_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_rect            = &LOCAL_libvideo_gfx_generic_rect_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_fill            = &LOCAL_libvideo_gfx_generic_fill_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_vline           = &LOCAL_libvideo_gfx_generic_vline_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_hline           = &LOCAL_libvideo_gfx_generic_hline_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_line            = &LOCAL_libvideo_gfx_generic_line_mirror;
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_putcolor        = &LOCAL_libvideo_gfx_generic_putcolor_mirror;
 		COMPILER_WRITE_BARRIER();
-		LOCAL_FUNC(libvideo_gfx_generic_ops_mirror).vgfo_getcolor = &LOCAL_FUNC(libvideo_gfx_generic_getcolor_mirror);
+		LOCAL_libvideo_gfx_generic_ops_mirror.vgfo_getcolor = &LOCAL_libvideo_gfx_generic_getcolor_mirror;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &LOCAL_FUNC(libvideo_gfx_generic_ops_mirror);
+	return &LOCAL_libvideo_gfx_generic_ops_mirror;
 }
 
 #define libvideo_gfx_generic_ops                 (*_libvideo_gfx_generic_ops())
@@ -1518,6 +1598,79 @@ LOCAL_FUNC(_libvideo_gfx_generic_ops_mirror)(void) {
 #define libvideo_gfx_generic_ops_wrap_xyswap     (*_libvideo_gfx_generic_ops_wrap_xyswap())
 #define libvideo_gfx_generic_ops_mirror          (*_libvideo_gfx_generic_ops_mirror())
 #define libvideo_gfx_generic_ops_mirror_xyswap   (*_libvideo_gfx_generic_ops_mirror_xyswap())
+
+#undef LOCAL_libvideo_gfx_generic_getcolor_wrap
+#undef LOCAL_libvideo_gfx_generic_getcolor_mirror
+#undef LOCAL_libvideo_gfx_generic_putcolor
+#undef LOCAL_libvideo_gfx_generic_putcolor_wrap
+#undef LOCAL_libvideo_gfx_generic_putcolor_mirror
+#undef LOCAL_libvideo_gfx_generic_line
+#undef LOCAL_libvideo_gfx_generic_line_wrap
+#undef LOCAL_libvideo_gfx_generic_line_mirror
+#undef LOCAL_libvideo_gfx_generic_hline
+#undef LOCAL_libvideo_gfx_generic_hline_wrap
+#undef LOCAL_libvideo_gfx_generic_hline_mirror
+#undef LOCAL_libvideo_gfx_generic_vline
+#undef LOCAL_libvideo_gfx_generic_vline_wrap
+#undef LOCAL_libvideo_gfx_generic_vline_mirror
+#undef LOCAL_libvideo_gfx_generic_fill
+#undef LOCAL_libvideo_gfx_generic_fill_wrap
+#undef LOCAL_libvideo_gfx_generic_fill_mirror
+#undef LOCAL_libvideo_gfx_generic_rect
+#undef LOCAL_libvideo_gfx_generic_rect_wrap
+#undef LOCAL_libvideo_gfx_generic_rect_mirror
+#undef LOCAL_libvideo_gfx_generic_gradient
+#undef LOCAL_libvideo_gfx_generic_gradient_wrap
+#undef LOCAL_libvideo_gfx_generic_gradient_mirror
+#undef LOCAL_libvideo_gfx_generic_hgradient
+#undef LOCAL_libvideo_gfx_generic_hgradient_wrap
+#undef LOCAL_libvideo_gfx_generic_hgradient_mirror
+#undef LOCAL_libvideo_gfx_generic_vgradient
+#undef LOCAL_libvideo_gfx_generic_vgradient_wrap
+#undef LOCAL_libvideo_gfx_generic_vgradient_mirror
+#undef LOCAL_libvideo_gfx_generic_fillmask
+#undef LOCAL_libvideo_gfx_generic_fillmask_wrap
+#undef LOCAL_libvideo_gfx_generic_fillmask_mirror
+#undef LOCAL_libvideo_gfx_generic_fillstretchmask
+#undef LOCAL_libvideo_gfx_generic_fillstretchmask_wrap
+#undef LOCAL_libvideo_gfx_generic_fillstretchmask_mirror
+
+#undef LOCAL__video_gfx_x_getcolor
+#undef LOCAL__video_gfx_x_putcolor
+#undef LOCAL__video_gfx_x_getpixel
+#undef LOCAL__video_gfx_x_setpixel
+#undef LOCAL__video_gfx_x_absline_llhh
+#undef LOCAL__video_gfx_x_absline_lhhl
+#undef LOCAL__video_gfx_x_absline_h
+#undef LOCAL__video_gfx_x_absline_v
+#undef LOCAL__video_gfx_x_absfill
+#undef LOCAL__video_gfx_x_absfillmask
+#undef LOCAL__video_gfx_x_absfillstretchmask
+#undef LOCAL__video_gfx_x_absgradient
+#undef LOCAL__video_gfx_x_absgradient_h
+#undef LOCAL__video_gfx_x_absgradient_v
+
+#undef LOCAL_video_gfx_x_getcolor
+#undef LOCAL_video_gfx_x_putcolor
+#undef LOCAL_video_gfx_x_getpixel
+#undef LOCAL_video_gfx_x_setpixel
+#undef LOCAL_video_gfx_x_absline_llhh
+#undef LOCAL_video_gfx_x_absline_lhhl
+#undef LOCAL_video_gfx_x_absline_h
+#undef LOCAL_video_gfx_x_absline_v
+#undef LOCAL_video_gfx_x_absfill
+#undef LOCAL_video_gfx_x_absfillmask
+#undef LOCAL_video_gfx_x_absfillstretchmask
+#undef LOCAL_video_gfx_x_absgradient
+#undef LOCAL_video_gfx_x_absgradient_h
+#undef LOCAL_video_gfx_x_absgradient_v
+
+#undef LOCAL_libvideo_gfx_generic_ops
+#undef LOCAL_libvideo_gfx_generic_ops_wrap
+#undef LOCAL_libvideo_gfx_generic_ops_mirror
+#undef LOCAL__libvideo_gfx_generic_ops
+#undef LOCAL__libvideo_gfx_generic_ops_wrap
+#undef LOCAL__libvideo_gfx_generic_ops_mirror
 
 #undef LOCAL_FUNC
 

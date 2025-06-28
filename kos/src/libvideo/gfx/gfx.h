@@ -60,7 +60,7 @@
 #endif /* !PRIdOFF */
 
 #undef GFX_DEBUG
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define GFX_DEBUG
 #endif
 
@@ -402,12 +402,12 @@ INTDEF ATTR_IN(1) ATTR_IN(10) void CC libvideo_blitter_noblend_difffmt__stretch_
 
 /* Generic GFX operators */
 INTDEF ATTR_RETNONNULL ATTR_IN(1) struct video_gfx const *CC libvideo_gfx_generic_noblend(struct video_gfx const *__restrict self);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_wrap_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) video_color_t CC libvideo_gfx_generic_getcolor_mirror_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_xyswap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic_putcolor_wrap(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y, video_color_t color);
