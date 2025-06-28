@@ -200,11 +200,11 @@ __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
 struct video_buffer {
-	__uintptr_t                    vb_refcnt; /* Reference counter. */
 	struct video_buffer_ops const *vb_ops;    /* [1..1][const] Buffer operations. */
 	struct video_format            vb_format; /* [const] Buffer format. */
 	video_dim_t                    vb_xdim;   /* Buffer dimension in X (in pixels) */
 	video_dim_t                    vb_ydim;   /* Buffer dimension in Y (in pixels) */
+	__uintptr_t                    vb_refcnt; /* Reference counter. */
 	/* Buffer-specific fields go here */
 
 #ifdef __cplusplus

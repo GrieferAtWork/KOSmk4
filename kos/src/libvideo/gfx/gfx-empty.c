@@ -266,7 +266,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empt
 
 #undef libvideo_buffer_empty
 PRIVATE struct video_buffer libvideo_buffer_empty = {
-	.vb_refcnt = 0x7fff,
 	.vb_ops    = NULL, /* Initialized lazily */
 	.vb_format = {
 		.vf_codec = NULL, /* Initialized lazily */
@@ -274,6 +273,7 @@ PRIVATE struct video_buffer libvideo_buffer_empty = {
 	},
 	.vb_xdim = 0,
 	.vb_ydim = 0,
+	.vb_refcnt = 0x7fff,
 };
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(void) {
