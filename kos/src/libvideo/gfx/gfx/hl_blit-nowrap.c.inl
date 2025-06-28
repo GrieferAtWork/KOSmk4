@@ -360,29 +360,26 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	}
 
 	/* Load identity matrix */
-	src_matrix[0][0] = 1;
-	src_matrix[0][1] = 0;
-	src_matrix[1][0] = 0;
-	src_matrix[1][1] = 1;
+	src_matrix = VIDEO_IMATRIX2D_INIT(1, 0, 0, 1);
 	if ((src_flags ^ dst->vx_flags) & VIDEO_GFX_F_XMIRROR) {
-		src_matrix[0][0] = -1;
+		src_matrix = VIDEO_IMATRIX2D_INIT(-1, 0, 0, 1);
 		src_x += LOCAL_src_size_x - 1;
 	}
 	if ((src_flags ^ dst->vx_flags) & VIDEO_GFX_F_YMIRROR) {
-		src_matrix[1][1] = -1;
+		video_imatrix2d_set(&src_matrix, 1, 1, -1);
 		src_y += LOCAL_src_size_y - 1;
 	}
 
 	/* Apply X/Y-swap rules and finalize src_x/src_y coords */
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
 	if (src_flags & VIDEO_GFX_F_XYSWAP) {
-		Tswap(video_imatrix2d_word_t, src_matrix[0][0], src_matrix[1][0]);
-		Tswap(video_imatrix2d_word_t, src_matrix[1][1], src_matrix[0][1]);
+		video_imatrix2d_swap(&src_matrix, 0, 0, /**/ 1, 0);
+		video_imatrix2d_swap(&src_matrix, 1, 1, /**/ 0, 1);
 		Tswap(video_offset_t, src_x, src_y);
 	}
 	if (dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
-		Tswap(video_imatrix2d_word_t, src_matrix[0][0], src_matrix[0][1]);
-		Tswap(video_imatrix2d_word_t, src_matrix[1][1], src_matrix[1][0]);
+		video_imatrix2d_swap(&src_matrix, 0, 0, /**/ 0, 1);
+		video_imatrix2d_swap(&src_matrix, 1, 1, /**/ 1, 0);
 		Tswap(video_offset_t, dst_x, dst_y);
 		Tswap(video_dim_t, LOCAL_dst_size_x, LOCAL_dst_size_y);
 #ifdef LOCAL_IS_STRETCH

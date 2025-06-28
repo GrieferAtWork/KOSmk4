@@ -156,9 +156,9 @@ libvideo_gfx_offset2coord(struct video_gfx const *__restrict self,
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxsiz); /* FIXME: divide-by-zero when GFX is empty */
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz);
+		x = wrap(x, self->vx_hdr.vxh_cxsiz); /* FIXME: divide-by-zero when GFX is empty */
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
 	if unlikely((video_coord_t)x < self->vx_hdr.vxh_bxmin)

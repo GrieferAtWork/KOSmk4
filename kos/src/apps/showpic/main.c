@@ -240,7 +240,6 @@ do_showpic(struct screen_buffer *screen,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_F_NORMAL, 0);
 
-#if 1
 	/*video_gfx_clip(&image_gfx, 200, 200,
 	               video_gfx_getclipw(&image_gfx) / 2,
 	               video_gfx_getcliph(&image_gfx) / 2);*/
@@ -251,25 +250,9 @@ do_showpic(struct screen_buffer *screen,
 	               video_gfx_getclipw(&screen_gfx) + 40,
 	               video_gfx_getcliph(&screen_gfx) + 40);*/
 	/*video_gfx_hmirror(&screen_gfx);*/
-//	video_gfx_vmirror(&screen_gfx);
+	//video_gfx_vmirror(&screen_gfx);
 	video_gfx_rrot90(&screen_gfx);
-	video_gfx_lrot90(&image_gfx);
-#else
-	/*video_gfx_clip(&image_gfx,
-	               video_gfx_getclipw(&image_gfx) / 2, 0,
-	               video_gfx_getclipw(&image_gfx) / 2,
-	               video_gfx_getcliph(&image_gfx) / 2);*/
-	video_gfx_clip(&image_gfx, 200, 200,
-	               video_gfx_getclipw(&image_gfx) / 2,
-	               video_gfx_getcliph(&image_gfx) / 2);
-	video_gfx_clip(&image_gfx, -80, -80,
-	               video_gfx_getclipw(&image_gfx) + 80,
-	               video_gfx_getcliph(&image_gfx) + 80);
-
-	video_gfx_lrot90(&screen_gfx);
-	/*video_gfx_hmirror(&image_gfx);*/
-	/*video_gfx_rrot90(&screen_gfx);*/
-#endif
+	//video_gfx_lrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);

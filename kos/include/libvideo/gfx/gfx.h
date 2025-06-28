@@ -124,13 +124,20 @@ struct video_bitmask {
  * Only allowed to  hold values -1,  0, or  1
  *
  * Vector is only applied to relative coords (never absolute ones). */
-typedef __INT_FAST8_TYPE__ video_imatrix2d_word_t;
-typedef video_imatrix2d_word_t video_imatrix2d_row_t[2];
-typedef video_imatrix2d_row_t video_imatrix2d_t[2];
-/* TODO: Instead of "video_imatrix2d_t" being i8[4],
- *       it should be u32 with macros to get/set the
- *       individual  words. - That  way, we can more
- *       efficiently pass it around via  parameters. */
+typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
+#define __video_imatrix2d_shift(y, x)      ((y) * 16 + (x) * 8)
+#define __video_imatrix2d_mask(y, x)       ((video_imatrix2d_t)0xff << __video_imatrix2d_shift(y, x))
+#define video_imatrix2d_get(self, y, x)    ((__INT8_TYPE__)(*(self) >> __video_imatrix2d_shift(y, x)))
+#define video_imatrix2d_set(self, y, x, v) (void)(*(self) = (*(self) & ~__video_imatrix2d_mask(y, x)) | ((video_imatrix2d_t)(__UINT8_TYPE__)(v) << __video_imatrix2d_shift(y, x)))
+#define VIDEO_IMATRIX2D_INIT(_00, _01, _10, _11)                                                    \
+	(((video_imatrix2d_t)(__UINT8_TYPE__)(_00)) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_01) << 8) | \
+	 ((video_imatrix2d_t)(__UINT8_TYPE__)(_10) << 16) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_11) << 24))
+#define video_imatrix2d_swap(self, y1, x1, y2, x2)                            \
+	do {                                                                      \
+		__INT_FAST8_TYPE__ _temp = video_imatrix2d_get(self, y1, x1);         \
+		video_imatrix2d_set(self, y1, x1, video_imatrix2d_get(self, y2, x2)); \
+		video_imatrix2d_set(self, y2, x2, _temp);                             \
+	}	__WHILE0
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 
@@ -184,21 +191,21 @@ struct video_blitter_xops {
 	 * meaning  it can only be used to do 90° rotation, as well as mirroring.
 	 *
 	 * When values outside this range are used, results are undefined. */
-	__ATTR_IN_T(1) __ATTR_IN_T(8) void
+	__ATTR_IN_T(1) void
 	(LIBVIDEO_GFX_CC *vbtx_blit_imatrix)(struct video_blitter const *__restrict __self,
 	                                     video_coord_t __dst_x, video_coord_t __dst_y,
 	                                     video_coord_t __src_x, video_coord_t __src_y,
 	                                     video_dim_t __size_x, video_dim_t __size_y,
-	                                     video_imatrix2d_t const __src_matrix);
+	                                     video_imatrix2d_t __src_matrix);
 
 	/* Same as "vbtx_stretch", but uses a matrix to calculate source pixel locations. */
-	__ATTR_IN_T(1) __ATTR_IN_T(10) void
+	__ATTR_IN_T(1) void
 	(LIBVIDEO_GFX_CC *vbtx_stretch_imatrix)(struct video_blitter const *__restrict __self,
 	                                        video_coord_t __dst_x, video_coord_t __dst_y,
 	                                        video_dim_t __dst_size_x, video_dim_t __dst_size_y,
 	                                        video_coord_t __src_x, video_coord_t __src_y,
 	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                        video_imatrix2d_t const __src_matrix);
+	                                        video_imatrix2d_t __src_matrix);
 
 	void (*_vbtx_pad[4])(void);
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */

@@ -1370,20 +1370,19 @@ libvideo_blitter_generic__blit(struct video_blitter const *__restrict self,
 	TRACE_END("generic__blit()\n");
 }
 
-INTERN ATTR_IN(1) ATTR_IN(8) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__blit_imatrix(struct video_blitter const *__restrict self,
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t size_x, video_dim_t size_y,
-                                       video_imatrix2d_t const src_matrix) {
+                                       video_imatrix2d_t src_matrix) {
 	video_dim_t x, y;
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
-	gfx_assert_imatrix2d(src_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
 		libvideo_blitter_generic__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
 		return;
 	}
@@ -1396,15 +1395,17 @@ libvideo_blitter_generic__blit_imatrix(struct video_blitter const *__restrict se
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y,
-	            (int)src_matrix[0][0], (int)src_matrix[0][1],
-	            (int)src_matrix[1][0], (int)src_matrix[1][1]);
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
 	for (y = 0; y < size_y; ++y) {
-		video_offset_t delta_src_x = src_x + src_matrix[0][1] * y;
-		video_offset_t delta_src_y = src_y + src_matrix[1][1] * y;
+		video_offset_t delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * y;
+		video_offset_t delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * y;
 		for (x = 0; x < size_x; ++x) {
 			video_color_t color;
-			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * x;
-			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * x;
+			video_coord_t used_src_x = delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * x;
+			video_coord_t used_src_y = delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * x;
 			video_coord_t used_dst_x = dst_x + x;
 			video_coord_t used_dst_y = dst_y + y;
 			color = LL_getcolor(src, used_src_x, used_src_y);
@@ -1490,33 +1491,32 @@ libvideo_blitter_generic__stretch_l(struct video_blitter const *__restrict self,
 #undef pixel_blend_xmax_ymax
 }
 
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restrict self,
                                             video_coord_t dst_x_, video_coord_t dst_y_,
                                             video_dim_t dst_size_x_, video_dim_t dst_size_y_,
                                             video_coord_t src_x_, video_coord_t src_y_,
                                             video_dim_t src_size_x_, video_dim_t src_size_y_,
-                                            video_imatrix2d_t const src_matrix) {
+                                            video_imatrix2d_t src_matrix) {
 #define LOCAL_getcolor(x, y)                                                             \
 	({                                                                                   \
-		video_coord_t used_src_x = src_x_ + src_matrix[0][0] * x + src_matrix[0][1] * y; \
-		video_coord_t used_src_y = src_y_ + src_matrix[1][0] * x + src_matrix[1][1] * y; \
+		video_coord_t used_src_x = src_x_ + video_imatrix2d_get(&src_matrix, 0, 0) * x + video_imatrix2d_get(&src_matrix, 0, 1) * y; \
+		video_coord_t used_src_y = src_y_ + video_imatrix2d_get(&src_matrix, 1, 0) * x + video_imatrix2d_get(&src_matrix, 1, 1) * y; \
 		LL_getcolor(src, used_src_x, used_src_y);                                        \
 	})
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
-	gfx_assert_imatrix2d(src_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
-#if 1 /* TODO: Breaks assertions for double-rotation blits */
-	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
 		libvideo_blitter_generic__stretch_l(self,
 		                                    dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 		                                    src_x_, src_y_, src_size_x_, src_size_y_);
 		return;
 	}
-#endif
+
+	/* TODO: More optimizations for known rotation/mirror matrices */
 
 #define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
 #define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
@@ -1563,8 +1563,10 @@ libvideo_blitter_generic__stretch_imatrix_l(struct video_blitter const *__restri
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	            src_x_, src_y_, src_size_x_, src_size_y_,
-	            (int)src_matrix[0][0], (int)src_matrix[0][1],
-	            (int)src_matrix[1][0], (int)src_matrix[1][1]);
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
 	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
 	                   0, 0, src_size_x_, src_size_y_,
 	                   pixel_blend_xmin_ymin,
@@ -1629,22 +1631,21 @@ libvideo_blitter_generic__stretch_n(struct video_blitter const *__restrict self,
 }
 
 
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restrict self,
                                             video_coord_t dst_x, video_coord_t dst_y,
                                             video_dim_t dst_size_x, video_dim_t dst_size_y,
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y,
-                                            video_imatrix2d_t const src_matrix) {
+                                            video_imatrix2d_t src_matrix) {
 	video_dim_t y;
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
 	stretch_fp_t step_x, step_y, src_pos_y;
-	gfx_assert_imatrix2d(src_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
-	if (src_matrix[0][0] == 1 && src_matrix[0][1] == 0 &&
-	    src_matrix[1][0] == 0 && src_matrix[1][1] == 1) {
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
 		libvideo_blitter_generic__stretch_n(self,
 		                                    dst_x, dst_y, dst_size_x, dst_size_y,
 		                                    src_x, src_y, src_size_x, src_size_y);
@@ -1657,8 +1658,8 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 	            "matrix: {{%d,%d},{%d,%d}})\n",
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y,
-	            (int)src_matrix[0][0], (int)src_matrix[0][1],
-	            (int)src_matrix[1][0], (int)src_matrix[1][1]);
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0), (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0), (int)video_imatrix2d_get(&src_matrix, 1, 1));
 	step_x = STRETCH_FP(src_size_x) / dst_size_x;
 	step_y = STRETCH_FP(src_size_y) / dst_size_y;
 	src_pos_y = step_y >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
@@ -1667,14 +1668,14 @@ libvideo_blitter_generic__stretch_imatrix_n(struct video_blitter const *__restri
 		video_coord_t row_dst_y = dst_y + y;
 		video_coord_t row_src_y = STRETCH_FP_WHOLE(src_pos_y);
 		stretch_fp_t src_pos_x = step_x >> 1; /* Start half-a-step ahead, thus rounding by 0.5 pixels */
-		video_offset_t delta_src_x = src_x + src_matrix[0][1] * row_src_y;
-		video_offset_t delta_src_y = src_y + src_matrix[1][1] * row_src_y;
+		video_offset_t delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * row_src_y;
+		video_offset_t delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * row_src_y;
 		video_dim_t x = 0;
 		do {
 			video_color_t color;
 			video_coord_t row_src_x = STRETCH_FP_WHOLE(src_pos_x);
-			video_coord_t used_src_x = delta_src_x + src_matrix[0][0] * row_src_x;
-			video_coord_t used_src_y = delta_src_y + src_matrix[1][0] * row_src_x;
+			video_coord_t used_src_x = delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * row_src_x;
+			video_coord_t used_src_y = delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * row_src_x;
 			video_coord_t used_dst_x = dst_x + x;
 			video_coord_t used_dst_y = row_dst_y;
 			color = LL_getcolor(src, used_src_x, used_src_y);
@@ -1906,23 +1907,23 @@ libvideo_blitter_samebuf__stretch_n(struct video_blitter const *__restrict self,
 	}
 }
 
-INTERN ATTR_IN(1) ATTR_IN(8) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_samebuf__blit_imatrix(struct video_blitter const *__restrict self,
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t size_x, video_dim_t size_y,
-                                       video_imatrix2d_t const src_matrix) {
+                                       video_imatrix2d_t src_matrix) {
 	/* TODO: Overlap handling */
 	libvideo_blitter_generic__blit_imatrix(self, dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix);
 }
 
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_samebuf__stretch_imatrix_l(struct video_blitter const *__restrict self,
                                             video_coord_t dst_x, video_coord_t dst_y,
                                             video_dim_t dst_size_x, video_dim_t dst_size_y,
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y,
-                                            video_imatrix2d_t const src_matrix) {
+                                            video_imatrix2d_t src_matrix) {
 	/* TODO: Overlap handling */
 	libvideo_blitter_generic__stretch_imatrix_l(self,
 	                                            dst_x, dst_y, dst_size_x, dst_size_y,
@@ -1930,13 +1931,13 @@ libvideo_blitter_samebuf__stretch_imatrix_l(struct video_blitter const *__restri
 	                                            src_matrix);
 }
 
-INTERN ATTR_IN(1) ATTR_IN(10) void CC
+INTERN ATTR_IN(1) void CC
 libvideo_blitter_samebuf__stretch_imatrix_n(struct video_blitter const *__restrict self,
                                             video_coord_t dst_x, video_coord_t dst_y,
                                             video_dim_t dst_size_x, video_dim_t dst_size_y,
                                             video_coord_t src_x, video_coord_t src_y,
                                             video_dim_t src_size_x, video_dim_t src_size_y,
-                                            video_imatrix2d_t const src_matrix) {
+                                            video_imatrix2d_t src_matrix) {
 	/* TODO: Overlap handling */
 	libvideo_blitter_generic__stretch_imatrix_n(self,
 	                                            dst_x, dst_y, dst_size_x, dst_size_y,
