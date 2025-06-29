@@ -100,6 +100,23 @@ libvideo_buffer_save(struct video_buffer *self, char const *filename,
                      char const *options);
 
 
+/* Same as `video_buffer_*save', but save pixel data from the
+ * Clip Rect of `self'. Values written for pixels outside the
+ * I/O Rect of `self'  are format-specific, but those  pixels
+ * are probably going to be either black, or transparent.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_fsave(struct video_gfx const *self, char const *format,
+                   FILE *__restrict fp, char const *options);
+INTDEF WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_fdsave(struct video_gfx const *self, char const *format,
+                    fd_t fd, char const *options);
+INTDEF /*WUNUSED*/ ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_save(struct video_gfx const *self, char const *filename,
+                  char const *options);
+
+
 
 /* Various functions for opening a file/stream/blob as an animation file.
  * The actual file format is auto-detected, and supported formats  depend

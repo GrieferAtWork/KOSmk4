@@ -51,6 +51,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 /**/
 
 #include "anim.h"
+#include "gfx-buffer.h"
 #include "io-utils.h"
 #include "io.h"
 #include "lockable-buffer.h"
@@ -352,6 +353,54 @@ libvideo_buffer_save(struct video_buffer *self,
 	(void)fclose(stream);
 	if (result != 0) /* Delete broken file on error. */
 		(void)unlink(filename);
+	return result;
+}
+
+
+
+
+/* Same as `video_buffer_*save', but save pixel data from the
+ * Clip Rect of `self'. Values written for pixels outside the
+ * I/O Rect of `self'  are format-specific, but those  pixels
+ * are probably going to be either black, or transparent.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+DEFINE_PUBLIC_ALIAS(video_gfx_fsave, libvideo_gfx_fsave);
+INTERN WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_fsave(struct video_gfx const *self, char const *format,
+                   FILE *__restrict fp, char const *options) {
+	int result;
+	struct video_buffer *buffer;
+	struct gfx_buffer gxb;
+	buffer = libvideo_buffer_fromgfx_init(&gxb, self);
+	result = libvideo_buffer_fsave(buffer, format, fp, options);
+	libvideo_buffer_fromgfx_fini(buffer);
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_fdsave, libvideo_gfx_fdsave);
+INTERN WUNUSED ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_fdsave(struct video_gfx const *self, char const *format,
+                    fd_t fd, char const *options) {
+	int result;
+	struct video_buffer *buffer;
+	struct gfx_buffer gxb;
+	buffer = libvideo_buffer_fromgfx_init(&gxb, self);
+	result = libvideo_buffer_fdsave(buffer, format, fd, options);
+	libvideo_buffer_fromgfx_fini(buffer);
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(video_gfx_save, libvideo_gfx_save);
+INTERN /*WUNUSED*/ ATTR_IN(1) NONNULL((2)) int CC
+libvideo_gfx_save(struct video_gfx const *self, char const *filename,
+                  char const *options) {
+	int result;
+	struct video_buffer *buffer;
+	struct gfx_buffer gxb;
+	buffer = libvideo_buffer_fromgfx_init(&gxb, self);
+	result = libvideo_buffer_save(buffer, filename, options);
+	libvideo_buffer_fromgfx_fini(buffer);
 	return result;
 }
 

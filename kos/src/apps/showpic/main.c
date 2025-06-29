@@ -250,7 +250,7 @@ do_showpic(struct screen_buffer *screen,
 	               video_gfx_getcliph(&screen_gfx) + 40);*/
 	/*video_gfx_hmirror(&screen_gfx);*/
 	//video_gfx_vmirror(&screen_gfx);
-	/*video_gfx_rrot90(&screen_gfx);*/
+	video_gfx_rrot90(&screen_gfx);
 	//video_gfx_lrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
@@ -393,12 +393,22 @@ do_showpic(struct screen_buffer *screen,
 #undef gfx_printf
 	}
 
+	static bool firsttime = true;
+	if (firsttime) {
+		firsttime = false;
+		/* Create screenshots in a couple of file formats. */
+		video_gfx_save(&screen_gfx, "/var/showpic.png", NULL);
+		video_gfx_save(&screen_gfx, "/var/showpic.jpg", NULL);
+		video_gfx_save(&screen_gfx, "/var/showpic.bmp", NULL);
+		sync();
+	}
+
+
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 }
 
 
 int main(int argc, char *argv[]) {
-	bool firsttime = true;
 	REF struct video_font *font;
 	REF struct screen_buffer *screen;
 	REF struct video_buffer *frame;
@@ -462,15 +472,6 @@ int main(int argc, char *argv[]) {
 
 		/* Render frame */
 		do_showpic(screen, frame, font, argv[1], &frame_info);
-		if (firsttime) {
-			firsttime = false;
-			/* Create screenshots in a couple of file formats. */
-			/*video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.png", NULL);
-			video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.jpg", NULL);
-			video_buffer_save(screen_buffer_asvideo(screen), "/var/showpic.bmp", NULL);
-			sync();
-			getchar();*/
-		}
 
 		/* Load next frame as part of render delay */
 		frame_nextinfo = frame_info;

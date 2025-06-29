@@ -90,8 +90,8 @@ lockable_readpixels(struct lockable_buffer const *__restrict self) {
 	struct video_gfx dstgfx, *p_dstgfx;
 	struct video_rambuffer dst;
 	lockable_asram(&dst, self);
-	p_dstgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	p_srcgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
 	video_gfx_bitblit(p_dstgfx, 0, 0, p_srcgfx, 0, 0,

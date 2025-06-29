@@ -551,6 +551,34 @@ video_buffer_save(struct video_buffer *__self, char const *__filename,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Same as `video_buffer_*save', but  save pixel data from  the
+ * Clip Rect of `__self'. Values written for pixels outside the
+ * I/O Rect of `__self'  are format-specific, but those  pixels
+ * are probably going to be either black, or transparent.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FSAVE)(struct video_gfx const *__self, char const *__format,
+                                    __FILE *__restrict __fp, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_FDSAVE)(struct video_gfx const *__self, char const *__format,
+                                     __fd_t __fd, char const *__options);
+typedef /*__ATTR_WUNUSED_T*/ __ATTR_IN_T(1) __ATTR_NONNULL_T((2)) int
+(LIBVIDEO_GFX_CC *PVIDEO_GFX_SAVE)(struct video_gfx const *__self, char const *__filename,
+                                   char const *__options);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fsave(struct video_gfx const *__self, char const *__format,
+                __FILE *__restrict __fp, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_fdsave(struct video_gfx const *__self, char const *__format,
+                 __fd_t __fd, char const *__options);
+LIBVIDEO_GFX_DECL /*__ATTR_WUNUSED*/ __ATTR_IN(1) __ATTR_NONNULL((2)) int LIBVIDEO_GFX_CC
+video_gfx_save(struct video_gfx const *__self, char const *__filename,
+               char const *__options);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 /* Return the preferred video format.
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
