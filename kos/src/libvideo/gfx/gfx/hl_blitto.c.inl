@@ -21,8 +21,8 @@
 #define _KOS_SOURCE 1
 
 #ifdef __INTELLISENSE__
-#define DEFINE_libvideo_gfx__blitfrom_n
-//#define DEFINE_libvideo_gfx__blitfrom_l
+#define DEFINE_libvideo_gfx__blitto_n
+//#define DEFINE_libvideo_gfx__blitto_l
 #endif /* __INTELLISENSE__ */
 
 #include "../api.h"
@@ -38,16 +38,16 @@
 
 #include "../gfx.h"
 
-#if (defined(DEFINE_libvideo_gfx__blitfrom_n) + \
-     defined(DEFINE_libvideo_gfx__blitfrom_l)) != 1
+#if (defined(DEFINE_libvideo_gfx__blitto_n) + \
+     defined(DEFINE_libvideo_gfx__blitto_l)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_gfx__blitfrom_n
+#ifdef DEFINE_libvideo_gfx__blitto_n
 #define LOCAL_IS_NEAREST
-#elif defined(DEFINE_libvideo_gfx__blitfrom_l)
+#elif defined(DEFINE_libvideo_gfx__blitto_l)
 #define LOCAL_IS_LINEAR
 #else /* ... */
 #error "Invalid configuration"
@@ -67,8 +67,8 @@ DECL_BEGIN
 #define LOCAL_libvideo_blitter_noblend_samefmt__stretch_imatrix_X LOCAL_Xnl(libvideo_blitter_noblend_samefmt__stretch_imatrix)
 #define LOCAL_libvideo_blitter_noblend_difffmt__stretch_imatrix_X LOCAL_Xnl(libvideo_blitter_noblend_difffmt__stretch_imatrix)
 #define LOCAL_libvideo_blitter_generic__stretch_imatrix_X         LOCAL_Xnl(libvideo_blitter_generic__stretch_imatrix)
-#define LOCAL_libvideo_gfx_noblend__blitfrom_X                    LOCAL_Xnl(libvideo_gfx_noblend__blitfrom)
-#define LOCAL_libvideo_gfx_generic__blitfrom_X                    LOCAL_Xnl(libvideo_gfx_generic__blitfrom)
+#define LOCAL_libvideo_gfx_noblend__blitto_X                    LOCAL_Xnl(libvideo_gfx_noblend__blitto)
+#define LOCAL_libvideo_gfx_generic__blitto_X                    LOCAL_Xnl(libvideo_gfx_generic__blitto)
 
 #ifndef DEFINED_noblend_blit_compatible
 #define DEFINED_noblend_blit_compatible
@@ -127,7 +127,7 @@ noblend_blit_compatible(struct video_codec const *dst,
 #endif /* !DEFINED_noblend_blit_compatible */
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
+LOCAL_libvideo_gfx_noblend__blitto_X(struct video_blitter *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vbt_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vbt_dst->vx_buffer;
 	video_blit_setops(ctx);
@@ -180,7 +180,7 @@ LOCAL_libvideo_gfx_noblend__blitfrom_X(struct video_blitter *__restrict ctx) {
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blitter *__restrict ctx) {
+LOCAL_libvideo_gfx_generic__blitto_X(struct video_blitter *__restrict ctx) {
 	struct video_buffer const *src_buffer = ctx->vbt_src->vx_buffer;
 	struct video_buffer const *dst_buffer = ctx->vbt_dst->vx_buffer;
 	video_blit_setops(ctx);
@@ -210,8 +210,8 @@ LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blitter *__restrict ctx) {
 #undef LOCAL_libvideo_blitter_noblend_samefmt__stretch_imatrix_X
 #undef LOCAL_libvideo_blitter_noblend_difffmt__stretch_imatrix_X
 #undef LOCAL_libvideo_blitter_generic__stretch_imatrix_X
-#undef LOCAL_libvideo_gfx_noblend__blitfrom_X
-#undef LOCAL_libvideo_gfx_generic__blitfrom_X
+#undef LOCAL_libvideo_gfx_noblend__blitto_X
+#undef LOCAL_libvideo_gfx_generic__blitto_X
 
 #undef LOCAL_Xnl
 
@@ -220,5 +220,5 @@ LOCAL_libvideo_gfx_generic__blitfrom_X(struct video_blitter *__restrict ctx) {
 
 DECL_END
 
-#undef DEFINE_libvideo_gfx__blitfrom_n
-#undef DEFINE_libvideo_gfx__blitfrom_l
+#undef DEFINE_libvideo_gfx__blitto_n
+#undef DEFINE_libvideo_gfx__blitto_l

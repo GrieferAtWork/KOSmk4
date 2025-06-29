@@ -61,9 +61,8 @@
 #define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
                                         *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
                                         *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
-#define VIDEO_GFX_F_NEAREST     0x0000 /* [w] Use nearest interpolation for stretch(), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_LINEAR      0x8000 /* [w] Use linear interpolation for stretch(), lines, and floating-point pixel accesses */
-/* TODO: "VIDEO_GFX_F_LINEAR" should be an r-flag when it comes to stretch() */
+#define VIDEO_GFX_F_NEAREST     0x0000 /* [rw] Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
+#define VIDEO_GFX_F_LINEAR      0x8000 /* [rw] Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 
 
 
@@ -837,9 +836,9 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 #define video_gfx_vgradient(self, x, y, size_x, size_y, locolor, hicolor) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_vgradient)(self, x, y, size_x, size_y, locolor, hicolor)
 #define video_gfx_blitfrom(dst, src, ctx) \
-	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
+	((ctx)->vbt_dst = (dst), (*((ctx)->vbt_src = (src))->vx_hdr.vxh_blitto)(ctx))
 #define video_gfx_blitto(src, dst, ctx) \
-	((ctx)->vbt_src = (src), (*((ctx)->vbt_dst = (dst))->vx_hdr.vxh_blitfrom)(ctx))
+	((ctx)->vbt_dst = (dst), (*((ctx)->vbt_src = (src))->vx_hdr.vxh_blitto)(ctx))
 #define video_gfx_bitblit(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y) \
 	(*(dst)->vx_hdr.vxh_ops->vgfo_bitblit)(dst, dst_x, dst_y, src, src_x, src_y, size_x, size_y)
 #define video_gfx_stretch(dst, dst_x, dst_y, dst_size_x, dst_size_y, src, src_x, src_y, src_size_x, src_size_y) \
@@ -894,7 +893,7 @@ struct video_gfxhdr {
 	 * operator here must be the one of `__ctx->vbt_dst'
 	 * @return: * : Always re-returns `__ctx' */
 	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blitter *
-	(LIBVIDEO_GFX_FCC *vxh_blitfrom)(struct video_blitter *__restrict __ctx);
+	(LIBVIDEO_GFX_FCC *vxh_blitto)(struct video_blitter *__restrict __ctx);
 
 	/* Clip Rect area (pixel area used for pixel clamping/wrapping, and accepted):
 	 *

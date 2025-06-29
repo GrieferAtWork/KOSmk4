@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-libvideo_gfx_empty__blitfrom(struct video_blitter *__restrict ctx);
+libvideo_gfx_empty__blitto(struct video_blitter *__restrict ctx);
 
 /* Empty GFX operators */
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_empty_getcolor(struct video_gfx const *__restrict self, video_offset_t x, video_offset_t y);
@@ -72,8 +72,8 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(vo
 /* Assign "empty" operators to "self". Initializes */
 LOCAL ATTR_OUT(1) void CC
 video_gfxhdr_setempty(struct video_gfxhdr *__restrict self) {
-	self->vxh_blitfrom = &libvideo_gfx_empty__blitfrom;
-	self->vxh_ops      = &libvideo_gfx_empty_ops;
+	self->vxh_blitto = &libvideo_gfx_empty__blitto;
+	self->vxh_ops    = &libvideo_gfx_empty_ops;
 }
 
 DECL_END

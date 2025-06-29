@@ -234,11 +234,10 @@ do_showpic(struct screen_buffer *screen,
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_LINEAR |
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
-	                    VIDEO_GFX_F_NORMAL, 0);
+	                    VIDEO_GFX_F_LINEAR, 0);
 
 	/*video_gfx_clip(&image_gfx, 200, 200,
 	               video_gfx_getclipw(&image_gfx) / 2,
@@ -284,7 +283,7 @@ do_showpic(struct screen_buffer *screen,
 	blit_x = (video_gfx_getclipw(&screen_gfx) - blit_w) / 2;
 	blit_y = (video_gfx_getcliph(&screen_gfx) - blit_h) / 2;
 
-#if 0
+#if 1
 	blit_w = video_gfx_getclipw(&screen_gfx);
 	blit_h = video_gfx_getcliph(&screen_gfx);
 	blit_x = 0;
@@ -292,7 +291,7 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 0
+#if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),

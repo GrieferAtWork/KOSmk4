@@ -49,7 +49,7 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-libvideo_gfx_empty__blitfrom(struct video_blitter *__restrict ctx) {
+libvideo_gfx_empty__blitto(struct video_blitter *__restrict ctx) {
 	ctx->vbt_ops = &libvideo_blit_empty_ops;
 	DBG_memset(&ctx->_vbt_xops, 0xcc, sizeof(ctx->_vbt_xops));
 	return ctx;
