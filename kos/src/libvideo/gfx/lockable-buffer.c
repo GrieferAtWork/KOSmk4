@@ -44,6 +44,7 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "gfx-empty.h"
+#include "gfx-buffer.h"
 #include "lockable-buffer.h"
 #include "ram-buffer.h"
 
@@ -136,7 +137,7 @@ lockable_lock_fallback(struct lockable_buffer *__restrict self,
 		byte_t *buffer;
 		struct video_rambuffer_requirements req;
 		(*self->vb_format.vf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
-		buffer = (byte_t *)malloc(req.vbs_bufsize);
+		buffer = (byte_t *)calloc(req.vbs_bufsize);
 		if unlikely(!buffer)
 			goto err;
 		self->lb_stride = req.vbs_stride;
@@ -242,10 +243,21 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _lockable_ops(v
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 video_buffer_islockable(struct video_buffer const *__restrict self) {
-	return self->vb_ops == &lockable_ops ||
-	       self->vb_ops == &rambuffer_ops ||
-	       self->vb_ops == &membuffer_ops ||
-	       self->vb_ops == &libvideo_buffer_empty_ops;
+	if (self->vb_ops == &lockable_ops)
+		goto yes;
+	if (self->vb_ops == &rambuffer_ops)
+		goto yes;
+	if (self->vb_ops == &membuffer_ops)
+		goto yes;
+	if (self->vb_ops == &subregion_buffer_ops) {
+		/* Subregion buffers are locked iff the underlying buffer is */
+		struct subregion_buffer const *me;
+		me = (struct subregion_buffer const *)self;
+		return video_buffer_islockable(me->srb_base);
+	}
+	return false;
+yes:
+	return true;
 }
 
 

@@ -469,6 +469,27 @@ video_buffer_lockable(struct video_buffer *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Return a video buffer that  will always (forcefully) re-return  `__self'
+ * whenever a GFX context is requested. Additionally, video locks will fail
+ * when pixels represented by `__self'  cannot represented as a video  lock
+ * (e.g.  the Clip-  and I/O-Rects don't  match, or the  Clip Rect's bounds
+ * don't end up at some whole-byte boundary,  or don't end up aligned to  a
+ * degree that is  sufficient for  the codec  of `__self',  or `__self'  is
+ * making using of some rotation/mirror GFX flags).
+ *
+ * If you want to guaranty that the returned buffer is still lockable, you
+ * should wrap it again using `video_buffer_lockable()'.
+ *
+ * @return: * :   A video buffer representing the Clip Rect of `__self'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory. */
+typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FROMGFX)(struct video_gfx const *__restrict __self);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_fromgfx(struct video_gfx const *__restrict __self);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */

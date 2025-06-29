@@ -550,6 +550,10 @@ libvideo_gfx_clip(struct video_gfx *__restrict self,
                   video_offset_t clip_x, video_offset_t clip_y,
                   video_dim_t size_x, video_dim_t size_y);
 
+/* Called after the Clip- or I/O-Rect of `self' was updated
+ * (caller must ensure  that I/O rect  is still  non-empty) */
+#define _libvideo_gfx_clip_updated(self) (void)0
+
 /* Translate virtual (offset) pixel coords to physical (coord) coords.
  * @param: x:      Virtual pixel X offset
  * @param: y:      Virtual pixel Y offset

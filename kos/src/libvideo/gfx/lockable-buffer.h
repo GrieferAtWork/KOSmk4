@@ -34,10 +34,6 @@
 
 DECL_BEGIN
 
-/* */
-#define LOCKABLE_BUFFER_VLOCK_ISWRITE 0
-static_assert(_VIDEO_LOCK__N_DRIVER >= 1);
-
 struct lockable_buffer: video_buffer {
 	REF struct video_buffer *lb_base;   /* [1..1][const] Underlying video buffer */
 	byte_t                  *lb_data;   /* [0..vl_size][owned][lock(WRITE_ONCE)] Cached video data */

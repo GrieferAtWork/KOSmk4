@@ -131,6 +131,7 @@ libvideo_gfx_clip(struct video_gfx *__restrict self,
 			goto empty_clip;
 //		self->vx_hdr.vxh_bysiz = self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin;
 	}
+	_libvideo_gfx_clip_updated(self);
 	return self;
 empty_clip:
 	video_gfxhdr_setempty(&self->vx_hdr);
