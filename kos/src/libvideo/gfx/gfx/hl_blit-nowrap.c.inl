@@ -111,7 +111,6 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #endif /* !LOCAL_IS_STRETCH */
 #ifdef LOCAL_USE_IMATRIX
 	video_imatrix2d_t src_matrix;
-	gfx_flag_t src_flags;
 #endif /* LOCAL_USE_IMATRIX */
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_gfx const *src = self->vbt_src;
@@ -334,20 +333,12 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	 * - src: VIDEO_GFX_F_XYSWAP
 	 * - dst: VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR
 	 * - dst: VIDEO_GFX_F_XYSWAP */
-	src_flags = src->vx_flags;
-	if (src_flags & VIDEO_GFX_F_XYSWAP) {
-#define XMIRROR_TO_YMIRROR_LSHIFT 1
-		static_assert((VIDEO_GFX_F_XMIRROR << XMIRROR_TO_YMIRROR_LSHIFT) == VIDEO_GFX_F_YMIRROR);
-		src_flags = (src_flags & ~(VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR)) |
-		            ((src_flags & VIDEO_GFX_F_XMIRROR) << XMIRROR_TO_YMIRROR_LSHIFT) |
-		            ((src_flags & VIDEO_GFX_F_YMIRROR) >> XMIRROR_TO_YMIRROR_LSHIFT);
-	}
-	if (src_flags & VIDEO_GFX_F_XMIRROR) {
+	if (src->vx_flags & VIDEO_GFX_F_XMIRROR) {
 		src_x -= src->vx_hdr.vxh_bxmin;
 		src_x = (_video_gfxhdr_bxsiz(&src->vx_hdr) - LOCAL_src_size_x) - src_x;
 		src_x += src->vx_hdr.vxh_bxmin;
 	}
-	if (src_flags & VIDEO_GFX_F_YMIRROR) {
+	if (src->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		src_y -= src->vx_hdr.vxh_bymin;
 		src_y = (_video_gfxhdr_bysiz(&src->vx_hdr) - LOCAL_src_size_y) - src_y;
 		src_y += src->vx_hdr.vxh_bymin;
@@ -355,18 +346,18 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 
 	/* Load identity matrix */
 	src_matrix = VIDEO_IMATRIX2D_INIT(1, 0, 0, 1);
-	if ((src_flags ^ dst->vx_flags) & VIDEO_GFX_F_XMIRROR) {
+	if ((src->vx_flags ^ dst->vx_flags) & VIDEO_GFX_F_XMIRROR) {
 		src_matrix = VIDEO_IMATRIX2D_INIT(-1, 0, 0, 1);
 		src_x += LOCAL_src_size_x - 1;
 	}
-	if ((src_flags ^ dst->vx_flags) & VIDEO_GFX_F_YMIRROR) {
+	if ((src->vx_flags ^ dst->vx_flags) & VIDEO_GFX_F_YMIRROR) {
 		video_imatrix2d_set(&src_matrix, 1, 1, -1);
 		src_y += LOCAL_src_size_y - 1;
 	}
 
 	/* Apply X/Y-swap rules and finalize src_x/src_y coords */
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
-	if (src_flags & VIDEO_GFX_F_XYSWAP) {
+	if (src->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&src_matrix, 0, 0, /**/ 1, 0);
 		video_imatrix2d_swap(&src_matrix, 1, 1, /**/ 0, 1);
 		Tswap(video_offset_t, src_x, src_y);

@@ -250,8 +250,8 @@ do_showpic(struct screen_buffer *screen,
 	               video_gfx_getcliph(&screen_gfx) + 40);*/
 	/*video_gfx_hmirror(&screen_gfx);*/
 	//video_gfx_vmirror(&screen_gfx);
-	video_gfx_rrot90(&screen_gfx);
-	//video_gfx_lrot90(&image_gfx);
+	video_gfx_lrot90(&screen_gfx);
+//	video_gfx_lrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -283,7 +283,7 @@ do_showpic(struct screen_buffer *screen,
 	blit_x = (video_gfx_getclipw(&screen_gfx) - blit_w) / 2;
 	blit_y = (video_gfx_getcliph(&screen_gfx) - blit_h) / 2;
 
-#if 1
+#if 0
 	blit_w = video_gfx_getclipw(&screen_gfx);
 	blit_h = video_gfx_getcliph(&screen_gfx);
 	blit_x = 0;
@@ -296,6 +296,10 @@ do_showpic(struct screen_buffer *screen,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
+#elif 0
+	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
+	                  &image_gfx, 0, 0,
+	                  blit_w, blit_h);
 #else
 	/* Enable read-tiling in X and Y for the image */
 	video_gfx_setflags(&image_gfx,
@@ -393,15 +397,17 @@ do_showpic(struct screen_buffer *screen,
 #undef gfx_printf
 	}
 
+#if 1
 	static bool firsttime = true;
 	if (firsttime) {
 		firsttime = false;
 		/* Create screenshots in a couple of file formats. */
 		video_gfx_save(&screen_gfx, "/var/showpic.png", NULL);
-		video_gfx_save(&screen_gfx, "/var/showpic.jpg", NULL);
-		video_gfx_save(&screen_gfx, "/var/showpic.bmp", NULL);
+//		video_gfx_save(&screen_gfx, "/var/showpic.jpg", NULL);
+//		video_gfx_save(&screen_gfx, "/var/showpic.bmp", NULL);
 		sync();
 	}
+#endif
 
 
 	screen_buffer_updaterect(screen, &WHOLE_SCREEN);

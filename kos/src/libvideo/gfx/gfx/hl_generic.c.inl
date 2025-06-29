@@ -559,12 +559,10 @@ LOCAL_libvideo_gfx_generic_fill_mirror(struct video_gfx const *__restrict self,
                                        video_offset_t x, video_offset_t y,
                                        video_dim_t size_x, video_dim_t size_y,
                                        video_color_t color) {
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
-	}
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
-	}
 	LOCAL_libvideo_gfx_generic_fill_wrap(self, x, y, size_x, size_y, color);
 }
 
@@ -765,12 +763,10 @@ LOCAL_libvideo_gfx_generic_rect_mirror(struct video_gfx const *__restrict self,
                                        video_offset_t x, video_offset_t y,
                                        video_dim_t size_x, video_dim_t size_y,
                                        video_color_t color) {
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
-	}
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
-	}
 	LOCAL_libvideo_gfx_generic_rect_wrap(self, x, y, size_x, size_y, color);
 }
 
@@ -1071,9 +1067,8 @@ LOCAL_libvideo_gfx_generic_hgradient_mirror(struct video_gfx const *__restrict s
 		locolor = hicolor;
 		hicolor = temp;
 	}
-	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;
-	}
 	LOCAL_libvideo_gfx_generic_hgradient_wrap(self, x, y, size_x, size_y, locolor, hicolor);
 }
 
@@ -1188,9 +1183,8 @@ LOCAL_libvideo_gfx_generic_vgradient_mirror(struct video_gfx const *__restrict s
                                             video_offset_t x, video_offset_t y,
                                             video_dim_t size_x, video_dim_t size_y,
                                             video_color_t locolor, video_color_t hicolor) {
-	if (self->vx_flags & VIDEO_GFX_F_XMIRROR) {
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - size_x) - x;
-	}
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR) {
 		video_color_t temp;
 		y = (self->vx_hdr.vxh_cysiz - size_y) - y;

@@ -219,13 +219,28 @@ fail:
 
 
 LOCAL ATTR_INOUT(1) void FCC
-_libvideo_gfxhdr_xyswap(struct video_gfxhdr *__restrict self) {
+_libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
+#define GFX_FLAGS_X_TO_Y_LSHIFT 1
+#define GFX_FLAGS_Y_TO_X_RSHIFT GFX_FLAGS_X_TO_Y_LSHIFT
+#define GFX_XFLAGS (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
+#define GFX_YFLAGS (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
+	static_assert((GFX_XFLAGS << GFX_FLAGS_X_TO_Y_LSHIFT) == GFX_YFLAGS);
+	static_assert((GFX_YFLAGS >> GFX_FLAGS_Y_TO_X_RSHIFT) == GFX_XFLAGS);
 #define Tswap(T, a, b) { T _temp = (a); (a) = (b); (b) = _temp; }
-	Tswap(video_offset_t, self->vxh_cxoff, self->vxh_cyoff);
-	Tswap(video_dim_t, self->vxh_cxsiz, self->vxh_cysiz);
-	Tswap(video_coord_t, self->vxh_bxmin, self->vxh_bymin);
-	Tswap(video_coord_t, self->vxh_bxend, self->vxh_byend);
+	Tswap(video_offset_t, self->vx_hdr.vxh_cxoff, self->vx_hdr.vxh_cyoff);
+	Tswap(video_dim_t, self->vx_hdr.vxh_cxsiz, self->vx_hdr.vxh_cysiz);
+	Tswap(video_coord_t, self->vx_hdr.vxh_bxmin, self->vx_hdr.vxh_bymin);
+	Tswap(video_coord_t, self->vx_hdr.vxh_bxend, self->vx_hdr.vxh_byend);
 #undef Tswap
+
+	/* Swap axis-specific flags */
+	self->vx_flags = (self->vx_flags & ~(GFX_XFLAGS | GFX_YFLAGS)) |
+	                 ((self->vx_flags & GFX_XFLAGS) << GFX_FLAGS_X_TO_Y_LSHIFT) |
+	                 ((self->vx_flags & GFX_YFLAGS) >> GFX_FLAGS_Y_TO_X_RSHIFT);
+#undef GFX_YFLAGS
+#undef GFX_XFLAGS
+#undef GFX_FLAGS_Y_TO_X_RSHIFT
+#undef GFX_FLAGS_X_TO_Y_LSHIFT
 }
 
 /* Perform geometric transformations on the contents of the current  clip
@@ -244,7 +259,7 @@ _libvideo_gfxhdr_xyswap(struct video_gfxhdr *__restrict self) {
 DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
-	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
+	_libvideo_gfx_xyswap(self);
 	self->vx_flags ^= VIDEO_GFX_F_XYSWAP;
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
@@ -266,16 +281,53 @@ libvideo_gfx_vmirror(struct video_gfx *__restrict self) {
 DEFINE_PUBLIC_ALIAS(video_gfx_lrot90, libvideo_gfx_lrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_lrot90(struct video_gfx *__restrict self) {
-	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
+	_libvideo_gfx_xyswap(self);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_rrot90, libvideo_gfx_rrot90);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_rrot90(struct video_gfx *__restrict self) {
-	_libvideo_gfxhdr_xyswap(&self->vx_hdr);
-	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_YMIRROR);
+	/* When rotated right, the virtual origin
+	 * >> vX=0, vY=0
+	 * maps to the physical origin at
+	 * >> pX=0, pY=self->vx_buffer->vb_ydim-1
+	 *
+	 * via the formula:
+	 * >> pX = vY, pY = (self->vx_buffer->vb_ydim - 1) - vX
+	 *
+	 * Since  mirroring  always  happens  before   X/Y-swap,
+	 * and since `_libvideo_gfx_xyswap'  already made it  so
+	 * `self->vx_hdr.vxh_cxsiz = self->vx_buffer->vb_ydim-1'
+	 * (assuming no custom clip rect), we have to toggle the
+	 * XMIRROR flag here  (since mirror  happens before  X/Y
+	 * swapping)
+	 *
+	 * This also means that rotating the screen 90° right actually
+	 * places the physical origin bottom-left -- THAT IS CORRECT!!
+	 *
+	 * Again: this is because if you  were to physically rotate  your
+	 *        screen 90° to the right to match, then the new physical
+	 *        origin would also be in the bottom left.
+	 *
+	 * Again: if you rotate an image right 90°, its physical origin
+	 *        will ALSO appears in the bottom-left.
+	 *
+	 *
+	 * If you're still not getting why this here is correct, image
+	 * your screen already containing an image. Now you now rotate
+	 * the screen to the right, what used to be the bottom-left is
+	 * now  the top-left, and the contents of your screen just got
+	 * rotate 90° clock-wise.
+	 * Now if you keep rendering stuff onto the screen, you're gonna
+	 * interact with the  former bottom-left as  the new top-  left!
+	 *
+	 * IOW: If  you rotate right, you're gonna get a NEW origin in
+	 *      the BOTTOM LEFT (even though your old origin is now in
+	 *      the top left). */
+	_libvideo_gfx_xyswap(self);
+	self->vx_flags ^= (VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_XMIRROR);
 	return video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS);
 }
 

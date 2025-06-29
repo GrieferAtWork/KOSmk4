@@ -211,6 +211,7 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 	}
 	return result;
 }
+#include <syslog.h>
 
 /* Convert "self" into a RGB/RGBA buffer. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
@@ -237,6 +238,9 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 		video_buffer_getgfx(self, &src_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
 		                    VIDEO_GFX_F_NORMAL, 0);
+		syslog(LOG_DEBUG, "libvideo_buffer_convert_to_lodepng_rgb(): [dst: %#x, %ux%u] [src: %#x, %ux%u]\n",
+		       dst_gfx.vx_flags, video_gfx_getclipw(&dst_gfx), video_gfx_getcliph(&dst_gfx),
+		       src_gfx.vx_flags, video_gfx_getclipw(&src_gfx), video_gfx_getcliph(&src_gfx));
 		video_gfx_bitblit(&dst_gfx, 0, 0,
 		                  &src_gfx, 0, 0,
 		                  self->vb_xdim, self->vb_ydim);
@@ -246,7 +250,7 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 
 PRIVATE WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_convert_and_save_lodepng(struct video_buffer *__restrict self,
-                                     FILE *stream, char const *options) {
+                                         FILE *stream, char const *options) {
 	int result;
 	REF struct video_buffer *rgb_buffer;
 	rgb_buffer = libvideo_buffer_convert_to_lodepng_rgb(self);

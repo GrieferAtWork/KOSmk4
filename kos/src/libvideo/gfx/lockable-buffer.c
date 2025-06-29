@@ -82,7 +82,6 @@ lockable_asram(struct video_rambuffer *__restrict rb,
 	rb->rb_data   = self->lb_data;
 }
 
-
 /* Read GFX into video lock */
 PRIVATE NONNULL((1)) void FCC
 lockable_readpixels(struct lockable_buffer const *__restrict self) {
@@ -94,7 +93,8 @@ lockable_readpixels(struct lockable_buffer const *__restrict self) {
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
-	video_gfx_bitblit(p_dstgfx, 0, 0, p_srcgfx, 0, 0,
+	video_gfx_bitblit(p_dstgfx, 0, 0,
+	                  p_srcgfx, 0, 0,
 	                  video_gfx_getclipw(p_dstgfx),
 	                  video_gfx_getcliph(p_dstgfx));
 }
