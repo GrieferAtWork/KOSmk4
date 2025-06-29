@@ -357,28 +357,36 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx const *__restrict self,
 	if (libvideo_gfx_allow_ignore(self, color))
 		return;
 
+	/*TRACE_START("generic__absline_llhh("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ")\n",
+	            dst_x, dst_y, size_x, size_y, color);*/
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
 	if (size_x > size_y) {
+		video_coord_t line_lox = 0;
 		do {
-			video_coord_t line_x = dst_x + step;
-			video_coord_t line_y = dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_x);
+			video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+			LL_absline_h(self, dst_x + line_lox, dst_y + step, line_hix - line_lox, color);
+			line_lox = line_hix;
+		} while (++step < size_y);
 	} else if (size_x < size_y) {
+		video_coord_t line_loy = 0;
 		do {
-			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
-			video_coord_t line_y = dst_y + step;
-			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_y);
+			video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+			LL_absline_v(self, dst_x + step, dst_y + line_loy, line_hiy - line_loy, color);
+			line_loy = line_hiy;
+		} while (++step < size_x);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y + step;
 			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_x);
+		} while (++step < size_x);
 	}
+	/*TRACE_END("generic__absline_llhh()\n");*/
 }
 
 INTERN ATTR_IN(1) void CC
@@ -396,21 +404,28 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 	}
 	if (libvideo_gfx_allow_ignore(self, color))
 		return;
+	/*TRACE_START("generic__absline_lhhl("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ")\n",
+	            dst_x, dst_y, size_x, size_y, color);*/
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
 	if (size_x > size_y) {
+		video_coord_t line_lox = 0;
 		do {
-			video_coord_t line_x = dst_x + step;
-			video_coord_t line_y = dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_x);
+			video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+			LL_absline_h(self, dst_x + line_lox, dst_y - step, line_hix - line_lox, color);
+			line_lox = line_hix;
+		} while (++step < size_y);
 	} else if (size_x < size_y) {
+		video_coord_t line_loy = 0;
 		do {
-			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
-			video_coord_t line_y = dst_y - step;
-			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_y);
+			video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+			LL_absline_v(self, dst_x + step, dst_y - line_hiy + 1, line_hiy - line_loy, color);
+			line_loy = line_hiy;
+		} while (++step < size_x);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
@@ -418,6 +433,7 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 			LL_putcolor(self, line_x, line_y, color);
 		} while (++step != size_x);
 	}
+	/*TRACE_END("generic__absline_llhh()\n");*/
 }
 
 INTERN ATTR_IN(1) void CC

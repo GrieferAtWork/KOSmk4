@@ -49,6 +49,14 @@
 
 DECL_BEGIN
 
+#if 1
+#define rand_color() \
+	VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256)
+#else
+#define rand_color() \
+	VIDEO_COLOR_RGB(rand() % 256, rand() % 256, rand() % 256)
+#endif
+
 PRIVATE void enable_rawtty_mode(void) {
 	pid_t cpid;
 	struct termios tios;
@@ -207,6 +215,40 @@ again_font:
 				gfx.fill(VIDEO_COLOR_BLACK);
 				continue;
 
+			case 'h': {
+				video_dim_t i;
+				video_offset_t x1 = video_gfx_getclipw(&gfx) / 2;
+				video_offset_t y1 = video_gfx_getcliph(&gfx) / 2;
+				for (i = 0; i < video_gfx_getclipw(&gfx); ++i) {
+					gfx.line(x1, y1, i, 0, rand_color());
+					gfx.line(x1, y1, i, video_gfx_getcliph(&gfx) - 1, rand_color());
+				}
+				for (i = 0; i < video_gfx_getcliph(&gfx); ++i) {
+					gfx.line(x1, y1, 0, i, rand_color());
+					gfx.line(x1, y1, video_gfx_getclipw(&gfx) - 1, i, rand_color());
+				}
+			}	continue;
+
+			case 'j': {
+				video_dim_t i;
+				video_offset_t x1 = rand() % screen->vb_xdim;
+				video_offset_t y1 = rand() % screen->vb_ydim;
+				video_color_t color = rand_color();
+				for (i = 0; i < 100; ++i) {
+					video_dim_t xm = (x1 <= 0 ? 0 : x1) ?: 1;
+					video_dim_t xp = (video_dim_t)(x1 >= screen->vb_xdim ? 0 : screen->vb_xdim - x1) ?: 1;
+					video_dim_t ym = (y1 <= 0 ? 0 : y1) ?: 1;
+					video_dim_t yp = (video_dim_t)(y1 >= screen->vb_ydim ? 0 : screen->vb_ydim - y1) ?: 1;
+					int xsign = (rand() % (screen->vb_xdim)) < xm ? -1 : 1;
+					int ysign = (rand() % (screen->vb_ydim)) < ym ? -1 : 1;
+					video_offset_t x2 = x1 + (xsign * (rand() % (xsign < 0 ? xm : xp)));
+					video_offset_t y2 = y1 + (ysign * (rand() % (ysign < 0 ? ym : yp)));
+					gfx.line(x1, y1, x2, y2, color);
+					x1 = x2;
+					y1 = y2;
+				}
+			}	continue;
+
 			case 'w': {
 				int mode;
 				mode = fcntl(STDIN_FILENO, F_GETFL);
@@ -240,10 +282,7 @@ again_font:
 random_step:
 		action = rand() % 8;
 step:
-		color = VIDEO_COLOR_RGBA(rand() % 256,
-		                         rand() % 256,
-		                         rand() % 256,
-		                         rand() % 256);
+		color = rand_color();
 		switch (action) {
 
 		case 0: {
@@ -292,10 +331,10 @@ step:
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
 			video_color_t colors[2][2];
-			colors[0][0] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
-			colors[0][1] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
-			colors[1][0] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
-			colors[1][1] = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			colors[0][0] = rand_color();
+			colors[0][1] = rand_color();
+			colors[1][0] = rand_color();
+			colors[1][1] = rand_color();
 			gfx.gradient(x, y, size_x, size_y, colors);
 		}	break;
 
@@ -304,8 +343,8 @@ step:
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
-			video_color_t locolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
-			video_color_t hicolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			video_color_t locolor = rand_color();
+			video_color_t hicolor = rand_color();
 			gfx.hgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 
@@ -314,8 +353,8 @@ step:
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;
 			video_coord_t size_y = rand() % screen->vb_ydim;
-			video_color_t locolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
-			video_color_t hicolor = VIDEO_COLOR_RGBA(rand() % 256, rand() % 256, rand() % 256, rand() % 256);
+			video_color_t locolor = rand_color();
+			video_color_t hicolor = rand_color();
 			gfx.vgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 

@@ -66,23 +66,37 @@ libvideo_gfx_noblend__absline_llhh__bypixel(struct video_gfx const *__restrict s
 	video_dim_t step;
 	step = 0;
 	if (size_x > size_y) {
+		video_coord_t line_lox = 0;
 		do {
-			video_coord_t line_x = dst_x + step;
-			video_coord_t line_y = dst_y + (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			LL_setpixel(self, line_x, line_y, pixel);
-		} while (++step != size_x);
-	} else if (size_x < size_y) {
-		do {
-			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
+			video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+			video_coord_t line_x = dst_x + line_lox;
 			video_coord_t line_y = dst_y + step;
-			LL_setpixel(self, line_x, line_y, pixel);
-		} while (++step != size_y);
+			video_dim_t length = line_hix - line_lox;
+			do {
+				LL_setpixel(self, line_x, line_y, pixel);
+				++line_x;
+			} while (--length);
+			line_lox = line_hix;
+		} while (++step < size_y);
+	} else if (size_x < size_y) {
+		video_coord_t line_loy = 0;
+		do {
+			video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y + line_loy;
+			video_dim_t length = line_hiy - line_loy;
+			do {
+				LL_setpixel(self, line_x, line_y, pixel);
+				++line_y;
+			} while (--length);
+			line_loy = line_hiy;
+		} while (++step < size_x);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y + step;
 			LL_setpixel(self, line_x, line_y, pixel);
-		} while (++step != size_x);
+		} while (++step < size_x);
 	}
 }
 
@@ -103,33 +117,33 @@ libvideo_gfx_noblend__absline_llhh(struct video_gfx const *__restrict self,
 		if (size_x > size_y) {
 			void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 			                                      video_pixel_t pixel, video_dim_t num_pixels);
+			video_coord_t line_lox = 0;
 			vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
 			do {
-				video_dim_t row = (video_dim_t)(((uint64_t)size_y * step) / size_x);
-				video_dim_t row_end_step, row_length;
-				row_end_step = step + 1;
-				while (row == (video_dim_t)(((uint64_t)size_y * row_end_step) / size_x) &&
-				       row_end_step != size_x)
-					++row_end_step;
-				row_length = row_end_step - row;
-				(*vc_linefill)(line, dst_x + step, pixel, row_length);
-				step = row_end_step;
+				video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+				(*vc_linefill)(line, dst_x + line_lox, pixel, line_hix - line_lox);
+				line_lox = line_hix;
 				line += lock.vl_stride;
-			} while (step != size_x);
+			} while (++step < size_y);
+		} else if (size_x < size_y) {
+			void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+			                                      video_pixel_t pixel, video_dim_t num_pixels);
+			video_coord_t line_loy = 0;
+			vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
+			do {
+				video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+				video_dim_t length = line_hiy - line_loy;
+				(*vc_vertfill)(line, dst_x + step, lock.vl_stride, pixel, length);
+				line_loy = line_hiy;
+				line += length * lock.vl_stride;
+			} while (++step < size_x);
 		} else {
 			void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line, video_coord_t dst_x, video_pixel_t pixel);
 			vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
-			if (size_x < size_y) {
-				do {
-					(*vc_setpixel)(line, dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y), pixel);
-					line += lock.vl_stride;
-				} while (++step != size_y);
-			} else {
-				do {
-					(*vc_setpixel)(line, dst_x + step, pixel);
-					line += lock.vl_stride;
-				} while (++step != size_y);
-			}
+			do {
+				(*vc_setpixel)(line, dst_x + step, pixel);
+				line += lock.vl_stride;
+			} while (++step != size_y);
 		}
 		video_buffer_unlock(buffer, &lock);
 	} else {
@@ -146,17 +160,31 @@ libvideo_gfx_noblend__absline_lhhl__bypixel(struct video_gfx const *__restrict s
 	video_dim_t step;
 	step = 0;
 	if (size_x > size_y) {
+		video_coord_t line_lox = 0;
 		do {
-			video_coord_t line_x = dst_x + step;
-			video_coord_t line_y = dst_y - (video_dim_t)(((uint64_t)size_y * step) / size_x);
-			LL_setpixel(self, line_x, line_y, pixel);
-		} while (++step != size_x);
-	} else if (size_x < size_y) {
-		do {
-			video_coord_t line_x = dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y);
+			video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+			video_coord_t line_x = dst_x + line_lox;
 			video_coord_t line_y = dst_y - step;
-			LL_setpixel(self, line_x, line_y, pixel);
-		} while (++step != size_y);
+			video_dim_t length = line_hix - line_lox;
+			do {
+				LL_setpixel(self, line_x, line_y, pixel);
+				++line_x;
+			} while (--length);
+			line_lox = line_hix;
+		} while (++step < size_y);
+	} else if (size_x < size_y) {
+		video_coord_t line_loy = 0;
+		do {
+			video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+			video_coord_t line_x = dst_x + step;
+			video_coord_t line_y = dst_y - line_hiy + 1;
+			video_dim_t length = line_hiy - line_loy;
+			do {
+				LL_setpixel(self, line_x, line_y, pixel);
+				++line_y;
+			} while (--length);
+			line_loy = line_hiy;
+		} while (++step < size_x);
 	} else {
 		do {
 			video_coord_t line_x = dst_x + step;
@@ -183,33 +211,34 @@ libvideo_gfx_noblend__absline_lhhl(struct video_gfx const *__restrict self,
 		if (size_x > size_y) {
 			void (LIBVIDEO_CODEC_CC *vc_linefill)(byte_t *__restrict line, video_coord_t dst_x,
 			                                      video_pixel_t pixel, video_dim_t num_pixels);
+			video_coord_t line_lox = 0;
 			vc_linefill = buffer->vb_format.vf_codec->vc_linefill;
 			do {
-				video_dim_t row = (video_dim_t)(((uint64_t)size_y * step) / size_x);
-				video_dim_t row_end_step, row_length;
-				row_end_step = step + 1;
-				while (row == (video_dim_t)(((uint64_t)size_y * row_end_step) / size_x) &&
-				       row_end_step != size_x)
-					++row_end_step;
-				row_length = row_end_step - row;
-				(*vc_linefill)(line, dst_x + step, pixel, row_length);
-				step = row_end_step;
+				video_coord_t line_hix = (video_dim_t)(((uint64_t)size_x * (step + 1)) / size_y);
+				(*vc_linefill)(line, dst_x + line_lox, pixel, line_hix - line_lox);
+				line_lox = line_hix;
 				line -= lock.vl_stride;
-			} while (step != size_x);
+			} while (++step < size_y);
+		} else if (size_x < size_y) {
+			void (LIBVIDEO_CODEC_CC *vc_vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,
+			                                      video_pixel_t pixel, video_dim_t num_pixels);
+			video_coord_t line_loy = 0;
+			vc_vertfill = buffer->vb_format.vf_codec->vc_vertfill;
+			line += lock.vl_stride;
+			do {
+				video_coord_t line_hiy = (video_dim_t)(((uint64_t)size_y * (step + 1)) / size_x);
+				video_dim_t length = line_hiy - line_loy;
+				line -= length * lock.vl_stride;
+				(*vc_vertfill)(line, dst_x + step, lock.vl_stride, pixel, length);
+				line_loy = line_hiy;
+			} while (++step < size_x);
 		} else {
 			void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line, video_coord_t dst_x, video_pixel_t pixel);
 			vc_setpixel = buffer->vb_format.vf_codec->vc_setpixel;
-			if (size_x < size_y) {
-				do {
-					(*vc_setpixel)(line, dst_x + (video_dim_t)(((uint64_t)size_x * step) / size_y), pixel);
-					line -= lock.vl_stride;
-				} while (++step != size_y);
-			} else {
-				do {
-					(*vc_setpixel)(line, dst_x + step, pixel);
-					line -= lock.vl_stride;
-				} while (++step != size_y);
-			}
+			do {
+				(*vc_setpixel)(line, dst_x + step, pixel);
+				line -= lock.vl_stride;
+			} while (++step != size_y);
 		}
 		video_buffer_unlock(buffer, &lock);
 	} else {
@@ -236,6 +265,7 @@ libvideo_gfx_noblend__absline_h(struct video_gfx const *__restrict self,
 	struct video_lock lock;
 	struct video_buffer *buffer = self->vx_buffer;
 	video_pixel_t pixel = video_format_color2pixel(&buffer->vb_format, color);
+	gfx_assert(length > 0);
 	if likely(video_buffer_wlock(buffer, &lock) == 0) {
 		byte_t *line = lock.vl_data + dst_y * lock.vl_stride;
 		(*buffer->vb_format.vf_codec->vc_linefill)(line, dst_x, pixel, length);
@@ -1138,7 +1168,7 @@ done:
 }
 
 static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)0)->_vbt_driver),
-              "This relation is required because `libvideo_gfx_generic__*' require driver-"
+              "This relation is required because `libvideo_blitter_noblend_difffmt__*' require driver-"
               "specific data to be set-up as a pixel format converter");
 
 INTERN ATTR_IN(1) void CC
@@ -1153,9 +1183,8 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 	TRACE_START("noblend_difffmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "}) "
-	            "[method: %[vinfo:%n]]\n",
-	            dst_x, dst_y, src_x, src_y, size_x, size_y, conv->vcv_mappixel);
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 	/* Blit per-pixel, with pixel format converter */
 	for (y = 0; y < size_y; ++y) {
 		for (x = 0; x < size_x; ++x) {
@@ -1254,6 +1283,81 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	}
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");
 }
+
+INTERN ATTR_IN(1) void CC
+libvideo_blitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__restrict self,
+                                               video_coord_t dst_x, video_coord_t dst_y,
+                                               video_coord_t src_x, video_coord_t src_y,
+                                               video_dim_t size_x, video_dim_t size_y,
+                                               video_imatrix2d_t src_matrix) {
+	video_dim_t x, y;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	gfx_assert_imatrix2d(&src_matrix);
+
+	/* Fast-pass for known matrices */
+	switch (src_matrix) {
+	case VIDEO_IMATRIX2D_INIT(1, 0, 0, 1):
+		libvideo_blitter_noblend_samefmt__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+		return;
+		/* TODO: More optimizations for known rotation/mirror matrices */
+	case VIDEO_IMATRIX2D_INIT(1, 0, 0, -1):
+		/* TODO: vflip */
+		break;
+	case VIDEO_IMATRIX2D_INIT(-1, 0, 0, 1):
+		/* TODO: hflip */
+		break;
+	case VIDEO_IMATRIX2D_INIT(0, -1, 1, 0):
+		/* TODO: lrot90 */
+		break;
+	case VIDEO_IMATRIX2D_INIT(0, 1, -1, 0):
+		/* TODO: rrot90 */
+		break;
+	case VIDEO_IMATRIX2D_INIT(-1, 0, 0, -1):
+		/* TODO: rot180 */
+		break;
+	default: break;
+	}
+
+
+	TRACE_START("noblend_samefmt__blit_imatrix("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "matrix: {{%d,%d},{%d,%d}})\n",
+	            dst_x, dst_y, src_x, src_y, size_x, size_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
+	/* Blit per-pixel, with pixel format converter */
+	for (y = 0; y < size_y; ++y) {
+		video_offset_t delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * y;
+		video_offset_t delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * y;
+		for (x = 0; x < size_x; ++x) {
+			video_pixel_t pixel;
+			video_coord_t used_src_x = delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * x;
+			video_coord_t used_src_y = delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * x;
+			video_coord_t used_dst_x = dst_x + x;
+			video_coord_t used_dst_y = dst_y + y;
+			pixel = LL_getpixel(src, used_src_x, used_src_y);
+			LL_setpixel(dst, used_dst_x, used_dst_y, pixel);
+		}
+	}
+	TRACE_END("noblend_samefmt__blit_imatrix()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_blitter_noblend_samebuf__blit_imatrix(struct video_blitter const *__restrict self,
+                                               video_coord_t dst_x, video_coord_t dst_y,
+                                               video_coord_t src_x, video_coord_t src_y,
+                                               video_dim_t size_x, video_dim_t size_y,
+                                               video_imatrix2d_t src_matrix) {
+	/* TODO */
+	libvideo_blitter_samebuf__blit_imatrix(self, dst_x, dst_y, src_x, src_y,
+	                                       size_x, size_y, src_matrix);
+}
+
 
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const *__restrict self,

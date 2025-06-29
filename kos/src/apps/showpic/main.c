@@ -248,10 +248,11 @@ do_showpic(struct screen_buffer *screen,
 	video_gfx_clip(&screen_gfx, -20, -20,
 	               video_gfx_getclipw(&screen_gfx) + 40,
 	               video_gfx_getcliph(&screen_gfx) + 40);*/
-	/*video_gfx_hmirror(&screen_gfx);*/
-	//video_gfx_vmirror(&screen_gfx);
-	video_gfx_lrot90(&screen_gfx);
+//	video_gfx_hmirror(&screen_gfx);
+//	video_gfx_vmirror(&screen_gfx);
+//	video_gfx_lrot90(&screen_gfx);
 //	video_gfx_lrot90(&image_gfx);
+	video_gfx_rrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -291,12 +292,12 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 1
+#if 0
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
-#elif 0
+#elif 1
 	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
 	                  &image_gfx, 0, 0,
 	                  blit_w, blit_h);
@@ -397,7 +398,7 @@ do_showpic(struct screen_buffer *screen,
 #undef gfx_printf
 	}
 
-#if 1
+#if 0
 	static bool firsttime = true;
 	if (firsttime) {
 		firsttime = false;

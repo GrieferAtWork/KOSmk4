@@ -324,6 +324,8 @@ struct video_codec {
 	                                 __byte_t const *__src_line, video_coord_t __src_x,
 	                                 __size_t __stride, video_dim_t __size_x, video_dim_t __size_y);
 
+	/* TODO: More operators for fast rectcopy w/ rotation/mirroring */
+
 	/* Extra implementation-specific operators/fields go here... */
 };
 
