@@ -247,7 +247,7 @@ struct video_anim_writer_ops {
 	 * write  the animation to a filesystem location, the output file will
 	 * be deleted by this call (though this failing is silently ignored). */
 	__ATTR_NONNULL_T((1)) void
-	(LIBVIDEO_GFX_CC *vawo_destroy)(struct video_anim_writer *__restrict __self);
+	__NOTHROW_T(LIBVIDEO_GFX_CC *vawo_destroy)(struct video_anim_writer *__restrict __self);
 
 	/* Write a single  `__frame' to  the animation. During  playback, said  frame
 	 * will be shown for the closest representable delay to `__self->vaw_showfor'
@@ -292,7 +292,7 @@ struct video_anim_writer_ops {
  * used to write the animation to a filesystem location, the output file will
  * be deleted by this call (though this failing is silently ignored). */
 extern __ATTR_NONNULL((1)) void
-video_anim_writer_destroy(struct video_anim_writer *__restrict __self);
+__NOTHROW(video_anim_writer_destroy)(struct video_anim_writer *__restrict __self);
 
 /* Write a single  `__frame' to  the animation. During  playback, said  frame
  * will be shown for the closest representable delay to `__self->vaw_showfor'
