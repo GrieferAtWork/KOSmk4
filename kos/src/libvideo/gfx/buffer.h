@@ -48,6 +48,13 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
                         struct video_palette *palette,
                         unsigned int type);
 
+/* Same as `video_buffer_convert()', but always return a distinct buffer, even if formats match */
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
+                                struct video_codec const *codec,
+                                struct video_palette *palette,
+                                unsigned int type);
+
 /* Create a video buffer, or return NULL and set errno if creation failed.
  * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
  *       which may not necessarily use the  given, or default `codec' and  `palette'

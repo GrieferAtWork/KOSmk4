@@ -156,6 +156,20 @@ video_buffer_convert(struct video_buffer *__restrict __self,
                      unsigned int __type);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
+/* Same as `video_buffer_convert()', but always return a distinct buffer, even if formats match */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT_OR_COPY)(struct video_buffer *__restrict __self,
+                                                 struct video_codec const *__codec,
+                                                 struct video_palette *__palette,
+                                                 unsigned int __type);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_convert_or_copy(struct video_buffer *__restrict __self,
+                             struct video_codec const *__codec,
+                             struct video_palette *__palette,
+                             unsigned int __type);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 #ifdef __INTELLISENSE__
 /* Get graphics functions for use with the given buffer
  * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
@@ -396,8 +410,8 @@ typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unl
  * @param: __getpixel: [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
  * @param: __setpixel: [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
  * @param: __destroy:  [0..1] Optional callback invoked when the returned buffer is destroyed
- * @param: __rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `__getpixel' is used)
- * @param: __wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `__setpixel' is used)
+ * @param: __rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `__getpixel' is always used)
+ * @param: __wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `__setpixel' is always used)
  * @param: __unlock:   [0..1] Optional callback invoked to release video locks previously acquired by `__rlock' or `__wlock'
  * @param: __cookie:   [?..?] Cookie argument passed to all user-supplied operators */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 5, 6)) __REF struct video_buffer *

@@ -92,10 +92,9 @@ struct video_blitter;
 
 /* Video bitmask descriptor.
  *
- * Bitmasks can be used to mask blitting/filling of pixels in
- * fill/blit/stretch  operations, such that only pixels where
- * the corresponding bit is "1"  in the used bitmask will  be
- * copied/filled.
+ * Bitmasks can be used to mask filling of pixels in fill/stretch
+ * operations, such that the corresponding bit selects the source
+ * color used for that pixel during the fill/stretch.
  *
  * Bitmasks are expected to encode their bits similar to
  * `VIDEO_CODEC_L1_MSB', except  that `vbm_skip'  allows
@@ -123,7 +122,9 @@ struct video_bitmask {
 /* 2d integer matrix video_imatrix2d_t[y][x].
  * Only allowed to  hold values -1,  0, or  1
  *
- * Vector is only applied to relative coords (never absolute ones). */
+ * Vector is only applied to relative coords (never absolute ones).
+ * >> used_x = base_x + video_imatrix2d_get(matrix, 0, 0) * rel_x + video_imatrix2d_get(matrix, 0, 1) * rel_y;
+ * >> used_y = base_y + video_imatrix2d_get(matrix, 1, 0) * rel_x + video_imatrix2d_get(matrix, 1, 1) * rel_y; */
 typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
 #define __video_imatrix2d_shift(y, x)      ((y) * 16 + (x) * 8)
 #define __video_imatrix2d_mask(y, x)       ((video_imatrix2d_t)0xff << __video_imatrix2d_shift(y, x))
@@ -143,9 +144,6 @@ typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
 
 struct video_blitter_xops {
 	/* All of the following callbacks are [1..1]
-	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
-	 *          as well as always  assume that the given  coords are in-bounds of  the
-	 *          underlying buffer.
 	 * WARNING: Don't use these operators; only use `struct video_gfx_ops' */
 
 #define _VIDEO_BLIT_XOPS__N_INTERNAL 8
@@ -227,7 +225,8 @@ struct video_blitter_ops {
 	                                video_offset_t __src_x, video_offset_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	/* TODO: Some way to rotate and flip pixels during blits (using a floating-point translation matrix) */
+	/* TODO: Some way to rotate and flip pixels during blits (using precise angles,
+	 *       rather than the mere 90° rotations possible via  `VIDEO_GFX_F_XYSWAP') */
 
 	/* More driver-specific operators go here... */
 };
@@ -239,10 +238,12 @@ struct video_gfx_xops {
 #ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
 	void (*_vgfx_internal[_VIDEO_GFX_XOPS__N_INTERNAL])(void);
 #else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
+	/* TODO: Don't even expose this stuff in headers -- instead,
+	 *       move all these operators into `_vx_driver' so a hw-
+	 *       gfx  implementation could do a completely different
+	 *       HL->LL system */
+
 	/* All of the following callbacks are [1..1]
-	 * WARNING: None of these functions will NOT add `vx_offt_(x|y)' to the given X/Y,
-	 *          as well as always  assume that the given  coords are in-bounds of  the
-	 *          underlying buffer.
 	 * WARNING: Don't use these operators; only use `struct video_gfx_ops' */
 
 	/* Get the color of a pixel */
@@ -885,7 +886,7 @@ public:
 };
 
 struct video_gfxhdr {
-	struct video_gfx_ops const *vxh_ops; /* [1..1][const] GFX operations (use these) */
+	struct video_gfx_ops const *vxh_ops; /* [1..1][const] GFX operators (use these) */
 
 	/* [1..1][const]
 	 * Initialize a blitting context that reads from `__ctx->vbt_src' and writes to  `__ctx->vbt_dst'.

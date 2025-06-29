@@ -150,8 +150,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
  * @param: getpixel: [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
  * @param: setpixel: [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
  * @param: destroy:  [0..1] Optional callback invoked when the returned buffer is destroyed
- * @param: rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `getpixel' is used)
- * @param: wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `setpixel' is used)
+ * @param: rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `getpixel' is always used)
+ * @param: wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `setpixel' is always used)
  * @param: unlock:   [0..1] Optional callback invoked to release video locks previously acquired by `rlock' or `wlock'
  * @param: cookie:   [?..?] Cookie argument passed to all user-supplied operators */
 DEFINE_PUBLIC_ALIAS(video_buffer_forcustom, libvideo_buffer_forcustom);

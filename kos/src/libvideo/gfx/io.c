@@ -50,8 +50,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/anim.h>
 /**/
 
-#include "io.h"
+#include "anim.h"
 #include "io-utils.h"
+#include "io.h"
 
 /**/
 
@@ -347,87 +348,6 @@ libvideo_buffer_save(struct video_buffer *self,
 	return result;
 }
 
-
-
-
-struct oneframe_anim: video_anim {
-	REF struct video_buffer *ofa_frame; /* [1..1][const] The one-and-only frame */
-};
-
-PRIVATE NONNULL((1)) void CC
-oneframe_anim_destroy(struct video_anim *__restrict self) {
-	struct oneframe_anim *me = (struct oneframe_anim *)self;
-	video_buffer_decref(me->ofa_frame);
-	free(me);
-}
-
-PRIVATE ATTR_OUT(1) void CC
-oneframe_anim_populate_info(struct video_anim_frameinfo *__restrict info) {
-	info->vafi_frameid         = 0;
-	info->vafi_showfor.tv_sec  = 999999;
-	info->vafi_showfor.tv_usec = 999999;
-}
-
-PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) REF struct video_buffer *CC
-oneframe_anim_firstframe(struct video_anim const *__restrict self,
-                         struct video_anim_frameinfo *__restrict info) {
-	struct oneframe_anim *me = (struct oneframe_anim *)self;
-	oneframe_anim_populate_info(info);
-	video_buffer_incref(me->ofa_frame);
-	return me->ofa_frame;
-}
-
-PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
-oneframe_anim_nextframe(struct video_anim const *__restrict self,
-                        /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
-                        struct video_anim_frameinfo *__restrict info) {
-	/* These is no next frame -- indicate that the caller
-	 * should  sleep really long,  and don't do anything. */
-	(void)self;
-	oneframe_anim_populate_info(info);
-	return buf;
-}
-
-
-#undef oneframe_anim_ops
-PRIVATE struct video_anim_ops oneframe_anim_ops = {};
-PRIVATE struct video_anim_ops *CC _oneframe_anim_ops(void) {
-	if (!oneframe_anim_ops.vao_destroy) {
-		oneframe_anim_ops.vao_nextframe  = &oneframe_anim_nextframe;
-		oneframe_anim_ops.vao_firstframe = &oneframe_anim_firstframe;
-		COMPILER_WRITE_BARRIER();
-		oneframe_anim_ops.vao_destroy = &oneframe_anim_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &oneframe_anim_ops;
-}
-#define oneframe_anim_ops (*_oneframe_anim_ops())
-
-
-/* Create a single-frame video animation from a given buffer.
- * The  returned  animation object  always  re-return `frame'
- * when a call is made to `video_anim_firstframe', and trying
- * to load any  other frame via  `video_anim_nextframe' is  a
- * no-op.
- * @return: * :   The controller for the single-frame video animation
- * @return: NULL: Out of memory. */
-DEFINE_PUBLIC_ALIAS(video_anim_fromframe, libvideo_anim_fromframe);
-INTERN WUNUSED ATTR_INOUT(1) REF struct video_anim *CC
-libvideo_anim_fromframe(struct video_buffer *__restrict frame) {
-	REF struct oneframe_anim *result;
-	result = (REF struct oneframe_anim *)malloc(sizeof(struct oneframe_anim));
-	if unlikely(!result)
-		goto err;
-	result->va_refcnt = 1;
-	result->va_ops    = &oneframe_anim_ops;
-	result->va_size_x = frame->vb_xdim;
-	result->va_size_y = frame->vb_ydim;
-	result->ofa_frame = frame;
-	video_buffer_incref(frame);
-	return result;
-err:
-	return NULL;
-}
 
 
 

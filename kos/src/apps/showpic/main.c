@@ -251,7 +251,7 @@ do_showpic(struct screen_buffer *screen,
 	               video_gfx_getcliph(&screen_gfx) + 40);*/
 	/*video_gfx_hmirror(&screen_gfx);*/
 	//video_gfx_vmirror(&screen_gfx);
-	video_gfx_rrot90(&screen_gfx);
+	/*video_gfx_rrot90(&screen_gfx);*/
 	//video_gfx_lrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
@@ -321,23 +321,19 @@ do_showpic(struct screen_buffer *screen,
 		                                   blit_h / tiles_y,
 		                                   format_buf->vb_format.vf_codec,
 		                                   format_buf->vb_format.vf_pal);
-		video_buffer_getgfx(sized_buffer, &sized_gfx,
-		                    video_gfx_getblend(&image_gfx),
-		                    (video_gfx_getflags(&image_gfx) |
-		                     VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR) &
-		                    ~VIDEO_GFX_F_XYSWAP,
-		                    video_gfx_getcolorkey(&image_gfx));
+		video_buffer_getgfx(sized_buffer, &sized_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_stretch(&sized_gfx, 0, 0, video_gfx_getclipw(&sized_gfx), video_gfx_getcliph(&sized_gfx),
 		                  &image_gfx, 0, 0, video_gfx_getclipw(&image_gfx), video_gfx_getcliph(&image_gfx));
+		video_buffer_getgfx(sized_buffer, &sized_gfx,
+		                    video_gfx_getblend(&image_gfx),
+		                    video_gfx_getflags(&image_gfx),
+		                    video_gfx_getcolorkey(&image_gfx));
 		video_gfx_bitblit(&screen_gfx, blit_x, blit_y, &sized_gfx,
 		                  dst_offset + (video_gfx_getclipw(&sized_gfx) / 2),
 		                  dst_offset + (video_gfx_getcliph(&sized_gfx) / 2),
 		                  blit_w, blit_h);
 		video_buffer_decref(sized_buffer);
 	} else {
-		video_gfx_setflags(&image_gfx,
-		                   video_gfx_getflags(&image_gfx)/* |
-		                   VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR*/);
 		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 		                  &image_gfx,
 		                  (video_gfx_getclipw(&image_gfx) / 2) + dst_offset * tiles_x,
@@ -346,7 +342,7 @@ do_showpic(struct screen_buffer *screen,
 		                  video_gfx_getcliph(&image_gfx) * tiles_y);
 	}
 
-#if 1
+#if 0
 	for (unsigned int tile_y = 0; tile_y < tiles_y + 1; ++tile_y) {
 		for (unsigned int tile_x = 0; tile_x < tiles_x + 1; ++tile_x) {
 			video_dim_t r_w = blit_w / tiles_x;
@@ -420,20 +416,35 @@ int main(int argc, char *argv[]) {
 	/* Load default system font */
 	font = video_font_lookup(VIDEO_FONT_DEFAULT);
 
+	/* Bind the screen buffer. */
+	screen = screen_buffer_create(NULL);
+	if (!screen)
+		err(EXIT_FAILURE, "Failed to load screen buffer");
+
 	/* Load the named file as a video buffer. */
 	anim = video_anim_open(argv[1]);
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to open image");
 
+	/* GIF render times (for some random animation I'm using for testing):
+	 * - no caching:         ~91% spent sleeping  (=> x10 pixel output possible)
+	 * - src format caching: ~95% spent sleeping  (=> x20 pixel output possible)
+	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
+#if 0
+	anim = video_anim_cached(anim, NULL, NULL, VIDEO_BUFFER_AUTO);
+#elif 0
+	anim = video_anim_cached(anim,
+	                         screen_buffer_asvideo(screen)->vb_format.vf_codec,
+	                         screen_buffer_asvideo(screen)->vb_format.vf_pal,
+	                         VIDEO_BUFFER_AUTO);
+#endif
+	if unlikely(!anim)
+		err(EXIT_FAILURE, "Failed to cache animation");
+
 	/* Load first frame of a potentially animated image */
 	frame = video_anim_firstframe(anim, &frame_info);
 	if unlikely(!frame)
 		err(EXIT_FAILURE, "Failed to load frame");
-
-	/* Bind the screen buffer. */
-	screen = screen_buffer_create(NULL);
-	if (!screen)
-		err(EXIT_FAILURE, "Failed to load screen buffer");
 
 	/* Clear screen */
 	{

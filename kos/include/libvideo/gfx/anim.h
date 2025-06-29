@@ -191,6 +191,22 @@ video_anim_fromframe(struct video_buffer *__restrict __frame);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
+/* Return a wrapper for `__self'  that caches animation frames  during
+ * the first loop, and simply replays them during any subsequent loop.
+ * @param: __codec:   When non-null,  animation frames  are converted  into
+ *                    this pixel format, rather than being copied verbatim.
+ * @param: __palette: Used with `__codec' (if non-NULL)
+ * @param: __type:    The type of video buffer to use for cached images. */
+typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_OPT_T(2) __ATTR_IN_OPT_T(3) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_CACHED)(struct video_anim *__restrict __self, struct video_codec const *__codec,
+                                      struct video_palette *__palette, unsigned int __type);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(2) __ATTR_IN_OPT(3) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_cached(struct video_anim *__restrict __self, struct video_codec const *__codec,
+                  struct video_palette *__palette, unsigned int __type);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
 /* Various functions for opening a file/stream/blob as an animation file.
  * The actual file format is auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, GIF is supported.

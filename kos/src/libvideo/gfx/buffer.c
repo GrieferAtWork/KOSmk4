@@ -70,8 +70,6 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
                         struct video_codec const *codec,
                         struct video_palette *palette,
                         unsigned int type) {
-	REF struct video_buffer *result;
-
 	/* Ensure that no palette is used if none is needed. */
 	if (/*palette &&*/ !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
 		palette = NULL;
@@ -80,11 +78,23 @@ libvideo_buffer_convert(struct video_buffer *__restrict self,
 	if (self->vb_format.vf_codec == codec &&
 	    self->vb_format.vf_pal == palette) {
 		if (type == VIDEO_BUFFER_AUTO ||
-		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == _rambuffer_ops())))
-			return incref(self);
+		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == _rambuffer_ops()))) {
+			video_buffer_incref(self);
+			return self;
+		}
 	}
+	return libvideo_buffer_convert_or_copy(self, codec, palette, type);
+}
 
+/* Same as `video_buffer_convert()', but always return a distinct buffer, even if formats match */
+DEFINE_PUBLIC_ALIAS(video_buffer_convert_or_copy, libvideo_buffer_convert_or_copy);
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
+                                struct video_codec const *codec,
+                                struct video_palette *palette,
+                                unsigned int type) {
 	/* Create a new video buffer */
+	REF struct video_buffer *result;
 	result = libvideo_buffer_create(type, self->vb_xdim, self->vb_ydim, codec, palette);
 	if likely(result) {
 		struct video_gfx src_gfx;
