@@ -67,26 +67,16 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-enum fmt {
-	FMT_BAD,
-#define FMT_FIRST FMT_PNG
-	FMT_PNG,
-	FMT_JPG,
-	FMT_BMP,
-	FMT_GIF,
-#define FMT_LAST FMT_GIF
-};
-
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) enum fmt CC
-detect_format(char const *name) {
-	if (strcasecmp(name, "png") == 0)
+INTERN ATTR_PURE WUNUSED NONNULL((1)) enum filefmt CC
+filefmt_detect(char const *__restrict format) {
+	if (strcasecmp(format, "png") == 0)
 		return FMT_PNG;
-	if (strcasecmp(name, "jpg") == 0 ||
-	    strcasecmp(name, "jpeg") == 0)
+	if (strcasecmp(format, "jpg") == 0 ||
+	    strcasecmp(format, "jpeg") == 0)
 		return FMT_JPG;
-	if (strcasecmp(name, "bmp") == 0)
+	if (strcasecmp(format, "bmp") == 0)
 		return FMT_BMP;
-	if (strcasecmp(name, "gif") == 0)
+	if (strcasecmp(format, "gif") == 0)
 		return FMT_GIF;
 	return FMT_BAD;
 }
@@ -114,7 +104,7 @@ frame2anim(REF struct video_buffer *frame) {
 
 PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
-                         struct mapfile *p_mapfile, enum fmt fmt) {
+                         struct mapfile *p_mapfile, enum filefmt fmt) {
 	switch (fmt) {
 	case FMT_PNG:
 		return libvideo_buffer_open_png(blob, blob_size);
@@ -132,7 +122,7 @@ libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
 
 PRIVATE ATTR_NOINLINE WUNUSED REF struct video_anim *CC
 libvideo_anim_open_fmt(void const *blob, size_t blob_size,
-                       struct mapfile *p_mapfile, enum fmt fmt) {
+                       struct mapfile *p_mapfile, enum filefmt fmt) {
 	switch (fmt) {
 	case FMT_PNG:
 		/* TODO: Use the (now-apng-patched) libpng to support animated PNG files */
@@ -149,10 +139,14 @@ libvideo_anim_open_fmt(void const *blob, size_t blob_size,
 	return NULL;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
+INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
                          FILE *stream, char const *options,
-                         enum fmt fmt) {
+                         enum filefmt fmt) {
+	/* TODO: Wrap "self" such that it rlock()  never fails due to the  underlying
+	 *       buffer not supporting that  function (where the underlying  buffer's
+	 *       rlock() would have failed, allocate a heap buffer, and use GFX pixel
+	 *       reads to read pixel data into a temporary buffer) */
 	switch (fmt) {
 	case FMT_PNG:
 		return libvideo_buffer_save_png(self, stream, options);
@@ -160,6 +154,7 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 		return libvideo_buffer_save_jpg(self, stream, options);
 	case FMT_BMP:
 		return libvideo_buffer_save_bmp(self, stream, options);
+		/* TODO: GIF */
 	default: break;
 	}
 	errno = ENOTSUP;
@@ -172,9 +167,9 @@ PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
 libvideo_buffer_open_impl(void const *blob, size_t blob_size,
                           char const *format_hint, struct mapfile *p_mapfile) {
 	REF struct video_buffer *result;
-	enum fmt used_format, hinted_format = FMT_BAD;
+	enum filefmt used_format, hinted_format = FMT_BAD;
 	if (format_hint != NULL) {
-		hinted_format = detect_format(format_hint);
+		hinted_format = filefmt_detect(format_hint);
 		if (hinted_format != FMT_BAD) {
 			result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, hinted_format);
 			if (result != VIDEO_BUFFER_WRONG_FMT)
@@ -183,7 +178,7 @@ libvideo_buffer_open_impl(void const *blob, size_t blob_size,
 	}
 	for (used_format = FMT_FIRST;
 	     (unsigned int)used_format <= (unsigned int)FMT_LAST;
-	     used_format = (enum fmt)((unsigned int)used_format + 1)) {
+	     used_format = (enum filefmt)((unsigned int)used_format + 1)) {
 		if (used_format == hinted_format)
 			continue; /* Already tried this one... */
 		result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, used_format);
@@ -199,9 +194,9 @@ PRIVATE ATTR_NOINLINE WUNUSED REF struct video_anim *CC
 libvideo_anim_open_impl(void const *blob, size_t blob_size,
                         char const *format_hint, struct mapfile *p_mapfile) {
 	REF struct video_anim *result;
-	enum fmt used_format, hinted_format = FMT_BAD;
+	enum filefmt used_format, hinted_format = FMT_BAD;
 	if (format_hint != NULL) {
-		hinted_format = detect_format(format_hint);
+		hinted_format = filefmt_detect(format_hint);
 		if (hinted_format != FMT_BAD) {
 			result = libvideo_anim_open_fmt(blob, blob_size, p_mapfile, hinted_format);
 			if (result != VIDEO_ANIM_WRONG_FMT)
@@ -210,7 +205,7 @@ libvideo_anim_open_impl(void const *blob, size_t blob_size,
 	}
 	for (used_format = FMT_FIRST;
 	     (unsigned int)used_format <= (unsigned int)FMT_LAST;
-	     used_format = (enum fmt)((unsigned int)used_format + 1)) {
+	     used_format = (enum filefmt)((unsigned int)used_format + 1)) {
 		if (used_format == hinted_format)
 			continue; /* Already tried this one... */
 		result = libvideo_anim_open_fmt(blob, blob_size, p_mapfile, used_format);
@@ -226,7 +221,7 @@ PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3)) int CC
 libvideo_buffer_save_impl(struct video_buffer *__restrict self,
                           char const *format,
                           FILE *stream, char const *options) {
-	enum fmt used_format = detect_format(format);
+	enum filefmt used_format = filefmt_detect(format);
 	return libvideo_buffer_save_fmt(self, stream, options, used_format);
 }
 
@@ -299,7 +294,6 @@ libvideo_buffer_open(char const *filename) {
  *                   simply pass `NULL' to use defaults for everything.
  * @return: 0 : Success
  * @return: -1: [errno=ENOTSUP] Unsupported `format'
- * @return: -1: [errno=ENOTSUP] Unsupported parameter in `options'
  * @return: -1: Error (s.a. `errno') */
 DEFINE_PUBLIC_ALIAS(video_buffer_fsave, libvideo_buffer_fsave);
 INTERN WUNUSED NONNULL((1, 2)) int CC

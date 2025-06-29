@@ -160,10 +160,10 @@ struct video_anim_ops {
 	(*(self)->va_ops->vao_nextframe)(self, buf, info)
 
 struct video_anim {
-	__uintptr_t                  va_refcnt; /* Reference counter. */
 	struct video_anim_ops const *va_ops;    /* [1..1][const] Video animation operators */
-	video_dim_t                  va_size_x; /* [const] Size in X of the animation buffer */
-	video_dim_t                  va_size_y; /* [const] Size in Y of the animation buffer */
+	video_dim_t                  va_xdim;   /* [const] X pixel dimension of animation frames */
+	video_dim_t                  va_ydim;   /* [const] Y pixel dimension of animation frames */
+	__uintptr_t                  va_refcnt; /* Reference counter. */
 	/* Extra animation-specific data goes here... */
 };
 
@@ -233,7 +233,145 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_anim *LIBVIDEO_GFX_CC
 video_anim_open(char const *__filename);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-/* TODO: Api for saving a video animation */
+
+
+/************************************************************************/
+/* VIDEO ANIMATION WRITER API                                           */
+/************************************************************************/
+
+struct video_anim_writer;
+struct video_anim_writer_ops {
+	/* Called to destroy the animation writer.
+	 *
+	 * When called before `vawo_finish', and `video_anim_save' was used to
+	 * write  the animation to a filesystem location, the output file will
+	 * be deleted by this call (though this failing is silently ignored). */
+	__ATTR_NONNULL_T((1)) void
+	(LIBVIDEO_GFX_CC *vawo_destroy)(struct video_anim_writer *__restrict __self);
+
+	/* Write a single  `__frame' to  the animation. During  playback, said  frame
+	 * will be shown for the closest representable delay to `__self->vaw_showfor'
+	 * The actual frame data  written is the Clip  Rect of `__frame', with  pixel
+	 * data blended with any preceding frame as per `GFX_BLENDMODE_OVERRIDE'  for
+	 * all  pixels within the I/O rect, with  all pixels outside simply not being
+	 * altered (the initial state of this "background" is format-specific, but it
+	 * is probably either all-black, or transparent).
+	 *
+	 * This function will automatically check what actually changed during  some
+	 * frame and (depending on output format), will probably only write actually
+	 * changed regions.
+	 *
+	 * @return: 0 : Success
+	 * @return: -1: [errno=EINVAL]  Clip rect of `__frame' has wrong dimensions
+	 * @return: -1: [errno=ENOTSUP] Max  # of frames  supported by output format
+	 *                              has  been reached. Generally,  if you try to
+	 *                              write an animation to a using a non-animated
+	 *                              image format, you can only write 1 frame.
+	 * @return: -1: Frame generation failed (s.a. `errno') */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) int
+	(LIBVIDEO_GFX_CC *vawo_putframe)(struct video_anim_writer *__restrict __self,
+	                                 struct video_gfx const *__restrict __frame);
+
+	/* Finish writing animation data. Must be called at the very end to  finalize
+	 * the generated file, once `vawo_putframe' will no longer be invoked. Trying
+	 * to call `vawo_putframe' after this has been called results in undefined
+	 * behavior:
+	 *
+	 * @return: 0 : Success
+	 * @return: -1: Error; probably I/O-related (s.a. `errno') */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) int
+	(LIBVIDEO_GFX_CC *vawo_finish)(struct video_anim_writer *__restrict __self);
+
+	/* Format-specific operators go here... */
+};
+
+#ifdef __INTELLISENSE__
+/* Called to destroy the animation writer.
+ *
+ * When called before  `video_anim_writer_finish', and `video_anim_save'  was
+ * used to write the animation to a filesystem location, the output file will
+ * be deleted by this call (though this failing is silently ignored). */
+extern __ATTR_NONNULL((1)) void
+video_anim_writer_destroy(struct video_anim_writer *__restrict __self);
+
+/* Write a single  `__frame' to  the animation. During  playback, said  frame
+ * will be shown for the closest representable delay to `__self->vaw_showfor'
+ * The actual frame data  written is the Clip  Rect of `__frame', with  pixel
+ * data blended with any preceding frame as per `GFX_BLENDMODE_OVERRIDE'  for
+ * all  pixels within the I/O rect, with  all pixels outside simply not being
+ * altered (and starting out as all-black for the first frame).
+ *
+ * This function will automatically check what actually changed during  some
+ * frame and (depending on output format), will probably only write actually
+ * changed regions.
+ *
+ * @return: 0 : Success
+ * @return: -1: Frame generation failed (s.a. `errno') */
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) int
+video_anim_writer_putframe(struct video_anim_writer *__restrict __self,
+                           struct video_gfx const *__restrict __frame);
+
+/* Finish writing animation data. Must be called at the very end to  finalize
+ * the generated file, once `vawo_putframe' will no longer be invoked. Trying
+ * to call `vawo_putframe' after this has been called results in undefined
+ * behavior:
+ *
+ * @return: 0 : Success
+ * @return: -1: Error; probably I/O-related (s.a. `errno') */
+extern __ATTR_WUNUSED __ATTR_INOUT(1) int
+video_anim_writer_finish(struct video_anim_writer *__restrict __self);
+#else /* __INTELLISENSE__ */
+#define video_anim_writer_destroy(self)         (*(self)->vaw_ops->vawo_destroy)(self)
+#define video_anim_writer_putframe(self, frame) (*(self)->vaw_ops->vawo_putframe)(self, frame)
+#define video_anim_writer_finish(self)          (*(self)->vaw_ops->vawo_finish)(self)
+#endif /* !__INTELLISENSE__ */
+
+struct video_anim_writer {
+	struct video_anim_writer_ops const *vaw_ops;     /* [1..1][const] Animation writer operators */
+	struct __timeval64                  vaw_showfor; /* How long the next frame in the next call to `vawo_putframe' should be shown for */
+	video_dim_t                         vaw_xdim;    /* [const] Animation canvas size in X */
+	video_dim_t                         vaw_ydim;    /* [const] Animation canvas size in X */
+#ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
+	char   *vaw_outfile;    /* [0..1][owned] File to delete in `vawo_destroy', or `NULL' if not a file output-stream, or `vawo_finish' was called */
+	__FILE *vaw_owned_fp;   /* [0..1][owned] Owned file stream (closed in `vawo_destroy' when non-NULL) */
+	__FILE *vaw_fp;         /* [1..1][const] Output file stream for writing image data */
+	__BOOL  vaw_release_fp; /* [const] Must call "frelease(vaw_owned_fp)" in `vawo_destroy' */
+#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
+	/* Format-specific fields go here... */
+};
+
+
+/* Various functions for writing a video animation files.
+ * @param: __size_x:             Animation canvas X dimension
+ * @param: __size_y:             Animation canvas Y dimension
+ * @param: __format:             Case-insensitive file format that should be used for output (e.g. "gif" for gif files)
+ * @param: __fp/__fd/__filename: Location where animation data should be streamed to
+ * @param: __options:            Optional format-specific options (','-separated string of "NAME=VALUE"; not documented here)
+ * @return: * :   A writer that can be fed with data on each frame of the animation
+ * @return: NULL: [errno=EINVAL] Unsupported `__format'
+ * @return: NULL: [errno=ENOMEM] Insufficient memory
+ * @return: NULL: [errno=*] Some other error */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 4)) __REF struct video_anim_writer *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FSAVE)(video_dim_t __size_x, video_dim_t __size_y,
+                                     char const *__format, __FILE *__restrict __fp, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3)) __REF struct video_anim_writer *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FDSAVE)(video_dim_t __size_x, video_dim_t __size_y,
+                                      char const *__format, __fd_t __fd, char const *__options);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3)) __REF struct video_anim_writer *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_SAVE)(video_dim_t __size_x, video_dim_t __size_y,
+                                    char const *__filename, char const *__options);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) __REF struct video_anim_writer *LIBVIDEO_GFX_CC
+video_anim_fsave(video_dim_t __size_x, video_dim_t __size_y,
+                 char const *__format, __FILE *__restrict __fp, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3)) __REF struct video_anim_writer *LIBVIDEO_GFX_CC
+video_anim_fdsave(video_dim_t __size_x, video_dim_t __size_y,
+                  char const *__format, __fd_t __fd, char const *__options);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3)) __REF struct video_anim_writer *LIBVIDEO_GFX_CC
+video_anim_save(video_dim_t __size_x, video_dim_t __size_y,
+                char const *__filename, char const *__options);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 
 __DECL_END
 #endif /* __CC__ */

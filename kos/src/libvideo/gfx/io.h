@@ -33,6 +33,33 @@
 
 DECL_BEGIN
 
+/************************************************************************/
+/* Common format helpers                                                */
+/************************************************************************/
+enum filefmt {
+	FMT_BAD,
+#define FMT_FIRST FMT_PNG
+	FMT_PNG,
+	FMT_JPG,
+	FMT_BMP,
+	FMT_GIF,
+#define FMT_LAST FMT_GIF
+};
+
+/* Determine the format named by `format' (returns "FMT_BAD" if unknown) */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) enum filefmt CC
+filefmt_detect(char const *__restrict format);
+
+/* Write a video buffer */
+INTDEF WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
+                         FILE *stream, char const *options,
+                         enum filefmt fmt);
+
+
+
+
+
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */
@@ -61,7 +88,6 @@ libvideo_buffer_open(char const *filename);
  *                   simply pass `NULL' to use defaults for everything.
  * @return: 0 : Success
  * @return: -1: [errno=ENOTSUP] Unsupported `format'
- * @return: -1: [errno=ENOTSUP] Unsupported parameter in `options'
  * @return: -1: Error (s.a. `errno') */
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_fsave(struct video_buffer *self, char const *format,

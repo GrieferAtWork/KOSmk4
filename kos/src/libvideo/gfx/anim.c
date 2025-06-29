@@ -115,8 +115,8 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame) {
 		goto err;
 	result->va_refcnt = 1;
 	result->va_ops    = _oneframe_anim_ops();
-	result->va_size_x = frame->vb_xdim;
-	result->va_size_y = frame->vb_ydim;
+	result->va_xdim = frame->vb_xdim;
+	result->va_ydim = frame->vb_ydim;
 	result->ofa_frame = frame;
 	video_buffer_incref(frame);
 	return result;
@@ -432,8 +432,8 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		goto err;
 	result->va_refcnt = 1;
 	result->va_ops    = _cached_anim_ops();
-	result->va_size_x = self->va_size_x;
-	result->va_size_y = self->va_size_y;
+	result->va_xdim = self->va_xdim;
+	result->va_ydim = self->va_ydim;
 	shared_lock_init(&result->ca_lock);
 	result->ca_framec = 0;
 	result->ca_framev = NULL;

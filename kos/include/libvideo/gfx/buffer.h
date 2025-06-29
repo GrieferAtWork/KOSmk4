@@ -476,7 +476,6 @@ video_buffer_open(char const *__filename);
  *                   simply pass `NULL' to use defaults for everything.
  * @return: 0 : Success
  * @return: -1: [errno=ENOTSUP] Unsupported `format'
- * @return: -1: [errno=ENOTSUP] Unsupported parameter in `options'
  * @return: -1: Error (s.a. `errno') */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) int
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FSAVE)(struct video_buffer *__self, char const *__format,

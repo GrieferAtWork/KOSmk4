@@ -963,10 +963,10 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		goto err;
 	result->vb_refcnt   = 1;
 	result->vb_ops      = &gifbuffer_ops;
-	result->vb_xdim   = me->va_size_x;
-	result->vb_ydim   = me->va_size_y;
-	result->rb_stride   = me->va_size_x * 1;
-	result->rb_total    = me->va_size_x * 1 * me->va_size_y;
+	result->vb_xdim     = me->va_xdim;
+	result->vb_ydim     = me->va_ydim;
+	result->rb_stride   = me->va_xdim * 1;
+	result->rb_total    = me->va_xdim * 1 * me->va_ydim;
 	result->gb_cfg      = me->ga_cfg;
 	result->gb_restore  = NULL;
 	result->gb_scratch  = NULL;
@@ -1271,12 +1271,12 @@ libvideo_anim_open_gif(void const *blob, size_t blob_size,
 	/* Fill in standard fields of "result" */
 	result->va_refcnt = 1;
 	result->va_ops    = &gif_anim_ops;
-	result->va_size_x = GET_LE16(header->gh_lscr_width);
-	result->va_size_y = GET_LE16(header->gh_lscr_height);
-	if (result->va_size_x < ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4)))
-		result->va_size_x = ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4));
-	if (result->va_size_y < ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6)))
-		result->va_size_y = ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6));
+	result->va_xdim   = GET_LE16(header->gh_lscr_width);
+	result->va_ydim   = GET_LE16(header->gh_lscr_height);
+	if (result->va_xdim < ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4)))
+		result->va_xdim = ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4));
+	if (result->va_ydim < ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6)))
+		result->va_ydim = ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6));
 
 	/* Fill in "result" */
 	if (p_mapfile) {
