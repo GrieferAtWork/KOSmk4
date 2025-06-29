@@ -62,8 +62,8 @@ INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC libvideo_buffer_empty_unlock)(s
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_noblend(struct video_gfx *__restrict self);
+INTDEF struct video_buffer_ops libvideo_buffer_empty_ops;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void);
-#define libvideo_buffer_empty_ops (*_libvideo_buffer_empty_ops())
 
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(void);
 #define libvideo_buffer_empty (*_libvideo_buffer_empty())

@@ -373,11 +373,11 @@ do_rgb_format:
 	result->rb_stride          = bufreq.vbs_stride;
 	result->rb_total           = bufreq.vbs_bufsize;
 	result->vb_refcnt          = 1;
-	result->vb_ops             = &rambuffer_ops;
+	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = result_pal; /* Inherit reference */
-	result->vb_xdim          = width;
-	result->vb_ydim          = height;
+	result->vb_xdim            = width;
+	result->vb_ydim            = height;
 
 	/* Read image data from PNG file */
 	{

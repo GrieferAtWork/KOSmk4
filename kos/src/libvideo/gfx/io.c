@@ -53,6 +53,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "anim.h"
 #include "io-utils.h"
 #include "io.h"
+#include "lockable-buffer.h"
 
 /**/
 
@@ -139,14 +140,10 @@ libvideo_anim_open_fmt(void const *blob, size_t blob_size,
 	return NULL;
 }
 
-INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
-libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
-                         FILE *stream, char const *options,
-                         enum filefmt fmt) {
-	/* TODO: Wrap "self" such that it rlock()  never fails due to the  underlying
-	 *       buffer not supporting that  function (where the underlying  buffer's
-	 *       rlock() would have failed, allocate a heap buffer, and use GFX pixel
-	 *       reads to read pixel data into a temporary buffer) */
+PRIVATE WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_fmt_lockable(struct video_buffer *__restrict self,
+                                  FILE *stream, char const *options,
+                                  enum filefmt fmt) {
 	switch (fmt) {
 	case FMT_PNG:
 		return libvideo_buffer_save_png(self, stream, options);
@@ -159,6 +156,22 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 	}
 	errno = ENOTSUP;
 	return -1;
+}
+
+INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
+libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
+                         FILE *stream, char const *options,
+                         enum filefmt fmt) {
+	/* Wrap "self" such that it rlock()  never fails due to the  underlying
+	 * buffer not supporting that  function (where the underlying  buffer's
+	 * rlock() would have failed, allocate a heap buffer, and use GFX pixel
+	 * reads to read pixel data into a temporary buffer) */
+	int result;
+	struct lockable_buffer lockable;
+	self   = libvideo_buffer_lockable_init(&lockable, self);
+	result = libvideo_buffer_save_fmt_lockable(self, stream, options, fmt);
+	libvideo_buffer_lockable_fini(&lockable);
+	return result;
 }
 
 

@@ -246,8 +246,7 @@ libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
 }
 
 
-#undef libvideo_buffer_empty_ops
-PRIVATE struct video_buffer_ops libvideo_buffer_empty_ops = {};
+INTERN struct video_buffer_ops libvideo_buffer_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void) {
 	if (!libvideo_buffer_empty_ops.vi_rlock) {
 		libvideo_buffer_empty_ops.vi_wlock      = &libvideo_buffer_empty_lock;
@@ -261,7 +260,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empt
 	}
 	return &libvideo_buffer_empty_ops;
 }
-#define libvideo_buffer_empty_ops (*_libvideo_buffer_empty_ops())
 
 
 #undef libvideo_buffer_empty
@@ -280,7 +278,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(vo
 	if (!libvideo_buffer_empty.vb_ops) {
 		libvideo_buffer_empty.vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
 		COMPILER_WRITE_BARRIER();
-		libvideo_buffer_empty.vb_ops = &libvideo_buffer_empty_ops;
+		libvideo_buffer_empty.vb_ops = _libvideo_buffer_empty_ops();
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_buffer_empty;

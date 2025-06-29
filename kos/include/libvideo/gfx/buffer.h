@@ -63,10 +63,11 @@ struct video_format;
 struct video_gfx;
 
 struct video_lock {
-	__byte_t *vl_data;      /* [1..vl_size] Memory-mapped video data. */
-	__size_t  vl_size;      /* Total image size (>= vl_stride * :vb_ydim) */
-	__size_t  vl_stride;    /* Scanline width (in bytes) */
-	void    *_vl_driver[1]; /* Driver-specific data */
+	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
+	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_ydim) */
+	__size_t  vl_stride; /* Scanline width (in bytes) */
+#define _VIDEO_LOCK__N_DRIVER 1
+	void *_vl_driver[_VIDEO_LOCK__N_DRIVER]; /* Driver-specific data */
 };
 
 struct video_buffer_ops {
@@ -82,6 +83,9 @@ struct video_buffer_ops {
 	 * - __self->vx_blend
 	 * - __self->vx_flags
 	 * - __self->vx_colorkey
+	 * NOTE: This operator is allowed to modify any/all of the  above!
+	 *       e.g. `video_buffer_lockable()' will change `vx_buffer' to
+	 *       the wrapped video buffer.
 	 * @return: * : Always re-returns `__self' */
 	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
 	(LIBVIDEO_GFX_FCC *vi_initgfx)(struct video_gfx *__restrict __self);
@@ -435,6 +439,33 @@ video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
                        video_buffer_custom_lock_t __wlock,
                        video_buffer_custom_unlock_t __unlock,
                        void *__cookie);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+/* When `__self' isn't known to unconditionally support read/write  locks,
+ * wrap it using a proxy video buffer that implements these operations as:
+ * - Attempt the lock on the underlying buffer.
+ * - If that fails:
+ *   - Allocate a heap buffer matching requirements of the buffer's codec
+ *   - If that fails, return from vi_rlock/vi_wlock with -1,errno=ENOMEM
+ *   - On success, use a GFX context to read pixel data and store it in
+ *     the heap buffer.
+ *   - Return said heap buffer from vi_rlock/vi_wlock
+ * - In case `vi_wlock' was called, the matching `vi_unlock' will  then
+ *   once again use a GFX context to at least all modified (or possibly
+ *   just all) pixels back to the underlying buffer.
+ * @param: __self:  The video buffer to wrap
+ * @return: * :     The video buffer wrapper (having the same codec/dimensions as `__self')
+ * @return: __self: The given `__self' is already known to have vi_rlock/vi_wlock operators
+ *                  that either never fail, or can only fail with errno=ENOMEM for the same
+ *                  reason that the  "lockable" wrapper could  also fail. (generally,  this
+ *                  means that this is a no-op when `__self' is a ram-buffer, or is already
+ *                  a "lockable" video buffer). */
+typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_buffer *
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_LOCKABLE)(struct video_buffer *__restrict __self);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_buffer_lockable(struct video_buffer *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

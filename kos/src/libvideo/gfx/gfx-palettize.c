@@ -501,7 +501,7 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	result->rb_stride          = stride;
 	result->rb_total           = total;
 /*	result->vb_refcnt          = 1;*/ /* Unused */
-	result->vb_ops             = &rambuffer_ops;
+	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = NULL;
 	result->vb_xdim          = video_gfx_getclipw(&gfx);

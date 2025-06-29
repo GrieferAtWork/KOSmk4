@@ -369,8 +369,7 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 }
 
 
-#undef rambuffer_ops
-PRIVATE struct video_buffer_ops rambuffer_ops = {};
+INTERN struct video_buffer_ops rambuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
 		rambuffer_ops.vi_rlock      = &rambuffer_rlock;
@@ -385,7 +384,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(
 	}
 	return &rambuffer_ops;
 }
-#define rambuffer_ops (*_rambuffer_ops())
 
 
 
@@ -411,11 +409,11 @@ libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
 	result->rb_stride          = req.vbs_stride;
 	result->rb_total           = req.vbs_bufsize;
 	result->vb_refcnt          = 1;
-	result->vb_ops             = &rambuffer_ops;
+	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;
-	result->vb_xdim          = size_x;
-	result->vb_ydim          = size_y;
+	result->vb_xdim            = size_x;
+	result->vb_ydim            = size_y;
 	if (palette)
 		video_palette_incref(palette);
 	return result;
@@ -432,7 +430,7 @@ struct video_membuffer: video_rambuffer {
 	void     *vm_release_mem_cookie;
 };
 
-PRIVATE struct video_buffer_ops membuffer_ops = {};
+INTERN struct video_buffer_ops membuffer_ops = {};
 
 PRIVATE NONNULL((1)) void FCC
 membuffer_destroy(struct video_buffer *__restrict self) {

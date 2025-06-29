@@ -1742,7 +1742,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	struct video_gfx rb_gfx;
 
 	/*rb.vb_refcnt = 1;*/
-	rb.vb_ops    = &rambuffer_ops;
+	rb.vb_ops    = _rambuffer_ops();
 	rb.vb_format.vf_codec = srcbuf->vb_format.vf_codec;
 	rb.vb_format.vf_pal   = srcbuf->vb_format.vf_pal;
 	rb.vb_xdim   = min(dst_size_x, src_size_x);

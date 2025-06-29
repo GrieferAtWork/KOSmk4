@@ -55,8 +55,10 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_noblend(str
 #define rambuffer_rlock rambuffer_lock
 #define rambuffer_wlock rambuffer_lock
 
+INTDEF struct video_buffer_ops rambuffer_ops;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void);
-#define rambuffer_ops (*_rambuffer_ops())
+
+INTDEF struct video_buffer_ops membuffer_ops; /* Used by `libvideo_buffer_formem()' */
 
 
 /* Indices into `video_gfx::bfx_driver' for RAM gfx buffers. */
