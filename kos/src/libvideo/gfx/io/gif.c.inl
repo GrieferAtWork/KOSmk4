@@ -385,12 +385,8 @@ gifbuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE struct video_buffer_ops gifbuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops(void) {
 	if unlikely(!gifbuffer_ops.vi_destroy) {
-		gifbuffer_ops.vi_rlock      = &rambuffer_rlock;
-		gifbuffer_ops.vi_wlock      = &rambuffer_wlock;
-		gifbuffer_ops.vi_unlock     = &rambuffer_unlock;
-		gifbuffer_ops.vi_initgfx    = &rambuffer_initgfx;
-		gifbuffer_ops.vi_updategfx  = &rambuffer_updategfx;
-		gifbuffer_ops.vi_noblendgfx = &rambuffer_noblend;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&gifbuffer_ops);
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -403,9 +399,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops(
 PRIVATE struct video_buffer_ops gifbuffer_ops__with_color_key = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops__with_color_key(void) {
 	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
-		gifbuffer_ops__with_color_key.vi_rlock      = &rambuffer_rlock;
-		gifbuffer_ops__with_color_key.vi_wlock      = &rambuffer_wlock;
-		gifbuffer_ops__with_color_key.vi_unlock     = &rambuffer_unlock;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
 		gifbuffer_ops__with_color_key.vi_initgfx    = &gifbuffer_initgfx__with_colorkey;
 		gifbuffer_ops__with_color_key.vi_updategfx  = &rambuffer_updategfx;
 		gifbuffer_ops__with_color_key.vi_noblendgfx = &rambuffer_noblend;

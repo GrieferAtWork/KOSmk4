@@ -217,17 +217,15 @@ rambuffer_lock(struct video_buffer *__restrict self,
 	return 0;
 }
 
-INTERN ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(FCC rambuffer_unlock)(struct video_buffer *__restrict self,
-                              struct video_lock *__restrict lock) {
-#ifndef NDEBUG
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+rambuffer_lockregion(struct video_buffer *__restrict self,
+                     struct video_regionlock *__restrict lock) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(lock->vl_data == me->rb_data);
-	assert(lock->vl_stride == me->rb_stride);
-#endif /* !NDEBUG */
-	(void)self;
-	(void)lock;
+	lock->vrl_lock.vl_stride = me->rb_stride;
+	lock->vrl_lock.vl_data   = me->rb_data + lock->vrl_ymin * me->rb_stride;
+	lock->vrl_xoff           = lock->vrl_xmin;
+	return 0;
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
@@ -370,12 +368,8 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 INTERN struct video_buffer_ops rambuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
-		rambuffer_ops.vi_rlock      = &rambuffer_rlock;
-		rambuffer_ops.vi_wlock      = &rambuffer_wlock;
-		rambuffer_ops.vi_unlock     = &rambuffer_unlock;
-		rambuffer_ops.vi_initgfx    = &rambuffer_initgfx;
-		rambuffer_ops.vi_updategfx  = &rambuffer_updategfx;
-		rambuffer_ops.vi_noblendgfx = &rambuffer_noblend;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&rambuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&rambuffer_ops);
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -444,12 +438,8 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 PRIVATE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC membuffer_getops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
-		membuffer_ops.vi_rlock      = &rambuffer_rlock;
-		membuffer_ops.vi_wlock      = &rambuffer_wlock;
-		membuffer_ops.vi_unlock     = &rambuffer_unlock;
-		membuffer_ops.vi_initgfx    = &rambuffer_initgfx;
-		membuffer_ops.vi_updategfx  = &rambuffer_updategfx;
-		membuffer_ops.vi_noblendgfx = &rambuffer_noblend;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&membuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&membuffer_ops);
 		COMPILER_WRITE_BARRIER();
 		membuffer_ops.vi_destroy = &membuffer_destroy;
 		COMPILER_WRITE_BARRIER();

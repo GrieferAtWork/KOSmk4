@@ -38,6 +38,7 @@ struct lockable_buffer: video_buffer {
 	REF struct video_buffer *lb_base;   /* [1..1][const] Underlying video buffer */
 	byte_t                  *lb_data;   /* [0..vl_size][owned][lock(WRITE_ONCE)] Cached video data */
 	size_t                   lb_stride; /* [valid_if(lb_data)] Scanline width (in bytes) */
+	byte_t                  *lb_edata;  /* [valid_if(lb_data)] End of lock data */
 };
 
 /* Check if `buffer' is lockable. If so re-return "buffer" and

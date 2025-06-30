@@ -58,6 +58,56 @@ libvideo_buffer_generic_noblend(struct video_gfx *__restrict self) {
 	return self;
 }
 
+INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_notsup_lock(struct video_buffer *__restrict self,
+                            struct video_lock *__restrict lock) {
+	(void)self;
+	(void)lock;
+	errno = ENOTSUP;
+	return -1;
+}
+
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
+                                         struct video_lock *__restrict lock) {
+	(void)self;
+	(void)lock;
+	COMPILER_IMPURE();
+}
+
+
+
+
+INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,
+                                    struct video_regionlock *__restrict lock) {
+	int result = video_buffer_rlock(self, &lock->vrl_lock);
+	/*if likely(result == 0)*/ {
+		lock->vrl_xoff = lock->vrl_xmin;
+		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+	}
+	return result;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
+                                    struct video_regionlock *__restrict lock) {
+	int result = video_buffer_wlock(self, &lock->vrl_lock);
+	/*if likely(result == 0)*/ {
+		lock->vrl_xoff = lock->vrl_xmin;
+		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+	}
+	return result;
+}
+
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restrict self,
+                                                  struct video_regionlock *__restrict lock) {
+	lock->vrl_lock.vl_data -= lock->vrl_ymin * lock->vrl_lock.vl_stride;
+	video_buffer_unlock(self, &lock->vrl_lock);
+}
+
+
 
 
 

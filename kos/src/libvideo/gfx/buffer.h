@@ -39,6 +39,41 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_buffer_generic_noblend(struct video_gfx *__restrict self);
 
 
+#define libvideo_buffer_notsup_rlock libvideo_buffer_notsup_lock
+#define libvideo_buffer_notsup_wlock libvideo_buffer_notsup_lock
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_notsup_lock(struct video_buffer *__restrict self,
+                            struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
+                                         struct video_lock *__restrict lock);
+
+#define libvideo_buffer_notsup_rlockregion libvideo_buffer_notsup_lockregion
+#define libvideo_buffer_notsup_wlockregion libvideo_buffer_notsup_lockregion
+#define libvideo_buffer_notsup_lockregion (*(int (FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_notsup_lock)
+#define libvideo_buffer_noop_unlockregion (*(void __NOTHROW_T(FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_noop_unlock)
+
+#define video_buffer_ops_set_LOCKOPS_like_NOTSUP(self)                    \
+	(void)((self)->vi_rlock        = &libvideo_buffer_notsup_rlock,       \
+	       (self)->vi_wlock        = &libvideo_buffer_notsup_wlock,       \
+	       (self)->vi_unlock       = &libvideo_buffer_noop_unlock,        \
+	       (self)->vi_rlockregion  = &libvideo_buffer_notsup_rlockregion, \
+	       (self)->vi_wlockregion  = &libvideo_buffer_notsup_wlockregion, \
+	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
+
+
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,
+                                    struct video_regionlock *__restrict lock);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
+libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
+                                    struct video_regionlock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restrict self,
+                                                  struct video_regionlock *__restrict lock);
+
+
+
 
 /* Convert `self' into the specified format.
  * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */

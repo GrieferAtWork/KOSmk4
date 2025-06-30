@@ -26,17 +26,19 @@
 
 #include <hybrid/compiler.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 
+#include "buffer-utils.h"
 #include "buffer.h"
 #include "custom-buffer.h"
 #include "gfx.h"
 
 DECL_BEGIN
 
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 custom_rlock(struct video_buffer *__restrict self,
              struct video_lock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
@@ -46,7 +48,7 @@ custom_rlock(struct video_buffer *__restrict self,
 	return -1;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 custom_wlock(struct video_buffer *__restrict self,
              struct video_lock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
@@ -62,6 +64,67 @@ NOTHROW(FCC custom_unlock)(struct video_buffer *__restrict self,
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	if (me->cb_unlock)
 		(*me->cb_unlock)(me->cb_cookie, lock);
+}
+
+
+PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_rlockregion(struct video_buffer *__restrict self,
+                   struct video_regionlock *__restrict lock) {
+	struct custom_buffer *me = (struct custom_buffer *)self;
+	if (me->cb_rlockregion)
+		return (*me->cb_rlockregion)(me->cb_cookie, lock);
+	if (me->cb_rlock) {
+		int ok;
+		size_t xoff;
+		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
+		                             lock->vrl_xmin, &xoff,
+		                             &lock->vrl_xoff);
+		ok = (*me->cb_rlock)(me->cb_cookie, &lock->vrl_lock);
+		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += xoff;
+		return ok;
+	}
+	errno = ENOTSUP;
+	return -1;
+}
+
+PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_wlockregion(struct video_buffer *__restrict self,
+                   struct video_regionlock *__restrict lock) {
+	struct custom_buffer *me = (struct custom_buffer *)self;
+	if (me->cb_wlockregion)
+		return (*me->cb_wlockregion)(me->cb_cookie, lock);
+	if (me->cb_wlock) {
+		int ok;
+		size_t xoff;
+		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
+		                             lock->vrl_xmin, &xoff,
+		                             &lock->vrl_xoff);
+		ok = (*me->cb_wlock)(me->cb_cookie, &lock->vrl_lock);
+		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += xoff;
+		return ok;
+	}
+	errno = ENOTSUP;
+	return -1;
+}
+
+PRIVATE ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
+                                 struct video_regionlock *__restrict lock) {
+	struct custom_buffer *me = (struct custom_buffer *)self;
+	if (me->cb_unlockregion) {
+		(*me->cb_unlockregion)(me->cb_cookie, lock);
+	} else if (me->cb_unlock) {
+		size_t xoff;
+		video_coord_t xrem;
+		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
+		                             lock->vrl_xmin, &xoff, &xrem);
+		assert(xrem == lock->vrl_xoff);
+		lock->vrl_lock.vl_data -= lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data -= xoff;
+		(*me->cb_unlock)(me->cb_cookie, &lock->vrl_lock);
+	}
 }
 
 
@@ -119,12 +182,15 @@ custom_destroy(struct video_buffer *__restrict self) {
 PRIVATE struct video_buffer_ops custom_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(void) {
 	if unlikely(!custom_ops.vi_destroy) {
-		custom_ops.vi_rlock      = &custom_rlock;
-		custom_ops.vi_wlock      = &custom_wlock;
-		custom_ops.vi_unlock     = &custom_unlock;
-		custom_ops.vi_initgfx    = &custom_initgfx;
-		custom_ops.vi_updategfx  = &libvideo_buffer_generic_updategfx;
-		custom_ops.vi_noblendgfx = &libvideo_buffer_generic_noblend;
+		custom_ops.vi_rlock        = &custom_rlock;
+		custom_ops.vi_wlock        = &custom_wlock;
+		custom_ops.vi_unlock       = &custom_unlock;
+		custom_ops.vi_rlockregion  = &custom_rlockregion;
+		custom_ops.vi_wlockregion  = &custom_wlockregion;
+		custom_ops.vi_unlockregion = &custom_unlockregion;
+		custom_ops.vi_initgfx      = &custom_initgfx;
+		custom_ops.vi_updategfx    = &libvideo_buffer_generic_updategfx;
+		custom_ops.vi_noblendgfx   = &libvideo_buffer_generic_noblend;
 		COMPILER_WRITE_BARRIER();
 		custom_ops.vi_destroy = &custom_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -146,14 +212,17 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
  * @param: codec:    [1..1] Video codec used for color<=>pixel conversion, as
  *                          well  as  pixel  I/O (when  rlock/wlock  is given
  *                          and returns `0')
- * @param: palette:  [0..1] Palette to-be used with `codec' (if needed)
- * @param: getpixel: [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
- * @param: setpixel: [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
- * @param: destroy:  [0..1] Optional callback invoked when the returned buffer is destroyed
- * @param: rlock:    [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `getpixel' is always used)
- * @param: wlock:    [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `setpixel' is always used)
- * @param: unlock:   [0..1] Optional callback invoked to release video locks previously acquired by `rlock' or `wlock'
- * @param: cookie:   [?..?] Cookie argument passed to all user-supplied operators */
+ * @param: palette:      [0..1] Palette to-be used with `codec' (if needed)
+ * @param: getpixel:     [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
+ * @param: setpixel:     [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
+ * @param: destroy:      [0..1] Optional callback invoked when the returned buffer is destroyed
+ * @param: rlock:        [0..1] Optional callback to lock video memory for reading (when missing, or doesn't return `0', `getpixel' is always used)
+ * @param: wlock:        [0..1] Optional callback to lock video memory for writing (when missing, or doesn't return `0', `setpixel' is always used)
+ * @param: unlock:       [0..1] Optional callback invoked to release video locks previously acquired by `rlock' or `wlock'
+ * @param: rlockregion:  [0..1] Optional extension to `rlock' (when not supplied, implemented in terms of `rlock')
+ * @param: wlockregion:  [0..1] Optional extension to `wlock' (when not supplied, implemented in terms of `wlock')
+ * @param: unlockregion: [0..1] Optional extension to `unlock' (when not supplied, implemented in terms of `unlock')
+ * @param: cookie:       [?..?] Cookie argument passed to all user-supplied operators */
 DEFINE_PUBLIC_ALIAS(video_buffer_forcustom, libvideo_buffer_forcustom);
 INTERN WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *LIBVIDEO_GFX_CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
@@ -164,6 +233,9 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           video_buffer_custom_lock_t rlock,
                           video_buffer_custom_lock_t wlock,
                           video_buffer_custom_unlock_t unlock,
+                          video_buffer_custom_lockregion_t rlockregion,
+                          video_buffer_custom_lockregion_t wlockregion,
+                          video_buffer_custom_unlockregion_t unlockregion,
                           void *cookie) {
 	REF struct custom_buffer *result;
 	result = (REF struct custom_buffer *)malloc(sizeof(struct custom_buffer));
@@ -176,16 +248,19 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	result->vb_format.vf_pal   = palette;
 	if (palette)
 		video_palette_incref(palette);
-	result->vb_xdim     = size_x;
-	result->vb_ydim     = size_y;
-	result->vb_refcnt   = 1;
-	result->cb_getpixel = getpixel;
-	result->cb_setpixel = setpixel;
-	result->cb_destroy  = destroy;
-	result->cb_rlock    = rlock ? rlock : wlock;
-	result->cb_wlock    = wlock;
-	result->cb_unlock   = unlock;
-	result->cb_cookie   = cookie;
+	result->vb_xdim         = size_x;
+	result->vb_ydim         = size_y;
+	result->vb_refcnt       = 1;
+	result->cb_getpixel     = getpixel;
+	result->cb_setpixel     = setpixel;
+	result->cb_destroy      = destroy;
+	result->cb_rlock        = rlock ? rlock : wlock;
+	result->cb_wlock        = wlock;
+	result->cb_unlock       = unlock;
+	result->cb_rlockregion  = rlockregion ? rlockregion : wlockregion;
+	result->cb_wlockregion  = wlockregion;
+	result->cb_unlockregion = unlockregion;
+	result->cb_cookie       = cookie;
 	return result;
 err:
 	return NULL;

@@ -40,6 +40,7 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
+#include "buffer-utils.h"
 #include "gfx-buffer.h"
 #include "gfx-empty.h"
 #include "gfx.h"
@@ -112,6 +113,45 @@ NOTHROW(FCC subregion_buffer_unlock)(struct video_buffer *__restrict self,
 }
 
 
+PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
+subregion_buffer_encoderegionlock(struct subregion_buffer const *__restrict self,
+                                  struct video_regionlock *__restrict lock) {
+	lock->vrl_xmin += self->srb_xoff;
+	lock->vrl_ymin += self->srb_xoff;
+}
+
+PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
+subregion_buffer_decoderegionlock(struct subregion_buffer const *__restrict self,
+                                  struct video_regionlock *__restrict lock) {
+	lock->vrl_xmin -= self->srb_xoff;
+	lock->vrl_ymin -= self->srb_xoff;
+}
+
+PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
+subregion_buffer_rlockregion(struct video_buffer *__restrict self,
+                             struct video_regionlock *__restrict lock) {
+	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	subregion_buffer_encoderegionlock(me, lock);
+	return (*me->srb_base->vb_ops->vi_rlockregion)(me->srb_base, lock);
+}
+
+PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
+subregion_buffer_wlockregion(struct video_buffer *__restrict self,
+                             struct video_regionlock *__restrict lock) {
+	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	subregion_buffer_encoderegionlock(me, lock);
+	return (*me->srb_base->vb_ops->vi_wlockregion)(me->srb_base, lock);
+}
+
+PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
+NOTHROW(FCC subregion_buffer_unlockregion)(struct video_buffer *__restrict self,
+                                           struct video_regionlock *__restrict lock) {
+	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	subregion_buffer_decoderegionlock(me, lock);
+	video_buffer_unlockregion(me->srb_base, lock);
+}
+
+
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 subregion_buffer_initgfx(struct video_gfx *__restrict self) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self->vx_buffer;
@@ -148,15 +188,19 @@ subregion_buffer_noblend(struct video_gfx *__restrict self) {
 
 
 INTERN struct video_buffer_ops subregion_buffer_ops = {};
+INTERN struct video_buffer_ops subregion_buffer_ops_norem = {};
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
 _subregion_buffer_ops(void) {
 	if unlikely(!subregion_buffer_ops.vi_destroy) {
-		subregion_buffer_ops.vi_rlock      = &subregion_buffer_rlock;
-		subregion_buffer_ops.vi_wlock      = &subregion_buffer_wlock;
-		subregion_buffer_ops.vi_unlock     = &subregion_buffer_unlock;
-		subregion_buffer_ops.vi_initgfx    = &subregion_buffer_initgfx;
-		subregion_buffer_ops.vi_updategfx  = &subregion_buffer_updategfx;
-		subregion_buffer_ops.vi_noblendgfx = &subregion_buffer_noblend;
+		subregion_buffer_ops.vi_rlock        = &libvideo_buffer_notsup_rlock;
+		subregion_buffer_ops.vi_wlock        = &libvideo_buffer_notsup_wlock;
+		subregion_buffer_ops.vi_unlock       = &libvideo_buffer_noop_unlock;
+		subregion_buffer_ops.vi_rlockregion  = &subregion_buffer_rlockregion;
+		subregion_buffer_ops.vi_wlockregion  = &subregion_buffer_wlockregion;
+		subregion_buffer_ops.vi_unlockregion = &subregion_buffer_unlockregion;
+		subregion_buffer_ops.vi_initgfx      = &subregion_buffer_initgfx;
+		subregion_buffer_ops.vi_updategfx    = &subregion_buffer_updategfx;
+		subregion_buffer_ops.vi_noblendgfx   = &subregion_buffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		subregion_buffer_ops.vi_destroy = &subregion_buffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -164,26 +208,26 @@ _subregion_buffer_ops(void) {
 	return &subregion_buffer_ops;
 }
 
-
-
-#define gfx_buffer_rlock gfx_buffer_lock
-#define gfx_buffer_wlock gfx_buffer_lock
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
-gfx_buffer_lock(struct video_buffer *__restrict self,
-                struct video_lock *__restrict lock) {
-	(void)self;
-	(void)lock;
-	errno = ENOTSUP;
-	return -1;
+PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
+_subregion_buffer_ops_norem(void) {
+	if unlikely(!subregion_buffer_ops_norem.vi_destroy) {
+		subregion_buffer_ops_norem.vi_rlockregion  = &subregion_buffer_rlockregion;
+		subregion_buffer_ops_norem.vi_wlockregion  = &subregion_buffer_wlockregion;
+		subregion_buffer_ops_norem.vi_unlockregion = &subregion_buffer_unlockregion;
+		subregion_buffer_ops_norem.vi_rlock        = &subregion_buffer_rlock;
+		subregion_buffer_ops_norem.vi_wlock        = &subregion_buffer_wlock;
+		subregion_buffer_ops_norem.vi_unlock       = &subregion_buffer_unlock;
+		subregion_buffer_ops_norem.vi_initgfx      = &subregion_buffer_initgfx;
+		subregion_buffer_ops_norem.vi_updategfx    = &subregion_buffer_updategfx;
+		subregion_buffer_ops_norem.vi_noblendgfx   = &subregion_buffer_noblend;
+		COMPILER_WRITE_BARRIER();
+		subregion_buffer_ops_norem.vi_destroy = &subregion_buffer_destroy;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &subregion_buffer_ops_norem;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(FCC gfx_buffer_unlock)(struct video_buffer *__restrict self,
-                               struct video_lock *__restrict lock) {
-	COMPILER_IMPURE();
-	(void)self;
-	(void)lock;
-}
+
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gfx_buffer_initgfx(struct video_gfx *__restrict self) {
@@ -235,9 +279,7 @@ INTERN struct video_buffer_ops gfx_buffer_ops = {};
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
 _gfx_buffer_ops(void) {
 	if unlikely(!gfx_buffer_ops.vi_destroy) {
-		gfx_buffer_ops.vi_rlock      = &gfx_buffer_rlock;
-		gfx_buffer_ops.vi_wlock      = &gfx_buffer_wlock;
-		gfx_buffer_ops.vi_unlock     = &gfx_buffer_unlock;
+		video_buffer_ops_set_LOCKOPS_like_NOTSUP(&gfx_buffer_ops);
 		gfx_buffer_ops.vi_initgfx    = &gfx_buffer_initgfx;
 		gfx_buffer_ops.vi_updategfx  = &gfx_buffer_updategfx;
 		gfx_buffer_ops.vi_noblendgfx = &gfx_buffer_noblend;
@@ -279,46 +321,6 @@ NOTHROW(CC video_gfx_is_cliprect_eq_iorect)(struct video_gfx const *__restrict s
 	       self->vx_hdr.vxh_byend == (self->vx_hdr.vxh_bymin + self->vx_hdr.vxh_cysiz);
 }
 
-/* Try to convert `x' into a byte-offset then stored in `*p_offset'.
- * Make sure that the pixel specified by `x' starts at the beginning
- * of a byte, and that the resulting offset is properly aligned.
- * @return: true:  Success
- * @return: false: Failure */
-PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(3) bool
-NOTHROW(CC video_codec_xcoord_to_offset)(struct video_codec const *__restrict self,
-                                         video_coord_t x, size_t *__restrict p_offset) {
-	if (self->vc_specs.vcs_pxsz > 1) {
-		/* Multi-byte codecs */
-		*p_offset = x * self->vc_specs.vcs_pxsz;
-	} else {
-		/* Handling for codecs that store multiple pixels in 1 byte */
-		switch (self->vc_specs.vcs_bpp) {
-		case 1:
-			if (x & 7)
-				goto fail;
-			*p_offset = x >> 3;
-			break;
-		case 2:
-			if (x & 3)
-				goto fail;
-			*p_offset = x >> 2;
-			break;
-		case 4:
-			if (x & 2)
-				goto fail;
-			*p_offset = x >> 1;
-			break;
-		case 8:
-			*p_offset = x;
-			break;
-		default: goto fail;
-		}
-	}
-	return IS_ALIGNED(*p_offset, self->vc_align);
-fail:
-	return false;
-}
-
 /* Check  if `buffer'  is gfx.  If so  re-return "buffer" and
  * initialize `self' such that `libvideo_buffer_fromgfx_fini'
  * does nothing. Else, wrap it using `buffer' and return *it*
@@ -342,26 +344,35 @@ libvideo_buffer_fromgfx_init(struct gfx_buffer *self,
 		}
 
 		/* May be able to use a `struct subregion_buffer' */
-		if (video_gfx_is_cliprect_eq_iorect(gfx)) {
+		if (video_gfx_is_cliprect_eq_iorect(gfx) && src->vb_ops != &gfx_buffer_ops) {
 			struct subregion_buffer *result;
 			result = (struct subregion_buffer *)self;
-			if (video_codec_xcoord_to_offset(src->vb_format.vf_codec,
-			                                 (video_coord_t)gfx->vx_hdr.vxh_cxoff,
-			                                 &result->srb_vm_xoff)) {
-				/* We **are** able to use a subregion buffer! */
-				result->vb_ops    = _subregion_buffer_ops();
-				result->vb_format = src->vb_format;
-				result->vb_xdim   = gfx->vx_hdr.vxh_cxsiz;
-				result->vb_ydim   = gfx->vx_hdr.vxh_cysiz;
+			video_codec_xcoord_to_offset(src->vb_format.vf_codec,
+			                             (video_coord_t)gfx->vx_hdr.vxh_cxoff,
+			                             &result->srb_vm_xoff,
+			                             &result->srb_vm_xrem);
+			/* We **are** able to use a subregion buffer! */
+			result->vb_ops = result->srb_vm_xrem ? _subregion_buffer_ops()
+			                                     : _subregion_buffer_ops_norem();
+			result->vb_format = src->vb_format;
+			result->vb_xdim   = gfx->vx_hdr.vxh_cxsiz;
+			result->vb_ydim   = gfx->vx_hdr.vxh_cysiz;
 #ifndef NDEBUG
-				result->vb_refcnt = 0;
+			result->vb_refcnt = 0;
 #endif /* !NDEBUG */
-				result->srb_base = src;
-				result->srb_xoff = gfx->vx_hdr.vxh_cxoff;
-				result->srb_yoff = gfx->vx_hdr.vxh_cyoff;
-				return result;
+			result->srb_base = src;
+			result->srb_xoff = gfx->vx_hdr.vxh_cxoff;
+			result->srb_yoff = gfx->vx_hdr.vxh_cyoff;
+			if (src->vb_ops == &subregion_buffer_ops ||
+			    src->vb_ops == &subregion_buffer_ops_norem) {
+				/* TODO */
 			}
+			return result;
 		}
+	}
+
+	if (src->vb_ops == &gfx_buffer_ops) {
+		/* TODO: merge GFX contexts */
 	}
 
 	/* Fallback: need to use an entire "struct gfx_buffer" */
@@ -425,36 +436,45 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 		/* May be able to use a `struct subregion_buffer' */
 		if (video_gfx_is_cliprect_eq_iorect(self)) {
 			size_t vm_xoff;
-			if (video_codec_xcoord_to_offset(src->vb_format.vf_codec,
-			                                 (video_coord_t)self->vx_hdr.vxh_cxoff,
-			                                 &vm_xoff)) {
-				/* We **are** able to use a subregion buffer! */
-				REF struct subregion_buffer *sr_result;
-				sr_result = (REF struct subregion_buffer *)malloc(sizeof(struct subregion_buffer));
-				if unlikely(!sr_result)
-					goto err;
-				sr_result->vb_ops    = _subregion_buffer_ops();
-				sr_result->vb_format = src->vb_format;
-				sr_result->vb_xdim   = self->vx_hdr.vxh_cxsiz;
-				sr_result->vb_ydim   = self->vx_hdr.vxh_cysiz;
-				sr_result->vb_refcnt = 1;
-				sr_result->srb_base  = src;
-				video_buffer_incref(src);
-				sr_result->srb_xoff = self->vx_hdr.vxh_cxoff;
-				sr_result->srb_yoff = self->vx_hdr.vxh_cyoff;
-				sr_result->srb_vm_xoff = vm_xoff;
-#ifdef SUBREGION_BUFFER_PALREF
-				if (sr_result->vb_format.vf_pal)
-					video_palette_incref(sr_result->vb_format.vf_pal);
-#endif /* SUBREGION_BUFFER_PALREF */
-				return sr_result;
+			video_coord_t vm_xrem;
+
+			/* We **are** able to use a subregion buffer! */
+			video_codec_xcoord_to_offset(src->vb_format.vf_codec,
+			                             (video_coord_t)self->vx_hdr.vxh_cxoff,
+			                             &vm_xoff, &vm_xrem);
+			REF struct subregion_buffer *sr_result;
+			sr_result = (REF struct subregion_buffer *)malloc(sizeof(struct subregion_buffer));
+			if unlikely(!sr_result)
+				goto err;
+			if (src->vb_ops == &subregion_buffer_ops ||
+				src->vb_ops == &subregion_buffer_ops_norem) {
+				/* TODO */
 			}
+			sr_result->vb_ops    = vm_xrem ? _subregion_buffer_ops()
+			                               : _subregion_buffer_ops_norem();
+			sr_result->vb_format = src->vb_format;
+			sr_result->vb_xdim   = self->vx_hdr.vxh_cxsiz;
+			sr_result->vb_ydim   = self->vx_hdr.vxh_cysiz;
+			sr_result->vb_refcnt = 1;
+			sr_result->srb_base  = src;
+			video_buffer_incref(src);
+			sr_result->srb_xoff = self->vx_hdr.vxh_cxoff;
+			sr_result->srb_yoff = self->vx_hdr.vxh_cyoff;
+			sr_result->srb_vm_xoff = vm_xoff;
+			sr_result->srb_vm_xrem = vm_xrem;
+#ifdef SUBREGION_BUFFER_PALREF
+			if (sr_result->vb_format.vf_pal)
+				video_palette_incref(sr_result->vb_format.vf_pal);
+#endif /* SUBREGION_BUFFER_PALREF */
+			return sr_result;
 		}
 	}
 
+	if (src->vb_ops == &gfx_buffer_ops) {
+		/* TODO: merge GFX contexts */
+	}
+
 	/* Fallback: need to use an entire "struct gfx_buffer" */
-
-
 	gx_result = (REF struct gfx_buffer *)malloc(sizeof(struct gfx_buffer));
 	if unlikely(!gx_result)
 		goto err;

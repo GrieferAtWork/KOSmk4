@@ -44,6 +44,7 @@ struct subregion_buffer: video_buffer {
 	                                       * (properly aligned as per `vb_format.vf_codec->vc_align')
 	                                       * When this value cannot be calculated, a subregion_buffer
 	                                       * cannot be used, and  `gfx_buffer' must be used  instead. */
+	video_coord_t            srb_vm_xrem; /* [const] Remaining X pixels not representable by `srb_vm_xoff' */
 };
 
 
@@ -61,7 +62,8 @@ struct gfx_buffer: video_buffer {
 	video_color_t            gxb_colorkey; /* [const] s.a. `struct video_gfx::vx_colorkey' */
 };
 
-INTDEF struct video_buffer_ops subregion_buffer_ops;
+INTDEF struct video_buffer_ops subregion_buffer_ops;       /* `srb_vm_xrem != 0' */
+INTDEF struct video_buffer_ops subregion_buffer_ops_norem; /* `srb_vm_xrem == 0' */
 INTDEF struct video_buffer_ops gfx_buffer_ops;
 
 

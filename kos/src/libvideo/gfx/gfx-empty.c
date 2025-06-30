@@ -218,12 +218,6 @@ libvideo_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
 	return 0;
 }
 
-INTERN ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(FCC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict UNUSED(self),
-                                         struct video_lock *__restrict UNUSED(lock)) {
-	COMPILER_IMPURE();
-}
-
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self) {
 	video_gfxhdr_setempty(&self->vx_hdr);
@@ -247,14 +241,17 @@ libvideo_buffer_empty_noblend(struct video_gfx *__restrict self) {
 
 INTERN struct video_buffer_ops libvideo_buffer_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_buffer_empty_ops(void) {
-	if (!libvideo_buffer_empty_ops.vi_rlock) {
-		libvideo_buffer_empty_ops.vi_wlock      = &libvideo_buffer_empty_lock;
-		libvideo_buffer_empty_ops.vi_unlock     = &libvideo_buffer_empty_unlock;
-		libvideo_buffer_empty_ops.vi_initgfx    = &libvideo_buffer_empty_initgfx;
-		libvideo_buffer_empty_ops.vi_updategfx  = &libvideo_buffer_empty_updategfx;
-		libvideo_buffer_empty_ops.vi_noblendgfx = &libvideo_buffer_empty_noblend;
+	if (!libvideo_buffer_empty_ops.vi_initgfx) {
+		libvideo_buffer_empty_ops.vi_rlock        = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_wlock        = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_unlock       = &libvideo_buffer_noop_unlock;
+		libvideo_buffer_empty_ops.vi_rlockregion  = &libvideo_buffer_empty_lockregion;
+		libvideo_buffer_empty_ops.vi_wlockregion  = &libvideo_buffer_empty_lockregion;
+		libvideo_buffer_empty_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
+		libvideo_buffer_empty_ops.vi_noblendgfx   = &libvideo_buffer_empty_noblend;
+		libvideo_buffer_empty_ops.vi_updategfx    = &libvideo_buffer_empty_updategfx;
 		COMPILER_WRITE_BARRIER();
-		libvideo_buffer_empty_ops.vi_rlock = &libvideo_buffer_empty_lock;
+		libvideo_buffer_empty_ops.vi_initgfx    = &libvideo_buffer_empty_initgfx;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_buffer_empty_ops;

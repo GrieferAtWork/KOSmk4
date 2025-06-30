@@ -73,18 +73,23 @@ bitmask_lock(struct video_buffer *__restrict self,
 	return 0;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(FCC bitmask_unlock)(struct video_buffer *__restrict self,
-                            struct video_lock *__restrict lock) {
-#ifndef NDEBUG
+#define bitmask_rlockregion bitmask_lockregion
+#define bitmask_wlockregion bitmask_lockregion
+PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
+bitmask_lockregion(struct video_buffer *__restrict self,
+                   struct video_regionlock *__restrict lock) {
 	struct bitmask_buffer *me = (struct bitmask_buffer *)self;
-	assert(lock->vl_data == (byte_t *)me->bmb_bm.vbm_mask);
-	assert(lock->vl_stride == me->bmb_bm.vbm_scan >> 3);
-#endif /* !NDEBUG */
-	(void)self;
-	(void)lock;
+	if (me->bmb_bm.vbm_scan & 7) {
+		/* Not scanline-aligned -> cannot "lock" into memory */
+		errno = EINVAL;
+		return -1;
+	}
+	lock->vrl_lock.vl_stride = me->bmb_bm.vbm_scan >> 3;
+	lock->vrl_lock.vl_data   = (byte_t *)me->bmb_bm.vbm_mask;
+	lock->vrl_lock.vl_data += lock->vrl_lock.vl_stride * lock->vrl_ymin;
+	lock->vrl_xoff = me->bmb_bm.vbm_skip + lock->vrl_xmin;
+	return 0;
 }
-
 
 PRIVATE ATTR_IN(1) video_pixel_t CC
 bitmask_gfx__getpixel(struct video_gfx const *__restrict self,
@@ -174,12 +179,15 @@ bitmask_initgfx(struct video_gfx *__restrict self) {
 PRIVATE struct video_buffer_ops bitmask_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bitmask_ops(void) {
 	if unlikely(!bitmask_ops.vi_destroy) {
-		bitmask_ops.vi_rlock      = &bitmask_rlock;
-		bitmask_ops.vi_wlock      = &bitmask_wlock;
-		bitmask_ops.vi_unlock     = &bitmask_unlock;
-		bitmask_ops.vi_initgfx    = &bitmask_initgfx;
-		bitmask_ops.vi_updategfx  = &bitmask_updategfx;
-		bitmask_ops.vi_noblendgfx = &bitmask_noblend;
+		bitmask_ops.vi_rlock        = &bitmask_rlock;
+		bitmask_ops.vi_wlock        = &bitmask_wlock;
+		bitmask_ops.vi_unlock       = &libvideo_buffer_noop_unlock;
+		bitmask_ops.vi_rlockregion  = &bitmask_rlockregion;
+		bitmask_ops.vi_wlockregion  = &bitmask_wlockregion;
+		bitmask_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
+		bitmask_ops.vi_initgfx      = &bitmask_initgfx;
+		bitmask_ops.vi_updategfx    = &bitmask_updategfx;
+		bitmask_ops.vi_noblendgfx   = &bitmask_noblend;
 		COMPILER_WRITE_BARRIER();
 		bitmask_ops.vi_destroy = &bitmask_destroy;
 		COMPILER_WRITE_BARRIER();

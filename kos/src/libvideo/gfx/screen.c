@@ -494,13 +494,9 @@ find_hinted_mode:
 
 	/* TODO: Need custom lock function here that prevents use of HW-accelerated
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
-	result->ss_ops.sbo_video.vi_rlock      = &rambuffer_rlock;
-	result->ss_ops.sbo_video.vi_wlock      = &rambuffer_wlock;
-	result->ss_ops.sbo_video.vi_unlock     = &rambuffer_unlock;
-	result->ss_ops.sbo_video.vi_initgfx    = &rambuffer_initgfx;
-	result->ss_ops.sbo_video.vi_updategfx  = &rambuffer_updategfx;
-	result->ss_ops.sbo_video.vi_noblendgfx = &rambuffer_noblend;
-	result->ss_ops.sbo_video.vi_destroy    = &svga_screen_destroy;
+	video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&result->ss_ops.sbo_video);
+	video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&result->ss_ops.sbo_video);
+	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
 	shared_lock_init(&result->ss_cslock);
 
 	/* Define the updaterects operators if needed by the chipset */

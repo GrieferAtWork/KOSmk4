@@ -106,12 +106,8 @@ PRIVATE struct video_buffer_ops bmpbuffer_ops = {};
 PRIVATE struct video_buffer_ops bmpbuffer_with_mapfile_ops = {};
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_ops(void) {
 	if unlikely(!bmpbuffer_ops.vi_destroy) {
-		bmpbuffer_ops.vi_rlock      = &rambuffer_rlock;
-		bmpbuffer_ops.vi_wlock      = &rambuffer_wlock;
-		bmpbuffer_ops.vi_unlock     = &rambuffer_unlock;
-		bmpbuffer_ops.vi_initgfx    = &rambuffer_initgfx;
-		bmpbuffer_ops.vi_updategfx  = &rambuffer_updategfx;
-		bmpbuffer_ops.vi_noblendgfx = &rambuffer_noblend;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&bmpbuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&bmpbuffer_ops);
 		COMPILER_WRITE_BARRIER();
 		bmpbuffer_ops.vi_destroy = &bmpbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -120,12 +116,8 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_ops
 }
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_with_mapfile_ops(void) {
 	if unlikely(!bmpbuffer_with_mapfile_ops.vi_destroy) {
-		bmpbuffer_with_mapfile_ops.vi_rlock      = &rambuffer_rlock;
-		bmpbuffer_with_mapfile_ops.vi_wlock      = &rambuffer_wlock;
-		bmpbuffer_with_mapfile_ops.vi_unlock     = &rambuffer_unlock;
-		bmpbuffer_with_mapfile_ops.vi_initgfx    = &rambuffer_initgfx;
-		bmpbuffer_with_mapfile_ops.vi_updategfx  = &rambuffer_updategfx;
-		bmpbuffer_with_mapfile_ops.vi_noblendgfx = &rambuffer_noblend;
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&bmpbuffer_with_mapfile_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&bmpbuffer_with_mapfile_ops);
 		COMPILER_WRITE_BARRIER();
 		bmpbuffer_with_mapfile_ops.vi_destroy = &bmpbuffer_with_mapfile_destroy;
 		COMPILER_WRITE_BARRIER();

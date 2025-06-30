@@ -58,7 +58,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
 
 /* Empty video buffer. */
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC libvideo_buffer_empty_lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC libvideo_buffer_empty_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+#define libvideo_buffer_empty_lockregion (*(int (FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_empty_lock)
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_buffer_empty_noblend(struct video_gfx *__restrict self);

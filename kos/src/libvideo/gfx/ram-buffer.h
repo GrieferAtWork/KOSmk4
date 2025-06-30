@@ -47,12 +47,28 @@ struct video_rambuffer: video_buffer {
 /* Ram-buffer operator callbacks. */
 INTDEF NONNULL((1)) void FCC rambuffer_destroy(struct video_buffer *__restrict self);
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC rambuffer_lockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_noblend(struct video_gfx *__restrict self);
-#define rambuffer_rlock rambuffer_lock
-#define rambuffer_wlock rambuffer_lock
+#define rambuffer_rlock       rambuffer_lock
+#define rambuffer_wlock       rambuffer_lock
+#define rambuffer_rlockregion rambuffer_lockregion
+#define rambuffer_wlockregion rambuffer_lockregion
+
+#define video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(self)          \
+	(void)((self)->vi_rlock        = &rambuffer_rlock,             \
+	       (self)->vi_wlock        = &rambuffer_wlock,             \
+	       (self)->vi_unlock       = &libvideo_buffer_noop_unlock, \
+	       (self)->vi_rlockregion  = &rambuffer_rlockregion,       \
+	       (self)->vi_wlockregion  = &rambuffer_wlockregion,       \
+	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
+#define video_buffer_ops_set_GFXOPS_like_RAMBUFFER(self) \
+	(void)((self)->vi_initgfx    = &rambuffer_initgfx,   \
+	       (self)->vi_updategfx  = &rambuffer_updategfx, \
+	       (self)->vi_noblendgfx = &rambuffer_noblend)
+
+
 
 INTDEF struct video_buffer_ops rambuffer_ops;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void);

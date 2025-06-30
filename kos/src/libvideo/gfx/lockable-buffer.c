@@ -115,6 +115,43 @@ lockable_writepixels(struct lockable_buffer const *__restrict self) {
 }
 
 
+/* Read GFX into video lock region */
+PRIVATE NONNULL((1, 2)) void FCC
+lockable_readpixels_region(struct lockable_buffer const *__restrict self,
+                           struct video_regionlock const *__restrict region) {
+	struct video_gfx srcgfx, *p_srcgfx;
+	struct video_gfx dstgfx, *p_dstgfx;
+	struct video_rambuffer dst;
+	lockable_asram(&dst, self);
+	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	assert(p_dstgfx == &dstgfx);
+	assert(p_srcgfx == &srcgfx);
+	video_gfx_bitblit(p_dstgfx, region->vrl_xmin, region->vrl_ymin,
+	                  p_srcgfx, region->vrl_xmin, region->vrl_ymin,
+	                  video_gfx_getclipw(p_dstgfx),
+	                  video_gfx_getcliph(p_dstgfx));
+}
+
+/* Write video lock region to GFX */
+PRIVATE NONNULL((1, 2)) void FCC
+lockable_writepixels_region(struct lockable_buffer const *__restrict self,
+                            struct video_regionlock const *__restrict region) {
+	struct video_gfx srcgfx, *p_srcgfx;
+	struct video_gfx dstgfx, *p_dstgfx;
+	struct video_rambuffer src;
+	lockable_asram(&src, self);
+	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	assert(p_dstgfx == &dstgfx);
+	assert(p_srcgfx == &srcgfx);
+	video_gfx_bitblit(p_dstgfx, region->vrl_xmin, region->vrl_ymin,
+	                  p_srcgfx, region->vrl_xmin, region->vrl_ymin,
+	                  region->vrl_xdim,
+	                  region->vrl_ydim);
+}
+
+
 PRIVATE NONNULL((1)) void
 NOTHROW(FCC lockable_destroy)(struct video_buffer *__restrict self) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
@@ -127,7 +164,7 @@ NOTHROW(FCC lockable_destroy)(struct video_buffer *__restrict self) {
 	free(me);
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_lock_fallback(struct lockable_buffer *__restrict self,
                        struct video_lock *__restrict lock) {
 	/* If not already done, allocate a buffer */
@@ -146,6 +183,7 @@ lockable_lock_fallback(struct lockable_buffer *__restrict self,
 			assert(lock->vl_data);
 			free(buffer);
 		}
+		self->lb_edata = lock->vl_data + req.vbs_bufsize;
 		COMPILER_WRITE_BARRIER();
 	}
 	lock->vl_stride = self->lb_stride;
@@ -155,7 +193,7 @@ err:
 	return -1;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_rlock(struct video_buffer *__restrict self,
                struct video_lock *__restrict lock) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
@@ -167,7 +205,7 @@ lockable_rlock(struct video_buffer *__restrict self,
 	return ok;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_wlock(struct video_buffer *__restrict self,
                struct video_lock *__restrict lock) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
@@ -192,6 +230,78 @@ NOTHROW(FCC lockable_unlock)(struct video_buffer *__restrict self,
 	/* Lock was created by **us** -- if it's a write-lock, write back pixel data */
 	if (lock->_vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE])
 		lockable_writepixels(me);
+}
+
+
+PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
+lockable_lockregion_fallback(struct lockable_buffer *__restrict self,
+                             struct video_regionlock *__restrict lock) {
+	/* If not already done, allocate a buffer */
+	lock->vrl_lock.vl_data = atomic_read(&self->lb_data);
+	if (!lock->vrl_lock.vl_data) {
+		byte_t *buffer;
+		struct video_rambuffer_requirements req;
+		(*self->vb_format.vf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
+		buffer = (byte_t *)calloc(req.vbs_bufsize);
+		if unlikely(!buffer)
+			goto err;
+		self->lb_stride = req.vbs_stride;
+		lock->vrl_lock.vl_data = buffer;
+		if (!atomic_cmpxch(&self->lb_data, NULL, buffer)) {
+			lock->vrl_lock.vl_data = atomic_read(&self->lb_data);
+			assert(lock->vrl_lock.vl_data);
+			free(buffer);
+		}
+		self->lb_edata = lock->vrl_lock.vl_data + req.vbs_bufsize;
+		COMPILER_WRITE_BARRIER();
+	}
+	lock->vrl_lock.vl_stride = self->lb_stride;
+	lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+	lock->vrl_xoff = lock->vrl_xmin;
+	lockable_readpixels_region(self, lock);
+	return 0;
+err:
+	return -1;
+}
+
+PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
+lockable_rlockregion(struct video_buffer *__restrict self,
+                     struct video_regionlock *__restrict lock) {
+	struct lockable_buffer *me = (struct lockable_buffer *)self;
+	int ok = (me->lb_base->vb_ops->vi_rlockregion)(me->lb_base, lock);
+	if (ok != 0 && errno != ENOMEM) {
+		ok = lockable_lockregion_fallback(me, lock);
+		lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)0;
+	}
+	return ok;
+}
+
+PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
+lockable_wlockregion(struct video_buffer *__restrict self,
+                     struct video_regionlock *__restrict lock) {
+	struct lockable_buffer *me = (struct lockable_buffer *)self;
+	int ok = (me->lb_base->vb_ops->vi_wlockregion)(me->lb_base, lock);
+	if (ok != 0 && errno != ENOMEM) {
+		ok = lockable_lockregion_fallback(me, lock);
+		lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)1;
+	}
+	return ok;
+}
+
+PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
+NOTHROW(FCC lockable_unlockregion)(struct video_buffer *__restrict self,
+                                   struct video_regionlock *__restrict lock) {
+	struct lockable_buffer *me = (struct lockable_buffer *)self;
+	/* Check for special case: lock was created by underlying buffer */
+	if (lock->vrl_lock.vl_data < me->lb_data ||
+	    lock->vrl_lock.vl_data >= me->lb_edata) {
+		video_buffer_unlockregion(me->lb_base, lock);
+		return;
+	}
+
+	/* Lock was created by **us** -- if it's a write-lock, write back pixel data */
+	if (lock->vrl_lock._vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE])
+		lockable_writepixels_region(me, lock);
 }
 
 
@@ -224,12 +334,15 @@ lockable_noblend(struct video_gfx *__restrict self) {
 PRIVATE struct video_buffer_ops lockable_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _lockable_ops(void) {
 	if unlikely(!lockable_ops.vi_destroy) {
-		lockable_ops.vi_rlock      = &lockable_rlock;
-		lockable_ops.vi_wlock      = &lockable_wlock;
-		lockable_ops.vi_unlock     = &lockable_unlock;
-		lockable_ops.vi_initgfx    = &lockable_initgfx;
-		lockable_ops.vi_updategfx  = &lockable_updategfx;
-		lockable_ops.vi_noblendgfx = &lockable_noblend;
+		lockable_ops.vi_rlock        = &lockable_rlock;
+		lockable_ops.vi_wlock        = &lockable_wlock;
+		lockable_ops.vi_unlock       = &lockable_unlock;
+		lockable_ops.vi_rlockregion  = &lockable_rlockregion;
+		lockable_ops.vi_wlockregion  = &lockable_wlockregion;
+		lockable_ops.vi_unlockregion = &lockable_unlockregion;
+		lockable_ops.vi_initgfx      = &lockable_initgfx;
+		lockable_ops.vi_updategfx    = &lockable_updategfx;
+		lockable_ops.vi_noblendgfx   = &lockable_noblend;
 		COMPILER_WRITE_BARRIER();
 		lockable_ops.vi_destroy = &lockable_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -246,7 +359,7 @@ video_buffer_islockable(struct video_buffer const *__restrict self) {
 		goto yes;
 	if (self->vb_ops == &membuffer_ops)
 		goto yes;
-	if (self->vb_ops == &subregion_buffer_ops) {
+	if (self->vb_ops == &subregion_buffer_ops_norem) {
 		/* Subregion buffers are locked iff the underlying buffer is */
 		struct subregion_buffer const *me;
 		me = (struct subregion_buffer const *)self;
