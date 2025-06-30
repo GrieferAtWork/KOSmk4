@@ -435,7 +435,7 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
  * for every pixel within the destination region, applying transformation as per "src_matrix"
  *
  * Allowed to clobber all given arguments. */
-#define GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, cb) \
+#define GFX_BLIT_FOREACH_IMATRIX(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, cb) \
 	do {                                                                                     \
 		video_coord_t used_dst_x = dst_x;                                                    \
 		video_coord_t used_src_x = src_x;                                                    \
@@ -451,6 +451,39 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                                     \
 		++dst_y;                                                                             \
 	} while (--size_y)
+
+/* Invoke:
+ * >> cb(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
+ * for every pixel within the destination region */
+#define GFX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, cb) \
+	do {                                                                 \
+		video_coord_t used_dst_x = dst_x;                                \
+		video_coord_t used_src_x = src_x;                                \
+		video_dim_t iter_size_x  = size_x;                               \
+		do {                                                             \
+			cb(used_dst_x, dst_y, used_src_x, src_y);                    \
+			++used_dst_x;                                                \
+			++used_src_x;                                                \
+		} while (--iter_size_x);                                         \
+		++dst_y;                                                         \
+		++src_y;                                                         \
+	} while (--size_y)
+
+/* Same as `GFX_BLIT_FOREACH()', but pixels are iterated in reverse order */
+#define GFX_BLIT_FOREACH_REV(dst_x, dst_y, src_x, src_y, size_x, size_y, cb)          \
+	do {                                                                              \
+		video_dim_t iter_size_x = size_x;                                             \
+		video_coord_t used_dst_y, used_src_y;                                         \
+		--size_y;                                                                     \
+		used_dst_y = dst_y + size_y;                                                  \
+		used_src_y = src_y + size_y;                                                  \
+		do {                                                                          \
+			--iter_size_x;                                                            \
+			{                                                                         \
+				cb(dst_x + iter_size_x, used_dst_y, src_x + iter_size_x, used_src_y); \
+			}                                                                         \
+		} while (iter_size_x);                                                        \
+	} while (size_y)
 
 /* Invoke:
  * >> cb(size_t sizeof_dst_pixel, size_t sizeof_src_pixel);

@@ -1056,23 +1056,20 @@ done:
 	TRACE_END("noblend__fillmask()\n");
 }
 
+#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
+	{                                                      \
+		video_pixel_t pixel;                               \
+		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
+		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
+	}
 PRIVATE ATTR_IN(1) void CC
 libvideo_blitter_noblend_samefmt__blit__bypixel(struct video_blitter const *__restrict self,
                                                 video_coord_t dst_x, video_coord_t dst_y,
                                                 video_coord_t src_x, video_coord_t src_y,
                                                 video_dim_t size_x, video_dim_t size_y) {
-	video_dim_t x, y;
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
-	y = 0;
-	do {
-		x = 0;
-		do {
-			video_pixel_t pixel;
-			pixel = LL_getpixel(src, src_x + x, src_y + y);
-			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
-		} while (++x < size_x);
-	} while (++y < size_y);
+	GFX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, BLIT_PIXEL);
 }
 
 PRIVATE ATTR_IN(1) void CC
@@ -1080,21 +1077,22 @@ libvideo_blitter_noblend_samefmt__blit__bypixel__rev(struct video_blitter const 
                                                      video_coord_t dst_x, video_coord_t dst_y,
                                                      video_coord_t src_x, video_coord_t src_y,
                                                      video_dim_t size_x, video_dim_t size_y) {
-	video_dim_t x, y;
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
-	y = size_y;
-	do {
-		--y;
-		x = size_x;
-		do {
-			video_pixel_t pixel;
-			--x;
-			pixel = LL_getpixel(src, src_x + x, src_y + y);
-			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
-		} while (x);
-	} while (y);
+	GFX_BLIT_FOREACH_REV(dst_x, dst_y, src_x, src_y, size_x, size_y, BLIT_PIXEL);
 }
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_samefmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
+                                                        video_coord_t dst_x, video_coord_t dst_y,
+                                                        video_coord_t src_x, video_coord_t src_y,
+                                                        video_dim_t size_x, video_dim_t size_y,
+                                                        video_imatrix2d_t src_matrix) {
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	GFX_BLIT_FOREACH_IMATRIX(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
+}
+#undef BLIT_PIXEL
 
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_samefmt__blit(struct video_blitter const *__restrict self,
@@ -1176,10 +1174,13 @@ libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict se
 	TRACE_END("noblend_samebuf__blit()\n");
 }
 
-static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)0)->_vbt_driver),
-              "This relation is required because `libvideo_blitter_noblend_difffmt__*' require driver-"
-              "specific data to be set-up as a pixel format converter");
-
+#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
+	{                                                      \
+		video_pixel_t pixel;                               \
+		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
+		pixel = video_converter_mappixel(conv, pixel);     \
+		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
+	}
 PRIVATE ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__blit__bypixel(struct video_blitter const *__restrict self,
                                                 video_coord_t dst_x, video_coord_t dst_y,
@@ -1188,24 +1189,27 @@ libvideo_blitter_noblend_difffmt__blit__bypixel(struct video_blitter const *__re
 	struct video_gfx const *src = self->vbt_src;
 	struct video_gfx const *dst = self->vbt_dst;
 	struct video_converter *conv = libvideo_blitter_generic__conv(self);
-
-	/* Blit per-pixel, with pixel format converter */
-	do {
-		video_coord_t used_dst_x = dst_x;
-		video_coord_t used_src_x = src_x;
-		video_dim_t iter_size_x = size_x;
-		do {
-			video_pixel_t pixel;
-			pixel = LL_getpixel(src, used_src_x, src_y);
-			pixel = video_converter_mappixel(conv, pixel);
-			LL_setpixel(dst, used_dst_x, dst_y, pixel);
-			++used_dst_x;
-			++used_src_x;
-		} while (--iter_size_x);
-		++dst_y;
-		++src_y;
-	} while (--size_y);
+	GFX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, BLIT_PIXEL);
 }
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_difffmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
+                                                        video_coord_t dst_x, video_coord_t dst_y,
+                                                        video_coord_t src_x, video_coord_t src_y,
+                                                        video_dim_t size_x, video_dim_t size_y,
+                                                        video_imatrix2d_t src_matrix) {
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_converter *conv = libvideo_blitter_generic__conv(self);
+	GFX_BLIT_FOREACH_IMATRIX(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
+}
+#undef BLIT_PIXEL
+
+
+
+static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)0)->_vbt_driver),
+              "This relation is required because `libvideo_blitter_noblend_difffmt__*' require driver-"
+              "specific data to be set-up as a pixel format converter");
 
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict self,
@@ -1351,26 +1355,6 @@ libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restri
 }
 
 
-PRIVATE ATTR_IN(1) void CC
-libvideo_blitter_noblend_difffmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
-                                                        video_coord_t dst_x, video_coord_t dst_y,
-                                                        video_coord_t src_x, video_coord_t src_y,
-                                                        video_dim_t size_x, video_dim_t size_y,
-                                                        video_imatrix2d_t src_matrix) {
-	struct video_gfx const *src = self->vbt_src;
-	struct video_gfx const *dst = self->vbt_dst;
-	struct video_converter *conv = libvideo_blitter_generic__conv(self);
-#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
-	{                                                      \
-		video_pixel_t pixel;                               \
-		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
-		pixel = video_converter_mappixel(conv, pixel);     \
-		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
-	}
-	GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
-#undef BLIT_PIXEL
-}
-
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__restrict self,
                                                video_coord_t dst_x, video_coord_t dst_y,
@@ -1404,24 +1388,6 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	libvideo_blitter_noblend_difffmt__blit_imatrix__bypixel(self, dst_x, dst_y, src_x, src_y,
 	                                                        size_x, size_y, src_matrix);
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");
-}
-
-PRIVATE ATTR_IN(1) void CC
-libvideo_blitter_noblend_samefmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
-                                                        video_coord_t dst_x, video_coord_t dst_y,
-                                                        video_coord_t src_x, video_coord_t src_y,
-                                                        video_dim_t size_x, video_dim_t size_y,
-                                                        video_imatrix2d_t src_matrix) {
-	struct video_gfx const *src = self->vbt_src;
-	struct video_gfx const *dst = self->vbt_dst;
-#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
-	{                                                      \
-		video_pixel_t pixel;                               \
-		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
-		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
-	}
-	GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
-#undef BLIT_PIXEL
 }
 
 INTERN ATTR_IN(1) void CC
