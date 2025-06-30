@@ -29,6 +29,7 @@
 #include <hybrid/bit.h>
 #include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
+#include <hybrid/wordbits.h>
 
 #include <kos/types.h>
 #include <sys/param.h>
@@ -789,7 +790,7 @@ libvideo_gfx_noblend__fillmask1(struct video_gfx const *__restrict self,
 						x += bits;                                 \
 						word <<= bits;                             \
 					}                                              \
-					line += lock.vrl_lock.vl_stride;              \
+					line += lock.vrl_lock.vl_stride;               \
 					bitmask += bm_scanline;                        \
 				} while (--size_y)
 			case 0 ... 8:
@@ -1186,32 +1187,171 @@ static_assert(sizeof(struct video_converter) <= sizeof(((struct video_blitter *)
               "This relation is required because `libvideo_blitter_noblend_difffmt__*' require driver-"
               "specific data to be set-up as a pixel format converter");
 
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_difffmt__blit__bypixel(struct video_blitter const *__restrict self,
+                                                video_coord_t dst_x, video_coord_t dst_y,
+                                                video_coord_t src_x, video_coord_t src_y,
+                                                video_dim_t size_x, video_dim_t size_y) {
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_converter *conv = libvideo_blitter_generic__conv(self);
+
+	/* Blit per-pixel, with pixel format converter */
+	do {
+		video_coord_t used_dst_x = dst_x;
+		video_coord_t used_src_x = src_x;
+		video_dim_t iter_size_x = size_x;
+		do {
+			video_pixel_t pixel;
+			pixel = LL_getpixel(src, used_src_x, src_y);
+			pixel = video_converter_mappixel(conv, pixel);
+			LL_setpixel(dst, used_dst_x, dst_y, pixel);
+			++used_dst_x;
+			++used_src_x;
+		} while (--iter_size_x);
+		++dst_y;
+		++src_y;
+	} while (--size_y);
+}
+
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict self,
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t size_x, video_dim_t size_y) {
-	video_dim_t x, y;
-	struct video_gfx const *src = self->vbt_src;
-	struct video_gfx const *dst = self->vbt_dst;
-	struct video_converter *conv = libvideo_blitter_generic__conv(self);
+	struct video_regionlock dst_lock;
+	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
 	TRACE_START("noblend_difffmt__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
 
-	/* TODO: Use video locks if possible */
+	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
+		struct video_regionlock src_lock;
+		struct video_buffer *src_buffer = self->vbt_src->vx_buffer;
+		if likely(LL_rlockregion(src_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
+			struct video_converter *conv = libvideo_blitter_generic__conv(self);
+			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
+			byte_t const *src_line = src_lock.vrl_lock.vl_data;
+
+			/* Fast-pass for well-known BPPs */
+#ifndef __OPTIMIZE_SIZE__
+#define getpixel8(p)     (*(uint8_t const *)p)
+#define getpixel16(p)    (*(uint16_t const *)p)
+#define getpixel24(p)    ENCODE_INT32(p[0], p[1], p[2], 0)
+#define getpixel32(p)    (*(uint32_t const *)p)
+#define setpixel8(p, v)  (*(uint8_t *)p = v)
+#define setpixel16(p, v) (*(uint16_t *)p = v)
+#define setpixel24(p, v) (p[0] = INT32_I8(v, 0), p[1] = INT32_I8(v, 1), p[2] = INT32_I8(v, 2))
+#define setpixel32(p, v) (*(uint32_t *)p = v)
+#define BLIT_DIFFFMT_FAST(SRCsz, SRCrd, DSTsz, DSTwr)                  \
+			do {                                                       \
+				dst_line += DSTsz * dst_lock.vrl_xbas;                 \
+				src_line += SRCsz * src_lock.vrl_xbas;                 \
+				do {                                                   \
+					video_dim_t iter_size_x = size_x;                  \
+					byte_t *dst_iter = dst_line;                       \
+					byte_t const *src_iter = src_line;                 \
+					do {                                               \
+						video_pixel_t pixel;                           \
+						pixel = SRCrd(src_iter);                       \
+						pixel = video_converter_mappixel(conv, pixel); \
+						DSTwr(dst_iter, pixel);                        \
+						dst_iter += DSTsz;                             \
+						src_iter += SRCsz;                             \
+					} while (--iter_size_x);                           \
+					src_line += src_lock.vrl_lock.vl_stride;           \
+					dst_line += dst_lock.vrl_lock.vl_stride;           \
+				} while (--size_y);                                    \
+				goto done_unlock_buffers;                              \
+			}	__WHILE0
+			switch (dst_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
+			case 8:
+				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
+				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 1, setpixel8);
+				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 1, setpixel8);
+				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 1, setpixel8);
+				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 1, setpixel8);
+				default: break;
+				}
+				break;
+			case 16:
+				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
+				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 2, setpixel16);
+				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 2, setpixel16);
+				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 2, setpixel16);
+				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 2, setpixel16);
+				default: break;
+				}
+				break;
+			case 24:
+				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
+				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 3, setpixel24);
+				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 3, setpixel24);
+				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 3, setpixel24);
+				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 3, setpixel24);
+				default: break;
+				}
+				break;
+			case 32:
+				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
+				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 4, setpixel32);
+				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 4, setpixel32);
+				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 4, setpixel32);
+				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 4, setpixel32);
+				default: break;
+				}
+				break;
+			default: break;
+			}
+#undef BLIT_DIFFFMT_FAST
+#undef getpixel8
+#undef getpixel16
+#undef getpixel24
+#undef getpixel32
+#undef setpixel8
+#undef setpixel16
+#undef setpixel24
+#undef setpixel32
+#endif /* !__OPTIMIZE_SIZE__ */
+
+			/* Fallback: use general-purpose operators to convert pixels */
+			{
+				video_pixel_t (LIBVIDEO_CODEC_CC *vc_getpixel)(byte_t const *__restrict line, video_coord_t x);
+				void (LIBVIDEO_CODEC_CC *vc_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+				vc_getpixel = src_buffer->vb_format.vf_codec->vc_getpixel;
+				vc_setpixel = dst_buffer->vb_format.vf_codec->vc_setpixel;
+				do {
+					video_coord_t used_dst_x = dst_lock.vrl_xbas;
+					video_coord_t used_src_x = src_lock.vrl_xbas;
+					video_dim_t iter_size_x = size_x;
+					do {
+						video_pixel_t pixel;
+						pixel = (*vc_getpixel)(src_line, used_src_x);
+						pixel = video_converter_mappixel(conv, pixel);
+						(*vc_setpixel)(dst_line, used_dst_x, pixel);
+						++used_dst_x;
+						++used_src_x;
+					} while (--iter_size_x);
+					src_line += src_lock.vrl_lock.vl_stride;
+					dst_line += dst_lock.vrl_lock.vl_stride;
+				} while (--size_y);
+			}
+
+#ifndef __OPTIMIZE_SIZE__
+done_unlock_buffers:
+#endif /* !__OPTIMIZE_SIZE__ */
+			LL_unlockregion(src_buffer, &src_lock);
+			LL_unlockregion(dst_buffer, &dst_lock);
+			goto done;
+		}
+		LL_unlockregion(dst_buffer, &dst_lock);
+	}
 
 	/* Blit per-pixel, with pixel format converter */
-	for (y = 0; y < size_y; ++y) {
-		for (x = 0; x < size_x; ++x) {
-			video_pixel_t pixel;
-			pixel = LL_getpixel(src, src_x + x, src_y + y);
-			pixel = video_converter_mappixel(conv, pixel);
-			LL_setpixel(dst, dst_x + x, dst_y + y, pixel);
-		}
-	}
+	libvideo_blitter_noblend_difffmt__blit__bypixel(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+done:
 	TRACE_END("noblend_difffmt__blit()\n");
 }
 
