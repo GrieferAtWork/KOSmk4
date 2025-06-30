@@ -1142,18 +1142,11 @@ libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict se
 	video_coord_t loy = dst_y;
 	video_dim_t lox_size = size_x;
 	video_dim_t loy_size = size_y;
-	if (src_x < dst_x) {
-		lox = src_x;
-		lox_size += (dst_x - src_x);
-	} else if (src_x > dst_x) {
-		lox_size += (src_x - dst_x);
-	}
-	if (src_y < dst_y) {
-		loy = src_y;
-		loy_size += (dst_y - src_y);
-	} else if (src_y > dst_y) {
-		loy_size += (src_y - dst_y);
-	}
+
+	/* Figure out the rect union of dst+src, which
+	 * is the region we have to acquire a lock to. */
+	range_union_samesize(&lox, &lox_size, src_x);
+	range_union_samesize(&loy, &loy_size, src_y);
 
 	TRACE_START("noblend_samebuf__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "

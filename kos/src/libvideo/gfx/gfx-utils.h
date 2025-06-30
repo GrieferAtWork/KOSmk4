@@ -44,6 +44,47 @@
 
 DECL_BEGIN
 
+/* >> range_union(video_coord_t *p_r1_start, video_dim_t *p_r1_size,
+ * >>             video_coord_t r2_start, video_dim_t r2_size);
+ *
+ * If necessary, update `*p_r1_start' / `*p_r1_size' to include
+ * whatever range is being expressed by `r2_start' / `r2_size'.
+ *
+ * In order to do a 2d rect union, this helper can simply be
+ * called  twice (once for the X dimension, and once for Y).
+ */
+#define range_union(p_r1_start, p_r1_size, r2_start, r2_size) \
+	do {                                                      \
+		if ((r2_start) < *(p_r1_start)) {                     \
+			*(p_r1_size) += *(p_r1_start) - (r2_start);       \
+			*(p_r1_start) = (r2_start);                       \
+		} else {                                              \
+			video_coord_t _r2_end = (r2_start) + (r2_size);   \
+			if (_r2_end > *(p_r1_start) + *(p_r1_size)) {     \
+				*(p_r1_size) = _r2_end - *(p_r1_start);       \
+			}                                                 \
+		}                                                     \
+	}	__WHILE0
+
+/* Same as  `range_union()',  but  "r2_size"  is
+ * omitted and assumed equal to `IN(*p_r1_size)' */
+#if 1
+#define range_union_samesize(p_r1_start, p_r1_size, r2_start) \
+	do {                                                      \
+		if ((r2_start) < *(p_r1_start)) {                     \
+			*(p_r1_start) = (r2_start);                       \
+			*(p_r1_size) += (*(p_r1_start) - (r2_start));     \
+		} else if ((r2_start) > *(p_r1_start)) {              \
+			*(p_r1_size) += ((r2_start) - *(p_r1_start));     \
+		}                                                     \
+	}	__WHILE0
+#else
+#define range_union_samesize(p_r1_start, p_r1_size, r2_start) \
+	range_union(p_r1_start, p_r1_size, r2_start, *(p_r1_size))
+#endif
+
+
+
 /************************************************************************/
 /* CLAMPING / WRAPPING HELPERS                                          */
 /************************************************************************/
