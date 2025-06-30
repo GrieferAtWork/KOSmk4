@@ -24,7 +24,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  */
 #ifndef GUARD_LIBVIDEO_GFX_RAM_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_RAM_BUFFER_C 1
-#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -56,14 +55,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "ram-buffer.h"
 
 DECL_BEGIN
-
-#define PRIdOFF PRIdN(__SIZEOF_VIDEO_OFFSET_T__)
-#define PRIxOFF PRIxN(__SIZEOF_VIDEO_OFFSET_T__)
-#define PRIuCRD PRIuN(__SIZEOF_VIDEO_COORD_T__)
-#define PRIxCRD PRIxN(__SIZEOF_VIDEO_COORD_T__)
-#define PRIuDIM PRIuN(__SIZEOF_VIDEO_DIM_T__)
-#define PRIxDIM PRIxN(__SIZEOF_VIDEO_DIM_T__)
-
 
 #define RAMGFX_DATA   (byte_t *)self->_vx_driver[RAMGFX_DRIVER__DATA]
 #define RAMGFX_STRIDE (size_t)self->_vx_driver[RAMGFX_DRIVER__STRIDE]
@@ -222,9 +213,10 @@ rambuffer_lockregion(struct video_buffer *__restrict self,
                      struct video_regionlock *__restrict lock) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
+	video_regionlock_assert(me, lock);
 	lock->vrl_lock.vl_stride = me->rb_stride;
-	lock->vrl_lock.vl_data   = me->rb_data + lock->vrl_ymin * me->rb_stride;
-	lock->vrl_xoff           = lock->vrl_xmin;
+	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_ymin * me->rb_stride;
+	lock->vrl_xbas           = lock->_vrl_xmin;
 	return 0;
 }
 

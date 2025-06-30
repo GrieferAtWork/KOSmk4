@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_C 1
-#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include "api.h"
 /**/
@@ -71,16 +70,17 @@ PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
 custom_rlockregion(struct video_buffer *__restrict self,
                    struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
+	video_regionlock_assert(me, lock);
 	if (me->cb_rlockregion)
 		return (*me->cb_rlockregion)(me->cb_cookie, lock);
 	if (me->cb_rlock) {
 		int ok;
 		size_t xoff;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->vrl_xmin, &xoff,
-		                             &lock->vrl_xoff);
+		                             lock->_vrl_xmin, &xoff,
+		                             &lock->vrl_xbas);
 		ok = (*me->cb_rlock)(me->cb_cookie, &lock->vrl_lock);
-		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
 		return ok;
 	}
@@ -92,16 +92,17 @@ PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
 custom_wlockregion(struct video_buffer *__restrict self,
                    struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
+	video_regionlock_assert(me, lock);
 	if (me->cb_wlockregion)
 		return (*me->cb_wlockregion)(me->cb_cookie, lock);
 	if (me->cb_wlock) {
 		int ok;
 		size_t xoff;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->vrl_xmin, &xoff,
-		                             &lock->vrl_xoff);
+		                             lock->_vrl_xmin, &xoff,
+		                             &lock->vrl_xbas);
 		ok = (*me->cb_wlock)(me->cb_cookie, &lock->vrl_lock);
-		lock->vrl_lock.vl_data += lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
 		return ok;
 	}
@@ -113,15 +114,16 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) void
 NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
                                  struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
+	video_regionlock_assert(me, lock);
 	if (me->cb_unlockregion) {
 		(*me->cb_unlockregion)(me->cb_cookie, lock);
 	} else if (me->cb_unlock) {
 		size_t xoff;
 		video_coord_t xrem;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->vrl_xmin, &xoff, &xrem);
-		assert(xrem == lock->vrl_xoff);
-		lock->vrl_lock.vl_data -= lock->vrl_ymin * lock->vrl_lock.vl_stride;
+		                             lock->_vrl_xmin, &xoff, &xrem);
+		assert(xrem == lock->vrl_xbas);
+		lock->vrl_lock.vl_data -= lock->_vrl_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data -= xoff;
 		(*me->cb_unlock)(me->cb_cookie, &lock->vrl_lock);
 	}

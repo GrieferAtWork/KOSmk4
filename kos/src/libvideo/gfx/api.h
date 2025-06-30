@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_API_H
 #define GUARD_LIBVIDEO_GFX_API_H 1
+#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include <hybrid/compiler.h>
 

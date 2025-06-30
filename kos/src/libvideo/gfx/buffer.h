@@ -27,10 +27,31 @@
 #include <kos/anno.h>
 #include <kos/types.h>
 
+#include <assert.h>
+
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include "gfx-utils.h"
 
 DECL_BEGIN
+
+#define video_regionlock_assert(self, lock)                                                  \
+	(__assertf(((lock)->_vrl_xmin + (lock)->_vrl_xdim) > (lock)->_vrl_xmin,                  \
+	           "video_regionlock: X+SX overflows, or SX=0 [X=%" PRIuCRD ",SX=%" PRIuDIM "]", \
+	           (lock)->_vrl_xmin, (lock)->_vrl_xdim),                                        \
+	 __assertf(((lock)->_vrl_ymin + (lock)->_vrl_ydim) > (lock)->_vrl_ymin,                  \
+	           "video_regionlock: Y+SY overflows, or SY=0 [Y=%" PRIuCRD ",SY=%" PRIuDIM "]", \
+	           (lock)->_vrl_ymin, (lock)->_vrl_ydim),                                        \
+	 __assertf(((lock)->_vrl_xmin + (lock)->_vrl_xdim) <= (self)->vb_xdim,                   \
+	           "video_regionlock: X+SX overflows exceeds buffer dimension "                  \
+	           "[X=%" PRIuCRD ",SX=%" PRIuDIM ",X+SX=%" PRIuDIM ",DIM=%" PRIuDIM "]",        \
+	           (lock)->_vrl_xmin, (lock)->_vrl_xdim,                                         \
+	           (lock)->_vrl_xmin + (lock)->_vrl_xdim, (self)->vb_xdim),                      \
+	 __assertf(((lock)->_vrl_ymin + (lock)->_vrl_ydim) <= (self)->vb_ydim,                   \
+	           "video_regionlock: Y+SY overflows exceeds buffer dimension "                  \
+	           "[Y=%" PRIuCRD ",SY=%" PRIuDIM ",Y+SY=%" PRIuDIM ",DIM=%" PRIuDIM "]",        \
+	           (lock)->_vrl_ymin, (lock)->_vrl_ydim,                                         \
+	           (lock)->_vrl_ymin + (lock)->_vrl_ydim, (self)->vb_ydim))
 
 /* Generic implementations for video buffer operators. */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC

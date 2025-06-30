@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_IO_GIF_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_GIF_C_INL 1
-#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 #define _KOS_SOURCE 1
 
 #include "../api.h"

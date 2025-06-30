@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BITMASK_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_BITMASK_BUFFER_C 1
-#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include "api.h"
 /**/
@@ -79,6 +78,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 bitmask_lockregion(struct video_buffer *__restrict self,
                    struct video_regionlock *__restrict lock) {
 	struct bitmask_buffer *me = (struct bitmask_buffer *)self;
+	video_regionlock_assert(me, lock);
 	if (me->bmb_bm.vbm_scan & 7) {
 		/* Not scanline-aligned -> cannot "lock" into memory */
 		errno = EINVAL;
@@ -86,8 +86,8 @@ bitmask_lockregion(struct video_buffer *__restrict self,
 	}
 	lock->vrl_lock.vl_stride = me->bmb_bm.vbm_scan >> 3;
 	lock->vrl_lock.vl_data   = (byte_t *)me->bmb_bm.vbm_mask;
-	lock->vrl_lock.vl_data += lock->vrl_lock.vl_stride * lock->vrl_ymin;
-	lock->vrl_xoff = me->bmb_bm.vbm_skip + lock->vrl_xmin;
+	lock->vrl_lock.vl_data += lock->vrl_lock.vl_stride * lock->_vrl_ymin;
+	lock->vrl_xbas = me->bmb_bm.vbm_skip + lock->_vrl_xmin;
 	return 0;
 }
 

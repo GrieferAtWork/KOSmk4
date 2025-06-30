@@ -65,6 +65,7 @@ struct video_codec;
 struct video_palette;
 
 struct video_lock {
+	/* WARNING: DO NOT MODIFY ANYTHING HERE BEFORE `video_buffer_unlock()' */
 	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
 	__size_t  vl_stride; /* Scanline width (in bytes) */
 #define _VIDEO_LOCK__N_DRIVER 1
@@ -72,13 +73,14 @@ struct video_lock {
 };
 
 struct video_regionlock {
+	/* WARNING: DO NOT MODIFY ANYTHING HERE BEFORE `video_buffer_unlockregion()' */
 	struct video_lock vrl_lock; /* [out] Underlying video lock */
-	video_coord_t     vrl_xoff; /* [out] X-offset added to start of every scanline */
+	video_coord_t     vrl_xbas; /* [out] X-offset added to start of every scanline */
 
-	video_coord_t     vrl_xmin; /* [in] Region starting X pixel coord */
-	video_coord_t     vrl_ymin; /* [in] Region starting Y pixel coord */
-	video_dim_t       vrl_xdim; /* [in] Region X dimension */
-	video_dim_t       vrl_ydim; /* [in] Region Y dimension */
+	video_coord_t    _vrl_xmin; /* [in][const] Region starting X pixel coord */
+	video_coord_t    _vrl_ymin; /* [in][const] Region starting Y pixel coord */
+	video_dim_t      _vrl_xdim; /* [in][const] Region X dimension */
+	video_dim_t      _vrl_ydim; /* [in][const] Region Y dimension */
 };
 
 struct video_buffer_ops {
@@ -149,7 +151,17 @@ struct video_buffer_ops {
 	/* Same as `vi_rlock', but possibly more efficient, as only a specific
 	 * sub-region is being  locked, rather than  the entire video  buffer.
 	 *
-	 * Also: this function may succeed in cases where `vi_rlock' fails. */
+	 * Also: this function may succeed in cases where `vi_rlock' fails.
+	 *
+	 * @assume(__lock->_vrl_xdim > 0);
+	 * @assume(__lock->_vrl_ydim > 0);
+	 * @assume((__lock->_vrl_xmin + __lock->_vrl_xdim) > __lock->_vrl_xmin);
+	 * @assume((__lock->_vrl_ymin + __lock->_vrl_ydim) > __lock->_vrl_ymin);
+	 * @assume((__lock->_vrl_xmin + __lock->_vrl_xdim) <= __self->vb_xdim);
+	 * @assume((__lock->_vrl_ymin + __lock->_vrl_ydim) <= __self->vb_ydim);
+	 *
+	 * @return: 0:  Success
+	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_INOUT_T(2) int
 	(LIBVIDEO_GFX_FCC *vi_rlockregion)(struct video_buffer *__restrict __self,
 	                                   struct video_regionlock *__restrict __lock);
@@ -157,7 +169,17 @@ struct video_buffer_ops {
 	/* Same as `vi_wlock', but possibly more efficient, as only a specific
 	 * sub-region is being  locked, rather than  the entire video  buffer.
 	 *
-	 * Also: this function may succeed in cases where `vi_wlock' fails. */
+	 * Also: this function may succeed in cases where `vi_wlock' fails.
+	 *
+	 * @assume(__lock->_vrl_xdim > 0);
+	 * @assume(__lock->_vrl_ydim > 0);
+	 * @assume((__lock->_vrl_xmin + __lock->_vrl_xdim) > __lock->_vrl_xmin);
+	 * @assume((__lock->_vrl_ymin + __lock->_vrl_ydim) > __lock->_vrl_ymin);
+	 * @assume((__lock->_vrl_xmin + __lock->_vrl_xdim) <= __self->vb_xdim);
+	 * @assume((__lock->_vrl_ymin + __lock->_vrl_ydim) <= __self->vb_ydim);
+	 *
+	 * @return: 0:  Success
+	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_INOUT_T(2) int
 	(LIBVIDEO_GFX_FCC *vi_wlockregion)(struct video_buffer *__restrict __self,
 	                                   struct video_regionlock *__restrict __lock);
@@ -223,21 +245,69 @@ video_buffer_getgfx(struct video_buffer *__self, struct video_gfx *__result,
                     gfx_blendmode_t __blendmode, gfx_flag_t __flags,
                     video_color_t __colorkey);
 
+
+
+/* Lock the video buffer into memory for reading.
+ * WARNING: Attempting to perform "gfx" operations on "this" while  holding
+ *          a  lock to video  memory may block and/or  be much slower until
+ *          said lock is released! The reason for this is that it is unsafe
+ *          to use hardware accelerated 2D operations while a video lock is
+ *          being held!
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_rlock(struct video_buffer *__self, struct video_lock *__lock);
+
+/* Same as `vi_rlock', but also lock for reading+writing */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_wlock(struct video_buffer *__self, struct video_lock *__lock);
+
+/* Unlock a video buffer that had previously been mapped into memory. */
 extern __ATTR_INOUT(1) __ATTR_IN(2) void
 video_buffer_unlock(struct video_buffer *__self, struct video_lock *__lock);
 
+
+
+/* Same as  `video_buffer_rlock', but  possibly more  efficient, as  only  a
+ * specific sub-region is being locked, rather than the entire video buffer.
+ *
+ * Also: this function may succeed in cases where `video_buffer_rlock' fails.
+ *
+ * @assume(__xdim > 0);
+ * @assume(__ydim > 0);
+ * @assume((__xmin + __xdim) > __xmin);
+ * @assume((__ymin + __ydim) > __ymin);
+ * @assume((__xmin + __xdim) <= __self->vb_xdim);
+ * @assume((__ymin + __ydim) <= __self->vb_ydim);
+ *
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_rlockregion(struct video_buffer *__self, struct video_regionlock *__lock,
                          video_coord_t __xmin, video_coord_t __ymin,
                          video_dim_t __xdim, video_dim_t __ydim);
+
+/* Same as  `video_buffer_wlock', but  possibly more  efficient, as  only  a
+ * specific sub-region is being locked, rather than the entire video buffer.
+ *
+ * Also: this function may succeed in cases where `video_buffer_wlock' fails.
+ *
+ * @assume(__xdim > 0);
+ * @assume(__ydim > 0);
+ * @assume((__xmin + __xdim) > __xmin);
+ * @assume((__ymin + __ydim) > __ymin);
+ * @assume((__xmin + __xdim) <= __self->vb_xdim);
+ * @assume((__ymin + __ydim) <= __self->vb_ydim);
+ *
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_buffer_wlockregion(struct video_buffer *__self, struct video_regionlock *__lock,
                          video_coord_t __xmin, video_coord_t __ymin,
                          video_dim_t __xdim, video_dim_t __ydim);
+
+/* Release a video  region lock that  had previously been  acquired
+ * by `video_buffer_rlockregion()' or `video_buffer_wlockregion()'. */
 extern __ATTR_INOUT(1) __ATTR_NONNULL((2)) void
 video_buffer_unlockregion(struct video_buffer *__self, struct video_regionlock *__lock);
 #else /* __INTELLISENSE__ */
@@ -252,12 +322,12 @@ video_buffer_unlockregion(struct video_buffer *__self, struct video_regionlock *
 #define video_buffer_unlock(self, lock) \
 	(*(self)->vb_ops->vi_unlock)(self, lock)
 #define video_buffer_rlockregion(self, lock, xmin, ymin, xdim, ydim) \
-	((lock)->vrl_xmin = (xmin), (lock)->vrl_ymin = (ymin),           \
-	 (lock)->vrl_xdim = (xdim), (lock)->vrl_ydim = (ydim),           \
+	((lock)->_vrl_xmin = (xmin), (lock)->_vrl_ymin = (ymin),         \
+	 (lock)->_vrl_xdim = (xdim), (lock)->_vrl_ydim = (ydim),         \
 	 (*(self)->vb_ops->vi_rlockregion)(self, lock))
 #define video_buffer_wlockregion(self, lock, xmin, ymin, xdim, ydim) \
-	((lock)->vrl_xmin = (xmin), (lock)->vrl_ymin = (ymin),           \
-	 (lock)->vrl_xdim = (xdim), (lock)->vrl_ydim = (ydim),           \
+	((lock)->_vrl_xmin = (xmin), (lock)->_vrl_ymin = (ymin),         \
+	 (lock)->_vrl_xdim = (xdim), (lock)->_vrl_ydim = (ydim),         \
 	 (*(self)->vb_ops->vi_wlockregion)(self, lock))
 #define video_buffer_unlockregion(self, lock) \
 	(*(self)->vb_ops->vi_unlockregion)(self, lock)

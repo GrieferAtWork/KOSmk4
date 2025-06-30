@@ -20,7 +20,6 @@
 #ifndef GUARD_LIBVIDEO_GFX_GFX_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_GFX_BUFFER_C 1
 #define _KOS_SOURCE 1
-#define LIBVIDEO_GFX_EXPOSE_INTERNALS
 
 #include "api.h"
 /**/
@@ -116,21 +115,22 @@ NOTHROW(FCC subregion_buffer_unlock)(struct video_buffer *__restrict self,
 PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
 subregion_buffer_encoderegionlock(struct subregion_buffer const *__restrict self,
                                   struct video_regionlock *__restrict lock) {
-	lock->vrl_xmin += self->srb_xoff;
-	lock->vrl_ymin += self->srb_xoff;
+	lock->_vrl_xmin += self->srb_xoff;
+	lock->_vrl_ymin += self->srb_xoff;
 }
 
 PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
 subregion_buffer_decoderegionlock(struct subregion_buffer const *__restrict self,
                                   struct video_regionlock *__restrict lock) {
-	lock->vrl_xmin -= self->srb_xoff;
-	lock->vrl_ymin -= self->srb_xoff;
+	lock->_vrl_xmin -= self->srb_xoff;
+	lock->_vrl_ymin -= self->srb_xoff;
 }
 
 PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 subregion_buffer_rlockregion(struct video_buffer *__restrict self,
                              struct video_regionlock *__restrict lock) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	video_regionlock_assert(me, lock);
 	subregion_buffer_encoderegionlock(me, lock);
 	return (*me->srb_base->vb_ops->vi_rlockregion)(me->srb_base, lock);
 }
@@ -139,6 +139,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 subregion_buffer_wlockregion(struct video_buffer *__restrict self,
                              struct video_regionlock *__restrict lock) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	video_regionlock_assert(me, lock);
 	subregion_buffer_encoderegionlock(me, lock);
 	return (*me->srb_base->vb_ops->vi_wlockregion)(me->srb_base, lock);
 }
@@ -147,6 +148,7 @@ PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
 NOTHROW(FCC subregion_buffer_unlockregion)(struct video_buffer *__restrict self,
                                            struct video_regionlock *__restrict lock) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
+	video_regionlock_assert(me, lock);
 	subregion_buffer_decoderegionlock(me, lock);
 	video_buffer_unlockregion(me->srb_base, lock);
 }
