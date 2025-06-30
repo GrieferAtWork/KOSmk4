@@ -65,6 +65,7 @@ struct video_codec;
 struct video_palette;
 
 struct video_lock {
+	/* TODO: Remove "vl_size" and add "video_coord_t vl_xoff; // X-coord offset to add to `vl_data'" */
 	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
 	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_ydim) */
 	__size_t  vl_stride; /* Scanline width (in bytes) */

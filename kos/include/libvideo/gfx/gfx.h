@@ -51,8 +51,8 @@
 #define VIDEO_GFX_F_NORMAL      0x0000 /* Normal render flags. */
 #define VIDEO_GFX_F_XWRAP       0x0001 /* [rw] OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
 #define VIDEO_GFX_F_YWRAP       0x0002 /* [rw] OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords within the Clip Rect are mirrored */
-#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords within the Clip Rect are mirrored */
+#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords are horizontally mirrored relative to the Clip Rect */
+#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords are vertically mirrored relative to the Clip Rect */
 #define VIDEO_GFX_F_XYSWAP      0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
                                         * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
                                         * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
