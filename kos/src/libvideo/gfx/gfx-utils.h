@@ -411,6 +411,56 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		++dst_y;                                                                             \
 	} while (--size_y)
 
+/* Invoke:
+ * >> cb(size_t sizeof_dst_pixel, size_t sizeof_src_pixel);
+ * (where "sizeof_dst_pixel" and "sizeof_src_pixel" are  preprocessor
+ * tokens "1", "2", "3" or "4") for the BPP combination specified  by
+ * the runtime expressions  "dst_bpp" and "src_bpp".  When either  of
+ * the given "dst_bpp" and "src_bpp" doesn't map to one of the afore-
+ * mentioned pixel sizes, simply return along a code-path that  never
+ * invoked `cb()' at all. */
+#define GFX_BLIT_SELECT_BPP_COMBINATION(dst_bpp, src_bpp, cb) \
+	switch (dst_bpp) {                                        \
+	case 8:                                                   \
+		switch (src_bpp) {                                    \
+		case 8: cb(1, 1);                                     \
+		case 16: cb(1, 2);                                    \
+		case 24: cb(1, 3);                                    \
+		case 32: cb(1, 4);                                    \
+		default: break;                                       \
+		}                                                     \
+		break;                                                \
+	case 16:                                                  \
+		switch (src_bpp) {                                    \
+		case 8: cb(2, 1);                                     \
+		case 16: cb(2, 2);                                    \
+		case 24: cb(2, 3);                                    \
+		case 32: cb(2, 4);                                    \
+		default: break;                                       \
+		}                                                     \
+		break;                                                \
+	case 24:                                                  \
+		switch (src_bpp) {                                    \
+		case 8: cb(3, 1);                                     \
+		case 16: cb(3, 2);                                    \
+		case 24: cb(3, 3);                                    \
+		case 32: cb(3, 4);                                    \
+		default: break;                                       \
+		}                                                     \
+		break;                                                \
+	case 32:                                                  \
+		switch (src_bpp) {                                    \
+		case 8: cb(4, 1);                                     \
+		case 16: cb(4, 2);                                    \
+		case 24: cb(4, 3);                                    \
+		case 32: cb(4, 4);                                    \
+		default: break;                                       \
+		}                                                     \
+		break;                                                \
+	default: break;                                           \
+	}
+
+
 /************************************************************************/
 /************************************************************************/
 /************************************************************************/

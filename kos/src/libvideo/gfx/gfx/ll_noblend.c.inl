@@ -1237,15 +1237,15 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 
 			/* Fast-pass for well-known BPPs */
 #ifndef __OPTIMIZE_SIZE__
-#define getpixel8(p)     (*(uint8_t const *)p)
-#define getpixel16(p)    (*(uint16_t const *)p)
-#define getpixel24(p)    ENCODE_INT32(p[0], p[1], p[2], 0)
-#define getpixel32(p)    (*(uint32_t const *)p)
-#define setpixel8(p, v)  (*(uint8_t *)p = v)
-#define setpixel16(p, v) (*(uint16_t *)p = v)
-#define setpixel24(p, v) (p[0] = INT32_I8(v, 0), p[1] = INT32_I8(v, 1), p[2] = INT32_I8(v, 2))
-#define setpixel32(p, v) (*(uint32_t *)p = v)
-#define BLIT_DIFFFMT_FAST(SRCsz, SRCrd, DSTsz, DSTwr)                  \
+#define getpixel1(p)    (*(uint8_t const *)p)
+#define getpixel2(p)    (*(uint16_t const *)p)
+#define getpixel3(p)    ENCODE_INT32(p[0], p[1], p[2], 0)
+#define getpixel4(p)    (*(uint32_t const *)p)
+#define setpixel1(p, v) (*(uint8_t *)p = v)
+#define setpixel2(p, v) (*(uint16_t *)p = v)
+#define setpixel3(p, v) (p[0] = INT32_I8(v, 0), p[1] = INT32_I8(v, 1), p[2] = INT32_I8(v, 2))
+#define setpixel4(p, v) (*(uint32_t *)p = v)
+#define BLIT_DIFFFMT_FAST(DSTsz, SRCsz)                                \
 			do {                                                       \
 				dst_line += DSTsz * dst_lock.vrl_xbas;                 \
 				src_line += SRCsz * src_lock.vrl_xbas;                 \
@@ -1255,9 +1255,9 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 					byte_t const *src_iter = src_line;                 \
 					do {                                               \
 						video_pixel_t pixel;                           \
-						pixel = SRCrd(src_iter);                       \
+						pixel = getpixel##SRCsz(src_iter);             \
 						pixel = video_converter_mappixel(conv, pixel); \
-						DSTwr(dst_iter, pixel);                        \
+						setpixel##DSTsz(dst_iter, pixel);              \
 						dst_iter += DSTsz;                             \
 						src_iter += SRCsz;                             \
 					} while (--iter_size_x);                           \
@@ -1266,45 +1266,9 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 				} while (--size_y);                                    \
 				goto done_unlock_buffers;                              \
 			}	__WHILE0
-			switch (dst_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
-			case 8:
-				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
-				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 1, setpixel8);
-				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 1, setpixel8);
-				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 1, setpixel8);
-				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 1, setpixel8);
-				default: break;
-				}
-				break;
-			case 16:
-				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
-				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 2, setpixel16);
-				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 2, setpixel16);
-				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 2, setpixel16);
-				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 2, setpixel16);
-				default: break;
-				}
-				break;
-			case 24:
-				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
-				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 3, setpixel24);
-				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 3, setpixel24);
-				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 3, setpixel24);
-				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 3, setpixel24);
-				default: break;
-				}
-				break;
-			case 32:
-				switch (src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp) {
-				case 8: BLIT_DIFFFMT_FAST(1, getpixel8, 4, setpixel32);
-				case 16: BLIT_DIFFFMT_FAST(2, getpixel16, 4, setpixel32);
-				case 24: BLIT_DIFFFMT_FAST(3, getpixel24, 4, setpixel32);
-				case 32: BLIT_DIFFFMT_FAST(4, getpixel32, 4, setpixel32);
-				default: break;
-				}
-				break;
-			default: break;
-			}
+			GFX_BLIT_SELECT_BPP_COMBINATION(dst_buffer->vb_format.vf_codec->vc_specs.vcs_bpp,
+			                                src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp,
+			                                BLIT_DIFFFMT_FAST);
 #undef BLIT_DIFFFMT_FAST
 #undef getpixel8
 #undef getpixel16
