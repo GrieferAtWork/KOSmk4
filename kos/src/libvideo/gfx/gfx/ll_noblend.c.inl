@@ -1394,16 +1394,32 @@ libvideo_blitter_noblend_difffmt__stretch_n(struct video_blitter const *__restri
 }
 
 
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_difffmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
+                                                        video_coord_t dst_x, video_coord_t dst_y,
+                                                        video_coord_t src_x, video_coord_t src_y,
+                                                        video_dim_t size_x, video_dim_t size_y,
+                                                        video_imatrix2d_t src_matrix) {
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_converter *conv = libvideo_blitter_generic__conv(self);
+#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
+	{                                                      \
+		video_pixel_t pixel;                               \
+		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
+		pixel = video_converter_mappixel(conv, pixel);     \
+		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
+	}
+	GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
+#undef BLIT_PIXEL
+}
+
 INTERN ATTR_IN(1) void CC
 libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__restrict self,
                                                video_coord_t dst_x, video_coord_t dst_y,
                                                video_coord_t src_x, video_coord_t src_y,
                                                video_dim_t size_x, video_dim_t size_y,
                                                video_imatrix2d_t src_matrix) {
-	video_dim_t x, y;
-	struct video_gfx const *src = self->vbt_src;
-	struct video_gfx const *dst = self->vbt_dst;
-	struct video_converter *conv = libvideo_blitter_generic__conv(self);
 	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
@@ -1428,21 +1444,27 @@ libvideo_blitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__res
 	/* TODO: Use video locks if possible */
 
 	/* Blit per-pixel, with pixel format converter */
-	for (y = 0; y < size_y; ++y) {
-		video_offset_t delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * y;
-		video_offset_t delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * y;
-		for (x = 0; x < size_x; ++x) {
-			video_pixel_t pixel;
-			video_coord_t used_src_x = delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * x;
-			video_coord_t used_src_y = delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * x;
-			video_coord_t used_dst_x = dst_x + x;
-			video_coord_t used_dst_y = dst_y + y;
-			pixel = LL_getpixel(src, used_src_x, used_src_y);
-			pixel = video_converter_mappixel(conv, pixel);
-			LL_setpixel(dst, used_dst_x, used_dst_y, pixel);
-		}
-	}
+	libvideo_blitter_noblend_difffmt__blit_imatrix__bypixel(self, dst_x, dst_y, src_x, src_y,
+	                                                        size_x, size_y, src_matrix);
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");
+}
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_blitter_noblend_samefmt__blit_imatrix__bypixel(struct video_blitter const *__restrict self,
+                                                        video_coord_t dst_x, video_coord_t dst_y,
+                                                        video_coord_t src_x, video_coord_t src_y,
+                                                        video_dim_t size_x, video_dim_t size_y,
+                                                        video_imatrix2d_t src_matrix) {
+	struct video_gfx const *src = self->vbt_src;
+	struct video_gfx const *dst = self->vbt_dst;
+#define BLIT_PIXEL(px_dst_x, px_dst_y, px_src_x, px_src_y) \
+	{                                                      \
+		video_pixel_t pixel;                               \
+		pixel = LL_getpixel(src, px_src_x, px_src_y);      \
+		LL_setpixel(dst, px_dst_x, px_dst_y, pixel);       \
+	}
+	GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, BLIT_PIXEL);
+#undef BLIT_PIXEL
 }
 
 INTERN ATTR_IN(1) void CC
@@ -1451,9 +1473,6 @@ libvideo_blitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__res
                                                video_coord_t src_x, video_coord_t src_y,
                                                video_dim_t size_x, video_dim_t size_y,
                                                video_imatrix2d_t src_matrix) {
-	video_dim_t x, y;
-	struct video_gfx const *src = self->vbt_src;
-	struct video_gfx const *dst = self->vbt_dst;
 	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
@@ -1495,19 +1514,8 @@ libvideo_blitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__res
 	/* TODO: Use video locks if possible */
 
 	/* Blit per-pixel, with pixel format converter */
-	for (y = 0; y < size_y; ++y) {
-		video_offset_t delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * y;
-		video_offset_t delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * y;
-		for (x = 0; x < size_x; ++x) {
-			video_pixel_t pixel;
-			video_coord_t used_src_x = delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * x;
-			video_coord_t used_src_y = delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * x;
-			video_coord_t used_dst_x = dst_x + x;
-			video_coord_t used_dst_y = dst_y + y;
-			pixel = LL_getpixel(src, used_src_x, used_src_y);
-			LL_setpixel(dst, used_dst_x, used_dst_y, pixel);
-		}
-	}
+	libvideo_blitter_noblend_samefmt__blit_imatrix__bypixel(self, dst_x, dst_y, src_x, src_y,
+	                                                        size_x, size_y, src_matrix);
 	TRACE_END("noblend_samefmt__blit_imatrix()\n");
 }
 

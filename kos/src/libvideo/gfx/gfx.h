@@ -59,7 +59,7 @@
 #endif /* !PRIdOFF */
 
 #undef GFX_DEBUG
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define GFX_DEBUG
 #endif
 

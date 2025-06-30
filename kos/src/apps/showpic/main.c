@@ -252,7 +252,7 @@ do_showpic(struct screen_buffer *screen,
 //	video_gfx_vmirror(&screen_gfx);
 //	video_gfx_lrot90(&screen_gfx);
 //	video_gfx_lrot90(&image_gfx);
-//	video_gfx_rrot90(&image_gfx);
+	video_gfx_rrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);

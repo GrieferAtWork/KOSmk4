@@ -389,6 +389,28 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		}                                                                                                                          \
 	}	__WHILE0
 
+/* Invoke:
+ * >> cb(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
+ * for every pixel within the destination region, applying transformation as per "src_matrix"
+ *
+ * Allowed to clobber all given arguments. */
+#define GFX_IMATRIX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, cb) \
+	do {                                                                                     \
+		video_coord_t used_dst_x = dst_x;                                                    \
+		video_coord_t used_src_x = src_x;                                                    \
+		video_coord_t used_src_y = src_y;                                                    \
+		video_dim_t iter_size_x  = size_x;                                                   \
+		do {                                                                                 \
+			cb(used_dst_x, dst_y, used_src_x, used_src_y);                                   \
+			used_src_x += video_imatrix2d_get(&src_matrix, 0, 0);                            \
+			used_src_y += video_imatrix2d_get(&src_matrix, 1, 0);                            \
+			++used_dst_x;                                                                    \
+		} while (--iter_size_x);                                                             \
+		src_x += video_imatrix2d_get(&src_matrix, 0, 1);                                     \
+		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                                     \
+		++dst_y;                                                                             \
+	} while (--size_y)
+
 /************************************************************************/
 /************************************************************************/
 /************************************************************************/
