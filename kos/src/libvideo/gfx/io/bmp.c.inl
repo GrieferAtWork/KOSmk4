@@ -596,7 +596,6 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 		resultwm->vb_xdim            = (size_t)(ULONG)biWidth;
 		resultwm->vb_ydim            = (size_t)(ULONG)biHeight;
 		resultwm->rb_data            = bPixelData;
-		resultwm->rb_total           = szPixelDataSize;
 		resultwm->rb_stride          = dwPixelScanline;
 		resultwm->bb_codec_handle    = result_codec_handle;
 		if (out_vflipped)
@@ -616,7 +615,6 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	result->vb_format.vf_pal   = result_pal;
 	result->vb_xdim            = (size_t)(ULONG)biWidth;
 	result->vb_ydim            = (size_t)(ULONG)biHeight;
-	result->rb_total           = szPixelDataSize;
 	result->rb_stride          = dwPixelScanline;
 	result->bb_codec_handle    = result_codec_handle;
 	result->rb_data = (byte_t *)malloc(szPixelDataSize);

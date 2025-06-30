@@ -61,16 +61,15 @@ bitmask_destroy(struct video_buffer *__restrict self) {
 #define bitmask_wlock bitmask_lock
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 bitmask_lock(struct video_buffer *__restrict self,
-             struct video_lock *__restrict result) {
+             struct video_lock *__restrict lock) {
 	struct bitmask_buffer *me = (struct bitmask_buffer *)self;
-	if (me->bmb_bm.vbm_scan & 7) {
+	if ((me->bmb_bm.vbm_scan & 7) || me->bmb_bm.vbm_skip) {
 		/* Not scanline-aligned -> cannot "lock" into memory */
 		errno = EINVAL;
 		return -1;
 	}
-	result->vl_stride = me->bmb_bm.vbm_scan >> 3;
-	result->vl_size   = result->vl_stride * me->vb_ydim;
-	result->vl_data   = (byte_t *)me->bmb_bm.vbm_mask;
+	lock->vl_data   = (byte_t *)me->bmb_bm.vbm_mask;
+	lock->vl_stride = me->bmb_bm.vbm_scan >> 3;
 	return 0;
 }
 
@@ -79,9 +78,8 @@ NOTHROW(FCC bitmask_unlock)(struct video_buffer *__restrict self,
                             struct video_lock *__restrict lock) {
 #ifndef NDEBUG
 	struct bitmask_buffer *me = (struct bitmask_buffer *)self;
-	assert(lock->vl_stride == me->bmb_bm.vbm_scan >> 3);
-	assert(lock->vl_size == lock->vl_stride * me->vb_ydim);
 	assert(lock->vl_data == (byte_t *)me->bmb_bm.vbm_mask);
+	assert(lock->vl_stride == me->bmb_bm.vbm_scan >> 3);
 #endif /* !NDEBUG */
 	(void)self;
 	(void)lock;
@@ -199,6 +197,8 @@ bitmask_buffer_init(struct bitmask_buffer *__restrict self,
                     struct video_bitmask const *__restrict bm,
                     video_color_t const bg_fg_colors[2]) {
 	memcpy(&self->bmb_bm, bm, sizeof(struct video_bitmask));
+	self->bmb_bm.vbm_mask = (byte_t const *)self->bmb_bm.vbm_mask + (self->bmb_bm.vbm_skip >> 3);
+	self->bmb_bm.vbm_skip &= 7;
 	self->bmb_pal.vp_cnt = 2;
 	self->bmb_pal.vp_pal[0] = bg_fg_colors[0];
 	self->bmb_pal.vp_pal[1] = bg_fg_colors[1];

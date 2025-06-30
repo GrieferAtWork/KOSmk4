@@ -499,7 +499,6 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	if unlikely(!result->rb_data)
 		goto err;
 	result->rb_stride          = stride;
-	result->rb_total           = total;
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;

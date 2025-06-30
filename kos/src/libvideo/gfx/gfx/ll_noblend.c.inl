@@ -1136,24 +1136,24 @@ libvideo_blitter_noblend_samebuf__blit(struct video_blitter const *__restrict se
                                        video_coord_t dst_x, video_coord_t dst_y,
                                        video_coord_t src_x, video_coord_t src_y,
                                        video_dim_t size_x, video_dim_t size_y) {
-	struct video_lock vlock;
+	struct video_lock lock;
 	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
 	TRACE_START("noblend_samebuf__blit("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            dst_x, dst_y, src_x, src_y, size_x, size_y);
-	if likely(video_buffer_wlock(dst_buffer, &vlock) == 0) {
-		byte_t *dst_line = vlock.vl_data + dst_y * vlock.vl_stride;
-		byte_t const *src_line = vlock.vl_data + src_y * vlock.vl_stride;
+	if likely(video_buffer_wlock(dst_buffer, &lock) == 0) {
+		byte_t *dst_line = lock.vl_data + dst_y * lock.vl_stride;
+		byte_t const *src_line = lock.vl_data + src_y * lock.vl_stride;
 		void (LIBVIDEO_CODEC_CC *vc_rectmove)(byte_t *__restrict dst_line, video_coord_t dst_x,
 		                                      byte_t const *__restrict src_line, video_coord_t src_x,
 		                                      size_t stride, video_dim_t size_x, video_dim_t size_y);
 		/* Make use of the special "vc_rectmove" operator */
 		vc_rectmove = dst_buffer->vb_format.vf_codec->vc_rectmove;
 		(*vc_rectmove)(dst_line, dst_x, src_line, src_x,
-		               vlock.vl_stride, size_x, size_y);
-		video_buffer_unlock(dst_buffer, &vlock);
+		               lock.vl_stride, size_x, size_y);
+		video_buffer_unlock(dst_buffer, &lock);
 		goto done;
 	}
 

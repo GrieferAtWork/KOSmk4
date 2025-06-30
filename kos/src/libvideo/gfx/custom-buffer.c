@@ -38,20 +38,20 @@ DECL_BEGIN
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 custom_rlock(struct video_buffer *__restrict self,
-             struct video_lock *__restrict result) {
+             struct video_lock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	if (me->cb_rlock)
-		return (*me->cb_rlock)(me->cb_cookie, result);
+		return (*me->cb_rlock)(me->cb_cookie, lock);
 	errno = ENOTSUP;
 	return -1;
 }
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 custom_wlock(struct video_buffer *__restrict self,
-             struct video_lock *__restrict result) {
+             struct video_lock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	if (me->cb_wlock)
-		return (*me->cb_wlock)(me->cb_cookie, result);
+		return (*me->cb_wlock)(me->cb_cookie, lock);
 	errno = ENOTSUP;
 	return -1;
 }

@@ -44,7 +44,6 @@ struct subregion_buffer: video_buffer {
 	                                       * (properly aligned as per `vb_format.vf_codec->vc_align')
 	                                       * When this value cannot be calculated, a subregion_buffer
 	                                       * cannot be used, and  `gfx_buffer' must be used  instead. */
-	video_dim_t              srb_vm_ylos; /* [const] # of lines lost in translation */
 };
 
 

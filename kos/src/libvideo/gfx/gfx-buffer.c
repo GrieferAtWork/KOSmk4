@@ -71,37 +71,35 @@ NOTHROW(FCC subregion_buffer_destroy)(struct video_buffer *__restrict self) {
 
 PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
 subregion_buffer_encodelock(struct subregion_buffer const *__restrict self,
-                            struct video_lock *__restrict result) {
-	result->vl_data += self->srb_yoff * result->vl_stride;
-	result->vl_data += self->srb_vm_xoff;
-	result->vl_size -= self->srb_vm_ylos * result->vl_stride;
+                            struct video_lock *__restrict lock) {
+	lock->vl_data += self->srb_yoff * lock->vl_stride;
+	lock->vl_data += self->srb_vm_xoff;
 }
 
 PRIVATE ATTR_IN(1) ATTR_INOUT(2) void FCC
 subregion_buffer_decodelock(struct subregion_buffer const *__restrict self,
-                            struct video_lock *__restrict result) {
-	result->vl_data -= self->srb_yoff * result->vl_stride;
-	result->vl_data -= self->srb_vm_xoff;
-	result->vl_size += self->srb_vm_ylos * result->vl_stride;
+                            struct video_lock *__restrict lock) {
+	lock->vl_data -= self->srb_yoff * lock->vl_stride;
+	lock->vl_data -= self->srb_vm_xoff;
 }
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 subregion_buffer_rlock(struct video_buffer *__restrict self,
-                       struct video_lock *__restrict result) {
+                       struct video_lock *__restrict lock) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
-	int ok = video_buffer_rlock(me->srb_base, result);
+	int ok = video_buffer_rlock(me->srb_base, lock);
 	if likely(ok == 0)
-		subregion_buffer_encodelock(me, result);
+		subregion_buffer_encodelock(me, lock);
 	return ok;
 }
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 subregion_buffer_wlock(struct video_buffer *__restrict self,
-                       struct video_lock *__restrict result) {
+                       struct video_lock *__restrict lock) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
-	int ok = video_buffer_wlock(me->srb_base, result);
+	int ok = video_buffer_wlock(me->srb_base, lock);
 	if likely(ok == 0)
-		subregion_buffer_encodelock(me, result);
+		subregion_buffer_encodelock(me, lock);
 	return ok;
 }
 
@@ -172,9 +170,9 @@ _subregion_buffer_ops(void) {
 #define gfx_buffer_wlock gfx_buffer_lock
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 gfx_buffer_lock(struct video_buffer *__restrict self,
-                struct video_lock *__restrict result) {
+                struct video_lock *__restrict lock) {
 	(void)self;
-	(void)result;
+	(void)lock;
 	errno = ENOTSUP;
 	return -1;
 }
@@ -361,7 +359,6 @@ libvideo_buffer_fromgfx_init(struct gfx_buffer *self,
 				result->srb_base = src;
 				result->srb_xoff = gfx->vx_hdr.vxh_cxoff;
 				result->srb_yoff = gfx->vx_hdr.vxh_cyoff;
-				result->srb_vm_ylos = result->vb_ydim - src->vb_ydim;
 				return result;
 			}
 		}
@@ -446,7 +443,6 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 				sr_result->srb_xoff = self->vx_hdr.vxh_cxoff;
 				sr_result->srb_yoff = self->vx_hdr.vxh_cyoff;
 				sr_result->srb_vm_xoff = vm_xoff;
-				sr_result->srb_vm_ylos = sr_result->vb_ydim - src->vb_ydim;
 #ifdef SUBREGION_BUFFER_PALREF
 				if (sr_result->vb_format.vf_pal)
 					video_palette_incref(sr_result->vb_format.vf_pal);

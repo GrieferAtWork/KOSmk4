@@ -209,12 +209,11 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 
 INTERN ATTR_INOUT(1) ATTR_OUT(2) int FCC
 rambuffer_lock(struct video_buffer *__restrict self,
-               struct video_lock *__restrict result) {
+               struct video_lock *__restrict lock) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	result->vl_stride = me->rb_stride;
-	result->vl_size   = me->rb_total;
-	result->vl_data   = me->rb_data;
+	lock->vl_data   = me->rb_data;
+	lock->vl_stride = me->rb_stride;
 	return 0;
 }
 
@@ -224,9 +223,8 @@ NOTHROW(FCC rambuffer_unlock)(struct video_buffer *__restrict self,
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(lock->vl_stride == me->rb_stride);
-	assert(lock->vl_size == me->rb_total);
 	assert(lock->vl_data == me->rb_data);
+	assert(lock->vl_stride == me->rb_stride);
 #endif /* !NDEBUG */
 	(void)self;
 	(void)lock;
@@ -407,7 +405,6 @@ libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
 	if unlikely(!result->rb_data)
 		goto err_result;
 	result->rb_stride          = req.vbs_stride;
-	result->rb_total           = req.vbs_bufsize;
 	result->vb_refcnt          = 1;
 	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = codec;
@@ -508,7 +505,6 @@ libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t
 	if unlikely(!result)
 		goto err;
 	result->rb_stride             = stride;
-	result->rb_total              = stride * size_y;
 	result->rb_data               = (byte_t *)mem;
 	result->vb_refcnt             = 1;
 	result->vb_ops                = membuffer_getops();

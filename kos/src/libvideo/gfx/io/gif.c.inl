@@ -687,7 +687,6 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		pal_buf = self->rb_data;
 		self->rb_data   = dcol_buf;
 		self->rb_stride = dcol_stride;
-		self->rb_total  = dcol_total;
 		dcol_end = dcol_buf + dcol_total;
 		free(self->gb_restore);
 		self->gb_restore = NULL;
@@ -737,10 +736,11 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	case GIF_DISPOSE_RESTORE_BACKGROUND: {
 		/* Backup previous frame & clear background for new
 		 * frame with  "global transparency" (if  defined). */
+		size_t rb_total = self->rb_stride * self->vb_ydim;
 		if (anim->ga_cfg.gc_trans != 0 && anim->ga_cfg.gc_trans <= 0xff) {
 			if (!anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
 				if (!self->gb_restore) {
-					byte_t *backup = (byte_t *)malloc(self->rb_total);
+					byte_t *backup = (byte_t *)malloc(rb_total);
 					if unlikely(!backup)
 						goto err;
 					self->gb_restore = self->rb_data;
@@ -751,11 +751,11 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 					self->rb_data    = backup;
 				}
 			}
-			memset(self->rb_data, anim->ga_cfg.gc_trans, self->rb_total);
+			memset(self->rb_data, anim->ga_cfg.gc_trans, rb_total);
 		} else if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
-			bzero(self->rb_data, self->rb_total);
+			bzero(self->rb_data, rb_total);
 		} else if (!self->gb_restore) {
-			byte_t *backup = (byte_t *)calloc(self->rb_total);
+			byte_t *backup = (byte_t *)calloc(rb_total);
 			if unlikely(!backup)
 				goto err;
 			self->gb_restore = self->rb_data;
@@ -764,29 +764,34 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 			byte_t *backup   = self->gb_restore;
 			self->gb_restore = self->rb_data;
 			self->rb_data    = backup;
-			bzero(backup, self->rb_total);
+			bzero(backup, rb_total);
 		}
 	}	break;
 
 	case GIF_DISPOSE_RESTORE_PREVIOUS:
 		self->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = true;
 		/* Restore previous frame */
-		if (self->gb_restore)
-			memcpy(self->rb_data, self->gb_restore, self->rb_total);
+		if (self->gb_restore) {
+			size_t rb_total = self->rb_stride * self->vb_ydim;
+			memcpy(self->rb_data, self->gb_restore, rb_total);
+		}
 		break;
 
-	default:
+	default: {
 		/* Backup current frame in case "GIF_DISPOSE_RESTORE_PREVIOUS" ever gets  used
 		 * Otherwise, don't do anything to the canvas and paint the new frame over-top */
+		size_t rb_total;
 		if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS)
 			break;
+		rb_total = self->rb_stride * self->vb_ydim;
 		if (!self->gb_restore) {
-			self->gb_restore = (byte_t *)malloc(self->rb_total);
+			self->gb_restore = (byte_t *)malloc(rb_total);
 			if unlikely(!self->gb_restore)
 				goto err;
 		}
-		memcpy(self->gb_restore, self->rb_data, self->rb_total);
-		break;
+		memcpy(self->gb_restore, self->rb_data, rb_total);
+	}	break;
+
 	}
 
 	frame_endx = (video_coord_t)frame_x + frame_w;
@@ -819,7 +824,8 @@ set_has_global_transparency:
 			ATTR_FALLTHROUGH
 		case GIF_DISPOSE_RESTORE_PREVIOUS:
 			/* Check if pixel data contains transparent pixels */
-			if (memchr(self->rb_data, anim->ga_cfg.gc_trans, self->rb_total))
+			if (memchr(self->rb_data, anim->ga_cfg.gc_trans,
+			           self->rb_stride * self->vb_ydim))
 				goto set_has_global_transparency;
 			self->vb_ops = &gifbuffer_ops;
 			break;
@@ -952,6 +958,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	uint16_t frame_w, frame_h;
 	video_coord_t frame_endx;
 	video_coord_t frame_endy;
+	size_t rb_total;
 
 	/* Fill in frame info */
 	info->vafi_frameid = 0;
@@ -966,7 +973,6 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	result->vb_xdim     = me->va_xdim;
 	result->vb_ydim     = me->va_ydim;
 	result->rb_stride   = me->va_xdim * 1;
-	result->rb_total    = me->va_xdim * 1 * me->va_ydim;
 	result->gb_cfg      = me->ga_cfg;
 	result->gb_restore  = NULL;
 	result->gb_scratch  = NULL;
@@ -1023,13 +1029,14 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	result->vb_format.vf_pal   = pal;
 
 	/* Fill with global transparency, or "0" if not defined */
+	rb_total = me->va_xdim * 1 * me->va_ydim;
 	if (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0) {
-		result->rb_data = (byte_t *)malloc(result->rb_total);
+		result->rb_data = (byte_t *)malloc(rb_total);
 		if unlikely(!result->rb_data)
 			goto err_r_pal;
-		memset(result->rb_data, me->ga_cfg.gc_trans, result->rb_total);
+		memset(result->rb_data, me->ga_cfg.gc_trans, rb_total);
 	} else {
-		result->rb_data = (byte_t *)calloc(result->rb_total);
+		result->rb_data = (byte_t *)calloc(rb_total);
 		if unlikely(!result->rb_data)
 			goto err_r_pal;
 	}
@@ -1064,8 +1071,9 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		/* Check if frame has "transparent" pixels:
 		 * - First frame does not paint whole image -> everything outside is global transparency!
 		 * - If pixel data contains a "transparent" pixel, then frame1 also needs global transparency */
+		assert(rb_total == me->va_xdim * 1 * me->va_ydim);
 		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_xdim || frame_h < result->vb_ydim ||
-		    memchr(result->rb_data, me->ga_cfg.gc_trans, result->rb_total)) {
+		    memchr(result->rb_data, me->ga_cfg.gc_trans, rb_total)) {
 			me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__YES;
 			goto have_global_trans;
 		}

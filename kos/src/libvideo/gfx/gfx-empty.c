@@ -212,10 +212,9 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit
 /* Empty video buffer. */
 INTERN WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
 libvideo_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
-                           struct video_lock *__restrict result) {
-	result->vl_data   = (byte_t *)result;
-	result->vl_size   = 0;
-	result->vl_stride = 0;
+                           struct video_lock *__restrict lock) {
+	lock->vl_data   = (byte_t *)lock;
+	lock->vl_stride = 0;
 	return 0;
 }
 

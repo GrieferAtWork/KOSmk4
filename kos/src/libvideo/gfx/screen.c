@@ -70,6 +70,7 @@
 DECL_BEGIN
 
 struct svga_screen: video_rambuffer {
+	size_t                            ss_rbtotal;       /* [const] Ram buffer total size. */
 	struct screen_buffer_ops          ss_ops;           /* [const] Screen buffer operators. */
 	REF struct video_codec_handle    *ss_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
 	fd_t                              ss_vdlck;         /* [const] Video lock file */
@@ -149,7 +150,7 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 	assert(me->vb_ops == &me->ss_ops.sbo_video);
 	/* Finalize */
 	(*me->ss_cs.sc_ops.sco_fini)(&me->ss_cs);
-	(*me->ss_libphys_unmap)(me->rb_data, me->rb_total);
+	(*me->ss_libphys_unmap)(me->rb_data, me->ss_rbtotal);
 	(void)dlclose(me->ss_libsvgadrv);
 	(void)dlclose(me->ss_libphys);
 	(void)close(me->ss_vdlck);
@@ -475,8 +476,8 @@ find_hinted_mode:
 
 	/* Map screen memory into a physical buffer. */
 	result->rb_stride = mode->smi_scanline;
-	result->rb_total  = mode->smi_scanline * mode->smi_resy;
-	result->rb_data   = (byte_t *)(*result->ss_libphys_map)(mode->smi_lfb, result->rb_total);
+	result->ss_rbtotal  = mode->smi_scanline * mode->smi_resy;
+	result->rb_data   = (byte_t *)(*result->ss_libphys_map)(mode->smi_lfb, result->ss_rbtotal);
 	if unlikely((void *)result->rb_data == MAP_FAILED) {
 		LOGERR("Failed to map LFB: %m\n");
 		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys;
@@ -520,7 +521,7 @@ find_hinted_mode:
 	/* And we're done! */
 	return result;
 /*err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys_data:
-	(*result->ss_libphys_unmap)(result->rb_data, result->rb_total);*/
+	(*result->ss_libphys_unmap)(result->rb_data, result->ss_rbtotal);*/
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys:
 	(void)dlclose(result->ss_libphys);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal:

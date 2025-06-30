@@ -78,7 +78,6 @@ lockable_asram(struct video_rambuffer *__restrict rb,
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
 	rb->rb_stride = self->lb_stride;
-	rb->rb_total  = self->lb_size;
 	rb->rb_data   = self->lb_data;
 }
 
@@ -130,10 +129,10 @@ NOTHROW(FCC lockable_destroy)(struct video_buffer *__restrict self) {
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_lock_fallback(struct lockable_buffer *__restrict self,
-                       struct video_lock *__restrict result) {
+                       struct video_lock *__restrict lock) {
 	/* If not already done, allocate a buffer */
-	result->vl_data = atomic_read(&self->lb_data);
-	if (!result->vl_data) {
+	lock->vl_data = atomic_read(&self->lb_data);
+	if (!lock->vl_data) {
 		byte_t *buffer;
 		struct video_rambuffer_requirements req;
 		(*self->vb_format.vf_codec->vc_rambuffer_requirements)(self->vb_xdim, self->vb_ydim, &req);
@@ -141,17 +140,15 @@ lockable_lock_fallback(struct lockable_buffer *__restrict self,
 		if unlikely(!buffer)
 			goto err;
 		self->lb_stride = req.vbs_stride;
-		self->lb_size   = req.vbs_bufsize;
-		result->vl_data = buffer;
+		lock->vl_data = buffer;
 		if (!atomic_cmpxch(&self->lb_data, NULL, buffer)) {
-			result->vl_data = atomic_read(&self->lb_data);
-			assert(result->vl_data);
+			lock->vl_data = atomic_read(&self->lb_data);
+			assert(lock->vl_data);
 			free(buffer);
 		}
 		COMPILER_WRITE_BARRIER();
 	}
-	result->vl_stride = self->lb_stride;
-	result->vl_size   = self->lb_size;
+	lock->vl_stride = self->lb_stride;
 	lockable_readpixels(self);
 	return 0;
 err:
@@ -160,24 +157,24 @@ err:
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_rlock(struct video_buffer *__restrict self,
-               struct video_lock *__restrict result) {
+               struct video_lock *__restrict lock) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
-	int ok = video_buffer_rlock(me->lb_base, result);
+	int ok = video_buffer_rlock(me->lb_base, lock);
 	if (ok != 0 && errno != ENOMEM) {
-		ok = lockable_lock_fallback(me, result);
-		result->_vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)0;
+		ok = lockable_lock_fallback(me, lock);
+		lock->_vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)0;
 	}
 	return ok;
 }
 
 PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 lockable_wlock(struct video_buffer *__restrict self,
-               struct video_lock *__restrict result) {
+               struct video_lock *__restrict lock) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
-	int ok = video_buffer_wlock(me->lb_base, result);
+	int ok = video_buffer_wlock(me->lb_base, lock);
 	if (ok != 0 && errno != ENOMEM) {
-		ok = lockable_lock_fallback(me, result);
-		result->_vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)1;
+		ok = lockable_lock_fallback(me, lock);
+		lock->_vl_driver[LOCKABLE_BUFFER_VLOCK_ISWRITE] = (void *)1;
 	}
 	return ok;
 }
@@ -279,7 +276,6 @@ libvideo_buffer_lockable_init(struct lockable_buffer *self,
 	video_buffer_incref(buffer);
 	self->lb_base = buffer;
 	self->lb_data = NULL;
-	DBG_memset(&self->lb_size, 0xcc, sizeof(self->lb_size));
 	DBG_memset(&self->lb_stride, 0xcc, sizeof(self->lb_stride));
 	return self;
 }
@@ -336,7 +332,6 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 	if (result->vb_format.vf_pal)
 		video_palette_incref(result->vb_format.vf_pal);
 #endif /* LOCKABLE_BUFFER_PALREF */
-	DBG_memset(&result->lb_size, 0xcc, sizeof(result->lb_size));
 	DBG_memset(&result->lb_stride, 0xcc, sizeof(result->lb_stride));
 	return result;
 err:

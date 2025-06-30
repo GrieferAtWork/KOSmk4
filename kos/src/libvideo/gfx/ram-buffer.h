@@ -41,13 +41,12 @@ DECL_BEGIN
 
 struct video_rambuffer: video_buffer {
 	size_t  rb_stride; /* [const] Buffer stride */
-	size_t  rb_total;  /* [const] Total buffer size */
 	byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
 };
 
 /* Ram-buffer operator callbacks. */
 INTDEF NONNULL((1)) void FCC rambuffer_destroy(struct video_buffer *__restrict self);
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC rambuffer_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what);

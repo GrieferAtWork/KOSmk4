@@ -371,7 +371,6 @@ do_rgb_format:
 	if unlikely(!result->rb_data)
 		goto err_png_ptr_info_ptr_pal_r;
 	result->rb_stride          = bufreq.vbs_stride;
-	result->rb_total           = bufreq.vbs_bufsize;
 	result->vb_refcnt          = 1;
 	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;

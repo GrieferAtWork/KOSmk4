@@ -1893,6 +1893,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	struct video_rambuffer rb;
 	struct video_blitter blitter;
 	struct video_gfx rb_gfx;
+	size_t rb_total;
 
 	/*rb.vb_refcnt = 1;*/
 	rb.vb_ops    = _rambuffer_ops();
@@ -1902,12 +1903,12 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	rb.vb_ydim   = min(dst_size_y, src_size_y);
 	rb.rb_stride = rb.vb_xdim * rb.vb_format.vf_codec->vc_specs.vcs_pxsz;
 	rb.rb_stride = CEIL_ALIGN(rb.rb_stride, rb.vb_format.vf_codec->vc_align);
-	rb.rb_total  = rb.rb_stride * rb.vb_ydim;
-	rb.rb_data   = (byte_t *)malloca(rb.rb_total);
+	rb_total     = rb.rb_stride * rb.vb_ydim;
+	rb.rb_data   = (byte_t *)malloca(rb_total);
 	if unlikely(!rb.rb_data) {
 		/* Well... Nothing we can do about it... :( */
 		syslog(LOG_WARN, "[libvideo-gfx] Failed to allocate %" PRIuSIZ " bytes for temporary buffer\n",
-		       rb.rb_total);
+		       rb_total);
 		return;
 	}
 	rb_gfx.vx_buffer   = &rb;

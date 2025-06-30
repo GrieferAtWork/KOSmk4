@@ -65,9 +65,7 @@ struct video_codec;
 struct video_palette;
 
 struct video_lock {
-	/* TODO: Remove "vl_size" and add "video_coord_t vl_xoff; // X-coord offset to add to `vl_data'" */
 	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
-	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_ydim) */
 	__size_t  vl_stride; /* Scanline width (in bytes) */
 #define _VIDEO_LOCK__N_DRIVER 1
 	void *_vl_driver[_VIDEO_LOCK__N_DRIVER]; /* Driver-specific data */
@@ -126,12 +124,12 @@ struct video_buffer_ops {
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_FCC *vi_rlock)(struct video_buffer *__restrict __self,
-	                             struct video_lock *__restrict __result);
+	                             struct video_lock *__restrict __lock);
 
 	/* Same as `vi_rlock', but also lock for reading+writing */
 	__ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_FCC *vi_wlock)(struct video_buffer *__restrict __self,
-	                             struct video_lock *__restrict __result);
+	                             struct video_lock *__restrict __lock);
 
 	/* Unlock a video buffer that had previously been mapped into memory. */
 	__ATTR_INOUT_T(1) __ATTR_IN_T(2) void
@@ -397,8 +395,8 @@ video_buffer_forbitmask(video_dim_t __size_x, video_dim_t __size_y,
 typedef void (LIBVIDEO_GFX_CC *video_buffer_custom_destroy_t)(void *__cookie);
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T video_pixel_t (LIBVIDEO_GFX_CC *video_buffer_custom_getpixel_t)(void *__cookie, video_coord_t __x, video_coord_t __y);
 typedef void (LIBVIDEO_GFX_CC *video_buffer_custom_setpixel_t)(void *__cookie, video_coord_t __x, video_coord_t __y, video_pixel_t __pixel);
-typedef __ATTR_OUT_T(2) int (LIBVIDEO_GFX_CC *video_buffer_custom_lock_t)(void *__cookie, struct video_lock *__restrict __result);
-typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unlock_t)(void *__cookie, struct video_lock *__restrict __result);
+typedef __ATTR_OUT_T(2) int (LIBVIDEO_GFX_CC *video_buffer_custom_lock_t)(void *__cookie, struct video_lock *__restrict __lock);
+typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unlock_t)(void *__cookie, struct video_lock *__restrict __lock);
 
 
 /* Construct a special video buffer which, rather than being backed by memory
