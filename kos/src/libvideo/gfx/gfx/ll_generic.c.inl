@@ -404,6 +404,7 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 	}
 	if (libvideo_gfx_allow_ignore(self, color))
 		return;
+
 	/*TRACE_START("generic__absline_lhhl("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "

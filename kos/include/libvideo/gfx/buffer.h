@@ -24,7 +24,6 @@
 
 #include <__crt.h> /* __FILE */
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/__atomic.h>
 
@@ -37,6 +36,7 @@
 #include <libvideo/codec/types.h>
 
 #include "gfx.h"
+#include "blend.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
@@ -61,6 +61,8 @@ __DECL_BEGIN
 
 struct video_format;
 struct video_gfx;
+struct video_codec;
+struct video_palette;
 
 struct video_lock {
 	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
@@ -429,7 +431,7 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 5, 6)) __REF struct video_buffer *
                                            video_buffer_custom_unlock_t __unlock,
                                            void *__cookie);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED NONNULL((3, 5, 6)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3, 5, 6)) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
                        struct video_codec const *__codec, struct video_palette *__palette,
                        video_buffer_custom_getpixel_t __getpixel,

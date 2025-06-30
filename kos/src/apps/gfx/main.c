@@ -219,13 +219,14 @@ again_font:
 				video_dim_t i;
 				video_offset_t x1 = video_gfx_getclipw(&gfx) / 2;
 				video_offset_t y1 = video_gfx_getcliph(&gfx) / 2;
+				video_color_t color = rand_color();
 				for (i = 0; i < video_gfx_getclipw(&gfx); ++i) {
-					gfx.line(x1, y1, i, 0, rand_color());
-					gfx.line(x1, y1, i, video_gfx_getcliph(&gfx) - 1, rand_color());
+					gfx.line(x1, y1, i, 0, color);
+					gfx.line(x1, y1, i, video_gfx_getcliph(&gfx) - 1, color);
 				}
 				for (i = 0; i < video_gfx_getcliph(&gfx); ++i) {
-					gfx.line(x1, y1, 0, i, rand_color());
-					gfx.line(x1, y1, video_gfx_getclipw(&gfx) - 1, i, rand_color());
+					gfx.line(x1, y1, 0, i, color);
+					gfx.line(x1, y1, video_gfx_getclipw(&gfx) - 1, i, color);
 				}
 			}	continue;
 
