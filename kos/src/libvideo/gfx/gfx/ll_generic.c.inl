@@ -357,11 +357,11 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx const *__restrict self,
 	if (libvideo_gfx_allow_ignore(self, color))
 		return;
 
-	/*TRACE_START("generic__absline_llhh("
+	TRACE_START("generic__absline_llhh("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
-	            dst_x, dst_y, size_x, size_y, color);*/
+	            dst_x, dst_y, size_x, size_y, color);
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
@@ -386,7 +386,7 @@ libvideo_gfx_generic__absline_llhh(struct video_gfx const *__restrict self,
 			LL_putcolor(self, line_x, line_y, color);
 		} while (++step < size_x);
 	}
-	/*TRACE_END("generic__absline_llhh()\n");*/
+	TRACE_END("generic__absline_llhh()\n");
 }
 
 INTERN ATTR_IN(1) void CC
@@ -405,11 +405,11 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 	if (libvideo_gfx_allow_ignore(self, color))
 		return;
 
-	/*TRACE_START("generic__absline_lhhl("
+	TRACE_START("generic__absline_lhhl("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
 	            "color: %#" PRIxCOL ")\n",
-	            dst_x, dst_y, size_x, size_y, color);*/
+	            dst_x, dst_y, size_x, size_y, color);
 	gfx_assert(size_x > 0);
 	gfx_assert(size_y > 0);
 	step = 0;
@@ -432,27 +432,163 @@ libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self,
 			video_coord_t line_x = dst_x + step;
 			video_coord_t line_y = dst_y - step;
 			LL_putcolor(self, line_x, line_y, color);
-		} while (++step != size_x);
+		} while (++step < size_x);
 	}
-	/*TRACE_END("generic__absline_llhh()\n");*/
+	TRACE_END("generic__absline_llhh()\n");
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_generic__absline_llhh_aa(struct video_gfx const *__restrict self,
-                                      video_coord_t dst_x, video_coord_t dst_y,
-                                      video_dim_t size_x, video_dim_t size_y,
-                                      video_color_t color) {
-	/* TODO: anti-aliased line drawing */
-	libvideo_gfx_generic__absline_llhh(self, dst_x, dst_y, size_x, size_y, color);
+libvideo_gfx_generic__absline_llhh_l(struct video_gfx const *__restrict self,
+                                     video_coord_t dst_x, video_coord_t dst_y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t color) {
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
+	TRACE_START("generic__absline_llhh_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ")\n",
+	            dst_x, dst_y, size_x, size_y, color);
+	if (size_x > size_y) {
+		sstretch_fp_t fp_start;
+		stretch_fp_t fp_step;
+		video_dim_t pad_min;
+		video_dim_t pad_max;
+		calc_linear_stretch_dim(size_y, size_x, &fp_start,
+		                        &fp_step, &pad_min, &pad_max);
+		if (pad_min) {
+			libvideo_gfx_generic__absline_h(self, dst_x, dst_y, pad_min, color);
+			dst_x += pad_min;
+			fp_start += pad_min * fp_step;
+			size_x -= pad_min;
+		}
+		for (size_x -= pad_max; size_x; --size_x, ++dst_x, fp_start += fp_step) {
+			linear_fp_blend_t frac_y0 = STRETCH_FP_BLEND_FRAC(fp_start);
+			linear_fp_blend_t frac_y1 = LINEAR_FP_BLEND(1) - frac_y0;
+			video_coord_t dst_y0 = dst_y + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_y1 = dst_y0 + 1;
+			video_color_t cy0 = LL_getcolor(self, dst_x, dst_y0);
+			video_color_t cy1 = LL_getcolor(self, dst_x, dst_y1);
+			cy0 = interpolate_1d(color, cy0, frac_y0, frac_y1);
+			cy1 = interpolate_1d(cy1, color, frac_y0, frac_y1);
+			LL_putcolor(self, dst_x, dst_y0, cy0);
+			LL_putcolor(self, dst_x, dst_y1, cy1);
+		}
+		if (pad_max)
+			libvideo_gfx_generic__absline_h(self, dst_x, dst_y + (size_y - 1), pad_max, color);
+	} else if (size_x < size_y) {
+		sstretch_fp_t fp_start;
+		stretch_fp_t fp_step;
+		video_dim_t pad_min;
+		video_dim_t pad_max;
+		calc_linear_stretch_dim(size_x, size_y, &fp_start,
+		                        &fp_step, &pad_min, &pad_max);
+		if (pad_min) {
+			libvideo_gfx_generic__absline_v(self, dst_x, dst_y, pad_min, color);
+			dst_y += pad_min;
+			fp_start += pad_min * fp_step;
+			size_y -= pad_min;
+		}
+		for (size_y -= pad_max; size_y; --size_y, ++dst_y, fp_start += fp_step) {
+			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(fp_start);
+			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
+			video_coord_t dst_x0 = dst_x + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_x1 = dst_x0 + 1;
+			video_color_t cx0 = LL_getcolor(self, dst_x0, dst_y);
+			video_color_t cx1 = LL_getcolor(self, dst_x1, dst_y);
+			cx0 = interpolate_1d(color, cx0, frac_x0, frac_x1);
+			cx1 = interpolate_1d(cx1, color, frac_x0, frac_x1);
+			LL_putcolor(self, dst_x0, dst_y, cx0);
+			LL_putcolor(self, dst_x1, dst_y, cx1);
+		}
+		if (pad_max)
+			libvideo_gfx_generic__absline_v(self, dst_x + (size_x - 1), dst_y, pad_max, color);
+	} else {
+		do {
+			LL_putcolor(self, dst_x, dst_y, color);
+			++dst_x;
+			++dst_y;
+		} while (--size_x);
+	}
+	TRACE_END("generic__absline_llhh_l()\n");
 }
 
 INTERN ATTR_IN(1) void CC
-libvideo_gfx_generic__absline_lhhl_aa(struct video_gfx const *__restrict self,
-                                      video_coord_t dst_x, video_coord_t dst_y,
-                                      video_dim_t size_x, video_dim_t size_y,
-                                      video_color_t color) {
-	/* TODO: anti-aliased line drawing */
-	libvideo_gfx_generic__absline_lhhl(self, dst_x, dst_y, size_x, size_y, color);
+libvideo_gfx_generic__absline_lhhl_l(struct video_gfx const *__restrict self,
+                                     video_coord_t dst_x, video_coord_t dst_y,
+                                     video_dim_t size_x, video_dim_t size_y,
+                                     video_color_t color) {
+	if (libvideo_gfx_allow_ignore(self, color))
+		return;
+	TRACE_START("generic__absline_lhhl_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
+	            "color: %#" PRIxCOL ")\n",
+	            dst_x, dst_y, size_x, size_y, color);
+	if (size_x > size_y) {
+		sstretch_fp_t fp_start;
+		stretch_fp_t fp_step;
+		video_dim_t pad_min;
+		video_dim_t pad_max;
+		calc_linear_stretch_dim(size_y, size_x, &fp_start,
+		                        &fp_step, &pad_min, &pad_max);
+		if (pad_min) {
+			libvideo_gfx_generic__absline_h(self, dst_x, dst_y, pad_min, color);
+			dst_x += pad_min;
+			fp_start += pad_min * fp_step;
+			size_x -= pad_min;
+		}
+		for (size_x -= pad_max; size_x; --size_x, ++dst_x, fp_start += fp_step) {
+			linear_fp_blend_t frac_y0 = STRETCH_FP_BLEND_FRAC(fp_start);
+			linear_fp_blend_t frac_y1 = LINEAR_FP_BLEND(1) - frac_y0;
+			video_coord_t dst_y0 = dst_y - STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_y1 = dst_y0 - 1;
+			video_color_t cy0 = LL_getcolor(self, dst_x, dst_y0);
+			video_color_t cy1 = LL_getcolor(self, dst_x, dst_y1);
+			cy0 = interpolate_1d(color, cy0, frac_y0, frac_y1);
+			cy1 = interpolate_1d(cy1, color, frac_y0, frac_y1);
+			LL_putcolor(self, dst_x, dst_y0, cy0);
+			LL_putcolor(self, dst_x, dst_y1, cy1);
+		}
+		if (pad_max)
+			libvideo_gfx_generic__absline_h(self, dst_x, dst_y - (size_y - 1), pad_max, color);
+	} else if (size_x < size_y) {
+		sstretch_fp_t fp_start;
+		stretch_fp_t fp_step;
+		video_dim_t pad_min;
+		video_dim_t pad_max;
+		calc_linear_stretch_dim(size_x, size_y, &fp_start,
+		                        &fp_step, &pad_min, &pad_max);
+		if (pad_min) {
+			dst_y -= pad_min;
+			libvideo_gfx_generic__absline_v(self, dst_x, dst_y + 1, pad_min, color);
+			fp_start += pad_min * fp_step;
+			size_y -= pad_min;
+		}
+		for (size_y -= pad_max; size_y; --size_y, --dst_y, fp_start += fp_step) {
+			linear_fp_blend_t frac_x0 = STRETCH_FP_BLEND_FRAC(fp_start);
+			linear_fp_blend_t frac_x1 = LINEAR_FP_BLEND(1) - frac_x0;
+			video_coord_t dst_x0 = dst_x + STRETCH_FP_WHOLE(fp_start);
+			video_coord_t dst_x1 = dst_x0 + 1;
+			video_color_t cx0 = LL_getcolor(self, dst_x0, dst_y);
+			video_color_t cx1 = LL_getcolor(self, dst_x1, dst_y);
+			cx0 = interpolate_1d(color, cx0, frac_x0, frac_x1);
+			cx1 = interpolate_1d(cx1, color, frac_x0, frac_x1);
+			LL_putcolor(self, dst_x0, dst_y, cx0);
+			LL_putcolor(self, dst_x1, dst_y, cx1);
+		}
+		if (pad_max) {
+			dst_y -= (pad_max - 1);
+			libvideo_gfx_generic__absline_v(self, dst_x + size_x - 1, dst_y, pad_max, color);
+		}
+	} else {
+		do {
+			LL_putcolor(self, dst_x, dst_y, color);
+			++dst_x;
+			--dst_y;
+		} while (--size_x);
+	}
+	TRACE_END("generic__absline_lhhl_l()\n");
 }
 
 

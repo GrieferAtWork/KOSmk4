@@ -292,7 +292,7 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 0
+#if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),

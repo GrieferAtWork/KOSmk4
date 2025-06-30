@@ -337,8 +337,8 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DECLARE_libvideo_gfx_generic__putcolor_FOO)
 /* Low-level, Generic, always-valid GFX functions (using only `vgfo_getcolor' + `vgfo_putcolor') */
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_llhh(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_lhhl(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_llhh_aa(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
-INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_lhhl_aa(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_llhh_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_lhhl_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_h(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absline_v(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t length, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absfill(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t color);
@@ -746,8 +746,8 @@ after_blend:;
 			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 				self->vx_hdr.vxh_blitto                = &libvideo_gfx_noblend__blitto_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
-				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_aa;
-				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_aa;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_l;
 			} else {
 				self->vx_hdr.vxh_blitto                = &libvideo_gfx_noblend__blitto_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
@@ -758,8 +758,8 @@ after_blend:;
 			if (self->vx_flags & VIDEO_GFX_F_LINEAR) {
 				self->vx_hdr.vxh_blitto                = &libvideo_gfx_generic__blitto_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
-				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_aa;
-				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_aa;
+				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;
+				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_l;
 			} else {
 				self->vx_hdr.vxh_blitto                = &libvideo_gfx_generic__blitto_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_n;

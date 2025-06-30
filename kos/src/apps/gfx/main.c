@@ -100,9 +100,7 @@ int main(int argc, char *argv[]) {
 	screen = screen_buffer_create(NULL);
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
-	screen->getgfx(gfx,
-	               GFX_BLENDMODE_ALPHA,
-	               VIDEO_GFX_F_LINEAR);
+	screen->getgfx(gfx, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_LINEAR);
 
 	fontprinter_data.vfp_height          = 16;
 	fontprinter_data.vfp_font            = font;
@@ -237,9 +235,9 @@ again_font:
 				video_color_t color = rand_color();
 				for (i = 0; i < 100; ++i) {
 					video_dim_t xm = (x1 <= 0 ? 0 : x1) ?: 1;
-					video_dim_t xp = (video_dim_t)(x1 >= screen->vb_xdim ? 0 : screen->vb_xdim - x1) ?: 1;
+					video_dim_t xp = (video_dim_t)(x1 >= (video_offset_t)screen->vb_xdim ? 0 : (video_offset_t)screen->vb_xdim - x1) ?: 1;
 					video_dim_t ym = (y1 <= 0 ? 0 : y1) ?: 1;
-					video_dim_t yp = (video_dim_t)(y1 >= screen->vb_ydim ? 0 : screen->vb_ydim - y1) ?: 1;
+					video_dim_t yp = (video_dim_t)(y1 >= (video_offset_t)screen->vb_ydim ? 0 : (video_offset_t)screen->vb_ydim - y1) ?: 1;
 					int xsign = (rand() % (screen->vb_xdim)) < xm ? -1 : 1;
 					int ysign = (rand() % (screen->vb_ydim)) < ym ? -1 : 1;
 					video_offset_t x2 = x1 + (xsign * (rand() % (xsign < 0 ? xm : xp)));

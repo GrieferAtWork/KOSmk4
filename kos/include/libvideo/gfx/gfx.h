@@ -270,7 +270,7 @@ struct video_gfx_xops {
 	/* Diagonal line from top-left -> bottom-right
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void
+	__ATTR_IN_T(1) void /* TODO: Some way to specify the line width */
 	(LIBVIDEO_GFX_CC *vgfx_absline_llhh)(struct video_gfx const *__restrict __self,
 	                                     video_coord_t __x, video_coord_t y,
 	                                     video_dim_t __size_x, video_dim_t __size_y,
@@ -279,7 +279,7 @@ struct video_gfx_xops {
 	/* Diagonal line from bottom-left -> top-right
 	 * @assume(__size_x > 0);
 	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void
+	__ATTR_IN_T(1) void /* TODO: Some way to specify the line width */
 	(LIBVIDEO_GFX_CC *vgfx_absline_lhhl)(struct video_gfx const *__restrict __self,
 	                                     video_coord_t __x, video_coord_t __y,
 	                                     video_dim_t __size_x, video_dim_t __size_y,
@@ -298,6 +298,8 @@ struct video_gfx_xops {
 	(LIBVIDEO_GFX_CC *vgfx_absline_v)(struct video_gfx const *__restrict __self,
 		                              video_coord_t __x, video_coord_t __y,
 		                              video_dim_t __length, video_color_t __color);
+
+	/* TODO: Curve drawing (Bézier curve) */
 
 	/* Rect fill
 	 * @assume(__size_x > 0);
