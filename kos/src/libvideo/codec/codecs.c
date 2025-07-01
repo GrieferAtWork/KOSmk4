@@ -1196,7 +1196,7 @@ rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	codec_assert(!((uintptr_t)line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	do {
-		memsetl(line, (uint16_t)pixel, size_x);
+		memsetl(line, (uint32_t)pixel, size_x);
 		line += stride;
 	} while (--size_y);
 }
