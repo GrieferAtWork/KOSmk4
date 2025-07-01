@@ -235,6 +235,12 @@ typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *video_codec_color2pixel_t)(struct video_format const *__restrict __self,
                                                video_color_t __color);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color64_t
+(LIBVIDEO_CODEC_CC *video_codec_pixel2color64_t)(struct video_format const *__restrict __self,
+                                                 video_pixel64_t __pixel);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel64_t
+(LIBVIDEO_CODEC_CC *video_codec_color2pixel64_t)(struct video_format const *__restrict __self,
+                                                 video_color64_t __color);
 
 /* Initialize a pixel format converter `__self' by:
  * - Filling in `__self->vcv_mappixel'
@@ -252,11 +258,16 @@ typedef __ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_converter *
 /* Get a pixel (The caller must ensure that the given x is in-bounds) */
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *video_codec_getpixel_t)(__byte_t const *__restrict __line, video_coord_t __x);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel64_t
+(LIBVIDEO_CODEC_CC *video_codec_getpixel64_t)(__byte_t const *__restrict __line, video_coord_t __x);
 
 /* Set a pixel (The caller must ensure that the given x is in-bounds) */
 typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_CODEC_CC *video_codec_setpixel_t)(__byte_t *__restrict __line,
                                             video_coord_t __x, video_pixel_t __pixel);
+typedef __ATTR_NONNULL_T((1)) void
+(LIBVIDEO_CODEC_CC *video_codec_setpixel64_t)(__byte_t *__restrict __line,
+                                              video_coord_t __x, video_pixel64_t __pixel);
 
 #ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if __has_attribute(__regparm__)
@@ -279,6 +290,9 @@ typedef void (*_video_codec_setpixel3_t)(void);
 typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_CODEC_CC *video_codec_linefill_t)(__byte_t *__restrict __line, video_coord_t __x,
                                             video_pixel_t __pixel, video_dim_t __num_pixels);
+typedef __ATTR_NONNULL_T((1)) void
+(LIBVIDEO_CODEC_CC *video_codec_linefill64_t)(__byte_t *__restrict __line, video_coord_t __x,
+                                              video_pixel64_t __pixel, video_dim_t __num_pixels);
 
 /* Fill a vertical line of pixels. Same as:
  * >> do {
@@ -291,6 +305,9 @@ typedef __ATTR_NONNULL_T((1)) void
 typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_CODEC_CC *video_codec_vertfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
                                             video_pixel_t __pixel, video_dim_t __num_pixels);
+typedef __ATTR_NONNULL_T((1)) void
+(LIBVIDEO_CODEC_CC *video_codec_vertfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                              video_pixel64_t __pixel, video_dim_t __num_pixels);
 
 /* Fill a rect of pixels. Same as:
  * >> do {
@@ -304,6 +321,9 @@ typedef __ATTR_NONNULL_T((1)) void
 typedef __ATTR_NONNULL_T((1)) void
 (LIBVIDEO_CODEC_CC *video_codec_rectfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
                                             video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
+typedef __ATTR_NONNULL_T((1)) void
+(LIBVIDEO_CODEC_CC *video_codec_rectfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                              video_pixel64_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 
 /* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
  * @assume(IS_ALIGNED(__dst_line, vc_align));
@@ -357,6 +377,15 @@ struct video_codec {
 	video_codec_rectfill_t      vc_rectfill;      /* Fill a rect of pixels. */
 	video_codec_rectcopy_t      vc_rectcopy;      /* Copy a rect of pixels. When src/dst overlap, results are weak-undefined. */
 	video_codec_rectmove_t      vc_rectmove;      /* Same as `vc_rectcopy', but properly deal with overlapping video buffers */
+
+	/* TODO: HDR video codecs */
+//	video_codec_pixel2color64_t vc_pixel2color64; /* Convert between color and pixel values. */
+//	video_codec_color2pixel64_t vc_color2pixel64; /* ... */
+//	video_codec_getpixel64_t    vc_getpixel64;    /* Get a pixel */
+//	video_codec_setpixel64_t    vc_setpixel64;    /* Set a pixel */
+//	video_codec_linefill64_t    vc_linefill64;    /* Fill neighboring pixels horizontally. .*/
+//	video_codec_vertfill64_t    vc_vertfill64;    /* Fill a vertical line of pixels.*/
+//	video_codec_rectfill64_t    vc_rectfill64;    /* Fill a rect of pixels. */
 
 	/* TODO: More operators for fast rectcopy w/ rotation/mirroring */
 

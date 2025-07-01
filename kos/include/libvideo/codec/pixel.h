@@ -111,8 +111,14 @@ __DECL_BEGIN
 typedef __UINT32_TYPE__ video_color_t;  /* General-purpose */
 typedef __UINT32_TYPE__ video_pixel_t;  /* Codec-specific */
 typedef __UINT8_TYPE__ video_channel_t; /* Singular color channel of "video_color_t" */
-typedef __UINT_FAST16_TYPE__ video_twochannels_t; /* Word with sufficient space for 2 color channels */
-typedef __INT_FAST16_TYPE__ video_stwochannels_t; /* Word with sufficient space for 2 color channels */
+typedef __UINT_FAST16_TYPE__ video_twochannels_t; /* Word with sufficient space for 2 video_channel_t */
+typedef __INT_FAST16_TYPE__ video_stwochannels_t; /* Word with sufficient space for 2 video_channel_t */
+
+typedef __UINT64_TYPE__ video_color64_t;   /* General-purpose */
+typedef __UINT64_TYPE__ video_pixel64_t;   /* Codec-specific */
+typedef __UINT16_TYPE__ video_channel16_t; /* Singular color channel of "video_color64_t" */
+typedef __UINT_FAST32_TYPE__ video_twochannels16_t; /* Word with sufficient space for 2 video_channel16_t */
+typedef __INT_FAST32_TYPE__ video_stwochannels16_t; /* Word with sufficient space for 2 video_channel16_t */
 #endif /* __CC__ */
 
 __DECL_END
