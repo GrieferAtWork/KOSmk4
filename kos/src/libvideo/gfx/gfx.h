@@ -48,7 +48,8 @@
 	cb(mul, GFX_BLENDMODE_MUL)
 
 #define GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(cb /*(name, mode)*/) \
-	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))
+	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))                 \
+	cb(alpha_override, GFX_BLENDMODE_ALPHA_OVERRIDE(0))
 
 #ifndef PRIdOFF
 #include <inttypes.h>
@@ -678,11 +679,11 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 	 * - _vx_xops.vgfx_absgradient_h
 	 * - _vx_xops.vgfx_absgradient_v */
 	if (what & VIDEO_GFX_UPDATE_BLEND) {
-		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_OVERRIDE);
-		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_ALPHA);
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect(GFX_BLENDMODE_GET_MODE(self->vx_blend), GFX_BLENDMODE_ALPHA);
 
 		/* Detect special blend modes. */
-		switch (self->vx_blend & _GFX_BLENDMODE_MODE_MASK) {
+		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
 		default:
 			if (!(GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
 			      GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
@@ -747,7 +748,7 @@ after_blend:;
 	 * - _vx_xops.vgfx_absline_lhhl */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
 		/* Select based on linear vs. Nearest interpolation, and blending */
-		if ((self->vx_blend & _GFX_BLENDMODE_MODE_MASK) == GFX_BLENDMODE_OVERRIDE) {
+		if (GFX_BLENDMODE_GET_MODE(self->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
 			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;

@@ -72,26 +72,20 @@
 /*      GFX_BLENDFUNC_...                      0x06  * ... */
 /*      GFX_BLENDFUNC_...                      0x07  * ... */
 
-#define _GFX_BLENDMODE_CONSTANT_SHIFT 32
-#define _GFX_BLENDMODE_MODE_MASK __UINT32_C(0xffffffff)
+#define _GFX_BLENDMODE_CONSTANT_SHIFT 32 /* Shift for where we store the constant color */
 #define _GFX_BLENDMODE_CR_SHIFT (_GFX_BLENDMODE_CONSTANT_SHIFT + VIDEO_COLOR_RED_SHIFT)
 #define _GFX_BLENDMODE_CG_SHIFT (_GFX_BLENDMODE_CONSTANT_SHIFT + VIDEO_COLOR_GREEN_SHIFT)
 #define _GFX_BLENDMODE_CB_SHIFT (_GFX_BLENDMODE_CONSTANT_SHIFT + VIDEO_COLOR_BLUE_SHIFT)
 #define _GFX_BLENDMODE_CA_SHIFT (_GFX_BLENDMODE_CONSTANT_SHIFT + VIDEO_COLOR_ALPHA_SHIFT)
 
-#define GFX_BLENDMODE_GETMODE(x)     (__CCAST(__UINT32_TYPE__)(x))
-#define GFX_BLENDMODE_GETCONSTANT(x) (__CCAST(video_color_t)((x) >> _GFX_BLENDMODE_CONSTANT_SHIFT))
-
-#define GFX_BLENDMODE_GET_SRCRGB(info) (__CCAST(__uint8_t)((info) & 0x1f))                              /* Source color (One of `GFX_BLENDDATA_*') */
-#define GFX_BLENDMODE_GET_SRCA(info)   (__CCAST(__uint8_t)(((info) >> 5) & 0x1f))                       /* Source alpha (One of `GFX_BLENDDATA_*') */
-#define GFX_BLENDMODE_GET_DSTRGB(info) (__CCAST(__uint8_t)(((info) >> 10) & 0x1f))                      /* Destination color (One of `GFX_BLENDDATA_*') */
-#define GFX_BLENDMODE_GET_DSTA(info)   (__CCAST(__uint8_t)(((info) >> 15) & 0x1f))                      /* Destination alpha (One of `GFX_BLENDDATA_*') */
-#define GFX_BLENDMODE_GET_FUNRGB(info) (__CCAST(__uint8_t)(((info) >> 20) & 0x7))                       /* Color blend function (One of `GFX_BLENDFUNC_*') */
-#define GFX_BLENDMODE_GET_FUNA(info)   (__CCAST(__uint8_t)(((info) >> 23) & 0x7))                       /* Alpha blend function (One of `GFX_BLENDFUNC_*') */
-#define GFX_BLENDMODE_GET_CR(info)     (__CCAST(__uint8_t)(((info) >> _GFX_BLENDMODE_CR_SHIFT) & 0xff)) /* Constant color red */
-#define GFX_BLENDMODE_GET_CG(info)     (__CCAST(__uint8_t)(((info) >> _GFX_BLENDMODE_CG_SHIFT) & 0xff)) /* Constant color green */
-#define GFX_BLENDMODE_GET_CB(info)     (__CCAST(__uint8_t)(((info) >> _GFX_BLENDMODE_CB_SHIFT) & 0xff)) /* Constant color blue */
-#define GFX_BLENDMODE_GET_CA(info)     (__CCAST(__uint8_t)(((info) >> _GFX_BLENDMODE_CA_SHIFT) & 0xff)) /* Constant color alpha */
+#define GFX_BLENDMODE_GET_SRCRGB(info) (__CCAST(__uint8_t)((info) & 0x1f))         /* Source color (One of `GFX_BLENDDATA_*') */
+#define GFX_BLENDMODE_GET_SRCA(info)   (__CCAST(__uint8_t)(((info) >> 5) & 0x1f))  /* Source alpha (One of `GFX_BLENDDATA_*') */
+#define GFX_BLENDMODE_GET_DSTRGB(info) (__CCAST(__uint8_t)(((info) >> 10) & 0x1f)) /* Destination color (One of `GFX_BLENDDATA_*') */
+#define GFX_BLENDMODE_GET_DSTA(info)   (__CCAST(__uint8_t)(((info) >> 15) & 0x1f)) /* Destination alpha (One of `GFX_BLENDDATA_*') */
+#define GFX_BLENDMODE_GET_FUNRGB(info) (__CCAST(__uint8_t)(((info) >> 20) & 0x7))  /* Color blend function (One of `GFX_BLENDFUNC_*') */
+#define GFX_BLENDMODE_GET_FUNA(info)   (__CCAST(__uint8_t)(((info) >> 23) & 0x7))  /* Alpha blend function (One of `GFX_BLENDFUNC_*') */
+#define GFX_BLENDMODE_GET_MODE(x)      (__CCAST(__UINT32_TYPE__)(x))               /* The actual blending mode config */
+#define GFX_BLENDMODE_GET_COLOR(x)     (__CCAST(video_color_t)((x) >> _GFX_BLENDMODE_CONSTANT_SHIFT)) /* Constant color */
 
 /* Helper macros for creating blend modes.
  * @param: src:  Source color/alpha (One of `GFX_BLENDDATA_*')
@@ -105,17 +99,17 @@
 #define GFX_BLENDMODE_EX(rgb_src, rgb_fun, rgb_dst, a_src, a_fun, a_dst, cr, cg, cb, ca)         \
 	_GFX_BLENDMODE_EX(GFX_BLENDDATA_##rgb_src, GFX_BLENDFUNC_##rgb_fun, GFX_BLENDDATA_##rgb_dst, \
 	                  GFX_BLENDDATA_##a_src, GFX_BLENDFUNC_##a_fun, GFX_BLENDDATA_##a_dst, cr, cg, cb, ca)
-#define _GFX_BLENDMODE_EX(rgb_src, rgb_fun, rgb_dst,           \
-                          a_src, a_fun, a_dst, cr, cg, cb, ca) \
-	(__CCAST(gfx_blendmode_t)((rgb_src) & 0x1f) |              \
-	 (__CCAST(gfx_blendmode_t)((a_src) & 0x1f) << 5) |         \
-	 (__CCAST(gfx_blendmode_t)((rgb_dst) & 0x1f) << 10) |      \
-	 (__CCAST(gfx_blendmode_t)((a_dst) & 0x1f) << 15) |        \
-	 (__CCAST(gfx_blendmode_t)((rgb_fun) & 0x7) << 20) |       \
-	 (__CCAST(gfx_blendmode_t)((a_fun) & 0x7) << 23) |         \
-	 (__CCAST(gfx_blendmode_t)((cr) & 0xff) << _GFX_BLENDMODE_CR_SHIFT) |           \
-	 (__CCAST(gfx_blendmode_t)((cg) & 0xff) << _GFX_BLENDMODE_CG_SHIFT) |           \
-	 (__CCAST(gfx_blendmode_t)((cb) & 0xff) << _GFX_BLENDMODE_CB_SHIFT) |           \
+#define _GFX_BLENDMODE_EX(rgb_src, rgb_fun, rgb_dst,                      \
+                          a_src, a_fun, a_dst, cr, cg, cb, ca)            \
+	(__CCAST(gfx_blendmode_t)((rgb_src) & 0x1f) |                         \
+	 (__CCAST(gfx_blendmode_t)((a_src) & 0x1f) << 5) |                    \
+	 (__CCAST(gfx_blendmode_t)((rgb_dst) & 0x1f) << 10) |                 \
+	 (__CCAST(gfx_blendmode_t)((a_dst) & 0x1f) << 15) |                   \
+	 (__CCAST(gfx_blendmode_t)((rgb_fun) & 0x7) << 20) |                  \
+	 (__CCAST(gfx_blendmode_t)((a_fun) & 0x7) << 23) |                    \
+	 (__CCAST(gfx_blendmode_t)((cr) & 0xff) << _GFX_BLENDMODE_CR_SHIFT) | \
+	 (__CCAST(gfx_blendmode_t)((cg) & 0xff) << _GFX_BLENDMODE_CG_SHIFT) | \
+	 (__CCAST(gfx_blendmode_t)((cb) & 0xff) << _GFX_BLENDMODE_CB_SHIFT) | \
 	 (__CCAST(gfx_blendmode_t)((ca) & 0xff) << _GFX_BLENDMODE_CA_SHIFT))
 
 #ifdef __CC__
@@ -151,6 +145,14 @@ __DECL_END
 #define GFX_BLENDMODE_ALPHA_FACTOR(ca)                                                                  \
 	GFX_BLENDMODE_EX(/*RGB=*/SRC_ALPHA_MUL_CONSTANT_ALPHA, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA, \
 	                 /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,                          \
+	                 0, 0, 0, ca)
+
+/* Same as `GFX_BLENDMODE_ALPHA', but use "ca" instead of source alpha values
+ * In  this sense, this is the same as "GFX_BLENDMODE_ALPHA_FACTOR()", but is
+ * faster when the source colors always use `VIDEO_CHANNEL_MAX' for alpha. */
+#define GFX_BLENDMODE_ALPHA_OVERRIDE(ca)                                    \
+	GFX_BLENDMODE_EX(/*RGB=*/CONSTANT_ALPHA, ADD, ONE_MINUS_CONSTANT_ALPHA, \
+	                 /*A  =*/ONE, ADD, ONE_MINUS_CONSTANT_ALPHA,            \
 	                 0, 0, 0, ca)
 
 /* Pre-multiplied alpha blending (same as "GFX_BLENDMODE_ALPHA",

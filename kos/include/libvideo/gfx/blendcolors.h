@@ -268,8 +268,8 @@ gfx_blendcolors_constant(video_color_t dst, video_color_t src,
  * be nearly as fast/efficient. */
 #define gfx_blendcolors(dst, src, mode)                   \
 	gfx_blendcolors_constant(dst, src,                    \
-	                         GFX_BLENDMODE_GETMODE(mode), \
-	                         GFX_BLENDMODE_GETCONSTANT(mode))
+	                         GFX_BLENDMODE_GET_MODE(mode), \
+	                         GFX_BLENDMODE_GET_COLOR(mode))
 
 __DECL_END
 #endif /* __CC__ */

@@ -343,7 +343,7 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_gfx_generic__putcolor_FOO)
 	                                      video_color_t color) {                      \
 		video_pixel_t op = LL_getpixel(self, x, y);                                   \
 		video_color_t oc = video_format_pixel2color(&self->vx_buffer->vb_format, op); \
-		video_color_t cc = GFX_BLENDMODE_GETCONSTANT(self->vx_blend);                 \
+		video_color_t cc = GFX_BLENDMODE_GET_COLOR(self->vx_blend);                   \
 		video_color_t nc = gfx_blendcolors_constant(oc, color, mode, cc);             \
 		video_pixel_t np = video_format_color2pixel(&self->vx_buffer->vb_format, nc); \
 		LL_setpixel(self, x, y, np);                                                  \
