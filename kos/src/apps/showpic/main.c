@@ -252,7 +252,7 @@ do_showpic(struct screen_buffer *screen,
 //	video_gfx_vmirror(&screen_gfx);
 //	video_gfx_lrot90(&screen_gfx);
 //	video_gfx_lrot90(&image_gfx);
-	video_gfx_rrot90(&image_gfx);
+//	video_gfx_rrot90(&image_gfx);
 
 	/* Calculate where the image should be displayed */
 	blit_w = video_gfx_getclipw(&image_gfx);
@@ -292,27 +292,73 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 0
+#if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
-#elif 1
+#elif 0
+	{
+		int offset = 10;
+		gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
+		/* Draw only red */
+		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
+		                                /*RGB=*/SRC_ALPHA_MUL_CONSTANT_COLOR, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR,
+		                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
+		                                0xff, 0, 0, 0xff));
+		video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
+		                  &image_gfx, 0, 0,
+		                  video_gfx_getclipw(&image_gfx),
+		                  video_gfx_getcliph(&image_gfx));
+		/* Alpha-blend on-top: green */
+		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
+		                                /*RGB=*/SRC_ALPHA_MUL_CONSTANT_COLOR, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR,
+		                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
+		                                0, 0xff, 0, 0xff));
+		video_gfx_stretch(&screen_gfx, blit_x + offset, blit_y + offset, blit_w, blit_h,
+		                  &image_gfx, 0, 0,
+		                  video_gfx_getclipw(&image_gfx),
+		                  video_gfx_getcliph(&image_gfx));
+		/* Alpha-blend on-top: blue */
+		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
+		                                /*RGB=*/SRC_ALPHA_MUL_CONSTANT_COLOR, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR,
+		                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
+		                                0, 0, 0xff, 0xff));
+		video_gfx_stretch(&screen_gfx, blit_x + 2 * offset, blit_y + 2 * offset, blit_w, blit_h,
+		                  &image_gfx, 0, 0,
+		                  video_gfx_getclipw(&image_gfx),
+		                  video_gfx_getcliph(&image_gfx));
+		video_gfx_setblend(&screen_gfx, omode);
+	}
+#elif 0
+	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
+	                  &image_gfx, 0, 0,
+	                  video_gfx_getclipw(&image_gfx),
+	                  video_gfx_getcliph(&image_gfx));
+
+	/* With MIN, this is like that pencil-sketching filter from VLC :D
+	 * With MAX, it looks like a  blur that also brightens the  image. */
+	int delta = 2;
+	for (int x = -delta; x <= delta; ++x)
+	for (int y = -delta; y <= delta; ++y)
+	{
+		gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
+		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_EX(
+		                                /*RGB=*/ONE, MAX, ONE,
+		                                /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,
+		                                0xff, 0, 0, 0xff));
+//		video_gfx_hmirror(&image_gfx);
+		video_gfx_stretch(&screen_gfx, blit_x + x, blit_y + y, blit_w, blit_h,
+		                  &image_gfx, 0, 0,
+		                  video_gfx_getclipw(&image_gfx),
+		                  video_gfx_getcliph(&image_gfx));
+//		video_gfx_hmirror(&image_gfx);
+		video_gfx_setblend(&screen_gfx, omode);
+	}
+#elif 0
 	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
 	                  &image_gfx, 0, 0,
 	                  blit_w, blit_h);
-#if 1
-	{
-		gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
-		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_ALPHA_FACTOR(0x7f));
-		video_gfx_lrot90(&image_gfx);
-		video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
-		                  &image_gfx, 0, 0,
-		                  blit_w, blit_h);
-		video_gfx_rrot90(&image_gfx);
-		video_gfx_setblend(&screen_gfx, omode);
-	}
-#endif
 #else
 	/* Enable read-tiling in X and Y for the image */
 	video_gfx_setflags(&image_gfx,

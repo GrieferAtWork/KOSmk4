@@ -25,9 +25,13 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_CODEC_CC __ATTR_FASTCALL
+#ifndef CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#define VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#endif /* !CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 #else /* ... */
 #define LIBVIDEO_CODEC_CC /* nothing */
 #endif /* !... */
+
 
 #if (!defined(LIBVIDEO_CODEC_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__))

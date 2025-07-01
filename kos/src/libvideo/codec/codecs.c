@@ -38,6 +38,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
+#include <hybrid/__asm.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -78,6 +79,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #endif /* !... */
 
 DECL_BEGIN
+
+#undef video_codec_setpixel_t
+#undef vc_setpixel
 
 union word32 {
 	uint32_t dword;
@@ -143,6 +147,37 @@ PRIVATE NONNULL((1)) void CC rectfill4_lsb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1, 4)) void CC rectcopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
 
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY) && !defined(__INTELLISENSE__)
+#error "_vc_setpixel3 not supported by compiler, but enabled in features -- rebuild with 'CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3'"
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY && !__INTELLISENSE__ */
+#ifndef VIDEO_CODEC_SETPIXEL3_CC
+#define VIDEO_CODEC_SETPIXEL3_CC /* nothing */
+#endif /* !VIDEO_CODEC_SETPIXEL3_CC */
+
+/* Work around a GCC code generation inefficiency:
+ * - For some reason, GCC always preserved "%ebx" in regparm(3)
+ *   function under -fPIC, even when that register doesn't  end
+ *   up being used.
+ * - Since the function here are probably the most performance
+ *   critical  ones in all  of KOS, work  around this issue by
+ *   implementing the assembly for RP3 by hand.
+ */
+#undef USE_INLINE_386_ASSEMBLY_FOR_RP3
+#if (defined(__COMPILER_HAVE_GCC_ASM) && defined(__ELF__) && \
+     defined(__i386__) && !defined(__x86_64__) && 1)
+#define USE_INLINE_386_ASSEMBLY_FOR_RP3
+#endif /* ... */
+
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC rp3_setpixel4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
 #ifndef __INTELLISENSE__
 DECL_END
 #define DEFINE_BPP 1
@@ -182,6 +217,28 @@ PRIVATE NONNULL((1)) void CC
 setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint8_t *)line)[x] = (uint8_t)pixel;
 }
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef USE_INLINE_386_ASSEMBLY_FOR_RP3
+INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+__ASM_BEGIN
+__ASM_L(.text)
+__ASM_L(.type rp3_setpixel8, @function)
+__ASM_L(rp3_setpixel8:)
+__ASM_L(	.cfi_startproc)
+__ASM_L(	movb %cl, (%eax,%edx))
+__ASM_L(	ret)
+__ASM_L(	.cfi_endproc)
+__ASM_L(.size rp3_setpixel8, .- rp3_setpixel8)
+__ASM_END
+#else /* USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	((uint8_t *)line)[x] = (uint8_t)pixel;
+}
+#endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 PRIVATE NONNULL((1)) void CC
 linefill8(byte_t *__restrict line, video_coord_t x,
@@ -287,6 +344,28 @@ PRIVATE NONNULL((1)) void CC
 setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint16_t *)line)[x] = (uint16_t)pixel;
 }
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef USE_INLINE_386_ASSEMBLY_FOR_RP3
+INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+__ASM_BEGIN
+__ASM_L(.text)
+__ASM_L(.type rp3_setpixel16, @function)
+__ASM_L(rp3_setpixel16:)
+__ASM_L(	.cfi_startproc)
+__ASM_L(	movw %cx, (%eax,%edx,2))
+__ASM_L(	ret)
+__ASM_L(	.cfi_endproc)
+__ASM_L(.size rp3_setpixel16, .- rp3_setpixel16)
+__ASM_END
+#else /* USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	((uint16_t *)line)[x] = (uint16_t)pixel;
+}
+#endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 PRIVATE NONNULL((1, 4)) void CC
 rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
@@ -412,6 +491,13 @@ PRIVATE NONNULL((1)) void CC
 unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET16(&((uint16_t *)line)[x], (uint16_t)pixel);
 }
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	UNALIGNED_SET16(&((uint16_t *)line)[x], (uint16_t)pixel);
+}
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 PRIVATE NONNULL((1)) void CC
 unaligned_linefill16(byte_t *__restrict line, video_coord_t x,
@@ -547,6 +633,37 @@ setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	line[1] = data.bytes[1];
 	line[2] = data.bytes[2];
 }
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef USE_INLINE_386_ASSEMBLY_FOR_RP3
+INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+__ASM_BEGIN
+__ASM_L(.text)
+__ASM_L(.type rp3_setpixel24, @function)
+__ASM_L(rp3_setpixel24:)
+__ASM_L(	.cfi_startproc)
+__ASM_L(	leal (%edx,%edx,2), %edx)
+__ASM_L(	addl %edx, %eax)
+__ASM_L(	movw %cx, (%eax))
+__ASM_L(	shrl $16, %ecx)
+__ASM_L(	movb %cl, 2(%eax))
+__ASM_L(	ret)
+__ASM_L(	.cfi_endproc)
+__ASM_L(.size rp3_setpixel24, .- rp3_setpixel24)
+__ASM_END
+#else /* USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	union word32 data;
+	data.dword = pixel;
+	line += x * 3;
+	line[0] = data.bytes[0];
+	line[1] = data.bytes[1];
+	line[2] = data.bytes[2];
+}
+#endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 PRIVATE NONNULL((1)) void CC
 linefill24(byte_t *__restrict line, video_coord_t x,
@@ -1023,6 +1140,28 @@ setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint32_t *)line)[x] = (uint32_t)pixel;
 }
 
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#ifdef USE_INLINE_386_ASSEMBLY_FOR_RP3
+INTDEF NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+__ASM_BEGIN
+__ASM_L(.text)
+__ASM_L(.type rp3_setpixel32, @function)
+__ASM_L(rp3_setpixel32:)
+__ASM_L(	.cfi_startproc)
+__ASM_L(	movl %ecx, (%eax,%edx,4))
+__ASM_L(	ret)
+__ASM_L(	.cfi_endproc)
+__ASM_L(.size rp3_setpixel32, .- rp3_setpixel32)
+__ASM_END
+#else /* USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	((uint32_t *)line)[x] = (uint32_t)pixel;
+}
+#endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
 PRIVATE NONNULL((1)) void CC
 linefill32(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
@@ -1147,6 +1286,13 @@ PRIVATE NONNULL((1)) void CC
 unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET32(&((uint32_t *)line)[x], (uint32_t)pixel);
 }
+
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+rp3_unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	UNALIGNED_SET32(&((uint32_t *)line)[x], (uint32_t)pixel);
+}
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
 PRIVATE NONNULL((1)) void CC
 unaligned_linefill32(byte_t *__restrict line, video_coord_t x,
@@ -2884,6 +3030,17 @@ libvideo_codec_lookup(video_codec_t codec) {
 #define UNPACK_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
 	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, rmask, gmask, bmask, amask }
 
+#if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3) && defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY)
+#define SET_vc_setpixel3_STATIC_INITIALIZER(x) (rp3_##x, NULL),
+#define SET_vc_setpixel3_INITIALIZER(p, v)     rp3_##x; p._vc_setpixel3 = NULL;
+#elif defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3)
+#define SET_vc_setpixel3_STATIC_INITIALIZER(x) &rp3_##x,
+#define SET_vc_setpixel3_INITIALIZER(p, v)     p._vc_setpixel3 = &rp3_##v;
+#else /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#define SET_vc_setpixel3_STATIC_INITIALIZER(x) /* nothing */
+#define SET_vc_setpixel3_INITIALIZER(p, v)     /* nothing */
+#endif /* !VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
 #if defined(__KERNEL__) || !defined(__pic__)
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
                           getpixel, setpixel, rectcopy, rectmove,       \
@@ -2900,6 +3057,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &getpixel,               \
 			/* .vc_setpixel               = */ &setpixel,               \
+			SET_vc_setpixel3_STATIC_INITIALIZER(setpixel)               \
 			/* .vc_linefill               = */ &linefill,               \
 			/* .vc_vertfill               = */ &vertfill,               \
 			/* .vc_rectfill               = */ &rectfill,               \
@@ -2926,6 +3084,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &unaligned_getpixel,     \
 			/* .vc_setpixel               = */ &unaligned_setpixel,     \
+			SET_vc_setpixel3_STATIC_INITIALIZER(setpixel)               \
 			/* .vc_linefill               = */ &unaligned_linefill,     \
 			/* .vc_vertfill               = */ &unaligned_vertfill,     \
 			/* .vc_rectfill               = */ &unaligned_rectfill,     \
@@ -2943,6 +3102,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_initconverter          = */ &initconverter,          \
 			/* .vc_getpixel               = */ &getpixel,               \
 			/* .vc_setpixel               = */ &setpixel,               \
+			SET_vc_setpixel3_STATIC_INITIALIZER(setpixel)               \
 			/* .vc_linefill               = */ &linefill,               \
 			/* .vc_vertfill               = */ &vertfill,               \
 			/* .vc_rectfill               = */ &rectfill,               \
@@ -2966,6 +3126,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_initconverter = &initconverter;                     \
 			name.vc_getpixel      = &getpixel;                          \
 			name.vc_setpixel      = &setpixel;                          \
+			SET_vc_setpixel3_INITIALIZER(name, setpixel)                \
 			name.vc_linefill      = &linefill;                          \
 			name.vc_vertfill      = &vertfill;                          \
 			name.vc_rectfill      = &rectfill;                          \
@@ -3002,6 +3163,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			unaligned_##name.vc_initconverter          = &initconverter;          \
 			unaligned_##name.vc_getpixel               = &unaligned_getpixel;     \
 			unaligned_##name.vc_setpixel               = &unaligned_setpixel;     \
+			SET_vc_setpixel3_INITIALIZER(unaligned_##name, unaligned_setpixel)    \
 			unaligned_##name.vc_linefill               = &unaligned_linefill;     \
 			unaligned_##name.vc_vertfill               = &unaligned_vertfill;     \
 			unaligned_##name.vc_rectfill               = &unaligned_rectfill;     \
@@ -3013,6 +3175,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_initconverter                      = &initconverter;          \
 			name.vc_getpixel                           = &getpixel;               \
 			name.vc_setpixel                           = &setpixel;               \
+			SET_vc_setpixel3_INITIALIZER(name, setpixel)                          \
 			name.vc_linefill                           = &linefill;               \
 			name.vc_vertfill                           = &vertfill;               \
 			name.vc_rectfill                           = &rectfill;               \
@@ -4856,12 +5019,19 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	self->vc_codec = VIDEO_CODEC_CUSTOM;
 	self->vc_specs.vcs_pxsz = CEILDIV(self->vc_specs.vcs_bpp, NBBY);
 	switch (self->vc_specs.vcs_bpp) {
+#if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3) && defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY)
+#define INIT__vc_setpixel(self, f) (&rp3_##f, self->vc_setpixel = &f, self->_vc_setpixel3 = NULL)
+#elif defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3)
+#define INIT__vc_setpixel(self, f) (self->vc_setpixel = &f, self->_vc_setpixel3 = &rp3_##f)
+#else /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+#define INIT__vc_setpixel(self, f) (self->vc_setpixel = &f)
+#endif /* !VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 	case 1:
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer1_requirements;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel1_lsb;
-			self->vc_setpixel = &setpixel1_lsb;
+			INIT__vc_setpixel(self, setpixel1_lsb);
 			self->vc_linefill = &linefill1_lsb;
 			self->vc_vertfill = &vertfill1_lsb;
 			self->vc_rectfill = &rectfill1_lsb;
@@ -4869,7 +5039,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectmove = &rectmove1_lsb;
 		} else {
 			self->vc_getpixel = &getpixel1_msb;
-			self->vc_setpixel = &setpixel1_msb;
+			INIT__vc_setpixel(self, setpixel1_msb);
 			self->vc_linefill = &linefill1_msb;
 			self->vc_vertfill = &vertfill1_msb;
 			self->vc_rectfill = &rectfill1_msb;
@@ -4882,7 +5052,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rambuffer_requirements = &buffer2_requirements;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel2_lsb;
-			self->vc_setpixel = &setpixel2_lsb;
+			INIT__vc_setpixel(self, setpixel2_lsb);
 			self->vc_linefill = &linefill2_lsb;
 			self->vc_vertfill = &vertfill2_lsb;
 			self->vc_rectfill = &rectfill2_lsb;
@@ -4890,7 +5060,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectmove = &rectmove2_lsb;
 		} else {
 			self->vc_getpixel = &getpixel2_msb;
-			self->vc_setpixel = &setpixel2_msb;
+			INIT__vc_setpixel(self, setpixel2_msb);
 			self->vc_linefill = &linefill2_msb;
 			self->vc_vertfill = &vertfill2_msb;
 			self->vc_rectfill = &rectfill2_msb;
@@ -4903,7 +5073,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rambuffer_requirements = &buffer4_requirements;
 		if (VIDEO_CODEC_FLAG_ISLSB(self->vc_specs.vcs_flags)) {
 			self->vc_getpixel = &getpixel4_lsb;
-			self->vc_setpixel = &setpixel4_lsb;
+			INIT__vc_setpixel(self, setpixel4_lsb);
 			self->vc_linefill = &linefill4_lsb;
 			self->vc_vertfill = &vertfill4_lsb;
 			self->vc_rectfill = &rectfill4_lsb;
@@ -4911,7 +5081,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectmove = &rectmove4_lsb;
 		} else {
 			self->vc_getpixel = &getpixel4_msb;
-			self->vc_setpixel = &setpixel4_msb;
+			INIT__vc_setpixel(self, setpixel4_msb);
 			self->vc_linefill = &linefill4_msb;
 			self->vc_vertfill = &vertfill4_msb;
 			self->vc_rectfill = &rectfill4_msb;
@@ -4923,7 +5093,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer8_requirements;
 		self->vc_getpixel = &getpixel8;
-		self->vc_setpixel = &setpixel8;
+		INIT__vc_setpixel(self, setpixel8);
 		self->vc_linefill = &linefill8;
 		self->vc_vertfill = &vertfill8;
 		self->vc_rectfill = &rectfill8;
@@ -4936,7 +5106,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel16;
-			self->vc_setpixel = &unaligned_setpixel16;
+			INIT__vc_setpixel(self, unaligned_setpixel16);
 			self->vc_linefill = &unaligned_linefill16;
 			self->vc_vertfill = &unaligned_vertfill16;
 			self->vc_rectfill = &unaligned_rectfill16;
@@ -4946,7 +5116,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
 			self->vc_getpixel = &getpixel16;
-			self->vc_setpixel = &setpixel16;
+			INIT__vc_setpixel(self, setpixel16);
 			self->vc_linefill = &linefill16;
 			self->vc_vertfill = &vertfill16;
 			self->vc_rectfill = &rectfill16;
@@ -4958,7 +5128,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_align = 1;
 		self->vc_rambuffer_requirements = &buffer24_requirements;
 		self->vc_getpixel = &getpixel24;
-		self->vc_setpixel = &setpixel24;
+		INIT__vc_setpixel(self, setpixel24);
 		self->vc_linefill = &linefill24;
 		self->vc_vertfill = &vertfill24;
 		self->vc_rectfill = &rectfill24;
@@ -4971,7 +5141,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 		if (populate_noalign) {
 			self->vc_getpixel = &unaligned_getpixel32;
-			self->vc_setpixel = &unaligned_setpixel32;
+			INIT__vc_setpixel(self, unaligned_setpixel32);
 			self->vc_linefill = &unaligned_linefill32;
 			self->vc_vertfill = &unaligned_vertfill32;
 			self->vc_rectfill = &unaligned_rectfill32;
@@ -4981,7 +5151,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
 			self->vc_getpixel = &getpixel32;
-			self->vc_setpixel = &setpixel32;
+			INIT__vc_setpixel(self, setpixel32);
 			self->vc_linefill = &linefill32;
 			self->vc_vertfill = &vertfill32;
 			self->vc_rectfill = &rectfill32;
@@ -4992,6 +5162,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	default:
 		/* Impossible/Unsupported BPP */
 		return false;
+#undef INIT__vc_setpixel
 	}
 
 	/* Fix  broken color masks -- only the least significant "vcs_bpp" bits

@@ -175,6 +175,28 @@ LOCAL_FUNC(setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pix
 	*line = value;
 }
 
+#ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
+PRIVATE NONNULL((1)) void VIDEO_CODEC_SETPIXEL3_CC
+LOCAL_FUNC(rp3_setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
+	byte_t value;
+	shift_t shift;
+	line += x >> LOCAL_PIXELS_PER_BYTE_LOG2;
+#ifdef DEFINE_LSB
+	shift = (x & LOCAL_PIXELS_PER_BYTE_MASK) << LOCAL_BPP_LOG2;
+#else /* DEFINE_LSB */
+#if 1
+	shift = (shift_t)((~x) & LOCAL_PIXELS_PER_BYTE_MASK) << LOCAL_BPP_LOG2;
+#else
+	shift = (LOCAL_PIXELS_PER_BYTE_MASK - (x & LOCAL_PIXELS_PER_BYTE_MASK)) << LOCAL_BPP_LOG2;
+#endif
+#endif /* !DEFINE_LSB */
+	value = *line;
+	value &= ~(LOCAL_PIXELS_MASK << shift);
+	value |= ((pixel & LOCAL_PIXELS_MASK) << shift);
+	*line = value;
+}
+#endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
+
 
 
 /************************************************************************/
