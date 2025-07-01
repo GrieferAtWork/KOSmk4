@@ -38,27 +38,48 @@ __DECL_BEGIN
 #else
 #define _gfx_div256(x) (video_channel_t)((x) / VIDEO_CHANNEL_MAX)
 #endif
+#define _gfx_mul256(a, b) _gfx_div256((video_twochannels_t)a * b)
+#define _gfx_1minus(x)    (0xff - x)
 
-#define _gfx_blend_zero(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                                   /* lhs* */ 0
-#define _gfx_blend_one(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                                       lhs
-#define _gfx_blend_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_div256((video_twochannels_t)lhs * csrc)
-#define _gfx_blend_one_minus_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_div256((video_twochannels_t)lhs * (0xff - csrc))
-#define _gfx_blend_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_div256((video_twochannels_t)lhs * cdst)
-#define _gfx_blend_one_minus_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_div256((video_twochannels_t)lhs * (0xff - cdst))
-#define _gfx_blend_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_div256((video_twochannels_t)lhs * asrc)
-#define _gfx_blend_one_minus_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_div256((video_twochannels_t)lhs * (0xff - asrc))
-#define _gfx_blend_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_div256((video_twochannels_t)lhs * adst)
-#define _gfx_blend_one_minus_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_div256((video_twochannels_t)lhs * (0xff - adst))
-#define _gfx_blend_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)               _gfx_div256((video_twochannels_t)lhs * cc)
-#define _gfx_blend_one_minus_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)     _gfx_div256((video_twochannels_t)lhs * (0xff - cc))
-#define _gfx_blend_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)               _gfx_div256((video_twochannels_t)lhs * ac)
-#define _gfx_blend_one_minus_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)     _gfx_div256((video_twochannels_t)lhs * (0xff - ac))
-#define _gfx_blend_src_alpha_saturate(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_div256((video_twochannels_t)lhs * __hybrid_min2(asrc, 0xff - adst))
-#define _gfx_blend_one_minus_src_alpha_saturate(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_div256((video_twochannels_t)lhs * (0xff - __hybrid_min2(asrc, 0xff - adst)))
+#define _gfx_blend_zero(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                  /* lhs* */ 0
+#define _gfx_blend_one(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                      lhs
+#define _gfx_blend_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_mul256(lhs, csrc)
+#define _gfx_blend_one_minus_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_mul256(lhs, _gfx_1minus(csrc))
+#define _gfx_blend_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_mul256(lhs, cdst)
+#define _gfx_blend_one_minus_dst_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_mul256(lhs, _gfx_1minus(cdst))
+#define _gfx_blend_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_mul256(lhs, asrc)
+#define _gfx_blend_one_minus_src_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_mul256(lhs, _gfx_1minus(asrc))
+#define _gfx_blend_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                    _gfx_mul256(lhs, adst)
+#define _gfx_blend_one_minus_dst_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)          _gfx_mul256(lhs, _gfx_1minus(adst))
+#define _gfx_blend_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)               _gfx_mul256(lhs, cc)
+#define _gfx_blend_one_minus_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)     _gfx_mul256(lhs, _gfx_1minus(cc))
+#define _gfx_blend_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)               _gfx_mul256(lhs, ac)
+#define _gfx_blend_one_minus_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)     _gfx_mul256(lhs, _gfx_1minus(ac))
+#define _gfx_blend_src_alpha_saturate(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, __hybrid_min2(asrc, _gfx_1minus(adst)))
+#define _gfx_blend_one_minus_src_alpha_saturate(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(__hybrid_min2(asrc, _gfx_1minus(adst))))
+
+#define _gfx_blend_src_color_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(csrc, cc))
+#define _gfx_blend_one_minus_src_color_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(csrc, cc)))
+#define _gfx_blend_dst_color_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(cdst, cc))
+#define _gfx_blend_one_minus_dst_color_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(cdst, cc)))
+#define _gfx_blend_src_alpha_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(asrc, cc))
+#define _gfx_blend_one_minus_src_alpha_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(asrc, cc)))
+#define _gfx_blend_dst_alpha_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(adst, cc))
+#define _gfx_blend_one_minus_dst_alpha_mul_constant_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(adst, cc)))
+#define _gfx_blend_src_color_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(csrc, ac))
+#define _gfx_blend_one_minus_src_color_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(csrc, ac)))
+#define _gfx_blend_dst_color_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(cdst, ac))
+#define _gfx_blend_one_minus_dst_color_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(cdst, ac)))
+#define _gfx_blend_src_alpha_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(asrc, ac))
+#define _gfx_blend_one_minus_src_alpha_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(asrc, ac)))
+#define _gfx_blend_dst_alpha_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)           _gfx_mul256(lhs, _gfx_mul256(adst, ac))
+#define _gfx_blend_one_minus_dst_alpha_mul_constant_alpha(lhs, rhs, csrc, cdst, asrc, adst, cc, ac) _gfx_mul256(lhs, _gfx_1minus(_gfx_mul256(adst, ac)))
+
 
 #define _GFX_BLENDDATA_SWITCH(kind, callback)                                                                      \
 	do {                                                                                                           \
 		switch (kind) {                                                                                            \
+		case GFX_BLENDDATA_ZERO:                         callback(_gfx_blend_zero); break;                         \
 		case GFX_BLENDDATA_ONE:                          callback(_gfx_blend_one); break;                          \
 		case GFX_BLENDDATA_SRC_COLOR:                    callback(_gfx_blend_src_color); break;                    \
 		case GFX_BLENDDATA_ONE_MINUS_SRC_COLOR:          callback(_gfx_blend_one_minus_src_color); break;          \
@@ -74,7 +95,23 @@ __DECL_BEGIN
 		case GFX_BLENDDATA_ONE_MINUS_CONSTANT_ALPHA:     callback(_gfx_blend_one_minus_constant_alpha); break;     \
 		case GFX_BLENDDATA_SRC_ALPHA_SATURATE:           callback(_gfx_blend_src_alpha_saturate); break;           \
 		case GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_SATURATE: callback(_gfx_blend_one_minus_src_alpha_saturate); break; \
-		default:                                         callback(_gfx_blend_zero); break;                         \
+		case GFX_BLENDDATA_SRC_COLOR_MUL_CONSTANT_COLOR: callback(_gfx_blend_src_color_mul_constant_color); break; \
+		case GFX_BLENDDATA_ONE_MINUS_SRC_COLOR_MUL_CONSTANT_COLOR: callback(_gfx_blend_one_minus_src_color_mul_constant_color); break; \
+		case GFX_BLENDDATA_DST_COLOR_MUL_CONSTANT_COLOR: callback(_gfx_blend_dst_color_mul_constant_color); break; \
+		case GFX_BLENDDATA_ONE_MINUS_DST_COLOR_MUL_CONSTANT_COLOR: callback(_gfx_blend_one_minus_dst_color_mul_constant_color); break; \
+		case GFX_BLENDDATA_SRC_ALPHA_MUL_CONSTANT_COLOR: callback(_gfx_blend_src_alpha_mul_constant_color); break; \
+		case GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_COLOR: callback(_gfx_blend_one_minus_src_alpha_mul_constant_color); break; \
+		case GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_COLOR: callback(_gfx_blend_dst_alpha_mul_constant_color); break; \
+		case GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_COLOR: callback(_gfx_blend_one_minus_dst_alpha_mul_constant_color); break; \
+		case GFX_BLENDDATA_SRC_COLOR_MUL_CONSTANT_ALPHA: callback(_gfx_blend_src_color_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_ONE_MINUS_SRC_COLOR_MUL_CONSTANT_ALPHA: callback(_gfx_blend_one_minus_src_color_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_DST_COLOR_MUL_CONSTANT_ALPHA: callback(_gfx_blend_dst_color_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_ONE_MINUS_DST_COLOR_MUL_CONSTANT_ALPHA: callback(_gfx_blend_one_minus_dst_color_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_SRC_ALPHA_MUL_CONSTANT_ALPHA: callback(_gfx_blend_src_alpha_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA: callback(_gfx_blend_one_minus_src_alpha_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_ALPHA: callback(_gfx_blend_dst_alpha_mul_constant_alpha); break; \
+		case GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_ALPHA: callback(_gfx_blend_one_minus_dst_alpha_mul_constant_alpha); break; \
+		default: __builtin_unreachable();                                                                          \
 		}                                                                                                          \
 	}	__WHILE0
 

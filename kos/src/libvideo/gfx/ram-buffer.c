@@ -328,10 +328,10 @@ rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 			if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888)
 				self->_vx_xops.vgfx_putcolor = self->_vx_xops.vgfx_setpixel;
 			break;
-#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                    \
-	case mode:                                                            \
-		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
-		break;
+#define LINK_libvideo_ramgfx__putcolor_FOO(name, mode)                        \
+		case mode:                                                            \
+			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
+			break;
 			GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 		default:

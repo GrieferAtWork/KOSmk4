@@ -301,6 +301,18 @@ do_showpic(struct screen_buffer *screen,
 	video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
 	                  &image_gfx, 0, 0,
 	                  blit_w, blit_h);
+#if 1
+	{
+		gfx_blendmode_t omode = video_gfx_getblend(&screen_gfx);
+		video_gfx_setblend(&screen_gfx, GFX_BLENDMODE_ALPHA_FACTOR(0x7f));
+		video_gfx_lrot90(&image_gfx);
+		video_gfx_bitblit(&screen_gfx, blit_x, blit_y,
+		                  &image_gfx, 0, 0,
+		                  blit_w, blit_h);
+		video_gfx_rrot90(&image_gfx);
+		video_gfx_setblend(&screen_gfx, omode);
+	}
+#endif
 #else
 	/* Enable read-tiling in X and Y for the image */
 	video_gfx_setflags(&image_gfx,
