@@ -1243,7 +1243,7 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 #define setpixel3(p, v) (p[0] = INT32_I8(v, 0), p[1] = INT32_I8(v, 1), p[2] = INT32_I8(v, 2))
 #define setpixel4(p, v) (*(uint32_t *)p = v)
 #define BLIT_DIFFFMT_FAST(DSTsz, SRCsz)                                \
-			do {                                                       \
+			{                                                          \
 				dst_line += DSTsz * dst_lock.vrl_xbas;                 \
 				src_line += SRCsz * src_lock.vrl_xbas;                 \
 				do {                                                   \
@@ -1258,11 +1258,11 @@ libvideo_blitter_noblend_difffmt__blit(struct video_blitter const *__restrict se
 						dst_iter += DSTsz;                             \
 						src_iter += SRCsz;                             \
 					} while (--iter_size_x);                           \
-					src_line += src_lock.vrl_lock.vl_stride;           \
 					dst_line += dst_lock.vrl_lock.vl_stride;           \
+					src_line += src_lock.vrl_lock.vl_stride;           \
 				} while (--size_y);                                    \
 				goto done_unlock_buffers;                              \
-			}	__WHILE0
+			}
 			GFX_BLIT_SELECT_BPP_COMBINATION(dst_buffer->vb_format.vf_codec->vc_specs.vcs_bpp,
 			                                src_buffer->vb_format.vf_codec->vc_specs.vcs_bpp,
 			                                BLIT_DIFFFMT_FAST);

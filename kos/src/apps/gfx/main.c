@@ -215,17 +215,13 @@ again_font:
 
 			case 'h': {
 				video_dim_t i;
-				video_offset_t x1 = video_gfx_getclipw(&gfx) / 2;
-				video_offset_t y1 = video_gfx_getcliph(&gfx) / 2;
 				video_color_t color = rand_color();
-				for (i = 0; i < video_gfx_getclipw(&gfx); ++i) {
-					gfx.line(x1, y1, i, 0, color);
-					gfx.line(x1, y1, i, video_gfx_getcliph(&gfx) - 1, color);
-				}
-				for (i = 0; i < video_gfx_getcliph(&gfx); ++i) {
-					gfx.line(x1, y1, 0, i, color);
-					gfx.line(x1, y1, video_gfx_getclipw(&gfx) - 1, i, color);
-				}
+				/* TODO: The quadrants of the image this produces aren't all identical
+				 *       (something must be wrong somewhere in the line drawing  also) */
+				for (i = 0; i < video_gfx_getclipw(&gfx); ++i)
+					gfx.line(i, 0, (video_gfx_getclipw(&gfx) - 1) - i, video_gfx_getcliph(&gfx) - 1, color);
+				for (i = 0; i < video_gfx_getcliph(&gfx); ++i)
+					gfx.line(0, i, video_gfx_getclipw(&gfx) - 1, (video_gfx_getcliph(&gfx) - 1) - i, color);
 			}	continue;
 
 			case 'j': {

@@ -224,6 +224,14 @@ struct video_blitter_ops {
 	                                video_offset_t __src_x, video_offset_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
+	/* TODO: Bring back "vbto_bitblit_masked" (same as "vbto_bitblit", but also has a
+	 *       `struct video_bitmask' specifying which pixels of the source GFX  should
+	 *       actually be copied)
+	 * - Gonna  need that one for window composition,  which I'm probably going to do
+	 *   by having windows that are covered such that the visible area isn't a simple
+	 *   rect, exclusively use a back-buffer that is then blit to-screen alongside  a
+	 *   bitmask (causing *only* the pixels still visible to be blit) */
+
 	/* TODO: Some way to rotate and flip pixels during blits (using precise angles,
 	 *       rather than the mere 90° rotations possible via  `VIDEO_GFX_F_XYSWAP') */
 

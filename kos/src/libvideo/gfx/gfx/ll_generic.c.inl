@@ -578,7 +578,7 @@ libvideo_gfx_generic__absline_lhhl_l(struct video_gfx const *__restrict self,
 		}
 		if (pad_max) {
 			dst_y -= (pad_max - 1);
-			libvideo_gfx_generic__absline_v(self, dst_x + size_x - 1, dst_y, pad_max, color);
+			libvideo_gfx_generic__absline_v(self, dst_x + (size_x - 1), dst_y, pad_max, color);
 		}
 	} else {
 		do {
