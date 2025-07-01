@@ -101,21 +101,20 @@
 #define VIDEO_CODEC_XBGR1555 0x0026
 #define VIDEO_CODEC_BGRA5551 0x0027
 #define VIDEO_CODEC_BGRX5551 0x0028
-/* TODO: Single-byte direct color codecs */
-/*      VIDEO_CODEC_RGB332           TODO */
-/*      VIDEO_CODEC_RGB323           TODO */
-/*      VIDEO_CODEC_RGB233           TODO */
-/*      VIDEO_CODEC_BGR332           TODO */
-/*      VIDEO_CODEC_BGR323           TODO */
-/*      VIDEO_CODEC_BGR233           TODO */
-/*      VIDEO_CODEC_RGBA2222         TODO */
-/*      VIDEO_CODEC_RGBX2222         TODO */
-/*      VIDEO_CODEC_ARGB2222         TODO */
-/*      VIDEO_CODEC_XRGB2222         TODO */
-/*      VIDEO_CODEC_BGRA2222         TODO */
-/*      VIDEO_CODEC_BGRX2222         TODO */
-/*      VIDEO_CODEC_ABGR2222         TODO */
-/*      VIDEO_CODEC_XBGR2222         TODO */
+#define VIDEO_CODEC_RGB332   0x0029 /* 0bRRRGGGBB  [r: 0xe0, g: 0x1c, b: 0x03] */
+#define VIDEO_CODEC_RGB323   0x002a /* 0bRRRGGBBB  [r: 0xe0, g: 0x18, b: 0x07] */
+#define VIDEO_CODEC_RGB233   0x002b /* 0bRRGGGBBB  [r: 0xc0, g: 0x38, b: 0x07] */
+#define VIDEO_CODEC_BGR332   0x002c /* 0bBBBGGGRR  [r: 0x03, g: 0x1c, b: 0xe0] */
+#define VIDEO_CODEC_BGR323   0x002d /* 0bBBBGGRRR  [r: 0x07, g: 0x18, b: 0xe0] */
+#define VIDEO_CODEC_BGR233   0x002e /* 0bBBGGGRRR  [r: 0x07, g: 0x38, b: 0xc0] */
+#define VIDEO_CODEC_RGBA2222 0x0030 /* 0bRRGGBBAA  [r: 0xc0, g: 0x30, b: 0x0c, a: 0x03] */
+#define VIDEO_CODEC_RGBX2222 0x0031 /* 0bRRGGBB__  [r: 0xc0, g: 0x30, b: 0x0c] */
+#define VIDEO_CODEC_ARGB2222 0x0032 /* 0bAARRGGBB  [r: 0x30, g: 0x0c, b: 0x03, a: 0xc0] */
+#define VIDEO_CODEC_XRGB2222 0x0033 /* 0b__RRGGBB  [r: 0x30, g: 0x0c, b: 0x03] */
+#define VIDEO_CODEC_BGRA2222 0x0034 /* 0bBBGGRRAA  [r: 0x0c, g: 0x30, b: 0xc0, a: 0x03] */
+#define VIDEO_CODEC_BGRX2222 0x0035 /* 0bBBGGRR__  [r: 0x0c, g: 0x30, b: 0xc0] */
+#define VIDEO_CODEC_ABGR2222 0x0036 /* 0bAABBGGRR  [r: 0x03, g: 0x0c, b: 0x30, a: 0xc0] */
+#define VIDEO_CODEC_XBGR2222 0x0037 /* 0b__BBGGRR  [r: 0x03, g: 0x0c, b: 0x30] */
 
 /* Gray-scale (Luminance) */
 #define VIDEO_CODEC_L1_MSB   0x1001 /* 1-bit-per-pixel, black/white, left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */

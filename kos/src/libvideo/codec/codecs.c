@@ -2772,6 +2772,99 @@ DEFINE_FORMAT_CONVERTER_RGB(bgr565, uint16_t, 5, 6, 5, (
 	__HYBRID_BITFIELD8_T r : 5
 ));
 
+DEFINE_FORMAT_CONVERTER_RGB(rgb332, uint8_t, 3, 3, 2, (
+	__HYBRID_BITFIELD8_T r : 3,
+	__HYBRID_BITFIELD8_T g : 3,
+	__HYBRID_BITFIELD8_T b : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGB(rgb323, uint8_t, 3, 2, 3, (
+	__HYBRID_BITFIELD8_T r : 3,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T b : 3
+));
+
+DEFINE_FORMAT_CONVERTER_RGB(rgb233, uint8_t, 2, 3, 3, (
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T g : 3,
+	__HYBRID_BITFIELD8_T b : 3
+));
+
+DEFINE_FORMAT_CONVERTER_RGB(bgr332, uint8_t, 3, 3, 2, (
+	__HYBRID_BITFIELD8_T b : 3,
+	__HYBRID_BITFIELD8_T g : 3,
+	__HYBRID_BITFIELD8_T r : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGB(bgr323, uint8_t, 3, 2, 3, (
+	__HYBRID_BITFIELD8_T b : 3,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T r : 3
+));
+
+DEFINE_FORMAT_CONVERTER_RGB(bgr233, uint8_t, 2, 3, 3, (
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T g : 3,
+	__HYBRID_BITFIELD8_T r : 3
+));
+
+DEFINE_FORMAT_CONVERTER_RGBA(rgba2222, uint8_t, 2, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T a : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBX(rgbx2222, uint8_t, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T x : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBA(argb2222, uint8_t, 2, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T a : 2,
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T b : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBX(xrgb2222, uint8_t, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T x : 2,
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T b : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBA(bgra2222, uint8_t, 2, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T a : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBX(bgrx2222, uint8_t, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T r : 2,
+	__HYBRID_BITFIELD8_T x : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBA(abgr2222, uint8_t, 2, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T a : 2,
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T r : 2
+));
+
+DEFINE_FORMAT_CONVERTER_RGBX(xbgr2222, uint8_t, 2, 2, 2, (
+	__HYBRID_BITFIELD8_T x : 2,
+	__HYBRID_BITFIELD8_T b : 2,
+	__HYBRID_BITFIELD8_T g : 2,
+	__HYBRID_BITFIELD8_T r : 2
+));
+
+
 
 
 INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
@@ -4031,6 +4124,201 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgr565_pixel2color, bgr565_color2pixel, initconv_from_rgb);
 
+	CASE_CODEC_AL1(VIDEO_CODEC_RGB332,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xe0,
+	                /* vcs_gmask */ 0x1c,
+	                /* vcs_bmask */ 0x03,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               rgb332_pixel2color, rgb332_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_RGB323,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xe0,
+	                /* vcs_gmask */ 0x18,
+	                /* vcs_bmask */ 0x07,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               rgb323_pixel2color, rgb323_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_RGB233,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xc0,
+	                /* vcs_gmask */ 0x38,
+	                /* vcs_bmask */ 0x07,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               rgb233_pixel2color, rgb233_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGR332,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x03,
+	                /* vcs_gmask */ 0x1c,
+	                /* vcs_bmask */ 0xe0,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               bgr332_pixel2color, bgr332_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGR323,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x07,
+	                /* vcs_gmask */ 0x18,
+	                /* vcs_bmask */ 0xe0,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               bgr323_pixel2color, bgr323_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGR233,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x07,
+	                /* vcs_gmask */ 0x38,
+	                /* vcs_bmask */ 0xc0,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               bgr233_pixel2color, bgr233_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_RGBA2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0xc0,
+	                /* vcs_gmask */ 0x30,
+	                /* vcs_bmask */ 0x0c,
+	                /* vcs_amask */ 0x03),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               rgba2222_pixel2color, rgba2222_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_RGBX2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 6,
+	                /* vcs_rmask */ 0xc0,
+	                /* vcs_gmask */ 0x30,
+	                /* vcs_bmask */ 0x0c,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               rgbx2222_pixel2color, rgbx2222_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_ARGB2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x30,
+	                /* vcs_gmask */ 0x0c,
+	                /* vcs_bmask */ 0x03,
+	                /* vcs_amask */ 0xc0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               argb2222_pixel2color, argb2222_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_XRGB2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 6,
+	                /* vcs_rmask */ 0x30,
+	                /* vcs_gmask */ 0x0c,
+	                /* vcs_bmask */ 0x03,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               xrgb2222_pixel2color, xrgb2222_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGRA2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x0c,
+	                /* vcs_gmask */ 0x30,
+	                /* vcs_bmask */ 0xc0,
+	                /* vcs_amask */ 0x03),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               bgra2222_pixel2color, bgra2222_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_BGRX2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 6,
+	                /* vcs_rmask */ 0x0c,
+	                /* vcs_gmask */ 0x30,
+	                /* vcs_bmask */ 0xc0,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               bgrx2222_pixel2color, bgrx2222_color2pixel, initconv_from_rgb);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_ABGR2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0x03,
+	                /* vcs_gmask */ 0x0c,
+	                /* vcs_bmask */ 0x30,
+	                /* vcs_amask */ 0xc0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               abgr2222_pixel2color, abgr2222_color2pixel, initconv_from_rgba);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_XBGR2222,
+	               (VIDEO_CODEC_FLAG_NORMAL,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 6,
+	                /* vcs_rmask */ 0x03,
+	                /* vcs_gmask */ 0x0c,
+	                /* vcs_bmask */ 0x30,
+	                /* vcs_amask */ 0),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               xbgr2222_pixel2color, xbgr2222_color2pixel, initconv_from_rgb);
 
 
 	/* 3-byte-per-pixel formats. */

@@ -321,6 +321,97 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 			}
 			break;
 
+		case 8:
+			/* 1-byte, direct-color codecs */
+			if (specs->vcs_amask == 0) {
+				switch (specs->vcs_rmask) {
+
+				case 0xe0:
+					if (specs->vcs_gmask == 0x1c &&
+					    specs->vcs_bmask == 0x03)
+						SET_CODEC(VIDEO_CODEC_RGB332);
+					if (specs->vcs_gmask == 0x18 &&
+					    specs->vcs_bmask == 0x07)
+						SET_CODEC(VIDEO_CODEC_RGB323);
+					break;
+
+				case 0xc0:
+					if (specs->vcs_gmask == 0x38 &&
+					    specs->vcs_bmask == 0x07)
+						SET_CODEC(VIDEO_CODEC_RGB233);
+					if (specs->vcs_gmask == 0x30 &&
+					    specs->vcs_bmask == 0x0c)
+						SET_CODEC(VIDEO_CODEC_RGBX2222);
+					break;
+
+				case 0x30:
+					if (specs->vcs_gmask == 0x0c &&
+					    specs->vcs_bmask == 0x03)
+						SET_CODEC(VIDEO_CODEC_XRGB2222);
+					break;
+
+				case 0x0c:
+					if (specs->vcs_gmask == 0x30 &&
+					    specs->vcs_bmask == 0xc0)
+						SET_CODEC(VIDEO_CODEC_BGRX2222);
+					break;
+
+				case 0x07:
+					if (specs->vcs_gmask == 0x18 &&
+					    specs->vcs_bmask == 0xe0)
+						SET_CODEC(VIDEO_CODEC_BGR323);
+					if (specs->vcs_gmask == 0x38 &&
+					    specs->vcs_bmask == 0xc0)
+						SET_CODEC(VIDEO_CODEC_BGR233);
+					break;
+
+				case 0x03:
+					if (specs->vcs_gmask == 0x1c &&
+					    specs->vcs_bmask == 0xe0)
+						SET_CODEC(VIDEO_CODEC_BGR332);
+					if (specs->vcs_gmask == 0x0c &&
+					    specs->vcs_bmask == 0x30)
+						SET_CODEC(VIDEO_CODEC_XBGR2222);
+					break;
+
+				default: goto nope;
+				}
+			} else {
+				switch (specs->vcs_rmask) {
+
+				case 0xc0:
+					if (specs->vcs_gmask == 0x30 &&
+					    specs->vcs_bmask == 0x0c &&
+					    specs->vcs_amask == 0x03)
+						SET_CODEC(VIDEO_CODEC_RGBA2222);
+					break;
+
+				case 0x30:
+					if (specs->vcs_gmask == 0x0c &&
+					    specs->vcs_bmask == 0x03 &&
+					    specs->vcs_amask == 0xc0)
+						SET_CODEC(VIDEO_CODEC_ARGB2222);
+					break;
+
+				case 0x0c:
+					if (specs->vcs_gmask == 0x30 &&
+					    specs->vcs_bmask == 0xc0 &&
+					    specs->vcs_amask == 0x03)
+						SET_CODEC(VIDEO_CODEC_BGRA2222);
+					break;
+
+				case 0x03:
+					if (specs->vcs_gmask == 0x0c &&
+					    specs->vcs_bmask == 0x30 &&
+					    specs->vcs_amask == 0xc0)
+						SET_CODEC(VIDEO_CODEC_ABGR2222);
+					break;
+
+				default: goto nope;
+				}
+			}
+			break;
+
 		default: goto nope;
 		}
 	}
