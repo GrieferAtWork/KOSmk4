@@ -1916,7 +1916,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	rb_gfx.vx_colorkey = 0;
 	blitter.vbt_src = self->vbt_src;
 	blitter.vbt_dst = rambuffer_initgfx(&rb_gfx);
-	/*(*self->vbt_src->vx_hdr.vxh_blitto)(&blitter);*/ /* Cheat a bit and skip this part... */
+	/*(*self->vbt_src->vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 
 	/* Blit source into temporary buffer... */
 	if (src_size_x == rb.vb_xdim && src_size_y == rb.vb_ydim) {
@@ -1933,7 +1933,7 @@ libvideo_blitter_samebuf__stretch__with_temporary(struct video_blitter const *__
 	/* Blit temporary buffer into target... */
 	blitter.vbt_src = blitter.vbt_dst;
 	blitter.vbt_dst = self->vbt_dst;
-	/*(*rb_gfx.vx_hdr.vxh_blitto)(&blitter);*/ /* Cheat a bit and skip this part... */
+	/*(*rb_gfx.vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 	if (dst_size_x == rb.vb_xdim && dst_size_y == rb.vb_ydim) {
 		libvideo_blitter_noblend_samefmt__blit(&blitter, dst_x, dst_y,
 		                                       0, 0, dst_size_x, dst_size_y);

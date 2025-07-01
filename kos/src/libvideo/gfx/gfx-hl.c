@@ -389,10 +389,7 @@ DECL_END
 #define DEFINE_libvideo_blitter_generic_blit_wrap
 #include "gfx/hl_blit.c.inl"
 
-#define DEFINE_libvideo_gfx__blitto_n
-#include "gfx/hl_blitto.c.inl"
-#define DEFINE_libvideo_gfx__blitto_l
-#include "gfx/hl_blitto.c.inl"
+#include "gfx/hl_blitfrom.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBVIDEO_GFX_GFX_HL_C */

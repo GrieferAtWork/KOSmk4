@@ -72,7 +72,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_buffer_empty(vo
 /* Assign "empty" operators to "self". Initializes */
 LOCAL ATTR_OUT(1) void CC
 video_gfxhdr_setempty(struct video_gfxhdr *__restrict self) {
-	self->vxh_blitto = &libvideo_gfx_empty__blitto;
+	self->vxh_blitfrom = &libvideo_gfx_empty__blitto;
 	self->vxh_ops    = &libvideo_gfx_empty_ops;
 }
 

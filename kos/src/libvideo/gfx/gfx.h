@@ -347,8 +347,7 @@ INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__absgradient_v(struct video_gfx c
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_gfx_generic__fillmask(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t size_x, video_dim_t size_y, video_color_t const bg_fg_colors[2], struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_l(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_gfx_generic__fillstretchmask_n(struct video_gfx const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitto_l(struct video_blitter *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitto_n(struct video_blitter *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_generic__blitto(struct video_blitter *__restrict ctx);
 
 /* Low-level, Generic, always-valid Blit functions (using only `vgfo_getcolor' + `vgfo_putcolor') */
 INTDEF ATTR_IN(1) void CC libvideo_blitter_generic__blit(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y);
@@ -386,8 +385,7 @@ INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samebuf__blit_imatrix(struct 
 INTDEF ATTR_IN(1) void CC libvideo_blitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__restrict self, video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y, video_dim_t size_x, video_dim_t size_y, video_imatrix2d_t src_matrix);
 #define libvideo_blitter_noblend_samefmt__stretch_imatrix_n libvideo_blitter_generic__stretch_imatrix_n
 #define libvideo_blitter_noblend_samefmt__stretch_imatrix_l libvideo_blitter_generic__stretch_imatrix_l
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitto_n(struct video_blitter *__restrict ctx);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitto_l(struct video_blitter *__restrict ctx);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC libvideo_gfx_noblend__blitto(struct video_blitter *__restrict ctx);
 
 /* The *_difffmt_* operators here "libvideo_blitter_generic__conv" to be initialized */
 #define libvideo_blitter_generic__conv(self) ((struct video_converter *)(self)->_vbt_driver)
@@ -665,6 +663,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 	}
 
 	/* Update:
+	 * - vx_hdr.vxh_blitfrom
 	 * - _vx_xops.vgfx_putcolor
 	 * - _vx_xops.vgfx_absline_h
 	 * - _vx_xops.vgfx_absline_v
@@ -701,6 +700,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 			} else {
 				self->_vx_xops.vgfx_putcolor = &libvideo_gfx_generic__putcolor_noblend;
 			}
+			self->vx_hdr.vxh_blitfrom       = &libvideo_gfx_noblend__blitto;
 			self->_vx_xops.vgfx_absline_h   = &libvideo_gfx_noblend__absline_h;
 			self->_vx_xops.vgfx_absline_v   = &libvideo_gfx_noblend__absline_v;
 			self->_vx_xops.vgfx_absfill     = &libvideo_gfx_noblend__absfill;
@@ -724,6 +724,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 #undef LINK_libvideo_gfx_generic__putcolor_FOO
 		}
 		/* Generic GFX operators that **do** have support for blending */
+		self->vx_hdr.vxh_blitfrom         = &libvideo_gfx_generic__blitto;
 		self->_vx_xops.vgfx_absline_h     = &libvideo_gfx_generic__absline_h;
 		self->_vx_xops.vgfx_absline_v     = &libvideo_gfx_generic__absline_v;
 		self->_vx_xops.vgfx_absfill       = &libvideo_gfx_generic__absfill;
@@ -735,7 +736,6 @@ after_blend:;
 	}
 
 	/* Update:
-	 * - vx_hdr.vxh_blitto
 	 * - _vx_xops.vgfx_absfillstretchmask
 	 * - _vx_xops.vgfx_absline_llhh
 	 * - _vx_xops.vgfx_absline_lhhl */
@@ -743,24 +743,20 @@ after_blend:;
 		/* Select based on linear vs. Nearest interpolation, and blending */
 		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
 			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
-				self->vx_hdr.vxh_blitto                = &libvideo_gfx_noblend__blitto_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;
 				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_l;
 			} else {
-				self->vx_hdr.vxh_blitto                = &libvideo_gfx_noblend__blitto_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_noblend__absline_llhh;
 				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_noblend__absline_lhhl;
 			}
 		} else {
 			if (self->vx_flags & VIDEO_GFX_F_LINEAR) {
-				self->vx_hdr.vxh_blitto                = &libvideo_gfx_generic__blitto_l;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_l;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;
 				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl_l;
 			} else {
-				self->vx_hdr.vxh_blitto                = &libvideo_gfx_generic__blitto_n;
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_generic__fillstretchmask_n;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh;
 				self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_generic__absline_lhhl;
@@ -802,13 +798,11 @@ libvideo_gfx_generic_populate_noblend(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_absgradient_h = &libvideo_gfx_noblend_interp8888__absgradient_h;
 		self->_vx_xops.vgfx_absgradient_v = &libvideo_gfx_noblend_interp8888__absgradient_v;
 	}
+	self->vx_hdr.vxh_blitfrom = &libvideo_gfx_noblend__blitto;
 	if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
-		self->vx_hdr.vxh_blitto                = &libvideo_gfx_noblend__blitto_n;
 		self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_noblend__absline_llhh;
 		self->_vx_xops.vgfx_absline_lhhl       = &libvideo_gfx_noblend__absline_lhhl;
 		self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
-	} else {
-		self->vx_hdr.vxh_blitto = &libvideo_gfx_noblend__blitto_l;
 	}
 }
 
