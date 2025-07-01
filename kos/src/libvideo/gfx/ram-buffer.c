@@ -113,6 +113,21 @@ libvideo_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
 GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_ramgfx__putcolor_FOO)
 #undef DEFINE_libvideo_ramgfx__putcolor_FOO
 
+#define DEFINE_libvideo_ramgfx__putcolor_FOO(name, mode)                      \
+	INTERN ATTR_IN(1) void CC                                                 \
+	libvideo_ramgfx__putcolor_##name(struct video_gfx const *__restrict self, \
+	                                 video_coord_t x, video_coord_t y,        \
+	                                 video_color_t color) {                   \
+		byte_t *line = RAMGFX_DATA + y * RAMGFX_STRIDE;                       \
+		struct video_buffer const *buffer = self->vx_buffer;                  \
+		video_color_t o = buffer->vb_format.getcolor(line, x);                \
+		video_color_t c = GFX_BLENDMODE_GETCONSTANT(self->vx_blend);          \
+		video_color_t n = gfx_blendcolors_constant(o, color, mode, c);        \
+		buffer->vb_format.setcolor(line, x, n);                               \
+	}
+GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DEFINE_libvideo_ramgfx__putcolor_FOO)
+#undef DEFINE_libvideo_ramgfx__putcolor_FOO
+
 INTERN ATTR_IN(1) video_pixel_t CC
 libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self,
                           video_coord_t x, video_coord_t y) {
@@ -267,9 +282,9 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 	}
 
 	/* Detect special blend modes. */
-	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
-	(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
-	switch (self->vx_blend) {
+	(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_OVERRIDE);
+	(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_ALPHA);
+	switch (self->vx_blend & _GFX_BLENDMODE_MODE_MASK) {
 	case GFX_BLENDMODE_OVERRIDE:
 		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_noblend;
 		break;
@@ -278,6 +293,7 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
 		break;
 	GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
+	GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 	default:
 		self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor;
@@ -319,9 +335,9 @@ rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 
 	/* Detect special blend modes. */
 	if (what & VIDEO_GFX_UPDATE_BLEND) {
-		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
-		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
-		switch (self->vx_blend) {
+		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_ALPHA);
+		switch (self->vx_blend & _GFX_BLENDMODE_MODE_MASK) {
 		case GFX_BLENDMODE_OVERRIDE:
 			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_noblend;
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
@@ -333,6 +349,7 @@ rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor_##name; \
 			break;
 			GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_ramgfx__putcolor_FOO)
+			GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_libvideo_ramgfx__putcolor_FOO)
 #undef LINK_libvideo_ramgfx__putcolor_FOO
 		default:
 			self->_vx_xops.vgfx_putcolor = &libvideo_ramgfx__putcolor;

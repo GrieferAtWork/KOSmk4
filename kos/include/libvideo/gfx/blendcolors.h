@@ -25,6 +25,7 @@
 #include <__stdinc.h>
 
 #include <hybrid/__minmax.h>
+#include <hybrid/typecore.h>
 
 #include <libvideo/codec/pixel.h>
 
@@ -134,25 +135,9 @@ __DECL_BEGIN
 
 
 
-/* Blend 2 colors `dst' and `src' together as per `mode'.
- *
- * This is the master function used for blending the
- * colors of  2 pixels  using a  `struct video_gfx'.
- *
- * This function has been carefully written such that it
- * should be fairly easy  for any compiler to  perfectly
- * optimize calls to it, so-long as "mode" is a compile-
- * time constant.
- *
- * As such, `struct video_gfx' contains dedicated impls
- * for these commonly used blending modes:
- * - GFX_BLENDMODE_ALPHA
- * - GFX_BLENDMODE_OVERRIDE
- *
- * All other moves will obviously work as well, but won't
- * be nearly as fast/efficient. */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED video_color_t LIBVIDEO_GFX_CC
-gfx_blendcolors(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
+gfx_blendcolors_constant(video_color_t dst, video_color_t src,
+                         __UINT32_TYPE__ mode, video_color_t constant) {
 	video_channel_t new_lhs_r, new_lhs_g, new_lhs_b, new_lhs_a;
 	video_channel_t new_rhs_r, new_rhs_g, new_rhs_b, new_rhs_a;
 	video_channel_t dst_r, dst_g, dst_b, dst_a;
@@ -166,25 +151,25 @@ gfx_blendcolors(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 	src_g = VIDEO_COLOR_GET_GREEN(src);
 	src_b = VIDEO_COLOR_GET_BLUE(src);
 	src_a = VIDEO_COLOR_GET_ALPHA(src);
-#define _gfx_blend_rgb_src(fun)                                                                                                               \
-	{                                                                                                                                         \
-		new_lhs_r = (video_channel_t)(fun(src_r, dst_r, src_r, dst_r, src_a, dst_a, GFX_BLENDMODE_GET_CR(mode), GFX_BLENDMODE_GET_CA(mode))); \
-		new_lhs_g = (video_channel_t)(fun(src_g, dst_g, src_g, dst_g, src_a, dst_a, GFX_BLENDMODE_GET_CG(mode), GFX_BLENDMODE_GET_CA(mode))); \
-		new_lhs_b = (video_channel_t)(fun(src_b, dst_b, src_b, dst_b, src_a, dst_a, GFX_BLENDMODE_GET_CB(mode), GFX_BLENDMODE_GET_CA(mode))); \
+#define _gfx_blend_rgb_src(fun)                                                                                                                         \
+	{                                                                                                                                                   \
+		new_lhs_r = (video_channel_t)(fun(src_r, dst_r, src_r, dst_r, src_a, dst_a, VIDEO_COLOR_GET_RED(constant), VIDEO_COLOR_GET_ALPHA(constant)));   \
+		new_lhs_g = (video_channel_t)(fun(src_g, dst_g, src_g, dst_g, src_a, dst_a, VIDEO_COLOR_GET_GREEN(constant), VIDEO_COLOR_GET_ALPHA(constant))); \
+		new_lhs_b = (video_channel_t)(fun(src_b, dst_b, src_b, dst_b, src_a, dst_a, VIDEO_COLOR_GET_BLUE(constant), VIDEO_COLOR_GET_ALPHA(constant)));  \
 	}
-#define _gfx_blend_a_src(fun)                                                                                                                 \
-	{                                                                                                                                         \
-		new_lhs_a = (video_channel_t)(fun(src_a, dst_a, src_a, dst_a, src_a, dst_a, GFX_BLENDMODE_GET_CA(mode), GFX_BLENDMODE_GET_CA(mode))); \
+#define _gfx_blend_a_src(fun)                                                                                                                           \
+	{                                                                                                                                                   \
+		new_lhs_a = (video_channel_t)(fun(src_a, dst_a, src_a, dst_a, src_a, dst_a, VIDEO_COLOR_GET_ALPHA(constant), VIDEO_COLOR_GET_ALPHA(constant))); \
 	}
-#define _gfx_blend_rgb_dst(fun)                                                                                                               \
-	{                                                                                                                                         \
-		new_rhs_r = (video_channel_t)(fun(dst_r, src_r, src_r, dst_r, src_a, dst_a, GFX_BLENDMODE_GET_CR(mode), GFX_BLENDMODE_GET_CA(mode))); \
-		new_rhs_g = (video_channel_t)(fun(dst_g, src_g, src_g, dst_g, src_a, dst_a, GFX_BLENDMODE_GET_CG(mode), GFX_BLENDMODE_GET_CA(mode))); \
-		new_rhs_b = (video_channel_t)(fun(dst_b, src_b, src_b, dst_b, src_a, dst_a, GFX_BLENDMODE_GET_CB(mode), GFX_BLENDMODE_GET_CA(mode))); \
+#define _gfx_blend_rgb_dst(fun)                                                                                                                         \
+	{                                                                                                                                                   \
+		new_rhs_r = (video_channel_t)(fun(dst_r, src_r, src_r, dst_r, src_a, dst_a, VIDEO_COLOR_GET_RED(constant), VIDEO_COLOR_GET_ALPHA(constant)));   \
+		new_rhs_g = (video_channel_t)(fun(dst_g, src_g, src_g, dst_g, src_a, dst_a, VIDEO_COLOR_GET_GREEN(constant), VIDEO_COLOR_GET_ALPHA(constant))); \
+		new_rhs_b = (video_channel_t)(fun(dst_b, src_b, src_b, dst_b, src_a, dst_a, VIDEO_COLOR_GET_BLUE(constant), VIDEO_COLOR_GET_ALPHA(constant)));  \
 	}
-#define _gfx_blend_a_dst(fun)                                                                                                                 \
-	{                                                                                                                                         \
-		new_rhs_a = (video_channel_t)(fun(dst_a, src_a, src_a, dst_a, src_a, dst_a, GFX_BLENDMODE_GET_CA(mode), GFX_BLENDMODE_GET_CA(mode))); \
+#define _gfx_blend_a_dst(fun)                                                                                                                           \
+	{                                                                                                                                                   \
+		new_rhs_a = (video_channel_t)(fun(dst_a, src_a, src_a, dst_a, src_a, dst_a, VIDEO_COLOR_GET_ALPHA(constant), VIDEO_COLOR_GET_ALPHA(constant))); \
 	}
 	_GFX_BLENDDATA_SWITCH(GFX_BLENDMODE_GET_SRCRGB(mode), _gfx_blend_rgb_src);
 	_GFX_BLENDDATA_SWITCH(GFX_BLENDMODE_GET_SRCA(mode), _gfx_blend_a_src);
@@ -261,6 +246,30 @@ gfx_blendcolors(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 	                        (video_channel_t)res_b,
 	                        (video_channel_t)res_a);
 }
+
+
+
+/* Blend 2 colors `dst' and `src' together as per `mode'.
+ *
+ * This is the master function used for blending the
+ * colors of  2 pixels  using a  `struct video_gfx'.
+ *
+ * This function has been carefully written such that it
+ * should be fairly easy  for any compiler to  perfectly
+ * optimize calls to it, so-long as "mode" is a compile-
+ * time constant.
+ *
+ * As such, `struct video_gfx' contains dedicated impls
+ * for these commonly used blending modes:
+ * - GFX_BLENDMODE_ALPHA
+ * - GFX_BLENDMODE_OVERRIDE
+ *
+ * All other moves will obviously work as well, but won't
+ * be nearly as fast/efficient. */
+#define gfx_blendcolors(dst, src, mode)                   \
+	gfx_blendcolors_constant(dst, src,                    \
+	                         GFX_BLENDMODE_GETMODE(mode), \
+	                         GFX_BLENDMODE_GETCONSTANT(mode))
 
 __DECL_END
 #endif /* __CC__ */

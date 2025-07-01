@@ -88,6 +88,7 @@ INTDEF ATTR_IN(1) void CC libvideo_ramgfx__putcolor_noblend(struct video_gfx con
 #define DECLARE_libvideo_ramgfx__putcolor_FOO(name, mode) \
 	INTDEF ATTR_IN(1) void CC libvideo_ramgfx__putcolor_##name(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 GFX_FOREACH_DEDICATED_BLENDMODE(DECLARE_libvideo_ramgfx__putcolor_FOO)
+GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DECLARE_libvideo_ramgfx__putcolor_FOO)
 #undef DECLARE_libvideo_ramgfx__putcolor_FOO
 INTDEF ATTR_IN(1) video_pixel_t CC libvideo_ramgfx__getpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC libvideo_ramgfx__setpixel(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);

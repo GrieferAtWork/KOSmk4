@@ -130,7 +130,7 @@ libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
                            video_color_t *__restrict p_color) {
 	gfx_blendmode_t mode = self->vx_blend;
 	/* TODO: Do this dynamically for all blending modes */
-	if (mode == GFX_BLENDMODE_ALPHA)
+	if ((mode & _GFX_BLENDMODE_MODE_MASK) == GFX_BLENDMODE_ALPHA)
 		return VIDEO_COLOR_ISOPAQUE(*p_color);
 	return false;
 }
@@ -146,7 +146,7 @@ libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
 	gfx_blendmode_t mode = self->vx_blend;
 
 	/* TODO: Do this dynamically for all blending modes */
-	if (mode == GFX_BLENDMODE_ALPHA)
+	if ((mode & _GFX_BLENDMODE_MODE_MASK) == GFX_BLENDMODE_ALPHA)
 		return VIDEO_COLOR_ISTRANSPARENT(color);
 	return false;
 }

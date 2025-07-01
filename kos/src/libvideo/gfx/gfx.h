@@ -47,6 +47,9 @@
 	cb(mod, GFX_BLENDMODE_MOD)                                 \
 	cb(mul, GFX_BLENDMODE_MUL)
 
+#define GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(cb /*(name, mode)*/) \
+	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))
+
 #ifndef PRIdOFF
 #include <inttypes.h>
 #define PRIdOFF __PRIN_PREFIX(__SIZEOF_VIDEO_OFFSET_T__) "d"
@@ -328,9 +331,11 @@ INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic__getcolor_blur(struct vi
 INTDEF ATTR_IN(1) video_color_t CC libvideo_gfx_generic__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__putcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__putcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
+INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__putcolor_alpha_factor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 #define DECLARE_libvideo_gfx_generic__putcolor_FOO(name, mode) \
 	INTDEF ATTR_IN(1) void CC libvideo_gfx_generic__putcolor_##name(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 GFX_FOREACH_DEDICATED_BLENDMODE(DECLARE_libvideo_gfx_generic__putcolor_FOO)
+GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DECLARE_libvideo_gfx_generic__putcolor_FOO)
 #undef DECLARE_libvideo_gfx_generic__putcolor_FOO
 
 /* Low-level, Generic, always-valid GFX functions (using only `vgfo_getcolor' + `vgfo_putcolor') */
@@ -673,11 +678,11 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 	 * - _vx_xops.vgfx_absgradient_h
 	 * - _vx_xops.vgfx_absgradient_v */
 	if (what & VIDEO_GFX_UPDATE_BLEND) {
-		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_OVERRIDE);
-		(void)__builtin_expect(self->vx_blend, GFX_BLENDMODE_ALPHA);
+		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_OVERRIDE);
+		(void)__builtin_expect((self->vx_blend & _GFX_BLENDMODE_MODE_MASK), GFX_BLENDMODE_ALPHA);
 
 		/* Detect special blend modes. */
-		switch (self->vx_blend) {
+		switch (self->vx_blend & _GFX_BLENDMODE_MODE_MASK) {
 		default:
 			if (!(GFX_BLENDMODE_GET_SRCRGB(self->vx_blend) == GFX_BLENDDATA_ONE &&
 			      GFX_BLENDMODE_GET_SRCA(self->vx_blend) == GFX_BLENDDATA_ONE &&
@@ -721,6 +726,7 @@ libvideo_gfx_generic_update(struct video_gfx *__restrict self, unsigned int what
 			self->_vx_xops.vgfx_putcolor = &libvideo_gfx_generic__putcolor_##name; \
 			break;
 		GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_gfx_generic__putcolor_FOO)
+		GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_libvideo_gfx_generic__putcolor_FOO)
 #undef LINK_libvideo_gfx_generic__putcolor_FOO
 		}
 		/* Generic GFX operators that **do** have support for blending */
@@ -741,7 +747,7 @@ after_blend:;
 	 * - _vx_xops.vgfx_absline_lhhl */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_BLEND)) {
 		/* Select based on linear vs. Nearest interpolation, and blending */
-		if (self->vx_blend == GFX_BLENDMODE_OVERRIDE) {
+		if ((self->vx_blend & _GFX_BLENDMODE_MODE_MASK) == GFX_BLENDMODE_OVERRIDE) {
 			if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
 				self->_vx_xops.vgfx_absfillstretchmask = &libvideo_gfx_noblend__fillstretchmask_n;
 				self->_vx_xops.vgfx_absline_llhh       = &libvideo_gfx_generic__absline_llhh_l;
