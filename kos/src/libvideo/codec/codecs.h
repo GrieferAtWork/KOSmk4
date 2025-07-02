@@ -77,6 +77,20 @@ struct video_codec_custom: video_codec {
 	shift_t       vcc_shft_gmask; /* `CTZ(vcc_used_gmask)' if `vcc_xtra_gmask == 0' and bits of `vcc_used_gmask' are continuous; else, `(shift_t)-1' */
 	shift_t       vcc_shft_bmask; /* `CTZ(vcc_used_bmask)' if `vcc_xtra_bmask == 0' and bits of `vcc_used_bmask' are continuous; else, `(shift_t)-1' */
 	shift_t       vcc_shft_amask; /* `CTZ(vcc_used_amask)' if `vcc_xtra_amask == 0' and bits of `vcc_used_amask' are continuous; else, `(shift_t)-1' */
+//TODO:#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+//TODO:	video_pixel64_t vcc_used_rmask64; /* Most significant up-to 16 bits of r-mask */
+//TODO:	video_pixel64_t vcc_used_gmask64; /* Most significant up-to 16 bits of g-mask */
+//TODO:	video_pixel64_t vcc_used_bmask64; /* Most significant up-to 16 bits of b-mask */
+//TODO:	video_pixel64_t vcc_used_amask64; /* Most significant up-to 16 bits of a-mask */
+//TODO:	video_pixel64_t vcc_xtra_rmask64; /* Mask of remaining r-bits not in "vcc_used_rmask" */
+//TODO:	video_pixel64_t vcc_xtra_gmask64; /* Mask of remaining g-bits not in "vcc_used_gmask" */
+//TODO:	video_pixel64_t vcc_xtra_bmask64; /* Mask of remaining b-bits not in "vcc_used_bmask" */
+//TODO:	video_pixel64_t vcc_xtra_amask64; /* Mask of remaining a-bits not in "vcc_used_amask" */
+//TODO:	shift_t         vcc_miss_rbits64; /* [== 16 - POPCOUNT(vcc_used_rmask)] # of r-bits lost during encode64 */
+//TODO:	shift_t         vcc_miss_gbits64; /* [== 16 - POPCOUNT(vcc_used_gmask)] # of g-bits lost during encode64 */
+//TODO:	shift_t         vcc_miss_bbits64; /* [== 16 - POPCOUNT(vcc_used_bmask)] # of b-bits lost during encode64 */
+//TODO:	shift_t         vcc_miss_abits64; /* [== 16 - POPCOUNT(vcc_used_amask)] # of a-bits lost during encode64 */
+//TODO:#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 };
 
 

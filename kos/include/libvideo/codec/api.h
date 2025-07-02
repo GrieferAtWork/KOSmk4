@@ -33,6 +33,12 @@
 #endif /* !... */
 
 
+/* Feature flag: are 64-bit pixel formats supported? */
+#ifndef CONFIG_NO_VIDEO_CODEC_HAVE_PIXEL64
+#define CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#endif /* !CONFIG_NO_VIDEO_CODEC_HAVE_PIXEL64 */
+
+
 #if (!defined(LIBVIDEO_CODEC_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__))
 #define LIBVIDEO_CODEC_WANT_PROTOTYPES

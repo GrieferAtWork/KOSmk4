@@ -147,7 +147,6 @@ PRIVATE NONNULL((1)) void CC rectfill4_lsb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1, 4)) void CC rectcopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
 
-
 #ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY) && !defined(__INTELLISENSE__)
 #error "_vc_setpixel3 not supported by compiler, but enabled in features -- rebuild with 'CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3'"
@@ -1406,6 +1405,111 @@ unaligned_rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 
 
 
+/* 64-bit pixel wrappers */
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define DEFINE_PIXEL64_IO_WRAPPERS(f, f64)                                           \
+	PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t CC              \
+	f64(getpixel)(byte_t const *__restrict line, video_coord_t x) {                  \
+		return (video_pixel64_t)f(getpixel)(line, x);                                \
+	}                                                                                \
+	PRIVATE ATTR_COLD NONNULL((1)) void CC                                           \
+	f64(setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) { \
+		f(setpixel)(line, x, (video_pixel_t)pixel);                                  \
+	}                                                                                \
+	PRIVATE ATTR_COLD NONNULL((1)) void CC                                           \
+	f64(linefill)(byte_t *__restrict line, video_coord_t x,                          \
+	              video_pixel64_t pixel, video_dim_t num_pixels) {                   \
+		f(linefill)(line, x, (video_pixel_t)pixel, num_pixels);                      \
+	}                                                                                \
+	PRIVATE ATTR_COLD NONNULL((1)) void CC                                           \
+	f64(vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,           \
+	              video_pixel64_t pixel, video_dim_t num_pixels) {                   \
+		f(vertfill)(line, x, stride, (video_pixel_t)pixel, num_pixels);              \
+	}                                                                                \
+	PRIVATE ATTR_COLD NONNULL((1)) void CC                                           \
+	f64(rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,           \
+	              video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {   \
+		f(rectfill)(line, x, stride, (video_pixel_t)pixel, size_x, size_y);          \
+	}
+#define MAP_IO(x)   x##1_msb
+#define MAP_IO64(x) x##1_msb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##1_lsb
+#define MAP_IO64(x) x##1_lsb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##2_msb
+#define MAP_IO64(x) x##2_msb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##2_lsb
+#define MAP_IO64(x) x##2_lsb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##4_msb
+#define MAP_IO64(x) x##4_msb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##4_lsb
+#define MAP_IO64(x) x##4_lsb_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##8
+#define MAP_IO64(x) x##8_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##16
+#define MAP_IO64(x) x##16_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##24
+#define MAP_IO64(x) x##24_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   x##32
+#define MAP_IO64(x) x##32_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define MAP_IO(x)   unaligned_##x##16
+#define MAP_IO64(x) unaligned_##x##16_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+
+#define MAP_IO(x)   unaligned_##x##32
+#define MAP_IO64(x) unaligned_##x##32_64
+DEFINE_PIXEL64_IO_WRAPPERS(MAP_IO, MAP_IO64)
+#undef MAP_IO
+#undef MAP_IO64
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+
+#undef DEFINE_PIXEL64_IO_WRAPPERS
+#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+
+
+
 
 
 
@@ -1413,6 +1517,64 @@ unaligned_rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 /************************************************************************/
 /* COLOR CONVERSION                                                     */
 /************************************************************************/
+
+/* 64-bit pixel format support */
+#ifndef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define video_channel16_t video_channel_t
+#define video_pixel64_t   video_pixel_t
+#define video_color64_t   video_color_t
+#define DEFINE_PIXEL2COLOR64_WRAPPER32(foo_pixel2color, foo_pixel2color64)
+#define DEFINE_COLOR2PIXEL64_WRAPPER32(foo_color2pixel, foo_color2pixel64)
+#else /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+LOCAL ATTR_CONST video_channel16_t CC
+fill_missing_bits16(video_channel16_t value, shift_t miss_bits) {
+	/* TODO: Optimizations */
+#define nmax(n) ((1 << (n)) - 1)
+	return (video_channel16_t)((((uint_fast32_t)value * 0xffff) +
+	                            nmax(16 - miss_bits - 1)) /
+	                           nmax(16 - miss_bits));
+#undef nmax
+}
+
+LOCAL ATTR_CONST video_channel16_t CC
+pext_channel16(video_pixel64_t pixel,
+               video_pixel64_t mask,
+               shift_t miss_bits) {
+	video_channel16_t result = PEXT(pixel, mask);
+	return fill_missing_bits16(result, miss_bits);
+}
+
+LOCAL ATTR_CONST video_pixel64_t CC
+pdep_channel16(video_channel16_t chan,
+               video_pixel64_t used_mask,
+               video_pixel64_t xtra_mask) {
+	video_pixel64_t result = PDEP((video_pixel64_t)chan, used_mask);
+#if 1 /* Same as other impl, but without if-statements */
+	result |= (video_pixel64_t)(chan & 1) * xtra_mask;
+#else
+	if (chan & 1)
+		result |= xtra_mask;
+#endif
+	return result;
+}
+
+#define DEFINE_PIXEL2COLOR64_WRAPPER32(foo_pixel2color, foo_pixel2color64)                   \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color64_t CC                               \
+	foo_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel) { \
+		video_color_t c = foo_pixel2color(format, (video_pixel_t)pixel);                     \
+		return VIDEO_COLOR64_FROM_COLOR(c);                                                  \
+	}
+#define DEFINE_COLOR2PIXEL64_WRAPPER32(foo_color2pixel, foo_color2pixel64)                   \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t CC                               \
+	foo_color2pixel64(struct video_format const *__restrict format, video_color64_t color) { \
+		video_color_t c = VIDEO_COLOR_FROM_COLOR64(color);                                   \
+		return (video_pixel64_t)foo_color2pixel(format, c);                                  \
+	}
+#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#define DEFINE_PIXEL64_WRAPPERS(foo)                                       \
+	DEFINE_PIXEL2COLOR64_WRAPPER32(foo##_pixel2color, foo##_pixel2color64) \
+	DEFINE_COLOR2PIXEL64_WRAPPER32(foo##_color2pixel, foo##_color2pixel64)
+
 
 
 union color_data {
@@ -1456,30 +1618,44 @@ identity_color2pixel(struct video_format const *__restrict UNUSED(format),
 	return value;
 }
 
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define identity_pixel2color64 identity_color2pixel64
+INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t CC
+identity_color2pixel64(struct video_format const *__restrict UNUSED(format),
+                       video_color64_t value) {
+	return value;
+}
+#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+
 INTERN ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
 rgbx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return pixel | VIDEO_COLOR_ALPHA_MASK;
 }
+DEFINE_PIXEL2COLOR64_WRAPPER32(rgbx8888_pixel2color, rgbx8888_pixel2color64)
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define rgb888_pixel2color rgbx8888_pixel2color
+#define rgb888_pixel2color   rgbx8888_pixel2color
+#define rgb888_pixel2color64 rgbx8888_pixel2color64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
 rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
                    video_pixel_t pixel) {
 	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
 }
+DEFINE_PIXEL2COLOR64_WRAPPER32(rgb888_pixel2color, rgb888_pixel2color64)
 #endif /* __BYTE_ORDER__ == ... */
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define rgb888_color2pixel identity_color2pixel
+#define rgb888_color2pixel   identity_color2pixel
+#define rgb888_color2pixel64 identity_color2pixel64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
 rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
                    video_color_t color) {
 	return color >> 8;
 }
+DEFINE_COLOR2PIXEL64_WRAPPER32(rgb888_color2pixel, rgb888_color2pixel64)
 #endif /* __BYTE_ORDER__ == ... */
 
 
@@ -1497,7 +1673,6 @@ argb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	return BIGENDIAN_SHR((uint32_t)color, 8) |
 	       BIGENDIAN_SHL((uint32_t)color, 24);
 }
-
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
 xrgb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
@@ -1586,6 +1761,18 @@ bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 
 #define bgr888_pixel2color bgrx8888_pixel2color
 #define bgr888_color2pixel bgrx8888_color2pixel
+
+DEFINE_PIXEL64_WRAPPERS(argb8888)
+DEFINE_PIXEL64_WRAPPERS(xrgb8888)
+DEFINE_PIXEL64_WRAPPERS(abgr8888)
+DEFINE_PIXEL64_WRAPPERS(xbgr8888)
+DEFINE_PIXEL64_WRAPPERS(bgra8888)
+DEFINE_PIXEL64_WRAPPERS(bgrx8888)
+
+#define bgr888_pixel2color   bgrx8888_pixel2color
+#define bgr888_pixel2color64 bgrx8888_pixel2color64
+#define bgr888_color2pixel   bgrx8888_color2pixel
+#define bgr888_color2pixel64 bgrx8888_color2pixel64
 
 
 #undef USE_FAST_COLOR_UPSCALE
@@ -2027,49 +2214,49 @@ fill_missing_bits(video_channel_t value,
 #define color_getblue7(c)       _color_getx7(c, VIDEO_COLOR_BLUE_SHIFT)
 #define color_getblue8(c)       VIDEO_COLOR_GET_BLUE(c)
 
-#define red8_tocolor(v)         (video_color_t)((__UINT32_C(0x01010101) & VIDEO_COLOR_RED_MASK) * (v))
+#define red8_tocolor(v)         (video_color_t)((UINT32_C(0x01010101) & VIDEO_COLOR_RED_MASK) * (v))
 #define red7_tocolor(v)         red8_tocolor(c7_to_c8(v))
 #define red6_tocolor(v)         red8_tocolor(c6_to_c8(v))
 #define red5_tocolor(v)         red8_tocolor(c5_to_c8(v))
-#define red4_tocolor(v)         (video_color_t)((__UINT32_C(0x11111111) & VIDEO_COLOR_RED_MASK) * (v))
+#define red4_tocolor(v)         (video_color_t)((UINT32_C(0x11111111) & VIDEO_COLOR_RED_MASK) * (v))
 #define red3_tocolor(v)         red8_tocolor(c3_to_c8(v))
-#define red2_tocolor(v)         (video_color_t)((__UINT32_C(0x55555555) & VIDEO_COLOR_RED_MASK) * (v))
+#define red2_tocolor(v)         (video_color_t)((UINT32_C(0x55555555) & VIDEO_COLOR_RED_MASK) * (v))
 #define red1_tocolor(v)         (video_color_t)(VIDEO_COLOR_RED_MASK * (v))
 
-#define green8_tocolor(v)       (video_color_t)((__UINT32_C(0x01010101) & VIDEO_COLOR_GREEN_MASK) * (v))
+#define green8_tocolor(v)       (video_color_t)((UINT32_C(0x01010101) & VIDEO_COLOR_GREEN_MASK) * (v))
 #define green7_tocolor(v)       green8_tocolor(c7_to_c8(v))
 #define green6_tocolor(v)       green8_tocolor(c6_to_c8(v))
 #define green5_tocolor(v)       green8_tocolor(c5_to_c8(v))
-#define green4_tocolor(v)       (video_color_t)((__UINT32_C(0x11111111) & VIDEO_COLOR_GREEN_MASK) * (v))
+#define green4_tocolor(v)       (video_color_t)((UINT32_C(0x11111111) & VIDEO_COLOR_GREEN_MASK) * (v))
 #define green3_tocolor(v)       green8_tocolor(c3_to_c8(v))
-#define green2_tocolor(v)       (video_color_t)((__UINT32_C(0x55555555) & VIDEO_COLOR_GREEN_MASK) * (v))
+#define green2_tocolor(v)       (video_color_t)((UINT32_C(0x55555555) & VIDEO_COLOR_GREEN_MASK) * (v))
 #define green1_tocolor(v)       (video_color_t)(VIDEO_COLOR_GREEN_MASK * (v))
 
-#define blue8_tocolor(v)        (video_color_t)((__UINT32_C(0x01010101) & VIDEO_COLOR_BLUE_MASK) * (v))
+#define blue8_tocolor(v)        (video_color_t)((UINT32_C(0x01010101) & VIDEO_COLOR_BLUE_MASK) * (v))
 #define blue7_tocolor(v)        blue8_tocolor(c7_to_c8(v))
 #define blue6_tocolor(v)        blue8_tocolor(c6_to_c8(v))
 #define blue5_tocolor(v)        blue8_tocolor(c5_to_c8(v))
-#define blue4_tocolor(v)        (video_color_t)((__UINT32_C(0x11111111) & VIDEO_COLOR_BLUE_MASK) * (v))
+#define blue4_tocolor(v)        (video_color_t)((UINT32_C(0x11111111) & VIDEO_COLOR_BLUE_MASK) * (v))
 #define blue3_tocolor(v)        blue8_tocolor(c3_to_c8(v))
-#define blue2_tocolor(v)        (video_color_t)((__UINT32_C(0x55555555) & VIDEO_COLOR_BLUE_MASK) * (v))
+#define blue2_tocolor(v)        (video_color_t)((UINT32_C(0x55555555) & VIDEO_COLOR_BLUE_MASK) * (v))
 #define blue1_tocolor(v)        (video_color_t)(VIDEO_COLOR_BLUE_MASK * (v))
 
-#define alpha8_tocolor(v)       (video_color_t)((__UINT32_C(0x01010101) & VIDEO_COLOR_ALPHA_MASK) * (v))
+#define alpha8_tocolor(v)       (video_color_t)((UINT32_C(0x01010101) & VIDEO_COLOR_ALPHA_MASK) * (v))
 #define alpha7_tocolor(v)       alpha8_tocolor(c7_to_c8(v))
 #define alpha6_tocolor(v)       alpha8_tocolor(c6_to_c8(v))
 #define alpha5_tocolor(v)       alpha8_tocolor(c5_to_c8(v))
-#define alpha4_tocolor(v)       (video_color_t)((__UINT32_C(0x11111111) & VIDEO_COLOR_ALPHA_MASK) * (v))
+#define alpha4_tocolor(v)       (video_color_t)((UINT32_C(0x11111111) & VIDEO_COLOR_ALPHA_MASK) * (v))
 #define alpha3_tocolor(v)       alpha8_tocolor(c3_to_c8(v))
-#define alpha2_tocolor(v)       (video_color_t)((__UINT32_C(0x55555555) & VIDEO_COLOR_ALPHA_MASK) * (v))
+#define alpha2_tocolor(v)       (video_color_t)((UINT32_C(0x55555555) & VIDEO_COLOR_ALPHA_MASK) * (v))
 #define alpha1_tocolor(v)       (video_color_t)(VIDEO_COLOR_ALPHA_MASK * (v))
 
-#define lumen8_tocolor(v)       (video_color_t)((__UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen8_tocolor(v)       (video_color_t)((UINT32_C(0x01010101) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
 #define lumen7_tocolor(v)       lumen8_tocolor(c7_to_c8(v))
 #define lumen6_tocolor(v)       lumen8_tocolor(c6_to_c8(v))
 #define lumen5_tocolor(v)       lumen8_tocolor(c5_to_c8(v))
-#define lumen4_tocolor(v)       (video_color_t)((__UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen4_tocolor(v)       (video_color_t)((UINT32_C(0x11111111) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
 #define lumen3_tocolor(v)       lumen8_tocolor(c3_to_c8(v))
-#define lumen2_tocolor(v)       (video_color_t)((__UINT32_C(0x55555555) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
+#define lumen2_tocolor(v)       (video_color_t)((UINT32_C(0x55555555) & (VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK)) * (v))
 #define lumen1_tocolor(v)       (video_color_t)((VIDEO_COLOR_RED_MASK | VIDEO_COLOR_GREEN_MASK | VIDEO_COLOR_BLUE_MASK) * (v))
 
 
@@ -2553,6 +2740,22 @@ la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_col
 }
 
 
+DEFINE_PIXEL64_WRAPPERS(l1)
+DEFINE_PIXEL64_WRAPPERS(l2)
+DEFINE_PIXEL64_WRAPPERS(l4)
+DEFINE_PIXEL64_WRAPPERS(l8)
+DEFINE_PIXEL64_WRAPPERS(al11)
+DEFINE_PIXEL64_WRAPPERS(la11)
+DEFINE_PIXEL64_WRAPPERS(al22)
+DEFINE_PIXEL64_WRAPPERS(la22)
+DEFINE_PIXEL64_WRAPPERS(al13)
+DEFINE_PIXEL64_WRAPPERS(la31)
+DEFINE_PIXEL64_WRAPPERS(al44)
+DEFINE_PIXEL64_WRAPPERS(la44)
+DEFINE_PIXEL64_WRAPPERS(al17)
+DEFINE_PIXEL64_WRAPPERS(la71)
+DEFINE_PIXEL64_WRAPPERS(al88)
+DEFINE_PIXEL64_WRAPPERS(la88)
 
 
 /* Cross-byte pixel format coverters */
@@ -2577,7 +2780,8 @@ la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_col
 		       green##g_bits##_tocolor(px.g) |                                           \
 		       blue##b_bits##_tocolor(px.b) |                                            \
 		       alpha##a_bits##_tocolor(px.a);                                            \
-	}
+	}                                                                                    \
+	DEFINE_PIXEL64_WRAPPERS(name)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union_type, \
                                                          r_bits, g_bits, b_bits)     \
@@ -2600,7 +2804,8 @@ la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_col
 		       green##g_bits##_tocolor(px.g) |                                       \
 		       blue##b_bits##_tocolor(px.b) |                                        \
 		       VIDEO_COLOR_ALPHA_MASK;                                               \
-	}
+	}                                                                                \
+	DEFINE_PIXEL64_WRAPPERS(name)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union_type, \
                                                         r_bits, g_bits, b_bits)     \
@@ -2622,7 +2827,8 @@ la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_col
 		       green##g_bits##_tocolor(px.g) |                                      \
 		       blue##b_bits##_tocolor(px.b) |                                       \
 		       VIDEO_COLOR_ALPHA_MASK;                                              \
-	}
+	}                                                                               \
+	DEFINE_PIXEL64_WRAPPERS(name)
 
 
 
@@ -3062,6 +3268,19 @@ pa88_color2pixel(struct video_format const *__restrict format, video_color_t col
 #undef color_getpalet8
 
 
+DEFINE_PIXEL64_WRAPPERS(pal)
+DEFINE_PIXEL64_WRAPPERS(ap11)
+DEFINE_PIXEL64_WRAPPERS(pa11)
+DEFINE_PIXEL64_WRAPPERS(ap22)
+DEFINE_PIXEL64_WRAPPERS(pa22)
+DEFINE_PIXEL64_WRAPPERS(ap13)
+DEFINE_PIXEL64_WRAPPERS(pa31)
+DEFINE_PIXEL64_WRAPPERS(ap44)
+DEFINE_PIXEL64_WRAPPERS(pa44)
+DEFINE_PIXEL64_WRAPPERS(ap17)
+DEFINE_PIXEL64_WRAPPERS(pa71)
+DEFINE_PIXEL64_WRAPPERS(ap88)
+DEFINE_PIXEL64_WRAPPERS(pa88)
 
 
 
@@ -3134,6 +3353,38 @@ libvideo_codec_lookup(video_codec_t codec) {
 #define SET_vc_setpixel3_INITIALIZER(p, v)     /* nothing */
 #endif /* !VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define SET_vc_pixel2color64_STATIC_INITIALIZER(v) v,
+#define SET_vc_color2pixel64_STATIC_INITIALIZER(v) v,
+#define SET_vc_getpixel64_STATIC_INITIALIZER(v)    v,
+#define SET_vc_setpixel64_STATIC_INITIALIZER(v)    v,
+#define SET_vc_linefill64_STATIC_INITIALIZER(v)    v,
+#define SET_vc_vertfill64_STATIC_INITIALIZER(v)    v,
+#define SET_vc_rectfill64_STATIC_INITIALIZER(v)    v,
+#define SET_vc_pixel2color64_INITIALIZER(p, v)     p.vc_pixel2color64 = v;
+#define SET_vc_color2pixel64_INITIALIZER(p, v)     p.vc_color2pixel64 = v;
+#define SET_vc_getpixel64_INITIALIZER(p, v)        p.vc_getpixel64 = v;
+#define SET_vc_setpixel64_INITIALIZER(p, v)        p.vc_setpixel64 = v;
+#define SET_vc_linefill64_INITIALIZER(p, v)        p.vc_linefill64 = v;
+#define SET_vc_vertfill64_INITIALIZER(p, v)        p.vc_vertfill64 = v;
+#define SET_vc_rectfill64_INITIALIZER(p, v)        p.vc_rectfill64 = v;
+#else /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#define SET_vc_pixel2color64_STATIC_INITIALIZER(v) /* nothing */
+#define SET_vc_color2pixel64_STATIC_INITIALIZER(v) /* nothing */
+#define SET_vc_getpixel64_STATIC_INITIALIZER(v)    /* nothing */
+#define SET_vc_setpixel64_STATIC_INITIALIZER(v)    /* nothing */
+#define SET_vc_linefill64_STATIC_INITIALIZER(v)    /* nothing */
+#define SET_vc_vertfill64_STATIC_INITIALIZER(v)    /* nothing */
+#define SET_vc_rectfill64_STATIC_INITIALIZER(v)    /* nothing */
+#define SET_vc_pixel2color64_INITIALIZER(p, v)     /* nothing */
+#define SET_vc_color2pixel64_INITIALIZER(p, v)     /* nothing */
+#define SET_vc_getpixel64_INITIALIZER(p, v)        /* nothing */
+#define SET_vc_setpixel64_INITIALIZER(p, v)        /* nothing */
+#define SET_vc_linefill64_INITIALIZER(p, v)        /* nothing */
+#define SET_vc_vertfill64_INITIALIZER(p, v)        /* nothing */
+#define SET_vc_rectfill64_INITIALIZER(p, v)        /* nothing */
+#endif /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+
 #if defined(__KERNEL__) || !defined(__pic__)
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
                           getpixel, setpixel, rectcopy, rectmove,       \
@@ -3156,6 +3407,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_rectfill               = */ &rectfill,               \
 			/* .vc_rectcopy               = */ &rectcopy,               \
 			/* .vc_rectmove               = */ &rectmove,               \
+			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)   \
+			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)   \
+			SET_vc_getpixel64_STATIC_INITIALIZER(&getpixel##_64)        \
+			SET_vc_setpixel64_STATIC_INITIALIZER(&setpixel##_64)        \
+			SET_vc_linefill64_STATIC_INITIALIZER(&linefill##_64)        \
+			SET_vc_vertfill64_STATIC_INITIALIZER(&vertfill##_64)        \
+			SET_vc_rectfill64_STATIC_INITIALIZER(&rectfill##_64)        \
 		}
 #define _DEFINE_CODEC_ALX(name, codec, specs,                           \
                           align, rambuffer_requirements,                \
@@ -3183,6 +3441,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_rectfill               = */ &unaligned_rectfill,     \
 			/* .vc_rectcopy               = */ &unaligned_rectcopy,     \
 			/* .vc_rectmove               = */ &unaligned_rectmove,     \
+			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)   \
+			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)   \
+			SET_vc_getpixel64_STATIC_INITIALIZER(&unaligned_getpixel##_64) \
+			SET_vc_setpixel64_STATIC_INITIALIZER(&unaligned_setpixel##_64) \
+			SET_vc_linefill64_STATIC_INITIALIZER(&unaligned_linefill##_64) \
+			SET_vc_vertfill64_STATIC_INITIALIZER(&unaligned_vertfill##_64) \
+			SET_vc_rectfill64_STATIC_INITIALIZER(&unaligned_rectfill##_64) \
 		};                                                              \
 		PRIVATE struct video_codec const name = {                       \
 			/* .vc_codec                  = */ codec,                   \
@@ -3201,6 +3466,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			/* .vc_rectfill               = */ &rectfill,               \
 			/* .vc_rectcopy               = */ &rectcopy,               \
 			/* .vc_rectmove               = */ &rectmove,               \
+			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)   \
+			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)   \
+			SET_vc_getpixel64_STATIC_INITIALIZER(&getpixel##_64)        \
+			SET_vc_setpixel64_STATIC_INITIALIZER(&setpixel##_64)        \
+			SET_vc_linefill64_STATIC_INITIALIZER(&linefill##_64)        \
+			SET_vc_vertfill64_STATIC_INITIALIZER(&vertfill##_64)        \
+			SET_vc_rectfill64_STATIC_INITIALIZER(&rectfill##_64)        \
 		}
 #else /* __KERNEL__ || !__pic__ */
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
@@ -3225,6 +3497,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_rectfill      = &rectfill;                          \
 			name.vc_rectcopy      = &rectcopy;                          \
 			name.vc_rectmove      = &rectmove;                          \
+			SET_vc_pixel2color64_INITIALIZER(name, &pixel2color##64)    \
+			SET_vc_color2pixel64_INITIALIZER(name, &color2pixel##64)    \
+			SET_vc_getpixel64_INITIALIZER(name, &getpixel##_64)         \
+			SET_vc_setpixel64_INITIALIZER(name, &setpixel##_64)         \
+			SET_vc_linefill64_INITIALIZER(name, &linefill##_64)         \
+			SET_vc_vertfill64_INITIALIZER(name, &vertfill##_64)         \
+			SET_vc_rectfill64_INITIALIZER(name, &rectfill##_64)         \
 			COMPILER_WRITE_BARRIER();                                   \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;   \
 			COMPILER_WRITE_BARRIER();                                   \
@@ -3262,6 +3541,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			unaligned_##name.vc_rectfill               = &unaligned_rectfill;     \
 			unaligned_##name.vc_rectcopy               = &unaligned_rectcopy;     \
 			unaligned_##name.vc_rectmove               = &unaligned_rectmove;     \
+			SET_vc_pixel2color64_INITIALIZER(unaligned_##name, &pixel2color##64)  \
+			SET_vc_color2pixel64_INITIALIZER(unaligned_##name, &color2pixel##64)  \
+			SET_vc_getpixel64_INITIALIZER(unaligned_##name, &unaligned_getpixel##_64) \
+			SET_vc_setpixel64_INITIALIZER(unaligned_##name, &unaligned_setpixel##_64) \
+			SET_vc_linefill64_INITIALIZER(unaligned_##name, &unaligned_linefill##_64) \
+			SET_vc_vertfill64_INITIALIZER(unaligned_##name, &unaligned_vertfill##_64) \
+			SET_vc_rectfill64_INITIALIZER(unaligned_##name, &unaligned_rectfill##_64) \
 			name.vc_nalgn                              = &unaligned_##name;       \
 			name.vc_pixel2color                        = &pixel2color;            \
 			name.vc_color2pixel                        = &color2pixel;            \
@@ -3274,6 +3560,13 @@ libvideo_codec_lookup(video_codec_t codec) {
 			name.vc_rectfill                           = &rectfill;               \
 			name.vc_rectcopy                           = &rectcopy;               \
 			name.vc_rectmove                           = &rectmove;               \
+			SET_vc_pixel2color64_INITIALIZER(name, &pixel2color##64)              \
+			SET_vc_color2pixel64_INITIALIZER(name, &color2pixel##64)              \
+			SET_vc_getpixel64_INITIALIZER(name, &getpixel##_64)                   \
+			SET_vc_setpixel64_INITIALIZER(name, &setpixel##_64)                   \
+			SET_vc_linefill64_INITIALIZER(name, &linefill##_64)                   \
+			SET_vc_vertfill64_INITIALIZER(name, &vertfill##_64)                   \
+			SET_vc_rectfill64_INITIALIZER(name, &rectfill##_64)                   \
 			COMPILER_WRITE_BARRIER();                                             \
 			name.vc_rambuffer_requirements = &rambuffer_requirements;             \
 			COMPILER_WRITE_BARRIER();                                             \
@@ -5207,6 +5500,52 @@ shft_rgba_color2pixel(struct video_format const *__restrict format,
 
 
 
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_pal_pixel2color, pext_pal_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_pal_color2pixel, pdep_pal_color2pixel64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_pal_pixel2color__withalpha, pext_pal_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_pal_color2pixel__withalpha, pdep_pal_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pal_pixel2color__withalpha, pal_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pal_color2pixel__withalpha, pal_color2pixel__withalpha64)
+
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray4_pixel2color, pext_gray4_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray4_color2pixel, pdep_gray4_color2pixel64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray16_pixel2color, pext_gray16_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray16_color2pixel, pdep_gray16_color2pixel64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray256_pixel2color, pext_gray256_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray256_color2pixel, pdep_gray256_color2pixel64)
+
+DEFINE_PIXEL2COLOR64_WRAPPER32(gray2_pixel2color__withalpha, gray2_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(gray2_color2pixel__withalpha, gray2_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(gray4_pixel2color__withalpha, gray4_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(gray4_color2pixel__withalpha, gray4_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(gray16_pixel2color__withalpha, gray16_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(gray16_color2pixel__withalpha, gray16_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(gray256_pixel2color__withalpha, gray256_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(gray256_color2pixel__withalpha, gray256_color2pixel__withalpha64)
+
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray4_pixel2color__withalpha, pext_gray4_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray4_color2pixel__withalpha, pdep_gray4_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray16_pixel2color__withalpha, pext_gray16_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray16_color2pixel__withalpha, pdep_gray16_color2pixel__withalpha64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_gray256_pixel2color__withalpha, pext_gray256_pixel2color__withalpha64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_gray256_color2pixel__withalpha, pdep_gray256_color2pixel__withalpha64)
+
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_rgba_pixel2color, pext_rgba_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_rgba_color2pixel, pdep_rgba_color2pixel64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(pext_rgb_pixel2color, pext_rgb_pixel2color64)
+DEFINE_COLOR2PIXEL64_WRAPPER32(pdep_rgb_color2pixel, pdep_rgb_color2pixel64)
+
+#ifdef HAVE_shft_channel_decode
+DEFINE_PIXEL64_WRAPPERS(shft_rgb)
+DEFINE_PIXEL64_WRAPPERS(shft_rgba)
+#ifdef HAVE_shft_channel_decode_nomiss
+DEFINE_PIXEL2COLOR64_WRAPPER32(shft_rgb_pixel2color_nomiss, shft_rgb_pixel2color_nomiss64)
+DEFINE_PIXEL2COLOR64_WRAPPER32(shft_rgba_pixel2color_nomiss, shft_rgba_pixel2color_nomiss64)
+#endif /* HAVE_shft_channel_decode_nomiss */
+#endif /* HAVE_shft_channel_decode */
+
+
+
 LOCAL ATTR_COLD NONNULL((2, 3, 4, 5)) void CC
 video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, as per codec specs */
                                    video_pixel_t *p_used_mask, /* sub-mask of "spec_mask" of bits encodeable in "video_color_t" */
@@ -5243,13 +5582,13 @@ video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, 
 }
 
 PRIVATE ATTR_COLD WUNUSED struct video_codec const *CC
-builtin_codec_from_masks(video_pixel_t rmask,
-                         video_pixel_t gmask,
-                         video_pixel_t bmask,
-                         video_pixel_t amask) {
+builtin_codec_from_masks(video_pixel64_t rmask,
+                         video_pixel64_t gmask,
+                         video_pixel64_t bmask,
+                         video_pixel64_t amask) {
 	struct video_codec const *result;
 	struct video_codec_specs specs;
-	video_pixel_t fullmask;
+	video_pixel64_t fullmask;
 	specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
 	specs.vcs_rmask = rmask;
 	specs.vcs_gmask = gmask;
@@ -5261,19 +5600,33 @@ builtin_codec_from_masks(video_pixel_t rmask,
 	} else if (fullmask <= UINT32_C(0xffffff)) {
 		specs.vcs_bpp = 24;
 	} else {
+#ifndef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 		specs.vcs_bpp = 32;
+#else /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+		if (fullmask <= UINT32_C(0xffffffff)) {
+			specs.vcs_bpp = 32;
+		} else {
+			/* TODO: 5-byte, 6-byte, 7-byte codecs (XXX: Do those even exist?) */
+			specs.vcs_bpp = 64;
+		}
+#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 	}
 	specs.vcs_cbits = specs.vcs_bpp;
 	result = libvideo_codec_lookup_specs(&specs);
-	if (!result && specs.vcs_bpp == 24) {
-		specs.vcs_bpp = 32; /* Try again for a 32-bit codec */
-		result = libvideo_codec_lookup_specs(&specs);
+	if (!result) {
+		if (specs.vcs_bpp == 24) {
+			specs.vcs_bpp = 32; /* Try again for a 32-bit codec */
+			result = libvideo_codec_lookup_specs(&specs);
+		} else if (specs.vcs_bpp > 32 && specs.vcs_bpp < 64) {
+			specs.vcs_bpp = 64; /* Try again for a 64-bit codec */
+			result = libvideo_codec_lookup_specs(&specs);
+		}
 	}
 	return result;
 }
 
 PRIVATE ATTR_COLD ATTR_CONST WUNUSED bool CC
-is_8bit_aligned(video_pixel_t mask) {
+is_8bit_aligned(video_pixel64_t mask) {
 	return mask == UINT32_C(0x000000ff) ||
 	       mask == UINT32_C(0x0000ff00) ||
 	       mask == UINT32_C(0x00ff0000) ||
@@ -5447,6 +5800,9 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectmove = &rectmove32;
 		}
 		break;
+
+	/* TODO: 40bpp, 48bpp, 56bpp, 64bpp */
+
 	default:
 		/* Impossible/Unsupported BPP */
 		return false;
@@ -5458,8 +5814,8 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 	 * above that is impossible to store, so we may as well mask those bits
 	 * away since there would be no way to store them anyways. */
 	{
-		video_pixel_t cmask;
-		video_pixel_t bpp_mask = ((video_pixel_t)1 << self->vc_specs.vcs_bpp) - 1;
+		video_pixel64_t cmask;
+		video_pixel64_t bpp_mask = ((video_pixel64_t)1 << self->vc_specs.vcs_bpp) - 1;
 		self->vc_specs.vcs_rmask &= bpp_mask;
 		self->vc_specs.vcs_gmask &= bpp_mask;
 		self->vc_specs.vcs_bmask &= bpp_mask;
@@ -5478,30 +5834,51 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			cmask |= self->vc_specs.vcs_amask;
 			self->vc_specs.vcs_cbits = POPCOUNT(cmask);
 		}
+
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+		if (cmask > UINT32_C(0xffffffff)) {
+			/* TODO: 64-bit codec */
+			/* TODO: BPP > 32 */
+			/* TODO: In this mode, the regular pixel2color  / color2pixel are just the  identity
+			 *       function, since *actual* pixel values  can't be encoded. Instead, only  the
+			 *       pixel2color64 / color2pixel64 function actually do anything, and the non-64
+			 *       line/vert/rect-fill function have to do the actual pixel encoding...
+			 * XXX: But that won't work for custom codecs since those operators don't take the
+			 *      video_format as argument, meaning there'd need to be 1 function for  every
+			 *      possible format, and we want to support arbitrary formats...
+			 * FIXME: Figure out a way to compress/uncompress 32/64-bit pixels in this case.
+			 *        It should be possible, since we know  that there will only be at  most
+			 *        32 bits of color information,  and all *we* need  is a limited set  of
+			 *        functions to expand those 32 bits  of color from video_pixel_t into  a
+			 *        larger video_pixel64_t (at that point we won't even need to deal  with
+			 *        reordering  bits,  since  that  can  still  happen  in  "color2pixel")
+			 *        (hmm...  but now that I think about it, there might still be *way* too
+			 *        many possible constellations of pixel expansion)
+			 * Solution: The only real solution here is to have a set of upscaling functions
+			 *           for operators like vc_linefill, and  when being given a codec  that
+			 *           doesn't  support any of these, we need to dynamically generate code
+			 *           that **does** support this.
+			 */
+			return false;
+		}
+#endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 	}
 
 
 	/* Load effective color masks */
-	video_codec_custom__init__usedmask(self->vc_specs.vcs_rmask,
-	                                   &self->vcc_used_rmask,
-	                                   &self->vcc_xtra_rmask,
-	                                   &self->vcc_miss_rbits,
-	                                   &self->vcc_shft_rmask);
-	video_codec_custom__init__usedmask(self->vc_specs.vcs_gmask,
-	                                   &self->vcc_used_gmask,
-	                                   &self->vcc_xtra_gmask,
-	                                   &self->vcc_miss_gbits,
-	                                   &self->vcc_shft_gmask);
-	video_codec_custom__init__usedmask(self->vc_specs.vcs_bmask,
-	                                   &self->vcc_used_bmask,
-	                                   &self->vcc_xtra_bmask,
-	                                   &self->vcc_miss_bbits,
-	                                   &self->vcc_shft_bmask);
-	video_codec_custom__init__usedmask(self->vc_specs.vcs_amask,
-	                                   &self->vcc_used_amask,
-	                                   &self->vcc_xtra_amask,
-	                                   &self->vcc_miss_abits,
-	                                   &self->vcc_shft_amask);
+	video_codec_custom__init__usedmask((video_pixel_t)self->vc_specs.vcs_rmask,
+	                                   &self->vcc_used_rmask, &self->vcc_xtra_rmask,
+	                                   &self->vcc_miss_rbits, &self->vcc_shft_rmask);
+	video_codec_custom__init__usedmask((video_pixel_t)self->vc_specs.vcs_gmask,
+	                                   &self->vcc_used_gmask, &self->vcc_xtra_gmask,
+	                                   &self->vcc_miss_gbits, &self->vcc_shft_gmask);
+	video_codec_custom__init__usedmask((video_pixel_t)self->vc_specs.vcs_bmask,
+	                                   &self->vcc_used_bmask, &self->vcc_xtra_bmask,
+	                                   &self->vcc_miss_bbits, &self->vcc_shft_bmask);
+	video_codec_custom__init__usedmask((video_pixel_t)self->vc_specs.vcs_amask,
+	                                   &self->vcc_used_amask, &self->vcc_xtra_amask,
+	                                   &self->vcc_miss_abits, &self->vcc_shft_amask);
+
 
 	/* Check if the codec qualifies for INTERP8888 optimizations. */
 	self->vc_specs.vcs_flags &= ~VIDEO_CODEC_FLAG_INTERP8888;
@@ -5511,6 +5888,13 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_specs.vcs_flags |= VIDEO_CODEC_FLAG_INTERP8888;
 
 	/* Select color <=> pixel conversion algorithm */
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define INIT__vc_pixel2color(v) (self->vc_pixel2color = v, self->vc_pixel2color64 = v##64)
+#define INIT__vc_color2pixel(v) (self->vc_color2pixel = v, self->vc_color2pixel64 = v##64)
+#else /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#define INIT__vc_pixel2color(v) (self->vc_pixel2color = v)
+#define INIT__vc_color2pixel(v) (self->vc_color2pixel = v)
+#endif /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 	if (self->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM)) {
 		/* cmask: Canonical mask */
 		video_pixel_t cmask = ((video_pixel_t)1 << self->vc_specs.vcs_cbits) - 1;
@@ -5526,34 +5910,64 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 				if (alpha_bits >= 1 && alpha_bits <= 8 && (self->vcc_used_amask & 1)) {
 					bool alpha_first = (self->vcc_used_amask & 1);
 					if (alpha_first) {
-						video_pixel_t cmask_after_alpha = cmask << alpha_bits;
+						video_pixel64_t cmask_after_alpha = cmask << alpha_bits;
 						if ((self->vc_specs.vcs_rmask & cmask_after_alpha) == cmask_after_alpha) {
 							/* Looks like a usable alpha codec */
 #define AL(n_alpha, n_lum) ((n_alpha - 1) | ((n_lum - 1) << 3))
 							switch (AL(alpha_bits, lumen_bits)) {
 							case AL(1, 1):
-								self->vc_pixel2color = ispal ? &ap11_pixel2color : &al11_pixel2color;
-								self->vc_color2pixel = ispal ? &ap11_color2pixel : &al11_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap11_pixel2color);
+									INIT__vc_color2pixel(&ap11_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al11_pixel2color);
+									INIT__vc_color2pixel(&al11_color2pixel);
+								}
 								goto got_p2c;
 							case AL(2, 2):
-								self->vc_pixel2color = ispal ? &ap22_pixel2color : &al22_pixel2color;
-								self->vc_color2pixel = ispal ? &ap22_color2pixel : &al22_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap22_pixel2color);
+									INIT__vc_color2pixel(&ap22_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al22_pixel2color);
+									INIT__vc_color2pixel(&al22_color2pixel);
+								}
 								goto got_p2c;
 							case AL(1, 3):
-								self->vc_pixel2color = ispal ? &ap13_pixel2color : &al13_pixel2color;
-								self->vc_color2pixel = ispal ? &ap13_color2pixel : &al13_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap13_pixel2color);
+									INIT__vc_color2pixel(&ap13_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al13_pixel2color);
+									INIT__vc_color2pixel(&al13_color2pixel);
+								}
 								goto got_p2c;
 							case AL(4, 4):
-								self->vc_pixel2color = ispal ? &ap44_pixel2color : &al44_pixel2color;
-								self->vc_color2pixel = ispal ? &ap44_color2pixel : &al44_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap44_pixel2color);
+									INIT__vc_color2pixel(&ap44_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al44_pixel2color);
+									INIT__vc_color2pixel(&al44_color2pixel);
+								}
 								goto got_p2c;
 							case AL(1, 7):
-								self->vc_pixel2color = ispal ? &ap17_pixel2color : &al17_pixel2color;
-								self->vc_color2pixel = ispal ? &ap17_color2pixel : &al17_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap17_pixel2color);
+									INIT__vc_color2pixel(&ap17_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al17_pixel2color);
+									INIT__vc_color2pixel(&al17_color2pixel);
+								}
 								goto got_p2c;
 							case AL(8, 8):
-								self->vc_pixel2color = ispal ? &ap88_pixel2color : &al88_pixel2color;
-								self->vc_color2pixel = ispal ? &ap88_color2pixel : &al88_color2pixel;
+								if (ispal) {
+									INIT__vc_pixel2color(&ap88_pixel2color);
+									INIT__vc_color2pixel(&ap88_color2pixel);
+								} else {
+									INIT__vc_pixel2color(&al88_pixel2color);
+									INIT__vc_color2pixel(&al88_color2pixel);
+								}
 								goto got_p2c;
 							default: break;
 							}
@@ -5565,28 +5979,58 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 #define LA(n_lum, n_alpha) ((n_lum - 1) | ((n_alpha - 1) << 3))
 						switch (LA(lumen_bits, alpha_bits)) {
 						case LA(1, 1):
-							self->vc_pixel2color = ispal ? &pa11_pixel2color : &la11_pixel2color;
-							self->vc_color2pixel = ispal ? &pa11_color2pixel : &la11_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa11_pixel2color);
+								INIT__vc_color2pixel(&pa11_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la11_pixel2color);
+								INIT__vc_color2pixel(&la11_color2pixel);
+							}
 							goto got_p2c;
 						case LA(2, 2):
-							self->vc_pixel2color = ispal ? &pa22_pixel2color : &la22_pixel2color;
-							self->vc_color2pixel = ispal ? &pa22_color2pixel : &la22_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa22_pixel2color);
+								INIT__vc_color2pixel(&pa22_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la22_pixel2color);
+								INIT__vc_color2pixel(&la22_color2pixel);
+							}
 							goto got_p2c;
 						case LA(3, 1):
-							self->vc_pixel2color = ispal ? &pa31_pixel2color : &la31_pixel2color;
-							self->vc_color2pixel = ispal ? &pa31_color2pixel : &la31_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa31_pixel2color);
+								INIT__vc_color2pixel(&pa31_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la31_pixel2color);
+								INIT__vc_color2pixel(&la31_color2pixel);
+							}
 							goto got_p2c;
 						case LA(4, 4):
-							self->vc_pixel2color = ispal ? &pa44_pixel2color : &la44_pixel2color;
-							self->vc_color2pixel = ispal ? &pa44_color2pixel : &la44_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa44_pixel2color);
+								INIT__vc_color2pixel(&pa44_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la44_pixel2color);
+								INIT__vc_color2pixel(&la44_color2pixel);
+							}
 							goto got_p2c;
 						case LA(7, 1):
-							self->vc_pixel2color = ispal ? &pa71_pixel2color : &la71_pixel2color;
-							self->vc_color2pixel = ispal ? &pa71_color2pixel : &la71_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa71_pixel2color);
+								INIT__vc_color2pixel(&pa71_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la71_pixel2color);
+								INIT__vc_color2pixel(&la71_color2pixel);
+							}
 							goto got_p2c;
 						case LA(8, 8):
-							self->vc_pixel2color = ispal ? &pa88_pixel2color : &la88_pixel2color;
-							self->vc_color2pixel = ispal ? &pa88_color2pixel : &la88_color2pixel;
+							if (ispal) {
+								INIT__vc_pixel2color(&pa88_pixel2color);
+								INIT__vc_color2pixel(&pa88_color2pixel);
+							} else {
+								INIT__vc_pixel2color(&la88_pixel2color);
+								INIT__vc_color2pixel(&la88_color2pixel);
+							}
 							goto got_p2c;
 						default: break;
 						}
@@ -5597,63 +6041,123 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 
 			/* Fallback: use a generic color conversion function */
 			if (ispal) {
-				self->vc_pixel2color = need_mask ? &pext_pal_pixel2color__withalpha : &pal_pixel2color__withalpha;
-				self->vc_color2pixel = need_mask ? &pdep_pal_color2pixel__withalpha : &pal_color2pixel__withalpha;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_pal_pixel2color__withalpha);
+					INIT__vc_color2pixel(&pdep_pal_color2pixel__withalpha);
+				} else {
+					INIT__vc_pixel2color(&pal_pixel2color__withalpha);
+					INIT__vc_color2pixel(&pal_color2pixel__withalpha);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 8) {
-				self->vc_pixel2color = need_mask ? &pext_gray256_pixel2color__withalpha : &gray256_pixel2color__withalpha;
-				self->vc_color2pixel = need_mask ? &pdep_gray256_color2pixel__withalpha : &gray256_color2pixel__withalpha;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray256_pixel2color__withalpha);
+					INIT__vc_color2pixel(&pdep_gray256_color2pixel__withalpha);
+				} else {
+					INIT__vc_pixel2color(&gray256_pixel2color__withalpha);
+					INIT__vc_color2pixel(&gray256_color2pixel__withalpha);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 4) {
-				self->vc_pixel2color = need_mask ? &pext_gray16_pixel2color__withalpha : &gray16_pixel2color__withalpha;
-				self->vc_color2pixel = need_mask ? &pdep_gray16_color2pixel__withalpha : &gray16_color2pixel__withalpha;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray16_pixel2color__withalpha);
+					INIT__vc_color2pixel(&pdep_gray16_color2pixel__withalpha);
+				} else {
+					INIT__vc_pixel2color(&gray16_pixel2color__withalpha);
+					INIT__vc_color2pixel(&gray16_color2pixel__withalpha);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 2) {
-				self->vc_pixel2color = need_mask ? &pext_gray4_pixel2color__withalpha : &gray4_pixel2color__withalpha;
-				self->vc_color2pixel = need_mask ? &pdep_gray4_color2pixel__withalpha : &gray4_color2pixel__withalpha;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray4_pixel2color__withalpha);
+					INIT__vc_color2pixel(&pdep_gray4_color2pixel__withalpha);
+				} else {
+					INIT__vc_pixel2color(&gray4_pixel2color__withalpha);
+					INIT__vc_color2pixel(&gray4_color2pixel__withalpha);
+				}
 			} else {
-				self->vc_pixel2color = &gray2_pixel2color__withalpha;
-				self->vc_color2pixel = &gray2_color2pixel__withalpha;
+				INIT__vc_pixel2color(&gray2_pixel2color__withalpha);
+				INIT__vc_color2pixel(&gray2_color2pixel__withalpha);
 			}
 		} else {
 			if (ispal) {
-				self->vc_pixel2color = need_mask ? &pext_pal_pixel2color : &pal_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_pal_color2pixel : &pal_color2pixel;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_pal_pixel2color);
+					INIT__vc_color2pixel(&pdep_pal_color2pixel);
+				} else {
+					INIT__vc_pixel2color(&pal_pixel2color);
+					INIT__vc_color2pixel(&pal_color2pixel);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 8) {
-				self->vc_pixel2color = need_mask ? &pext_gray256_pixel2color : &l8_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray256_color2pixel : &l8_color2pixel;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray256_pixel2color);
+					INIT__vc_color2pixel(&pdep_gray256_color2pixel);
+				} else {
+					INIT__vc_pixel2color(&l8_pixel2color);
+					INIT__vc_color2pixel(&l8_color2pixel);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 4) {
-				self->vc_pixel2color = need_mask ? &pext_gray16_pixel2color : &l4_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray16_color2pixel : &l4_color2pixel;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray16_pixel2color);
+					INIT__vc_color2pixel(&pdep_gray16_color2pixel);
+				} else {
+					INIT__vc_pixel2color(&l4_pixel2color);
+					INIT__vc_color2pixel(&l4_color2pixel);
+				}
 			} else if (self->vc_specs.vcs_cbits >= 2) {
-				self->vc_pixel2color = need_mask ? &pext_gray4_pixel2color : &l2_pixel2color;
-				self->vc_color2pixel = need_mask ? &pdep_gray4_color2pixel : &l2_color2pixel;
+				if (need_mask) {
+					INIT__vc_pixel2color(&pext_gray4_pixel2color);
+					INIT__vc_color2pixel(&pdep_gray4_color2pixel);
+				} else {
+					INIT__vc_pixel2color(&l2_pixel2color);
+					INIT__vc_color2pixel(&l2_color2pixel);
+				}
 			} else {
-				self->vc_pixel2color = &l1_pixel2color;
-				self->vc_color2pixel = &l1_color2pixel;
+				INIT__vc_pixel2color(&l1_pixel2color);
+				INIT__vc_color2pixel(&l1_color2pixel);
 			}
 		}
 	} else {
 		/* Fallback: must use generic PEXT/PDEP encode/decode functions. */
 		bool has_alpha = self->vcc_used_amask != 0;
-		self->vc_pixel2color = has_alpha ? &pext_rgba_pixel2color : &pext_rgb_pixel2color;
-		self->vc_color2pixel = has_alpha ? &pdep_rgba_color2pixel : &pdep_rgb_color2pixel;
+		/* TODO: Codecs with >8 bits for some channel need to use custom
+		 *       callbacks for `vc_color2pixel64' /  `vc_pixel2color64',
+		 *       even though they still use <=32-bit pixels.
+		 * The  default ones linked here will just strip the extra bits
+		 * during color conversion, meaning that e.g. RGBA1010102 would
+		 * lose the least significant 2 bits of color information. */
+		if (has_alpha) {
+			INIT__vc_pixel2color(&pext_rgba_pixel2color);
+			INIT__vc_color2pixel(&pdep_rgba_color2pixel);
+		} else {
+			INIT__vc_pixel2color(&pext_rgb_pixel2color);
+			INIT__vc_color2pixel(&pdep_rgb_color2pixel);
+		}
 
 		/* Optimization for codecs where masks are continuous (meaning PDEP/PEXT aren't needed) */
 #ifdef HAVE_shft_channel_decode
 		if (self->vcc_shft_rmask != (shift_t)-1 && self->vcc_shft_gmask != (shift_t)-1 &&
 		    self->vcc_shft_bmask != (shift_t)-1 && self->vcc_shft_amask != (shift_t)-1) {
 #ifdef HAVE_shft_channel_decode_nomiss
-				bool hasmiss = (self->vcc_miss_rbits | self->vcc_miss_gbits |
+			bool hasmiss = (self->vcc_miss_rbits | self->vcc_miss_gbits |
 			                self->vcc_miss_bbits | self->vcc_miss_abits) != 0;
 			if (!hasmiss) {
-				self->vc_pixel2color = has_alpha ? &shft_rgba_pixel2color_nomiss
-				                                 : &shft_rgb_pixel2color_nomiss;
+				if (has_alpha) {
+					INIT__vc_pixel2color(&shft_rgba_pixel2color_nomiss);
+				} else {
+					INIT__vc_pixel2color(&shft_rgb_pixel2color_nomiss);
+				}
 			} else
 #endif /* HAVE_shft_channel_decode_nomiss */
 			{
-				self->vc_pixel2color = has_alpha ? &shft_rgba_pixel2color
-				                                 : &shft_rgb_pixel2color;
+				if (has_alpha) {
+					INIT__vc_pixel2color(&shft_rgba_pixel2color);
+				} else {
+					INIT__vc_pixel2color(&shft_rgb_pixel2color);
+				}
 			}
-			self->vc_color2pixel = has_alpha ? &shft_rgba_color2pixel
-			                                 : &shft_rgb_color2pixel;
+			if (has_alpha) {
+				INIT__vc_color2pixel(&shft_rgba_color2pixel);
+			} else {
+				INIT__vc_color2pixel(&shft_rgb_color2pixel);
+			}
 		}
 #endif /* HAVE_shft_channel_decode */
 
@@ -5666,8 +6170,8 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			                                        self->vc_specs.vcs_bmask,
 			                                        self->vc_specs.vcs_amask);
 			if (encode_codec) {
-				self->vc_pixel2color = encode_codec->vc_pixel2color;
-				self->vc_color2pixel = encode_codec->vc_color2pixel;
+				INIT__vc_pixel2color(encode_codec->vc_pixel2color);
+				INIT__vc_color2pixel(encode_codec->vc_color2pixel);
 			} else {
 				/* Even if no codec exists for the true masks, we might  still
 				 * find one for the truncated decode-masks when the codec uses
@@ -5685,11 +6189,13 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 					 * "vc_pixel2color" can be inherited because it is a decoder
 					 * that loads only  the most significant  (up-to) 8 bits  of
 					 * each color channel. */
-					self->vc_pixel2color = decode_codec->vc_pixel2color;
+					INIT__vc_pixel2color(decode_codec->vc_pixel2color);
 				}
 			}
 		}
 	}
+#undef INIT__vc_pixel2color
+#undef INIT__vc_color2pixel
 got_p2c:
 
 	/* Figure out which pixel conversion init-function to use */
