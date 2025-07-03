@@ -133,7 +133,7 @@ BEGIN
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		DEFINE_SIMPLE_LIBRARY("libvm86")
 		DEFINE_SIMPLE_LIBRARY("libemu86")
-		DEFINE_SIMPLE_LIBRARY("libbios86")
+		DEFINE_SIMPLE_LIBRARY("libbios86", USELIB("libphys") USELIB("libvm86"))
 		DEFINE_SIMPLE_LIBRARY("libpciaccess", USELIB("libphys") LD_FLAGS({ "-fini=libpci_fini" }))
 		DEFINE_SIMPLE_LIBRARY("libsvgadrv", USELIB("libphys"))
 
