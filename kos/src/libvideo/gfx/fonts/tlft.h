@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <bits/crt/mapfile.h>
 #include <kos/anno.h>
 #include <kos/types.h>
 
@@ -37,9 +38,9 @@
 DECL_BEGIN
 
 struct tlft_font: video_font {
-	TLFT_Hdr      *tf_hdr;        /* [1..tf_siz][owned][const] mmaped file base */
-	size_t         tf_siz;        /* [const] mmap-ed file size */
-	TLFT_UniGroup *tf_grps;       /* [0..tf_hdr->h_ngroups][const] Unicode groups. */
+	struct mapfile tf_map;
+#define tlft_font_gethdr(self) ((TLFT_Hdr *)(self)->tf_map.mf_addr)
+	TLFT_UniGroup *tf_grps;       /* [0..tlft_font_gethdr(this)->h_ngroups][const] Unicode groups. */
 	byte_t        *tf_ascii;      /* [1..1][const] Ascii character bitmaps (`h_ascii'). */
 	byte_t        *tf_chars;      /* [1..1][const] Unicode character bitmaps (`h_chars'). */
 	uintptr_t      tf_bestheight; /* [const] Font height for best results. */
@@ -49,10 +50,10 @@ struct tlft_font: video_font {
 INTDEF ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void);
 #define libvideo_tlft_ops (*_libvideo_tlft_ops())
 
-/* Returns `(REF struct video_font *)-1'  if  not  a  tlft  file.
- * Upon success, the mmap-ed region `base...+=size' is inherited. */
+/* Returns `(REF struct video_font *)-1' if not a tlft file.
+ * Upon  success,  the  mmap-ed  region  `mf'  is inherited. */
 INTDEF WUNUSED NONNULL((1)) REF struct video_font *CC
-libvideo_font_tryopen_tlft(void *base, size_t size);
+libvideo_font_tryopen_tlft(struct mapfile const *__restrict mf);
 
 DECL_END
 

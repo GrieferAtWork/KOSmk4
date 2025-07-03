@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBVIDEO_GFX_FONTS_TLFT_C
 #define GUARD_LIBVIDEO_GFX_FONTS_TLFT_C 1
 #define TLFT_NO_LOOKUP 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -51,9 +52,8 @@ DECL_BEGIN
 /* Destroy the given video font object. */
 PRIVATE NONNULL((1)) void CC
 libvideo_tlft_destroy(struct video_font *__restrict self) {
-	struct tlft_font *me;
-	me = (struct tlft_font *)self;
-	(void)munmap(me->tf_hdr, me->tf_siz);
+	struct tlft_font *me = (struct tlft_font *)self;
+	(void)unmapfile(&me->tf_map);
 	(void)free(me);
 }
 
@@ -64,15 +64,15 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
                      char16_t ord) {
 	uint8_t i;
 	if (ord >= 0x0020 && ord <= 0x007e)
-		return self->tf_ascii + ((ord - 0x0020) << self->tf_hdr->h_log2chsize);
-	BSEARCH_RANGE (i, self->tf_grps, self->tf_hdr->h_ngroups,
+		return self->tf_ascii + ((ord - 0x0020) << tlft_font_gethdr(self)->h_log2chsize);
+	BSEARCH_RANGE (i, self->tf_grps, tlft_font_gethdr(self)->h_ngroups,
 	               /*item*/ .ug_minuni,
 	               /*item*/ .ug_maxuni,
 	               (uint16_t)ord) {
 		/* Found it! */
 		return self->tf_chars + ((self->tf_grps[i].ug_offset +
 		                          ((uint16_t)ord - self->tf_grps[i].ug_minuni))
-		                         << self->tf_hdr->h_log2chsize);
+		                         << tlft_font_gethdr(self)->h_log2chsize);
 	}
 	return NULL;
 }
@@ -85,9 +85,9 @@ libvideo_tlft_glyphsize(struct video_font const *__restrict self,
 	video_dim_t result;
 	me = (struct tlft_font *)self;
 	if (height == me->tf_bestheight) {
-		result = me->tf_hdr->h_chwidth;
+		result = tlft_font_gethdr(me)->h_chwidth;
 	} else {
-		result = ((height * me->tf_hdr->h_chwidth) +
+		result = ((height * tlft_font_gethdr(me)->h_chwidth) +
 		          (me->tf_bestheight / 2)) /
 		         me->tf_bestheight;
 	}
@@ -118,7 +118,7 @@ libvideo_tlft_drawglyph2(struct video_font const *__restrict self,
 	bitmask.vbm_skip = 0;
 	if (height == me->tf_bestheight) {
 		/* Can just directly blit the glyph */
-		result = me->tf_hdr->h_chwidth;
+		result = tlft_font_gethdr(me)->h_chwidth;
 		bitmask.vbm_scan = result;
 		video_gfx_absfillmask(/* self:         */ gfx,
 		                      /* x:            */ x,
@@ -129,19 +129,19 @@ libvideo_tlft_drawglyph2(struct video_font const *__restrict self,
 		                      /* bitmask:      */ &bitmask);
 	} else {
 		/* Must stretch the glyph somehow... */
-		result = ((height * me->tf_hdr->h_chwidth) +
+		result = ((height * tlft_font_gethdr(me)->h_chwidth) +
 		          (me->tf_bestheight / 2)) /
 		         me->tf_bestheight;
 		if unlikely(!result)
 			result = 1;
-		bitmask.vbm_scan = me->tf_hdr->h_chwidth;
+		bitmask.vbm_scan = tlft_font_gethdr(me)->h_chwidth;
 		video_gfx_absfillstretchmask(/* self:         */ gfx,
 		                             /* dst_x:        */ x,
 		                             /* dst_y:        */ y,
 		                             /* dst_size_x:   */ result,
 		                             /* dst_size_y:   */ height,
 		                             /* bg_fg_colors: */ bg_fg_colors,
-		                             /* src_size_x:   */ me->tf_hdr->h_chwidth,
+		                             /* src_size_x:   */ tlft_font_gethdr(me)->h_chwidth,
 		                             /* src_size_y:   */ me->tf_bestheight,
 		                             /* bitmask:      */ &bitmask);
 	}
@@ -174,12 +174,12 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_font_ops *CC _libvideo_tlft_ops(void
 /* Returns `(REF struct video_font *)-1'  if  not  a  tlft  file.
  * Upon success, the mmap-ed region `base...+=size' is inherited. */
 INTERN WUNUSED NONNULL((1)) REF struct video_font *CC
-libvideo_font_tryopen_tlft(void *base, size_t size) {
+libvideo_font_tryopen_tlft(struct mapfile const *__restrict mf) {
 	TLFT_Hdr *hdr;
 	REF struct tlft_font *result;
 	uintptr_t chend;
-	hdr = (TLFT_Hdr *)base;
-	if unlikely(size < sizeof(TLFT_Hdr))
+	hdr = (TLFT_Hdr *)mf->mf_addr;
+	if unlikely(mf->mf_size < sizeof(TLFT_Hdr))
 		goto err_inval;
 
 	/* Verify the magic header. */
@@ -206,8 +206,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 	result = (REF struct tlft_font *)malloc(sizeof(struct tlft_font));
 	if unlikely(!result)
 		goto done;
-	result->tf_hdr = hdr; /* Inherited (on success) */
-	result->tf_siz = size;
+	result->tf_map = *mf; /* Inherited (on success) */
 	if unlikely(!hdr->h_chwidth)
 		goto err_inval_r;
 	if (OVERFLOW_UADD((uintptr_t)hdr, hdr->h_hdrsize,
@@ -227,7 +226,7 @@ libvideo_font_tryopen_tlft(void *base, size_t size) {
 	                  (uintptr_t)hdr->h_nchars << hdr->h_log2chsize,
 	                  &chend))
 		goto err_inval_r;
-	if unlikely(chend > ((uintptr_t)base + size))
+	if unlikely(chend > ((uintptr_t)hdr + mf->mf_size))
 		goto err_inval_r;
 
 	/* Pre-calculate some values. */

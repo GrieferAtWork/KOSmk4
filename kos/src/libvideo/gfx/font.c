@@ -19,8 +19,9 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_FONT_C
 #define GUARD_LIBVIDEO_GFX_FONT_C 1
-#define _GNU_SOURCE 1
 #define _FILE_OFFSET_BITS 64
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -28,23 +29,19 @@
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
-#include <kos/types.h>
 #include <parts/uchar/format-printer.h> /* C32FORMATPRINTER_CC */
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 
 #include <alloca.h>
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <format-printer.h> /* FORMATPRINTER_CC */
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 #include <unicode.h>
-#include <unistd.h>
 
+#include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
@@ -54,25 +51,14 @@
 
 DECL_BEGIN
 
-
 PRIVATE WUNUSED REF struct video_font *CC
-libvideo_font_openfd(fd_t fd) {
-	void *base;
-	struct stat st;
+libvideo_font_openfile(char const *filename) {
+	struct mapfile mf;
 	REF struct video_font *result;
-	if unlikely(fstat(fd, &st))
-		goto err;
-#if __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__
-	if unlikely(st.st_size > SIZE_MAX) {
-		errno = EINVAL;
-		goto err;
-	}
-#endif /* __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__ */
 	/* Map the font file into memory. */
-	base = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if unlikely(base == MAP_FAILED)
+	if unlikely(mapfile(&mf, filename, 0, 0, (size_t)-1, 0, 0))
 		goto err;
-	result = libvideo_font_tryopen_tlft(base, (size_t)st.st_size);
+	result = libvideo_font_tryopen_tlft(&mf);
 	if (!result)
 		goto err_unmap;
 	if (result != (REF struct video_font *)-1)
@@ -82,7 +68,7 @@ libvideo_font_openfd(fd_t fd) {
 	/* ... */
 	errno = EINVAL; /* Bad file format. */
 err_unmap:
-	(void)munmap(base, (size_t)st.st_size);
+	(void)unmapfile(&mf);
 err:
 	return NULL;
 }
@@ -90,8 +76,6 @@ err:
 
 PRIVATE WUNUSED REF struct video_font *CC
 libvideo_font_create(char const *__restrict name) {
-	REF struct video_font *result;
-	fd_t fd;
 	char *full_name;
 	if (strchr(name, '/')) {
 		full_name = (char *)name;
@@ -106,14 +90,7 @@ libvideo_font_create(char const *__restrict name) {
 		p = (char *)mempcpy(p, name, namelen * sizeof(char));
 		*p = 0;
 	}
-	fd = open(full_name, O_RDONLY | O_CLOEXEC);
-	if unlikely(fd < 0)
-		goto err;
-	result = libvideo_font_openfd(fd);
-	close(fd);
-	return result;
-err:
-	return NULL;
+	return libvideo_font_openfile(full_name);
 }
 
 
