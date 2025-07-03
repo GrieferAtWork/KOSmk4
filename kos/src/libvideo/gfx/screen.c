@@ -55,6 +55,7 @@
 #include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/codecs-extra.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
@@ -155,7 +156,8 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 	(void)close(me->ss_vdlck);
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
-	video_codec_handle_decref(me->ss_codec_handle);
+	if (me->ss_codec_handle)
+		video_codec_handle_decref(me->ss_codec_handle);
 	(void)free(me);
 }
 
@@ -427,10 +429,15 @@ find_hinted_mode:
 	}
 
 	/* Convert the SVGA video mode into libvideo codec specs. */
-	svga_modeinfo_to_codec_specs(mode, &codec_specs);
+	if (mode->smi_bits_per_pixel == 4) {
+		result->ss_codec_handle = NULL;
+		result->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_X_VBE16);
+	} else {
+		svga_modeinfo_to_codec_specs(mode, &codec_specs);
 
-	/* Build a codec from the newly constructed specs. */
-	result->vb_format.vf_codec = video_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
+		/* Build a codec from the newly constructed specs. */
+		result->vb_format.vf_codec = video_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
+	}
 	if (!result->vb_format.vf_codec) {
 		LOGERR("No codec for SVGA video mode\n");
 		errno = ENODEV;
@@ -523,7 +530,8 @@ err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal:
 	if (result->vb_format.vf_pal)
 		video_palette_decref(result->vb_format.vf_pal);
 err_svga_vdlck_libsvgadrv_r_cs_mode_codec:
-	video_codec_handle_decref(result->ss_codec_handle);
+	if (result->ss_codec_handle)
+		video_codec_handle_decref(result->ss_codec_handle);
 err_svga_vdlck_libsvgadrv_r_cs_mode:
 	freea(mode);
 err_svga_vdlck_libsvgadrv_r_cs:

@@ -189,7 +189,7 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 #define SETPIXEL(line, x, v)                               \
 	do {                                                   \
 		byte_t *p   = line + (((x) >> 3) << 2);            \
-		byte_t mask = 1 << (7 - ((x) & 7));                \
+		byte_t mask = (byte_t)1 << (7 - ((x) & 7));        \
 		p[0] = (p[0] & ~mask) | (mask * (((v) >> 0) & 1)); \
 		p[1] = (p[1] & ~mask) | (mask * (((v) >> 1) & 1)); \
 		p[2] = (p[2] & ~mask) | (mask * (((v) >> 2) & 1)); \

@@ -222,6 +222,7 @@
 #define VIDEO_CODEC_FLAG_INTERP8888 0x08 /* When interpreted as uint8_t[4], pixel values can be interpolated directly (as opposed to converting to colors, interpolating,
                                           * then converting back)  This applies  to all  codecs supporting linear  blending, that  also make  use of  8-bits-per-channel.
                                           * The caller need not pre-calculate this flag for `video_codec_fromspecs' */
+#define VIDEO_CODEC_FLAG_SPECIAL    0x80 /* Special video codec that cannot be represented using `vcs_*mask' */
 #define VIDEO_CODEC_FLAG_ISLSB(x) ((x) & VIDEO_CODEC_FLAG_LSB)
 #define VIDEO_CODEC_FLAG_ISMSB(x) (!((x) & VIDEO_CODEC_FLAG_LSB))
 

@@ -42,6 +42,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/codec/palette.h>
 
 #include "converter.h"
+#include "codec-utils.h"
 
 #ifndef BITSOF
 #define BITSOF(x) (sizeof(x) * NBBY)
@@ -259,16 +260,6 @@ map_bswap_rol16_plus_drv0(struct video_converter const *__restrict self, video_p
 /************************************************************************/
 /* PIXEL CONVERSION INITIALIZERS                                        */
 /************************************************************************/
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
-identity_color2pixel(struct video_format const *__restrict format, video_color_t value);
-#define identity_pixel2color identity_color2pixel
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
-rgbx8888_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
-pal_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
-pal_color2pixel(struct video_format const *__restrict format, video_color_t color);
-
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
 initconv_from_generic(struct video_converter *__restrict self) {
@@ -383,9 +374,9 @@ initconv_from_rgb(struct video_converter *__restrict self) {
 			self->vcv_mappixel = self->_vcv_xdriver[0] ? &map_rol16_plus_drv0 : &map_rol16;
 			goto done;
 		} else {
-			video_pixel_t sw_from_rmask = px_bswap(from_codec->vc_specs.vcs_rmask);
-			video_pixel_t sw_from_gmask = px_bswap(from_codec->vc_specs.vcs_gmask);
-			video_pixel_t sw_from_bmask = px_bswap(from_codec->vc_specs.vcs_bmask);
+			video_pixel_t sw_from_rmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_rmask);
+			video_pixel_t sw_from_gmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_gmask);
+			video_pixel_t sw_from_bmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_bmask);
 			if (sw_from_rmask == to_codec->vc_specs.vcs_rmask &&
 			    sw_from_gmask == to_codec->vc_specs.vcs_gmask &&
 			    sw_from_bmask == to_codec->vc_specs.vcs_bmask) {
@@ -464,10 +455,10 @@ initconv_from_rgba(struct video_converter *__restrict self) {
 			self->vcv_mappixel = &map_rol16;
 			goto done;
 		} else {
-			video_pixel_t sw_from_rmask = px_bswap(from_codec->vc_specs.vcs_rmask);
-			video_pixel_t sw_from_gmask = px_bswap(from_codec->vc_specs.vcs_gmask);
-			video_pixel_t sw_from_bmask = px_bswap(from_codec->vc_specs.vcs_bmask);
-			video_pixel_t sw_from_amask = px_bswap(from_codec->vc_specs.vcs_amask);
+			video_pixel_t sw_from_rmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_rmask);
+			video_pixel_t sw_from_gmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_gmask);
+			video_pixel_t sw_from_bmask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_bmask);
+			video_pixel_t sw_from_amask = px_bswap((video_pixel_t)from_codec->vc_specs.vcs_amask);
 			if (sw_from_rmask == to_codec->vc_specs.vcs_rmask &&
 			    sw_from_gmask == to_codec->vc_specs.vcs_gmask &&
 			    sw_from_bmask == to_codec->vc_specs.vcs_bmask &&

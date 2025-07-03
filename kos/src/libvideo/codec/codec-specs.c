@@ -40,6 +40,7 @@
 #include <libvideo/codec/codecs.h>
 
 #include "codec-specs.h"
+#include "codec-utils.h"
 #include "codecs.h"
 
 DECL_BEGIN
