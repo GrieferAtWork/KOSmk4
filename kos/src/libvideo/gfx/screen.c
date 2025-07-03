@@ -560,6 +560,13 @@ err:
  *               before us). */
 INTERN WUNUSED REF struct screen_buffer *CC
 libvideo_screen_buffer_create(struct screen_buffer_hint *hint) {
+	/* TODO: This function is badly designed (or at least not fully thought through)
+	 *       There needs to another  abstraction layer "video_monitor" that  manages
+	 *       and  returns the actual video_buffer-s, as well as includes the ability
+	 *       to **change** resolution  in such a  way that doing  so causes any  old
+	 *       video buffer to lose access to video memory (such that any further  GFX
+	 *       operations are no-ops, and locking video memory always fails). */
+
 	/* XXX: Support for other video drivers would go here... */
 	return (REF struct screen_buffer *)svga_newscreen(hint);
 }

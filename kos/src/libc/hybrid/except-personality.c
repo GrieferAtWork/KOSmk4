@@ -27,6 +27,7 @@
 #include <kos/bits/except-register-state-helpers.h>
 #include <kos/bits/except-register-state.h>
 #include <kos/except.h>
+#include <kos/exec/idata.h>
 #include <kos/types.h>
 
 #include <ctype.h>
@@ -51,6 +52,13 @@
 DECL_BEGIN
 
 struct cxx_std_typeinfo;
+#ifdef _GLIBCXX_VTABLE_PADDING
+#define _EXTRA_SIZEOF_cxx_std_typeinfo_vtable_struct 2
+#else /* _GLIBCXX_VTABLE_PADDING */
+#define _EXTRA_SIZEOF_cxx_std_typeinfo_vtable_struct 0
+#endif /* !_GLIBCXX_VTABLE_PADDING */
+#define SIZEOF_cxx_std_typeinfo_vtable_struct \
+	((_EXTRA_SIZEOF_cxx_std_typeinfo_vtable_struct + 3) * __SIZEOF_POINTER__)
 struct cxx_std_typeinfo_vtable_struct {
 	ptrdiff_t tiv_whole_object;
 #ifdef _GLIBCXX_VTABLE_PADDING
@@ -69,6 +77,9 @@ struct cxx_std_typeinfo_vtable_struct {
 #endif /* !__KERNEL__ */
 };
 
+static_assert(sizeof(struct cxx_std_typeinfo_vtable_struct) ==
+              SIZEOF_cxx_std_typeinfo_vtable_struct);
+
 struct cxx_std_typeinfo {
 	struct cxx_std_typeinfo_vtable_struct *ti_vtable;
 	char const                            *ti_name;
@@ -79,16 +90,24 @@ cxx_std_typeinfo_getname(struct cxx_std_typeinfo *self) {
 	return self->ti_name;
 }
 
-DEFINE_PUBLIC_ALIAS(_ZTVN10__cxxabiv117__class_type_infoE, cxx_std_typeinfo_vtable);
-DEFINE_PUBLIC_ALIAS(_ZTVN10__cxxabiv120__si_class_type_infoE, cxx_std_typeinfo_vtable);
-INTERN struct cxx_std_typeinfo_vtable_struct cxx_std_typeinfo_vtable = {
+PRIVATE struct cxx_std_typeinfo_vtable_struct cxx_std_typeinfo_vtable = {
 	.tiv_whole_object = 0,
 	.tiv_whole_type   = NULL, /* This would need to be the `&typeinfo(std::type_info)', but we don't care... */
-	.tiv_getname      = &cxx_std_typeinfo_getname,
 };
 
+DEFINE_PUBLIC_IDATA(_ZTVN10__cxxabiv117__class_type_infoE, resolve_cxx_std_typeinfo_vtable, SIZEOF_cxx_std_typeinfo_vtable_struct);
+DEFINE_PUBLIC_IDATA(_ZTVN10__cxxabiv120__si_class_type_infoE, resolve_cxx_std_typeinfo_vtable, SIZEOF_cxx_std_typeinfo_vtable_struct);
+INTERN SECTION_EXCEPT_TEXT struct cxx_std_typeinfo_vtable_struct *
+NOTHROW(LIBCCALL resolve_cxx_std_typeinfo_vtable)(void) {
+	if (cxx_std_typeinfo_vtable.tiv_getname == NULL) {
+		cxx_std_typeinfo_vtable.tiv_getname = &cxx_std_typeinfo_getname;
+	}
+	return &cxx_std_typeinfo_vtable;
+}
 
-LOCAL WUNUSED ATTR_CONST unsigned int FCALL
+
+
+LOCAL SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST unsigned int FCALL
 size_of_encoded_value(unsigned char encoding) {
 #if ((DW_EH_PE_absptr | DW_EH_PE_signed) == DW_EH_PE_signed && \
      (DW_EH_PE_udata2 | DW_EH_PE_signed) == DW_EH_PE_sdata2 && \
@@ -182,7 +201,7 @@ size_of_encoded_value(unsigned char encoding) {
  * - kos::except::class_filter<except_class_t>: "N3kos6except12class_filterILy<"%d" % except_class()>EEE"
  * - kos::except::code_filter<except_code_t>:   "N3kos6except11code_filterILj<"%d" % except_code()>EEE"
  */
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool FCALL
+LOCAL SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) bool FCALL
 kos_exceptfilter_matches_current_exception(char const *cxx_typename) {
 	static char const common_prefix[] = "N3kos6except";
 	static char const class_filter_prefix[] = "12class_filterIL" _CXX_TEMPLATE_ARG_Un(__SIZEOF_EXCEPT_CLASS_T__);
