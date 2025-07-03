@@ -40,28 +40,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "codec-utils.h"
 #include "converter.h"
 
-#if defined(NDEBUG) || 1
-#if 1 /* Turn codec assertions into compile-time assumptions for max speed */
-#ifdef __CRT_UBSAN_BUILTIN_UNREACHABLE
-#undef __CRT_UBSAN_BUILTIN_UNREACHABLE
-#undef __builtin_unreachable /* Disable binding of "__ubsan_handle_builtin_unreachable" */
-#endif /* __CRT_UBSAN_BUILTIN_UNREACHABLE */
-#define codec_assert(x)       __builtin_assume(x)
-#define codec_assertf(x, ...) __builtin_assume(x)
-#else
-#define codec_assert(x)       (void)0
-#define codec_assertf(x, ...) (void)0
-#endif
-#else /* ... */
-#include <assert.h>
-#define codec_assert  assert
-#define codec_assertf assertf
-#endif /* !... */
-
 DECL_BEGIN
-
-#undef video_codec_setpixel_t
-#undef vc_setpixel
 
 #ifdef VIDEO_CODEC_X_VBE16
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
