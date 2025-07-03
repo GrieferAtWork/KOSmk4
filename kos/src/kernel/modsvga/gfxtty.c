@@ -45,8 +45,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #define PLANAR
 #include "gfxtty.c.inl"
 
-//TODO:#define BPP 4
-//TODO:#include "gfxtty.c.inl"
+#define BPP 4
+#include "gfxtty.c.inl"
 
 #define BPP 8
 #include "gfxtty.c.inl"

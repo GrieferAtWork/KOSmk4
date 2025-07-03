@@ -623,11 +623,13 @@ NOTHROW(FCALL svga_ttyaccess_gfx_set_modeops)(struct svga_ttyaccess_gfx *__restr
 		SETOPS(2_p);
 		break;
 
-//TODO:	case 3 ... 4:
-//TODO:		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
-//TODO:			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
-//TODO:		SETOPS(4);
-//TODO:		break;
+	case 3 ... 4:
+		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))
+			goto notsup; /* TODO: Auto-window selection via custom #PF handling */
+		if (mode->smi_flags & SVGA_MODEINFO_F_PLANAR)
+			goto notsup;
+		SETOPS(4);
+		break;
 
 	case 5 ... 8:
 		if (!(mode->smi_flags & SVGA_MODEINFO_F_LFB))

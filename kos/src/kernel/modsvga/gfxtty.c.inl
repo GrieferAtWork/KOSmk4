@@ -18,8 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#define BPP 2
-#define PLANAR
+#define BPP 4
+//#define PLANAR
 #include "gfxtty.c"
 #endif /* __INTELLISENSE__ */
 
@@ -164,7 +164,271 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cursor_gfx, BPP))(struct svga_ttya
 }
 
 #elif BPP == 4
-#error TODO
+
+#ifdef PLANAR
+#error "BPP == 4 only exists in non-PLANAR mode"
+#endif /* !PLANAR */
+
+
+/* Very weird pixel-format. You'd think this was
+ * >> Byte:  B1......B2......B3......B4......B5......B6......B7......B8......
+ * >> Pixel: AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIJJJJKKKKLLLLMMMMNNNNOOOOPPPP
+ * >> Bit:   3210321032103210321032103210321032103210321032103210321032103210
+ *
+ * But it's actually like this:
+ * >> Byte:  B1......B2......B3......B4......B5......B6......B7......B8......
+ * >> Pixel: ABCDEFGHABCDEFGHABCDEFGHABCDEFGHIJKLMNOPIJKLMNOPIJKLMNOPIJKLMNOP
+ * >> Bit:   1111111122222222333333334444444411111111222222223333333344444444
+ *
+ * iow: the  4 bits of  every pixel are  written across 4 consecutive
+ *      bytes, and on-top of that, they are written in reverse order!
+ *
+ * This format is actually closer to 1_p (planar 1bpp), except that the planes
+ * have all been stamped down into a linear buffer, with planes switch  places
+ * with each other every 4 bytes. */
+#define SETPIXEL(line, x, v)                               \
+	do {                                                   \
+		byte_t *p   = line + (((x) >> 3) << 2);            \
+		byte_t mask = 1 << (7 - ((x) & 7));                \
+		p[0] = (p[0] & ~mask) | (mask * (((v) >> 0) & 1)); \
+		p[1] = (p[1] & ~mask) | (mask * (((v) >> 1) & 1)); \
+		p[2] = (p[2] & ~mask) | (mask * (((v) >> 2) & 1)); \
+		p[3] = (p[3] & ~mask) | (mask * (((v) >> 3) & 1)); \
+	}	__WHILE0
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx4)(struct svga_ttyaccess_gfx *__restrict self,
+                                                 uintptr_t address) {
+#if 1
+	struct svga_gfxcell const *cell;
+	uintptr_half_t cellx, celly;
+	uintptr_half_t y, xoff;
+	byte_t *dst;
+	byte_t *base;
+	uint8_t plane;
+
+	cellx = address % self->vta_scan;
+	celly = address / self->vta_scan;
+	base  = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	base += (celly * self->stx_cellscan);
+	base += ((cellx * CELLSIZE_X) / 8) * 4;
+	xoff = (uintptr_half_t)(cellx * CELLSIZE_X) % 8;
+
+	/* Load colors. */
+	cell = &self->stx_display[address];
+
+	/* Go through scanlines. */
+	for (plane = 0; plane < 4; ++plane) {
+		dst = base + plane;
+		for (y = 0; y < CELLSIZE_Y; ++y) {
+			uint8_t mask;
+			union {
+				uint8_t b[2];
+				uint16_t w;
+			} vmem;
+
+			mask = cell->sgc_lines[y];
+
+			/* Apply colors
+			 *
+			 * Repeat for each of the 8 bits in `mask':
+			 * ```
+			 *     mask   fg   bg    result
+			 *        0    0    0    0
+			 *        0    0    1    1
+			 *        0    1    0    0
+			 *        0    1    1    1
+			 *        1    0    0    0
+			 *        1    0    1    0
+			 *        1    1    0    1
+			 *        1    1    1    1
+			 * ```
+			 * Solution: `result = (fg & mask) | (bg & ~mask);'
+			 *
+			 * Verbose code:
+			 * >> uint8_t bgfgbits[2], i, bit;
+			 * >> bgfgbits[0] = (cell->sgc_color >> (4 + plane)) & 1;
+			 * >> bgfgbits[1] = (cell->sgc_color >> plane) & 1;
+			 * >> for (i = 0; i < 8; ++i) {
+			 * >>     bit = (mask >> i) & 1;
+			 * >>     mask &= ~(1 << i);
+			 * >>     mask |= bgfgbits[bit] << i;
+			 * >> }
+			 */
+#if 1
+			{
+				uint8_t bg, fg;
+				bg   = ((cell->sgc_color >> (4 + plane)) & 1) * 0xff;
+				fg   = ((cell->sgc_color >> plane) & 1) * 0xff;
+				mask = (fg & mask) | (bg & ~mask);
+			}
+#else
+			{
+				uint8_t bgfgbits[2], i, bit;
+				bgfgbits[0] = (cell->sgc_color >> (4 + plane)) & 1;
+				bgfgbits[1] = (cell->sgc_color >> plane) & 1;
+				for (i = 0; i < 8; ++i) {
+					bit = (mask >> i) & 1;
+					mask &= ~(1 << i);
+					mask |= bgfgbits[bit] << i;
+				}
+			}
+#endif
+			switch (xoff) {
+
+			case 0:
+				/* 76543210|0_______ */
+				vmem.b[0] = mask;
+				vmem.b[1] = dst[4];
+				vmem.b[1] &= 0x7f;
+				vmem.b[1] |= (mask & 1) << 7;
+				break;
+
+#define BITMASK(n) ((1 << (n)) - 1)
+#define OVERRIDE_BITS(xoff)                                        \
+				vmem.b[0] = dst[0];                                \
+				vmem.b[1] = dst[4];                                \
+				vmem.b[0] &= ~BITMASK(8 - xoff);                   \
+				vmem.b[0] |= mask >> xoff;                         \
+				vmem.b[1] &= BITMASK(8 - (xoff + 1));              \
+				vmem.b[1] |= (mask & BITMASK(xoff)) << (8 - xoff); \
+				vmem.b[1] |= (mask & 1) << (8 - (xoff + 1));
+			case 1: OVERRIDE_BITS(1); break; /* _7654321|00______ */
+			case 2: OVERRIDE_BITS(2); break; /* __765432|100_____ */
+			case 3: OVERRIDE_BITS(3); break; /* ___76543|2100____ */
+			case 4: OVERRIDE_BITS(4); break; /* ____7654|32100___ */
+			case 5: OVERRIDE_BITS(5); break; /* _____765|432100__ */
+			case 6: OVERRIDE_BITS(6); break; /* ______76|5432100_ */
+#undef OVERRIDE_BITS
+
+			case 7:
+				/* _______7|65432100 */
+				vmem.b[0] = dst[0];
+				vmem.b[1] = (mask << 1) | (mask & 1);
+				vmem.b[0] &= 0xfe;
+				vmem.b[0] |= (mask & 0x80) >> 7;
+				break;
+
+			default: __builtin_unreachable();
+			}
+			dst[0] = vmem.b[0];
+			dst[4] = vmem.b[1];
+			dst += self->stx_scanline;
+		}
+	}
+#else
+	byte_t *line;
+	uintptr_half_t cellx, celly;
+	uintptr_half_t linex, y;
+	uint8_t colors[2];
+	struct svga_gfxcell const *cell;
+	cellx = address % self->vta_scan;
+	celly = address / self->vta_scan;
+	line  = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	line += (celly * self->stx_cellscan);
+	linex = (cellx * CELLSIZE_X);
+	cell = &self->stx_display[address];
+	colors[0] = self->stx_colors[(cell->sgc_color >> 4) & 0xf];
+	colors[1] = self->stx_colors[(cell->sgc_color) & 0xf];
+
+	for (y = 0; y < CELLSIZE_Y; ++y) {
+		uint8_t v, mask = cell->sgc_lines[y];
+		uintptr_half_t x;
+		for (x = 0; x < 8; ++x) {
+			v = colors[(mask >> (7 - x)) & 1];
+			SETPIXEL(line, linex + x, v);
+		}
+		v = colors[mask & 1];
+		SETPIXEL(line, linex + x, v);
+		line += self->stx_scanline;
+	}
+#endif
+}
+
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx4)(struct svga_ttyaccess_gfx *__restrict self) {
+#if 1
+	uintptr_half_t y, xoff;
+	byte_t *dst;
+	byte_t *base;
+	uint8_t plane;
+
+	/* Figure out where the cursor goes. */
+	base = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	base += self->stx_swcur.vtc_celly * self->stx_cellscan; /* Go to top-left of current line */
+	base += CURSOR_Y_OFFSET * self->stx_scanline;           /* Go to left of top-most cursor block */
+	base += (((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) / 8) * 4;
+	xoff = (uintptr_half_t)((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) % 8;
+
+	for (plane = 0; plane < 4; ++plane) {
+		dst = base + plane;
+		for (y = 0; y < CURSOR_HEIGHT; ++y) {
+#define CSHAPE 0x1ff /* Cursor horizontal shape (1: white bit; 0: black bit) */
+			union {
+				uint8_t b[2];
+				uint16_t w;
+			} vmem;
+			switch (xoff) {
+
+			case 0:
+				/* 87654321|0_______ */
+				vmem.b[0] = (CSHAPE >> 1);
+				vmem.b[1] = dst[4];
+				vmem.b[1] &= 0x7f;
+				vmem.b[1] |= (CSHAPE & 1) << 7;
+				break;
+
+#define BITMASK(n) ((1 << (n)) - 1)
+#define OVERRIDE_BITS(xoff)                                                 \
+				vmem.b[0] = dst[0];                                         \
+				vmem.b[1] = dst[4];                                         \
+				vmem.b[0] &= ~BITMASK(8 - xoff);                            \
+				vmem.b[0] |= (CSHAPE >> 1) >> xoff;                         \
+				vmem.b[1] &= BITMASK(8 - (xoff + 1));                       \
+				vmem.b[1] |= ((CSHAPE >> 1) & BITMASK(xoff)) << (8 - xoff); \
+				vmem.b[1] |= (CSHAPE & 1) << (8 - (xoff + 1));
+			case 1: OVERRIDE_BITS(1); break; /* _8765432|10______ */
+			case 2: OVERRIDE_BITS(2); break; /* __876543|210_____ */
+			case 3: OVERRIDE_BITS(3); break; /* ___87654|3210____ */
+			case 4: OVERRIDE_BITS(4); break; /* ____8765|43210___ */
+			case 5: OVERRIDE_BITS(5); break; /* _____876|543210__ */
+			case 6: OVERRIDE_BITS(6); break; /* ______87|6543210_ */
+#undef OVERRIDE_BITS
+
+			case 7:
+				/* _______8|76543210 */
+				vmem.b[0] = dst[0];
+				vmem.b[1] = CSHAPE & 0xff;
+				vmem.b[0] &= 0xfe;
+				vmem.b[0] |= (CSHAPE & 0x100) >> 8;
+				break;
+
+			default: __builtin_unreachable();
+			}
+			dst[0] = vmem.b[0];
+			dst[4] = vmem.b[1];
+			dst += self->stx_scanline;
+		}
+#undef CSHAPE
+	}
+#else
+	byte_t *line;
+	uintptr_half_t curx, y, x;
+
+	/* Figure out where the cursor goes. */
+	line = (byte_t *)mnode_getaddr(&self->sta_vmem);
+	line += self->stx_swcur.vtc_celly * self->stx_cellscan;
+	line += CURSOR_Y_OFFSET * self->stx_scanline;
+	curx = (self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET;
+	for (y = 0; y < CURSOR_HEIGHT; ++y) {
+		for (x = 0; x < CURSOR_WIDTH; ++x)
+			SETPIXEL(line, curx + x, self->stx_ccolor);
+		line += self->stx_scanline;
+	}
+#endif
+}
+
+#undef SETPIXEL
+
 #elif BPP == 2
 
 #ifndef PLANAR
@@ -247,8 +511,8 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx2_p)(struct svga_ttyaccess_gfx *__
 	cellx = address % self->vta_scan;
 	celly = address / self->vta_scan;
 	base  = (byte_t *)mnode_getaddr(&self->sta_vmem);
-	base += (uintptr_half_t)(celly * self->stx_cellscan);
-	base += (uintptr_half_t)(cellx * CELLSIZE_X) / 4;
+	base += (celly * self->stx_cellscan);
+	base += (cellx * CELLSIZE_X) / 4;
 	xoff = (uintptr_half_t)(cellx * CELLSIZE_X) % 4;
 
 	/* Load colors. */
@@ -379,8 +643,8 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cell_gfx1)(struct svga_ttyaccess_gfx *__re
 	cellx = address % self->vta_scan;
 	celly = address / self->vta_scan;
 	dst  = (byte_t *)mnode_getaddr(&self->sta_vmem);
-	dst += (uintptr_half_t)(celly * self->stx_cellscan);
-	dst += (uintptr_half_t)(cellx * CELLSIZE_X) / 8;
+	dst += (celly * self->stx_cellscan);
+	dst += (cellx * CELLSIZE_X) / 8;
 	xoff = (uintptr_half_t)(cellx * CELLSIZE_X) % 8;
 
 	/* Load colors. */
@@ -528,7 +792,7 @@ NOTHROW(FCALL svga_ttyaccess_v_redraw_cursor_gfx1)(struct svga_ttyaccess_gfx *__
 	dst = (byte_t *)mnode_getaddr(&self->sta_vmem);
 	dst += self->stx_swcur.vtc_celly * self->stx_cellscan; /* Go to top-left of current line */
 	dst += CURSOR_Y_OFFSET * self->stx_scanline;           /* Go to left of top-most cursor block */
-	dst += (uintptr_half_t)((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) / 8;
+	dst += ((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) / 8;
 	xoff = (uintptr_half_t)((self->stx_swcur.vtc_cellx * CELLSIZE_X) + CURSOR_X_OFFSET) % 8;
 
 #ifdef PLANAR
