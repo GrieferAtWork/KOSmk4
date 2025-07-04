@@ -2859,12 +2859,12 @@
 #define DEFINE_COLOR2PIXEL64_WRAPPER32(d,_,x)video_pixel64_t x(struct video_format const*__restrict format,video_color64_t color){}
 #define DEFINE_PIXEL64_WRAPPERS(d,x)video_color64_t x##_pixel2color64(struct video_format const*__restrict format,video_pixel64_t pixel){}video_pixel64_t x##_color2pixel64(struct video_format const*__restrict format,video_color64_t color){}
 #define LOCAL_FUNC64(x) x##_64
-#define DEFINE_GENERIC_linefill__with__setpixel(f,...)void f(byte_t*__restrict line,video_coord_t x,video_pixel_t pixel,video_dim_t num_pixels){}
-#define DEFINE_GENERIC_vertfill__with__setpixel(f,...)void f(byte_t*__restrict line,video_coord_t x,size_t stride,video_pixel_t pixel,video_dim_t num_pixels){}
-#define DEFINE_GENERIC_rectfill__with__linefill(f,...)void f(byte_t*__restrict line,video_coord_t x,size_t stride,video_pixel_t pixel,video_dim_t size_x,video_dim_t size_y){}
-#define DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(f,...)void f(byte_t*__restrict dst_line,video_coord_t dst_x,size_t dst_stride,byte_t const*__restrict src_line,video_coord_t src_x,size_t src_stride,video_dim_t size_x,video_dim_t size_y){}
-#define DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(f,...)void f(byte_t*__restrict dst_line,video_coord_t dst_x,byte_t const*__restrict src_line,video_coord_t src_x,size_t stride,video_dim_t size_x,video_dim_t size_y){}
-#define DEFINE_GENERIC_setpixel3__with__setpixel(f,...)void f(byte_t*__restrict line,video_coord_t x,video_pixel_t pixel){}
+#define DEFINE_GENERIC_linefill__with__setpixel(f,...)static void f(byte_t*__restrict line,video_coord_t x,video_pixel_t pixel,video_dim_t num_pixels){}
+#define DEFINE_GENERIC_vertfill__with__setpixel(f,...)static void f(byte_t*__restrict line,video_coord_t x,size_t stride,video_pixel_t pixel,video_dim_t num_pixels){}
+#define DEFINE_GENERIC_rectfill__with__linefill(f,...)static void f(byte_t*__restrict line,video_coord_t x,size_t stride,video_pixel_t pixel,video_dim_t size_x,video_dim_t size_y){}
+#define DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(f,...)static void f(byte_t*__restrict dst_line,video_coord_t dst_x,size_t dst_stride,byte_t const*__restrict src_line,video_coord_t src_x,size_t src_stride,video_dim_t size_x,video_dim_t size_y){}
+#define DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(f,...)static void f(byte_t*__restrict dst_line,video_coord_t dst_x,byte_t const*__restrict src_line,video_coord_t src_x,size_t stride,video_dim_t size_x,video_dim_t size_y){}
+#define DEFINE_GENERIC_setpixel3__with__setpixel(f,...)static void f(byte_t*__restrict line,video_coord_t x,video_pixel_t pixel){}
 #define DEFINE_PIXEL64_IO_WRAPPERS(...)
 #define DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(...)
 #define DEFINE_PIXEL64_IO_WRAPPERS__WITH_SUFFIX(...)

@@ -34,7 +34,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stddef.h>
 
 #include <libvideo/codec/codecs-extra.h>
-#include <libvideo/codec/format.h>
 #include <libvideo/codec/pixel.h>
 
 #include "codec-utils.h"
@@ -63,6 +62,13 @@ x_vbe16_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) 
 	line[1] = (line[1] & ~mask) | (mask * ((pixel >> 1) & 1));
 	line[2] = (line[2] & ~mask) | (mask * ((pixel >> 2) & 1));
 	line[3] = (line[3] & ~mask) | (mask * ((pixel >> 3) & 1));
+}
+
+PRIVATE NONNULL((3)) void CC
+x_vbe16_requirements(video_dim_t size_x, video_dim_t size_y,
+                     struct video_rambuffer_requirements *__restrict result) {
+	result->vbs_stride  = CEIL_ALIGN(size_x, 4) / 2;
+	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
 DEFINE_GENERIC_linefill__with__setpixel(x_vbe16_linefill, x_vbe16_setpixel)
@@ -100,7 +106,7 @@ libvideo_codec_lookup_extra(video_codec_t codec) {
 		                   /* vcs_gmask */ 0,
 		                   /* vcs_bmask */ 0,
 		                   /* vcs_amask */ 0),
-		                  buffer4_requirements,
+		                  x_vbe16_requirements,
 		                  x_vbe16_getpixel, x_vbe16_setpixel, x_vbe16_rectcopy, x_vbe16_rectmove,
 		                  x_vbe16_linefill, x_vbe16_vertfill, x_vbe16_rectfill,
 		                  pal_pixel2color, pal_color2pixel, initconv_from_p);

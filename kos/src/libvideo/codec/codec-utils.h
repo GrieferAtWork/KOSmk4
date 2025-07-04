@@ -33,7 +33,13 @@
 #include <kos/types.h>
 #include <sys/param.h>
 
+#include <stddef.h>
+
+#include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 
 DECL_BEGIN
 
@@ -530,13 +536,13 @@ INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t CC rgbx8888_pixel2color64
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 
-INTDEF NONNULL((3)) void CC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
 INTDEF NONNULL((3)) void CC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void CC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
 
 DECL_END
 
