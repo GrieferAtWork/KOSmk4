@@ -56,6 +56,50 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
 
+/* TODO: Window composition should be implemented by every window having 4 buffers:
+ * - Background buffer (RGB buffer that represents the full what lies behind the window)
+ *                      This buffer only exists when "Overlay buffer" is RGBA (else, it
+ *                      can be left as NULL)
+ * - Content buffer    (RGB/RGBA buffer of window contents as exposed to programs)
+ * - Display buffer    (RGB buffer that is always the result of GFX_BLENDMODE_ALPHA-blending
+ *                      "Content buffer" on-top  of "Background buffer".  This buffer  only
+ *                      exists when "Overlay buffer" is RGBA (else, it can be left as NULL)
+ * - Overlay buffer    (RGBA buffer that is GFX_BLENDMODE_ALPHA-blended on-top the
+ *                      content, to determine RGBA data composited over windows that
+ *                      lie behind this one)
+ * - Every window has a list of overlapping windows with a > Z-order
+ * - Every window has a list of overlapping windows with a < Z-order
+ *
+ * A window then tells the compositor that it has updated a "copy-rect" in "Content buffer"
+ * - if "Content buffer" is RGBA:
+ *   - GFX_BLENDMODE_ALPHA-blend "copy-rect" of "Content" onto "Background" and store result in "Display buffer"
+ *   - Use "Display buffer" as "Composited buffer" below
+ *   else:
+ *   - Use "Content buffer" as "Composited buffer" below
+ * - GFX_BLENDMODE_ALPHA-blend "Composited buffer" with relevant region of "Overlay" and show result on-screen
+ *   - Possible optimization here: if all relevant pixels from "Overlay" are opaque, no need to blit to screen
+ * - Iterate over list of windows with a > Z-order in ascending order:
+ *   - Truncate "copy-rect" to intersection with window
+ *   - if "Content buffer" is RGB, exit loop
+ *   - GFX_BLENDMODE_OVERRIDE-blend "Composited buffer" to "Background buffer" of window
+ *   - if last window in list, exit loop
+ *   - if "Composited buffer" is still the "Content buffer" of the original window, copy it now
+ *   - GFX_BLENDMODE_ALPHA-blend "Content buffer" of window onto "Composited buffer"
+ *   - continue with next window in stack
+ * - Iterate over list of windows with a < Z-order in descending order:
+ *   - GFX_BLENDMODE_ALPHA-blend "Overlay buffer" of window at Z-order+1 onto "Content buffer"
+ *     of  window  at  Z-order, and  store  result in  Overlay  buffer of  window  at Z-order.
+ *   - Possible optimization here: if all relevant pixels from "Content buffer" are opaque, exit loop
+ *   - continue with next window at Z-order-1
+ *   TODO: "Overlay buffer" should come with another bitmask that indicates pixels that
+ *         aren't fully opaque within the overlay, and the overlay should be allowed to
+ *         be  outdated for pixels that another overlays.  With this, we can fully skip
+ *         the second iteration  of windows with  a < Z-order  when the orignal  window
+ *         uses an RGB buffer, or all pixels in "copy-rect" are fully opaque.
+ *
+ * [*] Locking omitted from above code
+ */
+
 DECL_BEGIN
 
 static struct screen_rect const WHOLE_SCREEN = SCREEN_RECT_INIT_WHOLE_SCREEN;
