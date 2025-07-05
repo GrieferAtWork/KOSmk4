@@ -31,7 +31,7 @@
  *       exist  as `E_*' classes below. Also note that some exceptions may
  *       be merged with others,  while allowing for differentiation  using
  *       `except_info()' (most notably: `X86_E_SYSTEM_GP' as the result of
- *       non-canonical memory access is  thrown an `E_SEGFAULT', which  is
+ *       non-canonical memory access is  thrown as `E_SEGFAULT', which  is
  *       the same as `X86_E_SYSTEM_PF'). */
 #define X86_E_SYSTEM_DE   0xff00 /* Divide-by-zero. */
 #define X86_E_SYSTEM_DB   0xff01 /* Debug. */

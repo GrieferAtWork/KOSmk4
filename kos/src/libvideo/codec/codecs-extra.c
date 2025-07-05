@@ -102,10 +102,10 @@ libvideo_codec_lookup_extra(video_codec_t codec) {
 		                  (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_SPECIAL,
 		                   /* vcs_bpp   */ 4,
 		                   /* vcs_cbits */ 4,
-		                   /* vcs_rmask */ 0,
-		                   /* vcs_gmask */ 0,
-		                   /* vcs_bmask */ 0,
-		                   /* vcs_amask */ 0),
+		                   /* vcs_rmask */ 0,  /* Not representable, since masks change between pixels */
+		                   /* vcs_gmask */ 0,  /* ... */
+		                   /* vcs_bmask */ 0,  /* ... */
+		                   /* vcs_amask */ 0), /* ... */
 		                  x_vbe16_requirements,
 		                  x_vbe16_getpixel, x_vbe16_setpixel, x_vbe16_rectcopy, x_vbe16_rectmove,
 		                  x_vbe16_linefill, x_vbe16_vertfill, x_vbe16_rectfill,

@@ -28,6 +28,7 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/align.h>
 #include <hybrid/byteorder.h>
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <kos/types.h>
