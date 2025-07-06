@@ -1212,8 +1212,9 @@ PRIVATE struct video_gfx_ops LOCAL_libvideo_gfx_generic_ops_mirror = {};
 #define DEFINED_libvideo_gfx_ops_setcommon
 PRIVATE ATTR_INOUT(1) void CC
 libvideo_gfx_ops_setcommon(struct video_gfx_ops *__restrict self) {
-	self->vgfo_bitblit = &libvideo_gfx_generic_bitblit;
-	self->vgfo_stretch = &libvideo_gfx_generic_stretch;
+	self->vgfo_bitblit  = &libvideo_gfx_generic_bitblit;
+	self->vgfo_stretch  = &libvideo_gfx_generic_stretch;
+	self->vgfo_blitfrom = &libvideo_gfx_generic_blitfrom;
 }
 #endif /* !DEFINED_libvideo_gfx_ops_setcommon */
 

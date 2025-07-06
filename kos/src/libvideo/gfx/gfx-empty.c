@@ -47,14 +47,14 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+/* Empty GFX operators */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-libvideo_gfx_empty__blitto(struct video_blitter *__restrict ctx) {
+libvideo_gfx_empty_blitfrom(struct video_blitter *__restrict ctx) {
 	ctx->vbt_ops = &libvideo_blit_empty_ops;
 	DBG_memset(&ctx->_vbt_xops, 0xcc, sizeof(ctx->_vbt_xops));
 	return ctx;
 }
 
-/* Empty GFX operators */
 INTERN ATTR_IN(1) video_color_t CC
 libvideo_gfx_empty_getcolor(struct video_gfx const *__restrict UNUSED(self),
                             video_offset_t UNUSED(x), video_offset_t UNUSED(y)) {
@@ -154,6 +154,7 @@ libvideo_gfx_empty_stretch(struct video_gfx const *__restrict UNUSED(dst),
 PRIVATE struct video_gfx_ops libvideo_gfx_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_gfx_empty_ops(void) {
 	if unlikely(!libvideo_gfx_empty_ops.vgfo_getcolor) {
+		libvideo_gfx_empty_ops.vgfo_blitfrom        = &libvideo_gfx_empty_blitfrom;
 		libvideo_gfx_empty_ops.vgfo_bitblit         = &libvideo_gfx_empty_bitblit;
 		libvideo_gfx_empty_ops.vgfo_stretch         = &libvideo_gfx_empty_stretch;
 		libvideo_gfx_empty_ops.vgfo_vgradient       = &libvideo_gfx_empty_vgradient;
