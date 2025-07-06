@@ -96,6 +96,7 @@
  *         be  outdated for pixels that another overlays.  With this, we can fully skip
  *         the second iteration  of windows with  a < Z-order  when the orignal  window
  *         uses an RGB buffer, or all pixels in "copy-rect" are fully opaque.
+ *   TODO: When possible, the "Content buffer" should allow direct screen memory access
  *
  * [*] Locking omitted from above code
  */

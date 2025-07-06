@@ -182,8 +182,13 @@ DECL_BEGIN
 #define SET_vc_setpixel3_INITIALIZER(p, v)     /* nothing */
 #endif /* !VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
+#ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#define _UNPACK_CODEC_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
+	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, 0, rmask, gmask, bmask, amask }
+#else /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 #define _UNPACK_CODEC_SPECS(flags, bpp, cbits, rmask, gmask, bmask, amask) \
 	{ flags, CEILDIV(bpp, NBBY), bpp, cbits, rmask, gmask, bmask, amask }
+#endif /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 #if defined(__KERNEL__) || !defined(__pic__)
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,     \
                           getpixel, setpixel, rectcopy, rectmove,         \
