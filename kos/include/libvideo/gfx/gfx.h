@@ -115,30 +115,6 @@ struct video_bitmask {
 	__size_t    vbm_scan; /* # of bits that make up a scanline */
 };
 
-#ifdef LIBVIDEO_GFX_EXPOSE_INTERNALS
-/* 2d integer matrix video_imatrix2d_t[y][x].
- * Only allowed to  hold values -1,  0, or  1
- *
- * Vector is only applied to relative coords (never absolute ones).
- * >> used_x = base_x + video_imatrix2d_get(matrix, 0, 0) * rel_x + video_imatrix2d_get(matrix, 0, 1) * rel_y;
- * >> used_y = base_y + video_imatrix2d_get(matrix, 1, 0) * rel_x + video_imatrix2d_get(matrix, 1, 1) * rel_y; */
-typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
-#define __video_imatrix2d_shift(y, x)      ((y) * 16 + (x) * 8)
-#define __video_imatrix2d_mask(y, x)       ((video_imatrix2d_t)0xff << __video_imatrix2d_shift(y, x))
-#define video_imatrix2d_get(self, y, x)    ((__INT8_TYPE__)(*(self) >> __video_imatrix2d_shift(y, x)))
-#define video_imatrix2d_set(self, y, x, v) (void)(*(self) = (*(self) & ~__video_imatrix2d_mask(y, x)) | ((video_imatrix2d_t)(__UINT8_TYPE__)(v) << __video_imatrix2d_shift(y, x)))
-#define VIDEO_IMATRIX2D_INIT(_00, _01, _10, _11)                                                    \
-	(((video_imatrix2d_t)(__UINT8_TYPE__)(_00)) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_01) << 8) | \
-	 ((video_imatrix2d_t)(__UINT8_TYPE__)(_10) << 16) | ((video_imatrix2d_t)(__UINT8_TYPE__)(_11) << 24))
-#define video_imatrix2d_swap(self, y1, x1, y2, x2)                            \
-	do {                                                                      \
-		__INT_FAST8_TYPE__ _temp = video_imatrix2d_get(self, y1, x1);         \
-		video_imatrix2d_set(self, y1, x1, video_imatrix2d_get(self, y2, x2)); \
-		video_imatrix2d_set(self, y2, x2, _temp);                             \
-	}	__WHILE0
-#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
-
-
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_IN_T(1) void
