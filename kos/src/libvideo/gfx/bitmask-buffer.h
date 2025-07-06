@@ -32,6 +32,8 @@
 #include <libvideo/codec/palette.h>
 #include <libvideo/gfx/buffer.h>
 
+#include "gfx.h"
+
 DECL_BEGIN
 
 struct video_palette2 {

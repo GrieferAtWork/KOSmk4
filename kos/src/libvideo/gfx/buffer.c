@@ -44,7 +44,7 @@ DECL_BEGIN
 /* Generic implementations for video buffer operators. */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_buffer_generic_updategfx(struct video_gfx *__restrict self, unsigned int what) {
-	libvideo_gfx_generic_update(self, what);
+	libvideo_swgfx_update(self, what);
 	return self;
 }
 
@@ -53,7 +53,7 @@ libvideo_buffer_generic_noblend(struct video_gfx *__restrict self) {
 	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
 	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
 	self->vx_colorkey = 0;
-	libvideo_gfx_generic_populate_noblend(self);
+	libvideo_swgfx_populate_noblend(self);
 	return self;
 }
 
@@ -176,7 +176,7 @@ libvideo_buffer_create(unsigned int type, video_dim_t size_x, video_dim_t size_y
 	struct video_buffer *result;
 	/* Check for special case: empty video buffer. */
 	if unlikely(!size_x || !size_y)
-		return incref(&libvideo_buffer_empty);
+		return incref(&libvideo_emptybuffer);
 	if (!codec) {
 		/* Lookup the default format. */
 		struct video_format const *default_format;

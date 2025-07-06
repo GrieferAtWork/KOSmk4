@@ -33,7 +33,7 @@
 #include "buffer-utils.h"
 #include "buffer.h"
 #include "custom-buffer.h"
-#include "gfx.h"
+#include "swgfx.h"
 
 DECL_BEGIN
 
@@ -131,43 +131,47 @@ NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
 
 
 /* Indices for driver-specific data of "custom" video buffers. */
-#define CUSTOM_GFX_GETPIXEL 0
-#define CUSTOM_GFX_SETPIXEL 1
-#define CUSTOM_GFX_COOKIE   2
-static_assert(_VIDEO_GFX_N_DRIVER >= 3);
+struct gfx_customdrv: gfx_swdrv {
+	video_buffer_custom_getpixel_t gcd_getpixel; /* [1..1][const] ... */
+	video_buffer_custom_setpixel_t gcd_setpixel; /* [1..1][const] ... */
+	void                          *gcd_cookie;   /* [?..?][const] ... */
+};
+#define video_customgfx_getdrv(self) \
+	((struct gfx_customdrv *)(self)->_vx_driver)
+static_assert(sizeof(struct gfx_customdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
+              "sizeof(struct gfx_customdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
 PRIVATE ATTR_IN(1) video_pixel_t CC
 custom_gfx__getpixel(struct video_gfx const *__restrict self,
                      video_coord_t abs_x, video_coord_t abs_y) {
-	video_buffer_custom_getpixel_t cb;
-	cb = (video_buffer_custom_getpixel_t)self->_vx_driver[CUSTOM_GFX_GETPIXEL];
-	return (*cb)(self->_vx_driver[CUSTOM_GFX_COOKIE], abs_x, abs_y);
+	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
+	return (*drv->gcd_getpixel)(drv->gcd_cookie, abs_x, abs_y);
 }
 
 PRIVATE ATTR_IN(1) void CC
 custom_gfx__setpixel(struct video_gfx const *__restrict self,
                      video_coord_t abs_x, video_coord_t abs_y,
                      video_pixel_t pixel) {
-	video_buffer_custom_setpixel_t cb;
-	cb = (video_buffer_custom_setpixel_t)self->_vx_driver[CUSTOM_GFX_SETPIXEL];
-	(*cb)(self->_vx_driver[CUSTOM_GFX_COOKIE], abs_x, abs_y, pixel);
+	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
+	(*drv->gcd_setpixel)(drv->gcd_cookie, abs_x, abs_y, pixel);
 }
 
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 custom_initgfx(struct video_gfx *__restrict self) {
 	struct custom_buffer *me = (struct custom_buffer *)self->vx_buffer;
+	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
 	libvideo_gfx_init_fullclip(self);
-	self->_vx_driver[CUSTOM_GFX_GETPIXEL] = (void *)me->cb_getpixel;
-	self->_vx_driver[CUSTOM_GFX_SETPIXEL] = (void *)me->cb_setpixel;
-	self->_vx_driver[CUSTOM_GFX_COOKIE]   = me->cb_cookie;
+	drv->gcd_getpixel = me->cb_getpixel;
+	drv->gcd_setpixel = me->cb_setpixel;
+	drv->gcd_cookie   = me->cb_cookie;
 
 	/* Default pixel accessors */
-	self->_vx_xops.vgfx_getpixel = &custom_gfx__getpixel;
-	self->_vx_xops.vgfx_setpixel = &custom_gfx__setpixel;
+	drv->xsw_getpixel = &custom_gfx__getpixel;
+	drv->xsw_setpixel = &custom_gfx__setpixel;
 
 	/* Load generic operator defaults */
-	libvideo_gfx_generic_populate(self);
+	libvideo_swgfx_populate(self);
 	return self;
 }
 

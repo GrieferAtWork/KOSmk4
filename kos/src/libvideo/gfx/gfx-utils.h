@@ -40,9 +40,27 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "gfx.h"
-
+#include "gfx-debug.h"
 
 DECL_BEGIN
+
+/* List of blend modes for which we provide dedicated implementations.
+ * iow: these are the blend modes that are "fast" */
+#define GFX_FOREACH_DEDICATED_BLENDMODE(cb /*(name, mode)*/)   \
+	cb(alpha, GFX_BLENDMODE_ALPHA)                             \
+	cb(alpha_premultiplied, GFX_BLENDMODE_ALPHA_PREMULTIPLIED) \
+	cb(add, GFX_BLENDMODE_ADD)                                 \
+	cb(add_premultiplied, GFX_BLENDMODE_ADD_PREMULTIPLIED)     \
+	cb(mod, GFX_BLENDMODE_MOD)                                 \
+	cb(mul, GFX_BLENDMODE_MUL)
+
+#define GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(cb /*(name, mode)*/) \
+	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))                 \
+	cb(alpha_override, GFX_BLENDMODE_ALPHA_OVERRIDE(0))
+
+/************************************************************************/
+/* UTILITIES...                                                         */
+/************************************************************************/
 
 /* >> range_union(video_coord_t *p_r1_start, video_dim_t *p_r1_size,
  * >>             video_coord_t r2_start, video_dim_t r2_size);
@@ -156,6 +174,19 @@ libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
 /************************************************************************/
 /* LINEAR BLITTING HELPERS                                              */
 /************************************************************************/
+
+/* # of bits to use for the fractional part of the fixed-
+ * point  numbers used during nearest stretch operations. */
+#define STRETCH_FP_NFRAC 16
+typedef uint_fast64_t stretch_fp_t;      /* uint_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
+typedef int_fast64_t sstretch_fp_t;      /* int_fast{BITSOF(video_coord_t) + STRETCH_FP_NFRAC}_t */
+typedef uint_fast16_t stretch_fp_frac_t; /* uint_fast{STRETCH_FP_NFRAC}_t */
+#define STRETCH_FP(whole)    ((stretch_fp_t)(whole) << STRETCH_FP_NFRAC)
+#define STRETCH_FP_WHOLE(fp) ((video_coord_t)(fp) >> STRETCH_FP_NFRAC)
+#define STRETCH_FP_FRAC(fp)  ((stretch_fp_frac_t)(fp) & (stretch_fp_frac_t)(STRETCH_FP(1) - 1))
+
+
+
 
 typedef video_channel_t channel_t;
 typedef video_twochannels_t twochannels_t;

@@ -17,27 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_LL_H
-#define GUARD_LIBVIDEO_GFX_GFX_LL_H 1
+#ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_H
+#define GUARD_LIBVIDEO_GFX_SWGFX_LL_H 1
 
-#include "../gfx.h"
+#include "../swgfx.h"
 
 /* When  low-level  GFX  functions want  to  call other
  * low-level GFX functions, these macros should be used */
-#define _LL_getcolor           _video_gfx_x_getcolor
-#define _LL_putcolor           _video_gfx_x_putcolor
-#define _LL_getpixel           _video_gfx_x_getpixel
-#define _LL_setpixel           _video_gfx_x_setpixel
-#define _LL_absline_llhh       _video_gfx_x_absline_llhh
-#define _LL_absline_lhhl       _video_gfx_x_absline_lhhl
-#define _LL_absline_h          _video_gfx_x_absline_h
-#define _LL_absline_v          _video_gfx_x_absline_v
-#define _LL_absfill            _video_gfx_x_absfill
-#define _LL_absfillmask        _video_gfx_x_absfillmask
-#define _LL_absfillstretchmask _video_gfx_x_absfillstretchmask
-#define _LL_absgradient        _video_gfx_x_absgradient
-#define _LL_absgradient_h      _video_gfx_x_absgradient_h
-#define _LL_absgradient_v      _video_gfx_x_absgradient_v
+#define _LL_getcolor           _video_swgfx_x_getcolor
+#define _LL_putcolor           _video_swgfx_x_putcolor
+#define _LL_getpixel           _video_swgfx_x_getpixel
+#define _LL_setpixel           _video_swgfx_x_setpixel
+#define _LL_absline_llhh       _video_swgfx_x_absline_llhh
+#define _LL_absline_lhhl       _video_swgfx_x_absline_lhhl
+#define _LL_absline_h          _video_swgfx_x_absline_h
+#define _LL_absline_v          _video_swgfx_x_absline_v
+#define _LL_absfill            _video_swgfx_x_absfill
+#define _LL_absfillmask        _video_swgfx_x_absfillmask
+#define _LL_absfillstretchmask _video_swgfx_x_absfillstretchmask
+#define _LL_absgradient        _video_swgfx_x_absgradient
+#define _LL_absgradient_h      _video_swgfx_x_absgradient_h
+#define _LL_absgradient_v      _video_swgfx_x_absgradient_v
 
 #define LL_assert_x(self, x) \
 	gfx_assertf((x) < (self)->vx_buffer->vb_xdim, "X coord too large (%" PRIuCRD " >= %" PRIuCRD ")", (x), (self)->vx_buffer->vb_xdim)
@@ -103,4 +103,4 @@
 #define LL_unlockregion(buffer, lock) \
 	video_buffer_unlockregion(buffer, lock)
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_LL_H */
+#endif /* !GUARD_LIBVIDEO_GFX_SWGFX_LL_H */

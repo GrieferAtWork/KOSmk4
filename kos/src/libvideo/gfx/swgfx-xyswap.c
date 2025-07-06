@@ -22,23 +22,23 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_XYSWAP_C
-#define GUARD_LIBVIDEO_GFX_GFX_XYSWAP_C 1
+#ifndef GUARD_LIBVIDEO_GFX_SWGFX_XYSWAP_C
+#define GUARD_LIBVIDEO_GFX_SWGFX_XYSWAP_C 1
 #define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
 
 #ifndef __INTELLISENSE__
-#define DEFINE_libvideo_blitter_generic_blit_imatrix
-#include "gfx/hl_blit-nowrap.c.inl"
-#define DEFINE_libvideo_blitter_generic_stretch_imatrix
-#include "gfx/hl_blit-nowrap.c.inl"
-#define DEFINE_libvideo_blitter_generic_blit_wrap_imatrix
-#include "gfx/hl_blit.c.inl"
+#define DEFINE_libvideo_swblitter_blit_imatrix
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter_stretch_imatrix
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter_blit_wrap_imatrix
+#include "swgfx/hl_blit.c.inl"
 
-#define DEFINE_libvideo_gfx_generic_XXX_xyswap
-#include "gfx/hl_generic.c.inl"
+#define DEFINE_libvideo_swgfx_XXX_xyswap
+#include "swgfx/hl_generic.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_XYSWAP_C */
+#endif /* !GUARD_LIBVIDEO_GFX_SWGFX_XYSWAP_C */

@@ -40,6 +40,7 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "buffer-utils.h"
+#include "buffer.h"
 #include "gfx-buffer.h"
 #include "gfx-empty.h"
 #include "gfx.h"
@@ -335,7 +336,7 @@ libvideo_buffer_fromgfx_init(struct gfx_buffer *self,
 	/* Check for special case: empty GFX context */
 	if unlikely(gfx->vx_hdr.vxh_cxsiz == 0 ||
 	            gfx->vx_hdr.vxh_cysiz == 0)
-		return &libvideo_buffer_empty;
+		return &libvideo_emptybuffer;
 
 	/* Deal with  optimizations possible  when no-  or
 	 * only linear pixel transformation are being done */
@@ -421,7 +422,7 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 	/* Check for special case: empty GFX context */
 	if unlikely(self->vx_hdr.vxh_cxsiz == 0 ||
 	            self->vx_hdr.vxh_cysiz == 0) {
-		struct video_buffer *result = &libvideo_buffer_empty;
+		struct video_buffer *result = &libvideo_emptybuffer;
 		video_buffer_incref(result);
 		return result;
 	}

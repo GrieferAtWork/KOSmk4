@@ -51,6 +51,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "gfx-palettize.h"
 #include "gfx.h"
+#include "swgfx.h"
 #include "ram-buffer.h"
 
 
@@ -175,7 +176,8 @@ hist_palettize(struct video_gfx const *__restrict self,
 		do {
 			struct hist_bin *bin;
 			union color c;
-			c.c = (*self->_vx_xops.vgfx_getcolor)(self, x, y);
+			/* TODO: Check that "self" is SW-based */
+			c.c = (*video_swgfx_getdrv(self)->xsw_getcolor)(self, x, y);
 			bin = &h->h_bins[hist_quantize_r(c.r)]
 			                [hist_quantize_g(c.g)]
 			                [hist_quantize_b(c.b)];
@@ -469,7 +471,8 @@ median_io_gfx(void const *cookie, mc_index_t i) {
 	video_dim_t io_sx = _video_gfxhdr_bxsiz(&self->vx_hdr);
 	video_coord_t y = self->vx_hdr.vxh_bymin + (i / io_sx);
 	video_coord_t x = self->vx_hdr.vxh_bxmin + (i % io_sx);
-	return (*self->_vx_xops.vgfx_getcolor)(self, x, y);
+	/* TODO: Check that "self" is SW-based */
+	return (*video_swgfx_getdrv(self)->xsw_getcolor)(self, x, y);
 }
 
 PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC

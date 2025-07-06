@@ -72,11 +72,6 @@ static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_MUL_CON
 static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_ALPHA) == GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_ALPHA);
 static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_ALPHA) == GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_ALPHA);
 
-static_assert(sizeof(struct video_blitter_xops) == (_VIDEO_BLIT_XOPS__N_INTERNAL * sizeof(void (*)(void))),
-              "sizeof(struct video_blitter_xops) doesn't match '_VIDEO_BLIT_XOPS__N_INTERNAL'");
-static_assert(sizeof(struct video_gfx_xops) == (_VIDEO_GFX_XOPS__N_INTERNAL * sizeof(void (*)(void))),
-              "sizeof(struct video_gfx_xops) doesn't match '_VIDEO_GFX_XOPS__N_INTERNAL'");
-
 /************************************************************************/
 /* CLIP()                                                               */
 /************************************************************************/
@@ -149,7 +144,7 @@ libvideo_gfx_clip(struct video_gfx *__restrict self,
 	_libvideo_gfx_clip_updated(self);
 	return self;
 empty_clip:
-	video_gfxhdr_setempty(&self->vx_hdr);
+	self->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;
 	return self;
 }
 

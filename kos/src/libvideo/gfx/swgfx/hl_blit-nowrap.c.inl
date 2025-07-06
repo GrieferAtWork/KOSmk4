@@ -20,10 +20,10 @@
 #define _KOS_SOURCE 1
 
 #ifdef __INTELLISENSE__
-//#define         DEFINE_libvideo_blitter_generic_blit
-//#define      DEFINE_libvideo_blitter_generic_stretch
-//#define DEFINE_libvideo_blitter_generic_blit_imatrix
-#define DEFINE_libvideo_blitter_generic_stretch_imatrix
+//#define         DEFINE_libvideo_swblitter_blit
+//#define      DEFINE_libvideo_swblitter_stretch
+//#define DEFINE_libvideo_swblitter_blit_imatrix
+#define DEFINE_libvideo_swblitter_stretch_imatrix
 #endif /* __INTELLISENSE__ */
 
 #include "../api.h"
@@ -41,27 +41,27 @@
 /**/
 
 #include "../gfx-utils.h"
-#include "../gfx.h"
+#include "../swgfx.h"
 
-#if (defined(DEFINE_libvideo_blitter_generic_blit) +         \
-     defined(DEFINE_libvideo_blitter_generic_stretch) +      \
-     defined(DEFINE_libvideo_blitter_generic_blit_imatrix) + \
-     defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)) != 1
+#if (defined(DEFINE_libvideo_swblitter_blit) +         \
+     defined(DEFINE_libvideo_swblitter_stretch) +      \
+     defined(DEFINE_libvideo_swblitter_blit_imatrix) + \
+     defined(DEFINE_libvideo_swblitter_stretch_imatrix)) != 1
 #error "Must #define exactly one of these"
 #endif /* ... */
 
 DECL_BEGIN
 
-#ifdef DEFINE_libvideo_blitter_generic_blit
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit
-#elif defined(DEFINE_libvideo_blitter_generic_stretch)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch
+#ifdef DEFINE_libvideo_swblitter_blit
+#define LOCAL_libvideo_swblitter_blit libvideo_swblitter_blit
+#elif defined(DEFINE_libvideo_swblitter_stretch)
+#define LOCAL_libvideo_swblitter_blit libvideo_swblitter_stretch
 #define LOCAL_IS_STRETCH
-#elif defined(DEFINE_libvideo_blitter_generic_blit_imatrix)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_blit_imatrix
+#elif defined(DEFINE_libvideo_swblitter_blit_imatrix)
+#define LOCAL_libvideo_swblitter_blit libvideo_swblitter_blit_imatrix
 #define LOCAL_USE_IMATRIX
-#elif defined(DEFINE_libvideo_blitter_generic_stretch_imatrix)
-#define LOCAL_libvideo_blitter_generic_blit libvideo_blitter_generic_stretch_imatrix
+#elif defined(DEFINE_libvideo_swblitter_stretch_imatrix)
+#define LOCAL_libvideo_swblitter_blit libvideo_swblitter_stretch_imatrix
 #define LOCAL_USE_IMATRIX
 #define LOCAL_IS_STRETCH
 #else /* ... */
@@ -85,7 +85,7 @@ DECL_BEGIN
 #endif /* !LOCAL_USE_IMATRIX */
 
 INTERN ATTR_IN(1) void CC
-LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
+LOCAL_libvideo_swblitter_blit(struct video_blitter const *__restrict self
                                     , video_offset_t dst_x, video_offset_t dst_y
 #ifdef LOCAL_IS_STRETCH
                                     , video_dim_t dst_size_x, video_dim_t dst_size_y
@@ -120,7 +120,7 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 	       __LINE__, dst_x, dst_y, LOCAL_dst_size_y, LOCAL_dst_size_y, \
 	       src_x, src_y, LOCAL_src_size_y, LOCAL_src_size_y)
 
-	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_blitter_generic_blit) "("
+	syslog(LOG_DEBUG, PP_STR(LOCAL_libvideo_swblitter_blit) "("
 #ifdef LOCAL_IS_STRETCH
 	                  "dst: {%dx%d, %ux%u}, src: {%dx%d, %ux%u}"
 #else /* LOCAL_IS_STRETCH */
@@ -378,12 +378,12 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #ifdef LOCAL_IS_STRETCH
 	if (dst_size_x != src_size_x || dst_size_y != src_size_y) {
 #ifdef LOCAL_USE_IMATRIX
-		video_blitter_x_stretch_imatrix(self,
+		video_swblitter_x_stretch_imatrix(self,
 		                                (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
 		                                (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y,
 		                                src_matrix);
 #else /* LOCAL_USE_IMATRIX */
-		video_blitter_x_stretch(self,
+		video_swblitter_x_stretch(self,
 		                        (video_coord_t)dst_x, (video_coord_t)dst_y, dst_size_x, dst_size_y,
 		                        (video_coord_t)src_x, (video_coord_t)src_y, src_size_x, src_size_y);
 #endif /* !LOCAL_USE_IMATRIX */
@@ -393,13 +393,13 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 
 	/* Can use copy-blit */
 #ifdef LOCAL_USE_IMATRIX
-	video_blitter_x_blit_imatrix(self,
+	video_swblitter_x_blit_imatrix(self,
 	                             (video_coord_t)dst_x, (video_coord_t)dst_y,
 	                             (video_coord_t)src_x, (video_coord_t)src_y,
 	                             LOCAL_dst_size_x, LOCAL_dst_size_y,
 	                             src_matrix);
 #else /* LOCAL_USE_IMATRIX */
-	video_blitter_x_blit(self,
+	video_swblitter_x_blit(self,
 	                     (video_coord_t)dst_x, (video_coord_t)dst_y,
 	                     (video_coord_t)src_x, (video_coord_t)src_y,
 	                     LOCAL_dst_size_x, LOCAL_dst_size_y);
@@ -420,11 +420,11 @@ LOCAL_libvideo_blitter_generic_blit(struct video_blitter const *__restrict self
 #undef LOCAL_IF_IMATRIX_ELSE
 #undef LOCAL_USE_IMATRIX
 #undef LOCAL_IS_STRETCH
-#undef LOCAL_libvideo_blitter_generic_blit
+#undef LOCAL_libvideo_swblitter_blit
 
 DECL_END
 
-#undef DEFINE_libvideo_blitter_generic_stretch_imatrix
-#undef DEFINE_libvideo_blitter_generic_blit_imatrix
-#undef DEFINE_libvideo_blitter_generic_stretch
-#undef DEFINE_libvideo_blitter_generic_blit
+#undef DEFINE_libvideo_swblitter_stretch_imatrix
+#undef DEFINE_libvideo_swblitter_blit_imatrix
+#undef DEFINE_libvideo_swblitter_stretch
+#undef DEFINE_libvideo_swblitter_blit

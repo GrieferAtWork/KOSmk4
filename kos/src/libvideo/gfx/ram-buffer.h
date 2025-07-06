@@ -30,7 +30,7 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "buffer.h"
-#include "gfx.h"
+#include "swgfx.h"
 
 /* Define and link  optimized fast-pass  pixel
  * accessors for 8,16,24,32-bit pixel formats. */
@@ -76,9 +76,19 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(
 INTDEF struct video_buffer_ops membuffer_ops; /* Used by `libvideo_buffer_formem()' */
 
 
-/* Indices into `video_gfx::bfx_driver' for RAM gfx buffers. */
-#define RAMGFX_DRIVER__DATA   0
-#define RAMGFX_DRIVER__STRIDE 1
+/* This is the layout of `video_gfx::_vx_driver' expected by generic RAM-based GFX */
+struct gfx_ramdrv: gfx_swdrv {
+	byte_t                    *grd_data;   /* [const][== ((struct video_rambuffer *):vx_buffer)->rb_data] */
+	size_t                     grd_stride; /* [const][== ((struct video_rambuffer *):vx_buffer)->rb_stride] */
+	struct video_format const *grd_format; /* [const][== &((struct video_rambuffer *):vx_buffer)->vb_format] */
+};
+#define gfx_ramdrv_init(self, buffer)                \
+	(void)((self)->grd_data   = (buffer)->rb_data,   \
+	       (self)->grd_stride = (buffer)->rb_stride, \
+	       (self)->grd_format = &(buffer)->vb_format)
+#define video_ramgfx_getdrv(self) \
+	((struct gfx_ramdrv *)(self)->_vx_driver)
+
 
 /* GFX functions for memory-based video buffers (without GPU support) */
 INTDEF ATTR_IN(1) video_color_t CC libvideo_ramgfx__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);

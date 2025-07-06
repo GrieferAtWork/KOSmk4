@@ -40,7 +40,7 @@
 
 #include "bitmask-buffer.h"
 #include "buffer.h"
-#include "gfx.h"
+#include "swgfx.h"
 
 DECL_BEGIN
 
@@ -115,23 +115,31 @@ bitmask_gfx__setpixel(struct video_gfx const *__restrict self,
 }
 
 #ifndef __OPTIMIZE_SIZE__
-static_assert(_VIDEO_GFX_N_DRIVER >= 2);
+struct gfx_bitmaskdrv: gfx_swdrv {
+	video_color_t gbmd_pal[2]; /* Copy of palette */
+};
+#define video_bitmaskgfx_getdrv(self) \
+	((struct gfx_bitmaskdrv *)(self)->_vx_driver)
+static_assert(sizeof(struct gfx_bitmaskdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
+              "sizeof(struct gfx_bitmaskdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
 PRIVATE ATTR_IN(1) video_color_t CC
 bitmask_gfx__getcolor(struct video_gfx const *__restrict self,
                       video_coord_t x, video_coord_t y) {
+	struct gfx_bitmaskdrv *drv = video_bitmaskgfx_getdrv(self);
 	video_pixel_t pixel = bitmask_gfx__getpixel(self, x, y);
-	return ((video_color_t *)self->_vx_driver)[pixel];
+	return drv->gbmd_pal[pixel];
 }
 
 PRIVATE ATTR_INOUT(1) void CC
 bitmask_gfx_optimize(struct video_gfx *__restrict self) {
 	/* When no blending is being done, speed up color lookup by directly translating bits */
-	if likely(self->_vx_xops.vgfx_getcolor == &libvideo_gfx_generic__getcolor_noblend) {
-		struct bitmask_buffer *me    = (struct bitmask_buffer *)self->vx_buffer;
-		self->_vx_xops.vgfx_getcolor = &bitmask_gfx__getcolor;
-		((video_color_t *)self->_vx_driver)[0] = me->bmb_pal.vp_pal[0];
-		((video_color_t *)self->_vx_driver)[1] = me->bmb_pal.vp_pal[1];
+	struct gfx_bitmaskdrv *drv = video_bitmaskgfx_getdrv(self);
+	if likely(drv->xsw_getcolor == &libvideo_swgfx_generic__getcolor_noblend) {
+		struct bitmask_buffer *me = (struct bitmask_buffer *)self->vx_buffer;
+		drv->xsw_getcolor = &bitmask_gfx__getcolor;
+		drv->gbmd_pal[0] = me->bmb_pal.vp_pal[0];
+		drv->gbmd_pal[1] = me->bmb_pal.vp_pal[1];
 	}
 }
 
@@ -158,14 +166,15 @@ bitmask_noblend(struct video_gfx *__restrict self) {
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bitmask_initgfx(struct video_gfx *__restrict self) {
+	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
 	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
-	self->_vx_xops.vgfx_getpixel = &bitmask_gfx__getpixel;
-	self->_vx_xops.vgfx_setpixel = &bitmask_gfx__setpixel;
+	drv->xsw_getpixel = &bitmask_gfx__getpixel;
+	drv->xsw_setpixel = &bitmask_gfx__setpixel;
 
 	/* Load generic operator defaults */
-	libvideo_gfx_generic_populate(self);
+	libvideo_swgfx_populate(self);
 
 	/* Optimizations for color reads */
 	bitmask_gfx_optimize(self);

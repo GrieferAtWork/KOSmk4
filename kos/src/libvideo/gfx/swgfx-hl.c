@@ -22,12 +22,12 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_HL_C
-#define GUARD_LIBVIDEO_GFX_GFX_HL_C 1
+#ifndef GUARD_LIBVIDEO_GFX_SWGFX_HL_C
+#define GUARD_LIBVIDEO_GFX_SWGFX_HL_C 1
 #define _KOS_SOURCE 1
 
 /************************************************************************/
-/* HIGH-LEVEL, GENERIC GFX OPERATOR IMPLS                               */
+/* HIGH-LEVEL, GENERIC SW-GFX OPERATOR IMPLS                            */
 /************************************************************************/
 
 #include "api.h"
@@ -43,9 +43,14 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "bitmask-buffer.h"
 #include "gfx-empty.h"
 #include "gfx-utils.h"
+#include "swgfx.h"
 
 DECL_BEGIN
 
+static_assert(sizeof(struct blt_swdrv) <= (_VIDEO_BLIT_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blt_swdrv) too large for '_VIDEO_BLIT_N_DRIVER'");
+static_assert(sizeof(struct gfx_swdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
+              "sizeof(struct gfx_swdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
 /************************************************************************/
 /* BLITTER INITIALIZATION                                               */
@@ -105,34 +110,35 @@ noblend_blit_compatible(struct video_codec const *dst,
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
-libvideo_gfx_generic_blitfrom(struct video_blitter *__restrict ctx) {
+libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	struct video_gfx const *src_gfx = ctx->vbt_src;
 	struct video_gfx const *dst_gfx = ctx->vbt_dst;
 	struct video_buffer const *src_buffer = src_gfx->vx_buffer;
 	struct video_buffer const *dst_buffer = dst_gfx->vx_buffer;
-	video_blit_setops(ctx);
+	struct blt_swdrv *drv = video_swblitter_getdrv(ctx);
+	video_swblitter_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
 	if (src_buffer == dst_buffer) {
 		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-			ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_samebuf__stretch_l;
-			ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_samebuf__stretch_imatrix_l;
+			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_l;
+			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_l;
 		} else {
-			ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_samebuf__stretch_n;
-			ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_samebuf__stretch_imatrix_n;
+			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_n;
+			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_n;
 		}
 		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey) &&
 		    GFX_BLENDMODE_GET_MODE(dst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
-			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_noblend_samebuf__blit;
-			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_noblend_samebuf__blit_imatrix;
+			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
+			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
 		} else {
 			/* Need to use different impls here that essentially do a "memmove"-style blit,
 			 * rather  than the usual  "memcpy"-style one (since in  this case, writing new
 			 * pixels in an  incorrect order might  clobber other pixels  that have yet  to
 			 * be read) */
-			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_samebuf__blit;
-			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_samebuf__blit_imatrix;
+			drv->bsw_blit         = &libvideo_swblitter_samebuf__blit;
+			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
 	} else if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0) {
 		ctx->vbt_ops = &libvideo_blit_empty_ops;
@@ -147,42 +153,42 @@ libvideo_gfx_generic_blitfrom(struct video_blitter *__restrict ctx) {
 			/* Special optimization when not doing any blending, and both GFX contexts
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
-			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_noblend_samefmt__blit;
-			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_noblend_samefmt__blit_imatrix;
+			drv->bsw_blit         = &libvideo_swblitter_noblend_samefmt__blit;
+			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samefmt__blit_imatrix;
 			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_noblend_samefmt__stretch_l;
-				ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_noblend_samefmt__stretch_imatrix_l;
+				drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_l;
+				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_l;
 			} else {
-				ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_noblend_samefmt__stretch_n;
-				ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_noblend_samefmt__stretch_imatrix_n;
+				drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_n;
+				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_n;
 			}
 		} else {
 			/* Special optimization when not doing any blending, and both GFX contexts
 			 * share the same codec: in this case,  we can try to directly copy  pixel
 			 * data, either through video locks, or by directly reading/writing pixels */
-			video_converter_init(libvideo_blitter_generic__conv(ctx),
+			video_converter_init(libvideo_swblitter_generic__conv(ctx),
 			                     &src_buffer->vb_format,
 			                     &dst_buffer->vb_format);
-			ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_noblend_difffmt__blit;
-			ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_noblend_difffmt__blit_imatrix;
+			drv->bsw_blit         = &libvideo_swblitter_noblend_difffmt__blit;
+			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_difffmt__blit_imatrix;
 			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_noblend_difffmt__stretch_l;
-				ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_noblend_difffmt__stretch_imatrix_l;
+				drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_l;
+				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_l;
 			} else {
-				ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_noblend_difffmt__stretch_n;
-				ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_noblend_difffmt__stretch_imatrix_n;
+				drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_n;
+				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_n;
 			}
 		}
 	} else {
 set_generic_operators:
-		ctx->_vbt_xops.vbtx_blit         = &libvideo_blitter_generic__blit;
-		ctx->_vbt_xops.vbtx_blit_imatrix = &libvideo_blitter_generic__blit_imatrix;
+		drv->bsw_blit         = &libvideo_swblitter_generic__blit;
+		drv->bsw_blit_imatrix = &libvideo_swblitter_generic__blit_imatrix;
 		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-			ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_generic__stretch_l;
-			ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_generic__stretch_imatrix_l;
+			drv->bsw_stretch         = &libvideo_swblitter_generic__stretch_l;
+			drv->bsw_stretch_imatrix = &libvideo_swblitter_generic__stretch_imatrix_l;
 		} else {
-			ctx->_vbt_xops.vbtx_stretch         = &libvideo_blitter_generic__stretch_n;
-			ctx->_vbt_xops.vbtx_stretch_imatrix = &libvideo_blitter_generic__stretch_imatrix_n;
+			drv->bsw_stretch         = &libvideo_swblitter_generic__stretch_n;
+			drv->bsw_stretch_imatrix = &libvideo_swblitter_generic__stretch_imatrix_n;
 		}
 	}
 	return ctx;
@@ -196,11 +202,11 @@ set_generic_operators:
 /************************************************************************/
 
 INTERN ATTR_IN(1) ATTR_IN(4) void CC
-libvideo_gfx_generic_bitblit(struct video_gfx const *__restrict dst,
-                             video_offset_t dst_x, video_offset_t dst_y,
-                             struct video_gfx const *__restrict src,
-                             video_offset_t src_x, video_offset_t src_y,
-                             video_dim_t size_x, video_dim_t size_y) {
+libvideo_swgfx_bitblit(struct video_gfx const *__restrict dst,
+                       video_offset_t dst_x, video_offset_t dst_y,
+                       struct video_gfx const *__restrict src,
+                       video_offset_t src_x, video_offset_t src_y,
+                       video_dim_t size_x, video_dim_t size_y) {
 	struct video_blitter blitter, *p_blitter;
 	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
 	video_blitter_bitblit(p_blitter, dst_x, dst_y,
@@ -208,12 +214,12 @@ libvideo_gfx_generic_bitblit(struct video_gfx const *__restrict dst,
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) void CC
-libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst,
-                             video_offset_t dst_x, video_offset_t dst_y,
-                             video_dim_t dst_size_x, video_dim_t dst_size_y,
-                             struct video_gfx const *__restrict src,
-                             video_offset_t src_x, video_offset_t src_y,
-                             video_dim_t src_size_x, video_dim_t src_size_y) {
+libvideo_swgfx_stretch(struct video_gfx const *__restrict dst,
+                       video_offset_t dst_x, video_offset_t dst_y,
+                       video_dim_t dst_size_x, video_dim_t dst_size_y,
+                       struct video_gfx const *__restrict src,
+                       video_offset_t src_x, video_offset_t src_y,
+                       video_dim_t src_size_x, video_dim_t src_size_y) {
 	struct video_blitter blitter, *p_blitter;
 	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
 	video_blitter_stretch(p_blitter,
@@ -229,11 +235,11 @@ libvideo_gfx_generic_stretch(struct video_gfx const *__restrict dst,
 /* BIT-MASKED FILL                                                      */
 /************************************************************************/
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self,
-                              video_offset_t dst_x, video_offset_t dst_y,
-                              video_dim_t size_x, video_dim_t size_y,
-                              video_color_t const bg_fg_colors[2],
-                              struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillmask(struct video_gfx const *__restrict self,
+                        video_offset_t dst_x, video_offset_t dst_y,
+                        video_dim_t size_x, video_dim_t size_y,
+                        video_color_t const bg_fg_colors[2],
+                        struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if (!size_x || !size_y)
@@ -272,19 +278,19 @@ libvideo_gfx_generic_fillmask(struct video_gfx const *__restrict self,
 			return;
 		size_y = GFX_BYEND - (video_coord_t)dst_y;
 	}
-	video_gfx_x_absfillmask(self,
-	                        (video_coord_t)dst_x,
-	                        (video_coord_t)dst_y,
-	                        size_x, size_y,
-	                        bg_fg_colors, bm);
+	video_swgfx_x_absfillmask(self,
+	                          (video_coord_t)dst_x,
+	                          (video_coord_t)dst_y,
+	                          size_x, size_y,
+	                          bg_fg_colors, bm);
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-libvideo_gfx_generic_fillmask_wrap(struct video_gfx const *__restrict self,
-                                   video_offset_t dst_x, video_offset_t dst_y,
-                                   video_dim_t size_x, video_dim_t size_y,
-                                   video_color_t const bg_fg_colors[2],
-                                   struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillmask_wrap(struct video_gfx const *__restrict self,
+                             video_offset_t dst_x, video_offset_t dst_y,
+                             video_dim_t size_x, video_dim_t size_y,
+                             video_color_t const bg_fg_colors[2],
+                             struct video_bitmask const *__restrict bm) {
 	video_dim_t xwrap = 0;
 	video_dim_t ywrap = 0;
 	video_dim_t xinb = size_x;
@@ -316,19 +322,19 @@ libvideo_gfx_generic_fillmask_wrap(struct video_gfx const *__restrict self,
 	if (xwrap && ywrap) { /* Must do a partial fill at the top-left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb + (yinb * chunk_bm.vbm_scan);
-		libvideo_gfx_generic_fillmask(self, 0, 0, xwrap, ywrap, bg_fg_colors, &chunk_bm);
+		libvideo_swgfx_fillmask(self, 0, 0, xwrap, ywrap, bg_fg_colors, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += xinb;
-		libvideo_gfx_generic_fillmask(self, 0, dst_y, xwrap, size_y, bg_fg_colors, &chunk_bm);
+		libvideo_swgfx_fillmask(self, 0, dst_y, xwrap, size_y, bg_fg_colors, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		chunk_bm.vbm_skip += yinb * chunk_bm.vbm_scan;
-		libvideo_gfx_generic_fillmask(self, dst_x, 0, size_x, ywrap, bg_fg_colors, &chunk_bm);
+		libvideo_swgfx_fillmask(self, dst_x, 0, size_x, ywrap, bg_fg_colors, &chunk_bm);
 	}
-	libvideo_gfx_generic_fillmask(self, dst_x, dst_y, xinb, yinb, bg_fg_colors, bm);
+	libvideo_swgfx_fillmask(self, dst_x, dst_y, xinb, yinb, bg_fg_colors, bm);
 }
 
 
@@ -339,12 +345,12 @@ libvideo_gfx_generic_fillmask_wrap(struct video_gfx const *__restrict self,
 /* BIT-MASKED STRETCH FILL                                              */
 /************************************************************************/
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self,
-                                     video_offset_t dst_x, video_offset_t dst_y,
-                                     video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                     video_color_t const bg_fg_colors[2],
-                                     video_dim_t src_size_x, video_dim_t src_size_y,
-                                     struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillstretchmask(struct video_gfx const *__restrict self,
+                               video_offset_t dst_x, video_offset_t dst_y,
+                               video_dim_t dst_size_x, video_dim_t dst_size_y,
+                               video_color_t const bg_fg_colors[2],
+                               video_dim_t src_size_x, video_dim_t src_size_y,
+                               struct video_bitmask const *__restrict bm) {
 	struct video_bitmask fixed_bm;
 	video_coord_t temp;
 	if unlikely(!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
@@ -409,23 +415,23 @@ libvideo_gfx_generic_fillstretchmask(struct video_gfx const *__restrict self,
 	}
 	if (dst_size_x == src_size_x && dst_size_y == src_size_y) {
 		/* Can use copy-blit */
-		video_gfx_x_absfillmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                        dst_size_x, dst_size_y, bg_fg_colors, bm);
+		video_swgfx_x_absfillmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                          dst_size_x, dst_size_y, bg_fg_colors, bm);
 	} else {
 		/* Must use stretch-blit */
-		video_gfx_x_absfillstretchmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
-		                               dst_size_x, dst_size_y, bg_fg_colors,
-		                               src_size_x, src_size_y, bm);
+		video_swgfx_x_absfillstretchmask(self, (video_coord_t)dst_x, (video_coord_t)dst_y,
+		                                 dst_size_x, dst_size_y, bg_fg_colors,
+		                                 src_size_x, src_size_y, bm);
 	}
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-libvideo_gfx_generic_fillstretchmask_wrap(struct video_gfx const *__restrict self,
-                                          video_offset_t dst_x, video_offset_t dst_y,
-                                          video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                          video_color_t const bg_fg_colors[2],
-                                          video_dim_t src_size_x, video_dim_t src_size_y,
-                                          struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self,
+                                    video_offset_t dst_x, video_offset_t dst_y,
+                                    video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                    video_color_t const bg_fg_colors[2],
+                                    video_dim_t src_size_x, video_dim_t src_size_y,
+                                    struct video_bitmask const *__restrict bm) {
 #define xdst2src(x) ((video_coord_t)(((uint64_t)(x) * src_size_x) / dst_size_x))
 #define ydst2src(y) ((video_coord_t)(((uint64_t)(y) * src_size_y) / dst_size_y))
 	video_dim_t xwrap = 0;
@@ -468,27 +474,27 @@ libvideo_gfx_generic_fillstretchmask_wrap(struct video_gfx const *__restrict sel
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_x + (chunk_src_y * chunk_bm.vbm_scan);
-		libvideo_gfx_generic_fillstretchmask(self, 0, 0, xwrap, ywrap, bg_fg_colors,
-		                                     chunk_src_size_x, chunk_src_size_y, &chunk_bm);
+		libvideo_swgfx_fillstretchmask(self, 0, 0, xwrap, ywrap, bg_fg_colors,
+		                               chunk_src_size_x, chunk_src_size_y, &chunk_bm);
 	}
 	if (xwrap) { /* Must do a partial fill at the left */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_x = xdst2src(xinb);
 		size_t chunk_src_size_x = xdst2src(xwrap);
 		chunk_bm.vbm_skip += chunk_src_x;
-		libvideo_gfx_generic_fillstretchmask(self, 0, dst_y, xwrap, dst_size_y, bg_fg_colors,
-		                                     chunk_src_size_x, src_size_y, &chunk_bm);
+		libvideo_swgfx_fillstretchmask(self, 0, dst_y, xwrap, dst_size_y, bg_fg_colors,
+		                               chunk_src_size_x, src_size_y, &chunk_bm);
 	}
 	if (ywrap) { /* Must do a partial fill at the top */
 		struct video_bitmask chunk_bm = *bm;
 		size_t chunk_src_y = ydst2src(yinb);
 		size_t chunk_src_size_y = ydst2src(ywrap);
 		chunk_bm.vbm_skip += chunk_src_y * chunk_bm.vbm_scan;
-		libvideo_gfx_generic_fillstretchmask(self, dst_x, 0, dst_size_x, ywrap, bg_fg_colors,
-		                                     src_size_x, chunk_src_size_y, &chunk_bm);
+		libvideo_swgfx_fillstretchmask(self, dst_x, 0, dst_size_x, ywrap, bg_fg_colors,
+		                               src_size_x, chunk_src_size_y, &chunk_bm);
 	}
-	libvideo_gfx_generic_fillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y,
-	                                     bg_fg_colors, src_size_x, src_size_y, bm);
+	libvideo_swgfx_fillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y,
+	                               bg_fg_colors, src_size_x, src_size_y, bm);
 #undef xdst2src
 #undef ydst2src
 }
@@ -496,11 +502,11 @@ libvideo_gfx_generic_fillstretchmask_wrap(struct video_gfx const *__restrict sel
 
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC
-libvideo_gfx_generic_fillmask_byblit(struct video_gfx const *__restrict self,
-                                     video_offset_t dst_x, video_offset_t dst_y,
-                                     video_dim_t size_x, video_dim_t size_y,
-                                     video_color_t const bg_fg_colors[2],
-                                     struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillmask_byblit(struct video_gfx const *__restrict self,
+                               video_offset_t dst_x, video_offset_t dst_y,
+                               video_dim_t size_x, video_dim_t size_y,
+                               video_color_t const bg_fg_colors[2],
+                               struct video_bitmask const *__restrict bm) {
 	struct video_gfx bm_gfx, *pgfx;
 	struct bitmask_buffer temp, *pbuf;
 	pbuf = bitmask_buffer_init(&temp, size_x, size_y, bm, bg_fg_colors);
@@ -511,12 +517,12 @@ libvideo_gfx_generic_fillmask_byblit(struct video_gfx const *__restrict self,
 
 
 INTERN ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC
-libvideo_gfx_generic_fillstretchmask_byblit(struct video_gfx const *__restrict self,
-                                            video_offset_t dst_x, video_offset_t dst_y,
-                                            video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                            video_color_t const bg_fg_colors[2],
-                                            video_dim_t src_size_x, video_dim_t src_size_y,
-                                            struct video_bitmask const *__restrict bm) {
+libvideo_swgfx_fillstretchmask_byblit(struct video_gfx const *__restrict self,
+                                      video_offset_t dst_x, video_offset_t dst_y,
+                                      video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                      video_color_t const bg_fg_colors[2],
+                                      video_dim_t src_size_x, video_dim_t src_size_y,
+                                      struct video_bitmask const *__restrict bm) {
 	struct video_gfx bm_gfx, *pgfx;
 	struct bitmask_buffer temp, *pbuf;
 	pbuf = bitmask_buffer_init(&temp, src_size_x, src_size_y, bm, bg_fg_colors);
@@ -529,15 +535,15 @@ libvideo_gfx_generic_fillstretchmask_byblit(struct video_gfx const *__restrict s
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define DEFINE_libvideo_gfx_generic_XXX
-#include "gfx/hl_generic.c.inl"
+#define DEFINE_libvideo_swgfx_XXX
+#include "swgfx/hl_generic.c.inl"
 
-#define DEFINE_libvideo_blitter_generic_blit
-#include "gfx/hl_blit-nowrap.c.inl"
-#define DEFINE_libvideo_blitter_generic_stretch
-#include "gfx/hl_blit-nowrap.c.inl"
-#define DEFINE_libvideo_blitter_generic_blit_wrap
-#include "gfx/hl_blit.c.inl"
+#define DEFINE_libvideo_swblitter_blit
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter_stretch
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter_blit_wrap
+#include "swgfx/hl_blit.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_HL_C */
+#endif /* !GUARD_LIBVIDEO_GFX_SWGFX_HL_C */

@@ -55,8 +55,6 @@
 #define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords are vertically mirrored relative to the Clip Rect */
 #define VIDEO_GFX_F_XYSWAP      0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
                                         * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
-                                        * NOTE: Only affects `video_gfx_ops';  does not affect  `video_gfx_xops',
-                                        *       though **does** affect both the Clip Rect, as well as I/O region.
                                         * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
 #define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
                                         *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
@@ -141,73 +139,6 @@ typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
 #endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
 
 
-struct video_blitter_xops {
-	/* All of the following callbacks are [1..1]
-	 * WARNING: Don't use these operators; only use `struct video_gfx_ops' */
-
-#define _VIDEO_BLIT_XOPS__N_INTERNAL 8
-#ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
-	void (*_vbtx_internal[_VIDEO_BLIT_XOPS__N_INTERNAL])(void);
-#else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
-	/* Blit the contents of another video buffer into this one.
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbtx_blit)(struct video_blitter const *__restrict __self,
-	                             video_coord_t __dst_x, video_coord_t __dst_y,
-	                             video_coord_t __src_x, video_coord_t __src_y,
-	                             video_dim_t __size_x, video_dim_t __size_y);
-
-	/* Same as `vbtx_blit', but stretch the contents
-	 * @assume(__dst_size_x > 0);
-	 * @assume(__dst_size_y > 0);
-	 * @assume(__src_size_x > 0);
-	 * @assume(__src_size_y > 0);
-	 * @assume(__dst_size_x != __src_size_x);
-	 * @assume(__dst_size_y != __src_size_y); */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbtx_stretch)(struct video_blitter const *__restrict __self,
-	                                video_coord_t __dst_x, video_coord_t __dst_y,
-	                                video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                video_coord_t __src_x, video_coord_t __src_y,
-	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
-
-	/* Same as "vbtx_blit", but uses a matrix to calculate source pixel locations:
-	 * >> for (video_coord_t y = 0; y < __size_y; ++y) {
-	 * >>     for (video_coord_t x = 0; x < __size_x; ++x) {
-	 * >>         video_coord_t used_src_x = __src_x + __src_matrix[0][0] * x + __src_matrix[0][1] * y;
-	 * >>         video_coord_t used_src_y = __src_y + __src_matrix[1][0] * x + __src_matrix[1][1] * y;
-	 * >>         video_coord_t used_dst_x = __dst_x + x;
-	 * >>         video_coord_t used_dst_y = __dst_y + y;
-	 * >>         video_color_t color = (*__self->vbt_src->_vx_xops.vgfx_getcolor)(__self->vbt_src, used_src_x, used_src_y);
-	 * >>         (*__self->vbt_dst->_vx_xops.vgfx_putcolor)(__self->vbt_dst, used_dst_x, used_dst_y, color);
-	 * >>     }
-	 * >> }
-	 *
-	 * The given "__src_matrix" is assumed to only contain values -1, 0 or 1,
-	 * meaning  it can only be used to do 90° rotation, as well as mirroring.
-	 *
-	 * When values outside this range are used, results are undefined. */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbtx_blit_imatrix)(struct video_blitter const *__restrict __self,
-	                                     video_coord_t __dst_x, video_coord_t __dst_y,
-	                                     video_coord_t __src_x, video_coord_t __src_y,
-	                                     video_dim_t __size_x, video_dim_t __size_y,
-	                                     video_imatrix2d_t __src_matrix);
-
-	/* Same as "vbtx_stretch", but uses a matrix to calculate source pixel locations. */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vbtx_stretch_imatrix)(struct video_blitter const *__restrict __self,
-	                                        video_coord_t __dst_x, video_coord_t __dst_y,
-	                                        video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                        video_coord_t __src_x, video_coord_t __src_y,
-	                                        video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                        video_imatrix2d_t __src_matrix);
-
-	void (*_vbtx_pad[4])(void);
-#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
-};
-
 struct video_blitter_ops {
 	/* Blit the contents of another video buffer into this one. */
 	__ATTR_IN_T(1) void
@@ -239,136 +170,6 @@ struct video_blitter_ops {
 };
 
 
-
-struct video_gfx_xops {
-#define _VIDEO_GFX_XOPS__N_INTERNAL 15
-#ifndef LIBVIDEO_GFX_EXPOSE_INTERNALS
-	void (*_vgfx_internal[_VIDEO_GFX_XOPS__N_INTERNAL])(void);
-#else /* !LIBVIDEO_GFX_EXPOSE_INTERNALS */
-	/* TODO: Don't even expose this stuff in headers -- instead,
-	 *       move all these operators into `_vx_driver' so a hw-
-	 *       gfx  implementation could do a completely different
-	 *       HL->LL system */
-
-	/* All of the following callbacks are [1..1]
-	 * WARNING: Don't use these operators; only use `struct video_gfx_ops' */
-
-	/* Get the color of a pixel */
-	__ATTR_IN_T(1) video_color_t
-	(LIBVIDEO_GFX_CC *vgfx_getcolor)(struct video_gfx const *__restrict __self,
-	                                 video_coord_t __abs_x, video_coord_t __abs_y);
-
-	/* Place a colored pixel ontop of the graphic (whilst also performing blending) */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_putcolor)(struct video_gfx const *__restrict __self,
-	                                 video_coord_t __abs_x, video_coord_t __abs_y,
-	                                 video_color_t __color);
-
-	/* Get the raw data of a pixel (no blending is done) */
-	__ATTR_IN_T(1) video_pixel_t
-	(LIBVIDEO_GFX_CC *vgfx_getpixel)(struct video_gfx const *__restrict __self,
-	                                 video_coord_t __abs_x, video_coord_t __abs_y);
-
-	/* Set the raw data of a pixel (no blending is done) */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_setpixel)(struct video_gfx const *__restrict __self,
-	                                 video_coord_t __abs_x, video_coord_t __abs_y,
-	                                 video_pixel_t __pixel);
-
-	/* Diagonal line from top-left -> bottom-right
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void /* TODO: Some way to specify the line width */
-	(LIBVIDEO_GFX_CC *vgfx_absline_llhh)(struct video_gfx const *__restrict __self,
-	                                     video_coord_t __x, video_coord_t y,
-	                                     video_dim_t __size_x, video_dim_t __size_y,
-	                                     video_color_t __color);
-
-	/* Diagonal line from bottom-left -> top-right
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void /* TODO: Some way to specify the line width */
-	(LIBVIDEO_GFX_CC *vgfx_absline_lhhl)(struct video_gfx const *__restrict __self,
-	                                     video_coord_t __x, video_coord_t __y,
-	                                     video_dim_t __size_x, video_dim_t __size_y,
-	                                     video_color_t __color);
-
-	/* Horizontal line
-	 * @assume(__length > 0); */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_absline_h)(struct video_gfx const *__restrict __self,
-	                                  video_coord_t __x, video_coord_t __y,
-		                              video_dim_t __length, video_color_t __color);
-
-	/* Vertical line
-	 * @assume(__length > 0); */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_absline_v)(struct video_gfx const *__restrict __self,
-		                              video_coord_t __x, video_coord_t __y,
-		                              video_dim_t __length, video_color_t __color);
-
-	/* TODO: Curve drawing (Bézier curve) */
-
-	/* Rect fill
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_absfill)(struct video_gfx const *__restrict __self,
-	                                video_coord_t __x, video_coord_t __y,
-	                                video_dim_t __size_x, video_dim_t __size_y,
-	                                video_color_t __color);
-
-	/* Paint masked pixels
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(7) void
-	(LIBVIDEO_GFX_CC *vgfx_absfillmask)(struct video_gfx const *__restrict __self,
-	                                    video_coord_t __dst_x, video_coord_t __dst_y,
-	                                    video_dim_t __size_x, video_dim_t __size_y,
-	                                    video_color_t const __bg_fg_colors[2],
-	                                    struct video_bitmask const *__restrict __bm);
-
-	/* Stretch and paint masked pixels
-	 * @assume(__dst_size_x > 0);
-	 * @assume(__dst_size_y > 0);
-	 * @assume(__src_size_x > 0);
-	 * @assume(__src_size_y > 0);
-	 * @assume(__dst_size_x != __src_size_x);
-	 * @assume(__dst_size_y != __src_size_y); */
-	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(9) void
-	(LIBVIDEO_GFX_CC *vgfx_absfillstretchmask)(struct video_gfx const *__restrict __self,
-	                                           video_coord_t __dst_x, video_coord_t __dst_y,
-	                                           video_dim_t __dst_size_x, video_dim_t __dst_size_y,
-	                                           video_color_t const __bg_fg_colors[2],
-	                                           video_dim_t __src_size_x, video_dim_t __src_size_y,
-	                                           struct video_bitmask const *__restrict __bm);
-
-	/* Same as `vgfx_absfill', but do so via gradient with colors[y][x] being used
-	 * to essentially  do a  VIDEO_GFX_F_LINEAR  stretch-blit into  the  specified
-	 * destination rect.
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__ATTR_IN_T(1) __ATTR_IN_T(6) void
-	(LIBVIDEO_GFX_CC *vgfx_absgradient)(struct video_gfx const *__restrict __self,
-	                                    video_coord_t __x, video_coord_t __y,
-	                                    video_dim_t __size_x, video_dim_t __size_y,
-	                                    video_color_t const __colors[2][2]);
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_absgradient_h)(struct video_gfx const *__restrict __self,
-	                                      video_coord_t __x, video_coord_t __y,
-	                                      video_dim_t __size_x, video_dim_t __size_y,
-	                                      video_color_t __locolor, video_color_t __hicolor);
-	__ATTR_IN_T(1) void
-	(LIBVIDEO_GFX_CC *vgfx_absgradient_v)(struct video_gfx const *__restrict __self,
-	                                      video_coord_t __x, video_coord_t __y,
-	                                      video_dim_t __size_x, video_dim_t __size_y,
-	                                      video_color_t __locolor, video_color_t __hicolor);
-
-	/* TODO: Group related (and always set all-at-once) operators above into sub-structs */
-
-	void (*_vbtx_pad[1])(void);
-#endif /* LIBVIDEO_GFX_EXPOSE_INTERNALS */
-};
 
 struct video_gfx_ops {
 	/* All of the following callbacks are [1..1] */
@@ -868,11 +669,12 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
-#define _VIDEO_BLIT_N_DRIVER (_VIDEO_CONVERTER_N_YDRIVER + 1)
-#if _VIDEO_BLIT_N_DRIVER < 6
+#define __VIDEO_BLIT_N_DRIVER 8
+#define _VIDEO_BLIT_N_DRIVER (__VIDEO_BLIT_N_DRIVER + 1 + _VIDEO_CONVERTER_N_YDRIVER)
+#if _VIDEO_BLIT_N_DRIVER < (__VIDEO_BLIT_N_DRIVER + 6)
 #undef _VIDEO_BLIT_N_DRIVER
-#define _VIDEO_BLIT_N_DRIVER 6
-#endif /* _VIDEO_BLIT_N_DRIVER < 6 */
+#define _VIDEO_BLIT_N_DRIVER (__VIDEO_BLIT_N_DRIVER + 6)
+#endif /* _VIDEO_BLIT_N_DRIVER < (__VIDEO_BLIT_N_DRIVER + 6) */
 
 /* TODO: Need another "struct video_blitter3" that offers a way to composite between 3 buffers:
  * - src: Pixel source data      ("src" parameter during blending)
@@ -890,7 +692,6 @@ struct video_blitter {
 	struct video_blitter_ops const *vbt_ops;  /* Blitter operators */
 	struct video_gfx const         *vbt_dst;  /* [1..1][const] Destination GFX context */
 	struct video_gfx const         *vbt_src;  /* [1..1][const] Source GFX context */
-	struct video_blitter_xops      _vbt_xops; /* Internal blit operators */
 	void *_vbt_driver[_VIDEO_BLIT_N_DRIVER];  /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
@@ -1025,13 +826,12 @@ struct video_gfxhdr {
 #define _video_gfxhdr_bysiz(self) ((self)->vxh_byend - (self)->vxh_bymin)
 
 struct video_gfx {
-	struct video_gfxhdr         vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
-	struct video_buffer        *vx_buffer;   /* [1..1][const] The associated buffer. */
-	gfx_blendmode_t             vx_blend;    /* [const] Blending mode. */
-	gfx_flag_t                  vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
-	video_color_t               vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
-	struct video_gfx_xops      _vx_xops;     /* [1..1][const] Internal GFX operators (do not use directly) */
-#define _VIDEO_GFX_N_DRIVER 4
+	struct video_gfxhdr  vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
+	struct video_buffer *vx_buffer;   /* [1..1][const] The associated buffer. */
+	gfx_blendmode_t      vx_blend;    /* [const] Blending mode. */
+	gfx_flag_t           vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	video_color_t        vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
+#define _VIDEO_GFX_N_DRIVER 20
 	void *_vx_driver[_VIDEO_GFX_N_DRIVER];   /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
