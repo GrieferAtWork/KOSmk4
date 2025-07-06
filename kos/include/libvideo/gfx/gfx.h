@@ -181,6 +181,51 @@ struct video_gfx_ops {
 	__ATTR_RETNONNULL __ATTR_INOUT_T(1) struct video_blitter *
 	(LIBVIDEO_GFX_FCC *vgfo_blitfrom)(struct video_blitter *__restrict __ctx);
 
+	/* Apply a clipping  rect to "self",  shrinking the  pixel
+	 * area relative to offsets specified by the given coords.
+	 *
+	 * Note that the clip area can  only ever be shrunk. To  go
+	 * back to the initial clip area, either keep a copy of the
+	 * original GFX  context, or  create a  new context  (which
+	 * always starts  out with  its clipping  area set  to  the
+	 * associated buffer's entire surface)
+	 *
+	 * @param: __clip_x: Delta to add to the Clip Rect starting X coord.
+	 *                   When negative, extend clip rect with void-pixels to the left
+	 * @param: __clip_y: Delta to add to the Clip Rect starting Y coord.
+	 *                   When negative, extend clip rect with void-pixels to the top
+	 * @param: __size_x: New width of the clip rect. When greater than the old  clip
+	 *                   rect width, extend clip rect with void-pixels to the right.
+	 * @param: __size_y: New height of the clip rect.  When greater than the old  clip
+	 *                   rect height, extend clip rect with void-pixels to the bottom.
+	 * @return: * : Always re-returns `__self' */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
+	(LIBVIDEO_GFX_CC *vgfo_clip)(struct video_gfx *__restrict __self,
+	                             video_offset_t __clip_x, video_offset_t __clip_y,
+	                             video_dim_t __size_x, video_dim_t __size_y);
+
+	/* Translate virtual (offset) pixel coords to physical (coord) coords.
+	 * @param: __x:      Virtual pixel X offset
+	 * @param: __y:      Virtual pixel Y offset
+	 * @param: __coords: The absolute (physical) coords of the pixel are stored here
+	 * @return: true:  Translation was successful
+	 * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
+	(LIBVIDEO_GFX_CC *vgfo_offset2coord)(struct video_gfx const *__restrict __self,
+	                                     video_offset_t __x, video_offset_t __y,
+	                                     video_coord_t __coords[2]);
+
+	/* Translate physical (coord) pixel coords to virtual (offset) coords.
+	 * @param: __x:       Physical pixel X coord
+	 * @param: __y:       Physical pixel Y coord
+	 * @param: __offsets: The offset (virtual) coords of the pixel are stored here
+	 * @return: true:  Translation was successful
+	 * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
+	(LIBVIDEO_GFX_CC *vgfo_coord2offset)(struct video_gfx const *__restrict __self,
+	                                     video_coord_t __x, video_coord_t __y,
+	                                     video_offset_t __offsets[2]);
+
 	/* Get the color of a pixel */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_color_t
 	(LIBVIDEO_GFX_CC *vgfo_getcolor)(struct video_gfx const *__restrict __self,
@@ -286,77 +331,6 @@ struct video_gfx_ops {
 
 
 
-typedef struct video_gfxhdr video_gfx_clipinfo_t;
-
-/* Apply a clipping  rect to "self",  shrinking the  pixel
- * area relative to offsets specified by the given coords.
- *
- * Note that the clip area can  only ever be shrunk. To  go
- * back to the initial clip area, either keep a copy of the
- * original GFX  context, or  create a  new context  (which
- * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface)
- *
- * @param: __clip_x: Delta to add to the Clip Rect starting X coord.
- *                   When negative, extend clip rect with void-pixels to the left
- * @param: __clip_y: Delta to add to the Clip Rect starting Y coord.
- *                   When negative, extend clip rect with void-pixels to the top
- * @param: __size_x: New width of the clip rect. When greater than the old  clip
- *                   rect width, extend clip rect with void-pixels to the right.
- * @param: __size_y: New height of the clip rect.  When greater than the old  clip
- *                   rect height, extend clip rect with void-pixels to the bottom.
- * @return: * : Always re-returns `__self' */
-typedef __ATTR_INOUT_T(1) struct video_gfx *
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_CLIP)(struct video_gfx *__restrict __self,
-                                   video_offset_t __clip_x, video_offset_t __clip_y,
-                                   video_dim_t __size_x, video_dim_t __size_y);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_gfx *LIBVIDEO_GFX_CC
-video_gfx_clip(struct video_gfx *__restrict __self,
-               video_offset_t __clip_x, video_offset_t __clip_y,
-               video_dim_t __size_x, video_dim_t __size_y);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-/* TODO: Change "video_gfx_clip" into an operator in "struct video_gfx_ops" */
-
-
-/* Translate virtual (offset) pixel coords to physical (coord) coords.
- * @param: __x:      Virtual pixel X offset
- * @param: __y:      Virtual pixel Y offset
- * @param: __coords: The absolute (physical) coords of the pixel are stored here
- * @return: true:  Translation was successful
- * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_OFFSET2COORD)(struct video_gfx const *__restrict __self,
-                                           video_offset_t __x, video_offset_t __y,
-                                           video_coord_t __coords[2]);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL LIBVIDEO_GFX_CC
-video_gfx_offset2coord(struct video_gfx const *__restrict __self,
-                       video_offset_t __x, video_offset_t __y,
-                       video_coord_t __coords[2]);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-/* TODO: Change "video_gfx_offset2coord" into an operator in "struct video_gfx_ops" */
-
-/* Translate physical (coord) pixel coords to virtual (offset) coords.
- * @param: __x:       Physical pixel X coord
- * @param: __y:       Physical pixel Y coord
- * @param: __offsets: The offset (virtual) coords of the pixel are stored here
- * @return: true:  Translation was successful
- * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(4) __BOOL
-(LIBVIDEO_GFX_CC *PVIDEO_GFX_COORD2OFFSET)(struct video_gfx const *__restrict __self,
-                                           video_offset_t __x, video_offset_t __y,
-                                           video_offset_t __offsets[2]);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL LIBVIDEO_GFX_CC
-video_gfx_coord2offset(struct video_gfx const *__restrict __self,
-                       video_coord_t __x, video_coord_t __y,
-                       video_offset_t __offsets[2]);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-/* TODO: Change "video_gfx_coord2offset" into an operator in "struct video_gfx_ops" */
-
-
-
 /* Perform geometric transformations on the contents of the current  clip
  * rect of `self'. Note that none of these functions alter pixel data  of
  * the underlying buffer; they only affect how the given `self' interacts
@@ -422,6 +396,10 @@ video_gfx_palettize(struct video_gfx const *__restrict __self,
                     unsigned int __method);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
+
+/* GFX  clip data container (for backup+restore using
+ * `video_gfx_saveclip()' and `video_gfx_loadclip()') */
+typedef struct video_gfxhdr video_gfx_clipinfo_t;
 
 
 #ifdef __INTELLISENSE__
@@ -499,6 +477,54 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey
  * CAUTION: Do not use this operator when `__self' may be used by other threads! */
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
 video_gfx_noblend(struct video_gfx *__restrict __self);
+
+/* Apply a clipping  rect to "self",  shrinking the  pixel
+ * area relative to offsets specified by the given coords.
+ *
+ * Note that the clip area can  only ever be shrunk. To  go
+ * back to the initial clip area, either keep a copy of the
+ * original GFX  context, or  create a  new context  (which
+ * always starts  out with  its clipping  area set  to  the
+ * associated buffer's entire surface)
+ *
+ * @param: __clip_x: Delta to add to the Clip Rect starting X coord.
+ *                   When negative, extend clip rect with void-pixels to the left
+ * @param: __clip_y: Delta to add to the Clip Rect starting Y coord.
+ *                   When negative, extend clip rect with void-pixels to the top
+ * @param: __size_x: New width of the clip rect. When greater than the old  clip
+ *                   rect width, extend clip rect with void-pixels to the right.
+ * @param: __size_y: New height of the clip rect.  When greater than the old  clip
+ *                   rect height, extend clip rect with void-pixels to the bottom.
+ * @return: * : Always re-returns `__self' */
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
+video_gfx_clip(struct video_gfx *__restrict __self,
+               video_offset_t __clip_x, video_offset_t __clip_y,
+               video_dim_t __size_x, video_dim_t __size_y);
+
+
+/* Translate virtual (offset) pixel coords to physical (coord) coords.
+ * @param: __x:      Virtual pixel X offset
+ * @param: __y:      Virtual pixel Y offset
+ * @param: __coords: The absolute (physical) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+extern __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL
+video_gfx_offset2coord(struct video_gfx const *__restrict __self,
+                       video_offset_t __x, video_offset_t __y,
+                       video_coord_t __coords[2]);
+
+/* Translate physical (coord) pixel coords to virtual (offset) coords.
+ * @param: __x:       Physical pixel X coord
+ * @param: __y:       Physical pixel Y coord
+ * @param: __offsets: The offset (virtual) coords of the pixel are stored here
+ * @return: true:  Translation was successful
+ * @return: false: The given __x/__y lie outside the I/O Rect of `__self' */
+extern __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __BOOL
+video_gfx_coord2offset(struct video_gfx const *__restrict __self,
+                       video_coord_t __x, video_coord_t __y,
+                       video_offset_t __offsets[2]);
+
+
 
 /* Get/put(blend) the color of a singular pixel */
 extern __ATTR_WUNUSED __ATTR_IN(1) video_color_t
@@ -618,6 +644,12 @@ video_gfx_stretch(struct video_gfx const *__dst, video_offset_t __dst_x, video_o
 	(*(self)->vx_buffer->vb_ops->vi_updategfx)(self, what)
 #define video_gfx_getblend(self)              ((self)->vx_blend)
 #define video_gfx_getflags(self)              ((self)->vx_flags)
+#define video_gfx_clip(self, clip_x, clip_y, size_x, size_y) \
+	(*(self)->vx_hdr.vxh_ops->vgfo_clip)(self, clip_x, clip_y, size_x, size_y)
+#define video_gfx_offset2coord(self, x, y, coords) \
+	(*(self)->vx_hdr.vxh_ops->vgfo_offset2coord)(self, x, y, coords)
+#define video_gfx_coord2offset(self, x, y, offsets) \
+	(*(self)->vx_hdr.vxh_ops->vgfo_coord2offset)(self, x, y, offsets)
 #define video_gfx_getcolorkey(self)           ((self)->vx_colorkey)
 #define video_gfx_setblend(self, mode)        ((self)->vx_blend = (mode), video_gfx_update(self, VIDEO_GFX_UPDATE_BLEND))
 #define video_gfx_setflags(self, flags)       ((self)->vx_flags = (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))

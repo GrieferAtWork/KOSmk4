@@ -72,9 +72,34 @@ static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_SRC_ALPHA_MUL_CON
 static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_ALPHA) == GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_ALPHA);
 static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CONSTANT_ALPHA) == GFX_BLENDDATA_DST_ALPHA_MUL_CONSTANT_ALPHA);
 
-/************************************************************************/
-/* CLIP()                                                               */
-/************************************************************************/
+/* Generic GFX operator implementations */
+INTERN ATTR_IN(1) ATTR_IN(4) void CC
+libvideo_gfx_bitblit__with_blitter(struct video_gfx const *__restrict dst,
+                                   video_offset_t dst_x, video_offset_t dst_y,
+                                   struct video_gfx const *__restrict src,
+                                   video_offset_t src_x, video_offset_t src_y,
+                                   video_dim_t size_x, video_dim_t size_y) {
+	struct video_blitter blitter, *p_blitter;
+	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
+	video_blitter_bitblit(p_blitter, dst_x, dst_y,
+	                      src_x, src_y, size_x, size_y);
+}
+
+INTERN ATTR_IN(1) ATTR_IN(6) void CC
+libvideo_gfx_stretch__with_blitter(struct video_gfx const *__restrict dst,
+                                   video_offset_t dst_x, video_offset_t dst_y,
+                                   video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                   struct video_gfx const *__restrict src,
+                                   video_offset_t src_x, video_offset_t src_y,
+                                   video_dim_t src_size_x, video_dim_t src_size_y) {
+	struct video_blitter blitter, *p_blitter;
+	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
+	video_blitter_stretch(p_blitter,
+	                      dst_x, dst_y, dst_size_x, dst_size_y,
+	                      src_x, src_y, src_size_x, src_size_y);
+}
+
+
 
 /* Apply a clipping  rect to "self",  shrinking the  pixel
  * area relative to offsets specified by the given coords.
@@ -94,11 +119,10 @@ static_assert(_GFX_BLENDDATA_ONE_MINUS(GFX_BLENDDATA_ONE_MINUS_DST_ALPHA_MUL_CON
  * @param: size_y: New height of the clip rect.  When greater than the old  clip
  *                 rect height, extend clip rect with void-pixels to the bottom.
  * @return: * : Always re-returns `self' */
-DEFINE_PUBLIC_ALIAS(video_gfx_clip, libvideo_gfx_clip);
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
-libvideo_gfx_clip(struct video_gfx *__restrict self,
-                  video_offset_t clip_x, video_offset_t clip_y,
-                  video_dim_t size_x, video_dim_t size_y) {
+libvideo_gfx_clip__generic(struct video_gfx *__restrict self,
+                           video_offset_t clip_x, video_offset_t clip_y,
+                           video_dim_t size_x, video_dim_t size_y) {
 	video_offset_t cxend, cyend;
 	if unlikely(!size_x || !size_y)
 		goto empty_clip;
@@ -113,18 +137,16 @@ libvideo_gfx_clip(struct video_gfx *__restrict self,
 	self->vx_hdr.vxh_cxsiz = size_x;
 	self->vx_hdr.vxh_cysiz = size_y;
 
-	/* Clamp buffer rect according to new clip rect */
+	/* Clamp I/O Rect according to new Clip Rect */
 	if ((video_offset_t)self->vx_hdr.vxh_bxmin < self->vx_hdr.vxh_cxoff) {
 		self->vx_hdr.vxh_bxmin = (video_coord_t)self->vx_hdr.vxh_cxoff;
 		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
 			goto empty_clip;
-//		self->vx_hdr.vxh_bxsiz = self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin;
 	}
 	if ((video_offset_t)self->vx_hdr.vxh_bymin < self->vx_hdr.vxh_cyoff) {
 		self->vx_hdr.vxh_bymin = (video_coord_t)self->vx_hdr.vxh_cyoff;
 		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
 			goto empty_clip;
-//		self->vx_hdr.vxh_bysiz = self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin;
 	}
 
 	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cxoff, size_x, &cxend) &&
@@ -132,22 +154,18 @@ libvideo_gfx_clip(struct video_gfx *__restrict self,
 		self->vx_hdr.vxh_bxend = (video_coord_t)cxend;
 		if (self->vx_hdr.vxh_bxend <= self->vx_hdr.vxh_bxmin)
 			goto empty_clip;
-//		self->vx_hdr.vxh_bxsiz = self->vx_hdr.vxh_bxend - self->vx_hdr.vxh_bxmin;
 	}
 	if (!OVERFLOW_SADD(self->vx_hdr.vxh_cyoff, size_y, &cyend) &&
 	    self->vx_hdr.vxh_byend > (video_coord_t)cyend && cyend > 0) {
 		self->vx_hdr.vxh_byend = (video_coord_t)cyend;
 		if (self->vx_hdr.vxh_byend <= self->vx_hdr.vxh_bymin)
 			goto empty_clip;
-//		self->vx_hdr.vxh_bysiz = self->vx_hdr.vxh_byend - self->vx_hdr.vxh_bymin;
 	}
-	_libvideo_gfx_clip_updated(self);
 	return self;
 empty_clip:
 	self->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;
 	return self;
 }
-
 
 
 
@@ -157,19 +175,18 @@ empty_clip:
  * @param: coords: The absolute (physical) coords of the pixel are stored here
  * @return: true:  Translation was successful
  * @return: false: The given x/y lie outside the I/O Rect of `self' */
-DEFINE_PUBLIC_ALIAS(video_gfx_offset2coord, libvideo_gfx_offset2coord);
 INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
-libvideo_gfx_offset2coord(struct video_gfx const *__restrict self,
-                          video_offset_t x, video_offset_t y,
-                          video_coord_t coords[2]) {
+libvideo_gfx_offset2coord__generic(struct video_gfx const *__restrict self,
+                                   video_offset_t x, video_offset_t y,
+                                   video_coord_t coords[2]) {
 	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
 		x = (self->vx_hdr.vxh_cxsiz - 1) - x;
 	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
 		y = (self->vx_hdr.vxh_cysiz - 1) - y;
 	if (self->vx_flags & VIDEO_GFX_F_XWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz); /* FIXME: divide-by-zero when GFX is empty */
+		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	if (self->vx_flags & VIDEO_GFX_F_YWRAP)
-		x = wrap(x, self->vx_hdr.vxh_cxsiz); /* FIXME: divide-by-zero when GFX is empty */
+		x = wrap(x, self->vx_hdr.vxh_cxsiz);
 	x += self->vx_hdr.vxh_cxoff;
 	y += self->vx_hdr.vxh_cyoff;
 	if unlikely((video_coord_t)x < self->vx_hdr.vxh_bxmin)
@@ -199,11 +216,16 @@ fail:
  * @param: offsets: The offset (virtual) coords of the pixel are stored here
  * @return: true:  Translation was successful
  * @return: false: The given x/y lie outside the I/O Rect of `self' */
-DEFINE_PUBLIC_ALIAS(video_gfx_coord2offset, libvideo_gfx_coord2offset);
 INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
-libvideo_gfx_coord2offset(struct video_gfx const *__restrict self,
-                          video_coord_t x, video_coord_t y,
-                          video_offset_t offsets[2]) {
+libvideo_gfx_coord2offset__generic(struct video_gfx const *__restrict self,
+                                   video_coord_t x, video_coord_t y,
+                                   video_offset_t offsets[2]) {
+	if (self->vx_flags & VIDEO_GFX_F_XYSWAP) {
+		video_coord_t temp;
+		temp = x;
+		x    = y;
+		y    = temp;
+	}
 	if unlikely(x < self->vx_hdr.vxh_bxmin)
 		goto fail;
 	if unlikely(y < self->vx_hdr.vxh_bymin)
@@ -227,6 +249,22 @@ fail:
 
 
 
+
+
+
+/* Perform geometric transformations on the contents of the current  clip
+ * rect of `self'. Note that none of these functions alter pixel data  of
+ * the underlying buffer; they only affect how the given `self' interacts
+ * with pixel data of the underlying buffer.
+ *
+ * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
+ * - video_gfx_hmirror: Mirror pixel data horizontally
+ * - video_gfx_vmirror: Mirror pixel data vertically
+ * - video_gfx_lrot90:  Rotate pixel data left 90°
+ * - video_gfx_rrot90:  Rotate pixel data right 90°
+ * - video_gfx_rot180:  Rotate pixel data 180°
+ * - video_gfx_nrot90n: Rotate pixel data by left by 90*n°
+ * - video_gfx_rrot90n: Rotate pixel data by right by 90*n° */
 
 LOCAL ATTR_INOUT(1) void FCC
 _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
@@ -253,19 +291,6 @@ _libvideo_gfx_xyswap(struct video_gfx *__restrict self) {
 #undef GFX_FLAGS_X_TO_Y_LSHIFT
 }
 
-/* Perform geometric transformations on the contents of the current  clip
- * rect of `self'. Note that none of these functions alter pixel data  of
- * the underlying buffer; they only affect how the given `self' interacts
- * with pixel data of the underlying buffer.
- *
- * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
- * - video_gfx_hmirror: Mirror pixel data horizontally
- * - video_gfx_vmirror: Mirror pixel data vertically
- * - video_gfx_lrot90:  Rotate pixel data left 90°
- * - video_gfx_rrot90:  Rotate pixel data right 90°
- * - video_gfx_rot180:  Rotate pixel data 180°
- * - video_gfx_nrot:    Rotate pixel data by left by 90*n°
- * - video_gfx_rrot:    Rotate pixel data by right by 90*n° */
 DEFINE_PUBLIC_ALIAS(video_gfx_xyswap, libvideo_gfx_xyswap);
 INTERN ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_gfx_xyswap(struct video_gfx *__restrict self) {

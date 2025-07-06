@@ -586,8 +586,6 @@ INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(7) void CC libvideo_swgfx_fillmask_byblit(s
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask_wrap(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
 INTDEF ATTR_IN(1) ATTR_IN(6) ATTR_IN(9) void CC libvideo_swgfx_fillstretchmask_byblit(struct video_gfx const *__restrict self, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_color_t const bg_fg_colors[2], video_dim_t src_size_x, video_dim_t src_size_y, struct video_bitmask const *__restrict bm);
-INTDEF ATTR_IN(1) ATTR_IN(4) void CC libvideo_swgfx_bitblit(struct video_gfx const *__restrict dst, video_offset_t dst_x, video_offset_t dst_y, struct video_gfx const *__restrict src, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) ATTR_IN(6) void CC libvideo_swgfx_stretch(struct video_gfx const *__restrict dst, video_offset_t dst_x, video_offset_t dst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, struct video_gfx const *__restrict src, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops_xyswap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_swgfx_ops_wrap(void);
@@ -626,84 +624,6 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_swbl
 #define libvideo_swblitter_ops_rdwrap_imatrix (*_libvideo_swblitter_ops_rdwrap_imatrix()) /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+dst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
 #define libvideo_swblitter_ops_wrap           (*_libvideo_swblitter_ops_wrap())           /* Support: src+dst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
 #define libvideo_swblitter_ops_wrap_imatrix   (*_libvideo_swblitter_ops_wrap_imatrix())   /* Support: src+dst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+dst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
-
-
-
-
-
-
-/* Apply a clipping  rect to "self",  shrinking the  pixel
- * area relative to offsets specified by the given coords.
- *
- * Note that the clip area can  only ever be shrunk. To  go
- * back to the initial clip area, either keep a copy of the
- * original GFX  context, or  create a  new context  (which
- * always starts  out with  its clipping  area set  to  the
- * associated buffer's entire surface)
- *
- * @param: clip_x: Delta to add to the Clip Rect starting X coord.
- *                 When negative, extend clip rect with void-pixels to the left
- * @param: clip_y: Delta to add to the Clip Rect starting Y coord.
- *                 When negative, extend clip rect with void-pixels to the top
- * @param: size_x: New width of the clip rect. When greater than the old  clip
- *                 rect width, extend clip rect with void-pixels to the right.
- * @param: size_y: New height of the clip rect.  When greater than the old  clip
- *                 rect height, extend clip rect with void-pixels to the bottom.
- * @return: * : Always re-returns `self' */
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
-libvideo_gfx_clip(struct video_gfx *__restrict self,
-                  video_offset_t clip_x, video_offset_t clip_y,
-                  video_dim_t size_x, video_dim_t size_y);
-
-/* Called after the Clip- or I/O-Rect of `self' was updated
- * (caller must ensure  that I/O rect  is still  non-empty) */
-#define _libvideo_gfx_clip_updated(self) (void)0
-
-/* Translate virtual (offset) pixel coords to physical (coord) coords.
- * @param: x:      Virtual pixel X offset
- * @param: y:      Virtual pixel Y offset
- * @param: coords: The absolute (physical) coords of the pixel are stored here
- * @return: true:  Translation was successful
- * @return: false: The given x/y lie outside the I/O Rect of `self' */
-INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
-libvideo_gfx_offset2coord(struct video_gfx const *__restrict self,
-                          video_offset_t x, video_offset_t y,
-                          video_coord_t coords[2]);
-
-/* Translate physical (coord) pixel coords to virtual (offset) coords.
- * @param: x:       Physical pixel X coord
- * @param: y:       Physical pixel Y coord
- * @param: offsets: The offset (virtual) coords of the pixel are stored here
- * @return: true:  Translation was successful
- * @return: false: The given x/y lie outside the I/O Rect of `self' */
-INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
-libvideo_gfx_coord2offset(struct video_gfx const *__restrict self,
-                          video_coord_t x, video_coord_t y,
-                          video_offset_t offsets[2]);
-
-
-/* Perform geometric transformations on the contents of the current  clip
- * rect of `self'. Note that none of these functions alter pixel data  of
- * the underlying buffer; they only affect how the given `self' interacts
- * with pixel data of the underlying buffer.
- *
- * - video_gfx_xyswap:  Swap x/y coords (mirror pixel data along a diagonal starting in the top-left)
- * - video_gfx_hmirror: Mirror pixel data horizontally
- * - video_gfx_vmirror: Mirror pixel data vertically
- * - video_gfx_lrot90:  Rotate pixel data left 90°
- * - video_gfx_rrot90:  Rotate pixel data right 90°
- * - video_gfx_rot180:  Rotate pixel data 180°
- * - video_gfx_nrot90n: Rotate pixel data by left by 90*n°
- * - video_gfx_rrot90n: Rotate pixel data by right by 90*n° */
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_xyswap(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_hmirror(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_vmirror(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rot180(struct video_gfx *__restrict self);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_lrot90n(struct video_gfx *__restrict self, int n);
-INTDEF ATTR_INOUT(1) struct video_gfx *FCC libvideo_gfx_rrot90n(struct video_gfx *__restrict self, int n);
-
 
 
 LOCAL ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
@@ -810,8 +730,8 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 			}
 			goto after_blend;
 
-#define LINK_libvideo_swgfx_generic__putcolor_FOO(name, mode)                        \
-		case mode:                                                                 \
+#define LINK_libvideo_swgfx_generic__putcolor_FOO(name, mode)             \
+		case mode:                                                        \
 			drv->xsw_putcolor = &libvideo_swgfx_generic__putcolor_##name; \
 			break;
 		GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_swgfx_generic__putcolor_FOO)
@@ -872,7 +792,6 @@ after_blend:;
  * - self->vx_buffer    (if in "vi_initgfx", already done by *your* caller) */
 LOCAL ATTR_INOUT(1) void CC
 libvideo_swgfx_populate(struct video_gfx *__restrict self) {
-	/* Line/fill operators... */
 	libvideo_swgfx_update(self, VIDEO_GFX_UPDATE_ALL);
 }
 

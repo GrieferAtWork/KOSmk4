@@ -201,31 +201,6 @@ set_generic_operators:
 /* BLIT WRAPPERS                                                        */
 /************************************************************************/
 
-INTERN ATTR_IN(1) ATTR_IN(4) void CC
-libvideo_swgfx_bitblit(struct video_gfx const *__restrict dst,
-                       video_offset_t dst_x, video_offset_t dst_y,
-                       struct video_gfx const *__restrict src,
-                       video_offset_t src_x, video_offset_t src_y,
-                       video_dim_t size_x, video_dim_t size_y) {
-	struct video_blitter blitter, *p_blitter;
-	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
-	video_blitter_bitblit(p_blitter, dst_x, dst_y,
-	                      src_x, src_y, size_x, size_y);
-}
-
-INTERN ATTR_IN(1) ATTR_IN(6) void CC
-libvideo_swgfx_stretch(struct video_gfx const *__restrict dst,
-                       video_offset_t dst_x, video_offset_t dst_y,
-                       video_dim_t dst_size_x, video_dim_t dst_size_y,
-                       struct video_gfx const *__restrict src,
-                       video_offset_t src_x, video_offset_t src_y,
-                       video_dim_t src_size_x, video_dim_t src_size_y) {
-	struct video_blitter blitter, *p_blitter;
-	p_blitter = video_gfx_blitfrom(dst, src, &blitter);
-	video_blitter_stretch(p_blitter,
-	                      dst_x, dst_y, dst_size_x, dst_size_y,
-	                      src_x, src_y, src_size_x, src_size_y);
-}
 
 
 

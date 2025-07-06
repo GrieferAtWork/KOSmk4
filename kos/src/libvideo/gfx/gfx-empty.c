@@ -55,6 +55,36 @@ libvideo_emptygfx_blitfrom(struct video_blitter *__restrict ctx) {
 	return ctx;
 }
 
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *CC
+libvideo_emptygfx_clip(struct video_gfx *__restrict self,
+                       video_offset_t clip_x, video_offset_t clip_y,
+                       video_dim_t size_x, video_dim_t size_y) {
+	self->vx_hdr.vxh_cxoff += clip_x;
+	self->vx_hdr.vxh_cyoff += clip_y;
+	if (self->vx_flags & VIDEO_GFX_F_XMIRROR)
+		self->vx_hdr.vxh_cxoff -= 2 * clip_x;
+	if (self->vx_flags & VIDEO_GFX_F_YMIRROR)
+		self->vx_hdr.vxh_cyoff -= 2 * clip_y;
+	self->vx_hdr.vxh_cxsiz = size_x;
+	self->vx_hdr.vxh_cysiz = size_y;
+	return self;
+}
+
+#define libvideo_emptygfx_coord2offset \
+	(*(bool (CC *)(struct video_gfx const *__restrict, video_coord_t, video_coord_t, video_offset_t[2]))&libvideo_emptygfx_offset2coord)
+INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
+libvideo_emptygfx_offset2coord(struct video_gfx const *__restrict self,
+                               video_offset_t x, video_offset_t y,
+                               video_coord_t coords[2]) {
+	/* GFX is empty, so there are no valid offsets/coords */
+	(void)self;
+	(void)x;
+	(void)y;
+	(void)coords;
+	COMPILER_IMPURE();
+	return false;
+}
+
 INTERN ATTR_IN(1) video_color_t CC
 libvideo_emptygfx_getcolor(struct video_gfx const *__restrict UNUSED(self),
                             video_offset_t UNUSED(x), video_offset_t UNUSED(y)) {
@@ -155,6 +185,9 @@ PRIVATE struct video_gfx_ops libvideo_emptygfx_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_emptygfx_ops(void) {
 	if unlikely(!libvideo_emptygfx_ops.vgfo_getcolor) {
 		libvideo_emptygfx_ops.vgfo_blitfrom        = &libvideo_emptygfx_blitfrom;
+		libvideo_emptygfx_ops.vgfo_clip            = &libvideo_emptygfx_clip;
+		libvideo_emptygfx_ops.vgfo_coord2offset    = &libvideo_emptygfx_coord2offset;
+		libvideo_emptygfx_ops.vgfo_offset2coord    = &libvideo_emptygfx_offset2coord;
 		libvideo_emptygfx_ops.vgfo_bitblit         = &libvideo_emptygfx_bitblit;
 		libvideo_emptygfx_ops.vgfo_stretch         = &libvideo_emptygfx_stretch;
 		libvideo_emptygfx_ops.vgfo_vgradient       = &libvideo_emptygfx_vgradient;

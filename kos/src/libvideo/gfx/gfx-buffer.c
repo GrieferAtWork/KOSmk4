@@ -163,13 +163,13 @@ subregion_buffer_initgfx(struct video_gfx *__restrict self) {
 	self = (*base->vb_ops->vi_initgfx)(self);
 
 	/* Adjust clip rect so it points at the sub-region */
+	/* XXX: directly adjusting the clip rect might break for some buffer types */
 	self->vx_hdr.vxh_cxoff = self->vx_hdr.vxh_bxmin = me->srb_xoff;
 	self->vx_hdr.vxh_cyoff = self->vx_hdr.vxh_bymin = me->srb_yoff;
 	self->vx_hdr.vxh_cxsiz = me->vb_xdim;
 	self->vx_hdr.vxh_cysiz = me->vb_ydim;
 	self->vx_hdr.vxh_bxend = self->vx_hdr.vxh_bxmin + me->vb_xdim;
 	self->vx_hdr.vxh_byend = self->vx_hdr.vxh_bymin + me->vb_ydim;
-	_libvideo_gfx_clip_updated(self);
 	return self;
 }
 
@@ -244,6 +244,7 @@ gfx_buffer_initgfx(struct video_gfx *__restrict self) {
 	self = (*base->vb_ops->vi_initgfx)(self);
 
 	/* Restore clip rect */
+	/* XXX: directly adjusting the clip rect might break for some buffer types */
 	self->vx_hdr.vxh_cxoff = me->gxb_cxoff;
 	self->vx_hdr.vxh_cyoff = me->gxb_cyoff;
 	self->vx_hdr.vxh_cxsiz = me->vb_xdim;
@@ -252,7 +253,6 @@ gfx_buffer_initgfx(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_bymin = me->gxb_bymin;
 	self->vx_hdr.vxh_bxend = me->gxb_bxend;
 	self->vx_hdr.vxh_byend = me->gxb_byend;
-	_libvideo_gfx_clip_updated(self);
 	return self;
 }
 
