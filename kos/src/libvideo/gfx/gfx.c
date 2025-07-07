@@ -99,6 +99,37 @@ libvideo_gfx_stretch__with_blitter(struct video_gfx const *__restrict dst,
 	                      src_x, src_y, src_size_x, src_size_y);
 }
 
+INTERN ATTR_IN(1) ATTR_IN(4) ATTR_IN(7) void CC
+libvideo_gfx_bitblit3__with_blitter3(struct video_gfx const *wrdst, video_offset_t wrdst_x, video_offset_t wrdst_y,
+                                     struct video_gfx const *rddst, video_offset_t rddst_x, video_offset_t rddst_y,
+                                     struct video_gfx const *src, video_offset_t src_x, video_offset_t src_y,
+                                     video_dim_t size_x, video_dim_t size_y) {
+	struct video_blitter3 blitter, *p_blitter;
+	blitter.vbt3_wrdst = wrdst;
+	blitter.vbt3_rddst = rddst;
+	blitter.vbt3_src   = src;
+	p_blitter = (*wrdst->vx_hdr.vxh_ops->vgfo_blitfrom3)(&blitter);
+	video_blitter3_bitblit(p_blitter,
+	                       wrdst_x, wrdst_y, rddst_x, rddst_y,
+	                       src_x, src_y, size_x, size_y);
+}
+
+INTERN ATTR_IN(1) ATTR_IN(4) ATTR_IN(9) void CC
+libvideo_gfx_stretch3__with_blitter3(struct video_gfx const *wrdst, video_offset_t wrdst_x, video_offset_t wrdst_y,
+                                     struct video_gfx const *rddst, video_offset_t rddst_x, video_offset_t rddst_y,
+                                     video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                     struct video_gfx const *src, video_offset_t src_x, video_offset_t src_y,
+                                     video_dim_t src_size_x, video_dim_t src_size_y) {
+	struct video_blitter3 blitter, *p_blitter;
+	blitter.vbt3_wrdst = wrdst;
+	blitter.vbt3_rddst = rddst;
+	blitter.vbt3_src   = src;
+	p_blitter = (*wrdst->vx_hdr.vxh_ops->vgfo_blitfrom3)(&blitter);
+	video_blitter3_stretch(p_blitter, wrdst_x, wrdst_y,
+	                       rddst_x, rddst_y, dst_size_x, dst_size_y,
+	                       src_x, src_y, src_size_x, src_size_y);
+}
+
 
 
 /* Apply a clipping  rect to "self",  shrinking the  pixel

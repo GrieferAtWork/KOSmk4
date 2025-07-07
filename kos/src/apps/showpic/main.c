@@ -337,11 +337,23 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 1
+#if 0
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
+#elif 1
+	{
+		struct video_gfx flipgfx = image_gfx;
+		video_gfx_hmirror(&flipgfx);
+		video_gfx_setblend(&flipgfx, GFX_BLENDMODE_ALPHA_OVERRIDE(240));
+		video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
+		                   &flipgfx, 0, 0,
+		                   blit_w, blit_h,
+		                   &image_gfx, 0, 0,
+		                   video_gfx_getclipw(&image_gfx),
+		                   video_gfx_getcliph(&image_gfx));
+	}
 #elif 0
 	{
 		int offset = 10;

@@ -51,7 +51,13 @@ DECL_BEGIN
 /* Empty GFX operators */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter *FCC
 libvideo_emptygfx_blitfrom(struct video_blitter *__restrict ctx) {
-	ctx->vbt_ops = &libvideo_blit_empty_ops;
+	ctx->vbt_ops = &libvideo_emptyblitter_ops;
+	return ctx;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter3 *FCC
+libvideo_emptygfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
+	ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
 	return ctx;
 }
 
@@ -70,8 +76,6 @@ libvideo_emptygfx_clip(struct video_gfx *__restrict self,
 	return self;
 }
 
-#define libvideo_emptygfx_coord2offset \
-	(*(bool (CC *)(struct video_gfx const *__restrict, video_coord_t, video_coord_t, video_offset_t[2]))&libvideo_emptygfx_offset2coord)
 INTERN WUNUSED ATTR_IN(1) ATTR_OUT(4) bool CC
 libvideo_emptygfx_offset2coord(struct video_gfx const *__restrict self,
                                video_offset_t x, video_offset_t y,
@@ -161,19 +165,42 @@ libvideo_emptygfx_fillstretchmask(struct video_gfx const *__restrict UNUSED(self
 }
 
 INTERN ATTR_IN(1) ATTR_IN(4) void CC
-libvideo_emptygfx_bitblit(struct video_gfx const *__restrict UNUSED(dst),
+libvideo_emptygfx_bitblit(struct video_gfx const *UNUSED(dst),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
-                           struct video_gfx const *__restrict UNUSED(src),
+                           struct video_gfx const *UNUSED(src),
                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
 	COMPILER_IMPURE();
 }
 
 INTERN ATTR_IN(1) ATTR_IN(6) void CC
-libvideo_emptygfx_stretch(struct video_gfx const *__restrict UNUSED(dst),
+libvideo_emptygfx_stretch(struct video_gfx const *UNUSED(dst),
                            video_offset_t UNUSED(dst_x), video_offset_t UNUSED(dst_y),
                            video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
-                           struct video_gfx const *__restrict UNUSED(src),
+                           struct video_gfx const *UNUSED(src),
+                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                           video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
+	COMPILER_IMPURE();
+}
+
+INTERN ATTR_IN(1) ATTR_IN(4) ATTR_IN(7) void CC
+libvideo_emptygfx_bitblit3(struct video_gfx const *UNUSED(wrdst),
+                           video_offset_t UNUSED(wrdst_x), video_offset_t UNUSED(wrdst_y),
+                           struct video_gfx const *UNUSED(rddst),
+                           video_offset_t UNUSED(rddst_x), video_offset_t UNUSED(rddst_y),
+                           struct video_gfx const *UNUSED(src),
+                           video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                           video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
+	COMPILER_IMPURE();
+}
+
+INTERN ATTR_IN(1) ATTR_IN(4) ATTR_IN(9) void CC
+libvideo_emptygfx_stretch3(struct video_gfx const *UNUSED(wrdst),
+                           video_offset_t UNUSED(wrdst_x), video_offset_t UNUSED(wrdst_y),
+                           struct video_gfx const *UNUSED(rddst),
+                           video_offset_t UNUSED(rddst_x), video_offset_t UNUSED(rddst_y),
+                           video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                           struct video_gfx const *UNUSED(src),
                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
                            video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
 	COMPILER_IMPURE();
@@ -185,11 +212,14 @@ PRIVATE struct video_gfx_ops libvideo_emptygfx_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC _libvideo_emptygfx_ops(void) {
 	if unlikely(!libvideo_emptygfx_ops.vgfo_getcolor) {
 		libvideo_emptygfx_ops.vgfo_blitfrom        = &libvideo_emptygfx_blitfrom;
+		libvideo_emptygfx_ops.vgfo_blitfrom3       = &libvideo_emptygfx_blitfrom3;
 		libvideo_emptygfx_ops.vgfo_clip            = &libvideo_emptygfx_clip;
 		libvideo_emptygfx_ops.vgfo_coord2offset    = &libvideo_emptygfx_coord2offset;
 		libvideo_emptygfx_ops.vgfo_offset2coord    = &libvideo_emptygfx_offset2coord;
 		libvideo_emptygfx_ops.vgfo_bitblit         = &libvideo_emptygfx_bitblit;
 		libvideo_emptygfx_ops.vgfo_stretch         = &libvideo_emptygfx_stretch;
+		libvideo_emptygfx_ops.vgfo_bitblit3        = &libvideo_emptygfx_bitblit3;
+		libvideo_emptygfx_ops.vgfo_stretch3        = &libvideo_emptygfx_stretch3;
 		libvideo_emptygfx_ops.vgfo_vgradient       = &libvideo_emptygfx_vgradient;
 		libvideo_emptygfx_ops.vgfo_hgradient       = &libvideo_emptygfx_hgradient;
 		libvideo_emptygfx_ops.vgfo_gradient        = &libvideo_emptygfx_gradient;
@@ -227,18 +257,53 @@ libvideo_emptyblitter_stretch(struct video_blitter const *__restrict UNUSED(self
 	COMPILER_IMPURE();
 }
 
-#undef libvideo_blit_empty_ops
-PRIVATE struct video_blitter_ops libvideo_blit_empty_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_blit_empty_ops(void) {
-	if unlikely(!libvideo_blit_empty_ops.vbto_bitblit) {
-		libvideo_blit_empty_ops.vbto_stretch = &libvideo_emptyblitter_stretch;
+#undef libvideo_emptyblitter_ops
+PRIVATE struct video_blitter_ops libvideo_emptyblitter_ops = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter_ops const *CC _libvideo_emptyblitter_ops(void) {
+	if unlikely(!libvideo_emptyblitter_ops.vbto_bitblit) {
+		libvideo_emptyblitter_ops.vbto_stretch = &libvideo_emptyblitter_stretch;
 		COMPILER_WRITE_BARRIER();
-		libvideo_blit_empty_ops.vbto_bitblit = &libvideo_emptyblitter_blit;
+		libvideo_emptyblitter_ops.vbto_bitblit = &libvideo_emptyblitter_blit;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &libvideo_blit_empty_ops;
+	return &libvideo_emptyblitter_ops;
 }
-#define libvideo_blit_empty_ops (*_libvideo_blit_empty_ops())
+#define libvideo_emptyblitter_ops (*_libvideo_emptyblitter_ops())
+
+
+
+/* Empty blit3 operators */
+INTERN ATTR_IN(1) void CC
+libvideo_emptyblitter3_blit(struct video_blitter3 const *__restrict UNUSED(self),
+                            video_offset_t UNUSED(wrdst_x), video_offset_t UNUSED(wrdst_y),
+                            video_offset_t UNUSED(rddst_x), video_offset_t UNUSED(rddst_y),
+                            video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                            video_dim_t UNUSED(size_x), video_dim_t UNUSED(size_y)) {
+	COMPILER_IMPURE();
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_emptyblitter3_stretch(struct video_blitter3 const *__restrict UNUSED(self),
+                               video_offset_t UNUSED(wrdst_x), video_offset_t UNUSED(wrdst_y),
+                               video_offset_t UNUSED(rddst_x), video_offset_t UNUSED(rddst_y),
+                               video_dim_t UNUSED(dst_size_x), video_dim_t UNUSED(dst_size_y),
+                               video_offset_t UNUSED(src_x), video_offset_t UNUSED(src_y),
+                               video_dim_t UNUSED(src_size_x), video_dim_t UNUSED(src_size_y)) {
+	COMPILER_IMPURE();
+}
+
+#undef libvideo_emptyblitter3_ops
+PRIVATE struct video_blitter3_ops libvideo_emptyblitter3_ops = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_emptyblitter3_ops(void) {
+	if unlikely(!libvideo_emptyblitter3_ops.vbt3o_bitblit) {
+		libvideo_emptyblitter3_ops.vbt3o_stretch = &libvideo_emptyblitter3_stretch;
+		COMPILER_WRITE_BARRIER();
+		libvideo_emptyblitter3_ops.vbt3o_bitblit = &libvideo_emptyblitter3_blit;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &libvideo_emptyblitter3_ops;
+}
+#define libvideo_emptyblitter3_ops (*_libvideo_emptyblitter3_ops())
 
 
 

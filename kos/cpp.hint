@@ -2868,3 +2868,7 @@
 #define DEFINE_PIXEL64_IO_WRAPPERS(...)
 #define DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(...)
 #define DEFINE_PIXEL64_IO_WRAPPERS__WITH_SUFFIX(...)
+#define DECLARE_libvideo_swblitter3__blend_FOO(n,...) \
+	video_color_t libvideo_swblitter3__blend_##n(struct video_blitter3 const*__restrict self,video_color_t dst,video_color_t src);
+#define DEFINE_libvideo_swblitter3__blend_FOO(n,...) \
+	video_color_t libvideo_swblitter3__blend_##n(struct video_blitter3 const*__restrict self,video_color_t dst,video_color_t src){}

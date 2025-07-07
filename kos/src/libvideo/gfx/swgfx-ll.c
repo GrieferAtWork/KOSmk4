@@ -30,7 +30,10 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 /************************************************************************/
 
 #ifndef __INTELLISENSE__
+#include "swgfx/ll_blit.c.inl"
+#include "swgfx/ll_blit3.c.inl"
 #include "swgfx/ll_generic.c.inl"
+#include "swgfx/ll_noblend-blit.c.inl"
 #include "swgfx/ll_noblend.c.inl"
 #endif /* !__INTELLISENSE__ */
 

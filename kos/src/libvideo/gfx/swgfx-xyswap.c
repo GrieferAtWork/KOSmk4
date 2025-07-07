@@ -37,6 +37,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #define DEFINE_libvideo_swblitter_blit_wrap_imatrix
 #include "swgfx/hl_blit.c.inl"
 
+#define DEFINE_libvideo_swblitter3_blit_imatrix
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter3_stretch_imatrix
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter3_blit_wrap_imatrix
+#include "swgfx/hl_blit.c.inl"
+
 #define DEFINE_libvideo_swgfx_XXX_xyswap
 #include "swgfx/hl_generic.c.inl"
 #endif /* !__INTELLISENSE__ */

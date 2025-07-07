@@ -37,6 +37,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/overflow.h>
 
+#include <assert.h>
+
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
 
@@ -47,8 +49,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-static_assert(sizeof(struct blt_swdrv) <= (_VIDEO_BLIT_N_DRIVER * sizeof(void (*)(void))),
-              "sizeof(struct blt_swdrv) too large for '_VIDEO_BLIT_N_DRIVER'");
+static_assert(sizeof(struct blt_swdrv) <= (_VIDEO_BLITTER_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blt_swdrv) too large for '_VIDEO_BLITTER_N_DRIVER'");
 static_assert(sizeof(struct gfx_swdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
               "sizeof(struct gfx_swdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
@@ -119,7 +121,9 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 	video_swblitter_setops(ctx);
 
 	/* Check for special case: source and target buffers are the same */
-	if (src_buffer == dst_buffer) {
+	if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0) {
+		ctx->vbt_ops = &libvideo_emptyblitter_ops;
+	} else if (src_buffer == dst_buffer) {
 		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_l;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_l;
@@ -140,8 +144,6 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit         = &libvideo_swblitter_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
-	} else if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0) {
-		ctx->vbt_ops = &libvideo_blit_empty_ops;
 	} else if (GFX_BLENDMODE_GET_MODE(dst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
 		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) != 0)
 			goto set_generic_operators;
@@ -195,11 +197,54 @@ set_generic_operators:
 }
 
 
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_blitter3 *FCC
+libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
+	struct video_gfx const *src_gfx = ctx->vbt3_src;
+	struct video_gfx const *rddst_gfx = ctx->vbt3_rddst;
+	struct video_gfx const *wrdst_gfx = ctx->vbt3_wrdst;
+	struct blt3_swdrv *drv = video_swblitter3_getdrv(ctx);
+	video_swblitter3_setops(ctx);
+	(void)wrdst_gfx;
+	assert(video_gfx_getclipw(wrdst_gfx) != 0);
+	assert(video_gfx_getcliph(wrdst_gfx) != 0);
+	if (video_gfx_getclipw(src_gfx) == 0 || video_gfx_getcliph(src_gfx) == 0 ||
+	    video_gfx_getclipw(rddst_gfx) == 0 || video_gfx_getcliph(rddst_gfx) == 0) {
+		ctx->vbt3_ops = &libvideo_emptyblitter3_ops;
+	} else {
+		drv->bsw3_blendmode = rddst_gfx->vx_blend;
+		switch (__builtin_expect(GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend),
+		                         GFX_BLENDMODE_ALPHA)) {
+#define LINK_libvideo_swblt_generic__blend_FOO(name, mode)        \
+		case mode:                                                \
+			drv->bsw3_blend = &libvideo_swblitter3__blend_##name; \
+			break;
+		GFX_FOREACH_DEDICATED_BLENDMODE(LINK_libvideo_swblt_generic__blend_FOO)
+		GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(LINK_libvideo_swblt_generic__blend_FOO)
+#undef LINK_libvideo_swblt_generic__blend_FOO
+		default:
+			drv->bsw3_blend = &libvideo_swblitter3__blend;
+			break;
+		}
+
+		/* TODO: Special handling when buffers overlap */
+		/* TODO: Dedicated optimizations */
+
+		drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
+		drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
+		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+			drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_l;
+			drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_l;
+		} else {
+			drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_n;
+			drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_n;
+		}
+	}
+	return ctx;
+}
 
 
-/************************************************************************/
-/* BLIT WRAPPERS                                                        */
-/************************************************************************/
+
+
 
 
 
@@ -518,6 +563,13 @@ DECL_END
 #define DEFINE_libvideo_swblitter_stretch
 #include "swgfx/hl_blit-nowrap.c.inl"
 #define DEFINE_libvideo_swblitter_blit_wrap
+#include "swgfx/hl_blit.c.inl"
+
+#define DEFINE_libvideo_swblitter3_blit
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter3_stretch
+#include "swgfx/hl_blit-nowrap.c.inl"
+#define DEFINE_libvideo_swblitter3_blit_wrap
 #include "swgfx/hl_blit.c.inl"
 #endif /* !__INTELLISENSE__ */
 

@@ -516,6 +516,62 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		} while (iter_size_x);                                                        \
 	} while (size_y)
 
+
+/* Invoke:
+ * >> cb(video_coord_t out_x, video_coord_t out_y,
+ * >>    video_coord_t dst_x, video_coord_t dst_y,
+ * >>    video_coord_t src_x, video_coord_t src_y);
+ * for every pixel within the destination region */
+#define GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y, cb) \
+	do {                                                                                \
+		video_coord_t used_out_x = out_x;                                               \
+		video_coord_t used_dst_x = dst_x;                                               \
+		video_coord_t used_src_x = src_x;                                               \
+		video_dim_t iter_size_x  = size_x;                                              \
+		do {                                                                            \
+			cb(used_out_x, out_y, used_dst_x, dst_y, used_src_x, src_y);                \
+			++used_out_x;                                                               \
+			++used_dst_x;                                                               \
+			++used_src_x;                                                               \
+		} while (--iter_size_x);                                                        \
+		++out_y;                                                                        \
+		++dst_y;                                                                        \
+		++src_y;                                                                        \
+	} while (--size_y)
+
+/* Invoke:
+ * >> cb(video_coord_t out_x, video_coord_t out_y,
+ * >>    video_coord_t dst_x, video_coord_t dst_y,
+ * >>    video_coord_t src_x, video_coord_t src_y);
+ * for every pixel within the destination region, applying
+ * transformation as per "dst_matrix" and "src_matrix"
+ *
+ * Allowed to clobber all given arguments. */
+#define GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,          \
+                                  src_x, src_y, size_x, size_y, src_matrix, cb)    \
+	do {                                                                           \
+		video_coord_t used_out_x = out_x;                                          \
+		video_coord_t used_dst_x = dst_x;                                          \
+		video_coord_t used_dst_y = dst_y;                                          \
+		video_coord_t used_src_x = src_x;                                          \
+		video_coord_t used_src_y = src_y;                                          \
+		video_dim_t iter_size_x  = size_x;                                         \
+		do {                                                                       \
+			cb(used_out_x, out_y, used_dst_x, used_dst_y, used_src_x, used_src_y); \
+			used_src_x += video_imatrix2d_get(&src_matrix, 0, 0);                  \
+			used_src_y += video_imatrix2d_get(&src_matrix, 1, 0);                  \
+			used_dst_x += video_imatrix2d_get(&dst_matrix, 0, 0);                  \
+			used_dst_y += video_imatrix2d_get(&dst_matrix, 1, 0);                  \
+			++used_out_x;                                                          \
+		} while (--iter_size_x);                                                   \
+		src_x += video_imatrix2d_get(&src_matrix, 0, 1);                           \
+		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                           \
+		dst_x += video_imatrix2d_get(&dst_matrix, 0, 1);                           \
+		dst_y += video_imatrix2d_get(&dst_matrix, 1, 1);                           \
+		++out_y;                                                                   \
+	} while (--size_y)
+
+
 /* Invoke:
  * >> cb(size_t sizeof_dst_pixel, size_t sizeof_src_pixel);
  * (where "sizeof_dst_pixel" and "sizeof_src_pixel" are  preprocessor
