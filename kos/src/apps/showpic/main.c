@@ -348,7 +348,7 @@ do_showpic(struct screen_buffer *screen,
 //		video_gfx_lrot90(&flipgfx);
 		video_gfx_setblend(&flipgfx, GFX_BLENDMODE_ALPHA_OVERRIDE(200));
 		video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
-		                   &flipgfx, 0, 0,
+		                   &flipgfx, 100, 100,
 		                   blit_w, blit_h,
 		                   &image_gfx, 0, 0,
 		                   video_gfx_getclipw(&image_gfx),

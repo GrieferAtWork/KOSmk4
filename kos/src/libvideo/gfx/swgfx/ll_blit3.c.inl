@@ -444,11 +444,11 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
 
 	/* Try to acquire video locks to perform blit directly on video memory. */
-	if (video_buffer_rlockregion(src->vx_buffer, &srclock, src_x, src_y, size_x, size_y)) {
+	if (LL_rlockregion(src->vx_buffer, &srclock, src_x, src_y, size_x, size_y)) {
 		struct video_regionlock dstlock;
-		if (video_buffer_rlockregion(dst->vx_buffer, &dstlock, dst_x, dst_y, size_x, size_y)) {
+		if (LL_rlockregion(dst->vx_buffer, &dstlock, dst_x, dst_y, size_x, size_y)) {
 			struct video_regionlock outlock;
-			if (video_buffer_wlockregion(out->vx_buffer, &outlock, out_x, out_y, size_x, size_y)) {
+			if (LL_wlockregion(out->vx_buffer, &outlock, out_x, out_y, size_x, size_y)) {
 				byte_t const *srcline = srclock.vrl_lock.vl_data;
 				byte_t const *dstline = dstlock.vrl_lock.vl_data;
 				byte_t *outline = outlock.vrl_lock.vl_data;
@@ -477,14 +477,14 @@ libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
 					dstline += dstlock.vrl_lock.vl_stride;
 					outline += outlock.vrl_lock.vl_stride;
 				} while (--size_y);
-				video_buffer_unlockregion(out->vx_buffer, &outlock);
-				video_buffer_unlockregion(dst->vx_buffer, &dstlock);
-				video_buffer_unlockregion(src->vx_buffer, &srclock);
+				LL_unlockregion(out->vx_buffer, &outlock);
+				LL_unlockregion(dst->vx_buffer, &dstlock);
+				LL_unlockregion(src->vx_buffer, &srclock);
 				goto done;
 			}
-			video_buffer_unlockregion(dst->vx_buffer, &dstlock);
+			LL_unlockregion(dst->vx_buffer, &dstlock);
 		}
-		video_buffer_unlockregion(src->vx_buffer, &srclock);
+		LL_unlockregion(src->vx_buffer, &srclock);
 	}
 
 	/* Fallback: perform operate pixel-by-pixel */
