@@ -345,8 +345,8 @@ do_showpic(struct screen_buffer *screen,
 #elif 1
 	{
 		struct video_gfx flipgfx = image_gfx;
-		video_gfx_hmirror(&flipgfx);
-		video_gfx_setblend(&flipgfx, GFX_BLENDMODE_ALPHA_OVERRIDE(240));
+		video_gfx_lrot90(&flipgfx);
+		video_gfx_setblend(&flipgfx, GFX_BLENDMODE_ALPHA_OVERRIDE(200));
 		video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
 		                   &flipgfx, 0, 0,
 		                   blit_w, blit_h,

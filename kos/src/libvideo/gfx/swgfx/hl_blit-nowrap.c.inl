@@ -532,7 +532,7 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 	}
 #undef LOCAL_dst_vx_flags
 
-	/* Calculate rddst->wrdst transformation matrix */
+	/* Calculate dst->out transformation matrix */
 #ifdef LOCAL_USE_SWBLITTER3
 	dst_matrix = VIDEO_IMATRIX2D_INIT(1, 0, 0, 1);
 	if ((dst->vx_flags ^ out->vx_flags) & VIDEO_GFX_F_XMIRROR) {
@@ -543,7 +543,14 @@ LOCAL_libvideo_swblitter_blit(LOCAL_struct_video_blitter const *__restrict self
 		video_imatrix2d_set(&dst_matrix, 1, 1, -1);
 		dst_y += LOCAL_dst_size_y - 1;
 	}
-	if ((dst->vx_flags ^ out->vx_flags) & VIDEO_GFX_F_XYSWAP) {
+
+	/* Apply X/Y-swap rules and finalize dst_x/dst_y coords */
+	if (dst->vx_flags & VIDEO_GFX_F_XYSWAP) {
+		video_imatrix2d_swap(&dst_matrix, 0, 0, /**/ 1, 0);
+		video_imatrix2d_swap(&dst_matrix, 1, 1, /**/ 0, 1);
+		Tswap(video_offset_t, dst_x, dst_y);
+	}
+	if (out->vx_flags & VIDEO_GFX_F_XYSWAP) {
 		video_imatrix2d_swap(&dst_matrix, 0, 0, /**/ 0, 1);
 		video_imatrix2d_swap(&dst_matrix, 1, 1, /**/ 1, 0);
 		Tswap(video_offset_t, dst_x, dst_y);

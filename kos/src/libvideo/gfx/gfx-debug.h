@@ -33,6 +33,11 @@
 
 DECL_BEGIN
 
+#undef GFX_DEBUG
+#if !defined(NDEBUG) && 0
+#define GFX_DEBUG
+#endif
+
 #ifndef PRIdOFF
 #include <inttypes.h>
 #define PRIdOFF __PRIN_PREFIX(__SIZEOF_VIDEO_OFFSET_T__) "d"
@@ -43,11 +48,6 @@ DECL_BEGIN
 #define PRIxDIM __PRIN_PREFIX(__SIZEOF_VIDEO_DIM_T__) "x"
 #define PRIxCOL __PRIN_PREFIX(__SIZEOF_VIDEO_COLOR_T__) "x"
 #endif /* !PRIdOFF */
-
-#undef GFX_DEBUG
-#if !defined(NDEBUG) && 0
-#define GFX_DEBUG
-#endif
 
 #ifdef GFX_DEBUG
 #include <sys/syslog.h>

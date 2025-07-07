@@ -141,7 +141,9 @@ __DECL_END
 
 /* Same as `GFX_BLENDMODE_ALPHA', but with an additional constant factor "ca"
  * that gets multiplied in in every calculation (useful for defining "global"
- * alpha values) */
+ * alpha values)
+ *
+ * NOTE: "ca" is the SOURCE-alpha factor (iow: 0xff means "GFX_BLENDMODE_ALPHA") */
 #define GFX_BLENDMODE_ALPHA_FACTOR(ca)                                                                  \
 	GFX_BLENDMODE_EX(/*RGB=*/SRC_ALPHA_MUL_CONSTANT_ALPHA, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA, \
 	                 /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,                          \
@@ -149,7 +151,9 @@ __DECL_END
 
 /* Same as `GFX_BLENDMODE_ALPHA', but use "ca" instead of source alpha values
  * In  this sense, this is the same as "GFX_BLENDMODE_ALPHA_FACTOR()", but is
- * faster when the source colors always use `VIDEO_CHANNEL_MAX' for alpha. */
+ * faster when the source colors always use `VIDEO_CHANNEL_MAX' for alpha.
+ *
+ * NOTE: "ca" is the SOURCE-alpha factor (iow: 0xff means "GFX_BLENDMODE_OVERRIDE") */
 #define GFX_BLENDMODE_ALPHA_OVERRIDE(ca)                                    \
 	GFX_BLENDMODE_EX(/*RGB=*/CONSTANT_ALPHA, ADD, ONE_MINUS_CONSTANT_ALPHA, \
 	                 /*A  =*/ONE, ADD, ONE_MINUS_CONSTANT_ALPHA,            \
