@@ -113,61 +113,6 @@ libvideo_swblitter3__blit_imatrix__generic__bypixel(struct video_blitter3 const 
 }
 #undef BLIT_PIXEL
 
-INTERN ATTR_IN(1) void CC
-libvideo_swblitter3__blit__generic(struct video_blitter3 const *__restrict self,
-                                   video_coord_t out_x, video_coord_t out_y,
-                                   video_coord_t dst_x, video_coord_t dst_y,
-                                   video_coord_t src_x, video_coord_t src_y,
-                                   video_dim_t size_x, video_dim_t size_y) {
-	TRACE_START("swblitter3__blit__generic("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
-	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
-
-	/* TODO: Use video locks */
-	libvideo_swblitter3__blit__generic__bypixel(self, out_x, out_y, dst_x, dst_y,
-	                                            src_x, src_y, size_x, size_y);
-	TRACE_END("swblitter3__blit__generic()\n");
-}
-
-INTERN ATTR_IN(1) void CC
-libvideo_swblitter3__blit_imatrix__generic(struct video_blitter3 const *__restrict self,
-                                           video_coord_t out_x, video_coord_t out_y,
-                                           video_coord_t dst_x, video_coord_t dst_y,
-                                           video_imatrix2d_t dst_matrix,
-                                           video_coord_t src_x, video_coord_t src_y,
-                                           video_dim_t size_x, video_dim_t size_y,
-                                           video_imatrix2d_t src_matrix) {
-	gfx_assert_imatrix2d(&dst_matrix);
-	gfx_assert_imatrix2d(&src_matrix);
-
-	TRACE_START("swblitter3__blit_imatrix__generic("
-	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
-	            "dst: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "src: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
-	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
-	            out_x, out_y,
-	            dst_x, dst_y,
-	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
-	            (int)video_imatrix2d_get(&dst_matrix, 0, 1),
-	            (int)video_imatrix2d_get(&dst_matrix, 1, 0),
-	            (int)video_imatrix2d_get(&dst_matrix, 1, 1),
-	            src_x, src_y,
-	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
-	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
-	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
-	            (int)video_imatrix2d_get(&src_matrix, 1, 1),
-	            size_x, size_y);
-
-	/* TODO: Use video locks */
-	libvideo_swblitter3__blit_imatrix__generic__bypixel(self, out_x, out_y, dst_x, dst_y, dst_matrix,
-	                                                    src_x, src_y, size_x, size_y, src_matrix);
-	TRACE_END("swblitter3__blit_imatrix__generic()\n");
-}
-
-
 
 PRIVATE ATTR_IN(1) void CC
 libvideo_swblitter3__stretch__generic_n__bypixel(struct video_blitter3 const *__restrict self,
@@ -290,6 +235,62 @@ libvideo_swblitter3__stretch_imatrix__generic_l__bypixel(struct video_blitter3 c
 }
 
 
+
+
+
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__blit__generic(struct video_blitter3 const *__restrict self,
+                                   video_coord_t out_x, video_coord_t out_y,
+                                   video_coord_t dst_x, video_coord_t dst_y,
+                                   video_coord_t src_x, video_coord_t src_y,
+                                   video_dim_t size_x, video_dim_t size_y) {
+	TRACE_START("swblitter3__blit__generic("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
+	libvideo_swblitter3__blit__generic__bypixel(self, out_x, out_y, dst_x, dst_y,
+	                                            src_x, src_y, size_x, size_y);
+	TRACE_END("swblitter3__blit__generic()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__blit_imatrix__generic(struct video_blitter3 const *__restrict self,
+                                           video_coord_t out_x, video_coord_t out_y,
+                                           video_coord_t dst_x, video_coord_t dst_y,
+                                           video_imatrix2d_t dst_matrix,
+                                           video_coord_t src_x, video_coord_t src_y,
+                                           video_dim_t size_x, video_dim_t size_y,
+                                           video_imatrix2d_t src_matrix) {
+	gfx_assert_imatrix2d(&dst_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
+
+	TRACE_START("swblitter3__blit_imatrix__generic("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y,
+	            dst_x, dst_y,
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 1),
+	            src_x, src_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1),
+	            size_x, size_y);
+	libvideo_swblitter3__blit_imatrix__generic__bypixel(self, out_x, out_y, dst_x, dst_y, dst_matrix,
+	                                                    src_x, src_y, size_x, size_y, src_matrix);
+	TRACE_END("swblitter3__blit_imatrix__generic()\n");
+}
+
+
+
 INTERN ATTR_IN(1) void CC
 libvideo_swblitter3__stretch__generic_n(struct video_blitter3 const *__restrict self,
                                         video_coord_t out_x, video_coord_t out_y,
@@ -304,8 +305,6 @@ libvideo_swblitter3__stretch__generic_n(struct video_blitter3 const *__restrict 
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
-
-	/* TODO: Use video locks */
 	libvideo_swblitter3__stretch__generic_n__bypixel(self, out_x, out_y,
 	                                                 dst_x, dst_y, dst_size_x, dst_size_y,
 	                                                 src_x, src_y, src_size_x, src_size_y);
@@ -348,8 +347,6 @@ libvideo_swblitter3__stretch_imatrix__generic_n(struct video_blitter3 const *__r
 	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
-
-	/* TODO: Use video locks */
 	libvideo_swblitter3__stretch_imatrix__generic_n__bypixel(self, out_x, out_y,
 	                                                         dst_x, dst_y, dst_size_x, dst_size_y, dst_matrix,
 	                                                         src_x, src_y, src_size_x, src_size_y, src_matrix);
@@ -371,8 +368,6 @@ libvideo_swblitter3__stretch__generic_l(struct video_blitter3 const *__restrict 
 	            out_x, out_y,
 	            dst_x, dst_y, dst_size_x, dst_size_y,
 	            src_x, src_y, src_size_x, src_size_y);
-
-	/* TODO: Use video locks */
 	libvideo_swblitter3__stretch__generic_l__bypixel(self, out_x, out_y,
 	                                                 dst_x, dst_y, dst_size_x, dst_size_y,
 	                                                 src_x, src_y, src_size_x, src_size_y);
@@ -415,14 +410,257 @@ libvideo_swblitter3__stretch_imatrix__generic_l(struct video_blitter3 const *__r
 	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
-
-	/* TODO: Use video locks */
 	libvideo_swblitter3__stretch_imatrix__generic_l__bypixel(self, out_x, out_y,
 	                                                         dst_x, dst_y, dst_size_x, dst_size_y, dst_matrix,
 	                                                         src_x, src_y, src_size_x, src_size_y, src_matrix);
 	TRACE_END("swblitter3__stretch_imatrix__generic_l()\n");
 }
 
+
+
+
+
+/************************************************************************/
+/* SINGLE-BLEND, 3-WAY BLITTING                                         */
+/************************************************************************/
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__blit__blend1(struct video_blitter3 const *__restrict self,
+                                  video_coord_t out_x, video_coord_t out_y,
+                                  video_coord_t dst_x, video_coord_t dst_y,
+                                  video_coord_t src_x, video_coord_t src_y,
+                                  video_dim_t size_x, video_dim_t size_y) {
+	struct video_regionlock srclock;
+	struct video_gfx const *out = self->vbt3_wrdst;
+	struct video_gfx const *dst = self->vbt3_rddst;
+	struct video_gfx const *src = self->vbt3_src;
+	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
+
+	TRACE_START("swblitter3__blit__blend1("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
+
+	/* Try to acquire video locks to perform blit directly on video memory. */
+	if (video_buffer_rlockregion(src->vx_buffer, &srclock, src_x, src_y, size_x, size_y)) {
+		struct video_regionlock dstlock;
+		if (video_buffer_rlockregion(dst->vx_buffer, &dstlock, dst_x, dst_y, size_x, size_y)) {
+			struct video_regionlock outlock;
+			if (video_buffer_wlockregion(out->vx_buffer, &outlock, out_x, out_y, size_x, size_y)) {
+				byte_t const *srcline = srclock.vrl_lock.vl_data;
+				byte_t const *dstline = dstlock.vrl_lock.vl_data;
+				byte_t *outline = outlock.vrl_lock.vl_data;
+				struct video_format const *src_format = &src->vx_buffer->vb_format;
+				struct video_format const *dst_format = &dst->vx_buffer->vb_format;
+				struct video_format const *out_format = &out->vx_buffer->vb_format;
+				video_codec_getpixel_t src_getpixel       = src_format->vf_codec->vc_getpixel;
+				video_codec_pixel2color_t src_pixel2color = src_format->vf_codec->vc_pixel2color;
+				video_codec_getpixel_t dst_getpixel       = dst_format->vf_codec->vc_getpixel;
+				video_codec_pixel2color_t dst_pixel2color = dst_format->vf_codec->vc_pixel2color;
+				video_codec_setpixel_t out_setpixel       = out_format->vf_codec->vc_setpixel;
+				video_codec_color2pixel_t out_color2pixel = out_format->vf_codec->vc_color2pixel;
+				do {
+					video_coord_t x;
+					x = 0;
+					do {
+						video_pixel_t src_pixel = (*src_getpixel)(srcline, srclock.vrl_xbas + x);
+						video_color_t src_color = (*src_pixel2color)(src_format, src_pixel);
+						video_pixel_t dst_pixel = (*dst_getpixel)(dstline, dstlock.vrl_xbas + x);
+						video_color_t dst_color = (*dst_pixel2color)(dst_format, dst_pixel);
+						video_color_t out_color = (*blend)(self, dst_color, src_color);
+						video_pixel_t out_pixel = (*out_color2pixel)(out_format, out_color);
+						(*out_setpixel)(outline, outlock.vrl_xbas + x, out_pixel);
+					} while (++x < size_x);
+					srcline += srclock.vrl_lock.vl_stride;
+					dstline += dstlock.vrl_lock.vl_stride;
+					outline += outlock.vrl_lock.vl_stride;
+				} while (--size_y);
+				video_buffer_unlockregion(out->vx_buffer, &outlock);
+				video_buffer_unlockregion(dst->vx_buffer, &dstlock);
+				video_buffer_unlockregion(src->vx_buffer, &srclock);
+				goto done;
+			}
+			video_buffer_unlockregion(dst->vx_buffer, &dstlock);
+		}
+		video_buffer_unlockregion(src->vx_buffer, &srclock);
+	}
+
+	/* Fallback: perform operate pixel-by-pixel */
+	libvideo_swblitter3__blit__generic__bypixel(self, out_x, out_y, dst_x, dst_y,
+	                                            src_x, src_y, size_x, size_y);
+done:
+	TRACE_END("swblitter3__blit__blend1()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__blit_imatrix__blend1(struct video_blitter3 const *__restrict self,
+                                          video_coord_t out_x, video_coord_t out_y,
+                                          video_coord_t dst_x, video_coord_t dst_y,
+                                          video_imatrix2d_t dst_matrix,
+                                          video_coord_t src_x, video_coord_t src_y,
+                                          video_dim_t size_x, video_dim_t size_y,
+                                          video_imatrix2d_t src_matrix) {
+	gfx_assert_imatrix2d(&dst_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
+
+	TRACE_START("swblitter3__blit_imatrix__blend1("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y,
+	            dst_x, dst_y,
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 1),
+	            src_x, src_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1),
+	            size_x, size_y);
+
+	/* TODO: Use video locks */
+	libvideo_swblitter3__blit_imatrix__generic__bypixel(self, out_x, out_y, dst_x, dst_y, dst_matrix,
+	                                                    src_x, src_y, size_x, size_y, src_matrix);
+	TRACE_END("swblitter3__blit_imatrix__blend1()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__stretch__blend1_n(struct video_blitter3 const *__restrict self,
+                                       video_coord_t out_x, video_coord_t out_y,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                       video_coord_t src_x, video_coord_t src_y,
+                                       video_dim_t src_size_x, video_dim_t src_size_y) {
+	TRACE_START("swblitter3__stretch__blend1_n("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y,
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y);
+
+	/* TODO: Use video locks */
+	libvideo_swblitter3__stretch__generic_n__bypixel(self, out_x, out_y,
+	                                                 dst_x, dst_y, dst_size_x, dst_size_y,
+	                                                 src_x, src_y, src_size_x, src_size_y);
+	TRACE_END("swblitter3__stretch__blend1_n()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__stretch_imatrix__blend1_n(struct video_blitter3 const *__restrict self,
+                                               video_coord_t out_x, video_coord_t out_y,
+                                               video_coord_t dst_x, video_coord_t dst_y,
+                                               video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                               video_imatrix2d_t dst_matrix,
+                                               video_coord_t src_x, video_coord_t src_y,
+                                               video_dim_t src_size_x, video_dim_t src_size_y,
+                                               video_imatrix2d_t src_matrix) {
+	gfx_assert_imatrix2d(&dst_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1) &&
+	    dst_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
+		libvideo_swblitter3__stretch__blend1_n(self, out_x, out_y,
+		                                       dst_x, dst_y, dst_size_x, dst_size_y,
+		                                       src_x, src_y, src_size_x, src_size_y);
+		return;
+	}
+
+	TRACE_START("swblitter3__stretch_imatrix__blend1_n("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            out_x, out_y,
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 1),
+	            src_x, src_y, src_size_x, src_size_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
+
+	/* TODO: Use video locks */
+	libvideo_swblitter3__stretch_imatrix__generic_n__bypixel(self, out_x, out_y,
+	                                                         dst_x, dst_y, dst_size_x, dst_size_y, dst_matrix,
+	                                                         src_x, src_y, src_size_x, src_size_y, src_matrix);
+	TRACE_END("swblitter3__stretch_imatrix__blend1_n()\n");
+}
+
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__stretch__blend1_l(struct video_blitter3 const *__restrict self,
+                                       video_coord_t out_x, video_coord_t out_y,
+                                       video_coord_t dst_x, video_coord_t dst_y,
+                                       video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                       video_coord_t src_x, video_coord_t src_y,
+                                       video_dim_t src_size_x, video_dim_t src_size_y) {
+	TRACE_START("swblitter3__stretch__blend1_l("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            out_x, out_y,
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y);
+
+	/* TODO: Use video locks */
+	libvideo_swblitter3__stretch__generic_l__bypixel(self, out_x, out_y,
+	                                                 dst_x, dst_y, dst_size_x, dst_size_y,
+	                                                 src_x, src_y, src_size_x, src_size_y);
+	TRACE_END("swblitter3__stretch__blend1_l()\n");
+}
+
+INTERN ATTR_IN(1) void CC
+libvideo_swblitter3__stretch_imatrix__blend1_l(struct video_blitter3 const *__restrict self,
+                                               video_coord_t out_x, video_coord_t out_y,
+                                               video_coord_t dst_x, video_coord_t dst_y,
+                                               video_dim_t dst_size_x, video_dim_t dst_size_y,
+                                               video_imatrix2d_t dst_matrix,
+                                               video_coord_t src_x, video_coord_t src_y,
+                                               video_dim_t src_size_x, video_dim_t src_size_y,
+                                               video_imatrix2d_t src_matrix) {
+	gfx_assert_imatrix2d(&dst_matrix);
+	gfx_assert_imatrix2d(&src_matrix);
+
+	/* Fast-pass for known matrices */
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1) &&
+	    dst_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
+		libvideo_swblitter3__stretch__blend1_l(self, out_x, out_y,
+		                                       dst_x, dst_y, dst_size_x, dst_size_y,
+		                                       src_x, src_y, src_size_x, src_size_y);
+		return;
+	}
+
+	TRACE_START("swblitter3__stretch_imatrix__blend1_l("
+	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM ", matrix: {{%d,%d},{%d,%d}}})\n",
+	            out_x, out_y,
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&dst_matrix, 1, 1),
+	            src_x, src_y, src_size_x, src_size_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
+
+	/* TODO: Use video locks */
+	libvideo_swblitter3__stretch_imatrix__generic_l__bypixel(self, out_x, out_y,
+	                                                         dst_x, dst_y, dst_size_x, dst_size_y, dst_matrix,
+	                                                         src_x, src_y, src_size_x, src_size_y, src_matrix);
+	TRACE_END("swblitter3__stretch_imatrix__blend1_l()\n");
+}
 
 DECL_END
 

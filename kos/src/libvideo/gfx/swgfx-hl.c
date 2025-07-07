@@ -227,16 +227,29 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 		}
 
 		/* TODO: Special handling when buffers overlap */
-		/* TODO: Dedicated optimizations */
+		/* TODO: More dedicated optimizations */
 
-		drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
-		drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
-		if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-			drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_l;
-			drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_l;
+		if likely(GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
+			/* Special optimization for likely case where "wrdst_gfx" doesn't do any blending */
+			drv->bsw3_blit         = &libvideo_swblitter3__blit__blend1;
+			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__blend1;
+			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__blend1_l;
+				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__blend1_l;
+			} else {
+				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__blend1_n;
+				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__blend1_n;
+			}
 		} else {
-			drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_n;
-			drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_n;
+			drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
+			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
+			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_l;
+				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_l;
+			} else {
+				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__generic_n;
+				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__generic_n;
+			}
 		}
 	}
 	return ctx;

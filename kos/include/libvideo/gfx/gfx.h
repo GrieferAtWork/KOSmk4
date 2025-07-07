@@ -848,7 +848,11 @@ public:
 
 /* 3-way video blitter. Meant to be used to perform a blit  whilst
  * retaining/enforcing some sort of overlay whose dimensions match
- * that of the blit (write-)destination. */
+ * that of the blit (write-)destination.
+ *
+ * NOTE: Only the intersection of rects in "vbt3_rddst" / "vbt3_wrdst"
+ *       actually gets blitted!
+ */
 struct video_blitter3 {
 	struct video_blitter3_ops const *vbt3_ops;    /* Blitter operators */
 	/* WARNING: After initialization, the following fields must no longer be accessed by the user! */
