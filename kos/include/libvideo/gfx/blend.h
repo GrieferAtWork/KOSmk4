@@ -146,7 +146,7 @@ __DECL_END
  * NOTE: "ca" is the SOURCE-alpha factor (iow: 0xff means "GFX_BLENDMODE_ALPHA") */
 #define GFX_BLENDMODE_ALPHA_FACTOR(ca)                                                                  \
 	GFX_BLENDMODE_EX(/*RGB=*/SRC_ALPHA_MUL_CONSTANT_ALPHA, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA, \
-	                 /*A  =*/ONE, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,                          \
+	                 /*A  =*/CONSTANT_ALPHA, ADD, ONE_MINUS_SRC_ALPHA_MUL_CONSTANT_ALPHA,               \
 	                 0, 0, 0, ca)
 
 /* Same as `GFX_BLENDMODE_ALPHA', but use "ca" instead of source alpha values
@@ -156,7 +156,7 @@ __DECL_END
  * NOTE: "ca" is the SOURCE-alpha factor (iow: 0xff means "GFX_BLENDMODE_OVERRIDE") */
 #define GFX_BLENDMODE_ALPHA_OVERRIDE(ca)                                    \
 	GFX_BLENDMODE_EX(/*RGB=*/CONSTANT_ALPHA, ADD, ONE_MINUS_CONSTANT_ALPHA, \
-	                 /*A  =*/ONE, ADD, ONE_MINUS_CONSTANT_ALPHA,            \
+	                 /*A  =*/CONSTANT_ALPHA, ADD, ONE_MINUS_CONSTANT_ALPHA, \
 	                 0, 0, 0, ca)
 
 /* Pre-multiplied alpha blending (same as "GFX_BLENDMODE_ALPHA",

@@ -299,13 +299,26 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 		drv->xsw_putcolor = &libvideo_ramgfx__putcolor;
 		break;
 	}
+	switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+#define LINK_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend) \
+	case mode:                                                                                \
+		drv->xsw_putcolor_p = &libvideo_ramgfx__putcolor_##preblend_name;                     \
+		break;
+GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_FOO)
+#undef LINK_libvideo_swgfx_generic__render_preblend_FOO
+	default:
+		drv->xsw_putcolor_p = drv->xsw_putcolor;
+		break;
+	}
 
 	/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */
 	if (me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 		if (drv->xsw_getcolor == &libvideo_ramgfx__getcolor_noblend)
 			drv->xsw_getcolor = drv->xsw_getpixel;
-		if (drv->xsw_putcolor == &libvideo_ramgfx__putcolor_noblend)
-			drv->xsw_putcolor = drv->xsw_setpixel;
+		if (drv->xsw_putcolor == &libvideo_ramgfx__putcolor_noblend) {
+			drv->xsw_putcolor   = drv->xsw_setpixel;
+			drv->xsw_putcolor_p = drv->xsw_setpixel;
+		}
 	}
 	/* ... */
 
@@ -355,6 +368,17 @@ rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 			drv->xsw_putcolor = &libvideo_ramgfx__putcolor;
 			break;
 		}
+		switch (GFX_BLENDMODE_GET_MODE(self->vx_blend)) {
+#define LINK_libvideo_swgfx_generic__render_preblend_FOO(name, mode, preblend_name, preblend) \
+		case mode:                                                                            \
+			drv->xsw_putcolor_p = &libvideo_ramgfx__putcolor_##preblend_name;                 \
+			break;
+GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_FOO)
+#undef LINK_libvideo_swgfx_generic__render_preblend_FOO
+		default:
+			drv->xsw_putcolor_p = drv->xsw_putcolor;
+			break;
+		}
 	}
 
 	return self;
@@ -369,8 +393,10 @@ rambuffer_noblend(struct video_gfx *__restrict self) {
 	libvideo_swgfx_populate_noblend(self);
 	if (drv->xsw_getcolor != drv->xsw_getpixel)
 		drv->xsw_getcolor = &libvideo_ramgfx__getcolor_noblend;
-	if (drv->xsw_putcolor != drv->xsw_setpixel)
-		drv->xsw_putcolor = &libvideo_ramgfx__putcolor_noblend;
+	if (drv->xsw_putcolor != drv->xsw_setpixel) {
+		drv->xsw_putcolor   = &libvideo_ramgfx__putcolor_noblend;
+		drv->xsw_putcolor_p = &libvideo_ramgfx__putcolor_noblend;
+	}
 	return self;
 }
 

@@ -35,6 +35,10 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#define VIDEO_PALETTE_F_NORMAL 0x0000 /* Normal flags */
+#define VIDEO_PALETTE_F_ALPHA  0x0001 /* Palette contains colors with `VIDEO_COLOR_GET_ALPHA(c) != VIDEO_CHANNEL_MAX' */
+typedef __uint32_t video_palette_flag_t;
+
 struct video_palette_tree;
 struct video_palette {
 	/* [1..1][const] Translate a color into the closest palette index. */
@@ -46,6 +50,7 @@ struct video_palette {
 	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                              vp_refcnt; /* Reference counter. */
 	struct video_palette_tree              *_vp_tree;   /* [0..1] Internal cache used by `video_palette_optimize()' */
+	video_palette_flag_t                     vp_flags;  /* [const] Video palette flags (filled in by `video_palette_optimize()') */
 	video_pixel_t                            vp_cnt;    /* [const] # of colors (must be >= what is required by the associated codec) */
 	__COMPILER_FLEXIBLE_ARRAY(video_color_t, vp_pal);   /* [vp_cnt] Palette colors */
 };

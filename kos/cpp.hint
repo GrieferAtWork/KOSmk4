@@ -2872,3 +2872,33 @@
 	video_color_t libvideo_swblitter3__blend_##n(struct video_blitter3 const*__restrict self,video_color_t dst,video_color_t src);
 #define DEFINE_libvideo_swblitter3__blend_FOO(n,...) \
 	video_color_t libvideo_swblitter3__blend_##n(struct video_blitter3 const*__restrict self,video_color_t dst,video_color_t src){}
+
+#define DECLARE_libvideo_swgfx_generic__render_preblend_FOO(n,...)\
+	void libvideo_swgfx_preblend__absline_llhh__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color);\
+	void libvideo_swgfx_preblend__absline_lhhl__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color);\
+	void libvideo_swgfx_preblend__absline_llhh_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color);\
+	void libvideo_swgfx_preblend__absline_lhhl_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color);\
+	void libvideo_swgfx_preblend__absline_h__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t length,video_color_t color);\
+	void libvideo_swgfx_preblend__absline_v__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t length,video_color_t color);\
+	void libvideo_swgfx_preblend__absfill__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color);\
+	void libvideo_swgfx_preblend__absgradient__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t const colors[2][2]);\
+	void libvideo_swgfx_preblend__absgradient_h__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t locolor,video_color_t hicolor);\
+	void libvideo_swgfx_preblend__absgradient_v__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t locolor,video_color_t hicolor);\
+	void libvideo_swgfx_preblend__fillmask__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t const bg_fg_colors[2],struct video_bitmask const*__restrict bm);\
+	void libvideo_swgfx_preblend__fillstretchmask_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t dst_size_x,video_dim_t dst_size_y,video_color_t const bg_fg_colors[2],video_dim_t src_size_x,video_dim_t src_size_y,struct video_bitmask const*__restrict bm);\
+	void libvideo_swgfx_preblend__fillstretchmask_n__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t dst_size_x,video_dim_t dst_size_y,video_color_t const bg_fg_colors[2],video_dim_t src_size_x,video_dim_t src_size_y,struct video_bitmask const*__restrict bm);
+#define DEFINE_libvideo_swgfx_generic__render_preblend_FOO(n,...)\
+	void libvideo_swgfx_preblend__absline_llhh__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color){}\
+	void libvideo_swgfx_preblend__absline_lhhl__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color){}\
+	void libvideo_swgfx_preblend__absline_llhh_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color){}\
+	void libvideo_swgfx_preblend__absline_lhhl_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color){}\
+	void libvideo_swgfx_preblend__absline_h__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t length,video_color_t color){}\
+	void libvideo_swgfx_preblend__absline_v__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t length,video_color_t color){}\
+	void libvideo_swgfx_preblend__absfill__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t color){}\
+	void libvideo_swgfx_preblend__absgradient__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t const colors[2][2]){}\
+	void libvideo_swgfx_preblend__absgradient_h__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t locolor,video_color_t hicolor){}\
+	void libvideo_swgfx_preblend__absgradient_v__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t locolor,video_color_t hicolor){}\
+	void libvideo_swgfx_preblend__fillmask__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t size_x,video_dim_t size_y,video_color_t const bg_fg_colors[2],struct video_bitmask const*__restrict bm){}\
+	void libvideo_swgfx_preblend__fillstretchmask_l__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t dst_size_x,video_dim_t dst_size_y,video_color_t const bg_fg_colors[2],video_dim_t src_size_x,video_dim_t src_size_y,struct video_bitmask const*__restrict bm){}\
+	void libvideo_swgfx_preblend__fillstretchmask_n__##n(struct video_gfx const*__restrict self,video_coord_t dst_x,video_coord_t dst_y,video_dim_t dst_size_x,video_dim_t dst_size_y,video_color_t const bg_fg_colors[2],video_dim_t src_size_x,video_dim_t src_size_y,struct video_bitmask const*__restrict bm){}
+#define GFX_FOREACH_DEDICATED_PREBLENDMODE(cb)cb(alpha,0,alpha_premultiplied,gfx_preblend_alpha)cb(alpha_factor,0,alpha_premultiplied,gfx_preblend_alpha_factor)cb(alpha_override,0,alpha_premultiplied,gfx_preblend_alpha_override)cb(add,0,add_premultiplied,gfx_preblend_add)

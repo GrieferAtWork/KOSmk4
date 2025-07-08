@@ -278,7 +278,7 @@ do_showpic(struct screen_buffer *screen,
 
 	/* Load GFX contexts for the image and the screen */
 	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
-	                    GFX_BLENDMODE_OVERRIDE,
+	                    GFX_BLENDMODE_ALPHA,
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
@@ -337,12 +337,12 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 0
+#if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
-#elif 1
+#elif 0
 	{
 		struct video_gfx flipgfx = image_gfx;
 //		video_gfx_lrot90(&flipgfx);

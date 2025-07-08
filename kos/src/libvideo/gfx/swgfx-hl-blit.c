@@ -47,6 +47,8 @@ DECL_BEGIN
 
 static_assert(sizeof(struct blt_swdrv) <= (_VIDEO_BLITTER_N_DRIVER * sizeof(void (*)(void))),
               "sizeof(struct blt_swdrv) too large for '_VIDEO_BLITTER_N_DRIVER'");
+static_assert(sizeof(struct blt3_swdrv) <= (_VIDEO_BLITTER3_N_DRIVER * sizeof(void (*)(void))),
+              "sizeof(struct blt3_swdrv) too large for '_VIDEO_BLITTER3_N_DRIVER'");
 
 /************************************************************************/
 /* BLITTER INITIALIZATION                                               */
@@ -127,7 +129,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 		}
 		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) == 0 &&
 		    VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey) &&
-		    GFX_BLENDMODE_GET_MODE(dst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
+		    libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
 		} else {
@@ -138,7 +140,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit         = &libvideo_swblitter_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
-	} else if (GFX_BLENDMODE_GET_MODE(dst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
+	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) != 0)
 			goto set_generic_operators;
 		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
@@ -152,8 +154,13 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samefmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samefmt__blit_imatrix;
 			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_l;
-				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_l;
+				if (src_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_l;
+					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt_interp8888__stretch_imatrix_l;
+				} else {
+					drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_l;
+					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_l;
+				}
 			} else {
 				drv->bsw_stretch         = &libvideo_swblitter_noblend_samefmt__stretch_n;
 				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_samefmt__stretch_imatrix_n;
@@ -168,8 +175,13 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_difffmt__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_difffmt__blit_imatrix;
 			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
-				drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_l;
-				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_l;
+				if (src_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
+					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_l;
+					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l;
+				} else {
+					drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_l;
+					drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_l;
+				}
 			} else {
 				drv->bsw_stretch         = &libvideo_swblitter_noblend_difffmt__stretch_n;
 				drv->bsw_stretch_imatrix = &libvideo_swblitter_noblend_difffmt__stretch_imatrix_n;
@@ -221,9 +233,8 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 		}
 
 		/* TODO: Special handling when buffers overlap */
-		/* TODO: More dedicated optimizations */
 
-		if likely(GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_OVERRIDE) {
+		if likely(libvideo_gfx_allow_noblend_blit3(wrdst_gfx, rddst_gfx, src_gfx)) {
 			/* Special optimization for likely case where "wrdst_gfx" doesn't do any blending */
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__blend1;
 			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__blend1;

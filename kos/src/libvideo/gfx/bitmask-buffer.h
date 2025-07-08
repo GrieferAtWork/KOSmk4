@@ -44,6 +44,7 @@ struct video_palette2 {
 	NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	uintptr_t                              vp_refcnt;
 	struct video_palette_tree            *_vp_tree;
+	video_palette_flag_t                   vp_flags;
 	video_pixel_t                          vp_cnt;    /* == 2 */
 	video_color_t                          vp_pal[2];
 };

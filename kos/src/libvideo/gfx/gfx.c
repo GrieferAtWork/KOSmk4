@@ -97,6 +97,7 @@ libvideo_gfx_stretch__with_blitter(struct video_gfx const *__restrict dst,
 	video_blitter_stretch(p_blitter,
 	                      dst_x, dst_y, dst_size_x, dst_size_y,
 	                      src_x, src_y, src_size_x, src_size_y);
+//	asm("int3");
 }
 
 INTERN ATTR_IN(1) ATTR_IN(4) ATTR_IN(7) void CC

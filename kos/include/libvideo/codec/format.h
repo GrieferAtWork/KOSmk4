@@ -46,6 +46,10 @@ struct video_format;
 /* Helper macros for doing software-driven, low-level video data manipulations. */
 #ifdef __INTELLISENSE__
 
+/* Check if the given video-format can produce colors with a non-0xff alpha channel */
+extern __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __BOOL
+video_format_hasalpha(struct video_format const *__restrict __self);
+
 /* Get a pixel (The caller must ensure that the given x is in-bounds) */
 extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) video_pixel_t
 video_format_getpixel(struct video_format const *__restrict __self,
@@ -119,6 +123,9 @@ video_format_rectfill(struct video_format const *__restrict __self,
                       __byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
                       video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 #else /* __INTELLISENSE__ */
+#define video_format_hasalpha(self)                                      \
+	((self)->vf_pal ? ((self)->vf_pal->vp_flags & VIDEO_PALETTE_F_ALPHA) \
+	                : ((self)->vf_codec->vc_specs.vcs_amask != 0))
 #define video_format_getpixel(self, line, x)        (*(self)->vf_codec->vc_getpixel)(line, x)
 #define video_format_setpixel(self, line, x, pixel) (*(self)->vf_codec->vc_setpixel)(line, x, pixel);
 #define video_format_pixel2color(self, pixel)       (*(self)->vf_codec->vc_pixel2color)(self, pixel)

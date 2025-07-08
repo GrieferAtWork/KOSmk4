@@ -27,6 +27,7 @@
 
 #include <hybrid/typecore.h>
 
+#include <asm/sar.h>
 #include <kos/types.h>
 #include <sys/param.h>
 
@@ -34,13 +35,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/blend.h>
+#include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "gfx.h"
 #include "gfx-debug.h"
+#include "gfx.h"
 
 DECL_BEGIN
 
@@ -57,6 +60,50 @@ DECL_BEGIN
 #define GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(cb /*(name, mode)*/) \
 	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))                 \
 	cb(alpha_override, GFX_BLENDMODE_ALPHA_OVERRIDE(0))
+
+
+/* Preblending functions */
+#define gfx_preblend_alpha_mayignore(mode, color) VIDEO_COLOR_ISTRANSPARENT(color)
+#define gfx_preblend_alpha_maynblend(mode, color) VIDEO_COLOR_ISOPAQUE(color)
+#define gfx_preblend_alpha(mode, color)                                                       \
+	VIDEO_COLOR_RGBA(_gfx_mul256(VIDEO_COLOR_GET_RED(color), VIDEO_COLOR_GET_ALPHA(color)),   \
+	                 _gfx_mul256(VIDEO_COLOR_GET_GREEN(color), VIDEO_COLOR_GET_ALPHA(color)), \
+	                 _gfx_mul256(VIDEO_COLOR_GET_BLUE(color), VIDEO_COLOR_GET_ALPHA(color)),  \
+	                 VIDEO_COLOR_GET_ALPHA(color))
+
+#define gfx_preblend_alpha_factor_mayignore gfx_preblend_alpha_mayignore
+#define gfx_preblend_alpha_factor_maynblend gfx_preblend_alpha_maynblend
+#define gfx_preblend_alpha_factor(mode, color)                                                       \
+	__XBLOCK({                                                                                       \
+		video_channel_t _factor = _gfx_mul256(VIDEO_COLOR_GET_ALPHA(color),                          \
+		                                      VIDEO_COLOR_GET_ALPHA(GFX_BLENDMODE_GET_COLOR(mode))); \
+		__XRETURN VIDEO_COLOR_RGBA(_gfx_mul256(VIDEO_COLOR_GET_RED(color), _factor),                 \
+		                           _gfx_mul256(VIDEO_COLOR_GET_GREEN(color), _factor),               \
+		                           _gfx_mul256(VIDEO_COLOR_GET_BLUE(color), _factor),                \
+		                           _factor);                                                         \
+	})
+#define gfx_preblend_alpha_override_mayignore gfx_preblend_alpha_mayignore
+#define gfx_preblend_alpha_override_maynblend gfx_preblend_alpha_maynblend
+#define gfx_preblend_alpha_override(mode, color)                                                                      \
+	VIDEO_COLOR_RGBA(_gfx_mul256(VIDEO_COLOR_GET_RED(color), VIDEO_COLOR_GET_ALPHA(GFX_BLENDMODE_GET_COLOR(mode))),   \
+	                 _gfx_mul256(VIDEO_COLOR_GET_GREEN(color), VIDEO_COLOR_GET_ALPHA(GFX_BLENDMODE_GET_COLOR(mode))), \
+	                 _gfx_mul256(VIDEO_COLOR_GET_BLUE(color), VIDEO_COLOR_GET_ALPHA(GFX_BLENDMODE_GET_COLOR(mode))),  \
+	                 _gfx_mul256(VIDEO_COLOR_GET_ALPHA(color), VIDEO_COLOR_GET_ALPHA(GFX_BLENDMODE_GET_COLOR(mode))))
+#define gfx_preblend_add_mayignore(mode, color) (VIDEO_COLOR_GET_RED(color) == VIDEO_CHANNEL_MIN && VIDEO_COLOR_GET_GREEN(color) == VIDEO_CHANNEL_MIN && VIDEO_COLOR_GET_BLUE(color) == VIDEO_CHANNEL_MIN)
+#define gfx_preblend_add_maynblend(mode, color) (VIDEO_COLOR_GET_RED(color) == VIDEO_CHANNEL_MAX && VIDEO_COLOR_GET_GREEN(color) == VIDEO_CHANNEL_MAX && VIDEO_COLOR_GET_BLUE(color) == VIDEO_CHANNEL_MAX)
+#define gfx_preblend_add(mode, color)                                                         \
+	VIDEO_COLOR_RGBA(_gfx_mul256(VIDEO_COLOR_GET_RED(color), VIDEO_COLOR_GET_ALPHA(color)),   \
+	                 _gfx_mul256(VIDEO_COLOR_GET_GREEN(color), VIDEO_COLOR_GET_ALPHA(color)), \
+	                 _gfx_mul256(VIDEO_COLOR_GET_BLUE(color), VIDEO_COLOR_GET_ALPHA(color)),  \
+	                 0)
+
+/* List of blend modes for which we supply faster "pre-blended" code-paths */
+#define GFX_FOREACH_DEDICATED_PREBLENDMODE(cb /*(name, mode, preblend_name, preblend)*/)                  \
+	cb(alpha, GFX_BLENDMODE_ALPHA, alpha_premultiplied, gfx_preblend_alpha)                               \
+	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0), alpha_premultiplied, gfx_preblend_alpha_factor)       \
+	cb(alpha_override, GFX_BLENDMODE_ALPHA_OVERRIDE(0), alpha_premultiplied, gfx_preblend_alpha_override) \
+	cb(add, GFX_BLENDMODE_ADD, add_premultiplied, gfx_preblend_add)
+
 
 /************************************************************************/
 /* UTILITIES...                                                         */
@@ -143,13 +190,19 @@ wrap(video_offset_t offset, video_dim_t dim) {
  *
  * iow: Returns true iff:
  * >> ∀ c ∈ video_color_t: gfx_blendcolors(c, IN(*p_color), self->vx_blend) == OUT(*p_color) */
-LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_INOUT(2) bool CC
+LOCAL WUNUSED ATTR_IN(1) ATTR_INOUT(2) bool CC
 libvideo_gfx_allow_noblend(struct video_gfx const *__restrict self,
                            video_color_t *__restrict p_color) {
 	gfx_blendmode_t mode = self->vx_blend;
-	/* TODO: Do this dynamically for all blending modes */
-	if (GFX_BLENDMODE_GET_MODE(mode) == GFX_BLENDMODE_ALPHA)
-		return VIDEO_COLOR_ISOPAQUE(*p_color);
+	switch (GFX_BLENDMODE_GET_MODE(mode)) {
+	case GFX_BLENDMODE_ALPHA:
+		return gfx_preblend_alpha_maynblend(mode, *p_color);
+	case GFX_BLENDMODE_ALPHA_FACTOR(0):
+		return gfx_preblend_alpha_factor_maynblend(mode, *p_color);
+	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
+		return gfx_preblend_alpha_override_maynblend(mode, *p_color);
+	default: break;
+	}
 	return false;
 }
 
@@ -162,10 +215,77 @@ LOCAL ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 libvideo_gfx_allow_ignore(struct video_gfx const *__restrict self,
                           video_color_t color) {
 	gfx_blendmode_t mode = self->vx_blend;
+	switch (GFX_BLENDMODE_GET_MODE(mode)) {
+	case GFX_BLENDMODE_ALPHA:
+		return gfx_preblend_alpha_mayignore(mode, color);
+	case GFX_BLENDMODE_ALPHA_FACTOR(0):
+		return gfx_preblend_alpha_factor_mayignore(mode, color);
+	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
+		return gfx_preblend_alpha_override_mayignore(mode, color);
+	default: break;
+	}
+	return false;
+}
 
-	/* TODO: Do this dynamically for all blending modes */
-	if (GFX_BLENDMODE_GET_MODE(mode) == GFX_BLENDMODE_ALPHA)
-		return VIDEO_COLOR_ISTRANSPARENT(color);
+
+/* Check if blitting from "src->dst" can be done without blending */
+LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) bool CC
+libvideo_gfx_allow_noblend_blit(struct video_gfx const *dst,
+                                struct video_gfx const *src) {
+	gfx_blendmode_t mode = dst->vx_blend;
+	switch (GFX_BLENDMODE_GET_MODE(mode)) {
+	case GFX_BLENDMODE_OVERRIDE:
+		return true;
+	case GFX_BLENDMODE_ALPHA_FACTOR(0):
+		if (!VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
+			break;
+		ATTR_FALLTHROUGH
+	case GFX_BLENDMODE_ALPHA:
+		return !video_format_hasalpha(&src->vx_buffer->vb_format);
+	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
+		return VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode));
+	default: break;
+	}
+	return false;
+}
+
+/* Check if blitting from "src->rddst->wrdst" can be done without blending in "wrdst" */
+LOCAL ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) bool CC
+libvideo_gfx_allow_noblend_blit3(struct video_gfx const *wrdst,
+                                 struct video_gfx const *rddst,
+                                 struct video_gfx const *src) {
+	gfx_blendmode_t mode = wrdst->vx_blend;
+	switch (GFX_BLENDMODE_GET_MODE(mode)) {
+	case GFX_BLENDMODE_OVERRIDE:
+		return true;
+	case GFX_BLENDMODE_ALPHA_FACTOR(0):
+		if (!VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
+			break;
+		ATTR_FALLTHROUGH
+	case GFX_BLENDMODE_ALPHA:
+		mode = GFX_BLENDMODE_GET_MODE(rddst->vx_blend);
+		switch (mode) {
+		case GFX_BLENDMODE_ALPHA_FACTOR(0):
+			if (!VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
+				break;
+			ATTR_FALLTHROUGH
+		case GFX_BLENDMODE_ALPHA:
+			/* Result of ALPHA-blend always has alpha=1 when at least 1 source has alpha=1 */
+			return !video_format_hasalpha(&src->vx_buffer->vb_format) ||
+			       !video_format_hasalpha(&rddst->vx_buffer->vb_format);
+		case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
+			if (VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode)))
+				return true;
+			if (!video_format_hasalpha(&rddst->vx_buffer->vb_format))
+				return true;
+			break;
+		default: break;
+		}
+		break;
+	case GFX_BLENDMODE_ALPHA_OVERRIDE(0):
+		return VIDEO_COLOR_ISOPAQUE(GFX_BLENDMODE_GET_COLOR(mode));
+	default: break;
+	}
 	return false;
 }
 
@@ -653,7 +773,7 @@ bitmask2d_getbit_channel(byte_t const *__restrict bitmask, size_t bitscan,
 	 *       when "bitno == 3", then we want bit masked by 0x10 */
 	byte <<= bitno;
 	/* Used signed shift to duplicate the most significant bit into all other bits. */
-	byte = (byte_t)((__SBYTE_TYPE__)byte >> (NBBY - 1));
+	byte = (byte_t)sar((__SBYTE_TYPE__)byte, NBBY - 1);
 	return byte;
 #else
 	return ((byte >> (NBBY - 1) - bitno) & 1) ? 0xff : 0;

@@ -379,6 +379,14 @@ libvideo_palette_optimize(REF struct video_palette *__restrict self) {
 	unsigned int n_chans = 3;
 	PVIDEO_PALETTE_COLOR2PIXEL spec;
 
+	/* Calculate palette flags */
+	self->vp_flags = VIDEO_PALETTE_F_NORMAL;
+	for (i = 0 ; i < count; ++i) {
+		video_color_t c = self->vp_pal[i];
+		if (VIDEO_COLOR_GET_ALPHA(c) != VIDEO_CHANNEL_MAX)
+			self->vp_flags |= VIDEO_PALETTE_F_ALPHA;
+	}
+
 	/* Special handling for certain small palettes */
 	spec = video_palette_get_special_color2pixel(count);
 	if unlikely(spec) {

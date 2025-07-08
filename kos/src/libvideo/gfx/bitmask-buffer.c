@@ -48,6 +48,7 @@ static_assert(offsetof(struct video_palette2, vp_color2pixel) == offsetof(struct
 static_assert(offsetof(struct video_palette2, vp_destroy) == offsetof(struct video_palette, vp_destroy));
 static_assert(offsetof(struct video_palette2, vp_refcnt) == offsetof(struct video_palette, vp_refcnt));
 static_assert(offsetof(struct video_palette2, _vp_tree) == offsetof(struct video_palette, _vp_tree));
+static_assert(offsetof(struct video_palette2, vp_flags) == offsetof(struct video_palette, vp_flags));
 static_assert(offsetof(struct video_palette2, vp_cnt) == offsetof(struct video_palette, vp_cnt));
 static_assert(offsetof(struct video_palette2, vp_pal) == offsetof(struct video_palette, vp_pal));
 

@@ -62,13 +62,13 @@ libvideo_swblitter3__blend(struct video_blitter3 const *__restrict self,
 GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_libvideo_swblitter3__blend_FOO)
 #undef DEFINE_libvideo_swblitter3__blend_FOO
 
-#define DEFINE_libvideo_swblitter3__blend_FOO(name, mode)                            \
-	INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLT3_SWDRV_BLEND_CC            \
-	libvideo_swblitter3__blend_##name(struct video_blitter3 const *__restrict self,  \
-	                                  video_color_t dst, video_color_t src) {        \
-		struct blt3_swdrv const *drv = video_swblitter3_getcdrv(self);               \
-		video_color_t c = GFX_BLENDMODE_GET_COLOR(drv->bsw3_blendmode);              \
-		return gfx_blendcolors_constant(dst, src, mode, c);                          \
+#define DEFINE_libvideo_swblitter3__blend_FOO(name, mode)                           \
+	INTERN ATTR_PURE WUNUSED ATTR_IN(1) video_color_t BLT3_SWDRV_BLEND_CC           \
+	libvideo_swblitter3__blend_##name(struct video_blitter3 const *__restrict self, \
+	                                  video_color_t dst, video_color_t src) {       \
+		struct blt3_swdrv const *drv = video_swblitter3_getcdrv(self);              \
+		video_color_t c = GFX_BLENDMODE_GET_COLOR(drv->bsw3_blendmode);             \
+		return gfx_blendcolors_constant(dst, src, mode, c);                         \
 	}
 GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DEFINE_libvideo_swblitter3__blend_FOO)
 #undef DEFINE_libvideo_swblitter3__blend_FOO

@@ -26,6 +26,7 @@
  * low-level GFX functions, these macros should be used */
 #define _LL_getcolor           _video_swgfx_x_getcolor
 #define _LL_putcolor           _video_swgfx_x_putcolor
+#define _LL_putcolor_p         _video_swgfx_x_putcolor_p
 #define _LL_getpixel           _video_swgfx_x_getpixel
 #define _LL_setpixel           _video_swgfx_x_setpixel
 #define _LL_absline_llhh       _video_swgfx_x_absline_llhh
@@ -58,6 +59,8 @@
 	(LL_assert_xy(self, x, y), _LL_getcolor(self, x, y))
 #define LL_putcolor(self, x, y, color) \
 	(LL_assert_xy(self, x, y), _LL_putcolor(self, x, y, color))
+#define LL_putcolor_p(self, x, y, color) \
+	(LL_assert_xy(self, x, y), _LL_putcolor_p(self, x, y, color))
 #define LL_getpixel(self, x, y) \
 	(LL_assert_xy(self, x, y), _LL_getpixel(self, x, y))
 #define LL_setpixel(self, x, y, pixel) \
