@@ -76,6 +76,9 @@ struct screen_buffer_ops {
 __CXXDECL_BEGIN
 #endif /* __cplusplus */
 
+/* TODO: Rename to "struct video_monitor" */
+/* TODO: Have this be derived from "struct video_display" */
+
 struct screen_buffer
 #ifdef __cplusplus
     : video_buffer
