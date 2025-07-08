@@ -47,6 +47,24 @@
 
 DECL_BEGIN
 
+/* *__bypixel functions from "./ll_noblend.c.inl" */
+#ifdef __INTELLISENSE__
+PRIVATE ATTR_IN(1) void CC
+libvideo_swgfx_noblend__absline_h__bypixel(struct video_gfx const *__restrict self,
+                                           video_coord_t dst_x, video_coord_t dst_y,
+                                           video_dim_t length, video_pixel_t pixel);
+PRIVATE ATTR_IN(1) void CC
+libvideo_swgfx_noblend__absline_v__bypixel(struct video_gfx const *__restrict self,
+                                           video_coord_t dst_x, video_coord_t dst_y,
+                                           video_dim_t length, video_pixel_t pixel);
+PRIVATE ATTR_IN(1) void CC
+libvideo_swgfx_noblend__absfill__bypixel(struct video_gfx const *__restrict self,
+                                         video_coord_t dst_x, video_coord_t dst_y,
+                                         video_dim_t size_x, video_dim_t size_y,
+                                         video_pixel_t pixel);
+#endif /* __INTELLISENSE__ */
+
+
 /************************************************************************/
 /* MASKED FILL/STRETCH                                                  */
 /************************************************************************/
@@ -740,17 +758,189 @@ libvideo_swblitter_noblend_difffmt__stretch_imatrix_l(struct video_blitter const
 	                                              src_matrix);
 }
 
+PRIVATE ATTR_IN(1) void CC
+libvideo_swblitter_noblend_difffmt_interp8888__stretch_l__bypixel(struct video_blitter const *__restrict self,
+                                                                  video_coord_t dst_x_, video_coord_t dst_y_,
+                                                                  video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                                                  video_coord_t src_x_, video_coord_t src_y_,
+                                                                  video_dim_t src_size_x_, video_dim_t src_size_y_) {
+#define LOCAL_getpixel(x, y)                      \
+	({                                            \
+		video_coord_t used_src_x = src_x_ + x;    \
+		video_coord_t used_src_y = src_y_ + y;    \
+		LL_getpixel(src, used_src_x, used_src_y); \
+	})
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
+#define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmax_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)                 \
+	{                                                                                             \
+		video_pixel_t pxl = LOCAL_getpixel(src_x, src_y);                                         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                                  \
+		libvideo_swgfx_noblend__absfill__bypixel(dst, dst_x, dst_y, dst_size_x, dst_size_y, out); \
+	}
+
+#define pixel_blend_ymax pixel_blend_ymin
+#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
+	{                                                                                       \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x0, src_y);                            \
+		video_pixel_t src_y0_x1 = LOCAL_getpixel(src_x1, src_y);                            \
+		video_pixel_t pxl = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                            \
+		libvideo_swgfx_noblend__absline_v__bypixel(dst, dst_x, dst_y, dst_size_y, out);     \
+	}
+
+#define pixel_blend_xmax pixel_blend_xmin
+#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
+	{                                                                                       \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x, src_y0);                            \
+		video_pixel_t src_y1_x0 = LOCAL_getpixel(src_x, src_y1);                            \
+		video_pixel_t pxl = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                            \
+		libvideo_swgfx_noblend__absline_h__bypixel(dst, dst_x, dst_y, dst_size_x, out);     \
+	}
+
+#define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
+	{                                                                                                 \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x0, src_y0);                                     \
+		video_pixel_t src_y0_x1 = LOCAL_getpixel(src_x1, src_y0);                                     \
+		video_pixel_t src_y1_x0 = LOCAL_getpixel(src_x0, src_y1);                                     \
+		video_pixel_t src_y1_x1 = LOCAL_getpixel(src_x1, src_y1);                                     \
+		video_pixel_t pxl = interpolate_2d(src_y0_x0, src_y0_x1,                                      \
+		                                   src_y1_x0, src_y1_x1,                                      \
+		                                   frac_x0, frac_x1,                                          \
+		                                   frac_y0, frac_y1);                                         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                                      \
+		LL_setpixel(dst, dst_x, dst_y, out);                                                          \
+	}
+	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                   0, 0, src_size_x_, src_size_y_,
+	                   pixel_blend_xmin_ymin,
+	                   pixel_blend_ymin,
+	                   pixel_blend_xmax_ymin,
+	                   pixel_blend_xmin,
+	                   pixel_blend,
+	                   pixel_blend_xmax,
+	                   pixel_blend_xmin_ymax,
+	                   pixel_blend_ymax,
+	                   pixel_blend_xmax_ymax);
+#undef pixel_blend_xmin_ymin
+#undef pixel_blend_ymin
+#undef pixel_blend_xmax_ymin
+#undef pixel_blend_xmin
+#undef pixel_blend
+#undef pixel_blend_xmax
+#undef pixel_blend_xmin_ymax
+#undef pixel_blend_ymax
+#undef pixel_blend_xmax_ymax
+#undef LOCAL_getpixel
+}
+
+
 INTERN ATTR_IN(1) void CC
 libvideo_swblitter_noblend_difffmt_interp8888__stretch_l(struct video_blitter const *__restrict self,
                                                          video_coord_t dst_x, video_coord_t dst_y,
                                                          video_dim_t dst_size_x, video_dim_t dst_size_y,
                                                          video_coord_t src_x, video_coord_t src_y,
                                                          video_dim_t src_size_x, video_dim_t src_size_y) {
-	/* TODO */
-	libvideo_swblitter_generic__stretch_l(self,
-	                                      dst_x, dst_y, dst_size_x, dst_size_y,
-	                                      src_x, src_y, src_size_x, src_size_y);
+	TRACE_START("swblitter_noblend_difffmt_interp8888__stretch_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y);
+	/* TODO: Use video locks if possible */
+	libvideo_swblitter_noblend_difffmt_interp8888__stretch_l__bypixel(self,
+	                                                                  dst_x, dst_y, dst_size_x, dst_size_y,
+	                                                                  src_x, src_y, src_size_x, src_size_y);
+	TRACE_END("swblitter_noblend_difffmt_interp8888__stretch_l()\n");
 }
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l__bypixel(struct video_blitter const *__restrict self,
+                                                                          video_coord_t dst_x_, video_coord_t dst_y_,
+                                                                          video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                                                          video_coord_t src_x_, video_coord_t src_y_,
+                                                                          video_dim_t src_size_x_, video_dim_t src_size_y_,
+                                                                          video_imatrix2d_t src_matrix) {
+#define LOCAL_getpixel(x, y)                                                             \
+	({                                                                                   \
+		video_coord_t used_src_x = src_x_ + video_imatrix2d_get(&src_matrix, 0, 0) * x + video_imatrix2d_get(&src_matrix, 0, 1) * y; \
+		video_coord_t used_src_y = src_y_ + video_imatrix2d_get(&src_matrix, 1, 0) * x + video_imatrix2d_get(&src_matrix, 1, 1) * y; \
+		LL_getpixel(src, used_src_x, used_src_y);                                        \
+	})
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
+	gfx_assert_imatrix2d(&src_matrix);
+#define pixel_blend_xmax_ymin pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmax_ymax pixel_blend_xmin_ymin
+#define pixel_blend_xmin_ymin(dst_x, dst_y, dst_size_x, dst_size_y, src_x, src_y)                 \
+	{                                                                                             \
+		video_pixel_t pxl = LOCAL_getpixel(src_x, src_y);                                         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                                  \
+		libvideo_swgfx_noblend__absfill__bypixel(dst, dst_x, dst_y, dst_size_x, dst_size_y, out); \
+	}
+
+#define pixel_blend_ymax pixel_blend_ymin
+#define pixel_blend_ymin(dst_x, dst_y, dst_size_y, src_x0, src_y, src_x1, frac_x0, frac_x1) \
+	{                                                                                       \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x0, src_y);                            \
+		video_pixel_t src_y0_x1 = LOCAL_getpixel(src_x1, src_y);                            \
+		video_pixel_t pxl = interpolate_1d(src_y0_x0, src_y0_x1, frac_x0, frac_x1);         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                            \
+		libvideo_swgfx_noblend__absline_v__bypixel(dst, dst_x, dst_y, dst_size_y, out);     \
+	}
+
+#define pixel_blend_xmax pixel_blend_xmin
+#define pixel_blend_xmin(dst_x, dst_y, dst_size_x, src_x, src_y0, src_y1, frac_y0, frac_y1) \
+	{                                                                                       \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x, src_y0);                            \
+		video_pixel_t src_y1_x0 = LOCAL_getpixel(src_x, src_y1);                            \
+		video_pixel_t pxl = interpolate_1d(src_y0_x0, src_y1_x0, frac_y0, frac_y1);         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                            \
+		libvideo_swgfx_noblend__absline_h__bypixel(dst, dst_x, dst_y, dst_size_x, out);     \
+	}
+
+#define pixel_blend(dst_x, dst_y, src_x0, src_y0, src_x1, src_y1, frac_x0, frac_x1, frac_y0, frac_y1) \
+	{                                                                                                 \
+		video_pixel_t src_y0_x0 = LOCAL_getpixel(src_x0, src_y0);                                     \
+		video_pixel_t src_y0_x1 = LOCAL_getpixel(src_x1, src_y0);                                     \
+		video_pixel_t src_y1_x0 = LOCAL_getpixel(src_x0, src_y1);                                     \
+		video_pixel_t src_y1_x1 = LOCAL_getpixel(src_x1, src_y1);                                     \
+		video_pixel_t pxl = interpolate_2d(src_y0_x0, src_y0_x1,                                      \
+		                                   src_y1_x0, src_y1_x1,                                      \
+		                                   frac_x0, frac_x1,                                          \
+		                                   frac_y0, frac_y1);                                         \
+		video_pixel_t out = video_converter_mappixel(conv, pxl);                                      \
+		LL_setpixel(dst, dst_x, dst_y, out);                                                          \
+	}
+	GFX_LINEAR_STRETCH(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                   0, 0, src_size_x_, src_size_y_,
+	                   pixel_blend_xmin_ymin,
+	                   pixel_blend_ymin,
+	                   pixel_blend_xmax_ymin,
+	                   pixel_blend_xmin,
+	                   pixel_blend,
+	                   pixel_blend_xmax,
+	                   pixel_blend_xmin_ymax,
+	                   pixel_blend_ymax,
+	                   pixel_blend_xmax_ymax);
+#undef pixel_blend_xmin_ymin
+#undef pixel_blend_ymin
+#undef pixel_blend_xmax_ymin
+#undef pixel_blend_xmin
+#undef pixel_blend
+#undef pixel_blend_xmax
+#undef pixel_blend_xmin_ymax
+#undef pixel_blend_ymax
+#undef pixel_blend_xmax_ymax
+#undef LOCAL_getpixel
+}
+
 
 INTERN ATTR_IN(1) void CC
 libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l(struct video_blitter const *__restrict self,
@@ -759,11 +949,32 @@ libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l(struct video_bl
                                                                  video_coord_t src_x, video_coord_t src_y,
                                                                  video_dim_t src_size_x, video_dim_t src_size_y,
                                                                  video_imatrix2d_t src_matrix) {
-	/* TODO */
-	libvideo_swblitter_generic__stretch_imatrix_l(self,
-	                                              dst_x, dst_y, dst_size_x, dst_size_y,
-	                                              src_x, src_y, src_size_x, src_size_y,
-	                                              src_matrix);
+	/* Fast-pass for known matrices */
+	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
+		libvideo_swblitter_noblend_difffmt_interp8888__stretch_l(self,
+		                                                         dst_x, dst_y, dst_size_x, dst_size_y,
+		                                                         src_x, src_y, src_size_x, src_size_y);
+		return;
+	}
+
+
+	TRACE_START("swblitter_noblend_difffmt_interp8888__stretch_imatrix_l("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "matrix: {{%d,%d},{%d,%d}})\n",
+	            dst_x, dst_y, dst_size_x, dst_size_y,
+	            src_x, src_y, src_size_x, src_size_y,
+	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
+	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
+	/* TODO: Use video locks if possible */
+
+	libvideo_swblitter_noblend_difffmt_interp8888__stretch_imatrix_l__bypixel(self,
+	                                                                          dst_x, dst_y, dst_size_x, dst_size_y,
+	                                                                          src_x, src_y, src_size_x, src_size_y,
+	                                                                          src_matrix);
+	TRACE_END("swblitter_noblend_difffmt_interp8888__stretch_imatrix_l()\n");
 }
 
 DECL_END

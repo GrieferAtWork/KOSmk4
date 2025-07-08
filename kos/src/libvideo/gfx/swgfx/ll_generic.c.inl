@@ -1310,8 +1310,6 @@ libvideo_swgfx_generic__fillstretchmask_n(struct video_gfx const *__restrict sel
 	TRACE_END("swgfx_generic__fillstretchmask_n()\n");
 }
 
-#if 0
-#endif
 
 
 /* Custom pre-blending GFX functions */

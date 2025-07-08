@@ -22,17 +22,17 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_BLIT_C
-#define GUARD_LIBVIDEO_GFX_SWGFX_LL_BLIT_C 1
+#ifndef GUARD_LIBVIDEO_GFX_SWGFX_LL_NOBLEND_C
+#define GUARD_LIBVIDEO_GFX_SWGFX_LL_NOBLEND_C 1
 
 /************************************************************************/
 /* LOW-LEVEL, GENERIC SW-GFX OPERATOR IMPLS                             */
 /************************************************************************/
 
 #ifndef __INTELLISENSE__
-#include "swgfx/ll_blit.c.inl"
-#include "swgfx/ll_blit3.c.inl"
+#include "swgfx/ll_noblend.c.inl"
+/**/
 #include "swgfx/ll_noblend-blit.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_LIBVIDEO_GFX_SWGFX_LL_BLIT_C */
+#endif /* !GUARD_LIBVIDEO_GFX_SWGFX_LL_NOBLEND_C */
