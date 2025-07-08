@@ -97,7 +97,7 @@ struct svga_screen: video_rambuffer {
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterect_noop(struct screen_buffer *__restrict self,
-                            struct screen_rect const *__restrict rect) {
+                            struct video_crect const *__restrict rect) {
 	(void)self;
 	(void)rect;
 	COMPILER_IMPURE();
@@ -105,7 +105,7 @@ svga_screen_updaterect_noop(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterects_noop(struct screen_buffer *__restrict self,
-                             struct screen_rect const *__restrict rects,
+                             struct video_crect const *__restrict rects,
                              size_t n_rects) {
 	(void)self;
 	(void)rects;
@@ -115,17 +115,17 @@ svga_screen_updaterects_noop(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
-                          struct screen_rect const *__restrict rect) {
+                          struct video_crect const *__restrict rect) {
 	struct svga_screen *me = (struct svga_screen *)self;
 	struct svga_rect cs_rect;
-	if (OVERFLOW_UCAST(rect->sr_xmin, &cs_rect.svr_x) || cs_rect.svr_x >= self->vb_xdim)
+	if (OVERFLOW_UCAST(rect->vcr_xmin, &cs_rect.svr_x) || cs_rect.svr_x >= self->vb_xdim)
 		return;
-	if (OVERFLOW_UCAST(rect->sr_ymin, &cs_rect.svr_y) || cs_rect.svr_y >= self->vb_ydim)
+	if (OVERFLOW_UCAST(rect->vcr_ymin, &cs_rect.svr_y) || cs_rect.svr_y >= self->vb_ydim)
 		return;
-	if (OVERFLOW_UCAST(rect->sr_xdim, &cs_rect.svr_w) ||
+	if (OVERFLOW_UCAST(rect->vcr_xdim, &cs_rect.svr_w) ||
 	    cs_rect.svr_w > (self->vb_xdim - cs_rect.svr_x))
 		cs_rect.svr_w = (self->vb_xdim - cs_rect.svr_x);
-	if (OVERFLOW_UCAST(rect->sr_ydim, &cs_rect.svr_h) ||
+	if (OVERFLOW_UCAST(rect->vcr_ydim, &cs_rect.svr_h) ||
 	    cs_rect.svr_h > (self->vb_ydim - cs_rect.svr_y))
 		cs_rect.svr_h = (self->vb_ydim - cs_rect.svr_y);
 	svga_screen_cs_acquire(me);
@@ -135,7 +135,7 @@ svga_screen_updaterect_cs(struct screen_buffer *__restrict self,
 
 PRIVATE NONNULL((1, 2)) void CC
 svga_screen_updaterects_cs(struct screen_buffer *__restrict self,
-                           struct screen_rect const *__restrict rects,
+                           struct video_crect const *__restrict rects,
                            size_t n_rects) {
 	size_t i;
 	for (i = 0; i < n_rects; ++i)

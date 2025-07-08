@@ -103,7 +103,7 @@
 
 DECL_BEGIN
 
-static struct screen_rect const WHOLE_SCREEN = SCREEN_RECT_INIT_WHOLE_SCREEN;
+static struct video_crect const WHOLE_SCREEN = VIDEO_CRECT_INIT_FULL;
 
 static void
 do_dump_buffer_specs(struct video_buffer *buf,

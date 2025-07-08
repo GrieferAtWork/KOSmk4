@@ -29,28 +29,16 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
+#include <libvideo/codec/types.h>
+
 #include "buffer.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
-
-#include <libvideo/codec/types.h>
 #endif /* __cplusplus */
 
 #ifdef __CC__
 __DECL_BEGIN
-
-struct screen_rect {
-	video_coord_t sr_xmin; /* Starting X offset */
-	video_coord_t sr_ymin; /* Starting Y offset */
-	video_dim_t   sr_xdim; /* Rect size in X */
-	video_dim_t   sr_ydim; /* Rect size in Y */
-};
-#define SCREEN_RECT_INIT(xmin, xmax, xdim, ydim) \
-	{ xmin, xmax, xdim, ydim }
-#define SCREEN_RECT_INIT_WHOLE_SCREEN \
-	SCREEN_RECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
-
 
 struct screen_buffer;
 struct screen_buffer_ops {
@@ -65,12 +53,12 @@ struct screen_buffer_ops {
 	 * such that they are always in-bounds. */
 	__ATTR_NONNULL_T((1, 2)) void
 	(LIBVIDEO_GFX_CC *sbo_updaterect)(struct screen_buffer *__restrict self,
-	                                  struct screen_rect const *__restrict rect);
+	                                  struct video_crect const *__restrict rect);
 
 	/* Same as `sbo_updaterect()', but update multiple rects at once. */
 	__ATTR_NONNULL_T((1, 2)) void
 	(LIBVIDEO_GFX_CC *sbo_updaterects)(struct screen_buffer *__restrict self,
-	                                   struct screen_rect const *__restrict rects,
+	                                   struct video_crect const *__restrict rects,
 	                                   __size_t n_rects);
 };
 
@@ -112,7 +100,7 @@ struct screen_buffer
 public:
 
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1)) void LIBVIDEO_GFX_CC
-	updaterect(struct screen_rect const *__restrict rect) {
+	updaterect(struct video_crect const *__restrict rect) {
 		screen_buffer_updaterect(this, rect);
 	}
 
@@ -120,16 +108,16 @@ public:
 	updaterect(video_coord_t x = 0, video_coord_t y = 0,
 	           video_dim_t sx = VIDEO_DIM_MAX,
 	           video_dim_t sy = VIDEO_DIM_MAX) {
-		struct screen_rect rect;
-		rect.sr_xmin = x;
-		rect.sr_ymin = y;
-		rect.sr_xdim  = sx;
-		rect.sr_ydim  = sy;
+		struct video_crect rect;
+		rect.vcr_xmin = x;
+		rect.vcr_ymin = y;
+		rect.vcr_xdim = sx;
+		rect.vcr_ydim = sy;
 		screen_buffer_updaterect(this, &rect);
 	}
 
 	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1)) void LIBVIDEO_GFX_CC
-	updaterects(struct screen_rect const *__restrict rects, __size_t n_rects) {
+	updaterects(struct video_crect const *__restrict rects, __size_t n_rects) {
 		screen_buffer_updaterects(this, rects, n_rects);
 	}
 #endif /* __cplusplus */

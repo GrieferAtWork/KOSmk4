@@ -49,6 +49,24 @@ typedef __INT32_TYPE__ video_offset_t; /* Pixel offset (usually relative to some
 typedef __UINT32_TYPE__ video_coord_t; /* Pixel coordinate (usually absolute) */
 typedef __UINT32_TYPE__ video_dim_t;   /* Graphic dimension (in pixels) */
 
+struct video_rect {
+	video_offset_t vr_xmin; /* Starting X offset */
+	video_offset_t vr_ymin; /* Starting Y offset */
+	video_dim_t    vr_xdim; /* Rect size in X */
+	video_dim_t    vr_ydim; /* Rect size in Y */
+};
+#define VIDEO_RECT_INIT(xmin, xmax, xdim, ydim) { xmin, xmax, xdim, ydim }
+#define VIDEO_RECT_INIT_FULL VIDEO_RECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
+
+struct video_crect {
+	video_coord_t vcr_xmin; /* Starting X coord */
+	video_coord_t vcr_ymin; /* Starting Y coord */
+	video_dim_t   vcr_xdim; /* Rect size in X */
+	video_dim_t   vcr_ydim; /* Rect size in Y */
+};
+#define VIDEO_CRECT_INIT(xmin, xmax, xdim, ydim) { xmin, xmax, xdim, ydim }
+#define VIDEO_CRECT_INIT_FULL VIDEO_CRECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
+
 __DECL_END
 #endif /* __CC__ */
 
