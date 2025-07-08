@@ -654,6 +654,21 @@ libvideo_swblitter_noblend_difffmt__stretch_n__bypixel(struct video_blitter cons
 	                    src_x_, src_y_, src_size_x_, src_size_y_,
 	                    BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
 }
+
+PRIVATE ATTR_IN(1) void CC
+libvideo_swblitter_noblend_difffmt__stretch_imatrix_n__bypixel(struct video_blitter const *__restrict self,
+                                                               video_coord_t dst_x_, video_coord_t dst_y_,
+                                                               video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                                               video_coord_t src_x_, video_coord_t src_y_,
+                                                               video_dim_t src_size_x_, video_dim_t src_size_y_,
+                                                               video_imatrix2d_t src_matrix) {
+	struct video_gfx const *dst = self->vbt_dst;
+	struct video_gfx const *src = self->vbt_src;
+	struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
+	GFX_NEAREST_STRETCH_IMATRIX(dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                            src_x_, src_y_, src_size_x_, src_size_y_, src_matrix,
+	                            BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
+}
 #undef BLIT_PIXEL
 
 
@@ -847,16 +862,53 @@ done:
 
 INTERN ATTR_IN(1) void CC
 libvideo_swblitter_noblend_difffmt__stretch_imatrix_n(struct video_blitter const *__restrict self,
-                                                      video_coord_t dst_x, video_coord_t dst_y,
-                                                      video_dim_t dst_size_x, video_dim_t dst_size_y,
-                                                      video_coord_t src_x, video_coord_t src_y,
-                                                      video_dim_t src_size_x, video_dim_t src_size_y,
+                                                      video_coord_t dst_x_, video_coord_t dst_y_,
+                                                      video_dim_t dst_size_x_, video_dim_t dst_size_y_,
+                                                      video_coord_t src_x_, video_coord_t src_y_,
+                                                      video_dim_t src_size_x_, video_dim_t src_size_y_,
                                                       video_imatrix2d_t src_matrix) {
-	/* TODO */
-	libvideo_swblitter_generic__stretch_imatrix_n(self,
-	                                              dst_x, dst_y, dst_size_x, dst_size_y,
-	                                              src_x, src_y, src_size_x, src_size_y,
-	                                              src_matrix);
+	struct video_regionlock dst_lock;
+	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
+	TRACE_START("swblitter_noblend_difffmt__stretch_imatrix_n("
+	            "dst: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "}, "
+	            "src: {%" PRIuCRD "x%" PRIuCRD ", %" PRIuDIM "x%" PRIuDIM "})\n",
+	            dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	            src_x_, src_y_, src_size_x_, src_size_y_);
+	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, dst_size_x_, dst_size_y_)) {
+		struct video_regionlock src_lock;
+		struct video_buffer *src_buffer = self->vbt_src->vx_buffer;
+		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, src_size_x_, src_size_y_)) {
+			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
+			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vf_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vf_codec->vc_setpixel;
+#define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)                          \
+			{                                                                 \
+				byte_t const *src_line = src_lock.vrl_lock.vl_data +          \
+				                         src_y * src_lock.vrl_lock.vl_stride; \
+				video_pixel_t s = (*vc_getpixel)(src_line, src_x);            \
+				video_pixel_t o = video_converter_mappixel(conv, s);          \
+				(*vc_setpixel)(dst_line, dst_x, o);                           \
+			}
+#define LOCAL_dst_endrow(dst_y) \
+			dst_line += dst_lock.vrl_lock.vl_stride; (void)dst_y
+			GFX_NEAREST_STRETCH_IMATRIX((video_coord_t)dst_lock.vrl_xbas, 0, dst_size_x_, dst_size_y_,
+			                            (video_coord_t)src_lock.vrl_xbas, 0, src_size_x_, src_size_y_,
+			                            src_matrix, LOCAL_copy_pixel, GFX_ROW_NOOP, LOCAL_dst_endrow);
+#undef LOCAL_dst_endrow
+#undef LOCAL_copy_pixel
+			LL_unlockregion(src_buffer, &src_lock);
+			LL_unlockregion(dst_buffer, &dst_lock);
+			goto done;
+		}
+		LL_unlockregion(dst_buffer, &dst_lock);
+	}
+	libvideo_swblitter_noblend_difffmt__stretch_imatrix_n__bypixel(self,
+	                                                               dst_x_, dst_y_, dst_size_x_, dst_size_y_,
+	                                                               src_x_, src_y_, src_size_x_, src_size_y_,
+	                                                               src_matrix);
+done:
+	TRACE_END("swblitter_noblend_difffmt__stretch_imatrix_n()\n");
 }
 
 INTERN ATTR_IN(1) void CC
