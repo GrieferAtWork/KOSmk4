@@ -78,14 +78,25 @@ map_x_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t f
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
-map_rgba8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
+map_rgba8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_palette_getpixel(self->vcv_to.vf_pal, from_pixel);
+}
+
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+map_rgba8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
+	return video_format_color2pixel(&self->vcv_to, from_pixel);
+}
+
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+map_rgbx8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
+	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
+	return video_palette_getpixel(self->vcv_to.vf_pal, color);
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
 map_rgbx8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
-	return video_palette_getpixel(self->vcv_to.vf_pal, color);
+	return video_format_color2pixel(&self->vcv_to, color);
 }
 
 
@@ -267,12 +278,18 @@ initconv_from_generic(struct video_converter *__restrict self) {
 	    self->vcv_from.vf_pal == self->vcv_to.vf_pal) {
 		self->vcv_mappixel = &map_identity; /* No conversion is happening */
 	} else if (self->vcv_to.vf_codec->vc_color2pixel == &pal_color2pixel) {
-		self->vcv_mappixel = &map_x_to_p; /* Anything to palette */
+		if (self->vcv_from.vf_codec->vc_pixel2color == &identity_pixel2color) {
+			self->vcv_mappixel = &map_rgba8888_to_p; /* RGBA8888 to palette */
+		} else if (self->vcv_from.vf_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+			self->vcv_mappixel = &map_rgbx8888_to_p; /* RGBX8888 to palette */
+		} else {
+			self->vcv_mappixel = &map_x_to_p; /* Anything to palette */
+		}
 	} else if (self->vcv_to.vf_codec->vc_color2pixel == &identity_color2pixel) {
 		self->vcv_mappixel = &map_x_to_rgba8888; /* Anything to RGBA8888 */
-	} else 	if (self->vcv_from.vf_codec->vc_pixel2color == &identity_pixel2color) {
+	} else if (self->vcv_from.vf_codec->vc_pixel2color == &identity_pixel2color) {
 		self->vcv_mappixel = &map_rgba8888_to_x; /* RGBA8888 to anything */
-	} else 	if (self->vcv_from.vf_codec->vc_pixel2color == &rgbx8888_pixel2color) {
+	} else if (self->vcv_from.vf_codec->vc_pixel2color == &rgbx8888_pixel2color) {
 		self->vcv_mappixel = &map_rgbx8888_to_x; /* RGBX8888 to anything */
 	} else {
 		self->vcv_mappixel = &map_x_to_x; /* Anything to anything */
