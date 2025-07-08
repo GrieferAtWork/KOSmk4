@@ -350,7 +350,6 @@ libvideo_swblitter_noblend_samefmt__blit_imatrix(struct video_blitter const *__r
 	default: break;
 	}
 
-
 	TRACE_START("noblend_samefmt__blit_imatrix("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
@@ -777,36 +776,68 @@ done:
 
 INTERN ATTR_IN(1) void CC
 libvideo_swblitter_noblend_difffmt__blit_imatrix(struct video_blitter const *__restrict self,
-                                                 video_coord_t dst_x, video_coord_t dst_y,
-                                                 video_coord_t src_x, video_coord_t src_y,
-                                                 video_dim_t size_x, video_dim_t size_y,
+                                                 video_coord_t dst_x_, video_coord_t dst_y_,
+                                                 video_coord_t src_x_, video_coord_t src_y_,
+                                                 video_dim_t size_x_, video_dim_t size_y_,
                                                  video_imatrix2d_t src_matrix) {
+	struct video_regionlock dst_lock;
+	struct video_buffer *dst_buffer = self->vbt_dst->vx_buffer;
 	gfx_assert_imatrix2d(&src_matrix);
 
 	/* Fast-pass for known matrices */
 	if (src_matrix == VIDEO_IMATRIX2D_INIT(1, 0, 0, 1)) {
-		libvideo_swblitter_noblend_difffmt__blit(self, dst_x, dst_y, src_x, src_y, size_x, size_y);
+		libvideo_swblitter_noblend_difffmt__blit(self, dst_x_, dst_y_, src_x_, src_y_, size_x_, size_y_);
 		return;
 	}
-
-	/* TODO: More optimizations for known rotation/mirror matrices */
 
 	TRACE_START("noblend_difffmt__blit_imatrix("
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "}, "
 	            "matrix: {{%d,%d},{%d,%d}})\n",
-	            dst_x, dst_y, src_x, src_y, size_x, size_y,
+	            dst_x_, dst_y_, src_x_, src_y_, size_x_, size_y_,
 	            (int)video_imatrix2d_get(&src_matrix, 0, 0),
 	            (int)video_imatrix2d_get(&src_matrix, 0, 1),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 0),
 	            (int)video_imatrix2d_get(&src_matrix, 1, 1));
-
-	/* TODO: Use video locks if possible */
+	if likely(LL_wlockregion(dst_buffer, &dst_lock, dst_x_, dst_y_, size_x_, size_y_)) {
+		struct video_regionlock src_lock;
+		struct video_buffer *src_buffer = self->vbt_src->vx_buffer;
+		if likely(LL_rlockregion(src_buffer, &src_lock, src_x_, src_y_, size_x_, size_y_)) {
+			struct video_converter const *conv = libvideo_swblitter_generic__cconv(self);
+			byte_t *dst_line = dst_lock.vrl_lock.vl_data;
+			video_codec_getpixel_t vc_getpixel = src_buffer->vb_format.vf_codec->vc_getpixel;
+			video_codec_setpixel_t vc_setpixel = dst_buffer->vb_format.vf_codec->vc_setpixel;
+			video_coord_t iter_dst_x = dst_lock.vrl_xbas;
+			video_coord_t iter_dst_y = 0;
+			video_coord_t iter_src_x = src_lock.vrl_xbas;
+			video_coord_t iter_src_y = 0;
+#define LOCAL_copy_pixel(dst_x, dst_y, src_x, src_y)                          \
+			{                                                                 \
+				byte_t const *src_line = src_lock.vrl_lock.vl_data +          \
+				                         src_y * src_lock.vrl_lock.vl_stride; \
+				video_pixel_t s = (*vc_getpixel)(src_line, src_x);            \
+				video_pixel_t o = video_converter_mappixel(conv, s);          \
+				(*vc_setpixel)(dst_line, dst_x, o);                           \
+			}
+#define LOCAL_dst_endrow(dst_y) \
+			dst_line += dst_lock.vrl_lock.vl_stride; (void)dst_y
+			GFX_BLIT_FOREACH_IMATRIX(iter_dst_x, iter_dst_y, iter_src_x, iter_src_y,
+			                         size_x_, size_y_, src_matrix,
+			                         LOCAL_copy_pixel, GFX_ROW_NOOP, LOCAL_dst_endrow);
+#undef LOCAL_dst_endrow
+#undef LOCAL_copy_pixel
+			LL_unlockregion(src_buffer, &src_lock);
+			LL_unlockregion(dst_buffer, &dst_lock);
+			goto done;
+		}
+		LL_unlockregion(dst_buffer, &dst_lock);
+	}
 
 	/* Blit per-pixel, with pixel format converter */
-	libvideo_swblitter_noblend_difffmt__blit_imatrix__bypixel(self, dst_x, dst_y, src_x, src_y,
-	                                                          size_x, size_y, src_matrix);
+	libvideo_swblitter_noblend_difffmt__blit_imatrix__bypixel(self, dst_x_, dst_y_, src_x_, src_y_,
+	                                                          size_x_, size_y_, src_matrix);
+done:
 	TRACE_END("noblend_difffmt__blit_imatrix()\n");
 }
 
