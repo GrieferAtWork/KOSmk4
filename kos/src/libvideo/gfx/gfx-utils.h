@@ -581,60 +581,192 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 		}                                                                                                                          \
 	}	__WHILE0
 
-/* Invoke:
- * >> cb(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
- * for every pixel within the destination region, applying transformation as per "src_matrix"
+/* Macro-implementation of a general-purpose nearest stretch algorithm.
  *
- * Allowed to clobber all given arguments. */
-#define GFX_BLIT_FOREACH_IMATRIX(dst_x, dst_y, src_x, src_y, size_x, size_y, src_matrix, cb) \
-	do {                                                                                     \
-		video_coord_t used_dst_x = dst_x;                                                    \
-		video_coord_t used_src_x = src_x;                                                    \
-		video_coord_t used_src_y = src_y;                                                    \
-		video_dim_t iter_size_x  = size_x;                                                   \
-		do {                                                                                 \
-			cb(used_dst_x, dst_y, used_src_x, used_src_y);                                   \
-			used_src_x += video_imatrix2d_get(&src_matrix, 0, 0);                            \
-			used_src_y += video_imatrix2d_get(&src_matrix, 1, 0);                            \
-			++used_dst_x;                                                                    \
-		} while (--iter_size_x);                                                             \
-		src_x += video_imatrix2d_get(&src_matrix, 0, 1);                                     \
-		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                                     \
-		++dst_y;                                                                             \
-	} while (--size_y)
+ * @param: video_coord_t dst_x:      Destination X coord
+ * @param: video_coord_t dst_y:      Destination Y coord
+ * @param: video_dim_t   dst_size_x: Destination size in X
+ * @param: video_dim_t   dst_size_y: Destination size in Y
+ * @param: video_coord_t src_x:      Source X coord
+ * @param: video_coord_t src_y:      Source Y coord
+ * @param: video_dim_t   src_size_x: Source size in X
+ * @param: video_dim_t   src_size_y: Source size in Y
+ *
+ * @param: void copy_pixel(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
+ */
+#define GFX_NEAREST_STRETCH(dst_x, dst_y, dst_size_x, dst_size_y,                   \
+                            src_x, src_y, src_size_x, src_size_y,                   \
+                            copy_pixel /*(dst_x, dst_y, src_x, src_y)*/,            \
+                            dst_row_start /*(dst_y, src_y)*/,                       \
+                            dst_row_end /*(dst_y, src_y)*/)                         \
+	do {                                                                            \
+		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                 \
+		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                 \
+		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                  \
+		stretch_fp_t _src_pos_y = _step_y >> 1;                                     \
+		video_coord_t _iter_y = 0;                                                  \
+		do {                                                                        \
+			video_coord_t _row_dst_y = dst_y + _iter_y;                             \
+			video_coord_t _row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);        \
+			/* Start half-a-step ahead, thus rounding by 0.5 pixels */              \
+			stretch_fp_t _src_pos_x = _step_x >> 1;                                 \
+			video_coord_t _iter_x = 0;                                              \
+			_src_pos_x += STRETCH_FP(src_x);                                        \
+			{                                                                       \
+				dst_row_start(_row_dst_y, _row_src_y);                              \
+				do {                                                                \
+					video_coord_t row_src_x = STRETCH_FP_WHOLE(_src_pos_x);         \
+					copy_pixel(dst_x + _iter_x, _row_dst_y, row_src_x, _row_src_y); \
+					_src_pos_x += _step_x;                                          \
+				} while (++_iter_x < dst_size_x);                                   \
+				dst_row_end(_row_dst_y, _row_src_y);                                \
+			}                                                                       \
+			_src_pos_y += _step_y;                                                  \
+		} while (++_iter_y < dst_size_y);                                           \
+	}	__WHILE0
+
+#define GFX_NEAREST_STRETCH_IMATRIX(dst_x, dst_y, dst_size_x, dst_size_y,                                       \
+                                    src_x, src_y, src_size_x, src_size_y, src_matrix,                           \
+                                    copy_pixel /*(dst_x, dst_y, src_x, src_y)*/,                                \
+                                    dst_row_start /*(dst_y)*/,                                                  \
+                                    dst_row_end /*(dst_y)*/)                                                    \
+	do {                                                                                                        \
+		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                                             \
+		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                                             \
+		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                              \
+		stretch_fp_t _src_pos_y = _step_y >> 1;                                                                 \
+		video_coord_t _iter_y = 0;                                                                              \
+		do {                                                                                                    \
+			video_coord_t _row_dst_y = dst_y + _iter_y;                                                         \
+			video_coord_t _row_src_y = STRETCH_FP_WHOLE(_src_pos_y);                                            \
+			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                          \
+			stretch_fp_t _src_pos_x = _step_x >> 1;                                                             \
+			video_offset_t _delta_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * _row_src_y;          \
+			video_offset_t _delta_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * _row_src_y;          \
+			video_dim_t _iter_x = 0;                                                                            \
+			dst_row_start(_row_dst_y);                                                                          \
+			do {                                                                                                \
+				video_coord_t _row_src_x  = STRETCH_FP_WHOLE(_src_pos_x);                                       \
+				video_coord_t _used_src_x = _delta_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * _row_src_x; \
+				video_coord_t _used_src_y = _delta_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * _row_src_x; \
+				copy_pixel(dst_x + _iter_x, _row_dst_y, _used_src_x, _used_src_y);                              \
+				_src_pos_x += _step_x;                                                                          \
+			} while (++_iter_x < dst_size_x);                                                                   \
+			dst_row_end(_row_dst_y);                                                                            \
+			_src_pos_y += _step_y;                                                                              \
+		} while (++_iter_y < dst_size_y);                                                                       \
+	}	__WHILE0
+#define GFX_NEAREST_STRETCH_REV(dst_x, dst_y, dst_size_x, dst_size_y,        \
+                                src_x, src_y, src_size_x, src_size_y,        \
+                                copy_pixel /*(dst_x, dst_y, src_x, src_y)*/, \
+                                dst_row_start /*(dst_y, src_y)*/,            \
+                                dst_row_end /*(dst_y, src_y)*/)              \
+	do {                                                                     \
+		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;          \
+		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;          \
+		/* Start half-a-step ahead, thus rounding by 0.5 pixels */           \
+		stretch_fp_t _src_pos_y = (_step_y >> 1) + (dst_size_y * _step_y);   \
+		do {                                                                 \
+			video_coord_t _row_dst_y;                                        \
+			video_coord_t _row_src_y;                                        \
+			stretch_fp_t _src_pos_x;                                         \
+			video_coord_t _iter_x;                                           \
+			--dst_size_y;                                                    \
+			_src_pos_y -= _step_y;                                           \
+			_row_dst_y = dst_y + dst_size_y;                                 \
+			_row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);               \
+			/* Start half-a-step ahead, thus rounding by 0.5 pixels */       \
+			_src_pos_x = _step_x >> 1;                                       \
+			_src_pos_x += STRETCH_FP(src_x);                                 \
+			_src_pos_x += dst_size_x * _step_x;                              \
+			_iter_x = dst_size_x;                                            \
+			{                                                                \
+				dst_row_start(_row_dst_y, _row_src_y);                       \
+				do {                                                         \
+					video_coord_t _row_src_x;                                \
+					--_iter_x;                                               \
+					_src_pos_x -= _step_x;                                   \
+					_row_src_x = STRETCH_FP_WHOLE(_src_pos_x);               \
+					copy_pixel(dst_x + _iter_x, _row_dst_y,                  \
+					           _row_src_x, _row_src_y);                      \
+				} while (_iter_x);                                           \
+				dst_row_end(_row_dst_y, _row_src_y);                         \
+			}                                                                \
+		} while (dst_size_y);                                                \
+	}	__WHILE0
+
+
+/* Dummy callback for "dst_row_start" and "dst_row_end" */
+#define GFX_ROW_NOOP(...) (void)0
 
 /* Invoke:
  * >> cb(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
  * for every pixel within the destination region */
-#define GFX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, cb) \
+#define GFX_BLIT_FOREACH(dst_x, dst_y, src_x, src_y, size_x, size_y, cb, \
+                         dst_row_start /*(dst_y, src_y)*/,               \
+                         dst_row_end /*(dst_y, src_y)*/)                 \
 	do {                                                                 \
-		video_coord_t used_dst_x = dst_x;                                \
-		video_coord_t used_src_x = src_x;                                \
-		video_dim_t iter_size_x  = size_x;                               \
+		video_coord_t _used_dst_x = dst_x;                               \
+		video_coord_t _used_src_x = src_x;                               \
+		video_dim_t _iter_size_x  = size_x;                              \
+		dst_row_start(dst_y, src_y);                                     \
 		do {                                                             \
-			cb(used_dst_x, dst_y, used_src_x, src_y);                    \
-			++used_dst_x;                                                \
-			++used_src_x;                                                \
-		} while (--iter_size_x);                                         \
+			cb(_used_dst_x, dst_y, _used_src_x, src_y);                  \
+			++_used_dst_x;                                               \
+			++_used_src_x;                                               \
+		} while (--_iter_size_x);                                        \
+		dst_row_end(dst_y, src_y);                                       \
 		++dst_y;                                                         \
 		++src_y;                                                         \
 	} while (--size_y)
 
 /* Same as `GFX_BLIT_FOREACH()', but pixels are iterated in reverse order */
-#define GFX_BLIT_FOREACH_REV(dst_x, dst_y, src_x, src_y, size_x, size_y, cb)          \
-	do {                                                                              \
-		video_dim_t iter_size_x = size_x;                                             \
-		video_coord_t used_dst_y, used_src_y;                                         \
-		--size_y;                                                                     \
-		used_dst_y = dst_y + size_y;                                                  \
-		used_src_y = src_y + size_y;                                                  \
-		do {                                                                          \
-			--iter_size_x;                                                            \
-			{                                                                         \
-				cb(dst_x + iter_size_x, used_dst_y, src_x + iter_size_x, used_src_y); \
-			}                                                                         \
-		} while (iter_size_x);                                                        \
+#define GFX_BLIT_FOREACH_REV(dst_x, dst_y, src_x, src_y, size_x, size_y, cb,                  \
+                             dst_row_start /*(dst_y, src_y)*/,                                \
+                             dst_row_end /*(dst_y, src_y)*/)                                  \
+	do {                                                                                      \
+		--size_y;                                                                             \
+		{                                                                                     \
+			video_dim_t _iter_size_x  = size_x;                                               \
+			video_coord_t _used_dst_y = dst_y + size_y;                                       \
+			video_coord_t _used_src_y = src_y + size_y;                                       \
+			dst_row_start(_used_dst_y, _used_src_y);                                          \
+			do {                                                                              \
+				--_iter_size_x;                                                               \
+				{                                                                             \
+					cb(dst_x + _iter_size_x, _used_dst_y, src_x + _iter_size_x, _used_src_y); \
+				}                                                                             \
+			} while (_iter_size_x);                                                           \
+			dst_row_end(_used_dst_y, _used_src_y);                                            \
+		}                                                                                     \
 	} while (size_y)
+
+/* Invoke:
+ * >> cb(video_coord_t dst_x, video_coord_t dst_y, video_coord_t src_x, video_coord_t src_y);
+ * for every pixel within the destination region, applying transformation as per "src_matrix"
+ *
+ * Allowed to clobber all given arguments. */
+#define GFX_BLIT_FOREACH_IMATRIX(dst_x, dst_y, src_x, src_y,       \
+                                 size_x, size_y, src_matrix, cb,   \
+                                 dst_row_start /*(dst_y)*/,        \
+                                 dst_row_end /*(dst_y)*/)          \
+	do {                                                           \
+		video_coord_t _used_dst_x = dst_x;                         \
+		video_coord_t _used_src_x = src_x;                         \
+		video_coord_t _used_src_y = src_y;                         \
+		video_dim_t _iter_size_x  = size_x;                        \
+		dst_row_start(dst_y);                                      \
+		do {                                                       \
+			cb(_used_dst_x, dst_y, _used_src_x, _used_src_y);      \
+			_used_src_x += video_imatrix2d_get(&src_matrix, 0, 0); \
+			_used_src_y += video_imatrix2d_get(&src_matrix, 1, 0); \
+			++_used_dst_x;                                         \
+		} while (--_iter_size_x);                                  \
+		dst_row_end(dst_y);                                        \
+		src_x += video_imatrix2d_get(&src_matrix, 0, 1);           \
+		src_y += video_imatrix2d_get(&src_matrix, 1, 1);           \
+		++dst_y;                                                   \
+	} while (--size_y)
 
 
 /* Invoke:
@@ -642,18 +774,22 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
  * >>    video_coord_t dst_x, video_coord_t dst_y,
  * >>    video_coord_t src_x, video_coord_t src_y);
  * for every pixel within the destination region */
-#define GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y, cb) \
+#define GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y, cb, \
+                          out_row_start /*(out_y, dst_y, src_y)*/,                      \
+                          out_row_end /*(out_y, dst_y, src_y)*/)                        \
 	do {                                                                                \
-		video_coord_t used_out_x = out_x;                                               \
-		video_coord_t used_dst_x = dst_x;                                               \
-		video_coord_t used_src_x = src_x;                                               \
-		video_dim_t iter_size_x  = size_x;                                              \
+		video_coord_t _used_out_x = out_x;                                              \
+		video_coord_t _used_dst_x = dst_x;                                              \
+		video_coord_t _used_src_x = src_x;                                              \
+		video_dim_t _iter_size_x  = size_x;                                             \
+		out_row_start(out_y, dst_y, src_y);                                             \
 		do {                                                                            \
-			cb(used_out_x, out_y, used_dst_x, dst_y, used_src_x, src_y);                \
-			++used_out_x;                                                               \
-			++used_dst_x;                                                               \
-			++used_src_x;                                                               \
-		} while (--iter_size_x);                                                        \
+			cb(_used_out_x, out_y, _used_dst_x, dst_y, _used_src_x, src_y);             \
+			++_used_out_x;                                                              \
+			++_used_dst_x;                                                              \
+			++_used_src_x;                                                              \
+		} while (--_iter_size_x);                                                       \
+		out_row_end(out_y, dst_y, src_y);                                               \
 		++out_y;                                                                        \
 		++dst_y;                                                                        \
 		++src_y;                                                                        \
@@ -667,28 +803,32 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
  * transformation as per "dst_matrix" and "src_matrix"
  *
  * Allowed to clobber all given arguments. */
-#define GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,          \
-                                  src_x, src_y, size_x, size_y, src_matrix, cb)    \
-	do {                                                                           \
-		video_coord_t used_out_x = out_x;                                          \
-		video_coord_t used_dst_x = dst_x;                                          \
-		video_coord_t used_dst_y = dst_y;                                          \
-		video_coord_t used_src_x = src_x;                                          \
-		video_coord_t used_src_y = src_y;                                          \
-		video_dim_t iter_size_x  = size_x;                                         \
-		do {                                                                       \
-			cb(used_out_x, out_y, used_dst_x, used_dst_y, used_src_x, used_src_y); \
-			used_src_x += video_imatrix2d_get(&src_matrix, 0, 0);                  \
-			used_src_y += video_imatrix2d_get(&src_matrix, 1, 0);                  \
-			used_dst_x += video_imatrix2d_get(&dst_matrix, 0, 0);                  \
-			used_dst_y += video_imatrix2d_get(&dst_matrix, 1, 0);                  \
-			++used_out_x;                                                          \
-		} while (--iter_size_x);                                                   \
-		src_x += video_imatrix2d_get(&src_matrix, 0, 1);                           \
-		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                           \
-		dst_x += video_imatrix2d_get(&dst_matrix, 0, 1);                           \
-		dst_y += video_imatrix2d_get(&dst_matrix, 1, 1);                           \
-		++out_y;                                                                   \
+#define GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,               \
+                                  src_x, src_y, size_x, size_y, src_matrix, cb,         \
+                                  out_row_start /*(out_y)*/,                            \
+                                  out_row_end /*(out_y)*/)                              \
+	do {                                                                                \
+		video_coord_t _used_out_x = out_x;                                              \
+		video_coord_t _used_dst_x = dst_x;                                              \
+		video_coord_t _used_dst_y = dst_y;                                              \
+		video_coord_t _used_src_x = src_x;                                              \
+		video_coord_t _used_src_y = src_y;                                              \
+		video_dim_t _iter_size_x  = size_x;                                             \
+		out_row_start(out_y);                                                           \
+		do {                                                                            \
+			cb(_used_out_x, out_y, _used_dst_x, _used_dst_y, _used_src_x, _used_src_y); \
+			_used_src_x += video_imatrix2d_get(&src_matrix, 0, 0);                      \
+			_used_src_y += video_imatrix2d_get(&src_matrix, 1, 0);                      \
+			_used_dst_x += video_imatrix2d_get(&dst_matrix, 0, 0);                      \
+			_used_dst_y += video_imatrix2d_get(&dst_matrix, 1, 0);                      \
+			++_used_out_x;                                                              \
+		} while (--_iter_size_x);                                                       \
+		out_row_end(out_y);                                                             \
+		src_x += video_imatrix2d_get(&src_matrix, 0, 1);                                \
+		src_y += video_imatrix2d_get(&src_matrix, 1, 1);                                \
+		dst_x += video_imatrix2d_get(&dst_matrix, 0, 1);                                \
+		dst_y += video_imatrix2d_get(&dst_matrix, 1, 1);                                \
+		++out_y;                                                                        \
 	} while (--size_y)
 
 

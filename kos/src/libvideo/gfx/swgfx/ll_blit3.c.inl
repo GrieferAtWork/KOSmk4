@@ -92,7 +92,8 @@ libvideo_swblitter3__blit__generic__bypixel(struct video_blitter3 const *__restr
 	struct video_gfx const *dst = self->vbt3_rddst;
 	struct video_gfx const *src = self->vbt3_src;
 	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
-	GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y, BLIT_PIXEL);
+	GFX_BLIT_FOREACH3(out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y,
+	                  BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
 }
 
 PRIVATE ATTR_IN(1) void CC
@@ -109,7 +110,7 @@ libvideo_swblitter3__blit_imatrix__generic__bypixel(struct video_blitter3 const 
 	blt3_blend_t blend = video_swblitter3_getcdrv(self)->bsw3_blend;
 	GFX_BLIT_FOREACH3_IMATRIX(out_x, out_y, dst_x, dst_y, dst_matrix,
 	                          src_x, src_y, size_x, size_y, src_matrix,
-	                          BLIT_PIXEL);
+	                          BLIT_PIXEL, GFX_ROW_NOOP, GFX_ROW_NOOP);
 }
 #undef BLIT_PIXEL
 
