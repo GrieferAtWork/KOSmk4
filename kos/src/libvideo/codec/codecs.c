@@ -2472,6 +2472,47 @@ l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color
 
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+a1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha1_tocolor(pixel & 1);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+a1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	return color_getalpha1(color);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+a2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha2_tocolor(pixel & 0x3);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+a2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	return color_getalpha2(color);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+a4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha4_tocolor(pixel & 0xf);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+a4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	return color_getalpha4(color);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+a8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
+	return alpha8_tocolor(pixel & 0xff);
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+a8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
+	return color_getalpha8(color);
+}
+
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
 al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen1_tocolor((pixel >> 1) & 1);
@@ -2620,6 +2661,10 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, l1)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, l2)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, l4)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, l8)
+DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, a1)
+DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, a2)
+DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, a4)
+DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, a8)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, al11)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la11)
 DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, al22)
@@ -3609,6 +3654,113 @@ libvideo_codec_lookup(video_codec_t codec) {
 	               unaligned_rectcopy16, unaligned_rectmove16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               al88_pixel2color, al88_color2pixel, initconv_from_la);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A1_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0x1),
+	               buffer1_requirements,
+	               getpixel1_lsb, setpixel1_lsb,
+	               rectcopy1_lsb, rectmove1_lsb,
+	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
+	               a1_pixel2color, a1_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A1_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 1,
+	                /* vcs_cbits */ 1,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0x1),
+	               buffer1_requirements,
+	               getpixel1_msb, setpixel1_msb,
+	               rectcopy1_msb, rectmove1_msb,
+	               linefill1_msb, vertfill1_msb, rectfill1_msb,
+	               a1_pixel2color, a1_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A2_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0x3),
+	               buffer2_requirements,
+	               getpixel2_lsb, setpixel2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb,
+	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
+	               a2_pixel2color, a2_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A2_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 2,
+	                /* vcs_cbits */ 2,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0x3),
+	               buffer2_requirements,
+	               getpixel2_msb, setpixel2_msb,
+	               rectcopy2_msb, rectmove2_msb,
+	               linefill2_msb, vertfill2_msb, rectfill2_msb,
+	               a2_pixel2color, a2_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A4_LSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_LSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0xf),
+	               buffer4_requirements,
+	               getpixel4_lsb, setpixel4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb,
+	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
+	               a4_pixel2color, a4_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A4_MSB,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_MSB,
+	                /* vcs_bpp   */ 4,
+	                /* vcs_cbits */ 4,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0xf),
+	               buffer4_requirements,
+	               getpixel4_msb, setpixel4_msb,
+	               rectcopy4_msb, rectmove4_msb,
+	               linefill4_msb, vertfill4_msb, rectfill4_msb,
+	               a4_pixel2color, a4_color2pixel, initconv_from_a);
+
+	CASE_CODEC_AL1(VIDEO_CODEC_A8,
+	               (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_INTERP8888,
+	                /* vcs_bpp   */ 8,
+	                /* vcs_cbits */ 8,
+	                /* vcs_rmask */ 0,
+	                /* vcs_gmask */ 0,
+	                /* vcs_bmask */ 0,
+	                /* vcs_amask */ 0xff),
+	               buffer8_requirements,
+	               getpixel8, setpixel8,
+	               rectcopy8, rectmove8,
+	               linefill8, vertfill8, rectfill8,
+	               a8_pixel2color, a8_color2pixel, initconv_from_a);
+
+#define VIDEO_CODEC_A1_MSB   0x101a /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_A1_LSB   0x101b /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_A2_MSB   0x101c /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_A2_LSB   0x101d /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_A4_MSB   0x101e /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_A4_LSB   0x101f /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_A8       0x1020 /* 1-byte-per-pixel, 256-level alpha-mask (0=transparent; 255=opaque; rgb=0) */
+
 
 
 

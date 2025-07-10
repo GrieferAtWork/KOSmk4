@@ -70,6 +70,22 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 				static_assert((VIDEO_CODEC_L4_MSB + 1) == VIDEO_CODEC_L4_LSB);
 				if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
 					++codec;
+			} else if (specs->vcs_amask != 0 && specs->vcs_rmask == 0) {
+				if (specs->vcs_amask == (((uint32_t)1 << specs->vcs_bpp) - 1)) {
+					/* Alpha-only */
+					switch (specs->vcs_bpp) {
+					case 1: codec = VIDEO_CODEC_A1_MSB; break;
+					case 2: codec = VIDEO_CODEC_A2_MSB; break;
+					case 4: codec = VIDEO_CODEC_A4_MSB; break;
+					case 8: codec = VIDEO_CODEC_A8; break;
+					default: goto nope;
+					}
+					static_assert((VIDEO_CODEC_A1_MSB + 1) == VIDEO_CODEC_A1_LSB);
+					static_assert((VIDEO_CODEC_A2_MSB + 1) == VIDEO_CODEC_A2_LSB);
+					static_assert((VIDEO_CODEC_A4_MSB + 1) == VIDEO_CODEC_A4_LSB);
+					if (VIDEO_CODEC_FLAG_ISLSB(specs->vcs_flags) && specs->vcs_bpp < 8)
+						++codec;
+				}
 			} else {
 				/* With alpha channel */
 				switch (specs->vcs_bpp) {

@@ -357,6 +357,13 @@ initconv_from_la(struct video_converter *__restrict self) {
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+initconv_from_a(struct video_converter *__restrict self) {
+	/* TODO: Optimization for conversion to RGB(A) formats */
+	/* TODO: Optimization for conversion to other A-formats */
+	return initconv_from_generic(self);
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
 initconv_from_rgb(struct video_converter *__restrict self) {
 	struct video_codec const *from_codec = self->vcv_from.vf_codec;
 	struct video_codec const *to_codec = self->vcv_to.vf_codec;

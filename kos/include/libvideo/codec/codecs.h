@@ -171,6 +171,13 @@
 #define VIDEO_CODEC_AL17     0x1017 /* 1-byte-per-pixel, 128-level grayscale+alpha (0=black; 15=white) */
 #define VIDEO_CODEC_LA88     0x1018 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
 #define VIDEO_CODEC_AL88     0x1019 /* 2-byte-per-pixel, 256-level grayscale+alpha (0=black; 255=white) */
+#define VIDEO_CODEC_A1_MSB   0x101a /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b01234567" (e.g. x=1 is defined by "byte & 0x40") */
+#define VIDEO_CODEC_A1_LSB   0x101b /* 1-bit-per-pixel, alpha-mask (rgb=0), left->right pixels are encoded in a byte as "0b76543210" (e.g. x=1 is defined by "byte & 0x02") */
+#define VIDEO_CODEC_A2_MSB   0x101c /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00112233" (e.g. x=1 is defined by "byte & 0x30") */
+#define VIDEO_CODEC_A2_LSB   0x101d /* 2-bit-per-pixel, 4-level alpha-mask (0=transparent; 3=opaque; rgb=0), left->right pixels are encoded in a byte as "0b33221100" (e.g. x=1 is defined by "byte & 0x0c") */
+#define VIDEO_CODEC_A4_MSB   0x101e /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b00001111" (e.g. x=1 is defined by "byte & 0x0f") */
+#define VIDEO_CODEC_A4_LSB   0x101f /* 4-bit-per-pixel, 16-level alpha-mask (0=transparent; 15=opaque; rgb=0), left->right pixels are encoded in a byte as "0b11110000" (e.g. x=1 is defined by "byte & 0xf0") */
+#define VIDEO_CODEC_A8       0x1020 /* 1-byte-per-pixel, 256-level alpha-mask (0=transparent; 255=opaque; rgb=0) */
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 /* TODO: L16 */
 /* TODO: LA1616 */
@@ -216,7 +223,7 @@
 /* Video codec flags (bits for `struct video_codec_specs::vcs_flags') */
 #define VIDEO_CODEC_FLAG_NORMAL     0x00 /* Normal flags */
 #define VIDEO_CODEC_FLAG_PAL        0x01 /* Does this codec use a palette? (do not combine with `VIDEO_CODEC_FLAG_LUM') */
-#define VIDEO_CODEC_FLAG_LUM        0x02 /* Is this a grayscale-only (luminance) codec? (do not combine with `VIDEO_CODEC_FLAG_PAL') */
+#define VIDEO_CODEC_FLAG_LUM        0x02 /* Is this a grayscale-only (luminance) or alpha-only codec? (do not combine with `VIDEO_CODEC_FLAG_PAL') */
 #define VIDEO_CODEC_FLAG_MSB        0x00 /* When multiple pixels fit into a single byte, they are ordered as "0b01234567" (e.g. pixel at x=1 is defined by "byte & 0x40") */
 #define VIDEO_CODEC_FLAG_LSB        0x04 /* When multiple pixels fit into a single byte, they are ordered as "0b76543210" (e.g. pixel at x=1 is defined by "byte & 0x02") */
 #define VIDEO_CODEC_FLAG_INTERP8888 0x08 /* When interpreted as uint8_t[4], pixel values can be interpolated directly (as opposed to converting to colors, interpolating,

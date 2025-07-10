@@ -138,7 +138,16 @@ struct video_blitter_ops {
 	 * - Gonna  need that one for window composition,  which I'm probably going to do
 	 *   by having windows that are covered such that the visible area isn't a simple
 	 *   rect, exclusively use a back-buffer that is then blit to-screen alongside  a
-	 *   bitmask (causing *only* the pixels still visible to be blit) */
+	 *   bitmask (causing *only* the pixels still visible to be blit)
+	 *
+	 * XXX: This can already be done with blitter3:
+	 * - wrdst: Destination    [blend:GFX_BLENDMODE_ALPHA]  (or some other alpha-respecting blend-mode)
+	 * - rddst: video_bitmask  [blend:GFX_BLENDMODE_ALPHAMASK,codec:VIDEO_CODEC_A1_MSB]
+	 * - src:   Source
+	 *
+	 * In these configurations, only pixels that appear as 1-bits in the mask can be
+	 * blitted.
+	 */
 
 	/* TODO: Some way to rotate and flip pixels during blits (using precise angles,
 	 *       rather than the mere 90° rotations possible via  `VIDEO_GFX_F_XYSWAP') */

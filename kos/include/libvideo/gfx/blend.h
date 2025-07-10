@@ -186,4 +186,10 @@ __DECL_END
 	GFX_BLENDMODE(/*RGB=*/SRC_COLOR, ADD, ONE_MINUS_SRC_ALPHA, \
 	              /*A  =*/ZERO, ADD, ONE)
 
+
+/* TODO: Define and add fast paths for this mode */
+#define GFX_BLENDMODE_ALPHAMASK                 \
+	GFX_BLENDMODE(/*RGB=*/DST_ALPHA, ADD, ZERO, \
+	              /*A  =*/ONE, MUL, ONE)
+
 #endif /* !_LIBVIDEO_GFX_BLEND_H */

@@ -34,6 +34,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_p(
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_pa(struct video_converter *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_l(struct video_converter *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_la(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_a(struct video_converter *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_rgb(struct video_converter *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC initconv_from_rgba(struct video_converter *__restrict self);
 
