@@ -234,6 +234,17 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 
 		/* TODO: Special handling when buffers overlap */
 
+		/* Filter out contexts that prevent use of special optimizations */
+		if (src_gfx->vx_flags & VIDEO_GFX_F_BLUR)
+			goto set_generic_operators;
+		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
+			goto set_generic_operators;
+		if (rddst_gfx->vx_flags & VIDEO_GFX_F_BLUR)
+			goto set_generic_operators;
+		if (!VIDEO_COLOR_ISTRANSPARENT(rddst_gfx->vx_colorkey))
+			goto set_generic_operators;
+
+		/* Check for cases where we provide special optimizations */
 		if likely(libvideo_gfx_allow_noblend_blit3(wrdst_gfx, rddst_gfx, src_gfx)) {
 			/* Special optimization for likely case where "wrdst_gfx" doesn't do any blending */
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__blend1;
@@ -245,7 +256,59 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 				drv->bsw3_stretch         = &libvideo_swblitter3__stretch__blend1_n;
 				drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__blend1_n;
 			}
+		} else if (GFX_BLENDMODE_GET_MODE(wrdst_gfx->vx_blend) == GFX_BLENDMODE_ALPHA &&
+		           GFX_BLENDMODE_GET_MODE(rddst_gfx->vx_blend) == GFX_BLENDMODE_ALPHAMASK &&
+		           rddst_gfx->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_A1_MSB) {
+			/* Special optimization for bitmasked alpha-blending.
+			 * In this mode, only pixels masked by the given bitmask get blended
+			 * into the `wrdst_gfx' GFX, with all other pixels being left as-is. */
+			if (video_format_hasalpha(&src_gfx->vx_buffer->vb_format)) {
+				/* With the source GFX featuring an alpha-channel, regular
+				 * alpha-blending  still  needs to  happen  in `wrdst_gfx'
+				 * (though only for pixels specified by the mask). */
+				drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb;
+				drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb;
+				if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+					drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_l;
+					drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_l;
+				} else {
+					drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_n;
+					drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_n;
+				}
+			} else {
+				/* Since the source has no alpha, it always produces colors with A=255.
+				 * As such, the alpha-blending that happens in `wrdst_gfx' would  never
+				 * consider data from existing pixels, meaning blending can be skipped. */
+				if (src_gfx->vx_buffer->vb_format.vf_codec == wrdst_gfx->vx_buffer->vb_format.vf_codec &&
+				    src_gfx->vx_buffer->vb_format.vf_pal == wrdst_gfx->vx_buffer->vb_format.vf_pal) {
+					/* Same-codec+pal -> don't have to convert between pixel formats */
+					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_samefmt;
+					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_samefmt;
+					if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_samefmt_l;
+						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_samefmt_l;
+					} else {
+						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_samefmt_n;
+						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_samefmt_n;
+					}
+				} else {
+					/* Different formats -> pixel format conversion still has to happen */
+					video_converter_init(libvideo_swblitter3_generic__conv(ctx),
+					                     &src_gfx->vx_buffer->vb_format,
+					                     &wrdst_gfx->vx_buffer->vb_format);
+					drv->bsw3_blit         = &libvideo_swblitter3__blit__mask1msb_blend1_difffmt;
+					drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__mask1msb_blend1_difffmt;
+					if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {
+						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_difffmt_l;
+						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_difffmt_l;
+					} else {
+						drv->bsw3_stretch         = &libvideo_swblitter3__stretch__mask1msb_blend1_difffmt_n;
+						drv->bsw3_stretch_imatrix = &libvideo_swblitter3__stretch_imatrix__mask1msb_blend1_difffmt_n;
+					}
+				}
+			}
 		} else {
+set_generic_operators:
 			drv->bsw3_blit         = &libvideo_swblitter3__blit__generic;
 			drv->bsw3_blit_imatrix = &libvideo_swblitter3__blit_imatrix__generic;
 			if (src_gfx->vx_flags & VIDEO_GFX_F_LINEAR) {

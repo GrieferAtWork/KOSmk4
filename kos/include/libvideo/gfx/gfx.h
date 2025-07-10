@@ -132,23 +132,6 @@ struct video_blitter_ops {
 	                                video_offset_t __src_x, video_offset_t __src_y,
 	                                video_dim_t __src_size_x, video_dim_t __src_size_y);
 
-	/* TODO: Bring back "vbto_bitblit_masked" (same as "vbto_bitblit", but also has a
-	 *       `struct video_bitmask' specifying which pixels of the source GFX  should
-	 *       actually be copied)
-	 * - Gonna  need that one for window composition,  which I'm probably going to do
-	 *   by having windows that are covered such that the visible area isn't a simple
-	 *   rect, exclusively use a back-buffer that is then blit to-screen alongside  a
-	 *   bitmask (causing *only* the pixels still visible to be blit)
-	 *
-	 * XXX: This can already be done with blitter3:
-	 * - wrdst: Destination    [blend:GFX_BLENDMODE_ALPHA]  (or some other alpha-respecting blend-mode)
-	 * - rddst: video_bitmask  [blend:GFX_BLENDMODE_ALPHAMASK,codec:VIDEO_CODEC_A1_MSB]
-	 * - src:   Source
-	 *
-	 * In these configurations, only pixels that appear as 1-bits in the mask can be
-	 * blitted.
-	 */
-
 	/* TODO: Some way to rotate and flip pixels during blits (using precise angles,
 	 *       rather than the mere 90° rotations possible via  `VIDEO_GFX_F_XYSWAP') */
 
@@ -861,7 +844,26 @@ public:
  *
  * NOTE: Only the intersection of rects in "vbt3_rddst" / "vbt3_wrdst"
  *       actually gets blitted!
- */
+ *
+ * NOTE: In  order to perform  a marked blit (iow:  a blit where only
+ *       pixels that appear as 1-bits in some pixel mask are copied),
+ *       store the mask  as a  video_buffer using  VIDEO_CODEC_A1_MSB
+ *       as pixel codec, and then blit as follows:
+ * >> void masked_blit(struct video_buffer *dst,
+ * >>                  struct video_buffer *mask,
+ * >>                  struct video_buffer *src) {
+ * >>     struct video_gfx dst_gfx;
+ * >>     struct video_gfx src_gfx;
+ * >>     struct video_gfx mask_gfx;
+ * >>     video_buffer_getgfx(dst, &dst_gfx, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_NORMAL, 0);
+ * >>     video_buffer_getgfx(src, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0); // Blend mode doesn't matter
+ * >>     video_buffer_getgfx(mask, &mask_gfx, GFX_BLENDMODE_ALPHAMASK, VIDEO_GFX_F_NORMAL, 0);
+ * >>     video_gfx_bitblit3(&dst_gfx, 0, 0, &mask_gfx, 0, 0, &src_gfx, 0, 0,
+ * >>                        video_gfx_getclipw(&src_gfx), video_gfx_getclipw(&dst_gfx));
+ * >> }
+ *
+ * An optimizing video blitter implementation will detect this config
+ * of GFX contexts and provide dedicated optimizations for this case. */
 struct video_blitter3 {
 	struct video_blitter3_ops const *vbt3_ops;    /* Blitter operators */
 	/* WARNING: After initialization, the following fields must no longer be accessed by the user! */

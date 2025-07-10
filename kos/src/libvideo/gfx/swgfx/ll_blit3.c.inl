@@ -620,4 +620,13 @@ libvideo_swblitter3__stretch_imatrix__blend1_l(struct video_blitter3 const *__re
 
 DECL_END
 
+#ifndef __INTELLISENSE__
+#define DEFINE_libvideo_swblitter3__blit__mask1msb
+#include "ll_blit3-mask1msb.c.inl"
+#define DEFINE_libvideo_swblitter3__blit__mask1msb_blend1_samefmt
+#include "ll_blit3-mask1msb.c.inl"
+#define DEFINE_libvideo_swblitter3__blit__mask1msb_blend1_difffmt
+#include "ll_blit3-mask1msb.c.inl"
+#endif /* !__INTELLISENSE__ */
+
 #endif /* !GUARD_LIBVIDEO_GFX_SWGFX_LL_BLIT3_C_INL */
