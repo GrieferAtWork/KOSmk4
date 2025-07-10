@@ -187,7 +187,7 @@ __DECL_END
 	              /*A  =*/ZERO, ADD, ONE)
 
 
-/* TODO: Define and add fast paths for this mode */
+/* Destination alpha mask (for use when alpha-blending together with a bitmask codec) */
 #define GFX_BLENDMODE_ALPHAMASK                 \
 	GFX_BLENDMODE(/*RGB=*/DST_ALPHA, ADD, ZERO, \
 	              /*A  =*/ONE, MUL, ONE)

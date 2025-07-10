@@ -55,7 +55,8 @@ DECL_BEGIN
 	cb(add, GFX_BLENDMODE_ADD)                                 \
 	cb(add_premultiplied, GFX_BLENDMODE_ADD_PREMULTIPLIED)     \
 	cb(mod, GFX_BLENDMODE_MOD)                                 \
-	cb(mul, GFX_BLENDMODE_MUL)
+	cb(mul, GFX_BLENDMODE_MUL)                                 \
+	cb(alphamask, GFX_BLENDMODE_ALPHAMASK)
 
 #define GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(cb /*(name, mode)*/) \
 	cb(alpha_factor, GFX_BLENDMODE_ALPHA_FACTOR(0))                 \

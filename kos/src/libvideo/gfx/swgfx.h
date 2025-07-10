@@ -853,34 +853,42 @@ INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit(struct video_blitter3 const *
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_rdwrap(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_rdwrap_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
-INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_rdwrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_rdwrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_blit_wrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_offset_t src_x, video_offset_t src_y, video_dim_t size_x, video_dim_t size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_rdwrap(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_rdwrap_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
-INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_rdwrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_rdwrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap1(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
+INTDEF ATTR_IN(1) void CC libvideo_swblitter3_stretch_wrap1_imatrix(struct video_blitter3 const *__restrict self, video_offset_t wrdst_x, video_offset_t wrdst_y, video_offset_t rddst_x, video_offset_t rddst_y, video_dim_t dst_size_x, video_dim_t dst_size_y, video_offset_t src_x, video_offset_t src_y, video_dim_t src_size_x, video_dim_t src_size_y);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_imatrix(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_rdwrap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_rdwrap_imatrix(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap1(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap1_imatrix(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap(void);
 INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap_imatrix(void);
-#define libvideo_swblitter3_ops                (*_libvideo_swblitter3_ops())                /* Support: - */
-#define libvideo_swblitter3_ops_imatrix        (*_libvideo_swblitter3_ops_imatrix())        /* Support: src+rddst+wrdst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
-#define libvideo_swblitter3_ops_rdwrap         (*_libvideo_swblitter3_ops_rdwrap())         /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
-#define libvideo_swblitter3_ops_rdwrap_imatrix (*_libvideo_swblitter3_ops_rdwrap_imatrix()) /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+rddst+wrdst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
-#define libvideo_swblitter3_ops_wrap1          (*_libvideo_swblitter3_ops_wrap1())          /* Support: src+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
-#define libvideo_swblitter3_ops_wrap1_imatrix  (*_libvideo_swblitter3_ops_wrap1_imatrix())  /* Support: src+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+rddst+wrdst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
-#define libvideo_swblitter3_ops_wrap           (*_libvideo_swblitter3_ops_wrap())           /* Support: src+rddst+wrdst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
-#define libvideo_swblitter3_ops_wrap_imatrix   (*_libvideo_swblitter3_ops_wrap_imatrix())   /* Support: src+rddst+wrdst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+rddst+wrdst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_rdwrap1(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_rdwrap1_imatrix(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap1(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swblitter3_ops_wrap1_imatrix(void);
+#define libvideo_swblitter3_ops                 (*_libvideo_swblitter3_ops())                 /* Support: - */
+#define libvideo_swblitter3_ops_imatrix         (*_libvideo_swblitter3_ops_imatrix())         /* Support: src+wrdst+rddst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+#define libvideo_swblitter3_ops_rdwrap          (*_libvideo_swblitter3_ops_rdwrap())          /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
+#define libvideo_swblitter3_ops_rdwrap_imatrix  (*_libvideo_swblitter3_ops_rdwrap_imatrix())  /* Support: src:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+wrdst+rddst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+#define libvideo_swblitter3_ops_wrap            (*_libvideo_swblitter3_ops_wrap())            /* Support: src+wrdst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
+#define libvideo_swblitter3_ops_wrap_imatrix    (*_libvideo_swblitter3_ops_wrap_imatrix())    /* Support: src+wrdst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+wrdst+rddst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+#define libvideo_swblitter3_ops_rdwrap1         (*_libvideo_swblitter3_ops_rdwrap1())         /* Support: src+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
+#define libvideo_swblitter3_ops_rdwrap1_imatrix (*_libvideo_swblitter3_ops_rdwrap1_imatrix()) /* Support: src+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+wrdst+rddst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
+#define libvideo_swblitter3_ops_wrap1           (*_libvideo_swblitter3_ops_wrap1())           /* Support: src+wrdst+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP */
+#define libvideo_swblitter3_ops_wrap1_imatrix   (*_libvideo_swblitter3_ops_wrap1_imatrix())   /* Support: src+wrdst+rddst:VIDEO_GFX_F_XWRAP|VIDEO_GFX_F_YWRAP, src+wrdst+rddst:VIDEO_GFX_F_XMIRROR|VIDEO_GFX_F_YMIRROR|VIDEO_GFX_F_XYSWAP */
 
 
 LOCAL ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
@@ -1133,14 +1141,20 @@ video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 	gfx_flag_t flags = ctx->vbt3_rddst->vx_flags |
 	                   ctx->vbt3_wrdst->vx_flags |
 	                   ctx->vbt3_src->vx_flags;
-	if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+	if (ctx->vbt3_rddst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+		if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
+			ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
+			                ? &libvideo_swblitter3_ops_wrap1_imatrix
+			                : &libvideo_swblitter3_ops_wrap1;
+		} else {
+			ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
+			                ? &libvideo_swblitter3_ops_rdwrap1_imatrix
+			                : &libvideo_swblitter3_ops_rdwrap1;
+		}
+	} else if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_wrap_imatrix
 		                : &libvideo_swblitter3_ops_wrap;
-	} else if (ctx->vbt3_rddst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
-		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
-		                ? &libvideo_swblitter3_ops_wrap1_imatrix
-		                : &libvideo_swblitter3_ops_wrap1;
 	} else if (ctx->vbt3_src->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		                ? &libvideo_swblitter3_ops_rdwrap_imatrix
