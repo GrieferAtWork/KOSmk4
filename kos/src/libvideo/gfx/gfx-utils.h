@@ -695,6 +695,79 @@ interpolate_2d(video_color_t c_y0_x0, video_color_t c_y0_x1,
 			}                                                                \
 		} while (dst_size_y);                                                \
 	}	__WHILE0
+#define GFX_NEAREST_STRETCH3(out_x, out_y,                                              \
+                             dst_x, dst_y, dst_size_x, dst_size_y,                      \
+                             src_x, src_y, src_size_x, src_size_y,                      \
+                             copy_pixel /*(out_x, out_y, dst_x, dst_y, src_x, src_y)*/, \
+                             out_row_start /*(out_y, dst_y, src_y)*/,                   \
+                             out_row_end /*(out_y, dst_y, src_y)*/)                     \
+	do {                                                                                \
+		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                     \
+		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                     \
+		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                      \
+		stretch_fp_t _src_pos_y = _step_y >> 1;                                         \
+		video_coord_t _iter_y = 0;                                                      \
+		do {                                                                            \
+			video_coord_t _row_dst_y = dst_y + _iter_y;                                 \
+			video_coord_t _row_out_y = out_y + _iter_y;                                 \
+			video_coord_t _row_src_y = src_y + STRETCH_FP_WHOLE(_src_pos_y);            \
+			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                  \
+			stretch_fp_t _src_pos_x = _step_x >> 1;                                     \
+			video_coord_t _iter_x = 0;                                                  \
+			_src_pos_x += STRETCH_FP(src_x);                                            \
+			{                                                                           \
+				out_row_start(_row_out_y, _row_dst_y, _row_src_y);                      \
+				do {                                                                    \
+					video_coord_t row_src_x = STRETCH_FP_WHOLE(_src_pos_x);             \
+					copy_pixel(out_x + _iter_x, _row_out_y,                             \
+					           dst_x + _iter_x, _row_dst_y,                             \
+					           row_src_x, _row_src_y);                                  \
+					_src_pos_x += _step_x;                                              \
+				} while (++_iter_x < dst_size_x);                                       \
+				out_row_end(_row_out_y, _row_dst_y, _row_src_y);                        \
+			}                                                                           \
+			_src_pos_y += _step_y;                                                      \
+		} while (++_iter_y < dst_size_y);                                               \
+	}	__WHILE0
+#define GFX_NEAREST_STRETCH3_IMATRIX(out_x, out_y,                                                             \
+                                     dst_x, dst_y, dst_size_x, dst_size_y, dst_matrix,                         \
+                                     src_x, src_y, src_size_x, src_size_y, src_matrix,                         \
+                                     copy_pixel /*(out_x, out_y, dst_x, dst_y, src_x, src_y)*/,                \
+                                     out_row_start /*(out_y)*/,                                                \
+                                     out_row_end /*(out_y)*/)                                                  \
+	do {                                                                                                       \
+		stretch_fp_t _step_x = STRETCH_FP(src_size_x) / dst_size_x;                                            \
+		stretch_fp_t _step_y = STRETCH_FP(src_size_y) / dst_size_y;                                            \
+		/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                             \
+		stretch_fp_t _src_pos_y = _step_y >> 1;                                                                \
+		video_coord_t _iter_y   = 0;                                                                           \
+		do {                                                                                                   \
+			video_coord_t _row_out_y = out_y + _iter_y;                                                        \
+			video_coord_t _row_src_y = STRETCH_FP_WHOLE(_src_pos_y);                                           \
+			/* Start half-a-step ahead, thus rounding by 0.5 pixels */                                         \
+			stretch_fp_t _src_pos_x = _step_x >> 1;                                                            \
+			video_coord_t _base_src_x = src_x + video_imatrix2d_get(&src_matrix, 0, 1) * _row_src_y;           \
+			video_coord_t _base_src_y = src_y + video_imatrix2d_get(&src_matrix, 1, 1) * _row_src_y;           \
+			video_coord_t _used_dst_x = dst_x;                                                                 \
+			video_coord_t _used_dst_y = dst_y;                                                                 \
+			video_dim_t _iter_x = 0;                                                                           \
+			out_row_start(_row_out_y);                                                                         \
+			do {                                                                                               \
+				video_coord_t _row_src_x  = STRETCH_FP_WHOLE(_src_pos_x);                                      \
+				video_coord_t _used_src_x = _base_src_x + video_imatrix2d_get(&src_matrix, 0, 0) * _row_src_x; \
+				video_coord_t _used_src_y = _base_src_y + video_imatrix2d_get(&src_matrix, 1, 0) * _row_src_x; \
+				copy_pixel(out_x + _iter_x, _row_out_y, _used_dst_x, _used_dst_y, _used_src_x, _used_src_y);   \
+				_src_pos_x += _step_x;                                                                         \
+				_used_dst_x += video_imatrix2d_get(&dst_matrix, 0, 0);                                         \
+				_used_dst_y += video_imatrix2d_get(&dst_matrix, 1, 0);                                         \
+			} while (++_iter_x < dst_size_x);                                                                  \
+			out_row_end(_row_out_y);                                                                           \
+			_src_pos_y += _step_y;                                                                             \
+			dst_x += video_imatrix2d_get(&dst_matrix, 0, 1);                                                   \
+			dst_y += video_imatrix2d_get(&dst_matrix, 1, 1);                                                   \
+		} while (++_iter_y < dst_size_y);                                                                      \
+	}	__WHILE0
+
 
 
 /* Dummy callback for "dst_row_start" and "dst_row_end" */
