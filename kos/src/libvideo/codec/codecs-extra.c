@@ -76,6 +76,7 @@ DEFINE_GENERIC_vertfill__with__setpixel(x_vbe16_vertfill, x_vbe16_setpixel)
 DEFINE_GENERIC_rectfill__with__linefill(x_vbe16_rectfill, x_vbe16_linefill)
 DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(x_vbe16_rectcopy, x_vbe16_getpixel, x_vbe16_setpixel)
 DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(x_vbe16_rectmove, x_vbe16_getpixel, x_vbe16_setpixel)
+DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(x_vbe16_linecopy, x_vbe16_getpixel, x_vbe16_setpixel)
 DEFINE_GENERIC_setpixel3__with__setpixel(rp3_x_vbe16_setpixel, x_vbe16_setpixel)
 DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(PRIVATE, x_vbe16_)
 
@@ -83,6 +84,7 @@ DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(PRIVATE, x_vbe16_)
 #define unaligned_x_vbe16_setpixel x_vbe16_setpixel
 #define unaligned_x_vbe16_rectcopy x_vbe16_rectcopy
 #define unaligned_x_vbe16_rectmove x_vbe16_rectmove
+#define unaligned_x_vbe16_linecopy x_vbe16_linecopy
 #define unaligned_x_vbe16_linefill x_vbe16_linefill
 #define unaligned_x_vbe16_vertfill x_vbe16_vertfill
 #define unaligned_x_vbe16_rectfill x_vbe16_rectfill
@@ -107,7 +109,8 @@ libvideo_codec_lookup_extra(video_codec_t codec) {
 		                   /* vcs_bmask */ 0,  /* ... */
 		                   /* vcs_amask */ 0), /* ... */
 		                  x_vbe16_requirements,
-		                  x_vbe16_getpixel, x_vbe16_setpixel, x_vbe16_rectcopy, x_vbe16_rectmove,
+		                  x_vbe16_getpixel, x_vbe16_setpixel,
+		                  x_vbe16_rectcopy, x_vbe16_rectmove, x_vbe16_linecopy,
 		                  x_vbe16_linefill, x_vbe16_vertfill, x_vbe16_rectfill,
 		                  pal_pixel2color, pal_color2pixel, initconv_from_p);
 		result = &x_vbe16;

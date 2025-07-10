@@ -557,8 +557,7 @@ LOCAL_FUNC(rectcopy_bitwise)(byte_t *__restrict dst_line, shift_t dst_head_skip,
                              byte_t const *__restrict src_line, shift_t src_head_skip, size_t src_stride,
                              video_dim_t size_x, video_dim_t size_y) {
 	do {
-		video_dim_t x;
-		x = 0;
+		video_dim_t x = 0;
 		do {
 			video_pixel_t pixel = (LOCAL_FUNC(getpixel)(src_line, src_head_skip + x));
 			(LOCAL_FUNC(setpixel)(dst_line, dst_head_skip + x, pixel));
@@ -739,6 +738,135 @@ LOCAL_FUNC(rectmove)(byte_t *__restrict dst_line, video_coord_t dst_x,
 		                                   size_x, size_y));
 	}
 }
+
+
+/************************************************************************/
+/* LINE COPY                                                            */
+/************************************************************************/
+LOCAL NONNULL((1, 2)) void CC
+LOCAL_FUNC(linecopy_same_bitoff)(byte_t *__restrict dst_line,
+                                 byte_t const *__restrict src_line,
+                                 shift_t head_skip, video_dim_t size_x) {
+	byte_t value;
+	byte_t head_mask;
+	byte_t head_mask_i;
+	byte_t tail_mask;
+	byte_t tail_mask_i;
+	shift_t head_fill; /* # of bits to fill in the first byte */
+	shift_t tail_fill; /* # of bits to fill in the last byte */
+	video_dim_t full_words;
+	video_dim_t after_head; /* # of pixels after */
+
+	if (size_x <= (video_dim_t)(LOCAL_PIXELS_PER_BYTE - head_skip)) {
+		/* Head only */
+		head_mask = _PXMASK(size_x) >> (head_skip << LOCAL_BPP_LOG2);
+		head_mask_i = ~head_mask;
+		value = *dst_line;
+		value &= head_mask_i;
+		value |= *src_line & head_mask;
+		*dst_line = value;
+		return;
+	}
+
+	/* Fill-mode for the head-byte */
+	head_fill = (LOCAL_PIXELS_PER_BYTE - head_skip) & LOCAL_PIXELS_PER_BYTE_MASK;
+
+	/* Figure out how many "whole" words there are in a line */
+	after_head = size_x - head_fill;
+	full_words = after_head >> LOCAL_PIXELS_PER_BYTE_LOG2;
+
+	/* Figure out how many pixels must be written to a tail-byte */
+	tail_fill = after_head & LOCAL_PIXELS_PER_BYTE_MASK;
+	tail_mask = _PXMASK(tail_fill);
+	tail_mask_i = ~tail_mask;
+
+	/* Select fill loop based on presence of head/tail */
+	if (head_skip) {
+		head_mask = _PXMASK_I(head_skip);
+		head_mask_i = ~head_mask;
+		if (tail_fill) {
+#ifndef __OPTIMIZE_SIZE__
+			if (!full_words) {
+				dst_line[0] = (dst_line[0] & head_mask_i) | (src_line[0] & head_mask);
+				dst_line[1] = (dst_line[1] & tail_mask_i) | (src_line[1] & tail_mask);
+			} else
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				*dst_line = (*dst_line & head_mask_i) | (*src_line & head_mask);
+				++dst_line;
+				++src_line;
+				dst_line = mempcpyb(dst_line, src_line, full_words);
+				src_line += full_words;
+				*dst_line = (*dst_line & tail_mask_i) | (*src_line & tail_mask);
+			}
+		} else {
+#ifndef __OPTIMIZE_SIZE__
+			if (!full_words) {
+				*dst_line = (*dst_line & head_mask_i) | (*src_line & head_mask);
+			} else
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				*dst_line = (*dst_line & head_mask_i) | (*src_line & head_mask);
+				++dst_line;
+				++src_line;
+				memcpyb(dst_line, src_line, full_words);
+			}
+		}
+	} else if (tail_fill) {
+#ifndef __OPTIMIZE_SIZE__
+		if (!full_words) {
+			*dst_line = (*dst_line & tail_mask_i) | (*src_line & tail_mask);
+		} else
+#endif /* !__OPTIMIZE_SIZE__ */
+		{
+			dst_line = mempcpyb(dst_line, src_line, full_words);
+			src_line += full_words;
+			*dst_line = (*dst_line & tail_mask_i) | (*src_line & tail_mask);
+		}
+	} else {
+		codec_assert(full_words > 0);
+		dst_line = mempcpyb(dst_line, src_line, full_words);
+	}
+}
+
+LOCAL NONNULL((1, 3)) void CC
+LOCAL_FUNC(linecopy_bitwise)(byte_t *__restrict dst_line, shift_t dst_head_skip,
+                             byte_t const *__restrict src_line, shift_t src_head_skip,
+                             video_dim_t size_x) {
+	video_dim_t x = 0;
+	do {
+		video_pixel_t pixel = (LOCAL_FUNC(getpixel)(src_line, src_head_skip + x));
+		(LOCAL_FUNC(setpixel)(dst_line, dst_head_skip + x, pixel));
+	} while (++x < size_x);
+}
+
+PRIVATE NONNULL((1, 3)) void CC
+LOCAL_FUNC(linecopy)(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t size_x) {
+	shift_t dst_head_skip; /* # of bits to skip in the first byte */
+	shift_t src_head_skip; /* # of bits to skip in the first byte */
+	codec_assert(size_x > 0);
+
+	dst_line += dst_x >> LOCAL_PIXELS_PER_BYTE_LOG2;
+	dst_head_skip = dst_x & LOCAL_PIXELS_PER_BYTE_MASK;
+	src_line += src_x >> LOCAL_PIXELS_PER_BYTE_LOG2;
+	src_head_skip = src_x & LOCAL_PIXELS_PER_BYTE_MASK;
+
+	/* Simple case: source and destination have the same bit-alignment */
+	if (dst_head_skip == src_head_skip) {
+		(LOCAL_FUNC(linecopy_same_bitoff)(dst_line, src_line,
+		                                  dst_head_skip, size_x));
+		return;
+	}
+
+	/* TODO: More optimizations */
+
+	(LOCAL_FUNC(linecopy_bitwise)(dst_line, dst_head_skip,
+	                              src_line, src_head_skip,
+	                              size_x));
+}
+
 
 
 #undef _PXMASK

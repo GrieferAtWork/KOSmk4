@@ -86,6 +86,7 @@ PRIVATE NONNULL((1)) void CC vertfill1_msb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel1_lsb(byte_t const *__restrict line, video_coord_t x);
 PRIVATE NONNULL((1)) void CC setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
@@ -94,6 +95,7 @@ PRIVATE NONNULL((1)) void CC vertfill1_lsb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel2_msb(byte_t const *__restrict line, video_coord_t x);
 PRIVATE NONNULL((1)) void CC setpixel2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
@@ -102,6 +104,7 @@ PRIVATE NONNULL((1)) void CC vertfill2_msb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel2_lsb(byte_t const *__restrict line, video_coord_t x);
 PRIVATE NONNULL((1)) void CC setpixel2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
@@ -110,6 +113,7 @@ PRIVATE NONNULL((1)) void CC vertfill2_lsb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel4_msb(byte_t const *__restrict line, video_coord_t x);
 PRIVATE NONNULL((1)) void CC setpixel4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
@@ -118,6 +122,7 @@ PRIVATE NONNULL((1)) void CC vertfill4_msb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel4_lsb(byte_t const *__restrict line, video_coord_t x);
 PRIVATE NONNULL((1)) void CC setpixel4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
@@ -126,6 +131,7 @@ PRIVATE NONNULL((1)) void CC vertfill4_lsb(byte_t *__restrict line, video_coord_
 PRIVATE NONNULL((1)) void CC rectfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 4)) void CC rectcopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
 PRIVATE NONNULL((1, 3)) void CC rectmove4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void CC linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 #ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY) && !defined(__INTELLISENSE__)
@@ -303,6 +309,16 @@ rectmove8(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
+PRIVATE NONNULL((1, 3)) void CC
+linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
+          byte_t const *__restrict src_line, video_coord_t src_x,
+          video_dim_t size_x) {
+	dst_line += dst_x;
+	src_line += src_x;
+	codec_assert(size_x > 0);
+	memcpyb(dst_line, src_line, size_x);
+}
+
 
 
 
@@ -410,6 +426,16 @@ rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
+PRIVATE NONNULL((1, 3)) void CC
+linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
+          byte_t const *__restrict src_line, video_coord_t src_x,
+          video_dim_t size_x) {
+	dst_line += dst_x << 1;
+	src_line += src_x << 1;
+	codec_assert(size_x > 0);
+	memcpyw(dst_line, src_line, size_x);
+}
+
 PRIVATE NONNULL((1)) void CC
 linefill16(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
@@ -457,6 +483,7 @@ rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 #define unaligned_rectfill16 rectfill16
 #define unaligned_rectcopy16 rectcopy16
 #define unaligned_rectmove16 rectmove16
+#define unaligned_linecopy16 linecopy16
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 unaligned_getpixel16(byte_t const *__restrict line, video_coord_t x) {
@@ -578,6 +605,16 @@ unaligned_rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
 			} while (--size_y);
 		}
 	}
+}
+
+PRIVATE NONNULL((1, 3)) void CC
+unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t size_x) {
+	dst_line += dst_x << 1;
+	src_line += src_x << 1;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x << 1);
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
@@ -1099,6 +1136,17 @@ rectmove24(byte_t *__restrict dst_line, video_coord_t dst_x,
 }
 
 
+PRIVATE NONNULL((1, 3)) void CC
+linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x * 3;
+	src_line += src_x * 3;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x * 3);
+}
+
+
 
 
 
@@ -1243,6 +1291,16 @@ rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 	}
 }
+PRIVATE NONNULL((1, 3)) void CC
+linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
+           byte_t const *__restrict src_line, video_coord_t src_x,
+           video_dim_t size_x) {
+	dst_line += dst_x << 2;
+	src_line += src_x << 2;
+	codec_assert(size_x > 0);
+	memcpyl(dst_line, src_line, size_x);
+}
+
 
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #define unaligned_getpixel32 getpixel32
@@ -1252,6 +1310,7 @@ rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 #define unaligned_rectfill32 rectfill32
 #define unaligned_rectcopy32 rectcopy32
 #define unaligned_rectmove32 rectmove32
+#define unaligned_linecopy32 linecopy32
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 unaligned_getpixel32(byte_t const *__restrict line, video_coord_t x) {
@@ -1377,6 +1436,16 @@ unaligned_rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 			} while (--size_y);
 		}
 	}
+}
+
+PRIVATE NONNULL((1, 3)) void CC
+unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
+                     byte_t const *__restrict src_line, video_coord_t src_x,
+                     video_dim_t size_x) {
+	dst_line += dst_x << 2;
+	src_line += src_x << 2;
+	codec_assert(size_x > 0);
+	memcpy(dst_line, src_line, size_x << 2);
 }
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
@@ -3262,34 +3331,34 @@ INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
 libvideo_codec_lookup(video_codec_t codec) {
 #define CASE_CODEC_AL1(codec, specs, rambuffer_requirements,        \
                        getpixel, setpixel, rectcopy, rectmove,      \
-                       linefill, vertfill, rectfill,                \
+                       linecopy, linefill, vertfill, rectfill,      \
                        pixel2color, color2pixel, initconverter)     \
 	case codec: {                                                   \
 		_DEFINE_CODEC_AL1(_codec_##codec, codec,                    \
 		                  specs, rambuffer_requirements,            \
 		                  getpixel, setpixel, rectcopy, rectmove,   \
-		                  linefill, vertfill, rectfill,             \
+		                  linecopy, linefill, vertfill, rectfill,   \
 		                  pixel2color, color2pixel, initconverter); \
 		result = &_codec_##codec;                                   \
 	}	break
 #define CASE_CODEC_ALn(codec, specs,                                \
                        align, rambuffer_requirements,               \
                        getpixel, setpixel, rectcopy, rectmove,      \
-                       linefill, vertfill, rectfill,                \
+                       linecopy, linefill, vertfill, rectfill,      \
                        unaligned_getpixel, unaligned_setpixel,      \
                        unaligned_rectcopy, unaligned_rectmove,      \
-                       unaligned_linefill, unaligned_vertfill,      \
-                       unaligned_rectfill,                          \
+                       unaligned_linecopy, unaligned_linefill,      \
+                       unaligned_vertfill, unaligned_rectfill,      \
                        pixel2color, color2pixel, initconverter)     \
 	case codec: {                                                   \
 		_DEFINE_CODEC_ALX(_codec_##codec, codec, specs,             \
 		                  align, rambuffer_requirements,            \
 		                  getpixel, setpixel, rectcopy, rectmove,   \
-		                  linefill, vertfill, rectfill,             \
+		                  linecopy, linefill, vertfill, rectfill,   \
 		                  unaligned_getpixel, unaligned_setpixel,   \
 		                  unaligned_rectcopy, unaligned_rectmove,   \
-		                  unaligned_linefill, unaligned_vertfill,   \
-		                  unaligned_rectfill,                       \
+		                  unaligned_linecopy, unaligned_linefill,   \
+		                  unaligned_vertfill, unaligned_rectfill,   \
 		                  pixel2color, color2pixel, initconverter); \
 		result = &_codec_##codec;                                   \
 	}	break
@@ -3309,7 +3378,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer1_requirements,
 	               getpixel1_lsb, setpixel1_lsb,
-	               rectcopy1_lsb, rectmove1_lsb,
+	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
 	               l1_pixel2color, l1_color2pixel, initconv_from_l);
 
@@ -3323,7 +3392,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer1_requirements,
 	               getpixel1_msb, setpixel1_msb,
-	               rectcopy1_msb, rectmove1_msb,
+	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
 	               l1_pixel2color, l1_color2pixel, initconv_from_l);
 
@@ -3337,7 +3406,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               l2_pixel2color, l2_color2pixel, initconv_from_l);
 
@@ -3351,7 +3420,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               l2_pixel2color, l2_color2pixel, initconv_from_l);
 
@@ -3365,7 +3434,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               l4_pixel2color, l4_color2pixel, initconv_from_l);
 
@@ -3379,7 +3448,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               l4_pixel2color, l4_color2pixel, initconv_from_l);
 
@@ -3393,7 +3462,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               l8_pixel2color, l8_color2pixel, initconv_from_l);
 
@@ -3407,7 +3476,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x2),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               al11_pixel2color, al11_color2pixel, initconv_from_la);
 
@@ -3421,7 +3490,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x2),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               al11_pixel2color, al11_color2pixel, initconv_from_la);
 
@@ -3435,7 +3504,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               la11_pixel2color, la11_color2pixel, initconv_from_la);
 
@@ -3449,7 +3518,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               la11_pixel2color, la11_color2pixel, initconv_from_la);
 
@@ -3463,7 +3532,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               la22_pixel2color, la22_color2pixel, initconv_from_la);
 
@@ -3477,7 +3546,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               la22_pixel2color, la22_color2pixel, initconv_from_la);
 
@@ -3491,7 +3560,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               al22_pixel2color, al22_color2pixel, initconv_from_la);
 
@@ -3505,7 +3574,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               al22_pixel2color, al22_color2pixel, initconv_from_la);
 
@@ -3519,7 +3588,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x8),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               la31_pixel2color, la31_color2pixel, initconv_from_la);
 
@@ -3533,7 +3602,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x8),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               la31_pixel2color, la31_color2pixel, initconv_from_la);
 
@@ -3547,7 +3616,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               al13_pixel2color, al13_color2pixel, initconv_from_la);
 
@@ -3561,7 +3630,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               al13_pixel2color, al13_color2pixel, initconv_from_la);
 
@@ -3575,7 +3644,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xf0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               la44_pixel2color, la44_color2pixel, initconv_from_la);
 
@@ -3589,7 +3658,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0f),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               al44_pixel2color, al44_color2pixel, initconv_from_la);
 
@@ -3603,7 +3672,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x80),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               la71_pixel2color, la71_color2pixel, initconv_from_la);
 
@@ -3617,7 +3686,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x01),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               al17_pixel2color, al17_color2pixel, initconv_from_la);
 
@@ -3631,10 +3700,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0xff00)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               la88_pixel2color, la88_color2pixel, initconv_from_la);
 
@@ -3648,10 +3717,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               al88_pixel2color, al88_color2pixel, initconv_from_la);
 
@@ -3665,7 +3734,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer1_requirements,
 	               getpixel1_lsb, setpixel1_lsb,
-	               rectcopy1_lsb, rectmove1_lsb,
+	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
 	               a1_pixel2color, a1_color2pixel, initconv_from_a);
 
@@ -3679,7 +3748,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer1_requirements,
 	               getpixel1_msb, setpixel1_msb,
-	               rectcopy1_msb, rectmove1_msb,
+	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
 	               a1_pixel2color, a1_color2pixel, initconv_from_a);
 
@@ -3693,7 +3762,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               a2_pixel2color, a2_color2pixel, initconv_from_a);
 
@@ -3707,7 +3776,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               a2_pixel2color, a2_color2pixel, initconv_from_a);
 
@@ -3721,7 +3790,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xf),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               a4_pixel2color, a4_color2pixel, initconv_from_a);
 
@@ -3735,7 +3804,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xf),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               a4_pixel2color, a4_color2pixel, initconv_from_a);
 
@@ -3749,7 +3818,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xff),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               a8_pixel2color, a8_color2pixel, initconv_from_a);
 
@@ -3776,10 +3845,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               identity_pixel2color, identity_color2pixel, initconv_from_rgba);
 
@@ -3793,10 +3862,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               rgbx8888_pixel2color, identity_color2pixel, initconv_from_rgb);
 
@@ -3810,10 +3879,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               argb8888_pixel2color, argb8888_color2pixel, initconv_from_rgba);
 
@@ -3827,10 +3896,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               xrgb8888_pixel2color, xrgb8888_color2pixel, initconv_from_rgb);
 
@@ -3844,10 +3913,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK4_LE(0x000000ff)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               abgr8888_pixel2color, abgr8888_color2pixel, initconv_from_rgba);
 
@@ -3861,10 +3930,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               xbgr8888_pixel2color, xbgr8888_color2pixel, initconv_from_rgb);
 
@@ -3878,10 +3947,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK4_LE(0xff000000)),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               bgra8888_pixel2color, bgra8888_color2pixel, initconv_from_rgba);
 
@@ -3895,10 +3964,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               4, buffer32_requirements,
 	               getpixel32, setpixel32,
-	               rectcopy32, rectmove32,
+	               rectcopy32, rectmove32, linecopy32,
 	               linefill32, vertfill32, rectfill32,
 	               unaligned_getpixel32, unaligned_setpixel32,
-	               unaligned_rectcopy32, unaligned_rectmove32,
+	               unaligned_rectcopy32, unaligned_rectmove32, unaligned_linecopy32,
 	               unaligned_linefill32, unaligned_vertfill32, unaligned_rectfill32,
 	               bgrx8888_pixel2color, bgrx8888_color2pixel, initconv_from_rgb);
 
@@ -3915,10 +3984,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0xf000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               rgba4444_pixel2color, rgba4444_color2pixel, initconv_from_rgba);
 
@@ -3932,10 +4001,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               rgbx4444_pixel2color, rgbx4444_color2pixel, initconv_from_rgb);
 
@@ -3949,10 +4018,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x000f)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               argb4444_pixel2color, argb4444_color2pixel, initconv_from_rgba);
 
@@ -3966,10 +4035,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               xrgb4444_pixel2color, xrgb4444_color2pixel, initconv_from_rgb);
 
@@ -3983,10 +4052,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x000f)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               abgr4444_pixel2color, abgr4444_color2pixel, initconv_from_rgba);
 
@@ -4000,10 +4069,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               xbgr4444_pixel2color, xbgr4444_color2pixel, initconv_from_rgb);
 
@@ -4017,10 +4086,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0xf000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgra4444_pixel2color, bgra4444_color2pixel, initconv_from_rgba);
 
@@ -4034,10 +4103,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgrx4444_pixel2color, bgrx4444_color2pixel, initconv_from_rgb);
 
@@ -4051,10 +4120,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x8000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               rgba5551_pixel2color, rgba5551_color2pixel, initconv_from_rgba);
 
@@ -4068,10 +4137,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               rgbx5551_pixel2color, rgbx5551_color2pixel, initconv_from_rgb);
 
@@ -4085,10 +4154,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x0001)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               argb1555_pixel2color, argb1555_color2pixel, initconv_from_rgba);
 
@@ -4102,10 +4171,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               xrgb1555_pixel2color, xrgb1555_color2pixel, initconv_from_rgb);
 
@@ -4119,10 +4188,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x0001)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               abgr1555_pixel2color, abgr1555_color2pixel, initconv_from_rgba);
 
@@ -4136,10 +4205,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               xbgr1555_pixel2color, xbgr1555_color2pixel, initconv_from_rgb);
 
@@ -4153,10 +4222,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x8000)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgra5551_pixel2color, bgra5551_color2pixel, initconv_from_rgba);
 
@@ -4170,10 +4239,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgrx5551_pixel2color, bgrx5551_color2pixel, initconv_from_rgb);
 
@@ -4187,10 +4256,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               rgb565_pixel2color, rgb565_color2pixel, initconv_from_rgb);
 
@@ -4204,10 +4273,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               bgr565_pixel2color, bgr565_color2pixel, initconv_from_rgb);
 
@@ -4221,7 +4290,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               rgb332_pixel2color, rgb332_color2pixel, initconv_from_rgb);
 
@@ -4235,7 +4304,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               rgb323_pixel2color, rgb323_color2pixel, initconv_from_rgb);
 
@@ -4249,7 +4318,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               rgb233_pixel2color, rgb233_color2pixel, initconv_from_rgb);
 
@@ -4263,7 +4332,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               bgr332_pixel2color, bgr332_color2pixel, initconv_from_rgb);
 
@@ -4277,7 +4346,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               bgr323_pixel2color, bgr323_color2pixel, initconv_from_rgb);
 
@@ -4291,7 +4360,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               bgr233_pixel2color, bgr233_color2pixel, initconv_from_rgb);
 
@@ -4305,7 +4374,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x03),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               rgba2222_pixel2color, rgba2222_color2pixel, initconv_from_rgba);
 
@@ -4319,7 +4388,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               rgbx2222_pixel2color, rgbx2222_color2pixel, initconv_from_rgb);
 
@@ -4333,7 +4402,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               argb2222_pixel2color, argb2222_color2pixel, initconv_from_rgba);
 
@@ -4347,7 +4416,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               xrgb2222_pixel2color, xrgb2222_color2pixel, initconv_from_rgb);
 
@@ -4361,7 +4430,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x03),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               bgra2222_pixel2color, bgra2222_color2pixel, initconv_from_rgba);
 
@@ -4375,7 +4444,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               bgrx2222_pixel2color, bgrx2222_color2pixel, initconv_from_rgb);
 
@@ -4389,7 +4458,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               abgr2222_pixel2color, abgr2222_color2pixel, initconv_from_rgba);
 
@@ -4403,7 +4472,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               xbgr2222_pixel2color, xbgr2222_color2pixel, initconv_from_rgb);
 
@@ -4419,7 +4488,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer24_requirements,
 	               getpixel24, setpixel24,
-	               rectcopy24, rectmove24,
+	               rectcopy24, rectmove24, linecopy24,
 	               linefill24, vertfill24, rectfill24,
 	               rgb888_pixel2color, rgb888_color2pixel, initconv_from_rgb);
 
@@ -4433,7 +4502,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0),
 	               buffer24_requirements,
 	               getpixel24, setpixel24,
-	               rectcopy24, rectmove24,
+	               rectcopy24, rectmove24, linecopy24,
 	               linefill24, vertfill24, rectfill24,
 	               bgr888_pixel2color, bgr888_color2pixel, initconv_from_rgb);
 
@@ -4450,7 +4519,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer1_requirements,
 	               getpixel1_lsb, setpixel1_lsb,
-	               rectcopy1_lsb, rectmove1_lsb,
+	               rectcopy1_lsb, rectmove1_lsb, linecopy1_lsb,
 	               linefill1_lsb, vertfill1_lsb, rectfill1_lsb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4464,7 +4533,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer1_requirements,
 	               getpixel1_msb, setpixel1_msb,
-	               rectcopy1_msb, rectmove1_msb,
+	               rectcopy1_msb, rectmove1_msb, linecopy1_msb,
 	               linefill1_msb, vertfill1_msb, rectfill1_msb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4478,7 +4547,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4492,7 +4561,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4506,7 +4575,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4520,7 +4589,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4534,7 +4603,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               pal_pixel2color, pal_color2pixel, initconv_from_p);
 
@@ -4548,7 +4617,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x2),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               ap11_pixel2color, ap11_color2pixel, initconv_from_pa);
 
@@ -4562,7 +4631,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x2),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               ap11_pixel2color, ap11_color2pixel, initconv_from_pa);
 
@@ -4576,7 +4645,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer2_requirements,
 	               getpixel2_msb, setpixel2_msb,
-	               rectcopy2_msb, rectmove2_msb,
+	               rectcopy2_msb, rectmove2_msb, linecopy2_msb,
 	               linefill2_msb, vertfill2_msb, rectfill2_msb,
 	               pa11_pixel2color, pa11_color2pixel, initconv_from_pa);
 
@@ -4590,7 +4659,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer2_requirements,
 	               getpixel2_lsb, setpixel2_lsb,
-	               rectcopy2_lsb, rectmove2_lsb,
+	               rectcopy2_lsb, rectmove2_lsb, linecopy2_lsb,
 	               linefill2_lsb, vertfill2_lsb, rectfill2_lsb,
 	               pa11_pixel2color, pa11_color2pixel, initconv_from_pa);
 
@@ -4604,7 +4673,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               pa22_pixel2color, pa22_color2pixel, initconv_from_pa);
 
@@ -4618,7 +4687,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xc),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               pa22_pixel2color, pa22_color2pixel, initconv_from_pa);
 
@@ -4632,7 +4701,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               ap22_pixel2color, ap22_color2pixel, initconv_from_pa);
 
@@ -4646,7 +4715,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x3),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               ap22_pixel2color, ap22_color2pixel, initconv_from_pa);
 
@@ -4660,7 +4729,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x8),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               pa31_pixel2color, pa31_color2pixel, initconv_from_pa);
 
@@ -4674,7 +4743,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x8),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               pa31_pixel2color, pa31_color2pixel, initconv_from_pa);
 
@@ -4688,7 +4757,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer4_requirements,
 	               getpixel4_msb, setpixel4_msb,
-	               rectcopy4_msb, rectmove4_msb,
+	               rectcopy4_msb, rectmove4_msb, linecopy4_msb,
 	               linefill4_msb, vertfill4_msb, rectfill4_msb,
 	               ap13_pixel2color, ap13_color2pixel, initconv_from_pa);
 
@@ -4702,7 +4771,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x1),
 	               buffer4_requirements,
 	               getpixel4_lsb, setpixel4_lsb,
-	               rectcopy4_lsb, rectmove4_lsb,
+	               rectcopy4_lsb, rectmove4_lsb, linecopy4_lsb,
 	               linefill4_lsb, vertfill4_lsb, rectfill4_lsb,
 	               ap13_pixel2color, ap13_color2pixel, initconv_from_pa);
 
@@ -4716,7 +4785,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0xf0),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               pa44_pixel2color, pa44_color2pixel, initconv_from_pa);
 
@@ -4730,7 +4799,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x0f),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               ap44_pixel2color, ap44_color2pixel, initconv_from_pa);
 
@@ -4744,7 +4813,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x80),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               pa71_pixel2color, pa71_color2pixel, initconv_from_pa);
 
@@ -4758,7 +4827,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ 0x01),
 	               buffer8_requirements,
 	               getpixel8, setpixel8,
-	               rectcopy8, rectmove8,
+	               rectcopy8, rectmove8, linecopy8,
 	               linefill8, vertfill8, rectfill8,
 	               ap17_pixel2color, ap17_color2pixel, initconv_from_pa);
 
@@ -4772,10 +4841,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0xff00)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               pa88_pixel2color, pa88_color2pixel, initconv_from_pa);
 
@@ -4789,10 +4858,10 @@ libvideo_codec_lookup(video_codec_t codec) {
 	                /* vcs_amask */ MASK2_LE(0x00ff)),
 	               2, buffer16_requirements,
 	               getpixel16, setpixel16,
-	               rectcopy16, rectmove16,
+	               rectcopy16, rectmove16, linecopy16,
 	               linefill16, vertfill16, rectfill16,
 	               unaligned_getpixel16, unaligned_setpixel16,
-	               unaligned_rectcopy16, unaligned_rectmove16,
+	               unaligned_rectcopy16, unaligned_rectmove16, unaligned_linecopy16,
 	               unaligned_linefill16, unaligned_vertfill16, unaligned_rectfill16,
 	               ap88_pixel2color, ap88_color2pixel, initconv_from_pa);
 
@@ -5472,6 +5541,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill1_lsb;
 			self->vc_rectcopy = &rectcopy1_lsb;
 			self->vc_rectmove = &rectmove1_lsb;
+			self->vc_linecopy = &linecopy1_lsb;
 		} else {
 			self->vc_getpixel = &getpixel1_msb;
 			INIT__vc_setpixel(self, setpixel1_msb);
@@ -5480,6 +5550,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill1_msb;
 			self->vc_rectcopy = &rectcopy1_msb;
 			self->vc_rectmove = &rectmove1_msb;
+			self->vc_linecopy = &linecopy1_msb;
 		}
 		break;
 	case 2:
@@ -5493,6 +5564,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill2_lsb;
 			self->vc_rectcopy = &rectcopy2_lsb;
 			self->vc_rectmove = &rectmove2_lsb;
+			self->vc_linecopy = &linecopy2_lsb;
 		} else {
 			self->vc_getpixel = &getpixel2_msb;
 			INIT__vc_setpixel(self, setpixel2_msb);
@@ -5501,6 +5573,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill2_msb;
 			self->vc_rectcopy = &rectcopy2_msb;
 			self->vc_rectmove = &rectmove2_msb;
+			self->vc_linecopy = &linecopy2_msb;
 		}
 		break;
 	case 4:
@@ -5514,6 +5587,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill4_lsb;
 			self->vc_rectcopy = &rectcopy4_lsb;
 			self->vc_rectmove = &rectmove4_lsb;
+			self->vc_linecopy = &linecopy4_lsb;
 		} else {
 			self->vc_getpixel = &getpixel4_msb;
 			INIT__vc_setpixel(self, setpixel4_msb);
@@ -5522,6 +5596,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill4_msb;
 			self->vc_rectcopy = &rectcopy4_msb;
 			self->vc_rectmove = &rectmove4_msb;
+			self->vc_linecopy = &linecopy4_msb;
 		}
 		break;
 	case 8:
@@ -5534,6 +5609,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rectfill = &rectfill8;
 		self->vc_rectcopy = &rectcopy8;
 		self->vc_rectmove = &rectmove8;
+		self->vc_linecopy = &linecopy8;
 		break;
 	case 16:
 		self->vc_align = 2;
@@ -5547,6 +5623,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &unaligned_rectfill16;
 			self->vc_rectcopy = &unaligned_rectcopy16;
 			self->vc_rectmove = &unaligned_rectmove16;
+			self->vc_linecopy = &unaligned_linecopy16;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
@@ -5557,6 +5634,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill16;
 			self->vc_rectcopy = &rectcopy16;
 			self->vc_rectmove = &rectmove16;
+			self->vc_linecopy = &linecopy16;
 		}
 		break;
 	case 24:
@@ -5569,6 +5647,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 		self->vc_rectfill = &rectfill24;
 		self->vc_rectcopy = &rectcopy24;
 		self->vc_rectmove = &rectmove24;
+		self->vc_linecopy = &linecopy24;
 		break;
 	case 32:
 		self->vc_align = 4;
@@ -5582,6 +5661,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &unaligned_rectfill32;
 			self->vc_rectcopy = &unaligned_rectcopy32;
 			self->vc_rectmove = &unaligned_rectmove32;
+			self->vc_linecopy = &unaligned_linecopy32;
 		} else
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 		{
@@ -5592,6 +5672,7 @@ libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
 			self->vc_rectfill = &rectfill32;
 			self->vc_rectcopy = &rectcopy32;
 			self->vc_rectmove = &rectmove32;
+			self->vc_linecopy = &linecopy32;
 		}
 		break;
 

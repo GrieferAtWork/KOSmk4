@@ -377,6 +377,15 @@ typedef __ATTR_NONNULL_T((1, 3)) void
                                             __byte_t const *__src_line, video_coord_t __src_x,
                                             __size_t __stride, video_dim_t __size_x, video_dim_t __size_y);
 
+/* Copy a line of pixels. When src/dst overlap, results are weak-undefined.
+ * @assume(IS_ALIGNED(__dst_line, vc_align));
+ * @assume(IS_ALIGNED(__src_line, vc_align));
+ * @assume(__size_x > 0); */
+typedef __ATTR_NONNULL_T((1, 3)) void
+(LIBVIDEO_CODEC_CC *video_codec_linecopy_t)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
+                                            __byte_t const *__restrict __src_line, video_coord_t __src_x,
+                                            video_dim_t __size_x);
+
 /* 64-bit color/pixel functions */
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color64_t
@@ -431,6 +440,7 @@ struct video_codec {
 	video_codec_rectfill_t      vc_rectfill;      /* Fill a rect of pixels. */
 	video_codec_rectcopy_t      vc_rectcopy;      /* Copy a rect of pixels. When src/dst overlap, results are weak-undefined. */
 	video_codec_rectmove_t      vc_rectmove;      /* Same as `vc_rectcopy', but properly deal with overlapping video buffers */
+	video_codec_linecopy_t      vc_linecopy;      /* Copy a line of pixels */
 
 	/* TODO: More operators for fast rectcopy w/ rotation/mirroring */
 

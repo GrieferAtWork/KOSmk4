@@ -192,7 +192,7 @@ DECL_BEGIN
 #if defined(__KERNEL__) || !defined(__pic__)
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,     \
                           getpixel, setpixel, rectcopy, rectmove,         \
-                          linefill, vertfill, rectfill,                   \
+                          linecopy, linefill, vertfill, rectfill,         \
                           pixel2color, color2pixel, initconverter)        \
 		PRIVATE struct video_codec const name = {                         \
 			/* .vc_codec                  = */ codec,                     \
@@ -211,6 +211,7 @@ DECL_BEGIN
 			/* .vc_rectfill               = */ &rectfill,                 \
 			/* .vc_rectcopy               = */ &rectcopy,                 \
 			/* .vc_rectmove               = */ &rectmove,                 \
+			/* .vc_linecopy               = */ &linecopy,                 \
 			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)     \
 			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)     \
 			SET_vc_getpixel64_STATIC_INITIALIZER(&getpixel##_64)          \
@@ -222,11 +223,11 @@ DECL_BEGIN
 #define _DEFINE_CODEC_ALX(name, codec, specs,                             \
                           align, rambuffer_requirements,                  \
                           getpixel, setpixel, rectcopy, rectmove,         \
-                          linefill, vertfill, rectfill,                   \
+                          linecopy, linefill, vertfill, rectfill,         \
                           unaligned_getpixel, unaligned_setpixel,         \
                           unaligned_rectcopy, unaligned_rectmove,         \
-                          unaligned_linefill, unaligned_vertfill,         \
-                          unaligned_rectfill,                             \
+                          unaligned_linecopy, unaligned_linefill,         \
+                          unaligned_vertfill, unaligned_rectfill,         \
                           pixel2color, color2pixel, initconverter)        \
 		PRIVATE struct video_codec const unaligned_##name = {             \
 			/* .vc_codec                  = */ codec,                     \
@@ -245,6 +246,7 @@ DECL_BEGIN
 			/* .vc_rectfill               = */ &unaligned_rectfill,       \
 			/* .vc_rectcopy               = */ &unaligned_rectcopy,       \
 			/* .vc_rectmove               = */ &unaligned_rectmove,       \
+			/* .vc_linecopy               = */ &unaligned_linecopy,       \
 			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)     \
 			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)     \
 			SET_vc_getpixel64_STATIC_INITIALIZER(&unaligned_getpixel##_64) \
@@ -270,6 +272,7 @@ DECL_BEGIN
 			/* .vc_rectfill               = */ &rectfill,                 \
 			/* .vc_rectcopy               = */ &rectcopy,                 \
 			/* .vc_rectmove               = */ &rectmove,                 \
+			/* .vc_linecopy               = */ &linecopy,                 \
 			SET_vc_pixel2color64_STATIC_INITIALIZER(&pixel2color##64)     \
 			SET_vc_color2pixel64_STATIC_INITIALIZER(&color2pixel##64)     \
 			SET_vc_getpixel64_STATIC_INITIALIZER(&getpixel##_64)          \
@@ -281,7 +284,7 @@ DECL_BEGIN
 #else /* __KERNEL__ || !__pic__ */
 #define _DEFINE_CODEC_AL1(name, codec, specs, rambuffer_requirements,   \
                           getpixel, setpixel, rectcopy, rectmove,       \
-                          linefill, vertfill, rectfill,                 \
+                          linecopy, linefill, vertfill, rectfill,       \
                           pixel2color, color2pixel, initconverter)      \
 		PRIVATE struct video_codec name = {                             \
 			/* .vc_codec = */ codec,                                    \
@@ -301,6 +304,7 @@ DECL_BEGIN
 			name.vc_rectfill      = &rectfill;                          \
 			name.vc_rectcopy      = &rectcopy;                          \
 			name.vc_rectmove      = &rectmove;                          \
+			name.vc_linecopy      = &linecopy;                          \
 			SET_vc_pixel2color64_INITIALIZER(name, &pixel2color##64)    \
 			SET_vc_color2pixel64_INITIALIZER(name, &color2pixel##64)    \
 			SET_vc_getpixel64_INITIALIZER(name, &getpixel##_64)         \
@@ -315,11 +319,11 @@ DECL_BEGIN
 #define _DEFINE_CODEC_ALX(name, codec, specs,                                     \
                           align, rambuffer_requirements,                          \
                           getpixel, setpixel, rectcopy, rectmove,                 \
-                          linefill, vertfill, rectfill,                           \
+                          linecopy, linefill, vertfill, rectfill,                 \
                           unaligned_getpixel, unaligned_setpixel,                 \
                           unaligned_rectcopy, unaligned_rectmove,                 \
-                          unaligned_linefill, unaligned_vertfill,                 \
-                          unaligned_rectfill,                                     \
+                          unaligned_linecopy, unaligned_linefill,                 \
+                          unaligned_vertfill, unaligned_rectfill,                 \
                           pixel2color, color2pixel, initconverter)                \
 		PRIVATE struct video_codec unaligned_##name = {                           \
 			/* .vc_codec = */ codec,                                              \
@@ -345,6 +349,7 @@ DECL_BEGIN
 			unaligned_##name.vc_rectfill               = &unaligned_rectfill;     \
 			unaligned_##name.vc_rectcopy               = &unaligned_rectcopy;     \
 			unaligned_##name.vc_rectmove               = &unaligned_rectmove;     \
+			unaligned_##name.vc_linecopy               = &unaligned_linecopy;     \
 			SET_vc_pixel2color64_INITIALIZER(unaligned_##name, &pixel2color##64)  \
 			SET_vc_color2pixel64_INITIALIZER(unaligned_##name, &color2pixel##64)  \
 			SET_vc_getpixel64_INITIALIZER(unaligned_##name, &unaligned_getpixel##_64) \
@@ -364,6 +369,7 @@ DECL_BEGIN
 			name.vc_rectfill                           = &rectfill;               \
 			name.vc_rectcopy                           = &rectcopy;               \
 			name.vc_rectmove                           = &rectmove;               \
+			name.vc_linecopy                           = &linecopy;               \
 			SET_vc_pixel2color64_INITIALIZER(name, &pixel2color##64)              \
 			SET_vc_color2pixel64_INITIALIZER(name, &color2pixel##64)              \
 			SET_vc_getpixel64_INITIALIZER(name, &getpixel##_64)                   \
@@ -439,6 +445,19 @@ DECL_BEGIN
 			linefill(line, x, pixel, size_x);                               \
 			line += stride;                                                 \
 		} while (--size_y);                                                 \
+	}
+#define DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(linecopy, getpixel, setpixel) \
+	PRIVATE NONNULL((1, 3)) void CC                                                          \
+	linecopy(byte_t *__restrict dst_line, video_coord_t dst_x,                               \
+	         byte_t const *__restrict src_line, video_coord_t src_x,                         \
+	         video_dim_t size_x) {                                                           \
+		do {                                                                                 \
+			video_pixel_t pixel;                                                             \
+			pixel = getpixel(src_line, src_x);                                               \
+			setpixel(dst_line, dst_x, pixel);                                                \
+			++dst_x;                                                                         \
+			++src_x;                                                                         \
+		} while (--size_x);                                                                  \
 	}
 #define DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(rectcopy, getpixel, setpixel) \
 	PRIVATE NONNULL((1, 4)) void CC                                                          \
