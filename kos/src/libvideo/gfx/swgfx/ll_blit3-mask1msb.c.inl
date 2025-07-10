@@ -30,6 +30,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/bit.h>
+
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
@@ -49,6 +51,7 @@ DECL_BEGIN
 
 #ifdef DEFINE_libvideo_swblitter3__blit__mask1msb
 #define LOCAL_libvideo_swblitter3__blit__mask1msb              libvideo_swblitter3__blit__mask1msb
+#define LOCAL_libvideo_swblitter3__blit__mask1msb__vline       libvideo_swblitter3__blit__mask1msb__vline
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_l         libvideo_swblitter3__stretch__mask1msb_l
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_n         libvideo_swblitter3__stretch__mask1msb_n
 #define LOCAL_libvideo_swblitter3__blit_imatrix__mask1msb      libvideo_swblitter3__blit_imatrix__mask1msb
@@ -62,6 +65,7 @@ DECL_BEGIN
 #define LOCAL_LOGIDENT_swblitter3__stretch_imatrix__mask1msb_n "swblitter3__stretch_imatrix__mask1msb_n"
 #elif defined(DEFINE_libvideo_swblitter3__blit__mask1msb_blend1_samefmt)
 #define LOCAL_libvideo_swblitter3__blit__mask1msb              libvideo_swblitter3__blit__mask1msb_blend1_samefmt
+#define LOCAL_libvideo_swblitter3__blit__mask1msb__vline       libvideo_swblitter3__blit__mask1msb_blend1_samefmt__vline
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_l         libvideo_swblitter3__stretch__mask1msb_blend1_samefmt_l
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_n         libvideo_swblitter3__stretch__mask1msb_blend1_samefmt_n
 #define LOCAL_libvideo_swblitter3__blit_imatrix__mask1msb      libvideo_swblitter3__blit_imatrix__mask1msb_blend1_samefmt
@@ -77,6 +81,7 @@ DECL_BEGIN
 #define LOCAL_IS_SAMEFMT
 #elif defined(DEFINE_libvideo_swblitter3__blit__mask1msb_blend1_difffmt)
 #define LOCAL_libvideo_swblitter3__blit__mask1msb              libvideo_swblitter3__blit__mask1msb_blend1_difffmt
+#define LOCAL_libvideo_swblitter3__blit__mask1msb__vline       libvideo_swblitter3__blit__mask1msb_blend1_difffmt__vline
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_l         libvideo_swblitter3__stretch__mask1msb_blend1_difffmt_l
 #define LOCAL_libvideo_swblitter3__stretch__mask1msb_n         libvideo_swblitter3__stretch__mask1msb_blend1_difffmt_n
 #define LOCAL_libvideo_swblitter3__blit_imatrix__mask1msb      libvideo_swblitter3__blit_imatrix__mask1msb_blend1_difffmt
@@ -242,7 +247,58 @@ LOCAL_libvideo_swblitter3__stretch_imatrix__mask1msb_l__bypixel(struct video_bli
 
 
 
-
+#ifdef LOCAL_IS_BLEND1
+PRIVATE ATTR_IN(1) void CC
+LOCAL_libvideo_swblitter3__blit__mask1msb__vline(struct video_blitter3 const *__restrict self,
+                                                 byte_t *out_line, size_t out_stride, video_coord_t out_x,
+                                                 byte_t const *src_line, size_t src_stride, video_coord_t src_x,
+                                                 byte_t const *dst_line, size_t dst_stride,
+                                                 byte_t dst_mask, video_dim_t size_y) {
+#ifdef LOCAL_IS_SAMEFMT
+	video_codec_linecopy_t vc_linecopy = self->vbt3_wrdst->vx_buffer->vb_format.vf_codec->vc_linecopy;
+#else /* LOCAL_IS_SAMEFMT */
+	video_codec_setpixel_t vc_setpixel = self->vbt3_wrdst->vx_buffer->vb_format.vf_codec->vc_setpixel;
+	video_codec_getpixel_t vc_getpixel = self->vbt3_src->vx_buffer->vb_format.vf_codec->vc_getpixel;
+#endif /* !LOCAL_IS_SAMEFMT */
+	LOCAL_load_conv;
+	gfx_assert(dst_mask != 0);
+	gfx_assert(dst_mask != 0xff);
+	do {
+		byte_t mask = *dst_line & dst_mask;
+		video_coord_t out_line_x = out_x;
+		video_coord_t src_line_x = src_x;
+		while (mask) {
+			shift_t skip = CLZ(mask);
+			out_line_x += skip;
+			src_line_x += skip;
+			mask <<= skip;
+			/* Copy "n" pixels from "src_line" to "dst_line" */
+#ifdef LOCAL_IS_SAMEFMT
+			{
+				shift_t set = CLZ((byte_t)~mask);
+				gfx_assert(set);
+				(*vc_linecopy)(out_line, out_line_x, src_line, src_line_x, set);
+				out_line_x += set;
+				src_line_x += set;
+				mask <<= set;
+			}
+#else /* LOCAL_IS_SAMEFMT */
+			do {
+				video_pixel_t sp = (*vc_getpixel)(src_line, src_line_x);
+				video_pixel_t op = video_converter_mappixel(conv, sp);
+				(*vc_setpixel)(out_line, out_line_x, op);
+				++out_line_x;
+				++src_line_x;
+				mask <<= 1;
+			} while (mask & 0x80);
+#endif /* !LOCAL_IS_SAMEFMT */
+		}
+		src_line += src_stride;
+		dst_line += dst_stride;
+		out_line += out_stride;
+	} while (--size_y);
+}
+#endif /* LOCAL_IS_BLEND1 */
 
 INTERN ATTR_IN(1) void CC
 LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restrict self,
@@ -250,16 +306,172 @@ LOCAL_libvideo_swblitter3__blit__mask1msb(struct video_blitter3 const *__restric
                                           video_coord_t dst_x, video_coord_t dst_y,
                                           video_coord_t src_x, video_coord_t src_y,
                                           video_dim_t size_x, video_dim_t size_y) {
+#ifdef LOCAL_IS_BLEND1
+	struct video_regionlock out_lock;
+	struct video_gfx const *out = self->vbt3_wrdst;
+	struct video_gfx const *dst = self->vbt3_rddst;
+	struct video_gfx const *src = self->vbt3_src;
+#endif /* LOCAL_IS_BLEND1 */
 	TRACE_START(LOCAL_LOGIDENT_swblitter3__blit__mask1msb "("
 	            "out: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dst: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "src: {%" PRIuCRD "x%" PRIuCRD "}, "
 	            "dim: {%" PRIuDIM "x%" PRIuDIM "})\n",
 	            out_x, out_y, dst_x, dst_y, src_x, src_y, size_x, size_y);
+#ifdef LOCAL_IS_BLEND1
+	if (LL_wlockregion(out->vx_buffer, &out_lock, out_x, out_y, size_x, size_y)) {
+		struct video_regionlock dst_lock;
+		if (LL_rlockregion(dst->vx_buffer, &dst_lock, dst_x, dst_y, size_x, size_y)) {
+			struct video_regionlock src_lock;
+			if (LL_rlockregion(src->vx_buffer, &src_lock, src_x, src_y, size_x, size_y)) {
+				/* Use video locks */
+				video_coord_t used_src_x = src_lock.vrl_xbas;
+				video_coord_t used_dst_x = dst_lock.vrl_xbas;
+				video_coord_t used_out_x = out_lock.vrl_xbas;
+				byte_t const *src_line = src_lock.vrl_lock.vl_data;
+				byte_t const *dst_line = dst_lock.vrl_lock.vl_data;
+				byte_t *out_line = out_lock.vrl_lock.vl_data;
+#ifdef LOCAL_IS_SAMEFMT
+				video_codec_linecopy_t vc_linecopy = out->vx_buffer->vb_format.vf_codec->vc_linecopy;
+#else  /* LOCAL_IS_SAMEFMT */
+				video_codec_setpixel_t vc_setpixel = out->vx_buffer->vb_format.vf_codec->vc_setpixel;
+				video_codec_getpixel_t vc_getpixel = src->vx_buffer->vb_format.vf_codec->vc_getpixel;
+#endif /* !LOCAL_IS_SAMEFMT */
+				LOCAL_load_conv;
 
-	/* TODO: Use video locks */
+				/* Deal with unaligned leading bits */
+				if (used_dst_x) {
+					dst_line += (used_dst_x >> 3);
+					used_dst_x &= 7;
+					if (used_dst_x) {
+						byte_t leading_mask;
+						shift_t leading_unaligned = 8 - (shift_t)used_dst_x;
+						if (leading_unaligned > size_x)
+							leading_unaligned = (shift_t)size_x;
+						/* used_dst_x = 1, leading_unaligned = 7: leading_mask = 0x7f
+						 * used_dst_x = 2, leading_unaligned = 6: leading_mask = 0x3f
+						 * used_dst_x = 2, leading_unaligned = 5: leading_mask = 0x3e
+						 * used_dst_x = 2, leading_unaligned = 4: leading_mask = 0x3c
+						 * ... */
+						leading_mask = (((byte_t)1 << leading_unaligned) - 1)
+						               << (8 - (used_dst_x + leading_unaligned));
+						LOCAL_libvideo_swblitter3__blit__mask1msb__vline(self,
+						                                                 out_line, out_lock.vrl_lock.vl_stride, used_out_x,
+						                                                 src_line, src_lock.vrl_lock.vl_stride, used_src_x,
+						                                                 dst_line, dst_lock.vrl_lock.vl_stride, leading_mask, size_y);
+						if unlikely(leading_unaligned >= size_x)
+							goto done_lock; /* Blit consisted of **only** unaligned bits. */
+						used_out_x += leading_unaligned;
+						used_src_x += leading_unaligned;
+						size_x -= leading_unaligned;
+						/*used_dst_x = 0;*/
+						gfx_assert(size_x != 0);
+					}
+				}
+
+				/* Deal with unaligned trailing bits */
+				if (size_x & 7) {
+					shift_t trailing_unaligned = (shift_t)(size_x & 7);
+					byte_t trailing_mask = ~(0xff >> trailing_unaligned);
+					LOCAL_libvideo_swblitter3__blit__mask1msb__vline(self,
+					                                                 out_line, out_lock.vrl_lock.vl_stride, used_out_x + (size_x & ~7),
+					                                                 src_line, src_lock.vrl_lock.vl_stride, used_src_x + (size_x & ~7),
+					                                                 dst_line + (size_x >> 3), dst_lock.vrl_lock.vl_stride, trailing_mask, size_y);
+					size_x &= ~7;
+					if unlikely(!size_x)
+						return;
+				}
+
+				/* Copy pixels specified by byte-aligned bitmask */
+				size_x >>= 3;
+				gfx_assert(size_x);
+				do {
+					byte_t const *dst_iter = dst_line;
+					video_dim_t iter_x_byte = 0;
+					video_coord_t out_line_x = used_out_x;
+					video_coord_t src_line_x = used_src_x;
+					do {
+						byte_t mask = *dst_iter++;
+						shift_t skip;
+						++iter_x_byte;
+						if (!mask) {
+							out_line_x += 8;
+							src_line_x += 8;
+						} else {
+							skip = CLZ(mask);
+#ifdef LOCAL_IS_SAMEFMT
+							if (mask == (((byte_t)1 << (8 - skip)) - 1)) {
+								video_dim_t n = 8 - skip;
+								out_line_x += skip;
+								src_line_x += skip;
+								/* Optimize for cross-byte continuous masks. */
+								while (iter_x_byte < size_x && (*dst_iter == 0xff)) {
+									++iter_x_byte;
+									++dst_iter;
+									n += 8;
+								}
+								(*vc_linecopy)(out_line, out_line_x, src_line, src_line_x, n);
+								if (iter_x_byte >= size_x)
+									break;
+								out_line_x += n;
+								src_line_x += n;
+							} else
+#endif /* LOCAL_IS_SAMEFMT */
+							{
+								video_coord_t out_word_x = out_line_x;
+								video_coord_t src_word_x = src_line_x;
+								for (;;) {
+									mask <<= skip;
+									out_word_x += skip;
+									src_word_x += skip;
+#ifdef LOCAL_IS_SAMEFMT
+									gfx_assert(mask != 0xff);
+									{
+										shift_t set = CLZ((byte_t)~mask);
+										(*vc_linecopy)(out_line, out_word_x, src_line, src_word_x, set);
+										out_word_x += set;
+										src_word_x += set;
+										mask <<= set;
+									}
+#else /* LOCAL_IS_SAMEFMT */
+									do {
+										video_pixel_t sp = (*vc_getpixel)(src_line, src_word_x);
+										video_pixel_t op = video_converter_mappixel(conv, sp);
+										(*vc_setpixel)(out_line, out_word_x, op);
+										++out_word_x;
+										++src_word_x;
+										mask <<= 1;
+									} while (mask & 0x80);
+#endif /* !LOCAL_IS_SAMEFMT */
+									if (!mask)
+										break;
+									skip = CLZ(mask);
+								}
+								out_line_x += 8;
+								src_line_x += 8;
+							}
+						}
+					} while (iter_x_byte < size_x);
+					out_line += out_lock.vrl_lock.vl_stride;
+					src_line += src_lock.vrl_lock.vl_stride;
+					dst_line += dst_lock.vrl_lock.vl_stride;
+				} while (--size_y);
+done_lock:
+				LL_unlockregion(src->vx_buffer, &src_lock);
+				LL_unlockregion(dst->vx_buffer, &dst_lock);
+				LL_unlockregion(out->vx_buffer, &out_lock);
+				goto done;
+			}
+			LL_unlockregion(dst->vx_buffer, &dst_lock);
+		}
+		LL_unlockregion(out->vx_buffer, &out_lock);
+	}
+#endif /* LOCAL_IS_BLEND1 */
 	LOCAL_libvideo_swblitter3__blit__mask1msb__bypixel(self, out_x, out_y, dst_x, dst_y,
 	                                                   src_x, src_y, size_x, size_y);
+#ifdef LOCAL_IS_BLEND1
+done:
+#endif /* LOCAL_IS_BLEND1 */
 	TRACE_END(LOCAL_LOGIDENT_swblitter3__blit__mask1msb "()\n");
 }
 
@@ -448,6 +660,7 @@ LOCAL_libvideo_swblitter3__stretch_imatrix__mask1msb_n(struct video_blitter3 con
 #undef LOCAL_libvideo_swblitter3__stretch_imatrix__mask1msb_n__bypixel
 
 #undef LOCAL_libvideo_swblitter3__blit__mask1msb
+#undef LOCAL_libvideo_swblitter3__blit__mask1msb__vline
 #undef LOCAL_libvideo_swblitter3__stretch__mask1msb_l
 #undef LOCAL_libvideo_swblitter3__stretch__mask1msb_n
 #undef LOCAL_libvideo_swblitter3__blit_imatrix__mask1msb

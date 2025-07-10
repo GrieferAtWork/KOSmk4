@@ -345,34 +345,45 @@ do_showpic(struct screen_buffer *screen,
 	                  video_gfx_getcliph(&image_gfx));
 #elif 1
 	{
-		REF struct video_buffer *mask_buffer;
-		mask_buffer = video_buffer_create(VIDEO_BUFFER_AUTO, 64, 64,
-		                                  video_codec_lookup(VIDEO_CODEC_A1_MSB),
-		                                  NULL);
+		static REF struct video_buffer *mask_buffer = NULL;
+		if (!mask_buffer) {
+			mask_buffer = video_buffer_create(VIDEO_BUFFER_AUTO, 64, 64,
+			                                  video_codec_lookup(VIDEO_CODEC_A1_MSB),
+			                                  NULL);
+			if (mask_buffer) {
+				struct video_gfx mask_gfx;
+				video_buffer_getgfx(mask_buffer, &mask_gfx,
+				                    GFX_BLENDMODE_OVERRIDE,
+				                    VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP, 0);
+				video_gfx_fill(&mask_gfx, 0, 0, 64 - 1, 64 - 1, VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
+				for (unsigned int i = 0; i < (32 / 4); ++i) {
+					unsigned int x = i * 4;
+					unsigned int y = i * 4;
+					unsigned int w = 64 - (x * 2);
+					unsigned int h = 64 - (y * 2);
+					x += ((i & 1) >> 0) << 1;
+					y += ((i & 2) >> 1) << 1;
+					video_gfx_rect(&mask_gfx, x, y, w, h, VIDEO_COLOR_RGBA(0, 0, 0, 0));
+				}
+				video_gfx_setblend(&mask_gfx, GFX_BLENDMODE_ALPHAMASK);
+			}
+		}
 		if (mask_buffer) {
 			struct video_gfx mask_gfx;
 			video_buffer_getgfx(mask_buffer, &mask_gfx,
-			                    GFX_BLENDMODE_OVERRIDE,
+			                    GFX_BLENDMODE_ALPHAMASK,
 			                    VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP, 0);
-			video_gfx_fill(&mask_gfx, 0, 0, 64-1, 64-1, VIDEO_COLOR_RGBA(0, 0, 0, 0xff));
-			for (unsigned int i = 0; i < (32 / 4); ++i) {
-				unsigned int x = i * 4;
-				unsigned int y = i * 4;
-				unsigned int w = 64 - (x * 2);
-				unsigned int h = 64 - (y * 2);
-				x += ((i & 1) >> 0) << 1;
-				y += ((i & 2) >> 1) << 1;
-				video_gfx_rect(&mask_gfx, x, y, w, h, VIDEO_COLOR_RGBA(0, 0, 0, 0));
-			}
-			video_gfx_setblend(&mask_gfx, GFX_BLENDMODE_ALPHAMASK);
-
-			video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
+			/*video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
 			                   &mask_gfx, 32, 32,
 			                   blit_w, blit_h,
 			                   &image_gfx, 0, 0,
 			                   video_gfx_getclipw(&image_gfx),
+			                   video_gfx_getcliph(&image_gfx));*/
+			video_gfx_bitblit3(&screen_gfx, blit_x, blit_y,
+			                   &mask_gfx, 29, 29,
+			                   &image_gfx, 0, 0,
+			                   video_gfx_getclipw(&image_gfx),
 			                   video_gfx_getcliph(&image_gfx));
-			video_buffer_decref(mask_buffer);
 		}
 	}
 #elif 0
