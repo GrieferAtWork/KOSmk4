@@ -30,6 +30,8 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
+#include <libvideo/codec/types.h>
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -50,34 +52,74 @@ struct video_display_ops {
 	 * This function should be called either:
 	 * - Whenever some other system indicates that display memory (may)
 	 *   have changed:
-	 *   - When `self' is a `video_monitor': the monitor's resolution was changed
-	 *   - When `self' is a `video_window': the window was resized, or the  compositor
-	 *     indicated that the window's buffer should be reloaded (the later can happen
-	 *     even without the window being resized, as a result of an overlapping window
+	 *   - When `__self' is a `video_monitor': the monitor's resolution was changed
+	 *   - When `__self' is a `video_window': the window was resized, or the compositor
+	 *     indicated that the window's buffer should be reloaded (the later can  happen
+	 *     even without the window being resized, as a result of an overlapping  window
 	 *     appearing or disappearing)
 	 * - Or just whenever you're about to start rendering
 	 *
 	 * @return: * :   The currently active video buffer
 	 * @return: NULL: Video I/O access failed (s.a. `errno') */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T((1)) __REF struct video_buffer *
-	(LIBVIDEO_GFX_CC *vdo_getbuffer)(struct video_display *__restrict self);
+	(LIBVIDEO_GFX_CC *vdo_getbuffer)(struct video_display *__restrict __self);
 
 	/* Indicate  that the contents of a given physical rect have changed.
 	 * Chipset drivers might need this  to propagate changes to  actually
 	 * appear on-screen, and a compositor might need this to do its thing
 	 * and composite the specified rects and make them visible. */
 	__ATTR_INOUT_T(1) __ATTR_IN_T(2) void
-	(LIBVIDEO_GFX_CC *vdo_updaterect)(struct video_display *__restrict self,
-	                                  struct display_rect const *__restrict rect);
+	(LIBVIDEO_GFX_CC *vdo_updaterect)(struct video_display *__restrict __self,
+	                                  struct video_rect const *__restrict __rect);
 
 	/* Same as `vdo_updaterect()', but update multiple rects at once. */
 	__ATTR_INOUT_T(1) __ATTR_INS_T(2, 3) void
-	(LIBVIDEO_GFX_CC *vdo_updaterects)(struct video_display *__restrict self,
-	                                   struct display_rect const *__restrict rects,
-	                                   __size_t n_rects);
+	(LIBVIDEO_GFX_CC *vdo_updaterects)(struct video_display *__restrict __self,
+	                                   struct video_rect const *__restrict __rects,
+	                                   __size_t __n_rects);
 };
 
 
+
+#ifdef __INTELLISENSE__
+/* Return  a  reference to  the video  buffer that  can be  used to
+ * read/write the currently  active display.  That returned  buffer
+ * can be used indefinitely, but video locks might become unusable,
+ * and pixel access might break if the display changes  resolution.
+ *
+ * This function should be called either:
+ * - Whenever some other system indicates that display memory (may)
+ *   have changed:
+ *   - When `__self' is a `video_monitor': the monitor's resolution was changed
+ *   - When `__self' is a `video_window': the window was resized, or the compositor
+ *     indicated that the window's buffer should be reloaded (the later can  happen
+ *     even without the window being resized, as a result of an overlapping  window
+ *     appearing or disappearing)
+ * - Or just whenever you're about to start rendering
+ *
+ * @return: * :   The currently active video buffer
+ * @return: NULL: Video I/O access failed (s.a. `errno') */
+extern __ATTR_WUNUSED __ATTR_INOUT((1)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+video_display_getbuffer(struct video_display *__restrict __self);
+
+/* Indicate  that the contents of a given physical rect have changed.
+ * Chipset drivers might need this  to propagate changes to  actually
+ * appear on-screen, and a compositor might need this to do its thing
+ * and composite the specified rects and make them visible. */
+extern __ATTR_INOUT(1) __ATTR_IN(2) void LIBVIDEO_GFX_CC
+video_display_updaterect(struct video_display *__restrict __self,
+                         struct video_rect const *__restrict __rect);
+
+/* Same as `video_display_updaterect()', but update multiple rects at once. */
+extern __ATTR_INOUT(1) __ATTR_INS(2, 3) void LIBVIDEO_GFX_CC
+video_display_updaterects(struct video_display *__restrict __self,
+                          struct video_rect const *__restrict __rects,
+                          __size_t __n_rects);
+#else /* __INTELLISENSE__ */
+#define video_display_getbuffer(self)                   (*(self)->vd_ops->vdo_getbuffer)(self)
+#define video_display_updaterect(self, rect)            (*(self)->vd_ops->vdo_updaterect)(self, rect)
+#define video_display_updaterects(self, rects, n_rects) (*(self)->vd_ops->vdo_updaterects)(self, rects, n_rects)
+#endif /* !__INTELLISENSE__ */
 
 
 /************************************************************************/

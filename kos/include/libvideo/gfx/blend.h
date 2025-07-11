@@ -191,5 +191,8 @@ __DECL_END
 #define GFX_BLENDMODE_ALPHAMASK                 \
 	GFX_BLENDMODE(/*RGB=*/DST_ALPHA, ADD, ZERO, \
 	              /*A  =*/ONE, MUL, ONE)
+#define GFX_BLENDMODE_ONE_MINUS_ALPHAMASK                 \
+	GFX_BLENDMODE(/*RGB=*/ONE_MINUS_DST_ALPHA, ADD, ZERO, \
+	              /*A  =*/ONE, MUL, ONE)
 
 #endif /* !_LIBVIDEO_GFX_BLEND_H */
