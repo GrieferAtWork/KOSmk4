@@ -1066,9 +1066,9 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 
 	if (dst->vx_flags & VIDEO_GFX_F_XWRAP) {
 		video_dim_t out_endx;
-		/* Do some preliminary clamping on destination coords.
-		 * This is needed so  we can properly calculate  tiled
-		 * repeated when wrapping is enabled in "dst". */
+		/* Do some  preliminary clamping  on output  coords.
+		 * This is needed so we can properly calculate tiled
+		 * repeated when wrapping is enabled in "rddst". */
 		if unlikely(out_x < 0) {
 			video_dim_t delta = (video_dim_t)-out_x;
 			video_dim_t new_dst_size_x;
@@ -1095,9 +1095,9 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 
 	if (dst->vx_flags & VIDEO_GFX_F_YWRAP) {
 		video_dim_t out_endy;
-		/* Do some preliminary clamping on destination coords.
-		 * This is needed so  we can properly calculate  tiled
-		 * repeated when wrapping is enabled in "dst". */
+		/* Do some  preliminary clamping  on output  coords.
+		 * This is needed so we can properly calculate tiled
+		 * repeated when wrapping is enabled in "rddst". */
 		if unlikely(out_y < 0) {
 			video_dim_t delta = (video_dim_t)-out_y;
 			video_dim_t new_dst_size_y;
@@ -1296,8 +1296,8 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 		dst_x = 0; /* Fallthru to render the last part */
 	} else if (dst_size_y > dst_maxsy) {
 		video_dim_t firsttile_src_size_y = ydst2src(dst_maxsy);
-		LOCAL_stretch(out_y, out_y, dst_y, dst_y, dst_maxsy, dst_size_y,
-		              src_y, src_y, firsttile_src_size_y, src_size_y);
+		LOCAL_stretch(out_x, out_y, dst_x, dst_y, dst_size_x, dst_maxsy,
+		              src_x, src_y, src_size_x, firsttile_src_size_y);
 		dst_size_y -= dst_maxsy;
 		out_y += dst_maxsy;
 		src_y += firsttile_src_size_y;
@@ -1310,12 +1310,12 @@ LOCAL_libvideo_swblitter_stretch_rdwrap1(LOCAL_struct_video_blitter const *__res
 			video_dim_t wholetiles_src_size_y = src_size_y - lasttile_src_size_y;
 			video_coord_t base_src_y = src_y;
 			for (ywholetiles_i = 0; ywholetiles_i < ywholetiles_count; ++ywholetiles_i) {
-				video_coord_t neyt_src_y;
-				neyt_src_y = base_src_y + (wholetiles_src_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
-				LOCAL_stretch(out_y, out_y, 0, dst_y, dst->vx_hdr.vxh_cysiz, dst_size_y,
-				              src_y, src_y, neyt_src_y - src_y, src_size_y);
-				out_y += (neyt_src_y - src_y);
-				src_y = neyt_src_y;
+				video_coord_t next_src_y;
+				next_src_y = base_src_y + (wholetiles_src_size_y * (ywholetiles_i + 1)) / ywholetiles_count;
+				LOCAL_stretch(out_x, out_y, dst_x, 0, dst_size_x, dst->vx_hdr.vxh_cysiz,
+				              src_x, src_y, src_size_x, next_src_y - src_y);
+				out_y += (next_src_y - src_y);
+				src_y = next_src_y;
 			}
 			dst_size_y %= dst->vx_hdr.vxh_cysiz;
 			src_size_y = lasttile_src_size_y;

@@ -343,7 +343,7 @@ do_showpic(struct screen_buffer *screen,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
 	                  video_gfx_getcliph(&image_gfx));
-#elif 1
+#elif 0
 	{
 		static REF struct video_buffer *mask_buffer = NULL;
 		if (!mask_buffer) {
@@ -386,17 +386,23 @@ do_showpic(struct screen_buffer *screen,
 			                   video_gfx_getcliph(&image_gfx));
 		}
 	}
-#elif 0
+#elif 1
 	{
 		struct video_gfx flipgfx = image_gfx;
 //		video_gfx_lrot90(&flipgfx);
+		static int offset = 0;
 		video_gfx_setblend(&flipgfx, GFX_BLENDMODE_ALPHA_OVERRIDE(200));
+		video_gfx_enableflags(&flipgfx, VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP);
 		video_gfx_stretch3(&screen_gfx, blit_x, blit_y,
-		                   &flipgfx, 100, 100,
+		                   &flipgfx,
+		                   (video_gfx_getcliph(&image_gfx) * 2) + offset,
+		                   video_gfx_getcliph(&image_gfx) * 2,
 		                   blit_w, blit_h,
 		                   &image_gfx, 0, 0,
 		                   video_gfx_getclipw(&image_gfx),
 		                   video_gfx_getcliph(&image_gfx));
+		offset += 3;
+//		syslog(LOG_DEBUG, "offset = %d\n", offset);
 	}
 #elif 0
 	{
@@ -653,6 +659,7 @@ int main(int argc, char *argv[]) {
 		/* Wait until the next frame should be rendered */
 #if 0
 		getchar();
+		frame_info = frame_nextinfo;
 #else
 		gettimeofday(&frame_end, NULL);
 		timeval_sub(&tv_spent, &frame_end, &frame_start);
