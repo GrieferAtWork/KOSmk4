@@ -524,16 +524,6 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disableflag
 extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_color_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
 
-/* Disable  blending  for  `__self'.  Same   as:
- * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
- * >> __self->vx_flags &= ~VIDEO_GFX_F_BLUR;
- * >> __self->vx_colorkey = 0;
- * >> video_gfx_update(__self, VIDEO_GFX_UPDATE_ALL);
- *
- * CAUTION: Do not use this operator when `__self' may be used by other threads! */
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
-video_gfx_noblend(struct video_gfx *__restrict __self);
-
 /* Apply a clipping  rect to "self",  shrinking the  pixel
  * area relative to offsets specified by the given coords.
  *
@@ -738,8 +728,6 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_gfx_enableflags(self, flags)    ((self)->vx_flags |= (flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
 #define video_gfx_disableflags(self, flags)   ((self)->vx_flags &= ~(flags), video_gfx_update(self, VIDEO_GFX_UPDATE_FLAGS))
 #define video_gfx_setcolorkey(self, colorkey) ((self)->vx_colorkey = (colorkey), video_gfx_update(self, VIDEO_GFX_UPDATE_COLORKEY))
-#define video_gfx_noblend(self) \
-	(*(self)->vx_buffer->vb_ops->vi_noblendgfx)(self)
 #define video_gfx_getcolor(self, x, y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_getcolor)(self, x, y)
 #define video_gfx_putcolor(self, x, y, color) \

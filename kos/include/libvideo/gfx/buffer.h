@@ -114,17 +114,7 @@ struct video_buffer_ops {
 	(LIBVIDEO_GFX_FCC *vi_updategfx)(struct video_gfx *__restrict __self,
 	                                 unsigned int __what);
 
-	/* Disable blending for `__self', which uses this video buffer. Same as:
-	 * >> __self->vx_blend = GFX_BLENDMODE_OVERRIDE;
-	 * >> __self->vx_flags &= ~VIDEO_GFX_F_BLUR;
-	 * >> __self->vx_colorkey = 0;
-	 * >> (*vi_updategfx)(__self, VIDEO_GFX_UPDATE_ALL);
-	 *
-	 * CAUTION: Do not use this operator when `__self' may be used by other threads! */
-	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_gfx *
-	(LIBVIDEO_GFX_FCC *vi_noblendgfx)(struct video_gfx *__restrict __self);
-
-	void (*_vi_pad1[4])(void);
+	void (*_vi_pad1[5])(void);
 
 	/* Lock the video buffer into memory for reading.
 	 * WARNING: Attempting to perform "gfx" operations on "this" while  holding

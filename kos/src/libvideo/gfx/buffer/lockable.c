@@ -326,14 +326,6 @@ lockable_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	return (*base->vb_ops->vi_updategfx)(self, what);
 }
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-lockable_noblend(struct video_gfx *__restrict self) {
-	struct lockable_buffer *me = (struct lockable_buffer *)self->vx_buffer;
-	struct video_buffer *base = me->lb_base;
-	self->vx_buffer = base; /* This is allowed! */
-	return (*base->vb_ops->vi_noblendgfx)(self);
-}
-
 
 #undef lockable_ops
 PRIVATE struct video_buffer_ops lockable_ops = {};
@@ -347,7 +339,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _lockable_ops(v
 		lockable_ops.vi_unlockregion = &lockable_unlockregion;
 		lockable_ops.vi_initgfx      = &lockable_initgfx;
 		lockable_ops.vi_updategfx    = &lockable_updategfx;
-		lockable_ops.vi_noblendgfx   = &lockable_noblend;
 		COMPILER_WRITE_BARRIER();
 		lockable_ops.vi_destroy = &lockable_destroy;
 		COMPILER_WRITE_BARRIER();

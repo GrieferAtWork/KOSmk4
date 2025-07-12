@@ -50,7 +50,6 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer_lock(struct video_buffer *__r
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC rambuffer_lockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_noblend(struct video_gfx *__restrict self);
 #define rambuffer_rlock       rambuffer_lock
 #define rambuffer_wlock       rambuffer_lock
 #define rambuffer_rlockregion rambuffer_lockregion
@@ -64,9 +63,8 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_noblend(str
 	       (self)->vi_wlockregion  = &rambuffer_wlockregion,       \
 	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
 #define video_buffer_ops_set_GFXOPS_like_RAMBUFFER(self) \
-	(void)((self)->vi_initgfx    = &rambuffer_initgfx,   \
-	       (self)->vi_updategfx  = &rambuffer_updategfx, \
-	       (self)->vi_noblendgfx = &rambuffer_noblend)
+	(void)((self)->vi_initgfx   = &rambuffer_initgfx,    \
+	       (self)->vi_updategfx = &rambuffer_updategfx)
 
 
 

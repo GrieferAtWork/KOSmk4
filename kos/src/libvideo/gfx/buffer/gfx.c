@@ -183,14 +183,6 @@ subregion_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what)
 	return (*base->vb_ops->vi_updategfx)(self, what);
 }
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-subregion_buffer_noblend(struct video_gfx *__restrict self) {
-	struct subregion_buffer *me = (struct subregion_buffer *)self->vx_buffer;
-	struct video_buffer *base = me->srb_base;
-	self->vx_buffer = base; /* This is allowed! */
-	return (*base->vb_ops->vi_noblendgfx)(self);
-}
-
 
 INTERN struct video_buffer_ops subregion_buffer_ops = {};
 INTERN struct video_buffer_ops subregion_buffer_ops_norem = {};
@@ -205,7 +197,6 @@ _subregion_buffer_ops(void) {
 		subregion_buffer_ops.vi_unlockregion = &subregion_buffer_unlockregion;
 		subregion_buffer_ops.vi_initgfx      = &subregion_buffer_initgfx;
 		subregion_buffer_ops.vi_updategfx    = &subregion_buffer_updategfx;
-		subregion_buffer_ops.vi_noblendgfx   = &subregion_buffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		subregion_buffer_ops.vi_destroy = &subregion_buffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -224,7 +215,6 @@ _subregion_buffer_ops_norem(void) {
 		subregion_buffer_ops_norem.vi_unlock       = &subregion_buffer_unlock;
 		subregion_buffer_ops_norem.vi_initgfx      = &subregion_buffer_initgfx;
 		subregion_buffer_ops_norem.vi_updategfx    = &subregion_buffer_updategfx;
-		subregion_buffer_ops_norem.vi_noblendgfx   = &subregion_buffer_noblend;
 		COMPILER_WRITE_BARRIER();
 		subregion_buffer_ops_norem.vi_destroy = &subregion_buffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -268,16 +258,6 @@ gfx_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	return (*base->vb_ops->vi_updategfx)(self, what);
 }
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-gfx_buffer_noblend(struct video_gfx *__restrict self) {
-	struct gfx_buffer *me = (struct gfx_buffer *)self->vx_buffer;
-	struct video_buffer *base = me->gxb_base;
-	self->vx_buffer   = base; /* This is allowed! */
-	self->vx_flags    = me->gxb_flags;
-	self->vx_colorkey = me->gxb_colorkey;
-	return (*base->vb_ops->vi_noblendgfx)(self);
-}
-
 
 
 INTERN struct video_buffer_ops gfx_buffer_ops = {};
@@ -285,9 +265,8 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
 _gfx_buffer_ops(void) {
 	if unlikely(!gfx_buffer_ops.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_NOTSUP(&gfx_buffer_ops);
-		gfx_buffer_ops.vi_initgfx    = &gfx_buffer_initgfx;
-		gfx_buffer_ops.vi_updategfx  = &gfx_buffer_updategfx;
-		gfx_buffer_ops.vi_noblendgfx = &gfx_buffer_noblend;
+		gfx_buffer_ops.vi_initgfx   = &gfx_buffer_initgfx;
+		gfx_buffer_ops.vi_updategfx = &gfx_buffer_updategfx;
 		COMPILER_WRITE_BARRIER();
 		gfx_buffer_ops.vi_destroy = &gfx_buffer_destroy;
 		COMPILER_WRITE_BARRIER();

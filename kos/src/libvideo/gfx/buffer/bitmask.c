@@ -155,17 +155,9 @@ bitmask_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	bitmask_gfx_optimize(self);
 	return self;
 }
-
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-bitmask_noblend(struct video_gfx *__restrict self) {
-	self = libvideo_buffer_swgfx_noblend(self);
-	bitmask_gfx_optimize(self);
-	return self;
-}
 #else /* !__OPTIMIZE_SIZE__ */
 #define bitmask_gfx_optimize(self) (void)0
 #define bitmask_updategfx          libvideo_buffer_swgfx_updategfx
-#define bitmask_noblend            libvideo_buffer_swgfx_noblend
 #endif /* __OPTIMIZE_SIZE__ */
 
 
@@ -202,7 +194,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bitmask_ops(vo
 		bitmask_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
 		bitmask_ops.vi_initgfx      = &bitmask_initgfx;
 		bitmask_ops.vi_updategfx    = &bitmask_updategfx;
-		bitmask_ops.vi_noblendgfx   = &bitmask_noblend;
 		COMPILER_WRITE_BARRIER();
 		bitmask_ops.vi_destroy = &bitmask_destroy;
 		COMPILER_WRITE_BARRIER();

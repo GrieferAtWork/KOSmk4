@@ -207,7 +207,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
 		custom_ops.vi_unlockregion = &custom_unlockregion;
 		custom_ops.vi_initgfx      = &custom_initgfx;
 		custom_ops.vi_updategfx    = &libvideo_buffer_swgfx_updategfx;
-		custom_ops.vi_noblendgfx   = &libvideo_buffer_swgfx_noblend;
 		COMPILER_WRITE_BARRIER();
 		custom_ops.vi_destroy = &custom_destroy;
 		COMPILER_WRITE_BARRIER();

@@ -49,15 +49,6 @@ libvideo_buffer_swgfx_updategfx(struct video_gfx *__restrict self, unsigned int 
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_buffer_swgfx_noblend(struct video_gfx *__restrict self) {
-	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
-	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
-	self->vx_colorkey = 0;
-	libvideo_swgfx_populate_noblend(self);
-	return self;
-}
-
 INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
 libvideo_buffer_notsup_lock(struct video_buffer *__restrict self,
                             struct video_lock *__restrict lock) {

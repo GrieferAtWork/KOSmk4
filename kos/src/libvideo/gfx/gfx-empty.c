@@ -329,12 +329,6 @@ libvideo_emptybuffer_updategfx(struct video_gfx *__restrict self,
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_emptybuffer_noblend(struct video_gfx *__restrict self) {
-	COMPILER_IMPURE();
-	return self;
-}
-
 
 INTERN struct video_buffer_ops libvideo_emptybuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer_ops(void) {
@@ -345,7 +339,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer
 		libvideo_emptybuffer_ops.vi_rlockregion  = &libvideo_emptybuffer_lockregion;
 		libvideo_emptybuffer_ops.vi_wlockregion  = &libvideo_emptybuffer_lockregion;
 		libvideo_emptybuffer_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
-		libvideo_emptybuffer_ops.vi_noblendgfx   = &libvideo_emptybuffer_noblend;
 		libvideo_emptybuffer_ops.vi_updategfx    = &libvideo_emptybuffer_updategfx;
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer_ops.vi_initgfx    = &libvideo_emptybuffer_initgfx;

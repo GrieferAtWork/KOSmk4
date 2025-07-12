@@ -70,7 +70,6 @@ INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC libvideo_emptybuffer_lock(struc
 #define libvideo_emptybuffer_lockregion (*(int (FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_emptybuffer_lock)
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_emptybuffer_initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_emptybuffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC libvideo_emptybuffer_noblend(struct video_gfx *__restrict self);
 INTDEF struct video_buffer_ops libvideo_emptybuffer_ops;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer_ops(void);
 

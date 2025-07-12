@@ -387,23 +387,6 @@ GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-rambuffer_noblend(struct video_gfx *__restrict self) {
-	struct gfx_ramdrv *drv = video_ramgfx_getdrv(self);
-	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
-	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
-	self->vx_colorkey = 0;
-	libvideo_swgfx_populate_noblend(self);
-	if (drv->xsw_getcolor != drv->xsw_getpixel)
-		drv->xsw_getcolor = &libvideo_ramgfx__getcolor_noblend;
-	if (drv->xsw_putcolor != drv->xsw_setpixel) {
-		drv->xsw_putcolor   = &libvideo_ramgfx__putcolor_noblend;
-		drv->xsw_putcolor_p = &libvideo_ramgfx__putcolor_noblend;
-	}
-	return self;
-}
-
-
 INTERN struct video_buffer_ops rambuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {

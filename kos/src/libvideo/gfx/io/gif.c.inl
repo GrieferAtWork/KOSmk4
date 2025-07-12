@@ -398,9 +398,8 @@ PRIVATE struct video_buffer_ops gifbuffer_ops__with_color_key = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops__with_color_key(void) {
 	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
-		gifbuffer_ops__with_color_key.vi_initgfx    = &gifbuffer_initgfx__with_colorkey;
-		gifbuffer_ops__with_color_key.vi_updategfx  = &rambuffer_updategfx;
-		gifbuffer_ops__with_color_key.vi_noblendgfx = &rambuffer_noblend;
+		gifbuffer_ops__with_color_key.vi_initgfx   = &gifbuffer_initgfx__with_colorkey;
+		gifbuffer_ops__with_color_key.vi_updategfx = &rambuffer_updategfx;
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops__with_color_key.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
