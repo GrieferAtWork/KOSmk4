@@ -64,9 +64,23 @@ struct gfx_buffer: video_buffer {
 	video_color_t            gxb_colorkey; /* [const] s.a. `struct video_gfx::vx_colorkey' */
 };
 
+INTDEF NONNULL((1)) void NOTHROW(FCC subregion_buffer_destroy)(struct video_buffer *__restrict self);
+#define gfx_buffer_destroy subregion_buffer_destroy
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_wlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC subregion_buffer_norem_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC subregion_buffer_rlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC subregion_buffer_wlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC subregion_buffer_unlockregion)(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC subregion_buffer_initgfx(struct video_gfx *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC subregion_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
+
 INTDEF struct video_buffer_ops subregion_buffer_ops;       /* `srb_vm_xrem != 0' */
 INTDEF struct video_buffer_ops subregion_buffer_ops_norem; /* `srb_vm_xrem == 0' */
 INTDEF struct video_buffer_ops gfx_buffer_ops;
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_norem(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gfx_buffer_ops(void);
 
 
 /* Check  if `buffer'  is gfx.  If so  re-return "buffer" and

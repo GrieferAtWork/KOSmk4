@@ -91,12 +91,12 @@
 	(LL_assert_sxy(self, x, y, size_x, size_y), _LL_absgradient_v(self, x, y, size_x, size_y, locolor, hicolor))
 
 
-/* Helpers for acquring video region locks */
+/* Helpers for acquiring video region locks */
 #define assert_video_regionlock_retains_region(lock, xmin, ymin, xdim, ydim) \
-	(gfx_assert((lock)->_vrl_xmin == (xmin)),                                \
-	 gfx_assert((lock)->_vrl_ymin == (ymin)),                                \
-	 gfx_assert((lock)->_vrl_xdim == (xdim)),                                \
-	 gfx_assert((lock)->_vrl_ydim == (ydim)))
+	(/*gfx_assert((lock)->_vrl_rect.vcr_xmin == (xmin)), -- might get        \
+	 gfx_assert((lock)->_vrl_rect.vcr_ymin == (ymin)),   -- changed */       \
+	 gfx_assert((lock)->_vrl_rect.vcr_xdim == (xdim)),                       \
+	 gfx_assert((lock)->_vrl_rect.vcr_ydim == (ydim)))
 #define LL_wlockregion(buffer, lock, xmin, ymin, xdim, ydim)                \
 	(video_buffer_wlockregion(buffer, lock, xmin, ymin, xdim, ydim) == 0 && \
 	 (assert_video_regionlock_retains_region(lock, xmin, ymin, xdim, ydim), 1))

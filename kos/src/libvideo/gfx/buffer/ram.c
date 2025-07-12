@@ -233,8 +233,8 @@ rambuffer_lockregion(struct video_buffer *__restrict self,
 	me = (struct video_rambuffer *)self;
 	video_regionlock_assert(me, lock);
 	lock->vrl_lock.vl_stride = me->rb_stride;
-	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_ymin * me->rb_stride;
-	lock->vrl_xbas           = lock->_vrl_xmin;
+	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
+	lock->vrl_xbas           = lock->_vrl_rect.vcr_xmin;
 	return 0;
 }
 

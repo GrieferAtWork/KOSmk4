@@ -92,8 +92,8 @@ bitmask_lockregion(struct video_buffer *__restrict self,
 	}
 	lock->vrl_lock.vl_stride = me->bmb_bm.vbm_scan >> 3;
 	lock->vrl_lock.vl_data   = (byte_t *)me->bmb_bm.vbm_mask;
-	lock->vrl_lock.vl_data += lock->vrl_lock.vl_stride * lock->_vrl_ymin;
-	lock->vrl_xbas = me->bmb_bm.vbm_skip + lock->_vrl_xmin;
+	lock->vrl_lock.vl_data += lock->vrl_lock.vl_stride * lock->_vrl_rect.vcr_ymin;
+	lock->vrl_xbas = me->bmb_bm.vbm_skip + lock->_vrl_rect.vcr_xmin;
 	return 0;
 }
 

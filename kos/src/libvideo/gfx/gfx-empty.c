@@ -308,14 +308,6 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_emp
 
 
 /* Empty video buffer. */
-INTERN WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
-libvideo_emptybuffer_lock(struct video_buffer *__restrict UNUSED(self),
-                           struct video_lock *__restrict lock) {
-	lock->vl_data   = (byte_t *)lock;
-	lock->vl_stride = 0;
-	return 0;
-}
-
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 libvideo_emptybuffer_initgfx(struct video_gfx *__restrict self) {
 	self->vx_hdr.vxh_ops = &libvideo_emptygfx_ops;
@@ -333,11 +325,17 @@ libvideo_emptybuffer_updategfx(struct video_gfx *__restrict self,
 INTERN struct video_buffer_ops libvideo_emptybuffer_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _libvideo_emptybuffer_ops(void) {
 	if (!libvideo_emptybuffer_ops.vi_initgfx) {
-		libvideo_emptybuffer_ops.vi_rlock        = &libvideo_emptybuffer_lock;
-		libvideo_emptybuffer_ops.vi_wlock        = &libvideo_emptybuffer_lock;
+		/* NOTE: It is important that an  empty buffer doesn't support  video locks of any  kind.
+		 *       Reason is that `bigregion_buffer_r::brbr_orig' / `subregion_buffer_r::srbr_orig'
+		 *       do not get updated when the empty buffer is assigned during revoke, and the impl
+		 *       assumes that **ONLY** the original buffer  can create video locks, meaning  that
+		 *       **ONLY** locked created by **IT** can possible by released (for which it always
+		 *       just uses the original buffer). */
+		libvideo_emptybuffer_ops.vi_rlock        = &libvideo_buffer_notsup_rlock;
+		libvideo_emptybuffer_ops.vi_wlock        = &libvideo_buffer_notsup_wlock;
 		libvideo_emptybuffer_ops.vi_unlock       = &libvideo_buffer_noop_unlock;
-		libvideo_emptybuffer_ops.vi_rlockregion  = &libvideo_emptybuffer_lockregion;
-		libvideo_emptybuffer_ops.vi_wlockregion  = &libvideo_emptybuffer_lockregion;
+		libvideo_emptybuffer_ops.vi_rlockregion  = &libvideo_buffer_notsup_rlockregion;
+		libvideo_emptybuffer_ops.vi_wlockregion  = &libvideo_buffer_notsup_wlockregion;
 		libvideo_emptybuffer_ops.vi_unlockregion = &libvideo_buffer_noop_unlockregion;
 		libvideo_emptybuffer_ops.vi_updategfx    = &libvideo_emptybuffer_updategfx;
 		COMPILER_WRITE_BARRIER();

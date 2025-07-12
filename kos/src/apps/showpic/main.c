@@ -209,7 +209,7 @@ err:
 
 
 static void
-do_showpic(struct screen_buffer *screen,
+do_showpic(struct video_buffer *screen,
            struct video_buffer *image,
            struct video_font *font,
            char const *filename,
@@ -233,7 +233,7 @@ do_showpic(struct screen_buffer *screen,
 #endif
 
 	/* Load GFX contexts for the image and the screen */
-	video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
+	video_buffer_getgfx(screen, &screen_gfx,
 	                    GFX_BLENDMODE_ALPHA,
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_buffer_getgfx(image, &image_gfx,
@@ -514,7 +514,7 @@ do_showpic(struct screen_buffer *screen,
 		dump_buffer_specs(image, &fd);
 
 		gfx_printf("Screen:\n");
-		dump_buffer_specs(screen_buffer_asvideo(screen), &fd);
+		dump_buffer_specs(screen, &fd);
 #undef gfx_printf
 	}
 
@@ -529,15 +529,13 @@ do_showpic(struct screen_buffer *screen,
 		sync();
 	}
 #endif
-
-
-	screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 }
 
 
 int main(int argc, char *argv[]) {
 	REF struct video_font *font;
 	REF struct screen_buffer *screen;
+	REF struct video_buffer *bscreen;
 	REF struct video_buffer *frame;
 	REF struct video_anim *anim;
 	struct video_anim_frameinfo frame_info;
@@ -557,6 +555,22 @@ int main(int argc, char *argv[]) {
 	if (!screen)
 		err(EXIT_FAILURE, "Failed to load screen buffer");
 
+#if 0
+	{
+		struct video_rect rect;
+		rect.vr_xmin = 100;
+		rect.vr_ymin = 100;
+		rect.vr_xdim = screen_buffer_asvideo(screen)->vb_xdim - 200;
+		rect.vr_ydim = screen_buffer_asvideo(screen)->vb_ydim - 200;
+		bscreen = video_buffer_region_revocable(screen_buffer_asvideo(screen), &rect);
+		if (!bscreen)
+			err(EXIT_FAILURE, "Failed to load screen buffer");
+//		video_buffer_region_revoke(bscreen);
+	}
+#else
+	bscreen = screen_buffer_asvideo(screen);
+#endif
+
 	/* Load the named file as a video buffer. */
 	anim = video_anim_open(argv[1]);
 	if unlikely(!anim)
@@ -570,8 +584,8 @@ int main(int argc, char *argv[]) {
 	anim = video_anim_cached(anim, NULL, NULL, VIDEO_BUFFER_AUTO);
 #elif 0
 	anim = video_anim_cached(anim,
-	                         screen_buffer_asvideo(screen)->vb_format.vf_codec,
-	                         screen_buffer_asvideo(screen)->vb_format.vf_pal,
+	                         bscreen->vb_format.vf_codec,
+	                         bscreen->vb_format.vf_pal,
 	                         VIDEO_BUFFER_AUTO);
 #endif
 	if unlikely(!anim)
@@ -585,7 +599,7 @@ int main(int argc, char *argv[]) {
 	/* Clear screen */
 	{
 		struct video_gfx screen_gfx;
-		video_buffer_getgfx(screen_buffer_asvideo(screen), &screen_gfx,
+		video_buffer_getgfx(bscreen, &screen_gfx,
 		                    GFX_BLENDMODE_OVERRIDE,
 		                    VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_fillall(&screen_gfx, VIDEO_COLOR_BLACK);
@@ -598,7 +612,8 @@ int main(int argc, char *argv[]) {
 		struct timespec ts_delay;
 
 		/* Render frame */
-		do_showpic(screen, frame, font, argv[1], &frame_info);
+		do_showpic(bscreen, frame, font, argv[1], &frame_info);
+		screen_buffer_updaterect(screen, &WHOLE_SCREEN);
 
 		/* Load next frame as part of render delay */
 		frame_nextinfo = frame_info;
@@ -629,7 +644,7 @@ int main(int argc, char *argv[]) {
 	}
 
 #if 0 /* Not necessary; we're about to exit, so this happens automatically */
-	video_buffer_decref(screen_buffer_asvideo(screen));
+	video_buffer_decref(bscreen);
 	video_buffer_decref(image);
 	if (font)
 		video_font_decref(font);

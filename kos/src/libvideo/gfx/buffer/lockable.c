@@ -126,8 +126,8 @@ lockable_readpixels_region(struct lockable_buffer const *__restrict self,
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
-	video_gfx_bitblit(p_dstgfx, region->_vrl_xmin, region->_vrl_ymin,
-	                  p_srcgfx, region->_vrl_xmin, region->_vrl_ymin,
+	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
+	                  p_srcgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
 	                  video_gfx_getclipw(p_dstgfx),
 	                  video_gfx_getcliph(p_dstgfx));
 }
@@ -144,10 +144,10 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
 	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	assert(p_dstgfx == &dstgfx);
 	assert(p_srcgfx == &srcgfx);
-	video_gfx_bitblit(p_dstgfx, region->_vrl_xmin, region->_vrl_ymin,
-	                  p_srcgfx, region->_vrl_xmin, region->_vrl_ymin,
-	                  region->_vrl_xdim,
-	                  region->_vrl_ydim);
+	video_gfx_bitblit(p_dstgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
+	                  p_srcgfx, region->_vrl_rect.vcr_xmin, region->_vrl_rect.vcr_ymin,
+	                  region->_vrl_rect.vcr_xdim,
+	                  region->_vrl_rect.vcr_ydim);
 }
 
 
@@ -255,8 +255,8 @@ lockable_lockregion_fallback(struct lockable_buffer *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}
 	lock->vrl_lock.vl_stride = self->lb_stride;
-	lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
-	lock->vrl_xbas = lock->_vrl_xmin;
+	lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
+	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
 	lockable_readpixels_region(self, lock);
 	return 0;
 err:

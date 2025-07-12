@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_COMPOSITOR_API_H
 #define GUARD_LIBVIDEO_COMPOSITOR_API_H 1
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
 

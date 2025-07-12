@@ -74,8 +74,8 @@ libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,
                                     struct video_regionlock *__restrict lock) {
 	int result = video_buffer_rlock(self, &lock->vrl_lock);
 	/*if likely(result == 0)*/ {
-		lock->vrl_xbas = lock->_vrl_xmin;
-		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
+		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 	}
 	return result;
 }
@@ -85,8 +85,8 @@ libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
                                     struct video_regionlock *__restrict lock) {
 	int result = video_buffer_wlock(self, &lock->vrl_lock);
 	/*if likely(result == 0)*/ {
-		lock->vrl_xbas = lock->_vrl_xmin;
-		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_xbas = lock->_vrl_rect.vcr_xmin;
+		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 	}
 	return result;
 }
@@ -94,7 +94,7 @@ libvideo_buffer_generic_wlockregion(struct video_buffer *__restrict self,
 INTERN ATTR_INOUT(1) NONNULL((2)) void
 NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restrict self,
                                                   struct video_regionlock *__restrict lock) {
-	lock->vrl_lock.vl_data -= lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+	lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 	video_buffer_unlock(self, &lock->vrl_lock);
 }
 

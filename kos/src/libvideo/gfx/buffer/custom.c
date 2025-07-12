@@ -88,10 +88,10 @@ custom_rlockregion(struct video_buffer *__restrict self,
 		int ok;
 		size_t xoff;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_xmin, &xoff,
+		                             lock->_vrl_rect.vcr_xmin, &xoff,
 		                             &lock->vrl_xbas);
 		ok = (*me->cb_rlock)(me->cb_cookie, &lock->vrl_lock);
-		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
 		return ok;
 	}
@@ -110,10 +110,10 @@ custom_wlockregion(struct video_buffer *__restrict self,
 		int ok;
 		size_t xoff;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_xmin, &xoff,
+		                             lock->_vrl_rect.vcr_xmin, &xoff,
 		                             &lock->vrl_xbas);
 		ok = (*me->cb_wlock)(me->cb_cookie, &lock->vrl_lock);
-		lock->vrl_lock.vl_data += lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
 		return ok;
 	}
@@ -132,9 +132,9 @@ NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
 		size_t xoff;
 		video_coord_t xrem;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_xmin, &xoff, &xrem);
+		                             lock->_vrl_rect.vcr_xmin, &xoff, &xrem);
 		assert(xrem == lock->vrl_xbas);
-		lock->vrl_lock.vl_data -= lock->_vrl_ymin * lock->vrl_lock.vl_stride;
+		lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data -= xoff;
 		(*me->cb_unlock)(me->cb_cookie, &lock->vrl_lock);
 	}

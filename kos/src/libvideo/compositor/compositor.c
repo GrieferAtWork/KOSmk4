@@ -411,9 +411,7 @@ local_window_destroy(struct video_display *__restrict self) {
 	local_window_assert(me);
 	if (!(me->lw_attr.vwa_flags & VIDEO_WINDOW_F_HIDDEN)) {
 		if (TAILQ_ISBOUND(me, lw_passthru)) {
-			/* TODO: cause any future GFX to no-op, and any locks to fail
-			 * NOTE: Only really need this for video buffers created by `video_buffer_fromgfx()' */
-//			video_buffer_revoke(me->lw_content);
+			video_buffer_region_revoke(me->lw_content);
 			TAILQ_UNBIND(&comp->lc_passthru, me, lw_passthru);
 		}
 		local_window_hide__locked(me);
