@@ -55,9 +55,9 @@ DECL_BEGIN
 
 /* Generic implementations for video buffer operators. */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_buffer_generic_updategfx(struct video_gfx *__restrict self, unsigned int what);
+libvideo_buffer_swgfx_updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_buffer_generic_noblend(struct video_gfx *__restrict self);
+libvideo_buffer_swgfx_noblend(struct video_gfx *__restrict self);
 
 
 #define libvideo_buffer_notsup_rlock libvideo_buffer_notsup_lock

@@ -36,20 +36,21 @@
 /**/
 
 #include "buffer.h"
+#include "buffer/ram.h"
 #include "gfx-empty.h"
-#include "ram-buffer.h"
+#include "swgfx.h"
 
 DECL_BEGIN
 
 /* Generic implementations for video buffer operators. */
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_buffer_generic_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+libvideo_buffer_swgfx_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	libvideo_swgfx_update(self, what);
 	return self;
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-libvideo_buffer_generic_noblend(struct video_gfx *__restrict self) {
+libvideo_buffer_swgfx_noblend(struct video_gfx *__restrict self) {
 	self->vx_blend = GFX_BLENDMODE_OVERRIDE;
 	self->vx_flags &= ~(VIDEO_GFX_F_BLUR);
 	self->vx_colorkey = 0;

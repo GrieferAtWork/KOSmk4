@@ -27,6 +27,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #define _KOS_SOURCE 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -45,17 +46,14 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <unistd.h>
 
 #include <libiberty.h>
-#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/anim.h>
-/**/
+#include <libvideo/gfx/buffer.h>
 
 #include "anim.h"
-#include "gfx-buffer.h"
+#include "buffer/gfx.h"
+#include "buffer/lockable.h"
 #include "io-utils.h"
 #include "io.h"
-#include "lockable-buffer.h"
-
-/**/
 
 /* Pull in individual format I/O impl */
 #ifndef __INTELLISENSE__

@@ -17,19 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_BUFFER_H
-#define GUARD_LIBVIDEO_GFX_GFX_BUFFER_H 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_GFX_H
+#define GUARD_LIBVIDEO_GFX_BUFFER_GFX_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
-#include <kos/types.h>
+
 #include <stddef.h>
 
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
 
 DECL_BEGIN
 
@@ -95,4 +98,4 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_BUFFER_H */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_GFX_H */

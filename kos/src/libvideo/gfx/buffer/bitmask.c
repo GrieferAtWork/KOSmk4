@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_BITMASK_BUFFER_C
-#define GUARD_LIBVIDEO_GFX_BITMASK_BUFFER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_C 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -32,15 +32,20 @@
 #include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
 
-#include "bitmask-buffer.h"
-#include "buffer.h"
-#include "swgfx.h"
+#include "../buffer.h"
+#include "../gfx.h"
+#include "../swgfx.h"
+#include "bitmask.h"
 
 DECL_BEGIN
 
@@ -146,21 +151,21 @@ bitmask_gfx_optimize(struct video_gfx *__restrict self) {
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bitmask_updategfx(struct video_gfx *__restrict self, unsigned int what) {
-	self = libvideo_buffer_generic_updategfx(self, what);
+	self = libvideo_buffer_swgfx_updategfx(self, what);
 	bitmask_gfx_optimize(self);
 	return self;
 }
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bitmask_noblend(struct video_gfx *__restrict self) {
-	self = libvideo_buffer_generic_noblend(self);
+	self = libvideo_buffer_swgfx_noblend(self);
 	bitmask_gfx_optimize(self);
 	return self;
 }
 #else /* !__OPTIMIZE_SIZE__ */
 #define bitmask_gfx_optimize(self) (void)0
-#define bitmask_updategfx          libvideo_buffer_generic_updategfx
-#define bitmask_noblend            libvideo_buffer_generic_noblend
+#define bitmask_updategfx          libvideo_buffer_swgfx_updategfx
+#define bitmask_noblend            libvideo_buffer_swgfx_noblend
 #endif /* __OPTIMIZE_SIZE__ */
 
 
@@ -268,4 +273,4 @@ libvideo_buffer_forbitmask(video_dim_t size_x, video_dim_t size_y,
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_BITMASK_BUFFER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_C */

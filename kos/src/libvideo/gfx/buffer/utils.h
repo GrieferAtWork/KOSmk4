@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_BUFFER_UTILS_H
-#define GUARD_LIBVIDEO_GFX_BUFFER_UTILS_H 1
+#ifndef GUARD_LIBVIDEO_GFX_UTILS_BUFFER_H
+#define GUARD_LIBVIDEO_GFX_UTILS_BUFFER_H 1
 
-#include "api.h"
+#include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -85,4 +86,4 @@ NOTHROW(CC video_codec_xcoord_to_offset)(struct video_codec const *__restrict se
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_UTILS_H */
+#endif /* !GUARD_LIBVIDEO_GFX_UTILS_BUFFER_H */

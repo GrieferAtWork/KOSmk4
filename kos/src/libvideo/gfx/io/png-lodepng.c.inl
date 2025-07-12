@@ -44,12 +44,9 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <string.h>
 
 #include <libvideo/gfx/buffer.h>
-/**/
 
+#include "../buffer/ram.h"
 #include "../io-utils.h"
-#include "../ram-buffer.h"
-
-/**/
 
 /* Configure lodepng */
 //#define LODEPNG_NO_COMPILE_ZLIB

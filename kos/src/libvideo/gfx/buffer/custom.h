@@ -17,17 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_H
-#define GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_H 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_H
+#define GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
 
+#include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/codec/types.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
 
 DECL_BEGIN
@@ -69,7 +72,7 @@ struct custom_buffer: video_buffer {
  * @param: wlockregion:  [0..1] Optional extension to `wlock' (when not supplied, implemented in terms of `wlock')
  * @param: unlockregion: [0..1] Optional extension to `unlock' (when not supplied, implemented in terms of `unlock')
  * @param: cookie:       [?..?] Cookie argument passed to all user-supplied operators */
-INTDEF WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *LIBVIDEO_GFX_CC
+INTDEF WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           struct video_codec const *codec, struct video_palette *palette,
                           video_buffer_custom_getpixel_t getpixel,
@@ -85,4 +88,4 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_H */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_H */

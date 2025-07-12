@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_RAM_BUFFER_H
-#define GUARD_LIBVIDEO_GFX_RAM_BUFFER_H 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_RAM_H
+#define GUARD_LIBVIDEO_GFX_BUFFER_RAM_H 1
 
-#include "api.h"
+#include "../api.h"
 
 #include <hybrid/compiler.h>
 
@@ -29,8 +29,8 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "buffer.h"
-#include "swgfx.h"
+#include "../buffer.h"
+#include "../swgfx.h"
 
 /* Define and link  optimized fast-pass  pixel
  * accessors for 8,16,24,32-bit pixel formats. */
@@ -147,4 +147,4 @@ libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_RAM_BUFFER_H */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_RAM_H */

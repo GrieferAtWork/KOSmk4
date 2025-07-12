@@ -22,6 +22,7 @@
 #define _KOS_SOURCE 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -62,9 +63,8 @@
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/screen.h>
-/**/
 
-#include "ram-buffer.h"
+#include "buffer/ram.h"
 #include "screen.h"
 
 DECL_BEGIN

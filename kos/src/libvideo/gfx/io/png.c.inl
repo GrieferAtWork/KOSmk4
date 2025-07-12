@@ -38,10 +38,9 @@
 #include <stdlib.h>
 
 #include <libvideo/gfx/buffer.h>
-/**/
 
+#include "../buffer/ram.h"
 #include "../io-utils.h"
-#include "../ram-buffer.h"
 
 DECL_BEGIN
 

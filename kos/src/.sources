@@ -153,6 +153,7 @@ BEGIN
 		SOURCE({
 			"libvideo/gfx/*.c",
 			"libvideo/gfx/fonts/*.c",
+			"libvideo/gfx/buffer/*.c",
 		})
 	END
 

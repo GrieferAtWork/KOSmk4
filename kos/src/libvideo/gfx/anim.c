@@ -42,7 +42,7 @@
 
 #include "anim.h"
 #include "buffer.h"
-#include "ram-buffer.h"
+#include "buffer/ram.h"
 
 DECL_BEGIN
 

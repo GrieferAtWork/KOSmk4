@@ -56,11 +56,10 @@
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
-/**/
 
-#include "../io-utils.h"
 #include "../buffer.h"
-#include "../ram-buffer.h"
+#include "../buffer/ram.h"
+#include "../io-utils.h"
 
 #ifndef BITSOF
 #define BITSOF(x) (sizeof(x) * NBBY)

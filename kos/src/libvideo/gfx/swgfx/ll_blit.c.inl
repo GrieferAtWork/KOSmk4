@@ -44,9 +44,9 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
+#include "../buffer/ram.h"
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"
-#include "../ram-buffer.h"
 #include "../swgfx.h"
 #include "ll.h"
 

@@ -49,11 +49,10 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
+#include "buffer/ram.h"
 #include "gfx-palettize.h"
 #include "gfx.h"
 #include "swgfx.h"
-#include "ram-buffer.h"
-
 
 #undef HAVE_LOG
 #if 1

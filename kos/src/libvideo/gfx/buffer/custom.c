@@ -17,23 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_C
-#define GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
+
+#include <kos/anno.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 
-#include "buffer-utils.h"
-#include "buffer.h"
-#include "custom-buffer.h"
-#include "swgfx.h"
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
+#include <libvideo/gfx/api.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
+
+#include "../buffer.h"
+#include "../gfx.h"
+#include "../swgfx.h"
+#include "custom.h"
+#include "utils.h"
 
 DECL_BEGIN
 
@@ -195,8 +206,8 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
 		custom_ops.vi_wlockregion  = &custom_wlockregion;
 		custom_ops.vi_unlockregion = &custom_unlockregion;
 		custom_ops.vi_initgfx      = &custom_initgfx;
-		custom_ops.vi_updategfx    = &libvideo_buffer_generic_updategfx;
-		custom_ops.vi_noblendgfx   = &libvideo_buffer_generic_noblend;
+		custom_ops.vi_updategfx    = &libvideo_buffer_swgfx_updategfx;
+		custom_ops.vi_noblendgfx   = &libvideo_buffer_swgfx_noblend;
 		COMPILER_WRITE_BARRIER();
 		custom_ops.vi_destroy = &custom_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -230,7 +241,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
  * @param: unlockregion: [0..1] Optional extension to `unlock' (when not supplied, implemented in terms of `unlock')
  * @param: cookie:       [?..?] Cookie argument passed to all user-supplied operators */
 DEFINE_PUBLIC_ALIAS(video_buffer_forcustom, libvideo_buffer_forcustom);
-INTERN WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *LIBVIDEO_GFX_CC
+INTERN WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           struct video_codec const *codec, struct video_palette *palette,
                           video_buffer_custom_getpixel_t getpixel,
@@ -274,4 +285,4 @@ err:
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_CUSTOM_BUFFER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C */

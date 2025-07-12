@@ -17,11 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_GFX_BUFFER_C
-#define GUARD_LIBVIDEO_GFX_GFX_BUFFER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_GFX_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_GFX_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -36,14 +36,16 @@
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/codec/pixel.h>
+#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "buffer-utils.h"
-#include "buffer.h"
-#include "gfx-buffer.h"
-#include "gfx-empty.h"
+#include "../buffer.h"
+#include "../gfx-empty.h"
+#include "../gfx.h"
 #include "gfx.h"
+#include "utils.h"
 
 DECL_BEGIN
 
@@ -508,4 +510,4 @@ err:
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_GFX_BUFFER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_GFX_C */

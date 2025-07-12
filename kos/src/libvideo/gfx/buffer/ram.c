@@ -22,11 +22,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_RAM_BUFFER_C
-#define GUARD_LIBVIDEO_GFX_RAM_BUFFER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_RAM_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_RAM_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -43,6 +43,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stddef.h>
 
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
@@ -51,9 +52,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "buffer.h"
-#include "ram-buffer.h"
-#include "swgfx.h"
+#include "../buffer.h"
+#include "../gfx-utils.h"
+#include "../gfx.h"
+#include "../swgfx.h"
+#include "ram.h"
 
 DECL_BEGIN
 
@@ -549,4 +552,4 @@ err:
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_RAM_BUFFER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_RAM_C */

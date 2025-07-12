@@ -17,11 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_LOCKABLE_BUFFER_C
-#define GUARD_LIBVIDEO_GFX_LOCKABLE_BUFFER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_BUFFER_LOCKABLE_C
+#define GUARD_LIBVIDEO_GFX_BUFFER_LOCKABLE_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -42,10 +42,10 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 
-#include "gfx-empty.h"
-#include "gfx-buffer.h"
-#include "lockable-buffer.h"
-#include "ram-buffer.h"
+#include "../buffer.h"
+#include "gfx.h"
+#include "lockable.h"
+#include "ram.h"
 
 DECL_BEGIN
 
@@ -404,7 +404,7 @@ NOTHROW(CC libvideo_buffer_lockable_fini)(struct lockable_buffer *__restrict sel
 }
 
 
-/* When `__self' isn't known to unconditionally support read/write  locks,
+/* When `self' isn't  known to unconditionally  support read/write  locks,
  * wrap it using a proxy video buffer that implements these operations as:
  * - Attempt the lock on the underlying buffer.
  * - If that fails:
@@ -416,13 +416,13 @@ NOTHROW(CC libvideo_buffer_lockable_fini)(struct lockable_buffer *__restrict sel
  * - In case `vi_wlock' was called, the matching `vi_unlock' will  then
  *   once again use a GFX context to at least all modified (or possibly
  *   just all) pixels back to the underlying buffer.
- * @param: __self:  The video buffer to wrap
- * @return: * :     The video buffer wrapper (having the same codec/dimensions as `__self')
- * @return: __self: The given `__self' is already known to have vi_rlock/vi_wlock operators
- *                  that either never fail, or can only fail with errno=ENOMEM for the same
- *                  reason that the  "lockable" wrapper could  also fail. (generally,  this
- *                  means that this is a no-op when `__self' is a ram-buffer, or is already
- *                  a "lockable" video buffer). */
+ * @param: self:  The video buffer to wrap
+ * @return: * :   The video buffer wrapper (having the same codec/dimensions as `self')
+ * @return: self: The given `self' is already  known to have vi_rlock/vi_wlock  operators
+ *                that either never fail, or can only fail with errno=ENOMEM for the same
+ *                reason that the  "lockable" wrapper could  also fail. (generally,  this
+ *                means that this is a no-op when  `self' is a ram-buffer, or is  already
+ *                a "lockable" video buffer). */
 DEFINE_PUBLIC_ALIAS(video_buffer_lockable, libvideo_buffer_lockable);
 INTERN WUNUSED ATTR_INOUT(1) REF struct video_buffer *CC
 libvideo_buffer_lockable(struct video_buffer *__restrict self) {
@@ -458,4 +458,4 @@ err:
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_LOCKABLE_BUFFER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_BUFFER_LOCKABLE_C */
