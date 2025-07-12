@@ -184,7 +184,7 @@ struct video_compositor_ops {
 	 * @return: 0 : Success
 	 * @return: -1: [errno=EPERM] Not allowed to change target buffer of compositor
 	 * @return: -1: [errno=*] Failed to change backing buffer for some other reason */
-	/*__ATTR_WUNUSED_T*/ __ATTR_INOUT_T(1) __ATTR_INOUT_T(2) int
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_INOUT_T(2) int
 	(LIBVIDEO_COMPOSITOR_CC *vcpo_setbuffer)(struct video_compositor *__restrict __self,
 	                                         struct video_buffer *__restrict __buffer);
 
@@ -240,7 +240,7 @@ video_compositor_getbuffer(struct video_compositor *__restrict __self);
  * @return: 0 : Success
  * @return: -1: [errno=EPERM] Not allowed to change target buffer of compositor
  * @return: -1: [errno=*] Failed to change backing buffer for some other reason */
-extern /*__ATTR_WUNUSED*/ __ATTR_INOUT(1) __ATTR_INOUT(2) int LIBVIDEO_COMPOSITOR_CC
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) int LIBVIDEO_COMPOSITOR_CC
 video_compositor_setbuffer(struct video_compositor *__restrict __self,
                            struct video_buffer *__restrict __buffer);
 

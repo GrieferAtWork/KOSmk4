@@ -34,6 +34,7 @@
 #include <minmax.h>
 #include <string.h>
 
+#include <libvideo/codec/rectutils.h>
 #include <libvideo/compositor/compositor.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
@@ -102,32 +103,6 @@ local_window_assert(struct local_window *__restrict me) {
 #else /* !NDEBUG */
 #define local_window_assert(me) (void)0
 #endif /* NDEBUG */
-
-
-/* Check if "a" and "b" intersect, and if so: store that intersection and return true */
-LOCAL WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_OUT(3) bool CC
-video_rect_intersect(struct video_rect const *__restrict a,
-                     struct video_rect const *__restrict b,
-                     struct video_rect *__restrict intersect) {
-	video_offset_t a_xend, a_yend;
-	video_offset_t b_xend, b_yend;
-	video_offset_t intersect_xend, intersect_yend;
-	a_xend = a->vr_xmin + a->vr_xdim;
-	a_yend = a->vr_ymin + a->vr_ydim;
-	b_xend = b->vr_xmin + b->vr_xdim;
-	b_yend = b->vr_ymin + b->vr_ydim;
-	intersect_xend = min(a_xend, b_xend);
-	intersect_yend = min(a_yend, b_yend);
-	intersect->vr_xmin = max(a->vr_xmin, b->vr_xmin);
-	intersect->vr_ymin = max(a->vr_ymin, b->vr_ymin);
-	if (intersect->vr_xmin < intersect_xend && intersect->vr_ymin < intersect_yend) {
-		intersect->vr_xdim = (video_dim_t)(intersect_xend - intersect->vr_xmin);
-		intersect->vr_ydim = (video_dim_t)(intersect_yend - intersect->vr_ymin);
-		return true;
-	}
-	return false;
-}
-
 
 
 /* Copy lw_overlay_rgba/lw_overlay_mask from "src" into "dst"
@@ -372,16 +347,16 @@ local_window_hide__locked(struct local_window *__restrict me) {
 	above = TAILQ_NEXT(me, lw_zorder_visi);
 	TAILQ_UNBIND(&comp->lc_zorder_visi, me, lw_zorder_visi);
 	if (below) {
-		/* Update overlays in windows underneath ours */
-		local_compositor_foreach_below(comp, below, &me->lw_attr.vwa_rect,
-		                               &local_window_hide__locked_below_cb,
-		                               NULL, me);
 		/* Reduce use-counters of overlay buffers of windows below. */
 		local_compositor_foreach_all_below(comp, below, &me->lw_attr.vwa_rect,
 		                                   (me->lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA)
 		                                   ? &local_window_hide__locked_below2_rgba_cb
 		                                   : &local_window_hide__locked_below2_mask_cb,
 		                                   NULL);
+		/* Update overlays in windows underneath ours (that are still in-use) */
+		local_compositor_foreach_below(comp, below, &me->lw_attr.vwa_rect,
+		                               &local_window_hide__locked_below_cb,
+		                               NULL, me);
 	}
 	if (above) {
 		/* Update   background   buffers  of   windows   above  ours.
@@ -439,7 +414,7 @@ local_window_destroy(struct video_display *__restrict self) {
 			/* TODO: cause any future GFX to no-op, and any locks to fail
 			 * NOTE: Only really need this for video buffers created by `video_buffer_fromgfx()' */
 //			video_buffer_revoke(me->lw_content);
-			TAILQ_UNBIND(&comp->lc_zorder_visi, me, lw_passthru);
+			TAILQ_UNBIND(&comp->lc_passthru, me, lw_passthru);
 		}
 		local_window_hide__locked(me);
 	}
@@ -781,42 +756,152 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_window_ops *CC _local_window_ops(voi
  *
  * @return: >= 0: Sum of return values of `cb'
  * @return: < 0 : First negative return values of `cb' */
+
+typedef ATTR_PURE_T WUNUSED_T ATTR_IN_T(1) struct local_window *
+(CC *local_compositor_foreach_next_t)(struct local_window *__restrict window);
+
+/* Find the window at {x,y}, with enumeration starts at
+ * "start" (inclusive) and moving forward using "next". */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct local_window *CC
+local_compositor_windowat(struct local_window *__restrict start,
+                          local_compositor_foreach_next_t next,
+                          video_offset_t x, video_offset_t y) {
+	do {
+		if (video_rect_contains(&start->lw_attr.vwa_rect, x, y))
+			return start;
+	} while ((start = (*next)(start)) != NULL);
+	return NULL;
+}
+
+PRIVATE ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4, 7)) ssize_t CC
+local_compositor_foreach_impl(struct local_compositor *__restrict self,
+                              struct local_window *__restrict start,
+                              struct video_rect const *rect,
+                              local_compositor_foreach_cb_t cb,          /* [1..1] */
+                              local_compositor_foreach_nohit_cb_t nohit, /* [0..1] */
+                              void *cookie, local_compositor_foreach_next_t next) {
+	ssize_t temp, result = 0;
+	struct local_window *iter;
+	struct video_rect *stack;
+	size_t window_rect_count = 1;
+	assert(rect->vr_xdim);
+	assert(rect->vr_ydim);
+	for (iter = start; (iter = (*next)(iter)) != NULL;)
+		++window_rect_count;
+	stack = (struct video_rect *)malloc((window_rect_count * 3 + 1),
+	                                    sizeof(struct video_rect));
+	if likely(stack) {
+		/* "Fast" O(N^2) case: use a buffer of deleted rects
+		 * TODO: This can be made faster if windows were stored in a BSP tree */
+		size_t stacksz = 1;
+		stack[0] = *rect;
+		do {
+			size_t i;
+			assert(stacksz);
+			i = stacksz;
+			do {
+				struct video_rect intersection;
+				--i;
+				if (video_rect_intersect(&stack[i], &start->lw_attr.vwa_rect, &intersection)) {
+					struct video_rect orig;
+					temp = (*cb)(cookie, start, &intersection);
+					if unlikely(temp < 0) {
+						result = temp;
+						goto done_stack;
+					}
+					result += temp;
+
+					/* Update stack of intersecting rects */
+					orig = stack[i];
+					--stacksz;
+					stacksz += video_rect_subtract(&orig, &intersection, &stack[i]);
+				}
+			} while (i);
+			if (!stacksz)
+				goto done_stack;
+		} while ((start = (*next)(start)) != NULL);
+		assert(stacksz);
+		if (nohit) {
+			do {
+				--stacksz;
+				temp = (*nohit)(cookie, self, &stack[stacksz]);
+				if unlikely(temp < 0) {
+					result = temp;
+					goto done_stack;
+				}
+				result += temp;
+			} while (stacksz);
+		}
+done_stack:
+		free(stack);
+	} else {
+		/* "Slow" O(W*H*N) case: enumerate each pixel of "rect" and see if it intersects
+		 *                       with any  window, then  coalesce horizontally  adjacent
+		 *                       pixels that intersect with the same window. */
+		video_coord_t y = 0;
+		do {
+			video_offset_t used_y = rect->vr_ymin + y;
+			video_coord_t x = 0;
+			for (;;) {
+				struct video_rect intersect;
+				video_coord_t hit_x = x;
+				struct local_window *hit = local_compositor_windowat(start, next, rect->vr_xmin + x, used_y);
+				while (++x < rect->vr_xdim &&
+				       hit == local_compositor_windowat(start, next, rect->vr_xmin + x, used_y))
+					;
+				intersect.vr_xmin = rect->vr_xmin + hit_x;
+				intersect.vr_ymin = used_y;
+				intersect.vr_xdim = x - hit_x;
+				intersect.vr_ydim = 1;
+				if (hit) {
+					temp = (*cb)(cookie, hit, &intersect);
+				} else if (nohit) {
+					temp = (*nohit)(cookie, self, &intersect);
+				} else {
+					temp = 0;
+				}
+				if unlikely(temp < 0)
+					return temp;
+				result += temp;
+				if (x >= rect->vr_xdim)
+					break;
+			}
+		} while (++y < rect->vr_ydim);
+	}
+	return result;
+}
+
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) struct local_window *CC
+local_window_visi_above(struct local_window *__restrict window) {
+	return TAILQ_NEXT(window, lw_zorder_visi);
+}
+
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) struct local_window *CC
+local_window_visi_below(struct local_window *__restrict window) {
+	return TAILQ_PREV(window, lw_zorder_visi);
+}
+
 INTERN ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
-local_compositor_foreach_above(struct local_compositor const *__restrict self,
+local_compositor_foreach_above(struct local_compositor *__restrict self,
                                struct local_window *__restrict start,
                                struct video_rect const *rect,
                                local_compositor_foreach_cb_t cb,          /* [1..1] */
                                local_compositor_foreach_nohit_cb_t nohit, /* [0..1] */
                                void *cookie) {
-	/* TODO: Need  a way to dynamically (using only stack memory) keep track
-	 *       of a set of rects describing the intersection with the original
-	 *       "rect" that hasn't been hit (yet) */
-	(void)self;
-	(void)start;
-	(void)rect;
-	(void)cb;
-	(void)nohit;
-	(void)cookie;
-	/* TODO */
-	return 0;
+	return local_compositor_foreach_impl(self, start, rect, cb, nohit, cookie,
+	                                     &local_window_visi_above);
 }
 
 /* Same as "local_compositor_foreach_above", but cast rays towards Z=0 */
 INTERN ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
-local_compositor_foreach_below(struct local_compositor const *__restrict self,
+local_compositor_foreach_below(struct local_compositor *__restrict self,
                                struct local_window *__restrict start,
                                struct video_rect const *rect,
                                local_compositor_foreach_cb_t cb,          /* [1..1] */
                                local_compositor_foreach_nohit_cb_t nohit, /* [0..1] */
                                void *cookie) {
-	(void)self;
-	(void)start;
-	(void)rect;
-	(void)cb;
-	(void)nohit;
-	(void)cookie;
-	/* TODO */
-	return 0;
+	return local_compositor_foreach_impl(self, start, rect, cb, nohit, cookie,
+	                                     &local_window_visi_below);
 }
 
 /* Like above, but the imaginary "rays" being cast can travel through windows.
@@ -824,7 +909,7 @@ local_compositor_foreach_below(struct local_compositor const *__restrict self,
  *      the given `rect', even if the same sub-region intersects with multiple
  *      windows. */
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
-local_compositor_foreach_all_above(struct local_compositor const *__restrict self,
+local_compositor_foreach_all_above(struct local_compositor *__restrict self,
                                    struct local_window *__restrict start,
                                    struct video_rect const *rect,
                                    local_compositor_foreach_cb_t cb, void *cookie) {
@@ -845,7 +930,7 @@ local_compositor_foreach_all_above(struct local_compositor const *__restrict sel
 }
 
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
-local_compositor_foreach_all_below(struct local_compositor const *__restrict self,
+local_compositor_foreach_all_below(struct local_compositor *__restrict self,
                                    struct local_window *__restrict start,
                                    struct video_rect const *rect,
                                    local_compositor_foreach_cb_t cb, void *cookie) {
