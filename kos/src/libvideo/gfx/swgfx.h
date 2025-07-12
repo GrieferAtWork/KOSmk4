@@ -1123,32 +1123,6 @@ libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 	libvideo_swgfx_update(self, VIDEO_GFX_UPDATE_ALL);
 }
 
-/* Same as `libvideo_swgfx_populate()', but load non-blending defaults */
-LOCAL ATTR_INOUT(1) void CC
-libvideo_swgfx_populate_noblend(struct video_gfx *__restrict self) {
-	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
-	if (drv->xsw_getcolor != drv->xsw_getpixel)
-		drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_noblend;
-	if (drv->xsw_putcolor != drv->xsw_setpixel) {
-		drv->xsw_putcolor   = &libvideo_swgfx_generic__putcolor_noblend;
-		drv->xsw_putcolor_p = &libvideo_swgfx_generic__putcolor_noblend;
-	}
-	drv->xsw_absline_h   = &libvideo_swgfx_noblend__absline_h;
-	drv->xsw_absline_v   = &libvideo_swgfx_noblend__absline_v;
-	drv->xsw_absfill     = &libvideo_swgfx_noblend__absfill;
-	drv->xsw_absfillmask = &libvideo_swgfx_noblend__fillmask;
-	if (self->vx_buffer->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_INTERP8888) {
-		drv->xsw_absgradient   = &libvideo_swgfx_noblend_interp8888__absgradient;
-		drv->xsw_absgradient_h = &libvideo_swgfx_noblend_interp8888__absgradient_h;
-		drv->xsw_absgradient_v = &libvideo_swgfx_noblend_interp8888__absgradient_v;
-	}
-	if (!(self->vx_flags & VIDEO_GFX_F_LINEAR)) {
-		drv->xsw_absline_llhh       = &libvideo_swgfx_noblend__absline_llhh;
-		drv->xsw_absline_lhhl       = &libvideo_swgfx_noblend__absline_lhhl;
-		drv->xsw_absfillstretchmask = &libvideo_swgfx_noblend__fillstretchmask_n;
-	}
-}
-
 
 /* Select appropriate operators for a video blit operations */
 LOCAL ATTR_INOUT(1) void CC
