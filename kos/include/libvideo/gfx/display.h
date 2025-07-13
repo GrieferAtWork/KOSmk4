@@ -139,6 +139,21 @@ struct video_display {
 __DEFINE_REFCNT_FUNCTIONS(struct video_display, vd_refcnt, video_display_destroy)
 
 
+
+/* Create a video_display wrapper for a simple video buffer.
+ * - `video_display_getbuffer()' always returns `__buffer' and never fails
+ * - `video_display_updaterect()' is a no-op
+ * - `video_display_updaterects()' is a no-op
+ *
+ * @return: * :   The display wrapper for `__buffer'
+ * @return: NULL: [errno=ENOMEM] Out of memory. */
+typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_display *
+(LIBVIDEO_GFX_CC *PVIDEO_DISPLAY_FORBUFFER)(struct video_buffer *__restrict __buffer);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_display *LIBVIDEO_GFX_CC
+video_display_forbuffer(struct video_buffer *__restrict __buffer);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
 __DECL_END
 #endif /* __CC__ */
 
