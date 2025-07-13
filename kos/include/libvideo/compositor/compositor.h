@@ -42,6 +42,7 @@ __DECL_BEGIN
                                         * - When set, `VIDEO_WINDOW_F_PASSTHRU' is ignored
                                         * - When set, buffer returned by `video_window_getbuffer' has alpha-support */
 #define VIDEO_WINDOW_F_PASSTHRU 0x0002 /* Enable support for video_buffer passthru (when possible) */
+/* TODO: "VIDEO_WINDOW_F_PASSTHRU" should be the default -- disallow should be its own flag */
 #define VIDEO_WINDOW_F_HIDDEN   0x0004 /* Window is being hidden right now */
 #define VIDEO_WINDOW_F_ALL (VIDEO_WINDOW_F_ALPHA | VIDEO_WINDOW_F_PASSTHRU | VIDEO_WINDOW_F_HIDDEN)
 

@@ -101,6 +101,7 @@ struct local_window: video_window {
 	LIST_ENTRY(local_window)   lw_passthru;     /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of windows with passthru buffers */
 	TAILQ_ENTRY(local_window)  lw_zorder;       /* [1..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all windows */
 	TAILQ_ENTRY(local_window)  lw_zorder_visi;  /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all visible windows */
+	/* TODO: When our window fully overlays exactly 1 other window, "lw_background" can be that other window's `lw_display ?: lw_content' */
 	REF struct video_buffer   *lw_background;   /* [0..1][(== NULL) == !(lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA)][lock(local_window_comp(this)->lc_lock)]
 	                                             * - RGB Background buffer representing whatever lies behind this window.
 	                                             * - Only present on windows that support an alpha-channel (VIDEO_WINDOW_F_ALPHA).

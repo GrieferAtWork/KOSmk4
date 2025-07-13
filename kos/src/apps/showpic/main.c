@@ -604,7 +604,7 @@ int main(int argc, char *argv[]) {
 
 		/* Create a second (small) window to interact with the first (big) one */
 		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
-		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU /*| VIDEO_WINDOW_F_ALPHA*/;
+		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU | VIDEO_WINDOW_F_ALPHA;
 		position.vwp_attr.vwa_rect.vr_xmin = 10;
 		position.vwp_attr.vwa_rect.vr_ymin = 10;
 		position.vwp_attr.vwa_rect.vr_xdim = 200;
@@ -626,7 +626,7 @@ int main(int argc, char *argv[]) {
 			colors[0][0] = VIDEO_COLOR_RGBA(0xff, 0, 0, 0xff);
 			colors[0][1] = VIDEO_COLOR_RGBA(0, 0xff, 0, 0xff);
 			colors[1][0] = VIDEO_COLOR_RGBA(0, 0, 0xff, 0xff);
-			colors[1][1] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0xff);
+			colors[1][1] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0);
 			video_gfx_gradient(&window2_gfx, 0, 0,
 			                   video_gfx_getclipw(&window2_gfx),
 			                   video_gfx_getcliph(&window2_gfx),
