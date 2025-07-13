@@ -43,11 +43,13 @@ __DECL_BEGIN
                                         * - When set, buffer returned by `video_window_getbuffer' has alpha-support */
 #define VIDEO_WINDOW_F_PASSTHRU 0x0002 /* Enable support for video_buffer passthru (when possible) */
 #define VIDEO_WINDOW_F_HIDDEN   0x0004 /* Window is being hidden right now */
+#define VIDEO_WINDOW_F_ALL (VIDEO_WINDOW_F_ALPHA | VIDEO_WINDOW_F_PASSTHRU | VIDEO_WINDOW_F_HIDDEN)
 
 
 /* Possible values for `video_compositor_feature_t' */
 #define VIDEO_COMPOSITOR_FEAT_NORMAL   0x0000
 #define VIDEO_COMPOSITOR_FEAT_PASSTHRU VIDEO_WINDOW_F_PASSTHRU /* Enable support for video_buffer passthru (when possible) */
+#define VIDEO_COMPOSITOR_FEAT_ALL (VIDEO_WINDOW_F_PASSTHRU)
 
 
 #ifdef __CC__
@@ -170,23 +172,32 @@ struct video_compositor_ops {
 	(LIBVIDEO_COMPOSITOR_CC *vcpo_newwindow)(struct video_compositor *__restrict __self,
 	                                         struct video_window_position const *__restrict __position);
 
-	/* Returns a reference to the video buffer targeted by this compositor. */
-	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_buffer *
-	(LIBVIDEO_COMPOSITOR_CC *vcpo_getbuffer)(struct video_compositor *__restrict __self);
+	/* Returns a reference to the video display targeted by this compositor. */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_display *
+	(LIBVIDEO_COMPOSITOR_CC *vcpo_getdisplay)(struct video_compositor *__restrict __self);
 
-	/* Change the video buffer targeted by this compositor. This function may
-	 * not  be available for certain compositors (namely: when talking to the
+	/* Change the video display targeted by this compositor. This function may
+	 * not be available for certain  compositors (namely: when talking to  the
 	 * IPC compositor exposed by the window server).
 	 *
-	 * After a new buffer has been assigned, a full re-draw of all windows is
-	 * performed in the context of the new `__buffer'.
+	 * After a new display has been assigned, a full re-draw of all windows is
+	 * performed in the context of the new `__display'.
 	 *
 	 * @return: 0 : Success
-	 * @return: -1: [errno=EPERM] Not allowed to change target buffer of compositor
-	 * @return: -1: [errno=*] Failed to change backing buffer for some other reason */
+	 * @return: -1: [errno=EPERM] Not allowed to change target display of compositor
+	 * @return: -1: [errno=*] Failed to change backing display for some other reason */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_INOUT_T(2) int
-	(LIBVIDEO_COMPOSITOR_CC *vcpo_setbuffer)(struct video_compositor *__restrict __self,
-	                                         struct video_buffer *__restrict __buffer);
+	(LIBVIDEO_COMPOSITOR_CC *vcpo_setdisplay)(struct video_compositor *__restrict __self,
+	                                          struct video_display *__restrict __display);
+
+	/* Indicates to the compositor that it needs to call `video_display_getbuffer()' to
+	 * obtain a new buffer, since the one previously returned by the associated display
+	 * may have changed.
+	 *
+	 * @return: 0 : Success, no-op, or nothing changed
+	 * @return: -1: [errno=ENOMEM] Buffer changed, but insufficient memory to propagate changes */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) int
+	(LIBVIDEO_COMPOSITOR_CC *vcpo_updatebuffer)(struct video_compositor *__restrict __self);
 
 	/* Return features supported by `__self'
 	 * @return: 0 : Success
@@ -292,18 +303,18 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_compositor, vcp_refcnt, video_compositor_
 
 
 
-/* Create a new video compositor for `__buffer'. The compositor  returned
+/* Create a new video compositor for `__display'. The compositor returned
  * by this function will run in the caller's process, meaning it does not
  * impose any `EPERM'-like restrictions.
  * @return: * :   The newly created compositor
  * @return: NULL: [errno=ENOMEM] Out of memory */
 typedef __ATTR_INOUT_T(1) __REF struct video_compositor *
-(LIBVIDEO_COMPOSITOR_CC *PVIDEO_COMPOSITOR_CREATE)(struct video_buffer *__restrict __buffer,
+(LIBVIDEO_COMPOSITOR_CC *PVIDEO_COMPOSITOR_CREATE)(struct video_display *__restrict __display,
                                                    video_compositor_feature_t __features,
                                                    video_color_t __background);
 #ifdef LIBVIDEO_COMPOSITOR_WANT_PROTOTYPES
 LIBVIDEO_COMPOSITOR_DECL __ATTR_INOUT(1) __REF struct video_compositor *LIBVIDEO_COMPOSITOR_CC
-video_compositor_create(struct video_buffer *__restrict __buffer,
+video_compositor_create(struct video_display *__restrict __display,
                         video_compositor_feature_t __features,
                         video_color_t __background);
 #endif /* LIBVIDEO_COMPOSITOR_WANT_PROTOTYPES */
