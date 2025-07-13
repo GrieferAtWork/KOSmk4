@@ -24,8 +24,9 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/__minmax.h>
 #include <hybrid/__assert.h>
+#include <hybrid/__minmax.h>
+#include <hybrid/__overflow.h>
 
 #include <bits/types.h>
 
@@ -72,6 +73,30 @@ video_rect_intersect(struct video_rect const *__restrict a,
 	video_offset_t b_yend = video_rect_getyend(b);
 	video_offset_t intersect_xend = __hybrid_min(a_xend, b_xend);
 	video_offset_t intersect_yend = __hybrid_min(a_yend, b_yend);
+	video_rect_setxmin(intersect, __hybrid_max(video_rect_getxmin(a), video_rect_getxmin(b)));
+	video_rect_setymin(intersect, __hybrid_max(video_rect_getymin(a), video_rect_getymin(b)));
+	if (video_rect_getxmin(intersect) < intersect_xend && video_rect_getymin(intersect) < intersect_yend) {
+		video_rect_setxend(intersect, intersect_xend);
+		video_rect_setyend(intersect, intersect_yend);
+		return 1;
+	}
+	return 0;
+}
+
+/* Same as `video_rect_intersect()', but safely handles overflow in "b" */
+__LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) __BOOL LIBVIDEO_CODEC_CC
+video_rect_intersect_overflow_in_b(struct video_rect const *__restrict a,
+                                   struct video_rect const *__restrict b,
+                                   struct video_rect *__restrict intersect) {
+	video_offset_t a_xend = video_rect_getxend(a);
+	video_offset_t a_yend = video_rect_getyend(a);
+	video_offset_t b_xend, b_yend;
+	video_offset_t intersect_xend = __hybrid_min(a_xend, b_xend);
+	video_offset_t intersect_yend = __hybrid_min(a_yend, b_yend);
+	if (__hybrid_overflow_sadd(video_rect_getxmin(b), video_rect_getxdim(b), &b_xend))
+		b_xend = VIDEO_OFFSET_MAX;
+	if (__hybrid_overflow_sadd(video_rect_getymin(b), video_rect_getydim(b), &b_yend))
+		b_yend = VIDEO_OFFSET_MAX;
 	video_rect_setxmin(intersect, __hybrid_max(video_rect_getxmin(a), video_rect_getxmin(b)));
 	video_rect_setymin(intersect, __hybrid_max(video_rect_getymin(a), video_rect_getymin(b)));
 	if (video_rect_getxmin(intersect) < intersect_xend && video_rect_getymin(intersect) < intersect_yend) {

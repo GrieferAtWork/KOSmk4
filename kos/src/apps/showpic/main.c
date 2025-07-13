@@ -538,7 +538,7 @@ do_showpic(struct video_buffer *screen,
 int main(int argc, char *argv[]) {
 	REF struct video_font *font;
 	REF struct screen_buffer *screen;
-	REF struct video_display *bdisplay = NULL;
+	REF struct video_display *display = NULL;
 	REF struct video_buffer *bscreen;
 	REF struct video_buffer *frame;
 	REF struct video_anim *anim;
@@ -575,68 +575,70 @@ int main(int argc, char *argv[]) {
 	bscreen = screen_buffer_asvideo(screen);
 #endif
 
-#if 0
+#if 1
 	{
 		struct video_window_position position;
-		REF struct video_display *display;
+		REF struct video_display *temp_display;
 		REF struct video_buffer *buffer;
 		REF struct video_compositor *compositor;
 		REF struct video_window *window1;
 		REF struct video_window *window2;
 		/* TODO: This is the wrong way around -- "screen_buffer" shouldn't exist, and
 		 *       should actually be  "video_monitor", which extends  "video_display". */
-		display = video_display_forbuffer(bscreen);
-		if unlikely(!display)
+		temp_display = video_display_forbuffer(bscreen);
+		if unlikely(!temp_display)
 			err(EXIT_FAILURE, "Failed to wrap screen in display");
-		compositor = video_compositor_create(display, VIDEO_COMPOSITOR_FEAT_ALL, VIDEO_COLOR_AQUA);
+		compositor = video_compositor_create(temp_display, VIDEO_COMPOSITOR_FEAT_ALL, VIDEO_COLOR_AQUA);
 		if unlikely(!compositor)
 			err(EXIT_FAILURE, "Failed to allocate compositor");
 
 		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
 		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU;
-		position.vwp_attr.vwa_rect.vr_xmin = 10;
-		position.vwp_attr.vwa_rect.vr_ymin = 10;
-		position.vwp_attr.vwa_rect.vr_xdim = 400;
-		position.vwp_attr.vwa_rect.vr_ydim = 400;
-		window1 = video_compositor_newwindow(compositor, &position, NULL);
-		if unlikely(!window1)
-			err(EXIT_FAILURE, "Failed to allocate window1");
-
-		/* Render some stuff to the first window */
-		buffer = video_window_getbuffer(window1);
-		if unlikely(!buffer)
-			err(EXIT_FAILURE, "Failed to get screen from window1");
-		{
-			struct video_gfx window1_gfx;
-			video_color_t colors[2][2];
-			video_buffer_getgfx(buffer, &window1_gfx,
-			                    GFX_BLENDMODE_OVERRIDE,
-			                    VIDEO_GFX_F_NORMAL, 0);
-			colors[0][0] = VIDEO_COLOR_RGB(0xff, 0, 0);
-			colors[0][1] = VIDEO_COLOR_RGB(0, 0xff, 0);
-			colors[1][0] = VIDEO_COLOR_RGB(0, 0, 0xff);
-			colors[1][1] = VIDEO_COLOR_RGB(0xff, 0xff, 0xff);
-			video_gfx_gradient(&window1_gfx, 0, 0,
-			                   video_gfx_getclipw(&window1_gfx),
-			                   video_gfx_getcliph(&window1_gfx),
-			                   colors);
-		}
-
-		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__BACKGROUND;
-		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU;
 		position.vwp_attr.vwa_rect.vr_xmin = 80;
 		position.vwp_attr.vwa_rect.vr_ymin = 80;
 		position.vwp_attr.vwa_rect.vr_xdim = bscreen->vb_xdim - 160;
 		position.vwp_attr.vwa_rect.vr_ydim = bscreen->vb_ydim - 160;
+		window1 = video_compositor_newwindow(compositor, &position, NULL);
+		if unlikely(!window1)
+			err(EXIT_FAILURE, "Failed to allocate window1");
+
+		/* Create a second (small) window to interact with the first (big) one */
+		position.vwp_over = VIDEO_WINDOW_MOVE_OVER__FOREGROUND;
+		position.vwp_attr.vwa_flags = VIDEO_WINDOW_F_PASSTHRU /*| VIDEO_WINDOW_F_ALPHA*/;
+		position.vwp_attr.vwa_rect.vr_xmin = 10;
+		position.vwp_attr.vwa_rect.vr_ymin = 10;
+		position.vwp_attr.vwa_rect.vr_xdim = 200;
+		position.vwp_attr.vwa_rect.vr_ydim = 200;
 		window2 = video_compositor_newwindow(compositor, &position, NULL);
 		if unlikely(!window2)
 			err(EXIT_FAILURE, "Failed to allocate window2");
 
-		/* Use the second window as output for the main program */
-		bdisplay = video_window_asdisplay(window2);
-		bscreen = video_window_getbuffer(window2);
-		if unlikely(!bscreen)
+		/* Render some stuff to the second window */
+		buffer = video_window_getbuffer(window2);
+		if unlikely(!buffer)
 			err(EXIT_FAILURE, "Failed to get screen from window2");
+		{
+			struct video_gfx window2_gfx;
+			video_color_t colors[2][2];
+			video_buffer_getgfx(buffer, &window2_gfx,
+			                    GFX_BLENDMODE_OVERRIDE,
+			                    VIDEO_GFX_F_NORMAL, 0);
+			colors[0][0] = VIDEO_COLOR_RGBA(0xff, 0, 0, 0xff);
+			colors[0][1] = VIDEO_COLOR_RGBA(0, 0xff, 0, 0xff);
+			colors[1][0] = VIDEO_COLOR_RGBA(0, 0, 0xff, 0xff);
+			colors[1][1] = VIDEO_COLOR_RGBA(0xff, 0xff, 0xff, 0xff);
+			video_gfx_gradient(&window2_gfx, 0, 0,
+			                   video_gfx_getclipw(&window2_gfx),
+			                   video_gfx_getcliph(&window2_gfx),
+			                   colors);
+			video_window_updaterect(window2, &RECT_FULL);
+		}
+
+		/* Use the first window as output for the main program below... */
+		display = video_window_asdisplay(window1);
+		bscreen = video_window_getbuffer(window1);
+		if unlikely(!bscreen)
+			err(EXIT_FAILURE, "Failed to get screen from window1");
 	}
 #endif
 
@@ -682,8 +684,11 @@ int main(int argc, char *argv[]) {
 
 		/* Render frame */
 		do_showpic(bscreen, frame, font, argv[1], &frame_info);
-		if (bdisplay)
-			video_display_updaterect(bdisplay, &RECT_FULL);
+		if (display) {
+			syslog(LOG_DEBUG, "BEGIN: video_display_updaterect()\n");
+			video_display_updaterect(display, &RECT_FULL);
+			syslog(LOG_DEBUG, "END: video_display_updaterect()\n");
+		}
 		screen_buffer_updaterect(screen, &CRECT_FULL);
 
 		/* Load next frame as part of render delay */

@@ -123,6 +123,9 @@ struct local_window: video_window {
 	                                             * - If none of the  windows that obscure  the pixels of  this one have  `VIDEO_WINDOW_F_ALPHA',
 	                                             *   this buffer goes unused (but see `lw_overlay_mask', which (if present) must be used instead
 	                                             *   or- or in addition to this overlay) */
+	/* TODO: Have  a second mode to "lw_overlay_mask" that is used when "lw_overlay_mask_allcount"
+	 *       is rather small, which just uses "local_compositor_foreach_above" to dynamically skip
+	 *       the rects of overlapping windows */
 	REF struct video_buffer   *lw_overlay_mask; /* [0..1][lock(local_window_comp(this)->lc_lock)]
 	                                             * - `VIDEO_CODEC_A1_MSB'-buffer with 1-bits indicating pixels that are fully obscured  by
 	                                             *   some other window with `VIDEO_WINDOW_F_ALPHA' disabled (overlapping windows that have
@@ -317,7 +320,13 @@ local_compositor_render_mask_overlay_above(struct local_compositor *__restrict s
                                            struct local_window *__restrict start,
                                            struct video_rect const *screen_rect,
                                            struct video_gfx *out,
-                                           bool make_nohit_transparent);
+                                           bool make_nohit_alphamask_1);
+/* Same as `local_compositor_render_mask_overlay_above(..., true)', but **ONLY** render nohit as 1-bits */
+INTDEF ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
+local_compositor_render_mask_overlay_above_nohit_only(struct local_compositor *__restrict self,
+                                                      struct local_window *__restrict start,
+                                                      struct video_rect const *screen_rect,
+                                                      struct video_gfx *out);
 
 
 

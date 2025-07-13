@@ -820,7 +820,7 @@ local_window_updaterect(struct video_display *__restrict self,
 	local_window_assert(me);
 	video_rect_setxdim(&window_rect, video_rect_getxdim(&me->lw_attr.vwa_rect));
 	video_rect_setydim(&window_rect, video_rect_getydim(&me->lw_attr.vwa_rect));
-	if (!video_rect_intersect(&window_rect, rect, &update_rect)) {
+	if (!video_rect_intersect_overflow_in_b(&window_rect, rect, &update_rect)) {
 		/* Updated area is outside the window's bounds */
 		local_compositor_runlock(comp);
 		return;
@@ -869,7 +869,7 @@ local_window_updaterects(struct video_display *__restrict self,
 		struct video_rect const *rect;
 		--n_rects;
 		rect = rects++;
-		if (video_rect_intersect(&window_rect, rect, &update_rect_union))
+		if (video_rect_intersect_overflow_in_b(&window_rect, rect, &update_rect_union))
 			break;
 		if unlikely(!n_rects) {
 			local_compositor_runlock(comp);
@@ -887,7 +887,7 @@ local_window_updaterects(struct video_display *__restrict self,
 		local_window_updaterect_locked(me, &update_rect_union);
 		for (; n_rects; --n_rects, ++rects) {
 			struct video_rect update_rect;
-			if (video_rect_intersect(&window_rect, rects, &update_rect)) {
+			if (video_rect_intersect_overflow_in_b(&window_rect, rects, &update_rect)) {
 				video_rect_addx(&update_rect, video_rect_getxmin(&me->lw_attr.vwa_rect));
 				video_rect_addy(&update_rect, video_rect_getymin(&me->lw_attr.vwa_rect));
 				local_window_updaterect_locked(me, &update_rect);
@@ -897,7 +897,7 @@ local_window_updaterects(struct video_display *__restrict self,
 	} else {
 		for (; n_rects; --n_rects, ++rects) {
 			struct video_rect update_rect;
-			if (video_rect_intersect(&window_rect, rects, &update_rect)) {
+			if (video_rect_intersect_overflow_in_b(&window_rect, rects, &update_rect)) {
 				video_rect_addx(&update_rect, video_rect_getxmin(&me->lw_attr.vwa_rect));
 				video_rect_addy(&update_rect, video_rect_getymin(&me->lw_attr.vwa_rect));
 				video_rect_union(&update_rect_union, &update_rect);
@@ -1239,8 +1239,10 @@ local_compositor_foreach_impl(struct local_compositor *__restrict self,
 	}
 
 	/* Count the # of windows that participate with intersections */
-	for (iter = start; (iter = (*next)(iter)) != NULL;)
-		++window_rect_count;
+	for (iter = start; (iter = (*next)(iter)) != NULL;) {
+		if (video_rect_intersects(rect, &iter->lw_attr.vwa_rect))
+			++window_rect_count;
+	}
 	max_stack_sz = window_rect_count * 3 + 1;
 	stack = (struct video_rect *)malloc(max_stack_sz, sizeof(struct video_rect));
 	if likely(stack) {
@@ -1280,7 +1282,7 @@ local_compositor_foreach_impl(struct local_compositor *__restrict self,
 							--n_more;
 							/* Remaining sub-rects are appended to the stack */
 							assert((stacksz + n_more) <= max_stack_sz);
-							memcpyc(&stack[stacksz], more, n_more,
+							memcpyc(&stack[stacksz], more + 1, n_more,
 							        sizeof(struct video_rect));
 							stacksz += n_more;
 							++i;
@@ -1539,33 +1541,6 @@ local_compositor_render_rgba_overlay_above_nohit_cb(void *cookie,
 	return 0;
 }
 
-static_assert(ALPHAMASK_0 == VIDEO_COLOR_RGBA(0, 0, 0, 0));
-#define local_compositor_render_mask_overlay_above_nohit_cb \
-	local_compositor_render_rgba_overlay_above_nohit_cb
-
-PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
-local_compositor_render_mask_overlay_above_foreach_cb(void *cookie, struct local_window *window,
-                                                      struct video_rect const *intersect) {
-	struct video_gfx *out_gfx = (struct video_gfx *)cookie;
-	video_offset_t rel_x = video_rect_getxmin(intersect) - video_rect_getxmin(&window->lw_attr.vwa_rect);
-	video_offset_t rel_y = video_rect_getymin(intersect) - video_rect_getymin(&window->lw_attr.vwa_rect);
-	if (window->lw_overlay_mask) {
-		struct video_gfx overlay_gfx;
-		video_buffer_getgfx(window->lw_overlay_mask, &overlay_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-		video_gfx_bitblit(out_gfx, video_rect_getxmin(intersect), video_rect_getymin(intersect),
-		                  &overlay_gfx, rel_x, rel_y,
-		                  video_rect_getxdim(intersect),
-		                  video_rect_getydim(intersect));
-	} else {
-		video_gfx_fill(out_gfx, video_rect_getxmin(intersect), video_rect_getymin(intersect),
-		               video_rect_getxdim(intersect),
-		               video_rect_getydim(intersect),
-		               ALPHAMASK_1);
-	}
-	return 0;
-}
-
-
 /* Render RGBA overlay data */
 INTERN ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
 local_compositor_render_rgba_overlay_above(struct local_compositor *__restrict self,
@@ -1579,16 +1554,69 @@ local_compositor_render_rgba_overlay_above(struct local_compositor *__restrict s
 	                               out);
 }
 
+
+PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
+local_compositor_render_mask_overlay_above_foreach_cb(void *cookie, struct local_window *window,
+                                                      struct video_rect const *intersect) {
+	struct video_gfx *out_gfx = (struct video_gfx *)cookie;
+	video_color_t color;
+	if (window->lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA) {
+		color = ALPHAMASK_1; /* Render via RGBA mask (must set bitmask to 1 so render can happen at all) */
+	} else {
+		color = ALPHAMASK_0; /* Obstructed pixels -- don't render */
+	}
+	video_gfx_fill(out_gfx,
+	               video_rect_getxmin(intersect),
+	               video_rect_getymin(intersect),
+	               video_rect_getxdim(intersect),
+	               video_rect_getydim(intersect),
+	               color);
+	return 0;
+}
+
+PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
+local_compositor_render_mask_overlay_above_nohit_cb(void *cookie,
+                                                    struct local_compositor *UNUSED(comp),
+                                                    struct video_rect const *intersect) {
+	struct video_gfx *out_gfx = (struct video_gfx *)cookie;
+	video_gfx_fill(out_gfx, /* unobstructed pixels -- always render */
+	               video_rect_getxmin(intersect), video_rect_getymin(intersect),
+	               video_rect_getxdim(intersect), video_rect_getydim(intersect),
+	               ALPHAMASK_1);
+	return 0;
+}
+
+
+
 /* Render MASK overlay data */
 INTERN ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
 local_compositor_render_mask_overlay_above(struct local_compositor *__restrict self,
                                            struct local_window *__restrict start,
                                            struct video_rect const *screen_rect,
                                            struct video_gfx *out,
-                                           bool make_nohit_transparent) {
+                                           bool make_nohit_alphamask_1) {
 	local_compositor_foreach_above(self, start, screen_rect, &local_compositor_render_mask_overlay_above_foreach_cb,
-	                               make_nohit_transparent ? &local_compositor_render_mask_overlay_above_nohit_cb
+	                               make_nohit_alphamask_1 ? &local_compositor_render_mask_overlay_above_nohit_cb
 	                                                      : NULL,
+	                               out);
+}
+
+PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
+local_compositor_render_mask_overlay_above_nohit_only_foreach_cb(void *UNUSED(cookie),
+                                                                 struct local_window *UNUSED(window),
+                                                                 struct video_rect const *UNUSED(intersect)) {
+	return 0;
+}
+
+/* Same as `local_compositor_render_mask_overlay_above(..., true)', but **ONLY** render nohit as 1-bits */
+INTERN ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
+local_compositor_render_mask_overlay_above_nohit_only(struct local_compositor *__restrict self,
+                                                      struct local_window *__restrict start,
+                                                      struct video_rect const *screen_rect,
+                                                      struct video_gfx *out) {
+	local_compositor_foreach_above(self, start, screen_rect,
+	                               &local_compositor_render_mask_overlay_above_nohit_only_foreach_cb,
+	                               &local_compositor_render_mask_overlay_above_nohit_cb,
 	                               out);
 }
 
@@ -1698,34 +1726,6 @@ err:
 	return -1;
 }
 
-/* Increment "window->lw_overlay_mask_allcount", returning `-1' on error */
-PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
-local_compositor_inc_overlay_mask_cb(void *UNUSED(cookie),
-                                     struct local_window *window,
-                                     struct video_rect const *UNUSED(intersect)) {
-	local_window_assert(window);
-	if (window->lw_overlay_mask_allcount == 0) {
-		struct local_compositor *comp = local_window_comp(window);
-		assert(!window->lw_overlay_mask);
-		window->lw_overlay_mask = video_buffer_create(comp->lc_vidtyp,
-		                                              video_rect_getxdim(&window->lw_attr.vwa_rect),
-		                                              video_rect_getydim(&window->lw_attr.vwa_rect),
-		                                              comp->lc_a1_codec, NULL);
-		if unlikely(!window->lw_overlay_mask)
-			goto err;
-		if unlikely(local_window_ensure_not_passthru(window)) {
-			video_buffer_decref(window->lw_overlay_mask);
-			window->lw_overlay_mask = NULL;
-			goto err;
-		}
-	}
-	++window->lw_overlay_mask_allcount;
-	assert(!LIST_ISBOUND(window, lw_passthru));
-	return 0;
-err:
-	return -1;
-}
-
 /* Decrement "window->lw_overlay_rgba_allcount" */
 PRIVATE ATTR_INOUT(1) void CC
 local_compositor_dec_overlay_rgba(struct local_window *__restrict window) {
@@ -1748,9 +1748,51 @@ local_compositor_inc_overlay_rgba_rollback_cb(void *UNUSED(cookie), struct local
 }
 
 
-/* Decrement "window->lw_overlay_mask_allcount" */
-PRIVATE ATTR_INOUT(1) void CC
-local_compositor_dec_overlay_mask(struct local_window *__restrict window) {
+/* Increment "window->lw_overlay_mask_allcount", returning `-1' on error */
+PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
+local_compositor_inc_overlay_mask_cb(void *UNUSED(cookie),
+                                     struct local_window *window,
+                                     struct video_rect const *intersect) {
+	struct video_gfx overlay_mask_gfx;
+	local_window_assert(window);
+	if (window->lw_overlay_mask_allcount == 0) {
+		struct local_compositor *comp = local_window_comp(window);
+		assert(!window->lw_overlay_mask);
+		window->lw_overlay_mask = video_buffer_create(comp->lc_vidtyp,
+		                                              video_rect_getxdim(&window->lw_attr.vwa_rect),
+		                                              video_rect_getydim(&window->lw_attr.vwa_rect),
+		                                              comp->lc_a1_codec, NULL);
+		if unlikely(!window->lw_overlay_mask)
+			goto err;
+		if unlikely(local_window_ensure_not_passthru(window)) {
+			video_buffer_decref(window->lw_overlay_mask);
+			window->lw_overlay_mask = NULL;
+			goto err;
+		}
+		video_buffer_getgfx(window->lw_overlay_mask, &overlay_mask_gfx,
+		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		video_gfx_fillall(&overlay_mask_gfx, ALPHAMASK_1); /* Unobstructed by default */
+	} else {
+		video_buffer_getgfx(window->lw_overlay_mask, &overlay_mask_gfx,
+		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	}
+	++window->lw_overlay_mask_allcount;
+	assert(!LIST_ISBOUND(window, lw_passthru));
+
+	/* Fill obstructed portion ob bitmask mask with 0-bits */
+	video_gfx_fill(&overlay_mask_gfx,
+	               video_rect_getxmin(intersect) - video_rect_getxmin(&window->lw_attr.vwa_rect),
+	               video_rect_getymin(intersect) - video_rect_getymin(&window->lw_attr.vwa_rect),
+	               video_rect_getxdim(intersect), video_rect_getydim(intersect), ALPHAMASK_0);
+	return 0;
+err:
+	return -1;
+}
+
+/* Rollback function for `local_compositor_inc_overlay_mask_cb' */
+PRIVATE NONNULL((2)) ATTR_IN(3) void CC
+local_compositor_inc_overlay_mask_rollback_cb(void *cookie, struct local_window *window,
+                                              struct video_rect const *intersect) {
 	local_window_assert(window);
 	assert(window->lw_overlay_mask_allcount);
 	if (!--window->lw_overlay_mask_allcount) {
@@ -1758,15 +1800,29 @@ local_compositor_dec_overlay_mask(struct local_window *__restrict window) {
 		buffer = window->lw_overlay_mask;
 		window->lw_overlay_mask = NULL;
 		video_buffer_decref(buffer);
+	} else {
+		/* Must update the overlay mask for the affected region:
+		 * - There might be other windows that still intersect! */
+		struct local_window *origin_window = (struct local_window *)cookie;
+		struct local_compositor *comp = video_compositor_aslocal(window);
+		struct video_gfx overlay_mask_gfx;
+		struct local_window *above = TAILQ_NEXT(window, lw_zorder_visi);
+		video_buffer_getgfx(window->lw_overlay_mask, &overlay_mask_gfx,
+		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		video_gfx_clip(&overlay_mask_gfx,
+		               -video_rect_getxmin(intersect), -video_rect_getymin(intersect),
+		               video_rect_getxmin(intersect) + video_gfx_getclipw(&overlay_mask_gfx),
+		               video_rect_getymin(intersect) + video_gfx_getcliph(&overlay_mask_gfx));
+		assertf(above, "If this were the case, then 'lw_overlay_mask_allcount' should be 0 at this point!");
+		assert(TAILQ_ISBOUND(origin_window, lw_zorder_visi));
+		TAILQ_REMOVE(&comp->lc_zorder_visi, origin_window, lw_zorder_visi); /* Render without this one! */
+		local_compositor_render_mask_overlay_above_nohit_only(comp, above, intersect,
+		                                                      &overlay_mask_gfx);
+
+		/* For consistency: must re-insert "origin_window" (though it doesn't happen
+		 * where we re-insert  it; our  caller will eventually  remove it  anyways). */
+		TAILQ_INSERT_AFTER(&comp->lc_zorder_visi, window, origin_window, lw_zorder_visi);
 	}
-}
-
-
-/* Rollback function for `local_compositor_inc_overlay_mask_cb' */
-PRIVATE NONNULL((2)) ATTR_IN(3) void CC
-local_compositor_inc_overlay_mask_rollback_cb(void *UNUSED(cookie), struct local_window *window,
-                                              struct video_rect const *UNUSED(intersect)) {
-	local_compositor_dec_overlay_mask(window);
 }
 
 
@@ -1880,7 +1936,7 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 			               video_rect_getymin(&result->lw_attr.vwa_rect) + video_gfx_getcliph(&overlay_mask_gfx));
 			local_compositor_render_mask_overlay_above(comp, above_visible,
 			                                           &result->lw_attr.vwa_rect,
-			                                           &overlay_mask_gfx, false);
+			                                           &overlay_mask_gfx, true);
 
 			if (result->lw_overlay_rgba) {
 				result->lw_overlay_rend = video_buffer_create(comp->lc_vidtyp,
@@ -1984,7 +2040,7 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		if (local_compositor_foreach_all_below(comp, below_visible, &result->lw_attr.vwa_rect,
 		                                       has_alpha ? &local_compositor_inc_overlay_rgba_cb : local_compositor_inc_overlay_mask_cb,
 		                                       has_alpha ? &local_compositor_inc_overlay_rgba_rollback_cb : local_compositor_inc_overlay_mask_rollback_cb,
-		                                       NULL) < 0)
+		                                       result) < 0)
 			goto err_unlock_r_overlay_contents_zorder;
 	}
 
