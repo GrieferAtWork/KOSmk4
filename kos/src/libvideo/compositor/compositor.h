@@ -358,7 +358,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_compositor_ops *CC _local_compositor
  * impose any `EPERM'-like restrictions.
  * @return: * :   The newly created compositor
  * @return: NULL: [errno=ENOMEM] Out of memory */
-INTDEF ATTR_INOUT(1) REF struct video_compositor *CC
+INTDEF WUNUSED ATTR_INOUT(1) REF struct video_compositor *CC
 libvideo_compositor_create(struct video_display *__restrict display,
                            video_compositor_feature_t features,
                            video_color_t background);

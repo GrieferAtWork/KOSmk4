@@ -1624,6 +1624,52 @@ local_compositor_update_overlay_counts_cb(void *cookie, struct local_window *win
 }
 
 
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_INOUT(1) int CC
+_local_window_ensure_not_passthru_impl(struct local_window *__restrict self) {
+	struct local_compositor *comp = local_window_comp(self);
+	REF struct video_buffer *oldbuf = self->lw_content;
+	REF struct video_buffer *newbuf;
+	struct video_gfx passthru_gfx;
+	struct video_gfx distinct_gfx;
+	assert(LIST_ISBOUND(self, lw_passthru));
+	newbuf = video_buffer_create(comp->lc_vidtyp,
+	                             video_rect_getxdim(&self->lw_attr.vwa_rect),
+	                             video_rect_getydim(&self->lw_attr.vwa_rect),
+	                             comp->lc_nalpha_codec, comp->lc_palette);
+	if unlikely(!newbuf)
+		goto err;
+
+	/* Copy video data from the old passthru buffer into the new, distinct buffer */
+	video_buffer_getgfx(newbuf, &distinct_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	video_buffer_getgfx(oldbuf, &passthru_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	video_gfx_bitblit(&distinct_gfx, 0, 0,
+	                  &passthru_gfx, 0, 0,
+	                  video_gfx_getclipw(&passthru_gfx),
+	                  video_gfx_getcliph(&passthru_gfx));
+
+	/* Store the new buffer within the window. */
+	self->lw_content = newbuf; /* Inherit reference (x2) */
+
+	/* Revoke video access and drop old buffer */
+	oldbuf = video_buffer_region_revoke(oldbuf);
+	LIST_UNBIND(self, lw_passthru);
+	video_buffer_decref(oldbuf);
+	return 0;
+err:
+	return -1;
+}
+
+/* Ensure that `window' doesn't make use of a passthru buffer
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno'; probably `ENOMEM') */
+PRIVATE WUNUSED ATTR_INOUT(1) int CC
+local_window_ensure_not_passthru(struct local_window *__restrict self) {
+	if (LIST_ISBOUND(self, lw_passthru))
+		return _local_window_ensure_not_passthru_impl(self);
+	return 0;
+}
+
+
 /* Increment "window->lw_overlay_rgba_allcount", returning `-1' on error */
 PRIVATE NONNULL((2)) ATTR_IN(3) ssize_t CC
 local_compositor_inc_overlay_rgba_cb(void *UNUSED(cookie),
@@ -1639,8 +1685,14 @@ local_compositor_inc_overlay_rgba_cb(void *UNUSED(cookie),
 		                                              comp->lc_yalpha_codec, comp->lc_palette);
 		if unlikely(!window->lw_overlay_rgba)
 			goto err;
+		if unlikely(local_window_ensure_not_passthru(window)) {
+			video_buffer_decref(window->lw_overlay_rgba);
+			window->lw_overlay_rgba = NULL;
+			goto err;
+		}
 	}
 	++window->lw_overlay_rgba_allcount;
+	assert(!LIST_ISBOUND(window, lw_passthru));
 	return 0;
 err:
 	return -1;
@@ -1661,8 +1713,14 @@ local_compositor_inc_overlay_mask_cb(void *UNUSED(cookie),
 		                                              comp->lc_a1_codec, NULL);
 		if unlikely(!window->lw_overlay_mask)
 			goto err;
+		if unlikely(local_window_ensure_not_passthru(window)) {
+			video_buffer_decref(window->lw_overlay_mask);
+			window->lw_overlay_mask = NULL;
+			goto err;
+		}
 	}
 	++window->lw_overlay_mask_allcount;
+	assert(!LIST_ISBOUND(window, lw_passthru));
 	return 0;
 err:
 	return -1;
@@ -2073,10 +2131,17 @@ add_alpha(struct video_codec const *__restrict codec) {
 }
 
 PRIVATE ATTR_INOUT(1) void CC
-local_compositor_updatecodecs(struct local_compositor *__restrict me) {
-	me->lc_palette      = me->lc_buffer->vb_format.vf_pal;
-	me->lc_nalpha_codec = me->lc_buffer->vb_format.vf_codec;
+local_compositor_updatebuffercaches(struct local_compositor *__restrict me) {
+	struct video_buffer *buffer = me->lc_buffer;
+	me->lc_palette      = buffer->vb_format.vf_pal;
+	me->lc_nalpha_codec = buffer->vb_format.vf_codec;
 	me->lc_yalpha_codec = add_alpha(me->lc_nalpha_codec);
+
+	/* Generate new (pre-cached) GFX contexts */
+	DBG_memset(&me->lc_buffer_gfx_write, 0xcc, sizeof(me->lc_buffer_gfx_write));
+	DBG_memset(&me->lc_buffer_gfx_alpha, 0xcc, sizeof(me->lc_buffer_gfx_alpha));
+	video_buffer_getgfx(buffer, &me->lc_buffer_gfx_write, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+	video_buffer_getgfx(buffer, &me->lc_buffer_gfx_alpha, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_NORMAL, 0);
 }
 
 
@@ -2152,13 +2217,7 @@ local_compositor_setbuffer_locked(struct local_compositor *__restrict me,
 	video_buffer_incref(new_buffer);
 	old_buffer = me->lc_buffer;
 	me->lc_buffer = new_buffer;
-	local_compositor_updatecodecs(me);
-
-	/* Generate new (pre-cached) GFX contexts */
-	DBG_memset(&me->lc_buffer_gfx_write, 0xcc, sizeof(me->lc_buffer_gfx_write));
-	DBG_memset(&me->lc_buffer_gfx_alpha, 0xcc, sizeof(me->lc_buffer_gfx_alpha));
-	video_buffer_getgfx(new_buffer, &me->lc_buffer_gfx_write, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
-	video_buffer_getgfx(new_buffer, &me->lc_buffer_gfx_alpha, GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_NORMAL, 0);
+	local_compositor_updatebuffercaches(me);
 
 	/* Do a redraw of the  entire screen (this will  skip
 	 * passthru windows, which we already migrated above) */
@@ -2301,8 +2360,7 @@ local_compositor_setfeatures(struct video_compositor *__restrict self,
 			newbuf = video_buffer_create(me->lc_vidtyp,
 			                             video_rect_getxdim(&pt_window->lw_attr.vwa_rect),
 			                             video_rect_getydim(&pt_window->lw_attr.vwa_rect),
-			                             me->lc_buffer->vb_format.vf_codec,
-			                             me->lc_buffer->vb_format.vf_pal);
+			                             me->lc_nalpha_codec, me->lc_palette);
 			if unlikely(!newbuf) {
 				struct local_window *rollback;
 				LIST_FOREACH (rollback, &me->lc_passthru, lw_passthru) {
@@ -2341,6 +2399,7 @@ local_compositor_setfeatures(struct video_compositor *__restrict self,
 			video_gfx_bitblit(&ngfx, 0, 0, &ogfx, 0, 0,
 			                  video_gfx_getclipw(&ngfx),
 			                  video_gfx_getcliph(&ngfx));
+			obuffer = video_buffer_region_revoke(obuffer);
 			video_buffer_decref(obuffer);
 			LIST_UNBIND(pt_window, lw_passthru);
 		}
@@ -2460,6 +2519,56 @@ _local_compositor_ops(void) {
 }
 
 
+
+
+/* Create a new video compositor  for `display'. The compositor  returned
+ * by this function will run in the caller's process, meaning it does not
+ * impose any `EPERM'-like restrictions.
+ * @return: * :   The newly created compositor
+ * @return: NULL: [errno=ENOMEM] Out of memory */
+DEFINE_PUBLIC_ALIAS(video_compositor_create, libvideo_compositor_create);
+INTERN WUNUSED ATTR_INOUT(1) REF struct video_compositor *CC
+libvideo_compositor_create(struct video_display *__restrict display,
+                           video_compositor_feature_t features,
+                           video_color_t background) {
+	REF struct local_compositor *result;
+	REF struct video_buffer *buffer;
+	if (features & ~VIDEO_COMPOSITOR_FEAT_ALL) {
+		errno = EINVAL;
+		goto err;
+	}
+
+	buffer = video_display_getbuffer(display);
+	if unlikely(!buffer)
+		goto err;
+	result = (REF struct local_compositor *)malloc(sizeof(struct local_compositor));
+	if unlikely(!result)
+		goto err_buffer;
+	result->lc_a1_codec = video_codec_lookup(VIDEO_CODEC_A1_MSB);
+	if unlikely(!result->lc_a1_codec) {
+		errno = ENODEV;
+		goto err_buffer;
+	}
+
+	result->vcp_ops = _local_compositor_ops();
+	result->vcp_refcnt = 1;
+	shared_rwlock_init(&result->lc_lock);
+	result->lc_display = display;
+	video_display_incref(display);
+	result->lc_buffer = buffer; /* Inherit reference */
+	local_compositor_updatebuffercaches(result);
+	LIST_INIT(&result->lc_passthru);
+	TAILQ_INIT(&result->lc_zorder);
+	TAILQ_INIT(&result->lc_zorder_visi);
+	result->lc_background = background;
+	result->lc_features = features;
+	result->lc_vidtyp = VIDEO_BUFFER_AUTO; /* TODO: Make this configurable */
+	return result;
+err_buffer:
+	video_buffer_decref(buffer);
+err:
+	return NULL;
+}
 
 DECL_END
 

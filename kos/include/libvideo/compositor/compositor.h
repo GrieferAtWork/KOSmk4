@@ -316,12 +316,12 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_compositor, vcp_refcnt, video_compositor_
  * impose any `EPERM'-like restrictions.
  * @return: * :   The newly created compositor
  * @return: NULL: [errno=ENOMEM] Out of memory */
-typedef __ATTR_INOUT_T(1) __REF struct video_compositor *
+typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_compositor *
 (LIBVIDEO_COMPOSITOR_CC *PVIDEO_COMPOSITOR_CREATE)(struct video_display *__restrict __display,
                                                    video_compositor_feature_t __features,
                                                    video_color_t __background);
 #ifdef LIBVIDEO_COMPOSITOR_WANT_PROTOTYPES
-LIBVIDEO_COMPOSITOR_DECL __ATTR_INOUT(1) __REF struct video_compositor *LIBVIDEO_COMPOSITOR_CC
+LIBVIDEO_COMPOSITOR_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_compositor *LIBVIDEO_COMPOSITOR_CC
 video_compositor_create(struct video_display *__restrict __display,
                         video_compositor_feature_t __features,
                         video_color_t __background);
