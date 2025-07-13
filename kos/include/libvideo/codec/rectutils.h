@@ -48,6 +48,9 @@ __DECL_BEGIN
 #define video_rect_setxend(self, v) (void)((self)->vr_xdim = (video_dim_t)((v) - (self)->vr_xmin))
 #define video_rect_setyend(self, v) (void)((self)->vr_ydim = (video_dim_t)((v) - (self)->vr_ymin))
 
+#define video_rect_addx(self, v) (void)((self)->vr_xmin += (v))
+#define video_rect_addy(self, v) (void)((self)->vr_ymin += (v))
+
 /* Check if {x,y} is contained within "self" */
 #define video_rect_contains(self, x, y)                                   \
 	((x) >= video_rect_getxmin(self) && (x) < video_rect_getxend(self) && \
@@ -77,6 +80,21 @@ video_rect_intersect(struct video_rect const *__restrict a,
 		return 1;
 	}
 	return 0;
+}
+
+
+/* Update `__union' by adding `__addme' */
+__LOCAL __ATTR_INOUT(1) __ATTR_IN(2) void LIBVIDEO_CODEC_CC
+video_rect_union(struct video_rect *__restrict __union,
+                 struct video_rect const *__restrict __addme) {
+	if (video_rect_getxmin(__union) > video_rect_getxmin(__addme))
+		video_rect_setxmin(__union, video_rect_getxmin(__addme));
+	if (video_rect_getymin(__union) > video_rect_getymin(__addme))
+		video_rect_setymin(__union, video_rect_getymin(__addme));
+	if (video_rect_getxend(__union) < video_rect_getxend(__addme))
+		video_rect_setxend(__union, video_rect_getxend(__addme));
+	if (video_rect_getyend(__union) < video_rect_getyend(__addme))
+		video_rect_setyend(__union, video_rect_getyend(__addme));
 }
 
 

@@ -70,6 +70,8 @@ struct video_window_attr {
 #define VIDEO_WINDOW_MOVE_OVER__UNCHANGED  ((struct video_window *)0)  /* Leave unchanged (in `video_compositor_newwindow()', same as `VIDEO_WINDOW_MOVE_OVER__FOREGROUND') */
 #define VIDEO_WINDOW_MOVE_OVER__FOREGROUND ((struct video_window *)-1) /* Place at the top of the Z-stack */
 #define VIDEO_WINDOW_MOVE_OVER__BACKGROUND ((struct video_window *)-2) /* Place at the bottom of the Z-stack */
+#define VIDEO_WINDOW_MOVE_OVER__FORWARD    ((struct video_window *)-3) /* Move window towards the front by 1 position */
+#define VIDEO_WINDOW_MOVE_OVER__BACKWARD   ((struct video_window *)-4) /* Move window towards the back by 1 position */
 
 struct video_window_position {
 	struct video_window_attr vwp_attr; /* Window positioning and attributes */
@@ -166,11 +168,17 @@ struct video_compositor_ops {
 	(LIBVIDEO_COMPOSITOR_CC *vcpo_destroy)(struct video_compositor *__restrict __self);
 
 	/* Create and return a new window
+	 * @param: __initial_content: When  non-NULL, this GFX  is stretched to  the size of the
+	 *                            produced window, and used to populate it with some initial
+	 *                            content (in case  the window is  visible from the  start).
+	 *                            When "NULL", the window's initial content is the  pre-init
+	 *                            done by `video_buffer_create()'.
 	 * @return: * :   The newly created window
 	 * @return: NULL: Failed to create window (s.a. `errno') */
-	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_window *
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __ATTR_IN_OPT_T(3) __REF struct video_window *
 	(LIBVIDEO_COMPOSITOR_CC *vcpo_newwindow)(struct video_compositor *__restrict __self,
-	                                         struct video_window_position const *__restrict __position);
+	                                         struct video_window_position const *__restrict __position,
+	                                         struct video_gfx const *__initial_content);
 
 	/* Returns a reference to the video display targeted by this compositor. */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_display *

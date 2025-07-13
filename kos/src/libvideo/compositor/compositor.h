@@ -91,13 +91,14 @@ DECL_BEGIN
 /* Local compositor */
 struct local_window;
 TAILQ_HEAD(local_window_tailq, local_window);
+LIST_HEAD(local_window_list, local_window);
 struct local_window: video_window {
 	struct video_window_attr   lw_attr;         /* [lock(local_window_comp(this)->lc_lock)] Window attributes (empty windows aren't allowed!) */
 	REF struct video_buffer   *lw_content;      /* [1..1][lock(local_window_comp(this)->lc_lock)]
 	                                             * - RGB/RGBA Content buffer (returned by `video_window_getbuffer()')
 	                                             * - Alternatively, when `lw_passthru' is bound,  this is a revocable region  in
 	                                             *   `local_window_comp(this)->lc_buffer' (s.a. `video_buffer_region_revoke()'). */
-	TAILQ_ENTRY(local_window)  lw_passthru;     /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of windows with passthru buffers */
+	LIST_ENTRY(local_window)   lw_passthru;     /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of windows with passthru buffers */
 	TAILQ_ENTRY(local_window)  lw_zorder;       /* [1..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all windows */
 	TAILQ_ENTRY(local_window)  lw_zorder_visi;  /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all visible windows */
 	REF struct video_buffer   *lw_background;   /* [0..1][(== NULL) == !(lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA)][lock(local_window_comp(this)->lc_lock)]
@@ -182,9 +183,13 @@ struct local_compositor: video_compositor {
 	struct shared_rwlock       lc_lock;             /* Compositor lock */
 	REF struct video_display  *lc_display;          /* [1..1][const] Output buffer */
 	REF struct video_buffer   *lc_buffer;           /* [1..1][lock(lc_lock)] Output buffer */
+	struct video_codec const  *lc_a1_codec;         /* [1..1][const] Pointer to `VIDEO_CODEC_A1_MSB' codec */
+	struct video_codec const  *lc_nalpha_codec;     /* [1..1][lock(lc_lock)] Codec used for windows without alpha */
+	struct video_codec const  *lc_yalpha_codec;     /* [1..1][lock(lc_lock)] Codec used for windows with alpha */
+	struct video_palette      *lc_palette;          /* [== lc_buffer->vb_format.vf_pal][0..1][lock(lc_lock)] Palette used by `lc_buffer' */
 	struct video_gfx           lc_buffer_gfx_write; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_OVERRIDE) */
 	struct video_gfx           lc_buffer_gfx_alpha; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_ALPHA) */
-	struct local_window_tailq  lc_passthru;         /* [0..n][lock(lc_lock)] List of windows where `lw_content' is a passthru to `lc_buffer' */
+	struct local_window_list   lc_passthru;         /* [0..n][lock(lc_lock)] List of windows where `lw_content' is a passthru to `lc_buffer' */
 	struct local_window_tailq  lc_zorder;           /* [0..n][lock(lc_lock)] List of all windows */
 	struct local_window_tailq  lc_zorder_visi;      /* [0..n][lock(lc_lock)] List of visible windows */
 	/* TODO: "lc_zorder_visi" needs to use spatial partitioning (BSP tree) */
@@ -253,9 +258,8 @@ INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
 local_compositor_foreach_above(struct local_compositor *__restrict self,
                                struct local_window *__restrict start,
                                struct video_rect const *rect,
-                               local_compositor_foreach_cb_t cb,                /* [1..1] */
-                               local_compositor_foreach_nohit_cb_t nohit,       /* [0..1] */
-                               local_compositor_foreach_rollback_cb_t rollback, /* [0..1] */
+                               local_compositor_foreach_cb_t cb,          /* [1..1] */
+                               local_compositor_foreach_nohit_cb_t nohit, /* [0..1] */
                                void *cookie);
 
 /* Same as "local_compositor_foreach_above", but cast rays towards negative Z */
@@ -263,9 +267,8 @@ INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
 local_compositor_foreach_below(struct local_compositor *__restrict self,
                                struct local_window *__restrict start,
                                struct video_rect const *rect,
-                               local_compositor_foreach_cb_t cb,                /* [1..1] */
-                               local_compositor_foreach_nohit_cb_t nohit,       /* [0..1] */
-                               local_compositor_foreach_rollback_cb_t rollback, /* [0..1] */
+                               local_compositor_foreach_cb_t cb,          /* [1..1] */
+                               local_compositor_foreach_nohit_cb_t nohit, /* [0..1] */
                                void *cookie);
 
 /* Like above, but the imaginary "rays" being cast can travel through windows.
@@ -276,12 +279,16 @@ INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
 local_compositor_foreach_all_above(struct local_compositor *__restrict self,
                                    struct local_window *__restrict start,
                                    struct video_rect const *rect,
-                                   local_compositor_foreach_cb_t cb, void *cookie);
+                                   local_compositor_foreach_cb_t cb,
+                                   local_compositor_foreach_rollback_cb_t rollback, /* [0..1] */
+                                   void *cookie);
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) NONNULL((4)) ssize_t CC
 local_compositor_foreach_all_below(struct local_compositor *__restrict self,
                                    struct local_window *__restrict start,
                                    struct video_rect const *rect,
-                                   local_compositor_foreach_cb_t cb, void *cookie);
+                                   local_compositor_foreach_cb_t cb,
+                                   local_compositor_foreach_rollback_cb_t rollback, /* [0..1] */
+                                   void *cookie);
 
 
 /* Force a re-draw of all windows (and the background) that intersect with `screen_rect' */
@@ -297,24 +304,30 @@ local_compositor_render_behind(struct local_compositor *__restrict self,
                                struct video_rect const *screen_rect,
                                struct video_gfx *out);
 
-/* Render RGBA data from window contents (and their overlays) into "out".
- * When non-NULL, `opt_nohit_color' is used to fill areas where there are
- * no other windows. */
+/* Render RGBA overlay data */
 INTDEF ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
-local_compositor_render_above(struct local_compositor *__restrict self,
-                              struct local_window *__restrict start,
-                              struct video_rect const *screen_rect,
-                              struct video_gfx *out,
-                              video_color_t *opt_nohit_color);
+local_compositor_render_rgba_overlay_above(struct local_compositor *__restrict self,
+                                           struct local_window *__restrict start,
+                                           struct video_rect const *screen_rect,
+                                           struct video_gfx *out,
+                                           bool make_nohit_transparent);
+/* Render MASK overlay data */
+INTDEF ATTR_INOUT(1) ATTR_IN(2) ATTR_IN(3) ATTR_INOUT(4) void CC
+local_compositor_render_mask_overlay_above(struct local_compositor *__restrict self,
+                                           struct local_window *__restrict start,
+                                           struct video_rect const *screen_rect,
+                                           struct video_gfx *out,
+                                           bool make_nohit_transparent);
 
 
 
 /* Local compositor API functions */
 INTDEF ATTR_INOUT_T(1) void CC
 local_compositor_destroy(struct video_compositor *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_window *CC
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) ATTR_IN_OPT(3) REF struct video_window *CC
 local_compositor_newwindow(struct video_compositor *__restrict self,
-                           struct video_window_position const *__restrict position);
+                           struct video_window_position const *__restrict position,
+                           struct video_gfx const *initial_content);
 INTDEF WUNUSED ATTR_INOUT(1) REF struct video_display *CC
 local_compositor_getdisplay(struct video_compositor *__restrict self);
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int CC

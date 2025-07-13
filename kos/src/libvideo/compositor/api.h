@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBVIDEO_COMPOSITOR_API_H
 #define GUARD_LIBVIDEO_COMPOSITOR_API_H 1
-#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #include <hybrid/compiler.h>
 
@@ -28,5 +27,9 @@
 #include <libvideo/compositor/api.h>
 
 #define CC LIBVIDEO_COMPOSITOR_CC
+
+ /* Our library is linked against libvideo-codec.so and libvideo-gfx.so */
+#define LIBVIDEO_CODEC_WANT_PROTOTYPES
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #endif /* !GUARD_LIBVIDEO_COMPOSITOR_API_H */

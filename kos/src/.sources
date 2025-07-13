@@ -159,6 +159,7 @@ BEGIN
 
 	BEGIN GROUP("libs.libvideo-compositor") { COMPILE, LINK, ARCHIVE, MCOPY };
 		SET_OUTPUT_LIBDLL("libvideo-compositor")
+		USELIB("libvideo-codec")
 		USELIB("libvideo-gfx")
 		SOURCE({
 			"libvideo/compositor/*.c",
