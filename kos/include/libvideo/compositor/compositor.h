@@ -49,7 +49,7 @@ __DECL_BEGIN
 /* Possible values for `video_compositor_feature_t' */
 #define VIDEO_COMPOSITOR_FEAT_NORMAL   0x0000
 #define VIDEO_COMPOSITOR_FEAT_PASSTHRU VIDEO_WINDOW_F_PASSTHRU /* Enable support for video_buffer passthru (when possible) */
-#define VIDEO_COMPOSITOR_FEAT_ALL (VIDEO_WINDOW_F_PASSTHRU)
+#define VIDEO_COMPOSITOR_FEAT_ALL (VIDEO_COMPOSITOR_FEAT_PASSTHRU)
 
 
 #ifdef __CC__
@@ -132,8 +132,8 @@ video_window_updaterects(struct video_window *__restrict __self,
                          __size_t __n_rects);
 
 #else /* __INTELLISENSE__ */
-#define video_window_getattr(self, attr)               (*video_window_getops(self)->vwo_getattr)(self, attr)
-#define video_window_setposition(self, position)       (*video_window_getops(self)->vwo_setposition)(self, position)
+#define video_window_getattr(self, attr)               (*_video_window_getops(self)->vwo_getattr)(self, attr)
+#define video_window_setposition(self, position)       (*_video_window_getops(self)->vwo_setposition)(self, position)
 #define video_window_getbuffer(self)                   video_display_getbuffer(video_window_asdisplay(self))
 #define video_window_updaterect(self, rect)            video_display_updaterect(video_window_asdisplay(self), rect)
 #define video_window_updaterects(self, rects, n_rects) video_display_updaterects(video_window_asdisplay(self), rects, n_rects)
@@ -155,7 +155,7 @@ struct video_window
 	__REF struct video_compositor *vw_compositor; /* [1..1][const] Compositor  */
 	/* Extra, compositor-specific fields go here... */
 };
-#define video_window_getops(self) \
+#define _video_window_getops(self) \
 	((struct video_window_ops const *)(self)->_video_window__vw_display vd_ops)
 #define video_window_destroy(self) video_display_destroy(video_window_asdisplay(self))
 #define video_window_incref(self)  video_display_incref(video_window_asdisplay(self))
@@ -241,9 +241,10 @@ struct video_compositor_ops {
 /* Create and return a new window
  * @return: * :   The newly created window
  * @return: NULL: Failed to create window (s.a. `errno') */
-extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_window *LIBVIDEO_COMPOSITOR_CC
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __ATTR_IN_OPT(3) __REF struct video_window *LIBVIDEO_COMPOSITOR_CC
 video_compositor_newwindow(struct video_compositor *__restrict __self,
-                           struct video_window_position const *__restrict __position);
+                           struct video_window_position const *__restrict __position,
+                           struct video_gfx const *__initial_content);
 
 /* Returns a reference to the video buffer targeted by this compositor. */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_buffer *LIBVIDEO_COMPOSITOR_CC
@@ -286,7 +287,8 @@ video_compositor_setbackground(struct video_compositor *__restrict __self,
                                video_color_t __background);
 
 #else /* __INTELLISENSE__ */
-#define video_compositor_newwindow(self, position)         (*(self)->vcp_ops->vcpo_newwindow)(self, position)
+#define video_compositor_newwindow(self, position, initial_content) \
+	(*(self)->vcp_ops->vcpo_newwindow)(self, position, initial_content)
 #define video_compositor_getbuffer(self)                   (*(self)->vcp_ops->vcpo_getbuffer)(self)
 #define video_compositor_setbuffer(self, buffer)           (*(self)->vcp_ops->vcpo_setbuffer)(self, buffer)
 #define video_compositor_setfeatures(self, features)       (*(self)->vcp_ops->vcpo_setfeatures)(self, features)

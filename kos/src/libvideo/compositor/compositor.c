@@ -1956,9 +1956,9 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 
 	/* Insert "result" into the Z-order-visible */
 	if (!(result->lw_attr.vwa_flags & VIDEO_WINDOW_F_HIDDEN)) {
-		if (TAILQ_ISBOUND(above_visible, lw_zorder_visi)) {
+		if (above_visible) {
 			TAILQ_INSERT_BEFORE(above_visible, result, lw_zorder_visi);
-		} else if (TAILQ_ISBOUND(below_visible, lw_zorder_visi)) {
+		} else if (below_visible) {
 			TAILQ_INSERT_AFTER(&comp->lc_zorder_visi, below_visible, result, lw_zorder_visi);
 		} else {
 			assert(TAILQ_EMPTY(&comp->lc_zorder_visi));
