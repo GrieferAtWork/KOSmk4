@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBVIDEO_GFX_IO_BMP_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_BMP_C_INL 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -52,6 +53,7 @@
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
 #include <libvideo/codec/types.h>
@@ -60,6 +62,7 @@
 #include "../buffer.h"
 #include "../buffer/ram.h"
 #include "../io-utils.h"
+#include "../ramdomain.h"
 
 #ifndef BITSOF
 #define BITSOF(x) (sizeof(x) * NBBY)
@@ -71,59 +74,12 @@ DECL_BEGIN
  * - https://en.wikipedia.org/wiki/BMP_file_format
  */
 
-struct bmpbuffer: video_rambuffer {
-	REF struct video_codec_handle *bb_codec_handle; /* [1..1][const] Video codec handle */
-};
-struct bmpbuffer_with_mapfile: bmpbuffer {
-	struct mapfile bbwm_map; /* [const] Mapfile that owns the pixel buffer */
-};
-
-PRIVATE NONNULL((1)) void FCC
-bmpbuffer_destroy(struct video_buffer *__restrict self) {
-	struct bmpbuffer *me = (struct bmpbuffer *)self;
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
-	video_codec_handle_decref(me->bb_codec_handle);
-	free(me->rb_data);
-	free(me);
+PRIVATE void LIBVIDEO_GFX_CC
+unmap_mapfile_release_mem(void *cookie, void *UNUSED(mem)) {
+	struct mapfile *mf = (struct mapfile *)cookie;
+	(void)unmapfile(mf);
+	free(mf);
 }
-
-PRIVATE NONNULL((1)) void FCC
-bmpbuffer_with_mapfile_destroy(struct video_buffer *__restrict self) {
-	struct bmpbuffer_with_mapfile *me = (struct bmpbuffer_with_mapfile *)self;
-	if (me->vb_format.vf_pal)
-		video_palette_decref(me->vb_format.vf_pal);
-	video_codec_handle_decref(me->bb_codec_handle);
-	unmapfile(&me->bbwm_map);
-	free(me);
-}
-
-#undef bmpbuffer_ops
-#undef bmpbuffer_with_mapfile_ops
-PRIVATE struct video_buffer_ops bmpbuffer_ops = {};
-PRIVATE struct video_buffer_ops bmpbuffer_with_mapfile_ops = {};
-PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_ops(void) {
-	if unlikely(!bmpbuffer_ops.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&bmpbuffer_ops);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&bmpbuffer_ops);
-		COMPILER_WRITE_BARRIER();
-		bmpbuffer_ops.vi_destroy = &bmpbuffer_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &bmpbuffer_ops;
-}
-PRIVATE ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _bmpbuffer_with_mapfile_ops(void) {
-	if unlikely(!bmpbuffer_with_mapfile_ops.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&bmpbuffer_with_mapfile_ops);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&bmpbuffer_with_mapfile_ops);
-		COMPILER_WRITE_BARRIER();
-		bmpbuffer_with_mapfile_ops.vi_destroy = &bmpbuffer_with_mapfile_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &bmpbuffer_with_mapfile_ops;
-}
-#define bmpbuffer_ops              (*_bmpbuffer_ops())
-#define bmpbuffer_with_mapfile_ops (*_bmpbuffer_with_mapfile_ops())
 
 PRIVATE NONNULL((1, 4, 5)) void CC
 rle_decode(byte_t *dst, video_dim_t dst_scan, video_dim_t dst_resy,
@@ -248,7 +204,7 @@ vflip_scanlines(byte_t *data,
 
 
 PRIVATE NONNULL((1)) void CC
-fix_missing_alpha_channel(struct bmpbuffer *__restrict self) {
+fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	struct pixel {
 		uint8_t r;
 		uint8_t g;
@@ -256,23 +212,25 @@ fix_missing_alpha_channel(struct bmpbuffer *__restrict self) {
 		uint8_t a;
 	};
 	video_coord_t y;
-	assert(self->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
-	assert(self->vb_format.vf_pal == NULL);
-	for (y = 0; y < self->vb_ydim; ++y) {
+	struct video_rambuffer *me = (struct video_rambuffer *)self;
+	assert(me->vb_domain == &libvideo_ramdomain_);
+	assert(me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
+	assert(me->vb_format.vf_pal == NULL);
+	for (y = 0; y < me->vb_ydim; ++y) {
 		struct pixel *iter, *end;
-		iter = (struct pixel *)(self->rb_data + y * self->rb_stride);
-		end  = iter + self->vb_xdim;
+		iter = (struct pixel *)(me->rb_data + y * me->rb_stride);
+		end  = iter + me->vb_xdim;
 		do {
 			if (iter->a != 0)
 				return; /* Got actual alpha values! */
 		} while (++iter < end);
 	}
 
-	/* No alpha values -> use RGBX8888 instead */
-	self->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBX8888);
-	assert(self->vb_format.vf_codec);
+	/* No alpha values -> use RGBX8888 instead.
+	 * Because we're a ram-buffer, we can simply change the codec like this! */
+	me->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBX8888);
+	assert(me->vb_format.vf_codec);
 }
-
 
 struct bmp_masks {
 	video_pixel_t bm_r;
@@ -347,8 +305,9 @@ default_bmp_masks(WORD biBitCount) {
  *                    that the given blob is owned by this mapfile, and
  *                    is also allowed to steal that mapping by doing  a
  *                    bzero on `*p_mapfile' */
-INTERN ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
+INTERN ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size,
                          struct mapfile *p_mapfile) {
 #if 1
 #define Egoto(label)                                                         \
@@ -363,10 +322,9 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 #define ADDRAFTER(p) ((byte_t const *)(&(p) + 1))
 	byte_t const *blobEOF = (byte_t const *)blob + blob_size;
 	byte_t const *reader;
-	REF struct bmpbuffer *result;
+	REF struct video_buffer *result;
 	REF struct video_palette *result_pal;
-	REF struct video_codec_handle *result_codec_handle;
-	struct video_codec const *result_codec;
+	struct video_lock result_lock;
 	struct bm_hdr {
 		BITMAPFILEHEADER bmFile;
 		union {
@@ -568,64 +526,76 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	out_specs.vcs_bpp   = biBitCount;
 	out_specs.vcs_amask = amask;
 
-	/* Lookup codec */
-	result_codec = video_codec_fromspecs(&out_specs, &result_codec_handle);
-	if unlikely(!result_codec)
-		goto err_pal;
-
 	/* Check for special case: try to inherit BMP file and use as-is as video buffer. */
-	if (p_mapfile && biCompression == BI_BITFIELDS && szPixelDataSize == szPixelDataSizeGot) {
-		REF struct bmpbuffer_with_mapfile *resultwm;
-		resultwm = (REF struct bmpbuffer_with_mapfile *)malloc(sizeof(struct bmpbuffer_with_mapfile));
-		if unlikely(!resultwm)
-			goto err_pal_codec_handle;
-		memcpy(&resultwm->bbwm_map, p_mapfile, sizeof(resultwm->bbwm_map));
-		resultwm->vb_ops             = &bmpbuffer_with_mapfile_ops;
-		resultwm->vb_format.vf_codec = result_codec;
-		resultwm->vb_format.vf_pal   = result_pal;
-		resultwm->vb_xdim            = (size_t)(ULONG)biWidth;
-		resultwm->vb_ydim            = (size_t)(ULONG)biHeight;
-		resultwm->rb_data            = bPixelData;
-		resultwm->rb_stride          = dwPixelScanline;
-		resultwm->bb_codec_handle    = result_codec_handle;
+	if (p_mapfile && biCompression == BI_BITFIELDS &&
+	    szPixelDataSize == szPixelDataSizeGot && domain_hint == &libvideo_ramdomain_) {
+		void *mapfile_cookie;
+		REF struct video_buffer *result;
 		if (out_vflipped)
 			vflip_scanlines(bPixelData, dwPixelScanline, (size_t)(ULONG)biHeight);
-		bzero(p_mapfile, sizeof(*p_mapfile));
+		mapfile_cookie = malloc(sizeof(struct mapfile));
+		if unlikely(!mapfile_cookie)
+			goto err_pal;
+		mapfile_cookie = memcpy(mapfile_cookie, p_mapfile, sizeof(*p_mapfile));
+		result = video_domain_formem_ex(out_hasalpha_if_nonzero ? libvideo_ramdomain() : domain_hint,
+		                                (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
+		                                &out_specs, result_pal, bPixelData, dwPixelScanline,
+		                                &unmap_mapfile_release_mem, mapfile_cookie,
+		                                VIDEO_DOMAIN_FORMEM_F_NORMAL);
+		if unlikely(!result) {
+			free(mapfile_cookie);
+			goto err_pal;
+		}
 		if (out_hasalpha_if_nonzero)
-			fix_missing_alpha_channel(resultwm);
-		return resultwm;
+			fix_missing_alpha_channel(result);
+		return result;
 	}
 
-	/* Must allocate a dedicated image buffer */
-	result = (REF struct bmpbuffer *)malloc(sizeof(struct bmpbuffer));
+	/* Create result buffer */
+	result = video_domain_newbuffer_ex(out_hasalpha_if_nonzero ? libvideo_ramdomain() : domain_hint,
+	                                   (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
+	                                   &out_specs, result_pal, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result)
-		goto err_pal_codec_handle;
-	result->vb_ops             = &bmpbuffer_ops;
-	result->vb_format.vf_codec = result_codec;
-	result->vb_format.vf_pal   = result_pal;
-	result->vb_xdim            = (size_t)(ULONG)biWidth;
-	result->vb_ydim            = (size_t)(ULONG)biHeight;
-	result->rb_stride          = dwPixelScanline;
-	result->bb_codec_handle    = result_codec_handle;
-	result->rb_data = (byte_t *)malloc(szPixelDataSize);
-	if unlikely(!result->rb_data)
-		goto err_pal_codec_handle_r;
+		goto err_pal;
+	if (result_pal)
+		video_palette_decref(result_pal);
+	if unlikely(video_buffer_wlock(result, &result_lock))
+		goto err_r;
 
 	/* Time to read pixel data, based on used compression method */
 	switch (biCompression) {
-	case BI_BITFIELDS:
+	case BI_BITFIELDS: {
 		/* In this case, pixel data bounds were already asserted */
-		memcpy(result->rb_data, bPixelData, szPixelDataSizeGot);
-		assert(szPixelDataSize >= szPixelDataSizeGot);
-		if (szPixelDataSize > szPixelDataSizeGot) {
-			byte_t *iter = result->rb_data + szPixelDataSizeGot;
-			bzero(iter, szPixelDataSize - szPixelDataSizeGot);
+		byte_t *dst = result_lock.vl_data;
+		if likely(result_lock.vl_stride == dwPixelScanline) {
+			dst = (byte_t *)mempcpy(dst, bPixelData, szPixelDataSizeGot);
+		} else {
+			video_dim_t iter_y = result->vb_ydim;
+			if (result_lock.vl_stride > dwPixelScanline) {
+				byte_t const *src = bPixelData;
+				size_t missing    = result_lock.vl_stride - dwPixelScanline;
+				do {
+					memcpy(dst, src, dwPixelScanline);
+					bzero(dst + dwPixelScanline, dwPixelScanline, missing);
+					dst += result_lock.vl_stride;
+					src += dwPixelScanline;
+				} while (--iter_y);
+			} else {
+				byte_t const *src = bPixelData;
+				do {
+					dst = (byte_t *)mempcpy(dst, src, result_lock.vl_stride);
+					src += szPixelDataSizeGot;
+				} while (--iter_y);
+			}
 		}
-		break;
+		assert(szPixelDataSize >= szPixelDataSizeGot);
+		if (szPixelDataSize > szPixelDataSizeGot)
+			bzero(dst, szPixelDataSize - szPixelDataSizeGot);
+	}	break;
 
 	case BI_RLE4:
 	case BI_RLE8:
-		rle_decode(result->rb_data, dwPixelScanline, result->vb_ydim,
+		rle_decode(result_lock.vl_data, result_lock.vl_stride, result->vb_ydim,
 		           bPixelData, blobEOF, biCompression == BI_RLE4);
 		break;
 
@@ -634,27 +604,22 @@ libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
 	}
 
 	if (out_vflipped) {
-		vflip_scanlines(result->rb_data,
-		                result->rb_stride,
+		vflip_scanlines(result_lock.vl_data,
+		                result_lock.vl_stride,
 		                result->vb_ydim);
 	}
+	video_buffer_unlock(result, &result_lock);
 	if (out_hasalpha_if_nonzero)
 		fix_missing_alpha_channel(result);
 	return result;
-/*
-badfmt_pal_codec_handle_r:
-	free(result);
-badfmt_pal_codec_handle:
-	video_codec_handle_decref(result_codec_handle);*/
 badfmt_pal:
 	if (result_pal)
 		video_palette_decref(result_pal);
 badfmt:
 	return VIDEO_BUFFER_WRONG_FMT;
-err_pal_codec_handle_r:
-	free(result);
-err_pal_codec_handle:
-	video_codec_handle_decref(result_codec_handle);
+err_r:
+	video_buffer_decref(result);
+	goto err;
 err_pal:
 	if (result_pal)
 		video_palette_decref(result_pal);
@@ -696,7 +661,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		int result;
 		REF struct video_buffer *converted_buffer;
 		video_codec_t preferred_codec_id;
-		struct video_codec const *preferred_codec;
+		struct video_format preferred_format;
 		if (codec->vc_specs.vcs_amask) {
 			if (pal || (codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))) {
 				preferred_codec_id = VIDEO_CODEC_BGRA8888;
@@ -719,14 +684,14 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		} else {
 			preferred_codec_id = VIDEO_CODEC_BGRA8888;
 		}
-		preferred_codec = video_codec_lookup(preferred_codec_id);
-		if unlikely(!preferred_codec) {
+		preferred_format.vf_codec = video_codec_lookup(preferred_codec_id);
+		if unlikely(!preferred_format.vf_codec) {
 			errno = EINVAL;
 			return -1;
 		}
-		assert(preferred_codec->vc_specs.vcs_bpp > 8);
-		converted_buffer = libvideo_buffer_convert(self, preferred_codec,
-		                                           NULL, VIDEO_BUFFER_RAM);
+		assert(preferred_format.vf_codec->vc_specs.vcs_bpp > 8);
+		preferred_format.vf_pal = NULL;
+		converted_buffer = libvideo_buffer_convert(self, libvideo_ramdomain(), &preferred_format);
 		if unlikely(!converted_buffer)
 			return -1;
 		result = libvideo_buffer_save_bmp(converted_buffer, stream, options);

@@ -44,7 +44,21 @@ struct video_rambuffer: video_buffer {
 	byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
 };
 
+struct video_rambuffer__for_codec: video_rambuffer {
+	REF struct video_codec_handle *rbfc_codec; /* [1..1][const] Codec handle */
+};
+
+struct video_membuffer: video_rambuffer {
+	void (CC *vm_release_mem)(void *cookie, void *mem);
+	void     *vm_release_mem_cookie;
+};
+
+struct video_membuffer__for_codec: video_membuffer {
+	REF struct video_codec_handle *vmfc_codec; /* [1..1][const] Codec handle */
+};
+
 /* Ram-buffer operator callbacks. */
+INTDEF NONNULL((1)) void FCC rambuffer_destroy__for_codec(struct video_buffer *__restrict self);
 INTDEF NONNULL((1)) void FCC rambuffer_destroy(struct video_buffer *__restrict self);
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC rambuffer_lockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
@@ -66,12 +80,18 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_updategfx(s
 	(void)((self)->vi_initgfx   = &rambuffer_initgfx,    \
 	       (self)->vi_updategfx = &rambuffer_updategfx)
 
-
-
 INTDEF struct video_buffer_ops rambuffer_ops;
+INTDEF struct video_buffer_ops rambuffer_ops__for_codec;
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops__for_codec(void);
 
-INTDEF struct video_buffer_ops membuffer_ops; /* Used by `libvideo_buffer_formem()' */
+INTDEF struct video_buffer_ops membuffer_ops;
+INTDEF struct video_buffer_ops membuffer_ops__for_codec;
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops__for_codec(void);
+
+
+
 
 
 /* This is the layout of `video_gfx::_vx_driver' expected by generic RAM-based GFX */
@@ -110,38 +130,6 @@ INTDEF ATTR_IN(1) void CC libvideo_ramgfx__setpixel24(struct video_gfx const *__
 INTDEF ATTR_IN(1) video_pixel_t CC libvideo_ramgfx__getpixel32(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC libvideo_ramgfx__setpixel32(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_pixel_t pixel);
 #endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
-
-
-/* Create a new RAM-based video buffer */
-INTDEF WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
-libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
-                          struct video_codec const *__restrict codec,
-                          struct video_palette *palette);
-
-/* Create a video buffer that interfaces with a pre-existing buffer whose
- * base address is located at `mem' (which consists of  `stride * size_y'
- * bytes). When  non-NULL,  `(*release_mem)(release_mem_cookie, mem)'  is
- * called when the final reference for the returned buffer is dropped.
- *
- * This function can be used to wrap a memory-resident graphics buffer
- * in-place,    without   needing   to    copy   it   anywhere   else.
- * @param: mem:     Base address  of  the  pre-loaded  memory  buffer.
- *                  If this location isn't writable, attempts to write
- *                  pixel  data of the  returned buffer will SEGFAULT.
- * @param: size_x:  Width of returned buffer
- * @param: size_y:  Height of returned buffer
- * @param: stride:  Scanline width in `mem'
- * @param: codec:   The video codec that describes how `mem' is encoded.
- * @param: palette: The palette to use (only needed if used by `codec')
- * @param: release_mem: Optional callback invoked when the returned buffer is destroyed
- * @param: release_mem_cookie: Cookie argument for `release_mem'
- * @return: * :   The newly created video buffer
- * @return: NULL: Error (s.a. `errno') */
-INTDEF WUNUSED NONNULL((5)) REF struct video_buffer *CC
-libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t stride,
-                       struct video_codec const *codec, struct video_palette *palette,
-                       void (CC *release_mem)(void *cookie, void *mem),
-                       void *release_mem_cookie);
 
 DECL_END
 

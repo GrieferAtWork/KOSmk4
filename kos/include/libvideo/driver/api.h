@@ -17,39 +17,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_ANIM_H
-#define GUARD_LIBVIDEO_GFX_ANIM_H 1
+#ifndef _LIBVIDEO_DRIVER_API_H
+#define _LIBVIDEO_DRIVER_API_H 1
 
-#include "api.h"
-/**/
+#include <__stdinc.h>
+#include <hybrid/host.h>
 
-#include <hybrid/compiler.h>
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBVIDEO_DRIVER_CC __ATTR_STDCALL
+#else /* ... */
+#define LIBVIDEO_DRIVER_CC /* nothing */
+#endif /* !... */
 
-#include <kos/anno.h>
+#if (!defined(LIBVIDEO_DRIVER_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
+#define LIBVIDEO_DRIVER_WANT_PROTOTYPES
+#endif /* ... */
 
-#include <libvideo/gfx/anim.h>
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(BUILDING_KERNEL_CORE))
+#define LIBVIDEO_DRIVER_DECL __PUBDEF
+#elif defined(__LIBVIDEO_DRIVER_STATIC)
+#define LIBVIDEO_DRIVER_DECL __INTDEF
+#else /* ... */
+#define LIBVIDEO_DRIVER_DECL __IMPDEF
+#endif /* !... */
 
-DECL_BEGIN
+/* Library name for use with `dlopen(3D)' */
+#define LIBVIDEO_DRIVER_LIBRARY_NAME "libvideo-driver.so"
 
-/* Create a single-frame video animation from a given buffer.
- * The  returned  animation object  always  re-return `frame'
- * when a call is made to `video_anim_firstframe', and trying
- * to load any  other frame via  `video_anim_nextframe' is  a
- * no-op.
- * @return: * :   The controller for the single-frame video animation
- * @return: NULL: Out of memory. */
-INTDEF WUNUSED ATTR_INOUT(1) REF struct video_anim *CC
-libvideo_anim_fromframe(struct video_buffer *__restrict frame);
-
-/* Return  a wrapper  for `self'  that caches  animation frames during
- * the first loop, and simply replays them during any subsequent loop.
- * @param: format: When non-null,  animation frames  are converted  into
- *                 this pixel format, rather than being copied verbatim.
- * @param: type:   The type of video buffer to use for cached images. */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) REF struct video_anim *CC
-libvideo_anim_cached(struct video_anim *__restrict self,
-                     struct video_format const *format);
-
-DECL_END
-
-#endif /* !GUARD_LIBVIDEO_GFX_ANIM_H */
+#endif /* !_LIBVIDEO_DRIVER_API_H */

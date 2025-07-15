@@ -100,7 +100,8 @@ libvideo_display_forbuffer(struct video_buffer *__restrict buffer) {
 	result = (REF struct dummy_display *)malloc(sizeof(struct dummy_display));
 	if unlikely(!result)
 		goto err;
-	result->vd_ops = _dummy_display_ops();
+	result->vd_domain = buffer->vb_domain;
+	result->vd_ops    = _dummy_display_ops();
 	result->vd_refcnt = 1;
 	result->dd_buffer = buffer;
 	video_buffer_incref(buffer);

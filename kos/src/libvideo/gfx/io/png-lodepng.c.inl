@@ -47,6 +47,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "../buffer/ram.h"
 #include "../io-utils.h"
+#include "../ramdomain.h"
 
 /* Configure lodepng */
 //#define LODEPNG_NO_COMPILE_ZLIB
@@ -110,15 +111,15 @@ get_lodepng_stride(unsigned int w,
 }
 
 
-INTERN ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_lodepng(void const *blob, size_t blob_size) {
+INTERN ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
+                             void const *blob, size_t blob_size) {
 	LodePNGState state;
 	unsigned int w, h, error, stride;
 	unsigned char *out;
 	REF struct video_buffer *result;
-	struct video_codec const *codec;
+	struct video_format format;
 	video_codec_t codec_name;
-	struct video_palette *palette;
 	bzero(&state, sizeof(state));
 	error = lodepng_inspect(&w, &h, &state, (unsigned char const *)blob, blob_size);
 	if (error != 0)
@@ -127,7 +128,7 @@ libvideo_buffer_open_lodepng(void const *blob, size_t blob_size) {
 	/* Determine preferred code based on the PNG's native format.
 	 * If the caller wants to use a custom codec, they'll need to
 	 * blit the PNG buffer into another buffer of their choosing. */
-	palette = NULL;
+	format.vf_pal = NULL;
 	switch (state.info_png.color.colortype) {
 	case LCT_GREY:
 		switch (state.info_png.color.bitdepth) {
@@ -153,9 +154,9 @@ libvideo_buffer_open_lodepng(void const *blob, size_t blob_size) {
 		codec_name = VIDEO_CODEC_RGBA8888;
 		break;
 	}
-	codec = video_codec_lookup(codec_name);
-	if unlikely(!codec)
-		goto err;
+	format.vf_codec = video_codec_lookup(codec_name);
+	if unlikely(!format.vf_codec)
+		goto err_inval;
 	error = lodepng_decode_memory(&out, &w, &h, (unsigned char const *)blob,
 	                              blob_size, state.info_png.color.colortype,
 	                              state.info_png.color.bitdepth);
@@ -163,10 +164,18 @@ libvideo_buffer_open_lodepng(void const *blob, size_t blob_size) {
 		goto handle_error;
 	stride = get_lodepng_stride(w, state.info_png.color.colortype,
 	                            state.info_png.color.bitdepth);
-	result = libvideo_buffer_formem(out, w, h, stride, codec, palette,
-	                                &png_release_mem_free, NULL);
-	if unlikely(!result)
-		free(out);
+	result = video_domain_formem(domain_hint, w, h, &format, out, stride,
+	                             &png_release_mem_free, NULL,
+	                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
+	if unlikely(!result) {
+		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain_)
+			goto err_out;
+		result = video_domain_formem(domain_hint, w, h, &format, out, stride,
+		                             &png_release_mem_free, NULL,
+		                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
+		if unlikely(!result)
+			goto err_out;
+	}
 	return result;
 handle_error:
 	switch (error) {
@@ -180,9 +189,13 @@ handle_error:
 		return NULL;
 	default: break;
 	}
-err:
+err_inval:
 	errno = EINVAL; /* Malformed PNG file. */
+err:
 	return NULL;
+err_out:
+	free(out);
+	goto err;
 }
 
 PRIVATE unsigned
@@ -212,36 +225,15 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 /* Convert "self" into a RGB/RGBA buffer. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
-	REF struct video_buffer *rgb_buffer;
 	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
-	struct video_codec const *codec;
-	codec = video_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888
-	                                     : VIDEO_CODEC_RGB888);
-	if unlikely(!codec) {
+	struct video_format format;
+	format.vf_codec = video_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
+	if unlikely(!format.vf_codec) {
 		errno = ENOTSUP;
 		return NULL;
 	}
-	rgb_buffer = libvideo_rambuffer_create(self->vb_xdim,
-	                                       self->vb_ydim,
-	                                       codec, NULL);
-	if likely(rgb_buffer) {
-		/* Do a blit of "self" into "rgb_buffer" */
-		struct video_gfx dst_gfx;
-		struct video_gfx src_gfx;
-		video_buffer_getgfx(rgb_buffer, &dst_gfx,
-		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_F_NORMAL, 0);
-		video_buffer_getgfx(self, &src_gfx,
-		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_F_NORMAL, 0);
-		syslog(LOG_DEBUG, "libvideo_buffer_convert_to_lodepng_rgb(): [dst: %#x, %ux%u] [src: %#x, %ux%u]\n",
-		       dst_gfx.vx_flags, video_gfx_getclipw(&dst_gfx), video_gfx_getcliph(&dst_gfx),
-		       src_gfx.vx_flags, video_gfx_getclipw(&src_gfx), video_gfx_getcliph(&src_gfx));
-		video_gfx_bitblit(&dst_gfx, 0, 0,
-		                  &src_gfx, 0, 0,
-		                  self->vb_xdim, self->vb_ydim);
-	}
-	return rgb_buffer;
+	format.vf_pal = NULL;
+	return libvideo_buffer_convert(self, libvideo_ramdomain(), &format);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) int CC

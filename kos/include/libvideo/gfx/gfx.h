@@ -281,6 +281,11 @@ struct video_gfx_ops {
 
 	/* Same as `vgfo_fill()', but only fill in a pixel if masked by `__bm'
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
+
+	/* TODO: This  operator needs to  go away; mask-fills need  to happen using blits,
+	 *       and `video_buffer_forbitmask()' needs to go away, also. Instead, bitmasks
+	 *       need to use `video_buffer_formem()', which in turn also needs the ability
+	 *       to be allocated in V-RAM. */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(7) void
 	(LIBVIDEO_GFX_CC *vgfo_fillmask)(struct video_gfx const *__restrict __self,
 	                                 video_offset_t __x, video_offset_t __y,
@@ -289,6 +294,7 @@ struct video_gfx_ops {
 	                                 struct video_bitmask const *__restrict __bm);
 
 	/* Same as `vgfo_fillmask()', however perform the blit while up-scaling the given bitmask. */
+	/* TODO: This one needs to go away, too */
 	__ATTR_IN_T(1) __ATTR_IN_T(6) __ATTR_IN_T(9) void
 	(LIBVIDEO_GFX_CC *vgfo_fillstretchmask)(struct video_gfx const *__restrict __self,
 	                                        video_offset_t __dst_x, video_offset_t __dst_y,

@@ -501,6 +501,7 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 		goto err;
 	result->rb_stride          = stride;
 /*	result->vb_refcnt          = 1;*/ /* Unused */
+/*	result->vb_domain          = libvideo_ramdomain();*/ /* Unused */
 	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = NULL;

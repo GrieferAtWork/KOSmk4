@@ -352,7 +352,7 @@ LWZ_state_getc(LWZ_state *__restrict self) {
 
 
 struct gif_anim;
-struct gif_buffer: video_rambuffer {
+struct gif_buffer: video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
 	struct gif_config gb_cfg;      /* [const] Default config */
 	byte_t           *gb_scratch;  /* [0..1][owned] Scratch buffer for doing frame I/O */
 	byte_t           *gb_restore;  /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
@@ -959,7 +959,13 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	result = (REF struct gif_buffer *)malloc(sizeof(struct gif_buffer));
 	if unlikely(!result)
 		goto err;
+
+	/* TODO: Must re-design video_anim API so impls can store additional
+	 *       frame data **OUTSIDE** the frame buffer itself. That's  the
+	 *       only *real* way to leave the entire frame data structure up
+	 *       to the video domain! */
 	result->vb_refcnt   = 1;
+	result->vb_domain   = me->va_domain; /* TODO: This breaks for anything other than the RAM domain! */
 	result->vb_ops      = &gifbuffer_ops;
 	result->vb_xdim     = me->va_xdim;
 	result->vb_ydim     = me->va_ydim;
@@ -1194,8 +1200,9 @@ PRIVATE struct video_anim_ops *CC _gif_anim_ops(void) {
 
 
 /* GIF */
-INTERN WUNUSED REF struct video_anim *CC
-libvideo_anim_open_gif(void const *blob, size_t blob_size,
+INTERN WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_gif(struct video_domain const *__restrict domain,
+                       void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile) {
 	REF struct gif_anim *result;
 	struct GIF_header const *header;
@@ -1268,10 +1275,11 @@ libvideo_anim_open_gif(void const *blob, size_t blob_size,
 		goto fail_r;
 
 	/* Fill in standard fields of "result" */
-	result->va_refcnt = 1;
+	result->va_domain = domain;
 	result->va_ops    = &gif_anim_ops;
 	result->va_xdim   = GET_LE16(header->gh_lscr_width);
 	result->va_ydim   = GET_LE16(header->gh_lscr_height);
+	result->va_refcnt = 1;
 	if (result->va_xdim < ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4)))
 		result->va_xdim = ((video_dim_t)GET_LE16(reader + 0) + GET_LE16(reader + 4));
 	if (result->va_ydim < ((video_dim_t)GET_LE16(reader + 2) + GET_LE16(reader + 6)))

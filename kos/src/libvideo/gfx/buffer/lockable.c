@@ -43,6 +43,7 @@
 #include <libvideo/gfx/gfx.h>
 
 #include "../buffer.h"
+#include "../ramdomain.h"
 #include "gfx.h"
 #include "lockable.h"
 #include "ram.h"
@@ -353,7 +354,11 @@ video_buffer_islockable(struct video_buffer const *__restrict self) {
 		goto yes;
 	if (self->vb_ops == &rambuffer_ops)
 		goto yes;
+	if (self->vb_ops == &rambuffer_ops__for_codec)
+		goto yes;
 	if (self->vb_ops == &membuffer_ops)
+		goto yes;
+	if (self->vb_ops == &membuffer_ops__for_codec)
 		goto yes;
 	if (self->vb_ops == &subregion_buffer_ops_norem) {
 		/* Subregion buffers are locked iff the underlying buffer is */
@@ -381,8 +386,9 @@ libvideo_buffer_lockable_init(struct lockable_buffer *self,
 	self->vb_format = buffer->vb_format;
 	self->vb_xdim   = buffer->vb_xdim;
 	self->vb_ydim   = buffer->vb_ydim;
-	self->vb_refcnt = 1;
-	video_buffer_incref(buffer);
+#ifndef NDEBUG
+	self->vb_refcnt = 0;
+#endif /* !NDEBUG */
 	self->lb_base = buffer;
 	self->lb_data = NULL;
 	DBG_memset(&self->lb_stride, 0xcc, sizeof(self->lb_stride));
@@ -433,6 +439,7 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 	result->vb_format = self->vb_format;
 	result->vb_xdim   = self->vb_xdim;
 	result->vb_ydim   = self->vb_ydim;
+	result->vb_domain = video_buffer_domain_for_wrapper(self);
 	result->vb_refcnt = 1;
 	video_buffer_incref(self);
 	result->lb_base = self;

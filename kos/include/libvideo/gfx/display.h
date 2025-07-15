@@ -127,6 +127,7 @@ video_display_updaterects(struct video_display *__restrict __self,
 /************************************************************************/
 struct video_display {
 	struct video_display_ops const *vd_ops;    /* [1..1][const] Display operators */
+	struct video_domain const      *vd_domain; /* [1..1][const] Display domain */
 	__uintptr_t                     vd_refcnt; /* Reference counter. */
 };
 

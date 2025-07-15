@@ -185,21 +185,20 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_window_ops *CC _local_window_ops(voi
 
 struct local_compositor: video_compositor {
 	struct shared_rwlock       lc_lock;             /* Compositor lock */
-	REF struct video_display  *lc_display;          /* [1..1][const] Output buffer */
+	REF struct video_display  *lc_display;          /* [1..1][lock(lc_lock)] Output display */
 	REF struct video_buffer   *lc_buffer;           /* [1..1][lock(lc_lock)] Output buffer */
-	struct video_codec const  *lc_a1_codec;         /* [1..1][const] Pointer to `VIDEO_CODEC_A1_MSB' codec */
-	struct video_codec const  *lc_nalpha_codec;     /* [1..1][lock(lc_lock)] Codec used for windows without alpha */
-	struct video_codec const  *lc_yalpha_codec;     /* [1..1][lock(lc_lock)] Codec used for windows with alpha */
-	struct video_palette      *lc_palette;          /* [== lc_buffer->vb_format.vf_pal][0..1][lock(lc_lock)] Palette used by `lc_buffer' */
+	struct video_domain const *lc_domain;           /* [1..1][== lc_buffer->vb_domain][lock(lc_lock)] Output buffer */
+	struct video_format        lc_nalpha_format;    /* [lock(lc_lock)] Format used for windows without alpha */
+	struct video_format        lc_yalpha_format;    /* [lock(lc_lock)] Format used for windows with alpha */
 	struct video_gfx           lc_buffer_gfx_write; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_OVERRIDE) */
 	struct video_gfx           lc_buffer_gfx_alpha; /* [lock(lc_lock)] Pre-calculated GFX content for `lc_buffer' (with GFX_BLENDMODE_ALPHA) */
+	struct video_format        lc_a1_format;        /* [const] Pointer to `VIDEO_CODEC_A1_MSB' codec (palette is always "NULL" here) */
 	struct local_window_list   lc_passthru;         /* [0..n][lock(lc_lock)] List of windows where `lw_content' is a passthru to `lc_buffer' */
 	struct local_window_tailq  lc_zorder;           /* [0..n][lock(lc_lock)] List of all windows */
 	struct local_window_tailq  lc_zorder_visi;      /* [0..n][lock(lc_lock)] List of visible windows */
 	/* TODO: "lc_zorder_visi" needs to use spatial partitioning (BSP tree) */
 	video_color_t              lc_background;       /* [lock(lc_lock)] Background color */
 	video_compositor_feature_t lc_features;         /* [lock(lc_lock)] Compositor features */
-	unsigned int               lc_vidtyp;           /* [lock(lc_lock)] Buffer type used for new buffers (e.g. `VIDEO_BUFFER_AUTO') */
 };
 
 #define video_compositor_aslocal(self) ((struct local_compositor *)(self))

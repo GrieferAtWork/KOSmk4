@@ -33,11 +33,8 @@
 #include <stddef.h>
 
 #include <libvideo/gfx/buffer.h>
-/**/
 
 #include "buffer.h"
-#include "buffer/ram.h"
-#include "gfx-empty.h"
 #include "swgfx.h"
 
 DECL_BEGIN
@@ -65,8 +62,6 @@ NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
 	(void)lock;
 	COMPILER_IMPURE();
 }
-
-
 
 
 INTERN WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
@@ -103,124 +98,45 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
 
 
 
-/* Convert `self' into the specified format.
- * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
-DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
-INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
-libvideo_buffer_convert(struct video_buffer *__restrict self,
-                        struct video_codec const *codec,
-                        struct video_palette *palette,
-                        unsigned int type) {
-	/* Ensure that no palette is used if none is needed. */
-	if (/*palette &&*/ !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-		palette = NULL;
 
+
+/* Convert `self' into the specified domain and format. */
+DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
+INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
+libvideo_buffer_convert(struct video_buffer *__restrict self,
+                        struct video_domain const *domain,
+                        struct video_format const *format) {
 	/* Check for simple case: buffer is already in the expected format. */
-	if (self->vb_format.vf_codec == codec &&
-	    self->vb_format.vf_pal == palette) {
-		if (type == VIDEO_BUFFER_AUTO ||
-		    ((type == VIDEO_BUFFER_RAM) == (self->vb_ops == &rambuffer_ops))) {
-			video_buffer_incref(self);
-			return self;
-		}
+	if (self->vb_domain == domain &&
+	    self->vb_format.vf_codec == format->vf_codec &&
+	    (self->vb_format.vf_pal == format->vf_pal ||
+	     self->vb_format.vf_pal == NULL)) {
+		video_buffer_incref(self);
+		return self;
 	}
-	return libvideo_buffer_convert_or_copy(self, codec, palette, type);
+	return libvideo_buffer_convert_or_copy(self, domain, format);
 }
 
-/* Same as `video_buffer_convert()', but always return a distinct buffer, even if formats match */
 DEFINE_PUBLIC_ALIAS(video_buffer_convert_or_copy, libvideo_buffer_convert_or_copy);
-INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
-                                struct video_codec const *codec,
-                                struct video_palette *palette,
-                                unsigned int type) {
+                                struct video_domain const *domain,
+                                struct video_format const *format) {
 	/* Create a new video buffer */
 	REF struct video_buffer *result;
-	result = libvideo_buffer_create(type, self->vb_xdim, self->vb_ydim, codec, palette);
+	result = video_domain_newbuffer(domain, self->vb_xdim, self->vb_ydim,
+	                                format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if likely(result) {
-		struct video_gfx src_gfx;
-		struct video_gfx dst_gfx;
-
 		/* Blit the entirety of the source buffer into the target buffer. */
-		video_buffer_getgfx(self, &src_gfx,
-		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_F_NORMAL, 0);
-		video_buffer_getgfx(result, &dst_gfx,
-		                    GFX_BLENDMODE_OVERRIDE,
-		                    VIDEO_GFX_F_NORMAL, 0);
+		struct video_gfx src_gfx, dst_gfx;
+		video_buffer_getgfx(self, &src_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		video_buffer_getgfx(result, &dst_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
+		assert(video_gfx_getclipw(&dst_gfx) == video_gfx_getclipw(&src_gfx));
+		assert(video_gfx_getcliph(&dst_gfx) == video_gfx_getcliph(&src_gfx));
 		video_gfx_bitblit(&dst_gfx, 0, 0,
 		                  &src_gfx, 0, 0,
-		                  self->vb_xdim, self->vb_ydim);
-	}
-	return result;
-}
-
-
-/* Create a video buffer, or return NULL and set errno if creation failed.
- * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
- *       which may not necessarily use the  given, or default `codec' and  `palette'
- * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
- * @param: palette: The palette to use (only needed if used by `codec') */
-DEFINE_PUBLIC_ALIAS(video_buffer_create, libvideo_buffer_create);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_create(unsigned int type, video_dim_t size_x, video_dim_t size_y,
-                       struct video_codec const *codec, struct video_palette *palette) {
-	struct video_buffer *result;
-	/* Check for special case: empty video buffer. */
-	if unlikely(!size_x || !size_y)
-		return incref(&libvideo_emptybuffer);
-	if (!codec) {
-		/* Lookup the default format. */
-		struct video_format const *default_format;
-		default_format = libvideo_preferred_format();
-		codec          = default_format->vf_codec;
-		palette        = default_format->vf_pal;
-	} else {
-		/* Ensure that no palette is used if none is needed. */
-		if (/*palette &&*/ !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-			palette = NULL;
-	}
-	switch (type) {
-
-	case VIDEO_BUFFER_AUTO:
-	case VIDEO_BUFFER_RAM:
-		result = libvideo_rambuffer_create(size_x, size_y,
-		                                   codec, palette);
-		break;
-
-//TODO:	case VIDEO_BUFFER_GPU:
-//TODO:		break;
-
-	default:
-		/* Unknown buffer type. */
-		errno = EINVAL;
-		result = NULL;
-		break;
-	}
-	return result;
-}
-
-
-PRIVATE struct video_format preferred_video_format;
-
-/* Return the preferred video format.
- * If  possible, this format will match the format used by the host's graphics card.
- * If no graphics card exists, or the card isn't clear on its preferred format, some
- * other, common format will be returned instead. */
-DEFINE_PUBLIC_ALIAS(video_preferred_format, libvideo_preferred_format);
-INTERN ATTR_RETNONNULL WUNUSED struct video_format const *CC
-libvideo_preferred_format(void) {
-	struct video_format *result;
-	result = &preferred_video_format;
-	if (!result->vf_codec) {
-		struct video_codec const *codec;
-		/* TODO: Ask the bound video driver for its preferred format. */
-		COMPILER_IMPURE();
-		codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
-		result->vf_pal = NULL;
-		assert(codec != NULL);
-		COMPILER_WRITE_BARRIER();
-		result->vf_codec = codec;
+		                  video_gfx_getclipw(&dst_gfx),
+		                  video_gfx_getcliph(&dst_gfx));
 	}
 	return result;
 }

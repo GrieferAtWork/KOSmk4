@@ -44,6 +44,7 @@
 #include "../buffer.h"
 #include "../gfx-empty.h"
 #include "../gfx.h"
+#include "../ramdomain.h"
 #include "gfx.h"
 #include "utils.h"
 
@@ -431,6 +432,7 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 			sr_result->vb_format = src->vb_format;
 			sr_result->vb_xdim   = self->vx_hdr.vxh_cxsiz;
 			sr_result->vb_ydim   = self->vx_hdr.vxh_cysiz;
+			sr_result->vb_domain = video_buffer_domain_for_wrapper(src);
 			sr_result->vb_refcnt = 1;
 			sr_result->srb_base  = src;
 			video_buffer_incref(src);
@@ -458,6 +460,7 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 	gx_result->vb_format = src->vb_format;
 	gx_result->vb_xdim   = self->vx_hdr.vxh_cxsiz;
 	gx_result->vb_ydim   = self->vx_hdr.vxh_cysiz;
+	gx_result->vb_domain = video_buffer_domain_for_wrapper(src);
 	gx_result->vb_refcnt = 1;
 	gx_result->gxb_base  = src;
 	video_buffer_incref(src);

@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBVIDEO_GFX_IO_PNG_C_INL
 #define GUARD_LIBVIDEO_GFX_IO_PNG_C_INL 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -41,6 +42,7 @@
 
 #include "../buffer/ram.h"
 #include "../io-utils.h"
+#include "../ramdomain.h"
 
 DECL_BEGIN
 
@@ -200,36 +202,43 @@ libpng_mem_reader_cb(libpng_structp png_ptr, libpng_bytep p, size_t n) {
 }
 
 
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_png(void const *blob, size_t blob_size) {
+INTERN WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size) {
 	libpng_structp png_ptr;
 	libpng_infop info_ptr;
 	struct libpng_mem_reader_data rdat;
 	libpng_uint_32 width, height;
 	int bit_depth, color_type;
 	video_codec_t result_codec_id;
-	struct video_codec const *result_codec;
-	struct video_rambuffer *result;
-	REF struct video_palette *result_pal;
-	struct video_rambuffer_requirements bufreq;
+
+	/* Shared with setjmp() target */
+	struct video_format result_format;
+	REF struct video_buffer *result;
+	struct video_lock result_lock;
+	byte_t *temp_line;
 
 	if (!libpng_loadapi())
-		return libvideo_buffer_open_lodepng(blob, blob_size);
+		return libvideo_buffer_open_lodepng(domain_hint, blob, blob_size);
 	png_ptr = (*pdyn_png_create_read_struct)(LIBPNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if unlikely(!png_ptr)
 		goto err_nomem;
 	info_ptr = (*pdyn_png_create_info_struct)(png_ptr);
 	if unlikely(!info_ptr)
 		goto err_nomem_png_ptr;
-	result     = NULL;
-	result_pal = NULL;
+	result               = NULL;
+	result_format.vf_pal = NULL;
+	result_lock.vl_data  = NULL;
+	temp_line            = NULL;
 	if (setjmp(*(*pdyn_png_set_longjmp_fn)(png_ptr, &longjmp, sizeof(jmp_buf)))) {
-		if (result) {
-			free(result->rb_data);
-			free(result);
-		}
-		if (result_pal)
-			video_palette_decref(result_pal);
+		if (temp_line)
+			free(temp_line);
+		if (result_lock.vl_data)
+			video_buffer_unlock(result, &result_lock);
+		if (result)
+			video_buffer_decref(result);
+		if (result_format.vf_pal)
+			video_palette_decref(result_format.vf_pal);
 		(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 		return VIDEO_BUFFER_WRONG_FMT;
 	}
@@ -291,16 +300,16 @@ libvideo_buffer_open_png(void const *blob, size_t blob_size) {
 		}
 
 		/* Construct palette */
-		result_pal = video_palette_create((unsigned int)png_num_palette);
-		if unlikely(!result_pal)
+		result_format.vf_pal = video_palette_create((unsigned int)png_num_palette);
+		if unlikely(!result_format.vf_pal)
 			goto err_png_ptr_info_ptr;
 		for (pal_i = 0; pal_i < (unsigned int)png_num_palette; ++pal_i) {
 			video_color_t color = VIDEO_COLOR_RGB(png_palette[pal_i].red,
 			                                      png_palette[pal_i].green,
 			                                      png_palette[pal_i].blue);
-			result_pal->vp_pal[pal_i] = color;
+			result_format.vf_pal->vp_pal[pal_i] = color;
 		}
-		result_pal = video_palette_optimize(result_pal);
+		result_format.vf_pal = video_palette_optimize(result_format.vf_pal);
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
@@ -344,63 +353,80 @@ do_rgb_format:
 	}
 
 	/* Lookup needed codec. */
-	result_codec = video_codec_lookup(result_codec_id);
-	if unlikely(!result_codec) {
+	result_format.vf_codec = video_codec_lookup(result_codec_id);
+	if unlikely(!result_format.vf_codec) {
 		errno = ENODEV;
 		goto err_png_ptr_info_ptr_pal;
 	}
 
-	/* Figure out required scanline size */
-	(*result_codec->vc_rambuffer_requirements)(width, height, &bufreq);
-	{
-		/* Don't go below whatever scanline requirements libpng has */
-		size_t libpng_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
-		if (bufreq.vbs_stride < libpng_scanline) {
-			bufreq.vbs_stride = libpng_scanline;
-			bufreq.vbs_bufsize = bufreq.vbs_stride * height;
-		}
-	}
-
 	/* Allocate result video buffer. */
-	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
-	if unlikely(!result)
-		goto err_png_ptr_info_ptr;
-	result->rb_data = (byte_t *)malloc(bufreq.vbs_bufsize);
-	if unlikely(!result->rb_data)
+	result = video_domain_newbuffer(domain_hint, width, height, &result_format,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	if unlikely(!result) {
+		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain_)
+			goto err_png_ptr_info_ptr;
+		result = video_domain_newbuffer(libvideo_ramdomain(),
+		                                width, height, &result_format,
+		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		if unlikely(!result)
+			goto err_png_ptr_info_ptr;
+	}
+	if unlikely(video_buffer_wlock(result, &result_lock))
 		goto err_png_ptr_info_ptr_pal_r;
-	result->rb_stride          = bufreq.vbs_stride;
-	result->vb_refcnt          = 1;
-	result->vb_ops             = _rambuffer_ops();
-	result->vb_format.vf_codec = result_codec;
-	result->vb_format.vf_pal   = result_pal; /* Inherit reference */
-	result->vb_xdim            = width;
-	result->vb_ydim            = height;
 
 	/* Read image data from PNG file */
 	{
-		int pass, passes = (*pdyn_png_set_interlace_handling)(png_ptr);
-		for (pass = 0; pass < passes; ++pass) {
-			byte_t *dst = result->rb_data;
-			libpng_uint_32 y;
-			for (y = 0; y < height; ++y) {
-				(*pdyn_png_read_row)(png_ptr, dst, NULL);
-				dst += result->rb_stride;
+		/* Don't go below whatever scanline requirements libpng has */
+		size_t libpng_scanline = (*pdyn_png_get_rowbytes)(png_ptr, info_ptr);
+		int passes = (*pdyn_png_set_interlace_handling)(png_ptr);
+		if likely(result_lock.vl_stride >= libpng_scanline) {
+			int pass;
+			for (pass = 0; pass < passes; ++pass) {
+				byte_t *dst = result_lock.vl_data;
+				libpng_uint_32 y;
+				for (y = 0; y < height; ++y) {
+					(*pdyn_png_read_row)(png_ptr, dst, NULL);
+					dst += result_lock.vl_stride;
+				}
 			}
+		} else {
+			int pass;
+			temp_line = (byte_t *)malloc(libpng_scanline);
+			if unlikely(!temp_line)
+				goto err_png_ptr_info_ptr_pal_r_lock;
+			for (pass = 0; pass < passes; ++pass) {
+				byte_t *dst = result_lock.vl_data;
+				libpng_uint_32 y;
+				for (y = 0; y < height; ++y) {
+					(*pdyn_png_read_row)(png_ptr, temp_line, NULL);
+					dst = (byte_t *)mempcpy(dst, temp_line, result_lock.vl_stride);
+				}
+			}
+			free(temp_line);
 		}
 	}
+	video_buffer_unlock(result, &result_lock);
+	result_lock.vl_data = NULL;
+	COMPILER_WRITE_BARRIER();
 
 	/* Cleanup... */
 //	(*pdyn_png_read_end)(png_ptr, info_ptr);
 	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
+
+	if (result_format.vf_pal)
+		video_palette_decref(result_format.vf_pal);
 	return result;
 /*
-err_png_ptr_info_ptr_pal_r_data:
-	free(result->rb_data);*/
+err_png_ptr_info_ptr_pal_r_lock_temp_line:
+	free(temp_line);*/
+err_png_ptr_info_ptr_pal_r_lock:
+	if (result_lock.vl_data)
+		video_buffer_unlock(result, &result_lock);
 err_png_ptr_info_ptr_pal_r:
-	free(result);
+	video_buffer_decref(result);
 err_png_ptr_info_ptr_pal:
-	if (result_pal)
-		video_palette_decref(result_pal);
+	if (result_format.vf_pal)
+		video_palette_decref(result_format.vf_pal);
 err_png_ptr_info_ptr:
 	(*pdyn_png_destroy_read_struct)(&png_ptr, &info_ptr, NULL);
 	return NULL;

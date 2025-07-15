@@ -165,6 +165,15 @@ BEGIN
 			"libvideo/compositor/*.c",
 		})
 	END
+
+	BEGIN GROUP("libs.libvideo-driver") { COMPILE, LINK, ARCHIVE, MCOPY };
+		SET_OUTPUT_LIBDLL("libvideo-driver")
+		USELIB("libvideo-codec")
+		USELIB("libvideo-gfx")
+		SOURCE({
+			"libvideo/driver/*.c",
+		})
+	END
 END
 
 

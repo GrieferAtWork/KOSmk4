@@ -17,39 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_ANIM_H
-#define GUARD_LIBVIDEO_GFX_ANIM_H 1
-
-#include "api.h"
-/**/
+#ifndef GUARD_LIBVIDEO_DRIVER_API_H
+#define GUARD_LIBVIDEO_DRIVER_API_H 1
 
 #include <hybrid/compiler.h>
 
-#include <kos/anno.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
-#include <libvideo/gfx/anim.h>
+#include <libvideo/driver/api.h>
 
-DECL_BEGIN
+#define CC LIBVIDEO_DRIVER_CC
 
-/* Create a single-frame video animation from a given buffer.
- * The  returned  animation object  always  re-return `frame'
- * when a call is made to `video_anim_firstframe', and trying
- * to load any  other frame via  `video_anim_nextframe' is  a
- * no-op.
- * @return: * :   The controller for the single-frame video animation
- * @return: NULL: Out of memory. */
-INTDEF WUNUSED ATTR_INOUT(1) REF struct video_anim *CC
-libvideo_anim_fromframe(struct video_buffer *__restrict frame);
+ /* Our library is linked against libvideo-codec.so and libvideo-gfx.so */
+#define LIBVIDEO_CODEC_WANT_PROTOTYPES
+#define LIBVIDEO_GFX_WANT_PROTOTYPES
 
-/* Return  a wrapper  for `self'  that caches  animation frames during
- * the first loop, and simply replays them during any subsequent loop.
- * @param: format: When non-null,  animation frames  are converted  into
- *                 this pixel format, rather than being copied verbatim.
- * @param: type:   The type of video buffer to use for cached images. */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) REF struct video_anim *CC
-libvideo_anim_cached(struct video_anim *__restrict self,
-                     struct video_format const *format);
-
-DECL_END
-
-#endif /* !GUARD_LIBVIDEO_GFX_ANIM_H */
+#endif /* !GUARD_LIBVIDEO_DRIVER_API_H */

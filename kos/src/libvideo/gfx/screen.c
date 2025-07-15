@@ -55,8 +55,8 @@
 #include <libphys/phys.h>
 #include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
-#include <libvideo/codec/codecs.h>
 #include <libvideo/codec/codecs-extra.h>
+#include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/codec/pixel.h>
@@ -65,6 +65,7 @@
 #include <libvideo/gfx/screen.h>
 
 #include "buffer/ram.h"
+#include "ramdomain.h"
 #include "screen.h"
 
 DECL_BEGIN
@@ -491,6 +492,7 @@ find_hinted_mode:
 
 	/* Fill in remaining fields of "result" */
 	result->vb_refcnt     = 1;
+	result->vb_domain     = libvideo_ramdomain();
 	result->vb_ops        = &result->ss_ops.sbo_video;
 	result->vb_xdim       = mode->smi_resx;
 	result->vb_ydim       = mode->smi_resy;

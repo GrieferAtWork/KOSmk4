@@ -44,6 +44,7 @@
 
 #include "../buffer.h"
 #include "../gfx.h"
+#include "../ramdomain.h"
 #include "../swgfx.h"
 #include "bitmask.h"
 
@@ -225,6 +226,7 @@ bitmask_buffer_init(struct bitmask_buffer *__restrict self,
 #ifndef NDEBUG
 	self->vb_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
 	self->bmb_pal.vp_refcnt = 0; /* To hopefully cause assert fault it someone tries to incref() */
+	memset(&self->vb_domain, 0xcc, sizeof(self->vb_domain));
 	memset(&self->bmb_pal._vp_tree, 0xcc, sizeof(self->bmb_pal._vp_tree));
 	memset(&self->bmb_pal.vp_destroy, 0xcc, sizeof(self->bmb_pal.vp_destroy));
 #endif /* !NDEBUG */
@@ -258,6 +260,7 @@ libvideo_buffer_forbitmask(video_dim_t size_x, video_dim_t size_y,
 	if likely(result) {
 		result = bitmask_buffer_init(result, size_x, size_y, bm, bg_fg_colors);
 		result->vb_refcnt = 1;
+		result->vb_domain = libvideo_ramdomain();
 	}
 	return result;
 }

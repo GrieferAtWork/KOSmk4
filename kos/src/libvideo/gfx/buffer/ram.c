@@ -216,6 +216,14 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
+INTERN NONNULL((1)) void FCC
+rambuffer_destroy__for_codec(struct video_buffer *__restrict self) {
+	struct video_rambuffer__for_codec *me;
+	me = (struct video_rambuffer__for_codec *)self;
+	video_codec_handle_decref(me->rbfc_codec);
+	rambuffer_destroy(me);
+}
+
 INTERN ATTR_INOUT(1) ATTR_OUT(2) int FCC
 rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict lock) {
@@ -388,6 +396,7 @@ GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_
 }
 
 INTERN struct video_buffer_ops rambuffer_ops = {};
+INTERN struct video_buffer_ops rambuffer_ops__for_codec = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&rambuffer_ops);
@@ -398,57 +407,23 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(
 	}
 	return &rambuffer_ops;
 }
-
-
-
-/* Create a new RAM-based video buffer */
-INTERN WUNUSED NONNULL((3)) REF struct video_buffer *CC
-libvideo_rambuffer_create(video_dim_t size_x, video_dim_t size_y,
-                          struct video_codec const *__restrict codec,
-                          struct video_palette *palette) {
-	REF struct video_rambuffer *result;
-	struct video_rambuffer_requirements req;
-	assert(codec);
-
-	/* Figure out buffer requirements. */
-	(*codec->vc_rambuffer_requirements)(size_x, size_y, &req);
-
-	/* Allocate heap memory for the buffer */
-	result = (REF struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
-	if unlikely(!result)
-		goto err;
-	result->rb_data = (byte_t *)calloc(req.vbs_bufsize);
-	if unlikely(!result->rb_data)
-		goto err_result;
-	result->rb_stride          = req.vbs_stride;
-	result->vb_refcnt          = 1;
-	result->vb_ops             = _rambuffer_ops();
-	result->vb_format.vf_codec = codec;
-	result->vb_format.vf_pal   = palette;
-	result->vb_xdim            = size_x;
-	result->vb_ydim            = size_y;
-	if (palette)
-		video_palette_incref(palette);
-	return result;
-err_result:
-	free(result);
-err:
-	return NULL;
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops__for_codec(void) {
+	if unlikely(!rambuffer_ops__for_codec.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&rambuffer_ops__for_codec);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&rambuffer_ops__for_codec);
+		COMPILER_WRITE_BARRIER();
+		rambuffer_ops__for_codec.vi_destroy = &rambuffer_destroy__for_codec;
+		COMPILER_WRITE_BARRIER();
+	}
+	return &rambuffer_ops__for_codec;
 }
 
 
 
-struct video_membuffer: video_rambuffer {
-	void (CC *vm_release_mem)(void *cookie, void *mem);
-	void     *vm_release_mem_cookie;
-};
-
-INTERN struct video_buffer_ops membuffer_ops = {};
 
 PRIVATE NONNULL((1)) void FCC
 membuffer_destroy(struct video_buffer *__restrict self) {
 	struct video_membuffer *me = (struct video_membuffer *)self;
-	assert(me->vb_ops == &membuffer_ops);
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
 	if (me->vm_release_mem)
@@ -456,9 +431,17 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 	free(me);
 }
 
+PRIVATE NONNULL((1)) void FCC
+membuffer_destroy__for_codec(struct video_buffer *__restrict self) {
+	struct video_membuffer__for_codec *me = (struct video_membuffer__for_codec *)self;
+	video_codec_handle_decref(me->vmfc_codec);
+	membuffer_destroy(me);
+}
 
-PRIVATE ATTR_RETNONNULL WUNUSED
-struct video_buffer_ops *CC membuffer_getops(void) {
+
+INTERN struct video_buffer_ops membuffer_ops = {};
+INTERN struct video_buffer_ops membuffer_ops__for_codec = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops(void) {
 	if unlikely(!membuffer_ops.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&membuffer_ops);
 		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&membuffer_ops);
@@ -469,68 +452,15 @@ struct video_buffer_ops *CC membuffer_getops(void) {
 	return &membuffer_ops;
 }
 
-
-
-/* Create a video buffer that interfaces with a pre-existing buffer whose
- * base address is located at `mem' (which consists of  `stride * size_y'
- * bytes). When  non-NULL,  `(*release_mem)(release_mem_cookie, mem)'  is
- * called when the final reference for the returned buffer is dropped.
- *
- * This function can be used to wrap a memory-resident graphics buffer
- * in-place,    without   needing   to    copy   it   anywhere   else.
- * @param: mem:     Base address  of  the  pre-loaded  memory  buffer.
- *                  If this location isn't writable, attempts to write
- *                  pixel  data of the  returned buffer will SEGFAULT.
- * @param: size_x:  Width of returned buffer
- * @param: size_y:  Height of returned buffer
- * @param: stride:  Scanline width in `mem'
- * @param: codec:   The video codec that describes how `mem' is encoded.
- * @param: palette: The palette to use (only needed if used by `codec')
- * @param: release_mem: Optional callback invoked when the returned buffer is destroyed
- * @param: release_mem_cookie: Cookie argument for `release_mem'
- * @return: * :   The newly created video buffer
- * @return: NULL: Error (s.a. `errno') */
-DEFINE_PUBLIC_ALIAS(video_buffer_formem, libvideo_buffer_formem);
-INTERN WUNUSED NONNULL((5)) REF struct video_buffer *CC
-libvideo_buffer_formem(void *mem, video_dim_t size_x, video_dim_t size_y, size_t stride,
-                       struct video_codec const *codec, struct video_palette *palette,
-                       void (CC *release_mem)(void *cookie, void *mem),
-                       void *release_mem_cookie) {
-	REF struct video_membuffer *result;
-	struct video_rambuffer_requirements req;
-	assert(codec);
-
-	/* Ensure that the specified stride is great enough */
-	(*codec->vc_rambuffer_requirements)(size_x, size_y, &req);
-	if (stride < req.vbs_stride) {
-		errno = EINVAL;
-		return NULL;
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops__for_codec(void) {
+	if unlikely(!membuffer_ops__for_codec.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&membuffer_ops__for_codec);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&membuffer_ops__for_codec);
+		COMPILER_WRITE_BARRIER();
+		membuffer_ops__for_codec.vi_destroy = &membuffer_destroy__for_codec;
+		COMPILER_WRITE_BARRIER();
 	}
-
-	/* Must use a different, fallback "codec" that can deal with bad alignment */
-	if (!IS_ALIGNED(stride, codec->vc_align) ||
-	    !IS_ALIGNED((uintptr_t)mem, codec->vc_align))
-		codec = codec->vc_nalgn;
-
-	/* Allocate heap memory for the buffer */
-	result = (REF struct video_membuffer *)malloc(sizeof(struct video_membuffer));
-	if unlikely(!result)
-		goto err;
-	result->rb_stride             = stride;
-	result->rb_data               = (byte_t *)mem;
-	result->vb_refcnt             = 1;
-	result->vb_ops                = membuffer_getops();
-	result->vb_format.vf_codec    = codec;
-	result->vb_format.vf_pal      = palette;
-	result->vb_xdim             = size_x;
-	result->vb_ydim             = size_y;
-	result->vm_release_mem        = release_mem;
-	result->vm_release_mem_cookie = release_mem_cookie;
-	if (palette)
-		video_palette_incref(palette);
-	return result;
-err:
-	return NULL;
+	return &membuffer_ops__for_codec;
 }
 
 DECL_END

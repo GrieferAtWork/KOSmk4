@@ -42,6 +42,7 @@
 
 #include "../buffer.h"
 #include "../gfx.h"
+#include "../ramdomain.h"
 #include "../swgfx.h"
 #include "custom.h"
 #include "utils.h"
@@ -145,7 +146,7 @@ NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
 struct gfx_customdrv: gfx_swdrv {
 	video_buffer_custom_getpixel_t gcd_getpixel; /* [1..1][const] ... */
 	video_buffer_custom_setpixel_t gcd_setpixel; /* [1..1][const] ... */
-	void                          *gcd_cookie;   /* [?..?][const] ... */
+	void *gcd_cookie;                            /* [?..?][const] ... */
 };
 #define video_customgfx_getdrv(self) \
 	((struct gfx_customdrv *)(self)->_vx_driver)
@@ -170,7 +171,7 @@ custom_gfx__setpixel(struct video_gfx const *__restrict self,
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 custom_initgfx(struct video_gfx *__restrict self) {
-	struct custom_buffer *me = (struct custom_buffer *)self->vx_buffer;
+	struct custom_buffer *me  = (struct custom_buffer *)self->vx_buffer;
 	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
 	libvideo_gfx_init_fullclip(self);
 	drv->gcd_getpixel = me->cb_getpixel;
@@ -198,7 +199,7 @@ custom_destroy(struct video_buffer *__restrict self) {
 #undef custom_ops
 PRIVATE struct video_buffer_ops custom_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(void) {
-	if unlikely(!custom_ops.vi_destroy) {
+	if unlikely (!custom_ops.vi_destroy) {
 		custom_ops.vi_rlock        = &custom_rlock;
 		custom_ops.vi_wlock        = &custom_wlock;
 		custom_ops.vi_unlock       = &custom_unlock;
@@ -255,11 +256,12 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           void *cookie) {
 	REF struct custom_buffer *result;
 	result = (REF struct custom_buffer *)malloc(sizeof(struct custom_buffer));
-	if unlikely(!result)
+	if unlikely (!result)
 		goto err;
 	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
 		palette = NULL;
-	result->vb_ops = &custom_ops;
+	result->vb_ops             = &custom_ops;
+	result->vb_domain          = libvideo_ramdomain();
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;
 	if (palette)

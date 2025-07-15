@@ -141,8 +141,8 @@ local_window_hide_update_overlays_below_cb(void *cookie, struct local_window *wi
 	struct local_compositor *comp = local_window_comp(window);
 	video_offset_t window_x = video_rect_getxmin(intersect) - video_rect_getxmin(&window->lw_attr.vwa_rect);
 	video_offset_t window_y = video_rect_getymin(intersect) - video_rect_getymin(&window->lw_attr.vwa_rect);
-	video_offset_t hideme_x = video_rect_getxmin(intersect) - hideme->lw_attr.vwa_rect.vr_xmin;
-	video_offset_t hideme_y = video_rect_getymin(intersect) - hideme->lw_attr.vwa_rect.vr_ymin;
+	video_offset_t hideme_x = video_rect_getxmin(intersect) - video_rect_getxmin(&hideme->lw_attr.vwa_rect);
+	video_offset_t hideme_y = video_rect_getymin(intersect) - video_rect_getymin(&hideme->lw_attr.vwa_rect);
 	assert(comp == local_window_comp(hideme));
 
 	/* Copy RGBA overlay data */
@@ -291,8 +291,8 @@ local_window_draw_rect_to_screen(struct local_window *me,
 		return; /* Passthru already renders directly to screen */
 
 	comp = local_window_comp(me);
-	rel_x = screen_rect->vr_xmin - video_rect_getxmin(&me->lw_attr.vwa_rect);
-	rel_y = screen_rect->vr_ymin - video_rect_getymin(&me->lw_attr.vwa_rect);
+	rel_x = video_rect_getxmin(screen_rect)- video_rect_getxmin(&me->lw_attr.vwa_rect);
+	rel_y = video_rect_getymin(screen_rect) - video_rect_getymin(&me->lw_attr.vwa_rect);
 	video_buffer_getgfx(me->lw_display ? me->lw_display : me->lw_content, &content_gfx,
 	                    GFX_BLENDMODE_ALPHA, VIDEO_GFX_F_NORMAL, 0);
 	if (me->lw_overlay_rend) {
@@ -310,42 +310,49 @@ local_window_draw_rect_to_screen(struct local_window *me,
 		video_gfx_bitblit3(&overlay_render_gfx, rel_x, rel_y,
 		                   &content_gfx, rel_x, rel_y,
 		                   &overlay_rgba_gfx, rel_x, rel_y,
-		                   screen_rect->vr_xdim, screen_rect->vr_ydim);
+		                   video_rect_getxdim(screen_rect),
+		                   video_rect_getydim(screen_rect));
 
 		/* Combine "me->lw_overlay_mask" with "me->lw_overlay_rend" and render result to screen */
 		video_buffer_getgfx(me->lw_overlay_mask, &overlay_mask_gfx,
 		                    GFX_BLENDMODE_ALPHAMASK, VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_bitblit3(&comp->lc_buffer_gfx_alpha,
-		                   screen_rect->vr_xmin, screen_rect->vr_ymin,
+		                   video_rect_getxmin(screen_rect),
+		                   video_rect_getymin(screen_rect),
 		                   &overlay_mask_gfx, rel_x, rel_y,
 		                   &overlay_render_gfx, rel_x, rel_y,
-		                   screen_rect->vr_xdim, screen_rect->vr_ydim);
+		                   video_rect_getxdim(screen_rect),
+		                   video_rect_getydim(screen_rect));
 	} else if (me->lw_overlay_rgba) {
 		struct video_gfx overlay_gfx;
 		assert(!me->lw_overlay_mask);
 		video_buffer_getgfx(me->lw_overlay_rgba, &overlay_gfx,
 		                    GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_bitblit3(&comp->lc_buffer_gfx_write,
-		                   screen_rect->vr_xmin, screen_rect->vr_ymin,
+		                   video_rect_getxmin(screen_rect),
+		                   video_rect_getymin(screen_rect),
 		                   &content_gfx, rel_x, rel_y,
 		                   &overlay_gfx, rel_x, rel_y,
-		                   screen_rect->vr_xdim, screen_rect->vr_ydim);
+		                   video_rect_getxdim(screen_rect),
+		                   video_rect_getydim(screen_rect));
 	} else if (me->lw_overlay_mask) {
 		struct video_gfx mask_gfx;
 		video_buffer_getgfx(me->lw_overlay_mask, &mask_gfx,
 		                    GFX_BLENDMODE_ALPHAMASK, VIDEO_GFX_F_NORMAL, 0);
 		video_gfx_bitblit3(&comp->lc_buffer_gfx_alpha,
-		                   screen_rect->vr_xmin,
-		                   screen_rect->vr_ymin,
+		                   video_rect_getxmin(screen_rect),
+		                   video_rect_getymin(screen_rect),
 		                   &mask_gfx, rel_x, rel_y,
 		                   &content_gfx, rel_x, rel_y,
-		                   screen_rect->vr_xdim, screen_rect->vr_ydim);
+		                   video_rect_getxdim(screen_rect),
+		                   video_rect_getydim(screen_rect));
 	} else {
 		video_gfx_bitblit(&comp->lc_buffer_gfx_write,
-		                  screen_rect->vr_xmin,
-		                  screen_rect->vr_ymin,
+		                  video_rect_getxmin(screen_rect),
+		                  video_rect_getymin(screen_rect),
 		                  &content_gfx, rel_x, rel_y,
-		                  screen_rect->vr_xdim, screen_rect->vr_ydim);
+		                  video_rect_getxdim(screen_rect),
+		                  video_rect_getydim(screen_rect));
 		if (!(me->lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA))
 			try_convert_window_to_passthru(me);
 	}
@@ -382,10 +389,14 @@ local_window_hide_update_background_above_cb(void *cookie, struct local_window *
 			video_gfx_clipinfo_t clip;
 			video_gfx_saveclip(&background_gfx, &clip);
 			video_gfx_clip(&background_gfx, rel_x, rel_y,
-			               video_rect_getxdim(intersect), video_rect_getydim(intersect));
+			               video_rect_getxdim(intersect),
+			               video_rect_getydim(intersect));
 			if (below) {
-				video_gfx_clip(&background_gfx, -video_rect_getxmin(intersect), -video_rect_getymin(intersect),
-				               video_rect_getxdim(intersect), video_rect_getydim(intersect));
+				video_gfx_clip(&background_gfx,
+				               -video_rect_getxmin(intersect),
+				               -video_rect_getymin(intersect),
+				               video_rect_getxdim(intersect),
+				               video_rect_getydim(intersect));
 				local_compositor_render_behind(comp, below, intersect, &background_gfx);
 			} else {
 				video_gfx_fillall(&background_gfx, comp->lc_background);
@@ -399,7 +410,8 @@ local_window_hide_update_background_above_cb(void *cookie, struct local_window *
 		video_gfx_bitblit3(&display_gfx, rel_x, rel_y,
 		                   &content_gfx, rel_x, rel_y,
 		                   &background_gfx, rel_x, rel_y,
-		                   video_rect_getxdim(intersect), video_rect_getydim(intersect));
+		                   video_rect_getxdim(intersect),
+		                   video_rect_getydim(intersect));
 
 		/* Recursively update background buffers of windows in-front */
 		above = TAILQ_NEXT(window, lw_zorder_visi);
@@ -1234,8 +1246,8 @@ local_compositor_foreach_impl(struct local_compositor *__restrict self,
 	struct video_rect *stack;
 	size_t window_rect_count = 1;
 	size_t max_stack_sz;
-	assert(rect->vr_xdim);
-	assert(rect->vr_ydim);
+	assert(video_rect_getxdim(rect));
+	assert(video_rect_getydim(rect));
 
 	/* Skip windows that don't intersect with the original rect */
 	while (!video_rect_intersects(rect, &start->lw_attr.vwa_rect)) {
@@ -1322,19 +1334,19 @@ done_stack:
 		 *                       pixels that intersect with the same window. */
 		video_coord_t y = 0;
 		do {
-			video_offset_t used_y = rect->vr_ymin + y;
+			video_offset_t used_y = video_rect_getymin(rect) + y;
 			video_coord_t x = 0;
 			for (;;) {
 				struct video_rect intersect;
 				video_coord_t hit_x = x;
-				struct local_window *hit = local_compositor_windowat(start, next, rect->vr_xmin + x, used_y);
-				while (++x < rect->vr_xdim &&
-				       hit == local_compositor_windowat(start, next, rect->vr_xmin + x, used_y))
+				struct local_window *hit = local_compositor_windowat(start, next, video_rect_getxmin(rect) + x, used_y);
+				while (++x < video_rect_getxdim(rect) &&
+				       hit == local_compositor_windowat(start, next, video_rect_getxmin(rect) + x, used_y))
 					;
-				intersect.vr_xmin = rect->vr_xmin + hit_x;
-				intersect.vr_ymin = used_y;
-				intersect.vr_xdim = x - hit_x;
-				intersect.vr_ydim = 1;
+				video_rect_setxmin(&intersect, video_rect_getxmin(rect) + hit_x);
+				video_rect_setymin(&intersect, used_y);
+				video_rect_setxdim(&intersect, x - hit_x);
+				video_rect_setydim(&intersect, 1);
 				if (hit) {
 					temp = (*cb)(cookie, hit, &intersect);
 				} else if (nohit) {
@@ -1347,10 +1359,10 @@ done_stack:
 					goto done_loop;
 				}
 				result += temp;
-				if (x >= rect->vr_xdim)
+				if (x >= video_rect_getxdim(rect))
 					break;
 			}
-		} while (++y < rect->vr_ydim);
+		} while (++y < video_rect_getydim(rect));
 done_loop:;
 	}
 	return result;
@@ -1454,8 +1466,11 @@ local_compositor_updaterect__nopropagate(struct local_compositor *__restrict sel
 	if likely(last) {
 		local_compositor_render_behind(self, last, screen_rect, &self->lc_buffer_gfx_write);
 	} else {
-		video_gfx_fill(&self->lc_buffer_gfx_write, screen_rect->vr_xmin, screen_rect->vr_ymin,
-		               screen_rect->vr_xdim, screen_rect->vr_ydim,
+		video_gfx_fill(&self->lc_buffer_gfx_write,
+		               video_rect_getxmin(screen_rect),
+		               video_rect_getymin(screen_rect),
+		               video_rect_getxdim(screen_rect),
+		               video_rect_getydim(screen_rect),
 		               self->lc_background);
 	}
 }
@@ -1669,10 +1684,11 @@ _local_window_ensure_not_passthru_impl(struct local_window *__restrict self) {
 	struct video_gfx passthru_gfx;
 	struct video_gfx distinct_gfx;
 	assert(LIST_ISBOUND(self, lw_passthru));
-	newbuf = video_buffer_create(comp->lc_vidtyp,
-	                             video_rect_getxdim(&self->lw_attr.vwa_rect),
-	                             video_rect_getydim(&self->lw_attr.vwa_rect),
-	                             comp->lc_nalpha_codec, comp->lc_palette);
+	newbuf = video_domain_newbuffer(comp->lc_domain,
+	                                video_rect_getxdim(&self->lw_attr.vwa_rect),
+	                                video_rect_getydim(&self->lw_attr.vwa_rect),
+	                                &comp->lc_nalpha_format,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!newbuf)
 		goto err;
 
@@ -1716,10 +1732,11 @@ local_compositor_inc_overlay_rgba_cb(void *UNUSED(cookie),
 	if (window->lw_overlay_rgba_allcount == 0) {
 		struct local_compositor *comp = local_window_comp(window);
 		assert(!window->lw_overlay_rgba);
-		window->lw_overlay_rgba = video_buffer_create(comp->lc_vidtyp,
-		                                              video_rect_getxdim(&window->lw_attr.vwa_rect),
-		                                              video_rect_getydim(&window->lw_attr.vwa_rect),
-		                                              comp->lc_yalpha_codec, comp->lc_palette);
+		window->lw_overlay_rgba = video_domain_newbuffer(comp->lc_domain,
+		                                                 video_rect_getxdim(&window->lw_attr.vwa_rect),
+		                                                 video_rect_getydim(&window->lw_attr.vwa_rect),
+		                                                 &comp->lc_yalpha_format,
+		                                                 VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
 		if unlikely(!window->lw_overlay_rgba)
 			goto err;
 		if unlikely(local_window_ensure_not_passthru(window)) {
@@ -1767,10 +1784,11 @@ local_compositor_inc_overlay_mask_cb(void *UNUSED(cookie),
 	if (window->lw_overlay_mask_allcount == 0) {
 		struct local_compositor *comp = local_window_comp(window);
 		assert(!window->lw_overlay_mask);
-		window->lw_overlay_mask = video_buffer_create(comp->lc_vidtyp,
-		                                              video_rect_getxdim(&window->lw_attr.vwa_rect),
-		                                              video_rect_getydim(&window->lw_attr.vwa_rect),
-		                                              comp->lc_a1_codec, NULL);
+		window->lw_overlay_mask = video_domain_newbuffer(comp->lc_domain,
+		                                                 video_rect_getxdim(&window->lw_attr.vwa_rect),
+		                                                 video_rect_getydim(&window->lw_attr.vwa_rect),
+		                                                 &comp->lc_a1_format,
+		                                                 VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!window->lw_overlay_mask)
 			goto err;
 		if unlikely(local_window_ensure_not_passthru(window)) {
@@ -1843,6 +1861,7 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 	struct local_window *below, *above;
 	struct local_window *below_visible, *above_visible;
 	REF struct local_window *result;
+	unsigned int content_alloc_flags;
 	if ((position->vwp_attr.vwa_flags & ~VIDEO_WINDOW_F_ALL) ||
 	    (video_rect_getxdim(&position->vwp_attr.vwa_rect) <= 0) ||
 	    (video_rect_getydim(&position->vwp_attr.vwa_rect) <= 0)) {
@@ -1907,10 +1926,11 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		/* Allocate required overlays */
 		if (result->lw_overlay_rgba_allcount) {
 			struct video_gfx overlay_rgba_gfx;
-			result->lw_overlay_rgba = video_buffer_create(comp->lc_vidtyp,
-			                                              video_rect_getxdim(&result->lw_attr.vwa_rect),
-			                                              video_rect_getydim(&result->lw_attr.vwa_rect),
-			                                              comp->lc_yalpha_codec, comp->lc_palette);
+			result->lw_overlay_rgba = video_domain_newbuffer(comp->lc_domain,
+			                                                 video_rect_getxdim(&result->lw_attr.vwa_rect),
+			                                                 video_rect_getydim(&result->lw_attr.vwa_rect),
+			                                                 &comp->lc_yalpha_format,
+			                                                 VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
 			if unlikely(!result->lw_overlay_rgba)
 				goto err_unlock_r;
 
@@ -1928,10 +1948,11 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		}
 		if (result->lw_overlay_mask_allcount) {
 			struct video_gfx overlay_mask_gfx;
-			result->lw_overlay_mask = video_buffer_create(comp->lc_vidtyp,
-			                                              video_rect_getxdim(&result->lw_attr.vwa_rect),
-			                                              video_rect_getydim(&result->lw_attr.vwa_rect),
-			                                              comp->lc_a1_codec, NULL);
+			result->lw_overlay_mask = video_domain_newbuffer(comp->lc_domain,
+			                                                 video_rect_getxdim(&result->lw_attr.vwa_rect),
+			                                                 video_rect_getydim(&result->lw_attr.vwa_rect),
+			                                                 &comp->lc_a1_format,
+			                                                 VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 			if unlikely(!result->lw_overlay_mask)
 				goto err_unlock_r_orgba;
 
@@ -1948,36 +1969,43 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 			                                           &overlay_mask_gfx, true);
 
 			if (result->lw_overlay_rgba) {
-				result->lw_overlay_rend = video_buffer_create(comp->lc_vidtyp,
-				                                              video_rect_getxdim(&result->lw_attr.vwa_rect),
-				                                              video_rect_getydim(&result->lw_attr.vwa_rect),
-				                                              comp->lc_nalpha_codec, comp->lc_palette);
+				result->lw_overlay_rend = video_domain_newbuffer(comp->lc_domain,
+				                                                 video_rect_getxdim(&result->lw_attr.vwa_rect),
+				                                                 video_rect_getydim(&result->lw_attr.vwa_rect),
+				                                                 &comp->lc_nalpha_format,
+				                                                 VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 				if unlikely(!result->lw_overlay_rend)
 					goto err_unlock_r_orgba_omask;
 			}
 		}
 	}
 
+	/* Determine content allocation flags. */
+	content_alloc_flags = VIDEO_DOMAIN_NEWBUFFER_F_CALLOC;
+	if (initial_content)
+		content_alloc_flags = VIDEO_DOMAIN_NEWBUFFER_F_NORMAL;
+
 	/* Allocate the primary "lw_content", "lw_background" and "lw_display" and buffers */
 	LIST_ENTRY_UNBOUND_INIT(&result->lw_passthru);
 	if (result->lw_attr.vwa_flags & VIDEO_WINDOW_F_ALPHA) {
 		/* Need all those pretty, little alpha buffers */
-		result->lw_content = video_buffer_create(comp->lc_vidtyp,
-		                                         video_rect_getxdim(&result->lw_attr.vwa_rect),
-		                                         video_rect_getydim(&result->lw_attr.vwa_rect),
-		                                         comp->lc_yalpha_codec, comp->lc_palette);
-		if unlikely(!result->lw_content)
-			goto err_unlock_r_overlay;
-		result->lw_display = video_buffer_create(comp->lc_vidtyp,
-		                                         video_rect_getxdim(&result->lw_attr.vwa_rect),
-		                                         video_rect_getydim(&result->lw_attr.vwa_rect),
-		                                         comp->lc_nalpha_codec, comp->lc_palette);
-		if unlikely(!result->lw_display)
-			goto err_unlock_r_overlay_content;
-		result->lw_background = video_buffer_create(comp->lc_vidtyp,
+		result->lw_content = video_domain_newbuffer(comp->lc_domain,
 		                                            video_rect_getxdim(&result->lw_attr.vwa_rect),
 		                                            video_rect_getydim(&result->lw_attr.vwa_rect),
-		                                            comp->lc_nalpha_codec, comp->lc_palette);
+		                                            &comp->lc_yalpha_format, content_alloc_flags);
+		if unlikely(!result->lw_content)
+			goto err_unlock_r_overlay;
+		result->lw_display = video_domain_newbuffer(comp->lc_domain,
+		                                            video_rect_getxdim(&result->lw_attr.vwa_rect),
+		                                            video_rect_getydim(&result->lw_attr.vwa_rect),
+		                                            &comp->lc_nalpha_format, content_alloc_flags);
+		if unlikely(!result->lw_display)
+			goto err_unlock_r_overlay_content;
+		result->lw_background = video_domain_newbuffer(comp->lc_domain,
+		                                               video_rect_getxdim(&result->lw_attr.vwa_rect),
+		                                               video_rect_getydim(&result->lw_attr.vwa_rect),
+		                                               &comp->lc_nalpha_format,
+		                                               VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result->lw_background)
 			goto err_unlock_r_overlay_content_display;
 	} else {
@@ -1997,10 +2025,10 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		} else {
 			/* Use a regular non-alpha buffer */
 			REF struct video_buffer *content;
-			content = video_buffer_create(comp->lc_vidtyp,
-			                              video_rect_getxdim(&result->lw_attr.vwa_rect),
-			                              video_rect_getydim(&result->lw_attr.vwa_rect),
-			                              comp->lc_nalpha_codec, comp->lc_palette);
+			content = video_domain_newbuffer(comp->lc_domain,
+			                                 video_rect_getxdim(&result->lw_attr.vwa_rect),
+			                                 video_rect_getydim(&result->lw_attr.vwa_rect),
+			                                 &comp->lc_nalpha_format, content_alloc_flags);
 			if unlikely(!content)
 				goto err_unlock_r_overlay;
 			result->lw_content = content;
@@ -2008,7 +2036,8 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 	}
 
 	/* Fill in remaining (control) fields */
-	result->vd_ops = &_local_window_ops()->vwo_display;
+	result->vd_domain = comp->lc_domain;
+	result->vd_ops    = &_local_window_ops()->vwo_display;
 	result->vd_refcnt = 1;
 	result->vw_compositor = comp; /* reference is created later... */
 
@@ -2198,9 +2227,11 @@ add_alpha(struct video_codec const *__restrict codec) {
 PRIVATE ATTR_INOUT(1) void CC
 local_compositor_updatebuffercaches(struct local_compositor *__restrict me) {
 	struct video_buffer *buffer = me->lc_buffer;
-	me->lc_palette      = buffer->vb_format.vf_pal;
-	me->lc_nalpha_codec = buffer->vb_format.vf_codec;
-	me->lc_yalpha_codec = add_alpha(me->lc_nalpha_codec);
+	me->lc_domain                 = buffer->vb_domain;
+	me->lc_nalpha_format.vf_codec = buffer->vb_format.vf_codec;
+	me->lc_nalpha_format.vf_pal   = buffer->vb_format.vf_pal;
+	me->lc_yalpha_format.vf_codec = add_alpha(buffer->vb_format.vf_codec);
+	me->lc_yalpha_format.vf_pal   = buffer->vb_format.vf_pal;
 
 	/* Generate new (pre-cached) GFX contexts */
 	DBG_memset(&me->lc_buffer_gfx_write, 0xcc, sizeof(me->lc_buffer_gfx_write));
@@ -2422,10 +2453,11 @@ local_compositor_setfeatures(struct video_compositor *__restrict self,
 			assert(LIST_ISBOUND(pt_window, lw_passthru));
 			local_window_assert(pt_window);
 			assert(!pt_window->lw_display); /* Temporarily store new video buffers here */
-			newbuf = video_buffer_create(me->lc_vidtyp,
-			                             video_rect_getxdim(&pt_window->lw_attr.vwa_rect),
-			                             video_rect_getydim(&pt_window->lw_attr.vwa_rect),
-			                             me->lc_nalpha_codec, me->lc_palette);
+			newbuf = video_domain_newbuffer(me->lc_domain,
+			                                video_rect_getxdim(&pt_window->lw_attr.vwa_rect),
+			                                video_rect_getydim(&pt_window->lw_attr.vwa_rect),
+			                                &me->lc_nalpha_format,
+			                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 			if unlikely(!newbuf) {
 				struct local_window *rollback;
 				LIST_FOREACH (rollback, &me->lc_passthru, lw_passthru) {
@@ -2609,8 +2641,9 @@ libvideo_compositor_create(struct video_display *__restrict display,
 	result = (REF struct local_compositor *)malloc(sizeof(struct local_compositor));
 	if unlikely(!result)
 		goto err_buffer;
-	result->lc_a1_codec = video_codec_lookup(VIDEO_CODEC_A1_MSB);
-	if unlikely(!result->lc_a1_codec) {
+	result->lc_a1_format.vf_pal = NULL;
+	result->lc_a1_format.vf_codec = video_codec_lookup(VIDEO_CODEC_A1_MSB);
+	if unlikely(!result->lc_a1_format.vf_codec) {
 		errno = ENODEV;
 		goto err_buffer;
 	}
@@ -2627,7 +2660,6 @@ libvideo_compositor_create(struct video_display *__restrict display,
 	TAILQ_INIT(&result->lc_zorder_visi);
 	result->lc_background = background;
 	result->lc_features = features;
-	result->lc_vidtyp = VIDEO_BUFFER_AUTO; /* TODO: Make this configurable */
 	return result;
 err_buffer:
 	video_buffer_decref(buffer);

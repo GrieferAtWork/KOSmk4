@@ -112,10 +112,11 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame) {
 	result = (REF struct oneframe_anim *)malloc(sizeof(struct oneframe_anim));
 	if unlikely(!result)
 		goto err;
-	result->va_refcnt = 1;
 	result->va_ops    = _oneframe_anim_ops();
-	result->va_xdim = frame->vb_xdim;
-	result->va_ydim = frame->vb_ydim;
+	result->va_domain = frame->vb_domain;
+	result->va_xdim   = frame->vb_xdim;
+	result->va_ydim   = frame->vb_ydim;
+	result->va_refcnt = 1;
 	result->ofa_frame = frame;
 	video_buffer_incref(frame);
 	return result;
@@ -135,13 +136,12 @@ struct cached_frame {
 };
 
 struct cached_anim: video_anim {
-	struct shared_lock       ca_lock;    /* Lock for the cache */
-	video_anim_frame_id      ca_framec;  /* [if(!ca_base, [>= 1])][const_if(!ca_base)][lock(ca_lock)] # of cached frames */
-	struct cached_frame     *ca_framev;  /* [0..ca_framec][const_if(!ca_base)][owned][lock(ca_lock)] # Cached frames */
-	struct video_format      ca_fmt;     /* [lock(ca_lock)] Video format override for caches (unused when `.vf_codec' is `NULL') */
-	REF struct video_anim   *ca_base;    /* [0..1][lock(WRITE(ca_lock && CLEAR_ONCE), READ(ca_lock || ATOMIC))] Base animation, or "NULL" once fully cached */
-	REF struct video_buffer *ca_bbuf;    /* [0..1][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
-	unsigned int             ca_type;    /* [const] Type of buffer used by caches */
+	struct shared_lock       ca_lock;   /* Lock for the cache */
+	video_anim_frame_id      ca_framec; /* [if(!ca_base, [>= 1])][const_if(!ca_base)][lock(ca_lock)] # of cached frames */
+	struct cached_frame     *ca_framev; /* [0..ca_framec][const_if(!ca_base)][owned][lock(ca_lock)] # Cached frames */
+	struct video_format      ca_fmt;    /* [lock(ca_lock)] Video format override for caches (unused when `.vf_codec' is `NULL') */
+	REF struct video_anim   *ca_base;   /* [0..1][lock(WRITE(ca_lock && CLEAR_ONCE), READ(ca_lock || ATOMIC))] Base animation, or "NULL" once fully cached */
+	REF struct video_buffer *ca_bbuf;   /* [0..1][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
 };
 
 PRIVATE NONNULL((1)) void CC
@@ -199,8 +199,7 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 	frame_format = &me->ca_bbuf->vb_format;
 	if (me->ca_fmt.vf_codec)
 		frame_format = &me->ca_fmt;
-	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, frame_format->vf_codec,
-	                                                  frame_format->vf_pal, me->ca_type);
+	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, me->va_domain, frame_format);
 	if unlikely(!frame->cf_frame)
 		goto err_lock_frame_bbuf;
 
@@ -332,8 +331,7 @@ return_next_cached_frame:
 	frame_format = &me->ca_bbuf->vb_format;
 	if (me->ca_fmt.vf_codec)
 		frame_format = &me->ca_fmt;
-	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, frame_format->vf_codec,
-	                                                  frame_format->vf_pal, me->ca_type);
+	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, me->va_domain, frame_format);
 	if unlikely(!frame->cf_frame) {
 		/* Failed to convert frame -> must reset output
 		 * buffer since it's not 1 frame too far  ahead */
@@ -380,24 +378,18 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_anim_ops *CC _cached_anim_ops(void)
 
 /* Return  a wrapper  for `self'  that caches  animation frames during
  * the first loop, and simply replays them during any subsequent loop.
- * @param: codec:   When non-null,  animation frames  are converted  into
- *                  this pixel format, rather than being copied verbatim.
- * @param: palette: Used with `codec' (if non-NULL)
- * @param: type:    The type of video buffer to use for cached images. */
+ * @param: format: When non-null,  animation frames  are converted  into
+ *                 this pixel format, rather than being copied verbatim.
+ * @param: type:   The type of video buffer to use for cached images. */
 DEFINE_PUBLIC_ALIAS(video_anim_cached, libvideo_anim_cached);
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) REF struct video_anim *CC
+INTERN WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) REF struct video_anim *CC
 libvideo_anim_cached(struct video_anim *__restrict self,
-                     struct video_codec const *codec,
-                     struct video_palette *palette,
-                     unsigned int type) {
+                     struct video_format const *format) {
 	REF struct cached_anim *result;
-	if (codec && !(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-		palette = NULL;
-
 	if (self->va_ops == &cached_anim_ops) {
 		/* Check for special case: `self' is already cached and uses a compatible format */
 		struct cached_anim *me = (struct cached_anim *)self;
-		if (!codec && (type == VIDEO_BUFFER_AUTO || me->ca_type == type)) {
+		if (!format) {
 			video_anim_incref(me);
 			return me;
 		}
@@ -407,18 +399,14 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		REF struct video_buffer *converted;
 		struct oneframe_anim *me = (struct oneframe_anim *)self;
 		struct video_buffer *frame = me->ofa_frame;
-		if (codec == NULL)
-			codec = frame->vb_format.vf_codec;
-		if (palette == NULL)
-			palette = frame->vb_format.vf_pal;
-		if (frame->vb_format.vf_codec == codec &&
-		    frame->vb_format.vf_pal == palette &&
-		    (type == VIDEO_BUFFER_AUTO || (type == VIDEO_BUFFER_RAM &&
-		                                   frame->vb_ops == &rambuffer_ops))) {
+		if (format == NULL)
+			format = &frame->vb_format;
+		if (frame->vb_format.vf_codec == format->vf_codec &&
+		    frame->vb_format.vf_pal == format->vf_pal) {
 			video_anim_incref(me);
 			return me;
 		}
-		converted = libvideo_buffer_convert(frame, codec, palette, type);
+		converted = libvideo_buffer_convert(frame, me->va_domain, format);
 		if unlikely(!converted)
 			goto err;
 		oneframe_result = libvideo_anim_fromframe(converted);
@@ -429,25 +417,24 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 	result = (REF struct cached_anim *)malloc(sizeof(struct cached_anim));
 	if unlikely(!result)
 		goto err;
-	result->va_refcnt = 1;
+	result->va_domain = self->va_domain;
 	result->va_ops    = _cached_anim_ops();
-	result->va_xdim = self->va_xdim;
-	result->va_ydim = self->va_ydim;
+	result->va_xdim   = self->va_xdim;
+	result->va_ydim   = self->va_ydim;
+	result->va_refcnt = 1;
 	shared_lock_init(&result->ca_lock);
 	result->ca_framec = 0;
 	result->ca_framev = NULL;
 	result->ca_fmt.vf_codec = NULL;
 	result->ca_fmt.vf_pal   = NULL;
-	if (codec) {
-		if (palette)
-			video_palette_incref(palette);
-		result->ca_fmt.vf_codec = codec;
-		result->ca_fmt.vf_pal   = palette;
+	if (format) {
+		if (format->vf_pal)
+			video_palette_incref(format->vf_pal);
+		result->ca_fmt = *format;
 	}
 	video_anim_incref(self);
 	result->ca_base = self;
 	result->ca_bbuf = NULL;
-	result->ca_type = type;
 	return result;
 err:
 	return NULL;

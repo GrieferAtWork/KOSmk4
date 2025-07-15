@@ -150,14 +150,13 @@ static ATTR_UNUSED REF struct video_buffer *
 palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int method) {
 	struct video_gfx gfx;
 	struct video_gfx result_gfx;
-	REF struct video_palette *pal;
 	REF struct video_buffer *result;
-	struct video_codec const *result_codec;
+	struct video_format result_format;
 	video_codec_t result_codec_id;
 
 	/* Create palette with the requested # of colors */
-	pal = video_palette_create(num_colors);
-	if unlikely(!pal)
+	result_format.vf_pal = video_palette_create(num_colors);
+	if unlikely(!result_format.vf_pal)
 		goto err;
 
 	/* Acquire GFX context for source video buffer */
@@ -166,9 +165,9 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	                    VIDEO_GFX_F_NORMAL, 0);
 
 	/* Palettize source video buffer and store results in "pal" */
-	if unlikely(video_gfx_palettize(&gfx, num_colors, pal->vp_pal, method))
+	if unlikely(video_gfx_palettize(&gfx, num_colors, result_format.vf_pal->vp_pal, method))
 		goto err_pal;
-	pal = video_palette_optimize(pal);
+	result_format.vf_pal = video_palette_optimize(result_format.vf_pal);
 
 	/* Figure out appropriate codec for result buffer */
 	if (num_colors <= 2) {
@@ -180,18 +179,19 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 	} else {
 		result_codec_id = VIDEO_CODEC_P8;
 	}
-	result_codec = video_codec_lookup(result_codec_id);
-	if unlikely(!result_codec)
+	result_format.vf_codec = video_codec_lookup(result_codec_id);
+	if unlikely(!result_format.vf_codec)
 		goto err_pal;
 
 	/* Allocate result buffer */
-	result = video_buffer_create(VIDEO_BUFFER_AUTO,
-	                             video_gfx_getclipw(&gfx),
-	                             video_gfx_getcliph(&gfx),
-	                             result_codec, pal);
+	result = video_domain_newbuffer(self->vb_domain,
+	                                video_gfx_getclipw(&gfx),
+	                                video_gfx_getcliph(&gfx),
+	                                &result_format,
+	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+	video_palette_decref(result_format.vf_pal);
 	if unlikely(!result)
-		goto err_pal;
-	video_palette_decref(pal);
+		goto err;
 
 	/* Blit source GFX context onto result video_buffer. */
 	video_buffer_getgfx(result, &result_gfx,
@@ -205,7 +205,7 @@ palettize(struct video_buffer *self, video_pixel_t num_colors, unsigned int meth
 err_pal_r:
 	video_buffer_decref(result);*/
 err_pal:
-	video_palette_decref(pal);
+	video_palette_decref(result_format.vf_pal);
 err:
 	return NULL;
 }
@@ -643,7 +643,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	/* Load the named file as a video buffer. */
-	anim = video_anim_open(argv[1]);
+	anim = video_anim_open(bscreen->vb_domain, argv[1]);
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to open image");
 

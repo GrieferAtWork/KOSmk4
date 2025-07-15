@@ -97,6 +97,8 @@ struct video_window_ops {
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) int
 	(LIBVIDEO_COMPOSITOR_CC *vwo_setposition)(struct video_window *__restrict __self,
 	                                          struct video_window_position const *__restrict __position);
+
+	/* TODO: Expand with event handling functionality (User input, but also window events) */
 };
 
 

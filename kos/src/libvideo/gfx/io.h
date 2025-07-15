@@ -63,14 +63,16 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_mopen(void const *blob, size_t blob_size);
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_fopen(FILE *__restrict fp);
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_fdopen(fd_t fd);
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open(char const *filename);
+INTDEF WUNUSED ATTR_INS(2, 3) NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_mopen(struct video_domain const *__restrict domain,
+                      void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp);
+INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_fdopen(struct video_domain const *__restrict domain, fd_t fd);
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_open(struct video_domain const *__restrict domain,
+                     char const *filename);
 
 
 /* Do the inverse of `video_buffer_*open' and save the contents of a video buffer
@@ -125,14 +127,16 @@ libvideo_gfx_save(struct video_gfx const *self, char const *filename,
  * If the specified blob isn't for an animated video format, the file  is
  * instead opened using `video_buffer_open()', and the returned animation
  * will only have a single frame. */
-INTDEF WUNUSED REF struct video_anim *CC
-libvideo_anim_mopen(void const *blob, size_t blob_size);
-INTDEF WUNUSED REF struct video_anim *CC
-libvideo_anim_fopen(FILE *__restrict fp);
-INTDEF WUNUSED REF struct video_anim *CC
-libvideo_anim_fdopen(fd_t fd);
-INTDEF WUNUSED REF struct video_anim *CC
-libvideo_anim_open(char const *filename);
+INTDEF WUNUSED ATTR_INS(2, 3) NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_mopen(struct video_domain const *__restrict domain,
+                    void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_anim *CC
+libvideo_anim_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp);
+INTDEF WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_fdopen(struct video_domain const *__restrict domain, fd_t fd);
+INTDEF WUNUSED NONNULL((1, 2)) REF struct video_anim *CC
+libvideo_anim_open(struct video_domain const *__restrict domain,
+                   char const *filename);
 
 DECL_END
 

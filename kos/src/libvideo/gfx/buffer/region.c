@@ -47,6 +47,7 @@
 
 #include "../buffer.h"
 #include "../gfx-empty.h"
+#include "../ramdomain.h"
 #include "gfx.h"
 #include "region.h"
 #include "utils.h"
@@ -1323,6 +1324,7 @@ libvideo_buffer_region_impl(struct video_buffer *__restrict self,
 			video_palette_incref(result->vb_format.vf_pal);
 		result->vb_xdim = rect->vr_xdim;
 		result->vb_ydim = rect->vr_ydim;
+		result->vb_domain = video_buffer_domain_for_wrapper(self);
 		result->vb_refcnt = 1;
 		video_buffer_incref(self);
 		result->brb_base = self;
@@ -1364,6 +1366,7 @@ libvideo_buffer_region_impl(struct video_buffer *__restrict self,
 			video_palette_incref(result->vb_format.vf_pal);
 		result->vb_xdim = rect->vr_xdim;
 		result->vb_ydim = rect->vr_ydim;
+		result->vb_domain = video_buffer_domain_for_wrapper(self);
 		result->vb_refcnt = 1;
 		video_buffer_incref(self);
 		result->srb_base = self;

@@ -17,41 +17,56 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_DISPLAY_H
-#define GUARD_LIBVIDEO_GFX_DISPLAY_H 1
+#ifndef _LIBVIDEO_MONITOR_MONITOR_H
+#define _LIBVIDEO_MONITOR_MONITOR_H 1
 
 #include "api.h"
-/**/
 
-#include <hybrid/compiler.h>
+#include <__stdinc.h>
 
 #include <libvideo/gfx/display.h>
 
-DECL_BEGIN
+__DECL_BEGIN
 
-/* "libvideo-gfx" only supplies  the dummy wrapper  impl for video  displays.
- * The proper (big) impls of "video_display" are provided by other libraries:
- * - video_window:  libvideo-compositor
- * - video_monitor: libvideo-driver
- */
+#ifdef __CC__
 
-struct dummy_display: video_display {
-	REF struct video_buffer *dd_buffer; /* [1..1][const] Buffer used to drive this dummy display */
+struct video_monitor_mode {
+	video_dim_t           vmm_xres; /* Resolution in X */
+	video_dim_t           vmm_yres; /* Resolution in Y */
+	__UINT_LEAST16_TYPE__ vmm_hz;   /* Refresh rate (frames per second) */
+	__SHIFT_TYPE__        vmm_bpp;  /* Color depth */
 };
 
-INTDEF struct video_display_ops dummy_display_ops;
-INTDEF ATTR_RETNONNULL WUNUSED struct video_display_ops *CC _dummy_display_ops(void);
+/* TODO: `struct video_domain': allocator for `struct video_buffer' (including custom operators if needed) */
+/* TODO: `struct video_domain': generic implementation for ram-buffers */
+/* TODO: `struct video_adapter': enumerate `struct video_monitor' and extends `struct video_domain' */
 
-/* Create a video_display wrapper for a simple video buffer.
- * - `video_display_getbuffer()' always returns `buffer' and never fails
- * - `video_display_updaterect()' is a no-op
- * - `video_display_updaterects()' is a no-op
- *
- * @return: * :   The display wrapper for `buffer'
- * @return: NULL: [errno=ENOMEM] Out of memory. */
-INTDEF WUNUSED ATTR_INOUT(1) REF struct video_display *CC
-libvideo_display_forbuffer(struct video_buffer *__restrict buffer);
+struct video_monitor_ops {
+	struct video_display_ops vmo_display; /* Display operators */
 
-DECL_END
+//TODO:	/* Get the currently set video mode */
+//TODO:	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
+//TODO:	(LIBVIDEO_DRIVER_CC *vmo_getmode)(struct video_monitor *__restrict __self,
+//TODO:	                                  struct video_monitor_mode *__restrict __mode);
+//TODO:
+//TODO:	/* Set a new video mode () */
+//TODO:	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
+//TODO:	(LIBVIDEO_DRIVER_CC *vmo_setmode)(struct video_monitor *__restrict __self,
+//TODO:	                                  struct video_monitor_mode *__restrict __mode);
+};
 
-#endif /* !GUARD_LIBVIDEO_GFX_DISPLAY_H */
+struct video_monitor
+#ifdef __cplusplus
+    : video_display
+#endif /* __cplusplus */
+{
+};
+
+
+
+
+#endif /* __CC__ */
+
+__DECL_END
+
+#endif /* !_LIBVIDEO_MONITOR_MONITOR_H */

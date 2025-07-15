@@ -50,6 +50,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/buffer.h>
 
 #include "anim.h"
+#include "buffer.h"
 #include "buffer/gfx.h"
 #include "buffer/lockable.h"
 #include "io-utils.h"
@@ -101,41 +102,71 @@ frame2anim(REF struct video_buffer *frame) {
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_fmt(void const *blob, size_t blob_size,
-                         struct mapfile *p_mapfile, enum filefmt fmt) {
-	switch (fmt) {
-	case FMT_PNG:
-		return libvideo_buffer_open_png(blob, blob_size);
-	case FMT_JPG:
-		return libvideo_buffer_open_jpg(blob, blob_size);
-	case FMT_BMP:
-		return libvideo_buffer_open_bmp(blob, blob_size, p_mapfile);
-	case FMT_GIF:
-		return anim2frame(libvideo_anim_open_gif(blob, blob_size, p_mapfile));
-	default: break;
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+convert_to_wanted_domain(struct video_domain const *__restrict domain,
+                         /*inherit(always)*/ REF struct video_buffer *__restrict self) {
+	if unlikely(self->vb_domain != domain) {
+		REF struct video_buffer *converted;
+		struct video_format result_format;
+		result_format.vf_codec = video_domain_fitting_codec(domain, self->vb_format.vf_codec);
+		result_format.vf_pal   = self->vb_format.vf_pal;
+		converted = libvideo_buffer_convert(self, domain, &result_format);
+		video_buffer_decref(self);
+		self = converted;
 	}
-	errno = ENOTSUP;
-	return NULL;
+	return self;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED REF struct video_anim *CC
-libvideo_anim_open_fmt(void const *blob, size_t blob_size,
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) ATTR_INS(2, 3) REF struct video_buffer *CC
+libvideo_buffer_open_fmt(struct video_domain const *__restrict domain,
+                         void const *blob, size_t blob_size,
+                         struct mapfile *p_mapfile, enum filefmt fmt) {
+	REF struct video_buffer *result;
+	switch (fmt) {
+	case FMT_PNG:
+		result = libvideo_buffer_open_png(domain, blob, blob_size);
+		break;
+	case FMT_JPG:
+		result = libvideo_buffer_open_jpg(domain, blob, blob_size);
+		break;
+	case FMT_BMP:
+		result = libvideo_buffer_open_bmp(domain, blob, blob_size, p_mapfile);
+		break;
+	case FMT_GIF:
+		result = anim2frame(libvideo_anim_open_gif(domain, blob, blob_size, p_mapfile));
+		break;
+	default:
+		errno = ENOTSUP;
+		return NULL;
+	}
+	result = convert_to_wanted_domain(domain, result);
+	return result;
+}
+
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
+                       void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile, enum filefmt fmt) {
+	REF struct video_buffer *frame;
 	switch (fmt) {
 	case FMT_PNG:
 		/* TODO: Use the (now-apng-patched) libpng to support animated PNG files */
-		return frame2anim(libvideo_buffer_open_png(blob, blob_size));
+		frame = libvideo_buffer_open_png(domain, blob, blob_size);
+		break;
 	case FMT_JPG:
-		return frame2anim(libvideo_buffer_open_jpg(blob, blob_size));
+		frame = libvideo_buffer_open_jpg(domain, blob, blob_size);
+		break;
 	case FMT_BMP:
-		return frame2anim(libvideo_buffer_open_bmp(blob, blob_size, p_mapfile));
+		frame = libvideo_buffer_open_bmp(domain, blob, blob_size, p_mapfile);
+		break;
 	case FMT_GIF:
-		return libvideo_anim_open_gif(blob, blob_size, p_mapfile);
-	default: break;
+		return libvideo_anim_open_gif(domain, blob, blob_size, p_mapfile);
+	default:
+		errno = ENOTSUP;
+		return NULL;
 	}
-	errno = ENOTSUP;
-	return NULL;
+	frame = convert_to_wanted_domain(domain, frame);
+	return frame2anim(frame);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) int CC
@@ -164,6 +195,9 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 	 * buffer not supporting that  function (where the underlying  buffer's
 	 * rlock() would have failed, allocate a heap buffer, and use GFX pixel
 	 * reads to read pixel data into a temporary buffer) */
+
+	/* TODO: Don't do this here -- if the I/O backend converts the buffer to
+	 *       a different pixel format first, then locking might fail  again. */
 	int result;
 	struct lockable_buffer lockable;
 	self   = libvideo_buffer_lockable_init(&lockable, self);
@@ -174,15 +208,16 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 
 
 
-PRIVATE ATTR_NOINLINE WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_impl(void const *blob, size_t blob_size,
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) ATTR_INS(2, 3) REF struct video_buffer *CC
+libvideo_buffer_open_impl(struct video_domain const *__restrict domain,
+                          void const *blob, size_t blob_size,
                           char const *format_hint, struct mapfile *p_mapfile) {
 	REF struct video_buffer *result;
 	enum filefmt used_format, hinted_format = FMT_BAD;
 	if (format_hint != NULL) {
 		hinted_format = filefmt_detect(format_hint);
 		if (hinted_format != FMT_BAD) {
-			result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, hinted_format);
+			result = libvideo_buffer_open_fmt(domain, blob, blob_size, p_mapfile, hinted_format);
 			if (result != VIDEO_BUFFER_WRONG_FMT)
 				return result;
 		}
@@ -192,7 +227,7 @@ libvideo_buffer_open_impl(void const *blob, size_t blob_size,
 	     used_format = (enum filefmt)((unsigned int)used_format + 1)) {
 		if (used_format == hinted_format)
 			continue; /* Already tried this one... */
-		result = libvideo_buffer_open_fmt(blob, blob_size, p_mapfile, used_format);
+		result = libvideo_buffer_open_fmt(domain, blob, blob_size, p_mapfile, used_format);
 		if (result != VIDEO_BUFFER_WRONG_FMT)
 			return result;
 	}
@@ -201,15 +236,16 @@ libvideo_buffer_open_impl(void const *blob, size_t blob_size,
 	return NULL;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED REF struct video_anim *CC
-libvideo_anim_open_impl(void const *blob, size_t blob_size,
+PRIVATE ATTR_NOINLINE ATTR_INS(2, 3) NONNULL((1)) WUNUSED REF struct video_anim *CC
+libvideo_anim_open_impl(struct video_domain const *__restrict domain,
+                        void const *blob, size_t blob_size,
                         char const *format_hint, struct mapfile *p_mapfile) {
 	REF struct video_anim *result;
 	enum filefmt used_format, hinted_format = FMT_BAD;
 	if (format_hint != NULL) {
 		hinted_format = filefmt_detect(format_hint);
 		if (hinted_format != FMT_BAD) {
-			result = libvideo_anim_open_fmt(blob, blob_size, p_mapfile, hinted_format);
+			result = libvideo_anim_open_fmt(domain, blob, blob_size, p_mapfile, hinted_format);
 			if (result != VIDEO_ANIM_WRONG_FMT)
 				return result;
 		}
@@ -219,7 +255,7 @@ libvideo_anim_open_impl(void const *blob, size_t blob_size,
 	     used_format = (enum filefmt)((unsigned int)used_format + 1)) {
 		if (used_format == hinted_format)
 			continue; /* Already tried this one... */
-		result = libvideo_anim_open_fmt(blob, blob_size, p_mapfile, used_format);
+		result = libvideo_anim_open_fmt(domain, blob, blob_size, p_mapfile, used_format);
 		if (result != VIDEO_ANIM_WRONG_FMT)
 			return result;
 	}
@@ -242,38 +278,39 @@ libvideo_buffer_save_impl(struct video_buffer *__restrict self,
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */
 DEFINE_PUBLIC_ALIAS(video_buffer_mopen, libvideo_buffer_mopen);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_mopen(void const *blob, size_t blob_size) {
-	return libvideo_buffer_open_impl(blob, blob_size, NULL, NULL);
+INTERN WUNUSED ATTR_INS(2, 3) NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_mopen(struct video_domain const *__restrict domain,
+                      void const *blob, size_t blob_size) {
+	return libvideo_buffer_open_impl(domain, blob, blob_size, NULL, NULL);
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_fopen, libvideo_buffer_fopen);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_fopen(FILE *__restrict fp) {
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp) {
 	struct mapfile mf;
 	REF struct video_buffer *result;
 	if (ffmapfile(&mf, fp, 0, 0, (size_t)-1, 0, 0))
 		return NULL;
-	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
+	result = libvideo_buffer_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_fdopen, libvideo_buffer_fdopen);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_fdopen(fd_t fd) {
+INTERN WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_fdopen(struct video_domain const *__restrict domain, fd_t fd) {
 	struct mapfile mf;
 	REF struct video_buffer *result;
 	if (fmapfile(&mf, fd, 0, 0, (size_t)-1, 0, 0))
 		return NULL;
-	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
+	result = libvideo_buffer_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(video_buffer_open, libvideo_buffer_open);
-INTERN WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open(char const *filename) {
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+libvideo_buffer_open(struct video_domain const *__restrict domain, char const *filename) {
 	struct mapfile mf;
 	char const *format_hint;
 	REF struct video_buffer *result;
@@ -283,7 +320,7 @@ libvideo_buffer_open(char const *filename) {
 	format_hint = strrchr(filename, '.');
 	if (format_hint)
 		++format_hint;
-	result = libvideo_buffer_open_impl(mf.mf_addr, mf.mf_size, format_hint, &mf);
+	result = libvideo_buffer_open_impl(domain, mf.mf_addr, mf.mf_size, format_hint, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
@@ -412,38 +449,39 @@ libvideo_gfx_save(struct video_gfx const *self, char const *filename,
  * instead opened using `video_buffer_open()', and the returned animation
  * will only have a single frame. */
 DEFINE_PUBLIC_ALIAS(video_anim_mopen, libvideo_anim_mopen);
-INTERN WUNUSED REF struct video_anim *CC
-libvideo_anim_mopen(void const *blob, size_t blob_size) {
-	return libvideo_anim_open_impl(blob, blob_size, NULL, NULL);
+INTERN WUNUSED ATTR_INS(2, 3) NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_mopen(struct video_domain const *__restrict domain,
+                    void const *blob, size_t blob_size) {
+	return libvideo_anim_open_impl(domain, blob, blob_size, NULL, NULL);
 }
 
 DEFINE_PUBLIC_ALIAS(video_anim_fopen, libvideo_anim_fopen);
-INTERN WUNUSED REF struct video_anim *CC
-libvideo_anim_fopen(FILE *__restrict fp) {
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_anim *CC
+libvideo_anim_fopen(struct video_domain const *__restrict domain, FILE *__restrict fp) {
 	struct mapfile mf;
 	REF struct video_anim *result;
 	if (ffmapfile(&mf, fp, 0, 0, (size_t)-1, 0, 0))
 		return NULL;
-	result = libvideo_anim_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
+	result = libvideo_anim_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(video_anim_fdopen, libvideo_anim_fdopen);
-INTERN WUNUSED REF struct video_anim *CC
-libvideo_anim_fdopen(fd_t fd) {
+INTERN WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_fdopen(struct video_domain const *__restrict domain, fd_t fd) {
 	struct mapfile mf;
 	REF struct video_anim *result;
 	if (fmapfile(&mf, fd, 0, 0, (size_t)-1, 0, 0))
 		return NULL;
-	result = libvideo_anim_open_impl(mf.mf_addr, mf.mf_size, NULL, &mf);
+	result = libvideo_anim_open_impl(domain, mf.mf_addr, mf.mf_size, NULL, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(video_anim_open, libvideo_anim_open);
-INTERN WUNUSED REF struct video_anim *CC
-libvideo_anim_open(char const *filename) {
+INTERN WUNUSED NONNULL((1, 2)) REF struct video_anim *CC
+libvideo_anim_open(struct video_domain const *__restrict domain, char const *filename) {
 	struct mapfile mf;
 	char const *format_hint;
 	REF struct video_anim *result;
@@ -453,7 +491,7 @@ libvideo_anim_open(char const *filename) {
 	format_hint = strrchr(filename, '.');
 	if (format_hint)
 		++format_hint;
-	result = libvideo_anim_open_impl(mf.mf_addr, mf.mf_size, format_hint, &mf);
+	result = libvideo_anim_open_impl(domain, mf.mf_addr, mf.mf_size, format_hint, &mf);
 	(void)unmapfile(&mf);
 	return result;
 }

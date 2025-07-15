@@ -94,35 +94,15 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
 
 
 
-/* Convert `self' into the specified format.
- * @param: type: The type of buffer to-be returned (one of `VIDEO_BUFFER_*'). */
-INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+/* Convert `self' into the specified domain and format. */
+INTDEF WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert(struct video_buffer *__restrict self,
-                        struct video_codec const *codec,
-                        struct video_palette *palette,
-                        unsigned int type);
-
-/* Same as `video_buffer_convert()', but always return a distinct buffer, even if formats match */
-INTDEF WUNUSED NONNULL((1, 2)) REF struct video_buffer *CC
+                        struct video_domain const *domain,
+                        struct video_format const *format);
+INTDEF WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert_or_copy(struct video_buffer *__restrict self,
-                                struct video_codec const *codec,
-                                struct video_palette *palette,
-                                unsigned int type);
-
-/* Create a video buffer, or return NULL and set errno if creation failed.
- * NOTE: When the given `size_x' or `size_y' is ZERO(0), an empty buffer is returned
- *       which may not necessarily use the  given, or default `codec' and  `palette'
- * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
- * @param: palette: The palette to use (only needed if used by `codec') */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_create(unsigned int type, video_dim_t size_x, video_dim_t size_y,
-                       struct video_codec const *codec, struct video_palette *palette);
-
-/* Return the preferred video format.
- * If  possible, this format will match the format used by the host's graphics card.
- * If no graphics card exists, or the card isn't clear on its preferred format, some
- * other, common format will be returned instead. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_format const *CC libvideo_preferred_format(void);
+                                struct video_domain const *domain,
+                                struct video_format const *format);
 
 DECL_END
 

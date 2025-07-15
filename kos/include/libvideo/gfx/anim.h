@@ -51,7 +51,9 @@
 __DECL_BEGIN
 
 struct video_buffer;
+struct video_domain;
 struct video_anim;
+
 typedef __uint32_t video_anim_frame_id;
 
 struct video_anim_frameinfo {
@@ -161,6 +163,7 @@ struct video_anim_ops {
 
 struct video_anim {
 	struct video_anim_ops const *va_ops;    /* [1..1][const] Video animation operators */
+	struct video_domain const   *va_domain; /* [1..1][const] Video domain */
 	video_dim_t                  va_xdim;   /* [const] X pixel dimension of animation frames */
 	video_dim_t                  va_ydim;   /* [const] Y pixel dimension of animation frames */
 	__uintptr_t                  va_refcnt; /* Reference counter. */
@@ -193,17 +196,15 @@ video_anim_fromframe(struct video_buffer *__restrict __frame);
 
 /* Return a wrapper for `__self'  that caches animation frames  during
  * the first loop, and simply replays them during any subsequent loop.
- * @param: __codec:   When non-null,  animation frames  are converted  into
- *                    this pixel format, rather than being copied verbatim.
- * @param: __palette: Used with `__codec' (if non-NULL)
- * @param: __type:    The type of video buffer to use for cached images. */
-typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_OPT_T(2) __ATTR_IN_OPT_T(3) __REF struct video_anim *
-(LIBVIDEO_GFX_CC *PVIDEO_ANIM_CACHED)(struct video_anim *__restrict __self, struct video_codec const *__codec,
-                                      struct video_palette *__palette, unsigned int __type);
+ * @param: __format: When non-null,  animation frames  are converted  into
+ *                   this pixel format, rather than being copied verbatim.
+ * @param: __type:   The type of video buffer to use for cached images. */
+typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_OPT_T(2) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_CACHED)(struct video_anim *__restrict __self,
+                                      struct video_format const *__format);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(2) __ATTR_IN_OPT(3) __REF struct video_anim *LIBVIDEO_GFX_CC
-video_anim_cached(struct video_anim *__restrict __self, struct video_codec const *__codec,
-                  struct video_palette *__palette, unsigned int __type);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN_OPT(2) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_cached(struct video_anim *__restrict __self, struct video_format const *__format);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
@@ -214,23 +215,25 @@ video_anim_cached(struct video_anim *__restrict __self, struct video_codec const
  * If the specified blob isn't for an animated video format, the file  is
  * instead opened using `video_buffer_open()', and the returned animation
  * will only have a single frame. */
-typedef __ATTR_WUNUSED_T __REF struct video_anim *
-(LIBVIDEO_GFX_CC *PVIDEO_ANIM_MOPEN)(void const *__blob, __size_t __blob_size);
-typedef __ATTR_WUNUSED_T __REF struct video_anim *
-(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FOPEN)(__FILE *__restrict __fp);
-typedef __ATTR_WUNUSED_T __REF struct video_anim *
-(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FDOPEN)(__fd_t __fd);
-typedef __ATTR_WUNUSED_T __REF struct video_anim *
-(LIBVIDEO_GFX_CC *PVIDEO_ANIM_OPEN)(char const *__filename);
+typedef __ATTR_WUNUSED_T __ATTR_INS_T(2, 3) __ATTR_NONNULL_T((1)) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_MOPEN)(struct video_domain const *__restrict __domain,
+                                     void const *__blob, __size_t __blob_size);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FOPEN)(struct video_domain const *__restrict __domain, __FILE *__restrict __fp);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_FDOPEN)(struct video_domain const *__restrict __domain, __fd_t __fd);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __REF struct video_anim *
+(LIBVIDEO_GFX_CC *PVIDEO_ANIM_OPEN)(struct video_domain const *__restrict __domain, char const *__filename);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_anim *LIBVIDEO_GFX_CC
-video_anim_mopen(void const *__blob, __size_t __blob_size);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_anim *LIBVIDEO_GFX_CC
-video_anim_fopen(__FILE *__restrict __fp);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_anim *LIBVIDEO_GFX_CC
-video_anim_fdopen(__fd_t __fd);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_anim *LIBVIDEO_GFX_CC
-video_anim_open(char const *__filename);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_mopen(struct video_domain const *__restrict __domain,
+                 void const *__blob, __size_t __blob_size);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_fopen(struct video_domain const *__restrict __domain, __FILE *__restrict __fp);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_fdopen(struct video_domain const *__restrict __domain, __fd_t __fd);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __REF struct video_anim *LIBVIDEO_GFX_CC
+video_anim_open(struct video_domain const *__restrict __domain, char const *__filename);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

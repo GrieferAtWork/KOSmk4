@@ -43,13 +43,15 @@ DECL_BEGIN
 
 
 /* PNG */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_png(void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_png(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_lodepng(void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
+                             void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
                              FILE *stream, char const *options);
@@ -57,8 +59,9 @@ libvideo_buffer_save_lodepng(struct video_buffer *__restrict self,
 
 
 /* JPG */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_jpg(void const *blob, size_t blob_size);
+INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_jpg(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
                          FILE *stream, char const *options);
@@ -70,8 +73,9 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
  *                    that the given blob is owned by this mapfile, and
  *                    is also allowed to steal that mapping by doing  a
  *                    bzero on `*p_mapfile' */
-INTDEF WUNUSED REF struct video_buffer *CC
-libvideo_buffer_open_bmp(void const *blob, size_t blob_size,
+INTDEF WUNUSED NONNULL((1)) REF struct video_buffer *CC
+libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
+                         void const *blob, size_t blob_size,
                          struct mapfile *p_mapfile);
 INTDEF WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
@@ -80,8 +84,9 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 
 
 /* GIF */
-INTDEF WUNUSED REF struct video_anim *CC
-libvideo_anim_open_gif(void const *blob, size_t blob_size,
+INTDEF WUNUSED NONNULL((1)) REF struct video_anim *CC
+libvideo_anim_open_gif(struct video_domain const *__restrict domain,
+                       void const *blob, size_t blob_size,
                        struct mapfile *p_mapfile);
 
 

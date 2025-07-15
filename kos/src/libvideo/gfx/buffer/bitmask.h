@@ -38,6 +38,8 @@
 
 DECL_BEGIN
 
+/* TODO: ALL THE STUFF IN HERE IS DEPRECATED !!! */
+
 struct video_palette2 {
 	ATTR_PURE_T WUNUSED_T ATTR_IN_T(1) video_pixel_t
 	NOTHROW_T(LIBVIDEO_CODEC_CC *vp_color2pixel)(struct video_palette const *__restrict self,
