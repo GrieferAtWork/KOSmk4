@@ -31,6 +31,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/__asm.h>
 #include <hybrid/__bitfield.h>
 #include <hybrid/align.h>
 #include <hybrid/bit.h>
@@ -38,7 +39,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
-#include <hybrid/__asm.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -52,8 +52,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
+#include <libvideo/types.h>
 
 #include "codec-specs.h"
 #include "codec-utils.h"

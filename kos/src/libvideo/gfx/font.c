@@ -41,10 +41,10 @@
 #include <string.h>
 #include <unicode.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "font.h"
 #include "fonts/tlft.h"

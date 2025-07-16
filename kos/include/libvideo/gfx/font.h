@@ -33,8 +33,8 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include <libvideo/codec/pixel.h> /* video_color_t */
-#include <libvideo/codec/types.h>
+#include "../color.h" /* video_color_t */
+#include "../types.h"
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -188,9 +188,6 @@ LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) video_dim_t LIBVIDEO_GFX_CC
 video_fontprintch(struct video_fontprinter_data *__restrict __self,
                   __CHAR32_TYPE__ __ch);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
-
-
 
 __DECL_END
 #endif /* __CC__ */

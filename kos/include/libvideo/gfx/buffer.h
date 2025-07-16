@@ -21,6 +21,7 @@
 #define _LIBVIDEO_GFX_BUFFER_H 1
 
 #include "api.h"
+/**/
 
 #include <__crt.h> /* __FILE */
 #include <__stdinc.h>
@@ -32,11 +33,11 @@
 #include <kos/refcnt.h>
 
 #include <libvideo/codec/format.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
 
-#include "gfx.h"
+#include "../color.h"
+#include "../crect.h"
 #include "blend.h"
+#include "gfx.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
@@ -58,6 +59,7 @@ struct video_gfx;
 struct video_domain;
 struct video_codec;
 struct video_palette;
+struct video_rect;
 
 
 /* Video-domain: Low-level driver interface for creation of video buffers */
@@ -140,8 +142,14 @@ struct video_domain {
 	 *
 	 * HINT: `video_ramdomain()' implements this function by always re-returning `__codec' */
 	__ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_IN_T(2) __ATTR_NONNULL_T((1)) struct video_codec const *
-	(LIBVIDEO_GFX_CC *vd_fitting_codec)(struct video_domain const *__restrict __self,
-	                                    struct video_codec const *__restrict __codec);
+	(LIBVIDEO_GFX_CC *vd_supported_codec)(struct video_domain const *__restrict __self,
+	                                      struct video_codec const *__restrict __codec);
+
+	void (*_vd_pad[11])(void); /* Reserved for future expansion */
+
+	/* TODO: Functions for creating video palettes also need to go here (so translation  data
+	 *       can be stored server-side in case of a window server, or in V-RAM so-as to speed
+	 *       up palette conversion blits) */
 };
 
 
@@ -240,8 +248,8 @@ video_domain_formem_ex(struct video_domain const *__restrict __self, video_dim_t
  *
  * HINT: `video_ramdomain()' implements this function by always re-returning `__codec' */
 extern __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_NONNULL((1)) struct video_codec const *LIBVIDEO_GFX_CC
-video_domain_fitting_codec(struct video_domain const *__restrict __self,
-                           struct video_codec const *__restrict __codec);
+video_domain_supported_codec(struct video_domain const *__restrict __self,
+                             struct video_codec const *__restrict __codec);
 #else /* __INTELLISENSE__ */
 #define video_domain_newbuffer(self, xdim, ydim, format, flags) \
 	(*(self)->vd_newbuffer)(self, xdim, ydim, format, flags)
@@ -251,8 +259,8 @@ video_domain_fitting_codec(struct video_domain const *__restrict __self,
 	(*(self)->vd_formem)(self, xdim, ydim, format, mem, stride, release_mem, release_mem_cookie, flags)
 #define video_domain_formem_ex(self, xdim, ydim, codec_specs, palette, mem, stride, release_mem, release_mem_cookie, flags) \
 	(*(self)->vd_formem_ex)(self, xdim, ydim, codec_specs, palette, mem, stride, release_mem, release_mem_cookie, flags)
-#define video_domain_fitting_codec(self, codec) \
-	(*(self)->vd_fitting_codec)(self, codec)
+#define video_domain_supported_codec(self, codec) \
+	(*(self)->vd_supported_codec)(self, codec)
 #endif /* !__INTELLISENSE__ */
 
 

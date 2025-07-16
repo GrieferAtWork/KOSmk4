@@ -34,8 +34,8 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
+#include <libvideo/types.h>
 
 #if !(DEFINE_BPP == 1 || DEFINE_BPP == 2 || DEFINE_BPP == 4)
 #error "Must '#define DEFINE_BPP' as 1, 2 or 4"

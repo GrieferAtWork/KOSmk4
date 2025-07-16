@@ -21,22 +21,20 @@
 #define _LIBVIDEO_GFX_DISPLAY_H 1
 
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
-
-#include <hybrid/typecore.h>
 
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include <libvideo/codec/types.h>
-
 #ifdef __CC__
 __DECL_BEGIN
 
-
+struct video_rect;
 struct video_display;
+
 struct video_display_ops {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 

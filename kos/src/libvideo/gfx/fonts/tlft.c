@@ -37,11 +37,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 /**/
 #include "../font.h"

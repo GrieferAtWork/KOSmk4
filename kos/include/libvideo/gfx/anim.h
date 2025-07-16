@@ -21,8 +21,10 @@
 #define _LIBVIDEO_GFX_ANIM_H 1
 
 #include "api.h"
+/**/
 
 #include <__crt.h> /* __FILE */
+
 #include <hybrid/__atomic.h>
 
 #include <bits/os/timeval.h>
@@ -30,7 +32,7 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include <libvideo/codec/types.h>
+#include "../types.h"
 
 /* TODO: Support for animations (e.g. .gif):
  * - DON'T do this the way that SDL-image does it (i.e. have 1 buffer for every frame)

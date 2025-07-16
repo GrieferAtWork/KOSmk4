@@ -26,11 +26,11 @@
 
 #include <hybrid/compiler.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/blendcolors.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "../gfx-utils.h"
 #include "../swgfx.h"

@@ -42,10 +42,10 @@
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 #include "../buffer/ram.h"
 #include "../io-utils.h"

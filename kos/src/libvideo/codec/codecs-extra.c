@@ -34,7 +34,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stddef.h>
 
 #include <libvideo/codec/codecs-extra.h>
-#include <libvideo/codec/pixel.h>
+#include <libvideo/color.h>
 
 #include "codec-utils.h"
 #include "converter.h"

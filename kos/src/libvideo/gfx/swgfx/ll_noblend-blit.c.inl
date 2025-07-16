@@ -35,10 +35,10 @@
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"

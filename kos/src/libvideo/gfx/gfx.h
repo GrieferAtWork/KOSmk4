@@ -21,14 +21,15 @@
 #define GUARD_LIBVIDEO_GFX_GFX_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <stdbool.h>
 
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

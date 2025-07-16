@@ -108,7 +108,7 @@ convert_to_wanted_domain(struct video_domain const *__restrict domain,
 	if unlikely(self->vb_domain != domain) {
 		REF struct video_buffer *converted;
 		struct video_format result_format;
-		result_format.vf_codec = video_domain_fitting_codec(domain, self->vb_format.vf_codec);
+		result_format.vf_codec = video_domain_supported_codec(domain, self->vb_format.vf_codec);
 		result_format.vf_pal   = self->vb_format.vf_pal;
 		converted = libvideo_buffer_convert(self, domain, &result_format);
 		video_buffer_decref(self);

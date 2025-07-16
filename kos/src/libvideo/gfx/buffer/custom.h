@@ -29,9 +29,8 @@
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/types.h>
-#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

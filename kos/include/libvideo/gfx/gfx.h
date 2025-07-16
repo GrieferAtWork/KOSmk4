@@ -21,6 +21,7 @@
 #define _LIBVIDEO_GFX_GFX_H 1
 
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
 
@@ -28,10 +29,10 @@
 
 #include <bits/types.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
 #include <libvideo/codec/format.h>
 
+#include "../color.h"
+#include "../types.h"
 #include "blend.h" /* gfx_blendmode_t */
 
 #ifdef __cplusplus
@@ -1007,6 +1008,35 @@ struct video_gfxhdr {
 struct video_gfx {
 	struct video_gfxhdr  vx_hdr;      /* GFX header (this part of the struct can be saved/restored in order to restore old Clip Rects) */
 	struct video_buffer *vx_buffer;   /* [1..1][const] The associated buffer. */
+	/* TODO: To get rid of "vgfo_fillmask" and "vgfo_fillstretchmask":
+	 * TLFT fonts will need to:
+	 * - load their character bitmasks using `video_domain_formem()' with:
+	 *   >> xdim = character_width
+	 *   >> ydim = num_characters * character_height
+	 *   >> codec = video_codec_lookup(VIDEO_CODEC_P1_MSB);
+	 * - render the I'th characters using:
+	 *   >> video_gfx_bitblit(dst, x, y, FONT_BUFFER, src_x: 0, src_y: I * character_height);
+	 *   But to do this render using custom colors,  there needs to be a way for doing  blits
+	 *   using custom source color palettes.
+	 * Currently, in order to do custom color blits, the font would need to re-load its entire
+	 * video buffer. Even more  general, palette-drive video buffers  should be able of  being
+	 * assigned a new video_palette **DURING** their  live-time, so just allowing a  different
+	 * palette to be used for singular GFX operations wouldn't even be enough here!
+	 *
+	 * The more I think about this, only the CODEC of a video buffer has to remain constant for
+	 * the duration of that buffer's life-time. The palette should be interchangeable as  often
+	 * as one pleases... Yet  that brings up the  problem that palettes are  reference-counted,
+	 * and yet they would **really** need to be stored in `struct video_gfx'. But I also really
+	 * don't  want to give `struct video_gfx' a finalizer, though it'd need one for the current
+	 * color palette if it couldn't rely on the associated buffer's palette remaining constant.
+	 *
+	 * ------------
+	 *
+	 * Thinking about this, the only *real* solution is to NOT have this field, but simply have
+	 * a second version of `video_blitter_bitblit()` that takes a source palette override as an
+	 * argument.
+	 */
+//	struct video_palette *vx_rdpalette; /* [0..1][(!= NULL) == (vx_buffer->vb_format.vf_pal != NULL)][const] Palette used for color reads and bitblit sources */
 	gfx_blendmode_t      vx_blend;    /* [const] Blending mode. */
 	gfx_flag_t           vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t        vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */

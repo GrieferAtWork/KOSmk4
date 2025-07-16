@@ -20,19 +20,20 @@
 #ifndef _LIBVIDEO_CODEC_FORMAT_H
 #define _LIBVIDEO_CODEC_FORMAT_H 1
 
+#include "api.h"
+/**/
+
 #include <__stdinc.h>
 
 #include <hybrid/__assert.h>
 
 #include <bits/types.h>
 
-#include "api.h"
-#include "pixel.h"
-#include "types.h"
+#include "../color.h"
+#include "../types.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
-
 #include "codecs.h"
 #endif /* __cplusplus */
 

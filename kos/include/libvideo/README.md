@@ -93,12 +93,19 @@ Descriptor for a video graphics context
 - NOT reference-counted, NO finalizer, created on-demand and usually stored on-stack
 	- State-full wrapper around linked `video_buffer`
 
+---
 
 
 
 ### Codec
 
 Library: `libvideo-codec.so` -- TODO: Merge with `libvideo-gfx.so` (one is never used without the other, so no point in splitting them)
+
+---
+
+> struct video_format { };
+
+Combination of `struct video_codec` ([1..1]) and `struct video_palette` ([0..1])
 
 ---
 

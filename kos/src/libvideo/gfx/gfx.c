@@ -28,9 +28,9 @@
 
 #include <hybrid/overflow.h>
 
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 /**/
 
 #include "gfx-empty.h"

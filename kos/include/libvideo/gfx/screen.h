@@ -21,6 +21,7 @@
 #define _LIBVIDEO_GFX_SCREEN_H 1
 
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
 
@@ -29,7 +30,7 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
-#include <libvideo/codec/types.h>
+#include "../types.h"
 
 #include "buffer.h"
 

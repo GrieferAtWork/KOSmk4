@@ -20,7 +20,7 @@
 #ifndef GUARD_LIBVIDEO_DRIVER_API_H
 #define GUARD_LIBVIDEO_DRIVER_API_H 1
 
-#include <hybrid/compiler.h>
+#include <__stdinc.h>
 
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
 

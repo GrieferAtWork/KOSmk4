@@ -32,9 +32,9 @@
 
 #include <hybrid/bit.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"

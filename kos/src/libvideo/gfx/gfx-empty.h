@@ -24,7 +24,8 @@
 /**/
 
 #include <hybrid/compiler.h>
-#include <libvideo/codec/types.h>
+
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

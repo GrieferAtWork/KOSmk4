@@ -30,7 +30,7 @@
 #include <stddef.h>
 
 #include <libvideo/codec/codecs.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

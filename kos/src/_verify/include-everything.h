@@ -1207,10 +1207,12 @@ incdir("");
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/compositor/api.h>
 #include <libvideo/compositor/compositor.h>
+#include <libvideo/crect.h>
+#include <libvideo/driver/api.h>
+#include <libvideo/driver/monitor.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
@@ -1221,6 +1223,8 @@ incdir("");
 #include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
+#include <libvideo/rect.h>
+#include <libvideo/types.h>
 #include <libvio/access.h>
 #include <libvio/api.h>
 #include <libvio/userviofd.h>

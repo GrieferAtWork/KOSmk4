@@ -27,8 +27,8 @@
 
 #include <kos/anno.h>
 
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 #include "gfx.h" /* struct subregion_buffer */
 

@@ -17,14 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_MONITOR_MONITOR_H
-#define _LIBVIDEO_MONITOR_MONITOR_H 1
+#ifndef _LIBVIDEO_DRIVER_MONITOR_H
+#define _LIBVIDEO_DRIVER_MONITOR_H 1
 
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
 
 #include <libvideo/gfx/display.h>
+
+#include "../types.h"
 
 __DECL_BEGIN
 
@@ -69,4 +72,4 @@ struct video_monitor
 
 __DECL_END
 
-#endif /* !_LIBVIDEO_MONITOR_MONITOR_H */
+#endif /* !_LIBVIDEO_DRIVER_MONITOR_H */

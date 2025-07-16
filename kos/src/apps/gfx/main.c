@@ -41,7 +41,7 @@
 #include <unicode.h>
 #include <unistd.h>
 
-#include <libvideo/codec/pixel.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>

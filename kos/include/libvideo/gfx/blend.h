@@ -21,12 +21,13 @@
 #define _LIBVIDEO_GFX_BLEND_H 1
 
 #include "api.h"
+/**/
 
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h>
 
-#include <libvideo/codec/pixel.h>
+#include "../color.h"
 
 /* Surface blend definitions. */
 #define GFX_BLENDDATA_ZERO                                   0x00 /*             0 */
@@ -190,9 +191,6 @@ __DECL_END
 /* Destination alpha mask (for use when alpha-blending together with a bitmask codec) */
 #define GFX_BLENDMODE_ALPHAMASK                 \
 	GFX_BLENDMODE(/*RGB=*/DST_ALPHA, ADD, ZERO, \
-	              /*A  =*/ONE, MUL, ONE)
-#define GFX_BLENDMODE_ONE_MINUS_ALPHAMASK                 \
-	GFX_BLENDMODE(/*RGB=*/ONE_MINUS_DST_ALPHA, ADD, ZERO, \
 	              /*A  =*/ONE, MUL, ONE)
 
 #endif /* !_LIBVIDEO_GFX_BLEND_H */

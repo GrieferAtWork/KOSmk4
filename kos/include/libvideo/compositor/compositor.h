@@ -24,15 +24,15 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/display.h>
+
+#include "../color.h"
+#include "../rect.h"
+#include "../types.h"
 
 __DECL_BEGIN
 
@@ -59,6 +59,7 @@ typedef __uint32_t video_compositor_feature_t;
 
 struct video_window_ops;
 struct video_window;
+struct video_buffer;
 struct video_compositor;
 struct video_compositor_ops;
 
@@ -106,7 +107,7 @@ struct video_window_ops {
 /* Get window attributes (position & flags)
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int LIBVIDEO_COMPOSITOR_CC
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 video_window_getattr(struct video_window *__restrict __self,
                      struct video_window_attr *__restrict __attr);
 
@@ -115,21 +116,21 @@ video_window_getattr(struct video_window *__restrict __self,
  * underlying display, using `vwo_display.vdo_getbuffer'.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) int LIBVIDEO_COMPOSITOR_CC
+extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) int
 video_window_setposition(struct video_window *__restrict __self,
                          struct video_window_position const *__restrict __position);
 
 /* s.a. `video_display_getbuffer()' */
-extern __ATTR_WUNUSED __ATTR_INOUT((1)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+extern __ATTR_WUNUSED __ATTR_INOUT((1)) __REF struct video_buffer *
 video_window_getbuffer(struct video_window *__restrict __self);
 
 /* s.a. `video_display_updaterect()' */
-extern __ATTR_INOUT(1) __ATTR_IN(2) void LIBVIDEO_GFX_CC
+extern __ATTR_INOUT(1) __ATTR_IN(2) void
 video_window_updaterect(struct video_window *__restrict __self,
                         struct video_rect const *__restrict __rect);
 
 /* s.a. `video_display_updaterects()' */
-extern __ATTR_INOUT(1) __ATTR_INS(2, 3) void LIBVIDEO_GFX_CC
+extern __ATTR_INOUT(1) __ATTR_INS(2, 3) void
 video_window_updaterects(struct video_window *__restrict __self,
                          struct video_rect const *__restrict __rects,
                          __size_t __n_rects);

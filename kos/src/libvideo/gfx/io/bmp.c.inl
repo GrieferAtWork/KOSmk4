@@ -55,9 +55,9 @@
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../buffer/ram.h"

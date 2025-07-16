@@ -49,8 +49,7 @@
 
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/compositor/compositor.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/blend.h>
@@ -58,6 +57,7 @@
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

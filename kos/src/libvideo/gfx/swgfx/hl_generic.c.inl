@@ -35,9 +35,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "../gfx-utils.h"
 #include "../swgfx.h"

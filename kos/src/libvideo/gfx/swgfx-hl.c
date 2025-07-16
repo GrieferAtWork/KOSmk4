@@ -39,8 +39,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <assert.h>
 
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "buffer/bitmask.h"
 #include "gfx-empty.h"

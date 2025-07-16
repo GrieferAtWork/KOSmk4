@@ -39,8 +39,8 @@
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 #include "buffer/ram.h"
 #include "gfx-empty.h"
@@ -283,8 +283,8 @@ err:
 }
 
 INTERN ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec const *CC
-libvideo_ramdomain_fitting_codec(struct video_domain const *__restrict self,
-                                 struct video_codec const *__restrict codec) {
+libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
+                                   struct video_codec const *__restrict codec) {
 	/* Ram buffers support *all* codecs */
 	COMPILER_IMPURE();
 	(void)self;
@@ -309,10 +309,10 @@ DEFINE_PUBLIC_ALIAS(video_ramdomain, libvideo_ramdomain);
 INTERN /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED
 struct video_domain const *CC libvideo_ramdomain(void) {
 	if unlikely(!libvideo_ramdomain_.vd_newbuffer) {
-		libvideo_ramdomain_.vd_fitting_codec = &libvideo_ramdomain_fitting_codec;
-		libvideo_ramdomain_.vd_formem_ex     = &libvideo_ramdomain_formem_ex;
-		libvideo_ramdomain_.vd_formem        = &libvideo_ramdomain_formem;
-		libvideo_ramdomain_.vd_newbuffer_ex  = &libvideo_ramdomain_newbuffer_ex;
+		libvideo_ramdomain_.vd_supported_codec = &libvideo_ramdomain_supported_codec;
+		libvideo_ramdomain_.vd_formem_ex       = &libvideo_ramdomain_formem_ex;
+		libvideo_ramdomain_.vd_formem          = &libvideo_ramdomain_formem;
+		libvideo_ramdomain_.vd_newbuffer_ex    = &libvideo_ramdomain_newbuffer_ex;
 		COMPILER_WRITE_BARRIER();
 		libvideo_ramdomain_.vd_newbuffer = &libvideo_ramdomain_newbuffer;
 		COMPILER_WRITE_BARRIER();

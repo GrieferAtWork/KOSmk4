@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_CODEC_PIXEL_H
-#define _LIBVIDEO_CODEC_PIXEL_H 1
+#ifndef _LIBVIDEO_PIXEL_H
+#define _LIBVIDEO_PIXEL_H 1
 
-#include "api.h"
+#include <__stdinc.h>
 
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
@@ -200,4 +200,4 @@ typedef __INT_FAST32_TYPE__ video_stwochannels16_t; /* Word with sufficient spac
 
 __DECL_END
 
-#endif /* !_LIBVIDEO_CODEC_PIXEL_H */
+#endif /* !_LIBVIDEO_PIXEL_H */

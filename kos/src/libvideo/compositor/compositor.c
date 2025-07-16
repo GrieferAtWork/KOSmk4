@@ -26,22 +26,31 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/sequence/list.h>
+
 #include <kos/anno.h>
+#include <kos/sched/shared-rwlock.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <malloc.h>
+#include <stddef.h>
+#include <string.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <malloc.h>
-#include <string.h>
 
 #include <libvideo/codec/codecs.h>
-#include <libvideo/codec/rectutils.h>
+#include <libvideo/color.h>
 #include <libvideo/compositor/compositor.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/display.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/rect.h>
+#include <libvideo/types.h>
 
 #include "compositor.h"
 

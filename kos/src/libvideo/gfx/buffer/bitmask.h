@@ -31,10 +31,10 @@
 
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

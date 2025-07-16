@@ -39,14 +39,17 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/rect.h>
+#include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../gfx-empty.h"
+#include "../gfx.h"
 #include "../ramdomain.h"
 #include "gfx.h"
 #include "region.h"

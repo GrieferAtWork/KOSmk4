@@ -39,8 +39,8 @@
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

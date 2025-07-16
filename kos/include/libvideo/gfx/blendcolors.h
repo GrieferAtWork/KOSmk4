@@ -27,8 +27,7 @@
 #include <hybrid/__minmax.h>
 #include <hybrid/typecore.h>
 
-#include <libvideo/codec/pixel.h>
-
+#include "../color.h"
 #include "blend.h"
 
 #ifdef __CC__
@@ -266,8 +265,8 @@ gfx_blendcolors_constant(video_color_t dst, video_color_t src,
  *
  * All other moves will obviously work as well, but won't
  * be nearly as fast/efficient. */
-#define gfx_blendcolors(dst, src, mode)                   \
-	gfx_blendcolors_constant(dst, src,                    \
+#define gfx_blendcolors(dst, src, mode)                    \
+	gfx_blendcolors_constant(dst, src,                     \
 	                         GFX_BLENDMODE_GET_MODE(mode), \
 	                         GFX_BLENDMODE_GET_COLOR(mode))
 

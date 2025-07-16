@@ -17,19 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_COMPOSITOR_API_H
-#define GUARD_LIBVIDEO_COMPOSITOR_API_H 1
+#ifndef _LIBVIDEO_CRECT_H
+#define _LIBVIDEO_CRECT_H 1
 
 #include <__stdinc.h>
 
-#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+#include "types.h"
 
-#include <libvideo/compositor/api.h>
+#define __OFFSET_VIDEO_CRECT_XMIN  0
+#define __OFFSET_VIDEO_CRECT_YMIN  __SIZEOF_VIDEO_COORD_T__
+#define __OFFSET_VIDEO_CRECT_XDIM  (2 * __SIZEOF_VIDEO_COORD_T__)
+#define __OFFSET_VIDEO_CRECT_YDIM  (2 * __SIZEOF_VIDEO_COORD_T__ + __SIZEOF_VIDEO_DIM_T__)
+#define __SIZEOF_VIDEO_CRECT_YDIM  (2 * __SIZEOF_VIDEO_COORD_T__ + 2 * __SIZEOF_VIDEO_DIM_T__)
+#define __ALIGNOF_VIDEO_CRECT_YDIM (__ALIGNOF_VIDEO_COORD_T__ > __ALIGNOF_VIDEO_DIM_T__ ? __ALIGNOF_VIDEO_COORD_T__ : __ALIGNOF_VIDEO_DIM_T__)
 
-#define CC LIBVIDEO_COMPOSITOR_CC
+#ifdef __CC__
+__DECL_BEGIN
 
- /* Our library is linked against libvideo-codec.so and libvideo-gfx.so */
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES
-#define LIBVIDEO_GFX_WANT_PROTOTYPES
+struct video_crect {
+	video_coord_t vcr_xmin; /* Starting X coord */
+	video_coord_t vcr_ymin; /* Starting Y coord */
+	video_dim_t   vcr_xdim; /* Rect size in X */
+	video_dim_t   vcr_ydim; /* Rect size in Y */
+};
 
-#endif /* !GUARD_LIBVIDEO_COMPOSITOR_API_H */
+#define VIDEO_CRECT_INIT(xmin, xmax, xdim, ydim) { xmin, xmax, xdim, ydim }
+#define VIDEO_CRECT_INIT_FULL VIDEO_CRECT_INIT(0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX)
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_LIBVIDEO_CRECT_H */

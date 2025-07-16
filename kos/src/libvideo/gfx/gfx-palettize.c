@@ -32,8 +32,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/align.h>
-#include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 
 #include <kos/types.h>
@@ -41,22 +39,26 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <libvideo/codec/types.h>
+#include <libvideo/codec/api.h>
+#include <libvideo/codec/codecs.h>
+#include <libvideo/color.h>
+#include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "buffer/ram.h"
 #include "gfx-palettize.h"
-#include "gfx.h"
 #include "swgfx.h"
 
 #undef HAVE_LOG
 #if 1
-#include <syslog.h>
+#include <sys/syslog.h>
 #define LOG(...) syslog(LOG_DEBUG, __VA_ARGS__)
 #define HAVE_LOG
 #else

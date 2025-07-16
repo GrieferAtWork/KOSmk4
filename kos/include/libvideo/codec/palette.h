@@ -30,7 +30,7 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include "pixel.h"
+#include "../color.h"
 
 #ifdef __CC__
 __DECL_BEGIN

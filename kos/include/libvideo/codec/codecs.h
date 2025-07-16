@@ -32,8 +32,8 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include "pixel.h"
-#include "types.h"
+#include "../color.h"
+#include "../types.h"
 
 #define VIDEO_CODEC_NONE   0x0000 /* Invalid codec. */
 #define VIDEO_CODEC_USER   0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */

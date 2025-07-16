@@ -22,6 +22,7 @@
 #define _KOS_SOURCE 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -31,11 +32,10 @@
 #include <string.h>
 
 #include <libvideo/codec/codecs.h>
-#include <libvideo/codec/pixel.h>
-#include <libvideo/codec/types.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
-/**/
+#include <libvideo/types.h>
 
 #include "buffer.h"
 #include "gfx-empty.h"

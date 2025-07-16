@@ -30,8 +30,8 @@
 #include <stddef.h>
 
 #include <libvideo/codec/format.h>
-#include <libvideo/codec/types.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 
@@ -70,8 +70,8 @@ libvideo_ramdomain_formem_ex(struct video_domain const *__restrict self, video_d
                              void (CC *release_mem)(void *cookie, void *mem),
                              void *release_mem_cookie, unsigned int flags);
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(2) NONNULL((1)) struct video_codec const *CC
-libvideo_ramdomain_fitting_codec(struct video_domain const *__restrict self,
-                                 struct video_codec const *__restrict codec);
+libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
+                                   struct video_codec const *__restrict codec);
 /************************************************************************/
 
 
