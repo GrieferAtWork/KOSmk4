@@ -5,11 +5,11 @@ The KOS video system is based on various layers of control structures and operat
 
 ### Driver
 
-Library: `libvideo-driver.so` -- TODO: Create this library
+Library: `libvideo-driver.so`
 
 ---
 
-> struct video_driver: video_domain { ... }; -- TODO: Create this
+> struct video_adapter: video_domain { ... };
 
 Enumerate `video_monitor`s and provide a driver-specific domain allocator for video buffers (if possible, these are then set-up to directly use V-RAM, as well as provide hardware GFX operators)
 

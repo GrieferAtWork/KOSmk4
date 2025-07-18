@@ -34,28 +34,24 @@ __DECL_BEGIN
 #ifdef __CC__
 
 struct video_monitor_mode {
-	video_dim_t           vmm_xres; /* Resolution in X */
-	video_dim_t           vmm_yres; /* Resolution in Y */
-	__UINT_LEAST16_TYPE__ vmm_hz;   /* Refresh rate (frames per second) */
-	__SHIFT_TYPE__        vmm_bpp;  /* Color depth */
+	struct video_codec const *vmm_codec; /* [1..1] Video codec */
+	video_dim_t               vmm_xres;  /* Resolution in X */
+	video_dim_t               vmm_yres;  /* Resolution in Y */
+	__UINT_LEAST16_TYPE__     vmm_hz;    /* Refresh rate (frames per second) */
 };
-
-/* TODO: `struct video_domain': allocator for `struct video_buffer' (including custom operators if needed) */
-/* TODO: `struct video_domain': generic implementation for ram-buffers */
-/* TODO: `struct video_adapter': enumerate `struct video_monitor' and extends `struct video_domain' */
 
 struct video_monitor_ops {
 	struct video_display_ops vmo_display; /* Display operators */
 
-//TODO:	/* Get the currently set video mode */
-//TODO:	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
-//TODO:	(LIBVIDEO_DRIVER_CC *vmo_getmode)(struct video_monitor *__restrict __self,
-//TODO:	                                  struct video_monitor_mode *__restrict __mode);
-//TODO:
-//TODO:	/* Set a new video mode () */
-//TODO:	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
-//TODO:	(LIBVIDEO_DRIVER_CC *vmo_setmode)(struct video_monitor *__restrict __self,
-//TODO:	                                  struct video_monitor_mode *__restrict __mode);
+	/* Get the currently set video mode */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
+	(LIBVIDEO_DRIVER_CC *vmo_getmode)(struct video_monitor *__restrict __self,
+	                                  struct video_monitor_mode *__restrict __mode);
+
+	/* Set a new video mode */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_OUT_T(2) int
+	(LIBVIDEO_DRIVER_CC *vmo_setmode)(struct video_monitor *__restrict __self,
+	                                  struct video_monitor_mode *__restrict __mode);
 };
 
 struct video_monitor
@@ -63,6 +59,7 @@ struct video_monitor
     : video_display
 #endif /* __cplusplus */
 {
+
 };
 
 
