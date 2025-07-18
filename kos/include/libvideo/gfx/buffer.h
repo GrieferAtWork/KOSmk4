@@ -147,7 +147,10 @@ struct video_domain {
 
 	void (*_vd_pad[11])(void); /* Reserved for future expansion */
 
-	/* TODO: Functions for creating video palettes also need to go here (so translation  data
+	/* TODO: Function for getting memory usage (for the ram-domain,
+	 *       just return regular ram usage info as per `sysinfo(2)) */
+
+	/* TODO: Function  for creating video palettes also need  to go here (so translation data
 	 *       can be stored server-side in case of a window server, or in V-RAM so-as to speed
 	 *       up palette conversion blits) */
 };
@@ -376,6 +379,66 @@ struct video_buffer_ops {
 	__ATTR_INOUT_T(1) __ATTR_NONNULL_T((2)) void
 	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_unlockregion)(struct video_buffer *__restrict __self,
 	                                               struct video_regionlock *__restrict __lock);
+
+
+	/* Buffer revocation / sub-region operators */
+
+	/* Revoke access to non-anonymous pixel data (and maybe even anonymous) of this video buffer.
+	 * Access  to pixel data of any sub-region created from `__self' (or recursively created form
+	 * one of those buffers) is also revoked.
+	 *
+	 * All types of video buffers can have their access revoked, except for buffers returned by
+	 * `video_domain_newbuffer[_ex]()' (though sub-region buffers of those can be revoked,  and
+	 * calling this function for one such buffer will do exactly that).
+	 *
+	 * @return: * : Always re-returns `__self' */
+	__ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_buffer *
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vi_revoke)(struct video_buffer *__restrict __self);
+
+
+	/* Create a new hard subregion-proxy of `__self'. The caller is responsible to  ensure
+	 * that the given `__rect' does not exceed `__self->vb_xdim' / `__self->vb_ydim'. Note
+	 * that this function behaves slightly different from `video_buffer_region()', in that
+	 * the  later accepts a signed rect, while also  allowing said rect to be greater than
+	 * the dimensions of the original buffer.
+	 *
+	 * On the other hand, this function only works for creating **true** sub-rects, but
+	 * since this one is implemented by individual buffers, it is probably faster, too.
+	 *
+	 * Buffers returned by this function are guarantied to share pixel access with `__self',
+	 * and `vi_revoke' is to `__self' will also revoke access for `return' (either directly,
+	 * by keeping a list of sub-region buffers  in `__self', or indirectly, by having  every
+	 * access to pixel-data in `return' check if `__self' has been revoked).
+	 *
+	 * NOTE: This function will never re-return `__self', even if `__rect' is the  full
+	 *       rect of `__self', and `__xor_flags == 0'. This is because doing also cause
+	 *       `vi_revoke' invoked on the returned buffer to revoke `__self'.
+	 *
+	 * @assume(__rect->vcr_xdim > 0);
+	 * @assume(__rect->vcr_ydim > 0);
+	 * @assume((__rect->vcr_xmin + __rect->vcr_xdim) > __rect->vcr_xmin);
+	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) > __rect->vcr_ymin);
+	 * @assume((__rect->vcr_xmin + __rect->vcr_xdim) <= __self->vb_xdim);
+	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
+	 * @param: __self: Video buffer to create a sub-region of
+	 * @param: __rect: Sub-region rect of `__self' to-be returned
+	 * @param: __xor_flags: Flags to xor- toggle in GFX contexts created on `return'.
+	 *                      These flags are NOT applied  to `__rect', but they  still
+	 *                      allow you to create  sub-region buffers that will  appear
+	 *                      to be  natively rotated  in `struct video_gfx'  contexts.
+	 *                      Only the following flags *should* be used here. All other
+	 *                      flags can still be used, but many not necessarily produce
+	 *                      expected results:
+	 *                      - VIDEO_GFX_F_XMIRROR
+	 *                      - VIDEO_GFX_F_YMIRROR
+	 *                      - VIDEO_GFX_F_XYSWAP
+	 * @return: * : The newly created sub-region buffer
+	 * @return: NULL: [errno=ENOMEM] Insufficient memory
+	 * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
+	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
+	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_buffer *__restrict __self,
+	                                 struct video_crect const *__restrict __rect,
+	                                 gfx_flag_t __xor_flags);
 };
 
 

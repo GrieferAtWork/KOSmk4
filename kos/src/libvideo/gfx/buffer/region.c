@@ -70,8 +70,8 @@ static_assert(offsetof(struct bigregion_buffer, brb_base) == offsetof(struct sub
 #define subregion_buffer_r_destroy       bigregion_buffer_r_destroy
 #define subregion_buffer_norem_r_destroy bigregion_buffer_r_destroy
 #define basregion_buffer_r_destroy       bigregion_buffer_r_destroy
-PRIVATE NONNULL((1)) void
-NOTHROW(FCC bigregion_buffer_r_destroy)(struct video_buffer *__restrict self) {
+PRIVATE NONNULL((1)) void FCC
+bigregion_buffer_r_destroy(struct video_buffer *__restrict self) {
 	struct bigregion_buffer *me = (struct bigregion_buffer *)self;
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);

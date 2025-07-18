@@ -482,7 +482,7 @@ median_io_buf(void const *cookie, mc_index_t i) {
 }
 
 PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_CODEC_CC
-video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
+video_gfx_iorect_as_rgba8888(struct old_video_rambuffer *result,
                              struct video_gfx const *__restrict self) {
 	struct video_codec const *result_codec;
 	struct video_gfx gfx = *self;
@@ -504,7 +504,7 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer *result,
 	result->rb_stride          = stride;
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 /*	result->vb_domain          = libvideo_ramdomain();*/ /* Unused */
-	result->vb_ops             = _rambuffer_ops();
+	result->vb_ops             = _old_rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = NULL;
 	result->vb_xdim          = video_gfx_getclipw(&gfx);
@@ -526,7 +526,7 @@ median_cut_start(struct video_gfx const *__restrict self,
                  video_color_t *pal, shift_t pal_depth,
                  video_color_t constant_alpha) {
 	struct median_io io;
-	struct video_rambuffer rgba_buf;
+	struct old_video_rambuffer rgba_buf;
 	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
 	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
 	     *       "self->vx_buffer->vb_format.vf_codec->vc_color2pixel" the

@@ -67,9 +67,9 @@ static_assert(_VIDEO_LOCK__N_DRIVER >= 1);
 
 /* Initialize a mock ram-buffer using the video lock of "self" */
 PRIVATE ATTR_OUT(1) ATTR_IN(2) void FCC
-lockable_asram(struct video_rambuffer *__restrict rb,
+lockable_asram(struct old_video_rambuffer *__restrict rb,
                struct lockable_buffer const *__restrict self) {
-	rb->vb_ops             = _rambuffer_ops();
+	rb->vb_ops             = _old_rambuffer_ops();
 	rb->vb_format.vf_codec = self->vb_format.vf_codec;
 	rb->vb_format.vf_pal   = self->vb_format.vf_pal;
 	rb->vb_xdim            = self->vb_xdim;
@@ -86,7 +86,7 @@ PRIVATE NONNULL((1)) void FCC
 lockable_readpixels(struct lockable_buffer const *__restrict self) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct video_rambuffer dst;
+	struct old_video_rambuffer dst;
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -103,7 +103,7 @@ PRIVATE NONNULL((1)) void FCC
 lockable_writepixels(struct lockable_buffer const *__restrict self) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct video_rambuffer src;
+	struct old_video_rambuffer src;
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -121,7 +121,7 @@ lockable_readpixels_region(struct lockable_buffer const *__restrict self,
                            struct video_regionlock const *__restrict region) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct video_rambuffer dst;
+	struct old_video_rambuffer dst;
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -139,7 +139,7 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
                             struct video_regionlock const *__restrict region) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct video_rambuffer src;
+	struct old_video_rambuffer src;
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -152,8 +152,8 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
 }
 
 
-PRIVATE NONNULL((1)) void
-NOTHROW(FCC lockable_destroy)(struct video_buffer *__restrict self) {
+PRIVATE NONNULL((1)) void FCC
+lockable_destroy(struct video_buffer *__restrict self) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
 #ifdef LOCKABLE_BUFFER_PALREF
 	if (me->vb_format.vf_pal)
@@ -352,13 +352,13 @@ PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 video_buffer_islockable(struct video_buffer const *__restrict self) {
 	if (self->vb_ops == &lockable_ops)
 		goto yes;
-	if (self->vb_ops == &rambuffer_ops)
+	if (self->vb_ops == &old_rambuffer_ops)
 		goto yes;
-	if (self->vb_ops == &rambuffer_ops__for_codec)
+	if (self->vb_ops == &old_rambuffer_ops__for_codec)
 		goto yes;
-	if (self->vb_ops == &membuffer_ops)
+	if (self->vb_ops == &old_membuffer_ops)
 		goto yes;
-	if (self->vb_ops == &membuffer_ops__for_codec)
+	if (self->vb_ops == &old_membuffer_ops__for_codec)
 		goto yes;
 	if (self->vb_ops == &subregion_buffer_ops_norem) {
 		/* Subregion buffers are locked iff the underlying buffer is */

@@ -70,7 +70,7 @@
 
 DECL_BEGIN
 
-struct svga_screen: video_rambuffer {
+struct svga_screen: old_video_rambuffer {
 	size_t                            ss_rbtotal;       /* [const] Ram buffer total size. */
 	struct screen_buffer_ops          ss_ops;           /* [const] Screen buffer operators. */
 	REF struct video_codec_handle    *ss_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */

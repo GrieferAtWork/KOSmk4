@@ -53,13 +53,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-static_assert(sizeof(struct gfx_ramdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
-              "sizeof(struct gfx_ramdrv) too large for '_VIDEO_GFX_N_DRIVER'");
+static_assert(sizeof(struct old_gfx_ramdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
+              "sizeof(struct old_gfx_ramdrv) too large for '_VIDEO_GFX_N_DRIVER'");
 
-#define RAMGFX_DATA   video_ramgfx_getdrv(self)->grd_data
-#define RAMGFX_STRIDE video_ramgfx_getdrv(self)->grd_stride
-#define RAMGFX_FORMAT video_ramgfx_getdrv(self)->grd_format
-#define RAMGFX_CODEC  video_ramgfx_getdrv(self)->grd_format->vf_codec
+#define RAMGFX_DATA   video_old_ramgfx_getdrv(self)->grd_data
+#define RAMGFX_STRIDE video_old_ramgfx_getdrv(self)->grd_stride
+#define RAMGFX_FORMAT video_old_ramgfx_getdrv(self)->grd_format
+#define RAMGFX_CODEC  video_old_ramgfx_getdrv(self)->grd_format->vf_codec
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
@@ -142,7 +142,7 @@ libvideo_ramgfx__setpixel(struct video_gfx const *__restrict self,
 }
 
 
-#ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+#ifdef CONFIG_HAVE_OLD_RAMBUFFER_PIXELn_FASTPASS
 #define DEFINE_RAMGFX_GETSETPIXELn(n)                                     \
 	INTERN ATTR_IN(1) video_pixel_t CC                                    \
 	libvideo_ramgfx__getpixel##n(struct video_gfx const *__restrict self, \
@@ -195,14 +195,14 @@ libvideo_ramgfx__setpixel24(struct video_gfx const *__restrict self,
 	line[1] = data.bytes[1];
 	line[2] = data.bytes[2];
 }
-#endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
+#endif /* CONFIG_HAVE_OLD_RAMBUFFER_PIXELn_FASTPASS */
 
 
 
 INTERN NONNULL((1)) void FCC
-rambuffer_destroy(struct video_buffer *__restrict self) {
-	struct video_rambuffer *me;
-	me = (struct video_rambuffer *)self;
+old_rambuffer_destroy(struct video_buffer *__restrict self) {
+	struct old_video_rambuffer *me;
+	me = (struct old_video_rambuffer *)self;
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
 	free(me->rb_data);
@@ -210,28 +210,28 @@ rambuffer_destroy(struct video_buffer *__restrict self) {
 }
 
 INTERN NONNULL((1)) void FCC
-rambuffer_destroy__for_codec(struct video_buffer *__restrict self) {
-	struct video_rambuffer__for_codec *me;
-	me = (struct video_rambuffer__for_codec *)self;
+old_rambuffer_destroy__for_codec(struct video_buffer *__restrict self) {
+	struct old_video_rambuffer__for_codec *me;
+	me = (struct old_video_rambuffer__for_codec *)self;
 	video_codec_handle_decref(me->rbfc_codec);
-	rambuffer_destroy(me);
+	old_rambuffer_destroy(me);
 }
 
 INTERN ATTR_INOUT(1) ATTR_OUT(2) int FCC
-rambuffer_lock(struct video_buffer *__restrict self,
+old_rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict lock) {
-	struct video_rambuffer *me;
-	me = (struct video_rambuffer *)self;
+	struct old_video_rambuffer *me;
+	me = (struct old_video_rambuffer *)self;
 	lock->vl_data   = me->rb_data;
 	lock->vl_stride = me->rb_stride;
 	return 0;
 }
 
 INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
-rambuffer_lockregion(struct video_buffer *__restrict self,
+old_rambuffer_lockregion(struct video_buffer *__restrict self,
                      struct video_regionlock *__restrict lock) {
-	struct video_rambuffer *me;
-	me = (struct video_rambuffer *)self;
+	struct old_video_rambuffer *me;
+	me = (struct old_video_rambuffer *)self;
 	video_regionlock_assert(me, lock);
 	lock->vrl_lock.vl_stride = me->rb_stride;
 	lock->vrl_lock.vl_data   = me->rb_data + lock->_vrl_rect.vcr_ymin * me->rb_stride;
@@ -240,18 +240,18 @@ rambuffer_lockregion(struct video_buffer *__restrict self,
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-rambuffer_initgfx(struct video_gfx *__restrict self) {
-	struct video_rambuffer const *me = (struct video_rambuffer *)self->vx_buffer;
-	struct gfx_ramdrv *drv = video_ramgfx_getdrv(self);
+old_rambuffer_initgfx(struct video_gfx *__restrict self) {
+	struct old_video_rambuffer const *me = (struct old_video_rambuffer *)self->vx_buffer;
+	struct old_gfx_ramdrv *drv = video_old_ramgfx_getdrv(self);
 	libvideo_gfx_init_fullclip(self);
-	gfx_ramdrv_init(drv, me);
+	old_gfx_ramdrv_init(drv, me);
 
 	/* Default pixel accessors */
 	drv->xsw_getpixel = &libvideo_ramgfx__getpixel;
 	drv->xsw_setpixel = &libvideo_ramgfx__setpixel;
 
 	/* Load optimized pixel accessors if applicable to the loaded format. */
-#ifdef CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS
+#ifdef CONFIG_HAVE_OLD_RAMBUFFER_PIXELn_FASTPASS
 	switch (me->vb_format.vf_codec->vc_specs.vcs_bpp) {
 	case 8:
 		drv->xsw_setpixel = &libvideo_ramgfx__setpixel8;
@@ -271,7 +271,7 @@ rambuffer_initgfx(struct video_gfx *__restrict self) {
 		break;
 	default: break;
 	}
-#endif /* CONFIG_HAVE_RAMBUFFER_PIXELn_FASTPASS */
+#endif /* CONFIG_HAVE_OLD_RAMBUFFER_PIXELn_FASTPASS */
 
 	/* Load generic operator defaults (overwritten as appropriate below) */
 	libvideo_swgfx_populate(self);
@@ -330,8 +330,8 @@ GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_
 }
 
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
-	struct gfx_ramdrv *drv = video_ramgfx_getdrv(self);
+old_rambuffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
+	struct old_gfx_ramdrv *drv = video_old_ramgfx_getdrv(self);
 
 	/* Updated generic operators */
 	libvideo_swgfx_update(self, what);
@@ -388,27 +388,27 @@ GFX_FOREACH_DEDICATED_PREBLENDMODE(LINK_libvideo_swgfx_generic__render_preblend_
 	return self;
 }
 
-INTERN struct video_buffer_ops rambuffer_ops = {};
-INTERN struct video_buffer_ops rambuffer_ops__for_codec = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops(void) {
-	if unlikely(!rambuffer_ops.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&rambuffer_ops);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&rambuffer_ops);
+INTERN struct video_buffer_ops old_rambuffer_ops = {};
+INTERN struct video_buffer_ops old_rambuffer_ops__for_codec = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _old_rambuffer_ops(void) {
+	if unlikely(!old_rambuffer_ops.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&old_rambuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&old_rambuffer_ops);
 		COMPILER_WRITE_BARRIER();
-		rambuffer_ops.vi_destroy = &rambuffer_destroy;
+		old_rambuffer_ops.vi_destroy = &old_rambuffer_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &rambuffer_ops;
+	return &old_rambuffer_ops;
 }
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops__for_codec(void) {
-	if unlikely(!rambuffer_ops__for_codec.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&rambuffer_ops__for_codec);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&rambuffer_ops__for_codec);
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _old_rambuffer_ops__for_codec(void) {
+	if unlikely(!old_rambuffer_ops__for_codec.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&old_rambuffer_ops__for_codec);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&old_rambuffer_ops__for_codec);
 		COMPILER_WRITE_BARRIER();
-		rambuffer_ops__for_codec.vi_destroy = &rambuffer_destroy__for_codec;
+		old_rambuffer_ops__for_codec.vi_destroy = &old_rambuffer_destroy__for_codec;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &rambuffer_ops__for_codec;
+	return &old_rambuffer_ops__for_codec;
 }
 
 
@@ -416,7 +416,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _rambuffer_ops_
 
 PRIVATE NONNULL((1)) void FCC
 membuffer_destroy(struct video_buffer *__restrict self) {
-	struct video_membuffer *me = (struct video_membuffer *)self;
+	struct old_video_membuffer *me = (struct old_video_membuffer *)self;
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
 	if (me->vm_release_mem)
@@ -426,34 +426,34 @@ membuffer_destroy(struct video_buffer *__restrict self) {
 
 PRIVATE NONNULL((1)) void FCC
 membuffer_destroy__for_codec(struct video_buffer *__restrict self) {
-	struct video_membuffer__for_codec *me = (struct video_membuffer__for_codec *)self;
+	struct old_video_membuffer__for_codec *me = (struct old_video_membuffer__for_codec *)self;
 	video_codec_handle_decref(me->vmfc_codec);
 	membuffer_destroy(me);
 }
 
 
-INTERN struct video_buffer_ops membuffer_ops = {};
-INTERN struct video_buffer_ops membuffer_ops__for_codec = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops(void) {
-	if unlikely(!membuffer_ops.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&membuffer_ops);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&membuffer_ops);
+INTERN struct video_buffer_ops old_membuffer_ops = {};
+INTERN struct video_buffer_ops old_membuffer_ops__for_codec = {};
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _old_membuffer_ops(void) {
+	if unlikely(!old_membuffer_ops.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&old_membuffer_ops);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&old_membuffer_ops);
 		COMPILER_WRITE_BARRIER();
-		membuffer_ops.vi_destroy = &membuffer_destroy;
+		old_membuffer_ops.vi_destroy = &membuffer_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &membuffer_ops;
+	return &old_membuffer_ops;
 }
 
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _membuffer_ops__for_codec(void) {
-	if unlikely(!membuffer_ops__for_codec.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&membuffer_ops__for_codec);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&membuffer_ops__for_codec);
+INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _old_membuffer_ops__for_codec(void) {
+	if unlikely(!old_membuffer_ops__for_codec.vi_destroy) {
+		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&old_membuffer_ops__for_codec);
+		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&old_membuffer_ops__for_codec);
 		COMPILER_WRITE_BARRIER();
-		membuffer_ops__for_codec.vi_destroy = &membuffer_destroy__for_codec;
+		old_membuffer_ops__for_codec.vi_destroy = &membuffer_destroy__for_codec;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &membuffer_ops__for_codec;
+	return &old_membuffer_ops__for_codec;
 }
 
 DECL_END

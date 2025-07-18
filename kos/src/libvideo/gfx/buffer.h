@@ -70,7 +70,7 @@ NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
 #define libvideo_buffer_notsup_rlockregion libvideo_buffer_notsup_lockregion
 #define libvideo_buffer_notsup_wlockregion libvideo_buffer_notsup_lockregion
 #define libvideo_buffer_notsup_lockregion (*(int (FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_notsup_lock)
-#define libvideo_buffer_noop_unlockregion (*(void __NOTHROW_T(FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_noop_unlock)
+#define libvideo_buffer_noop_unlockregion (*(void NOTHROW_T(FCC *)(struct video_buffer *__restrict, struct video_regionlock *__restrict))&libvideo_buffer_noop_unlock)
 
 #define video_buffer_ops_set_LOCKOPS_like_NOTSUP(self)                    \
 	(void)((self)->vi_rlock        = &libvideo_buffer_notsup_rlock,       \

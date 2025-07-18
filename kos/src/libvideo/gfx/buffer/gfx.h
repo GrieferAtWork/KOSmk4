@@ -64,7 +64,7 @@ struct gfx_buffer: video_buffer {
 	video_color_t            gxb_colorkey; /* [const] s.a. `struct video_gfx::vx_colorkey' */
 };
 
-INTDEF NONNULL((1)) void NOTHROW(FCC subregion_buffer_destroy)(struct video_buffer *__restrict self);
+INTDEF NONNULL((1)) void FCC subregion_buffer_destroy(struct video_buffer *__restrict self);
 #define gfx_buffer_destroy subregion_buffer_destroy
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_wlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);

@@ -24,6 +24,7 @@
 /**/
 
 #include <hybrid/compiler.h>
+#include <hybrid/typecore.h>
 
 #include <kos/anno.h>
 
@@ -37,13 +38,13 @@ DECL_BEGIN
 struct video_buffer;
 
 /* Buffer used to represent a region of `brb_base' containing unmappable pixels */
-struct bigregion_buffer: video_buffer {
+struct bigregion_buffer: video_buffer { /* TODO: MERGE WITH "bigregion_buffer_r" */
 	REF struct video_buffer *brb_base; /* [1..1][const] Underlying video buffer */
 	video_offset_t           brb_xoff; /* [const] Starting X offset of pixel data in `brb_base' */
 	video_offset_t           brb_yoff; /* [const] Starting Y offset of pixel data in `brb_base' */
 };
 
-typedef unsigned int revokable_inuse_t;
+typedef __REGISTER_TYPE__ revokable_inuse_t;
 
 struct bigregion_buffer_r: bigregion_buffer {
 	/* [OVERRIDE(.brb_base, [lock(READ(ATOMIC), WRITE(ATOMIC && OLD_VALUE_VALID_UNTIL(brbr_inuse == 0)))])] */
@@ -56,24 +57,24 @@ struct bigregion_buffer_r: bigregion_buffer {
 	                                  * becomes "0". */
 };
 
-struct subregion_buffer_r: subregion_buffer {
+struct subregion_buffer_r: subregion_buffer { /* TODO: REMOVE THIS */
 	/* [OVERRIDE(.srb_base, [lock(READ(ATOMIC), WRITE(ATOMIC && OLD_VALUE_VALID_UNTIL(srbr_inuse == 0)))])] */
 	struct video_buffer *srbr_orig;  /* [1..1][valid_if(srbr_inuse > 0)] The original video buffer (for releasing video locks) */
 	revokable_inuse_t    srbr_inuse; /* [lock(ATOMIC)] s.a. `struct bigregion_buffer_r::brbr_inuse' */
 };
 
-INTDEF struct video_buffer_ops bigregion_buffer_ops;
+INTDEF struct video_buffer_ops bigregion_buffer_ops; /* TODO: REMOVE THIS */
 INTDEF struct video_buffer_ops bigregion_buffer_ops_r;
-//TDEF struct video_buffer_ops subregion_buffer_ops;         /* `srb_vm_xrem != 0' */
-//TDEF struct video_buffer_ops subregion_buffer_ops_norem;   /* `srb_vm_xrem == 0' */
-INTDEF struct video_buffer_ops subregion_buffer_ops_r;       /* `srb_vm_xrem != 0' */
-INTDEF struct video_buffer_ops subregion_buffer_ops_norem_r; /* `srb_vm_xrem == 0' */
-INTDEF struct video_buffer_ops basregion_buffer_ops_r;       /* Same dimensions as base-buffer */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bigregion_buffer_ops(void);
+//TDEF struct video_buffer_ops subregion_buffer_ops;         /* `srb_vm_xrem != 0' */ /* TODO: REMOVE THIS */
+//TDEF struct video_buffer_ops subregion_buffer_ops_norem;   /* `srb_vm_xrem == 0' */ /* TODO: REMOVE THIS */
+INTDEF struct video_buffer_ops subregion_buffer_ops_r;       /* `srb_vm_xrem != 0' */ /* TODO: REMOVE THIS */
+INTDEF struct video_buffer_ops subregion_buffer_ops_norem_r; /* `srb_vm_xrem == 0' */ /* TODO: REMOVE THIS */
+INTDEF struct video_buffer_ops basregion_buffer_ops_r;       /* Same dimensions as base-buffer */ /* TODO: REMOVE THIS */
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bigregion_buffer_ops(void); /* TODO: REMOVE THIS */
 INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _bigregion_buffer_ops_r(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_r(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_norem_r(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _basregion_buffer_ops_r(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_r(void); /* TODO: REMOVE THIS */
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_norem_r(void); /* TODO: REMOVE THIS */
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _basregion_buffer_ops_r(void); /* TODO: REMOVE THIS */
 
 
 /* Create a wrapper video buffer for `self' that can only ever be used to access

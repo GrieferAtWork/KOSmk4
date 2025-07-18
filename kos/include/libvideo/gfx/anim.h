@@ -34,21 +34,6 @@
 
 #include "../types.h"
 
-/* TODO: Support for animations (e.g. .gif):
- * - DON'T do this the way that SDL-image does it (i.e. have 1 buffer for every frame)
- * - Instead, animated video buffers rendered progressively, using a control structure
- *   that (among other things) includes a `struct mapfile' of the raw underlying file.
- * - This structure then exposes a function like `paint_next_frame()' (possibly using
- *   a secondary control structure, such that the original animation can be  rendered
- *   in parallel by multiple threads using individual rendering contexts)
- * - When called, `paint_next_frame()' takes a  video_buffer that is expected to  have
- *   originally  been created by  the animation itself (iow:  its codec/palette may be
- *   assumed to be known to the animation),  as well that the buffer's video  contents
- *   have not been modified since the last call to `paint_next_frame()' (meaning  that
- *   for animation formats where a frame is allowed to consist of only a specific sub-
- *   region of a larger image only has to render said sub-region)
- */
-
 #ifdef __CC__
 __DECL_BEGIN
 

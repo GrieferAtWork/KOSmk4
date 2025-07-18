@@ -56,8 +56,8 @@ static_assert(offsetof(struct subregion_buffer, srb_base) == offsetof(struct gfx
 static_assert(offsetof(struct subregion_buffer, srb_xoff) == offsetof(struct gfx_buffer, gxb_cxoff));
 static_assert(offsetof(struct subregion_buffer, srb_yoff) == offsetof(struct gfx_buffer, gxb_cyoff));
 
-INTERN NONNULL((1)) void
-NOTHROW(FCC subregion_buffer_destroy)(struct video_buffer *__restrict self) {
+INTERN NONNULL((1)) void FCC
+subregion_buffer_destroy(struct video_buffer *__restrict self) {
 	struct subregion_buffer *me = (struct subregion_buffer *)self;
 #ifdef SUBREGION_BUFFER_PALREF
 	if (me->vb_format.vf_pal)

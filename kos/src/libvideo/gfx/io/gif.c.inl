@@ -352,7 +352,7 @@ LWZ_state_getc(LWZ_state *__restrict self) {
 
 
 struct gif_anim;
-struct gif_buffer: video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
+struct gif_buffer: old_video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
 	struct gif_config gb_cfg;      /* [const] Default config */
 	byte_t           *gb_scratch;  /* [0..1][owned] Scratch buffer for doing frame I/O */
 	byte_t           *gb_restore;  /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
@@ -368,7 +368,7 @@ PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gifbuffer_initgfx__with_colorkey(struct video_gfx *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self->vx_buffer;
 	self->vx_colorkey = me->gb_colorkey;
-	return rambuffer_initgfx(self);
+	return old_rambuffer_initgfx(self);
 }
 
 PRIVATE NONNULL((1)) void FCC
@@ -376,7 +376,7 @@ gifbuffer_destroy(struct video_buffer *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self;
 	free(me->gb_scratch);
 	free(me->gb_restore);
-	rambuffer_destroy(me);
+	old_rambuffer_destroy(me);
 }
 
 #undef gifbuffer_ops
@@ -399,7 +399,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops_
 	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
 		gifbuffer_ops__with_color_key.vi_initgfx   = &gifbuffer_initgfx__with_colorkey;
-		gifbuffer_ops__with_color_key.vi_updategfx = &rambuffer_updategfx;
+		gifbuffer_ops__with_color_key.vi_updategfx = &old_rambuffer_updategfx;
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops__with_color_key.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();

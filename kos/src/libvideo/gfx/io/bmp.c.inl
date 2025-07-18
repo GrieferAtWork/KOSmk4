@@ -212,7 +212,7 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 		uint8_t a;
 	};
 	video_coord_t y;
-	struct video_rambuffer *me = (struct video_rambuffer *)self;
+	struct old_video_rambuffer *me = (struct old_video_rambuffer *)self;
 	assert(me->vb_domain == &libvideo_ramdomain_);
 	assert(me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
 	assert(me->vb_format.vf_pal == NULL);
