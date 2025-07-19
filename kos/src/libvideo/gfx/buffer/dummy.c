@@ -35,6 +35,8 @@
 #include <sys/mman.h>
 
 #include <assert.h>
+#include <atomic.h>
+#include <fcntl.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <unistd.h>
@@ -45,21 +47,51 @@
 
 DECL_BEGIN
 
-PRIVATE WUNUSED byte_t *CC dummy_mmap(size_t num_bytes) {
-	byte_t *result = (byte_t *)mmap(NULL, num_bytes, PROT_READ | PROT_WRITE,
-	                                MAP_PRIVATE | MAP_ANON, -1, 0);
-	if (result == MAP_FAILED) {
-		result = NULL;
-	} else {
-		assert(result != NULL);
-		/* XXX: "MADV_FREE"  is a one-time hint, but we'd
-		 *      need it in the form of a permanent effect */
-		(void)madvise(result, num_bytes, MADV_FREE);
+PRIVATE fd_t dev_void = -1;
+PRIVATE WUNUSED fd_t CC get_dev_void(void) {
+	fd_t result = atomic_read(&dev_void);
+	if (result == -1) {
+#ifdef __KOS__
+		result = open("/dev/void", O_RDWR);
+		if (result < 0)
+#endif /* __KOS__ */
+		{
+			/* Shouldn't happen under KOS... */
+			result = open("/dev/null", O_RDWR);
+		}
+		if (result >= 0) {
+			fd_t old = atomic_cmpxch_val(&dev_void, -1, result);
+			if unlikely(old != -1) {
+				(void)close(result);
+				result = old;
+			}
+		}
 	}
 	return result;
 }
 
-PRIVATE void CC dummy_munmap(byte_t *data, size_t num_bytes) {
+/* Hooked by build script via `-fini=libvideo_gfx_fini' */
+INTERN void libvideo_gfx_fini(void) {
+	if (dev_void != -1)
+		(void)close(dev_void);
+}
+
+PRIVATE WUNUSED byte_t *CC mmap_void(size_t num_bytes) {
+	byte_t *result;
+	fd_t dev_void = get_dev_void();
+	if unlikely(dev_void < 0)
+		return NULL;
+	result = (byte_t *)mmap(NULL, num_bytes, PROT_READ | PROT_WRITE,
+	                        MAP_PRIVATE | MAP_FILE, dev_void, 0);
+	if (result == MAP_FAILED) {
+		result = NULL;
+	} else {
+		assert(result != NULL);
+	}
+	return result;
+}
+
+PRIVATE void CC munmap_void(byte_t *data, size_t num_bytes) {
 	(void)munmap(data, num_bytes);
 }
 
@@ -74,7 +106,7 @@ PRIVATE struct video_buffer_dummy_awref current_dummy = AWREF_INIT(NULL);
 PRIVATE NONNULL((1)) void CC
 dummy_destroy(struct video_buffer_dummy *__restrict self) {
 	awref_cmpxch(&current_dummy, self, NULL);
-	dummy_munmap(self->vbd_data, self->vbd_size);
+	munmap_void(self->vbd_data, self->vbd_size);
 	free(self);
 }
 
@@ -100,7 +132,7 @@ libvideo_buffer_getdummy(size_t num_bytes) {
 	if unlikely(!result)
 		goto err;
 	aligned_num_bytes = CEIL_ALIGN(num_bytes, getpagesize());
-	result->vbd_data = dummy_mmap(aligned_num_bytes);
+	result->vbd_data = mmap_void(aligned_num_bytes);
 	if unlikely(!result->vbd_data)
 		goto err_r;
 	result->vbd_size    = aligned_num_bytes;
