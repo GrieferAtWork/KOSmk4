@@ -39,6 +39,7 @@ DATDEF struct device dev_full;    /* /dev/full */
 DATDEF struct device dev_random;  /* /dev/random */
 DATDEF struct device dev_urandom; /* /dev/urandom */
 DATDEF struct device dev_kmsg;    /* /dev/kmsg */
+DATDEF struct device dev_void;    /* /dev/void    (KOS-specific: writes are no-ops, reads return undefined data) */
 DATDEF struct device dev_tty;     /* /dev/tty */
 
 DECL_END

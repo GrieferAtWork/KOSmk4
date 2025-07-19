@@ -41,6 +41,8 @@
 #include <sched/group.h>
 #include <sched/tsc.h>
 
+#include <hybrid/align.h>
+
 #include <sys/filio.h>
 #include <sys/io.h>
 #include <sys/param.h> /* NBBY */
@@ -343,6 +345,134 @@ PRIVATE struct mfile_stream_ops const devzero_stream_ops = {
 	.mso_pwrite  = &devzero_v_pwrite,
 	.mso_pwritev = &devzero_v_pwritev,
 	.mso_seek    = &devzero_v_seek,
+	.mso_stat    = &nullfile_v_stat,
+	.mso_ioctl   = &chrdev_v_ioctl,
+};
+
+
+
+
+/************************************************************************/
+/* General-purpose, write-discard file (/dev/void)                      */
+/* KOS-specific: writes are no-ops, reads return undefined data         */
+/************************************************************************/
+
+#ifndef CONFIG_DEVVOID_PAGE_COUNT
+#define CONFIG_DEVVOID_PAGE_COUNT 16
+#endif /* !CONFIG_DEVVOID_PAGE_COUNT */
+
+PRIVATE physpage_t devvoid_page_addr = PHYSPAGE_INVALID;
+PRIVATE physpage_t KCALL get_devvoid_page_addr(void) {
+	physpage_t result = atomic_read(&devvoid_page_addr);
+	if (result == PHYSPAGE_INVALID) {
+		physpage_t old;
+		/* XXX: Why actually allocate memory  here? Instead of doing  that,
+		 *      we could also just find some large range of physical memory
+		 *      that doesn't map to anything...
+		 * (but then we'd run  the risk of  some of the  CPU pins not  being
+		 * connected and the seemingly unused memory range actually aliasing
+		 * some other **used** range) */
+		result = page_malloc(CONFIG_DEVVOID_PAGE_COUNT);
+		if unlikely(result == PHYSPAGE_INVALID)
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, CONFIG_DEVVOID_PAGE_COUNT * PAGESIZE);
+		old = atomic_cmpxch_val(&devvoid_page_addr, PHYSPAGE_INVALID, result);
+		if unlikely(old != PHYSPAGE_INVALID) {
+			page_ccfree(result, CONFIG_DEVVOID_PAGE_COUNT);
+			result = old;
+		}
+	}
+	return result;
+}
+
+/* Construct a new mmap-able mem-part for /dev/void */
+PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct mpart *KCALL
+devvoid_v_newpart(struct mfile *__restrict UNUSED(self),
+                  PAGEDIR_PAGEALIGNED pos_t UNUSED(minaddr),
+                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	REF struct mpart *result;
+	size_t pages  = num_bytes >> PAGESHIFT;
+	result = (REF struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
+	/* (re-)configure the part to point to static, physical memory. */
+	result->mp_flags     = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
+	result->mp_blkst_ptr = NULL; /* Disable block status (thus having the system act like all
+	                              * blocks  were using `MPART_BLOCK_ST_CHNG' as their status) */
+	result->mp_meta      = NULL;
+
+	/* Have all chunks of the mem-part map to the same portion of physical
+	 * memory, which gets used as a system-wide void scratch-memory  area. */
+	TRY {
+		physpage_t page = get_devvoid_page_addr();
+		size_t chunks   = CEILDIV(pages, CONFIG_DEVVOID_PAGE_COUNT);
+		assert(chunks >= 1);
+		if (chunks == 1) {
+			result->mp_state = MPART_ST_MEM;
+			result->mp_mem.mc_start = page;
+			result->mp_mem.mc_size  = pages;
+		} else {
+			size_t i;
+			struct mchunk *vec;
+			vec = (struct mchunk *)kmalloc(chunks * sizeof(struct mchunk),
+			                               GFP_LOCKED | GFP_PREFLT);
+			for (i = 0; i < chunks; ++i) {
+				vec[i].mc_start = page;
+				vec[i].mc_size  = CONFIG_DEVVOID_PAGE_COUNT;
+			}
+			vec[i].mc_size = pages - (i * CONFIG_DEVVOID_PAGE_COUNT);
+			result->mp_state = MPART_ST_MEM_SC;
+			result->mp_mem_sc.ms_v = vec;
+			result->mp_mem_sc.ms_c = chunks;
+		}
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devvoid_v_read(struct mfile *__restrict UNUSED(self), NCX void *UNUSED(dst),
+               size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	/* Note how we don't actually initialize "dst" ;)
+	 * That's  because our file's whole point is that
+	 * anything read from it is **UNDEFINED** */
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devvoid_v_readv(struct mfile *__restrict UNUSED(self),
+                struct iov_buffer *__restrict UNUSED(dst),
+                size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1)) size_t KCALL
+devvoid_v_pread(struct mfile *__restrict UNUSED(self), NCX void *UNUSED(dst),
+                size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+devvoid_v_preadv(struct mfile *__restrict UNUSED(self), struct iov_buffer *__restrict UNUSED(dst),
+                 size_t num_bytes, pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
+	return num_bytes;
+}
+
+/* Explicit writes are simply ignored here */
+#define devvoid_v_write   devnull_v_write
+#define devvoid_v_writev  devnull_v_writev
+#define devvoid_v_pwrite  devnull_v_pwrite
+#define devvoid_v_pwritev devnull_v_pwritev
+#define devvoid_v_seek    devnull_v_seek
+PRIVATE struct mfile_stream_ops const devvoid_stream_ops = {
+	.mso_read    = &devvoid_v_read,
+	.mso_readv   = &devvoid_v_readv,
+	.mso_write   = &devvoid_v_write,
+	.mso_writev  = &devvoid_v_writev,
+	.mso_pread   = &devvoid_v_pread,
+	.mso_preadv  = &devvoid_v_preadv,
+	.mso_pwrite  = &devvoid_v_pwrite,
+	.mso_pwritev = &devvoid_v_pwritev,
+	.mso_seek    = &devvoid_v_seek,
 	.mso_stat    = &nullfile_v_stat,
 	.mso_ioctl   = &chrdev_v_ioctl,
 };
@@ -1191,6 +1321,7 @@ INTERN_CONST struct chrdev_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v
 INTERN_CONST struct chrdev_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devnull_v_loadpages, &devnull_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_v_loadpages, &devzero_stream_ops, NULL);
+INTERN_CONST struct chrdev_ops const dev_void_ops    = DEVICE_OPS_INIT(&devvoid_v_newpart, NULL, &devvoid_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_v_loadpages, &devfull_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
