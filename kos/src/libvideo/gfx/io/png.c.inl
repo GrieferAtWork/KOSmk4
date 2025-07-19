@@ -27,7 +27,10 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/typecore.h>
+
 #include <kos/anno.h>
+#include <kos/types.h>
 #include <sys/syslog.h>
 
 #include <dlfcn.h>
@@ -36,11 +39,16 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <libvideo/codec/codecs.h>
+#include <libvideo/codec/format.h>
+#include <libvideo/codec/palette.h>
+#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 
-#include "../buffer/ram.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 

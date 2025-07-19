@@ -51,28 +51,28 @@
 #include "../gfx-empty.h"
 #include "../gfx.h"
 #include "../ramdomain.h"
-#include "gfx.h"
-#include "region.h"
+#include "old-gfx.h"
+#include "old-region.h"
 #include "utils.h"
 
 DECL_BEGIN
 
-static_assert(offsetof(struct bigregion_buffer_r, brbr_orig) == offsetof(struct subregion_buffer_r, srbr_orig));
-static_assert(offsetof(struct bigregion_buffer_r, brbr_inuse) == offsetof(struct subregion_buffer_r, srbr_inuse));
+static_assert(offsetof(struct old_bigregion_buffer_r, brbr_orig) == offsetof(struct old_subregion_buffer_r, srbr_orig));
+static_assert(offsetof(struct old_bigregion_buffer_r, brbr_inuse) == offsetof(struct old_subregion_buffer_r, srbr_inuse));
 #define bigregion_buffer_r_startuse(self) atomic_inc(&(self)->brbr_inuse)
 #define bigregion_buffer_r_enduse(self)   atomic_dec(&(self)->brbr_inuse)
 #define subregion_buffer_r_startuse(self) atomic_inc(&(self)->srbr_inuse)
 #define subregion_buffer_r_enduse(self)   atomic_dec(&(self)->srbr_inuse)
 
 
-static_assert(offsetof(struct bigregion_buffer, brb_base) == offsetof(struct subregion_buffer, srb_base));
-#define bigregion_buffer_destroy         subregion_buffer_destroy
+static_assert(offsetof(struct old_bigregion_buffer, brb_base) == offsetof(struct old_subregion_buffer, srb_base));
+#define bigregion_buffer_destroy         old_subregion_buffer_destroy
 #define subregion_buffer_r_destroy       bigregion_buffer_r_destroy
 #define subregion_buffer_norem_r_destroy bigregion_buffer_r_destroy
 #define basregion_buffer_r_destroy       bigregion_buffer_r_destroy
 PRIVATE NONNULL((1)) void FCC
 bigregion_buffer_r_destroy(struct video_buffer *__restrict self) {
-	struct bigregion_buffer *me = (struct bigregion_buffer *)self;
+	struct old_bigregion_buffer *me = (struct old_bigregion_buffer *)self;
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
 	video_buffer_decref(me->brb_base);
@@ -90,7 +90,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 bigregion_buffer_rlockregion(struct video_buffer *__restrict self,
                              struct video_regionlock *__restrict lock) {
 	video_coord_t xend, yend;
-	struct bigregion_buffer *me = (struct bigregion_buffer *)self;
+	struct old_bigregion_buffer *me = (struct old_bigregion_buffer *)self;
 	struct video_buffer *base = me->brb_base; /* non-atomic read OK because not revokable */
 	lock->_vrl_rect.vcr_xmin += me->brb_xoff;
 	lock->_vrl_rect.vcr_ymin += me->brb_yoff;
@@ -106,7 +106,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 bigregion_buffer_wlockregion(struct video_buffer *__restrict self,
                              struct video_regionlock *__restrict lock) {
 	video_coord_t xend, yend;
-	struct bigregion_buffer *me = (struct bigregion_buffer *)self;
+	struct old_bigregion_buffer *me = (struct old_bigregion_buffer *)self;
 	struct video_buffer *base = me->brb_base; /* non-atomic read OK because not revokable */
 	lock->_vrl_rect.vcr_xmin += me->brb_xoff;
 	lock->_vrl_rect.vcr_ymin += me->brb_yoff;
@@ -121,7 +121,7 @@ bigregion_buffer_wlockregion(struct video_buffer *__restrict self,
 PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
 NOTHROW(FCC bigregion_buffer_unlockregion)(struct video_buffer *__restrict self,
                                            struct video_regionlock *__restrict lock) {
-	struct bigregion_buffer *me = (struct bigregion_buffer *)self;
+	struct old_bigregion_buffer *me = (struct old_bigregion_buffer *)self;
 	struct video_buffer *base = me->brb_base; /* non-atomic read OK because not revokable */
 	(*base->vb_ops->vi_unlockregion)(base, lock);
 	lock->_vrl_rect.vcr_ymin -= me->brb_yoff;
@@ -133,7 +133,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 bigregion_buffer_r_rlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	video_coord_t xend, yend;
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self;
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self;
 	struct video_buffer *base;
 	atomic_inc(&me->brbr_inuse);
 	base = atomic_read(&me->brb_base);
@@ -157,7 +157,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 bigregion_buffer_r_wlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	video_coord_t xend, yend;
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self;
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self;
 	struct video_buffer *base;
 	atomic_inc(&me->brbr_inuse);
 	base = atomic_read(&me->brb_base);
@@ -183,7 +183,7 @@ NOTHROW(FCC bigregion_buffer_r_unlockregion)(struct video_buffer *__restrict sel
 	/* During revoke, `libvideo_emptybuffer' is assigned as buffer, whose  lock
 	 * operations always fail. As such, the only way to get here is if the lock
 	 * was created by the **ORIGINAL** video buffer. */
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self;
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self;
 	struct video_buffer *base     = me->brbr_orig;
 	(*base->vb_ops->vi_unlockregion)(base, lock);
 	atomic_dec(&me->brbr_inuse);
@@ -200,7 +200,7 @@ PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 subregion_buffer_norem_r_rlock(struct video_buffer *__restrict self,
                                struct video_lock *__restrict lock) {
 	int ok;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -218,7 +218,7 @@ PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 subregion_buffer_norem_r_wlock(struct video_buffer *__restrict self,
                                struct video_lock *__restrict lock) {
 	int ok;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -238,7 +238,7 @@ NOTHROW(FCC subregion_buffer_norem_r_unlock)(struct video_buffer *__restrict sel
 	/* During revoke, `libvideo_emptybuffer' is assigned as buffer, whose  lock
 	 * operations always fail. As such, the only way to get here is if the lock
 	 * was created by the **ORIGINAL** video buffer. */
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base = me->srbr_orig;
 	lock->vl_data -= me->srb_vm_xoff;
 	lock->vl_data -= me->srb_yoff * lock->vl_stride;
@@ -254,7 +254,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 subregion_buffer_r_rlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	int result;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	lock->_vrl_rect.vcr_xmin += me->srb_xoff;
 	lock->_vrl_rect.vcr_ymin += me->srb_yoff;
@@ -270,7 +270,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 subregion_buffer_r_wlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	int result;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	lock->_vrl_rect.vcr_xmin += me->srb_xoff;
 	lock->_vrl_rect.vcr_ymin += me->srb_yoff;
@@ -288,7 +288,7 @@ NOTHROW(FCC subregion_buffer_r_unlockregion)(struct video_buffer *__restrict sel
 	/* During revoke, `libvideo_emptybuffer' is assigned as buffer, whose  lock
 	 * operations always fail. As such, the only way to get here is if the lock
 	 * was created by the **ORIGINAL** video buffer. */
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base     = me->srbr_orig;
 	(*base->vb_ops->vi_unlockregion)(base, lock);
 	subregion_buffer_r_enduse(me);
@@ -302,7 +302,7 @@ PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 basregion_buffer_r_rlock(struct video_buffer *__restrict self,
                          struct video_lock *__restrict lock) {
 	int ok;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -316,7 +316,7 @@ PRIVATE ATTR_INOUT(1) ATTR_OUT(2) int FCC
 basregion_buffer_r_wlock(struct video_buffer *__restrict self,
                          struct video_lock *__restrict lock) {
 	int ok;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -332,7 +332,7 @@ NOTHROW(FCC basregion_buffer_r_unlock)(struct video_buffer *__restrict self,
 	/* During revoke, `libvideo_emptybuffer' is assigned as buffer, whose  lock
 	 * operations always fail. As such, the only way to get here is if the lock
 	 * was created by the **ORIGINAL** video buffer. */
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base = me->srbr_orig;
 	(*base->vb_ops->vi_unlock)(base, lock);
 	subregion_buffer_r_enduse(me);
@@ -342,7 +342,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 basregion_buffer_r_rlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	int result;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -356,7 +356,7 @@ PRIVATE ATTR_INOUT(1) NONNULL((2)) int FCC
 basregion_buffer_r_wlockregion(struct video_buffer *__restrict self,
                                struct video_regionlock *__restrict lock) {
 	int result;
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base;
 	subregion_buffer_r_startuse(me);
 	base = atomic_read(&me->srb_base);
@@ -372,21 +372,21 @@ NOTHROW(FCC basregion_buffer_r_unlockregion)(struct video_buffer *__restrict sel
 	/* During revoke, `libvideo_emptybuffer' is assigned as buffer, whose  lock
 	 * operations always fail. As such, the only way to get here is if the lock
 	 * was created by the **ORIGINAL** video buffer. */
-	struct subregion_buffer_r *me = (struct subregion_buffer_r *)self;
+	struct old_subregion_buffer_r *me = (struct old_subregion_buffer_r *)self;
 	struct video_buffer *base     = me->srbr_orig;
 	(*base->vb_ops->vi_unlockregion)(base, lock);
 	subregion_buffer_r_enduse(me);
 }
 
 
-static_assert(offsetof(struct bigregion_buffer, brb_base) == offsetof(struct subregion_buffer, srb_base));
-static_assert(sizeof_field(struct bigregion_buffer, brb_base) == sizeof_field(struct subregion_buffer, srb_base));
-static_assert(offsetof(struct bigregion_buffer, brb_xoff) == offsetof(struct subregion_buffer, srb_xoff));
-static_assert(sizeof_field(struct bigregion_buffer, brb_xoff) == sizeof_field(struct subregion_buffer, srb_xoff));
-static_assert(offsetof(struct bigregion_buffer, brb_yoff) == offsetof(struct subregion_buffer, srb_yoff));
-static_assert(sizeof_field(struct bigregion_buffer, brb_yoff) == sizeof_field(struct subregion_buffer, srb_yoff));
-#define bigregion_buffer_initgfx   subregion_buffer_initgfx
-#define bigregion_buffer_updategfx subregion_buffer_updategfx
+static_assert(offsetof(struct old_bigregion_buffer, brb_base) == offsetof(struct old_subregion_buffer, srb_base));
+static_assert(sizeof_field(struct old_bigregion_buffer, brb_base) == sizeof_field(struct old_subregion_buffer, srb_base));
+static_assert(offsetof(struct old_bigregion_buffer, brb_xoff) == offsetof(struct old_subregion_buffer, srb_xoff));
+static_assert(sizeof_field(struct old_bigregion_buffer, brb_xoff) == sizeof_field(struct old_subregion_buffer, srb_xoff));
+static_assert(offsetof(struct old_bigregion_buffer, brb_yoff) == offsetof(struct old_subregion_buffer, srb_yoff));
+static_assert(sizeof_field(struct old_bigregion_buffer, brb_yoff) == sizeof_field(struct old_subregion_buffer, srb_yoff));
+#define bigregion_buffer_initgfx   old_subregion_buffer_initgfx
+#define bigregion_buffer_updategfx old_subregion_buffer_updategfx
 
 
 #define REGION_GFX_SUBOPS      (_VIDEO_GFX_N_DRIVER - 1)
@@ -410,7 +410,7 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC _region_gfx_ops_subops(
 
 #define SUBGFX_BEGIN(subgfx_name, self)                                                 \
 	struct video_gfx subgfx_name;                                                       \
-	struct bigregion_buffer_r *_sg_me = (struct bigregion_buffer_r *)(self)->vx_buffer; \
+	struct old_bigregion_buffer_r *_sg_me = (struct old_bigregion_buffer_r *)(self)->vx_buffer; \
 	struct video_buffer *base;                                                          \
 	atomic_inc(&_sg_me->brbr_inuse);                                                    \
 	base = atomic_read(&_sg_me->brb_base);                                              \
@@ -434,7 +434,7 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC _region_gfx_ops_subops(
 #define SUBOPS_BEGIN(self)                                                                            \
 	struct video_gfx *_mygfx = (struct video_gfx *)(self);                                            \
 	struct video_buffer *_so_base;                                                                    \
-	struct bigregion_buffer_r *_so_me = (struct bigregion_buffer_r *)_mygfx->vx_buffer;               \
+	struct old_bigregion_buffer_r *_so_me = (struct old_bigregion_buffer_r *)_mygfx->vx_buffer;               \
 	assert(_mygfx->vx_hdr.vxh_ops == &region_gfx_ops_subops);                                         \
 	atomic_inc(&_so_me->brbr_inuse);                                                                  \
 	_so_base = atomic_read(&_so_me->brb_base);                                                        \
@@ -1117,7 +1117,7 @@ _region_gfx_ops_subops(void) {
 #define subregion_buffer_norem_r_initgfx bigregion_buffer_r_initgfx
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bigregion_buffer_r_initgfx(struct video_gfx *__restrict self) {
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self->vx_buffer;
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self->vx_buffer;
 	struct video_buffer *base;
 	bigregion_buffer_r_startuse(me);
 	self->vx_buffer = base = atomic_read(&me->brb_base);
@@ -1140,7 +1140,7 @@ bigregion_buffer_r_initgfx(struct video_gfx *__restrict self) {
 
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 basregion_buffer_r_initgfx(struct video_gfx *__restrict self) {
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self->vx_buffer;
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self->vx_buffer;
 	struct video_buffer *base;
 	bigregion_buffer_r_startuse(me);
 	self->vx_buffer = base = atomic_read(&me->brb_base);
@@ -1165,7 +1165,7 @@ basregion_buffer_r_initgfx(struct video_gfx *__restrict self) {
 PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 bigregion_buffer_r_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 	if (self->vx_hdr.vxh_ops == &region_gfx_ops_subops) {
-		struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self->vx_buffer;
+		struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self->vx_buffer;
 		struct video_buffer *base;
 		bigregion_buffer_r_startuse(me);
 		base = atomic_read(&me->brb_base);
@@ -1196,100 +1196,100 @@ bigregion_buffer_r_updategfx(struct video_gfx *__restrict self, unsigned int wha
 
 
 
-INTERN struct video_buffer_ops bigregion_buffer_ops = {};
-INTERN struct video_buffer_ops bigregion_buffer_ops_r = {};
-INTERN struct video_buffer_ops subregion_buffer_ops_r = {};
-INTERN struct video_buffer_ops subregion_buffer_ops_norem_r = {};
-INTERN struct video_buffer_ops basregion_buffer_ops_r = {};
+INTERN struct video_buffer_ops old_bigregion_buffer_ops = {};
+INTERN struct video_buffer_ops old_bigregion_buffer_ops_r = {};
+INTERN struct video_buffer_ops old_subregion_buffer_ops_r = {};
+INTERN struct video_buffer_ops old_subregion_buffer_ops_norem_r = {};
+INTERN struct video_buffer_ops old_basregion_buffer_ops_r = {};
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
-_bigregion_buffer_ops(void) {
-	if (!bigregion_buffer_ops.vi_destroy) {
-		bigregion_buffer_ops.vi_rlock        = &bigregion_buffer_rlock;
-		bigregion_buffer_ops.vi_wlock        = &bigregion_buffer_wlock;
-		bigregion_buffer_ops.vi_unlock       = &bigregion_buffer_unlock;
-		bigregion_buffer_ops.vi_rlockregion  = &bigregion_buffer_rlockregion;
-		bigregion_buffer_ops.vi_wlockregion  = &bigregion_buffer_wlockregion;
-		bigregion_buffer_ops.vi_unlockregion = &bigregion_buffer_unlockregion;
-		bigregion_buffer_ops.vi_initgfx      = &bigregion_buffer_initgfx;
-		bigregion_buffer_ops.vi_updategfx    = &bigregion_buffer_updategfx;
+_old_bigregion_buffer_ops(void) {
+	if (!old_bigregion_buffer_ops.vi_destroy) {
+		old_bigregion_buffer_ops.vi_rlock        = &bigregion_buffer_rlock;
+		old_bigregion_buffer_ops.vi_wlock        = &bigregion_buffer_wlock;
+		old_bigregion_buffer_ops.vi_unlock       = &bigregion_buffer_unlock;
+		old_bigregion_buffer_ops.vi_rlockregion  = &bigregion_buffer_rlockregion;
+		old_bigregion_buffer_ops.vi_wlockregion  = &bigregion_buffer_wlockregion;
+		old_bigregion_buffer_ops.vi_unlockregion = &bigregion_buffer_unlockregion;
+		old_bigregion_buffer_ops.vi_initgfx      = &bigregion_buffer_initgfx;
+		old_bigregion_buffer_ops.vi_updategfx    = &bigregion_buffer_updategfx;
 		COMPILER_WRITE_BARRIER();
-		bigregion_buffer_ops.vi_destroy = &bigregion_buffer_destroy;
+		old_bigregion_buffer_ops.vi_destroy = &bigregion_buffer_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &bigregion_buffer_ops;
+	return &old_bigregion_buffer_ops;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
-_bigregion_buffer_ops_r(void) {
-	if (!bigregion_buffer_ops_r.vi_destroy) {
-		bigregion_buffer_ops_r.vi_rlock        = &bigregion_buffer_r_rlock;
-		bigregion_buffer_ops_r.vi_wlock        = &bigregion_buffer_r_wlock;
-		bigregion_buffer_ops_r.vi_unlock       = &bigregion_buffer_r_unlock;
-		bigregion_buffer_ops_r.vi_rlockregion  = &bigregion_buffer_r_rlockregion;
-		bigregion_buffer_ops_r.vi_wlockregion  = &bigregion_buffer_r_wlockregion;
-		bigregion_buffer_ops_r.vi_unlockregion = &bigregion_buffer_r_unlockregion;
-		bigregion_buffer_ops_r.vi_initgfx      = &bigregion_buffer_r_initgfx;
-		bigregion_buffer_ops_r.vi_updategfx    = &bigregion_buffer_r_updategfx;
+_old_bigregion_buffer_ops_r(void) {
+	if (!old_bigregion_buffer_ops_r.vi_destroy) {
+		old_bigregion_buffer_ops_r.vi_rlock        = &bigregion_buffer_r_rlock;
+		old_bigregion_buffer_ops_r.vi_wlock        = &bigregion_buffer_r_wlock;
+		old_bigregion_buffer_ops_r.vi_unlock       = &bigregion_buffer_r_unlock;
+		old_bigregion_buffer_ops_r.vi_rlockregion  = &bigregion_buffer_r_rlockregion;
+		old_bigregion_buffer_ops_r.vi_wlockregion  = &bigregion_buffer_r_wlockregion;
+		old_bigregion_buffer_ops_r.vi_unlockregion = &bigregion_buffer_r_unlockregion;
+		old_bigregion_buffer_ops_r.vi_initgfx      = &bigregion_buffer_r_initgfx;
+		old_bigregion_buffer_ops_r.vi_updategfx    = &bigregion_buffer_r_updategfx;
 		COMPILER_WRITE_BARRIER();
-		bigregion_buffer_ops_r.vi_destroy = &bigregion_buffer_r_destroy;
+		old_bigregion_buffer_ops_r.vi_destroy = &bigregion_buffer_r_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &bigregion_buffer_ops_r;
+	return &old_bigregion_buffer_ops_r;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
-_subregion_buffer_ops_r(void) {
-	if (!subregion_buffer_ops_r.vi_destroy) {
-		subregion_buffer_ops_r.vi_rlock        = &subregion_buffer_r_rlock;
-		subregion_buffer_ops_r.vi_wlock        = &subregion_buffer_r_wlock;
-		subregion_buffer_ops_r.vi_unlock       = &subregion_buffer_r_unlock;
-		subregion_buffer_ops_r.vi_rlockregion  = &subregion_buffer_r_rlockregion;
-		subregion_buffer_ops_r.vi_wlockregion  = &subregion_buffer_r_wlockregion;
-		subregion_buffer_ops_r.vi_unlockregion = &subregion_buffer_r_unlockregion;
-		subregion_buffer_ops_r.vi_initgfx      = &subregion_buffer_r_initgfx;
-		subregion_buffer_ops_r.vi_updategfx    = &subregion_buffer_r_updategfx;
+_old_subregion_buffer_ops_r(void) {
+	if (!old_subregion_buffer_ops_r.vi_destroy) {
+		old_subregion_buffer_ops_r.vi_rlock        = &subregion_buffer_r_rlock;
+		old_subregion_buffer_ops_r.vi_wlock        = &subregion_buffer_r_wlock;
+		old_subregion_buffer_ops_r.vi_unlock       = &subregion_buffer_r_unlock;
+		old_subregion_buffer_ops_r.vi_rlockregion  = &subregion_buffer_r_rlockregion;
+		old_subregion_buffer_ops_r.vi_wlockregion  = &subregion_buffer_r_wlockregion;
+		old_subregion_buffer_ops_r.vi_unlockregion = &subregion_buffer_r_unlockregion;
+		old_subregion_buffer_ops_r.vi_initgfx      = &subregion_buffer_r_initgfx;
+		old_subregion_buffer_ops_r.vi_updategfx    = &subregion_buffer_r_updategfx;
 		COMPILER_WRITE_BARRIER();
-		subregion_buffer_ops_r.vi_destroy = &subregion_buffer_r_destroy;
+		old_subregion_buffer_ops_r.vi_destroy = &subregion_buffer_r_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &subregion_buffer_ops_r;
+	return &old_subregion_buffer_ops_r;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
-_subregion_buffer_ops_norem_r(void) {
-	if (!subregion_buffer_ops_norem_r.vi_destroy) {
-		subregion_buffer_ops_norem_r.vi_rlock        = &subregion_buffer_norem_r_rlock;
-		subregion_buffer_ops_norem_r.vi_wlock        = &subregion_buffer_norem_r_wlock;
-		subregion_buffer_ops_norem_r.vi_unlock       = &subregion_buffer_norem_r_unlock;
-		subregion_buffer_ops_norem_r.vi_rlockregion  = &subregion_buffer_norem_r_rlockregion;
-		subregion_buffer_ops_norem_r.vi_wlockregion  = &subregion_buffer_norem_r_wlockregion;
-		subregion_buffer_ops_norem_r.vi_unlockregion = &subregion_buffer_norem_r_unlockregion;
-		subregion_buffer_ops_norem_r.vi_initgfx      = &subregion_buffer_norem_r_initgfx;
-		subregion_buffer_ops_norem_r.vi_updategfx    = &subregion_buffer_norem_r_updategfx;
+_old_subregion_buffer_ops_norem_r(void) {
+	if (!old_subregion_buffer_ops_norem_r.vi_destroy) {
+		old_subregion_buffer_ops_norem_r.vi_rlock        = &subregion_buffer_norem_r_rlock;
+		old_subregion_buffer_ops_norem_r.vi_wlock        = &subregion_buffer_norem_r_wlock;
+		old_subregion_buffer_ops_norem_r.vi_unlock       = &subregion_buffer_norem_r_unlock;
+		old_subregion_buffer_ops_norem_r.vi_rlockregion  = &subregion_buffer_norem_r_rlockregion;
+		old_subregion_buffer_ops_norem_r.vi_wlockregion  = &subregion_buffer_norem_r_wlockregion;
+		old_subregion_buffer_ops_norem_r.vi_unlockregion = &subregion_buffer_norem_r_unlockregion;
+		old_subregion_buffer_ops_norem_r.vi_initgfx      = &subregion_buffer_norem_r_initgfx;
+		old_subregion_buffer_ops_norem_r.vi_updategfx    = &subregion_buffer_norem_r_updategfx;
 		COMPILER_WRITE_BARRIER();
-		subregion_buffer_ops_norem_r.vi_destroy = &subregion_buffer_norem_r_destroy;
+		old_subregion_buffer_ops_norem_r.vi_destroy = &subregion_buffer_norem_r_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &subregion_buffer_ops_norem_r;
+	return &old_subregion_buffer_ops_norem_r;
 }
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC
-_basregion_buffer_ops_r(void) {
-	if (!basregion_buffer_ops_r.vi_destroy) {
-		basregion_buffer_ops_r.vi_rlock        = &basregion_buffer_r_rlock;
-		basregion_buffer_ops_r.vi_wlock        = &basregion_buffer_r_wlock;
-		basregion_buffer_ops_r.vi_unlock       = &basregion_buffer_r_unlock;
-		basregion_buffer_ops_r.vi_rlockregion  = &basregion_buffer_r_rlockregion;
-		basregion_buffer_ops_r.vi_wlockregion  = &basregion_buffer_r_wlockregion;
-		basregion_buffer_ops_r.vi_unlockregion = &basregion_buffer_r_unlockregion;
-		basregion_buffer_ops_r.vi_initgfx      = &basregion_buffer_r_initgfx;
-		basregion_buffer_ops_r.vi_updategfx    = &basregion_buffer_r_updategfx;
+_old_basregion_buffer_ops_r(void) {
+	if (!old_basregion_buffer_ops_r.vi_destroy) {
+		old_basregion_buffer_ops_r.vi_rlock        = &basregion_buffer_r_rlock;
+		old_basregion_buffer_ops_r.vi_wlock        = &basregion_buffer_r_wlock;
+		old_basregion_buffer_ops_r.vi_unlock       = &basregion_buffer_r_unlock;
+		old_basregion_buffer_ops_r.vi_rlockregion  = &basregion_buffer_r_rlockregion;
+		old_basregion_buffer_ops_r.vi_wlockregion  = &basregion_buffer_r_wlockregion;
+		old_basregion_buffer_ops_r.vi_unlockregion = &basregion_buffer_r_unlockregion;
+		old_basregion_buffer_ops_r.vi_initgfx      = &basregion_buffer_r_initgfx;
+		old_basregion_buffer_ops_r.vi_updategfx    = &basregion_buffer_r_updategfx;
 		COMPILER_WRITE_BARRIER();
-		basregion_buffer_ops_r.vi_destroy = &basregion_buffer_r_destroy;
+		old_basregion_buffer_ops_r.vi_destroy = &basregion_buffer_r_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &basregion_buffer_ops_r;
+	return &old_basregion_buffer_ops_r;
 }
 
 
@@ -1305,23 +1305,23 @@ libvideo_buffer_region_impl(struct video_buffer *__restrict self,
 	/* TODO: Better integration when "self" is a GFX-buffer */
 
 	/* TODO: Inline offsets when "self" is one of the following:
-	 * >> bigregion_buffer_ops
-	 * >> bigregion_buffer_ops_r
-	 * >> subregion_buffer_ops
-	 * >> subregion_buffer_ops_norem
-	 * >> subregion_buffer_ops_r
-	 * >> subregion_buffer_ops_norem_r
+	 * >> old_bigregion_buffer_ops
+	 * >> old_bigregion_buffer_ops_r
+	 * >> old_subregion_buffer_ops
+	 * >> old_subregion_buffer_ops_norem
+	 * >> old_subregion_buffer_ops_r
+	 * >> old_subregion_buffer_ops_norem_r
 	 */
 
 	if (!is_subregion) {
-		struct bigregion_buffer_r *result;
-		size_t struct_size = revokable ? sizeof(struct bigregion_buffer_r)
-		                               : sizeof(struct bigregion_buffer_r);
-		result = (struct bigregion_buffer_r *)malloc(struct_size);
+		struct old_bigregion_buffer_r *result;
+		size_t struct_size = revokable ? sizeof(struct old_bigregion_buffer_r)
+		                               : sizeof(struct old_bigregion_buffer_r);
+		result = (struct old_bigregion_buffer_r *)malloc(struct_size);
 		if unlikely(!result)
 			goto err;
-		result->vb_ops = revokable ? _bigregion_buffer_ops_r()
-		                           : _bigregion_buffer_ops();
+		result->vb_ops = revokable ? _old_bigregion_buffer_ops_r()
+		                           : _old_bigregion_buffer_ops();
 		result->vb_format = self->vb_format;
 		if (result->vb_format.vf_pal)
 			video_palette_incref(result->vb_format.vf_pal);
@@ -1339,10 +1339,10 @@ libvideo_buffer_region_impl(struct video_buffer *__restrict self,
 		}
 		return result;
 	} else {
-		struct subregion_buffer_r *result;
-		size_t struct_size = revokable ? sizeof(struct subregion_buffer_r)
-		                               : sizeof(struct subregion_buffer_r);
-		result = (struct subregion_buffer_r *)malloc(struct_size);
+		struct old_subregion_buffer_r *result;
+		size_t struct_size = revokable ? sizeof(struct old_subregion_buffer_r)
+		                               : sizeof(struct old_subregion_buffer_r);
+		result = (struct old_subregion_buffer_r *)malloc(struct_size);
 		if unlikely(!result)
 			goto err;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
@@ -1356,13 +1356,13 @@ libvideo_buffer_region_impl(struct video_buffer *__restrict self,
 			/* Special case optimization: same dimensions as base buffer.
 			 * This has a special optimization since this happens when an
 			 * app is given fullscreen, passthru access to display memory */
-			result->vb_ops = _basregion_buffer_ops_r();
+			result->vb_ops = _old_basregion_buffer_ops_r();
 		} else if (result->srb_vm_xrem) {
-			result->vb_ops = revokable ? _subregion_buffer_ops_r()
-			                           : _subregion_buffer_ops();
+			result->vb_ops = revokable ? _old_subregion_buffer_ops_r()
+			                           : _old_subregion_buffer_ops();
 		} else {
-			result->vb_ops = revokable ? _subregion_buffer_ops_norem_r()
-			                           : _subregion_buffer_ops_norem();
+			result->vb_ops = revokable ? _old_subregion_buffer_ops_norem_r()
+			                           : _old_subregion_buffer_ops_norem();
 		}
 		result->vb_format = self->vb_format;
 		if (result->vb_format.vf_pal)
@@ -1394,16 +1394,16 @@ err:
  * NOTE: Starting coords in `rect' are allowed to be negative, and its dimensions
  *       are allowed to be greater than those of `self', too!
  *
- * `video_buffer_region_revocable()' does the same,  but the returned video  buffer
- * is also "revocable" (s.a. `libvideo_buffer_region_revoke()'), meaning it can  be
- * detached from the original buffer (and turned into a no-op) at any point in time
- * (blocking if a video lock is held in `libvideo_buffer_region_revoke()').
+ * `old_video_buffer_region_revocable()' does the same, but the returned video  buffer
+ * is also "revocable" (s.a. `old_libvideo_buffer_region_revoke()'), meaning it can be
+ * detached from the original buffer  (and turned into a no-op)  at any point in  time
+ * (blocking if a video lock is held in `old_libvideo_buffer_region_revoke()').
  *
  * @return: * :   The wrapper video buffer
  * @return: NULL: Failed to create video buffer (s.a. `errno') */
-DEFINE_PUBLIC_ALIAS(video_buffer_region, libvideo_buffer_region);
+DEFINE_PUBLIC_ALIAS(old_video_buffer_region, old_libvideo_buffer_region);
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
-libvideo_buffer_region(struct video_buffer *__restrict self,
+old_libvideo_buffer_region(struct video_buffer *__restrict self,
                        struct video_rect const *__restrict rect) {
 	/* Check for special case: "rect" is the full buffer */
 	if (rect->vr_xmin == 0 && rect->vr_ymin == 0 &&
@@ -1415,52 +1415,52 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 	return libvideo_buffer_region_impl(self, rect, false);
 }
 
-DEFINE_PUBLIC_ALIAS(video_buffer_region_revocable, libvideo_buffer_region_revocable);
+DEFINE_PUBLIC_ALIAS(old_video_buffer_region_revocable, old_libvideo_buffer_region_revocable);
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
-libvideo_buffer_region_revocable(struct video_buffer *__restrict self,
+old_libvideo_buffer_region_revocable(struct video_buffer *__restrict self,
                                  struct video_rect const *__restrict rect) {
 	struct video_buffer *me = self;
 
 	/* Check for special case: "self" is already revocable
-	 * -> In this case, can  just create a non-revocable  wrapper
-	 *    that `libvideo_buffer_region_revoke()' will just unwrap */
-	while (me->vb_ops == &bigregion_buffer_ops ||
-	       me->vb_ops == &subregion_buffer_ops ||
-	       me->vb_ops == &subregion_buffer_ops_norem)
-		me = ((struct bigregion_buffer_r *)me)->brb_base;
-	if (me->vb_ops == &bigregion_buffer_ops_r ||
-	    me->vb_ops == &subregion_buffer_ops_r ||
-	    me->vb_ops == &subregion_buffer_ops_norem_r)
-		return libvideo_buffer_region(self, rect);
+	 * -> In this  case,  can  just create  a  non-revocable  wrapper
+	 *    that `old_libvideo_buffer_region_revoke()' will just unwrap */
+	while (me->vb_ops == &old_bigregion_buffer_ops ||
+	       me->vb_ops == &old_subregion_buffer_ops ||
+	       me->vb_ops == &old_subregion_buffer_ops_norem)
+		me = ((struct old_bigregion_buffer_r *)me)->brb_base;
+	if (me->vb_ops == &old_bigregion_buffer_ops_r ||
+	    me->vb_ops == &old_subregion_buffer_ops_r ||
+	    me->vb_ops == &old_subregion_buffer_ops_norem_r)
+		return old_libvideo_buffer_region(self, rect);
 
 	/* Create a new region buffer with revocation support */
 	return libvideo_buffer_region_impl(self, rect, true);
 }
 
 
-/* Revoke  access  to the  underlying  video buffer,  given  a video
- * buffer that was returned by `libvideo_buffer_region_revocable()'.
+/* Revoke  access  to  the  underlying  video  buffer,  given  a   video
+ * buffer that was returned by `old_libvideo_buffer_region_revocable()'.
  * If the buffer had already been revoked, this is a no-op.
  *
  * >> DO NOT CALL THIS FUNCTION FOR BUFFERS OBTAINED FROM SOMETHING
- * >> OTHER THAN `libvideo_buffer_region_revocable()' !!!
+ * >> OTHER THAN `old_libvideo_buffer_region_revocable()' !!!
  *
  * @return: * : Always re-returns `self' */
-DEFINE_PUBLIC_ALIAS(video_buffer_region_revoke, libvideo_buffer_region_revoke);
+DEFINE_PUBLIC_ALIAS(old_video_buffer_region_revoke, old_libvideo_buffer_region_revoke);
 INTERN ATTR_INOUT(1) struct video_buffer *CC
-libvideo_buffer_region_revoke(struct video_buffer *__restrict self) {
-	struct bigregion_buffer_r *me = (struct bigregion_buffer_r *)self;
+old_libvideo_buffer_region_revoke(struct video_buffer *__restrict self) {
+	struct old_bigregion_buffer_r *me = (struct old_bigregion_buffer_r *)self;
 	struct video_buffer *obuf, *empty;
-	static_assert(offsetof(struct bigregion_buffer_r, brbr_inuse) ==
-	              offsetof(struct subregion_buffer_r, srbr_inuse));
+	static_assert(offsetof(struct old_bigregion_buffer_r, brbr_inuse) ==
+	              offsetof(struct old_subregion_buffer_r, srbr_inuse));
 	/* Unwrap region wrappers without revoke support. */
-	while (me->vb_ops == &bigregion_buffer_ops ||
-	       me->vb_ops == &subregion_buffer_ops ||
-	       me->vb_ops == &subregion_buffer_ops_norem)
-		me = (struct bigregion_buffer_r *)me->brb_base;
-	assertf(me->vb_ops == &bigregion_buffer_ops_r ||
-	        me->vb_ops == &subregion_buffer_ops_r ||
-	        me->vb_ops == &subregion_buffer_ops_norem_r,
+	while (me->vb_ops == &old_bigregion_buffer_ops ||
+	       me->vb_ops == &old_subregion_buffer_ops ||
+	       me->vb_ops == &old_subregion_buffer_ops_norem)
+		me = (struct old_bigregion_buffer_r *)me->brb_base;
+	assertf(me->vb_ops == &old_bigregion_buffer_ops_r ||
+	        me->vb_ops == &old_subregion_buffer_ops_r ||
+	        me->vb_ops == &old_subregion_buffer_ops_norem_r,
 	        "Not a revokable buffer!");
 
 	/* Load replacement buffer (for this: always use the "empty" buffer) */

@@ -60,7 +60,7 @@
 #include <libvideo/types.h>
 
 #include "../buffer.h"
-#include "../buffer/ram.h"
+#include "../buffer/old-ram.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 

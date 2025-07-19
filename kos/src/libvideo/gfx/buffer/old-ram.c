@@ -49,7 +49,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "../gfx-utils.h"
 #include "../gfx.h"
 #include "../swgfx.h"
-#include "ram.h"
+#include "old-ram.h"
 
 DECL_BEGIN
 

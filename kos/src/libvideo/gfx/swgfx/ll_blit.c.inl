@@ -44,7 +44,7 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "../buffer/ram.h"
+#include "../buffer/old-ram.h"
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"
 #include "../swgfx.h"

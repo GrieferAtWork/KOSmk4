@@ -41,7 +41,6 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "buffer/ram.h"
 #include "gfx-utils.h"
 #include "gfx.h"
 #include "ramdomain.h"
@@ -315,6 +314,7 @@ LOCAL_ramgfx__putcolor_noblend(struct video_gfx const *__restrict self,
 	LOCAL_GFX_UNLOCK();
 }
 
+#ifndef __INTELLISENSE__
 #define DEFINE_LOCAL_ramgfx__putcolor_FOO(name, mode)                        \
 	INTERN ATTR_IN(1) void CC                                                \
 	LOCAL_ramgfx__(putcolor_##name)(struct video_gfx const *__restrict self, \
@@ -349,9 +349,9 @@ GFX_FOREACH_DEDICATED_BLENDMODE(DEFINE_LOCAL_ramgfx__putcolor_FOO)
 		video_format_setcolor(LOCAL_GFX_FORMAT, line, x, n);                 \
 		LOCAL_GFX_UNLOCK();                                                  \
 	}
-GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DEFINE_LOCAL_ramgfx__putcolor_FOO)
+GFX_FOREACH_DEDICATED_BLENDMODE_FACTOR(DEFINE_LOCAL_ramgfx__putcolor_FOO);
 #undef DEFINE_LOCAL_ramgfx__putcolor_FOO
-;
+#endif /* !__INTELLISENSE__ */
 
 INTERN ATTR_IN(1) video_pixel_t CC
 LOCAL_ramgfx__getpixel(struct video_gfx const *__restrict self,

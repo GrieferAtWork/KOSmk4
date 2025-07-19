@@ -44,9 +44,9 @@
 
 #include "../buffer.h"
 #include "../ramdomain.h"
-#include "gfx.h"
+#include "old-gfx.h"
 #include "lockable.h"
-#include "ram.h"
+#include "old-ram.h"
 
 DECL_BEGIN
 
@@ -360,10 +360,10 @@ video_buffer_islockable(struct video_buffer const *__restrict self) {
 		goto yes;
 	if (self->vb_ops == &old_membuffer_ops__for_codec)
 		goto yes;
-	if (self->vb_ops == &subregion_buffer_ops_norem) {
+	if (self->vb_ops == &old_subregion_buffer_ops_norem) {
 		/* Subregion buffers are locked iff the underlying buffer is */
-		struct subregion_buffer const *me;
-		me = (struct subregion_buffer const *)self;
+		struct old_subregion_buffer const *me;
+		me = (struct old_subregion_buffer const *)self;
 		return video_buffer_islockable(me->srb_base);
 	}
 	return false;

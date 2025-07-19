@@ -47,7 +47,7 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/types.h>
 
-#include "../buffer/ram.h"
+#include "../buffer/old-ram.h"
 #include "../io-utils.h"
 
 DECL_BEGIN

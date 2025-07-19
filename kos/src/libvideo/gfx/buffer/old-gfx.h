@@ -37,25 +37,25 @@
 DECL_BEGIN
 
 /* Buffer representing a sub-region of a larger buffer */
-struct subregion_buffer: video_buffer {
+struct old_subregion_buffer: video_buffer {
 	REF struct video_buffer *srb_base;    /* [1..1][const] Underlying video buffer */
 	video_coord_t            srb_xoff;    /* [const] Starting X offset of pixel data in `srb_base' */
 	video_coord_t            srb_yoff;    /* [const] Starting Y offset of pixel data in `srb_base' */
-	/* HINT: Until this point, we are binary-compatible with `struct gfx_buffer' */
-	size_t                   srb_vm_xoff; /* [const] Byte  offset  for  `srb_xoff'  in  video  memory
-	                                       * (properly aligned as per `vb_format.vf_codec->vc_align')
-	                                       * When this value cannot be calculated, a subregion_buffer
-	                                       * cannot be used, and  `gfx_buffer' must be used  instead. */
+	/* HINT: Until this point, we are binary-compatible with `struct old_gfx_buffer' */
+	size_t                   srb_vm_xoff; /* [const] Byte   offset   for  `srb_xoff'   in   video  memory
+	                                       * (properly  aligned  as  per  `vb_format.vf_codec->vc_align')
+	                                       * When this value cannot be calculated, a old_subregion_buffer
+	                                       * cannot be used, and  `old_gfx_buffer' must be used  instead. */
 	video_coord_t            srb_vm_xrem; /* [const] Remaining X pixels not representable by `srb_vm_xoff' */
 };
 
 
 /* Buffer representing a custom GFX region / format within a larger video buffer */
-struct gfx_buffer: video_buffer {
+struct old_gfx_buffer: video_buffer {
 	REF struct video_buffer *gxb_base;     /* [1..1][const] Underlying video buffer */
 	video_offset_t           gxb_cxoff;    /* [const] s.a. `struct video_gfxhdr::vxh_cxoff' */
 	video_offset_t           gxb_cyoff;    /* [const] s.a. `struct video_gfxhdr::vxh_cyoff' */
-	/* HINT: Until this point, we are binary-compatible with `struct subregion_buffer' */
+	/* HINT: Until this point, we are binary-compatible with `struct old_subregion_buffer' */
 	video_coord_t            gxb_bxmin;    /* [const] s.a. `struct video_gfxhdr::vxh_bxmin' */
 	video_coord_t            gxb_bymin;    /* [const] s.a. `struct video_gfxhdr::vxh_bymin' */
 	video_coord_t            gxb_bxend;    /* [const] s.a. `struct video_gfxhdr::vxh_bxend' */
@@ -64,33 +64,33 @@ struct gfx_buffer: video_buffer {
 	video_color_t            gxb_colorkey; /* [const] s.a. `struct video_gfx::vx_colorkey' */
 };
 
-INTDEF NONNULL((1)) void FCC subregion_buffer_destroy(struct video_buffer *__restrict self);
-#define gfx_buffer_destroy subregion_buffer_destroy
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC subregion_buffer_norem_wlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC subregion_buffer_norem_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
-INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC subregion_buffer_rlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
-INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC subregion_buffer_wlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
-INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC subregion_buffer_unlockregion)(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC subregion_buffer_initgfx(struct video_gfx *__restrict self);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC subregion_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
+INTDEF NONNULL((1)) void FCC old_subregion_buffer_destroy(struct video_buffer *__restrict self);
+#define old_gfx_buffer_destroy old_subregion_buffer_destroy
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC old_subregion_buffer_norem_rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC old_subregion_buffer_norem_wlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC old_subregion_buffer_norem_unlock)(struct video_buffer *__restrict self, struct video_lock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC old_subregion_buffer_rlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC old_subregion_buffer_wlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_INOUT(1) ATTR_IN(2) void NOTHROW(FCC old_subregion_buffer_unlockregion)(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC old_subregion_buffer_initgfx(struct video_gfx *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC old_subregion_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what);
 
-INTDEF struct video_buffer_ops subregion_buffer_ops;       /* `srb_vm_xrem != 0' */
-INTDEF struct video_buffer_ops subregion_buffer_ops_norem; /* `srb_vm_xrem == 0' */
-INTDEF struct video_buffer_ops gfx_buffer_ops;
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _subregion_buffer_ops_norem(void);
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _gfx_buffer_ops(void);
+INTDEF struct video_buffer_ops old_subregion_buffer_ops;       /* `srb_vm_xrem != 0' */
+INTDEF struct video_buffer_ops old_subregion_buffer_ops_norem; /* `srb_vm_xrem == 0' */
+INTDEF struct video_buffer_ops old_gfx_buffer_ops;
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _old_subregion_buffer_ops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _old_subregion_buffer_ops_norem(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC _old_gfx_buffer_ops(void);
 
 
-/* Check  if `buffer'  is gfx.  If so  re-return "buffer" and
- * initialize `self' such that `libvideo_buffer_fromgfx_fini'
- * does nothing. Else, wrap it using `buffer' and return *it*
+/* Check  if  `buffer'  is  gfx.  If  so  re-return  "buffer" and
+ * initialize `self' such that `old_libvideo_buffer_fromgfx_fini'
+ * does  nothing. Else,  wrap it  using `buffer'  and return *it*
  * instead. */
 INTDEF WUNUSED ATTR_OUT(1) NONNULL((2)) struct video_buffer *CC
-libvideo_buffer_fromgfx_init(struct gfx_buffer *self,
-                             struct video_gfx const *__restrict gfx);
-#define libvideo_buffer_fromgfx_fini(self) (void)0
+old_libvideo_buffer_fromgfx_init(struct old_gfx_buffer *self,
+                                 struct video_gfx const *__restrict gfx);
+#define old_libvideo_buffer_fromgfx_fini(self) (void)0
 
 
 
@@ -108,7 +108,7 @@ libvideo_buffer_fromgfx_init(struct gfx_buffer *self,
  * @return: * :   A video buffer representing the Clip Rect of `self'
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
 INTDEF WUNUSED ATTR_IN(1) REF struct video_buffer *CC
-libvideo_buffer_fromgfx(struct video_gfx const *__restrict self);
+old_libvideo_buffer_fromgfx(struct video_gfx const *__restrict self);
 
 DECL_END
 

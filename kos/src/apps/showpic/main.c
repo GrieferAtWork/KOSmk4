@@ -566,10 +566,10 @@ int main(int argc, char *argv[]) {
 		rect.vr_ymin = 100;
 		rect.vr_xdim = screen_buffer_asvideo(screen)->vb_xdim - 200;
 		rect.vr_ydim = screen_buffer_asvideo(screen)->vb_ydim - 200;
-		bscreen = video_buffer_region_revocable(screen_buffer_asvideo(screen), &rect);
+		bscreen = old_video_buffer_region_revocable(screen_buffer_asvideo(screen), &rect);
 		if (!bscreen)
 			err(EXIT_FAILURE, "Failed to load screen buffer");
-//		video_buffer_region_revoke(bscreen);
+//		old_video_buffer_region_revoke(bscreen);
 	}
 #else
 	bscreen = screen_buffer_asvideo(screen);

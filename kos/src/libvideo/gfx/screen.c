@@ -64,7 +64,7 @@
 #include <libvideo/gfx/screen.h>
 #include <libvideo/types.h>
 
-#include "buffer/ram.h"
+#include "buffer/old-ram.h"
 #include "ramdomain.h"
 #include "screen.h"
 

@@ -52,7 +52,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "buffer/ram.h"
+#include "buffer/old-ram.h"
 #include "gfx-palettize.h"
 #include "swgfx.h"
 

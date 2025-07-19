@@ -196,10 +196,9 @@ custom_destroy(struct video_buffer *__restrict self) {
 }
 
 
-#undef custom_ops
 PRIVATE struct video_buffer_ops custom_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(void) {
-	if unlikely (!custom_ops.vi_destroy) {
+	if unlikely(!custom_ops.vi_destroy) {
 		custom_ops.vi_rlock        = &custom_rlock;
 		custom_ops.vi_wlock        = &custom_wlock;
 		custom_ops.vi_unlock       = &custom_unlock;
@@ -208,13 +207,14 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
 		custom_ops.vi_unlockregion = &custom_unlockregion;
 		custom_ops.vi_initgfx      = &custom_initgfx;
 		custom_ops.vi_updategfx    = &libvideo_buffer_swgfx_updategfx;
+//		custom_ops.vi_revoke       = &custom_revoke;    /* TODO */
+//		custom_ops.vi_subregion    = &custom_subregion; /* TODO */
 		COMPILER_WRITE_BARRIER();
 		custom_ops.vi_destroy = &custom_destroy;
 		COMPILER_WRITE_BARRIER();
 	}
 	return &custom_ops;
 }
-#define custom_ops (*_custom_ops())
 
 
 /* Construct a special video buffer which, rather than being backed by memory
@@ -260,7 +260,7 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 		goto err;
 	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
 		palette = NULL;
-	result->vb_ops             = &custom_ops;
+	result->vb_ops             = _custom_ops();
 	result->vb_domain          = libvideo_ramdomain();
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;

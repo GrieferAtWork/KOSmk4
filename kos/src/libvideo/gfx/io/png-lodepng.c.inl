@@ -45,7 +45,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <libvideo/gfx/buffer.h>
 
-#include "../buffer/ram.h"
+#include "../buffer.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
