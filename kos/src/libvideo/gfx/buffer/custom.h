@@ -66,7 +66,7 @@ struct custom_buffer: custom_buffer_common {
 };
 
 struct custom_buffer_subregion: custom_buffer_common {
-	gfx_flag_t                          cbsr_xor;    /* [const] XOR flags to apply during GFX init */
+	video_gfx_flag_t                    cbsr_xor;    /* [const] XOR flags to apply during GFX init */
 	video_coord_t                       cbsr_xoff;   /* [const] X-offset to add to all pixel coords */
 	video_coord_t                       cbsr_yoff;   /* [const] Y-offset to add to all pixel coords */
 	size_t                              cbsr_bxoff;  /* [const] In-scanline byte offset for `cbsr_xoff' */
@@ -97,8 +97,8 @@ INTDEF NONNULL((1)) void FCC custom_buffer_subregion__destroy(struct video_buffe
 /* REVOKE+SUBREGION */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC custom_buffer__revoke)(struct video_buffer *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC custom_buffer_subregion__revoke)(struct video_buffer *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC custom_buffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC custom_buffer__rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);

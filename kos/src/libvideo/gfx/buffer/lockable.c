@@ -163,7 +163,7 @@ NOTHROW(FCC lockable_buffer_subregion__revoke)(struct video_buffer *__restrict s
 PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 lockable_buffer__subregion_impl(struct lockable_buffer *__restrict self,
                                 struct video_crect const *__restrict rect,
-                                gfx_flag_t xor_flags,
+                                video_gfx_flag_t xor_flags,
                                 video_coord_t base_xoff,
                                 video_coord_t base_yoff) {
 	REF struct lockable_buffer_subregion *result;
@@ -204,7 +204,7 @@ err:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 lockable_buffer__subregion(struct video_buffer *__restrict self,
                            struct video_crect const *__restrict rect,
-                           gfx_flag_t xor_flags) {
+                           video_gfx_flag_t xor_flags) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
 	return lockable_buffer__subregion_impl(me, rect, xor_flags, 0, 0);
 }
@@ -212,7 +212,7 @@ lockable_buffer__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 lockable_buffer_subregion__subregion(struct video_buffer *__restrict self,
                                      struct video_crect const *__restrict rect,
-                                     gfx_flag_t xor_flags) {
+                                     video_gfx_flag_t xor_flags) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
 	return lockable_buffer__subregion_impl(me, rect,
 	                                       gfx_flag_combine(me->lbsb_xor, xor_flags),

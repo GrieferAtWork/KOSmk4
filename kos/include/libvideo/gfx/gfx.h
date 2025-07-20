@@ -49,19 +49,19 @@
  * [w]: Indicates a flag that affects the results of graphics operations
  *      that use  the associated  GFX context  as destination,  or  when
  *      writing pixel data. */
-#define VIDEO_GFX_F_NORMAL      0x0000 /* Normal render flags. */
-#define VIDEO_GFX_F_XWRAP       0x0001 /* [rw] OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_YWRAP       0x0002 /* [rw] OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
-#define VIDEO_GFX_F_XMIRROR     0x0004 /* [rw] X coords are horizontally mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_YMIRROR     0x0008 /* [rw] Y coords are vertically mirrored relative to the Clip Rect */
-#define VIDEO_GFX_F_XYSWAP      0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
-                                        * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
-                                        * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
-#define VIDEO_GFX_F_BLUR        0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
-                                        *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
-                                        *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
-#define VIDEO_GFX_F_NEAREST     0x0000 /* [rw] Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
-#define VIDEO_GFX_F_LINEAR      0x8000 /* [rw] Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
+#define VIDEO_GFX_F_NORMAL  0x0000 /* Normal render flags. */
+#define VIDEO_GFX_F_XWRAP   0x0001 /* [rw] OOB X coords wrap to the other side of the Clip Rect (else: coords are clamped) */
+#define VIDEO_GFX_F_YWRAP   0x0002 /* [rw] OOB Y coords wrap to the other side of the Clip Rect (else: coords are clamped) */
+#define VIDEO_GFX_F_XMIRROR 0x0004 /* [rw] X coords are horizontally mirrored relative to the Clip Rect */
+#define VIDEO_GFX_F_YMIRROR 0x0008 /* [rw] Y coords are vertically mirrored relative to the Clip Rect */
+#define VIDEO_GFX_F_XYSWAP  0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
+                                    * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
+                                    * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
+#define VIDEO_GFX_F_BLUR    0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
+                                    *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
+                                    *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
+#define VIDEO_GFX_F_NEAREST 0x0000 /* [rw] Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
+#define VIDEO_GFX_F_LINEAR  0x8000 /* [rw] Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 
 
 
@@ -81,14 +81,38 @@ __DECL_BEGIN
 
 
 /* Set of `VIDEO_GFX_F*' */
-typedef __UINT32_TYPE__ gfx_flag_t;
+typedef __UINT32_TYPE__ video_gfx_flag_t;
 
-/* XXX: When  "old_flags & VIDEO_GFX_F_XYSWAP",  I  believe  we  have  to  swap
- *      "more_flags & VIDEO_GFX_F_XMIRROR" / "more_flags & VIDEO_GFX_F_YMIRROR"
- *      before they are XOR'd with `old_flags'
- * TODO: Yes, the above needs to be done here, and also for "VIDEO_GFX_F_XWRAP" / "VIDEO_GFX_F_YWRAP" */
-#define gfx_flag_combine(old_flags, more_flags) \
-	((old_flags) ^ (more_flags))
+
+#define _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT 1
+#define _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT
+
+#define _VIDEO_GFX_XFLAGS    (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
+#define _VIDEO_GFX_YFLAGS    (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
+#define _VIDEO_GFX_AND_FLAGS (0)
+#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR | VIDEO_GFX_F_BLUR)
+#define _VIDEO_GFX_XOR_FLAGS (~(_VIDEO_GFX_AND_FLAGS | _VIDEO_GFX_OR_FLAGS))
+
+/* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED video_gfx_flag_t
+gfx_flag_combine(video_gfx_flag_t __old_flags, video_gfx_flag_t __more_flags) {
+	if (__old_flags & VIDEO_GFX_F_XYSWAP) {
+		__more_flags = (__more_flags & ~(_VIDEO_GFX_XFLAGS | _VIDEO_GFX_YFLAGS)) |
+		               ((__more_flags & _VIDEO_GFX_XFLAGS) << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) |
+		               ((__more_flags & _VIDEO_GFX_YFLAGS) >> _VIDEO_GFX_FLAGS_Y_TO_X_RSHIFT);
+	}
+	return 0 |
+#if _VIDEO_GFX_XOR_FLAGS != 0
+	       ((__old_flags ^ __more_flags) & _VIDEO_GFX_XOR_FLAGS) |
+#endif /* _VIDEO_GFX_XOR_FLAGS != 0 */
+#if _VIDEO_GFX_OR_FLAGS != 0
+	       ((__old_flags | __more_flags) & _VIDEO_GFX_OR_FLAGS) |
+#endif /* _VIDEO_GFX_OR_FLAGS != 0 */
+#if _VIDEO_GFX_AND_FLAGS != 0
+	       ((__old_flags & __more_flags) & _VIDEO_GFX_AND_FLAGS) |
+#endif /* _VIDEO_GFX_AND_FLAGS != 0 */
+	       0;
+}
 
 struct video_buffer;
 struct video_gfxhdr;
@@ -530,11 +554,11 @@ video_gfx_update(struct video_gfx *__restrict __self, unsigned int __what);
  * `video_gfx_update()' specifying exactly what changed. */
 extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_blendmode_t video_gfx_getblend(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setblend(struct video_gfx *__restrict __self, gfx_blendmode_t __mode);
-extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) gfx_flag_t video_gfx_getflags(struct video_gfx const *__restrict __self);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_toggleflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_enableflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
-extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disableflags(struct video_gfx *__restrict __self, gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_gfx_flag_t video_gfx_getflags(struct video_gfx const *__restrict __self);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_toggleflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_enableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_disableflags(struct video_gfx *__restrict __self, video_gfx_flag_t __flags);
 extern __ATTR_RETNONNULL __ATTR_PURE __ATTR_IN(1) video_color_t video_gfx_getcolorkey(struct video_gfx const *__restrict __self);
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *video_gfx_setcolorkey(struct video_gfx *__restrict __self, video_color_t __colorkey);
 
@@ -1045,7 +1069,7 @@ struct video_gfx {
 	 */
 //	struct video_palette *vx_rdpalette; /* [0..1][(!= NULL) == (vx_buffer->vb_format.vf_pal != NULL)][const] Palette used for color reads and bitblit sources */
 	gfx_blendmode_t      vx_blend;    /* [const] Blending mode. */
-	gfx_flag_t           vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	video_gfx_flag_t     vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t        vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 #define _VIDEO_GFX_N_DRIVER 20
 	void *_vx_driver[_VIDEO_GFX_N_DRIVER];   /* [?..?] Driver-specific graphics data. */

@@ -66,7 +66,7 @@ struct lockable_buffer_subregion: lockable_buffer {    /* [OVERRIDE(.lbb_data, [
                                                         * [OVERRIDE(.lbb_base, [NOT(REF)])] */
 	video_coord_t                         lbsb_xoff;   /* [const] X offset */
 	video_coord_t                         lbsb_yoff;   /* [const] Y offset */
-	gfx_flag_t                            lbsb_xor;    /* [const] GFX XOR flags */
+	video_gfx_flag_t                      lbsb_xor;    /* [const] GFX XOR flags */
 	video_coord_t                         lbsb_bxrem;  /* [const] X coord remainder that needs to be added to `lbb_data' */
 	size_t                                lbsb_bxoff;  /* [const] X byte offset that needs to be added to `lbb_data->lbb_base' */
 	struct lockable_buffer               *lbsb_orig;   /* [1..1][const] Original lockable buffer */
@@ -94,8 +94,8 @@ INTDEF NONNULL((1)) void FCC lockable_buffer_subregion__destroy(struct video_buf
 /* REVOKE+SUBREGION */
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC lockable_buffer__revoke)(struct video_buffer *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC lockable_buffer_subregion__revoke)(struct video_buffer *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC lockable_buffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC lockable_buffer__rlock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);

@@ -100,7 +100,7 @@ struct video_rambuffer_revokable_subregion;
 LIST_HEAD(video_rambuffer_revokable_subregion_list, video_rambuffer_revokable_subregion);
 struct /*abstract*/ video_rambuffer_revokable_subregion: video_rambuffer_revokable {
 	video_coord_t                                   rbrvsr_xoff;   /* [const] Extra X-offset added to all pixel coords */
-	gfx_flag_t                                      rbrvsr_xflags; /* [const] Flags to XOR with `video_gfx::vx_flags' during `video_buffer_getgfx()' */
+	video_gfx_flag_t                                rbrvsr_xflags; /* [const] Flags to XOR with `video_gfx::vx_flags' during `video_buffer_getgfx()' */
 	LIST_ENTRY(video_rambuffer_revokable_subregion) rbrvsr_chain;  /* [lock([:rbsr_base,:rbssr_base,:rbfmsr_base]->rb_subregions_lock)] Link in chain of sub-regions of base */
 	struct video_rambuffer_revokable_subregion_list rbrvsr_subsubregions_list; /* [0..n][lock(rbrvsr_subsubregions_lock)] List of sub-subregions */
 	struct atomic_lock                              rbrvsr_subsubregions_lock; /* Lock for `rbrvsr_subsubregions_list' */
@@ -177,11 +177,11 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC rambuffer_
 #define rambuffer_subsubregion__revoke rambuffer_subregion__revoke
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self);
 #define rambuffer_formem_subregion__revoke rambuffer_subregion__revoke
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
 #define rambuffer_subsubregion__subregion rambuffer_subregion__subregion
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) ATTR_OUT(2) int FCC rambuffer__lock(struct video_buffer *__restrict self, struct video_lock *__restrict lock);

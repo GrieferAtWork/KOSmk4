@@ -301,7 +301,7 @@ err:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer__subregion(struct video_buffer *__restrict self,
                      struct video_crect const *__restrict rect,
-                     gfx_flag_t xor_flags) {
+                     video_gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_subregion *result;
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
 	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect, me->rb_stride);
@@ -321,7 +321,7 @@ rambuffer__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_subregion__subregion(struct video_buffer *__restrict self,
                                struct video_crect const *__restrict rect,
-                               gfx_flag_t xor_flags) {
+                               video_gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_subsubregion *result;
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
@@ -344,7 +344,7 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_formem__subregion(struct video_buffer *__restrict self,
                             struct video_crect const *__restrict rect,
-                            gfx_flag_t xor_flags) {
+                            video_gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
@@ -367,7 +367,7 @@ rambuffer_formem__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
                                       struct video_crect const *__restrict rect,
-                                      gfx_flag_t xor_flags) {
+                                      video_gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);

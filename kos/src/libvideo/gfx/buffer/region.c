@@ -179,7 +179,7 @@ NOTHROW(FCC region_buffer_subregion_alias__revoke)(struct video_buffer *__restri
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer__subregion(struct video_buffer *__restrict self,
                          struct video_crect const *__restrict rect,
-                         gfx_flag_t xor_flags) {
+                         video_gfx_flag_t xor_flags) {
 	struct video_rect old_rect, new_rect, result_rect, base_iorect;
 	REF struct region_buffer_subregion *result;
 	REF struct video_buffer *base;
@@ -308,7 +308,7 @@ err_base:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self,
                                          struct video_crect const *__restrict rect,
-                                         gfx_flag_t xor_flags) {
+                                         video_gfx_flag_t xor_flags) {
 	REF struct video_buffer *result_base;
 	REF struct region_buffer_subregion_alias *result;
 	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self;
@@ -1327,7 +1327,7 @@ DEFINE_PUBLIC_ALIAS(video_buffer_region, libvideo_buffer_region);
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_buffer_region(struct video_buffer *__restrict self,
                        struct video_rect const *__restrict rect,
-                       gfx_flag_t xor_flags) {
+                       video_gfx_flag_t xor_flags) {
 	REF struct region_buffer *result;
 	bool self_is_region;
 

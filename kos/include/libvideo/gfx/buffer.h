@@ -436,7 +436,7 @@ struct video_buffer_ops {
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_buffer *__restrict __self,
 	                                 struct video_crect const *__restrict __rect,
-	                                 gfx_flag_t __xor_flags);
+	                                 video_gfx_flag_t __xor_flags);
 };
 
 
@@ -458,7 +458,7 @@ struct video_buffer_ops {
  * @return: * : Always re-returns `__result' */
 extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_OUT(2) struct video_gfx *
 video_buffer_getgfx(struct video_buffer *__self, struct video_gfx *__result,
-                    gfx_blendmode_t __blendmode, gfx_flag_t __flags,
+                    gfx_blendmode_t __blendmode, video_gfx_flag_t __flags,
                     video_color_t __colorkey);
 
 
@@ -582,7 +582,7 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_subregion(struct video_buffer *__restrict __self,
                        struct video_crect const *__restrict __rect,
-                       gfx_flag_t __xor_flags);
+                       video_gfx_flag_t __xor_flags);
 
 #else /* __INTELLISENSE__ */
 #define video_buffer_getgfx(self, result, blendmode, flags, colorkey)  \
@@ -888,12 +888,12 @@ video_buffer_lockable(struct video_buffer *__restrict __self);
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_REGION)(struct video_buffer *__restrict __self,
                                         struct video_rect const *__restrict __rect,
-                                        gfx_flag_t __xor_flags);
+                                        video_gfx_flag_t __xor_flags);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_region(struct video_buffer *__restrict __self,
                     struct video_rect const *__restrict __rect,
-                    gfx_flag_t __xor_flags);
+                    video_gfx_flag_t __xor_flags);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

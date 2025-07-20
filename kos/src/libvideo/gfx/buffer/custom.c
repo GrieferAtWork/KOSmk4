@@ -180,7 +180,7 @@ NOTHROW(FCC custom_buffer_subregion__revoke)(struct video_buffer *__restrict sel
 PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 custom_buffer__subregion_impl(struct custom_buffer_common *__restrict parent,
                               struct video_crect const *__restrict rect,
-                              gfx_flag_t xor_flags,
+                              video_gfx_flag_t xor_flags,
                               video_coord_t parent_xoff,
                               video_coord_t parent_yoff) {
 	REF struct custom_buffer_subregion *result;
@@ -229,7 +229,7 @@ err:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 custom_buffer__subregion(struct video_buffer *__restrict self,
                          struct video_crect const *__restrict rect,
-                         gfx_flag_t xor_flags) {
+                         video_gfx_flag_t xor_flags) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
 	return custom_buffer__subregion_impl(me, rect, xor_flags, 0, 0);
 }
@@ -237,7 +237,7 @@ custom_buffer__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 custom_buffer_subregion__subregion(struct video_buffer *__restrict self,
                                    struct video_crect const *__restrict rect,
-                                   gfx_flag_t xor_flags) {
+                                   video_gfx_flag_t xor_flags) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
 	return custom_buffer__subregion_impl(me, rect,
 	                                     gfx_flag_combine(me->cbsr_xor, xor_flags),

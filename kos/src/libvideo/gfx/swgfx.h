@@ -929,7 +929,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_blitter3_ops const *CC _libvideo_swb
 
 
 LOCAL ATTR_RETNONNULL WUNUSED struct video_gfx_ops const *CC
-libvideo_swgfx_ops_of(gfx_flag_t flags) {
+libvideo_swgfx_ops_of(video_gfx_flag_t flags) {
 	if (flags & VIDEO_GFX_F_XYSWAP) {
 		if (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR))
 			return &libvideo_swgfx_ops_mirror_xyswap;
@@ -1130,7 +1130,7 @@ libvideo_swgfx_populate(struct video_gfx *__restrict self) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter_setops(struct video_blitter *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	gfx_flag_t flags = ctx->vbt_dst->vx_flags | ctx->vbt_src->vx_flags;
+	video_gfx_flag_t flags = ctx->vbt_dst->vx_flags | ctx->vbt_src->vx_flags;
 	if (ctx->vbt_dst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		ctx->vbt_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))
 		               ? &libvideo_swblitter_ops_wrap_imatrix
@@ -1149,7 +1149,7 @@ video_swblitter_setops(struct video_blitter *__restrict ctx) {
 LOCAL ATTR_INOUT(1) void CC
 video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
-	gfx_flag_t flags = ctx->vbt3_rddst->vx_flags |
+	video_gfx_flag_t flags = ctx->vbt3_rddst->vx_flags |
 	                   ctx->vbt3_wrdst->vx_flags |
 	                   ctx->vbt3_src->vx_flags;
 	if (ctx->vbt3_rddst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {

@@ -60,7 +60,7 @@ struct old_gfx_buffer: video_buffer {
 	video_coord_t            gxb_bymin;    /* [const] s.a. `struct video_gfxhdr::vxh_bymin' */
 	video_coord_t            gxb_bxend;    /* [const] s.a. `struct video_gfxhdr::vxh_bxend' */
 	video_coord_t            gxb_byend;    /* [const] s.a. `struct video_gfxhdr::vxh_byend' */
-	gfx_flag_t               gxb_flags;    /* [const] s.a. `struct video_gfx::vx_flags' */
+	video_gfx_flag_t         gxb_flags;    /* [const] s.a. `struct video_gfx::vx_flags' */
 	video_color_t            gxb_colorkey; /* [const] s.a. `struct video_gfx::vx_colorkey' */
 };
 
