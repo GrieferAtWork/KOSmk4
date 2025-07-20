@@ -56,37 +56,40 @@ oneframe_anim_destroy(struct video_anim *__restrict self) {
 	free(me);
 }
 
-PRIVATE ATTR_OUT(1) void CC
-oneframe_anim_populate_info(struct video_anim_frameinfo *__restrict info) {
-	info->vafi_frameid         = 0;
-	info->vafi_showfor.tv_sec  = 999999;
-	info->vafi_showfor.tv_usec = 999999;
+PRIVATE NONNULL((1)) void CC
+oneframe_frame_fini(struct video_anim_frame *__restrict self) {
+	video_buffer_decref(self->vaf_frame);
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) int CC
 oneframe_anim_firstframe(struct video_anim const *__restrict self,
-                         struct video_anim_frameinfo *__restrict info) {
+                         struct video_anim_frame *__restrict frame) {
 	struct oneframe_anim *me = (struct oneframe_anim *)self;
-	oneframe_anim_populate_info(info);
+	frame->vaf_fini = &oneframe_frame_fini;
+	frame->vaf_frameid         = 0;
+	frame->vaf_showfor.tv_sec  = 999999;
+	frame->vaf_showfor.tv_usec = 999999;
+	frame->vaf_colorkey        = 0;
+	frame->vaf_frame = me->ofa_frame;
 	video_buffer_incref(me->ofa_frame);
-	return me->ofa_frame;
+	return 0;
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) int CC
 oneframe_anim_nextframe(struct video_anim const *__restrict self,
-                        /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
-                        struct video_anim_frameinfo *__restrict info) {
+                        struct video_anim_frame *__restrict frame) {
 	/* These is no next frame -- indicate that the caller
 	 * should  sleep really long,  and don't do anything. */
 	(void)self;
-	oneframe_anim_populate_info(info);
-	return buf;
+	(void)frame;
+	return 0;
 }
 
 
 PRIVATE struct video_anim_ops oneframe_anim_ops = {};
 PRIVATE struct video_anim_ops *CC _oneframe_anim_ops(void) {
 	if (!oneframe_anim_ops.vao_destroy) {
+		oneframe_anim_ops.vao_sizeof_frame = sizeof(struct video_anim_frame);
 		oneframe_anim_ops.vao_nextframe  = &oneframe_anim_nextframe;
 		oneframe_anim_ops.vao_firstframe = &oneframe_anim_firstframe;
 		COMPILER_WRITE_BARRIER();
@@ -130,8 +133,9 @@ err:
 
 
 struct cached_frame {
-	REF struct video_buffer    *cf_frame;     /* [1..1][const] The cached frame */
-	struct video_anim_frameinfo cf_frameinfo; /* [const] Information about `cf_frame' */
+	REF struct video_buffer *cf_frame;    /* [1..1][const] The cached frame */
+	struct __timeval64       cf_showfor;  /* How long to display the frame before showing the next */
+	video_color_t            cf_colorkey; /* Frame color key, or "0" if not needed */
 };
 
 struct cached_anim: video_anim {
@@ -140,7 +144,7 @@ struct cached_anim: video_anim {
 	struct cached_frame     *ca_framev; /* [0..ca_framec][const_if(!ca_base)][owned][lock(ca_lock)] # Cached frames */
 	struct video_format      ca_fmt;    /* [lock(ca_lock)] Video format override for caches (unused when `.vf_codec' is `NULL') */
 	REF struct video_anim   *ca_base;   /* [0..1][lock(WRITE(ca_lock && CLEAR_ONCE), READ(ca_lock || ATOMIC))] Base animation, or "NULL" once fully cached */
-	REF struct video_buffer *ca_bbuf;   /* [0..1][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
+	struct video_anim_frame *ca_bbuf;   /* [0..1][owned][lock(ca_lock)] Base animation work buffer, or "NULL" if not loaded or done */
 };
 
 PRIVATE NONNULL((1)) void CC
@@ -153,28 +157,32 @@ cached_anim_destroy(struct video_anim *__restrict self) {
 		video_palette_decref(me->ca_fmt.vf_pal);
 	if (me->ca_base)
 		video_anim_decref(me->ca_base);
-	if (me->ca_bbuf)
-		video_buffer_decref(me->ca_bbuf);
+	if (me->ca_bbuf) {
+		video_anim_frame_fini(me->ca_bbuf);
+		free(me->ca_bbuf);
+	}
 	free(me->ca_framev);
 	free(me);
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) int CC
 cached_anim_firstframe(struct video_anim const *__restrict self,
-                       struct video_anim_frameinfo *__restrict info) {
-	REF struct video_buffer *result;
-	struct cached_frame *frame;
+                       struct video_anim_frame *__restrict frame) {
+	struct cached_frame *cframe;
 	struct video_format *frame_format;
 	struct cached_anim *me = (struct cached_anim *)self;
 
 	/* Check for special case: animation was already fully loaded */
 	if (!atomic_read(&me->ca_base)) {
 		assert(me->ca_framec >= 1);
-		frame = &me->ca_framev[0];
-		memcpy(info, &frame->cf_frameinfo,
-		       sizeof(struct video_anim_frameinfo));
-		video_buffer_incref(frame->cf_frame);
-		return frame->cf_frame;
+		cframe = &me->ca_framev[0];
+		frame->vaf_fini     = &oneframe_frame_fini;
+		frame->vaf_frame    = cframe->cf_frame;
+		frame->vaf_showfor  = cframe->cf_showfor;
+		frame->vaf_frameid  = 0;
+		frame->vaf_colorkey = cframe->cf_colorkey;
+		video_buffer_incref(cframe->cf_frame);
+		return 0;
 	}
 
 	/* Acquire lock */
@@ -182,188 +190,207 @@ cached_anim_firstframe(struct video_anim const *__restrict self,
 
 	/* Check if first frame was already allocated */
 	if unlikely(me->ca_framec >= 1) {
-		frame = &me->ca_framev[0];
+		cframe = &me->ca_framev[0];
 		goto unlock_and_return_frame;
 	}
 
 	/* Allocate a frame for the first time. */
 	assert(me->ca_base);
 	assert(!me->ca_bbuf);
-	frame = (struct cached_frame *)malloc(sizeof(struct cached_frame));
-	if unlikely(!frame)
+	cframe = (struct cached_frame *)malloc(sizeof(struct cached_frame));
+	if unlikely(!cframe)
 		goto err_lock;
-	me->ca_bbuf = video_anim_firstframe(me->ca_base, &frame->cf_frameinfo);
+	me->ca_bbuf = (struct video_anim_frame *)malloc(video_anim_sizeof_frame(me->ca_base));
 	if unlikely(!me->ca_bbuf)
-		goto err_lock_frame;
-	frame_format = &me->ca_bbuf->vb_format;
+		goto err_lock_cframe;
+	if unlikely(video_anim_firstframe(me->ca_base, me->ca_bbuf))
+		goto err_lock_cframe_bbuf;
+
+	/* Copy data into "cframe" */
+	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
+	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
+	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
 	if (me->ca_fmt.vf_codec)
 		frame_format = &me->ca_fmt;
-	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, me->va_domain, frame_format);
-	if unlikely(!frame->cf_frame)
-		goto err_lock_frame_bbuf;
+	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
+	if unlikely(!cframe->cf_frame)
+		goto err_lock_cframe_bbuf_fini;
 
 	/* Remember the first frame */
 	me->ca_framec = 1;
-	me->ca_framev = frame;
+	me->ca_framev = cframe;
 
 	/* Return the now-cached frame */
 unlock_and_return_frame:
-	memcpy(info, &frame->cf_frameinfo,
-	       sizeof(struct video_anim_frameinfo));
-	result = frame->cf_frame;
-	video_buffer_incref(result);
+	frame->vaf_fini     = &oneframe_frame_fini;
+	frame->vaf_frame    = cframe->cf_frame;
+	frame->vaf_showfor  = cframe->cf_showfor;
+	frame->vaf_frameid  = 0;
+	frame->vaf_colorkey = cframe->cf_colorkey;
+	video_buffer_incref(cframe->cf_frame);
 	shared_lock_release(&me->ca_lock);
-	return result;
-err_lock_frame_bbuf:
-	video_buffer_decref(me->ca_bbuf);
+	return 0;
+err_lock_cframe_bbuf_fini:
+	video_anim_frame_fini(me->ca_bbuf);
+err_lock_cframe_bbuf:
+	free(me->ca_bbuf);
 	me->ca_bbuf = NULL;
-err_lock_frame:
-	free(frame);
+err_lock_cframe:
+	free(cframe);
 err_lock:
 	shared_lock_release(&me->ca_lock);
-	return NULL;
+	return -1;
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) int CC
 cached_anim_nextframe(struct video_anim const *__restrict self,
-                      /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
-                      struct video_anim_frameinfo *__restrict info) {
-	REF struct video_buffer *result;
-	REF struct video_buffer *next_frame;
+                      struct video_anim_frame *__restrict frame) {
 	struct video_format *frame_format;
-	struct cached_frame *frame;
+	struct cached_frame *cframe;
 	struct cached_anim *me = (struct cached_anim *)self;
-	video_anim_frame_id next_id = info->vafi_frameid + 1;
+	video_anim_frame_id next_id = frame->vaf_frameid + 1;
+	video_anim_frame_id old_frameid;
+	assert(frame->vaf_fini == &oneframe_frame_fini);
 
 	/* Check for special case: animation was already fully loaded */
 	if (!atomic_read(&me->ca_base)) {
 		assert(me->ca_framec >= 1);
 		if (next_id >= me->ca_framec)
 			next_id = 0;
-		assert(buf == me->ca_framev[info->vafi_frameid].cf_frame);
+		assert(frame->vaf_frame == me->ca_framev[frame->vaf_frameid].cf_frame);
 return_next_cached_frame:
-		frame = &me->ca_framev[next_id];
-		memcpy(info, &frame->cf_frameinfo,
-		       sizeof(struct video_anim_frameinfo));
-		video_buffer_incref(frame->cf_frame);
-		assertf(atomic_read(&buf->vb_refcnt) >= 2, "1 by the cache, and one by the caller");
-		atomic_dec(&buf->vb_refcnt);
-		return frame->cf_frame;
+		assertf(atomic_read(&frame->vaf_frame->vb_refcnt) >= 2, "1 by the cache, and one by the caller");
+		atomic_dec(&frame->vaf_frame->vb_refcnt);
+		cframe = &me->ca_framev[next_id];
+		video_buffer_incref(cframe->cf_frame);
+		frame->vaf_frame    = cframe->cf_frame;
+		frame->vaf_showfor  = cframe->cf_showfor;
+		frame->vaf_frameid  = next_id;
+		frame->vaf_colorkey = cframe->cf_colorkey;
+		return 0;
 	}
 
 	/* Acquire lock */
 	shared_lock_acquire(&me->ca_lock);
-	assert(info->vafi_frameid < me->ca_framec);
+	assert(frame->vaf_frameid < me->ca_framec);
 	assert(me->ca_framev);
-	assert(buf == me->ca_framev[info->vafi_frameid].cf_frame);
+	assert(frame->vaf_frame == me->ca_framev[frame->vaf_frameid].cf_frame);
 
 	/* Check for special case: the specific frame requested was already loaded. */
-	if (next_id < me->ca_framec) {
-		frame = &me->ca_framev[next_id];
+	if (next_id < me->ca_framec)
 		goto unlock_and_return_frame;
-	}
 
 	/* Check for special case: animation has been
 	 * fully  loaded now, and  we must start over */
 	if unlikely(!me->ca_base) {
 		assert(!me->ca_bbuf);
-		frame = &me->ca_framev[0];
+		next_id = 0;
 		goto unlock_and_return_frame;
 	}
 
 	/* Make sure the "ca_framev" vector has space. */
-	frame = (struct cached_frame *)realloc(me->ca_framev,
-	                                       me->ca_framec + 1,
-	                                       sizeof(struct cached_frame));
-	if unlikely(!frame)
+	cframe = (struct cached_frame *)realloc(me->ca_framev,
+	                                        me->ca_framec + 1,
+	                                        sizeof(struct cached_frame));
+	if unlikely(!cframe)
 		goto err_lock;
-	me->ca_framev = frame;
-	frame += me->ca_framec;
+	me->ca_framev = cframe;
+	cframe += me->ca_framec;
 
 	/* Check for special case: was the output buffer lost? */
 	if (!me->ca_bbuf) {
 		video_anim_frame_id n_skip;
-		me->ca_bbuf = video_anim_firstframe(me->ca_base, info);
+		me->ca_bbuf = (struct video_anim_frame *)malloc(video_anim_sizeof_frame(me->ca_base));
 		if unlikely(!me->ca_bbuf)
 			goto err_lock;
+		if unlikely(video_anim_firstframe(me->ca_base, me->ca_bbuf)) {
+			free(me->ca_bbuf);
+			me->ca_bbuf = NULL;
+			goto err_lock;
+		}
 		n_skip = me->ca_framec;
 		assert(n_skip >= 1);
 		do {
-			REF struct video_buffer *next_frame;
-			next_frame = video_anim_nextframe(me->ca_base, me->ca_bbuf, info);
-			if unlikely(!next_frame)
-				goto err_lock_bbuf;
-			me->ca_bbuf = next_frame;
+			if unlikely(video_anim_nextframe(me->ca_base, me->ca_bbuf))
+				goto err_lock_bbuf_fini;
 		} while (--n_skip);
 	}
 
 	/* Load the next frame in line */
 	assert(me->ca_base);
 	assert(me->ca_bbuf);
-	memcpy(&frame->cf_frameinfo, &frame[-1].cf_frameinfo,
-	       sizeof(struct video_anim_frameinfo));
-	next_frame = video_anim_nextframe(me->ca_base, me->ca_bbuf, &frame->cf_frameinfo);
-	if unlikely(!next_frame)
+	old_frameid = me->ca_bbuf->vaf_frameid;
+	if unlikely(video_anim_nextframe(me->ca_base, me->ca_bbuf))
 		goto err_lock;
-	me->ca_bbuf = next_frame;
 
 	/* Check for special case: animation has rewound itself (meaning we are done) */
-	if (frame->cf_frameinfo.vafi_frameid < frame[-1].cf_frameinfo.vafi_frameid) {
-		REF struct video_buffer *old_bbuf;
+	if (me->ca_bbuf->vaf_frameid < old_frameid) {
+		struct video_anim_frame *old_bbuf;
 		REF struct video_anim *old_base;
-		frame = (struct cached_frame *)realloc(me->ca_framev, me->ca_framec,
-		                                       sizeof(struct cached_frame));
+		cframe = (struct cached_frame *)realloc(me->ca_framev, me->ca_framec,
+		                                        sizeof(struct cached_frame));
 		if likely(frame)
-			me->ca_framev = frame;
+			me->ca_framev = cframe;
 		old_bbuf = me->ca_bbuf;
 		old_base = me->ca_base;
 		me->ca_bbuf = NULL;
 		me->ca_base = NULL;
 		shared_lock_release(&me->ca_lock);
-		video_buffer_decref(old_bbuf);
 		video_anim_decref(old_base);
+		video_anim_frame_fini(old_bbuf);
+		free(old_bbuf);
 		next_id = 0;
 		goto return_next_cached_frame;
 	}
 
 	/* Convert output buffer formats. */
-	frame_format = &me->ca_bbuf->vb_format;
+	frame_format = &me->ca_bbuf->vaf_frame->vb_format;
 	if (me->ca_fmt.vf_codec)
 		frame_format = &me->ca_fmt;
-	frame->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf, me->va_domain, frame_format);
-	if unlikely(!frame->cf_frame) {
+	cframe->cf_frame = libvideo_buffer_convert_or_copy(me->ca_bbuf->vaf_frame, me->va_domain, frame_format);
+	if unlikely(!cframe->cf_frame) {
 		/* Failed to convert frame -> must reset output
-		 * buffer since it's not 1 frame too far  ahead */
-		REF struct video_buffer *old_bbuf;
-err_lock_bbuf:
+		 * buffer since it's now 1 frame too far  ahead */
+		REF struct video_anim_frame *old_bbuf;
+err_lock_bbuf_fini:
 		old_bbuf = me->ca_bbuf;
 		me->ca_bbuf = NULL;
 		shared_lock_release(&me->ca_lock);
-		video_buffer_decref(old_bbuf);
+		video_anim_frame_fini(old_bbuf);
+		free(old_bbuf);
 		goto err;
 	}
 
+	/* Copy other frame information into "cframe" */
+	cframe->cf_showfor  = me->ca_bbuf->vaf_showfor;
+	cframe->cf_colorkey = me->ca_bbuf->vaf_colorkey;
+
 	/* Remember that another frame has been loaded. */
-	++me->ca_framec;
+	next_id = me->ca_framec++;
+	assert(cframe == &me->ca_framev[next_id]);
 unlock_and_return_frame:
-	memcpy(info, &frame->cf_frameinfo,
-	       sizeof(struct video_anim_frameinfo));
-	result = frame->cf_frame;
-	video_buffer_incref(result);
+	assert(next_id < me->ca_framec);
+	assertf(atomic_read(&frame->vaf_frame->vb_refcnt) >= 2, "1 by the cache, and one by the caller");
+	atomic_dec(&frame->vaf_frame->vb_refcnt);
+	video_buffer_incref(cframe->cf_frame);
+	cframe = &me->ca_framev[next_id];
+	frame->vaf_frame    = cframe->cf_frame;
+	frame->vaf_showfor  = cframe->cf_showfor;
+	frame->vaf_frameid  = next_id;
+	frame->vaf_colorkey = cframe->cf_colorkey;
 	shared_lock_release(&me->ca_lock);
-	assertf(atomic_read(&buf->vb_refcnt) >= 2, "1 by the cache, and one by the caller");
-	atomic_dec(&buf->vb_refcnt);
-	return result;
+	return 0;
 err_lock:
 	shared_lock_release(&me->ca_lock);
 err:
-	return NULL;
+	return -1;
 }
 
 
 PRIVATE struct video_anim_ops cached_anim_ops = {};
 PRIVATE ATTR_RETNONNULL WUNUSED struct video_anim_ops *CC _cached_anim_ops(void) {
 	if (!cached_anim_ops.vao_destroy) {
+		cached_anim_ops.vao_sizeof_frame = sizeof(struct video_anim_frame);
 		cached_anim_ops.vao_nextframe  = &cached_anim_nextframe;
 		cached_anim_ops.vao_firstframe = &cached_anim_firstframe;
 		COMPILER_WRITE_BARRIER();

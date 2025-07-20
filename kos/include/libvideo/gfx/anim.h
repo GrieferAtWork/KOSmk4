@@ -32,6 +32,7 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
+#include "../color.h"
 #include "../types.h"
 
 #ifdef __CC__
@@ -43,36 +44,61 @@ struct video_anim;
 
 typedef __uint32_t video_anim_frame_id;
 
-struct video_anim_frameinfo {
-	struct __timeval64  vafi_showfor; /* How long to display the frame before showing the next */
-	video_anim_frame_id vafi_frameid; /* ID (# of frames that came before) of the associated frame */
+/* Frame data created when the first frame is read, and updated whenever a next frame is read.
+ * You must treat this data as READ-ONLY  if you ever intend to call  `video_anim_nextframe()'
+ * using this data again. */
+struct video_anim_frame {
+	__ATTR_NONNULL_T((1)) void /* Destructor callback for frame data */
+	(LIBVIDEO_GFX_CC *vaf_fini)(struct video_anim_frame *__restrict __self);
+	REF struct video_buffer *vaf_frame;    /* [1..1] Current frame (and previous frame during) */
+	struct __timeval64       vaf_showfor;  /* How long to display the frame before showing the next */
+	video_anim_frame_id      vaf_frameid;  /* ID of this frame */
+	video_color_t            vaf_colorkey; /* Frame color key, or "0" if not needed */
+
+	/* Animation-specific frame data goes here... */
 };
+
+#define video_anim_frame_fini(self) ((self)->vaf_fini)(self)
+
 
 struct video_anim_ops {
 	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vao_destroy)(struct video_anim *__restrict __self);
 
-	/* Start a new animation cycle and return a video buffer for the first frame.
-	 * - The video contents of the returned buffer should NOT be modified.
+	/* Size of  `struct video_anim_frame' that  the
+	 * caller must use with this type of animation. */
+	size_t vao_sizeof_frame;
+
+	/* Start a new animation cycle and initialize `__frame' for the first frame.
+	 * - The video contents of the buffer included in `__frame'  should NOT be modified.
 	 * - Make a call to `vao_nextframe()' to advance to the next frame.
+	 * - Once done, finalize frame data using `video_anim_frame_fini(__frame)'
+	 * - The given  `__frame' must  be at  least `vao_sizeof_frame'  bytes  large,
+	 *   and be aligned according to standard alignment (`alloca()' and `malloc()'
+	 *   are both fine for allocating this buffer))
 	 *
 	 * To render the animation, the caller should do this:
-	 * >> struct video_anim_frameinfo info, nextinfo;
-	 * >> REF struct video_screen *screen = screen_buffer_create(NULL);
-	 * >> REF struct video_anim *anim = video_anim_open("/vat/anim.gif");
-	 * >> REF struct video_buffer *frame = video_anim_firstframe(anim, &info);
 	 * >> struct video_gfx screen_gfx;
 	 * >> struct video_gfx frame_gfx;
 	 * >> struct timeval frame_start, frame_end;
-	 * >> struct timeval tv_delay, tv_spent;
+	 * >> struct timeval tv_delay, tv_spent, showfor;
 	 * >> struct timespec ts_delay;
+	 * >> REF struct video_screen *screen;
+	 * >> REF struct video_anim *anim;
+	 * >> struct video_anim_frame *data;
+	 * >>
+	 * >> screen = screen_buffer_create(NULL);
+	 * >> anim = video_anim_open("/var/anim.gif");
+	 * >> data = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
+	 * >>
+	 * >> video_anim_firstframe(anim, data);
 	 * >> video_buffer_getgfx((struct video_buffer *)screen, &screen_gfx,
 	 * >>                     GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	 * >> gettimeofday(&frame_start, NULL);
 	 * >> for (;;) {
 	 * >>
 	 * >>     // Display current frame on-screen (here: stretched)
-	 * >>     video_buffer_getgfx(frame, &frame_gfx,
+	 * >>     video_buffer_getgfx(data->vaf_frame, &frame_gfx,
 	 * >>                         GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	 * >>     video_gfx_stretch(&screen_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX,
 	 * >>                       &frame_gfx, 0, 0, VIDEO_DIM_MAX, VIDEO_DIM_MAX);
@@ -80,73 +106,43 @@ struct video_anim_ops {
 	 * >>     screen_buffer_updaterect(screen, &update_rect);
 	 * >>
 	 * >>     // Load next frame as part of render delay
-	 * >>     nextinfo = info;
-	 * >>     video_anim_nextframe(&anim, frame, &nextinfo);
+	 * >>     showfor = data->vaf_showfor;
+	 * >>     video_anim_nextframe(&anim, data);
 	 * >>
 	 * >>     // Wait until the next frame should be rendered
 	 * >>     gettimeofday(&frame_end, NULL);
 	 * >>     timeval_sub(&tv_spent, &frame_end, &frame_start);
-	 * >>     timeval_sub(&tv_delay, &info.vafi_showfor, &tv_spent);
+	 * >>     timeval_sub(&tv_delay, &showfor, &tv_spent);
 	 * >>     timeval_add(&frame_end, &frame_end, &tv_delay);
 	 * >>     TIMEVAL_TO_TIMESPEC(&tv_delay, &ts_delay);
 	 * >>     frame_start = frame_end;
-	 * >>     info = nextinfo;
 	 * >>     if (ts_delay.tv_sec >= 0)
 	 * >>         nanosleep(&ts_delay, NULL);
 	 * >> }
 	 *
-	 * @return: * : A video buffer containing the  first frame of the  animation
-	 *              If  you do not intend to render  any of the other frame, you
-	 *              can simply decref() the animation and use this buffer as you
-	 *              would one returned by `video_buffer_open()'
-	 * @return: NULL: Failed to load first frame (s.a. `errno') */
-	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) __REF struct video_buffer *
+	 * @return: 0 : Success: `__frame' was initialized and the caller must eventually finalize it
+	 * @return: -1: Failed to load first frame (s.a. `errno') */
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_OUT_T(2) int
 	(LIBVIDEO_GFX_CC *vao_firstframe)(struct video_anim const *__restrict __self,
-	                                  struct video_anim_frameinfo *__restrict __info);
+	                                  struct video_anim_frame *__restrict __frame);
 
-	/* Update  pixel data of `__buf' to contain the contents of the next frame in line.
-	 * For this purpose, assume that on entry, `__buf' was returned by `vao_firstframe'
-	 * or  a preceding call to `vao_nextframe', and  currently contains a redner of the
-	 * frame identified by `IN(__info->vafi_frameid)'.
+	/* Update `__frame' (and specifically: `__frame->vaf_frame') to contain the contents
+	 * of the next frame in line.
 	 *
-	 * This function may  then update the  contents of `__buf'  and `__info' such  that
-	 * upon successful return (return == 0), `__info->vafi_frameid' has been  increment
-	 * or reset back to `0',  and `__buf' now contains a  render of the next frame.  It
-	 * may also simply return some other video buffer (iow: return != __buf) is allowed
-	 *
-	 * CAUTION: This function is not thread-safe when `__buf' is simultaneously being
-	 *          used by another thread, or if someone is still holding a  video_lock.
-	 *          This function is also allowed to  modify `__buf' in way not  normally
-	 *          allowed  (including changing its codec and/or palette, as well as the
-	 *          memory  used to back any potential video  lock). The only thing it is
-	 *          not allowed to changed are the buffer's dimensions.
-	 *
-	 * CAUTION: The video buffer returned by `vao_firstframe' might contain some extra
-	 *          out-of-band data that is then  needed/used by this function to  render
-	 *          the next frame. Do **NOT** pass a video buffer that wasn't returned by
-	 *          `vao_firstframe',  and do **NOT**  try to skip  frames by changing the
-	 *          value in `__info->vafi_frameid' between calls.
-	 *
-	 * @return: * :   A video buffer with the  same resolution as `__buf' (or  possibly
-	 *                just  `__buf' again), that  contains a render  of the next frame.
-	 *                In this case,  this function semantically  inherited a  reference
-	 *                to the given `__buf' (meaning that if another buffer is returned,
-	 *                the call will have video_buffer_decref'd the given `__buf')
-	 * @return: NULL: Failed  to render next frame (s.a. `errno'). In this case, no
-	 *                reference to  `__buf' has  been inherited,  though the  pixel
-	 *                contents  of `__buf' may have been modified and may even look
-	 *                corrupted now (though semantically speaking, `__buf' is still
-	 *                guarantied to be in a consistent state). */
-	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_INOUT_T(2) __ATTR_INOUT_T(3) __REF struct video_buffer *
+	 * @return: 0 : Success: `__frame' was updated to contain the next frame.
+	 * @return: -1: Failed  to render next frame (s.a. `errno'). In this case, no
+	 *              reference to  `__buf' has  been inherited,  though the  pixel
+	 *              contents  of `__buf' may have been modified and may even look
+	 *              corrupted now (though semantically speaking, `__buf' is still
+	 *              guarantied to be in a consistent state). */
+	__ATTR_WUNUSED_T __ATTR_IN_T(1) __ATTR_INOUT_T(2) int
 	(LIBVIDEO_GFX_CC *vao_nextframe)(struct video_anim const *__restrict __self,
-	                                 /*inherit(on_success)*/ __REF struct video_buffer *__restrict __buf,
-	                                 struct video_anim_frameinfo *__restrict __info);
+	                                 struct video_anim_frame *__restrict __frame);
 };
 
-#define video_anim_firstframe(self, info) \
-	(*(self)->va_ops->vao_firstframe)(self, info)
-#define video_anim_nextframe(self, buf, info) \
-	(*(self)->va_ops->vao_nextframe)(self, buf, info)
+#define video_anim_sizeof_frame(self)      ((self)->va_ops->vao_sizeof_frame)
+#define video_anim_firstframe(self, frame) (*(self)->va_ops->vao_firstframe)(self, frame)
+#define video_anim_nextframe(self, frame)  (*(self)->va_ops->vao_nextframe)(self, frame)
 
 struct video_anim {
 	struct video_anim_ops const *va_ops;    /* [1..1][const] Video animation operators */

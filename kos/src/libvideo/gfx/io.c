@@ -39,6 +39,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <errno.h>
 #include <malloc.h>
+#include <malloca.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -51,8 +52,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "anim.h"
 #include "buffer.h"
-#include "buffer/old-gfx.h"
 #include "buffer/lockable.h"
+#include "buffer/old-gfx.h"
 #include "io-utils.h"
 #include "io.h"
 
@@ -81,15 +82,37 @@ filefmt_detect(char const *__restrict format) {
 	return FMT_BAD;
 }
 
-PRIVATE REF struct video_buffer *CC
+PRIVATE ATTR_NOINLINE REF struct video_buffer *CC
 anim2frame(REF struct video_anim *anim) {
-	struct video_anim_frameinfo frame_info;
 	REF struct video_buffer *result;
+	struct video_anim_frame *frame;
 	if (!anim || anim == VIDEO_ANIM_WRONG_FMT)
 		return (REF struct video_buffer *)anim;
-	result = video_anim_firstframe(anim, &frame_info);
+
+	/* Create temp. buffer for animation frame */
+	frame = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
+	if unlikely(!frame)
+		goto err;
+
+	/* Load first animation frame */
+	if unlikely(video_anim_firstframe(anim, frame))
+		goto err_frame;
+
+	/* Take first frame */
+	result = frame->vaf_frame;
+	video_buffer_incref(result);
+
+	/* Finalize frame reader and animation */
+	video_anim_frame_fini(frame);
+	freea(frame);
 	video_anim_decref(anim);
+
+	/* Return first frame */
 	return result;
+err_frame:
+	freea(frame);
+err:
+	return NULL;
 }
 
 PRIVATE REF struct video_anim *CC

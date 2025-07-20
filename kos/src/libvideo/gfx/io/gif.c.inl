@@ -92,19 +92,6 @@ struct gif_config {
 	uint16_t      gc_delay;   /* Delay time between frames (in 1/100th seconds) default is 10 */
 };
 
-PRIVATE NONNULL((1, 2)) void CC
-gif_config_populate_showfor(struct gif_config *__restrict self,
-                            struct video_anim_frameinfo *__restrict info) {
-	if (self->gc_delay < 2) {
-		info->vafi_showfor.tv_sec  = 0;
-		info->vafi_showfor.tv_usec = 100000; /* 1/10'th of a second */
-	} else {
-		info->vafi_showfor.tv_sec  = (self->gc_delay / 100);
-		info->vafi_showfor.tv_usec = (self->gc_delay % 100) * 10000;
-	}
-}
-
-
 /* Call after reading the '!' used to start a gif "extension" block
  * @return: * :   New read pointer
  * @return: NULL: gif file is corrupted */
@@ -352,64 +339,17 @@ LWZ_state_getc(LWZ_state *__restrict self) {
 
 
 struct gif_anim;
-struct gif_buffer: video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
-	struct gif_config gb_cfg;      /* [const] Default config */
-	byte_t           *gb_scratch;  /* [0..1][owned] Scratch buffer for doing frame I/O */
-	byte_t           *gb_restore;  /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
-	byte_t const     *gb_reader;   /* [1..1] Pointer at ';' if last frame rendered, or ',' if there is more */
-	byte_t const     *gb_lct;      /* [0..gb_lct_len] Currently used local color table */
-	unsigned int      gb_lct_len;  /* Length of the currently used local color table */
-	LWZ_state         gb_lzw;      /* LZW reader used to decompress frame data */
-	video_color_t     gb_colorkey; /* Forced color-key, or "0" if not needed */
+struct gif_frame: video_anim_frame {
+	struct gif_config gb_cfg;            /* [const] Default config */
+	byte_t           *gb_scratch;        /* [0..1][owned] Scratch buffer for doing frame I/O */
+	byte_t           *gb_restore;        /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
+	size_t            gb_restore_stride; /* Scanline stride in `gb_restore' */
+	byte_t const     *gb_reader;         /* [1..1] Pointer at ';' if last frame rendered, or ',' if there is more */
+	byte_t const     *gb_lct;            /* [0..gb_lct_len] Currently used local color table */
+	unsigned int      gb_lct_len;        /* Length of the currently used local color table */
+	LWZ_state         gb_lzw;            /* LZW reader used to decompress frame data */
 	bool gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS; /* True if "GIF_DISPOSE_RESTORE_PREVIOUS" was encountered */
 };
-
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-gifbuffer_initgfx__with_colorkey(struct video_gfx *__restrict self) {
-	struct gif_buffer *me = (struct gif_buffer *)self->vx_buffer;
-	self->vx_colorkey = me->gb_colorkey;
-	return rambuffer__initgfx(self);
-}
-
-PRIVATE NONNULL((1)) void FCC
-gifbuffer_destroy(struct video_buffer *__restrict self) {
-	struct gif_buffer *me = (struct gif_buffer *)self;
-	free(me->gb_scratch);
-	free(me->gb_restore);
-	rambuffer__destroy(me);
-}
-
-#undef gifbuffer_ops
-PRIVATE struct video_buffer_ops gifbuffer_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops(void) {
-	if unlikely(!gifbuffer_ops.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops);
-		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&gifbuffer_ops);
-		video_buffer_ops_set_SUBREGION_like_RAMBUFFER(&gifbuffer_ops);
-		COMPILER_WRITE_BARRIER();
-		gifbuffer_ops.vi_destroy = &gifbuffer_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &gifbuffer_ops;
-}
-#define gifbuffer_ops (*_gifbuffer_ops())
-
-#undef gifbuffer_ops__with_color_key
-PRIVATE struct video_buffer_ops gifbuffer_ops__with_color_key = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops__with_color_key(void) {
-	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
-		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
-		video_buffer_ops_set_SUBREGION_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
-		gifbuffer_ops__with_color_key.vi_initgfx   = &gifbuffer_initgfx__with_colorkey;
-		gifbuffer_ops__with_color_key.vi_updategfx = &rambuffer__updategfx;
-		COMPILER_WRITE_BARRIER();
-		gifbuffer_ops__with_color_key.vi_destroy = &gifbuffer_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &gifbuffer_ops__with_color_key;
-}
-#define gifbuffer_ops__with_color_key (*_gifbuffer_ops__with_color_key())
-
 
 struct gif_anim: video_anim {
 	struct mapfile            ga_file;    /* [const][owned] Memory-mapping for the gif file */
@@ -426,6 +366,26 @@ struct gif_anim: video_anim {
 };
 
 PRIVATE NONNULL((1)) void CC
+gif_frame_fini(struct video_anim_frame *__restrict self) {
+	struct gif_frame *me = (struct gif_frame *)self;
+	free(me->gb_scratch);
+	free(me->gb_restore);
+	video_buffer_decref(me->vaf_frame);
+}
+
+PRIVATE NONNULL((1, 2)) void CC
+gif_config_populate_showfor(struct gif_config *__restrict self,
+                            struct gif_frame *__restrict data) {
+	if (self->gc_delay < 2) {
+		data->vaf_showfor.tv_sec  = 0;
+		data->vaf_showfor.tv_usec = 100000; /* 1/10'th of a second */
+	} else {
+		data->vaf_showfor.tv_sec  = (self->gc_delay / 100);
+		data->vaf_showfor.tv_usec = (self->gc_delay % 100) * 10000;
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
 gif_anim_destroy(struct video_anim *__restrict self) {
 	struct gif_anim *me = (struct gif_anim *)self;
 	(void)unmapfile(&me->ga_file);
@@ -436,7 +396,7 @@ gif_anim_destroy(struct video_anim *__restrict self) {
  * @return: * :   New reader pointer
  * @return: NULL: I/O error (corrupt data; `errno' was modified) */
 PRIVATE WUNUSED NONNULL((1, 2, 6, 7)) byte_t const *CC
-gif_read_frame(struct gif_buffer *__restrict self,
+gif_read_frame(struct gif_frame *__restrict self,
                byte_t *__restrict dst, size_t dst_stride,
                uint16_t w, uint16_t h,
                byte_t const *reader, byte_t const *eof,
@@ -606,16 +566,18 @@ fail:
 /* Called with "reader" pointing after the ',' of the frame to paint */
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) byte_t const *CC
 gif_anim_paintframe(struct gif_anim const *__restrict anim,
-                    struct gif_buffer *__restrict self,
+                    struct gif_frame *__restrict self,
                     byte_t const *reader, byte_t const *eof) {
 	byte_t ctrl;
 	byte_t const *lct;
 	unsigned int lct_len;
 	struct video_codec const *codec;
+	struct video_buffer *frame = self->vaf_frame;
 	uint16_t frame_x, frame_y;
 	uint16_t frame_w, frame_h;
 	video_coord_t frame_endx;
 	video_coord_t frame_endy;
+	struct video_lock frame_lock;
 
 	/* Read frame position and dimensions */
 	frame_x = GET_LE16(reader + 0); /* struct GIF_FRAME_header::gfh_x */
@@ -641,16 +603,19 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	}
 
 	/* Check if we need to convert from a palette-based output buffer to a direct-color one */
-	codec = self->vb_format.vf_codec;
+	codec = frame->vb_format.vf_codec;
 	if ((self->gb_lct != lct) &&
 	    (codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
 	    /* When the old frame gets disposed, then we also don't need DCOL mode */
 	    (self->gb_cfg.gc_dispose != GIF_DISPOSE_RESTORE_BACKGROUND)) {
 
 		/* Must convert from P8 to RGB888/RGBA8888 */
-		byte_t *dcol_buf, *dcol_end, *pal_buf, *pal_iter;
-		size_t dcol_stride, dcol_total;
-		struct video_palette *pal = self->vb_format.vf_pal;
+		byte_t *dcol_line, *pal_line;
+		video_coord_t iter_y;
+		struct video_lock pal_lock;
+		REF struct video_buffer *dcol_buffer;
+		struct video_format format;
+		struct video_palette *pal = frame->vb_format.vf_pal;
 		assert(pal);
 
 		/* Only the transparency-config of the first frame (i.e. the "gobal transparency")
@@ -661,62 +626,84 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		 * use "GIF_DISPOSE_RESTORE_BACKGROUND" to make *all* pixels transparent, and then
 		 * proceed to re-paint the entire canvas, or use "GIF_DISPOSE_RESTORE_PREVIOUS" to
 		 * restore a previous frame that had transparency at the intended locations. */
-		codec = video_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
-		                           ? VIDEO_CODEC_RGBA8888
-		                           : VIDEO_CODEC_RGB888);
-		if unlikely(!codec) {
+		format.vf_pal   = NULL;
+		format.vf_codec = video_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
+		                                     ? VIDEO_CODEC_RGBA8888
+		                                     : VIDEO_CODEC_RGB888);
+		if unlikely(!format.vf_codec) {
 			errno = ENODEV;
 			goto err;
 		}
 
 		/* Allocate new buffer for direct-color mode */
-		assert(codec->vc_specs.vcs_pxsz == 3 ||
-		       codec->vc_specs.vcs_pxsz == 4);
-		dcol_stride = self->vb_xdim * codec->vc_specs.vcs_pxsz;
-		dcol_total  = dcol_stride * self->vb_ydim;
-		dcol_buf = (byte_t *)malloc(dcol_total);
-		if unlikely(!dcol_buf)
+		assert(format.vf_codec->vc_specs.vcs_pxsz == 3 ||
+		       format.vf_codec->vc_specs.vcs_pxsz == 4);
+		dcol_buffer = video_domain_newbuffer(anim->va_domain, frame->vb_xdim, frame->vb_ydim,
+		                                     &format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
+		if unlikely(!dcol_buffer) /* TODO: What if the domain doesn't support the format? */
 			goto err;
-		pal_buf = self->rb_data;
-		self->rb_data   = dcol_buf;
-		self->rb_stride = dcol_stride;
-		dcol_end = dcol_buf + dcol_total;
-		free(self->gb_restore);
-		self->gb_restore = NULL;
+		if unlikely(video_buffer_wlock(dcol_buffer, &frame_lock)) {
+err_dcol_buffer:
+			video_buffer_decref(dcol_buffer);
+			goto err;
+		}
+		if unlikely(video_buffer_rlock(frame, &pal_lock)) {
+			video_buffer_unlock(dcol_buffer, &frame_lock);
+			goto err_dcol_buffer;
+		}
 
 		/* Convert pixel data */
-		pal_iter = pal_buf;
-		if (codec->vc_specs.vcs_pxsz == 3) {
+		pal_line  = pal_lock.vl_data;
+		dcol_line = frame_lock.vl_data;
+		iter_y    = frame->vb_ydim;
+		if (format.vf_codec->vc_specs.vcs_pxsz == 3) {
 			do {
-				byte_t pixel = *pal_iter++;
-				video_color_t color = pal->vp_pal[pixel];
-				*dcol_buf++ = VIDEO_COLOR_GET_RED(color);
-				*dcol_buf++ = VIDEO_COLOR_GET_GREEN(color);
-				*dcol_buf++ = VIDEO_COLOR_GET_BLUE(color);
-			} while (dcol_buf < dcol_end);
+				video_coord_t iter_x = frame->vb_xdim;
+				byte_t *dcol_iter = dcol_line;
+				byte_t *pal_iter = pal_line;
+				do {
+					byte_t pixel = *pal_iter++;
+					video_color_t color = pal->vp_pal[pixel];
+					*dcol_iter++ = VIDEO_COLOR_GET_RED(color);
+					*dcol_iter++ = VIDEO_COLOR_GET_GREEN(color);
+					*dcol_iter++ = VIDEO_COLOR_GET_BLUE(color);
+				} while (--iter_x);
+				dcol_line += frame_lock.vl_stride;
+				pal_line += pal_lock.vl_stride;
+			} while (--iter_y);
 		} else {
 			do {
-				byte_t pixel = *pal_iter++;
-				video_color_t color;
-				if (pixel == anim->ga_cfg.gc_trans) {
-					color = 0;
-				} else {
-					color = pal->vp_pal[pixel];
-				}
-				*(uint32_t *)dcol_buf = color;
-				dcol_buf += 4;
-			} while (dcol_buf < dcol_end);
+				video_coord_t iter_x = frame->vb_xdim;
+				byte_t *dcol_iter = dcol_line;
+				byte_t *pal_iter = pal_line;
+				do {
+					byte_t pixel = *pal_iter++;
+					video_color_t color;
+					if (pixel == anim->ga_cfg.gc_trans) {
+						color = 0;
+					} else {
+						color = pal->vp_pal[pixel];
+					}
+					*(uint32_t *)dcol_iter = color;
+					dcol_iter += 4;
+				} while (--iter_x);
+				dcol_line += frame_lock.vl_stride;
+				pal_line += pal_lock.vl_stride;
+			} while (--iter_y);
 		}
-		self->vb_ops = &gifbuffer_ops; /* Set regular ops (in case color-key was set before) */
-		self->vb_format.vf_codec = codec;
-		self->vb_format.vf_pal   = NULL;
-		video_palette_decref(pal);
-		if (malloc_usable_size(pal_buf) > malloc_usable_size(self->gb_scratch)) {
-			free(self->gb_scratch);
-			self->gb_scratch = pal_buf;
-		} else {
-			free(pal_buf);
-		}
+		video_buffer_unlock(frame, &pal_lock);
+
+		free(self->gb_restore);
+		self->gb_restore = NULL;
+		self->vaf_colorkey = 0;
+		assert(pal == frame->vb_format.vf_pal);
+		assert(self->vaf_frame == frame);
+		video_buffer_decref(frame);            /* Decref old (palette) frame */
+		self->vaf_frame = frame = dcol_buffer; /* Inherit reference */
+		codec = frame->vb_format.vf_codec;
+	} else {
+		if unlikely(video_buffer_wlock(frame, &frame_lock))
+			goto err;
 	}
 
 	/* Remember the new (current) LCT as being active */
@@ -729,60 +716,53 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	case GIF_DISPOSE_RESTORE_BACKGROUND: {
 		/* Backup previous frame & clear background for new
 		 * frame with  "global transparency" (if  defined). */
-		size_t rb_total = self->rb_stride * self->vb_ydim;
-		if (anim->ga_cfg.gc_trans != 0 && anim->ga_cfg.gc_trans <= 0xff) {
-			if (!anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
-				if (!self->gb_restore) {
-					byte_t *backup = (byte_t *)malloc(rb_total);
-					if unlikely(!backup)
-						goto err;
-					self->gb_restore = self->rb_data;
-					self->rb_data    = backup;
-				} else {
-					byte_t *backup   = self->gb_restore;
-					self->gb_restore = self->rb_data;
-					self->rb_data    = backup;
-				}
+		if (!anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
+			if (!self->gb_restore) {
+				byte_t *backup;
+				struct video_rambuffer_requirements req;
+				(*frame->vb_format.vf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+				backup = (byte_t *)malloc(req.vbs_bufsize);
+				if unlikely(!backup)
+					goto err_frame_lock;
+				self->gb_restore        = backup;
+				self->gb_restore_stride = req.vbs_stride;
 			}
-			memset(self->rb_data, anim->ga_cfg.gc_trans, rb_total);
-		} else if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS) {
-			bzero(self->rb_data, rb_total);
-		} else if (!self->gb_restore) {
-			byte_t *backup = (byte_t *)calloc(rb_total);
-			if unlikely(!backup)
-				goto err;
-			self->gb_restore = self->rb_data;
-			self->rb_data    = backup;
-		} else {
-			byte_t *backup   = self->gb_restore;
-			self->gb_restore = self->rb_data;
-			self->rb_data    = backup;
-			bzero(backup, rb_total);
+			(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
+			                      frame_lock.vl_data, 0, frame_lock.vl_stride,
+			                      frame->vb_xdim, frame->vb_ydim);
 		}
+		(*codec->vc_rectfill)(frame_lock.vl_data, 0, frame_lock.vl_stride,
+		                      anim->ga_cfg.gc_trans, frame->vb_xdim, frame->vb_ydim);
 	}	break;
 
 	case GIF_DISPOSE_RESTORE_PREVIOUS:
 		self->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = true;
 		/* Restore previous frame */
 		if (self->gb_restore) {
-			size_t rb_total = self->rb_stride * self->vb_ydim;
-			memcpy(self->rb_data, self->gb_restore, rb_total);
+			(*codec->vc_rectcopy)(frame_lock.vl_data, 0, frame_lock.vl_stride,
+			                      self->gb_restore, 0, self->gb_restore_stride,
+			                      frame->vb_xdim, frame->vb_ydim);
 		}
 		break;
 
 	default: {
 		/* Backup current frame in case "GIF_DISPOSE_RESTORE_PREVIOUS" ever gets  used
 		 * Otherwise, don't do anything to the canvas and paint the new frame over-top */
-		size_t rb_total;
 		if (anim->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS)
 			break;
-		rb_total = self->rb_stride * self->vb_ydim;
 		if (!self->gb_restore) {
-			self->gb_restore = (byte_t *)malloc(rb_total);
-			if unlikely(!self->gb_restore)
-				goto err;
+			byte_t *backup;
+			struct video_rambuffer_requirements req;
+			(*frame->vb_format.vf_codec->vc_rambuffer_requirements)(frame->vb_xdim, frame->vb_ydim, &req);
+			backup = (byte_t *)malloc(req.vbs_bufsize);
+			if unlikely(!backup)
+				goto err_frame_lock;
+			self->gb_restore        = backup;
+			self->gb_restore_stride = req.vbs_stride;
 		}
-		memcpy(self->gb_restore, self->rb_data, rb_total);
+		(*codec->vc_rectcopy)(self->gb_restore, 0, self->gb_restore_stride,
+		                      frame_lock.vl_data, 0, frame_lock.vl_stride,
+		                      frame->vb_xdim, frame->vb_ydim);
 	}	break;
 
 	}
@@ -793,14 +773,14 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 	/* Check if we can directly render into the frame buffer, or if we have
 	 * to  go through the  extra work of using  a temporary scratch buffer. */
 	if ((codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) &&
-	    likely(frame_endx <= self->vb_xdim && frame_endy <= self->vb_ydim)) {
+	    likely(frame_endx <= frame->vb_xdim && frame_endy <= frame->vb_ydim)) {
 		/* Can render directly into the frame buffer (no scratch buffer needed) */
 		byte_t *dst;
-		dst = self->rb_data + frame_x + frame_y * self->rb_stride;
-		reader = gif_read_frame(self, dst, self->rb_stride, frame_w, frame_h,
+		dst    = frame_lock.vl_data + frame_x + frame_y * frame_lock.vl_stride;
+		reader = gif_read_frame(self, dst, frame_lock.vl_stride, frame_w, frame_h,
 		                        reader, eof, ctrl, self->gb_cfg.gc_trans);
 		if unlikely(!reader)
-			goto err;
+			goto err_frame_lock;
 
 check_for_global_transparency:
 		switch (self->gb_cfg.gc_dispose) {
@@ -808,20 +788,24 @@ check_for_global_transparency:
 			/* When  the background (all-transparent) was restored, there is
 			 * always some transparency if the frame doesn't cover the whole
 			 * canvas. */
-			if (frame_x > 0 || frame_y > 0 || frame_w < self->vb_xdim || frame_h < self->vb_ydim) {
+			if (frame_x > 0 || frame_y > 0 || frame_w < frame->vb_xdim || frame_h < frame->vb_ydim) {
 set_has_global_transparency:
-				self->gb_colorkey = self->vb_format.vf_pal->vp_pal[anim->ga_cfg.gc_trans];
-				self->vb_ops = &gifbuffer_ops__with_color_key;
+				self->vaf_colorkey = frame->vb_format.vf_pal->vp_pal[anim->ga_cfg.gc_trans];
 				break;
 			}
 			ATTR_FALLTHROUGH
-		case GIF_DISPOSE_RESTORE_PREVIOUS:
+		case GIF_DISPOSE_RESTORE_PREVIOUS: {
 			/* Check if pixel data contains transparent pixels */
-			if (memchr(self->rb_data, anim->ga_cfg.gc_trans,
-			           self->rb_stride * self->vb_ydim))
-				goto set_has_global_transparency;
-			self->vb_ops = &gifbuffer_ops;
-			break;
+			byte_t *line_iter = frame_lock.vl_data;
+			video_coord_t y_iter = frame->vb_ydim;
+			do {
+				if (memchr(line_iter, anim->ga_cfg.gc_trans, frame->vb_xdim))
+					goto set_has_global_transparency;
+				line_iter += frame_lock.vl_stride;
+			} while (--y_iter);
+			self->vaf_colorkey = 0;
+		}	break;
+
 		default: break;
 		}
 	} else {
@@ -837,7 +821,7 @@ set_has_global_transparency:
 		if (reqsize > avlsize) {
 			byte_t *newbuf = (byte_t *)realloc(self->gb_scratch, reqsize);
 			if unlikely(!newbuf)
-				goto err;
+				goto err_frame_lock;
 			self->gb_scratch = newbuf;
 		}
 
@@ -846,19 +830,19 @@ set_has_global_transparency:
 		                        frame_w, frame_w, frame_h,
 		                        reader, eof, ctrl, (video_pixel_t)-1);
 		if unlikely(!reader)
-			goto err;
+			goto err_frame_lock;
 
 		/* Force-clamp frame coords to valid coords.
 		 * These should never point out-of-bounds, but better be safe than sorry. */
-		if unlikely(frame_endx > self->vb_xdim) {
-			if (frame_w > self->vb_xdim)
-				frame_w = self->vb_xdim;
-			frame_x = self->vb_xdim - frame_w;
+		if unlikely(frame_endx > frame->vb_xdim) {
+			if (frame_w > frame->vb_xdim)
+				frame_w = frame->vb_xdim;
+			frame_x = frame->vb_xdim - frame_w;
 		}
-		if unlikely(frame_endy > self->vb_ydim) {
-			if (frame_h > self->vb_ydim)
-				frame_h = self->vb_ydim;
-			frame_y = self->vb_ydim - frame_h;
+		if unlikely(frame_endy > frame->vb_ydim) {
+			if (frame_h > frame->vb_ydim)
+				frame_h = frame->vb_ydim;
+			frame_y = frame->vb_ydim - frame_h;
 		}
 
 		/* Render scratch buffer onto frame and translate palette indices. */
@@ -866,7 +850,7 @@ set_has_global_transparency:
 		       codec->vc_specs.vcs_pxsz == 3 || /* RGB888 */
 		       codec->vc_specs.vcs_pxsz == 4);  /* RGBA8888 */
 		src = self->gb_scratch;
-		dst = self->rb_data + (frame_x * codec->vc_specs.vcs_pxsz) + (frame_y * self->rb_stride);
+		dst = frame_lock.vl_data + (frame_x * codec->vc_specs.vcs_pxsz) + (frame_y * frame_lock.vl_stride);
 		switch (codec->vc_specs.vcs_pxsz) {
 		case 1:
 			for (y = 0; y < frame_h; ++y) {
@@ -877,7 +861,7 @@ set_has_global_transparency:
 						*line = pixel;
 					++line;
 				}
-				dst += self->rb_stride;
+				dst += frame_lock.vl_stride;
 			}
 			goto check_for_global_transparency;
 		case 3:
@@ -900,7 +884,7 @@ set_has_global_transparency:
 					}
 					line += 3;
 				}
-				dst += self->rb_stride;
+				dst += frame_lock.vl_stride;
 			}
 			break;
 		case 4:
@@ -922,14 +906,18 @@ set_has_global_transparency:
 					}
 					line += 4;
 				}
-				dst += self->rb_stride;
+				dst += frame_lock.vl_stride;
 			}
 			break;
 		default: __builtin_unreachable();
 		}
 	}
 
+	video_buffer_unlock(frame, &frame_lock);
 	return reader;
+err_frame_lock:
+	video_buffer_unlock(frame, &frame_lock);
+	goto err;
 fail:
 	errno = EINVAL;
 err:
@@ -937,48 +925,34 @@ err:
 }
 
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_OUT(2) int CC
 gif_anim_firstframe(struct video_anim const *__restrict self,
-                    struct video_anim_frameinfo *__restrict info) {
+                    struct video_anim_frame *__restrict _frame) {
+	struct gif_frame *frame = (struct gif_frame *)_frame;
 	struct gif_anim *me = (struct gif_anim *)self;
-	REF struct gif_buffer *result;
+	REF struct video_buffer *result;
+	struct video_lock result_lock;
 	byte_t const *reader = me->ga_frame1;
 	byte_t const *eof = me->ga_eof;
-	struct video_codec const *codec;
-	REF struct video_palette *pal;
+	struct video_format format;
 	byte_t ctrl;
 	uint16_t frame_x, frame_y;
 	uint16_t frame_w, frame_h;
 	video_coord_t frame_endx;
 	video_coord_t frame_endy;
-	size_t rb_total;
 
-	/* Fill in frame info */
-	info->vafi_frameid = 0;
-	gif_config_populate_showfor(&me->ga_cfg, info);
+	/* Fill in frame frame */
+	frame->vaf_frameid = 0;
+	gif_config_populate_showfor(&me->ga_cfg, frame);
 
-	/* Create main animation frame buffer */
-	result = (REF struct gif_buffer *)malloc(sizeof(struct gif_buffer));
-	if unlikely(!result)
-		goto err;
-
-	/* TODO: Must re-design video_anim API so impls can store additional
-	 *       frame data **OUTSIDE** the frame buffer itself. That's  the
-	 *       only *real* way to leave the entire frame data structure up
-	 *       to the video domain! */
-	result->vb_refcnt   = 1;
-	result->vb_domain   = me->va_domain; /* TODO: This breaks for anything other than the RAM domain! */
-	result->vb_ops      = &gifbuffer_ops;
-	result->vb_xdim     = me->va_xdim;
-	result->vb_ydim     = me->va_ydim;
-	result->rb_stride   = me->va_xdim * 1;
-	result->gb_cfg      = me->ga_cfg;
-	result->gb_restore  = NULL;
-	result->gb_scratch  = NULL;
-	result->gb_lct      = NULL;
-	result->gb_lct_len  = 0;
-	result->gb_colorkey = 0;
-	result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = false;
+	frame->gb_cfg       = me->ga_cfg;
+	frame->gb_restore   = NULL;
+	frame->gb_scratch   = NULL;
+	frame->gb_lct       = NULL;
+	frame->gb_lct_len   = 0;
+	frame->vaf_colorkey = 0;
+	frame->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS = false;
+	frame->vaf_fini = &gif_frame_fini;
 
 	/* Read frame position and dimensions */
 	frame_x = GET_LE16(reader + 0); /* struct GIF_FRAME_header::gfh_x */
@@ -991,54 +965,56 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	ctrl = *reader++;
 	if (ctrl & 0x80) {
 		static_assert((2 << (0xff & 0x07)) <= 256);
-		result->gb_lct_len = 2 << (ctrl & 0x07);
-		result->gb_lct = reader;
-		reader += result->gb_lct_len * 3;
+		frame->gb_lct_len = 2 << (ctrl & 0x07);
+		frame->gb_lct = reader;
+		reader += frame->gb_lct_len * 3;
 		if (reader >= eof)
 			goto fail_r;
 	} else {
-		result->gb_lct_len = me->ga_gct_len;
-		result->gb_lct = me->ga_gct;
-		if unlikely(!result->gb_lct_len)
+		frame->gb_lct_len = me->ga_gct_len;
+		frame->gb_lct = me->ga_gct;
+		if unlikely(!frame->gb_lct_len)
 			goto fail_r;
 	}
 
 	/* First frame can always be rendered using a palette */
-	codec = video_codec_lookup(VIDEO_CODEC_P8);
-	if unlikely(!codec) {
+	format.vf_codec = video_codec_lookup(VIDEO_CODEC_P8);
+	if unlikely(!format.vf_codec) {
 		errno = ENODEV;
-		goto err_r;
+		goto err;
 	}
-	pal = video_palette_create(256);
-	if unlikely(!pal)
-		goto err_r;
+	format.vf_pal = video_palette_create(256);
+	if unlikely(!format.vf_pal)
+		goto err;
 	{
 		video_pixel_t i;
-		byte_t const *lct_reader = result->gb_lct;
-		for (i = 0; i < result->gb_lct_len; ++i) {
+		byte_t const *lct_reader = frame->gb_lct;
+		for (i = 0; i < frame->gb_lct_len; ++i) {
 			byte_t r = *lct_reader++;
 			byte_t g = *lct_reader++;
 			byte_t b = *lct_reader++;
-			pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
+			format.vf_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			if (i == me->ga_cfg.gc_trans)
-				pal->vp_pal[i] = 0;
+				format.vf_pal->vp_pal[i] = 0;
 		}
 	}
-	result->vb_format.vf_codec = codec;
-	result->vb_format.vf_pal   = pal;
-	_video_rambuffer_init(result);
+
+	/* Create main animation frame buffer */
+	result = video_domain_newbuffer(me->va_domain, me->va_xdim, me->va_ydim, &format,
+	                                (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0)
+	                                ? VIDEO_DOMAIN_NEWBUFFER_F_NORMAL
+	                                : VIDEO_DOMAIN_NEWBUFFER_F_CALLOC);
+	video_palette_decref(format.vf_pal);
+	if unlikely(!result)
+		goto err;
+	if unlikely(video_buffer_wlock(result, &result_lock))
+		goto err_r;
+	frame->vaf_frame = result;
 
 	/* Fill with global transparency, or "0" if not defined */
-	rb_total = me->va_xdim * 1 * me->va_ydim;
 	if (me->ga_cfg.gc_trans <= 0xff && me->ga_cfg.gc_trans != 0) {
-		result->rb_data = (byte_t *)malloc(rb_total);
-		if unlikely(!result->rb_data)
-			goto err_r_pal;
-		memset(result->rb_data, me->ga_cfg.gc_trans, rb_total);
-	} else {
-		result->rb_data = (byte_t *)calloc(rb_total);
-		if unlikely(!result->rb_data)
-			goto err_r_pal;
+		(*format.vf_codec->vc_rectfill)(result_lock.vl_data, 0, result_lock.vl_stride,
+		                                me->ga_cfg.gc_trans, result->vb_xdim, result->vb_ydim);
 	}
 
 	/* Force-clamp frame coords to valid coords.
@@ -1057,12 +1033,12 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	}
 
 	/* Read frame into buffer */
-	reader = gif_read_frame(result,
-	                        result->rb_data + frame_x + frame_y * result->rb_stride,
-	                        result->rb_stride, frame_w, frame_h, reader, eof, ctrl,
+	reader = gif_read_frame(frame,
+	                        result_lock.vl_data + frame_x + frame_y * result_lock.vl_stride,
+	                        result_lock.vl_stride, frame_w, frame_h, reader, eof, ctrl,
 	                        (video_pixel_t)-1);
 	if unlikely(!reader)
-		goto err_r_pal_data;
+		goto err_r_lock;
 
 	/* Set-up global color-key for used during GFX (if needed) */
 	switch (me->ga_frame1_global_trans) {
@@ -1071,20 +1047,27 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 		/* Check if frame has "transparent" pixels:
 		 * - First frame does not paint whole image -> everything outside is global transparency!
 		 * - If pixel data contains a "transparent" pixel, then frame1 also needs global transparency */
-		assert(rb_total == me->va_xdim * 1 * me->va_ydim);
-		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_xdim || frame_h < result->vb_ydim ||
-		    memchr(result->rb_data, me->ga_cfg.gc_trans, rb_total)) {
+		byte_t *line_iter;
+		video_coord_t y_iter;
+		if (frame_x > 0 || frame_y > 0 || frame_w < result->vb_xdim || frame_h < result->vb_ydim) {
+set_have_global_trans:
 			me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__YES;
 			goto have_global_trans;
 		}
+		line_iter = result_lock.vl_data;
+		y_iter    = result->vb_ydim;
+		do {
+			if (memchr(line_iter, me->ga_cfg.gc_trans, result->vb_xdim))
+				goto set_have_global_trans;
+			line_iter += result_lock.vl_stride;
+		} while (--y_iter);
 		me->ga_frame1_global_trans = GIF_ANIM_FRAME1_GLOBAL_TRANS__NO;
 	}	break;
 
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__YES:
 have_global_trans:
 		/* Use special operators to force a color key into a GFX context */
-		result->gb_colorkey = result->vb_format.vf_pal->vp_pal[me->ga_cfg.gc_trans];
-		result->vb_ops = &gifbuffer_ops__with_color_key;
+		frame->vaf_colorkey = result->vb_format.vf_pal->vp_pal[me->ga_cfg.gc_trans];
 		break;
 
 	case GIF_ANIM_FRAME1_GLOBAL_TRANS__NO:
@@ -1092,42 +1075,34 @@ have_global_trans:
 
 	default: __builtin_unreachable();
 	}
-	result->gb_reader = reader;
-	return result;
+	video_buffer_unlock(result, &result_lock);
+	frame->gb_reader = reader;
+	return 0;
 fail_r:
 	errno = EINVAL;
 	goto err_r;
-err_r_pal_data:
-	free(result->gb_restore);
-	free(result->rb_data);
-err_r_pal:
-	video_palette_decref(result->vb_format.vf_pal);
+err_r_lock:
+	video_buffer_unlock(result, &result_lock);
 err_r:
-	free(result);
+	video_buffer_decref(result);
 err:
-	return NULL;
+	return -1;
 }
 
-PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) ATTR_INOUT(3) REF struct video_buffer *CC
+PRIVATE WUNUSED ATTR_IN(1) ATTR_INOUT(2) int CC
 gif_anim_nextframe(struct video_anim const *__restrict self,
-                   /*inherit(on_success)*/ REF struct video_buffer *__restrict buf,
-                   struct video_anim_frameinfo *__restrict info) {
+                   struct video_anim_frame *__restrict _frame) {
 	struct gif_anim *me = (struct gif_anim *)self;
-	REF struct gif_buffer *result = (REF struct gif_buffer *)buf;
+	struct gif_frame *frame = (struct gif_frame *)_frame;
 	byte_t const *reader, *eof;
 	byte_t ctrl;
-#undef gifbuffer_ops
-#undef gifbuffer_ops__with_color_key
-	assert(result->vb_ops == &gifbuffer_ops ||
-	       result->vb_ops == &gifbuffer_ops__with_color_key);
-#define gifbuffer_ops (*_gifbuffer_ops())
-#define gifbuffer_ops__with_color_key (*_gifbuffer_ops__with_color_key())
+	assert(frame->vaf_fini == &gif_frame_fini);
 
-	/* Indicate next frame in caller-given "info" */
-	++info->vafi_frameid;
+	/* Indicate next frame in caller-given "frame" */
+	++frame->vaf_frameid;
 
 	/* Start reading blocks until we hit another frame */
-	reader = result->gb_reader;
+	reader = frame->gb_reader;
 	eof    = me->ga_eof;
 	for (;;) {
 		if unlikely(reader >= eof)
@@ -1136,7 +1111,7 @@ gif_anim_nextframe(struct video_anim const *__restrict self,
 		if (ctrl == ';')
 			goto rewind;
 		if (ctrl == '!') {
-			reader = gif_config_parse_extension(&result->gb_cfg, reader, eof);
+			reader = gif_config_parse_extension(&frame->gb_cfg, reader, eof);
 			if unlikely(!reader)
 				goto fail;
 			continue;
@@ -1152,45 +1127,45 @@ gif_anim_nextframe(struct video_anim const *__restrict self,
 
 read_frame_at_header:
 	/* Paint the next frame */
-	reader = gif_anim_paintframe(me, result, reader, eof);
+	reader = gif_anim_paintframe(me, frame, reader, eof);
 	if unlikely(!reader)
 		goto err;
 
-	/* Fill in frame info */
-	gif_config_populate_showfor(&result->gb_cfg, info);
-	result->gb_reader = reader;
-	return result;
+	/* Fill in frame frame */
+	gif_config_populate_showfor(&frame->gb_cfg, frame);
+	frame->gb_reader = reader;
+	return 0;
 rewind:
-	if (!result->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS) {
+	if (!frame->gb_encountered_GIF_DISPOSE_RESTORE_PREVIOUS) {
 		me->ga_no_GIF_DISPOSE_RESTORE_PREVIOUS = true;
-		free(result->gb_restore); /* Will no longer be needed during next iteration... */
-		result->gb_restore = NULL;
+		free(frame->gb_restore); /* Will no longer be needed during next iteration... */
+		frame->gb_restore = NULL;
 	}
-	if (info->vafi_frameid == 1) {
+	if (frame->vaf_frameid == 1) {
 		/* Tried to render the first frame, but got nothing.
 		 * This has to be a single-frame gif file (i.e.  not
 		 * animated) */
-		info->vafi_frameid         = 0;
-		info->vafi_showfor.tv_sec  = 999999;
-		info->vafi_showfor.tv_usec = 999999;
-		return result;
+		frame->vaf_frameid         = 0;
+		frame->vaf_showfor.tv_sec  = 999999;
+		frame->vaf_showfor.tv_usec = 999999;
+		return 0;
 	}
-	info->vafi_frameid = 0;
-	result->gb_cfg = me->ga_cfg;
+	frame->vaf_frameid = 0;
+	frame->gb_cfg = me->ga_cfg;
 	reader = me->ga_frame1;
 	goto read_frame_at_header;
 fail:
 	errno = EINVAL;
 err:
-	return NULL;
+	return -1;
 }
 
 
 
-#undef gif_anim_ops
 PRIVATE struct video_anim_ops gif_anim_ops = {};
 PRIVATE struct video_anim_ops *CC _gif_anim_ops(void) {
 	if (!gif_anim_ops.vao_destroy) {
+		gif_anim_ops.vao_sizeof_frame = sizeof(struct gif_frame);
 		gif_anim_ops.vao_nextframe  = &gif_anim_nextframe;
 		gif_anim_ops.vao_firstframe = &gif_anim_firstframe;
 		COMPILER_WRITE_BARRIER();
@@ -1199,7 +1174,6 @@ PRIVATE struct video_anim_ops *CC _gif_anim_ops(void) {
 	}
 	return &gif_anim_ops;
 }
-#define gif_anim_ops (*_gif_anim_ops())
 
 
 /* GIF */
@@ -1279,7 +1253,7 @@ libvideo_anim_open_gif(struct video_domain const *__restrict domain,
 
 	/* Fill in standard fields of "result" */
 	result->va_domain = domain;
-	result->va_ops    = &gif_anim_ops;
+	result->va_ops    = _gif_anim_ops();
 	result->va_xdim   = GET_LE16(header->gh_lscr_width);
 	result->va_ydim   = GET_LE16(header->gh_lscr_height);
 	result->va_refcnt = 1;

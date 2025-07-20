@@ -35,6 +35,7 @@
 
 #include <err.h>
 #include <format-printer.h>
+#include <malloca.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -216,7 +217,7 @@ do_showpic(struct video_buffer *screen,
            struct video_buffer *image,
            struct video_font *font,
            char const *filename,
-           struct video_anim_frameinfo *frameinfo) {
+           struct video_anim_frame *frameinfo) {
 	struct video_gfx screen_gfx;
 	struct video_gfx image_gfx;
 	video_dim_t blit_w, blit_h;
@@ -296,7 +297,7 @@ do_showpic(struct video_buffer *screen,
 #endif
 
 	/* Display the image */
-#if 0
+#if 1
 	video_gfx_stretch(&screen_gfx, blit_x, blit_y, blit_w, blit_h,
 	                  &image_gfx, 0, 0,
 	                  video_gfx_getclipw(&image_gfx),
@@ -344,7 +345,7 @@ do_showpic(struct video_buffer *screen,
 			                   video_gfx_getcliph(&image_gfx));
 		}
 	}
-#elif 1
+#elif 0
 	{
 		struct video_gfx flipgfx = image_gfx;
 //		video_gfx_lrot90(&flipgfx);
@@ -513,7 +514,7 @@ do_showpic(struct video_buffer *screen,
 		fd.vfp_bg_fg_colors[1] = VIDEO_COLOR_WHITE;
 		gfx_printf("\n");
 
-		gfx_printf("%s#%u\n", filename, (unsigned int)frameinfo->vafi_frameid);
+		gfx_printf("%s#%u\n", filename, (unsigned int)frameinfo->vaf_frameid);
 		dump_buffer_specs(image, &fd);
 
 		gfx_printf("Screen:\n");
@@ -540,10 +541,8 @@ int main(int argc, char *argv[]) {
 	REF struct screen_buffer *screen;
 	REF struct video_display *display = NULL;
 	REF struct video_buffer *bscreen;
-	REF struct video_buffer *frame;
 	REF struct video_anim *anim;
-	struct video_anim_frameinfo frame_info;
-	struct video_anim_frameinfo frame_nextinfo;
+	struct video_anim_frame *frame;
 	struct timeval frame_start, frame_end;
 
 	if (argc != 2) {
@@ -652,19 +651,18 @@ int main(int argc, char *argv[]) {
 	 * - src format caching: ~95% spent sleeping  (=> x20 pixel output possible)
 	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
 #if 0
-	anim = video_anim_cached(anim, NULL, NULL, VIDEO_BUFFER_AUTO);
-#elif 0
-	anim = video_anim_cached(anim,
-	                         bscreen->vb_format.vf_codec,
-	                         bscreen->vb_format.vf_pal,
-	                         VIDEO_BUFFER_AUTO);
+	anim = video_anim_cached(anim, NULL);
+#elif 1
+	anim = video_anim_cached(anim, &bscreen->vb_format);
 #endif
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to cache animation");
+	frame = (struct video_anim_frame *)malloca(video_anim_sizeof_frame(anim));
+	if unlikely(!frame)
+		err(EXIT_FAILURE, "Failed to allocate animation frame reader");
 
 	/* Load first frame of a potentially animated image */
-	frame = video_anim_firstframe(anim, &frame_info);
-	if unlikely(!frame)
+	if unlikely(video_anim_firstframe(anim, frame))
 		err(EXIT_FAILURE, "Failed to load frame");
 
 	/* Clear screen */
@@ -679,11 +677,11 @@ int main(int argc, char *argv[]) {
 	/* Render loop */
 	gettimeofday(&frame_start, NULL);
 	for (;;) {
-		struct timeval tv_delay, tv_spent;
+		struct timeval tv_delay, tv_spent, tv_showfor;
 		struct timespec ts_delay;
 
 		/* Render frame */
-		do_showpic(bscreen, frame, font, argv[1], &frame_info);
+		do_showpic(bscreen, frame->vaf_frame, font, argv[1], frame);
 		if (display) {
 			syslog(LOG_DEBUG, "BEGIN: video_display_updaterect()\n");
 			video_display_updaterect(display, &RECT_FULL);
@@ -692,28 +690,31 @@ int main(int argc, char *argv[]) {
 		screen_buffer_updaterect(screen, &CRECT_FULL);
 
 		/* Load next frame as part of render delay */
-		frame_nextinfo = frame_info;
-		frame = video_anim_nextframe(anim, frame, &frame_nextinfo);
-		if (!frame) {
+		tv_showfor = frame->vaf_showfor;
+		if (video_anim_nextframe(anim, frame)) {
 			/* NOTE: Technically would need to decref the "frame" passed
 			 *       as parameter, but we  don't care about leaks  since
 			 *       everything gets cleaned up when we exit anyways. */
-			err(EXIT_FAILURE, "Failed to load frame after %u",
-			    (unsigned int)frame_info.vafi_frameid);
+			err(EXIT_FAILURE, "Failed to load frame at %u",
+			    (unsigned int)frame->vaf_frameid);
 		}
 
 		/* Wait until the next frame should be rendered */
 #if 0
+		(void)frame_start;
+		(void)frame_end;
+		(void)tv_showfor;
+		(void)tv_spent;
+		(void)tv_delay;
+		(void)ts_delay;
 		getchar();
-		frame_info = frame_nextinfo;
 #else
 		gettimeofday(&frame_end, NULL);
 		timeval_sub(&tv_spent, &frame_end, &frame_start);
-		timeval_sub(&tv_delay, &frame_info.vafi_showfor, &tv_spent);
+		timeval_sub(&tv_delay, &tv_showfor, &tv_spent);
 		timeval_add(&frame_end, &frame_end, &tv_delay);
 		TIMEVAL_TO_TIMESPEC(&tv_delay, &ts_delay);
 		frame_start = frame_end;
-		frame_info  = frame_nextinfo;
 		if (ts_delay.tv_sec >= 0)
 			nanosleep(&ts_delay, NULL);
 #endif
