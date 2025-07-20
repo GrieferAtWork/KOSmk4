@@ -247,10 +247,17 @@ rectfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
 	line += x;
 	codec_assert(size_x > 0);
 	codec_assert(size_y > 0);
-	do {
-		memset(line, (uint8_t)pixel, size_x);
-		line += stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == size_x) {
+		memset(line, (uint8_t)pixel, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memset(line, (uint8_t)pixel, size_x);
+			line += stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
@@ -469,10 +476,17 @@ rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	codec_assert(!(stride & 1));
 	codec_assert(!((uintptr_t)line & 1));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	do {
-		memsetw(line, (uint16_t)pixel, size_x);
-		line += stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == (size_x << 1)) {
+		memsetw(line, (uint16_t)pixel, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memsetw(line, (uint16_t)pixel, size_x);
+			line += stride;
+		} while (--size_y);
+	}
 }
 
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -1219,10 +1233,17 @@ rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	codec_assert(!(stride & 3));
 	codec_assert(!((uintptr_t)line & 3));
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	do {
-		memsetl(line, (uint32_t)pixel, size_x);
-		line += stride;
-	} while (--size_y);
+#ifndef __OPTIMIZE_SIZE__
+	if (stride == (size_x << 2)) {
+		memsetl(line, (uint32_t)pixel, size_x * size_y);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		do {
+			memsetl(line, (uint32_t)pixel, size_x);
+			line += stride;
+		} while (--size_y);
+	}
 }
 
 PRIVATE NONNULL((1, 4)) void CC
