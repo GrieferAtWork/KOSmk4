@@ -233,7 +233,7 @@ try_convert_window_to_passthru(struct local_window *__restrict self) {
 	 *      become viewable, even if the window  is moved to be fully  on-screen) */
 
 	/* Allocate passthru buffer */
-	new_content = old_video_buffer_region_revocable(comp->lc_buffer, &self->lw_attr.vwa_rect);
+	new_content = video_buffer_region(comp->lc_buffer, &self->lw_attr.vwa_rect, 0);
 	if unlikely(!new_content)
 		return; /* Failed to allocate passthru buffer */
 
@@ -540,7 +540,7 @@ local_window_destroy(struct video_display *__restrict self) {
 	local_window_assert(me);
 	if (!(me->lw_attr.vwa_flags & VIDEO_WINDOW_F_HIDDEN)) {
 		if (LIST_ISBOUND(me, lw_passthru)) {
-			old_video_buffer_region_revoke(me->lw_content);
+			video_buffer_revoke(me->lw_content);
 			LIST_UNBIND(me, lw_passthru);
 		}
 		local_window_hide_impl(me);
@@ -1713,7 +1713,7 @@ _local_window_ensure_not_passthru_impl(struct local_window *__restrict self) {
 	self->lw_content = newbuf; /* Inherit reference (x2) */
 
 	/* Revoke video access and drop old buffer */
-	oldbuf = old_video_buffer_region_revoke(oldbuf);
+	oldbuf = video_buffer_revoke(oldbuf);
 	LIST_UNBIND(self, lw_passthru);
 	video_buffer_decref(oldbuf);
 	return 0;
@@ -2026,7 +2026,7 @@ local_compositor_newwindow(struct video_compositor *__restrict self,
 		    (result->lw_overlay_mask_allcount == 0)) {
 			/* Use a passthru buffer */
 			REF struct video_buffer *content;
-			content = old_video_buffer_region_revocable(comp->lc_buffer, &result->lw_attr.vwa_rect);
+			content = video_buffer_region(comp->lc_buffer, &result->lw_attr.vwa_rect, 0);
 			if unlikely(!content)
 				goto err_unlock_r_overlay;
 			result->lw_content = content;
@@ -2272,7 +2272,7 @@ local_compositor_setbuffer_locked(struct local_compositor *__restrict me,
 			REF struct video_buffer *new_passthru;
 			assert(LIST_ISBOUND(pt_window, lw_passthru));
 			local_window_assert(pt_window);
-			new_passthru = old_video_buffer_region_revocable(new_buffer, &pt_window->lw_attr.vwa_rect);
+			new_passthru = video_buffer_region(new_buffer, &pt_window->lw_attr.vwa_rect, 0);
 			if unlikely(!new_passthru) {
 				struct local_window *rollback;
 				/* Rollback already-allocated (new) passthru buffers */
@@ -2505,7 +2505,7 @@ local_compositor_setfeatures(struct video_compositor *__restrict self,
 			video_gfx_bitblit(&ngfx, 0, 0, &ogfx, 0, 0,
 			                  video_gfx_getclipw(&ngfx),
 			                  video_gfx_getcliph(&ngfx));
-			obuffer = old_video_buffer_region_revoke(obuffer);
+			obuffer = video_buffer_revoke(obuffer);
 			video_buffer_decref(obuffer);
 			LIST_UNBIND(pt_window, lw_passthru);
 		}

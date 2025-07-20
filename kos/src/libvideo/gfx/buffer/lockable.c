@@ -44,9 +44,8 @@
 
 #include "../buffer.h"
 #include "../ramdomain.h"
-#include "old-gfx.h"
 #include "lockable.h"
-#include "old-ram.h"
+#include "region.h"
 
 DECL_BEGIN
 
@@ -56,24 +55,19 @@ DECL_BEGIN
 #define DBG_memset(p, c, n) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-#undef LOCKABLE_BUFFER_PALREF
-#if 0
-#define LOCKABLE_BUFFER_PALREF
-#endif
-
 /* Indices into `struct video_lock::_vl_driver' */
 #define LOCKABLE_BUFFER_VLOCK_ISWRITE 0
 static_assert(_VIDEO_LOCK__N_DRIVER >= 1);
 
 /* Initialize a mock ram-buffer using the video lock of "self" */
 PRIVATE ATTR_OUT(1) ATTR_IN(2) void FCC
-lockable_asram(struct old_video_rambuffer *__restrict rb,
+lockable_asram(struct video_rambuffer_base *__restrict rb,
                struct lockable_buffer const *__restrict self) {
-	rb->vb_ops             = _old_rambuffer_ops();
-	rb->vb_format.vf_codec = self->vb_format.vf_codec;
-	rb->vb_format.vf_pal   = self->vb_format.vf_pal;
-	rb->vb_xdim            = self->vb_xdim;
-	rb->vb_ydim            = self->vb_ydim;
+	DBG_memset(&rb->vb_domain, 0xcc, sizeof(rb->vb_domain));
+	rb->vb_ops    = _rambuffer_ops();
+	rb->vb_format = self->vb_format;
+	rb->vb_xdim   = self->vb_xdim;
+	rb->vb_ydim   = self->vb_ydim;
 #ifndef NDEBUG
 	rb->vb_refcnt = 0; /* So someone incref'ing will fault */
 #endif /* !NDEBUG */
@@ -86,7 +80,7 @@ PRIVATE NONNULL((1)) void FCC
 lockable_readpixels(struct lockable_buffer const *__restrict self) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct old_video_rambuffer dst;
+	struct video_rambuffer_base dst;
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -103,7 +97,7 @@ PRIVATE NONNULL((1)) void FCC
 lockable_writepixels(struct lockable_buffer const *__restrict self) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct old_video_rambuffer src;
+	struct video_rambuffer_base src;
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -121,7 +115,7 @@ lockable_readpixels_region(struct lockable_buffer const *__restrict self,
                            struct video_regionlock const *__restrict region) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct old_video_rambuffer dst;
+	struct video_rambuffer_base dst;
 	lockable_asram(&dst, self);
 	p_srcgfx = video_buffer_getgfx(self->lb_base, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(&dst, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -139,7 +133,7 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
                             struct video_regionlock const *__restrict region) {
 	struct video_gfx srcgfx, *p_srcgfx;
 	struct video_gfx dstgfx, *p_dstgfx;
-	struct old_video_rambuffer src;
+	struct video_rambuffer_base src;
 	lockable_asram(&src, self);
 	p_srcgfx = video_buffer_getgfx(&src, &srcgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	p_dstgfx = video_buffer_getgfx(self->lb_base, &dstgfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
@@ -155,10 +149,8 @@ lockable_writepixels_region(struct lockable_buffer const *__restrict self,
 PRIVATE NONNULL((1)) void FCC
 lockable_destroy(struct video_buffer *__restrict self) {
 	struct lockable_buffer *me = (struct lockable_buffer *)self;
-#ifdef LOCKABLE_BUFFER_PALREF
 	if (me->vb_format.vf_pal)
 		video_palette_decref(me->vb_format.vf_pal);
-#endif /* LOCKABLE_BUFFER_PALREF */
 	video_buffer_decref(me->lb_base);
 	free(me->lb_data);
 	free(me);
@@ -352,19 +344,28 @@ PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) bool CC
 video_buffer_islockable(struct video_buffer const *__restrict self) {
 	if (self->vb_ops == &lockable_ops)
 		goto yes;
-	if (self->vb_ops == &old_rambuffer_ops)
+	if (self->vb_ops == &rambuffer_ops)
 		goto yes;
-	if (self->vb_ops == &old_rambuffer_ops__for_codec)
+	if (self->vb_ops == &rambuffer_xcodec_ops)
 		goto yes;
-	if (self->vb_ops == &old_membuffer_ops)
+	if (self->vb_ops == &rambuffer_subregion_ops)
 		goto yes;
-	if (self->vb_ops == &old_membuffer_ops__for_codec)
+	if (self->vb_ops == &rambuffer_subsubregion_ops)
 		goto yes;
-	if (self->vb_ops == &old_subregion_buffer_ops_norem) {
-		/* Subregion buffers are locked iff the underlying buffer is */
-		struct old_subregion_buffer const *me;
-		me = (struct old_subregion_buffer const *)self;
-		return video_buffer_islockable(me->srb_base);
+	if (self->vb_ops == &rambuffer_formem_ops)
+		goto yes;
+	if (self->vb_ops == &rambuffer_formem_xcodec_ops)
+		goto yes;
+	if (self->vb_ops == &rambuffer_formem_subregion_ops)
+		goto yes;
+	if (self->vb_ops == &region_buffer_subregion_alias_ops) {
+		/* Region alias buffers are locked iff the underlying buffer is.
+		 * Note that other region buffers are never lockable, since they
+		 * always contain at least 1 pixel that is out-of-bounds of some
+		 * base buffer (meaning not **all** pixels are lockable) */
+		struct region_buffer_subregion_alias const *me;
+		me = (struct region_buffer_subregion_alias const *)self;
+		return video_buffer_islockable(me->rbf_base);
 	}
 	return false;
 yes:
@@ -379,7 +380,6 @@ yes:
 INTERN WUNUSED ATTR_OUT(1) NONNULL((2)) struct video_buffer *CC
 libvideo_buffer_lockable_init(struct lockable_buffer *self,
                               struct video_buffer *__restrict buffer) {
-	self->lb_data = NULL;
 	if (video_buffer_islockable(buffer))
 		return buffer;
 	self->vb_ops    = _lockable_ops();
@@ -389,8 +389,9 @@ libvideo_buffer_lockable_init(struct lockable_buffer *self,
 #ifndef NDEBUG
 	self->vb_refcnt = 0;
 #endif /* !NDEBUG */
-	self->lb_base = buffer;
-	self->lb_data = NULL;
+	self->lb_base  = buffer;
+	self->lb_data  = NULL;
+	self->lb_edata = NULL;
 	DBG_memset(&self->lb_stride, 0xcc, sizeof(self->lb_stride));
 	return self;
 }
@@ -439,15 +440,14 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 	result->vb_format = self->vb_format;
 	result->vb_xdim   = self->vb_xdim;
 	result->vb_ydim   = self->vb_ydim;
-	result->vb_domain = video_buffer_domain_for_wrapper(self);
+	result->vb_domain = _libvideo_ramdomain();
 	result->vb_refcnt = 1;
 	video_buffer_incref(self);
-	result->lb_base = self;
-	result->lb_data = NULL;
-#ifdef LOCKABLE_BUFFER_PALREF
+	result->lb_base  = self;
+	result->lb_data  = NULL;
+	result->lb_edata = NULL;
 	if (result->vb_format.vf_pal)
 		video_palette_incref(result->vb_format.vf_pal);
-#endif /* LOCKABLE_BUFFER_PALREF */
 	DBG_memset(&result->lb_stride, 0xcc, sizeof(result->lb_stride));
 	return result;
 err:

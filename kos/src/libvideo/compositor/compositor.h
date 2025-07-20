@@ -96,8 +96,8 @@ struct local_window: video_window {
 	struct video_window_attr   lw_attr;         /* [lock(local_window_comp(this)->lc_lock)] Window attributes (empty windows aren't allowed!) */
 	REF struct video_buffer   *lw_content;      /* [1..1][lock(local_window_comp(this)->lc_lock)]
 	                                             * - RGB/RGBA Content buffer (returned by `video_window_getbuffer()')
-	                                             * - Alternatively,  when  `lw_passthru' is  bound, this  is  a revocable  region in
-	                                             *   `local_window_comp(this)->lc_buffer' (s.a. `old_video_buffer_region_revoke()'). */
+	                                             * - Alternatively, when `lw_passthru' is bound, this is a revocable region in
+	                                             *   `local_window_comp(this)->lc_buffer'   (s.a.    `video_buffer_revoke()'). */
 	LIST_ENTRY(local_window)   lw_passthru;     /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of windows with passthru buffers */
 	TAILQ_ENTRY(local_window)  lw_zorder;       /* [1..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all windows */
 	TAILQ_ENTRY(local_window)  lw_zorder_visi;  /* [0..1][lock(local_window_comp(this)->lc_lock)] Entry in the list of all visible windows */

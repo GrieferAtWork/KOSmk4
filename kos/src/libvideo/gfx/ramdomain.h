@@ -42,18 +42,11 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
+#include "buffer.h"
 #include "gfx-utils.h"
 #include "swgfx.h"
 
 DECL_BEGIN
-
-
-/* Return the video domain to-be-used for a wrapper of `base' */
-#if 1 /* TODO: REMOVE THIS (also: wrappers need to use "_libvideo_ramdomain()"!) */
-#define video_buffer_domain_for_wrapper(base) (base)->vb_domain
-#else
-#define video_buffer_domain_for_wrapper(base) _libvideo_ramdomain()
-#endif
 
 /* Define and link  optimized fast-pass  pixel
  * accessors for 8,16,24,32-bit pixel formats. */
@@ -69,12 +62,19 @@ struct video_buffer_dummy;
 
 struct video_rambuffer_subregion;
 LIST_HEAD(video_rambuffer_subregion_list, video_rambuffer_subregion);
-struct video_rambuffer: video_buffer {                        /* vb_ops == &rambuffer_ops */
-	byte_t                               *rb_data;            /* [1..1][owned][const] Buffer data */
-	size_t                                rb_stride;          /* [const] Buffer stride */
+struct video_rambuffer_base: video_buffer {
+	/* This type is sufficient for doing simple GFX */
+	byte_t *rb_data;   /* [1..1][owned][const] Buffer data */
+	size_t  rb_stride; /* [const] Buffer stride */
+};
+
+struct video_rambuffer: video_rambuffer_base { /* vb_ops == &rambuffer_ops */
 	struct video_rambuffer_subregion_list rb_subregions_list; /* [0..n][lock(rb_subregions_lock)] List of subregions */
 	struct atomic_lock                    rb_subregions_lock; /* Lock for `rb_subregions_list' */
 };
+#define _video_rambuffer_init(self)          \
+	(LIST_INIT(&(self)->rb_subregions_list), \
+	 atomic_lock_init(&(self)->rb_subregions_lock))
 
 struct video_rambuffer_xcodec: video_rambuffer { /* vb_ops == &rambuffer_xcodec_ops */
 	REF struct video_codec_handle *rbxc_codec;   /* [1..1][const] Codec handle */
@@ -84,6 +84,10 @@ struct video_rambuffer_revokable_gfx {
 	__REGISTER_TYPE__ rbrvg_inuse;  /* [lock(ATOMIC)] Non-zero while `rbrv_data' is being accessed */
 	byte_t           *rbrvg_data;   /* [1..1][lock(ATOMIC)][valid_if(rbrv_inuse != 0)] Buffer data */
 };
+#define video_rambuffer_revokable_gfx_start(self)   atomic_inc(&(self)->rbrvg_inuse)
+#define video_rambuffer_revokable_gfx_end(self)     atomic_dec(&(self)->rbrvg_inuse)
+#define video_rambuffer_revokable_gfx_getdata(self) atomic_read(&(self)->rbrvg_data)
+
 
 struct /*abstract*/ video_rambuffer_revokable: video_buffer {
 	struct video_rambuffer_revokable_gfx rbrv_gfx;    /* Data shared with GFX */
@@ -195,6 +199,27 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__updategfx(struct video_gfx *__restrict self, unsigned int what);
+
+/* Helpers for setting video buffer operators for ram-buffer-compatible buffers */
+
+/* Requires: Derived from "struct video_rambuffer_base" */
+#define video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(self)          \
+	(void)((self)->vi_rlock        = &rambuffer__lock,             \
+	       (self)->vi_wlock        = &rambuffer__lock,             \
+	       (self)->vi_unlock       = &libvideo_buffer_noop_unlock, \
+	       (self)->vi_rlockregion  = &rambuffer__lockregion,       \
+	       (self)->vi_wlockregion  = &rambuffer__lockregion,       \
+	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
+
+/* Requires: Derived from "struct video_rambuffer_base" */
+#define video_buffer_ops_set_GFXOPS_like_RAMBUFFER(self) \
+	(void)((self)->vi_initgfx   = &rambuffer__initgfx,   \
+	       (self)->vi_updategfx = &rambuffer__updategfx)
+
+/* Requires: Derived from "struct video_rambuffer" */
+#define video_buffer_ops_set_SUBREGION_like_RAMBUFFER(self) \
+	(void)((self)->vi_revoke    = &rambuffer__revoke,       \
+	       (self)->vi_subregion = &rambuffer__subregion)
 
 
 /************************************************************************/

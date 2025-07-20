@@ -47,8 +47,8 @@
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/types.h>
 
-#include "../buffer/old-ram.h"
 #include "../io-utils.h"
+#include "../ramdomain.h"
 
 DECL_BEGIN
 
@@ -352,7 +352,7 @@ LWZ_state_getc(LWZ_state *__restrict self) {
 
 
 struct gif_anim;
-struct gif_buffer: old_video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
+struct gif_buffer: video_rambuffer { /* TODO: Can't mandate a specific buffer type here -- must use video_domain */
 	struct gif_config gb_cfg;      /* [const] Default config */
 	byte_t           *gb_scratch;  /* [0..1][owned] Scratch buffer for doing frame I/O */
 	byte_t           *gb_restore;  /* [0..1][owned] Pointer to video at start of frame when `gb_cfg.gc_dispose == GIF_DISPOSE_RESTORE_PREVIOUS' */
@@ -368,7 +368,7 @@ PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 gifbuffer_initgfx__with_colorkey(struct video_gfx *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self->vx_buffer;
 	self->vx_colorkey = me->gb_colorkey;
-	return old_rambuffer_initgfx(self);
+	return rambuffer__initgfx(self);
 }
 
 PRIVATE NONNULL((1)) void FCC
@@ -376,7 +376,7 @@ gifbuffer_destroy(struct video_buffer *__restrict self) {
 	struct gif_buffer *me = (struct gif_buffer *)self;
 	free(me->gb_scratch);
 	free(me->gb_restore);
-	old_rambuffer_destroy(me);
+	rambuffer__destroy(me);
 }
 
 #undef gifbuffer_ops
@@ -385,6 +385,7 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops(
 	if unlikely(!gifbuffer_ops.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops);
 		video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&gifbuffer_ops);
+		video_buffer_ops_set_SUBREGION_like_RAMBUFFER(&gifbuffer_ops);
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -398,8 +399,9 @@ PRIVATE struct video_buffer_ops gifbuffer_ops__with_color_key = {};
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _gifbuffer_ops__with_color_key(void) {
 	if unlikely(!gifbuffer_ops__with_color_key.vi_destroy) {
 		video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
+		video_buffer_ops_set_SUBREGION_like_RAMBUFFER(&gifbuffer_ops__with_color_key);
 		gifbuffer_ops__with_color_key.vi_initgfx   = &gifbuffer_initgfx__with_colorkey;
-		gifbuffer_ops__with_color_key.vi_updategfx = &old_rambuffer_updategfx;
+		gifbuffer_ops__with_color_key.vi_updategfx = &rambuffer__updategfx;
 		COMPILER_WRITE_BARRIER();
 		gifbuffer_ops__with_color_key.vi_destroy = &gifbuffer_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -1024,6 +1026,7 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	}
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = pal;
+	_video_rambuffer_init(result);
 
 	/* Fill with global transparency, or "0" if not defined */
 	rb_total = me->va_xdim * 1 * me->va_ydim;

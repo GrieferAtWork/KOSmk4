@@ -60,7 +60,6 @@
 #include <libvideo/types.h>
 
 #include "../buffer.h"
-#include "../buffer/old-ram.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -212,8 +211,12 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 		uint8_t a;
 	};
 	video_coord_t y;
-	struct old_video_rambuffer *me = (struct old_video_rambuffer *)self;
+	struct video_rambuffer_base *me = (struct video_rambuffer_base *)self;
 	assert(me->vb_domain == &libvideo_ramdomain);
+	assert(me->vb_ops == &rambuffer_ops ||
+	       me->vb_ops == &rambuffer_xcodec_ops ||
+	       me->vb_ops == &rambuffer_formem_ops ||
+	       me->vb_ops == &rambuffer_formem_xcodec_ops);
 	assert(me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
 	assert(me->vb_format.vf_pal == NULL);
 	for (y = 0; y < me->vb_ydim; ++y) {

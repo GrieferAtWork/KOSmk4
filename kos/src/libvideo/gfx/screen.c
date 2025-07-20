@@ -64,13 +64,12 @@
 #include <libvideo/gfx/screen.h>
 #include <libvideo/types.h>
 
-#include "buffer/old-ram.h"
 #include "ramdomain.h"
 #include "screen.h"
 
 DECL_BEGIN
 
-struct svga_screen: old_video_rambuffer {
+struct svga_screen: video_rambuffer {
 	size_t                            ss_rbtotal;       /* [const] Ram buffer total size. */
 	struct screen_buffer_ops          ss_ops;           /* [const] Screen buffer operators. */
 	REF struct video_codec_handle    *ss_codec_handle;  /* [1..1][const] Custom codec keep-alive handle */
@@ -491,6 +490,7 @@ find_hinted_mode:
 	}
 
 	/* Fill in remaining fields of "result" */
+	_video_rambuffer_init(result);
 	result->vb_refcnt     = 1;
 	result->vb_domain     = _libvideo_ramdomain();
 	result->vb_ops        = &result->ss_ops.sbo_video;
@@ -504,6 +504,7 @@ find_hinted_mode:
 	 *       render functions, as well as calls "sco_hw_async_waitfor" on lock. */
 	video_buffer_ops_set_LOCKOPS_like_RAMBUFFER(&result->ss_ops.sbo_video);
 	video_buffer_ops_set_GFXOPS_like_RAMBUFFER(&result->ss_ops.sbo_video);
+	video_buffer_ops_set_SUBREGION_like_RAMBUFFER(&result->ss_ops.sbo_video);
 	result->ss_ops.sbo_video.vi_destroy = &svga_screen_destroy;
 	shared_lock_init(&result->ss_cslock);
 

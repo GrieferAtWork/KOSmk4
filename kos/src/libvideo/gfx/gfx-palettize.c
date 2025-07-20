@@ -52,8 +52,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "buffer/old-ram.h"
 #include "gfx-palettize.h"
+#include "ramdomain.h"
 #include "swgfx.h"
 
 #undef HAVE_LOG
@@ -482,7 +482,7 @@ median_io_buf(void const *cookie, mc_index_t i) {
 }
 
 PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_CODEC_CC
-video_gfx_iorect_as_rgba8888(struct old_video_rambuffer *result,
+video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
                              struct video_gfx const *__restrict self) {
 	struct video_codec const *result_codec;
 	struct video_gfx gfx = *self;
@@ -504,7 +504,7 @@ video_gfx_iorect_as_rgba8888(struct old_video_rambuffer *result,
 	result->rb_stride          = stride;
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 /*	result->vb_domain          = _libvideo_ramdomain();*/ /* Unused */
-	result->vb_ops             = _old_rambuffer_ops();
+	result->vb_ops             = _rambuffer_ops();
 	result->vb_format.vf_codec = result_codec;
 	result->vb_format.vf_pal   = NULL;
 	result->vb_xdim          = video_gfx_getclipw(&gfx);
@@ -513,8 +513,8 @@ video_gfx_iorect_as_rgba8888(struct old_video_rambuffer *result,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_F_NORMAL, 0);
 	video_gfx_bitblit(&result_gfx, 0, 0, &gfx, 0, 0,
-	               video_gfx_getclipw(&gfx),
-	               video_gfx_getcliph(&gfx));
+	                  video_gfx_getclipw(&gfx),
+	                  video_gfx_getcliph(&gfx));
 	return 0;
 err:
 	return -1;
@@ -526,7 +526,7 @@ median_cut_start(struct video_gfx const *__restrict self,
                  video_color_t *pal, shift_t pal_depth,
                  video_color_t constant_alpha) {
 	struct median_io io;
-	struct old_video_rambuffer rgba_buf;
+	struct video_rambuffer_base rgba_buf;
 	if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888 &&
 	    /* TODO: This actually works for any XXXX8888 codec. Just need  to
 	     *       "self->vx_buffer->vb_format.vf_codec->vc_color2pixel" the

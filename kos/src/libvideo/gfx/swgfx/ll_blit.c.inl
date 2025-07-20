@@ -44,9 +44,9 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "../buffer/old-ram.h"
 #include "../gfx-debug.h"
 #include "../gfx-utils.h"
+#include "../ramdomain.h"
 #include "../swgfx.h"
 #include "ll.h"
 
@@ -380,15 +380,14 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
                                                     video_coord_t src_x, video_coord_t src_y,
                                                     video_dim_t src_size_x, video_dim_t src_size_y) {
 	struct video_buffer const *srcbuf = self->vbt_src->vx_buffer;
-	struct old_video_rambuffer rb;
+	struct video_rambuffer_base rb;
 	struct video_blitter blitter;
 	struct video_gfx rb_gfx;
 	size_t rb_total;
 
 	/*rb.vb_refcnt = 1;*/
-	rb.vb_ops    = _old_rambuffer_ops();
-	rb.vb_format.vf_codec = srcbuf->vb_format.vf_codec;
-	rb.vb_format.vf_pal   = srcbuf->vb_format.vf_pal;
+	rb.vb_ops    = _rambuffer_ops();
+	rb.vb_format = srcbuf->vb_format;
 	rb.vb_xdim   = min(dst_size_x, src_size_x);
 	rb.vb_ydim   = min(dst_size_y, src_size_y);
 	rb.rb_stride = rb.vb_xdim * rb.vb_format.vf_codec->vc_specs.vcs_pxsz;
@@ -405,8 +404,8 @@ libvideo_swblitter_samebuf__stretch__with_temporary(struct video_blitter const *
 	rb_gfx.vx_blend    = GFX_BLENDMODE_OVERRIDE;
 	rb_gfx.vx_flags    = self->vbt_src->vx_flags;
 	rb_gfx.vx_colorkey = 0;
-	blitter.vbt_src = self->vbt_src;
-	blitter.vbt_dst = old_rambuffer_initgfx(&rb_gfx);
+	blitter.vbt_src    = self->vbt_src;
+	blitter.vbt_dst    = rambuffer__initgfx(&rb_gfx);
 	/*(*self->vbt_src->vx_hdr.vxh_blitfrom)(&blitter);*/ /* Cheat a bit and skip this part... */
 
 	/* Blit source into temporary buffer... */

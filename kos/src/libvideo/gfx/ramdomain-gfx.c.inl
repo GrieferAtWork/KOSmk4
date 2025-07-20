@@ -248,9 +248,9 @@ LOCAL_rambuffer__updategfx(struct video_gfx *__restrict self, unsigned int what)
 #define LOCAL_GFX_UNLOCK() (void)0
 #define LOCAL_GFX_DATA     video_ramgfx_getcdrv(self)->grd_data
 #else /* DEFINE_rambuffer__initgfx */
-#define LOCAL_GFX_LOCK()   atomic_inc(&video_ramgfx_getcdrv_revokable(self)->grdrv_gfx->rbrvg_inuse)
-#define LOCAL_GFX_UNLOCK() atomic_dec(&video_ramgfx_getcdrv_revokable(self)->grdrv_gfx->rbrvg_inuse)
-#define LOCAL_GFX_DATA     atomic_read(&video_ramgfx_getcdrv_revokable(self)->grdrv_gfx->rbrvg_data)
+#define LOCAL_GFX_LOCK()   video_rambuffer_revokable_gfx_start(video_ramgfx_getcdrv_revokable(self)->grdrv_gfx)
+#define LOCAL_GFX_UNLOCK() video_rambuffer_revokable_gfx_end(video_ramgfx_getcdrv_revokable(self)->grdrv_gfx)
+#define LOCAL_GFX_DATA     video_rambuffer_revokable_gfx_getdata(video_ramgfx_getcdrv_revokable(self)->grdrv_gfx)
 #endif /* !DEFINE_rambuffer__initgfx */
 #define LOCAL_GFX_STRIDE video_ramgfx_getcdrv_common(self)->grdc_stride
 #define LOCAL_GFX_FORMAT video_ramgfx_getcdrv_common(self)->grdc_format

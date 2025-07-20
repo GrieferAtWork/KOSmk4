@@ -917,54 +917,6 @@ old_video_buffer_fromgfx(struct video_gfx const *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
-/* Create  a wrapper video buffer for `__self' that can only ever be used to access
- * the intersection of pixels from `__rect' and `__self' (trying a GFX context will
- * always  start out with the I/O rect set to "__rect", but the clip rect still set
- * to the buffer's base dimensions, and trying to lock OOB regions always fails)
- *
- * NOTE: Starting coords in `__rect' are allowed to be negative, and its dimensions
- *       are allowed to be greater than those of `__self', too!
- *
- * `old_video_buffer_region_revocable()' does the same, but the returned video buffer
- * is also "revocable" (s.a.  `old_video_buffer_region_revoke()'), meaning it can  be
- * detached  from the original buffer (and turned into  a no-op) at any point in time
- * (blocking if a video lock is held in `old_video_buffer_region_revoke()').
- *
- * @return: * :   The wrapper video buffer
- * @return: NULL: Failed to create video buffer (s.a. `errno') */
-typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *POLD_VIDEO_BUFFER_REGION)(struct video_buffer *__restrict __self,
-                                            struct video_rect const *__restrict __rect);
-typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *POLD_VIDEO_BUFFER_REGION_REVOCABLE)(struct video_buffer *__restrict __self,
-                                                      struct video_rect const *__restrict __rect);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
-old_video_buffer_region(struct video_buffer *__restrict __self,
-                        struct video_rect const *__restrict __rect);
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
-old_video_buffer_region_revocable(struct video_buffer *__restrict __self,
-                                  struct video_rect const *__restrict __rect);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
-
-/* Revoke access  to  the  underlying video  buffer,  given  a  video
- * buffer that was returned by `old_video_buffer_region_revocable()'.
- * If the buffer had already been revoked, this is a no-op.
- *
- * >> DO NOT CALL THIS FUNCTION FOR BUFFERS OBTAINED FROM SOMETHING
- * >> OTHER THAN `old_video_buffer_region_revocable()' !!!
- *
- * @return: * : Always re-returns `__self' */
-typedef __ATTR_INOUT_T(1) struct video_buffer *
-(LIBVIDEO_GFX_CC *POLD_VIDEO_BUFFER_REGION_REVOKE)(struct video_buffer *__restrict __self);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_INOUT(1) struct video_buffer *LIBVIDEO_GFX_CC
-old_video_buffer_region_revoke(struct video_buffer *__restrict __self);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
-
-
 /* Various functions  for opening  a file/stream/blob  as an  image  file.
  * The actual file format is  auto-detected, and supported formats  depend
  * on installed 3rd party libraries. By default, BMP and PNG is supported. */
