@@ -49,7 +49,7 @@ LIST_HEAD(region_buffer_subregion_list, region_buffer_subregion);
 struct region_buffer: video_buffer {     /* vb_ops == &region_buffer_ops || vb_ops == &region_buffer_xoff_ops */
 	video_offset_t           rbf_cxoff; /* [const] Starting X offset of Clip Rect in `rbf_base' */
 	video_offset_t           rbf_cyoff; /* [const] Starting Y offset of Clip Rect in `rbf_base' */
-	video_gfx_flag_t         rbf_xor;   /* [const] Flags to XOR toggle during GFX init */
+	video_gfx_flag_t         rbf_gfx;   /* [const] GFX flags to apply during GFX init */
 	REF struct video_buffer *rbf_base;  /* [1..1][lock(READ(ATOMIC), WRITE(ATOMIC && OLD_VALUE_VALID_UNTIL(rbf_inuse == 0)))])]
 	                                     * Underlying video buffer.  Set to `libvideo_emptybuffer'  when revoking access.  When
 	                                     * creating for a GFX context with an I/O Rect that differs from its Clip Rect, this is
@@ -78,7 +78,7 @@ struct region_buffer_subregion_alias: region_buffer_subregion {
 	 * >> rbf_inuse        [UNUSED]
 	 * >> rbf_cxoff == 0
 	 * >> rbf_cyoff == 0
-	 * >> rbf_xor == 0
+	 * >> rbf_gfx == 0
 	 * >> vb_xdim == rbf_base->vb_xdim
 	 * >> vb_ydim == rbf_base->vb_ydim
 	 *
@@ -110,9 +110,9 @@ INTDEF NONNULL((1)) void FCC region_buffer_subregion__destroy(struct video_buffe
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC region_buffer__revoke)(struct video_buffer *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC region_buffer_subregion__revoke)(struct video_buffer *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *NOTHROW(FCC region_buffer_subregion_alias__revoke)(struct video_buffer *__restrict self);
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC region_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC region_buffer__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
 #define region_buffer_subregion__subregion region_buffer__subregion
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t xor_flags);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self, struct video_crect const *__restrict rect, video_gfx_flag_t gfx_flags);
 
 /* LOCK */
 INTDEF ATTR_INOUT(1) NONNULL((2)) int FCC region_buffer__rlockregion(struct video_buffer *__restrict self, struct video_regionlock *__restrict lock);
@@ -252,7 +252,7 @@ INTDEF ATTR_IN_T(1) void CC region_blitter3_subops__stretch(struct video_blitter
  *
  * @param: self: Video buffer to create a region of
  * @param: rect: region rect of `self' to-be returned
- * @param: xor_flags: Flags to xor- toggle in GFX contexts created on  `return'.
+ * @param: gfx_flags: Flags to xor- toggle in GFX contexts created on  `return'.
  *                    These flags  are NOT  applied to  `rect', but  they  still
  *                    allow  you to create region buffers that will appear to be
  *                    natively  rotated in `struct video_gfx' contexts. Only the
@@ -268,7 +268,7 @@ INTDEF ATTR_IN_T(1) void CC region_blitter3_subops__stretch(struct video_blitter
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_buffer_region(struct video_buffer *__restrict self,
                        struct video_rect const *__restrict rect,
-                       video_gfx_flag_t xor_flags);
+                       video_gfx_flag_t gfx_flags);
 
 DECL_END
 

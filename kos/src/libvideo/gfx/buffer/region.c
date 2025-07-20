@@ -179,7 +179,7 @@ NOTHROW(FCC region_buffer_subregion_alias__revoke)(struct video_buffer *__restri
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer__subregion(struct video_buffer *__restrict self,
                          struct video_crect const *__restrict rect,
-                         video_gfx_flag_t xor_flags) {
+                         video_gfx_flag_t gfx_flags) {
 	struct video_rect old_rect, new_rect, result_rect, base_iorect;
 	REF struct region_buffer_subregion *result;
 	REF struct video_buffer *base;
@@ -209,8 +209,8 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	if (!video_rect_intersect_overflow(&base_iorect, &result_rect, &base_iorect))
 		goto do_return_empty_buffer_base;
 
-	/* Combine "xor_flags" with those of "me" */
-	xor_flags = gfx_flag_combine(me->rbf_xor, xor_flags);
+	/* Combine "gfx_flags" with those of "me" */
+	gfx_flags = gfx_flag_combine(me->rbf_gfx, gfx_flags);
 
 	/* Check if this whole thing has once again turned into a sub-region-only buffer.
 	 * If it has, then we should create a `region_buffer_subregion_alias_ops' buffer. */
@@ -220,7 +220,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	    result_rect.vr_ydim == base_iorect.vr_ydim) {
 		REF struct video_buffer *result_base;
 		REF struct region_buffer_subregion_alias *alias_result;
-		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, xor_flags);
+		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -236,7 +236,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 		alias_result->vb_refcnt = 1;
 		alias_result->rbf_cxoff = 0;
 		alias_result->rbf_cyoff = 0;
-		alias_result->rbf_xor   = 0;
+		alias_result->rbf_gfx   = 0;
 		alias_result->rbf_base  = base; /* Inherit reference */
 		alias_result->rbf_orig  = base;
 		alias_result->rbf_inuse = 0;
@@ -258,7 +258,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	    base_iorect.vr_xdim < base->vb_xdim ||
 	    base_iorect.vr_ydim < base->vb_ydim) {
 		REF struct video_buffer *result_base;
-		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, xor_flags);
+		result_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
 		if unlikely(!result_base)
 			goto err_base;
 		video_buffer_decref(base);
@@ -279,7 +279,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 	result->vb_refcnt = 1;
 	result->rbf_cxoff = result_rect.vr_xmin;
 	result->rbf_cyoff = result_rect.vr_ymin;
-	result->rbf_xor   = xor_flags;
+	result->rbf_gfx   = gfx_flags;
 	result->rbf_base  = base; /* Inherit reference */
 	result->rbf_orig  = base;
 	result->rbf_inuse = 0;
@@ -308,14 +308,14 @@ err_base:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self,
                                          struct video_crect const *__restrict rect,
-                                         video_gfx_flag_t xor_flags) {
+                                         video_gfx_flag_t gfx_flags) {
 	REF struct video_buffer *result_base;
 	REF struct region_buffer_subregion_alias *result;
 	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self;
 	result = (REF struct region_buffer_subregion_alias *)malloc(sizeof(struct region_buffer_subregion_alias));
 	if unlikely(!result)
 		goto err;
-	result_base = video_buffer_subregion(me->rbf_base, rect, xor_flags);
+	result_base = video_buffer_subregion(me->rbf_base, rect, gfx_flags);
 	if unlikely(!result_base)
 		goto err_r;
 	result->vb_ops    = me->vb_ops;
@@ -326,7 +326,7 @@ region_buffer_subregion_alias__subregion(struct video_buffer *__restrict self,
 	result->vb_refcnt = 1;
 	result->rbf_cxoff = 0;
 	result->rbf_cyoff = 0;
-	result->rbf_xor   = 0;
+	result->rbf_gfx   = 0;
 	result->rbf_base  = result_base; /* Inherit reference */
 	result->rbf_orig  = result_base;
 	result->rbf_inuse = 0;
@@ -519,7 +519,7 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer_subregion_alias__initgfx(struct video_gfx *__restrict self) {
 	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self->vx_buffer;
 	self->vx_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
-	self->vx_flags  = gfx_flag_combine(me->rbf_xor, self->vx_flags);
+	self->vx_flags  = gfx_flag_combine(me->rbf_gfx, self->vx_flags);
 	self = (*self->vx_buffer->vb_ops->vi_initgfx)(self);
 	return self;
 }
@@ -1310,7 +1310,7 @@ region_blitter3_subops__stretch(struct video_blitter3 const *__restrict self,
  *
  * @param: self: Video buffer to create a region of
  * @param: rect: region rect of `self' to-be returned
- * @param: xor_flags: Flags to xor- toggle in GFX contexts created on  `return'.
+ * @param: gfx_flags: Flags to xor- toggle in GFX contexts created on  `return'.
  *                    These flags  are NOT  applied to  `rect', but  they  still
  *                    allow  you to create region buffers that will appear to be
  *                    natively  rotated in `struct video_gfx' contexts. Only the
@@ -1327,7 +1327,7 @@ DEFINE_PUBLIC_ALIAS(video_buffer_region, libvideo_buffer_region);
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *CC
 libvideo_buffer_region(struct video_buffer *__restrict self,
                        struct video_rect const *__restrict rect,
-                       video_gfx_flag_t xor_flags) {
+                       video_gfx_flag_t gfx_flags) {
 	REF struct region_buffer *result;
 	bool self_is_region;
 
@@ -1342,7 +1342,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			return video_buffer_subregion(self, (struct video_crect const *)rect, xor_flags);
+			return video_buffer_subregion(self, (struct video_crect const *)rect, gfx_flags);
 		}
 	}
 
@@ -1421,7 +1421,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		/* Populate "ret" based on rect offsets */
 		ret->rbf_cxoff = ret_crect.vr_xmin;
 		ret->rbf_cyoff = ret_crect.vr_ymin;
-		xor_flags = gfx_flag_combine(me->rbf_xor, xor_flags);
+		gfx_flags = gfx_flag_combine(me->rbf_gfx, gfx_flags);
 
 		/* Check if we need to create a new sub-region buffer to enforce an I/O Rect */
 		if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
@@ -1432,7 +1432,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 			static_assert(offsetof(struct video_rect, vr_ymin) == offsetof(struct video_crect, vcr_ymin));
 			static_assert(offsetof(struct video_rect, vr_xdim) == offsetof(struct video_crect, vcr_xdim));
 			static_assert(offsetof(struct video_rect, vr_ydim) == offsetof(struct video_crect, vcr_ydim));
-			used_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, xor_flags);
+			used_base = video_buffer_subregion(base, (struct video_crect const *)&base_iorect, gfx_flags);
 			video_buffer_decref(base);
 			if unlikely(!used_base)
 				goto err_r;
@@ -1444,7 +1444,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		}
 
 		ret->vb_ops   = &region_buffer_subregion_ops;
-		ret->rbf_xor  = xor_flags;
+		ret->rbf_gfx  = gfx_flags;
 		ret->rbf_base = base; /* Inherit reference */
 		ret->rbf_orig = ret->rbf_base;
 		ret->brbsr_parent = me;
@@ -1454,7 +1454,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		atomic_lock_release(&me->rbf_child_lock);
 	} else {
 		result->vb_ops   = &region_buffer_ops;
-		result->rbf_xor  = xor_flags;
+		result->rbf_gfx  = gfx_flags;
 		result->rbf_base = self;
 		result->rbf_orig = result->rbf_base;
 		video_buffer_incref(self);

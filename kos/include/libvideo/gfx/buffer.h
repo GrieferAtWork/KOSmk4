@@ -409,7 +409,7 @@ struct video_buffer_ops {
 	 * access to pixel-data in `return' check if `__self' has been revoked).
 	 *
 	 * NOTE: This function will never re-return `__self', even if `__rect' is the  full
-	 *       rect of `__self', and `__xor_flags == 0'. This is because doing also cause
+	 *       rect of `__self', and `__gfx_flags == 0'. This is because doing also cause
 	 *       `vi_revoke' invoked on the returned buffer to revoke `__self'.
 	 *
 	 * @assume(__rect->vcr_xdim > 0);
@@ -420,23 +420,17 @@ struct video_buffer_ops {
 	 * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
 	 * @param: __self: Video buffer to create a sub-region of
 	 * @param: __rect: Sub-region rect of `__self' to-be returned
-	 * @param: __xor_flags: Flags to xor- toggle in GFX contexts created on `return'.
-	 *                      These flags are NOT applied  to `__rect', but they  still
-	 *                      allow you to create  sub-region buffers that will  appear
-	 *                      to be  natively rotated  in `struct video_gfx'  contexts.
-	 *                      Only the following flags *should* be used here. All other
-	 *                      flags can still be used, but many not necessarily produce
-	 *                      expected results:
-	 *                      - VIDEO_GFX_F_XMIRROR
-	 *                      - VIDEO_GFX_F_YMIRROR
-	 *                      - VIDEO_GFX_F_XYSWAP
+	 * @param: __gfx_flags: Flags to apply in GFX contexts created using  `return'.
+	 *                      These flags are NOT applied to `__rect', but they still
+	 *                      allow you to create sub-region buffers that will appear
+	 *                      to be natively rotated in `struct video_gfx' contexts.
 	 * @return: * : The newly created sub-region buffer
 	 * @return: NULL: [errno=ENOMEM] Insufficient memory
 	 * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
 	__ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 	(LIBVIDEO_GFX_FCC *vi_subregion)(struct video_buffer *__restrict __self,
 	                                 struct video_crect const *__restrict __rect,
-	                                 video_gfx_flag_t __xor_flags);
+	                                 video_gfx_flag_t __gfx_flags);
 };
 
 
@@ -555,7 +549,7 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
  * every access to pixel-data in `return' check if `__self' has been revoked).
  *
  * NOTE: This function will never re-return `__self', even if `__rect' is the  full
- *       rect of `__self', and `__xor_flags == 0'. This is because doing also cause
+ *       rect of `__self', and `__gfx_flags == 0'. This is because doing also cause
  *       `video_buffer_revoke' invoked on the returned buffer to revoke `__self'.
  *
  * @assume(__rect->vcr_xdim > 0);
@@ -566,23 +560,17 @@ __NOTHROW(video_buffer_revoke)(struct video_buffer *__restrict __self);
  * @assume((__rect->vcr_ymin + __rect->vcr_ydim) <= __self->vb_ydim);
  * @param: __self: Video buffer to create a sub-region of
  * @param: __rect: Sub-region rect of `__self' to-be returned
- * @param: __xor_flags: Flags to xor- toggle in GFX contexts created on `return'.
- *                      These flags are NOT applied  to `__rect', but they  still
- *                      allow you to create  sub-region buffers that will  appear
- *                      to be  natively rotated  in `struct video_gfx'  contexts.
- *                      Only the following flags *should* be used here. All other
- *                      flags can still be used, but many not necessarily produce
- *                      expected results:
- *                      - VIDEO_GFX_F_XMIRROR
- *                      - VIDEO_GFX_F_YMIRROR
- *                      - VIDEO_GFX_F_XYSWAP
+ * @param: __gfx_flags: Flags to apply in GFX contexts created using  `return'.
+ *                      These flags are NOT applied to `__rect', but they still
+ *                      allow you to create sub-region buffers that will appear
+ *                      to be natively rotated in `struct video_gfx' contexts.
  * @return: * : The newly created sub-region buffer
  * @return: NULL: [errno=ENOMEM] Insufficient memory
  * @return: NULL: [errno=*] Failed to create sub-region for some other reason */
 extern __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *
 video_buffer_subregion(struct video_buffer *__restrict __self,
                        struct video_crect const *__restrict __rect,
-                       video_gfx_flag_t __xor_flags);
+                       video_gfx_flag_t __gfx_flags);
 
 #else /* __INTELLISENSE__ */
 #define video_buffer_getgfx(self, result, blendmode, flags, colorkey)  \
@@ -606,8 +594,8 @@ video_buffer_subregion(struct video_buffer *__restrict __self,
 #define video_buffer_unlockregion(self, lock) \
 	(*(self)->vb_ops->vi_unlockregion)(self, lock)
 #define video_buffer_revoke(self) (*(self)->vb_ops->vi_revoke)(self)
-#define video_buffer_subregion(self, rect, xor_flags) \
-	(*(self)->vb_ops->vi_subregion)(self, rect, xor_flags)
+#define video_buffer_subregion(self, rect, gfx_flags) \
+	(*(self)->vb_ops->vi_subregion)(self, rect, gfx_flags)
 #endif /* !__INTELLISENSE__ */
 
 
@@ -872,7 +860,7 @@ video_buffer_lockable(struct video_buffer *__restrict __self);
  *
  * @param: __self: Video buffer to create a region of
  * @param: __rect: region rect of `__self' to-be returned
- * @param: __xor_flags: Flags to xor- toggle in GFX contexts created on  `return'.
+ * @param: __gfx_flags: Flags to xor- toggle in GFX contexts created on  `return'.
  *                      These flags are  NOT applied to  `__rect', but they  still
  *                      allow  you to create region buffers that will appear to be
  *                      natively  rotated in `struct video_gfx' contexts. Only the
@@ -888,12 +876,12 @@ video_buffer_lockable(struct video_buffer *__restrict __self);
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_IN_T(2) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_REGION)(struct video_buffer *__restrict __self,
                                         struct video_rect const *__restrict __rect,
-                                        video_gfx_flag_t __xor_flags);
+                                        video_gfx_flag_t __gfx_flags);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_IN(2) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_region(struct video_buffer *__restrict __self,
                     struct video_rect const *__restrict __rect,
-                    video_gfx_flag_t __xor_flags);
+                    video_gfx_flag_t __gfx_flags);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

@@ -20,6 +20,8 @@
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_H
 #define GUARD_LIBVIDEO_GFX_BUFFER_BITMASK_H 1
 
+/* TODO: REMOVE THIS FILE */
+
 #include "../api.h"
 /**/
 

@@ -1150,8 +1150,8 @@ LOCAL ATTR_INOUT(1) void CC
 video_swblitter3_setops(struct video_blitter3 *__restrict ctx) {
 	/* Select operators based on wrapping flags of src/dst */
 	video_gfx_flag_t flags = ctx->vbt3_rddst->vx_flags |
-	                   ctx->vbt3_wrdst->vx_flags |
-	                   ctx->vbt3_src->vx_flags;
+	                         ctx->vbt3_wrdst->vx_flags |
+	                         ctx->vbt3_src->vx_flags;
 	if (ctx->vbt3_rddst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 		if (ctx->vbt3_wrdst->vx_flags & (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_YWRAP)) {
 			ctx->vbt3_ops = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR | VIDEO_GFX_F_XYSWAP))

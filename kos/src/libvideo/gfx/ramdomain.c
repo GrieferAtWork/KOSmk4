@@ -301,13 +301,13 @@ err:
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer__subregion(struct video_buffer *__restrict self,
                      struct video_crect const *__restrict rect,
-                     video_gfx_flag_t xor_flags) {
+                     video_gfx_flag_t gfx_flags) {
 	REF struct video_rambuffer_subregion *result;
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
 	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect, me->rb_stride);
 	if likely(result) {
 		result->rbrv_gfx.rbrvg_data += (uintptr_t)me->rb_data;
-		result->rbrvsr_xflags = xor_flags;
+		result->rbrvsr_xflags = gfx_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subregion_xoff_ops()
 		                                     : _rambuffer_subregion_ops();
 		atomic_lock_acquire(&me->rb_subregions_lock);
@@ -321,13 +321,13 @@ rambuffer__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_subregion__subregion(struct video_buffer *__restrict self,
                                struct video_crect const *__restrict rect,
-                               video_gfx_flag_t xor_flags) {
+                               video_gfx_flag_t gfx_flags) {
 	REF struct video_rambuffer_subsubregion *result;
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
 	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
+		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subsubregion_xoff_ops()
 		                                     : _rambuffer_subsubregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -344,13 +344,13 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_formem__subregion(struct video_buffer *__restrict self,
                             struct video_crect const *__restrict rect,
-                            video_gfx_flag_t xor_flags) {
+                            video_gfx_flag_t gfx_flags) {
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
 	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = xor_flags;
+		result->rbrvsr_xflags = gfx_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbfm_subregions_lock);
@@ -367,13 +367,13 @@ rambuffer_formem__subregion(struct video_buffer *__restrict self,
 INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
 rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
                                       struct video_crect const *__restrict rect,
-                                      video_gfx_flag_t xor_flags) {
+                                      video_gfx_flag_t gfx_flags) {
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
 	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
+		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
