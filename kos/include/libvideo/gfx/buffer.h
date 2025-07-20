@@ -605,7 +605,9 @@ __CXXDECL_BEGIN
 
 struct video_buffer {
 	struct video_buffer_ops const *vb_ops;    /* [1..1][const] Buffer operations. */
-	struct video_domain const     *vb_domain; /* [1..1][const] Buffer domain. */
+	struct video_domain const     *vb_domain; /* [1..1][const] Buffer domain (generic wrappers use `video_ramdomain()',
+	                                           * meaning a different value here implies that the buffer was created  by
+	                                           * that domain's `video_domain_newbuffer()' or `video_domain_formem()') */
 	struct video_format            vb_format; /* [const] Buffer format. */
 	video_dim_t                    vb_xdim;   /* Buffer dimension in X (in pixels) */
 	video_dim_t                    vb_ydim;   /* Buffer dimension in Y (in pixels) */
@@ -679,7 +681,11 @@ __CXXDECL_END
 __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 
 
-/* Convert `__self' into the specified domain and format. */
+/* Convert `__self' into the specified domain and format.
+ * @return: * : The converted video buffer.
+ * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
+ * @return: NULL: [errno=ENOTSUP] Given `__format->vf_codec' is not supported by `__domain ?: __self->vb_domain'
+ * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_NONNULL_T((2)) __ATTR_IN_T(3) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT)(struct video_buffer *__restrict __self,
                                          struct video_domain const *__domain,

@@ -100,7 +100,11 @@ NOTHROW(FCC libvideo_buffer_generic_unlockregion)(struct video_buffer *__restric
 
 
 
-/* Convert `self' into the specified domain and format. */
+/* Convert `self' into the specified domain and format.
+ * @return: * : The converted video buffer.
+ * @return: NULL: [errno=ENOMEM]  Insufficient memory (either regular RAM, or V-RAM)
+ * @return: NULL: [errno=ENOTSUP] Given `format->vf_codec' is not supported by `domain ?: self->vb_domain'
+ * @return: NULL: [errno=*] Failed to convert buffer for some reason (s.a. `errno') */
 DEFINE_PUBLIC_ALIAS(video_buffer_convert, libvideo_buffer_convert);
 INTERN WUNUSED ATTR_INOUT(1) NONNULL((2)) ATTR_IN(3) REF struct video_buffer *CC
 libvideo_buffer_convert(struct video_buffer *__restrict self,
