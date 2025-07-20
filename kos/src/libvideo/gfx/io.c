@@ -222,10 +222,10 @@ libvideo_buffer_save_fmt(struct video_buffer *__restrict self,
 	/* TODO: Don't do this here -- if the I/O backend converts the buffer to
 	 *       a different pixel format first, then locking might fail  again. */
 	int result;
-	struct lockable_buffer lockable;
-	self   = libvideo_buffer_lockable_init(&lockable, self);
+	struct lockable_buffer_base lockable;
+	self   = lockable_buffer_initbase(&lockable, self);
 	result = libvideo_buffer_save_fmt_lockable(self, stream, options, fmt);
-	libvideo_buffer_lockable_fini(&lockable);
+	lockable_buffer_finibase(&lockable);
 	return result;
 }
 
