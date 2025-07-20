@@ -81,48 +81,6 @@ extern __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void
 video_format_setcolor(struct video_format const *__restrict __self,
                       __byte_t *__restrict __line,
                       video_coord_t __x, video_color_t __color);
-
-/* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
- * @assume(IS_ALIGNED(__dst_line, __self->vf_codec->vc_align));
- * @assume(IS_ALIGNED(__src_line, __self->vf_codec->vc_align));
- * @assume(IS_ALIGNED(__dst_stride, __self->vf_codec->vc_align));
- * @assume(IS_ALIGNED(__src_stride, __self->vf_codec->vc_align));
- * @assume(__size_x > 0);
- * @assume(__size_y > 0); */
-extern __ATTR_NONNULL((1, 2, 5)) void
-video_format_rectcopy(struct video_format const *__restrict __self,
-                      __byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
-                      __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
-                      video_dim_t __size_x, video_dim_t __size_y);
-
-/* Fill `num_pixels'  neighboring  pixels  horizontally.
- * The caller must ensure that all coords are in-bounds.
- * @assume(IS_ALIGNED(__line, __self->vf_codec->vc_align));
- * @assume(__num_pixels > 0); */
-extern __ATTR_NONNULL((1, 2)) void
-video_format_linefill(struct video_format const *__restrict __self,
-                      __byte_t *__restrict __line, video_coord_t __x,
-                      video_pixel_t __pixel, video_dim_t __num_pixels);
-
-/* Fill a vertical line of pixels.
- * @assume(IS_ALIGNED(__line, __self->vf_codec->vc_align));
- * @assume(IS_ALIGNED(__stride, __self->vf_codec->vc_align));
- * @assume(__num_pixels > 0); */
-extern __ATTR_NONNULL((1, 2)) void
-video_format_vertfill(struct video_format const *__restrict __self,
-                      __byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                      video_pixel_t __pixel, video_dim_t __num_pixels);
-
-
-/* Fill a rect of pixels.
- * @assume(__size_x > 0);
- * @assume(__size_y > 0);
- * @assume(IS_ALIGNED(__line, __self->vf_codec->vc_align));
- * @assume(IS_ALIGNED(__stride, __self->vf_codec->vc_align)); */
-extern __ATTR_NONNULL((1, 2)) void
-video_format_rectfill(struct video_format const *__restrict __self,
-                      __byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                      video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 #else /* __INTELLISENSE__ */
 #define video_format_hasalpha(self)                 \
 	(((self)->vf_codec->vc_specs.vcs_amask != 0) || \
@@ -133,14 +91,6 @@ video_format_rectfill(struct video_format const *__restrict __self,
 #define video_format_color2pixel(self, color)       (*(self)->vf_codec->vc_color2pixel)(self, color)
 #define video_format_getcolor(self, line, x)        video_format_pixel2color(self, video_format_getpixel(self, line, x))
 #define video_format_setcolor(self, line, x, color) video_format_setpixel(self, line, x, video_format_color2pixel(self, color))
-#define video_format_rectcopy(self, dst_line, dst_x, dst_stride, src_line, src_x, src_stride, size_x, size_y) \
-	(*(self)->vf_codec->vc_rectcopy)(dst_line, dst_x, dst_stride, src_line, src_x, src_stride, size_x, size_y)
-#define video_format_linefill(self, dst_line, x, pixel, num_pixels) \
-	(*(self)->vf_codec->vc_linefill)(dst_line, x, pixel, num_pixels)
-#define video_format_vertfill(self, dst_line, x, stride, pixel, num_pixels) \
-	(*(self)->vf_codec->vc_vertfill)(dst_line, x, stride, pixel, num_pixels)
-#define video_format_rectfill(self, dst_line, x, stride, pixel, size_x, size_y) \
-	(*(self)->vf_codec->vc_rectfill)(dst_line, x, stride, pixel, size_x, size_y)
 #endif /* !__INTELLISENSE__ */
 
 struct video_format {
@@ -160,48 +110,6 @@ public: /* Low-level, memory-based pixel accessor functions. */
 	/* Convert between color and pixel values. */
 	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t __pixel) const { return video_format_pixel2color(this, __pixel); }
 	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t __color) const { return video_format_color2pixel(this, __color); }
-
-	/* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
-	 * @assume(IS_ALIGNED(__dst_line, vf_codec->vc_align));
-	 * @assume(IS_ALIGNED(__src_line, vf_codec->vc_align));
-	 * @assume(IS_ALIGNED(__dst_stride, vf_codec->vc_align));
-	 * @assume(IS_ALIGNED(__src_stride, vf_codec->vc_align));
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0); */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC rectcopy(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
-	                                                  __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
-	                                                  video_dim_t __size_x, video_dim_t __size_y) const {
-		video_format_rectcopy(this, __dst_line, __dst_x, __dst_stride, __src_line, __src_x, __src_stride, __size_x, __size_y);
-	}
-
-	/* Fill `num_pixels'  neighboring  pixels  horizontally.
-	 * The caller must ensure that all coords are in-bounds.
-	 * @assume(IS_ALIGNED(__line, vf_codec->vc_align));
-	 * @assume(__num_pixels > 0); */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linefill(__byte_t *__restrict __line, video_coord_t __x,
-	                                                  video_pixel_t __pixel, video_dim_t __num_pixels) const {
-		video_format_linefill(this, __line, __x, __pixel, __num_pixels);
-	}
-
-	/* Fill a vertical line of pixels.
-	 * @assume(IS_ALIGNED(__line, vf_codec->vc_align));
-	 * @assume(IS_ALIGNED(__stride, vf_codec->vc_align));
-	 * @assume(__num_pixels > 0); */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC vertfill(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-	                                                  video_pixel_t __pixel, video_dim_t __num_pixels) const {
-		video_format_vertfill(this, __line, __x, __stride, __pixel, __num_pixels);
-	}
-
-	/* Fill a rect of pixels.
-	 * @assume(__size_x > 0);
-	 * @assume(__size_y > 0);
-	 * @assume(IS_ALIGNED(__line, vf_codec->vc_align));
-	 * @assume(IS_ALIGNED(__stride, vf_codec->vc_align)); */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC rectfill(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-	                                                  video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y) const {
-		video_format_rectfill(this, __line, __x, __stride, __pixel, __size_x, __size_y);
-	}
-
 #endif /* __cplusplus */
 };
 
@@ -219,8 +127,8 @@ struct video_converter;
 struct video_converter {
 	/* [1..1] Map pixel from `vcv_from' into the format used by `vcv_to'.
 	 * Same as the following (but faster in many cases):
-	 * >> video_color_t color = vcv_from.pixel2color(__from_pixel);
-	 * >> video_pixel_t to_pixel = vcv_to.color2pixel(color); */
+	 * >> video_color_t color = video_format_pixel2color(&vcv_from, __from_pixel);
+	 * >> video_pixel_t to_pixel = video_format_color2pixel(&vcv_to, color); */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
 	(LIBVIDEO_CODEC_CC *vcv_mappixel)(struct video_converter const *__restrict __self,
 	                                  video_pixel_t __from_pixel);
