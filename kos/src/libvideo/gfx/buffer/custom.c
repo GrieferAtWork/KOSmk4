@@ -19,6 +19,8 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C
 #define GUARD_LIBVIDEO_GFX_BUFFER_CUSTOM_C 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -28,8 +30,10 @@
 #include <kos/anno.h>
 
 #include <assert.h>
+#include <atomic.h>
 #include <errno.h>
 #include <malloc.h>
+#include <sched.h>
 #include <stddef.h>
 
 #include <libvideo/codec/codecs.h>
@@ -49,134 +53,447 @@
 
 DECL_BEGIN
 
-PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
-custom_rlock(struct video_buffer *__restrict self,
-             struct video_lock *__restrict lock) {
+/* Custom buffer operator types */
+DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_ops,
+                         custom_buffer__destroy, custom_buffer__initgfx, libvideo_buffer_swgfx_updategfx,
+                         custom_buffer__rlock, custom_buffer__wlock, custom_buffer__unlock,
+                         custom_buffer__rlockregion, custom_buffer__wlockregion, custom_buffer__unlockregion,
+                         custom_buffer__revoke, custom_buffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_ops,
+                         custom_buffer_subregion__destroy, custom_buffer_subregion__initgfx, libvideo_buffer_swgfx_updategfx,
+                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         custom_buffer_subregion__rlockregion, custom_buffer_subregion__wlockregion, custom_buffer_subregion__unlockregion,
+                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_norem_ops,
+                         custom_buffer_subregion__destroy, custom_buffer_subregion__initgfx, libvideo_buffer_swgfx_updategfx,
+                         custom_buffer_subregion__rlock, custom_buffer_subregion__wlock, custom_buffer_subregion__unlock,
+                         custom_buffer_subregion__rlockregion, custom_buffer_subregion__wlockregion, custom_buffer_subregion__unlockregion,
+                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(custom_buffer_subregion_nooff_ops,
+                         custom_buffer_subregion__destroy, custom_buffer_subregion_nooff__initgfx, libvideo_buffer_swgfx_updategfx,
+                         custom_buffer__rlock, custom_buffer__wlock, custom_buffer__unlock,
+                         custom_buffer__rlockregion, custom_buffer__wlockregion, custom_buffer__unlockregion,
+                         custom_buffer_subregion__revoke, custom_buffer_subregion__subregion);
+
+
+/* Operators for custom buffers, as seen above */
+
+/* DESTROY */
+INTERN NONNULL((1)) void FCC
+custom_buffer__destroy(struct video_buffer *__restrict self) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
-	if (me->cb_rlock)
-		return (*me->cb_rlock)(me->cb_cookie, lock);
+	assert(me->cbc_inuse == 0);
+	if (me->cb_destroy)
+		(*me->cb_destroy)(me->cbc_cookie);
+	free(self);
+}
+
+INTERN NONNULL((1)) void FCC
+custom_buffer_subregion__destroy(struct video_buffer *__restrict self) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	REF struct custom_buffer_common *parent = me->cbsr_parent;
+	if (parent) {
+		atomic_lock_acquire(&parent->cbc_subregion_lock);
+		if (LIST_ISBOUND(me, cbsr_link))
+			LIST_UNBIND(me, cbsr_link);
+		atomic_lock_release(&parent->cbc_subregion_lock);
+		video_buffer_decref(parent);
+	}
+	free(me);
+}
+
+/* Dummy operators (for use after the buffer was revoked) */
+PRIVATE ATTR_PURE WUNUSED video_pixel_t CC
+dummy_custom_getpixel(void *UNUSED(cookie),
+                      video_coord_t UNUSED(x),
+                      video_coord_t UNUSED(y)) {
+	COMPILER_IMPURE();
+	return 0;
+}
+
+PRIVATE void CC
+dummy_custom_setpixel(void *UNUSED(cookie),
+                      video_coord_t UNUSED(x),
+                      video_coord_t UNUSED(y),
+                      video_pixel_t UNUSED(pixel)) {
+	COMPILER_IMPURE();
+}
+
+/* REVOKE+SUBREGION */
+INTERN ATTR_INOUT(1) void
+NOTHROW(FCC custom_buffer__revoke_common)(struct custom_buffer_common *__restrict me) {
+	/* Revoke sub-regions */
+	atomic_lock_acquire(&me->cbc_subregion_lock);
+	while (!LIST_EMPTY(&me->cbc_subregion_list)) {
+		REF struct custom_buffer_subregion *sr = LIST_FIRST(&me->cbc_subregion_list);
+		if (!tryincref(sr)) {
+			LIST_UNBIND(sr, cbsr_link);
+		} else {
+			atomic_lock_release(&me->cbc_subregion_lock);
+			sr = (struct custom_buffer_subregion *)video_buffer_revoke(sr);
+			video_buffer_decref(sr);
+			atomic_lock_acquire(&me->cbc_subregion_lock);
+		}
+	}
+	atomic_lock_release(&me->cbc_subregion_lock);
+
+	/* Revoke user-defined operator callbacks.
+	 * Order of these writes doesn't matter, but writes need to be atomic */
+	COMPILER_WRITE_BARRIER();
+	atomic_store_explicit(&me->cbc_getpixel, &dummy_custom_getpixel, memory_order_relaxed);
+	atomic_store_explicit(&me->cbc_setpixel, &dummy_custom_setpixel, memory_order_relaxed);
+	atomic_store_explicit(&me->cbc_rlock, NULL, memory_order_relaxed);
+	atomic_store_explicit(&me->cbc_wlock, NULL, memory_order_relaxed);
+	atomic_store_explicit(&me->cbc_rlockregion, NULL, memory_order_relaxed);
+	atomic_store_explicit(&me->cbc_wlockregion, NULL, memory_order_relaxed);
+	COMPILER_WRITE_BARRIER();
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *
+NOTHROW(FCC custom_buffer__revoke)(struct video_buffer *__restrict self) {
+	struct custom_buffer *me = (struct custom_buffer *)self;
+	video_buffer_custom_revoke_t revoke;
+	custom_buffer__revoke_common(me);
+	revoke = atomic_xch(&me->cb_revoke, NULL);
+	if (revoke)
+		(*revoke)(me->cbc_cookie);
+	while (atomic_read(&me->cbc_inuse))
+		sched_yield();
+	return me;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_buffer *
+NOTHROW(FCC custom_buffer_subregion__revoke)(struct video_buffer *__restrict self) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	REF struct custom_buffer_common *parent = atomic_xch(&me->cbsr_parent, NULL);
+	if (parent) {
+		atomic_lock_acquire(&parent->cbc_subregion_lock);
+		if (LIST_ISBOUND(me, cbsr_link))
+			LIST_UNBIND(me, cbsr_link);
+		atomic_lock_release(&parent->cbc_subregion_lock);
+		video_buffer_decref(parent);
+	}
+	custom_buffer__revoke_common(me);
+	return me;
+}
+
+PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
+custom_buffer__subregion_impl(struct custom_buffer_common *__restrict parent,
+                              struct video_crect const *__restrict rect,
+                              gfx_flag_t xor_flags,
+                              video_coord_t parent_xoff,
+                              video_coord_t parent_yoff) {
+	REF struct custom_buffer_subregion *result;
+	result = (REF struct custom_buffer_subregion *)malloc(sizeof(struct custom_buffer_subregion));
+	if unlikely(!result)
+		goto err;
+	result->vb_domain  = parent->vb_domain;
+	result->vb_format  = parent->vb_format;
+	result->vb_xdim    = rect->vcr_xdim;
+	result->vb_ydim    = rect->vcr_ydim;
+	result->vb_refcnt  = 1;
+	result->cbsr_xoff  = parent_xoff + rect->vcr_xmin;
+	result->cbsr_yoff  = parent_yoff + rect->vcr_ymin;
+	result->cbsr_xor   = xor_flags;
+	video_codec_xcoord_to_offset(result->vb_format.vf_codec, result->cbsr_xoff,
+	                             &result->cbsr_bxoff, &result->cbsr_bxrem);
+	result->vb_ops = !result->cbsr_xoff && !result->cbsr_yoff
+	                 ? _custom_buffer_subregion_nooff_ops()
+	                 : result->cbsr_bxrem == 0
+	                   ? _custom_buffer_subregion_norem_ops()
+	                   : _custom_buffer_subregion_ops();
+	result->cbc_inuse        = 0;
+	result->cbc_unlock       = parent->cbc_unlock;
+	result->cbc_unlockregion = parent->cbc_unlockregion;
+	result->cbc_cookie       = parent->cbc_cookie;
+	LIST_INIT(&result->cbc_subregion_list);
+	atomic_lock_init(&result->cbc_subregion_lock);
+	atomic_lock_acquire(&parent->cbc_subregion_lock);
+	COMPILER_WRITE_BARRIER();
+	result->cbc_getpixel     = atomic_read(&parent->cbc_getpixel);
+	result->cbc_setpixel     = atomic_read(&parent->cbc_setpixel);
+	result->cbc_rlock        = atomic_read(&parent->cbc_rlock);
+	result->cbc_wlock        = atomic_read(&parent->cbc_wlock);
+	result->cbc_rlockregion  = atomic_read(&parent->cbc_rlockregion);
+	result->cbc_wlockregion  = atomic_read(&parent->cbc_wlockregion);
+	COMPILER_WRITE_BARRIER();
+	LIST_INSERT_HEAD(&parent->cbc_subregion_list, result, cbsr_link);
+	atomic_lock_release(&parent->cbc_subregion_lock);
+	if (result->vb_format.vf_pal)
+		video_palette_incref(result->vb_format.vf_pal);
+	return result;
+err:
+	return NULL;
+}
+
+INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
+custom_buffer__subregion(struct video_buffer *__restrict self,
+                         struct video_crect const *__restrict rect,
+                         gfx_flag_t xor_flags) {
+	struct custom_buffer *me = (struct custom_buffer *)self;
+	return custom_buffer__subregion_impl(me, rect, xor_flags, 0, 0);
+}
+
+INTERN WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_buffer *FCC
+custom_buffer_subregion__subregion(struct video_buffer *__restrict self,
+                                   struct video_crect const *__restrict rect,
+                                   gfx_flag_t xor_flags) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	return custom_buffer__subregion_impl(me, rect,
+	                                     gfx_flag_combine(me->cbsr_xor, xor_flags),
+	                                     me->cbsr_xoff,
+	                                     me->cbsr_yoff);
+}
+
+/* LOCK */
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer__rlock(struct video_buffer *__restrict self,
+                     struct video_lock *__restrict lock) {
+	struct custom_buffer_common *me = (struct custom_buffer_common *)self;
+	video_buffer_custom_lock_t rlock;
+	atomic_inc(&me->cbc_inuse);
+	rlock = atomic_read(&me->cbc_rlock);
+	if (rlock) {
+		int result = (*rlock)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
 	errno = ENOTSUP;
 	return -1;
 }
 
-PRIVATE WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int FCC
-custom_wlock(struct video_buffer *__restrict self,
-             struct video_lock *__restrict lock) {
-	struct custom_buffer *me = (struct custom_buffer *)self;
-	if (me->cb_wlock)
-		return (*me->cb_wlock)(me->cb_cookie, lock);
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer__wlock(struct video_buffer *__restrict self,
+                     struct video_lock *__restrict lock) {
+	struct custom_buffer_common *me = (struct custom_buffer_common *)self;
+	video_buffer_custom_lock_t wlock;
+	atomic_inc(&me->cbc_inuse);
+	wlock = atomic_read(&me->cbc_wlock);
+	if (wlock) {
+		int result = (*wlock)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
 	errno = ENOTSUP;
 	return -1;
 }
 
-PRIVATE ATTR_INOUT(1) ATTR_IN(2) void
-NOTHROW(FCC custom_unlock)(struct video_buffer *__restrict self,
-                           struct video_lock *__restrict lock) {
-	struct custom_buffer *me = (struct custom_buffer *)self;
-	if (me->cb_unlock)
-		(*me->cb_unlock)(me->cb_cookie, lock);
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC custom_buffer__unlock)(struct video_buffer *__restrict self,
+                                   struct video_lock *__restrict lock) {
+	struct custom_buffer_common *me = (struct custom_buffer_common *)self;
+	if (me->cbc_unlock)
+		(*me->cbc_unlock)(me->cbc_cookie, lock);
+	atomic_dec(&me->cbc_inuse);
+}
+
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer_subregion__rlock(struct video_buffer *__restrict self,
+                               struct video_lock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	video_buffer_custom_lock_t rlock;
+	assert(me->cbsr_bxrem == 0);
+	atomic_inc(&me->cbc_inuse);
+	rlock = atomic_read(&me->cbc_rlock);
+	if (rlock) {
+		int result;
+		result = (*me->cbc_rlock)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		lock->vl_data += me->cbsr_yoff * lock->vl_stride;
+		lock->vl_data += me->cbsr_bxoff;
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
+	errno = ENOTSUP;
+	return -1;
+}
+
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer_subregion__wlock(struct video_buffer *__restrict self,
+                               struct video_lock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	video_buffer_custom_lock_t wlock;
+	assert(me->cbsr_bxrem == 0);
+	atomic_inc(&me->cbc_inuse);
+	wlock = atomic_read(&me->cbc_wlock);
+	if (wlock) {
+		int result;
+		result = (*me->cbc_wlock)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		lock->vl_data += me->cbsr_yoff * lock->vl_stride;
+		lock->vl_data += me->cbsr_bxoff;
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
+	errno = ENOTSUP;
+	return -1;
+}
+
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC custom_buffer_subregion__unlock)(struct video_buffer *__restrict self,
+                                             struct video_lock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	if (me->cbc_unlock) {
+		lock->vl_data -= me->cbsr_bxoff;
+		lock->vl_data -= me->cbsr_yoff * lock->vl_stride;
+		(*me->cbc_unlock)(me->cbc_cookie, lock);
+	}
+	atomic_dec(&me->cbc_inuse);
 }
 
 
-PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
-custom_rlockregion(struct video_buffer *__restrict self,
-                   struct video_regionlock *__restrict lock) {
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer__rlockregion(struct video_buffer *__restrict self,
+                           struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
-	video_regionlock_assert(me, lock);
-	if (me->cb_rlockregion)
-		return (*me->cb_rlockregion)(me->cb_cookie, lock);
-	if (me->cb_rlock) {
-		int ok;
+	video_buffer_custom_lockregion_t rlockregion;
+	video_buffer_custom_lock_t rlock;
+	atomic_inc(&me->cbc_inuse);
+	rlockregion = atomic_read(&me->cbc_rlockregion);
+	if (rlockregion) {
+		int result = (*rlockregion)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+
+	rlock = atomic_read(&me->cbc_rlock);
+	if (rlock) {
+		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_rect.vcr_xmin, &xoff,
-		                             &lock->vrl_xbas);
-		ok = (*me->cb_rlock)(me->cb_cookie, &lock->vrl_lock);
+		video_codec_xcoord_to_offset(me->vb_format.vf_codec,
+		                             lock->_vrl_rect.vcr_xmin,
+		                             &xoff, &lock->vrl_xbas);
+		result = (*rlock)(me->cbc_cookie, &lock->vrl_lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
 		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
-		return ok;
+		return result;
 	}
+
+	atomic_dec(&me->cbc_inuse);
 	errno = ENOTSUP;
 	return -1;
 }
 
-PRIVATE WUNUSED ATTR_INOUT(1) NONNULL((2)) int FCC
-custom_wlockregion(struct video_buffer *__restrict self,
-                   struct video_regionlock *__restrict lock) {
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer__wlockregion(struct video_buffer *__restrict self,
+                           struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
-	video_regionlock_assert(me, lock);
-	if (me->cb_wlockregion)
-		return (*me->cb_wlockregion)(me->cb_cookie, lock);
-	if (me->cb_wlock) {
-		int ok;
+	video_buffer_custom_lockregion_t wlockregion;
+	video_buffer_custom_lock_t wlock;
+	atomic_inc(&me->cbc_inuse);
+	wlockregion = atomic_read(&me->cbc_wlockregion);
+	if (wlockregion) {
+		int result = (*wlockregion)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+
+	wlock = atomic_read(&me->cbc_wlock);
+	if (wlock) {
+		int result;
 		size_t xoff;
-		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_rect.vcr_xmin, &xoff,
-		                             &lock->vrl_xbas);
-		ok = (*me->cb_wlock)(me->cb_cookie, &lock->vrl_lock);
+		video_codec_xcoord_to_offset(me->vb_format.vf_codec,
+		                             lock->_vrl_rect.vcr_xmin,
+		                             &xoff, &lock->vrl_xbas);
+		result = (*wlock)(me->cbc_cookie, &lock->vrl_lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
 		lock->vrl_lock.vl_data += lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data += xoff;
-		return ok;
+		return result;
 	}
+
+	atomic_dec(&me->cbc_inuse);
 	errno = ENOTSUP;
 	return -1;
 }
 
-PRIVATE ATTR_INOUT(1) NONNULL((2)) void
-NOTHROW(FCC custom_unlockregion)(struct video_buffer *__restrict self,
-                                 struct video_regionlock *__restrict lock) {
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC custom_buffer__unlockregion)(struct video_buffer *__restrict self,
+                                         struct video_regionlock *__restrict lock) {
 	struct custom_buffer *me = (struct custom_buffer *)self;
-	video_regionlock_assert(me, lock);
-	if (me->cb_unlockregion) {
-		(*me->cb_unlockregion)(me->cb_cookie, lock);
-	} else if (me->cb_unlock) {
+	if (me->cbc_unlockregion) {
+		(*me->cbc_unlockregion)(me->cbc_cookie, lock);
+	} else if (me->cbc_unlock) {
 		size_t xoff;
 		video_coord_t xrem;
 		video_codec_xcoord_to_offset(self->vb_format.vf_codec,
-		                             lock->_vrl_rect.vcr_xmin, &xoff, &xrem);
+		                             lock->_vrl_rect.vcr_xmin,
+		                             &xoff, &xrem);
 		assert(xrem == lock->vrl_xbas);
 		lock->vrl_lock.vl_data -= lock->_vrl_rect.vcr_ymin * lock->vrl_lock.vl_stride;
 		lock->vrl_lock.vl_data -= xoff;
-		(*me->cb_unlock)(me->cb_cookie, &lock->vrl_lock);
+		(*me->cbc_unlock)(me->cbc_cookie, &lock->vrl_lock);
 	}
 }
 
 
-/* Indices for driver-specific data of "custom" video buffers. */
-struct gfx_customdrv: gfx_swdrv {
-	video_buffer_custom_getpixel_t gcd_getpixel; /* [1..1][const] ... */
-	video_buffer_custom_setpixel_t gcd_setpixel; /* [1..1][const] ... */
-	void *gcd_cookie;                            /* [?..?][const] ... */
-};
-#define video_customgfx_getdrv(self) \
-	((struct gfx_customdrv *)(self)->_vx_driver)
-static_assert(sizeof(struct gfx_customdrv) <= (_VIDEO_GFX_N_DRIVER * sizeof(void *)),
-              "sizeof(struct gfx_customdrv) too large for '_VIDEO_GFX_N_DRIVER'");
-
-PRIVATE ATTR_IN(1) video_pixel_t CC
-custom_gfx__getpixel(struct video_gfx const *__restrict self,
-                     video_coord_t abs_x, video_coord_t abs_y) {
-	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
-	return (*drv->gcd_getpixel)(drv->gcd_cookie, abs_x, abs_y);
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer_subregion__rlockregion(struct video_buffer *__restrict self,
+                                     struct video_regionlock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	video_buffer_custom_lockregion_t rlockregion;
+	lock->_vrl_rect.vcr_xmin += me->cbsr_xoff;
+	lock->_vrl_rect.vcr_ymin += me->cbsr_yoff;
+	atomic_inc(&me->cbc_inuse);
+	rlockregion = atomic_read(&me->cbc_rlockregion);
+	if (rlockregion) {
+		int result = (*rlockregion)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
+	errno = ENOTSUP;
+	return -1;
 }
 
-PRIVATE ATTR_IN(1) void CC
-custom_gfx__setpixel(struct video_gfx const *__restrict self,
-                     video_coord_t abs_x, video_coord_t abs_y,
-                     video_pixel_t pixel) {
-	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
-	(*drv->gcd_setpixel)(drv->gcd_cookie, abs_x, abs_y, pixel);
+INTERN ATTR_INOUT(1) NONNULL((2)) int FCC
+custom_buffer_subregion__wlockregion(struct video_buffer *__restrict self,
+                                     struct video_regionlock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	video_buffer_custom_lockregion_t wlockregion;
+	lock->_vrl_rect.vcr_xmin += me->cbsr_xoff;
+	lock->_vrl_rect.vcr_ymin += me->cbsr_yoff;
+	atomic_inc(&me->cbc_inuse);
+	wlockregion = atomic_read(&me->cbc_wlockregion);
+	if (wlockregion) {
+		int result = (*wlockregion)(me->cbc_cookie, lock);
+		if unlikely(result)
+			atomic_dec(&me->cbc_inuse);
+		return result;
+	}
+	atomic_dec(&me->cbc_inuse);
+	errno = ENOTSUP;
+	return -1;
 }
 
+INTERN ATTR_INOUT(1) NONNULL((2)) void
+NOTHROW(FCC custom_buffer_subregion__unlockregion)(struct video_buffer *__restrict self,
+                                                   struct video_regionlock *__restrict lock) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
+	if (me->cbc_unlockregion)
+		(*me->cbc_unlockregion)(me->cbc_cookie, lock);
+	atomic_dec(&me->cbc_inuse);
+	lock->_vrl_rect.vcr_ymin -= me->cbsr_yoff;
+	lock->_vrl_rect.vcr_xmin -= me->cbsr_xoff;
+}
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-custom_initgfx(struct video_gfx *__restrict self) {
-	struct custom_buffer *me  = (struct custom_buffer *)self->vx_buffer;
-	struct gfx_customdrv *drv = video_customgfx_getdrv(self);
+/* GFX */
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+custom_buffer__initgfx(struct video_gfx *__restrict self) {
+	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
 	libvideo_gfx_init_fullclip(self);
-	drv->gcd_getpixel = me->cb_getpixel;
-	drv->gcd_setpixel = me->cb_setpixel;
-	drv->gcd_cookie   = me->cb_cookie;
 
 	/* Default pixel accessors */
 	drv->xsw_getpixel = &custom_gfx__getpixel;
@@ -187,34 +504,84 @@ custom_initgfx(struct video_gfx *__restrict self) {
 	return self;
 }
 
-PRIVATE NONNULL((1)) void FCC
-custom_destroy(struct video_buffer *__restrict self) {
-	struct custom_buffer *me = (struct custom_buffer *)self;
-	if (me->cb_destroy)
-		(*me->cb_destroy)(me->cb_cookie);
-	free(self);
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
+	struct custom_buffer_subregion *me  = (struct custom_buffer_subregion *)self->vx_buffer;
+	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
+	self->vx_flags = gfx_flag_combine(me->cbsr_xor, self->vx_flags);
+	libvideo_gfx_init_fullclip(self);
+
+	/* Default pixel accessors */
+	drv->xsw_getpixel = &custom_gfx_subregion__getpixel;
+	drv->xsw_setpixel = &custom_gfx_subregion__setpixel;
+
+	/* Load generic operator defaults */
+	libvideo_swgfx_populate(self);
+	return self;
+}
+
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+custom_buffer_subregion_nooff__initgfx(struct video_gfx *__restrict self) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
+	self->vx_flags = gfx_flag_combine(me->cbsr_xor, self->vx_flags);
+	return custom_buffer__initgfx(self);
 }
 
 
-PRIVATE struct video_buffer_ops custom_ops = {};
-INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(void) {
-	if unlikely(!custom_ops.vi_destroy) {
-		custom_ops.vi_rlock        = &custom_rlock;
-		custom_ops.vi_wlock        = &custom_wlock;
-		custom_ops.vi_unlock       = &custom_unlock;
-		custom_ops.vi_rlockregion  = &custom_rlockregion;
-		custom_ops.vi_wlockregion  = &custom_wlockregion;
-		custom_ops.vi_unlockregion = &custom_unlockregion;
-		custom_ops.vi_initgfx      = &custom_initgfx;
-		custom_ops.vi_updategfx    = &libvideo_buffer_swgfx_updategfx;
-//		custom_ops.vi_revoke       = &custom_revoke;    /* TODO */
-//		custom_ops.vi_subregion    = &custom_subregion; /* TODO */
-		COMPILER_WRITE_BARRIER();
-		custom_ops.vi_destroy = &custom_destroy;
-		COMPILER_WRITE_BARRIER();
-	}
-	return &custom_ops;
+INTERN ATTR_IN(1) video_pixel_t CC
+custom_gfx__getpixel(struct video_gfx const *__restrict self,
+                     video_coord_t abs_x, video_coord_t abs_y) {
+	video_pixel_t result;
+	struct custom_buffer_common *me = (struct custom_buffer_common *)self->vx_buffer;
+	video_buffer_custom_getpixel_t getpixel;
+	atomic_inc(&me->cbc_inuse);
+	getpixel = atomic_read(&me->cbc_getpixel);
+	result = (*getpixel)(me->cbc_cookie, abs_x, abs_y);
+	atomic_dec(&me->cbc_inuse);
+	return result;
 }
+
+INTERN ATTR_IN(1) void CC
+custom_gfx__setpixel(struct video_gfx const *__restrict self,
+                     video_coord_t abs_x, video_coord_t abs_y,
+                     video_pixel_t pixel) {
+	struct custom_buffer_common *me = (struct custom_buffer_common *)self->vx_buffer;
+	video_buffer_custom_setpixel_t setpixel;
+	atomic_inc(&me->cbc_inuse);
+	setpixel = atomic_read(&me->cbc_setpixel);
+	(*setpixel)(me->cbc_cookie, abs_x, abs_y, pixel);
+	atomic_dec(&me->cbc_inuse);
+}
+
+INTERN ATTR_IN(1) video_pixel_t CC
+custom_gfx_subregion__getpixel(struct video_gfx const *__restrict self,
+                               video_coord_t abs_x, video_coord_t abs_y) {
+	video_pixel_t result;
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
+	video_buffer_custom_getpixel_t getpixel;
+	abs_x += me->cbsr_xoff;
+	abs_y += me->cbsr_yoff;
+	atomic_inc(&me->cbc_inuse);
+	getpixel = atomic_read(&me->cbc_getpixel);
+	result = (*getpixel)(me->cbc_cookie, abs_x, abs_y);
+	atomic_dec(&me->cbc_inuse);
+	return result;
+}
+
+INTERN ATTR_IN(1) void CC
+custom_gfx_subregion__setpixel(struct video_gfx const *__restrict self,
+                               video_coord_t abs_x, video_coord_t abs_y,
+                               video_pixel_t pixel) {
+	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
+	video_buffer_custom_setpixel_t setpixel;
+	abs_x += me->cbsr_xoff;
+	abs_y += me->cbsr_yoff;
+	atomic_inc(&me->cbc_inuse);
+	setpixel = atomic_read(&me->cbc_setpixel);
+	(*setpixel)(me->cbc_cookie, abs_x, abs_y, pixel);
+	atomic_dec(&me->cbc_inuse);
+}
+
 
 
 /* Construct a special video buffer which, rather than being backed by memory
@@ -224,11 +591,11 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
  * WARNING: The  given  `getpixel'  / `setpixel'  callbacks  better be
  *          fast, or any GFX on the returned buffer will take forever!
  *
- * @param: size_x:   X dimension of the returned video buffer
- * @param: size_y:   Y dimension of the returned video buffer
- * @param: codec:    [1..1] Video codec used for color<=>pixel conversion, as
- *                          well  as  pixel  I/O (when  rlock/wlock  is given
- *                          and returns `0')
+ * @param: size_x:       X dimension of the returned video buffer
+ * @param: size_y:       Y dimension of the returned video buffer
+ * @param: format:       [1..1] Video format used for color<=>pixel conversion,
+ *                              as well as pixel I/O (when rlock/wlock is given
+ *                              and returns `0')
  * @param: palette:      [0..1] Palette to-be used with `codec' (if needed)
  * @param: getpixel:     [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
  * @param: setpixel:     [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
@@ -239,11 +606,12 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _custom_ops(voi
  * @param: rlockregion:  [0..1] Optional extension to `rlock' (when not supplied, implemented in terms of `rlock')
  * @param: wlockregion:  [0..1] Optional extension to `wlock' (when not supplied, implemented in terms of `wlock')
  * @param: unlockregion: [0..1] Optional extension to `unlock' (when not supplied, implemented in terms of `unlock')
+ * @param: revoke:       [0..1] Optional callback invoked when the returned buffer is revoked.
  * @param: cookie:       [?..?] Cookie argument passed to all user-supplied operators */
 DEFINE_PUBLIC_ALIAS(video_buffer_forcustom, libvideo_buffer_forcustom);
-INTERN WUNUSED NONNULL((3, 5, 6)) REF struct video_buffer *CC
+INTERN WUNUSED NONNULL((3, 4, 5)) REF struct video_buffer *CC
 libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
-                          struct video_codec const *codec, struct video_palette *palette,
+                          struct video_format const *__restrict format,
                           video_buffer_custom_getpixel_t getpixel,
                           video_buffer_custom_setpixel_t setpixel,
                           video_buffer_custom_destroy_t destroy,
@@ -253,33 +621,43 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
                           video_buffer_custom_lockregion_t rlockregion,
                           video_buffer_custom_lockregion_t wlockregion,
                           video_buffer_custom_unlockregion_t unlockregion,
+                          video_buffer_custom_revoke_t revoke,
                           void *cookie) {
 	REF struct custom_buffer *result;
 	result = (REF struct custom_buffer *)malloc(sizeof(struct custom_buffer));
 	if unlikely (!result)
 		goto err;
-	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
-		palette = NULL;
-	result->vb_ops             = _custom_ops();
-	result->vb_domain          = _libvideo_ramdomain();
-	result->vb_format.vf_codec = codec;
-	result->vb_format.vf_pal   = palette;
-	if (palette)
-		video_palette_incref(palette);
-	result->vb_xdim         = size_x;
-	result->vb_ydim         = size_y;
-	result->vb_refcnt       = 1;
-	result->cb_getpixel     = getpixel;
-	result->cb_setpixel     = setpixel;
-	result->cb_destroy      = destroy;
-	result->cb_rlock        = rlock ? rlock : wlock;
-	result->cb_wlock        = wlock;
-	result->cb_unlock       = unlock;
-	result->cb_rlockregion  = rlockregion ? rlockregion : wlockregion;
-	result->cb_wlockregion  = wlockregion;
-	result->cb_unlockregion = unlockregion;
-	result->cb_cookie       = cookie;
+	result->vb_ops    = _custom_buffer_ops();
+	result->vb_domain = _libvideo_ramdomain();
+	result->vb_format = *format;
+	if (format->vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL) {
+		result->vb_format.vf_pal = NULL;
+	} else if (!result->vb_format.vf_pal) {
+		errno = EINVAL;
+		goto err_r;
+	} else {
+		video_palette_incref(result->vb_format.vf_pal);
+	}
+	result->vb_xdim          = size_x;
+	result->vb_ydim          = size_y;
+	result->vb_refcnt        = 1;
+	result->cbc_getpixel     = getpixel;
+	result->cbc_setpixel     = setpixel;
+	result->cbc_rlock        = rlock ? rlock : wlock;
+	result->cbc_wlock        = wlock;
+	result->cbc_unlock       = unlock;
+	result->cbc_rlockregion  = rlockregion ? rlockregion : wlockregion;
+	result->cbc_wlockregion  = wlockregion;
+	result->cbc_unlockregion = unlockregion;
+	result->cbc_cookie       = cookie;
+	result->cbc_inuse        = 0;
+	LIST_INIT(&result->cbc_subregion_list);
+	atomic_lock_init(&result->cbc_subregion_lock);
+	result->cb_destroy = destroy;
+	result->cb_revoke  = revoke;
 	return result;
+err_r:
+	free(result);
 err:
 	return NULL;
 }

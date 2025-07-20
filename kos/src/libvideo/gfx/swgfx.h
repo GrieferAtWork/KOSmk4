@@ -176,65 +176,67 @@ struct gfx_swdrv {
 
 #define video_swgfx_getdrv(self) \
 	((struct gfx_swdrv *)(self)->_vx_driver)
+#define video_swgfx_getcdrv(self) \
+	((struct gfx_swdrv const *)(self)->_vx_driver)
 
 /* Video GFX internal API wrappers */
 #define _video_swgfx_x_getcolor(self, x, y) \
-	(*video_swgfx_getdrv(self)->xsw_getcolor)(self, x, y)
+	(*video_swgfx_getcdrv(self)->xsw_getcolor)(self, x, y)
 #define _video_swgfx_x_putcolor(self, x, y, color) \
-	(*video_swgfx_getdrv(self)->xsw_putcolor)(self, x, y, color)
+	(*video_swgfx_getcdrv(self)->xsw_putcolor)(self, x, y, color)
 #define _video_swgfx_x_putcolor_p(self, x, y, color) \
-	(*video_swgfx_getdrv(self)->xsw_putcolor_p)(self, x, y, color)
+	(*video_swgfx_getcdrv(self)->xsw_putcolor_p)(self, x, y, color)
 #define _video_swgfx_x_getpixel(self, x, y) \
-	(*video_swgfx_getdrv(self)->xsw_getpixel)(self, x, y)
+	(*video_swgfx_getcdrv(self)->xsw_getpixel)(self, x, y)
 #define _video_swgfx_x_setpixel(self, x, y, pixel) \
-	(*video_swgfx_getdrv(self)->xsw_setpixel)(self, x, y, pixel)
+	(*video_swgfx_getcdrv(self)->xsw_setpixel)(self, x, y, pixel)
 #define _video_swgfx_x_absline_llhh(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_llhh)(self, x, y, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_llhh)(self, x, y, size_x, size_y, color)
 #define _video_swgfx_x_absline_lhhl(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_lhhl)(self, x, y, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_lhhl)(self, x, y, size_x, size_y, color)
 #define _video_swgfx_x_absline_h(self, x, y, length, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_h)(self, x, y, length, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_h)(self, x, y, length, color)
 #define _video_swgfx_x_absline_v(self, x, y, length, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_v)(self, x, y, length, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_v)(self, x, y, length, color)
 #define _video_swgfx_x_absfill(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absfill)(self, x, y, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absfill)(self, x, y, size_x, size_y, color)
 #define _video_swgfx_x_absfillmask(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm) \
-	(*video_swgfx_getdrv(self)->xsw_absfillmask)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm)
+	(*video_swgfx_getcdrv(self)->xsw_absfillmask)(self, dst_x, dst_y, size_x, size_y, bg_fg_colors, bm)
 #define _video_swgfx_x_absfillstretchmask(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm) \
-	(*video_swgfx_getdrv(self)->xsw_absfillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm)
+	(*video_swgfx_getcdrv(self)->xsw_absfillstretchmask)(self, dst_x, dst_y, dst_size_x, dst_size_y, bg_fg_colors, src_size_x, src_size_y, bm)
 #define _video_swgfx_x_absgradient(self, x, y, size_x, size_y, colors) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient)(self, x, y, size_x, size_y, colors)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient)(self, x, y, size_x, size_y, colors)
 #define _video_swgfx_x_absgradient_h(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient_h)(self, x, y, size_x, size_y, locolor, hicolor)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient_h)(self, x, y, size_x, size_y, locolor, hicolor)
 #define _video_swgfx_x_absgradient_v(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient_v)(self, x, y, size_x, size_y, locolor, hicolor)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient_v)(self, x, y, size_x, size_y, locolor, hicolor)
 
 #define _video_swgfx_x_getcolor_xyswap(self, x, y) \
-	(*video_swgfx_getdrv(self)->xsw_getcolor)(self, y, x)
+	(*video_swgfx_getcdrv(self)->xsw_getcolor)(self, y, x)
 #define _video_swgfx_x_putcolor_xyswap(self, x, y, color) \
-	(*video_swgfx_getdrv(self)->xsw_putcolor)(self, y, x, color)
+	(*video_swgfx_getcdrv(self)->xsw_putcolor)(self, y, x, color)
 #define _video_swgfx_x_putcolor_p_xyswap(self, x, y, color) \
-	(*video_swgfx_getdrv(self)->xsw_putcolor_p)(self, y, x, color)
+	(*video_swgfx_getcdrv(self)->xsw_putcolor_p)(self, y, x, color)
 #define _video_swgfx_x_getpixel_xyswap(self, x, y) \
-	(*video_swgfx_getdrv(self)->xsw_getpixel)(self, y, x)
+	(*video_swgfx_getcdrv(self)->xsw_getpixel)(self, y, x)
 #define _video_swgfx_x_setpixel_xyswap(self, x, y, pixel) \
-	(*video_swgfx_getdrv(self)->xsw_setpixel)(self, y, x, pixel)
+	(*video_swgfx_getcdrv(self)->xsw_setpixel)(self, y, x, pixel)
 #define _video_swgfx_x_absline_llhh_xyswap(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_llhh)(self, y, x, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_llhh)(self, y, x, size_x, size_y, color)
 #define _video_swgfx_x_absline_lhhl_xyswap(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_lhhl)(self, y, x, size_x, size_y, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_lhhl)(self, y, x, size_x, size_y, color)
 #define _video_swgfx_x_absline_h_xyswap(self, x, y, length, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_v)(self, y, x, length, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_v)(self, y, x, length, color)
 #define _video_swgfx_x_absline_v_xyswap(self, x, y, length, color) \
-	(*video_swgfx_getdrv(self)->xsw_absline_h)(self, y, x, length, color)
+	(*video_swgfx_getcdrv(self)->xsw_absline_h)(self, y, x, length, color)
 #define _video_swgfx_x_absfill_xyswap(self, x, y, size_x, size_y, color) \
-	(*video_swgfx_getdrv(self)->xsw_absfill)(self, y, x, size_y, size_x, color)
+	(*video_swgfx_getcdrv(self)->xsw_absfill)(self, y, x, size_y, size_x, color)
 #define _video_swgfx_x_absgradient_xyswap(self, x, y, size_x, size_y, colors) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient)(self, y, x, size_y, size_x, colors)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient)(self, y, x, size_y, size_x, colors)
 #define _video_swgfx_x_absgradient_h_xyswap(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient_v)(self, y, x, size_y, size_x, locolor, hicolor)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient_v)(self, y, x, size_y, size_x, locolor, hicolor)
 #define _video_swgfx_x_absgradient_v_xyswap(self, x, y, size_x, size_y, locolor, hicolor) \
-	(*video_swgfx_getdrv(self)->xsw_absgradient_h)(self, y, x, size_y, size_x, locolor, hicolor)
+	(*video_swgfx_getcdrv(self)->xsw_absgradient_h)(self, y, x, size_y, size_x, locolor, hicolor)
 
 
 /* Video GFX internal API wrappers (w/ assertions) */

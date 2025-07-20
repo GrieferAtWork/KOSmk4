@@ -252,11 +252,11 @@ NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self) {
  * - Add `return' to the chain of sub-regions of `self' (thus initializing `return->rbrvsr_chain')
  * - Fill in `return->vb_ops'
  * - Fill in `return->rbrvsr_xflags'
+ * - Adjust `return->rbrv_gfx.rbrvg_data'
  */
 PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_rambuffer_revokable_subregion *FCC
 rambuffer__subregion__common(struct video_buffer *__restrict self,
-                             struct video_crect const *__restrict rect,
-                             byte_t *self_data, size_t self_stride) {
+                             struct video_crect const *__restrict rect, size_t self_stride) {
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_subsubregion));
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_formem_subregion));
 	static_assert(offsetof(struct video_rambuffer_subregion, rbsr_base) == offsetof(struct video_rambuffer_subsubregion, rbssr_base));
@@ -273,7 +273,7 @@ rambuffer__subregion__common(struct video_buffer *__restrict self,
 	result->vb_refcnt = 1;
 	video_codec_xcoord_to_offset(result->vb_format.vf_codec, rect->vcr_xmin,
 	                             &x_byte_offset, &result->rbrvsr_xoff);
-	result->rbrv_gfx.rbrvg_data  = self_data + x_byte_offset + rect->vcr_ymin * self_stride;
+	result->rbrv_gfx.rbrvg_data  = (byte_t *)(x_byte_offset + rect->vcr_ymin * self_stride);
 	result->rbrv_gfx.rbrvg_inuse = 0;
 	result->rbrv_stride = self_stride;
 	result->rbrv_dummy  = libvideo_buffer_getdummy(result->vb_ydim * self_stride);
@@ -301,10 +301,9 @@ rambuffer__subregion(struct video_buffer *__restrict self,
                      gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_subregion *result;
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
-	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect,
-	                                                                              me->rb_data,
-	                                                                              me->rb_stride);
+	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect, me->rb_stride);
 	if likely(result) {
+		result->rbrv_gfx.rbrvg_data += (uintptr_t)me->rb_data;
 		result->rbrvsr_xflags = xor_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subregion_xoff_ops()
 		                                     : _rambuffer_subregion_ops();
@@ -323,14 +322,14 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_subsubregion *result;
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect,
-	                                                                                 video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx),
-	                                                                                 me->rbrv_stride);
+	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
 		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subsubregion_xoff_ops()
 		                                     : _rambuffer_subsubregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
+		/* Must read data base-pointer only now, in case buffer is being revoked right now */
+		result->rbrv_gfx.rbrvg_data += (uintptr_t)video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx);
 		LIST_INSERT_HEAD(&me->rbrvsr_subsubregions_list,
 		                 (struct video_rambuffer_revokable_subregion *)result, rbrvsr_chain);
 		atomic_lock_release(&me->rbrvsr_subsubregions_lock);
@@ -346,14 +345,14 @@ rambuffer_formem__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect,
-	                                                                                     video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx),
-	                                                                                     me->rbrv_stride);
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
 		result->rbrvsr_xflags = xor_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbfm_subregions_lock);
+		/* Must read data base-pointer only now, in case buffer is being revoked right now */
+		result->rbrv_gfx.rbrvg_data += (uintptr_t)video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx);
 		LIST_INSERT_HEAD((struct video_rambuffer_revokable_subregion_list *)&me->rbfm_subregions_list,
 		                 (struct video_rambuffer_revokable_subregion *)result, rbrvsr_chain);
 		atomic_lock_release(&me->rbfm_subregions_lock);
@@ -369,14 +368,14 @@ rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect,
-	                                                                                     video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx),
-	                                                                                     me->rbrv_stride);
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
 		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
+		/* Must read data base-pointer only now, in case buffer is being revoked right now */
+		result->rbrv_gfx.rbrvg_data += (uintptr_t)video_rambuffer_revokable_gfx_getdata(&me->rbrv_gfx);
 		LIST_INSERT_HEAD((struct video_rambuffer_revokable_subregion_list *)&me->rbrvsr_subsubregions_list,
 		                 (struct video_rambuffer_revokable_subregion *)result, rbrvsr_chain);
 		atomic_lock_release(&me->rbrvsr_subsubregions_lock);
@@ -461,6 +460,14 @@ DECL_END
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
+rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
+	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self->vx_buffer;
+	self->vx_flags = gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
+	return rambuffer_revokable__initgfx(self);
+}
+
+
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
                          rambuffer__initgfx, rambuffer__updategfx,
                          rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
@@ -472,7 +479,7 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_xcodec_ops, rambuffer_xcodec__destroy,
                          rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
                          rambuffer__revoke, rambuffer__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
-                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_subregion__revoke, rambuffer_subregion__subregion);
@@ -482,7 +489,7 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_xoff_ops, rambuffer_subregion__dest
                          rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
                          rambuffer_subregion__revoke, rambuffer_subregion__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subsubregion_ops, rambuffer_subsubregion__destroy,
-                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
@@ -503,7 +510,7 @@ DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_xcodec_ops, rambuffer_formem_xcodec__d
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_formem__revoke, rambuffer_formem__subregion);
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_subregion_ops, rambuffer_formem_subregion__destroy,
-                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_subregion__initgfx, rambuffer_revokable__updategfx,
                          rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
                          rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
                          rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);

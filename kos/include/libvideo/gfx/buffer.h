@@ -761,6 +761,7 @@ typedef __ATTR_OUT_T(2) int (LIBVIDEO_GFX_CC *video_buffer_custom_lock_t)(void *
 typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unlock_t)(void *__cookie, struct video_lock *__restrict __lock);
 typedef __ATTR_OUT_T(2) int (LIBVIDEO_GFX_CC *video_buffer_custom_lockregion_t)(void *__cookie, struct video_regionlock *__restrict __lock);
 typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unlockregion_t)(void *__cookie, struct video_regionlock *__restrict __lock);
+typedef void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_revoke_t)(void *__cookie);
 
 
 /* Construct a special video buffer which, rather than being backed by memory
@@ -771,12 +772,11 @@ typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unl
  * WARNING: The  given `__getpixel' / `__setpixel' callbacks better be
  *          fast, or any GFX on the returned buffer will take forever!
  *
- * @param: __size_x:   X dimension of the returned video buffer
- * @param: __size_y:   Y dimension of the returned video buffer
- * @param: __codec:    [1..1] Video codec used for color<=>pixel conversion, as
- *                            well  as pixel I/O (when __rlock/__wlock is given
- *                            and returns `0')
- * @param: __palette:      [0..1] Palette to-be used with `__codec' (if needed)
+ * @param: __size_x:       X dimension of the returned video buffer
+ * @param: __size_y:       Y dimension of the returned video buffer
+ * @param: __format:       [1..1] Video format used for color<=>pixel conversion, as
+ *                                well  as pixel I/O  (when __rlock/__wlock is given
+ *                                and returns `0')
  * @param: __getpixel:     [1..1] Mandatory pixel read operator (passed coords are absolute and guarantied in-bounds)
  * @param: __setpixel:     [1..1] Mandatory pixel write operator (passed coords are absolute and guarantied in-bounds)
  * @param: __destroy:      [0..1] Optional callback invoked when the returned buffer is destroyed
@@ -786,10 +786,11 @@ typedef __ATTR_IN_T(2) void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_unl
  * @param: __rlockregion:  [0..1] Optional extension to `__rlock' (when not supplied, implemented in terms of `__rlock')
  * @param: __wlockregion:  [0..1] Optional extension to `__wlock' (when not supplied, implemented in terms of `__wlock')
  * @param: __unlockregion: [0..1] Optional extension to `__unlock' (when not supplied, implemented in terms of `__unlock')
+ * @param: __revoke:       [0..1] Optional callback invoked when the returned buffer is revoked.
  * @param: __cookie:       [?..?] Cookie argument passed to all user-supplied operators */
-typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 5, 6)) __REF struct video_buffer *
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 4, 5)) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORCUSTOM)(video_dim_t __size_x, video_dim_t __size_y,
-                                           struct video_codec const *__codec, struct video_palette *__palette,
+                                           struct video_format const *__restrict __format,
                                            video_buffer_custom_getpixel_t __getpixel,
                                            video_buffer_custom_setpixel_t __setpixel,
                                            video_buffer_custom_destroy_t __destroy,
@@ -799,11 +800,12 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 5, 6)) __REF struct video_buffer *
                                            video_buffer_custom_lockregion_t __rlockregion,
                                            video_buffer_custom_lockregion_t __wlockregion,
                                            video_buffer_custom_unlockregion_t __unlockregion,
+                                           video_buffer_custom_revoke_t __revoke,
                                            void *__cookie);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3, 5, 6)) __REF struct video_buffer *LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((3, 4, 5)) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
-                       struct video_codec const *__codec, struct video_palette *__palette,
+                       struct video_format const *__restrict __format,
                        video_buffer_custom_getpixel_t __getpixel,
                        video_buffer_custom_setpixel_t __setpixel,
                        video_buffer_custom_destroy_t __destroy,
@@ -813,6 +815,7 @@ video_buffer_forcustom(video_dim_t __size_x, video_dim_t __size_y,
                        video_buffer_custom_lockregion_t __rlockregion,
                        video_buffer_custom_lockregion_t __wlockregion,
                        video_buffer_custom_unlockregion_t __unlockregion,
+                       video_buffer_custom_revoke_t __revoke,
                        void *__cookie);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 

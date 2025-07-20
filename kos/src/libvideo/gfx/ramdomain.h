@@ -199,6 +199,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable__updategfx(struct video_gfx *__restrict self, unsigned int what);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__initgfx(struct video_gfx *__restrict self);
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_revokable_xoff__updategfx(struct video_gfx *__restrict self, unsigned int what);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC rambuffer_subregion__initgfx(struct video_gfx *__restrict self);
 
 /* Helpers for setting video buffer operators for ram-buffer-compatible buffers */
 

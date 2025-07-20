@@ -85,7 +85,8 @@ typedef __UINT32_TYPE__ gfx_flag_t;
 
 /* XXX: When  "old_flags & VIDEO_GFX_F_XYSWAP",  I  believe  we  have  to  swap
  *      "more_flags & VIDEO_GFX_F_XMIRROR" / "more_flags & VIDEO_GFX_F_YMIRROR"
- *      before they are XOR'd with `old_flags' */
+ *      before they are XOR'd with `old_flags'
+ * TODO: Yes, the above needs to be done here, and also for "VIDEO_GFX_F_XWRAP" / "VIDEO_GFX_F_YWRAP" */
 #define gfx_flag_combine(old_flags, more_flags) \
 	((old_flags) ^ (more_flags))
 
