@@ -417,7 +417,7 @@ devvoid_v_newpart(struct mfile *__restrict UNUSED(self),
 				vec[i].mc_start = page;
 				vec[i].mc_size  = CONFIG_DEVVOID_PAGE_COUNT;
 			}
-			vec[i].mc_size = pages - (i * CONFIG_DEVVOID_PAGE_COUNT);
+			vec[chunks - 1].mc_size = pages - ((chunks - 1) * CONFIG_DEVVOID_PAGE_COUNT);
 			result->mp_state = MPART_ST_MEM_SC;
 			result->mp_mem_sc.ms_v = vec;
 			result->mp_mem_sc.ms_c = chunks;
