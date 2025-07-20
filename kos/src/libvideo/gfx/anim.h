@@ -43,11 +43,13 @@ libvideo_anim_fromframe(struct video_buffer *__restrict frame);
 
 /* Return  a wrapper  for `self'  that caches  animation frames during
  * the first loop, and simply replays them during any subsequent loop.
+ * @param: domain: When  non-null, animation frames are cached in this
+ *                 domain, rather than being kept in `self->va_domain'
  * @param: format: When non-null,  animation frames  are converted  into
- *                 this pixel format, rather than being copied verbatim.
- * @param: type:   The type of video buffer to use for cached images. */
-INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) REF struct video_anim *CC
+ *                 this pixel format, rather than being copied verbatim. */
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) REF struct video_anim *CC
 libvideo_anim_cached(struct video_anim *__restrict self,
+                     struct video_domain const *domain,
                      struct video_format const *format);
 
 DECL_END

@@ -651,9 +651,9 @@ int main(int argc, char *argv[]) {
 	 * - src format caching: ~95% spent sleeping  (=> x20 pixel output possible)
 	 * - dst format caching: ~97% spent sleeping  (=> x30 pixel output possible) */
 #if 0
-	anim = video_anim_cached(anim, NULL);
+	anim = video_anim_cached(anim, NULL, NULL);
 #elif 1
-	anim = video_anim_cached(anim, &bscreen->vb_format);
+	anim = video_anim_cached(anim, bscreen->vb_domain, &bscreen->vb_format);
 #endif
 	if unlikely(!anim)
 		err(EXIT_FAILURE, "Failed to cache animation");

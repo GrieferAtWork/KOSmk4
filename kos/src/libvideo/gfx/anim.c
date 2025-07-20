@@ -404,18 +404,26 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct video_anim_ops *CC _cached_anim_ops(void)
 
 /* Return  a wrapper  for `self'  that caches  animation frames during
  * the first loop, and simply replays them during any subsequent loop.
+ * @param: domain: When  non-null, animation frames are cached in this
+ *                 domain, rather than being kept in `self->va_domain'
  * @param: format: When non-null,  animation frames  are converted  into
- *                 this pixel format, rather than being copied verbatim.
- * @param: type:   The type of video buffer to use for cached images. */
+ *                 this pixel format, rather than being copied verbatim. */
 DEFINE_PUBLIC_ALIAS(video_anim_cached, libvideo_anim_cached);
-INTERN WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) REF struct video_anim *CC
+INTERN WUNUSED ATTR_INOUT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) REF struct video_anim *CC
 libvideo_anim_cached(struct video_anim *__restrict self,
+                     struct video_domain const *domain,
                      struct video_format const *format) {
 	REF struct cached_anim *result;
+	if (domain == NULL)
+		domain = self->va_domain;
 	if (self->va_ops == &cached_anim_ops) {
 		/* Check for special case: `self' is already cached and uses a compatible format */
 		struct cached_anim *me = (struct cached_anim *)self;
-		if (!format) {
+		if (format == NULL)
+			format = &me->ca_fmt;
+		if (format->vf_codec == me->ca_fmt.vf_codec &&
+		    format->vf_pal == me->ca_fmt.vf_pal &&
+		    me->va_domain == domain) {
 			video_anim_incref(me);
 			return me;
 		}
@@ -428,11 +436,12 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 		if (format == NULL)
 			format = &frame->vb_format;
 		if (frame->vb_format.vf_codec == format->vf_codec &&
-		    frame->vb_format.vf_pal == format->vf_pal) {
+		    frame->vb_format.vf_pal == format->vf_pal &&
+		    frame->vb_domain == domain) {
 			video_anim_incref(me);
 			return me;
 		}
-		converted = libvideo_buffer_convert(frame, me->va_domain, format);
+		converted = libvideo_buffer_convert(frame, domain, format);
 		if unlikely(!converted)
 			goto err;
 		oneframe_result = libvideo_anim_fromframe(converted);
@@ -443,7 +452,7 @@ libvideo_anim_cached(struct video_anim *__restrict self,
 	result = (REF struct cached_anim *)malloc(sizeof(struct cached_anim));
 	if unlikely(!result)
 		goto err;
-	result->va_domain = self->va_domain;
+	result->va_domain = domain ? domain : self->va_domain;
 	result->va_ops    = _cached_anim_ops();
 	result->va_xdim   = self->va_xdim;
 	result->va_ydim   = self->va_ydim;
