@@ -80,6 +80,29 @@ NOTHROW(FCC libvideo_buffer_noop_unlock)(struct video_buffer *__restrict self,
 	       (self)->vi_wlockregion  = &libvideo_buffer_notsup_wlockregion, \
 	       (self)->vi_unlockregion = &libvideo_buffer_noop_unlockregion)
 
+#define DEFINE_VIDEO_BUFFER_TYPE(name, vi_destroy_, vi_initgfx_, vi_updategfx_, vi_rlock_, vi_wlock_, \
+                                 vi_unlock_, vi_rlockregion_, vi_wlockregion_, vi_unlockregion_,      \
+                                 vi_revoke_, vi_subregion_)                                           \
+	INTERN struct video_buffer_ops name = {};                                                         \
+	INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _##name(void) {                  \
+		if unlikely(!name.vi_destroy) {                                                               \
+			name.vi_initgfx      = vi_initgfx_;                                                       \
+			name.vi_updategfx    = vi_updategfx_;                                                     \
+			name.vi_rlock        = vi_rlock_;                                                         \
+			name.vi_wlock        = vi_wlock_;                                                         \
+			name.vi_unlock       = vi_unlock_;                                                        \
+			name.vi_rlockregion  = vi_rlockregion_;                                                   \
+			name.vi_wlockregion  = vi_wlockregion_;                                                   \
+			name.vi_unlockregion = vi_unlockregion_;                                                  \
+			name.vi_revoke       = vi_revoke_;                                                        \
+			name.vi_subregion    = vi_subregion_;                                                     \
+			COMPILER_WRITE_BARRIER();                                                                 \
+			name.vi_destroy = &vi_destroy_;                                                           \
+			COMPILER_WRITE_BARRIER();                                                                 \
+		}                                                                                             \
+		return &name;                                                                                 \
+	}
+
 
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) int FCC
 libvideo_buffer_generic_rlockregion(struct video_buffer *__restrict self,

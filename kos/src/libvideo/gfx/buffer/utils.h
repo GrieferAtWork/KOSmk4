@@ -36,9 +36,7 @@ DECL_BEGIN
 
 /* Try to convert `x' into  a byte-offset then stored in  `*p_xoff'.
  * Make sure that the pixel specified by `x' starts at the beginning
- * of a byte, and that the resulting offset is properly aligned.
- * @return: true:  Success
- * @return: false: Failure */
+ * of a byte, and that the resulting offset is properly aligned. */
 LOCAL WUNUSED ATTR_IN(1) ATTR_OUT(3) ATTR_OUT(4) void
 NOTHROW(CC video_codec_xcoord_to_offset)(struct video_codec const *__restrict self,
                                          video_coord_t x, size_t *__restrict p_xoff,

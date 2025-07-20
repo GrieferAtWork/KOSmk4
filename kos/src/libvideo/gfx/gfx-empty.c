@@ -362,7 +362,7 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(void) {
 	if (!libvideo_emptybuffer.vb_ops) {
-		libvideo_emptybuffer.vb_domain = libvideo_ramdomain();
+		libvideo_emptybuffer.vb_domain = _libvideo_ramdomain();
 		libvideo_emptybuffer.vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer.vb_ops = _libvideo_emptybuffer_ops();

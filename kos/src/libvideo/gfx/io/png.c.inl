@@ -371,9 +371,9 @@ do_rgb_format:
 	result = video_domain_newbuffer(domain_hint, width, height, &result_format,
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
-		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain_)
+		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_png_ptr_info_ptr;
-		result = video_domain_newbuffer(libvideo_ramdomain(),
+		result = video_domain_newbuffer(_libvideo_ramdomain(),
 		                                width, height, &result_format,
 		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)

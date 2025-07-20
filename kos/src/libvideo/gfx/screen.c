@@ -492,7 +492,7 @@ find_hinted_mode:
 
 	/* Fill in remaining fields of "result" */
 	result->vb_refcnt     = 1;
-	result->vb_domain     = libvideo_ramdomain();
+	result->vb_domain     = _libvideo_ramdomain();
 	result->vb_ops        = &result->ss_ops.sbo_video;
 	result->vb_xdim       = mode->smi_resx;
 	result->vb_ydim       = mode->smi_resy;

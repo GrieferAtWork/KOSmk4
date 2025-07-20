@@ -77,9 +77,9 @@ struct video_rect {
 
 /* Check if "a" and "b" intersect, and if so: store that intersection and return true */
 __LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) __BOOL
-video_rect_intersect(struct video_rect const *__restrict __a,
-                     struct video_rect const *__restrict __b,
-                     struct video_rect *__restrict __intersect) {
+video_rect_intersect(struct video_rect const *__a,
+                     struct video_rect const *__b,
+                     struct video_rect *__intersect) {
 	video_offset_t __a_xend = video_rect_getxend(__a);
 	video_offset_t __a_yend = video_rect_getyend(__a);
 	video_offset_t __b_xend = video_rect_getxend(__b);
@@ -99,12 +99,38 @@ video_rect_intersect(struct video_rect const *__restrict __a,
 
 /* Same as `video_rect_intersect()', but safely handles overflow in "__b" */
 __LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) __BOOL
-video_rect_intersect_overflow_in_b(struct video_rect const *__restrict __a,
-                                   struct video_rect const *__restrict __b,
-                                   struct video_rect *__restrict __intersect) {
+video_rect_intersect_overflow_in_b(struct video_rect const *__a,
+                                   struct video_rect const *__b,
+                                   struct video_rect *__intersect) {
 	video_offset_t __b_xend, __b_yend, __intersect_xend, __intersect_yend;
 	video_offset_t __a_xend = video_rect_getxend(__a);
 	video_offset_t __a_yend = video_rect_getyend(__a);
+	if (__hybrid_overflow_sadd(video_rect_getxmin(__b), video_rect_getxdim(__b), &__b_xend))
+		__b_xend = VIDEO_OFFSET_MAX;
+	if (__hybrid_overflow_sadd(video_rect_getymin(__b), video_rect_getydim(__b), &__b_yend))
+		__b_yend = VIDEO_OFFSET_MAX;
+	__intersect_xend = __hybrid_min(__a_xend, __b_xend);
+	__intersect_yend = __hybrid_min(__a_yend, __b_yend);
+	video_rect_setxmin(__intersect, __hybrid_max(video_rect_getxmin(__a), video_rect_getxmin(__b)));
+	video_rect_setymin(__intersect, __hybrid_max(video_rect_getymin(__a), video_rect_getymin(__b)));
+	if (video_rect_getxmin(__intersect) < __intersect_xend && video_rect_getymin(__intersect) < __intersect_yend) {
+		video_rect_setxend(__intersect, __intersect_xend);
+		video_rect_setyend(__intersect, __intersect_yend);
+		return 1;
+	}
+	return 0;
+}
+
+
+__LOCAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) __BOOL
+video_rect_intersect_overflow(struct video_rect const *__a,
+                              struct video_rect const *__b,
+                              struct video_rect *__intersect) {
+	video_offset_t __a_xend, __a_yend, __b_xend, __b_yend, __intersect_xend, __intersect_yend;
+	if (__hybrid_overflow_sadd(video_rect_getxmin(__a), video_rect_getxdim(__a), &__a_xend))
+		__a_xend = VIDEO_OFFSET_MAX;
+	if (__hybrid_overflow_sadd(video_rect_getymin(__a), video_rect_getydim(__a), &__a_yend))
+		__a_yend = VIDEO_OFFSET_MAX;
 	if (__hybrid_overflow_sadd(video_rect_getxmin(__b), video_rect_getxdim(__b), &__b_xend))
 		__b_xend = VIDEO_OFFSET_MAX;
 	if (__hybrid_overflow_sadd(video_rect_getymin(__b), video_rect_getydim(__b), &__b_yend))

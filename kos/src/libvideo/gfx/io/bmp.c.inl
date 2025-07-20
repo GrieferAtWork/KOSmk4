@@ -213,7 +213,7 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 	};
 	video_coord_t y;
 	struct old_video_rambuffer *me = (struct old_video_rambuffer *)self;
-	assert(me->vb_domain == &libvideo_ramdomain_);
+	assert(me->vb_domain == &libvideo_ramdomain);
 	assert(me->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888);
 	assert(me->vb_format.vf_pal == NULL);
 	for (y = 0; y < me->vb_ydim; ++y) {
@@ -528,7 +528,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 
 	/* Check for special case: try to inherit BMP file and use as-is as video buffer. */
 	if (p_mapfile && biCompression == BI_BITFIELDS &&
-	    szPixelDataSize == szPixelDataSizeGot && domain_hint == &libvideo_ramdomain_) {
+	    szPixelDataSize == szPixelDataSizeGot && domain_hint == &libvideo_ramdomain) {
 		void *mapfile_cookie;
 		REF struct video_buffer *result;
 		if (out_vflipped)
@@ -537,7 +537,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		if unlikely(!mapfile_cookie)
 			goto err_pal;
 		mapfile_cookie = memcpy(mapfile_cookie, p_mapfile, sizeof(*p_mapfile));
-		result = video_domain_formem_ex(out_hasalpha_if_nonzero ? libvideo_ramdomain() : domain_hint,
+		result = video_domain_formem_ex(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
 		                                (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
 		                                &out_specs, result_pal, bPixelData, dwPixelScanline,
 		                                &unmap_mapfile_release_mem, mapfile_cookie,
@@ -552,7 +552,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 	}
 
 	/* Create result buffer */
-	result = video_domain_newbuffer_ex(out_hasalpha_if_nonzero ? libvideo_ramdomain() : domain_hint,
+	result = video_domain_newbuffer_ex(out_hasalpha_if_nonzero ? _libvideo_ramdomain() : domain_hint,
 	                                   (size_t)(ULONG)biWidth, (size_t)(ULONG)biHeight,
 	                                   &out_specs, result_pal, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result)
@@ -691,7 +691,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		}
 		assert(preferred_format.vf_codec->vc_specs.vcs_bpp > 8);
 		preferred_format.vf_pal = NULL;
-		converted_buffer = libvideo_buffer_convert(self, libvideo_ramdomain(), &preferred_format);
+		converted_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &preferred_format);
 		if unlikely(!converted_buffer)
 			return -1;
 		result = libvideo_buffer_save_bmp(converted_buffer, stream, options);

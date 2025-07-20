@@ -260,7 +260,7 @@ libvideo_buffer_forbitmask(video_dim_t size_x, video_dim_t size_y,
 	if likely(result) {
 		result = bitmask_buffer_init(result, size_x, size_y, bm, bg_fg_colors);
 		result->vb_refcnt = 1;
-		result->vb_domain = libvideo_ramdomain();
+		result->vb_domain = _libvideo_ramdomain();
 	}
 	return result;
 }

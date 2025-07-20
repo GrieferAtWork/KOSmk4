@@ -106,7 +106,7 @@ rambuffer_subregion__destroy(struct video_buffer *__restrict self) {
 INTERN NONNULL((1)) void FCC
 rambuffer_subsubregion__destroy(struct video_buffer *__restrict self) {
 	struct video_rambuffer_subsubregion *me = (struct video_rambuffer_subsubregion *)self;
-	REF struct video_rambuffer_subregion *base = me->rbssr_base;
+	REF struct video_rambuffer_subregion *base = atomic_read(&me->rbssr_base);
 	assertf(me->rbrv_gfx.rbrvg_inuse, "Non-zero 'rbrv_gfx.rbrvg_inuse' counter during finalization");
 	assertf(LIST_EMPTY(&me->rbrvsr_subsubregions_list), "Sub-sub-regions should have been holding references");
 	if (base) {
@@ -141,7 +141,7 @@ rambuffer_formem_xcodec__destroy(struct video_buffer *__restrict self) {
 INTERN NONNULL((1)) void FCC
 rambuffer_formem_subregion__destroy(struct video_buffer *__restrict self) {
 	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
-	REF struct video_rambuffer_formem *base = me->rbfmsr_base;
+	REF struct video_rambuffer_formem *base = atomic_read(&me->rbfmsr_base);
 	assertf(me->rbrv_gfx.rbrvg_inuse, "Non-zero 'rbrv_gfx.rbrvg_inuse' counter during finalization");
 	assertf(LIST_EMPTY(&me->rbrvsr_subsubregions_list), "Sub-regions should have been holding references");
 	if (base) {
@@ -168,7 +168,7 @@ NOTHROW(FCC rambuffer__revoke)(struct video_buffer *__restrict self) {
 			LIST_UNBIND(sr, rbrvsr_chain);
 		} else {
 			atomic_lock_release(&me->rb_subregions_lock);
-			sr = (struct video_rambuffer_subregion *)(*sr->vb_ops->vi_revoke)(sr);
+			sr = (struct video_rambuffer_subregion *)video_buffer_revoke(sr);
 			video_buffer_decref(sr);
 			atomic_lock_acquire(&me->rb_subregions_lock);
 		}
@@ -194,7 +194,7 @@ NOTHROW(FCC rambuffer_revokable_subregion__revoke)(struct video_rambuffer_revoka
 			LIST_UNBIND(sr, rbrvsr_chain);
 		} else {
 			atomic_lock_release(&me->rbrvsr_subsubregions_lock);
-			sr = (struct video_rambuffer_revokable_subregion *)(*sr->vb_ops->vi_revoke)(sr);
+			sr = (struct video_rambuffer_revokable_subregion *)video_buffer_revoke(sr);
 			video_buffer_decref(sr);
 			atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
 		}
@@ -230,7 +230,7 @@ NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self) {
 			LIST_UNBIND(sr, rbrvsr_chain);
 		} else {
 			atomic_lock_release(&me->rbfm_subregions_lock);
-			sr = (struct video_rambuffer_formem_subregion *)(*sr->vb_ops->vi_revoke)(sr);
+			sr = (struct video_rambuffer_formem_subregion *)video_buffer_revoke(sr);
 			video_buffer_decref(sr);
 			atomic_lock_acquire(&me->rbfm_subregions_lock);
 		}
@@ -251,11 +251,12 @@ NOTHROW(FCC rambuffer_formem__revoke)(struct video_buffer *__restrict self) {
 /* Common base for creation a sub-region. Caller must still:
  * - Add `return' to the chain of sub-regions of `self' (thus initializing `return->rbrvsr_chain')
  * - Fill in `return->vb_ops'
+ * - Fill in `return->rbrvsr_xflags'
  */
 PRIVATE WUNUSED ATTR_INOUT(1) ATTR_IN(2) REF struct video_rambuffer_revokable_subregion *FCC
 rambuffer__subregion__common(struct video_buffer *__restrict self,
                              struct video_crect const *__restrict rect,
-                             gfx_flag_t xor_flags, byte_t *self_data, size_t self_stride) {
+                             byte_t *self_data, size_t self_stride) {
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_subsubregion));
 	static_assert(sizeof(struct video_rambuffer_subregion) == sizeof(struct video_rambuffer_formem_subregion));
 	static_assert(offsetof(struct video_rambuffer_subregion, rbsr_base) == offsetof(struct video_rambuffer_subsubregion, rbssr_base));
@@ -282,7 +283,6 @@ rambuffer__subregion__common(struct video_buffer *__restrict self,
 /*	result->rbrvsr_chain = ...; // Initialized by caller */
 	LIST_INIT(&result->rbrvsr_subsubregions_list);
 	atomic_lock_init(&result->rbrvsr_subsubregions_lock);
-	result->rbrvsr_xflags = xor_flags;
 	result->rbsr_base = (REF struct video_rambuffer *)self;
 
 	video_buffer_incref(self); /* for "result->rbsr_base" */
@@ -301,10 +301,11 @@ rambuffer__subregion(struct video_buffer *__restrict self,
                      gfx_flag_t xor_flags) {
 	REF struct video_rambuffer_subregion *result;
 	struct video_rambuffer *me = (struct video_rambuffer *)self;
-	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect, xor_flags,
+	result = (REF struct video_rambuffer_subregion *)rambuffer__subregion__common(me, rect,
 	                                                                              me->rb_data,
 	                                                                              me->rb_stride);
 	if likely(result) {
+		result->rbrvsr_xflags = xor_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subregion_xoff_ops()
 		                                     : _rambuffer_subregion_ops();
 		atomic_lock_acquire(&me->rb_subregions_lock);
@@ -322,10 +323,11 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_subsubregion *result;
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self;
 	atomic_inc(&me->rbrv_gfx.rbrvg_inuse);
-	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect, xor_flags,
+	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect,
 	                                                                                 atomic_read(&me->rbrv_gfx.rbrvg_data),
 	                                                                                 me->rbrv_stride);
 	if likely(result) {
+		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subsubregion_xoff_ops()
 		                                     : _rambuffer_subsubregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -344,10 +346,11 @@ rambuffer_formem__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem *me = (struct video_rambuffer_formem *)self;
 	atomic_inc(&me->rbrv_gfx.rbrvg_inuse);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, xor_flags,
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect,
 	                                                                                     atomic_read(&me->rbrv_gfx.rbrvg_data),
 	                                                                                     me->rbrv_stride);
 	if likely(result) {
+		result->rbrvsr_xflags = xor_flags;
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbfm_subregions_lock);
@@ -366,10 +369,11 @@ rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
 	REF struct video_rambuffer_formem_subregion *result;
 	struct video_rambuffer_formem_subregion *me = (struct video_rambuffer_formem_subregion *)self;
 	atomic_inc(&me->rbrv_gfx.rbrvg_inuse);
-	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, xor_flags,
+	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect,
 	                                                                                     atomic_read(&me->rbrv_gfx.rbrvg_data),
 	                                                                                     me->rbrv_stride);
 	if likely(result) {
+		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, xor_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -457,80 +461,57 @@ DECL_END
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
-#define DEFINE_RAMBUFFER_TYPE(name, vi_destroy_, vi_initgfx_, vi_updategfx_, vi_rlock_, vi_wlock_, \
-                              vi_unlock_, vi_rlockregion_, vi_wlockregion_, vi_unlockregion_,      \
-                              vi_revoke_, vi_subregion_)                                           \
-	INTERN struct video_buffer_ops name = {};                                                      \
-	INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _##name(void) {               \
-		if unlikely(!name.vi_destroy) {                                                            \
-			name.vi_initgfx      = vi_initgfx_;                                                    \
-			name.vi_updategfx    = vi_updategfx_;                                                  \
-			name.vi_rlock        = vi_rlock_;                                                      \
-			name.vi_wlock        = vi_wlock_;                                                      \
-			name.vi_unlock       = vi_unlock_;                                                     \
-			name.vi_rlockregion  = vi_rlockregion_;                                                \
-			name.vi_wlockregion  = vi_wlockregion_;                                                \
-			name.vi_unlockregion = vi_unlockregion_;                                               \
-			name.vi_revoke       = vi_revoke_;                                                     \
-			name.vi_subregion    = vi_subregion_;                                                  \
-			COMPILER_WRITE_BARRIER();                                                              \
-			name.vi_destroy = &vi_destroy_;                                                        \
-			COMPILER_WRITE_BARRIER();                                                              \
-		}                                                                                          \
-		return &name;                                                                              \
-	}
-DEFINE_RAMBUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
-                      rambuffer__initgfx, rambuffer__updategfx,
-                      rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                      rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                      rambuffer__revoke, rambuffer__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_xcodec_ops, rambuffer_xcodec__destroy,
-                      rambuffer__initgfx, rambuffer__updategfx,
-                      rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
-                      rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
-                      rambuffer__revoke, rambuffer__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
-                      rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                      rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                      rambuffer_subregion__revoke, rambuffer_subregion__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_subregion_xoff_ops, rambuffer_subregion__destroy,
-                      rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
-                      libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
-                      rambuffer_subregion__revoke, rambuffer_subregion__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_subsubregion_ops, rambuffer_subsubregion__destroy,
-                      rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                      rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                      rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_subsubregion_xoff_ops, rambuffer_subsubregion__destroy,
-                      rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
-                      libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
-                      rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
+                         rambuffer__initgfx, rambuffer__updategfx,
+                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
+                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
+                         rambuffer__revoke, rambuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_xcodec_ops, rambuffer_xcodec__destroy,
+                         rambuffer__initgfx, rambuffer__updategfx,
+                         rambuffer__lock, rambuffer__lock, libvideo_buffer_noop_unlock,
+                         rambuffer__lockregion, rambuffer__lockregion, libvideo_buffer_noop_unlockregion,
+                         rambuffer__revoke, rambuffer__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_ops, rambuffer_subregion__destroy,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
+                         rambuffer_subregion__revoke, rambuffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subregion_xoff_ops, rambuffer_subregion__destroy,
+                         rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
+                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
+                         rambuffer_subregion__revoke, rambuffer_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subsubregion_ops, rambuffer_subsubregion__destroy,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
+                         rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_subsubregion_xoff_ops, rambuffer_subsubregion__destroy,
+                         rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
+                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
+                         rambuffer_subsubregion__revoke, rambuffer_subsubregion__subregion);
 
-DEFINE_RAMBUFFER_TYPE(rambuffer_formem_ops, rambuffer_formem__destroy,
-                      rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                      rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                      rambuffer_formem__revoke, rambuffer_formem__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_formem_xcodec_ops, rambuffer_formem_xcodec__destroy,
-                      rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                      rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                      rambuffer_formem__revoke, rambuffer_formem__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_formem_subregion_ops, rambuffer_formem_subregion__destroy,
-                      rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
-                      rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
-                      rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);
-DEFINE_RAMBUFFER_TYPE(rambuffer_formem_subregion_xoff_ops, rambuffer_formem_subregion__destroy,
-                      rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
-                      libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
-                      rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
-                      rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);
-#undef DEFINE_RAMBUFFER_TYPE
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_ops, rambuffer_formem__destroy,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
+                         rambuffer_formem__revoke, rambuffer_formem__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_xcodec_ops, rambuffer_formem_xcodec__destroy,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
+                         rambuffer_formem__revoke, rambuffer_formem__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_subregion_ops, rambuffer_formem_subregion__destroy,
+                         rambuffer_revokable__initgfx, rambuffer_revokable__updategfx,
+                         rambuffer_revokable__lock, rambuffer_revokable__lock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable__lockregion, rambuffer_revokable__lockregion, rambuffer_revokable__unlockregion,
+                         rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);
+DEFINE_VIDEO_BUFFER_TYPE(rambuffer_formem_subregion_xoff_ops, rambuffer_formem_subregion__destroy,
+                         rambuffer_revokable_xoff__initgfx, rambuffer_revokable_xoff__updategfx,
+                         libvideo_buffer_notsup_rlock, libvideo_buffer_notsup_wlock, libvideo_buffer_noop_unlock,
+                         rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__lockregion, rambuffer_revokable_xoff__unlockregion,
+                         rambuffer_formem_subregion__revoke, rambuffer_formem_subregion__subregion);
 
 
 
@@ -785,7 +766,7 @@ libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
 
 
 
-INTERN struct video_domain libvideo_ramdomain_ = {};
+INTERN struct video_domain libvideo_ramdomain = {};
 
 /* Returns the default, built-in "RAM" video domain.
  *
@@ -795,19 +776,19 @@ INTERN struct video_domain libvideo_ramdomain_ = {};
  * On the plus side: these buffers are generally able to do
  * much more than buffers from hardware domains, given that
  * they can support **any** video codec. */
-DEFINE_PUBLIC_ALIAS(video_ramdomain, libvideo_ramdomain);
+DEFINE_PUBLIC_ALIAS(video_ramdomain, _libvideo_ramdomain);
 INTERN /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED
-struct video_domain const *CC libvideo_ramdomain(void) {
-	if unlikely(!libvideo_ramdomain_.vd_newbuffer) {
-		libvideo_ramdomain_.vd_supported_codec = &libvideo_ramdomain_supported_codec;
-		libvideo_ramdomain_.vd_formem_ex       = &libvideo_ramdomain_formem_ex;
-		libvideo_ramdomain_.vd_formem          = &libvideo_ramdomain_formem;
-		libvideo_ramdomain_.vd_newbuffer_ex    = &libvideo_ramdomain_newbuffer_ex;
+struct video_domain const *CC _libvideo_ramdomain(void) {
+	if unlikely(!libvideo_ramdomain.vd_newbuffer) {
+		libvideo_ramdomain.vd_supported_codec = &libvideo_ramdomain_supported_codec;
+		libvideo_ramdomain.vd_formem_ex       = &libvideo_ramdomain_formem_ex;
+		libvideo_ramdomain.vd_formem          = &libvideo_ramdomain_formem;
+		libvideo_ramdomain.vd_newbuffer_ex    = &libvideo_ramdomain_newbuffer_ex;
 		COMPILER_WRITE_BARRIER();
-		libvideo_ramdomain_.vd_newbuffer = &libvideo_ramdomain_newbuffer;
+		libvideo_ramdomain.vd_newbuffer = &libvideo_ramdomain_newbuffer;
 		COMPILER_WRITE_BARRIER();
 	}
-	return &libvideo_ramdomain_;
+	return &libvideo_ramdomain;
 }
 
 DECL_END

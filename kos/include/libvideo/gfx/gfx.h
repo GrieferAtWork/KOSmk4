@@ -83,6 +83,12 @@ __DECL_BEGIN
 /* Set of `VIDEO_GFX_F*' */
 typedef __UINT32_TYPE__ gfx_flag_t;
 
+/* XXX: When  "old_flags & VIDEO_GFX_F_XYSWAP",  I  believe  we  have  to  swap
+ *      "more_flags & VIDEO_GFX_F_XMIRROR" / "more_flags & VIDEO_GFX_F_YMIRROR"
+ *      before they are XOR'd with `old_flags' */
+#define gfx_flag_combine(old_flags, more_flags) \
+	((old_flags) ^ (more_flags))
+
 struct video_buffer;
 struct video_gfxhdr;
 struct video_gfx;

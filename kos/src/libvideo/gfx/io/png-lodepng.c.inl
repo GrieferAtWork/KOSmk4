@@ -168,7 +168,7 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 	                             &png_release_mem_free, NULL,
 	                             VIDEO_DOMAIN_FORMEM_F_NORMAL);
 	if unlikely(!result) {
-		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain_)
+		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_out;
 		result = video_domain_formem(domain_hint, w, h, &format, out, stride,
 		                             &png_release_mem_free, NULL,
@@ -233,7 +233,7 @@ libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
 		return NULL;
 	}
 	format.vf_pal = NULL;
-	return libvideo_buffer_convert(self, libvideo_ramdomain(), &format);
+	return libvideo_buffer_convert(self, _libvideo_ramdomain(), &format);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2)) int CC

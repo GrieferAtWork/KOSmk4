@@ -49,10 +49,10 @@ DECL_BEGIN
 
 
 /* Return the video domain to-be-used for a wrapper of `base' */
-#if 1
+#if 1 /* TODO: REMOVE THIS (also: wrappers need to use "_libvideo_ramdomain()"!) */
 #define video_buffer_domain_for_wrapper(base) (base)->vb_domain
 #else
-#define video_buffer_domain_for_wrapper(base) libvideo_ramdomain()
+#define video_buffer_domain_for_wrapper(base) _libvideo_ramdomain()
 #endif
 
 /* Define and link  optimized fast-pass  pixel
@@ -327,8 +327,8 @@ libvideo_ramdomain_supported_codec(struct video_domain const *__restrict self,
  * On the plus side: these buffers are generally able to do
  * much more than buffers from hardware domains, given that
  * they can support **any** video codec. */
-INTDEF /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED struct video_domain const *CC libvideo_ramdomain(void);
-INTDEF struct video_domain libvideo_ramdomain_;
+INTDEF /*ATTR_CONST*/ ATTR_RETNONNULL WUNUSED struct video_domain const *CC _libvideo_ramdomain(void);
+INTDEF struct video_domain libvideo_ramdomain;
 
 DECL_END
 

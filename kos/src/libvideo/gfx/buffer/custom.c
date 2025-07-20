@@ -261,7 +261,7 @@ libvideo_buffer_forcustom(video_dim_t size_x, video_dim_t size_y,
 	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
 		palette = NULL;
 	result->vb_ops             = _custom_ops();
-	result->vb_domain          = libvideo_ramdomain();
+	result->vb_domain          = _libvideo_ramdomain();
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;
 	if (palette)

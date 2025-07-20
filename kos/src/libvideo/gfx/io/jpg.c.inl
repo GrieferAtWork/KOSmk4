@@ -417,9 +417,9 @@ err_wrong_fmt:
 	result = video_domain_newbuffer(domain_hint, result_size_x, result_size_y,
 	                                &result_format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
-		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain_)
+		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
 			goto err_errno;
-		result = video_domain_newbuffer(libvideo_ramdomain(), result_size_x, result_size_y,
+		result = video_domain_newbuffer(_libvideo_ramdomain(), result_size_x, result_size_y,
 		                                &result_format, VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
 			goto err_errno;
@@ -502,7 +502,7 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 			return -1;
 		}
 		in_format.vf_pal = NULL;
-		conv_buffer = libvideo_buffer_convert(self, libvideo_ramdomain(), &in_format);
+		conv_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &in_format);
 		if unlikely(!conv_buffer)
 			return -1;
 		result = libvideo_buffer_save_jpg(conv_buffer, stream, options);
