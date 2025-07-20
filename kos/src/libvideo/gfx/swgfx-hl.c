@@ -42,7 +42,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-#include "buffer/bitmask.h"
+#include "buffer/old-bitmask.h" /* TODO: Get rid of mask-fill operators */
 #include "gfx-empty.h"
 #include "gfx-utils.h"
 #include "swgfx.h"
@@ -329,11 +329,11 @@ libvideo_swgfx_fillmask_byblit(struct video_gfx const *__restrict self,
                                video_color_t const bg_fg_colors[2],
                                struct video_bitmask const *__restrict bm) {
 	struct video_gfx bm_gfx, *pgfx;
-	struct bitmask_buffer temp, *pbuf;
-	pbuf = bitmask_buffer_init(&temp, size_x, size_y, bm, bg_fg_colors);
+	struct old_bitmask_buffer temp, *pbuf;
+	pbuf = old_bitmask_buffer_init(&temp, size_x, size_y, bm, bg_fg_colors);
 	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	video_gfx_bitblit(self, dst_x, dst_y, pgfx, 0, 0, size_x, size_y);
-	bitmask_buffer_fini(pbuf);
+	old_bitmask_buffer_fini(pbuf);
 }
 
 
@@ -345,12 +345,12 @@ libvideo_swgfx_fillstretchmask_byblit(struct video_gfx const *__restrict self,
                                       video_dim_t src_size_x, video_dim_t src_size_y,
                                       struct video_bitmask const *__restrict bm) {
 	struct video_gfx bm_gfx, *pgfx;
-	struct bitmask_buffer temp, *pbuf;
-	pbuf = bitmask_buffer_init(&temp, src_size_x, src_size_y, bm, bg_fg_colors);
+	struct old_bitmask_buffer temp, *pbuf;
+	pbuf = old_bitmask_buffer_init(&temp, src_size_x, src_size_y, bm, bg_fg_colors);
 	pgfx = video_buffer_getgfx(pbuf, &bm_gfx, GFX_BLENDMODE_OVERRIDE, VIDEO_GFX_F_NORMAL, 0);
 	video_gfx_stretch(self, dst_x, dst_y, dst_size_x, dst_size_y,
 	                  pgfx, 0, 0, src_size_x, src_size_y);
-	bitmask_buffer_fini(pbuf);
+	old_bitmask_buffer_fini(pbuf);
 }
 
 DECL_END

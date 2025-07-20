@@ -679,36 +679,6 @@ __CXXDECL_END
 __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 
 
-#if 1 /* TODO: BEGIN DEPRECATED */
-
-/* Create a video buffer that represents the pixel data defined by  a
- * given `__bm' (bitmask). This function is primarily used internally
- * by `video_gfx_absfillmask()' and  `video_gfx_absfillstretchmask()'
- * to deal with  GFX contexts  where the bitmask  cannot be  rendered
- * using  the default method,  but has to be  rendered by being blit.
- *
- * @param: __size_x:       Width of the given `__bm' (in pixels)
- * @param: __size_y:       Height of the given `__bm' (in pixels)
- * @param: __bm:           Bitmask whose data should be referenced interpreted
- * @param: __bg_fg_colors: Colors that 0/1 bits of `__bm' should map to
- * @return: * :   The newly created video buffer
- * @return: NULL: [errno=ENOMEM] Insufficient memory (won't happen when
- *                               used internally, where struct is  just
- *                               allocated on-stack) */
-typedef __ATTR_WUNUSED_T __ATTR_IN_T(3) __ATTR_IN_T(4) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORBITMASK)(video_dim_t __size_x, video_dim_t __size_y,
-                                            struct video_bitmask const *__restrict __bm,
-                                            video_color_t const __bg_fg_colors[2]);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_IN(4) __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_buffer_forbitmask(video_dim_t __size_x, video_dim_t __size_y,
-                        struct video_bitmask const *__restrict __bm,
-                        video_color_t const __bg_fg_colors[2]);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
-#endif /* TODO: END DEPRECATED */
-
-
 /* Convert `__self' into the specified domain and format. */
 typedef __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __ATTR_NONNULL_T((2)) __ATTR_IN_T(3) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CONVERT)(struct video_buffer *__restrict __self,
@@ -768,6 +738,11 @@ typedef void __NOTHROW_T(LIBVIDEO_GFX_CC *video_buffer_custom_revoke_t)(void *__
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((3, 4, 5)) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FORCUSTOM)(video_dim_t __size_x, video_dim_t __size_y,
                                            struct video_format const *__restrict __format,
+                                           /* TODO: Instead of passing each operator individually,
+                                            *       define  a helper struct that packages them all
+                                            *       together, and document  that said struct  gets
+                                            *       copied (and doesn't need to remain valid) once
+                                            *       this call returns. */
                                            video_buffer_custom_getpixel_t __getpixel,
                                            video_buffer_custom_setpixel_t __setpixel,
                                            video_buffer_custom_destroy_t __destroy,
