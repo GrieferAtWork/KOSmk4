@@ -122,7 +122,7 @@ LOCAL_rambuffer__initgfx(struct video_gfx *__restrict self) {
 	drv->grdc_stride = me->rbrv_stride;
 	drv->grdrv_gfx   = &me->rbrv_gfx;
 	drv->grdrvx_xoff = me->rbrvsr_xoff;
-	self->vx_flags = gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
+	self->vx_flags = video_gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
 #endif /* !DEFINE_rambuffer__initgfx */
 
 	/* Initialize GFX as a full clip */

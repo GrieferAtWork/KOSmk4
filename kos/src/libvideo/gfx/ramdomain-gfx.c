@@ -50,7 +50,7 @@ DECL_BEGIN
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self->vx_buffer;
-	self->vx_flags = gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
+	self->vx_flags = video_gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
 	return rambuffer_revokable__initgfx(self);
 }
 

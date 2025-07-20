@@ -706,17 +706,6 @@ video_buffer_forbitmask(video_dim_t __size_x, video_dim_t __size_y,
                         video_color_t const __bg_fg_colors[2]);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
-/* Return the preferred video format.
- * If  possible, this format will match the format used by the host's graphics card.
- * If no graphics card exists, or the card isn't clear on its preferred format, some
- * other, common format will be returned instead. */
-typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *
-(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
-#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *
-LIBVIDEO_GFX_CC video_preferred_format(void);
-#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
-
 #endif /* TODO: END DEPRECATED */
 
 
@@ -885,27 +874,44 @@ video_buffer_region(struct video_buffer *__restrict __self,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
-
-
-/* Return a video buffer that  will always (forcefully) re-return  `__self'
- * whenever a GFX context is requested. Additionally, video locks will fail
- * when pixels represented by `__self'  cannot represented as a video  lock
- * (e.g.  the Clip-  and I/O-Rects don't  match, or the  Clip Rect's bounds
- * don't end up at some whole-byte boundary,  or don't end up aligned to  a
- * degree that is  sufficient for  the codec  of `__self',  or `__self'  is
- * making using of some rotation/mirror GFX flags).
+/* Return a video buffer  that simulates the clipping/rotation  behavior
+ * of the given GFX context `__self'. Other GFX pixel modification flags
+ * that  are unrelated  to rotation/mirroring  are also  retained by the
+ * returned buffer (e.g. VIDEO_GFX_F_BLUR is retained).
  *
- * If you want to guaranty that the returned buffer is still lockable, you
- * should wrap it again using `video_buffer_lockable()'.
+ * Note that the returned buffer only retains:
+ * - Clip Rect
+ * - I/O Rect
+ * - GFX Flags
  *
- * @return: * :   A video buffer representing the Clip Rect of `__self'
+ * It does not retain:
+ * - Blend Mode
+ * - Color Key
+ *
+ * Note that unlike `video_buffer_region()', which still allows for use
+ * of video locks being applied to the returned buffer when rotation is
+ * being used (with those locks then used to access un-rotated pixels),
+ * the  buffer returned by this function REJECTS video locks when pixel
+ * data is transformed in any way that cannot be represented using only
+ * I/O rects. As such, you may need to use `video_buffer_lockable()' on
+ * the returned buffer in order to make it lockable (if you wish to use
+ * pixel data in a rotated/mirrored form).
+ *
+ * NOTE: Revoking pixel access on the returned buffer, or other types
+ *       of buffers derived from it may also revoke pixel access from
+ *       `__self', so use with care.
+ *
+ * @return: * :   A video buffer representing the given `__self'
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
 typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *POLD_VIDEO_BUFFER_FROMGFX)(struct video_gfx const *__restrict __self);
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FROMGFX)(struct video_gfx const *__restrict __self);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
-old_video_buffer_fromgfx(struct video_gfx const *__restrict __self);
+video_buffer_fromgfx(struct video_gfx const *__restrict __self);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+
+
 
 
 /* Various functions  for opening  a file/stream/blob  as an  image  file.

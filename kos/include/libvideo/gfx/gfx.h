@@ -40,6 +40,7 @@
 #endif /* __cplusplus */
 
 #ifndef __INTELLISENSE__
+#include "../rect.h"
 #include <libc/string.h>
 #endif /* !__INTELLISENSE__ */
 
@@ -95,7 +96,7 @@ typedef __UINT32_TYPE__ video_gfx_flag_t;
 
 /* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED video_gfx_flag_t
-gfx_flag_combine(video_gfx_flag_t __old_flags, video_gfx_flag_t __more_flags) {
+video_gfx_flag_combine(video_gfx_flag_t __old_flags, video_gfx_flag_t __more_flags) {
 	if (__old_flags & VIDEO_GFX_F_XYSWAP) {
 		__more_flags = (__more_flags & ~(_VIDEO_GFX_XFLAGS | _VIDEO_GFX_YFLAGS)) |
 		               ((__more_flags & _VIDEO_GFX_XFLAGS) << _VIDEO_GFX_FLAGS_X_TO_Y_LSHIFT) |
@@ -584,6 +585,9 @@ extern __ATTR_RETNONNULL __ATTR_INOUT(1) struct video_gfx *
 video_gfx_clip(struct video_gfx *__restrict __self,
                video_offset_t __clip_x, video_offset_t __clip_y,
                video_dim_t __size_x, video_dim_t __size_y);
+extern __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_IN(2) struct video_gfx *
+video_gfx_cliprect(struct video_gfx *__restrict __self,
+                   struct video_rect const *__restrict __rect);
 
 
 /* Translate virtual (offset) pixel coords to physical (coord) coords.
@@ -755,6 +759,8 @@ video_gfx_stretch3(struct video_gfx const *__wrdst, video_offset_t __wrdst_x, vi
 #define video_gfx_getflags(self)              ((self)->vx_flags)
 #define video_gfx_clip(self, clip_x, clip_y, size_x, size_y) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_clip)(self, clip_x, clip_y, size_x, size_y)
+#define video_gfx_cliprect(self, rect) \
+	video_gfx_clip(self, (rect)->vr_xmin, (rect)->vr_ymin, (rect)->vr_xdim, (rect)->vr_ydim)
 #define video_gfx_offset2coord(self, x, y, coords) \
 	(*(self)->vx_hdr.vxh_ops->vgfo_offset2coord)(self, x, y, coords)
 #define video_gfx_coord2offset(self, x, y, offsets) \

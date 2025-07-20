@@ -215,7 +215,7 @@ lockable_buffer_subregion__subregion(struct video_buffer *__restrict self,
                                      video_gfx_flag_t gfx_flags) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self;
 	return lockable_buffer__subregion_impl(me, rect,
-	                                       gfx_flag_combine(me->lbsb_gfx, gfx_flags),
+	                                       video_gfx_flag_combine(me->lbsb_gfx, gfx_flags),
 	                                       me->lbsb_xoff, me->lbsb_yoff);
 }
 
@@ -690,7 +690,7 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 lockable_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct lockable_buffer_subregion *me = (struct lockable_buffer_subregion *)self->vx_buffer;
 	struct video_buffer *base = me->lbb_base;
-	self->vx_flags = gfx_flag_combine(me->lbsb_gfx, self->vx_flags);
+	self->vx_flags = video_gfx_flag_combine(me->lbsb_gfx, self->vx_flags);
 	self->vx_buffer = base; /* This is allowed! */
 	self = (*base->vb_ops->vi_initgfx)(self);
 	/* Set clip rect to our relevant sub-region */

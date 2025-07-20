@@ -240,7 +240,7 @@ custom_buffer_subregion__subregion(struct video_buffer *__restrict self,
                                    video_gfx_flag_t gfx_flags) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self;
 	return custom_buffer__subregion_impl(me, rect,
-	                                     gfx_flag_combine(me->cbsr_gfx, gfx_flags),
+	                                     video_gfx_flag_combine(me->cbsr_gfx, gfx_flags),
 	                                     me->cbsr_xoff,
 	                                     me->cbsr_yoff);
 }
@@ -508,7 +508,7 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 	struct custom_buffer_subregion *me  = (struct custom_buffer_subregion *)self->vx_buffer;
 	struct gfx_swdrv *drv = video_swgfx_getdrv(self);
-	self->vx_flags = gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
+	self->vx_flags = video_gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
 	libvideo_gfx_init_fullclip(self);
 
 	/* Default pixel accessors */
@@ -523,7 +523,7 @@ custom_buffer_subregion__initgfx(struct video_gfx *__restrict self) {
 INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 custom_buffer_subregion_nooff__initgfx(struct video_gfx *__restrict self) {
 	struct custom_buffer_subregion *me = (struct custom_buffer_subregion *)self->vx_buffer;
-	self->vx_flags = gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
+	self->vx_flags = video_gfx_flag_combine(me->cbsr_gfx, self->vx_flags);
 	return custom_buffer__initgfx(self);
 }
 

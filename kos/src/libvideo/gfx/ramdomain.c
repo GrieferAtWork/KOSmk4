@@ -327,7 +327,7 @@ rambuffer_subregion__subregion(struct video_buffer *__restrict self,
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
 	result = (REF struct video_rambuffer_subsubregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
+		result->rbrvsr_xflags = video_gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_subsubregion_xoff_ops()
 		                                     : _rambuffer_subsubregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);
@@ -373,7 +373,7 @@ rambuffer_formem_subregion__subregion(struct video_buffer *__restrict self,
 	video_rambuffer_revokable_gfx_start(&me->rbrv_gfx);
 	result = (REF struct video_rambuffer_formem_subregion *)rambuffer__subregion__common(me, rect, me->rbrv_stride);
 	if likely(result) {
-		result->rbrvsr_xflags = gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
+		result->rbrvsr_xflags = video_gfx_flag_combine(me->rbrvsr_xflags, gfx_flags);
 		result->vb_ops = result->rbrvsr_xoff ? _rambuffer_formem_subregion_xoff_ops()
 		                                     : _rambuffer_formem_subregion_ops();
 		atomic_lock_acquire(&me->rbrvsr_subsubregions_lock);

@@ -52,8 +52,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "anim.h"
 #include "buffer.h"
+#include "buffer/gfx.h"
 #include "buffer/lockable.h"
-#include "buffer/old-gfx.h"
 #include "io-utils.h"
 #include "io.h"
 
@@ -427,12 +427,15 @@ INTERN WUNUSED ATTR_IN(1) NONNULL((2)) int CC
 libvideo_gfx_fsave(struct video_gfx const *self, char const *format,
                    FILE *__restrict fp, char const *options) {
 	int result;
-	struct video_buffer *buffer;
-	struct old_gfx_buffer gxb;
-	buffer = old_libvideo_buffer_fromgfx_init(&gxb, self);
+	REF struct video_buffer *buffer;
+	buffer = libvideo_buffer_fromgfx(self);
+	if unlikely(!buffer)
+		goto err;
 	result = libvideo_buffer_fsave(buffer, format, fp, options);
-	old_libvideo_buffer_fromgfx_fini(buffer);
+	video_buffer_decref(buffer);
 	return result;
+err:
+	return -1;
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_fdsave, libvideo_gfx_fdsave);
@@ -440,12 +443,15 @@ INTERN WUNUSED ATTR_IN(1) NONNULL((2)) int CC
 libvideo_gfx_fdsave(struct video_gfx const *self, char const *format,
                     fd_t fd, char const *options) {
 	int result;
-	struct video_buffer *buffer;
-	struct old_gfx_buffer gxb;
-	buffer = old_libvideo_buffer_fromgfx_init(&gxb, self);
+	REF struct video_buffer *buffer;
+	buffer = libvideo_buffer_fromgfx(self);
+	if unlikely(!buffer)
+		goto err;
 	result = libvideo_buffer_fdsave(buffer, format, fd, options);
-	old_libvideo_buffer_fromgfx_fini(buffer);
+	video_buffer_decref(buffer);
 	return result;
+err:
+	return -1;
 }
 
 DEFINE_PUBLIC_ALIAS(video_gfx_save, libvideo_gfx_save);
@@ -453,12 +459,15 @@ INTERN /*WUNUSED*/ ATTR_IN(1) NONNULL((2)) int CC
 libvideo_gfx_save(struct video_gfx const *self, char const *filename,
                   char const *options) {
 	int result;
-	struct video_buffer *buffer;
-	struct old_gfx_buffer gxb;
-	buffer = old_libvideo_buffer_fromgfx_init(&gxb, self);
+	REF struct video_buffer *buffer;
+	buffer = libvideo_buffer_fromgfx(self);
+	if unlikely(!buffer)
+		goto err;
 	result = libvideo_buffer_save(buffer, filename, options);
-	old_libvideo_buffer_fromgfx_fini(buffer);
+	video_buffer_decref(buffer);
 	return result;
+err:
+	return -1;
 }
 
 

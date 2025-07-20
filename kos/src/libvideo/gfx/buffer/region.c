@@ -210,7 +210,7 @@ region_buffer__subregion(struct video_buffer *__restrict self,
 		goto do_return_empty_buffer_base;
 
 	/* Combine "gfx_flags" with those of "me" */
-	gfx_flags = gfx_flag_combine(me->rbf_gfx, gfx_flags);
+	gfx_flags = video_gfx_flag_combine(me->rbf_gfx, gfx_flags);
 
 	/* Check if this whole thing has once again turned into a sub-region-only buffer.
 	 * If it has, then we should create a `region_buffer_subregion_alias_ops' buffer. */
@@ -519,7 +519,7 @@ INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
 region_buffer_subregion_alias__initgfx(struct video_gfx *__restrict self) {
 	struct region_buffer_subregion_alias *me = (struct region_buffer_subregion_alias *)self->vx_buffer;
 	self->vx_buffer = me->rbf_base; /* Fast-forward to the underlying buffer */
-	self->vx_flags  = gfx_flag_combine(me->rbf_gfx, self->vx_flags);
+	self->vx_flags  = video_gfx_flag_combine(me->rbf_gfx, self->vx_flags);
 	self = (*self->vx_buffer->vb_ops->vi_initgfx)(self);
 	return self;
 }
@@ -1421,7 +1421,7 @@ libvideo_buffer_region(struct video_buffer *__restrict self,
 		/* Populate "ret" based on rect offsets */
 		ret->rbf_cxoff = ret_crect.vr_xmin;
 		ret->rbf_cyoff = ret_crect.vr_ymin;
-		gfx_flags = gfx_flag_combine(me->rbf_gfx, gfx_flags);
+		gfx_flags = video_gfx_flag_combine(me->rbf_gfx, gfx_flags);
 
 		/* Check if we need to create a new sub-region buffer to enforce an I/O Rect */
 		if (base_iorect.vr_xmin > 0 || base_iorect.vr_ymin > 0 ||
