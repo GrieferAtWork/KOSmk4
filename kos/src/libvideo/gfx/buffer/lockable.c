@@ -332,6 +332,10 @@ INTERN ATTR_RETNONNULL WUNUSED struct video_buffer_ops const *CC _lockable_ops(v
 		lockable_ops.vi_unlockregion = &lockable_unlockregion;
 		lockable_ops.vi_initgfx      = &lockable_initgfx;
 		lockable_ops.vi_updategfx    = &lockable_updategfx;
+		/* TODO: Revocation & sub-region support */
+		/* NOTE: Revocation can simply be done by revoking the underlying buffer
+		 *       However, sub-region support needs to be implemented via  custom
+		 *       means. */
 		COMPILER_WRITE_BARRIER();
 		lockable_ops.vi_destroy = &lockable_destroy;
 		COMPILER_WRITE_BARRIER();
@@ -437,10 +441,10 @@ libvideo_buffer_lockable(struct video_buffer *__restrict self) {
 	if unlikely(!result)
 		goto err;
 	result->vb_ops    = _lockable_ops();
+	result->vb_domain = _libvideo_ramdomain();
 	result->vb_format = self->vb_format;
 	result->vb_xdim   = self->vb_xdim;
 	result->vb_ydim   = self->vb_ydim;
-	result->vb_domain = _libvideo_ramdomain();
 	result->vb_refcnt = 1;
 	video_buffer_incref(self);
 	result->lb_base  = self;

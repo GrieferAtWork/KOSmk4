@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/__atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
@@ -84,9 +85,9 @@ struct video_rambuffer_revokable_gfx {
 	__REGISTER_TYPE__ rbrvg_inuse;  /* [lock(ATOMIC)] Non-zero while `rbrv_data' is being accessed */
 	byte_t           *rbrvg_data;   /* [1..1][lock(ATOMIC)][valid_if(rbrv_inuse != 0)] Buffer data */
 };
-#define video_rambuffer_revokable_gfx_start(self)   atomic_inc(&(self)->rbrvg_inuse)
-#define video_rambuffer_revokable_gfx_end(self)     atomic_dec(&(self)->rbrvg_inuse)
-#define video_rambuffer_revokable_gfx_getdata(self) atomic_read(&(self)->rbrvg_data)
+#define video_rambuffer_revokable_gfx_start(self)   __hybrid_atomic_inc(&(self)->rbrvg_inuse, __ATOMIC_ACQUIRE)
+#define video_rambuffer_revokable_gfx_end(self)     __hybrid_atomic_dec(&(self)->rbrvg_inuse, __ATOMIC_RELEASE)
+#define video_rambuffer_revokable_gfx_getdata(self) __hybrid_atomic_load(&(self)->rbrvg_data, __ATOMIC_ACQUIRE)
 
 
 struct /*abstract*/ video_rambuffer_revokable: video_buffer {

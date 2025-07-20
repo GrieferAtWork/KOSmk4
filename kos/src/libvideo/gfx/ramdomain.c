@@ -28,6 +28,7 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 
 #include <kos/anno.h>
@@ -44,8 +45,10 @@
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
+#include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/dummy.h>
+#include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 #include "buffer.h"
@@ -448,25 +451,6 @@ rambuffer_revokable_xoff__lockregion(struct video_buffer *__restrict self,
 	lock->vrl_xbas = lock->_vrl_rect.vcr_xmin + me->rbrvsr_xoff;
 	return 0;
 }
-
-#ifndef __INTELLISENSE__
-DECL_END
-#define DEFINE_rambuffer__initgfx
-#include "ramdomain-gfx.c.inl"
-#define DEFINE_rambuffer_revokable__initgfx
-#include "ramdomain-gfx.c.inl"
-#define DEFINE_rambuffer_revokable_xoff__initgfx
-#include "ramdomain-gfx.c.inl"
-DECL_BEGIN
-#endif /* !__INTELLISENSE__ */
-
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC
-rambuffer_subregion__initgfx(struct video_gfx *__restrict self) {
-	struct video_rambuffer_subregion *me = (struct video_rambuffer_subregion *)self->vx_buffer;
-	self->vx_flags = gfx_flag_combine(me->rbrvsr_xflags, self->vx_flags);
-	return rambuffer_revokable__initgfx(self);
-}
-
 
 DEFINE_VIDEO_BUFFER_TYPE(rambuffer_ops, rambuffer__destroy,
                          rambuffer__initgfx, rambuffer__updategfx,
