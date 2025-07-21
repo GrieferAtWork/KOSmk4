@@ -637,7 +637,10 @@ INTERN ATTR_NOINLINE WUNUSED NONNULL((1, 2)) int CC
 libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
                          FILE *stream, char const *options) {
 	struct ATTR_PACKED bmp_pal_color {
-		uint8_t r, g, b, zero;
+		uint8_t b;
+		uint8_t g;
+		uint8_t r;
+		uint8_t zero;
 	};
 	struct ATTR_PACKED bm_hdr {
 		BITMAPFILEHEADER bmFile;
