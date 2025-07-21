@@ -352,6 +352,59 @@ typedef __INT_FAST32_TYPE__ video_imatrix2d_t;
 		video_imatrix2d_set(self, y2, x2, _temp);                             \
 	}	__WHILE0
 
+#define gfx_region_imatrix_getxmin(src_x, src_y, size_x, size_y, src_matrix) \
+	_gfx_region_imatrix_getxmin(src_x, size_x, size_y, src_matrix)
+LOCAL ATTR_CONST video_coord_t
+_gfx_region_imatrix_getxmin(video_coord_t src_x,
+                            video_dim_t size_x, video_dim_t size_y,
+                            video_imatrix2d_t src_matrix) {
+	video_coord_t result = src_x;
+	if (video_imatrix2d_get(&src_matrix, 0, 1) < 0)
+		result -= (size_y - 1);
+	if (video_imatrix2d_get(&src_matrix, 0, 0) < 0)
+		result -= (size_x - 1);
+	return result;
+}
+
+#define gfx_region_imatrix_getymin(src_x, src_y, size_x, size_y, src_matrix) \
+	_gfx_region_imatrix_getymin(src_y, size_x, size_y, src_matrix)
+LOCAL ATTR_CONST video_coord_t
+_gfx_region_imatrix_getymin(video_coord_t src_y,
+                            video_dim_t size_x, video_dim_t size_y,
+                            video_imatrix2d_t src_matrix) {
+	video_coord_t result = src_y;
+	if (video_imatrix2d_get(&src_matrix, 1, 1) < 0)
+		result -= (size_y - 1);
+	if (video_imatrix2d_get(&src_matrix, 1, 0) < 0)
+		result -= (size_x - 1);
+	return result;
+}
+
+LOCAL ATTR_CONST video_dim_t
+gfx_region_imatrix_getxdim(video_dim_t size_x, video_dim_t size_y,
+                           video_imatrix2d_t src_matrix) {
+	video_coord_t result = 0;
+	if (video_imatrix2d_get(&src_matrix, 0, 0) != 0)
+		result += size_x;
+	if (video_imatrix2d_get(&src_matrix, 0, 1) != 0)
+		result += size_y;
+	return result;
+}
+
+LOCAL ATTR_CONST video_dim_t
+gfx_region_imatrix_getydim(video_dim_t size_x, video_dim_t size_y,
+                           video_imatrix2d_t src_matrix) {
+	video_coord_t result = 0;
+	if (video_imatrix2d_get(&src_matrix, 1, 0) != 0)
+		result += size_x;
+	if (video_imatrix2d_get(&src_matrix, 1, 1) != 0)
+		result += size_y;
+	return result;
+}
+
+
+
+
 
 
 

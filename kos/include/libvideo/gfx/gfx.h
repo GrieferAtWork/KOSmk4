@@ -828,24 +828,12 @@ __CXXDECL_BEGIN
 #define _VIDEO_BLITTER_N_DRIVER (__VIDEO_BLITTER_N_DRIVER + 6)
 #endif /* _VIDEO_BLITTER_N_DRIVER < (__VIDEO_BLITTER_N_DRIVER + 6) */
 
-/* TODO: Need another "struct video_blitter3" that offers a way to composite between 3 buffers:
- * - src: Pixel source data      ("src" parameter during blending)
- * - dst: Pixel destination data ("dst" parameter during blending; this one's vx_blend specifies how colors are
- *                                are blended during an initial step, before potentially being blended a second
- *                                time upon being written to "out")
- * - out: Pixel output data      (GFX where colors are actually written to; usually has "GFX_BLENDMODE_OVERRIDE")
- *
- * src/dst are used READ-ONLY, and out is used WRITE-ONLY under "GFX_BLENDMODE_OVERRIDE" / READ-WRITE else
- *
- * This functionality is required for window composition (s.a. algorithm mock in showpic/main.c)
- */
-
 struct video_blitter {
-	struct video_blitter_ops const *vbt_ops;  /* Blitter operators */
+	struct video_blitter_ops const *vbt_ops;    /* Blitter operators */
 	/* WARNING: After initialization, the following fields must no longer be accessed by the user! */
-	struct video_gfx const         *vbt_dst;  /* [1..1][const] Destination GFX context */
-	struct video_gfx const         *vbt_src;  /* [1..1][const] Source GFX context */
-	void *_vbt_driver[_VIDEO_BLITTER_N_DRIVER];  /* [?..?] Driver-specific graphics data. */
+	struct video_gfx const         *vbt_dst;    /* [1..1][const] Destination GFX context */
+	struct video_gfx const         *vbt_src;    /* [1..1][const] Source GFX context */
+	void *_vbt_driver[_VIDEO_BLITTER_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:

@@ -29,7 +29,7 @@
 
 #include "../color.h"
 
-/* Surface blend definitions. */
+/* GFX blend definitions. */
 #define GFX_BLENDDATA_ZERO                                   0x00 /*             0 */
 #define GFX_BLENDDATA_ONE                                    0x01 /* {channel} * 1  (max intensity; channel=0xff) */
 #define GFX_BLENDDATA_SRC_COLOR                              0x02 /* {channel} * source_color */
