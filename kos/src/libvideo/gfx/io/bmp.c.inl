@@ -549,6 +549,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 			free(mapfile_cookie);
 			goto err_pal;
 		}
+		bzero(p_mapfile, sizeof(*p_mapfile)); /* Stolen by `mapfile_cookie' */
 		if (out_hasalpha_if_nonzero)
 			fix_missing_alpha_channel(result);
 		return result;
@@ -653,7 +654,6 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 
 	/* From Wikipedia: """The size of each row is rounded up to a multiple of 4 bytes""" */
 	dwPixelScanline = CEIL_ALIGN(dwPixelScanline, 4);
-
 
 	/* Check for codec types that cannot be written as-it into a BMP file */
 	if ((codec->vc_specs.vcs_flags & (VIDEO_CODEC_FLAG_PAL | VIDEO_CODEC_FLAG_LUM))
