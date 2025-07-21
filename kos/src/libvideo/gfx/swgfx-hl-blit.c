@@ -127,8 +127,7 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_stretch         = &libvideo_swblitter_samebuf__stretch_n;
 			drv->bsw_stretch_imatrix = &libvideo_swblitter_samebuf__stretch_imatrix_n;
 		}
-		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) == 0 &&
-		    VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey) &&
+		if (VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey) &&
 		    libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
 			drv->bsw_blit         = &libvideo_swblitter_noblend_samebuf__blit;
 			drv->bsw_blit_imatrix = &libvideo_swblitter_noblend_samebuf__blit_imatrix;
@@ -141,8 +140,6 @@ libvideo_swgfx_blitfrom(struct video_blitter *__restrict ctx) {
 			drv->bsw_blit_imatrix = &libvideo_swblitter_samebuf__blit_imatrix;
 		}
 	} else if (libvideo_gfx_allow_noblend_blit(dst_gfx, src_gfx)) {
-		if ((src_gfx->vx_flags & VIDEO_GFX_F_BLUR) != 0)
-			goto set_generic_operators;
 		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
 			goto set_generic_operators;
 		if (noblend_blit_compatible(dst_buffer->vb_format.vf_codec,
@@ -235,11 +232,7 @@ libvideo_swgfx_blitfrom3(struct video_blitter3 *__restrict ctx) {
 		/* TODO: Special handling when buffers overlap */
 
 		/* Filter out contexts that prevent use of special optimizations */
-		if (src_gfx->vx_flags & VIDEO_GFX_F_BLUR)
-			goto set_generic_operators;
 		if (!VIDEO_COLOR_ISTRANSPARENT(src_gfx->vx_colorkey))
-			goto set_generic_operators;
-		if (rddst_gfx->vx_flags & VIDEO_GFX_F_BLUR)
 			goto set_generic_operators;
 		if (!VIDEO_COLOR_ISTRANSPARENT(rddst_gfx->vx_colorkey))
 			goto set_generic_operators;

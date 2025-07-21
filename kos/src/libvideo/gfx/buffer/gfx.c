@@ -121,7 +121,7 @@ gfx_buffer_updategfx(struct video_gfx *__restrict self, unsigned int what) {
 /* Return a video buffer that simulates the clipping/rotation behavior
  * of the given GFX context `self'. Other GFX pixel modification flags
  * that are unrelated to rotation/mirroring  are also retained by  the
- * returned buffer (e.g. VIDEO_GFX_F_BLUR is retained).
+ * returned buffer.
  *
  * Note that the returned buffer only retains:
  * - Clip Rect
@@ -176,7 +176,7 @@ libvideo_buffer_fromgfx(struct video_gfx const *__restrict self) {
 
 	/* Check if GFX contains flags that require use of a `struct gfx_buffer' */
 	must_use_gfx_buffer = (flags & (VIDEO_GFX_F_XMIRROR | VIDEO_GFX_F_YMIRROR |
-	                                VIDEO_GFX_F_XYSWAP | VIDEO_GFX_F_BLUR));
+	                                VIDEO_GFX_F_XYSWAP));
 	if (must_use_gfx_buffer) {
 		/* NOTE: Technically, the buffer here could  also be represented using 2  nestings
 		 *       of `libvideo_buffer_region()' (first for I/O-Rect, second for Clip-Rect),

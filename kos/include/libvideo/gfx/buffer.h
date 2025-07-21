@@ -858,7 +858,7 @@ video_buffer_region(struct video_buffer *__restrict __self,
 /* Return a video buffer  that simulates the clipping/rotation  behavior
  * of the given GFX context `__self'. Other GFX pixel modification flags
  * that  are unrelated  to rotation/mirroring  are also  retained by the
- * returned buffer (e.g. VIDEO_GFX_F_BLUR is retained).
+ * returned buffer.
  *
  * Note that the returned buffer only retains:
  * - Clip Rect

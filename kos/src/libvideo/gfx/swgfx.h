@@ -658,7 +658,6 @@ struct blt3_swdrv {
 
 /* Low-level, Generic, always-valid GFX color functions (using only `xsw_getpixel' + `xsw_setpixel') */
 INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
-INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor_blur(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) video_color_t CC libvideo_swgfx_generic__getcolor_with_key(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__putcolor(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
 INTDEF ATTR_IN(1) void CC libvideo_swgfx_generic__putcolor_noblend(struct video_gfx const *__restrict self, video_coord_t x, video_coord_t y, video_color_t color);
@@ -1020,9 +1019,7 @@ libvideo_swgfx_update(struct video_gfx *__restrict self, unsigned int what) {
 	 * - drv->xsw_getcolor */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
 		/* Select how colors should be read. */
-		if (self->vx_flags & VIDEO_GFX_F_BLUR) {
-			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_blur;
-		} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+		if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
 			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_with_key;
 		} else if (self->vx_buffer->vb_format.vf_codec->vc_codec == VIDEO_CODEC_RGBA8888) {
 			/* Special optimization for "VIDEO_CODEC_RGBA8888": no color conversion needed */

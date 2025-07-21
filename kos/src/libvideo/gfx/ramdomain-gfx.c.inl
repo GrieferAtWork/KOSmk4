@@ -159,9 +159,7 @@ LOCAL_rambuffer__initgfx(struct video_gfx *__restrict self) {
 	libvideo_swgfx_populate(self);
 
 	/* Select how colors should be read. */
-	if (self->vx_flags & VIDEO_GFX_F_BLUR) {
-		drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_blur;
-	} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+	if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
 		drv->xsw_getcolor = &LOCAL_ramgfx__getcolor_withkey;
 	} else {
 		drv->xsw_getcolor = &LOCAL_ramgfx__getcolor_noblend;
@@ -206,9 +204,7 @@ LOCAL_rambuffer__updategfx(struct video_gfx *__restrict self, unsigned int what)
 
 	/* Select how colors should be read. */
 	if (what & (VIDEO_GFX_UPDATE_FLAGS | VIDEO_GFX_UPDATE_COLORKEY)) {
-		if (self->vx_flags & VIDEO_GFX_F_BLUR) {
-			drv->xsw_getcolor = &libvideo_swgfx_generic__getcolor_blur;
-		} else if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
+		if (!VIDEO_COLOR_ISTRANSPARENT(self->vx_colorkey)) {
 			drv->xsw_getcolor = &LOCAL_ramgfx__getcolor_withkey;
 		} else {
 			drv->xsw_getcolor = &LOCAL_ramgfx__getcolor_noblend;

@@ -309,18 +309,6 @@ step:
 		}	break;
 
 		case 3: {
-			struct video_gfx blurgfx;
-			video_offset_t x = (rand() % screen->vb_xdim) - 16;
-			video_offset_t y = (rand() % screen->vb_ydim) - 16;
-			video_coord_t size_x = rand() % screen->vb_xdim;
-			video_coord_t size_y = rand() % screen->vb_ydim;
-			blurgfx = gfx;
-			video_gfx_enableflags(&blurgfx, VIDEO_GFX_F_BLUR);
-			gfx.bitblit(x, y, blurgfx, x, y, size_x, size_y);
-			gfx.rect(x, y, size_x, size_y, VIDEO_COLOR_BLACK);
-		}	break;
-
-		case 4: {
 			video_offset_t x = (rand() % screen->vb_xdim) - 16;
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;
@@ -333,7 +321,7 @@ step:
 			gfx.gradient(x, y, size_x, size_y, colors);
 		}	break;
 
-		case 5: {
+		case 4: {
 			video_offset_t x = (rand() % screen->vb_xdim) - 16;
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;
@@ -343,7 +331,7 @@ step:
 			gfx.hgradient(x, y, size_x, size_y, locolor, hicolor);
 		}	break;
 
-		case 6: {
+		case 5: {
 			video_offset_t x = (rand() % screen->vb_xdim) - 16;
 			video_offset_t y = (rand() % screen->vb_ydim) - 16;
 			video_coord_t size_x = rand() % screen->vb_xdim;

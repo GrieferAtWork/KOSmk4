@@ -58,9 +58,6 @@
 #define VIDEO_GFX_F_XYSWAP  0x0010 /* [rw] Swap X/Y coords (width becoming height, and height becoming width)
                                     * WARNING: Do not alter this flag directly; use `video_gfx_xyswap()'
                                     * NOTE: Happens **after** VIDEO_GFX_F_XMIRROR/VIDEO_GFX_F_YMIRROR! */
-#define VIDEO_GFX_F_BLUR    0x2000 /* [r] Pixel reads will return the average of the surrounding 9 pixels.
-                                    *     For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
-                                    *     The  behavior is weak  undefined if this flag  is used alongside  a non-zero color key */
 #define VIDEO_GFX_F_NEAREST 0x0000 /* [rw] Use nearest interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 #define VIDEO_GFX_F_LINEAR  0x8000 /* [rw] Use linear interpolation for stretch() (flag used from src-gfx), lines, and floating-point pixel accesses */
 
@@ -91,7 +88,7 @@ typedef __UINT32_TYPE__ video_gfx_flag_t;
 #define _VIDEO_GFX_XFLAGS    (VIDEO_GFX_F_XWRAP | VIDEO_GFX_F_XMIRROR)
 #define _VIDEO_GFX_YFLAGS    (VIDEO_GFX_F_YWRAP | VIDEO_GFX_F_YMIRROR)
 #define _VIDEO_GFX_AND_FLAGS (0)
-#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR | VIDEO_GFX_F_BLUR)
+#define _VIDEO_GFX_OR_FLAGS  (VIDEO_GFX_F_LINEAR)
 #define _VIDEO_GFX_XOR_FLAGS (~(_VIDEO_GFX_AND_FLAGS | _VIDEO_GFX_OR_FLAGS))
 
 /* Combine pre-existing GFX flags `__old_flags' with `__more_flags' */
@@ -933,7 +930,7 @@ struct video_gfxhdr {
 	 *  ║   ║                       ║     ║                 │                       │  *
 	 *  ║   ║                       ║     ║                 │                       │  *
 	 *  ║   ║  ╔═════════════════╗  ║  ┌─────────────────┐  │  ┌─────────────────┐  │  *
-	 *  ║   ║  ║ I/O Rect        ║  ║  │ I/O Rect        │  │  │ I/O Rect        │  │  *
+	 *  ║   ║  ║ I/O Rect        ║  ║  │ I/O Rect (alias)│  │  │ I/O Rect (alias)│  │  *
 	 *  ║   ║  ║                 ║  ║  │  ║              │  │  │                 │  │  *
 	 *  ║   ║  ╚═════════════════╝  ║  └─────────────────┘  │  └─────────────────┘  │  *
 	 *  ║   ║                       ║     ║                 │                       │  *
@@ -942,7 +939,7 @@ struct video_gfxhdr {
 	 *  ╚═══╪═══════════════════════╪═════╝                 ·                       ·  *
 	 *      │                       │                       ·                       ·  *
 	 *      │  ┌─────────────────┐  │  ···················  ·  ···················  ·  *
-	 *      │  │ I/O Rect        │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  │ I/O Rect (alias)│  │  ·                 ·  ·  ·                 ·  ·  *
 	 *      │  │                 │  │  ·                 ·  ·  ·                 ·  ·  *
 	 *      │  └─────────────────┘  │  ···················  ·  ···················  ·  *
 	 *      │                       │                       ·                       ·  *
@@ -951,7 +948,7 @@ struct video_gfxhdr {
 	 *      │                       │                       ·                       ·  *
 	 *      │                       │                       ·                       ·  *
 	 *      │  ┌─────────────────┐  │  ···················  ·  ···················  ·  *
-	 *      │  │ I/O Rect        │  │  ·                 ·  ·  ·                 ·  ·  *
+	 *      │  │ I/O Rect (alias)│  │  ·                 ·  ·  ·                 ·  ·  *
 	 *      │  │                 │  │  ·                 ·  ·  ·                 ·  ·  *
 	 *      │  └─────────────────┘  │  ···················  ·  ···················  ·  *
 	 *      │                       │                       ·                       ·  *
@@ -960,7 +957,7 @@ struct video_gfxhdr {
 	 ***********************************************************************************
 	 *
 	 * Invariants:
-	 * - "I/O Rect" ⊆ "Clip Rect" ⊆ "Buffer"
+	 * - "I/O Rect" ⊆ "Clip Rect", "I/O Rect" ⊆ "Buffer"
 	 * - VIDEO_GFX_F_XWRAP/*Y are wrapped around "Clip Rect"
 	 * - Only pixels within the "I/O Rect" can be read/written
 	 * - VIDEO_GFX_F_XMIRROR/*Y mirror the "I/O Rect"

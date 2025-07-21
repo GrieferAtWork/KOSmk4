@@ -70,7 +70,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_gfx *FCC gfx_buffer_updategfx(
 /* Return a video buffer that simulates the clipping/rotation behavior
  * of the given GFX context `self'. Other GFX pixel modification flags
  * that are unrelated to rotation/mirroring  are also retained by  the
- * returned buffer (e.g. VIDEO_GFX_F_BLUR is retained).
+ * returned buffer.
  *
  * Note that the returned buffer only retains:
  * - Clip Rect
