@@ -757,20 +757,20 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		goto err;
 
 	/* Write file header and color masks/palette */
-	if (fwrite(&hdr, 1, hdr.bmFile.bfOffBits, stream) != hdr.bmFile.bfOffBits)
+	if (!fwrite(&hdr, hdr.bmFile.bfOffBits, 1, stream))
 		goto err_unlock;
 
 	/* Write pixel data */
 	if likely(vid_lock.vl_stride == dwPixelScanline) {
 		/* Can write data without any need for padding or-the-like */
 		size_t n_bytes = vid_lock.vl_stride * self->vb_ydim;
-		if (fwrite(vid_lock.vl_data, 1, n_bytes, stream) != n_bytes)
+		if (!fwrite(vid_lock.vl_data, n_bytes, 1, stream))
 			goto err_unlock;
 	} else if (vid_lock.vl_stride > dwPixelScanline) {
 		video_coord_t y;
 		for (y = 0; y < self->vb_ydim; ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
-			if (fwrite(src, 1, dwPixelScanline, stream) != dwPixelScanline)
+			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
 		}
 	} else {
@@ -778,7 +778,7 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		video_coord_t y;
 		for (y = 0; y < self->vb_ydim; ++y) {
 			byte_t const *src = vid_lock.vl_data + y * vid_lock.vl_stride;
-			if (fwrite(src, 1, dwPixelScanline, stream) != dwPixelScanline)
+			if (!fwrite(src, dwPixelScanline, 1, stream))
 				goto err_unlock;
 			if (fseek(stream, n_skip, SEEK_CUR))
 				goto err_unlock;
