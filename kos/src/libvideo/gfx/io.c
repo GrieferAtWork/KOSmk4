@@ -162,7 +162,8 @@ libvideo_buffer_open_fmt(struct video_domain const *__restrict domain,
 		errno = ENOTSUP;
 		return NULL;
 	}
-	result = convert_to_wanted_domain(domain, result);
+	if (result && result != VIDEO_BUFFER_WRONG_FMT)
+		result = convert_to_wanted_domain(domain, result);
 	return result;
 }
 
@@ -188,7 +189,8 @@ libvideo_anim_open_fmt(struct video_domain const *__restrict domain,
 		errno = ENOTSUP;
 		return NULL;
 	}
-	frame = convert_to_wanted_domain(domain, frame);
+	if (frame && frame != VIDEO_BUFFER_WRONG_FMT)
+		frame = convert_to_wanted_domain(domain, frame);
 	return frame2anim(frame);
 }
 
