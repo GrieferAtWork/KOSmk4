@@ -886,6 +886,20 @@ video_buffer_region(struct video_buffer *__restrict __self,
  * @return: NULL: [errno=ENOMEM] Insufficient memory. */
 typedef __ATTR_WUNUSED_T __ATTR_IN_T(1) __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_FROMGFX)(struct video_gfx const *__restrict __self);
+/* TODO: Change `video_buffer_region()' and `video_buffer_subregion()' and require
+ *       it  to  support   *all*  video_gfx_flag_t  (which   they  already   does) */
+/* TODO: Change `video_buffer_region()' to take an extra "region_flags" argument,
+ *       that can be used to select how the sub-region/flags should be  enforced:
+ *       - TRANSFORM_GFXONLY (current behavior: rotation only appears within video_gfx)
+ *       - TRANSFORM_ALWAYS  (region/flags are always enforced. video locks will either
+ *                            fail, or expose properly rotated/clipped pixel data)
+ *       Another flag:
+ *       - REVOKE_SHAREABLE  (allow `video_buffer_revoke(return)' to also revoke the
+ *                            original buffer, though this behavior is not mandatory) */
+/* With all of the above TODOs implemented, this function can be removed and its current
+ * semantics can be implemented as:
+ * >> temp = video_buffer_region(self->vx_buffer, IO_RECT_OF(self), self->vx_flags, TRANSFORM_ALWAYS | REVOKE_SHAREABLE);
+ * >> return video_buffer_region(temp, CLIP_RECT_RELATIVE_TO_IO_OF(self), 0, REVOKE_SHAREABLE); */
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_IN(1) __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_fromgfx(struct video_gfx const *__restrict __self);

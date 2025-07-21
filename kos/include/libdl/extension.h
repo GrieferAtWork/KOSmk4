@@ -163,9 +163,10 @@ struct dlmodule_format {
 
 	/* [1..1] Open a DL module, given a header, filename and file descriptor.
 	 * NOTE: This function is only called when `bcmp(header, df_magic, df_magsz) == 0'! */
-	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
-	                                                    /*inherit(on_success,HEAP)*/ char *__restrict filename,
-	                                                    /*inherit(on_success)*/ fd_t fd);
+	NONNULL_T((1, 2))
+	__REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
+	                                    /*inherit(on_success,HEAP)*/ char *__restrict filename,
+	                                    /*inherit(on_success)*/ fd_t fd);
 
 	/* Special return value for `df_open' to instruct libdl to continue
 	 * searching for a  matching module format  (to-be used for  module
@@ -176,24 +177,24 @@ struct dlmodule_format {
 	/* [1..1] Finalizer callback, to-be invoked when the module is destroyed.
 	 * NOTE: This callback is also responsible for calling `sys_unmap()' on
 	 *       any mapped program segment  associated with the given  module. */
-	NONNULL((1)) void (LIBDL_CC *df_fini)(DlModule *__restrict self);
+	NONNULL_T((1)) void (LIBDL_CC *df_fini)(DlModule *__restrict self);
 
 	/* [0..1] Run user-defined module initializers. */
-	NONNULL((1)) void (LIBDL_CC *df_run_initializers)(DlModule *__restrict self);
+	NONNULL_T((1)) void (LIBDL_CC *df_run_initializers)(DlModule *__restrict self);
 
 	/* [0..1] Run user-defined module finalizers (but don't run `dm_finalize'). */
-	NONNULL((1)) void (LIBDL_CC *df_run_finalizers)(DlModule *__restrict self);
+	NONNULL_T((1)) void (LIBDL_CC *df_run_finalizers)(DlModule *__restrict self);
 
 	/* [1..1] Check if `module_relative_pointer' points into a mapped segment. */
-	NONNULL((1)) bool (LIBDL_CC *df_ismapped)(DlModule *__restrict self,
-	                                          uintptr_t module_relative_pointer);
+	NONNULL_T((1)) bool (LIBDL_CC *df_ismapped)(DlModule *__restrict self,
+	                                            uintptr_t module_relative_pointer);
 
 	/* [1..1] Format-specific symbol lookup.
 	 * @return: * : One of `DLMODULE_FORMAT_DLSYM_*' */
-	NONNULL((1, 2, 3)) int (LIBDL_CC *df_dlsym)(DlModule *__restrict self,
-	                                            char const *__restrict symbol_name,
-	                                            void **__restrict psymbol_addr,
-	                                            size_t *psymbol_size);
+	NONNULL_T((1, 2, 3)) int (LIBDL_CC *df_dlsym)(DlModule *__restrict self,
+	                                              char const *__restrict symbol_name,
+	                                              void **__restrict psymbol_addr,
+	                                              size_t *psymbol_size);
 #define DLMODULE_FORMAT_DLSYM_WEAK  1    /* Symbol found, but it is weak */
 #define DLMODULE_FORMAT_DLSYM_OK    0    /* Symbol found */
 #define DLMODULE_FORMAT_DLSYM_ERROR (-1) /* Symbol could not be found (dlerror() was not modified) */
@@ -201,25 +202,26 @@ struct dlmodule_format {
 	/* [0..1] Format-specific implementation of `dladdr()'.
 	 * @return: 1 : Success. (yes: this function returns boolean-style)
 	 * @return: 0 : Error (s.a. `dlerror(3D)') */
-	NONNULL((1)) int (LIBDL_CC *df_dladdr)(DlModule *__restrict self,
-	                                       uintptr_t module_relative_pointer,
-	                                       struct __dl_info_struct *info);
+	NONNULL_T((1)) int (LIBDL_CC *df_dladdr)(DlModule *__restrict self,
+	                                         uintptr_t module_relative_pointer,
+	                                         struct __dl_info_struct *info);
 
 	/* [0..1] Return the index of a section, given its name.
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: >= self->dm_shnum: Unknown section `name' (dlerror() was not modified) */
-	NONNULL((1, 2)) uintptr_t (LIBDL_CC *df_dlsectindex)(DlModule *__restrict self, char const *__restrict name);
+	NONNULL_T((1, 2)) uintptr_t (LIBDL_CC *df_dlsectindex)(DlModule *__restrict self,
+	                                                       char const *__restrict name);
 
 	/* [0..1] Return information about a section, given its index.
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: != 0: Invalid section index (dlerror() was modified) */
-	NONNULL((1, 3)) int (LIBDL_CC *df_dlsectinfo)(DlModule *__restrict self, uintptr_t index,
-	                                              struct dl_sect_info *__restrict result);
+	NONNULL_T((1, 3)) int (LIBDL_CC *df_dlsectinfo)(DlModule *__restrict self, uintptr_t index,
+	                                                struct dl_sect_info *__restrict result);
 
 	/* [0..1] Return the name of a section, given its index.
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: NULL: Invalid section index (dlerror() was modified) */
-	NONNULL((1)) char const *(LIBDL_CC *df_dlsectname)(DlModule *__restrict self, uintptr_t index);
+	NONNULL_T((1)) char const *(LIBDL_CC *df_dlsectname)(DlModule *__restrict self, uintptr_t index);
 
 	/* [0..1] Enumerate individual program headers in an ELF-like way.
 	 *        This operator should fill in:
@@ -229,7 +231,7 @@ struct dlmodule_format {
 	 *        propagate its return value.
 	 * If this operator isn't provided, the module will be enumerated as though
 	 * it only had a single program header spanning `dm_loadstart...dm_loadend' */
-	NONNULL((1, 2, 3)) int
+	NONNULL_T((1, 2, 3)) int
 	(LIBDL_CC *df_lsphdrs)(DlModule *__restrict self,
 	                       struct dl_phdr_info *__restrict info,
 	                       __dl_iterator_callback callback, void *arg);
@@ -241,7 +243,7 @@ struct dlmodule_format {
 	 *               provided  by  an  extension, this  operator  will be
 	 *               invoked from that extension.
 	 * @param: cmd:  The command being invoked. Note that this will never
-	 *               be any of th standard commands, as this operator  is
+	 *               be any of the standard commands, as this operator is
 	 *               essentially just called in the fallback branch after
 	 *               all standard commands were checked.
 	 * @param: args: Additional arguments (varargs)
@@ -249,7 +251,7 @@ struct dlmodule_format {
 	 *               `dlerror()' must be done by this operator (if  such
 	 *               manipulation is desired).
 	 *               This includes the case where `cmd' isn't recognized! */
-	NONNULL((1)) void *
+	NONNULL_T((1)) void *
 	(LIBDL_CC *df_dlauxctrl)(DlModule *__restrict self,
 	                         unsigned int cmd,
 	                         __builtin_va_list args);

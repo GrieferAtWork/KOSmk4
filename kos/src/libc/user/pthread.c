@@ -431,6 +431,9 @@ void LIBCCALL pthread_waitfor_suspended(void) {
 	(void)sys_lfutex((uintptr_t *)&me->pt_pmask.lpm_pmask.pm_sigmask,
 	                 LFUTEX_WAKE, (uintptr_t)-1, NULL, 0);
 
+	/* This is the main "suspended"-loop: here, we wait for our thread's
+	 * suspension control word to no longer indicate that we must remain
+	 * suspended. */
 	for (;;) {
 		uint32_t suspend = atomic_read(&me->pt_suspended);
 		if (suspend == 0)
