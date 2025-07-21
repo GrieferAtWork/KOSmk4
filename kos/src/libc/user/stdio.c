@@ -2025,8 +2025,6 @@ NOTHROW_CB_NCX(LIBCCALL libc_fread)(void *__restrict buf,
 		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
-	if unlikely(!elemsize)
-		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
 		(void)libc_seterrno(EOVERFLOW);
@@ -2065,8 +2063,6 @@ NOTHROW_CB_NCX(LIBCCALL libc_fread_unlocked)(void *__restrict buf,
 		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
-	if unlikely(!elemsize)
-		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
 		(void)libc_seterrno(EOVERFLOW);
@@ -2096,8 +2092,6 @@ NOTHROW_CB_NCX(LIBCCALL libc_fwrite)(void const *__restrict buf,
 		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
-	if unlikely(!elemsize)
-		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
 		(void)libc_seterrno(EOVERFLOW);
@@ -2130,8 +2124,6 @@ NOTHROW_CB_NCX(LIBCCALL libc_fwrite_unlocked)(void const *__restrict buf,
 		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
-	if unlikely(!elemsize)
-		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
 		(void)libc_seterrno(EOVERFLOW);
