@@ -21,9 +21,11 @@
 #define GUARD_LIBVIDEO_GFX_IO_UTILS_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <stddef.h>

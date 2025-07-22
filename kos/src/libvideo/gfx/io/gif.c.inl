@@ -41,12 +41,14 @@
 #include <stdio.h> /* EOF */
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/types.h>
 
+#include "../codec/codec.h"
+#include "../codec/palette.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -627,13 +629,10 @@ gif_anim_paintframe(struct gif_anim const *__restrict anim,
 		 * proceed to re-paint the entire canvas, or use "GIF_DISPOSE_RESTORE_PREVIOUS" to
 		 * restore a previous frame that had transparency at the intended locations. */
 		format.vf_pal   = NULL;
-		format.vf_codec = video_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
-		                                     ? VIDEO_CODEC_RGBA8888
-		                                     : VIDEO_CODEC_RGB888);
-		if unlikely(!format.vf_codec) {
-			errno = ENODEV;
-			goto err;
-		}
+		format.vf_codec = libvideo_codec_lookup(anim->ga_cfg.gc_trans <= 0xff
+		                                        ? VIDEO_CODEC_RGBA8888
+		                                        : VIDEO_CODEC_RGB888);
+		assertf(format.vf_codec, "Built-in codec should have been recognized");
 
 		/* Allocate new buffer for direct-color mode */
 		assert(format.vf_codec->vc_specs.vcs_pxsz == 3 ||
@@ -978,12 +977,9 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 	}
 
 	/* First frame can always be rendered using a palette */
-	format.vf_codec = video_codec_lookup(VIDEO_CODEC_P8);
-	if unlikely(!format.vf_codec) {
-		errno = ENODEV;
-		goto err;
-	}
-	format.vf_pal = video_palette_create(256);
+	format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_P8);
+	assertf(format.vf_codec, "Built-in codec should have been recognized");
+	format.vf_pal = libvideo_palette_create(256);
 	if unlikely(!format.vf_pal)
 		goto err;
 	{
@@ -997,6 +993,8 @@ gif_anim_firstframe(struct video_anim const *__restrict self,
 			if (i == me->ga_cfg.gc_trans)
 				format.vf_pal->vp_pal[i] = 0;
 		}
+		/* Optimize palette after it was populated */
+		format.vf_pal = libvideo_palette_optimize(format.vf_pal);
 	}
 
 	/* Create main animation frame buffer */

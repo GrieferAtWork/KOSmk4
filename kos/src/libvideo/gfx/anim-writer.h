@@ -28,7 +28,7 @@
 #include <kos/anno.h>
 #include <kos/types.h>
 
-#include <stdio.h>
+#include <stdio.h> /* FILE */
 
 #include <libvideo/gfx/anim.h>
 

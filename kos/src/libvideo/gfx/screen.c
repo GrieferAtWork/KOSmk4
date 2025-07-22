@@ -55,15 +55,17 @@
 #include <libphys/phys.h>
 #include <libsvgadrv/api.h>
 #include <libsvgadrv/chipset.h>
-#include <libvideo/codec/codecs-extra.h>
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec-extra.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/screen.h>
-#include <libvideo/types.h>
 
+#include "codec/codec-specs.h"
+#include "codec/codec.h"
+#include "codec/palette.h"
 #include "ramdomain.h"
 #include "screen.h"
 
@@ -166,10 +168,10 @@ svga_screen_destroy(struct video_buffer *__restrict self) {
 
 PRIVATE WUNUSED NONNULL((1)) REF struct video_palette *CC
 svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
-	size_t i, palsize;
+	video_pixel_t i, palsize;
 	struct video_palette *result;
 	struct svga_palette_color *colors;
-	palsize = (size_t)1 << colorbits;
+	palsize = (video_pixel_t)1 << colorbits;
 	colors  = (struct svga_palette_color *)malloca(palsize, sizeof(struct svga_palette_color));
 	if unlikely(!colors) {
 		LOGERR("Failed to allocate palette color buffer: %m\n");
@@ -180,7 +182,7 @@ svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 	(*cs->sc_modeops.sco_getpal)(cs, 0, palsize, colors);
 
 	/* Allocate video palette */
-	result = video_palette_create(palsize);
+	result = libvideo_palette_create(palsize);
 	if unlikely(!result) {
 		LOGERR("Failed to allocate palette controller: %m\n");
 		freea(colors);
@@ -192,7 +194,7 @@ svga_palette_new(struct svga_chipset *__restrict cs, shift_t colorbits) {
 		result->vp_pal[i] = vcolor;
 	}
 	freea(colors);
-	return video_palette_optimize(result);
+	return libvideo_palette_optimize(result);
 err:
 	return NULL;
 }
@@ -431,12 +433,12 @@ find_hinted_mode:
 	/* Convert the SVGA video mode into libvideo codec specs. */
 	if (mode->smi_bits_per_pixel == 4) {
 		result->ss_codec_handle = NULL;
-		result->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_X_VBE16);
+		result->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_X_VBE16);
 	} else {
 		svga_modeinfo_to_codec_specs(mode, &codec_specs);
 
 		/* Build a codec from the newly constructed specs. */
-		result->vb_format.vf_codec = video_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
+		result->vb_format.vf_codec = libvideo_codec_fromspecs(&codec_specs, &result->ss_codec_handle);
 	}
 	if (!result->vb_format.vf_codec) {
 		LOGERR("No codec for SVGA video mode\n");
@@ -481,9 +483,9 @@ find_hinted_mode:
 		mode->smi_lfb = (physaddr_t)0xA0000;
 
 	/* Map screen memory into a physical buffer. */
-	result->rb_stride = mode->smi_scanline;
-	result->ss_rbtotal  = mode->smi_scanline * mode->smi_resy;
-	result->rb_data   = (byte_t *)(*result->ss_libphys_map)(mode->smi_lfb, result->ss_rbtotal);
+	result->rb_stride  = mode->smi_scanline;
+	result->ss_rbtotal = mode->smi_scanline * mode->smi_resy;
+	result->rb_data    = (byte_t *)(*result->ss_libphys_map)(mode->smi_lfb, result->ss_rbtotal);
 	if unlikely((void *)result->rb_data == MAP_FAILED) {
 		LOGERR("Failed to map LFB: %m\n");
 		goto err_svga_vdlck_libsvgadrv_r_cs_mode_codec_pal_libphys;

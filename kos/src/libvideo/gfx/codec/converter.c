@@ -22,10 +22,10 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CONVERTER_C
-#define GUARD_LIBVIDEO_CODEC_CONVERTER_C 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_C
+#define GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_C 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -35,14 +35,14 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <sys/param.h>
 
 #include <stdint.h>
-#include <syslog.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
+#include <libvideo/color.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 
-#include "converter.h"
 #include "codec-utils.h"
+#include "converter.h"
 
 #ifndef BITSOF
 #define BITSOF(x) (sizeof(x) * NBBY)
@@ -53,47 +53,47 @@ DECL_BEGIN
 /************************************************************************/
 /* PIXEL MAPPERS (COMMON)                                               */
 /************************************************************************/
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_identity(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	(void)self;
 	COMPILER_IMPURE();
 	return from_pixel;
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = video_format_pixel2color(&self->vcv_from, from_pixel);
 	return video_format_color2pixel(&self->vcv_to, color);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = video_format_pixel2color(&self->vcv_from, from_pixel);
 	return video_palette_getpixel(self->vcv_to.vf_pal, color);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_x_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_format_pixel2color(&self->vcv_from, from_pixel);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgba8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_palette_getpixel(self->vcv_to.vf_pal, from_pixel);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgba8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_format_color2pixel(&self->vcv_to, from_pixel);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgbx8888_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
 	return video_palette_getpixel(self->vcv_to.vf_pal, color);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rgbx8888_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = from_pixel | VIDEO_COLOR_ALPHA_MASK;
 	return video_format_color2pixel(&self->vcv_to, color);
@@ -104,24 +104,24 @@ map_rgbx8888_to_x(struct video_converter const *__restrict self, video_pixel_t f
 /* PIXEL MAPPERS (PALETTE SOURCE)                                       */
 /************************************************************************/
 #define video_converter__palmap(self) ((video_pixel_t *)(self)->_vcv_ydriver)
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p256(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_converter__palmap(self)[from_pixel & 0xff];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_p(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
 	return video_palette_getpixel(self->vcv_to.vf_pal, color);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_x(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_color_t color = video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
 	return video_format_color2pixel(&self->vcv_to, color);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_p_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return video_palette_getcolor(self->vcv_from.vf_pal, from_pixel);
 }
@@ -142,121 +142,121 @@ map_p_to_rgba8888(struct video_converter const *__restrict self, video_pixel_t f
 #define px_rol(x, n) (((video_pixel_t)(x) << (n)) | ((video_pixel_t)(x) >> (PIXEL_BITS - (n))))
 #define px_ror(x, n) (((video_pixel_t)(x) >> (n)) | ((video_pixel_t)(x) << (PIXEL_BITS - (n))))
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_shl8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_shl(from_pixel, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rol8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_rol(from_pixel, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_shr8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_shr(from_pixel, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_ror8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_ror(from_pixel, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rol16(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_rol(from_pixel, 16);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_shl8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_shl(from_pixel, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rol8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_rol(from_pixel, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_shr8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_shr(from_pixel, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_ror8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_ror(from_pixel, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_rol16_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_rol(from_pixel, 16) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	return px_bswap(from_pixel);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_shl8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_shl(temp, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_rol8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_rol(temp, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_shr8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_shr(temp, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_ror8(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_ror(temp, 8);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_rol16(struct video_converter const *__restrict UNUSED(self), video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_rol(temp, 16);
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	return px_bswap(from_pixel) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_shl8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_shl(temp, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_rol8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_rol(temp, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_shr8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_shr(temp, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_ror8_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_ror(temp, 8) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
 }
 
-PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t FCC
 map_bswap_rol16_plus_drv0(struct video_converter const *__restrict self, video_pixel_t from_pixel) {
 	video_pixel_t temp = px_bswap(from_pixel);
 	return px_rol(temp, 16) | (video_pixel_t)(uintptr_t)self->_vcv_xdriver[0];
@@ -272,7 +272,7 @@ map_bswap_rol16_plus_drv0(struct video_converter const *__restrict self, video_p
 /* PIXEL CONVERSION INITIALIZERS                                        */
 /************************************************************************/
 
-PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+PRIVATE ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_generic(struct video_converter *__restrict self) {
 	if (self->vcv_from.vf_codec == self->vcv_to.vf_codec &&
 	    self->vcv_from.vf_pal == self->vcv_to.vf_pal) {
@@ -297,7 +297,7 @@ initconv_from_generic(struct video_converter *__restrict self) {
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_p(struct video_converter *__restrict self) {
 	struct video_palette *srcpal;
 	if unlikely(self->vcv_from.vf_codec->vc_pixel2color != &pal_pixel2color)
@@ -339,33 +339,33 @@ done:
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_pa(struct video_converter *__restrict self) {
 	return initconv_from_generic(self);
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_l(struct video_converter *__restrict self) {
 	/* TODO: Optimization for conversion to RGB(A) formats */
 	/* TODO: Optimization for conversion to other L-formats */
 	return initconv_from_generic(self);
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_la(struct video_converter *__restrict self) {
 	/* TODO: Optimization for conversion to RGB(A) formats */
 	/* TODO: Optimization for conversion to other LA-formats */
 	return initconv_from_generic(self);
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_a(struct video_converter *__restrict self) {
 	/* TODO: Optimization for conversion to RGB(A) formats */
 	/* TODO: Optimization for conversion to other A-formats */
 	return initconv_from_generic(self);
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_rgb(struct video_converter *__restrict self) {
 	struct video_codec const *from_codec = self->vcv_from.vf_codec;
 	struct video_codec const *to_codec = self->vcv_to.vf_codec;
@@ -442,7 +442,7 @@ done:
 	return self;
 }
 
-INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *CC
+INTERN ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC
 initconv_from_rgba(struct video_converter *__restrict self) {
 	struct video_codec const *from_codec = self->vcv_from.vf_codec;
 	struct video_codec const *to_codec = self->vcv_to.vf_codec;
@@ -532,4 +532,4 @@ done:
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CONVERTER_C */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_C */

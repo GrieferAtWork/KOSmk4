@@ -26,6 +26,9 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+
 #include <kos/anno.h>
 #include <kos/types.h>
 
@@ -36,11 +39,13 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
+#include <libvideo/crect.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../ramdomain.h"

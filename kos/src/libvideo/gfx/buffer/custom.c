@@ -27,6 +27,9 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sequence/list.h>
+
 #include <kos/anno.h>
 
 #include <assert.h>
@@ -36,11 +39,12 @@
 #include <sched.h>
 #include <stddef.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
-#include <libvideo/gfx/api.h>
+#include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
@@ -120,7 +124,7 @@ dummy_custom_setpixel(void *UNUSED(cookie),
 }
 
 /* REVOKE+SUBREGION */
-INTERN ATTR_INOUT(1) void
+PRIVATE ATTR_INOUT(1) void
 NOTHROW(FCC custom_buffer__revoke_common)(struct custom_buffer_common *__restrict me) {
 	/* Revoke sub-regions */
 	atomic_lock_acquire(&me->cbc_subregion_lock);

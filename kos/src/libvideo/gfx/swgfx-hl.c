@@ -37,13 +37,16 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/overflow.h>
 
-#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 
+#include <libvideo/color.h>
+#include <libvideo/gfx/blend.h>
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 #include "buffer/old-bitmask.h" /* TODO: Get rid of mask-fill operators */
-#include "gfx-empty.h"
 #include "gfx-utils.h"
 #include "swgfx.h"
 

@@ -27,7 +27,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <assert.h>
@@ -37,17 +36,18 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
 #include "../gfx.h"
-#include "../ramdomain.h"
 #include "../swgfx.h"
+#include "../codec/codec.h"
+#include "../codec/palette.h"
 #include "old-bitmask.h"
 
 DECL_BEGIN
@@ -218,8 +218,8 @@ old_bitmask_buffer_init(struct old_bitmask_buffer *__restrict self,
 	self->bmb_pal.vp_pal[0] = bg_fg_colors[0];
 	self->bmb_pal.vp_pal[1] = bg_fg_colors[1];
 	self->vb_ops = _old_bitmask_ops();
-	self->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_P1_MSB);
-	self->vb_format.vf_pal = video_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
+	self->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_P1_MSB);
+	self->vb_format.vf_pal = libvideo_palette_optimize((struct video_palette *)&self->bmb_pal); /* For "vp_color2pixel" */
 	assert(self->vb_format.vf_codec);
 	self->vb_xdim = size_x;
 	self->vb_ydim = size_y;

@@ -26,18 +26,18 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
-
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 #include "buffer.h"
+#include "codec/codec.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
 
@@ -363,7 +363,8 @@ PRIVATE struct video_buffer libvideo_emptybuffer = {
 INTERN ATTR_RETNONNULL WUNUSED struct video_buffer *CC _libvideo_emptybuffer(void) {
 	if (!libvideo_emptybuffer.vb_ops) {
 		libvideo_emptybuffer.vb_domain = _libvideo_ramdomain();
-		libvideo_emptybuffer.vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
+		libvideo_emptybuffer.vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
+		assertf(libvideo_emptybuffer.vb_format.vf_codec, "Built-in codec should have been recognized");
 		COMPILER_WRITE_BARRIER();
 		libvideo_emptybuffer.vb_ops = _libvideo_emptybuffer_ops();
 		COMPILER_WRITE_BARRIER();

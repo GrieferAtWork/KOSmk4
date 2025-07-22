@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODEC_UTILS_H
-#define GUARD_LIBVIDEO_CODEC_CODEC_UTILS_H 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_UTILS_H
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_UTILS_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -36,10 +36,10 @@
 
 #include <stddef.h>
 
-#include <libvideo/codec/api.h>
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN
@@ -80,39 +80,39 @@ DECL_BEGIN
 #define DEFINE_PIXEL2COLOR64_WRAPPER32(decl, foo_pixel2color, foo_pixel2color64) /* nothing */
 #define DEFINE_COLOR2PIXEL64_WRAPPER32(decl, foo_color2pixel, foo_color2pixel64) /* nothing */
 #define DEFINE_PIXEL64_IO_WRAPPERS(f, f_, f64, f64_)                             /* nothing */
-#else /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
+#else                                                                            /* !CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 #define DEFINE_PIXEL2COLOR64_WRAPPER32(decl, foo_pixel2color, foo_pixel2color64)             \
-	decl WUNUSED NONNULL((1)) video_color64_t CC                                             \
+	decl WUNUSED NONNULL((1)) video_color64_t FCC                                            \
 	foo_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel) { \
 		video_color_t c = foo_pixel2color(format, (video_pixel_t)pixel);                     \
 		return VIDEO_COLOR64_FROM_COLOR(c);                                                  \
 	}
 #define DEFINE_COLOR2PIXEL64_WRAPPER32(decl, foo_color2pixel, foo_color2pixel64)             \
-	decl WUNUSED NONNULL((1)) video_pixel64_t CC                                             \
+	decl WUNUSED NONNULL((1)) video_pixel64_t FCC                                            \
 	foo_color2pixel64(struct video_format const *__restrict format, video_color64_t color) { \
 		video_color_t c = VIDEO_COLOR_FROM_COLOR64(color);                                   \
 		return (video_pixel64_t)foo_color2pixel(format, c);                                  \
 	}
 #define DEFINE_PIXEL64_IO_WRAPPERS(decl, f, f_, f64, f64_)                                 \
-	decl ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t CC                       \
+	decl ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC                      \
 	f64(f64_, getpixel)(byte_t const *__restrict line, video_coord_t x) {                  \
 		return (video_pixel64_t)f(f_, getpixel)(line, x);                                  \
 	}                                                                                      \
-	decl ATTR_COLD NONNULL((1)) void CC                                                    \
+	decl ATTR_COLD NONNULL((1)) void FCC                                                   \
 	f64(f64_, setpixel)(byte_t *__restrict line, video_coord_t x, video_pixel64_t pixel) { \
 		f(f_, setpixel)(line, x, (video_pixel_t)pixel);                                    \
 	}                                                                                      \
-	decl ATTR_COLD NONNULL((1)) void CC                                                    \
+	decl ATTR_COLD NONNULL((1)) void FCC                                                   \
 	f64(f64_, linefill)(byte_t *__restrict line, video_coord_t x,                          \
 	                    video_pixel64_t pixel, video_dim_t num_pixels) {                   \
 		f(f_, linefill)(line, x, (video_pixel_t)pixel, num_pixels);                        \
 	}                                                                                      \
-	decl ATTR_COLD NONNULL((1)) void CC                                                    \
+	decl ATTR_COLD NONNULL((1)) void FCC                                                   \
 	f64(f64_, vertfill)(byte_t *__restrict line, video_coord_t x, size_t stride,           \
 	                    video_pixel64_t pixel, video_dim_t num_pixels) {                   \
 		f(f_, vertfill)(line, x, stride, (video_pixel_t)pixel, num_pixels);                \
 	}                                                                                      \
-	decl ATTR_COLD NONNULL((1)) void CC                                                    \
+	decl ATTR_COLD NONNULL((1)) void FCC                                                   \
 	f64(f64_, rectfill)(byte_t *__restrict line, video_coord_t x, size_t stride,           \
 	                    video_pixel64_t pixel, video_dim_t size_x, video_dim_t size_y) {   \
 		f(f_, rectfill)(line, x, stride, (video_pixel_t)pixel, size_x, size_y);            \
@@ -420,7 +420,7 @@ DECL_BEGIN
 /************************************************************************/
 
 #define DEFINE_GENERIC_linefill__with__setpixel(linefill, setpixel) \
-	PRIVATE NONNULL((1)) void CC                                    \
+	PRIVATE NONNULL((1)) void FCC                                    \
 	linefill(byte_t *__restrict line, video_coord_t x,              \
 	         video_pixel_t pixel, video_dim_t num_pixels) {         \
 		do {                                                        \
@@ -429,7 +429,7 @@ DECL_BEGIN
 		} while (--num_pixels);                                     \
 	}
 #define DEFINE_GENERIC_vertfill__with__setpixel(vertfill, setpixel)   \
-	PRIVATE NONNULL((1)) void CC                                      \
+	PRIVATE NONNULL((1)) void FCC                                      \
 	vertfill(byte_t *__restrict line, video_coord_t x, size_t stride, \
 	         video_pixel_t pixel, video_dim_t num_pixels) {           \
 		do {                                                          \
@@ -438,7 +438,7 @@ DECL_BEGIN
 		} while (--num_pixels);                                       \
 	}
 #define DEFINE_GENERIC_rectfill__with__linefill(rectfill, linefill)         \
-	PRIVATE NONNULL((1)) void CC                                            \
+	PRIVATE NONNULL((1)) void FCC                                            \
 	rectfill(byte_t *__restrict line, video_coord_t x, size_t stride,       \
 	         video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) { \
 		do {                                                                \
@@ -447,7 +447,7 @@ DECL_BEGIN
 		} while (--size_y);                                                 \
 	}
 #define DEFINE_GENERIC_linecopy__with__getpixel__and__setpixel(linecopy, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 3)) void CC                                                          \
+	PRIVATE NONNULL((1, 3)) void FCC                                                          \
 	linecopy(byte_t *__restrict dst_line, video_coord_t dst_x,                               \
 	         byte_t const *__restrict src_line, video_coord_t src_x,                         \
 	         video_dim_t size_x) {                                                           \
@@ -460,7 +460,7 @@ DECL_BEGIN
 		} while (--size_x);                                                                  \
 	}
 #define DEFINE_GENERIC_rectcopy__with__getpixel__and__setpixel(rectcopy, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 4)) void CC                                                          \
+	PRIVATE NONNULL((1, 4)) void FCC                                                          \
 	rectcopy(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,            \
 	         byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,      \
 	         video_dim_t size_x, video_dim_t size_y) {                                       \
@@ -476,7 +476,7 @@ DECL_BEGIN
 		} while (--size_y);                                                                  \
 	}
 #define DEFINE_GENERIC_rectmove__with__getpixel__and__setpixel(rectmove, getpixel, setpixel) \
-	PRIVATE NONNULL((1, 3)) void CC                                                          \
+	PRIVATE NONNULL((1, 3)) void FCC                                                          \
 	rectmove(byte_t *__restrict dst_line, video_coord_t dst_x,                               \
 	         byte_t const *__restrict src_line, video_coord_t src_x,                         \
 	         size_t stride, video_dim_t size_x, video_dim_t size_y) {                        \
@@ -545,30 +545,30 @@ DECL_BEGIN
 /************************************************************************/
 
 #define identity_pixel2color identity_color2pixel
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC identity_color2pixel(struct video_format const *__restrict format, video_color_t value);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC pal_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC pal_color2pixel(struct video_format const *__restrict format, video_color_t color);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC identity_color2pixel(struct video_format const *__restrict format, video_color_t value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC pal_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC pal_color2pixel(struct video_format const *__restrict format, video_color_t color);
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 #define identity_pixel2color64 identity_color2pixel64
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t CC identity_color2pixel64(struct video_format const *__restrict format, video_color64_t value);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color64_t CC pal_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t CC pal_color2pixel64(struct video_format const *__restrict format, video_color64_t color);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC identity_color2pixel64(struct video_format const *__restrict format, video_color64_t value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_color64_t FCC pal_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) video_pixel64_t FCC pal_color2pixel64(struct video_format const *__restrict format, video_color64_t color);
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC rgbx8888_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC rgbx8888_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel);
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
-INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t CC rgbx8888_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
+INTDEF ATTR_CONST WUNUSED NONNULL((1)) video_color64_t FCC rgbx8888_pixel2color64(struct video_format const *__restrict format, video_pixel64_t pixel);
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 
-INTDEF NONNULL((3)) void CC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
-INTDEF NONNULL((3)) void CC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer1_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer2_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer4_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer8_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer16_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer24_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
+INTDEF NONNULL((3)) void FCC buffer32_requirements(video_dim_t size_x, video_dim_t size_y, struct video_rambuffer_requirements *__restrict result);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODEC_UTILS_H */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_UTILS_H */

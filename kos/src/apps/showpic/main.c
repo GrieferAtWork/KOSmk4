@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_APPS_SHOWPIC_MAIN_C
 #define GUARD_APPS_SHOWPIC_MAIN_C 1
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 #define LIBVIDEO_COMPOSITOR_WANT_PROTOTYPES
 #define _KOS_SOURCE 1
@@ -48,13 +47,13 @@
 #include <uchar.h>
 #include <unistd.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
 #include <libvideo/compositor/compositor.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/font.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/gfx/screen.h>

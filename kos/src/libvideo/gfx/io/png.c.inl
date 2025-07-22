@@ -43,12 +43,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 
+#include "../codec/codec.h"
+#include "../codec/palette.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -308,7 +310,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 		}
 
 		/* Construct palette */
-		result_format.vf_pal = video_palette_create((unsigned int)png_num_palette);
+		result_format.vf_pal = libvideo_palette_create((unsigned int)png_num_palette);
 		if unlikely(!result_format.vf_pal)
 			goto err_png_ptr_info_ptr;
 		for (pal_i = 0; pal_i < (unsigned int)png_num_palette; ++pal_i) {
@@ -317,7 +319,7 @@ libvideo_buffer_open_png(struct video_domain const *__restrict domain_hint,
 			                                      png_palette[pal_i].blue);
 			result_format.vf_pal->vp_pal[pal_i] = color;
 		}
-		result_format.vf_pal = video_palette_optimize(result_format.vf_pal);
+		result_format.vf_pal = libvideo_palette_optimize(result_format.vf_pal);
 	} else if (!(color_type & LIBPNG_COLOR_MASK_COLOR)) {
 		/* Grayscale (aka. luminance) */
 		/*png_set_packswap(png_ptr);*/ /* If we called this, below would become *_LSB */
@@ -361,23 +363,20 @@ do_rgb_format:
 	}
 
 	/* Lookup needed codec. */
-	result_format.vf_codec = video_codec_lookup(result_codec_id);
-	if unlikely(!result_format.vf_codec) {
-		errno = ENODEV;
-		goto err_png_ptr_info_ptr_pal;
-	}
+	result_format.vf_codec = libvideo_codec_lookup(result_codec_id);
+	assertf(result_format.vf_codec, "Built-in codec should have been recognized");
 
 	/* Allocate result video buffer. */
 	result = video_domain_newbuffer(domain_hint, width, height, &result_format,
 	                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 	if unlikely(!result) {
 		if (errno != ENOTSUP && domain_hint != &libvideo_ramdomain)
-			goto err_png_ptr_info_ptr;
+			goto err_png_ptr_info_ptr_pal;
 		result = video_domain_newbuffer(_libvideo_ramdomain(),
 		                                width, height, &result_format,
 		                                VIDEO_DOMAIN_NEWBUFFER_F_NORMAL);
 		if unlikely(!result)
-			goto err_png_ptr_info_ptr;
+			goto err_png_ptr_info_ptr_pal;
 	}
 	if unlikely(video_buffer_wlock(result, &result_lock))
 		goto err_png_ptr_info_ptr_pal_r;
@@ -467,6 +466,8 @@ libvideo_buffer_save_png(struct video_buffer *__restrict self,
 DECL_END
 #include <libpng/png.h>
 DECL_BEGIN
+
+/* TODO */
 #endif /* __has_include(<libpng/png.h>) */
 
 DECL_END

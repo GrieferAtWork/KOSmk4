@@ -33,11 +33,13 @@
 #include <errno.h>
 #include <malloc.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <libvideo/gfx/anim.h>
+#include <libvideo/types.h>
 
 #include "anim-writer.h"
 #include "io.h"

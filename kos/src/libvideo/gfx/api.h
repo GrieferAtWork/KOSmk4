@@ -30,7 +30,4 @@
 #define CC  LIBVIDEO_GFX_CC
 #define FCC LIBVIDEO_GFX_FCC
 
-/* Our library is linked against libvideo-codec.so */
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES
-
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */

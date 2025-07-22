@@ -27,14 +27,12 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/anno.h>
-
 #include <stdint.h>
 
-#include <libvideo/codec/api.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
@@ -44,10 +42,10 @@ DECL_BEGIN
 
 struct video_palette2 {
 	ATTR_PURE_T WUNUSED_T ATTR_IN_T(1) video_pixel_t
-	NOTHROW_T(LIBVIDEO_CODEC_CC *vp_color2pixel)(struct video_palette const *__restrict self,
+	NOTHROW_T(LIBVIDEO_GFX_FCC *vp_color2pixel)(struct video_palette const *__restrict self,
 	                                             video_color_t color);
 	NONNULL_T((1)) void
-	NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
+	NOTHROW_T(LIBVIDEO_GFX_FCC *vp_destroy)(struct video_palette *__restrict self);
 	uintptr_t                              vp_refcnt;
 	struct video_palette_tree            *_vp_tree;
 	video_palette_flag_t                   vp_flags;

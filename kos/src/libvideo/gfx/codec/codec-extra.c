@@ -22,19 +22,25 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODECS_EXTRA_C
-#define GUARD_LIBVIDEO_CODEC_CODECS_EXTRA_C 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_EXTRA_C
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_EXTRA_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
+
+#include <kos/types.h>
+
 #include <stddef.h>
 
-#include <libvideo/codec/codecs-extra.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/codec/codec-extra.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/types.h>
 
 #include "codec-utils.h"
 #include "converter.h"
@@ -42,7 +48,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 DECL_BEGIN
 
 #ifdef VIDEO_CODEC_X_VBE16
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 x_vbe16_getpixel(byte_t const *__restrict line, video_coord_t x) {
 	shift_t shift;
 	line += ((x >> 3) << 2);
@@ -53,7 +59,7 @@ x_vbe16_getpixel(byte_t const *__restrict line, video_coord_t x) {
 	       (((line[3] >> shift) & 1) << 3);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 x_vbe16_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	byte_t mask;
 	line += ((x >> 3) << 2);
@@ -64,7 +70,7 @@ x_vbe16_setpixel(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) 
 	line[3] = (line[3] & ~mask) | (mask * ((pixel >> 3) & 1));
 }
 
-PRIVATE NONNULL((3)) void CC
+PRIVATE NONNULL((3)) void FCC
 x_vbe16_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = CEIL_ALIGN(size_x, 4) / 2;
@@ -93,7 +99,7 @@ DEFINE_PIXEL64_IO_WRAPPERS__WITH_PREFIX(PRIVATE, x_vbe16_)
 
 
 /* Same as `libvideo_codec_lookup()', but used for "extra" codecs */
-INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
+INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
 libvideo_codec_lookup_extra(video_codec_t codec) {
 	struct video_codec const *result;
 	switch (codec) {
@@ -126,4 +132,4 @@ libvideo_codec_lookup_extra(video_codec_t codec) {
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODECS_EXTRA_C */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_EXTRA_C */

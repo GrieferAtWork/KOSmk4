@@ -42,18 +42,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/buffer/dummy.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 #include "buffer.h"
 #include "buffer/dummy.h"
 #include "buffer/utils.h"
+#include "codec/codec-specs.h"
 #include "gfx-empty.h"
 #include "ramdomain.h"
 
@@ -572,7 +573,7 @@ libvideo_ramdomain_newbuffer_ex(struct video_domain const *__restrict self,
 	if unlikely(!xdim || !ydim)
 		return_empty_buffer;
 
-	codec = video_codec_fromspecs(codec_specs, &codec_handle);
+	codec = libvideo_codec_fromspecs(codec_specs, &codec_handle);
 	if unlikely(!codec)
 		goto err;
 	if (!(codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_PAL))
@@ -690,7 +691,7 @@ libvideo_ramdomain_formem_ex(struct video_domain const *__restrict self, video_d
 	if unlikely(!xdim || !ydim)
 		return_empty_buffer;
 
-	codec = video_codec_fromspecs(codec_specs, &codec_handle);
+	codec = libvideo_codec_fromspecs(codec_specs, &codec_handle);
 	if unlikely(!codec)
 		goto err;
 

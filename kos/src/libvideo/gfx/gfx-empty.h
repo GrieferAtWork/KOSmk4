@@ -25,6 +25,9 @@
 
 #include <hybrid/compiler.h>
 
+#include <libvideo/color.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN

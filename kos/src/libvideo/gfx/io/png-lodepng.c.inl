@@ -34,6 +34,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <errno.h>
@@ -43,9 +44,15 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stdio.h>
 #include <string.h>
 
+#include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/palette.h>
+#include <libvideo/gfx/gfx.h>
 
 #include "../buffer.h"
+#include "../codec/codec.h"
+#include "../codec/palette.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -64,11 +71,6 @@ __pragma_GCC_diagnostic_ignored(Wstringop_overflow)
 #pragma GCC visibility push(hidden) /* Don't export any of this stuff... */
 #include "lodepng/lodepng.h"
 #include "lodepng/lodepng.c"
-#include <kos/anno.h>
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/palette.h>
-#include <libvideo/gfx/blend.h>
-#include <libvideo/gfx/gfx.h>
 #pragma GCC visibility pop
 __pragma_GCC_diagnostic_pop
 
@@ -154,9 +156,8 @@ libvideo_buffer_open_lodepng(struct video_domain const *__restrict domain_hint,
 		codec_name = VIDEO_CODEC_RGBA8888;
 		break;
 	}
-	format.vf_codec = video_codec_lookup(codec_name);
-	if unlikely(!format.vf_codec)
-		goto err_inval;
+	format.vf_codec = libvideo_codec_lookup(codec_name);
+	assertf(format.vf_codec, "Built-in codec should have been recognized");
 	error = lodepng_decode_memory(&out, &w, &h, (unsigned char const *)blob,
 	                              blob_size, state.info_png.color.colortype,
 	                              state.info_png.color.bitdepth);
@@ -189,7 +190,7 @@ handle_error:
 		return NULL;
 	default: break;
 	}
-err_inval:
+/*err_inval:*/
 	errno = EINVAL; /* Malformed PNG file. */
 err:
 	return NULL;
@@ -220,18 +221,14 @@ video_lock_convert_stride(struct video_lock *__restrict self,
 	}
 	return result;
 }
-#include <syslog.h>
 
 /* Convert "self" into a RGB/RGBA buffer. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) REF struct video_buffer *CC
 libvideo_buffer_convert_to_lodepng_rgb(struct video_buffer *__restrict self) {
-	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
 	struct video_format format;
-	format.vf_codec = video_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
-	if unlikely(!format.vf_codec) {
-		errno = ENOTSUP;
-		return NULL;
-	}
+	bool has_alpha = self->vb_format.vf_codec->vc_specs.vcs_amask != 0;
+	format.vf_codec = libvideo_codec_lookup(has_alpha ? VIDEO_CODEC_RGBA8888 : VIDEO_CODEC_RGB888);
+	assertf(format.vf_codec, "Built-in codec should have been recognized");
 	format.vf_pal = NULL;
 	return libvideo_buffer_convert(self, _libvideo_ramdomain(), &format);
 }

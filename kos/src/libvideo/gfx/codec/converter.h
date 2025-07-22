@@ -17,34 +17,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_CODEC_CODECS_EXTRA_H
-#define _LIBVIDEO_CODEC_CODECS_EXTRA_H 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H
+#define GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H 1
 
-#include "api.h"
+#include "../api.h"
+/**/
 
-/************************************************************************/
-/* "Extra" video codecs                                                 */
-/************************************************************************/
+#include <hybrid/compiler.h>
 
+#include <libvideo/gfx/codec/format.h>
 
-/* Video mode used by 16-bit  VBE video modes. You'd  think they'd have just  used
- * `VIDEO_CODEC_P4_MSB' for this one, but ///nOoOoOoO/// it had to be more similar
- * to what happens in 16-color  planar mode (which is actually  VIDEO_CODEC_P1_MSB
- * repeated 4 times across different "planes").
- *
- * 4-bit-per-pixel, 8-pixels-per-byte, 4-byte-repeating:
- * >> Byte:      B0......B1......B2......B3...... B4......B5......B6......B7......
- * >> Pixel:     ABCDEFGHABCDEFGHABCDEFGHABCDEFGH IJKLMNOPIJKLMNOPIJKLMNOPIJKLMNOP
- * >> Pixel-Bit: 00000000111111112222222233333333 00000000111111112222222233333333
- *
- * iow: to set pixel "C" as "v" (where "v in [0,15]"), you have to do:
- * >> B0 = (B0 & 0xdf) | (((v >> 0) & 1) << 5); // Bit#0
- * >> B1 = (B1 & 0xdf) | (((v >> 1) & 1) << 5); // Bit#1
- * >> B2 = (B2 & 0xdf) | (((v >> 2) & 1) << 5); // Bit#2
- * >> B3 = (B3 & 0xdf) | (((v >> 3) & 1) << 5); // Bit#3 */
-#define VIDEO_CODEC_X_VBE16  0x3001
+DECL_BEGIN
 
- /* TODO: 4-bit-per-pixel, 8-pixels-per-byte, planar */
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_p(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_pa(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_l(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_la(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_a(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_rgb(struct video_converter *__restrict self);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct video_converter *FCC initconv_from_rgba(struct video_converter *__restrict self);
 
+DECL_END
 
-#endif /* !_LIBVIDEO_CODEC_CODECS_EXTRA_H */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CONVERTER_H */

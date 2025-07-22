@@ -25,6 +25,9 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+
+#include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/display.h>
 
 DECL_BEGIN

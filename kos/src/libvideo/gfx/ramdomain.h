@@ -21,6 +21,7 @@
 #define GUARD_LIBVIDEO_GFX_RAMDOMAIN_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -31,15 +32,17 @@
 
 #include <kos/anno.h>
 #include <kos/types.h>
+#include <sys/types.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
+#include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 

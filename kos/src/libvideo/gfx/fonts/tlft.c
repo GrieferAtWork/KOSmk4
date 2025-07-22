@@ -43,7 +43,6 @@
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
-/**/
 #include "../font.h"
 #include "tlft.h"
 

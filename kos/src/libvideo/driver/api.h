@@ -28,8 +28,7 @@
 
 #define CC LIBVIDEO_DRIVER_CC
 
- /* Our library is linked against libvideo-codec.so and libvideo-gfx.so */
-#define LIBVIDEO_CODEC_WANT_PROTOTYPES
+ /* Our library is linked against libvideo-gfx.so */
 #define LIBVIDEO_GFX_WANT_PROTOTYPES
 
 #endif /* !GUARD_LIBVIDEO_DRIVER_API_H */

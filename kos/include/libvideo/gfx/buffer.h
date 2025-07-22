@@ -32,11 +32,10 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include <libvideo/codec/format.h>
-
 #include "../color.h"
 #include "../crect.h"
 #include "blend.h"
+#include "codec/format.h"
 #include "gfx.h"
 
 #ifdef __cplusplus

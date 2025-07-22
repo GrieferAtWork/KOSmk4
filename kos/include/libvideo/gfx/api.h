@@ -25,9 +25,17 @@
 
 /*#define LIBVIDEO_GFX_EXPOSE_INTERNALS*/
 
+/* Feature flag: are 64-bit pixel formats supported? */
+#ifndef CONFIG_NO_VIDEO_CODEC_HAVE_PIXEL64
+#define CONFIG_VIDEO_CODEC_HAVE_PIXEL64
+#endif /* !CONFIG_NO_VIDEO_CODEC_HAVE_PIXEL64 */
+
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBVIDEO_GFX_CC  __ATTR_STDCALL
 #define LIBVIDEO_GFX_FCC __ATTR_FASTCALL
+#ifndef CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#define VIDEO_CODEC_HAVE__VC_SETPIXEL3
+#endif /* !CONFIG_NO_VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 #else /* ... */
 #define LIBVIDEO_GFX_CC  /* nothing */
 #define LIBVIDEO_GFX_FCC /* nothing */

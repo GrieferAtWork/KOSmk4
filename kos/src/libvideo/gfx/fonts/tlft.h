@@ -29,7 +29,6 @@
 #include <kos/anno.h>
 #include <kos/types.h>
 
-#include <stddef.h>
 #include <stdint.h>
 
 #include <libvideo/gfx/font.h>

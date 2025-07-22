@@ -26,7 +26,6 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-lock.h>
 
 #include <kos/anno.h>
 #include <kos/sched/shared-rwlock.h>
@@ -35,7 +34,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <libvideo/color.h>
 #include <libvideo/compositor/compositor.h>
+#include <libvideo/gfx/api.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/display.h>
+#include <libvideo/gfx/gfx.h>
+#include <libvideo/rect.h>
 
 DECL_BEGIN
 

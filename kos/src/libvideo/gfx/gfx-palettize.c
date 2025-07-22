@@ -44,14 +44,15 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stdlib.h>
 #include <string.h>
 
-#include <libvideo/codec/api.h>
-#include <libvideo/codec/codecs.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 
+#include "codec/codec.h"
 #include "gfx-palettize.h"
 #include "ramdomain.h"
 #include "swgfx.h"
@@ -313,7 +314,7 @@ typedef size_t mc_index_t;
 #endif
 
 struct median_io {
-	video_color_t (LIBVIDEO_CODEC_CC *mio_getcolor)(void const *cookie, mc_index_t i);
+	video_color_t (LIBVIDEO_GFX_FCC *mio_getcolor)(void const *cookie, mc_index_t i);
 	void const                       *mio_cookie;
 };
 
@@ -465,7 +466,7 @@ median_cut_start_impl(struct median_io const *__restrict io,
 #endif
 }
 
-PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
+PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_GFX_FCC
 median_io_gfx(void const *cookie, mc_index_t i) {
 	/* Fallback median-cut I/O callback using direct GFX color reads (slow) */
 	struct video_gfx const *self = (struct video_gfx const *)cookie;
@@ -476,15 +477,14 @@ median_io_gfx(void const *cookie, mc_index_t i) {
 	return (*video_swgfx_getcdrv(self)->xsw_getcolor)(self, x, y);
 }
 
-PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_CODEC_CC
+PRIVATE WUNUSED ATTR_PURE video_color_t LIBVIDEO_GFX_FCC
 median_io_buf(void const *cookie, mc_index_t i) {
 	return ((video_color_t const *)cookie)[i];
 }
 
-PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_CODEC_CC
+PRIVATE ATTR_NOINLINE ATTR_OUT(1) ATTR_IN(2) int LIBVIDEO_GFX_FCC
 video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
                              struct video_gfx const *__restrict self) {
-	struct video_codec const *result_codec;
 	struct video_gfx gfx = *self;
 	struct video_gfx result_gfx;
 	size_t stride, total;
@@ -493,9 +493,6 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
 	               (video_offset_t)gfx.vx_hdr.vxh_bymin - gfx.vx_hdr.vxh_cyoff,
 	               _video_gfxhdr_bxsiz(&gfx.vx_hdr),
 	               _video_gfxhdr_bysiz(&gfx.vx_hdr));
-	result_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
-	if unlikely(!result_codec)
-		goto err;
 	stride = video_gfx_getclipw(&gfx) * 4;
 	total  = video_gfx_getcliph(&gfx) * stride;
 	result->rb_data = (byte_t *)malloc(total);
@@ -505,10 +502,11 @@ video_gfx_iorect_as_rgba8888(struct video_rambuffer_base *result,
 /*	result->vb_refcnt          = 1;*/ /* Unused */
 /*	result->vb_domain          = _libvideo_ramdomain();*/ /* Unused */
 	result->vb_ops             = _rambuffer_ops();
-	result->vb_format.vf_codec = result_codec;
+	result->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBA8888);
 	result->vb_format.vf_pal   = NULL;
-	result->vb_xdim          = video_gfx_getclipw(&gfx);
-	result->vb_ydim          = video_gfx_getcliph(&gfx);
+	result->vb_xdim            = video_gfx_getclipw(&gfx);
+	result->vb_ydim            = video_gfx_getcliph(&gfx);
+	assertf(result->vb_format.vf_codec, "Built-in codec should have been recognized");
 	video_buffer_getgfx(result, &result_gfx,
 	                    GFX_BLENDMODE_OVERRIDE,
 	                    VIDEO_GFX_F_NORMAL, 0);

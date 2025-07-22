@@ -31,7 +31,6 @@
 #include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
-/**/
 
 #include "gfx-empty.h"
 #include "gfx-utils.h"

@@ -29,7 +29,7 @@
 
 #include <stddef.h>
 
-#include <libvideo/codec/codecs.h>
+#include <libvideo/gfx/codec/codec.h>
 #include <libvideo/types.h>
 
 DECL_BEGIN

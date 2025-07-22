@@ -17,17 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_PALETTE_H
-#define GUARD_LIBVIDEO_CODEC_PALETTE_H 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_PALETTE_H
+#define GUARD_LIBVIDEO_GFX_CODEC_PALETTE_H 1
 
-#include "api.h"
+#include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
-#include <stddef.h>
 
-#include <libvideo/codec/palette.h>
+#include <libvideo/color.h>
+#include <libvideo/gfx/codec/palette.h>
 
 DECL_BEGIN
 
@@ -47,7 +48,7 @@ DECL_BEGIN
  *
  * @return: * :   The newly created palette
  * @return: NULL: Out of memory */
-INTDEF WUNUSED REF struct video_palette *CC
+INTDEF WUNUSED REF struct video_palette *FCC
 libvideo_palette_create(video_pixel_t count);
 
 
@@ -61,10 +62,10 @@ libvideo_palette_create(video_pixel_t count);
  * This  function  is NOT  thread-safe,  so `self->vp_color2pixel'
  * must not be called by other threads until this function returns
  * @return: * : The optimized color palette */
-INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *CC
-libvideo_palette_optimize(REF struct video_palette *__restrict self);
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *FCC
+libvideo_palette_optimize(/*inherited(always)*/ REF struct video_palette *__restrict self);
 
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_PALETTE_H */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_PALETTE_H */

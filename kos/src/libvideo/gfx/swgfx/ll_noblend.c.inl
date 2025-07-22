@@ -37,10 +37,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
 #include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 

@@ -39,10 +39,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include <libvideo/codec/codecs.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
 
 #include "../buffer.h"
+#include "../codec/codec.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -408,9 +409,8 @@ err_wrong_fmt:
 	case 4: result_codec_id = VIDEO_CODEC_RGBX8888; break; /* ??? */
 	default: goto err_wrong_fmt;
 	}
-	result_format.vf_codec = video_codec_lookup(result_codec_id);
-	if unlikely(!result_format.vf_codec)
-		goto err_wrong_fmt;
+	result_format.vf_codec = libvideo_codec_lookup(result_codec_id);
+	assertf(result_format.vf_codec, "Built-in codec should have been recognized");
 	result_format.vf_pal = NULL;
 
 	/* Allocate video buffer */
@@ -494,13 +494,10 @@ libvideo_buffer_save_jpg(struct video_buffer *__restrict self,
 		struct video_format in_format;
 		struct video_buffer *conv_buffer;
 		in_codec_id = (self->vb_format.vf_codec->vc_specs.vcs_flags & VIDEO_CODEC_FLAG_LUM)
-		           ? VIDEO_CODEC_L8
-		           : VIDEO_CODEC_RGB888;
-		in_format.vf_codec = video_codec_lookup(in_codec_id);
-		if unlikely(!in_format.vf_codec) {
-			errno = EINVAL;
-			return -1;
-		}
+		              ? VIDEO_CODEC_L8
+		              : VIDEO_CODEC_RGB888;
+		in_format.vf_codec = libvideo_codec_lookup(in_codec_id);
+		assertf(in_format.vf_codec, "Built-in codec should have been recognized");
 		in_format.vf_pal = NULL;
 		conv_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &in_format);
 		if unlikely(!conv_buffer)

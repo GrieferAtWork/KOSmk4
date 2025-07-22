@@ -21,6 +21,7 @@
 #define GUARD_LIBVIDEO_GFX_GFX_PALETTIZE_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 

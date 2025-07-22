@@ -28,6 +28,8 @@
 #include <kos/anno.h>
 
 #include <libvideo/gfx/anim.h>
+#include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/format.h>
 
 DECL_BEGIN
 

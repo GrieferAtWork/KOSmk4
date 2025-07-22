@@ -17,15 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H
-#define GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_H
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
-#include <libvideo/codec/codecs.h>
+#include <kos/anno.h>
+
+#include <libvideo/gfx/codec/codec.h>
 
 DECL_BEGIN
 
@@ -33,7 +35,7 @@ DECL_BEGIN
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
  * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
-INTDEF WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
 
 /* Same as `video_codec_lookup_specs()', but can also be used to construct
@@ -51,10 +53,10 @@ libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs);
  * @return: NULL: [EINVAL] Impossible codec
  * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
-INTDEF WUNUSED NONNULL((1, 2)) struct video_codec const *CC
+INTDEF WUNUSED NONNULL((1, 2)) struct video_codec const *FCC
 libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
                          /*out*/ REF struct video_codec_handle **__restrict p_handle);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODEC_SPECS_H */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_H */

@@ -27,9 +27,6 @@
 
 #include <kos/anno.h>
 
-#include <stddef.h>
-
-#include <libvideo/color.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>

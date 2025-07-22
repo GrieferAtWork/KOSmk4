@@ -35,10 +35,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 
 #include "anim.h"
 #include "buffer.h"

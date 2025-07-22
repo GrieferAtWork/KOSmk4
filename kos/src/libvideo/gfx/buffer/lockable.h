@@ -25,16 +25,19 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-lock.h>
 
 #include <kos/anno.h>
 #include <kos/types.h>
 
 #include <stddef.h>
 
-#include <libc/malloc.h>
+#include <libc/stdlib.h>
+#include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

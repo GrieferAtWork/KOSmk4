@@ -31,10 +31,12 @@
 
 #include <kos/anno.h>
 
-#include <libvideo/codec/format.h>
+#include <stddef.h>
+
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/format.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/types.h>
 

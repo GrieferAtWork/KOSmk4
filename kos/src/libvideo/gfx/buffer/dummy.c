@@ -30,7 +30,6 @@
 
 #include <kos/anno.h>
 #include <kos/aref.h>
-#include <kos/refcnt.h>
 #include <kos/types.h>
 #include <sys/mman.h>
 

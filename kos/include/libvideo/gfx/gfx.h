@@ -29,11 +29,10 @@
 
 #include <bits/types.h>
 
-#include <libvideo/codec/format.h>
-
 #include "../color.h"
 #include "../types.h"
 #include "blend.h" /* gfx_blendmode_t */
+#include "codec/format.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>

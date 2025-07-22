@@ -62,6 +62,32 @@ Abstraction between `video_monitor` and `video_window`:
 	- A `video_window` is resized, moved, becomes overlapped, ...
 - Indicate that LFB region was changed
 
+> struct video_format { };
+
+Combination of `struct video_codec` ([1..1]) and `struct video_palette` ([0..1])
+
+---
+
+> struct video_codec { ... };
+
+Descriptor for a pixel- and color format:
+- Convert between `video_pixel_t` and `video_color_t`
+- Do low-level pixel I/O on memory obtained through `video_lock` / `video_lockregion`:
+	- Functions to get/set singular pixels
+	- Functions to do horizontal/vertical/area fills
+	- Functions to do area copies
+- NOT reference-counted by default (except when dynamically created)
+- Lots of built-in codecs for common formats
+- Custom codecs can be constructed from 
+
+---
+
+> struct video_palette { ... };
+
+Descriptor for color conversion of palette-based video codecs:
+- Can be optimized for fast (`O(log N)`) color → pixel conversion
+- Reference-counted, read-only (after creation)
+
 ---
 
 > struct video_buffer { ... };
@@ -94,38 +120,3 @@ Descriptor for a video graphics context
 	- State-full wrapper around linked `video_buffer`
 
 ---
-
-
-
-### Codec
-
-Library: `libvideo-codec.so` -- TODO: Merge with `libvideo-gfx.so` (one is never used without the other, so no point in splitting them)
-
----
-
-> struct video_format { };
-
-Combination of `struct video_codec` ([1..1]) and `struct video_palette` ([0..1])
-
----
-
-> struct video_codec { ... };
-
-Descriptor for a pixel- and color format:
-- Convert between `video_pixel_t` and `video_color_t`
-- Do low-level pixel I/O on memory obtained through `video_lock` / `video_lockregion`:
-	- Functions to get/set singular pixels
-	- Functions to do horizontal/vertical/area fills
-	- Functions to do area copies
-- NOT reference-counted by default (except when dynamically created)
-- Lots of built-in codecs for common formats
-- Custom codecs can be constructed from 
-
----
-
-> struct video_palette { ... };
-
-Descriptor for color conversion of palette-based video codecs:
-- Can be optimized for fast (`O(log N)`) color → pixel conversion
-- Reference-counted, read-only (after creation)
-

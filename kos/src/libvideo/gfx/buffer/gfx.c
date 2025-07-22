@@ -28,12 +28,15 @@
 
 #include <kos/anno.h>
 
+#include <assert.h>
 #include <malloc.h>
 #include <stddef.h>
 
 #include <libvideo/color.h>
 #include <libvideo/crect.h>
+#include <libvideo/gfx/blend.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/rect.h>
 #include <libvideo/types.h>

@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_CODEC_PALETTE_H
-#define _LIBVIDEO_CODEC_PALETTE_H 1
+#ifndef _LIBVIDEO_GFX_CODEC_PALETTE_H
+#define _LIBVIDEO_GFX_CODEC_PALETTE_H 1
 
-#include "api.h"
+#include "../api.h"
+/**/
 
 #include <__stdinc.h>
 
@@ -30,7 +31,7 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include "../color.h"
+#include "../../color.h"
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -43,11 +44,11 @@ struct video_palette_tree;
 struct video_palette {
 	/* [1..1][const] Translate a color into the closest palette index. */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
-	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_color2pixel)(struct video_palette const *__restrict self,
-	                                               video_color_t color);
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vp_color2pixel)(struct video_palette const *__restrict self,
+	                                              video_color_t color);
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
 	__ATTR_NONNULL_T((1)) void
-	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
+	__NOTHROW_T(LIBVIDEO_GFX_FCC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                              vp_refcnt; /* Reference counter. */
 	struct video_palette_tree              *_vp_tree;   /* [0..1] Internal cache used by `video_palette_optimize()' */
 	video_palette_flag_t                     vp_flags;  /* [const] Video palette flags (filled in by `video_palette_optimize()') */
@@ -94,11 +95,11 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy
  * @return: * :   The newly created palette
  * @return: NULL: Out of memory */
 typedef __ATTR_WUNUSED __REF struct video_palette *
-(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_CREATE)(video_pixel_t __count);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __REF struct video_palette *
-LIBVIDEO_CODEC_CC video_palette_create(video_pixel_t __count);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+(LIBVIDEO_GFX_FCC *PVIDEO_PALETTE_CREATE)(video_pixel_t __count);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_palette *
+LIBVIDEO_GFX_FCC video_palette_create(video_pixel_t __count);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Optimize lookup times for `self', making `self->vp_color2pixel'
  * execute in sub-linear time (if possible). This function must be
@@ -111,14 +112,14 @@ LIBVIDEO_CODEC_CC video_palette_create(video_pixel_t __count);
  * must not be called by other threads until this function returns
  * @return: * : The optimized color palette */
 typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_INOUT_T(1) __REF struct video_palette *
-(LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_OPTIMIZE)(__REF struct video_palette *__restrict self);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_palette *LIBVIDEO_CODEC_CC
-video_palette_optimize(__REF struct video_palette *__restrict self);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+(LIBVIDEO_GFX_FCC *PVIDEO_PALETTE_OPTIMIZE)(/*inherited(always)*/ __REF struct video_palette *__restrict self);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_INOUT(1) __REF struct video_palette *LIBVIDEO_GFX_FCC
+video_palette_optimize(/*inherited(always)*/ __REF struct video_palette *__restrict self);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBVIDEO_CODEC_PALETTE_H */
+#endif /* !_LIBVIDEO_GFX_CODEC_PALETTE_H */

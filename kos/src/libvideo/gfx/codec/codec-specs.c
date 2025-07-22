@@ -17,11 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODEC_SPECS_C
-#define GUARD_LIBVIDEO_CODEC_CODEC_SPECS_C 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_C
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -37,11 +37,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
+#include <libvideo/gfx/codec/codec.h>
 
 #include "codec-specs.h"
 #include "codec-utils.h"
-#include "codecs.h"
+#include "codec.h"
 
 DECL_BEGIN
 
@@ -49,7 +49,8 @@ DECL_BEGIN
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
  * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
-INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *CC
+DEFINE_PUBLIC_ALIAS(video_codec_lookup_specs, libvideo_codec_lookup_specs);
+INTERN WUNUSED ATTR_PURE NONNULL((1)) struct video_codec const *FCC
 libvideo_codec_lookup_specs(struct video_codec_specs const *__restrict specs) {
 	video_codec_t codec = VIDEO_CODEC_NONE;
 	if (specs->vcs_flags & (VIDEO_CODEC_FLAG_LUM | VIDEO_CODEC_FLAG_PAL)) {
@@ -441,7 +442,7 @@ nope:
 
 PRIVATE struct video_codec_handle dummy_handle = {
 	.vch_refcnt  = 0x7fff,
-	.vch_destroy = (void (CC *)(struct video_codec_handle *__restrict))(void *)-1,
+	.vch_destroy = (void (FCC *)(struct video_codec_handle *__restrict))(void *)-1,
 };
 
 
@@ -450,7 +451,7 @@ struct video_codec_custom_handle: video_codec_handle {
 	struct video_codec_custom vcch_unaligned;
 };
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
 	struct video_codec_custom_handle *me;
 	me = (struct video_codec_custom_handle *)self;
@@ -474,7 +475,8 @@ video_codec_custom_handle_destroy(struct video_codec_handle *__restrict self) {
  * @return: NULL: [EINVAL] Impossible codec
  * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
-INTERN WUNUSED NONNULL((1, 2)) struct video_codec const *CC
+DEFINE_PUBLIC_ALIAS(video_codec_fromspecs, libvideo_codec_fromspecs);
+INTERN WUNUSED NONNULL((1, 2)) struct video_codec const *FCC
 libvideo_codec_fromspecs(struct video_codec_specs const *__restrict specs,
                          /*out*/ REF struct video_codec_handle **__restrict p_handle) {
 	struct video_codec_custom_handle *custom;
@@ -528,9 +530,7 @@ err_inval:
 }
 
 
-DEFINE_PUBLIC_ALIAS(video_codec_lookup_specs, libvideo_codec_lookup_specs);
-DEFINE_PUBLIC_ALIAS(video_codec_fromspecs, libvideo_codec_fromspecs);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODEC_SPECS_C */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_SPECS_C */

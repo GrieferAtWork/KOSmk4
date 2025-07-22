@@ -31,14 +31,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/limitcore.h>
-
 #include <kos/anno.h>
 #include <kos/types.h>
 #include <sys/mman.h>
 
 #include <errno.h>
-#include <malloc.h>
 #include <malloca.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -46,7 +43,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <string.h>
 #include <unistd.h>
 
-#include <libiberty.h>
 #include <libvideo/gfx/anim.h>
 #include <libvideo/gfx/buffer.h>
 
@@ -65,6 +61,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "io/png-lodepng.c.inl"
 #include "io/png.c.inl"
 #endif /* !__INTELLISENSE__ */
+
+#include <libiberty.h>
 
 DECL_BEGIN
 

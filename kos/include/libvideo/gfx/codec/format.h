@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_CODEC_FORMAT_H
-#define _LIBVIDEO_CODEC_FORMAT_H 1
+#ifndef _LIBVIDEO_GFX_CODEC_FORMAT_H
+#define _LIBVIDEO_GFX_CODEC_FORMAT_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <__stdinc.h>
@@ -29,12 +29,12 @@
 
 #include <bits/types.h>
 
-#include "../color.h"
-#include "../types.h"
+#include "../../color.h"
+#include "../../types.h"
 
 #ifdef __cplusplus
 #include <__stdcxx.h>
-#include "codecs.h"
+#include "codec.h"
 #endif /* __cplusplus */
 
 __DECL_BEGIN
@@ -100,16 +100,16 @@ struct video_format {
 public: /* Low-level, memory-based pixel accessor functions. */
 
 	/* Get a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getpixel(this, __line, __x); }
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getcolor(this, __line, __x); }
+	__CXX_CLASSMEMBER video_pixel_t getpixel(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getpixel(this, __line, __x); }
+	__CXX_CLASSMEMBER video_color_t getcolor(__byte_t const *__restrict __line, video_coord_t __x) const { return video_format_getcolor(this, __line, __x); }
 
 	/* Set a pixel (The caller must ensure that the given x/y are in-bounds) */
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setpixel(__byte_t *__restrict __line, video_coord_t __x, video_pixel_t __pixel) const { video_format_setpixel(this, __line, __x, __pixel); }
-	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC setcolor(__byte_t *__restrict __line, video_coord_t __x, video_color_t __color) const { video_format_setcolor(this, __line, __x, __color); }
+	__CXX_CLASSMEMBER void setpixel(__byte_t *__restrict __line, video_coord_t __x, video_pixel_t __pixel) const { video_format_setpixel(this, __line, __x, __pixel); }
+	__CXX_CLASSMEMBER void setcolor(__byte_t *__restrict __line, video_coord_t __x, video_color_t __color) const { video_format_setcolor(this, __line, __x, __color); }
 
 	/* Convert between color and pixel values. */
-	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC pixel2color(video_pixel_t __pixel) const { return video_format_pixel2color(this, __pixel); }
-	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC color2pixel(video_color_t __color) const { return video_format_color2pixel(this, __color); }
+	__CXX_CLASSMEMBER video_color_t pixel2color(video_pixel_t __pixel) const { return video_format_pixel2color(this, __pixel); }
+	__CXX_CLASSMEMBER video_pixel_t color2pixel(video_color_t __color) const { return video_format_color2pixel(this, __color); }
 #endif /* __cplusplus */
 };
 
@@ -130,8 +130,8 @@ struct video_converter {
 	 * >> video_color_t color = video_format_pixel2color(&vcv_from, __from_pixel);
 	 * >> video_pixel_t to_pixel = video_format_color2pixel(&vcv_to, color); */
 	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_IN_T(1) video_pixel_t
-	(LIBVIDEO_CODEC_CC *vcv_mappixel)(struct video_converter const *__restrict __self,
-	                                  video_pixel_t __from_pixel);
+	(LIBVIDEO_GFX_FCC *vcv_mappixel)(struct video_converter const *__restrict __self,
+	                                 video_pixel_t __from_pixel);
 	union {
 		struct {
 			struct video_format vcv_from; /* [OVERRIDE(.vf_pal, [NOT(REF)])] Source video format (may be invalid after init) */
@@ -178,4 +178,4 @@ video_converter_mappixel(struct video_converter const *__restrict __self,
 
 __DECL_END
 
-#endif /* !_LIBVIDEO_CODEC_FORMAT_H */
+#endif /* !_LIBVIDEO_GFX_CODEC_FORMAT_H */

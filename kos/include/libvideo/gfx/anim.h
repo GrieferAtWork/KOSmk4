@@ -40,6 +40,7 @@ __DECL_BEGIN
 
 struct video_buffer;
 struct video_domain;
+struct video_format;
 struct video_anim;
 
 typedef __uint32_t video_anim_frame_id;

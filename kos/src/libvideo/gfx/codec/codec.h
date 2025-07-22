@@ -17,31 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODECS_H
-#define GUARD_LIBVIDEO_CODEC_CODECS_H 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_H
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_H 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/__byteswap.h>
-#include <hybrid/byteorder.h>
-#include <hybrid/typecore.h>
-
 #include <kos/types.h>
 
-#include <libvideo/codec/codecs.h>
+#include <libvideo/color.h>
+#include <libvideo/gfx/codec/codec.h>
 
 DECL_BEGIN
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
  * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
-INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
+INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
 libvideo_codec_lookup(video_codec_t codec);
 
 /* Same as `libvideo_codec_lookup()', but used for "extra" codecs */
-INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
+INTDEF /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
 libvideo_codec_lookup_extra(video_codec_t codec);
 
 struct video_codec_custom: video_codec {
@@ -101,10 +98,10 @@ struct video_codec_custom: video_codec {
  *
  * @return: true:  Success -- all fields initialized
  * @return: false: Failure -- codec cannot be represented */
-INTDEF WUNUSED NONNULL((1)) bool CC
+INTDEF WUNUSED NONNULL((1)) bool FCC
 libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
                                bool populate_noalign);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODECS_H */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_H */

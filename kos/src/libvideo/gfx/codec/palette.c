@@ -22,28 +22,31 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_PALETTE_C
-#define GUARD_LIBVIDEO_CODEC_PALETTE_C 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_PALETTE_C
+#define GUARD_LIBVIDEO_GFX_CODEC_PALETTE_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
-#include "palette.h"
-
-#include "api.h"
+#include "../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
 #include <kos/types.h>
 
 #include <assert.h>
-#include <atomic.h>
 #include <malloc.h>
 #include <malloca.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <libvideo/codec/palette.h>
+#include <libvideo/color.h>
+#include <libvideo/gfx/codec/palette.h>
+
+#include "palette.h"
 
 DECL_BEGIN
 
@@ -90,7 +93,7 @@ PRIVATE shift_t const chan_weight[4] = { 1, 0, 1, 0 };
 #define chan_diff2weight_a(v) chan_diff2weight(3, v)
 #endif /* !chan_diff2weight_a */
 
-LOCAL ATTR_CONST video_twochannels_t CC
+LOCAL ATTR_CONST video_twochannels_t FCC
 abs_color_delta3(video_color_t c1, video_color_t c2) {
 	video_stwochannels_t dr = (video_stwochannels_t)VIDEO_COLOR_GET_RED(c1) - VIDEO_COLOR_GET_RED(c2);
 	video_stwochannels_t dg = (video_stwochannels_t)VIDEO_COLOR_GET_GREEN(c1) - VIDEO_COLOR_GET_GREEN(c2);
@@ -100,7 +103,7 @@ abs_color_delta3(video_color_t c1, video_color_t c2) {
 	       chan_diff2weight_b(db);
 }
 
-LOCAL ATTR_CONST video_twochannels_t CC
+LOCAL ATTR_CONST video_twochannels_t FCC
 abs_color_delta4(video_color_t c1, video_color_t c2) {
 	video_stwochannels_t dr = (video_stwochannels_t)VIDEO_COLOR_GET_RED(c1) - VIDEO_COLOR_GET_RED(c2);
 	video_stwochannels_t dg = (video_stwochannels_t)VIDEO_COLOR_GET_GREEN(c1) - VIDEO_COLOR_GET_GREEN(c2);
@@ -111,11 +114,11 @@ abs_color_delta4(video_color_t c1, video_color_t c2) {
 }
 
 typedef ATTR_PURE_T WUNUSED_T ATTR_IN_T((1)) video_pixel_t
-NOTHROW_T(CC *PVIDEO_PALETTE_COLOR2PIXEL)(struct video_palette const *__restrict self,
+NOTHROW_T(FCC *PVIDEO_PALETTE_COLOR2PIXEL)(struct video_palette const *__restrict self,
                                           video_color_t color);
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN((1)) video_pixel_t
-NOTHROW(CC video_palette_color2pixel_0)(struct video_palette const *__restrict self,
+NOTHROW(FCC video_palette_color2pixel_0)(struct video_palette const *__restrict self,
                                         video_color_t color) {
 	(void)self;
 	(void)color;
@@ -124,7 +127,7 @@ NOTHROW(CC video_palette_color2pixel_0)(struct video_palette const *__restrict s
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN((1)) video_pixel_t
-NOTHROW(CC video_palette_color2pixel_1)(struct video_palette const *__restrict self,
+NOTHROW(FCC video_palette_color2pixel_1)(struct video_palette const *__restrict self,
                                         video_color_t color) {
 	(void)self;
 	(void)color;
@@ -132,7 +135,7 @@ NOTHROW(CC video_palette_color2pixel_1)(struct video_palette const *__restrict s
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN((1)) video_pixel_t
-NOTHROW(CC video_palette_color2pixel_2_c3)(struct video_palette const *__restrict self,
+NOTHROW(FCC video_palette_color2pixel_2_c3)(struct video_palette const *__restrict self,
                                            video_color_t color) {
 	video_twochannels_t delta0 = abs_color_delta3(self->vp_pal[0], color);
 	video_twochannels_t delta1 = abs_color_delta3(self->vp_pal[1], color);
@@ -140,7 +143,7 @@ NOTHROW(CC video_palette_color2pixel_2_c3)(struct video_palette const *__restric
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN((1)) video_pixel_t
-NOTHROW(CC video_palette_color2pixel_2_c4)(struct video_palette const *__restrict self,
+NOTHROW(FCC video_palette_color2pixel_2_c4)(struct video_palette const *__restrict self,
                                            video_color_t color) {
 	video_twochannels_t delta0 = abs_color_delta4(self->vp_pal[0], color);
 	video_twochannels_t delta1 = abs_color_delta4(self->vp_pal[1], color);
@@ -148,7 +151,7 @@ NOTHROW(CC video_palette_color2pixel_2_c4)(struct video_palette const *__restric
 }
 
 LOCAL ATTR_CONST WUNUSED PVIDEO_PALETTE_COLOR2PIXEL
-NOTHROW(CC video_palette_get_special_color2pixel)(video_pixel_t n_colors) {
+NOTHROW(FCC video_palette_get_special_color2pixel)(video_pixel_t n_colors) {
 	switch (n_colors) {
 	case 0:
 		return &video_palette_color2pixel_0;
@@ -162,7 +165,7 @@ NOTHROW(CC video_palette_get_special_color2pixel)(video_pixel_t n_colors) {
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN((1)) video_pixel_t
-NOTHROW(CC linear_video_palette_color2pixel)(struct video_palette const *__restrict self,
+NOTHROW(FCC linear_video_palette_color2pixel)(struct video_palette const *__restrict self,
                                              video_color_t color) {
 	video_pixel_t i, winner = 0;
 	video_twochannels_t winner_delta = (video_twochannels_t)-1;
@@ -181,7 +184,7 @@ NOTHROW(CC linear_video_palette_color2pixel)(struct video_palette const *__restr
 
 
 PRIVATE NONNULL((1)) void
-NOTHROW(CC default_video_palette_destroy)(struct video_palette *__restrict self) {
+NOTHROW(FCC default_video_palette_destroy)(struct video_palette *__restrict self) {
 	free(self);
 }
 
@@ -213,7 +216,8 @@ struct video_palette_tree {
  *
  * @return: * :   The newly created palette
  * @return: NULL: Out of memory */
-INTERN WUNUSED REF struct video_palette *CC
+DEFINE_PUBLIC_ALIAS(video_palette_create, libvideo_palette_create);
+INTERN WUNUSED REF struct video_palette *FCC
 libvideo_palette_create(video_pixel_t count) {
 	REF struct video_palette *result;
 	uintptr_t treeoff = offsetof(struct video_palette, vp_pal) +
@@ -252,7 +256,7 @@ compare_chan(void const *_a, void const *_b, void *_chan_id) {
 }
 
 /* @param: chan_id: Channel ID (index into `pi_chans') */
-PRIVATE WUNUSED NONNULL((1)) ATTR_INOUTS(2, 3) struct video_palette_tree *CC
+PRIVATE WUNUSED NONNULL((1)) ATTR_INOUTS(2, 3) struct video_palette_tree *FCC
 vp_build_kd_tree(struct video_palette_tree **p_alloc, struct pal_item *items,
                  video_pixel_t n, unsigned int chan_id, unsigned int n_chans) {
 	struct video_palette_tree *node;
@@ -283,53 +287,53 @@ struct kd_tree_result {
 	video_twochannels_t ktr_delta;
 };
 
-#define DEFINE_vp_kd_treeN_find(N)                                              \
-	LOCAL void                                                                  \
-	NOTHROW(CC vp_kd_tree##N##_find)(struct video_palette_tree const *node,     \
-	                                 video_color_t color, unsigned int chan_id, \
-	                                 struct kd_tree_result *result) {           \
-		struct video_palette_tree const *near;                                  \
-		struct video_palette_tree const *far;                                   \
-		video_twochannels_t delta;                                              \
-		video_twochannels_t weight;                                             \
-		video_stwochannels_t diff;                                              \
-		union {                                                                 \
-			video_color_t color;                                                \
-			video_channel_t chans[4];                                           \
-		} color_data;                                                           \
-		delta = abs_color_delta##N(color, node->vpt_color);                     \
-		if (result->ktr_delta > delta) {                                        \
-			result->ktr_delta = delta;                                          \
-			result->ktr_pixel = node->vpt_pixel;                                \
-		}                                                                       \
-		                                                                        \
-		__builtin_assume(chan_id < N);                                          \
-		color_data.color = color;                                               \
-		diff = (video_stwochannels_t)color_data.chans[chan_id] -                \
-		       (video_stwochannels_t)node->vpt_chans[chan_id];                  \
-		weight = chan_diff2weight(chan_id, diff);                               \
-		if (diff < 0) {                                                         \
-			near = node->vpt_lhs;                                               \
-			far  = node->vpt_rhs;                                               \
-		} else {                                                                \
-			near = node->vpt_rhs;                                               \
-			far  = node->vpt_lhs;                                               \
-		}                                                                       \
-		if (++chan_id >= N)                                                     \
-			chan_id = 0;                                                        \
-		if (near)                                                               \
-			vp_kd_tree##N##_find(near, color, chan_id, result);                 \
-		if (weight < result->ktr_delta) {                                       \
-			if (far)                                                            \
-				vp_kd_tree##N##_find(far, color, chan_id, result);              \
-		}                                                                       \
+#define DEFINE_vp_kd_treeN_find(N)                                               \
+	LOCAL void                                                                   \
+	NOTHROW(FCC vp_kd_tree##N##_find)(struct video_palette_tree const *node,     \
+	                                  video_color_t color, unsigned int chan_id, \
+	                                  struct kd_tree_result *result) {           \
+		struct video_palette_tree const *near;                                   \
+		struct video_palette_tree const *far;                                    \
+		video_twochannels_t delta;                                               \
+		video_twochannels_t weight;                                              \
+		video_stwochannels_t diff;                                               \
+		union {                                                                  \
+			video_color_t color;                                                 \
+			video_channel_t chans[4];                                            \
+		} color_data;                                                            \
+		delta = abs_color_delta##N(color, node->vpt_color);                      \
+		if (result->ktr_delta > delta) {                                         \
+			result->ktr_delta = delta;                                           \
+			result->ktr_pixel = node->vpt_pixel;                                 \
+		}                                                                        \
+		                                                                         \
+		__builtin_assume(chan_id < N);                                           \
+		color_data.color = color;                                                \
+		diff = (video_stwochannels_t)color_data.chans[chan_id] -                 \
+		       (video_stwochannels_t)node->vpt_chans[chan_id];                   \
+		weight = chan_diff2weight(chan_id, diff);                                \
+		if (diff < 0) {                                                          \
+			near = node->vpt_lhs;                                                \
+			far  = node->vpt_rhs;                                                \
+		} else {                                                                 \
+			near = node->vpt_rhs;                                                \
+			far  = node->vpt_lhs;                                                \
+		}                                                                        \
+		if (++chan_id >= N)                                                      \
+			chan_id = 0;                                                         \
+		if (near)                                                                \
+			vp_kd_tree##N##_find(near, color, chan_id, result);                  \
+		if (weight < result->ktr_delta) {                                        \
+			if (far)                                                             \
+				vp_kd_tree##N##_find(far, color, chan_id, result);               \
+		}                                                                        \
 	}
 DEFINE_vp_kd_treeN_find(3) /* 3 channels: RGB */
 DEFINE_vp_kd_treeN_find(4) /* 4 channels: RGBA */
 #undef DEFINE_vp_kd_treeN_find
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t
-NOTHROW(CC vp_kd_tree3_color2pixel)(struct video_palette const *__restrict self,
+NOTHROW(FCC vp_kd_tree3_color2pixel)(struct video_palette const *__restrict self,
                                     video_color_t color) {
 	struct kd_tree_result result;
 	result.ktr_delta = (video_twochannels_t)-1;
@@ -339,7 +343,7 @@ NOTHROW(CC vp_kd_tree3_color2pixel)(struct video_palette const *__restrict self,
 }
 
 PRIVATE ATTR_PURE WUNUSED ATTR_IN(1) video_pixel_t
-NOTHROW(CC vp_kd_tree4_color2pixel)(struct video_palette const *__restrict self,
+NOTHROW(FCC vp_kd_tree4_color2pixel)(struct video_palette const *__restrict self,
                                     video_color_t color) {
 	struct kd_tree_result result;
 	result.ktr_delta = (video_twochannels_t)-1;
@@ -370,8 +374,9 @@ compare_color(void const *_a, void const *_b) {
  * This  function  is NOT  thread-safe,  so `self->vp_color2pixel'
  * must not be called by other threads until this function returns
  * @return: * : The optimized color palette */
-INTERN ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *CC
-libvideo_palette_optimize(REF struct video_palette *__restrict self) {
+DEFINE_PUBLIC_ALIAS(video_palette_optimize, libvideo_palette_optimize);
+INTERN ATTR_RETNONNULL WUNUSED ATTR_INOUT(1) REF struct video_palette *FCC
+libvideo_palette_optimize(/*inherited(always)*/ REF struct video_palette *__restrict self) {
 	video_pixel_t i, count = self->vp_cnt;
 	struct pal_item *items;
 	struct video_palette_tree *p_alloc;
@@ -456,9 +461,6 @@ done:
 	return self;
 }
 
-DEFINE_PUBLIC_ALIAS(video_palette_create, libvideo_palette_create);
-DEFINE_PUBLIC_ALIAS(video_palette_optimize, libvideo_palette_optimize);
-
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_PALETTE_C */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_PALETTE_C */

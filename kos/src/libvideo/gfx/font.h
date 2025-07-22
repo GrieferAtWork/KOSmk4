@@ -21,16 +21,21 @@
 #define GUARD_LIBVIDEO_GFX_FONT_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
+#include <kos/anno.h>
 #include <parts/uchar/format-printer.h> /* C32FORMATPRINTER_CC */
+#include <sys/types.h>
 
 #include <format-printer.h> /* FORMATPRINTER_CC */
-#include <uchar.h>
+#include <stddef.h>
 
+#include <libvideo/color.h>
 #include <libvideo/gfx/font.h>
+#include <libvideo/gfx/gfx.h>
+#include <libvideo/types.h>
 
 DECL_BEGIN
 

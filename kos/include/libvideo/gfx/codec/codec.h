@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBVIDEO_CODEC_CODECS_H
-#define _LIBVIDEO_CODEC_CODECS_H 1
+#ifndef _LIBVIDEO_GFX_CODEC_CODEC_H
+#define _LIBVIDEO_GFX_CODEC_CODEC_H 1
 
-#include "api.h"
+#include "../api.h"
+/**/
 
 #include <__stdinc.h>
 
@@ -32,8 +33,8 @@
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
-#include "../color.h"
-#include "../types.h"
+#include "../../color.h"
+#include "../../types.h"
 
 #define VIDEO_CODEC_NONE   0x0000 /* Invalid codec. */
 #define VIDEO_CODEC_USER   0xfffe /* User-defined codec (use this when defining+implementing your own `struct video_codec') */
@@ -282,11 +283,11 @@ struct video_codec_specs {
 
 /* Convert between color and pixel values. */
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
-(LIBVIDEO_CODEC_CC *video_codec_pixel2color_t)(struct video_format const *__restrict __self,
-                                               video_pixel_t __pixel);
+(LIBVIDEO_GFX_FCC *video_codec_pixel2color_t)(struct video_format const *__restrict __self,
+                                              video_pixel_t __pixel);
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-(LIBVIDEO_CODEC_CC *video_codec_color2pixel_t)(struct video_format const *__restrict __self,
-                                               video_color_t __color);
+(LIBVIDEO_GFX_FCC *video_codec_color2pixel_t)(struct video_format const *__restrict __self,
+                                              video_color_t __color);
 
 /* Initialize a pixel format converter `__self' by:
  * - Filling in `__self->vcv_mappixel'
@@ -299,16 +300,16 @@ typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
  * This operator must be called as `(*__self->vcv_from.vf_codec->vc_initconverter)(__self)'
  * @return: * : Always re-returns `__self' */
 typedef __ATTR_RETNONNULL_T __ATTR_INOUT_T(1) struct video_converter *
-(LIBVIDEO_CODEC_CC *video_codec_initconverter_t)(struct video_converter *__restrict __self);
+(LIBVIDEO_GFX_FCC *video_codec_initconverter_t)(struct video_converter *__restrict __self);
 
 /* Get a pixel (The caller must ensure that the given x is in-bounds) */
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
-(LIBVIDEO_CODEC_CC *video_codec_getpixel_t)(__byte_t const *__restrict __line, video_coord_t __x);
+(LIBVIDEO_GFX_FCC *video_codec_getpixel_t)(__byte_t const *__restrict __line, video_coord_t __x);
 
 /* Set a pixel (The caller must ensure that the given x is in-bounds) */
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_setpixel_t)(__byte_t *__restrict __line,
-                                            video_coord_t __x, video_pixel_t __pixel);
+(LIBVIDEO_GFX_FCC *video_codec_setpixel_t)(__byte_t *__restrict __line,
+                                           video_coord_t __x, video_pixel_t __pixel);
 
 #ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if __has_attribute(__regparm__)
@@ -329,8 +330,8 @@ typedef void (*_video_codec_setpixel3_t)(void);
  * @assume(IS_ALIGNED(__line, vc_align));
  * @assume(__num_pixels > 0); */
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_linefill_t)(__byte_t *__restrict __line, video_coord_t __x,
-                                            video_pixel_t __pixel, video_dim_t __num_pixels);
+(LIBVIDEO_GFX_FCC *video_codec_linefill_t)(__byte_t *__restrict __line, video_coord_t __x,
+                                           video_pixel_t __pixel, video_dim_t __num_pixels);
 
 /* Fill a vertical line of pixels. Same as:
  * >> do {
@@ -341,8 +342,8 @@ typedef __ATTR_NONNULL_T((1)) void
  * @assume(IS_ALIGNED(__stride, vc_align));
  * @assume(__num_pixels > 0); */
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_vertfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                                            video_pixel_t __pixel, video_dim_t __num_pixels);
+(LIBVIDEO_GFX_FCC *video_codec_vertfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                           video_pixel_t __pixel, video_dim_t __num_pixels);
 
 /* Fill a rect of pixels. Same as:
  * >> do {
@@ -354,8 +355,8 @@ typedef __ATTR_NONNULL_T((1)) void
  * @assume(IS_ALIGNED(__line, vc_align));
  * @assume(IS_ALIGNED(__stride, vc_align)); */
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_rectfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                                            video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
+(LIBVIDEO_GFX_FCC *video_codec_rectfill_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                           video_pixel_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 
 /* Copy a rect of pixels. When src/dst overlap, results are weak-undefined.
  * @assume(IS_ALIGNED(__dst_line, vc_align));
@@ -365,49 +366,49 @@ typedef __ATTR_NONNULL_T((1)) void
  * @assume(__size_x > 0);
  * @assume(__size_y > 0); */
 typedef __ATTR_NONNULL_T((1, 4)) void
-(LIBVIDEO_CODEC_CC *video_codec_rectcopy_t)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
-                                            __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
-                                            video_dim_t __size_x, video_dim_t __size_y);
+(LIBVIDEO_GFX_FCC *video_codec_rectcopy_t)(__byte_t *__restrict __dst_line, video_coord_t __dst_x, __size_t __dst_stride,
+                                           __byte_t const *__restrict __src_line, video_coord_t __src_x, __size_t __src_stride,
+                                           video_dim_t __size_x, video_dim_t __size_y);
 
 /* Same as `vc_rectcopy', but able to deal with the actual memory of __dst_line/__src_line
  * overlapping, whilst properly dealing with that being the case without producing corrupt
  * results (iow: this is "memmove", and `vc_rectcopy' is "memcpy") */
 typedef __ATTR_NONNULL_T((1, 3)) void
-(LIBVIDEO_CODEC_CC *video_codec_rectmove_t)(__byte_t *__dst_line, video_coord_t __dst_x,
-                                            __byte_t const *__src_line, video_coord_t __src_x,
-                                            __size_t __stride, video_dim_t __size_x, video_dim_t __size_y);
+(LIBVIDEO_GFX_FCC *video_codec_rectmove_t)(__byte_t *__dst_line, video_coord_t __dst_x,
+                                           __byte_t const *__src_line, video_coord_t __src_x,
+                                           __size_t __stride, video_dim_t __size_x, video_dim_t __size_y);
 
 /* Copy a line of pixels. When src/dst overlap, results are weak-undefined.
  * @assume(IS_ALIGNED(__dst_line, vc_align));
  * @assume(IS_ALIGNED(__src_line, vc_align));
  * @assume(__size_x > 0); */
 typedef __ATTR_NONNULL_T((1, 3)) void
-(LIBVIDEO_CODEC_CC *video_codec_linecopy_t)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
-                                            __byte_t const *__restrict __src_line, video_coord_t __src_x,
-                                            video_dim_t __size_x);
+(LIBVIDEO_GFX_FCC *video_codec_linecopy_t)(__byte_t *__restrict __dst_line, video_coord_t __dst_x,
+                                           __byte_t const *__restrict __src_line, video_coord_t __src_x,
+                                           video_dim_t __size_x);
 
 /* 64-bit color/pixel functions */
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color64_t
-(LIBVIDEO_CODEC_CC *video_codec_pixel2color64_t)(struct video_format const *__restrict __self,
-                                                 video_pixel64_t __pixel);
+(LIBVIDEO_GFX_FCC *video_codec_pixel2color64_t)(struct video_format const *__restrict __self,
+                                                video_pixel64_t __pixel);
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel64_t
-(LIBVIDEO_CODEC_CC *video_codec_color2pixel64_t)(struct video_format const *__restrict __self,
-                                                 video_color64_t __color);
+(LIBVIDEO_GFX_FCC *video_codec_color2pixel64_t)(struct video_format const *__restrict __self,
+                                                video_color64_t __color);
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel64_t
-(LIBVIDEO_CODEC_CC *video_codec_getpixel64_t)(__byte_t const *__restrict __line, video_coord_t __x);
+(LIBVIDEO_GFX_FCC *video_codec_getpixel64_t)(__byte_t const *__restrict __line, video_coord_t __x);
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_setpixel64_t)(__byte_t *__restrict __line,
-                                              video_coord_t __x, video_pixel64_t __pixel);
+(LIBVIDEO_GFX_FCC *video_codec_setpixel64_t)(__byte_t *__restrict __line,
+                                             video_coord_t __x, video_pixel64_t __pixel);
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_linefill64_t)(__byte_t *__restrict __line, video_coord_t __x,
-                                              video_pixel64_t __pixel, video_dim_t __num_pixels);
+(LIBVIDEO_GFX_FCC *video_codec_linefill64_t)(__byte_t *__restrict __line, video_coord_t __x,
+                                             video_pixel64_t __pixel, video_dim_t __num_pixels);
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_vertfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                                              video_pixel64_t __pixel, video_dim_t __num_pixels);
+(LIBVIDEO_GFX_FCC *video_codec_vertfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                             video_pixel64_t __pixel, video_dim_t __num_pixels);
 typedef __ATTR_NONNULL_T((1)) void
-(LIBVIDEO_CODEC_CC *video_codec_rectfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
-                                              video_pixel64_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
+(LIBVIDEO_GFX_FCC *video_codec_rectfill64_t)(__byte_t *__restrict __line, video_coord_t __x, __size_t __stride,
+                                             video_pixel64_t __pixel, video_dim_t __size_x, video_dim_t __size_y);
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
 
@@ -424,8 +425,8 @@ struct video_codec {
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes,
 	 * though this restriction may be omitted by simply using `vc_nalgn' instead. */
 	__ATTR_NONNULL_T((3)) void
-	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
-	                                               struct video_rambuffer_requirements *__restrict __result);
+	(LIBVIDEO_GFX_FCC *vc_rambuffer_requirements)(video_dim_t __size_x, video_dim_t __size_y,
+	                                              struct video_rambuffer_requirements *__restrict __result);
 
 	video_codec_pixel2color_t   vc_pixel2color;   /* Convert between color and pixel values. */
 	video_codec_color2pixel_t   vc_color2pixel;   /* ... */
@@ -470,29 +471,29 @@ struct video_codec {
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t __codec);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_CONST __ATTR_WUNUSED struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_lookup)(video_codec_t __codec);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+(LIBVIDEO_GFX_FCC *PVIDEO_CODEC_LOOKUP)(video_codec_t __codec);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_CONST __ATTR_WUNUSED struct video_codec const *
+(LIBVIDEO_GFX_FCC video_codec_lookup)(video_codec_t __codec);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_codec_lookup()', and also only returns built-in codecs, but lookup
  * is  done via `specs', as opposed to the  caller having to provide the codec's ID.
  *
  * NOTE: This function doesn't need `vcs_pxsz' or `vcs_cbits' to be initialized. */
 typedef __ATTR_CONST_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict __specs);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_lookup_specs)(struct video_codec_specs const *__restrict __specs);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+(LIBVIDEO_GFX_FCC *PVIDEO_CODEC_LOOKUP_SPECS)(struct video_codec_specs const *__restrict __specs);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) struct video_codec const *
+(LIBVIDEO_GFX_FCC video_codec_lookup_specs)(struct video_codec_specs const *__restrict __specs);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
 /* Anonymous descriptor for a (possibly) dynamically created codec. */
 struct video_codec_handle {
-	__uintptr_t              vch_refcnt; /* Reference counter. */
+	__uintptr_t             vch_refcnt; /* Reference counter. */
 	__ATTR_NONNULL_T((1))
-	void (LIBVIDEO_CODEC_CC *vch_destroy)(struct video_codec_handle *__restrict __self);
+	void (LIBVIDEO_GFX_FCC *vch_destroy)(struct video_codec_handle *__restrict __self);
 	/* Actual implementation data goes here */
 };
 
@@ -521,15 +522,15 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_codec_handle, vch_refcnt, video_codec_han
  * @return: NULL: [ENOMEM] Out-of-memory
  * @return: NULL: [*] Error */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) struct video_codec const *
-(LIBVIDEO_CODEC_CC *PVIDEO_CODEC_FROMSPECS)(struct video_codec_specs const *__restrict __specs,
-                                            /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
-#ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
-LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct video_codec const *
-(LIBVIDEO_CODEC_CC video_codec_fromspecs)(struct video_codec_specs const *__restrict __specs,
-                                          /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
-#endif /* LIBVIDEO_CODEC_WANT_PROTOTYPES */
+(LIBVIDEO_GFX_FCC *PVIDEO_CODEC_FROMSPECS)(struct video_codec_specs const *__restrict __specs,
+                                           /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct video_codec const *
+(LIBVIDEO_GFX_FCC video_codec_fromspecs)(struct video_codec_specs const *__restrict __specs,
+                                         /*out*/ __REF struct video_codec_handle **__restrict __p_handle);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBVIDEO_CODEC_CODECS_H */
+#endif /* !_LIBVIDEO_GFX_CODEC_CODEC_H */

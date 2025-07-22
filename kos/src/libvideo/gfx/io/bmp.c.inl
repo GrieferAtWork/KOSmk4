@@ -52,14 +52,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/types.h>
 
 #include "../buffer.h"
+#include "../codec/codec.h"
+#include "../codec/palette.h"
+#include "../gfx-utils.h"
 #include "../io-utils.h"
 #include "../ramdomain.h"
 
@@ -231,8 +235,8 @@ fix_missing_alpha_channel(struct video_buffer *__restrict self) {
 
 	/* No alpha values -> use RGBX8888 instead.
 	 * Because we're a ram-buffer, we can simply change the codec like this! */
-	me->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBX8888);
-	assert(me->vb_format.vf_codec);
+	me->vb_format.vf_codec = libvideo_codec_lookup(VIDEO_CODEC_RGBX8888);
+	assertf(me->vb_format.vf_codec, "Built-in codec should have been recognized");
 }
 
 struct bmp_masks {
@@ -488,7 +492,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 		out_specs.vcs_gmask = out_specs.vcs_rmask;
 		out_specs.vcs_bmask = out_specs.vcs_rmask;
 
-		result_pal = video_palette_create(biClrUsed);
+		result_pal = libvideo_palette_create(biClrUsed);
 		if unlikely(!result_pal)
 			goto err;
 
@@ -517,7 +521,7 @@ libvideo_buffer_open_bmp(struct video_domain const *__restrict domain_hint,
 				result_pal->vp_pal[i] = VIDEO_COLOR_RGB(r, g, b);
 			}
 		}
-		result_pal = video_palette_optimize(result_pal);
+		result_pal = libvideo_palette_optimize(result_pal);
 	} else {
 		/* Color-mask-driven format */
 		out_specs.vcs_flags = VIDEO_CODEC_FLAG_NORMAL;
@@ -690,11 +694,8 @@ libvideo_buffer_save_bmp(struct video_buffer *__restrict self,
 		} else {
 			preferred_codec_id = VIDEO_CODEC_BGRA8888;
 		}
-		preferred_format.vf_codec = video_codec_lookup(preferred_codec_id);
-		if unlikely(!preferred_format.vf_codec) {
-			errno = EINVAL;
-			return -1;
-		}
+		preferred_format.vf_codec = libvideo_codec_lookup(preferred_codec_id);
+		assertf(preferred_format.vf_codec, "Built-in codec should have been recognized");
 		assert(preferred_format.vf_codec->vc_specs.vcs_bpp > 8);
 		preferred_format.vf_pal = NULL;
 		converted_buffer = libvideo_buffer_convert(self, _libvideo_ramdomain(), &preferred_format);

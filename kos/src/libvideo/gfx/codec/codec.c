@@ -22,11 +22,11 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_CODEC_CODECS_C
-#define GUARD_LIBVIDEO_CODEC_CODECS_C 1
+#ifndef GUARD_LIBVIDEO_GFX_CODEC_CODEC_C
+#define GUARD_LIBVIDEO_GFX_CODEC_CODEC_C 1
 #define _KOS_SOURCE 1
 
-#include "api.h"
+#include "../api.h"
 /**/
 
 #include <hybrid/compiler.h>
@@ -40,7 +40,6 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 
-#include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/param.h>
 
@@ -49,15 +48,16 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <stdint.h>
 #include <string.h>
 
-#include <libvideo/codec/codecs.h>
-#include <libvideo/codec/format.h>
-#include <libvideo/codec/palette.h>
 #include <libvideo/color.h>
+#include <libvideo/gfx/api.h>
+#include <libvideo/gfx/codec/codec.h>
+#include <libvideo/gfx/codec/format.h>
+#include <libvideo/gfx/codec/palette.h>
 #include <libvideo/types.h>
 
 #include "codec-specs.h"
 #include "codec-utils.h"
-#include "codecs.h"
+#include "codec.h"
 #include "converter.h"
 #include "palette.h"
 
@@ -79,59 +79,59 @@ union word16 {
 /************************************************************************/
 /* SUB-8-BPP PIXEL OPERATORS                                            */
 /************************************************************************/
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel1_msb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel1_msb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill1_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill1_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy1_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel1_lsb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel1_lsb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill1_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill1_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy1_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel2_msb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel2_msb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill2_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill2_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy2_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel2_lsb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel2_lsb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill2_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill2_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy2_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel4_msb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel4_msb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill4_msb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill4_msb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy4_msb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC getpixel4_lsb(byte_t const *__restrict line, video_coord_t x);
-PRIVATE NONNULL((1)) void CC setpixel4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
-PRIVATE NONNULL((1)) void CC linefill4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC vertfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
-PRIVATE NONNULL((1)) void CC rectfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 4)) void CC rectcopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC rectmove4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
-PRIVATE NONNULL((1, 3)) void CC linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC getpixel4_lsb(byte_t const *__restrict line, video_coord_t x);
+PRIVATE NONNULL((1)) void FCC setpixel4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel);
+PRIVATE NONNULL((1)) void FCC linefill4_lsb(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC vertfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t num_pixels);
+PRIVATE NONNULL((1)) void FCC rectfill4_lsb(byte_t *__restrict line, video_coord_t x, size_t stride, video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 4)) void FCC rectcopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride, byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC rectmove4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, size_t stride, video_dim_t size_x, video_dim_t size_y);
+PRIVATE NONNULL((1, 3)) void FCC linecopy4_lsb(byte_t *__restrict dst_line, video_coord_t dst_x, byte_t const *__restrict src_line, video_coord_t src_x, video_dim_t size_x);
 
 #ifdef VIDEO_CODEC_HAVE__VC_SETPIXEL3
 #if defined(VIDEO_CODEC_HAVE__VC_SETPIXEL3_DUMMY) && !defined(__INTELLISENSE__)
@@ -190,12 +190,12 @@ DECL_BEGIN
 /* 8BPP PIXEL OPERATORS                                                 */
 /************************************************************************/
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 getpixel8(byte_t const *__restrict line, video_coord_t x) {
 	return ((uint8_t const *)line)[x];
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint8_t *)line)[x] = (uint8_t)pixel;
 }
@@ -222,7 +222,7 @@ rp3_setpixel8(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 #endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 linefill8(byte_t *__restrict line, video_coord_t x,
           video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x;
@@ -230,7 +230,7 @@ linefill8(byte_t *__restrict line, video_coord_t x,
 	memsetb(line, (uint8_t)pixel, num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 vertfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
           video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x;
@@ -241,7 +241,7 @@ vertfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 rectfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
           video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x;
@@ -260,7 +260,7 @@ rectfill8(byte_t *__restrict line, video_coord_t x, size_t stride,
 	}
 }
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 rectcopy8(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
           byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
           video_dim_t size_x, video_dim_t size_y) {
@@ -283,7 +283,7 @@ rectcopy8(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 rectmove8(byte_t *__restrict dst_line, video_coord_t dst_x,
           byte_t const *__restrict src_line, video_coord_t src_x,
           size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -316,7 +316,7 @@ rectmove8(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
           byte_t const *__restrict src_line, video_coord_t src_x,
           video_dim_t size_x) {
@@ -334,12 +334,12 @@ linecopy8(byte_t *__restrict dst_line, video_coord_t dst_x,
 /* 16BPP PIXEL OPERATORS                                                */
 /************************************************************************/
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 getpixel16(byte_t const *__restrict line, video_coord_t x) {
 	return ((uint16_t const *)line)[x];
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint16_t *)line)[x] = (uint16_t)pixel;
 }
@@ -366,7 +366,7 @@ rp3_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 #endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
            video_dim_t size_x, video_dim_t size_y) {
@@ -395,7 +395,7 @@ rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -433,7 +433,7 @@ rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
           byte_t const *__restrict src_line, video_coord_t src_x,
           video_dim_t size_x) {
@@ -443,7 +443,7 @@ linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	memcpyw(dst_line, src_line, size_x);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 linefill16(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
@@ -451,7 +451,7 @@ linefill16(byte_t *__restrict line, video_coord_t x,
 	memsetw(line, (uint16_t)pixel, num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
@@ -466,7 +466,7 @@ vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x << 1;
@@ -499,12 +499,12 @@ rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 #define unaligned_rectmove16 rectmove16
 #define unaligned_linecopy16 linecopy16
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 unaligned_getpixel16(byte_t const *__restrict line, video_coord_t x) {
 	return UNALIGNED_GET16(&((uint16_t const *)line)[x]);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET16(&((uint16_t *)line)[x], (uint16_t)pixel);
 }
@@ -516,7 +516,7 @@ rp3_unaligned_setpixel16(byte_t *__restrict line, video_coord_t x, video_pixel_t
 }
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_linefill16(byte_t *__restrict line, video_coord_t x,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 #ifndef __OPTIMIZE_SIZE__
@@ -535,7 +535,7 @@ unaligned_linefill16(byte_t *__restrict line, video_coord_t x,
 	}
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 1;
@@ -546,7 +546,7 @@ unaligned_vertfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	union word16 data;
@@ -563,7 +563,7 @@ unaligned_rectfill16(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--size_y);
 }
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 unaligned_rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
                      video_dim_t size_x, video_dim_t size_y) {
@@ -587,7 +587,7 @@ unaligned_rectcopy16(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 unaligned_rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -621,7 +621,7 @@ unaligned_rectmove16(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      video_dim_t size_x) {
@@ -640,7 +640,7 @@ unaligned_linecopy16(byte_t *__restrict dst_line, video_coord_t dst_x,
 /* 24BPP PIXEL OPERATORS                                                */
 /************************************************************************/
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 getpixel24(byte_t const *__restrict line, video_coord_t x) {
 	union word32 result;
 	line += x * 3;
@@ -651,7 +651,7 @@ getpixel24(byte_t const *__restrict line, video_coord_t x) {
 	return result.dword;
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	union word32 data;
 	data.dword = pixel;
@@ -692,7 +692,7 @@ rp3_setpixel24(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 #endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 linefill24(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
 #ifdef __OPTIMIZE_SIZE__
@@ -784,7 +784,7 @@ linefill24(byte_t *__restrict line, video_coord_t x,
 #endif /* !__OPTIMIZE_SIZE__ */
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 vertfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	union word32 data;
@@ -799,7 +799,7 @@ vertfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 #ifdef __OPTIMIZE_SIZE__
@@ -1091,7 +1091,7 @@ rectfill24(byte_t *__restrict line, video_coord_t x, size_t stride,
 #endif /* !__OPTIMIZE_SIZE__ */
 }
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 rectcopy24(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
            video_dim_t size_x, video_dim_t size_y) {
@@ -1115,7 +1115,7 @@ rectcopy24(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 rectmove24(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -1150,7 +1150,7 @@ rectmove24(byte_t *__restrict dst_line, video_coord_t dst_x,
 }
 
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            video_dim_t size_x) {
@@ -1168,12 +1168,12 @@ linecopy24(byte_t *__restrict dst_line, video_coord_t dst_x,
 /* 32BPP PIXEL OPERATORS                                                */
 /************************************************************************/
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 getpixel32(byte_t const *__restrict line, video_coord_t x) {
 	return ((uint32_t const *)line)[x];
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	((uint32_t *)line)[x] = (uint32_t)pixel;
 }
@@ -1200,7 +1200,7 @@ rp3_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 #endif /* !USE_INLINE_386_ASSEMBLY_FOR_RP3 */
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 linefill32(byte_t *__restrict line, video_coord_t x,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
@@ -1208,7 +1208,7 @@ linefill32(byte_t *__restrict line, video_coord_t x,
 	memsetl(line, (uint32_t)pixel, num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
@@ -1223,7 +1223,7 @@ vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
            video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	line += x << 2;
@@ -1246,7 +1246,7 @@ rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	}
 }
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
            byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
            video_dim_t size_x, video_dim_t size_y) {
@@ -1275,7 +1275,7 @@ rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -1312,7 +1312,7 @@ rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 		}
 	}
 }
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
            byte_t const *__restrict src_line, video_coord_t src_x,
            video_dim_t size_x) {
@@ -1333,12 +1333,12 @@ linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
 #define unaligned_rectmove32 rectmove32
 #define unaligned_linecopy32 linecopy32
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 unaligned_getpixel32(byte_t const *__restrict line, video_coord_t x) {
 	return UNALIGNED_GET32(&((uint32_t const *)line)[x]);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t pixel) {
 	UNALIGNED_SET32(&((uint32_t *)line)[x], (uint32_t)pixel);
 }
@@ -1350,7 +1350,7 @@ rp3_unaligned_setpixel32(byte_t *__restrict line, video_coord_t x, video_pixel_t
 }
 #endif /* VIDEO_CODEC_HAVE__VC_SETPIXEL3 */
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_linefill32(byte_t *__restrict line, video_coord_t x,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 #ifndef __OPTIMIZE_SIZE__
@@ -1371,7 +1371,7 @@ unaligned_linefill32(byte_t *__restrict line, video_coord_t x,
 	}
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t num_pixels) {
 	line += x << 2;
@@ -1382,7 +1382,7 @@ unaligned_vertfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--num_pixels);
 }
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void FCC
 unaligned_rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
                      video_pixel_t pixel, video_dim_t size_x, video_dim_t size_y) {
 	union word32 data;
@@ -1401,7 +1401,7 @@ unaligned_rectfill32(byte_t *__restrict line, video_coord_t x, size_t stride,
 	} while (--size_y);
 }
 
-PRIVATE NONNULL((1, 4)) void CC
+PRIVATE NONNULL((1, 4)) void FCC
 unaligned_rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t dst_stride,
                      byte_t const *__restrict src_line, video_coord_t src_x, size_t src_stride,
                      video_dim_t size_x, video_dim_t size_y) {
@@ -1425,7 +1425,7 @@ unaligned_rectcopy32(byte_t *__restrict dst_line, video_coord_t dst_x, size_t ds
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 unaligned_rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      size_t stride, video_dim_t size_x, video_dim_t size_y) {
@@ -1459,7 +1459,7 @@ unaligned_rectmove32(byte_t *__restrict dst_line, video_coord_t dst_x,
 	}
 }
 
-PRIVATE NONNULL((1, 3)) void CC
+PRIVATE NONNULL((1, 3)) void FCC
 unaligned_linecopy32(byte_t *__restrict dst_line, video_coord_t dst_x,
                      byte_t const *__restrict src_line, video_coord_t src_x,
                      video_dim_t size_x) {
@@ -1510,7 +1510,7 @@ DEFINE_PIXEL64_IO_WRAPPERS(PRIVATE, MAP_IO, MAP_IO64)
 
 /* 64-bit pixel format support */
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
-LOCAL ATTR_CONST video_channel16_t CC
+LOCAL ATTR_CONST video_channel16_t FCC
 fill_missing_bits16(video_channel16_t value, shift_t miss_bits) {
 	/* TODO: Optimizations */
 #define nmax(n) ((1 << (n)) - 1)
@@ -1520,7 +1520,7 @@ fill_missing_bits16(video_channel16_t value, shift_t miss_bits) {
 #undef nmax
 }
 
-LOCAL ATTR_CONST video_channel16_t CC
+LOCAL ATTR_CONST video_channel16_t FCC
 pext_channel16(video_pixel64_t pixel,
                video_pixel64_t mask,
                shift_t miss_bits) {
@@ -1528,7 +1528,7 @@ pext_channel16(video_pixel64_t pixel,
 	return fill_missing_bits16(result, miss_bits);
 }
 
-LOCAL ATTR_CONST video_pixel64_t CC
+LOCAL ATTR_CONST video_pixel64_t FCC
 pdep_channel16(video_channel16_t chan,
                video_pixel64_t used_mask,
                video_pixel64_t xtra_mask) {
@@ -1579,21 +1579,21 @@ union color_data {
 #define PIXEL32_B3(pixel)       INT16_I8(pixel, 3)
 
 
-INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 identity_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t value) {
 	return value;
 }
 
 #ifdef CONFIG_VIDEO_CODEC_HAVE_PIXEL64
-INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t CC
+INTERN ATTR_CONST WUNUSED NONNULL((1)) video_pixel64_t FCC
 identity_color2pixel64(struct video_format const *__restrict UNUSED(format),
                        video_color64_t value) {
 	return value;
 }
 #endif /* CONFIG_VIDEO_CODEC_HAVE_PIXEL64 */
 
-INTERN ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+INTERN ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 rgbx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return pixel | VIDEO_COLOR_ALPHA_MASK;
@@ -1604,7 +1604,7 @@ DEFINE_PIXEL2COLOR64_WRAPPER32(INTERN ATTR_CONST, rgbx8888_pixel2color, rgbx8888
 #define rgb888_pixel2color   rgbx8888_pixel2color
 #define rgb888_pixel2color64 rgbx8888_pixel2color64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 rgb888_pixel2color(struct video_format const *__restrict UNUSED(format),
                    video_pixel_t pixel) {
 	return (pixel << 8) | VIDEO_COLOR_ALPHA_MASK;
@@ -1616,7 +1616,7 @@ DEFINE_PIXEL2COLOR64_WRAPPER32(PRIVATE ATTR_CONST, rgb888_pixel2color, rgb888_pi
 #define rgb888_color2pixel   identity_color2pixel
 #define rgb888_color2pixel64 identity_color2pixel64
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 rgb888_color2pixel(struct video_format const *__restrict UNUSED(format),
                    video_color_t color) {
 	return color >> 8;
@@ -1626,34 +1626,34 @@ DEFINE_COLOR2PIXEL64_WRAPPER32(PRIVATE ATTR_CONST, rgb888_color2pixel, rgb888_co
 
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 argb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return BIGENDIAN_SHL((uint32_t)pixel, 8) |
 	       BIGENDIAN_SHR((uint32_t)pixel, 24);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 argb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return BIGENDIAN_SHR((uint32_t)color, 8) |
 	       BIGENDIAN_SHL((uint32_t)color, 24);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 xrgb8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return BIGENDIAN_SHL((uint32_t)pixel, 8) | VIDEO_COLOR_ALPHA_MASK;
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 xrgb8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return BIGENDIAN_SHR((uint32_t)color, 8);
 }
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGBA(PIXEL32_B1(pixel),
@@ -1662,7 +1662,7 @@ abgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 	                        PIXEL32_B0(pixel));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_ALPHA(color),
@@ -1671,7 +1671,7 @@ abgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	               VIDEO_COLOR_GET_RED(color));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGB(PIXEL32_B3(pixel),
@@ -1679,7 +1679,7 @@ xbgr8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 	                       PIXEL32_B1(pixel));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return PIXEL32(0 /* undefined */,
@@ -1689,7 +1689,7 @@ xbgr8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 }
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGBA(PIXEL32_B2(pixel),
@@ -1698,7 +1698,7 @@ bgra8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 	                        PIXEL32_B3(pixel));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_BLUE(color),
@@ -1707,7 +1707,7 @@ bgra8888_color2pixel(struct video_format const *__restrict UNUSED(format),
 	               VIDEO_COLOR_GET_ALPHA(color));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
                      video_pixel_t pixel) {
 	return VIDEO_COLOR_RGB(PIXEL32_B2(pixel),
@@ -1715,7 +1715,7 @@ bgrx8888_pixel2color(struct video_format const *__restrict UNUSED(format),
 	                       PIXEL32_B0(pixel));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 bgrx8888_color2pixel(struct video_format const *__restrict UNUSED(format),
                      video_color_t color) {
 	return PIXEL32(VIDEO_COLOR_GET_BLUE(color),
@@ -2075,7 +2075,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, bgrx8888)
 #define fill_missing_bits(c, n)         __fill_missing_bits(c, n)
 #else /* !USE_FAST_COLOR_UPSCALE */
 #if 0 /* Basic impl just to get the logic down (don't use; super-inefficient) */
-LOCAL ATTR_CONST video_channel_t CC
+LOCAL ATTR_CONST video_channel_t FCC
 fill_missing_bits(video_channel_t value, shift_t miss_bits) {
 	video_channel_t result = value << miss_bits;
 	shift_t present_bits = NBBY - miss_bits;
@@ -2109,7 +2109,7 @@ fill_missing_bits(video_channel_t value, shift_t miss_bits) {
 	: _else)
 #endif /* ... */
 
-LOCAL ATTR_CONST video_channel_t CC
+LOCAL ATTR_CONST video_channel_t FCC
 fill_missing_bits(video_channel_t value,
                   shift_t miss_bits) {
 	return _fill_missing_bits(value, miss_bits, (__builtin_unreachable(), -999));
@@ -2520,227 +2520,227 @@ ASSERT_N_TO_COLOR(7, 127, 0xff);
 
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 l1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen1_tocolor(pixel & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 l1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getlumen1(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 l2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen2_tocolor(pixel & 0x3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 l2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getlumen2(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 l4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen4_tocolor(pixel & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 l4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getlumen4(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 l8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return VIDEO_COLOR_ALPHA_MASK | lumen8_tocolor(pixel & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 l8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getlumen8(color);
 }
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 a1_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha1_tocolor(pixel & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 a1_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getalpha1(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 a2_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha2_tocolor(pixel & 0x3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 a2_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getalpha2(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 a4_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha4_tocolor(pixel & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 a4_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getalpha4(color);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 a8_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha8_tocolor(pixel & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 a8_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return color_getalpha8(color);
 }
 
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen1_tocolor((pixel >> 1) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen1(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la11_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen1_tocolor((pixel) & 1) |
 	       alpha1_tocolor((pixel >> 1) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la11_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen1(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha2_tocolor((pixel) & 3) |
 	       lumen2_tocolor((pixel >> 2) & 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha2(color)) |
 	       ((video_pixel_t)color_getlumen2(color) << 2);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la22_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen2_tocolor((pixel) & 3) |
 	       alpha2_tocolor((pixel >> 2) & 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la22_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen2(color)) |
 	       ((video_pixel_t)color_getalpha2(color) << 2);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al13_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen3_tocolor((pixel >> 1) & 7);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al13_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen3(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la31_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen3_tocolor((pixel) & 7) |
 	       alpha1_tocolor((pixel >> 3) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la31_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen3(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha4_tocolor((pixel) & 0xf) |
 	       lumen4_tocolor((pixel >> 4) & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha4(color)) |
 	       ((video_pixel_t)color_getlumen4(color) << 4);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la44_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen4_tocolor((pixel) & 0xf) |
 	       alpha4_tocolor((pixel >> 4) & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la44_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen4(color)) |
 	       ((video_pixel_t)color_getalpha4(color) << 4);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al17_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       lumen7_tocolor((pixel >> 1) & 127);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al17_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getlumen7_shl1(color));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la71_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen7_tocolor((pixel) & 127) |
 	       alpha1_tocolor((pixel >> 7) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la71_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen7(color)) |
 	       ((video_pixel_t)color_getalpha1_shl7(color));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 al88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return alpha8_tocolor((pixel) & 0xff) |
 	       lumen8_tocolor((pixel >> 8) & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 al88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getalpha8(color)) |
 	       ((video_pixel_t)color_getlumen8(color) << 8);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 la88_pixel2color(struct video_format const *__restrict UNUSED(format), video_pixel_t pixel) {
 	return lumen8_tocolor((pixel) & 0xff) |
 	       alpha8_tocolor((pixel >> 8) & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 la88_color2pixel(struct video_format const *__restrict UNUSED(format), video_color_t color) {
 	return ((video_pixel_t)color_getlumen8(color)) |
 	       ((video_pixel_t)color_getalpha8(color) << 8);
@@ -2772,7 +2772,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 /* Cross-byte pixel format coverters */
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBA(name, datatype, union_type,     \
                                                          r_bits, g_bits, b_bits, a_bits) \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                             \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                             \
 	name##_color2pixel(struct video_format const *__restrict UNUSED(format),             \
 	                   video_color_t color) {                                            \
 		union_type px;                                                                   \
@@ -2782,7 +2782,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.a = color_getalpha##a_bits(color);                                            \
 		return px.data;                                                                  \
 	}                                                                                    \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                             \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                             \
 	name##_pixel2color(struct video_format const *__restrict UNUSED(format),             \
 	                   video_pixel_t pixel) {                                            \
 		union_type px;                                                                   \
@@ -2796,7 +2796,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGBX(name, datatype, union_type, \
                                                          r_bits, g_bits, b_bits)     \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                         \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                         \
 	name##_color2pixel(struct video_format const *__restrict UNUSED(format),         \
 	                   video_color_t color) {                                        \
 		union_type px;                                                               \
@@ -2806,7 +2806,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.x = 0;                                                                    \
 		return px.data;                                                              \
 	}                                                                                \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                         \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                         \
 	name##_pixel2color(struct video_format const *__restrict UNUSED(format),         \
 	                   video_pixel_t pixel) {                                        \
 		union_type px;                                                               \
@@ -2820,7 +2820,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 
 #define DEFINE_FORMAT_CONVERTER_WITH_BITFIELD_UNION_RGB(name, datatype, union_type, \
                                                         r_bits, g_bits, b_bits)     \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC                        \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC                        \
 	name##_color2pixel(struct video_format const *__restrict UNUSED(format),        \
 	                   video_color_t color) {                                       \
 		union_type px;                                                              \
@@ -2829,7 +2829,7 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_CONST, la88)
 		px.b = color_getblue##b_bits(color);                                        \
 		return px.data;                                                             \
 	}                                                                               \
-	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC                        \
+	PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC                        \
 	name##_pixel2color(struct video_format const *__restrict UNUSED(format),        \
 	                   video_pixel_t pixel) {                                       \
 		union_type px;                                                              \
@@ -3084,7 +3084,7 @@ DEFINE_FORMAT_CONVERTER_RGBX(xbgr2222, uint8_t, 2, 2, 2, (
 
 
 
-INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+INTERN ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pal_pixel2color(struct video_format const *__restrict format,
                 video_pixel_t pixel) {
 	struct video_palette *pal = format->vf_pal;
@@ -3094,7 +3094,7 @@ pal_pixel2color(struct video_format const *__restrict format,
 #define pal_color2pixel(format, color) \
 	video_palette_getpixel(format->vf_pal, color)
 INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
-(CC pal_color2pixel)(struct video_format const *__restrict format,
+(FCC pal_color2pixel)(struct video_format const *__restrict format,
                      video_color_t color) {
 	return video_palette_getpixel(format->vf_pal, color);
 }
@@ -3120,145 +3120,145 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t
 #define color_getpalet7(v) color_getpaletN(v, 0x7f)
 #define color_getpalet8(v) color_getpaletN(v, 0xff)
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap11_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet1_tocolor((pixel >> 1) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap11_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet1(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa11_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet1_tocolor((pixel) & 1) |
 	       alpha1_tocolor((pixel >> 1) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa11_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet1(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap22_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha2_tocolor((pixel) & 3) |
 	       palet2_tocolor((pixel >> 2) & 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap22_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha2(color)) |
 	       ((video_pixel_t)color_getpalet2(color) << 2);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa22_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet2_tocolor((pixel) & 3) |
 	       alpha2_tocolor((pixel >> 2) & 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa22_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet2(color)) |
 	       ((video_pixel_t)color_getalpha2(color) << 2);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap13_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet3_tocolor((pixel >> 1) & 7);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap13_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet3(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa31_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet3_tocolor((pixel) & 7) |
 	       alpha1_tocolor((pixel >> 3) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa31_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet3(color)) |
 	       ((video_pixel_t)color_getalpha1(color) << 3);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap44_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha4_tocolor((pixel) & 0xf) |
 	       palet4_tocolor((pixel >> 4) & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap44_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha4(color)) |
 	       ((video_pixel_t)color_getpalet4(color) << 4);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa44_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet4_tocolor((pixel) & 0xf) |
 	       alpha4_tocolor((pixel >> 4) & 0xf);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa44_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet4(color)) |
 	       ((video_pixel_t)color_getalpha4(color) << 4);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap17_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha1_tocolor((pixel) & 1) |
 	       palet7_tocolor((pixel >> 1) & 127);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap17_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha1(color)) |
 	       ((video_pixel_t)color_getpalet7(color) << 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa71_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet7_tocolor((pixel) & 127) |
 	       alpha1_tocolor((pixel >> 7) & 1);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa71_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet7(color)) |
 	       ((video_pixel_t)color_getalpha1_shl7(color));
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 ap88_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return alpha8_tocolor((pixel) & 0xff) |
 	       palet8_tocolor((pixel >> 8) & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 ap88_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getalpha8(color)) |
 	       ((video_pixel_t)color_getpalet8(color) << 8);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_color_t FCC
 pa88_pixel2color(struct video_format const *__restrict format, video_pixel_t pixel) {
 	return palet8_tocolor((pixel) & 0xff) |
 	       alpha8_tocolor((pixel >> 8) & 0xff);
 }
 
-PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) video_pixel_t FCC
 pa88_color2pixel(struct video_format const *__restrict format, video_color_t color) {
 	return ((video_pixel_t)color_getpalet8(color)) |
 	       ((video_pixel_t)color_getalpha8(color) << 8);
@@ -3296,49 +3296,49 @@ DEFINE_PIXEL64_WRAPPERS(PRIVATE ATTR_PURE, pa88)
 
 
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer32_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer24_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 3;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer16_requirements(video_dim_t size_x, video_dim_t size_y,
                       struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x * 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer8_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = size_x;
 	result->vbs_bufsize = size_y * size_x;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer4_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 1) / 2;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer2_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 3) / 4;
 	result->vbs_bufsize = size_y * result->vbs_stride;
 }
 
-INTERN NONNULL((3)) void CC
+INTERN NONNULL((3)) void FCC
 buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
                      struct video_rambuffer_requirements *__restrict result) {
 	result->vbs_stride  = (size_x + 7) / 8;
@@ -3348,7 +3348,7 @@ buffer1_requirements(video_dim_t size_x, video_dim_t size_y,
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported.
  * Don't declare as  ATTR_CONST; in  PIC-mode, needs  to do  one-time-init of  globals! */
-INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *CC
+INTERN /*ATTR_CONST*/ WUNUSED struct video_codec const *FCC
 libvideo_codec_lookup(video_codec_t codec) {
 #define CASE_CODEC_AL1(codec, specs, rambuffer_requirements,        \
                        getpixel, setpixel, rectcopy, rectmove,      \
@@ -4899,7 +4899,7 @@ libvideo_codec_lookup(video_codec_t codec) {
 
 
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_pal_pixel2color(struct video_format const *__restrict format,
                      video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
@@ -4907,7 +4907,7 @@ pext_pal_pixel2color(struct video_format const *__restrict format,
 	return pal_pixel2color(format, pixl);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_pal_color2pixel(struct video_format const *__restrict format,
                      video_color_t color) {
 	video_pixel_t pixl = pal_color2pixel(format, color);
@@ -4915,7 +4915,7 @@ pdep_pal_color2pixel(struct video_format const *__restrict format,
 	return PDEP(pixl, mask);
 }
 
-LOCAL ATTR_CONST video_channel_t CC
+LOCAL ATTR_CONST video_channel_t FCC
 pext_channel(video_pixel_t pixel,
              video_pixel_t mask,
              shift_t miss_bits) {
@@ -4923,7 +4923,7 @@ pext_channel(video_pixel_t pixel,
 	return fill_missing_bits(result, miss_bits);
 }
 
-LOCAL ATTR_CONST video_pixel_t CC
+LOCAL ATTR_CONST video_pixel_t FCC
 pdep_channel(video_channel_t chan,
              video_pixel_t used_mask,
              video_pixel_t xtra_mask) {
@@ -4937,7 +4937,7 @@ pdep_channel(video_channel_t chan,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_pal_pixel2color__withalpha(struct video_format const *__restrict format,
                                 video_pixel_t pixel) {
 	struct video_codec_custom const *codec;
@@ -4950,7 +4950,7 @@ pext_pal_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pal_pixel2color__withalpha(struct video_format const *__restrict format,
                            video_pixel_t pixel) {
 	struct video_codec_custom const *codec;
@@ -4963,7 +4963,7 @@ pal_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pal_color2pixel__withalpha(struct video_format const *__restrict format,
                            video_color_t color) {
 	video_pixel_t result;
@@ -4976,7 +4976,7 @@ pal_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_pal_color2pixel__withalpha(struct video_format const *__restrict format,
                                 video_color_t color) {
 	video_pixel_t result;
@@ -4991,7 +4991,7 @@ pdep_pal_color2pixel__withalpha(struct video_format const *__restrict format,
 
 
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray4_pixel2color(struct video_format const *__restrict format,
                        video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
@@ -4999,7 +4999,7 @@ pext_gray4_pixel2color(struct video_format const *__restrict format,
 	return l2_pixel2color(format, pixl);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray4_color2pixel(struct video_format const *__restrict format,
                        video_color_t color) {
 	video_pixel_t pixl = l2_color2pixel(format, color);
@@ -5007,7 +5007,7 @@ pdep_gray4_color2pixel(struct video_format const *__restrict format,
 	return PDEP(pixl, mask);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray16_pixel2color(struct video_format const *__restrict format,
                         video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
@@ -5015,7 +5015,7 @@ pext_gray16_pixel2color(struct video_format const *__restrict format,
 	return l4_pixel2color(format, pixl);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray16_color2pixel(struct video_format const *__restrict format,
                         video_color_t color) {
 	video_pixel_t pixl = l4_color2pixel(format, color);
@@ -5023,7 +5023,7 @@ pdep_gray16_color2pixel(struct video_format const *__restrict format,
 	return PDEP(pixl, mask);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray256_pixel2color(struct video_format const *__restrict format,
                          video_pixel_t pixel) {
 	video_pixel_t mask = format->vf_codec->vc_specs.vcs_rmask;
@@ -5031,7 +5031,7 @@ pext_gray256_pixel2color(struct video_format const *__restrict format,
 	return l8_pixel2color(format, pixl);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray256_color2pixel(struct video_format const *__restrict format,
                          video_color_t color) {
 	video_pixel_t pixl = l8_color2pixel(format, color);
@@ -5041,7 +5041,7 @@ pdep_gray256_color2pixel(struct video_format const *__restrict format,
 
 
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 gray2_pixel2color__withalpha(struct video_format const *__restrict format,
                              video_pixel_t pixel) {
 	video_color_t result;
@@ -5055,7 +5055,7 @@ gray2_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 gray2_color2pixel__withalpha(struct video_format const *__restrict format,
                              video_color_t color) {
 	video_pixel_t result;
@@ -5068,7 +5068,7 @@ gray2_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 gray4_pixel2color__withalpha(struct video_format const *__restrict format,
                              video_pixel_t pixel) {
 	video_color_t result;
@@ -5082,7 +5082,7 @@ gray4_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray4_pixel2color__withalpha(struct video_format const *__restrict format,
                                   video_pixel_t pixel) {
 	video_color_t result;
@@ -5096,7 +5096,7 @@ pext_gray4_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 gray4_color2pixel__withalpha(struct video_format const *__restrict format,
                              video_color_t color) {
 	video_pixel_t result;
@@ -5109,7 +5109,7 @@ gray4_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray4_color2pixel__withalpha(struct video_format const *__restrict format,
                                   video_color_t color) {
 	video_pixel_t result;
@@ -5122,7 +5122,7 @@ pdep_gray4_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 gray16_pixel2color__withalpha(struct video_format const *__restrict format,
                               video_pixel_t pixel) {
 	video_color_t result;
@@ -5136,7 +5136,7 @@ gray16_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray16_pixel2color__withalpha(struct video_format const *__restrict format,
                                    video_pixel_t pixel) {
 	video_color_t result;
@@ -5150,7 +5150,7 @@ pext_gray16_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 gray16_color2pixel__withalpha(struct video_format const *__restrict format,
                               video_color_t color) {
 	video_pixel_t result;
@@ -5163,7 +5163,7 @@ gray16_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray16_color2pixel__withalpha(struct video_format const *__restrict format,
                                    video_color_t color) {
 	video_pixel_t result;
@@ -5176,7 +5176,7 @@ pdep_gray16_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 gray256_pixel2color__withalpha(struct video_format const *__restrict format,
                                video_pixel_t pixel) {
 	video_color_t result;
@@ -5190,7 +5190,7 @@ gray256_pixel2color__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_gray256_pixel2color__withalpha(struct video_format const *__restrict format,
                                     video_pixel_t pixel) {
 	video_color_t result;
@@ -5204,7 +5204,7 @@ pext_gray256_pixel2color__withalpha(struct video_format const *__restrict format
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 gray256_color2pixel__withalpha(struct video_format const *__restrict format,
                                video_color_t color) {
 	video_pixel_t result;
@@ -5217,7 +5217,7 @@ gray256_color2pixel__withalpha(struct video_format const *__restrict format,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_gray256_color2pixel__withalpha(struct video_format const *__restrict format,
                                     video_color_t color) {
 	video_pixel_t result;
@@ -5231,7 +5231,7 @@ pdep_gray256_color2pixel__withalpha(struct video_format const *__restrict format
 }
 
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_rgba_pixel2color(struct video_format const *__restrict format,
                       video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5242,7 +5242,7 @@ pext_rgba_pixel2color(struct video_format const *__restrict format,
 	return VIDEO_COLOR_RGBA(r, g, b, a);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_rgba_color2pixel(struct video_format const *__restrict format,
                       video_color_t color) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5256,7 +5256,7 @@ pdep_rgba_color2pixel(struct video_format const *__restrict format,
 	       pdep_channel(a, codec->vcc_used_amask, codec->vcc_xtra_amask);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 pext_rgb_pixel2color(struct video_format const *__restrict format,
                      video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5266,7 +5266,7 @@ pext_rgb_pixel2color(struct video_format const *__restrict format,
 	return VIDEO_COLOR_RGB(r, g, b);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 pdep_rgb_color2pixel(struct video_format const *__restrict format,
                      video_color_t color) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5285,7 +5285,7 @@ pdep_rgb_color2pixel(struct video_format const *__restrict format,
 #define HAVE_shft_channel_decode_nomiss
 
 #ifdef HAVE_shft_channel_decode
-LOCAL ATTR_CONST video_channel_t CC
+LOCAL ATTR_CONST video_channel_t FCC
 shft_channel_decode(video_pixel_t pixel,
                     video_pixel_t mask,
                     shift_t shft,
@@ -5295,7 +5295,7 @@ shft_channel_decode(video_pixel_t pixel,
 }
 
 #ifdef HAVE_shft_channel_decode_nomiss
-LOCAL ATTR_CONST video_channel_t CC
+LOCAL ATTR_CONST video_channel_t FCC
 shft_channel_decode_nomiss(video_pixel_t pixel,
                            video_pixel_t mask,
                            shift_t shft) {
@@ -5303,7 +5303,7 @@ shft_channel_decode_nomiss(video_pixel_t pixel,
 }
 #endif /* HAVE_shft_channel_decode_nomiss */
 
-LOCAL ATTR_CONST video_pixel_t CC
+LOCAL ATTR_CONST video_pixel_t FCC
 shft_channel_encode(video_channel_t chan,
                     shift_t shft,
                     shift_t miss_bits) {
@@ -5311,7 +5311,7 @@ shft_channel_encode(video_channel_t chan,
 }
 
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 shft_rgb_pixel2color(struct video_format const *__restrict format,
                      video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5321,7 +5321,7 @@ shft_rgb_pixel2color(struct video_format const *__restrict format,
 	return VIDEO_COLOR_RGB(r, g, b);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 shft_rgba_pixel2color(struct video_format const *__restrict format,
                       video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5333,7 +5333,7 @@ shft_rgba_pixel2color(struct video_format const *__restrict format,
 }
 
 #ifdef HAVE_shft_channel_decode_nomiss
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 shft_rgb_pixel2color_nomiss(struct video_format const *__restrict format,
                             video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5343,7 +5343,7 @@ shft_rgb_pixel2color_nomiss(struct video_format const *__restrict format,
 	return VIDEO_COLOR_RGB(r, g, b);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_color_t FCC
 shft_rgba_pixel2color_nomiss(struct video_format const *__restrict format,
                              video_pixel_t pixel) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5355,7 +5355,7 @@ shft_rgba_pixel2color_nomiss(struct video_format const *__restrict format,
 }
 #endif /* HAVE_shft_channel_decode_nomiss */
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 shft_rgb_color2pixel(struct video_format const *__restrict format,
                      video_color_t color) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5367,7 +5367,7 @@ shft_rgb_color2pixel(struct video_format const *__restrict format,
 	       shft_channel_encode(b, codec->vcc_shft_bmask, codec->vcc_miss_bbits);
 }
 
-PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_COLD ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t FCC
 shft_rgba_color2pixel(struct video_format const *__restrict format,
                       video_color_t color) {
 	struct video_codec_custom const *codec = (struct video_codec_custom const *)format->vf_codec;
@@ -5430,7 +5430,7 @@ DEFINE_PIXEL2COLOR64_WRAPPER32(PRIVATE ATTR_PURE, shft_rgba_pixel2color_nomiss, 
 
 
 
-LOCAL ATTR_COLD NONNULL((2, 3, 4, 5)) void CC
+LOCAL ATTR_COLD NONNULL((2, 3, 4, 5)) void FCC
 video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, as per codec specs */
                                    video_pixel_t *p_used_mask, /* sub-mask of "spec_mask" of bits encodeable in "video_color_t" */
                                    video_pixel_t *p_xtra_mask, /* sub-mask of "spec_mask" of bits not encodeable in "video_color_t" */
@@ -5465,7 +5465,7 @@ video_codec_custom__init__usedmask(video_pixel_t spec_mask,    /* Channel mask, 
 	}
 }
 
-PRIVATE ATTR_COLD WUNUSED struct video_codec const *CC
+PRIVATE ATTR_COLD WUNUSED struct video_codec const *FCC
 builtin_codec_from_masks(video_pixel64_t rmask,
                          video_pixel64_t gmask,
                          video_pixel64_t bmask,
@@ -5509,7 +5509,7 @@ builtin_codec_from_masks(video_pixel64_t rmask,
 	return result;
 }
 
-PRIVATE ATTR_COLD ATTR_CONST WUNUSED bool CC
+PRIVATE ATTR_COLD ATTR_CONST WUNUSED bool FCC
 is_8bit_aligned(video_pixel64_t mask) {
 	return mask == UINT32_C(0x000000ff) ||
 	       mask == UINT32_C(0x0000ff00) ||
@@ -5538,7 +5538,7 @@ is_8bit_aligned(video_pixel64_t mask) {
  *
  * @return: true:  Success -- all fields initialized
  * @return: false: Failure -- codec cannot be represented */
-INTERN ATTR_COLD NONNULL((1)) bool CC
+INTERN ATTR_COLD NONNULL((1)) bool FCC
 libvideo_codec_populate_custom(struct video_codec_custom *__restrict self,
                                bool populate_noalign) {
 	self->vc_codec = VIDEO_CODEC_CUSTOM;
@@ -6122,4 +6122,4 @@ DEFINE_PUBLIC_ALIAS(video_codec_lookup, libvideo_codec_lookup);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_CODEC_CODECS_C */
+#endif /* !GUARD_LIBVIDEO_GFX_CODEC_CODEC_C */

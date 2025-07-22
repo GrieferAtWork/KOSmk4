@@ -142,25 +142,19 @@ BEGIN
 		DEFINE_SIMPLE_LIBRARY("libkernel32", USELIB("libdl") USELIB("libdl-pe"))
 	}
 
-	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };
-		SET_OUTPUT_LIBDLL("libvideo-codec")
-		SOURCE({ "libvideo/codec/*.c" })
-	END
-
 	BEGIN GROUP("libs.libvideo-gfx") { COMPILE, LINK, ARCHIVE, MCOPY };
 		SET_OUTPUT_LIBDLL("libvideo-gfx")
-		USELIB("libvideo-codec")
 		LD_FLAGS({ "-fini=libvideo_gfx_fini" })
 		SOURCE({
 			"libvideo/gfx/*.c",
 			"libvideo/gfx/fonts/*.c",
+			"libvideo/gfx/codec/*.c",
 			"libvideo/gfx/buffer/*.c",
 		})
 	END
 
 	BEGIN GROUP("libs.libvideo-compositor") { COMPILE, LINK, ARCHIVE, MCOPY };
 		SET_OUTPUT_LIBDLL("libvideo-compositor")
-		USELIB("libvideo-codec")
 		USELIB("libvideo-gfx")
 		SOURCE({
 			"libvideo/compositor/*.c",
@@ -169,7 +163,6 @@ BEGIN
 
 	BEGIN GROUP("libs.libvideo-driver") { COMPILE, LINK, ARCHIVE, MCOPY };
 		SET_OUTPUT_LIBDLL("libvideo-driver")
-		USELIB("libvideo-codec")
 		USELIB("libvideo-gfx")
 		SOURCE({
 			"libvideo/driver/*.c",
