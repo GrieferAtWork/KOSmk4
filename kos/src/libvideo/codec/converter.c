@@ -314,6 +314,8 @@ initconv_from_p(struct video_converter *__restrict self) {
 		/* Precalculate pixel conversion map */
 		video_pixel_t srpxl;
 		struct video_format dstfmt = self->vcv_to;
+		/* TODO: This sort of lookup-based pixel conversion also works
+		 *       for  any non-palette-based pixel format with <= 8bpp! */
 		for (srpxl = 0; srpxl < srcpal->vp_cnt; ++srpxl) {
 			video_color_t color = srcpal->vp_pal[srpxl];
 			video_pixel_t dspxl = video_format_color2pixel(&dstfmt, color);

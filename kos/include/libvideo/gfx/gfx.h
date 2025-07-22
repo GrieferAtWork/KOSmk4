@@ -1059,11 +1059,39 @@ struct video_gfx {
 	 * argument.
 	 */
 //	struct video_palette *vx_rdpalette; /* [0..1][(!= NULL) == (vx_buffer->vb_format.vf_pal != NULL)][const] Palette used for color reads and bitblit sources */
-	gfx_blendmode_t      vx_blend;    /* [const] Blending mode. */
-	video_gfx_flag_t     vx_flags;    /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	gfx_blendmode_t      vx_blend;    /* Blending mode. */
+	video_gfx_flag_t     vx_flags;    /* Additional rendering flags (Set of `VIDEO_GFX_F*'). */
+	/* TODO: Get rid of "vx_colorkey":
+	 * - Color keys must be represented as `video_pixel_t'
+	 * - Color keys must be defined by `video_buffer' (somehow?)
+	 * - Color keys only become relevant for `struct video_blitter[3]'
+	 *
+	 * TODO: There needs to be another intermediate layer between  `struct video_buffer'
+	 *       and `struct video_gfx': `struct video_surface'. This layer then defines all
+	 *       the runtime changeable attributes of a video buffer:
+	 * >> struct video_palette *vs_palette;  // [0..1] Color palette for use with `vs_buffer' (keep at offset=0, for faster pixel<=>color conversion)
+	 * >> struct video_buffer  *vs_buffer;   // [1..1][const] Linked buffer
+	 * >> video_pixel_t         vs_colorkey; // [valid_if(vs_flags & VIDEO_SURFACE_F_COLORKEY)] Color key
+	 * >> uint32_t              vs_flags;    // Set of `VIDEO_SURFACE_F_*'
+	 *
+	 * This structure is  managed by the  user on the  stack, just like  `video_gfx',
+	 * and  as a matter of fact, `video_gfx'  should just contain an inlined instance
+	 * of  this structure. This  structure is then passed  to codecs for pixel2color,
+	 * instead of `struct video_format', preventing the need for an extra indirection
+	 * when GFX wants  to access pixel  data, and also  allowing `vs_flags' above  to
+	 * also contain `vx_flags' of the GFX context.
+	 *
+	 * This way, `struct video_buffer' can easily define [const] default values for
+	 * stuff like palette or color-key, while still allowing the user to operate on
+	 * the buffer using non-default values for all of these.
+	 *
+	 * When the palette/color-key of the `video_surface' embedded within `video_gfx'
+	 * is changed, `VIDEO_GFX_UPDATE_PALETTE' and `VIDEO_GFX_UPDATE_COLOR_KEY'  must
+	 * be used to propagate such changes to the driver.
+	 */
 	video_color_t        vx_colorkey; /* [const] Transparent color key (or any color with alpha=0 when disabled). */
 #define _VIDEO_GFX_N_DRIVER 20
-	void *_vx_driver[_VIDEO_GFX_N_DRIVER];   /* [?..?] Driver-specific graphics data. */
+	void *_vx_driver[_VIDEO_GFX_N_DRIVER]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
 public:
